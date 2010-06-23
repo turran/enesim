@@ -26,6 +26,35 @@ typedef struct _Enesim_Equanime_Pool
 	Equanime *equ;
 	Equ_Host *host;
 } Enesim_Equanime_Pool;
+/*============================================================================*
+ *                                  Local                                     *
+ *============================================================================*/
+static void * _surface_new(Enesim_Pool *p,
+		Enesim_Backend be, Enesim_Format f,
+		int w, int h)
+{
+	Enesim_Equanime_Pool *pool = (Enesim_Eina_Pool *)p;
+	Equ_Format fmt;
+	Equ_Surface *s;
+
+	s = equ_host_surface_get(pool->equ, pool->host, w, h, fmt, EQU_SURFACE_SHARED);
+
+	return s;
+}
+
+static void _surface_free(Enesim_Pool *p,
+		void *data)
+{
+	Enesim_Equanime_Pool *pool = (Enesim_Eina_Pool *)p;
+
+}
+
+static void _free(Enesim_Pool *p)
+{
+	Enesim_Equanime_Pool *pool = (Enesim_Equanime_Pool *)p;
+
+	free(pool);
+}
 
 EAPI Enesim_Pool * enesim_pool_equanime_get(Equanime *eq, Equ_Host *h)
 {

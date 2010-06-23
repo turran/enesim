@@ -38,7 +38,7 @@ static void * _surface_new(Enesim_Pool *p,
 	if (be != ENESIM_BACKEND_SOFTWARE)
 		return NULL;
 
-	bytes = enesim_format_bytes_calc(f, w, h);
+	bytes = enesim_format_size_get(f, w, h);
 	data = eina_mempool_malloc(pool->mp, bytes);
 
 	return data;
@@ -71,6 +71,9 @@ EAPI Enesim_Pool * enesim_pool_eina_get(Eina_Mempool *mp)
 
 	pool = calloc(1, sizeof(Enesim_Eina_Pool));
 	pool->mp = mp;
+	pool->pool.data_alloc = _surface_new;
+	pool->pool.data_free = _surface_free;
+	pool->pool.data_free = _free;
 
 	return &pool->pool;
 }

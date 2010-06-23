@@ -37,13 +37,14 @@ EAPI int enesim_init(void)
 		 * get the cpuid for this
 		 */
 		eina_init();
+		enesim_surface_init();
 		enesim_compositor_init();
 		enesim_converter_init();
 #ifdef EFL_HAVE_MMX
-		EINA_ERROR_PINFO("MMX Drawer available\n");
+		//EINA_ERROR_PINFO("MMX Drawer available\n");
 #endif
 #ifdef EFL_HAVE_SSE2
-		EINA_ERROR_PINFO("SSE2 Drawer available\n");
+		//EINA_ERROR_PINFO("SSE2 Drawer available\n");
 #endif
 	}
 	return _init;
@@ -55,6 +56,7 @@ EAPI int enesim_init(void)
  */
 EAPI void enesim_shutdown(void)
 {
+	enesim_surface_shutdown();
 	enesim_compositor_shutdown();
 	enesim_converter_shutdown();
 	eina_shutdown();
@@ -93,7 +95,7 @@ EAPI const char * enesim_format_name_get(Enesim_Format f)
  * @param w The width
  * @param h The height
  */
-EAPI size_t enesim_format_bytes_calc(Enesim_Format f, uint32_t w, uint32_t h)
+EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h)
 {
 	switch (f)
 	{
@@ -109,4 +111,9 @@ EAPI size_t enesim_format_bytes_calc(Enesim_Format f, uint32_t w, uint32_t h)
 		return 0;
 
 	}
+}
+
+EAPI size_t enesim_format_pitch_get(Enesim_Format fmt, uint32_t w)
+{
+	return enesim_format_size_get(fmt, w, 1);
 }

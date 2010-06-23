@@ -41,12 +41,17 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	uint32_t color[2] = { s->color1, s->color2};
 	uint32_t *end = dst + len;
 	int sy;
+	Eina_F16p16 yy, xx;
 
 	/* translate to the origin */
-	y -= s->base.oy;
-	x -= s->base.ox;
+#if 1
+	x -= r->ox;
+	y -= r->oy;
+#else
+	renderer_identity_setup(r, x, y, &xx, &yy);
+#endif
 	/* normalize the modulo */
-	sy = (y % h2);
+	sy = ((y  >> 16) % h2);
 	if (sy < 0)
 	{
 		sy += h2;
@@ -62,7 +67,11 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 		int sx;
 		uint32_t p0;
 
+#if 1
 		sx = (x % w2);
+#else
+		sx = ((xx >> 16) % w2);
+#endif
 		if (sx < 0)
 		{
 			sx += w2;
@@ -77,7 +86,11 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 			p0 = color[1];
 		}
 		*dst++ = p0;
+#if 1
 		x++;
+#else
+		xx += (1 << 16);
+#endif
 	}
 }
 

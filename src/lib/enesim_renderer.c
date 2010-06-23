@@ -112,6 +112,8 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	uint32_t *ddata;
 	int stride;
 	Enesim_Format dfmt;
+	Eina_F16p16 ox;
+	Eina_F16p16 oy;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
@@ -127,6 +129,9 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		h = clip->h;
 	}
 
+	ox = eina_f16p16_int_from(r->ox);
+	oy = eina_f16p16_int_from(r->oy);
+
 	dfmt = enesim_surface_format_get(s);
 	ddata = enesim_surface_data_get(s);
 	stride = enesim_surface_stride_get(s);
@@ -137,8 +142,14 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	{
 		while (h--)
 		{
+#if 1
 			enesim_renderer_span_fill(r, x, y, w, ddata);
 			y++;
+#else
+			enesim_renderer_span_fill(r, ox, oy, w, ddata);
+			oy += (1 << 16);
+
+#endif
 			ddata += stride;
 		}
 	}
@@ -152,10 +163,15 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		fdata = alloca(clip->w * sizeof(uint32_t));
 		while (h--)
 		{
+#if 1
 			enesim_renderer_span_fill(r, x, y, w, fdata);
+			y++;
+#else
+			enesim_renderer_span_fill(r, ox, oy, w, ddata);
+			oy += (1 << 16);
+#endif
 			/* compose the filled and the destination spans */
 			span(ddata, w, fdata, color, NULL);
-			y++;
 			ddata += stride;
 		}
 	}

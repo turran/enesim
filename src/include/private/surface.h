@@ -35,9 +35,11 @@ struct _Enesim_Surface
 	void *data;
 	Enesim_Format format;
 	Enesim_Backend backend;
-	Enesim_Pool *epool;
-	Eina_Mempool *pool;
+	Enesim_Pool *pool;
 	void *user; /* user provided data */
 };
+
+void enesim_surface_init(void);
+void enesim_surface_shutdown(void);
 
 #endif

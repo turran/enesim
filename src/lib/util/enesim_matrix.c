@@ -1,5 +1,5 @@
 /* ENESIM - Direct Rendering Library
- * Copyright (C) 2007-2008 Jorge Luis Zapata
+ * Copyright (C) 2007-2010 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -404,7 +404,6 @@ EAPI void enesim_matrix_rotate(Enesim_Matrix *m, float rad)
 #else
 	/* normalize the angle between -pi,pi */
 	rad = fmod(rad + M_PI, 2 * M_PI) - M_PI;
-	printf("rad = %g\n", rad);
 	c = _cos(rad);
 	s = _sin(rad);
 #endif

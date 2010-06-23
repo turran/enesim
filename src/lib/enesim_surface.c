@@ -20,6 +20,29 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Enesim_Pool *_sw_backend = NULL;
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+void enesim_surface_init(void)
+{
+	if (!_sw_backend)
+	{
+		Eina_Mempool *emp;
+
+		emp = eina_mempool_add("pass_through", NULL, NULL);
+		if (!emp)
+		{
+		}
+		_sw_backend = enesim_pool_eina_get(emp);
+	}
+}
+
+void enesim_surface_shutdown(void)
+{
+	if (_sw_backend)
+		enesim_pool_free(_sw_backend);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -45,56 +68,14 @@ enesim_surface_new_data_from(int w, int h, void *data)
  * FIXME: To be fixed
  */
 EAPI Enesim_Surface *
-enesim_surface_new_allocator_from(Enesim_Format f, int w, int h, Eina_Mempool *mpool)
-{
-	Enesim_Surface *s;
-	size_t bytes;
-	void *data;
-
-	if (!mpool)
-		return enesim_surface_new(f, w, h);
-
-	switch (f)
-	{
-		case ENESIM_FORMAT_A8:
-		bytes = w * h * sizeof(uint8_t);
-		break;
-
-		case ENESIM_FORMAT_ARGB8888:
-		bytes = w * h * sizeof(uint32_t);
-		break;
-	}
-
-	data = eina_mempool_malloc(mpool, bytes);
-	if (!data)
-	{
-		return NULL;
-	}
-
-	s = calloc(1, sizeof(Enesim_Surface));
-	s->w = w;
-	s->h = h;
-	s->stride = w;
-	s->format = f;
-	s->pool = mpool;
-	s->data = data;
-
-	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
-
-	return s;
-}
-
-/**
- *
- */
-EAPI Enesim_Surface *
-enesim_surface_new2(Enesim_Backend b, Enesim_Format f,
+enesim_surface_new_pool_from(Enesim_Backend b, Enesim_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p)
 {
 	Enesim_Surface *s;
 	void *data;
 
-	if (!p) return NULL;
+	if (!p)
+		return enesim_surface_new(b, f, w, h);
 
 	data = enesim_pool_data_alloc(p, b, f, w, h);
 	if (!data) return NULL;
@@ -104,7 +85,7 @@ enesim_surface_new2(Enesim_Backend b, Enesim_Format f,
 	s->h = h;
 	s->stride = w;
 	s->format = f;
-	s->epool = p;
+	s->pool = p;
 	s->data = data;
 
 	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
@@ -113,26 +94,18 @@ enesim_surface_new2(Enesim_Backend b, Enesim_Format f,
 }
 
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Enesim_Surface *
-enesim_surface_new(Enesim_Format f, int w, int h)
+enesim_surface_new(Enesim_Backend b, Enesim_Format f, int w, int h)
 {
 	Enesim_Surface *s;
 
-	static Eina_Mempool *pthrough = NULL;
+	if (!_sw_backend) return NULL;
+	s = enesim_surface_new_pool_from(b, f, w, h, _sw_backend);
 
-	if (!pthrough)
-	{
-		pthrough = eina_mempool_add("pass_through", NULL, NULL);
-		if (!pthrough)
-		{
-			printf("Error %s\n", eina_error_msg_get(eina_error_get()));	
-			return NULL;
-		}
-	}
-
-	return enesim_surface_new_allocator_from(f, w, h, pthrough);
+	return s;
 }
 /**
  * To be documented
@@ -169,6 +142,16 @@ EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s)
+{
+	ENESIM_MAGIC_CHECK_SURFACE(s);
+	return s->backend;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void
 enesim_surface_delete(Enesim_Surface *s)
 {
@@ -176,7 +159,7 @@ enesim_surface_delete(Enesim_Surface *s)
 
 	if (s->pool)
 	{
-		eina_mempool_free(s->pool, s->data);
+		enesim_pool_data_free(s->pool, s->data);
 	}
 	free(s);
 }
@@ -321,3 +304,5 @@ EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	return s->user;
 }
+
+

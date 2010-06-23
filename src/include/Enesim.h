@@ -51,16 +51,16 @@ extern "C" {
 #endif
 /* core headers */
 #include "enesim_main.h"
-#include "enesim_surface.h"
+#include "enesim_pool.h"
 /* util headers */
 #include "enesim_perlin.h"
 #include "enesim_matrix.h"
 #include "enesim_curve.h"
 /* main subsystems */
+#include "enesim_surface.h"
 #include "enesim_converter.h"
 #include "enesim_compositor.h"
 #include "enesim_rasterizer.h"
-#include "enesim_pool.h"
 #include "enesim_renderer.h"
 
 #ifdef __cplusplus

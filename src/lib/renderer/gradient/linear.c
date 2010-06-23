@@ -120,6 +120,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 	/* get the length of the transformed points */
 	x0 = l->fx1 - l->fx0;
 	y0 = l->fy1 - l->fy0;
+
 	/* we need to use floats because of the limitation of 16.16 values */
 	f = eina_f16p16_float_from(hypot(eina_f16p16_float_to(x0), eina_f16p16_float_to(y0)));
 	f += 32768;
