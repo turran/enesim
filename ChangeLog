@@ -1,5 +1,10 @@
 2010-07-01 jorgeluis.zapata
 
+	* src/lib/enesim_rasterizer.c:
+	Remove the last file
+
+2010-07-01 jorgeluis.zapata
+
 	* configure.ac:
 	* src/include/Enesim.h:
 	* src/include/Makefile.am:
