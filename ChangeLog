@@ -1,3 +1,22 @@
+2010-07-01 jorgeluis.zapata
+
+	* configure.ac:
+	* src/include/Enesim.h:
+	* src/include/Makefile.am:
+	* src/include/enesim_private.h:
+	* src/include/enesim_rasterizer.h:
+	* src/include/private/rasterizer.h:
+	* src/lib/Makefile.am:
+	* src/lib/rasterizer/Makefile.am:
+	* src/lib/rasterizer/circle.c:
+	* src/lib/rasterizer/cpsc.c:
+	* src/lib/rasterizer/kiia.c:
+	* src/lib/rasterizer/kiia.h:
+	* src/lib/rasterizer/kiia16.c:
+	* src/lib/rasterizer/kiia32.c:
+	* src/lib/rasterizer/kiia8.c:
+	Remove the rasterizer code
+
 2010-06-29  jorgeluis.zapata
 
 	* src/lib/renderer/hswitch.c:

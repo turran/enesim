@@ -157,7 +157,6 @@ typedef __m128i sse2_t;
 #include "private/format_argb8888.h"
 #include "private/compositor.h"
 #include "private/matrix.h"
-#include "private/rasterizer.h"
 #include "private/renderer.h"
 #include "private/pool.h"
 #include "private/surface.h"
