@@ -133,8 +133,8 @@ static void _free(Enesim_Renderer *r)
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * Creates a new perlin renderer
+ * @return The renderer
  */
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 {

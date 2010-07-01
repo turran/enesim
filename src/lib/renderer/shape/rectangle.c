@@ -655,8 +655,8 @@ static void _free(Enesim_Renderer *p)
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * Creates a new rectangle renderer
+ * @return The new renderer 
  */
 EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 {

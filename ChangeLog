@@ -1,0 +1,1787 @@
+2010-06-29  jorgeluis.zapata
+
+	* src/lib/renderer/hswitch.c:
+	* src/lib/renderer/importer.c:
+	* src/lib/renderer/perlin.c:
+	* src/lib/renderer/shape/rectangle.c:
+	  More documentation
+
+2010-06-23 10:01  jorgeluis.zapata
+
+	* src/include/Enesim.h, src/include/enesim_main.h,
+	  src/include/enesim_pool.h, src/include/enesim_surface.h,
+	  src/include/private/pool.h, src/include/private/renderer.h,
+	  src/include/private/surface.h, src/lib/enesim_main.c,
+	  src/lib/enesim_renderer.c, src/lib/enesim_surface.c,
+	  src/lib/pool/enesim_eina.c, src/lib/pool/enesim_equanime.c,
+	  src/lib/renderer/checker.c, src/lib/renderer/gradient/linear.c,
+	  src/lib/util/enesim_matrix.c:
+	  Apply pending patch. This adds the pool allocator
+
+2010-04-10 01:46  turran
+
+	* src/lib/converter/rgb888.c:
+	  Of course, dont forget the new files
+
+2010-04-10 01:33  turran
+
+	* Makefile.am, configure.ac, src/include/enesim_converter.h,
+	  src/include/enesim_renderer.h, src/lib/converter/Makefile.am,
+	  src/lib/converter/a8.c, src/lib/converter/argb8888.c,
+	  src/lib/converter/rgb565.c, src/lib/enesim_converter.c,
+	  src/lib/enesim_surface.c, src/lib/renderer/checker.c,
+	  src/lib/renderer/compound.c, src/lib/renderer/filter/dispmap.c,
+	  src/lib/renderer/filter/raddist.c, src/lib/renderer/grid.c,
+	  src/lib/renderer/importer.c, src/lib/renderer/shape/rectangle.c,
+	  src/lib/renderer/stripes.c, src/lib/renderer/surface.c:
+	  Don't compile the examples dir, it is going to be removed
+	  As we need a loader/saver there's no point to redo what
+	  emage already has. Better use it.
+	  Start adding getters to the renderers. This will simplify
+	  the eon integration.
+	  Reduce the functions of renderers to single attributes
+	  for better eon integration
+	  Add rgb888 format to both the converter and the importer
+	  Add channel selection to the displacement map filter
+	  Add projective support to the stripes renderer
+	  Upgrade some copyright dates
+
+2010-02-24 00:24  turran
+
+	* examples/enesim_bench_dispmap.c,
+	  examples/enesim_bench_renderer.c, src/include/enesim_renderer.h,
+	  src/include/private/renderer.h, src/lib/enesim_renderer.c:
+	  Dont export the span_fill(), state_setup() and state_cleanup()
+	  use only the surface_draw() for that
+	  Fix the benchmark to use the exported function only
+
+2010-02-19 01:07  turran
+
+	* configure.ac, src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_main.h, src/include/enesim_private.h,
+	  src/include/private/pool.h, src/include/private/surface.h,
+	  src/lib/Makefile.am, src/lib/enesim_main.c,
+	  src/lib/enesim_pool.c, src/lib/enesim_surface.c,
+	  src/lib/pool/enesim_eina.c:
+	  Add pool support:
+	  A pool is an interface for allocating surface's data
+	  Is not supported on the surface subsystem yet,
+	  but is a start on how enesim should support different backends
+	  on different gfx systems
+
+2010-02-16 00:49  turran
+
+	* src/include/enesim_matrix.h, src/include/enesim_pool.h,
+	  src/include/enesim_surface.h, src/include/private/pool.h,
+	  src/lib/pool, src/lib/pool/Makefile.am,
+	  src/lib/pool/enesim_eina.c, src/lib/pool/enesim_equanime.c,
+	  src/lib/renderer/checker.c, src/lib/renderer/compound.c,
+	  src/lib/renderer/grid.c, src/lib/renderer/stripes.c,
+	  src/lib/renderer/transition.c:
+	  DOCS++
+	  Add some prototypes for the enesim surface pools
+
+2010-01-07 01:11  turran
+
+	* src/include/Enesim.h:
+	  Docs++
+
+2009-12-29 17:03  turran
+
+	* doc/img/renderer_checker.png, doc/img/renderer_template.svg,
+	  examples/enesim_bench_checker.c, src/include/Enesim.h,
+	  src/include/enesim_compositor.h, src/include/enesim_converter.h,
+	  src/include/enesim_main.h, src/include/enesim_matrix.h,
+	  src/include/enesim_rasterizer.h, src/include/enesim_renderer.h,
+	  src/include/enesim_surface.h, src/include/enesim_vector.h,
+	  src/lib/enesim_compositor.c, src/lib/enesim_converter.c,
+	  src/lib/enesim_renderer.c, src/lib/renderer/checker.c,
+	  src/lib/renderer/compound.c, src/lib/renderer/grid.c,
+	  src/lib/renderer/hswitch.c, src/lib/renderer/importer.c,
+	  src/lib/renderer/perlin.c, src/lib/renderer/shape.c,
+	  src/lib/renderer/shape/circle.c,
+	  src/lib/renderer/shape/ellipse.c,
+	  src/lib/renderer/shape/figure.c, src/lib/renderer/shape/path.c,
+	  src/lib/renderer/shape/rectangle.c, src/lib/renderer/stripes.c,
+	  src/lib/renderer/surface.c, src/lib/renderer/transition.c:
+	  Remove more unused headers
+	  Add doxygen templates
+	  Documentation++
+	  Use the benchmark to generate the doc images
+
+2009-12-23 12:01  turran
+
+	* src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_converter.h, src/include/enesim_format.h,
+	  src/include/enesim_main.h, src/include/private/surface.h,
+	  src/lib/Makefile.am, src/lib/enesim_converter.c,
+	  src/lib/enesim_format.c, src/lib/enesim_main.c,
+	  src/lib/enesim_renderer.c, src/lib/enesim_surface.c,
+	  src/lib/renderer/compound.c:
+	  Some cleanup from a pending commit
+	  Remove unneeded format source and header file
+
+2009-10-30 23:56  turran
+
+	* configure.ac, src/lib/vector, src/tool:
+	  The vector subdir and tool are no longer used or compiled, lets
+	  clean this thing
+
+2009-10-28 12:27  turran
+
+	* examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_figure.c,
+	  examples/enesim_bench_grid.c, src/include/enesim_renderer.h,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/grid.c:
+	  Add a grid renderer
+
+2009-10-26 01:03  turran
+
+	* examples/enesim_bench_renderer.c, src/include/enesim_renderer.h,
+	  src/lib/enesim_renderer.c:
+	  Add a span_fill wrapper to the renderers. Now it is easier to
+	  actually draw into a surface
+
+2009-10-25 19:15  turran
+
+	* examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_figure.c,
+	  examples/enesim_bench_path.c, src/include/enesim_renderer.h,
+	  src/lib/renderer/shape/Makefile.am,
+	  src/lib/renderer/shape/circle.c, src/lib/renderer/shape/figure.c,
+	  src/lib/renderer/shape/path.c, src/lib/renderer/surface.c:
+	  Initial version of Jose's code that supports paths and polygons
+	  as renderers
+	  A fix to the surface renderer
+
+2009-09-13 14:42  turran
+
+	* src/include/enesim_matrix.h, src/include/enesim_renderer.h,
+	  src/include/private/renderer.h, src/lib/renderer/Makefile.am,
+	  src/lib/renderer/transition.c, src/lib/util/enesim_matrix.c:
+	  Bring the transition renderer back
+	  Add a fixed matrix multiplication
+
+2009-09-06 17:13  turran
+
+	* src/include/enesim_renderer.h, src/lib/renderer/checker.c,
+	  src/lib/renderer/shape/rectangle.c:
+	  Export the renderer origin_set function
+	  Make the rectangle renderer use it
+	  Remove the origin move on the checker, it is already part of
+	  the renderer's helper functions
+
+2009-09-04 17:55  turran
+
+	* examples/enesim_bench_compositor.c,
+	  examples/enesim_bench_rasterizer.c,
+	  examples/enesim_bench_samples.c, src/include/enesim_compositor.h,
+	  src/include/enesim_main.h, src/include/private/compositor.h,
+	  src/include/private/surface.h, src/lib/compositor/argb8888.c,
+	  src/lib/compositor/argb8888_blend.c, src/lib/enesim_compositor.c,
+	  src/lib/enesim_format.c, src/lib/enesim_surface.c,
+	  src/lib/renderer/compound.c:
+	  Merge alpha flags into the format itself
+	  Simplify the compositor point/span_get function
+	  Add a8 as mask for fill and blend mask_color operations
+	  Update the formats and compositor API
+
+2009-08-28 16:49  turran
+
+	* src/include/private/renderer.h, src/lib/renderer/surface.c:
+	  TODO--
+	  Add an affine transformer on the surface renderer
+
+2009-08-28 10:37  turran
+
+	* examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_compound.c,
+	  src/include/enesim_renderer.h,
+	  src/include/private/format_argb8888.h,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/compound.c,
+	  src/lib/renderer/shape/circle.c:
+	  Add Jose's layered renderer and example
+	  Disable the mmx version of the interp_256, it is giving some fp
+	  exceptions
+	  need to track it down
+	  Upgrade the circle renderer to support not fill renderer, only
+	  color
+
+2009-08-28 10:10  caro
+
+	* src/lib/enesim_surface.c:
+	  use latest eina API
+
+2009-08-26 16:52  turran
+
+	* examples/enesim_bench.c, examples/enesim_bench_gradient_linear.c,
+	  src/include/enesim_renderer.h, src/lib/rasterizer/circle.c,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/circle.c,
+	  src/lib/renderer/dispmap.c, src/lib/renderer/ellipse.c,
+	  src/lib/renderer/filter/Makefile.am,
+	  src/lib/renderer/filter/dispmap.c,
+	  src/lib/renderer/filter/raddist.c,
+	  src/lib/renderer/gradient/linear.c, src/lib/renderer/raddist.c,
+	  src/lib/renderer/rectangle.c, src/lib/renderer/shape/Makefile.am,
+	  src/lib/renderer/shape/circle.c,
+	  src/lib/renderer/shape/ellipse.c,
+	  src/lib/renderer/shape/rectangle.c:
+	  Move some renderers into subdirs
+	  Fix the linear gradient length calculation
+	  Add a mssing magic check
+
+2009-08-25 22:46  turran
+
+	* src/lib/renderer/gradient.c, src/lib/renderer/gradient/linear.c:
+	  Fix the gradient generator
+	  Remove printfs
+
+2009-08-25 22:31  turran
+
+	* examples/enesim_bench_gradient_linear.c,
+	  src/include/enesim_renderer.h, src/include/private/renderer.h,
+	  src/lib/renderer/gradient.c, src/lib/util/enesim_perlin.c:
+	  Add missing file
+	  More work on the gradient
+	  Some tests on the perlin generator
+
+2009-08-25 17:28  turran
+
+	* configure.ac, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_gradient_linear.c,
+	  src/include/enesim_renderer.h,
+	  src/include/private/format_argb8888.h,
+	  src/include/private/renderer.h, src/lib/renderer/Makefile.am,
+	  src/lib/renderer/filter, src/lib/renderer/filter/Makefile.am,
+	  src/lib/renderer/gradient, src/lib/renderer/gradient/Makefile.am,
+	  src/lib/renderer/gradient/linear.c, src/lib/renderer/shape,
+	  src/lib/renderer/shape/Makefile.am:
+	  Fix the interpolation with mmx
+	  Add subdirectories on the renderer dir, it is growing too fast
+	  :)
+	  Initial gradient renderers. Not working yet
+
+2009-08-22 19:32  turran
+
+	* examples/enesim_bench_dispmap.c, examples/enesim_bench_perlin.c,
+	  src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_perlin.h, src/include/enesim_renderer.h,
+	  src/include/private/format_argb8888.h,
+	  src/include/private/rasterizer.h, src/lib/enesim_rasterizer.c,
+	  src/lib/rasterizer/cpsc.c, src/lib/rasterizer/kiia.c,
+	  src/lib/renderer/importer.c, src/lib/renderer/perlin.c,
+	  src/lib/util/enesim_perlin.c:
+	  Split the perlin-noise frequency into x and y frequencies
+	  Make all rasterizers initialize the magic check
+	  Add a header for the exported perlin-noise functions
+	  More format changes
+
+2009-08-21 16:47  turran
+
+	* examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_dispmap.c,
+	  examples/enesim_bench_perlin.c, src/include/enesim_renderer.h,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/perlin.c,
+	  src/lib/util/Makefile.am, src/lib/util/enesim_perlin.c:
+	  Add a perlin-noise renderer: It is a very naive implementation,
+	  still needs
+	  several things to fix.
+	  Update the dispmap benchmark to use a perlin noise renderer as
+	  the map
+	  Make the perlin-noise code be util system, so other renderers
+	  can be done: marble, wood, etc :)
+
+2009-08-21 10:52  turran
+
+	* examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_circle.c, examples/enesim_bench_common.h,
+	  examples/enesim_bench_ellipse.c,
+	  examples/enesim_bench_rasterizer.c,
+	  examples/enesim_bench_rectangle.c, examples/enesim_bench_shape.c,
+	  src/include/enesim_renderer.h, src/include/private/renderer.h,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/checker.c,
+	  src/lib/renderer/circle.c, src/lib/renderer/dispmap.c,
+	  src/lib/renderer/ellipse.c, src/lib/renderer/rectangle.c,
+	  src/lib/renderer/shape.c:
+	  Refactor a little bit the shape renderers
+	  Add benchmarks for the shape renderers
+	  Add common affine/projective coordinate setup
+
+2009-08-19 17:21  turran
+
+	* examples/enesim_bench.c, examples/enesim_bench_hswitch.c,
+	  examples/enesim_bench_renderer.c, src/include/private/renderer.h,
+	  src/lib/renderer/hswitch.c, src/lib/renderer/importer.c,
+	  src/lib/renderer/raddist.c, src/lib/renderer/surface.c:
+	  More cleanup
+	  Make the Horizontal Switch (hswitch) renderer work again
+	  Update the hswitch benchmark
+
+2009-08-19 09:07  turran
+
+	* examples/enesim_bench_renderer.c, src/lib/renderer/raddist.c:
+	  Make the renderer bench compile correctly
+	  The raddist renderer interpolates the pixel vales correctly
+
+2009-08-19 08:56  turran
+
+	* examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_dispmap.c, examples/enesim_bench_raddist.c,
+	  examples/enesim_bench_renderer.c, src/include/enesim_renderer.h,
+	  src/include/private/format_argb8888.h,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/checker.c,
+	  src/lib/renderer/dispmap.c, src/lib/renderer/raddist.c:
+	  Add the displacement map (dispmap) renderer. For identity and
+	  affine matrices
+	  Add the radial distort (raddist) renderer
+	  Add examples of the above
+
+2009-08-18 21:26  turran
+
+	* src/include/Enesim.h, src/include/enesim_converter.h,
+	  src/include/enesim_renderer.h, src/lib/renderer/Makefile.am,
+	  src/lib/renderer/importer.c:
+	  Add the importer renderer
+
+2009-08-18 11:06  turran
+
+	* configure.ac, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_checker.c, examples/enesim_bench_common.h,
+	  examples/enesim_bench_compositor.c, examples/enesim_bench_cpu.c,
+	  examples/enesim_bench_dispmap.c, examples/enesim_bench_drawer.c,
+	  examples/enesim_bench_raddist.c,
+	  examples/enesim_bench_rasterizer.c,
+	  examples/enesim_bench_renderer.c,
+	  examples/enesim_bench_samples.c, examples/enesim_bench_stripes.c,
+	  examples/enesim_bench_transformer.c, examples/enesim_test.c,
+	  examples/enesim_test.h, examples/image.c, examples/png.c,
+	  examples/surface.c, src/include/Enesim.h,
+	  src/include/Makefile.am, src/include/enesim_compositor.h,
+	  src/include/enesim_converter.h, src/include/enesim_cpu.h,
+	  src/include/enesim_dispmap.h, src/include/enesim_drawer.h,
+	  src/include/enesim_main.h, src/include/enesim_matrix.h,
+	  src/include/enesim_operator.h, src/include/enesim_private.h,
+	  src/include/enesim_raddist.h, src/include/enesim_reflector.h,
+	  src/include/enesim_renderer.h, src/include/enesim_repeater.h,
+	  src/include/enesim_rotator.h, src/include/enesim_scaler.h,
+	  src/include/enesim_transformer.h,
+	  src/include/private/compositor.h, src/include/private/cpu.h,
+	  src/include/private/drawer.h,
+	  src/include/private/format_argb8888.h,
+	  src/include/private/rasterizer.h, src/include/private/renderer.h,
+	  src/include/private/transformer.h, src/lib/Makefile.am,
+	  src/lib/compositor, src/lib/compositor/Makefile.am,
+	  src/lib/compositor/argb8888.c,
+	  src/lib/compositor/argb8888_blend.c,
+	  src/lib/converter/Makefile.am, src/lib/converter/a8.c,
+	  src/lib/converter/argb8888.c, src/lib/converter/rgb565.c,
+	  src/lib/cpu, src/lib/dispmap, src/lib/drawer,
+	  src/lib/enesim_compositor.c, src/lib/enesim_converter.c,
+	  src/lib/enesim_cpu.c, src/lib/enesim_dispmap.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_main.c,
+	  src/lib/enesim_operator.c, src/lib/enesim_raddist.c,
+	  src/lib/enesim_rasterizer.c, src/lib/enesim_reflector.c,
+	  src/lib/enesim_renderer.c, src/lib/enesim_repeater.c,
+	  src/lib/enesim_rotator.c, src/lib/enesim_scaler.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/format, src/lib/raddist, src/lib/renderer/Makefile.am,
+	  src/lib/renderer/checker.c, src/lib/renderer/circle.c,
+	  src/lib/renderer/dispmap.c, src/lib/renderer/ellipse.c,
+	  src/lib/renderer/hswitch.c, src/lib/renderer/importer.c,
+	  src/lib/renderer/raddist.c, src/lib/renderer/rectangle.c,
+	  src/lib/renderer/shape.c, src/lib/renderer/stripes.c,
+	  src/lib/scaler, src/lib/transformer,
+	  src/lib/util/enesim_matrix.c, src/tool/enesim_generator_drawer.c:
+	  Remove unused subsystems
+	  Get rid of the operator's indirect rendering
+	  Remove the CPU abstraction
+	  Merge Jose's patch to the renderer subsystem
+	  Add the rasterizer magic check
+	  Add the renderer magic check
+	  Add affine and projective matrix support on the checker
+	  renderer
+	  Move old operators (dispmap, raddist, etc) into skeleton files
+	  under the renderer subsystem
+	  Rename drawer subsystem to compositor for easy understanding of
+	  what it does
+	  Add more TODO renderers (importer, etc).
+	  The converter subsystem now only exports into different pixel
+	  formats, it no longer imports
+	  Version bump =)
+	  
+
+2009-07-31 15:15  turran
+
+	* src/include/enesim_matrix.h, src/include/enesim_renderer.h,
+	  src/include/private/renderer.h, src/lib/enesim_renderer.c,
+	  src/lib/reflector, src/lib/renderer/Makefile.am,
+	  src/lib/renderer/checker.c, src/lib/renderer/circle.c,
+	  src/lib/renderer/ellipse.c, src/lib/renderer/rectangle.c,
+	  src/lib/renderer/sqpattern.c, src/lib/renderer/surface.c,
+	  src/lib/renderer/transition.c, src/lib/repeater, src/lib/rotator:
+	  More Jose's code
+	  Remove unsued operators
+	  Still the renderer interface needs to be cleaned up
+
+2009-07-24 14:57  turran
+
+	* examples/enesim_bench_hswitch.c, src/include/enesim_renderer.h,
+	  src/lib/enesim_surface.c, src/lib/renderer/hswitch.c:
+	  Change the horizontal switch renderer to use renderers instead
+	  of surfaces.
+
+2009-07-23 15:59  turran
+
+	* src/include/enesim_renderer.h, src/include/private/renderer.h,
+	  src/lib/enesim_renderer.c, src/lib/renderer/Makefile.am,
+	  src/lib/renderer/circle.c, src/lib/renderer/ellipse.c,
+	  src/lib/renderer/hswitch.c, src/lib/renderer/rectangle.c,
+	  src/lib/renderer/sqpattern.c, src/lib/renderer/surface.c,
+	  src/lib/renderer/transition.c:
+	  New renderers from Jose: circle, ellipse, rectangle (all with
+	  stroking and fill properties) and a transition renderer.
+	  Add some common renderer parameters, like the x,y offsets
+	  Squared pattern renderer added
+	  Still lots of stuff to fix and finish, but it is a start :)
+
+2009-07-21 17:13  turran
+
+	* src/lib/renderer/hswitch.c:
+	  Use the correct offset on the image at the right
+
+2009-07-20 17:14  turran
+
+	* configure.ac, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_hswitch.c,
+	  examples/enesim_bench_renderer.c, examples/enesim_bench_scaler.c,
+	  src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_context.h, src/include/enesim_primitives.h,
+	  src/include/enesim_private.h, src/include/enesim_rasterizer.h,
+	  src/include/enesim_renderer.h, src/include/private/context.h,
+	  src/include/private/renderer.h, src/lib/Makefile.am,
+	  src/lib/enesim_renderer.c, src/lib/primitives,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/color.c,
+	  src/lib/renderer/hswitch.c, src/lib/renderer/surface.c:
+	  Remove the old primitvie subsystem, we no longer handle that
+	  Put back the renderer API similar to how the rasterizers are
+	  handled
+	  Slow moving operators to renderers where possible
+
+2009-07-16 17:50  turran
+
+	* src/include/enesim_converter.h, src/include/enesim_surface.h,
+	  src/include/private/surface.h, src/lib/enesim_surface.c:
+	  Add more converter formats
+	  Allow creating surfaces from an Eina Mempool
+
+2009-06-28 23:25  turran
+
+	* examples/enesim_bench.c, examples/enesim_bench_rasterizer.c,
+	  src/include/enesim_rasterizer.h,
+	  src/include/private/rasterizer.h, src/lib/enesim_rasterizer.c,
+	  src/lib/rasterizer/Makefile.am, src/lib/rasterizer/circle.c,
+	  src/lib/rasterizer/cpsc.c, src/lib/rasterizer/kiia.c:
+	  Refactor a bit the rasterizers
+	  Add a circle rasterizer
+
+2009-06-28 18:08  turran
+
+	* examples/enesim_bench_dispmap.c:
+	  Add missing file
+
+2009-05-24 19:02  turran
+
+	* src/lib/drawer/argb8888.c, src/lib/drawer/argb8888_blend.c,
+	  src/lib/enesim_drawer.c:
+	  Add pixel_color drawer for blend rop
+
+2009-05-24 11:50  turran
+
+	* src/lib/enesim_dispmap.c:
+	  Missing file again
+
+2009-05-24 11:44  turran
+
+	* src/include/enesim_dispmap.h:
+	  Add missing file
+
+2009-05-21 21:17  turran
+
+	* configure.ac, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_samples.c,
+	  src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_cpu.h, src/include/enesim_main.h,
+	  src/include/enesim_operator.h, src/lib/Makefile.am,
+	  src/lib/cpu/smp.c, src/lib/dispmap, src/lib/dispmap/Makefile.am,
+	  src/lib/dispmap/_fast.c, src/lib/dispmap/argb8888.c,
+	  src/lib/enesim_main.c, src/lib/enesim_operator.c,
+	  src/lib/enesim_raddist.c, src/lib/enesim_rasterizer.c,
+	  src/lib/raddist/_fast.c:
+	  Add a displacement map filter
+
+2009-04-18 11:04  turran
+
+	* src/lib/Makefile.am:
+	  Oops, this is no longer used
+
+2009-04-18 10:49  turran
+
+	* configure.ac, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_raddist.c,
+	  src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_cpu.h, src/include/enesim_main.h,
+	  src/include/enesim_operator.h, src/include/enesim_raddist.h,
+	  src/lib/Makefile.am, src/lib/cpu/smp.c, src/lib/enesim_main.c,
+	  src/lib/enesim_operator.c, src/lib/enesim_raddist.c,
+	  src/lib/raddist, src/lib/raddist/Makefile.am,
+	  src/lib/raddist/_fast.c, src/lib/raddist/argb8888.c:
+	  + Add a radial distort filter, thanks jose! :)
+	  The code is kind of redundant with other parts of enesim but at
+	  least it works, check out the benchmark!
+
+2009-04-15 21:13  turran
+
+	* examples/enesim_bench_transformer.c,
+	  src/include/enesim_transformer.h, src/lib/enesim_transformer.c,
+	  src/lib/transformer/_affine.c, src/lib/transformer/_projective.c:
+	  Export the transformation's API
+	  Fix the transformation algorithms
+	  Improve the transformer benchmark
+
+2009-04-13 23:33  turran
+
+	* examples/image.c, src/include/Makefile.am,
+	  src/include/enesim_converter.h, src/lib/converter/argb8888.c,
+	  src/lib/cpu/smp.c, src/lib/drawer/argb8888.c,
+	  src/lib/enesim_converter.c, src/lib/enesim_operator.c,
+	  src/lib/enesim_surface.c:
+	  Add a to/from converter
+	  Fix the installed headers
+
+2009-04-13 01:36  turran
+
+	* configure.ac, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_transformer.c, src/include/enesim_cpu.h,
+	  src/include/enesim_main.h, src/include/enesim_operator.h,
+	  src/include/enesim_transformer.h, src/lib/Makefile.am,
+	  src/lib/cpu/smp.c, src/lib/enesim_main.c,
+	  src/lib/enesim_operator.c, src/lib/enesim_transformer.c,
+	  src/lib/transformer/Makefile.am, src/lib/transformer/_affine.c,
+	  src/lib/transformer/_argb8888_c.c,
+	  src/lib/transformer/_projective.c,
+	  src/lib/transformer/argb8888.c,
+	  src/lib/transformer/argb8888_affine.c:
+	  Add the 1d transformer. The fixed point representation of the
+	  matrix is no longer cached so now the benchmark is slower.
+
+2009-04-12 21:45  turran
+
+	* TODO, configure.ac, examples/Makefile.am,
+	  examples/enesim_bench.c, examples/enesim_bench_common.h,
+	  examples/enesim_bench_scaler.c, src/include/enesim_cpu.h,
+	  src/include/enesim_scaler.h, src/lib/Makefile.am,
+	  src/lib/cpu/smp.c, src/lib/enesim_main.c,
+	  src/lib/enesim_operator.c, src/lib/enesim_scaler.c,
+	  src/lib/scaler/Makefile.am, src/lib/scaler/scaler.c:
+	  Add the 1d scaler
+
+2009-04-09 19:22  turran
+
+	* Doxyfile, TODO, configure.ac, examples/Makefile.am,
+	  examples/enesim_bench.c, examples/enesim_bench_common.h,
+	  examples/enesim_bench_converter.c, examples/enesim_bench_cpu.c,
+	  examples/enesim_bench_drawer.c, examples/enesim_bench_renderer.c,
+	  examples/enesim_bench_samples.c, examples/enesim_bench_scaler.c,
+	  examples/image.c, src/include/Enesim.h,
+	  src/include/enesim_converter.h, src/include/enesim_cpu.h,
+	  src/include/enesim_curve.h, src/include/enesim_drawer.h,
+	  src/include/enesim_format.h, src/include/enesim_main.h,
+	  src/include/enesim_operator.h, src/include/enesim_private.h,
+	  src/include/enesim_reflector.h, src/include/enesim_renderer.h,
+	  src/include/enesim_repeater.h, src/include/enesim_rotator.h,
+	  src/include/enesim_scaler.h, src/include/enesim_surface.h,
+	  src/include/enesim_transformer.h, src/include/private/cpu.h,
+	  src/include/private/drawer.h, src/include/private/format_a8.h,
+	  src/include/private/format_argb8888.h,
+	  src/include/private/format_rgb565.h,
+	  src/include/private/format_rgb565_b1a3.h,
+	  src/include/private/format_rgb565_xa5.h,
+	  src/include/private/surface.h, src/lib/Makefile.am,
+	  src/lib/converter, src/lib/converter/Makefile.am,
+	  src/lib/converter/argb8888.c, src/lib/converter/rgb565.c,
+	  src/lib/cpu, src/lib/cpu/Makefile.am, src/lib/cpu/smp.c,
+	  src/lib/drawer/Makefile.am, src/lib/drawer/_argb8888_c.c,
+	  src/lib/drawer/_argb8888_mmx.c, src/lib/drawer/_argb8888_sse2.c,
+	  src/lib/drawer/argb8888.c, src/lib/drawer/argb8888_blend.c,
+	  src/lib/drawer/generic.c, src/lib/drawer/rgb565_b1a3.c,
+	  src/lib/enesim_converter.c, src/lib/enesim_cpu.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_format.c,
+	  src/lib/enesim_main.c, src/lib/enesim_matrix.c,
+	  src/lib/enesim_operator.c, src/lib/enesim_reflector.c,
+	  src/lib/enesim_renderer.c, src/lib/enesim_repeater.c,
+	  src/lib/enesim_rotator.c, src/lib/enesim_scaler.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/primitives/rect.c, src/lib/reflector,
+	  src/lib/reflector/Makefile.am, src/lib/renderer/repeater.c,
+	  src/lib/renderer/scaler.c, src/lib/renderer/transformer.c,
+	  src/lib/repeater, src/lib/repeater/Makefile.am, src/lib/rotator,
+	  src/lib/rotator/Makefile.am, src/lib/scaler,
+	  src/lib/scaler/Makefile.am,
+	  src/lib/transformer/argb8888_affine.c, src/lib/util/Makefile.am,
+	  src/lib/util/curve.h, src/lib/util/curve_decasteljau.c,
+	  src/lib/util/enesim_curve_decasteljau.c,
+	  src/lib/util/enesim_matrix.c, src/lib/util/fixed_16p16.h,
+	  src/lib/util/fixed_24p8.h, src/lib/util/fixed_math.h,
+	  src/lib/util/rectangle.h:
+	  This is the first step on the last Enesim refactor :)
+	  No more dynamic formats
+	  Native enesim surface just handles now argb8888 and a8
+	  Move the other format definitions to the converters
+	  Add a cpu abstraction, useful for ASMP processors. Now every
+	  operation is indirectly called to handle offloading to other
+	  cores.
+	  Add pthreads support
+	  Redo the drawer implementation to fit the new API
+	  Add a rgb565 and argb8888 converter to test the "cpu operator"
+	  approach
+	  Of course increase the enesim version :)
+	  More TODOs :)
+
+2009-03-25 16:09  turran
+
+	* configure.ac, src/lib/drawer/_argb8888_mmx.c,
+	  src/lib/drawer/_argb8888_sse2.c:
+	  Add EFL_SIMD_FLAGS to ENESIM_CFLAGS
+	  Make the X86 SIMD drawers compile again
+
+2009-03-25 07:14  caro
+
+	* Makefile.am, configure.ac, examples/Makefile.am,
+	  m4/efl_benchmark.m4, m4/efl_coverage.m4, m4/efl_cpu.m4,
+	  m4/efl_tests.m4, src/include/enesim_private.h,
+	  src/lib/Makefile.am, src/lib/drawer/_argb8888_mmx.c,
+	  src/lib/drawer/_argb8888_sse2.c, src/lib/enesim_main.c:
+	  add m4 macro that allows unit tests, coverage, benchmarking
+	  and cpu arch configuration
+	  simplification of configure.ac
+
+2009-03-24 15:23  turran
+
+	* examples/enesim_bench_renderer.c, src/include/enesim_renderer.h,
+	  src/include/enesim_surface.h, src/include/private/renderer.h,
+	  src/lib/Makefile.am, src/lib/enesim_renderer.c,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/repeater.c,
+	  src/lib/renderer/scaler.c, src/lib/renderer/transformer.c:
+	  Change how the renderers are created, no need for double
+	  dereference.
+	  Simplify the code on the scaler and repeater
+	  Refactor the transformer to match the new renderer api
+	  More benchmark tests for the renderers
+	  Make it compile again :)
+
+2009-03-20 20:06  turran
+
+	* configure.ac, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_drawer.c,
+	  examples/enesim_bench_rasterizer.c,
+	  examples/enesim_bench_renderer.c,
+	  examples/enesim_bench_transformer.c, examples/enesim_test.c,
+	  examples/enesim_test.h, examples/image.c, examples/surface.c,
+	  src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_converter.h, src/include/enesim_drawer.h,
+	  src/include/enesim_format.h, src/include/enesim_main.h,
+	  src/include/enesim_private.h, src/include/enesim_renderer.h,
+	  src/include/enesim_surface.h, src/include/private/context.h,
+	  src/include/private/drawer.h, src/include/private/format.h,
+	  src/include/private/format_a8.h,
+	  src/include/private/format_argb8888.h,
+	  src/include/private/format_argb8888_unpre.h,
+	  src/include/private/format_rgb565.h,
+	  src/include/private/format_rgb565_b1a3.h,
+	  src/include/private/format_rgb565_xa5.h,
+	  src/include/private/renderer.h, src/include/private/surface.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_argb8888_unpre_rop.h,
+	  src/include/private/surface_rgb565_b1a3_rop.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/private/surface_rgb565_xa5_rop.h,
+	  src/include/private/transformer.h, src/lib/Makefile.am,
+	  src/lib/drawer/Makefile.am, src/lib/drawer/_argb8888_c.c,
+	  src/lib/drawer/_generic.c, src/lib/drawer/argb8888.c,
+	  src/lib/drawer/argb8888_unpre.c, src/lib/drawer/generic.c,
+	  src/lib/drawer/rgb565_b1a3.c, src/lib/enesim_converter.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_format.c,
+	  src/lib/enesim_main.c, src/lib/enesim_renderer.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/format, src/lib/format/Makefile.am, src/lib/format/a8.c,
+	  src/lib/format/argb8888.c, src/lib/format/argb8888_unpre.c,
+	  src/lib/format/rgb565_xa5.c, src/lib/primitives/enesim_context.c,
+	  src/lib/primitives/image.c, src/lib/primitives/rect.c,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/color.c,
+	  src/lib/renderer/repeater.c, src/lib/renderer/scaler.c,
+	  src/lib/renderer/surface.c, src/lib/renderer/transformer.c,
+	  src/lib/transformer/_argb8888_c.c,
+	  src/lib/transformer/argb8888.c, src/lib/transformer/generic.c,
+	  src/tool/common.c, src/tool/common.h,
+	  src/tool/enesim_generator.c, src/tool/enesim_generator.h:
+	  New Format system. Basically now, the formats are not fixed.
+	  The final idea is not finished yet and might even be replaced
+	  again before we find a solid and fast way
+	  New way to register drawers, just a test, as the formats maybe
+	  we'll go back to the initial implementation too
+	  Renderers now return a function and generate only one span at a
+	  time
+	  No need for the transfomer but the API is still there as a
+	  reference for a renderer
+
+2009-03-04 17:19  turran
+
+	* examples/enesim_bench.c, examples/enesim_bench_transformer.c,
+	  src/include/enesim_context.h, src/include/enesim_matrix.h,
+	  src/include/enesim_primitives.h, src/include/enesim_surface.h,
+	  src/include/private/context.h, src/include/private/matrix.h,
+	  src/include/private/surface.h, src/include/private/transformer.h,
+	  src/lib/drawer/_generic.c, src/lib/enesim_matrix.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/primitives/enesim_context.c, src/lib/primitives/image.c,
+	  src/lib/primitives/rect.c, src/lib/transformer/_argb8888_c.c,
+	  src/lib/transformer/argb8888.c, src/lib/transformer/generic.c:
+	  Add a function to retrieve the matrix type
+	  Add context clipping
+	  Add clipping on the primitives drawing
+	  Generic span_fill function
+	  Fix the image convert function
+
+2009-02-23 12:27  turran
+
+	* configure.ac, examples/enesim_bench_transformer.c,
+	  src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_context.h, src/include/enesim_drawer.h,
+	  src/include/enesim_matrix.h, src/include/enesim_primitives.h,
+	  src/include/enesim_private.h, src/include/enesim_surface.h,
+	  src/include/private/context.h, src/include/private/drawer.h,
+	  src/include/private/matrix.h, src/include/private/surface.h,
+	  src/include/private/transformer.h, src/lib/Makefile.am,
+	  src/lib/drawer/_argb8888_c.c, src/lib/drawer/_argb8888_mmx.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_matrix.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/primitives, src/lib/primitives/Makefile.am,
+	  src/lib/primitives/enesim_context.c, src/lib/primitives/image.c,
+	  src/lib/primitives/point.c, src/lib/primitives/rect.c,
+	  src/lib/transformer/_argb8888_c.c, src/lib/transformer/generic.c:
+	  Formatting fixes
+	  Export the Matrix struct definition
+	  Add a context for primitive drawing
+	  Rect and Image primitives
+
+2009-01-17 06:05  vapier
+
+	* Makefile.am:
+	  declare proper ACLOCAL_AMFLAGS
+
+2008-12-17 09:40  turran
+
+	* examples/enesim_bench.c, examples/enesim_bench_common.h,
+	  examples/enesim_bench_drawer.c,
+	  examples/enesim_bench_transformer.c,
+	  src/lib/drawer/_argb8888_c.c, src/lib/drawer/argb8888.c,
+	  src/lib/enesim_surface.c, src/lib/transformer/generic.c:
+	  Add the first transformation relative to a mask
+	  Some cleanups
+
+2008-12-16 15:27  turran
+
+	* examples/enesim_bench.c, examples/enesim_bench_drawer.c,
+	  examples/enesim_bench_transformer.c, src/include/enesim_drawer.h,
+	  src/include/enesim_transformer.h, src/include/private/drawer.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/transformer.h, src/lib/drawer/_argb8888_c.c,
+	  src/lib/drawer/_generic.c, src/lib/drawer/argb8888.c,
+	  src/lib/drawer/argb8888_unpre.c, src/lib/enesim_drawer.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/transformer/_argb8888_c.c,
+	  src/lib/transformer/argb8888.c, src/lib/transformer/generic.c:
+	  Create the generic drawer. Still lots of stubs
+	  Add a quality modifier
+	  Create a generic transformer, the good-projective gives bad
+	  results
+	  Add the quality to the transformer
+	  Make macros for the projective and affine common iterators
+
+2008-12-13 01:55  turran
+
+	* src/lib/enesim_drawer.c, src/lib/enesim_transformer.c:
+	  Some changes to make the benchmark work again, ugly but works
+	  Fix the transformers to use the generic functions
+	  Fix the generic drawer pixel function
+
+2008-12-13 00:55  turran
+
+	* examples/enesim_bench.c, examples/enesim_bench_common.h,
+	  examples/enesim_bench_drawer.c, examples/enesim_bench_renderer.c,
+	  examples/enesim_bench_transformer.c, src/include/enesim_common.h,
+	  src/include/enesim_drawer.h, src/include/enesim_main.h,
+	  src/include/enesim_surface.h, src/include/enesim_transformer.h,
+	  src/include/private/drawer.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/transformer.h, src/lib/drawer/_argb8888_c.c,
+	  src/lib/drawer/argb8888.c, src/lib/drawer/rgb565_b1a3.c,
+	  src/lib/enesim_converter.c, src/lib/enesim_drawer.c,
+	  src/lib/enesim_main.c, src/lib/enesim_matrix.c,
+	  src/lib/enesim_rasterizer.c, src/lib/enesim_renderer.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/rasterizer/cpsc.c, src/lib/rasterizer/kiia.c,
+	  src/lib/rasterizer/kiia16.c, src/lib/rasterizer/kiia8.c,
+	  src/lib/renderer/color.c, src/lib/renderer/surface.c,
+	  src/lib/transformer/_argb8888_c.c,
+	  src/lib/transformer/argb8888.c, src/lib/util/curve_decasteljau.c:
+	  Support pixel_mask and mask_color drawer functions
+	  Remove enesim_common.h
+	  Make the transformer use a mask surface and a color
+	  argb8888 transformer for fast and good (slow) versions
+	  More TODO's on the documentation
+	  Fill more stub functions
+	  Refactor the benchmarks, better output on the drawer bench
+
+2008-12-04 10:46  turran
+
+	* Makefile.am, configure.ac, examples/enesim_bench.c,
+	  examples/enesim_bench_drawer.c, examples/image.c,
+	  examples/surface.c, src/Makefile.am, src/include/Makefile.am,
+	  src/include/enesim_drawer.h, src/include/enesim_main.h,
+	  src/include/enesim_private.h, src/include/enesim_surface.h,
+	  src/include/private/drawer.h, src/include/private/surface.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_argb8888_unpre_rop.h,
+	  src/include/private/surface_rgb565_b1a3_rop.h,
+	  src/include/private/surface_rgb565_xa5_rop.h,
+	  src/include/private/transformer.h, src/lib/Makefile.am,
+	  src/lib/drawer/Makefile.am, src/lib/drawer/_argb8888_c.c,
+	  src/lib/drawer/_argb8888_mmx.c, src/lib/drawer/_argb8888_sse2.c,
+	  src/lib/drawer/argb8888_unpre.c, src/lib/drawer/rgb565_b1a3.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_main.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/renderer/color.c, src/lib/renderer/surface.c,
+	  src/lib/transformer, src/lib/transformer/Makefile.am,
+	  src/lib/transformer/_argb8888_c.c,
+	  src/lib/transformer/argb8888.c, src/lib/transformer/generic.c:
+	  Big refactor of several internals
+	  There's no more Enesim_Color but Enesim_Surface_Pixel which is
+	  an abstraction to store a pixel value on every surface format
+	  Use of the above for the drawer functions
+	  Initial code to support transformations specific for a surface
+	  format, argb8888 ~4x speed increase
+	  No more autogenerated files
+
+2008-12-01 21:49  turran
+
+	* enesim.pc.in, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_bench_common.h, examples/enesim_bench_drawer.c,
+	  examples/enesim_bench_rasterizer.c,
+	  examples/enesim_bench_renderer.c,
+	  examples/enesim_bench_transformer.c,
+	  src/lib/drawer/_argb8888_mmx.c, src/lib/drawer/_argb8888_sse2.c,
+	  src/lib/enesim_main.c, src/lib/enesim_surface.c:
+	  Correct pkg-config requirements (thanks vincent)
+	  Split the benchmark into different ones
+	  Add options for width, height and benchmark to run on
+	  enesim_benchmark
+	  Fix some warnings
+	  Remove debug printfs
+
+2008-12-01 15:34  turran
+
+	* configure.ac, enesim.pc.in, examples/enesim_bench.c,
+	  src/include/Enesim.h, src/include/enesim_common.h,
+	  src/include/enesim_matrix.h, src/include/enesim_private.h,
+	  src/include/enesim_surface.h, src/include/enesim_transformer.h,
+	  src/include/private/surface.h, src/include/private/transformer.h,
+	  src/lib/drawer, src/lib/drawer/Makefile.am,
+	  src/lib/drawer/_argb8888_c.c, src/lib/drawer/_argb8888_mmx.c,
+	  src/lib/drawer/_argb8888_sse2.c, src/lib/drawer/argb8888.c,
+	  src/lib/drawer/argb8888_unpre.c, src/lib/drawer/rgb565_b1a3.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_main.c,
+	  src/lib/enesim_matrix.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c:
+	  The drawers are no longer generated. Just use the generated
+	  code as a template
+	  Initial SIMD instructions support, MMX and SSE2
+	  Some cleanups
+	  Rename _free to _delete
+	  Initial stubs for border support on transformations
+
+2008-10-16 14:09  barbieri
+
+	* ., examples, src/include, src/include/private, src/lib,
+	  src/lib/drawer, src/tool:
+	  set svn:ignore on new directories.
+	  
+	  Please pay attention to svn:ignore, it's not recursive as
+	  .gitignore or .cvsignore, you need to set them on per-directory, even if you
+	  use -R (recursive), it's just at that time, it's not a property that
+	  is automatically inherited by new folders.
+
+2008-09-30 18:07  pfritz
+
+	* configure.ac, configure.in:
+	  configure.in -> configure.ac
+
+2008-09-16 19:44  barbieri
+
+	* src/lib/drawer, src/lib/rasterizer, src/lib/renderer, src/tool:
+	  More svn:ignore
+
+2008-09-12 09:40  turran
+
+	* doc/img/enesim.png, doc/img/enesim_images.svg,
+	  doc/img/enesim_text.svg, doc/img/raster.png,
+	  src/include/Enesim.h, src/include/enesim_transformer.h,
+	  src/include/private/matrix.h, src/lib/enesim_transformer.c:
+	  Update the documentation images
+	  Add the enesim logo
+	  Add the license on matrix.h
+	  Update the introduction page to match the one found on trac
+	  Add a function to delete the transformer
+
+2008-09-11 17:05  turran
+
+	* examples/enesim_bench.c, src/include/enesim_matrix.h,
+	  src/include/private/matrix.h, src/lib/enesim_matrix.c,
+	  src/lib/enesim_transformer.c:
+	  Make transformations work over an origin
+	  Add a _coords_set/get function for the quads
+	  Add missing file
+
+2008-09-11 13:23  turran
+
+	* examples/enesim_bench.c, src/include/Enesim.h,
+	  src/include/Makefile.am, src/include/enesim_matrix.h,
+	  src/include/enesim_private.h, src/include/enesim_transformer.h,
+	  src/include/private/transformer.h, src/lib/Makefile.am,
+	  src/lib/enesim_matrix.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c:
+	  Split enesim_matrix_xxx into it's own file
+	  Abstract both: Enesim_Matrix and Enesim_Quad
+	  Some API changes
+
+2008-09-08 20:30  turran
+
+	* examples/enesim_bench.c, examples/enesim_test.c,
+	  src/include/enesim_renderer.h, src/include/enesim_transformer.h,
+	  src/include/private/surface_rgb565_b1a3_rop.h,
+	  src/include/private/transformer.h, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/lib/rasterizer/cpsc.c,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/surface.c,
+	  src/tool/enesim_generator_drawer.c:
+	  More transformation code, quads are now in, is easier to get
+	  the projective matrix
+	  Surface renderer code is finally in, yo can draw patterns with
+	  it
+	  The bench has been updated to this changes
+
+2008-08-24 23:27  turran
+
+	* examples/enesim_bench.c, src/lib/enesim_transformer.c:
+	  Add projective transformations
+	  Add a benchmark for it
+
+2008-08-23 22:58  turran
+
+	* TODO, examples/enesim_bench.c, src/include/Makefile.am,
+	  src/include/enesim_main.h, src/include/enesim_transformer.h,
+	  src/lib/enesim_drawer.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/lib/rasterizer/cpsc.c:
+	  New function to get the transformation matrix
+	  Benchmark demo also tests transformations
+	  Make the generator work correctly for different build directories
+	  Pre conditions on the transformation algorithms
+	  Remove unsued printfs
+	  Add stubs for new drawer functions
+
+2008-08-20 14:55  turran
+
+	* configure.in:
+	  Remove the converter output directory
+
+2008-08-20 14:50  turran
+
+	* COPYING, Doxyfile, Makefile.am, TODO, autogen.sh, configure.in,
+	  doc/img/enesim_text.svg, examples/Makefile.am,
+	  examples/enesim_bench.c, examples/enesim_test.c,
+	  examples/enesim_test.h, examples/image.c, examples/image.h,
+	  examples/surface.c, m4, m4/enesim_format.m4, src/Makefile.am,
+	  src/include, src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_common.h, src/include/enesim_converter.h,
+	  src/include/enesim_drawer.h, src/include/enesim_main.h,
+	  src/include/enesim_private.h, src/include/enesim_rasterizer.h,
+	  src/include/enesim_renderer.h, src/include/enesim_surface.h,
+	  src/include/enesim_transformer.h, src/include/enesim_vector.h,
+	  src/include/extender_float.h, src/include/extender_int.h,
+	  src/include/private, src/include/private/curve.h,
+	  src/include/private/drawer.h, src/include/private/rasterizer.h,
+	  src/include/private/renderer.h, src/include/private/surface.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_argb8888_unpre_rop.h,
+	  src/include/private/surface_rgb565_b1a3_rop.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/private/surface_rgb565_xa5_rop.h,
+	  src/include/private/transformer.h, src/lib/Enesim.h,
+	  src/lib/Makefile.am, src/lib/drawer, src/lib/drawer/Makefile.am,
+	  src/lib/enesim_converter.c, src/lib/enesim_core.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_main.c,
+	  src/lib/enesim_private.h, src/lib/enesim_rasterizer.c,
+	  src/lib/enesim_renderer.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/lib/raster, src/lib/rasterizer,
+	  src/lib/rasterizer/Makefile.am, src/lib/rasterizer/cpsc.c,
+	  src/lib/rasterizer/kiia.c, src/lib/rasterizer/kiia.h,
+	  src/lib/rasterizer/kiia16.c, src/lib/rasterizer/kiia32.c,
+	  src/lib/rasterizer/kiia8.c, src/lib/renderer,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/color.c,
+	  src/lib/renderer/surface.c, src/lib/util/Makefile.am,
+	  src/lib/util/curve_decasteljau.c, src/lib/vector/Makefile.am,
+	  src/lib/vector/component/Makefile.am,
+	  src/lib/vector/component/bop.c,
+	  src/lib/vector/component/component.c,
+	  src/lib/vector/component/component.h,
+	  src/lib/vector/component/path.c,
+	  src/lib/vector/component/reader.c,
+	  src/lib/vector/component/reader.h,
+	  src/lib/vector/component/source_csv.c,
+	  src/lib/vector/component/transform.c, src/lib/vector/container.c,
+	  src/lib/vector/container.h, src/lib/vector/enesim_vector.h,
+	  src/tool, src/tool/Makefile.am, src/tool/README,
+	  src/tool/common.c, src/tool/common.h,
+	  src/tool/enesim_generator.c, src/tool/enesim_generator.h,
+	  src/tool/enesim_generator_core.c,
+	  src/tool/enesim_generator_drawer.c, src/tool/fixed.c,
+	  src/tool/transformer.c:
+	  Move efl-research enesim into e svn
+
+2008-08-20 10:00  jorgeluis.zapata
+
+	* examples/enesim_bench.c, src/include/enesim_surface.h,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c:
+	  More changes
+
+
+2008-08-18 16:42  barbieri
+
+	* data/tiger.png, doc/img/raster.png, doc/img/vector.png:
+	  Set svn:mime-type to image/png on *.png
+
+2008-08-17 23:41  raster
+
+	* data/tiger.png, doc/img/enesim_images.svg, doc/img/raster.png,
+	  doc/img/vector.png:
+	  fix more bin files...
+
+2008-08-17 14:29  raster
+
+	* data/tiger.png, doc/img/enesim_images.svg, doc/img/raster.png,
+	  doc/img/vector.png:
+	  fix binaries
+
+2008-08-17 07:52  raster
+
+	* :
+	  move more...
+
+2008-08-17 07:44  raster
+
+	* :
+	  move around - flatter.
+
+2008-08-06 17:05  jorgeluis.zapata
+
+	* COPYING, Makefile.am, configure.in, doc/img/enesim_text.svg,
+	  examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_test.c, examples/enesim_test.h, src/Makefile.am,
+	  src/include/Enesim.h, src/include/Makefile.am,
+	  src/include/enesim_common.h, src/include/enesim_converter.h,
+	  src/include/enesim_drawer.h, src/include/enesim_main.h,
+	  src/include/enesim_private.h, src/include/enesim_rasterizer.h,
+	  src/include/enesim_renderer.h, src/include/enesim_surface.h,
+	  src/include/enesim_transformer.h, src/include/enesim_vector.h,
+	  src/include/extender_float.h, src/include/extender_int.h,
+	  src/include/private/curve.h, src/include/private/drawer.h,
+	  src/include/private/rasterizer.h, src/include/private/renderer.h,
+	  src/include/private/surface.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_argb8888_unpre_rop.h,
+	  src/include/private/surface_rgb565_b1a3_rop.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/private/surface_rgb565_xa5_rop.h,
+	  src/include/private/transformer.h, src/lib/Makefile.am,
+	  src/lib/drawer/Makefile.am, src/lib/enesim_converter.c,
+	  src/lib/enesim_core.c, src/lib/enesim_drawer.c,
+	  src/lib/enesim_image.c, src/lib/enesim_main.c,
+	  src/lib/enesim_rasterizer.c, src/lib/enesim_renderer.c,
+	  src/lib/enesim_surface.c, src/lib/enesim_transformer.c,
+	  src/lib/rasterizer/cpsc.c, src/lib/rasterizer/kiia.c,
+	  src/lib/rasterizer/kiia.h, src/lib/rasterizer/kiia16.c,
+	  src/lib/rasterizer/kiia32.c, src/lib/rasterizer/kiia8.c,
+	  src/lib/renderer/Makefile.am, src/lib/renderer/color.c,
+	  src/lib/renderer/fill_color.c, src/lib/renderer/fill_surface.c,
+	  src/lib/renderer/surface.c, src/lib/util/curve_decasteljau.c,
+	  src/lib/vector/component/bop.c,
+	  src/lib/vector/component/component.c,
+	  src/lib/vector/component/component.h,
+	  src/lib/vector/component/path.c,
+	  src/lib/vector/component/reader.c,
+	  src/lib/vector/component/reader.h,
+	  src/lib/vector/component/source_csv.c,
+	  src/lib/vector/component/transform.c, src/lib/vector/container.c,
+	  src/lib/vector/container.h, src/lib/vector/enesim_vector.h,
+	  src/tool/Makefile.am:
+	  Make enesim LGPL
+	  Fix cross-dev building
+	  Add SVG logo
+
+2008-08-03 22:21  jorgeluis.zapata
+
+	* Doxyfile, Makefile.am, configure.in, examples/enesim_bench.c,
+	  examples/image.c, examples/image.h, genperf,
+	  src/include/Makefile.am, src/include/enesim_drawer.h,
+	  src/include/enesim_main.h, src/include/enesim_private.h,
+	  src/include/enesim_rasterizer.h, src/include/enesim_renderer.h,
+	  src/include/enesim_surface.h, src/include/enesim_transformer.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_argb8888_unpre_rop.h,
+	  src/include/private/surface_rgb565_b1a3_rop.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/private/surface_rgb565_xa5_rop.h,
+	  src/lib/enesim_main.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/tool/Makefile.am,
+	  src/tool/enesim_generator.c, src/tool/enesim_generator.h,
+	  src/tool/enesim_generator_core.c,
+	  src/tool/enesim_generator_drawer.c:
+	  Add coverage support
+	  Add More surface formats
+	  Improve the benchmark tool
+	  Add missing files
+
+2008-07-29 17:31  jorgeluis.zapata
+
+	* configure.in, examples/Makefile.am, examples/enesim_bench.c,
+	  examples/enesim_test.c, examples/enesim_test.h, examples/image.c,
+	  examples/png.c, examples/surface.c, src/Makefile.am, src/bin,
+	  src/include/Makefile.am, src/include/enesim_common.h,
+	  src/include/enesim_converter.h, src/include/enesim_drawer.h,
+	  src/include/enesim_private.h, src/include/enesim_surface.h,
+	  src/include/extender_int.h, src/include/private/drawer.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_argb8888_unpre_rop.h,
+	  src/include/private/surface_rgb565_xa5_rop.h,
+	  src/lib/Makefile.am, src/lib/drawer/Makefile.am,
+	  src/lib/enesim_drawer.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/lib/renderer/fill_color.c,
+	  src/tool, src/tool/Makefile.am, src/tool/README,
+	  src/tool/common.c, src/tool/common.h,
+	  src/tool/enesim_generator.c, src/tool/enesim_generator.h,
+	  src/tool/enesim_generator_core.c,
+	  src/tool/enesim_generator_drawer.c, src/tool/fixed.c,
+	  src/tool/transformer.c:
+	  Move the generator to the tool dir
+	  Remvoe bin dir, move the bench to example for now as we need
+	  the png output, this file might go outside once enesim is solid
+	  enough
+	  Fix the data types
+	  Some more minor fixes
+
+2008-07-28 17:14  jorgeluis.zapata
+
+	* src/include/Makefile.am:
+	  Delete config.h.in~
+
+2008-07-28 17:06  jorgeluis.zapata
+
+	* Makefile.am, configure.in, examples/enesim_test.c,
+	  examples/png.c, examples/surface.c, m4/enesim_format.m4,
+	  src/Makefile.am, src/bin/Makefile.am, src/bin/common.c,
+	  src/bin/common.h, src/bin/core.c, src/bin/drawer.c,
+	  src/bin/enesim_bench.c, src/bin/enesim_generator.c,
+	  src/bin/enesim_generator.h, src/bin/enesim_generator_core.c,
+	  src/bin/enesim_generator_drawer.c, src/include/Enesim.h,
+	  src/include/Makefile.am, src/include/enesim_drawer.h,
+	  src/include/enesim_private.h, src/include/enesim_surface.h,
+	  src/include/private/drawer.h,
+	  src/include/private/surface_argb8888_core.h,
+	  src/include/private/surface_argb8888_pre_core.h,
+	  src/include/private/surface_argb8888_pre_rop.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_argb8888_unpre_rop.h,
+	  src/include/private/surface_rgb565_core.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/private/surface_rgb565_xa5_rop.h,
+	  src/lib/drawer/Makefile.am, src/lib/drawer/argb8888.c,
+	  src/lib/drawer/argb8888_pre.c, src/lib/enesim_drawer.c,
+	  src/lib/enesim_surface.c:
+	  Rename the argb8888_premul to only argb8888, premul is the
+	  default data type now
+	  Add a bnechmark tool
+	  Make the genreator create the files dynamically when building
+	  the project (still has bugs)
+	  Reorganize the bin directory
+	  Make formats selectable at compilation time
+	  Add drawer stubs for formats that aren't supported
+
+2008-07-26 17:45  jorgeluis.zapata
+
+	* autogen.sh, configure.in, examples/enesim_test.c, m4,
+	  m4/enesim_format.m4, src/bin/enesim_generator.c,
+	  src/bin/enesim_generator.h, src/include/Enesim.h,
+	  src/include/Makefile.am, src/include/enesim_core.h,
+	  src/include/enesim_main.h, src/include/enesim_surface.h,
+	  src/lib/Makefile.am, src/lib/drawer/Makefile.am,
+	  src/lib/enesim_core.c, src/lib/enesim_drawer.c,
+	  src/lib/enesim_main.c:
+	  Add support for conditional build of code, both at autotools
+	  level and at drawer level
+	  Some comments to explain how to add a new surface format
+	  Add an empty drawer
+	  Add alpha format of Davinci OSD attribute window, it is still
+	  not in the generator
+
+2008-07-25 17:46  jorgeluis.zapata
+
+	* src/lib/enesim_transformer.c:
+	  Make it compile again
+
+2008-04-28 00:46  jorgeluis.zapata
+
+	* TODO, examples/enesim_test.c, examples/enesim_test.h,
+	  examples/png.c, src/bin/Makefile.am, src/bin/drawer.c,
+	  src/bin/enesim_generator.c, src/bin/fixed.c,
+	  src/bin/transformer.c, src/include/Enesim.h,
+	  src/include/Makefile.am, src/include/curve.h,
+	  src/include/enesim_core.h, src/include/enesim_private.h,
+	  src/include/enesim_rasterizer.h, src/include/enesim_rectangle.h,
+	  src/include/enesim_renderer.h, src/include/enesim_surface.h,
+	  src/include/enesim_transformer.h, src/include/fixed_16p16.h,
+	  src/include/fixed_24p8.h, src/include/fixed_math.h,
+	  src/include/private/curve.h, src/include/private/rasterizer.h,
+	  src/include/private/transformer.h, src/lib/enesim_rasterizer.c,
+	  src/lib/enesim_transformer.c, src/lib/rasterizer/cpsc.c,
+	  src/lib/rasterizer/kiia.c, src/lib/rasterizer/kiia.h,
+	  src/lib/rasterizer/kiia16.c, src/lib/rasterizer/kiia8.c,
+	  src/lib/renderer/fill_color.c, src/lib/renderer/fill_surface.c,
+	  src/lib/util/Makefile.am, src/lib/util/curve_decasteljau.c:
+	  Move the fixed point and the rectangle code to eina.
+	  Added more error code.
+
+2008-04-24 19:02  jorgeluis.zapata
+
+	* TODO, configure.in, examples/surface.c, src/bin/drawer.c,
+	  src/include/Makefile.am, src/include/enesim_core.h,
+	  src/include/enesim_private.h, src/include/enesim_rasterizer.h,
+	  src/include/enesim_renderer.h, src/include/enesim_surface.h,
+	  src/include/enesim_transformer.h, src/include/private/renderer.h,
+	  src/include/private/surface.h, src/include/private/transformer.h,
+	  src/lib/Makefile.am, src/lib/enesim_core.c,
+	  src/lib/enesim_image.c, src/lib/enesim_rasterizer.c,
+	  src/lib/enesim_renderer.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/lib/image,
+	  src/lib/image/Makefile.am, src/lib/image/jpeg.c,
+	  src/lib/image/png.c, src/lib/renderer/fill_color.c,
+	  src/lib/surface:
+	  Remove completely the old surface backends. New
+	  debugging functions.
+	  Use the errors where possible. New stub functions to
+	  load images.
+	  
+2008-04-23 23:22  jorgeluis.zapata
+
+	* TODO, configure.in, examples/Makefile.am, examples/enesim_test.c,
+	  examples/enesim_test.h, examples/surface.c, src/bin/core.c,
+	  src/bin/drawer.c, src/bin/transformer.c, src/include/Enesim.h,
+	  src/include/enesim_transformer.h,
+	  src/include/private/surface_argb8888_core.h,
+	  src/include/private/surface_argb8888_pre_rop.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_rgb565_core.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/private/transformer.h, src/lib/drawer/Makefile.am,
+	  src/lib/drawer/argb8888.c, src/lib/drawer/argb8888_pre.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/lib/renderer/fill_color.c:
+	  Affine transformation working. More generator code.
+	  Support for argb8888 pixel format. Better example, now it uses SDL.
+
+2008-04-20 22:35  jorgeluis.zapata
+
+	* configure.in, examples/Makefile.am, examples/enesim_test.c,
+	  examples/enesim_test.h, examples/png.c, examples/surface.c,
+	  src/bin/Makefile.am, src/bin/core.c, src/bin/drawer.c,
+	  src/bin/enesim_generator.c, src/bin/enesim_generator.h,
+	  src/bin/rop.c, src/bin/transformer.c, src/include/Enesim.h,
+	  src/include/enesim_drawer.h, src/include/enesim_private.h,
+	  src/include/enesim_surface.h, src/include/enesim_transformer.h,
+	  src/include/enesim_vector.h, src/include/private/drawer.h,
+	  src/include/private/rasterizer.h, src/include/private/renderer.h,
+	  src/include/private/surface.h,
+	  src/include/private/surface_argb8888_core.h,
+	  src/include/private/surface_argb8888_pre_core.h,
+	  src/include/private/surface_argb8888_pre_rop.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_rgb565_core.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/private/transformer.h, src/lib/Makefile.am,
+	  src/lib/drawer/Makefile.am, src/lib/drawer/argb8888_pre.c,
+	  src/lib/enesim_drawer.c, src/lib/enesim_surface.c,
+	  src/lib/enesim_transformer.c, src/lib/rasterizer/cpsc.c,
+	  src/lib/rasterizer/kiia.c, src/lib/rasterizer/kiia16.c,
+	  src/lib/rasterizer/kiia8.c, src/lib/renderer/fill_color.c,
+	  src/lib/renderer/fill_surface.c:
+	  New generator code, drawer finally is ok :D
+	  Initial code for the transformer
+
+2008-04-18 15:49  jorgeluis.zapata
+
+	* src/bin/drawer.c, src/bin/enesim_generator.c,
+	  src/bin/enesim_generator.h, src/include/enesim_private.h,
+	  src/include/private, src/include/private/rasterizer.h,
+	  src/include/private/renderer.h, src/include/private/surface.h,
+	  src/include/private/surface_argb8888_pre_rop.h,
+	  src/include/private/surface_argb8888_rop.h,
+	  src/include/private/surface_rgb565_rop.h,
+	  src/include/rasterizer.h, src/include/renderer.h,
+	  src/include/surface.h, src/include/surface_argb8888.h,
+	  src/include/surface_rgb565.h:
+	  Organize the headers
+	  Add argb8888_pre generator
+
+2008-04-17 22:45  jorgeluis.zapata
+
+	* src/bin/drawer.c, src/bin/enesim_generator.c:
+	  More functions on the drawer :)
+
+2008-04-17 16:48  jorgeluis.zapata
+
+	* src/bin/core.c, src/bin/drawer.c, src/bin/enesim_generator.c,
+	  src/bin/enesim_generator.h, src/include/enesim_private.h,
+	  src/include/enesim_surface.h, src/include/surface.h,
+	  src/include/surface_argb8888.h, src/include/surface_rgb565.h,
+	  src/lib/enesim_drawer.c, src/lib/enesim_surface.c,
+	  src/lib/surface/argb8888.c,
+	  src/lib/surface/argb8888/_noscale_affine.h,
+	  src/lib/surface/argb8888/_noscale_identity.h,
+	  src/lib/surface/argb8888/color_c.c,
+	  src/lib/surface/argb8888/pixel_c.c:
+	  Generator now writes files :)
+	  Added a couple of files (the headers) we should refactor how
+	  headers should be incldued by the drawer/converter/whatever
+
+2008-04-16 12:52  jorgeluis.zapata
+
+	* src/bin/core.c, src/bin/drawer.c, src/bin/enesim_generator.c,
+	  src/include/enesim_core.h, src/lib/enesim_drawer.c,
+	  src/lib/enesim_surface.c:
+	  More generator functions :)
+
+2008-04-14 15:14  jorgeluis.zapata
+
+	* src/bin/core.c:
+	  Small changes
+
+2008-04-13 22:18  jorgeluis.zapata
+
+	* src/bin/Makefile.am, src/bin/core.c, src/bin/drawer.c,
+	  src/bin/enesim_generator.c, src/bin/enesim_generator.h,
+	  src/bin/rop.c, src/include/Enesim.h, src/include/enesim_core.h,
+	  src/include/enesim_drawer.h, src/include/enesim_renderer.h,
+	  src/include/enesim_surface.h, src/include/surface.h,
+	  src/lib/enesim_drawer.c, src/lib/enesim_surface.c,
+	  src/lib/surface/argb8888.c:
+	  More generator stubs
+	  Export surface data
+
+2008-04-12 10:24  jorgeluis.zapata
+
+	* src/include/Makefile.am:
+	  Missing file
+
+2008-04-11 14:52  jorgeluis.zapata
+
+	* src/bin/enesim_generator.c, src/lib/Makefile.am,
+	  src/lib/surface/Makefile.am:
+	  More generated functions ;)
+	  Now the library build ok! :)
+
+2008-04-10 17:07  jorgeluis.zapata
+
+	* configure.in, examples/Makefile.am, src/Makefile.am, src/bin,
+	  src/bin/Makefile.am, src/bin/README, src/bin/enesim_generator.c,
+	  src/include/Enesim.h, src/include/enesim_converter.h,
+	  src/include/enesim_core.h, src/include/enesim_private.h,
+	  src/include/enesim_rasterizer.h, src/include/enesim_surface.h,
+	  src/lib/Makefile.am, src/lib/enesim_converter.c,
+	  src/lib/enesim_rasterizer.c, src/lib/enesim_renderer.c,
+	  src/lib/enesim_surface.c, src/lib/rasterizer/Makefile.am,
+	  src/lib/renderer/Makefile.am, src/lib/surface/Makefile.am,
+	  src/lib/surface/argb8888.c, src/lib/surface/argb8888/Makefile.am,
+	  src/lib/surface/argb8888/_2x2conv.h,
+	  src/lib/surface/argb8888/color_c.c,
+	  src/lib/surface/argb8888/draw_fill.c, src/lib/surface/rgb565.c,
+	  src/lib/util/Makefile.am:
+	  Generator inside, lets make the argb888 pixel format to be
+	  generated by itself! =)
+	  This compiles again!
+
+2008-04-09 15:50  jorgeluis.zapata
+
+	* src/include/Enesim.h, src/include/enesim_rasterizer.h,
+	  src/include/enesim_renderer.h, src/include/enesim_surface.h:
+	  Lets split the main header
+
+2008-04-09 15:44  jorgeluis.zapata
+
+	* configure.in, src/include/enesim_rasterizer.h,
+	  src/include/enesim_renderer.h, src/include/enesim_surface.h,
+	  src/include/rasterizer.h, src/include/renderer.h,
+	  src/include/surface.h, src/lib/Makefile.am,
+	  src/lib/enesim_converter.c, src/lib/enesim_drawer.c:
+	  Private headers without the prefix
+	  Add future source files
+
+2008-04-09 11:03  jorgeluis.zapata
+
+	* configure.in, src/include/enesim_rasterizer.h,
+	  src/include/enesim_renderer.h, src/include/enesim_surface.h,
+	  src/lib/converter, src/lib/converter/Makefile.am, src/lib/drawer,
+	  src/lib/drawer/Makefile.am, src/lib/enesim_rasterizer.c,
+	  src/lib/enesim_renderer.c, src/lib/enesim_surface.c,
+	  src/lib/raster, src/lib/rasterizer/rasterizer.c,
+	  src/lib/rasterizer/rasterizer.h, src/lib/renderer/renderer.c,
+	  src/lib/renderer/renderer.h, src/lib/surface/surface.c,
+	  src/lib/surface/surface.h:
+	  Start refactoring enesim
+
+2008-04-09 10:53  jorgeluis.zapata
+
+	* src/include, src/include/Enesim.h, src/include/curve.h,
+	  src/include/enesim_common.h, src/include/enesim_private.h,
+	  src/include/enesim_rectangle.h, src/include/extender_float.h,
+	  src/include/extender_int.h, src/include/fixed_16p16.h,
+	  src/include/fixed_24p8.h, src/include/fixed_math.h,
+	  src/lib/Enesim.h, src/lib/enesim_common.h,
+	  src/lib/enesim_private.h, src/lib/raster/rasterizer,
+	  src/lib/raster/renderer, src/lib/raster/surface,
+	  src/lib/rasterizer, src/lib/renderer, src/lib/surface,
+	  src/lib/util/curve.h, src/lib/util/enesim_rectangle.h,
+	  src/lib/util/extender_float.h, src/lib/util/extender_int.h,
+	  src/lib/util/fixed_16p16.h, src/lib/util/fixed_24p8.h,
+	  src/lib/util/fixed_math.h:
+	  Start refactoring enesim
+
+2008-01-23 10:45  jorgeluis.zapata
+
+	* Makefile.am, configure.in, examples/Makefile.am,
+	  examples/enesim_test.c, src/lib/Makefile.am,
+	  src/lib/raster/Makefile.am,
+	  src/lib/raster/rasterizer/Makefile.am,
+	  src/lib/raster/rasterizer/cpsc.c,
+	  src/lib/raster/rasterizer/kiia.h,
+	  src/lib/raster/renderer/Makefile.am,
+	  src/lib/raster/surface/Makefile.am,
+	  src/lib/raster/surface/argb8888/Makefile.am,
+	  src/lib/util/Makefile.am, src/lib/vector/Makefile.am,
+	  src/lib/vector/component/Makefile.am,
+	  src/lib/vector/component/source_csv.c:
+	  Vincent's patches =) autofoo stuff and minor fixes
+
+2008-01-17 11:54  jorgeluis.zapata
+
+	* src/lib/enesim_common.h:
+	  Missed file
+
+2008-01-16 23:24  jorgeluis.zapata
+
+	* examples/enesim_test.c, examples/png.c, examples/surface.c,
+	  src/lib/Enesim.h, src/lib/enesim_private.h,
+	  src/lib/raster/rasterizer/cpsc.c,
+	  src/lib/raster/rasterizer/kiia.c,
+	  src/lib/raster/rasterizer/kiia16.c,
+	  src/lib/raster/rasterizer/kiia8.c,
+	  src/lib/raster/rasterizer/rasterizer.c,
+	  src/lib/raster/renderer/fill_color.c,
+	  src/lib/raster/renderer/fill_surface.c,
+	  src/lib/raster/renderer/renderer.c,
+	  src/lib/raster/surface/argb8888.c,
+	  src/lib/raster/surface/argb8888/color_c.c,
+	  src/lib/raster/surface/argb8888/draw_blend.c,
+	  src/lib/raster/surface/argb8888/draw_fill.c,
+	  src/lib/raster/surface/argb8888/pixel_c.c,
+	  src/lib/raster/surface/rgb565.c,
+	  src/lib/raster/surface/surface.c,
+	  src/lib/vector/component/component.c,
+	  src/lib/vector/component/path.c,
+	  src/lib/vector/component/reader.c,
+	  src/lib/vector/component/source_csv.c,
+	  src/lib/vector/component/transform.c, src/lib/vector/container.c:
+	  
+
+2008-01-16 00:03  jorgeluis.zapata
+
+	* src/lib/util/enesim_rectangle.h:
+	  Fix the rectnalge_in/_out to work correct
+
+2008-01-14 23:36  jorgeluis.zapata
+
+	* src/lib/util/enesim_rectangle.h:
+	  Add a script to generate the wiki documentation
+	  More code to the subcanvas
+	  A couple of functions to the rectangle
+
+2008-01-13 20:29  jorgeluis.zapata
+
+	* src/lib/raster/rasterizer/rasterizer.loT:
+	  Remove useless file
+
+2008-01-11 16:35  jorgeluis.zapata
+
+	* src/lib/raster/surface/surface.c,
+	  src/lib/util/enesim_rectangle.h:
+	  Fix the rectangle "class", add some fixme's
+
+2008-01-10 20:38  jorgeluis.zapata
+
+	* examples/enesim_test.c, src/lib/Enesim.h,
+	  src/lib/raster/rasterizer/cpsc.c,
+	  src/lib/raster/rasterizer/kiia.c,
+	  src/lib/raster/rasterizer/kiia.h,
+	  src/lib/raster/rasterizer/kiia16.c,
+	  src/lib/raster/rasterizer/kiia8.c,
+	  src/lib/raster/rasterizer/rasterizer.c,
+	  src/lib/raster/rasterizer/rasterizer.h,
+	  src/lib/raster/renderer/fill_surface.c,
+	  src/lib/raster/surface/argb8888.h,
+	  src/lib/raster/surface/argb8888/_noscale_affine.h,
+	  src/lib/raster/surface/argb8888/_noscale_identity.h,
+	  src/lib/raster/surface/argb8888/draw_blend.c,
+	  src/lib/raster/surface/argb8888/draw_fill.c,
+	  src/lib/raster/surface/surface.c,
+	  src/lib/util/enesim_rectangle.h:
+	  Move the rectangle stuff into enesim (where it
+	  belongs)
+
+2008-01-05 12:56  jorgeluis.zapata
+
+	* configure.in, examples/.cvsignore, examples/Makefile.am,
+	  examples/enesim_test.c, src/lib/Enesim.h, src/lib/Makefile.am,
+	  src/lib/enesim_private.h, src/lib/raster/.cvsignore,
+	  src/lib/raster/Makefile.am, src/lib/raster/rasterizer/.cvsignore,
+	  src/lib/raster/rasterizer/Makefile.am,
+	  src/lib/raster/rasterizer/cpsc.c,
+	  src/lib/raster/rasterizer/kiia.c,
+	  src/lib/raster/rasterizer/kiia.h,
+	  src/lib/raster/rasterizer/kiia16.c,
+	  src/lib/raster/rasterizer/kiia8.c,
+	  src/lib/raster/rasterizer/rasterizer.c,
+	  src/lib/raster/rasterizer/rasterizer.h,
+	  src/lib/raster/renderer/.cvsignore,
+	  src/lib/raster/renderer/Makefile.am,
+	  src/lib/raster/renderer/fill_surface.c,
+	  src/lib/raster/surface/.cvsignore,
+	  src/lib/raster/surface/Makefile.am,
+	  src/lib/raster/surface/argb8888.h,
+	  src/lib/raster/surface/argb8888/.cvsignore,
+	  src/lib/raster/surface/argb8888/Makefile.am,
+	  src/lib/raster/surface/argb8888/_noscale_affine.h,
+	  src/lib/raster/surface/argb8888/_noscale_identity.h,
+	  src/lib/raster/surface/argb8888/draw_blend.c,
+	  src/lib/raster/surface/argb8888/draw_fill.c,
+	  src/lib/raster/surface/surface.c, src/lib/util/.cvsignore,
+	  src/lib/util/Makefile.am, src/lib/util/enesim_rectangle.h,
+	  src/lib/vector/.cvsignore, src/lib/vector/Makefile.am,
+	  src/lib/vector/component/.cvsignore,
+	  src/lib/vector/component/Makefile.am,
+	  src/lib/vector/component/component.c,
+	  src/lib/vector/component/component.h,
+	  src/lib/vector/component/reader.c, src/lib/vector/container.c,
+	  src/lib/vector/container.h, src/lib/vector/enesim_vector.h:
+	  Make enesim compile again
+
+2008-01-04 18:49  jorgeluis.zapata
+
+	* ., AUTHORS, COPYING, ChangeLog, Doxyfile, INSTALL, Makefile.am,
+	  NEWS, README, TODO, autogen.sh, configure.in, data,
+	  data/Makefile.am, data/star.csv, data/tiger.png, doc, doc/img,
+	  doc/img/enesim_images.svg, doc/img/raster.png,
+	  doc/img/vector.png, enesim.pc.in, examples, examples/.cvsignore,
+	  examples/Makefile.am, examples/enesim_test.c,
+	  examples/enesim_test.h, examples/png.c, examples/surface.c,
+	  gendoc, src, src/Makefile.am, src/lib, src/lib/Enesim.h,
+	  src/lib/Makefile.am, src/lib/enesim_private.h, src/lib/raster,
+	  src/lib/raster/.cvsignore, src/lib/raster/Makefile.am,
+	  src/lib/raster/rasterizer, src/lib/raster/rasterizer/.cvsignore,
+	  src/lib/raster/rasterizer/Makefile.am,
+	  src/lib/raster/rasterizer/cpsc.c,
+	  src/lib/raster/rasterizer/kiia.c,
+	  src/lib/raster/rasterizer/kiia.h,
+	  src/lib/raster/rasterizer/kiia16.c,
+	  src/lib/raster/rasterizer/kiia32.c,
+	  src/lib/raster/rasterizer/kiia8.c,
+	  src/lib/raster/rasterizer/rasterizer.c,
+	  src/lib/raster/rasterizer/rasterizer.h,
+	  src/lib/raster/rasterizer/rasterizer.loT,
+	  src/lib/raster/renderer, src/lib/raster/renderer/.cvsignore,
+	  src/lib/raster/renderer/Makefile.am,
+	  src/lib/raster/renderer/fill_color.c,
+	  src/lib/raster/renderer/fill_surface.c,
+	  src/lib/raster/renderer/renderer.c,
+	  src/lib/raster/renderer/renderer.h, src/lib/raster/surface,
+	  src/lib/raster/surface/.cvsignore,
+	  src/lib/raster/surface/Makefile.am,
+	  src/lib/raster/surface/argb8888,
+	  src/lib/raster/surface/argb8888.c,
+	  src/lib/raster/surface/argb8888.h,
+	  src/lib/raster/surface/argb8888/.cvsignore,
+	  src/lib/raster/surface/argb8888/Makefile.am,
+	  src/lib/raster/surface/argb8888/_2x2conv.h,
+	  src/lib/raster/surface/argb8888/_noscale_affine.h,
+	  src/lib/raster/surface/argb8888/_noscale_identity.h,
+	  src/lib/raster/surface/argb8888/color_c.c,
+	  src/lib/raster/surface/argb8888/draw_blend.c,
+	  src/lib/raster/surface/argb8888/draw_fill.c,
+	  src/lib/raster/surface/argb8888/pixel_c.c,
+	  src/lib/raster/surface/rgb565.c, src/lib/raster/surface/rgb565.h,
+	  src/lib/raster/surface/surface.c,
+	  src/lib/raster/surface/surface.h, src/lib/util,
+	  src/lib/util/.cvsignore, src/lib/util/Makefile.am,
+	  src/lib/util/curve.h, src/lib/util/curve_decasteljau.c,
+	  src/lib/util/extender_float.h, src/lib/util/extender_int.h,
+	  src/lib/util/fixed_16p16.h, src/lib/util/fixed_24p8.h,
+	  src/lib/util/fixed_math.h, src/lib/vector,
+	  src/lib/vector/.cvsignore, src/lib/vector/Makefile.am,
+	  src/lib/vector/component, src/lib/vector/component/.cvsignore,
+	  src/lib/vector/component/Makefile.am,
+	  src/lib/vector/component/bop.c,
+	  src/lib/vector/component/component.c,
+	  src/lib/vector/component/component.h,
+	  src/lib/vector/component/outline.c,
+	  src/lib/vector/component/path.c,
+	  src/lib/vector/component/reader.c,
+	  src/lib/vector/component/reader.h,
+	  src/lib/vector/component/source_csv.c,
+	  src/lib/vector/component/transform.c, src/lib/vector/container.c,
+	  src/lib/vector/container.h, src/lib/vector/enesim_vector.h:
+	  Enesim in again
+	  Add pc.in
+2007-12-27 15:47  turran
+
+	* :
+	  Remove the scanline.h includes, now it should compile
+
+2007-12-27 15:14  turran
+
+	* :
+	  Change how fixed point headers should be (16p16 only)
+	  Remove scanline directory completely, the API is better now
+	  without it
+	  Jose's code: Add support for surface draw
+	  transformation/scaling (only affine transformations for now). the
+	  API has to be changed again.
+	  Add an examples directory (still have to merge it with svn
+	  code) but is usable
+	  All the rop directory is also removed, now each backend has its
+	  own dir. Now we can reuse the code better.
+	  Add more code to the utils dir, rectangle to easily handle
+	  clips, intersections, etc. Better than macros
+
+2007-12-16 23:49  turran
+
+	* :
+	  Match new Edata_Array API
+	  Remove scanline library dependency
+
+2007-12-11 16:03  turran
+
+	* :
+	  De Casteljau flat's test works now a simple manhattan distance
+	  between the control point and the ends
+	  Added fixed precision code on utils
+	  Make Kiia's algorithm use this header instead of its own
+	  implementation of fixed points
+
+2007-12-10 23:12  turran
+
+	* :
+	  I forgot to ignore them
+
+2007-12-10 23:04  turran
+
+	* :
+	  Disable building the scanline directory
+	  Add DeCasteljau bezier subdivision (the flat test isnt done
+	  yet)
+	  Clean the renderer to use new API
+	  Make extenders for different types (float, int)
+	  Fix the vector components / container to use new Edata_Array
+	  API
+
+2007-12-02 23:28  turran
+
+	* :
+	  Anti Alias Polygon rasterizer (kiia8, 16 and 32)
+	  Move scanline definitions to the API (first step for a new
+	  scanline approach)
+	  Blending with a relative alpha
+	  New data types (extender, etc)
+
+2007-11-13 00:23  turran
+
+	* :
+	  Refactor the rasterizers
+	  Initial code for Kiia's aa polygon rasterizer (doesnt generate
+	  anything yet)
+	  Stub file for mask based "scanlines" (got to find a better word
+	  for this)
+	  Add a helper to keep track of min and max values
+
+2007-10-22 18:51  turran
+
+	* :
+	  Make it compile
+
+2007-10-21 22:39  turran
+
+	* :
+	  Code some of the path component stubs
+	  Simplify the fill surface code
+
+2007-10-19 16:21  turran
+
+	* :
+	  renderer fill surface now has a src and dst rectangle
+	  general function to create a rectangle from its coordinates
+
+2007-10-19 15:30  turran
+
+	* :
+	  Fix unsued autotools definitions
+	  Make argb8888 premul/unpremul functions part of the surface
+	  backend
+
+2007-10-17 21:51  turran
+
+	* :
+	  Make backends for each surface format, better way to handle
+	  common functions =)
+
+2007-10-16 22:09  turran
+
+	* : 
+	  Initial stubs for convert functions
+	  Initial stubs for premul/unpremul functions
+
+2007-10-14 17:49  turran
+
+	* : 
+	  Add ignore files
+	  Clean up several warnings (thanks caro)
+
+2007-10-12 11:04  turran
+
+	* : 
+	  Vector/Raster Pipeline
+

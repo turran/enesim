@@ -116,8 +116,11 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * Creates an importer renderer
+ *
+ * An importer renderer imports pixels from different surface formats into
+ * a native enesim format
+ * @return The renderer
  */
 EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 {
@@ -132,8 +135,9 @@ EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 	return r;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the angle
+ * @param[in] r The importer renderer
+ * @param[in] angle The angle
  */
 EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle angle)
 {
@@ -142,8 +146,9 @@ EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle an
 	i->angle = angle;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the data to import pixels from
+ * @param[in] r The importer renderer
+ * @param[in] cdata The data
  */
 EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Converter_Data *cdata)
 {
@@ -152,8 +157,9 @@ EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Converter
 	i->cdata = *cdata;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the format
+ * @param[in] r The importer renderer
+ * @param[in] fmt The format
  */
 EAPI void enesim_renderer_importer_format_set(Enesim_Renderer *r, Enesim_Converter_Format fmt)
 {

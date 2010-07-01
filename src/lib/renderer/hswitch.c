@@ -184,8 +184,11 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * Creates a new horizontal switch renderer
+ *
+ * A horizontal switch renderer renders an horizontal translation between
+ * the left and right renderers based on the step value.
+ * @return The renderer
  */
 EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void)
 {
@@ -202,8 +205,9 @@ EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void)
 	return r;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the width of the renderer window
+ * @param[in] r The horizontal switch renderer
+ * @param[in] w The width
  */
 EAPI void enesim_renderer_hswitch_w_set(Enesim_Renderer *r, int w)
 {
@@ -214,8 +218,9 @@ EAPI void enesim_renderer_hswitch_w_set(Enesim_Renderer *r, int w)
 	hs->w = w;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the height of the renderer window
+ * @param[in] r The horizontal switch renderer
+ * @param[in] h The height
  */
 EAPI void enesim_renderer_hswitch_h_set(Enesim_Renderer *r, int h)
 {
@@ -226,8 +231,9 @@ EAPI void enesim_renderer_hswitch_h_set(Enesim_Renderer *r, int h)
 	hs->h = h;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the left renderer
+ * @param[in] r The horizontal switch renderer
+ * @param[in] left The left renderer
  */
 EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
 		Enesim_Renderer *left)
@@ -237,8 +243,9 @@ EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
 	hs->lrend = left;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the right renderer
+ * @param[in] r The horizontal switch renderer
+ * @param[in] right The right renderer
  */
 EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
 		Enesim_Renderer *right)
@@ -248,8 +255,10 @@ EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
 	hs->rrend = right;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the step
+ * @param[in] r The horizontal switch renderer
+ * @param[in] step The step. A value of 0 will render the left
+ * renderer, a value of 1 will render the right renderer
  */
 EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, float step)
 {
