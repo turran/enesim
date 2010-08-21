@@ -40,7 +40,6 @@ EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Backend b, Enesim_Form
 EAPI void enesim_surface_delete(Enesim_Surface *s);
 
 EAPI void enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h);
-EAPI void enesim_surface_size_set(Enesim_Surface *s, int w, int h);
 EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s);
 EAPI uint32_t enesim_surface_stride_get(Enesim_Surface *s);
 EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s);

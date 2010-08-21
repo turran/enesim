@@ -22,6 +22,10 @@
  *============================================================================*/
 static int _init = 0;
 /*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+int enesim_log = -1;
+/*============================================================================*
  *                                   API                                      *
  *============================================================================*/
 /**
@@ -40,6 +44,7 @@ EAPI int enesim_init(void)
 		enesim_surface_init();
 		enesim_compositor_init();
 		enesim_converter_init();
+		enesim_log = eina_log_domain_register("enesim", NULL);
 #ifdef EFL_HAVE_MMX
 		//EINA_ERROR_PINFO("MMX Drawer available\n");
 #endif
@@ -56,10 +61,15 @@ EAPI int enesim_init(void)
  */
 EAPI void enesim_shutdown(void)
 {
-	enesim_surface_shutdown();
-	enesim_compositor_shutdown();
-	enesim_converter_shutdown();
-	eina_shutdown();
+	if (!_init == 1)
+	{
+		eina_log_domain_unregister(enesim_log);
+		enesim_surface_shutdown();
+		enesim_compositor_shutdown();
+		enesim_converter_shutdown();
+		eina_shutdown();
+	}
+	_init--;
 }
 
 /**

@@ -29,7 +29,7 @@ typedef struct _Enesim_Eina_Pool
  *============================================================================*/
 static void * _surface_new(Enesim_Pool *p,
 		Enesim_Backend be, Enesim_Format f,
-		int w, int h)
+		uint32_t w, uint32_t h)
 {
 	Enesim_Eina_Pool *pool = (Enesim_Eina_Pool *)p;
 	void *data;
@@ -69,11 +69,13 @@ EAPI Enesim_Pool * enesim_pool_eina_get(Eina_Mempool *mp)
 {
 	Enesim_Eina_Pool *pool;
 
+	if (!mp) return NULL;
+
 	pool = calloc(1, sizeof(Enesim_Eina_Pool));
 	pool->mp = mp;
 	pool->pool.data_alloc = _surface_new;
 	pool->pool.data_free = _surface_free;
-	pool->pool.data_free = _free;
+	pool->pool.free = _free;
 
 	return &pool->pool;
 }

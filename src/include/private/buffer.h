@@ -15,14 +15,26 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef POOL_H_
-#define POOL_H_
+#ifndef _BUFFER_H
+#define _BUFFER_H
 
-extern Enesim_Pool enesim_default_pool;
+#define ENESIM_MAGIC_BUFFER 0xe7e51402
+#define ENESIM_MAGIC_CHECK_BUFFER(d)\
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_MAGIC_BUFFER))\
+			EINA_MAGIC_FAIL(d, ENESIM_MAGIC_BUFFER);\
+	} while(0)
 
-void * enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Backend be,
-		Enesim_Format fmt, uint32_t w, uint32_t h);
-void enesim_pool_data_free(Enesim_Pool *p, void *data);
-void enesim_pool_free(Enesim_Pool *p);
+struct _Enesim_Buffer
+{
+	EINA_MAGIC;
+	uint32_t w;
+	uint32_t h;
+	Enesim_Buffer_Data data;
+	Enesim_Format format;
+	Enesim_Backend backend;
+	Enesim_Pool *pool;
+	void *user; /* user provided data */
+};
 
 #endif

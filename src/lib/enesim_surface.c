@@ -32,9 +32,9 @@ void enesim_surface_init(void)
 
 		emp = eina_mempool_add("pass_through", NULL, NULL);
 		if (!emp)
-		{
-		}
-		_sw_backend = enesim_pool_eina_get(emp);
+			WRN("Unable to create default memory pool allocator");
+		else
+			_sw_backend = enesim_pool_eina_get(emp);
 	}
 }
 
@@ -117,16 +117,6 @@ enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h)
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	if (w) *w = s->w;
 	if (h) *h = s->h;
-}
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_surface_size_set(Enesim_Surface *s, int w, int h)
-{
-	ENESIM_MAGIC_CHECK_SURFACE(s);
-	s->w = w;
-	s->h = h;
 }
 /**
  * To be documented

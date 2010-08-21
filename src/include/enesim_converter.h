@@ -23,93 +23,19 @@
  * @{
  */
 
-/*
- * ENESIM_CONVERTER_FORMAT_A8
- * +---------------+----------------+
- * |     Alpha     |      Alpha     |
- * +---------------+----------------+
- *         8                8
- * <------P0------>.<------P1------>.
- *
- * ENESIM_CONVERTER_FORMAT_b1A3
- * +-------+-------+--------+-------+
- * | Blink | Alpha |  Blink | Alpha |
- * +-------+-------+--------+-------+
- *     1       3        1        3
- * <------P0------>.<------P1------>.
- */
-
-typedef enum _Enesim_Converter_Format
-{
-	ENESIM_CONVERTER_RGB565,
-	ENESIM_CONVERTER_ARGB8888,
-	ENESIM_CONVERTER_ARGB8888_PRE,
-	ENESIM_CONVERTER_RGB888,
-	ENESIM_CONVERTER_A8,
-	ENESIM_CONVERTER_GRAY,
-	ENESIM_CONVERTER_FORMATS
-} Enesim_Converter_Format;
-
-typedef struct _Enesim_Converter_Argb8888
-{
-	uint32_t *plane0;
-	int plane0_stride;
-} Enesim_Converter_Argb8888;
-
-typedef struct _Enesim_Converter_Rgb565
-{
-	uint16_t *plane0;
-	int plane0_stride;
-} Enesim_Converter_Rgb565;
-
-typedef struct _Enesim_Converter_A8
-{
-	uint8_t *plane0;
-	int plane0_stride;
-} Enesim_Converter_A8;
-
-typedef struct _Enesim_Converter_Rgb888
-{
-	uint8_t *plane0;
-	int plane0_stride;
-} Enesim_Converter_Rgb888;
-
-typedef struct _Enesim_Converter_Data
-{
-	union {
-		Enesim_Converter_Argb8888 argb8888;
-		Enesim_Converter_Rgb565 rgb565;
-		Enesim_Converter_A8 a8;
-		Enesim_Converter_Rgb888 rgb888;
-	} pixels;
-	unsigned int w;
-	unsigned int h;
-} Enesim_Converter_Data;
-
-typedef void (*Enesim_Converter_2D)(Enesim_Converter_Data *data, uint32_t dw, uint32_t dh,
-		uint32_t dpitch, uint32_t *src, uint32_t sw, uint32_t sh,
-		uint32_t spitch);
-
-typedef void (*Enesim_Converter_1D)(Enesim_Converter_Data *data, uint32_t len, uint32_t *src);
-
-#define ENESIM_CONVERTER_1D(f) ((Enesim_Converter_1D)(f))
-#define ENESIM_CONVERTER_2D(f) ((Enesim_Converter_2D)(f))
-
-EAPI void enesim_converter_span_register(Enesim_Converter_1D cnv,
-		Enesim_Converter_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt);
-EAPI void enesim_converter_surface_register(Enesim_Converter_2D cnv,
-		Enesim_Converter_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt);
-
-EAPI Enesim_Converter_Format enesim_converter_format_get(uint8_t aoffset, uint8_t alen,
+EAPI Enesim_Buffer_Format enesim_converter_format_get(uint8_t aoffset, uint8_t alen,
 		uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen,
 		uint8_t boffset, uint8_t blen);
 
-EAPI uint8_t enesim_converter_format_depth_get(Enesim_Converter_Format fmt);
+EAPI uint8_t enesim_converter_format_depth_get(Enesim_Buffer_Format fmt);
 
-EAPI Enesim_Converter_1D enesim_converter_span_get(Enesim_Converter_Format dfmt,
-		Enesim_Angle angle, Enesim_Format f);
-EAPI Enesim_Converter_2D enesim_converter_surface_get(Enesim_Converter_Format dfmt,
-		Enesim_Angle angle, Enesim_Format f);
-
+EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst,
+		Enesim_Angle angle,
+		Eina_Rectangle *clip,
+		int x, int y);
+EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
+		Enesim_Angle angle,
+		Eina_Rectangle *clip,
+		int x, int y);
 /** @} */
 #endif /*ENESIM_CONVERTER_H_*/

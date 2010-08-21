@@ -160,7 +160,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		span = enesim_compositor_span_get(rop, &dfmt, ENESIM_FORMAT_ARGB8888,
 				color, ENESIM_FORMAT_NONE);
 
-		fdata = alloca(clip->w * sizeof(uint32_t));
+		fdata = alloca(w * sizeof(uint32_t));
 		while (h--)
 		{
 #if 1

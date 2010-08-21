@@ -198,8 +198,7 @@ EAPI void enesim_renderer_raddist_center_set(Enesim_Renderer *r, int ox, int oy)
  */
 EAPI Enesim_Renderer * enesim_renderer_importer_new(void);
 EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle angle);
-EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Converter_Data *cdata);
-EAPI void enesim_renderer_importer_format_set(Enesim_Renderer *r, Enesim_Converter_Format fmt);
+EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer *buffer);
 /**
  * @}
  * @defgroup Enesim_Renderer_Perlin_Group Perlin

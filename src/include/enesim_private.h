@@ -35,6 +35,11 @@
 
 #include "config.h"
 
+#define ERR(...) EINA_LOG_DOM_ERR(enesim_log, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(enesim_log, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(enesim_log, __VA_ARGS__)
+extern int enesim_log; 
+
 #define DEBUG
 /* Magic values for each system */
 typedef enum
@@ -159,6 +164,7 @@ typedef __m128i sse2_t;
 #include "private/matrix.h"
 #include "private/renderer.h"
 #include "private/pool.h"
+#include "private/buffer.h"
 #include "private/surface.h"
 /** @} */
 #endif

@@ -11,6 +11,7 @@ AC_ISC_POSIX
 
 AM_INIT_AUTOMAKE(1.6 dist-bzip2)
 AM_CONFIG_HEADER(src/include/config.h)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_LIBTOOL_WIN32_DLL
 define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
@@ -34,13 +35,13 @@ AC_PROG_CC
 
 ### Checks for libraries
 
-# Eina
+PKG_CHECK_MODULES(EINA, [eina >= 1.0.0])
+PKG_CHECK_MODULES(EQUANIME, [equanime], [have_equanime="yes"], [have_equanime="no"])
 
-PKG_CHECK_MODULES(EINA, [eina-0 >= 0.0.1])
-
-# Libpng
-
-PKG_CHECK_MODULES(PNG, [libpng >= 0.22], [have_png="yes"], [have_png="no"])
+if test "x$have_equanime" = "xyes" ; then
+  AC_DEFINE(BUILD_EQUANIME, 1, [Build Equanime Pool])
+fi
+AM_CONDITIONAL(HAVE_EQUANIME, [test "x$have_equanime" = "xyes"])
 
 ### Checks for header files
 
@@ -236,6 +237,7 @@ echo "  Software..................................: yes"
 echo
 echo "Surface Pools:"
 echo "  Eina......................................: yes"
+echo "  Equanime..................................: ${have_equanime}"
 echo
 echo "Installation Path...........................: ${prefix}"
 echo

@@ -20,9 +20,33 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static void * _surface_new(Enesim_Pool *p,
+		Enesim_Backend be, Enesim_Format f,
+		uint32_t w, uint32_t h)
+{
+	size_t bytes;
+
+	if (be != ENESIM_BACKEND_SOFTWARE)
+		return NULL;
+
+	bytes = enesim_format_size_get(f, w, h);
+	return calloc(bytes, sizeof(char));
+}
+
+static void _surface_free(Enesim_Pool *p,
+		void *data)
+{
+	free(data);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+/* The main enesim pool */
+Enesim_Pool enesim_default_pool = {
+	.data_alloc = _surface_new,
+	.data_free = _surface_free,
+};
+
 void * enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Backend be,
 		Enesim_Format fmt, uint32_t w, uint32_t h)
 {

@@ -57,6 +57,7 @@ extern "C" {
 #include "enesim_matrix.h"
 #include "enesim_curve.h"
 /* main subsystems */
+#include "enesim_buffer.h"
 #include "enesim_surface.h"
 #include "enesim_converter.h"
 #include "enesim_compositor.h"
