@@ -23,8 +23,8 @@
 typedef struct _Importer
 {
 	Enesim_Renderer base;
-	Enesim_Converter_Data cdata;
-	Enesim_Converter_Format cfmt;
+	Enesim_Buffer_Data cdata;
+	Enesim_Buffer_Format cfmt;
 	Enesim_Angle angle;
 } Importer;
 
@@ -150,7 +150,7 @@ EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle an
  * @param[in] r The importer renderer
  * @param[in] cdata The data
  */
-EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Converter_Data *cdata)
+EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Buffer_Data *cdata)
 {
 	Importer *i = (Importer *)r;
 
@@ -161,7 +161,7 @@ EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Converter
  * @param[in] r The importer renderer
  * @param[in] fmt The format
  */
-EAPI void enesim_renderer_importer_format_set(Enesim_Renderer *r, Enesim_Converter_Format fmt)
+EAPI void enesim_renderer_importer_format_set(Enesim_Renderer *r, Enesim_Buffer_Format fmt)
 {
 	Importer *i = (Importer *)r;
 

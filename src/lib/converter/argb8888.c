@@ -3,7 +3,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static void _2d_argb8888_none_argb8888(Enesim_Converter_Data *data, uint32_t dw, uint32_t dh,
+static void _2d_argb8888_none_argb8888(Enesim_Buffer_Data *data, uint32_t dw, uint32_t dh,
 		uint32_t dpitch, uint32_t *src, uint32_t sw, uint32_t sh,
 		uint32_t spitch)
 {
@@ -37,7 +37,7 @@ static void _2d_argb8888_none_argb8888(Enesim_Converter_Data *data, uint32_t dw,
 		src += spitch;
 	}
 }
-static void _1d_argb8888_none_argb8888(Enesim_Converter_Data *data, uint32_t len, uint32_t *native)
+static void _1d_argb8888_none_argb8888(Enesim_Buffer_Data *data, uint32_t len, uint32_t *native)
 {
 	uint32_t *dst = data->pixels.argb8888.plane0;
 

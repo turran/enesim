@@ -90,13 +90,13 @@ typedef struct _Enesim_Buffer_Data
 } Enesim_Buffer_Data;
 
 
-EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Backend b, Enesim_Format f, int w, int h);
-EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Format g, uint32_t w, uint32_t h, Enesim_Buffer_Data *data);
-EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
+EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Backend b, Enesim_Buffer_Format f, int w, int h);
+EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Buffer_Format g, uint32_t w, uint32_t h, Enesim_Buffer_Data *data);
+EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
 EAPI void enesim_buffer_delete(Enesim_Buffer *b);
 
 EAPI void enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h);
-EAPI Enesim_Format enesim_buffer_format_get(const Enesim_Buffer *b);
+EAPI Enesim_Buffer_Format enesim_buffer_format_get(const Enesim_Buffer *b);
 EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b);
 
 EAPI void enesim_buffer_private_set(Enesim_Buffer *b, void *data);

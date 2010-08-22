@@ -27,16 +27,17 @@
  *                                   API                                      *
  *============================================================================*/
 EAPI Enesim_Buffer *
-enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Format g,
-		uint32_t w, uint32_t h, Enesim_Converter_Data *data)
+enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Buffer_Format fmt,
+		uint32_t w, uint32_t h, Enesim_Buffer_Data *data)
 {
-	Enesim_Surface *buf;
+	Enesim_Buffer *buf;
 
 	buf = calloc(1, sizeof(Enesim_Buffer));
 	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
 	buf->w = w;
 	buf->h = h;
-	buf->data = data;
+	buf->format = fmt;
+	buf->data = *data;
 
 	return buf;
 }
@@ -45,7 +46,7 @@ enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Format g,
  * FIXME: To be fixed
  */
 EAPI Enesim_Buffer *
-enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Format f,
+enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p)
 {
 	Enesim_Buffer *buf;
@@ -72,7 +73,7 @@ enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Format f,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Backend b, Enesim_Format f, int w, int h)
+EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Backend b, Enesim_Buffer_Format f, int w, int h)
 {
 	Enesim_Buffer *buf;
 
@@ -94,7 +95,7 @@ EAPI void enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Format enesim_buffer_format_get(const Enesim_Buffer *b)
+EAPI Enesim_Buffer_Format enesim_buffer_format_get(const Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	return b->format;
