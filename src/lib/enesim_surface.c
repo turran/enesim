@@ -20,29 +20,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static Enesim_Pool *_sw_backend = NULL;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void enesim_surface_init(void)
-{
-	if (!_sw_backend)
-	{
-		Eina_Mempool *emp;
-
-		emp = eina_mempool_add("pass_through", NULL, NULL);
-		if (!emp)
-			WRN("Unable to create default memory pool allocator");
-		else
-			_sw_backend = enesim_pool_eina_get(emp);
-	}
-}
-
-void enesim_surface_shutdown(void)
-{
-	if (_sw_backend)
-		enesim_pool_free(_sw_backend);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -51,7 +31,8 @@ void enesim_surface_shutdown(void)
  * FIXME: To be fixed
  */
 EAPI Enesim_Surface *
-enesim_surface_new_data_from(int w, int h, void *data)
+enesim_surface_new_data_from(Enesim_Backend b, Enesim_Format fmt,
+		uint32_t w, uint32_t h, Enesim_Buffer_Data *data)
 {
 	Enesim_Surface *s;
 
@@ -98,7 +79,7 @@ enesim_surface_new_pool_from(Enesim_Backend b, Enesim_Format f,
  * FIXME: To be fixed
  */
 EAPI Enesim_Surface *
-enesim_surface_new(Enesim_Backend b, Enesim_Format f, int w, int h)
+enesim_surface_new(Enesim_Backend b, Enesim_Format f, uint32_t w, uint32_t h)
 {
 	Enesim_Surface *s;
 

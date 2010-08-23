@@ -20,9 +20,25 @@
 
 extern Enesim_Pool enesim_default_pool;
 
-void * enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Backend be,
-		Enesim_Format fmt, uint32_t w, uint32_t h);
-void enesim_pool_data_free(Enesim_Pool *p, void *data);
+typedef Eina_Bool (*Enesim_Pool_Data_Alloc)(Enesim_Pool *p, Enesim_Buffer_Data *data,
+		Enesim_Backend be, Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
+typedef void (*Enesim_Pool_Data_Free)(Enesim_Pool *p, Enesim_Buffer_Data *data,
+		Enesim_Backend be, Enesim_Buffer_Format fmt);
+typedef void (*Enesim_Pool_Free)(Enesim_Pool *p);
+
+struct _Enesim_Pool
+{
+	EINA_MAGIC;
+	Enesim_Pool_Data_Alloc data_alloc;
+	Enesim_Pool_Data_Free data_free;
+	Enesim_Pool_Free free;
+};
+
+
+Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
+		Enesim_Backend be, Enesim_Format fmt, uint32_t w, uint32_t h);
+void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
+		Enesim_Backend be, Enesim_Buffer_Format fmt);
 void enesim_pool_free(Enesim_Pool *p);
 
 #endif

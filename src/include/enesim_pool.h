@@ -24,20 +24,9 @@
  */
 typedef struct _Enesim_Pool Enesim_Pool;
 
-typedef void * (*Enesim_Pool_Data_Alloc)(Enesim_Pool *p, Enesim_Backend be,
-		Enesim_Format fmt, uint32_t w, uint32_t h);
-typedef void (*Enesim_Pool_Data_Free)(Enesim_Pool *p, void *);
-typedef void (*Enesim_Pool_Free)(Enesim_Pool *p);
-
-struct _Enesim_Pool
-{
-	EINA_MAGIC;
-	Enesim_Pool_Data_Alloc data_alloc;
-	Enesim_Pool_Data_Free data_free;
-	Enesim_Pool_Free free;
-};
-
 EAPI Enesim_Pool * enesim_pool_eina_get(Eina_Mempool *mp);
+
+EAPI Eina_Bool enesim_pool_equanime_support(void);
 
 /** @} */
 
