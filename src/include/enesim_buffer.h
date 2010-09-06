@@ -77,21 +77,17 @@ typedef struct _Enesim_Buffer_Rgb888
 	int plane0_stride;
 } Enesim_Buffer_Rgb888;
 
-typedef struct _Enesim_Buffer_Data
+typedef union _Enesim_Buffer_Data
 {
-	union {
-		Enesim_Buffer_Argb8888 argb8888;
-		Enesim_Buffer_Rgb565 rgb565;
-		Enesim_Buffer_A8 a8;
-		Enesim_Buffer_Rgb888 rgb888;
-	} pixels;
-	unsigned int w;
-	unsigned int h;
+	Enesim_Buffer_Argb8888 argb8888;
+	Enesim_Buffer_Argb8888 argb8888_pre;
+	Enesim_Buffer_Rgb565 rgb565;
+	Enesim_Buffer_A8 a8;
+	Enesim_Buffer_Rgb888 rgb888;
 } Enesim_Buffer_Data;
 
-
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Backend b, Enesim_Buffer_Format f, uint32_t w, uint32_t h);
-EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Buffer_Format g, uint32_t w, uint32_t h, Enesim_Buffer_Data *data);
+EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Buffer_Data *data);
 EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
 EAPI void enesim_buffer_delete(Enesim_Buffer *b);
 
@@ -103,6 +99,8 @@ EAPI void enesim_buffer_private_set(Enesim_Buffer *b, void *data);
 EAPI void * enesim_buffer_private_get(Enesim_Buffer *b);
 
 EAPI void enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Data *data);
+
+EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
 
 /** @} */ //End of Enesim_Buffer_Group
 

@@ -48,7 +48,6 @@ EAPI void enesim_surface_private_set(Enesim_Surface *s, void *data);
 EAPI void * enesim_surface_private_get(Enesim_Surface *s);
 
 EAPI void * enesim_surface_data_get(const Enesim_Surface *s);
-EAPI void enesim_surface_data_set(Enesim_Surface *s, void *data);
 
 EAPI void enesim_surface_pixel_components_from(uint32_t *color,
 		Enesim_Format f, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
@@ -56,6 +55,5 @@ EAPI void enesim_surface_pixel_components_to(uint32_t color,
 		Enesim_Format f, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
 
 /** @} */ //End of Enesim_Surface_Group
-
 
 #endif /*ENESIM_SURFACE_H_*/

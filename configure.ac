@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT([enesim], [0.0.3], [enlightenment-devel@lists.sourceforge.net])
+AC_INIT([enesim], [0.0.4], [enlightenment-devel@lists.sourceforge.net])
 AC_PREREQ([2.60])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
@@ -187,6 +187,7 @@ AC_SUBST(ENESIM_LIBS)
 AC_OUTPUT([
 Makefile
 enesim.pc
+enesim_equanime.pc
 src/Makefile
 src/include/Makefile
 src/lib/Makefile
@@ -235,7 +236,7 @@ echo
 echo "Backends:"
 echo "  Software..................................: yes"
 echo
-echo "Surface Pools:"
+echo "Buffer Pools:"
 echo "  Eina......................................: yes"
 echo "  Equanime..................................: ${have_equanime}"
 echo

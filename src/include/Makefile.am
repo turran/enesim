@@ -6,6 +6,7 @@ Makefile.in
 
 ENESIM_UTILHEADERS = \
 enesim_main.h \
+enesim_buffer.h \
 enesim_surface.h \
 enesim_curve.h \
 enesim_converter.h \
@@ -18,3 +19,7 @@ enesim_renderer.h
 installed_headersdir = $(prefix)/include/enesim
 installed_headers_DATA = $(ENESIM_UTILHEADERS)
 include_HEADERS = Enesim.h
+
+if HAVE_EQUANIME
+include_HEADERS += Enesim_Equanime.h
+endif

@@ -7,17 +7,19 @@ static void _2d_rgb888_none_argb8888(Enesim_Buffer_Data *data, uint32_t dw, uint
 		uint32_t dpitch, uint32_t *src, uint32_t sw, uint32_t sh,
 		uint32_t spitch)
 {
-	uint8_t *dst = data->pixels.rgb888.plane0;
+	uint8_t *dst = data->rgb888.plane0;
+	dpitch *= 3;
 	while (dh--)
 	{
-		uint16_t *ddst = dst;
+		uint8_t *ddst = dst;
 		uint32_t *ssrc = src;
 		uint32_t ddw = dw;
 		while (ddw--)
 		{
-			*dst++ = (*ssrc >> 16) & 0xff;
-			*dst++ = (*ssrc >> 8) & 0xff;
-			*dst++ = *ssrc & 0xff;
+			*ddst++ = (*ssrc >> 16) & 0xff;
+			*ddst++ = (*ssrc >> 8) & 0xff;
+			*ddst++ = *ssrc & 0xff;
+			//printf("%02x%02x%02x\n", *(ddst - 3), *(ddst - 2), *(ddst - 1));
 			ssrc++;
 		}
 		dst += dpitch;

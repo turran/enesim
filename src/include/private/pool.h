@@ -34,9 +34,8 @@ struct _Enesim_Pool
 	Enesim_Pool_Free free;
 };
 
-
 Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Format fmt, uint32_t w, uint32_t h);
+		Enesim_Backend be, Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
 void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
 		Enesim_Backend be, Enesim_Buffer_Format fmt);
 void enesim_pool_free(Enesim_Pool *p);

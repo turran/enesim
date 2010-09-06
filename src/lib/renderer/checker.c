@@ -38,7 +38,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	Checker *s = (Checker *)r;
 	int w2 = s->sw * 2;
 	int h2 = s->sh * 2;
-	uint32_t color[2] = { s->color1, s->color2};
+	uint32_t color[2] = {s->color1, s->color2};
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx;
@@ -275,12 +275,19 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 {
 	Checker *c = (Checker *)r;
 
+#if 0
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_identity);
 	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
 		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_affine);
 	else
 		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_projective);
+#else
+	if (r->matrix.type == ENESIM_MATRIX_PROJECTIVE)
+		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_projective);
+	else
+		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_affine);
+#endif
 	return EINA_TRUE;
 }
 

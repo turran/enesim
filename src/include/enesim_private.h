@@ -166,5 +166,6 @@ typedef __m128i sse2_t;
 #include "private/pool.h"
 #include "private/buffer.h"
 #include "private/surface.h"
+#include "private/converter.h"
 /** @} */
 #endif

@@ -28,18 +28,9 @@
 struct _Enesim_Surface
 {
 	EINA_MAGIC;
-	uint32_t w;
-	uint32_t h;
-	/* TODO make all code use this */
-	uint32_t stride; /* number of bytes per line */
-	void *data;
+	Enesim_Buffer buffer;
 	Enesim_Format format;
-	Enesim_Backend backend;
-	Enesim_Pool *pool;
 	void *user; /* user provided data */
 };
-
-void enesim_surface_init(void);
-void enesim_surface_shutdown(void);
 
 #endif

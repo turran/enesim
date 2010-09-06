@@ -31,9 +31,9 @@ typedef struct _Importer
 static void _span_argb8888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Importer *i = (Importer *)r;
-	uint32_t *ssrc = i->cdata.pixels.argb8888.plane0;
+	uint32_t *ssrc = i->cdata.argb8888.plane0;
 
-	ssrc = ssrc + (i->cdata.pixels.argb8888.plane0_stride * y) + x;
+	ssrc = ssrc + (i->cdata.argb8888.plane0_stride * y) + x;
 	while (len--)
 	{
 		uint16_t a = (*ssrc >> 24) + 1;
@@ -54,9 +54,9 @@ static void _span_argb8888_none_argb8888(Enesim_Renderer *r, int x, int y, unsig
 static void _span_a8_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Importer *i = (Importer *)r;
-	uint8_t *ssrc = i->cdata.pixels.a8.plane0;
+	uint8_t *ssrc = i->cdata.a8.plane0;
 
-	ssrc = ssrc + (i->cdata.pixels.a8.plane0_stride * y) + x;
+	ssrc = ssrc + (i->cdata.a8.plane0_stride * y) + x;
 	while (len--)
 	{
 		*dst = *ssrc << 24;;
@@ -69,9 +69,9 @@ static void _span_a8_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned in
 static void _span_rgb888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Importer *i = (Importer *)r;
-	uint8_t *ssrc = i->cdata.pixels.rgb888.plane0;
+	uint8_t *ssrc = i->cdata.rgb888.plane0;
 
-	ssrc = ssrc + (i->cdata.pixels.rgb888.plane0_stride * y * 3) + (x * 3);
+	ssrc = ssrc + (i->cdata.rgb888.plane0_stride * y * 3) + (x * 3);
 	while (len--)
 	{
 		uint8_t r, g, b;

@@ -7,7 +7,7 @@ static void _2d_rgb565_none_argb8888(Enesim_Buffer_Data *data, uint32_t dw, uint
 		uint32_t dpitch, uint32_t *src, uint32_t sw, uint32_t sh,
 		uint32_t spitch)
 {
-	uint16_t *dst = data->pixels.rgb565.plane0;
+	uint16_t *dst = data->rgb565.plane0;
 	while (dh--)
 	{
 		uint16_t *ddst = dst;

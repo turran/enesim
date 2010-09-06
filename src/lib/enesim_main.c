@@ -41,7 +41,6 @@ EAPI int enesim_init(void)
 		 * get the cpuid for this
 		 */
 		eina_init();
-		enesim_surface_init();
 		enesim_compositor_init();
 		enesim_converter_init();
 		enesim_log = eina_log_domain_register("enesim", NULL);
@@ -64,7 +63,6 @@ EAPI void enesim_shutdown(void)
 	if (!_init == 1)
 	{
 		eina_log_domain_unregister(enesim_log);
-		enesim_surface_shutdown();
 		enesim_compositor_shutdown();
 		enesim_converter_shutdown();
 		eina_shutdown();

@@ -17,6 +17,7 @@ build-stamp \
 configure-stamp \
 depcomp \
 enesim.pc \
+enesim_equanime.pc \
 enesim_docs.tar.gz
 
 EXTRA_DIST = \
@@ -31,6 +32,11 @@ ACLOCAL_AMFLAGS = -I m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = enesim.pc
+
+if HAVE_EQUANIME
+pkgconfig_DATA += enesim_equanime.pc
+endif
+
 
 .PHONY: coverage benchmark
 

@@ -37,4 +37,8 @@ struct _Enesim_Buffer
 	void *user; /* user provided data */
 };
 
+Eina_Bool enesim_buffer_setup(Enesim_Buffer *buf, Enesim_Backend b,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
+		Enesim_Buffer_Data *data, Enesim_Pool *pool);
+
 #endif
