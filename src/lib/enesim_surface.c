@@ -255,7 +255,6 @@ EAPI uint32_t
 enesim_surface_stride_get(Enesim_Surface *s)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
-	printf("stride = %d\n", s->buffer.data.argb8888.plane0_stride);
 	return s->buffer.data.argb8888.plane0_stride;
 }
 /**
