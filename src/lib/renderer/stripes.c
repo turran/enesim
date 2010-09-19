@@ -164,6 +164,9 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	st = calloc(1, sizeof(Stripes));
 	if (!st)
 		return NULL;
+	/* specific renderer setup */
+	st->s0.thickness = 1;
+	st->s1.thickness = 1;
 	r = (Enesim_Renderer *)st;
 	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_setup_state);
 	enesim_renderer_init(r);

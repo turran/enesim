@@ -311,6 +311,8 @@ EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
 	Checker *s;
 
 	s = calloc(1, sizeof(Checker));
+	if (!s)
+		return NULL;
 	/* specific renderer setup */
 	s->sw = 10;
 	s->sh = 10;
