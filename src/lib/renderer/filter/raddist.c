@@ -73,6 +73,10 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 
 static Eina_Bool _state_setup(Enesim_Renderer *r)
 {
+	Raddist *rd = (Raddist *)r;
+
+	if (!rd->src) return EINA_FALSE;
+
 	r->span = ENESIM_RENDERER_SPAN_DRAW(_span_identity);
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)

@@ -92,5 +92,6 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 	sdata = enesim_surface_data_get(s);
 	/* TODO check the clip and x, y */
 	converter(&data, clip->w, clip->h, clip->w, sdata, clip->w, clip->h, clip->w);
+
 	return EINA_TRUE;
 }

@@ -311,8 +311,11 @@ EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
 	Checker *s;
 
 	s = calloc(1, sizeof(Checker));
+	/* specific renderer setup */
+	s->sw = 10;
+	s->sh = 10;
+	/* common renderer setup */
 	r = (Enesim_Renderer *)s;
-
 	enesim_renderer_init(r);
 	r->free = ENESIM_RENDERER_DELETE(_free);
 	r->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);

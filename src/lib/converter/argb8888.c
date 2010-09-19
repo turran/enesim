@@ -29,7 +29,6 @@ static void _2d_argb8888_none_argb8888(Enesim_Buffer_Data *data, uint32_t dw, ui
 			{
 				*ddst = *ssrc;
 			}
-
 			ssrc++;
 			ddst++;
 		}
