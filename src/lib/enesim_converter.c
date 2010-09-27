@@ -84,11 +84,9 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 	sfmt = enesim_surface_format_get(s);
 
 	converter = enesim_converter_surface_get(dfmt, angle, sfmt);
-	printf("dfmt = %d sfmt = %d\n", dfmt, sfmt);
 	if (!converter) return EINA_FALSE;
 
 	enesim_buffer_data_get(dst, &data);
-	printf("buffer data = %p\n", data.rgb888.plane0);
 	sdata = enesim_surface_data_get(s);
 	/* TODO check the clip and x, y */
 	converter(&data, clip->w, clip->h, clip->w, sdata, clip->w, clip->h, clip->w);

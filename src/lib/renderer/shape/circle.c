@@ -235,6 +235,18 @@ EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, float x, float y
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, float *x, float *y)
+{
+	Circle *circ;
+
+	circ = (Circle *)r;
+	if (x) *x = circ->x;
+	if (y) *y = circ->y;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, float radius)
 {
 	Circle *circ;
@@ -243,4 +255,16 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, float radius)
 	if (radius < 1)
 		radius = 1;
 	circ->r = radius;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, float *radius)
+{
+	Circle *circ;
+
+	circ = (Circle *)r;
+	if (radius) *radius = circ->r;
 }

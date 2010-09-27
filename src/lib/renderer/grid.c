@@ -206,6 +206,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 {
 	Grid *g = (Grid *)r;
 
+	if (!g->inside.w || !g->inside.h || !g->outside.w || !g->outside.h)
+		return EINA_FALSE;
+
 	g->ht = g->inside.h + g->outside.h;
 	g->wt = g->inside.w + g->outside.w;
 	g->hht = eina_f16p16_int_from(g->ht);
@@ -244,8 +247,13 @@ EAPI Enesim_Renderer * enesim_renderer_grid_new(void)
 	Grid *g;
 
 	g = calloc(1, sizeof(Grid));
+	/* specific renderer setup */
+	g->inside.w = 1;
+	g->inside.h = 1;
+	g->outside.w = 1;
+	g->outside.h = 1;
+	/* common renderer setup */
 	r = (Enesim_Renderer *)g;
-
 	enesim_renderer_init(r);
 	r->free = ENESIM_RENDERER_DELETE(_free);
 	r->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);

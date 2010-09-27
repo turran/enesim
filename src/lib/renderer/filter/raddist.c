@@ -120,6 +120,12 @@ EAPI void enesim_renderer_raddist_scale_set(Enesim_Renderer *r, float scale)
 	rd->scale = scale;
 }
 
+EAPI float enesim_renderer_raddist_scale_get(Enesim_Renderer *r)
+{
+	Raddist *rd = (Raddist *)r;
+	return rd->scale;
+}
+
 EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Raddist *rd = (Raddist *)r;
@@ -127,10 +133,15 @@ EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	rd->src = src;
 }
 
-EAPI void enesim_renderer_raddist_center_set(Enesim_Renderer *r, int ox, int oy)
+EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
 {
 	Raddist *rd = (Raddist *)r;
 
 	rd->orx = ox;
+}
+
+EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy)
+{
+	Raddist *rd = (Raddist *)r;
 	rd->ory = oy;
 }

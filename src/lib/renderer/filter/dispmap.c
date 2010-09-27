@@ -248,10 +248,13 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 {
 	Dispmap *d = (Dispmap *)r;
 
-	d->s_scale = eina_f16p16_float_from(d->scale);
+	if (!d->map || !d->src) return EINA_FALSE;
+
 	r->span = _spans[d->x_channel][d->y_channel][r->matrix.type];
-	if (!r->span)
-		return EINA_FALSE;
+	if (!r->span) return EINA_FALSE;
+
+	d->s_scale = eina_f16p16_float_from(d->scale);
+
 	return EINA_TRUE;
 }
 /*============================================================================*
@@ -268,7 +271,11 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 	Enesim_Renderer *r;
 
 	d = calloc(1, sizeof(Dispmap));
-
+	if (!d) return NULL;
+	/* specific renderer setup */
+	d->x_channel = ENESIM_CHANNEL_RED;
+	d->y_channel = ENESIM_CHANNEL_GREEN;
+	/* common renderer setup */
 	r = (Enesim_Renderer *)d;
 	enesim_renderer_init(r);
 	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);

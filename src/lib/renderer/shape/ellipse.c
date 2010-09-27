@@ -411,6 +411,18 @@ EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, float x, float 
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, float *x, float *y)
+{
+	Ellipse *ellipse = (Ellipse *)p;
+
+	if (x) *x = ellipse->x;
+	if (y) *y = ellipse->y;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, float radius_x, float radius_y)
 {
 	Ellipse *ellipse;
@@ -426,4 +438,16 @@ EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, float radius_x, 
 	ellipse->rx = radius_x;
 	ellipse->ry = radius_y;
 	p->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, float *radius_x, float *radius_y)
+{
+	Ellipse *ellipse = (Ellipse *)p;
+
+	if (radius_x) *radius_x = ellipse->rx;
+	if (radius_y) *radius_y = ellipse->ry;
 }

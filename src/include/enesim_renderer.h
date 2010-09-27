@@ -26,8 +26,10 @@ typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
 EAPI void enesim_renderer_transform_set(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_delete(Enesim_Renderer *r);
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, int x, int y);
+EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, int *x, int *y);
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Enesim_Color color, Eina_Rectangle *clip);
+		Enesim_Rop rop, Enesim_Color color, Eina_Rectangle *clip,
+		int x, int y);
 /**
  * @defgroup Enesim_Renderer_Shapes_Group Shapes
  * @{
@@ -60,7 +62,9 @@ EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p, int tl, int 
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void);
 EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, float x, float y);
+EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, float *x, float *y);
 EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, float radius);
+EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, float *radius);
 /**
  * @}
  * @defgroup Enesim_Renderer_Ellipse_Group Ellipse
@@ -68,7 +72,9 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, float radius);
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void);
 EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, float x, float y);
+EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, float *x, float *y);
 EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, float radius_x, float radius_y);
+EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, float *radius_x, float *radius_y);
 /**
  * @}
  * @defgroup Enesim_Renderer_Figure_Group Figure
@@ -181,6 +187,8 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void);
 EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *map);
 EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI void enesim_renderer_dispmap_scale_set(Enesim_Renderer *r, float scale);
+EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
+EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
 /**
  * @}
  * @defgroup Enesim_Renderer_Raddist_Group Radial Distortion
@@ -190,7 +198,8 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void);
 EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, float radius);
 EAPI void enesim_renderer_raddist_scale_set(Enesim_Renderer *r, float scale);
 EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src);
-EAPI void enesim_renderer_raddist_center_set(Enesim_Renderer *r, int ox, int oy);
+EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox);
+EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy);
 /**
  * @}
  * @defgroup Enesim_Renderer_Importer_Group Importer
