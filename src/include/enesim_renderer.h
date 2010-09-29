@@ -52,9 +52,14 @@ EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_D
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void);
-EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, int w, int h);
+EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *p, unsigned int w);
+EAPI unsigned int enesim_renderer_rectangle_width_get(Enesim_Renderer *p);
+EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *p, unsigned int h);
+EAPI unsigned int enesim_renderer_rectangle_height_get(Enesim_Renderer *p);
+EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, unsigned int w, unsigned int h);
+EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *p, unsigned int *w, unsigned int *h);
 EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, float radius);
-EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p, int tl, int tr, int bl, int br);
+EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p, Eina_Bool tl, Eina_Bool tr, Eina_Bool bl, Eina_Bool br);
 /**
  * @}
  * @defgroup Enesim_Renderer_Circle_Group Circle

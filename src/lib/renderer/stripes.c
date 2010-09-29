@@ -41,8 +41,6 @@ static void _span_projective(Enesim_Renderer *p, int x, int y,
 	unsigned int *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx, zz;
 
-	//yy = (ayx * x) + (ayy * y) + ayz;
-	//xx = (axx * x) + (axy * y) + axz;
 	renderer_projective_setup(p, x, y, &xx, &yy, &zz);
 
 	while (d < e)

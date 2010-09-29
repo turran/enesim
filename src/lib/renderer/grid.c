@@ -114,7 +114,20 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	Grid *g = (Grid *)r;
 	uint32_t *end = dst + len;
 	int sy;
+	Eina_F16p16 yy, xx;
 
+#if 0
+	renderer_identity_setup(r, x, y, &xx, &yy);
+	while (dst < end)
+	{
+		uint32_t p0;
+
+		p0 = _grid(g, yy, xx);
+
+		xx += EINA_F16P16_ONE;
+		*dst++ = p0;
+	}
+#else
 	sy = (y % g->ht);
 	if (sy < 0)
 	{
@@ -146,6 +159,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 			x++;
 		}
 	}
+#endif
 }
 
 static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
@@ -159,8 +173,6 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 	while (dst < end)
 	{
-		Eina_F16p16 syy;
-		int sy;
 		uint32_t p0;
 
 		p0 = _grid(g, yy, xx);
@@ -182,13 +194,13 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 
 	while (dst < end)
 	{
-		Eina_F16p16 syy, sxx, syyy, sxxx;
+		Eina_F16p16 syy, sxx;
 		uint32_t p0;
 
-		syyy = ((((int64_t)yy) << 16) / zz);
-		sxxx = ((((int64_t)xx) << 16) / zz);
+		syy = ((((int64_t)yy) << 16) / zz);
+		sxx = ((((int64_t)xx) << 16) / zz);
 
-		p0 = _grid(g, syyy, sxxx);
+		p0 = _grid(g, syy, sxx);
 
 		yy += r->matrix.values.yx;
 		xx += r->matrix.values.xx;

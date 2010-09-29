@@ -44,14 +44,9 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	Eina_F16p16 yy, xx;
 
 	/* translate to the origin */
-#if 1
-	x -= r->ox;
-	y -= r->oy;
-#else
 	renderer_identity_setup(r, x, y, &xx, &yy);
-#endif
 	/* normalize the modulo */
-	sy = ((y  >> 16) % h2);
+	sy = ((yy  >> 16) % h2);
 	if (sy < 0)
 	{
 		sy += h2;
@@ -67,11 +62,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 		int sx;
 		uint32_t p0;
 
-#if 1
-		sx = (x % w2);
-#else
 		sx = ((xx >> 16) % w2);
-#endif
 		if (sx < 0)
 		{
 			sx += w2;
@@ -86,11 +77,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 			p0 = color[1];
 		}
 		*dst++ = p0;
-#if 1
-		x++;
-#else
-		xx += (1 << 16);
-#endif
+		xx += EINA_F16P16_ONE;
 	}
 }
 
@@ -275,19 +262,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 {
 	Checker *c = (Checker *)r;
 
-#if 0
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_identity);
 	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
 		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_affine);
 	else
 		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_projective);
-#else
-	if (r->matrix.type == ENESIM_MATRIX_PROJECTIVE)
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_projective);
-	else
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_affine);
-#endif
 	return EINA_TRUE;
 }
 

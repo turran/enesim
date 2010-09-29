@@ -129,7 +129,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	enesim_renderer_state_setup(r);
+	if (!enesim_renderer_state_setup(r)) return;
 	if (!clip)
 		enesim_surface_size_get(s, &cw, &ch);
 	else

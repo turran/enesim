@@ -27,11 +27,10 @@ typedef struct _Rectangle {
 	int w, h;
 	struct {
 		float radius;
-	//       int     style;
-	       unsigned char tl : 1;
-	       unsigned char tr : 1;
-	       unsigned char bl : 1;
-	       unsigned char br : 1;
+		Eina_Bool tl : 1;
+		Eina_Bool tr : 1;
+		Eina_Bool bl : 1;
+		Eina_Bool br : 1;
 	} corner;
 
 	int lxx0, rxx0;
@@ -681,18 +680,49 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, int w, int h)
+EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *p, unsigned int w)
 {
-	Rectangle *rect;
+	Rectangle *rect = (Rectangle *)p;
 
-	rect = (Rectangle *) p;
-	if (!rect) return;
-	if (w < 0)
-		w = 0;
-	if (h < 0)
-		h = 0;
-	if ((rect->w == w) && (rect->h == h))
-		return;
+	rect->w = w;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI unsigned int enesim_renderer_rectangle_width_get(Enesim_Renderer *p)
+{
+	Rectangle *rect = (Rectangle *)p;
+
+	return rect->w;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *p, unsigned int h)
+{
+	Rectangle *rect = (Rectangle *)p;
+
+	rect->h = h;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI unsigned int enesim_renderer_rectangle_height_get(Enesim_Renderer *p)
+{
+	Rectangle *rect = (Rectangle *)p;
+
+	return rect->h;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, unsigned int w, unsigned int h)
+{
+	Rectangle *rect = (Rectangle *)p;
 	rect->w = w;
 	rect->h = h;
 }
@@ -700,11 +730,20 @@ EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, int w, int h)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *p, unsigned int *w, unsigned int *h)
+{
+	Rectangle *rect = (Rectangle *) p;
+
+	if (w) *w = rect->w;
+	if (h) *h = rect->h;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, float radius)
 {
-	Rectangle *rect;
-
-	rect = (Rectangle *) p;
+	Rectangle *rect = (Rectangle *) p;
 	if (!rect) return;
 	if (radius < 0)
 		radius = 0;
@@ -717,13 +756,12 @@ EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, float 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p, int tl, int tr, int bl, int br)
+EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p,
+		Eina_Bool tl, Eina_Bool tr, Eina_Bool bl, Eina_Bool br)
 {
-	Rectangle  *rect;
-
-	rect = (Rectangle *)p;
+	Rectangle *rect = (Rectangle *)p;
 	if (!rect) return;
-	tl = !!tl;  tr = !!tr;  bl = !!bl;  br = !!br;
+
 	if ((rect->corner.tl == tl) && (rect->corner.tr == tr) &&
 	     (rect->corner.bl == bl) && (rect->corner.br == br))
 		return;

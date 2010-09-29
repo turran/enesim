@@ -23,6 +23,10 @@
  * + add common parameters to the renderer here like transformation matrix and quality
  */
 
+
+/* eina fixed point helpers, this should go to eina some day */
+#define EINA_F16P16_ONE (1 << 16)
+
 typedef void (*Enesim_Renderer_Span_Draw)(void *r, int x, int y, unsigned int len, uint32_t *dst);
 typedef void (*Enesim_Renderer_Delete)(void *r);
 typedef Eina_Bool (*Enesim_Renderer_State_Setup)(void *r);
@@ -84,52 +88,56 @@ static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p
 static inline void renderer_identity_setup(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
 {
-	*fpx = x;
-	*fpy = y;
+	Eina_F16p16 xx, yy;
+	Eina_F16p16 ox, oy;
+
+	x -= r->ox;
+	y -= r->oy;
+	*fpx = eina_f16p16_int_from(x);
+	*fpy = eina_f16p16_int_from(y);
 }
 
 static inline void renderer_affine_setup(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
 {
 	Eina_F16p16 xx, yy;
+	Eina_F16p16 ox, oy;
 
-#if 1
-	x -= r->ox;
-	y -= r->oy;
+	ox = eina_f16p16_int_from(r->ox);
+	oy = eina_f16p16_int_from(r->oy);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
-#else
-	xx = x;
-	yy = y;
-#endif
+
 	*fpx = enesim_point_f16p16_transform(xx, yy, r->matrix.values.xx,
 			r->matrix.values.xy, r->matrix.values.xz);
 	*fpy = enesim_point_f16p16_transform(xx, yy, r->matrix.values.yx,
 			r->matrix.values.yy, r->matrix.values.yz);
+
+	*fpx = eina_f16p16_sub(*fpx, ox);
+	*fpy = eina_f16p16_sub(*fpy, oy);
 }
 
 static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy, Eina_F16p16 *fpz)
 {
 	Eina_F16p16 xx, yy;
+	Eina_F16p16 ox, oy;
 
-#if 1
-	x -= r->ox;
-	y -= r->oy;
+	ox = eina_f16p16_int_from(r->ox);
+	oy = eina_f16p16_int_from(r->oy);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
-#else
-	xx = x;
-	yy = y;
-#endif
 	*fpx = enesim_point_f16p16_transform(xx, yy, r->matrix.values.xx,
 			r->matrix.values.xy, r->matrix.values.xz);
 	*fpy = enesim_point_f16p16_transform(xx, yy, r->matrix.values.yx,
 			r->matrix.values.yy, r->matrix.values.yz);
 	*fpz = enesim_point_f16p16_transform(xx, yy, r->matrix.values.zx,
 			r->matrix.values.zy, r->matrix.values.zz);
+
+	*fpx = eina_f16p16_sub(*fpx, ox);
+	*fpy = eina_f16p16_sub(*fpy, oy);
 }
 
 Eina_Bool enesim_renderer_state_setup(Enesim_Renderer *r);
@@ -141,6 +149,7 @@ void enesim_renderer_shape_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len);
 
+/* TODO remove this */
 /* some built-in renderer type identifiers */
 #define SURFACE_RENDERER (1)
 //#define FIGURE_RENDERER (2)

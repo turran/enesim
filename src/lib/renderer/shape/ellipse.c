@@ -76,8 +76,7 @@ static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *p, int x, 
 	if ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
 		fpaint->span(fpaint, x, y, len, dst);
 
-	xx = (axx * x) + (axy * y) + axz;
-	yy = (ayx * x) + (ayy * y) + ayz;
+	renderer_affine_setup(p, x, y, &xx, &yy);
 
 	while (d < e)
 	{
@@ -194,9 +193,7 @@ static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, in
 	if ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
 		fpaint->span(fpaint, x, y, len, dst);
 
-	xx = (axx * x) + (axy * y) + axz;
-	yy = (ayx * x) + (ayy * y) + ayz;
-	zz = (azx * x) + (azy * y) + azz;
+	renderer_projective_setup(p, x, y, &xx, &yy, &zz);
 
 	while (d < e)
 	{
