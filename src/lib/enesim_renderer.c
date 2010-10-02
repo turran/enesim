@@ -35,6 +35,7 @@ void enesim_renderer_init(Enesim_Renderer *r)
 	/* common properties */
 	r->ox = 0;
 	r->oy = 0;
+	r->color = ENESIM_COLOR_FULL;
 	enesim_f16p16_matrix_identity(&r->matrix.values);
 }
 
@@ -110,12 +111,31 @@ EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, int *x, int *y)
 	if (y) *y = r->oy;
 }
 /**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->color = color;
+}
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	return r->color;
+}
+
+/**
  * To be documented
  * FIXME: To be fixed
  * What about the mask?
  */
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Enesim_Color color, Eina_Rectangle *clip,
+		Enesim_Rop rop, Eina_Rectangle *clip,
 		int x, int y)
 {
 	Enesim_Compositor_Span span;
@@ -152,7 +172,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	cx -= x;
 	cy -= y;
 	/* fill the new span */
-	if ((rop == ENESIM_FILL) && (color == ENESIM_COLOR_FULL))
+	if ((rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
 	{
 		while (ch--)
 		{
@@ -166,7 +186,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		uint32_t *fdata;
 
 		span = enesim_compositor_span_get(rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				color, ENESIM_FORMAT_NONE);
+				r->color, ENESIM_FORMAT_NONE);
 
 		fdata = alloca(cw * sizeof(uint32_t));
 		while (ch--)
@@ -174,7 +194,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 			enesim_renderer_span_fill(r, cx, cy, cw, fdata);
 			cy++;
 			/* compose the filled and the destination spans */
-			span(ddata, cw, fdata, color, NULL);
+			span(ddata, cw, fdata, r->color, NULL);
 			ddata += stride;
 		}
 	}

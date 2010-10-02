@@ -40,8 +40,9 @@ struct _Enesim_Renderer
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_State_Setup state_setup;
 	Enesim_Renderer_State_Cleanup state_cleanup;
-	Eina_Bool changed;
+	Eina_Bool changed; /* TODO remove this */
 	/* the renderer common properties */
+	Enesim_Color color;
 	int ox, oy; /* the origin */
 	struct {
 		Enesim_F16p16_Matrix values;
