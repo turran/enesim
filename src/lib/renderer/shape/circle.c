@@ -32,7 +32,7 @@ typedef struct _Circle {
 } Circle;
 
 static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
-		int len, unsigned int *dst)
+		unsigned int len, uint32_t *dst)
 {
 	Circle *circ = (Circle *)r;
 	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
@@ -61,11 +61,11 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 		fill_only = 1;
 		do_inner = 0;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if ((circ->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner
 			&& fpaint)
-		fpaint->span(fpaint, x, y, len, dst);
+		fpaint->sw_fill(fpaint, x, y, len, dst);
 
         renderer_affine_setup(r, x, y, &xx, &yy);
 	xx -= xx0;
@@ -140,7 +140,7 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 }
 
 
-static int _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Circle *circ = (Circle *)r;
 	float rad;
@@ -167,11 +167,10 @@ static int _state_setup(Enesim_Renderer *r)
 	circ->irr0 = rad * 65536;
 	if (circ->base.fill.rend)
 	{
-		if (!enesim_renderer_state_setup(circ->base.fill.rend))
+		if (!enesim_renderer_sw_setup(circ->base.fill.rend))
 			return EINA_FALSE;
-
 	}
-	r->span = ENESIM_RENDERER_SPAN_DRAW(_outlined_fill_paint);
+	*fill = _outlined_fill_paint;
 
 	return EINA_TRUE;
 }
@@ -181,7 +180,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 	Circle *circ = (Circle *)r;
 
 	if (circ->base.fill.rend)
-		enesim_renderer_state_cleanup(circ->base.fill.rend);
+		enesim_renderer_sw_cleanup(circ->base.fill.rend);
 }
 
 static void _free(Enesim_Renderer *r)
@@ -208,9 +207,9 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 
 	r = (Enesim_Renderer *)circ;
 	enesim_renderer_shape_init(r);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
-	r->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);
-	r->free = ENESIM_RENDERER_DELETE(_free);
+	r->sw_setup = _state_setup;
+	r->sw_cleanup = _state_cleanup;
+	r->free = _free;
 
 	return r;
 }

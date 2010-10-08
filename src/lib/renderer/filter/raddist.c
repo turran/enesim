@@ -71,16 +71,15 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Raddist *rd = (Raddist *)r;
 
 	if (!rd->src) return EINA_FALSE;
 
-	r->span = ENESIM_RENDERER_SPAN_DRAW(_span_identity);
-
+	*fill = _span_identity;
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_identity);
+		*fill = _span_identity;
 	else
 		return EINA_FALSE;
 	return EINA_TRUE;
@@ -97,7 +96,7 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 
 	r = (Enesim_Renderer *)rd;
 	enesim_renderer_init(r);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
+	r->sw_setup = _state_setup;
 
 	return r;
 }

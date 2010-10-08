@@ -120,7 +120,7 @@ static void _span_affine(Enesim_Renderer *p, int x, int y,
 	}
 }
 
-static int _setup_state(Enesim_Renderer *r, int len)
+static Eina_Bool _setup_state(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Stripes *st = (Stripes *)r;
 
@@ -130,11 +130,11 @@ static int _setup_state(Enesim_Renderer *r, int len)
 	st->hh = st->hh0 + (st->s1.thickness * 65536);
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_affine);
+		*fill = _span_affine;
 	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_affine);
+		*fill = _span_affine;
 	else
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_projective);
+		*fill = _span_projective;
 	return EINA_TRUE;
 }
 
@@ -166,7 +166,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	st->s0.thickness = 1;
 	st->s1.thickness = 1;
 	r = (Enesim_Renderer *)st;
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_setup_state);
+	r->sw_setup = _setup_state;
 	enesim_renderer_init(r);
 	return r;
 }

@@ -23,7 +23,29 @@
  * @{
  */
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
-EAPI void enesim_renderer_transform_set(Enesim_Renderer *r, Enesim_Matrix *m);
+typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
+
+typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
+		unsigned int len, uint32_t *dst);
+
+typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
+typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Fill *fill);
+typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
+
+struct _Enesim_Renderer_Descriptor {
+	Enesim_Renderer_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	Enesim_Renderer_Delete free;
+};
+
+EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
+		*descriptor, void *data);
+EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
+EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
+
+EAPI void enesim_renderer_matrix_set(Enesim_Renderer *r, Enesim_Matrix *m);
+EAPI void enesim_renderer_matrix_get(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_delete(Enesim_Renderer *r);
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, int x, int y);
 EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, int *x, int *y);

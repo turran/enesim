@@ -27,24 +27,20 @@
 /* eina fixed point helpers, this should go to eina some day */
 #define EINA_F16P16_ONE (1 << 16)
 
-typedef void (*Enesim_Renderer_Span_Draw)(void *r, int x, int y, unsigned int len, uint32_t *dst);
-typedef void (*Enesim_Renderer_Delete)(void *r);
-typedef Eina_Bool (*Enesim_Renderer_State_Setup)(void *r);
-typedef void (*Enesim_Renderer_State_Cleanup)(void *r);
-
 struct _Enesim_Renderer
 {
 	EINA_MAGIC;
 	int type_id;
-	Enesim_Renderer_Span_Draw span;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_State_Setup state_setup;
-	Enesim_Renderer_State_Cleanup state_cleanup;
-	Eina_Bool changed; /* TODO remove this */
+	Enesim_Renderer_Sw_Fill sw_fill;
+	Enesim_Renderer_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	void *data;
 	/* the renderer common properties */
 	Enesim_Color color;
 	int ox, oy; /* the origin */
 	struct {
+		Enesim_Matrix original;
 		Enesim_F16p16_Matrix values;
 		Enesim_Matrix_Type type;
 	} matrix;
@@ -73,11 +69,6 @@ typedef struct _Enesim_Renderer_Gradient
 	int slen;
 	Eina_List *stops;
 } Enesim_Renderer_Gradient;
-
-#define ENESIM_RENDERER_DELETE(f) ((Enesim_Renderer_Delete)(f))
-#define ENESIM_RENDERER_SPAN_DRAW(f) ((Enesim_Renderer_Span_Draw)(f))
-#define ENESIM_RENDERER_STATE_SETUP(f) ((Enesim_Renderer_State_Setup)(f))
-#define ENESIM_RENDERER_STATE_CLEANUP(f) ((Enesim_Renderer_State_Cleanup)(f))
 
 /* Helper functions needed by other renderers */
 static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
@@ -141,10 +132,8 @@ static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 	*fpy = eina_f16p16_sub(*fpy, oy);
 }
 
-Eina_Bool enesim_renderer_state_setup(Enesim_Renderer *r);
-void enesim_renderer_state_cleanup(Enesim_Renderer *r);
-void enesim_renderer_span_fill(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst);
+Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);
+void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
 
 void enesim_renderer_shape_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_init(Enesim_Renderer *r);

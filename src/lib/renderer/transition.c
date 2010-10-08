@@ -45,17 +45,17 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 
 	if (interp == 0)
 	{
-		s0->span(s0, x, y, len, d);
+		s0->sw_fill(s0, x, y, len, d);
 		return;
 	}
 	if (interp == 256)
 	{
-		s1->span(s1, t->offset.x + x, t->offset.y + y, len, d);
+		s1->sw_fill(s1, t->offset.x + x, t->offset.y + y, len, d);
 		return;
 	}
 	buf = alloca(len * sizeof(unsigned int));
-	s1->span(s1, t->offset.x + x, t->offset.y + y, len, buf);
-	s0->span(s0, x, y, len, d);
+	s1->sw_fill(s1, t->offset.x + x, t->offset.y + y, len, buf);
+	s0->sw_fill(s0, x, y, len, d);
 
 	while (d < e)
 	{
@@ -66,7 +66,7 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Transition *t = (Transition *)r;
 
@@ -93,12 +93,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 		t->r1.rend->matrix.type = enesim_f16p16_matrix_type_get(
 				&t->r1.rend->matrix.values);
 	}
-	if (!enesim_renderer_state_setup(t->r0.rend))
+	if (!enesim_renderer_sw_setup(t->r0.rend))
 		return EINA_FALSE;
-	if (!enesim_renderer_state_setup(t->r1.rend))
+	if (!enesim_renderer_sw_setup(t->r1.rend))
 		return EINA_FALSE;
 
-	r->span = ENESIM_RENDERER_SPAN_DRAW(_span_general);
+	*fill = _span_general;
 
 	return EINA_TRUE;
 }
@@ -107,8 +107,8 @@ static void _state_cleanup(Enesim_Renderer *r)
 {
 	Transition *trans = (Transition *)r;
 
-	enesim_renderer_state_cleanup(trans->r0.rend);
-	enesim_renderer_state_cleanup(trans->r1.rend);
+	enesim_renderer_sw_cleanup(trans->r0.rend);
+	enesim_renderer_sw_cleanup(trans->r1.rend);
 	/* restore the original matrices
 	 */
 	if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
@@ -142,10 +142,9 @@ EAPI Enesim_Renderer * enesim_renderer_transition_new(void)
 	r = (Enesim_Renderer *)t;
 
 	enesim_renderer_init(r);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
-	r->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);
-	r->free = ENESIM_RENDERER_DELETE(_free);
-	r->changed = EINA_TRUE;
+	r->sw_setup = _state_setup;
+	r->sw_cleanup = _state_cleanup;
+	r->free = _free;
 
 	return r;
 }

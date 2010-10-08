@@ -37,46 +37,98 @@ void enesim_renderer_init(Enesim_Renderer *r)
 	r->oy = 0;
 	r->color = ENESIM_COLOR_FULL;
 	enesim_f16p16_matrix_identity(&r->matrix.values);
+	enesim_matrix_identity(&r->matrix.original);
 }
 
-Eina_Bool enesim_renderer_state_setup(Enesim_Renderer *r)
-{
-	if (!r->state_setup) return EINA_TRUE;
-	return r->state_setup(r);
-}
-
-void enesim_renderer_state_cleanup(Enesim_Renderer *r)
-{
-	if (r->state_cleanup)
-		r->state_cleanup(r);
-}
-
-void enesim_renderer_span_fill(Enesim_Renderer *r, int x, int y,
-	unsigned int len, uint32_t *dst)
-{
-	if (r->span)
-		r->span(r, x, y, len, dst);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ *
+ */
+EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
+		*descriptor, void *data)
+{
+	Enesim_Renderer *r;
+
+	r = malloc(sizeof(Enesim_Renderer));
+	enesim_renderer_init(r);
+	r->sw_setup = descriptor->sw_setup;
+	r->sw_cleanup = descriptor->sw_cleanup;
+	r->free = descriptor->free;
+	r->data = data;
+
+	return r;
+}
+/**
+ *
+ */
+EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Sw_Fill fill;
+	Eina_Bool ret;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (!r->sw_setup) return EINA_TRUE;
+	if (r->sw_setup(r, &fill))
+	{
+		r->sw_fill = fill;
+		return EINA_TRUE;
+	}
+	return EINA_FALSE;
+}
+/**
+ *
+ */
+EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (r->sw_cleanup) r->sw_cleanup(r);
+}
+/**
+ *
+ */
+EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	return r->sw_fill;
+}
+/**
+ *
+ */
+EAPI void * enesim_renderer_data_get(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	return r->data;
+}
+
 /**
  * Sets the transformation matrix of a renderer
  * @param[in] r The renderer to set the transformation matrix on
  * @param[in] m The transformation matrix to set
  */
-EAPI void enesim_renderer_transform_set(Enesim_Renderer *r, Enesim_Matrix *m)
+EAPI void enesim_renderer_matrix_set(Enesim_Renderer *r, Enesim_Matrix *m)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
 	if (!m)
 	{
 		enesim_f16p16_matrix_identity(&r->matrix.values);
+		enesim_matrix_identity(&r->matrix.original);
 		r->matrix.type = ENESIM_MATRIX_IDENTITY;
 		return;
 	}
+	r->matrix.original = *m;
 	enesim_matrix_f16p16_matrix_to(m, &r->matrix.values);
 	r->matrix.type = enesim_f16p16_matrix_type_get(&r->matrix.values);
+}
+
+EAPI void enesim_renderer_matrix_get(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	if (m) *m = r->matrix.original;
 }
 /**
  * Deletes a renderer
@@ -85,7 +137,7 @@ EAPI void enesim_renderer_transform_set(Enesim_Renderer *r, Enesim_Matrix *m)
 EAPI void enesim_renderer_delete(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	enesim_renderer_state_cleanup(r);
+	enesim_renderer_sw_cleanup(r);
 	if (r->free)
 		r->free(r);
 	free(r);
@@ -139,6 +191,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		int x, int y)
 {
 	Enesim_Compositor_Span span;
+	Enesim_Renderer_Sw_Fill fill;
 	int cx = 0, cy = 0, ch, cw;
 	uint32_t *ddata;
 	int stride;
@@ -149,7 +202,10 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	if (!enesim_renderer_state_setup(r)) return;
+	if (!enesim_renderer_sw_setup(r)) return;
+	fill = enesim_renderer_sw_fill_get(r);
+	if (!fill) return;
+
 	if (!clip)
 		enesim_surface_size_get(s, &cw, &ch);
 	else
@@ -176,7 +232,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	{
 		while (ch--)
 		{
-			enesim_renderer_span_fill(r, cx, cy, cw, ddata);
+			fill(r, cx, cy, cw, ddata);
 			y++;
 			ddata += stride;
 		}
@@ -191,7 +247,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		fdata = alloca(cw * sizeof(uint32_t));
 		while (ch--)
 		{
-			enesim_renderer_span_fill(r, cx, cy, cw, fdata);
+			fill(r, cx, cy, cw, fdata);
 			cy++;
 			/* compose the filled and the destination spans */
 			span(ddata, cw, fdata, r->color, NULL);

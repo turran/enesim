@@ -221,18 +221,18 @@ static void _span(Enesim_Renderer *p, int x, int y, int len, unsigned int *dst)
 {
 	Path *o = (Path *) p;
 
-	o->figure->span(o->figure, x, y, len, dst);
+	o->figure->sw_fill(o->figure, x, y, len, dst);
 }
 
-static int _state_setup(Enesim_Renderer *p)
+static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 {
 	Path *o = (Path *) p;
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 
-	if (!f || !o)
-		return 0;
+	if (!p)
+		return EINA_FALSE;
 	if (!o->figure)
-		return 0; // should just not draw
+		return EINA_FALSE; // should just not draw
 
 	enesim_renderer_shape_outline_weight_set(o->figure, f->stroke.weight);
 	enesim_renderer_shape_outline_color_set(o->figure, f->stroke.color);
@@ -243,19 +243,19 @@ static int _state_setup(Enesim_Renderer *p)
 
 	o->figure->matrix = p->matrix;
 
-	if (!enesim_renderer_state_setup(o->figure))
-		return 0;
+	if (!enesim_renderer_sw_setup(o->figure))
+		return EINA_FALSE;
 
-	p->span = _span;
+	*fill = _span;
 
-	return 1;
+	return EINA_TRUE;
 }
 
 static void _state_cleanup(Enesim_Renderer *p)
 {
 	Path *o = (Path *) p;
 
-	enesim_renderer_state_cleanup(o->figure);
+	enesim_renderer_sw_cleanup(o->figure);
 }
 
 #if 0
@@ -297,8 +297,8 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 
 	p = (Enesim_Renderer *) o;
 	enesim_renderer_shape_init(p);
-	p->state_setup = _state_setup;
-	p->state_cleanup = _state_cleanup;
+	p->sw_setup = _state_setup;
+	p->sw_cleanup = _state_cleanup;
 
 	return p;
 }

@@ -85,7 +85,7 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigne
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Importer *i = (Importer *)r;
 
@@ -93,15 +93,15 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 	switch (i->cfmt)
 	{
 		case ENESIM_CONVERTER_ARGB8888:
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_argb8888_none_argb8888);
+		*fill = _span_argb8888_none_argb8888;
 		break;
 
 		case ENESIM_CONVERTER_A8:
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_a8_none_argb8888);
+		*fill = _span_a8_none_argb8888;
 		break;
 
 		case ENESIM_CONVERTER_RGB888:
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_span_rgb888_none_argb8888);
+		*fill = _span_rgb888_none_argb8888;
 		break;
 
 		default:
@@ -131,7 +131,7 @@ EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 
 	r = (Enesim_Renderer *)i;
 	enesim_renderer_init(r);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
+	r->sw_setup = _state_setup;
 	return r;
 }
 /**

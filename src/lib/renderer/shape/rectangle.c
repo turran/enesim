@@ -316,20 +316,20 @@ static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *p,
 	char bl = rect->corner.bl, br = rect->corner.br, tl = rect->corner.tl, tr = rect->corner.tr;
 
 	if (rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
-	  {
+	{
 		icolor = 0;
 		fpaint = NULL;
-	  }
+	}
 	if (rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
-	  {
+	{
 		ocolor = icolor;
 		fill_only = 1;
 		do_inner = 0;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
-	  }
+			fpaint->sw_fill(fpaint, x, y, len, dst);
+	}
 	if ((rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
-		fpaint->span(fpaint, x, y, len, dst);
+		fpaint->sw_fill(fpaint, x, y, len, dst);
 
 #if 1
         renderer_affine_setup(p, x, y, &xx, &yy);
@@ -465,10 +465,10 @@ static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *p, i
 		ocolor = icolor;
 		fill_only = 1;
 		do_inner = 0;
-		if (fpaint)  fpaint->span(fpaint, x, y, len, dst);
+		if (fpaint)  fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if ((rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
-		fpaint->span(fpaint, x, y, len, dst);
+		fpaint->sw_fill(fpaint, x, y, len, dst);
 #if 1
 	renderer_projective_setup(p, x, y, &xx, &yy, &zz);
 #else
@@ -578,7 +578,7 @@ static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *p, i
 }
 
 
-static Eina_Bool _state_setup(Enesim_Renderer *p)
+static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 {
 	Rectangle *rect = (Rectangle *) p;
 
@@ -620,15 +620,14 @@ static Eina_Bool _state_setup(Enesim_Renderer *p)
 	    ((rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
 	     (rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		if (!enesim_renderer_state_setup(rect->base.fill.rend))
+		if (!enesim_renderer_sw_setup(rect->base.fill.rend))
 			return EINA_FALSE;
 	}
 
-	p->span = ENESIM_RENDERER_SPAN_DRAW(_span_rounded_color_outlined_paint_filled_proj);
+	*fill = _span_rounded_color_outlined_paint_filled_proj;
 	if (p->matrix.type == ENESIM_MATRIX_AFFINE || p->matrix.type == ENESIM_MATRIX_IDENTITY)
-		p->span = ENESIM_RENDERER_SPAN_DRAW(_span_rounded_color_outlined_paint_filled_affine);
+		*fill = _span_rounded_color_outlined_paint_filled_affine;
 
-	p->changed = EINA_FALSE;
 	return EINA_TRUE;
 }
 
@@ -639,9 +638,9 @@ static void _state_cleanup(Enesim_Renderer *p)
 	if (rect->base.fill.rend &&
 	    ((rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
 	     (rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-		enesim_renderer_state_cleanup(rect->base.fill.rend);
+		enesim_renderer_sw_cleanup(rect->base.fill.rend);
 //	if (rect->stroke.paint)
-//		enesim_renderer_state_cleanup(rect->stroke.paint);
+//		enesim_renderer_sw_cleanup(rect->stroke.paint);
 }
 
 static void _free(Enesim_Renderer *p)
@@ -669,11 +668,10 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 	p = (Enesim_Renderer *) rect;
 	p->type_id = RECTANGLE_RENDERER;
 	enesim_renderer_shape_init(p);
-	p->free = ENESIM_RENDERER_DELETE(_free);
-	p->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);
-	p->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
-	p->changed = EINA_TRUE;
-	//   if (!rectangle_setup_state(p, 0)) { free(rect); return NULL; }
+	p->free = _free;
+	p->sw_cleanup = _state_cleanup;
+	p->sw_setup = _state_setup;
+
 	return p;
 }
 /**
@@ -750,7 +748,6 @@ EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, float 
 	if (rect->corner.radius == radius)
 		return;
 	rect->corner.radius = radius;
-	p->changed = EINA_TRUE;
 }
 /**
  * To be documented

@@ -46,17 +46,17 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 		l = eina_list_data_get(ll);
 		if (!l->span)
 		{
-			enesim_renderer_span_fill(l->r, x, y, len, dst);
+			l->r->sw_fill(l->r, x, y, len, dst);
 		}
 		else
 		{
-			enesim_renderer_span_fill(l->r, x, y, len, tmp);
+			l->r->sw_fill(l->r, x, y, len, tmp);
 			l->span(dst, len, tmp, 0, NULL);
 		}
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Compound *c = (Compound *)r;
 	Eina_List *ll;
@@ -66,8 +66,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 	{
 		Layer *l = eina_list_data_get(ll);
 
-		enesim_renderer_state_setup(l->r);
+		if (!enesim_renderer_sw_setup(l->r))
+			return EINA_FALSE;
 	}
+	*fill = _span_identity;
 
 	return EINA_TRUE;
 }
@@ -87,8 +89,7 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 
 	r = (Enesim_Renderer *)c;
 	enesim_renderer_init(r);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
-	r->span = ENESIM_RENDERER_SPAN_DRAW(_span_identity);
+	r->sw_setup = _state_setup;
 
 	return r;
 }

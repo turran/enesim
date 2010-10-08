@@ -98,7 +98,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Perlin *p = (Perlin *)r;
 
@@ -116,9 +116,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 		p->ampl.coeff);
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_argb8888_span_identity);
+		*fill = _argb8888_span_identity;
 	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_argb8888_span_affine);
+		*fill = _argb8888_span_affine;
 	return EINA_TRUE;
 }
 
@@ -148,9 +148,9 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 	r = (Enesim_Renderer *)p;
 
 	enesim_renderer_init(r);
-	r->free = ENESIM_RENDERER_DELETE(_free);
-	r->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
+	r->free = _free;
+	r->sw_cleanup = _state_cleanup;
+	r->sw_setup = _state_setup;
 
 	return r;
 }

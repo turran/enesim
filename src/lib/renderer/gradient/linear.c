@@ -81,7 +81,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Linear *l = (Linear *)r;
 	Eina_F16p16 x0, x1, y0, y1;
@@ -131,7 +131,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 	 * < tolerance
 	 */
 	enesim_renderer_gradient_state_setup(r, eina_f16p16_int_to(f));
-	r->span = ENESIM_RENDERER_SPAN_DRAW(_argb8888_pad_span);
+	*fill = _argb8888_pad_span;
+
 	return EINA_TRUE;
 }
 /*============================================================================*
@@ -146,7 +147,8 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
 
 	r = (Enesim_Renderer *)l;
 	enesim_renderer_gradient_init(r);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
+	r->sw_setup = _state_setup;
+	r->sw_cleanup = _state_cleanup;
 
 	return r;
 }

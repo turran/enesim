@@ -71,10 +71,10 @@ static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *p, int x, 
 		fill_only = 1;
 		do_inner = 0;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	  }
 	if ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
-		fpaint->span(fpaint, x, y, len, dst);
+		fpaint->sw_fill(fpaint, x, y, len, dst);
 
 	renderer_affine_setup(p, x, y, &xx, &yy);
 
@@ -188,10 +188,10 @@ static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, in
 		fill_only = 1;
 		do_inner = 0;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	  }
 	if ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
-		fpaint->span(fpaint, x, y, len, dst);
+		fpaint->sw_fill(fpaint, x, y, len, dst);
 
 	renderer_projective_setup(p, x, y, &xx, &yy, &zz);
 
@@ -270,7 +270,7 @@ static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, in
 	}
 }
 
-static int _state_setup(Enesim_Renderer *p)
+static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 {
 	Ellipse *ellipse = (Ellipse *) p;
 	float rx, ry;
@@ -332,15 +332,14 @@ static int _state_setup(Enesim_Renderer *p)
 	    ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
 	     (ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		if (!enesim_renderer_state_setup(ellipse->base.fill.rend))
+		if (!enesim_renderer_sw_setup(ellipse->base.fill.rend))
 			return EINA_FALSE;
 	}
 
-	p->span = ENESIM_RENDERER_SPAN_DRAW(_span_color_outlined_paint_filled_proj);
+	*fill = _span_color_outlined_paint_filled_proj;
 	if (p->matrix.type == ENESIM_MATRIX_AFFINE || p->matrix.type == ENESIM_MATRIX_IDENTITY)
-		p->span = ENESIM_RENDERER_SPAN_DRAW(_span_color_outlined_paint_filled_affine);
+		*fill = _span_color_outlined_paint_filled_affine;
 
-	p->changed = EINA_FALSE;
 	return EINA_TRUE;
 }
 
@@ -351,7 +350,7 @@ static void _state_cleanup(Enesim_Renderer *p)
 	if (ellipse->base.fill.rend &&
 	    ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
 	     (ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-		enesim_renderer_state_cleanup(ellipse->base.fill.rend);
+		enesim_renderer_sw_cleanup(ellipse->base.fill.rend);
 }
 
 static void _free(Enesim_Renderer *p)
@@ -380,12 +379,10 @@ EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 
 	p->type_id = ELLIPSE_RENDERER;
 	enesim_renderer_shape_init(p);
-	p->free = ENESIM_RENDERER_DELETE(_free);
-	p->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);
-	p->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
+	p->free = _free;
+	p->sw_cleanup = _state_cleanup;
+	p->sw_setup = _state_setup;
 
-	p->changed = EINA_TRUE;
-	//   if (!ellipse_setup_state(p, 0)) { free(ellipse); return NULL; }
 	return p;
 }
 /**
@@ -402,7 +399,6 @@ EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, float x, float 
 		return;
 	ellipse->x = x;
 	ellipse->y = y;
-	p->changed = EINA_TRUE;
 }
 /**
  * To be documented
@@ -434,7 +430,6 @@ EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, float radius_x, 
 		return;
 	ellipse->rx = radius_x;
 	ellipse->ry = radius_y;
-	p->changed = EINA_TRUE;
 }
 
 /**

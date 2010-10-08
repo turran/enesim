@@ -46,11 +46,11 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 
 		if (x > mx)
 		{
-			enesim_renderer_span_fill(hs->rrend, x, y, 1, &p0);
+			hs->rrend->sw_fill(hs->rrend, x, y, 1, &p0);
 		}
 		else if (x < mx)
 		{
-			enesim_renderer_span_fill(hs->lrend, x, y, 1, &p0);
+			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
 		}
 		else
 		{
@@ -58,8 +58,8 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 			uint16_t a;
 
 			a = 1 + ((mmx & 0xffff) >> 8);
-			enesim_renderer_span_fill(hs->lrend, x, y, 1, &p0);
-			enesim_renderer_span_fill(hs->rrend, 0, y, 1, &p1);
+			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
+			hs->rrend->sw_fill(hs->rrend, 0, y, 1, &p1);
 			p0 = argb8888_interp_256(a, p0, p1);
 		}
 		*dst++ = p0;
@@ -92,11 +92,11 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 		y = eina_f16p16_int_to(yy);
 		if (x > mx)
 		{
-			enesim_renderer_span_fill(hs->rrend, x, y, 1, &p0);
+			hs->rrend->sw_fill(hs->rrend, x, y, 1, &p0);
 		}
 		else if (x < mx)
 		{
-			enesim_renderer_span_fill(hs->lrend, x, y, 1, &p0);
+			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
 		}
 		/* FIXME, what should we use here? mmx or xx?
 		 * or better use a subpixel center?
@@ -107,8 +107,8 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 			uint16_t a;
 
 			a = 1 + ((xx & 0xffff) >> 8);
-			enesim_renderer_span_fill(hs->lrend, x, y, 1, &p0);
-			enesim_renderer_span_fill(hs->rrend, 0, y, 1, &p1);
+			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
+			hs->rrend->sw_fill(hs->rrend, 0, y, 1, &p1);
 			p0 = argb8888_interp_256(a, p1, p0);
 		}
 		*dst++ = p0;
@@ -131,50 +131,51 @@ static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	mx = hs->w - (hs->w * hs->step);
 	if (mx == 0)
 	{
-		enesim_renderer_span_fill(hs->rrend, ir.x, ir.y, ir.w, dst);
+		hs->rrend->sw_fill(hs->rrend, ir.x, ir.y, ir.w, dst);
 	}
 	else if (mx == hs->w)
 	{
-		enesim_renderer_span_fill(hs->lrend, ir.x, ir.y, ir.w, dst);
+		hs->lrend->sw_fill(hs->lrend, ir.x, ir.y, ir.w, dst);
 	}
 	else
 	{
 		if (ir.x > mx)
 		{
-			enesim_renderer_span_fill(hs->rrend, ir.x, ir.y, ir.w, dst);
+			hs->rrend->sw_fill(hs->rrend, ir.x, ir.y, ir.w, dst);
 		}
 		else if (ir.x + ir.w < mx)
 		{
-			enesim_renderer_span_fill(hs->lrend, ir.x, ir.y, ir.w, dst);
+			hs->lrend->sw_fill(hs->lrend, ir.x, ir.y, ir.w, dst);
 		}
 		else
 		{
 			int w;
 
 			w = mx - ir.x;
-			enesim_renderer_span_fill(hs->lrend, ir.x, ir.y, w, dst);
+			hs->lrend->sw_fill(hs->lrend, ir.x, ir.y, w, dst);
 			dst += w;
-			enesim_renderer_span_fill(hs->rrend, 0, ir.y, ir.w + ir.x - mx , dst);
+			hs->rrend->sw_fill(hs->rrend, 0, ir.y, ir.w + ir.x - mx , dst);
 		}
 	}
 }
 
-static void _free(Hswitch *hs)
+static void _free(Enesim_Renderer *r)
 {
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Hswitch *h = (Hswitch *)r;
 
 	if (!h->lrend || !h->rrend)
 		return EINA_FALSE;
-	if (!enesim_renderer_state_setup(h->lrend))
+	if (!enesim_renderer_sw_setup(h->lrend))
 		return EINA_FALSE;
-	if (!enesim_renderer_state_setup(h->rrend))
+	if (!enesim_renderer_sw_setup(h->rrend))
 		return EINA_FALSE;
 
+	*fill = _affine_good;
 	return EINA_TRUE;
 }
 /*============================================================================*
@@ -198,9 +199,8 @@ EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void)
 	h = calloc(1, sizeof(Hswitch));
 	r = (Enesim_Renderer *)h;
 	enesim_renderer_init(r);
-	r->free = ENESIM_RENDERER_DELETE(_free);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
-	r->span = ENESIM_RENDERER_SPAN_DRAW(_affine_good);
+	r->free = _free;
+	r->sw_setup = _state_setup;
 
 	return r;
 }

@@ -97,7 +97,7 @@ struct _Figure
 };
 
 static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *p, int x,
-		int y, unsigned int *dst, int len)
+		int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 	Figure *o = (Figure *) p;
@@ -130,13 +130,13 @@ get_out:
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -254,7 +254,7 @@ get_out:
 }
 
 static void figure_stroke_fill_paint_affine(Enesim_Renderer *p, int x, int y,
-		int len, unsigned int *dst)
+		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 	Figure *o = (Figure *) p;
@@ -336,13 +336,13 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *p, int x, int y,
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -419,7 +419,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *p, int x, int y,
 }
 
 static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
-		int len, unsigned int *dst)
+		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 	Figure *o = (Figure *) p;
@@ -476,13 +476,13 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
-			fpaint->span(fpaint, x, y, len, dst);
+			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
 	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -564,15 +564,12 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
 	}
 }
 
-static void figure_destroy(Enesim_Renderer *p)
+static void _free(Enesim_Renderer *p)
 {
-	Figure *o = (Figure *) p;
-
-	paint_polygon_clear(p);
-	free(o);
+	enesim_renderer_figure_clear(p);
 }
 
-static int _state_setup(Enesim_Renderer *p)
+static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 {
 	Figure *o = (Figure *) p;
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
@@ -674,23 +671,23 @@ static int _state_setup(Enesim_Renderer *p)
 			((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
 			(f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		if (!enesim_renderer_state_setup(f->fill.rend))
+		if (!enesim_renderer_sw_setup(f->fill.rend))
 			return 0;
 	}
 	/*
 	 if (f->stroke.rend &&
 	 ((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) || (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	 {
-	 if (!enesim_renderer_state_setup(f->stroke.paint)) return 0;
+	 if (!enesim_renderer_sw_setup(f->stroke.paint)) return 0;
 	 }
 	 */
 
-	p->span = figure_stroke_fill_paint_proj;
+	*fill = figure_stroke_fill_paint_proj;
 	if (!p->matrix.type == ENESIM_MATRIX_PROJECTIVE)
 	{
-		p->span = figure_stroke_fill_paint_affine;
+		*fill = figure_stroke_fill_paint_affine;
 		if (p->matrix.values.yx == 0)
-			p->span = figure_stroke_fill_paint_affine_simple;
+			*fill = figure_stroke_fill_paint_affine_simple;
 	}
 
 	return 1;
@@ -704,12 +701,12 @@ static void _state_cleanup(Enesim_Renderer *p)
 	 if (f->stroke.rend &&
 			((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
 			(f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-		 enesim_renderer_state_cleanup(f->stroke.paint);
+		 enesim_renderer_sw_cleanup(f->stroke.paint);
 	 */
 	if (f->fill.rend &&
 			((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
 			(f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-		enesim_renderer_state_cleanup(f->fill.rend);
+		enesim_renderer_sw_cleanup(f->fill.rend);
 }
 
 /*============================================================================*
@@ -734,8 +731,9 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 
 	p = (Enesim_Renderer *) o;
 	enesim_renderer_shape_init(p);
-	p->state_setup = _state_setup;
-	p->state_cleanup = _state_cleanup;
+	p->sw_setup = _state_setup;
+	p->sw_cleanup = _state_cleanup;
+	p->free = _free;
 
 	return p;
 }
@@ -819,7 +817,7 @@ EAPI void enesim_renderer_figure_extents_get(Enesim_Renderer *p, int *lx,
 	o = (Figure *) p;
 
 	// for now.. but do this better later
-	if (!enesim_renderer_state_setup(p))
+	if (!enesim_renderer_sw_setup(p))
 	{
 		if (lx)
 			*lx = 0;

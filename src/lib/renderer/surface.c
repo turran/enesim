@@ -217,7 +217,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	int sw, sh;
 	Surface *s = (Surface *)r;
@@ -241,13 +241,13 @@ static Eina_Bool _state_setup(Enesim_Renderer *r)
 		_offsets(s->y, s->h, sh, s->yoff);
 
 		if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
-			r->span = ENESIM_RENDERER_SPAN_DRAW(_scale_fast_identity);
+			*fill = _scale_fast_identity;
 		else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
-			r->span = ENESIM_RENDERER_SPAN_DRAW(_scale_fast_affine);
+			*fill = _scale_fast_affine;
 	}
 	else
 	{
-		r->span = ENESIM_RENDERER_SPAN_DRAW(_noscale);
+		*fill = _noscale;
 	}
 	return EINA_TRUE;
 }
@@ -276,9 +276,9 @@ EAPI Enesim_Renderer * enesim_renderer_surface_new(void)
 	r = (Enesim_Renderer *)s;
 
 	enesim_renderer_init(r);
-	r->free = ENESIM_RENDERER_DELETE(_free);
-	r->state_cleanup = ENESIM_RENDERER_STATE_CLEANUP(_state_cleanup);
-	r->state_setup = ENESIM_RENDERER_STATE_SETUP(_state_setup);
+	r->free = _free;
+	r->sw_cleanup = _state_cleanup;
+	r->sw_setup = _state_setup;
 
 	return r;
 }
@@ -293,7 +293,6 @@ EAPI void enesim_renderer_surface_x_set(Enesim_Renderer *r, int x)
 	if (s->x == x)
 		return;
 	s->x = x;
-	r->changed = EINA_TRUE;
 }
 /**
  * To be documented
@@ -306,7 +305,6 @@ EAPI void enesim_renderer_surface_y_set(Enesim_Renderer *r, int y)
 	if (s->y == y)
 		return;
 	s->y = y;
-	r->changed = EINA_TRUE;
 }
 /**
  * To be documented
@@ -319,7 +317,6 @@ EAPI void enesim_renderer_surface_w_set(Enesim_Renderer *r, int w)
 	if (s->w == w)
 		return;
 	s->w = w;
-	r->changed = EINA_TRUE;
 }
 /**
  * To be documented
@@ -332,7 +329,6 @@ EAPI void enesim_renderer_surface_h_set(Enesim_Renderer *r, int h)
 	if (s->h == h)
 		return;
 	s->h = h;
-	r->changed = EINA_TRUE;
 }
 /**
  * To be documented
@@ -343,5 +339,4 @@ EAPI void enesim_renderer_surface_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	Surface *s = (Surface *)r;
 
 	s->s = src;
-	r->changed = EINA_TRUE;
 }
