@@ -30,6 +30,7 @@ typedef struct _Compound
 typedef struct _Layer
 {
 	Enesim_Compositor_Span span;
+	Enesim_Matrix original;
 	Enesim_Renderer *r;
 } Layer;
 
@@ -65,13 +66,31 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
+		int ox, oy, oox, ooy;
 
 		if (!enesim_renderer_sw_setup(l->r))
 			return EINA_FALSE;
+		enesim_renderer_relative_set(r, l->r, &l->original);
 	}
 	*fill = _span_identity;
 
 	return EINA_TRUE;
+}
+
+static void _state_cleanup(Enesim_Renderer *r)
+{
+	Compound *c = (Compound *)r;
+	Eina_List *ll;
+
+	/* cleanup every layer */
+	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	{
+		Layer *l = eina_list_data_get(ll);
+		int ox, oy, oox, ooy;
+
+		enesim_renderer_relative_unset(r, l->r, &l->original);
+		enesim_renderer_sw_cleanup(l->r);
+	}
 }
 /*============================================================================*
  *                                   API                                      *
@@ -90,6 +109,7 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 	r = (Enesim_Renderer *)c;
 	enesim_renderer_init(r);
 	r->sw_setup = _state_setup;
+	r->sw_cleanup = _state_cleanup;
 
 	return r;
 }

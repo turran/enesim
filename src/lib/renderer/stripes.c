@@ -33,7 +33,7 @@ struct _Stripes {
 };
 
 static void _span_projective(Enesim_Renderer *p, int x, int y,
-		int len, unsigned int *dst)
+		unsigned int len, uint32_t *dst)
 {
 	Stripes *st = (Stripes *) p;
 	int hh = st->hh, hh0 = st->hh0, h0 = hh0 >> 16;
@@ -78,18 +78,17 @@ static void _span_projective(Enesim_Renderer *p, int x, int y,
 	}
 }
 
-static void _span_affine(Enesim_Renderer *p, int x, int y,
-		int len, unsigned int *dst)
+static void _span_affine(Enesim_Renderer *r, int x, int y,
+		unsigned int len, uint32_t *dst)
 {
-	Stripes *st = (Stripes *) p;
-	int ayx = p->matrix.values.yx, ayy = p->matrix.values.yy, ayz = p->matrix.values.yz;
+	Stripes *st = (Stripes *)r;
+	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
 	int hh = st->hh, hh0 = st->hh0, h0 = hh0 >> 16;
 	unsigned int c0 = st->s0.color, c1 = st->s1.color;
 	unsigned int *d = dst, *e = d + len;
-	int yy;
+	Eina_F16p16 yy, xx;
 
-	yy = (ayx * x) + (ayy * y) + ayz;
-
+	renderer_affine_setup(r, x, y, &xx, &yy);
 	while (d < e)
 	{
 		unsigned int p0 = c0;

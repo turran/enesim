@@ -43,6 +43,8 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data);
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
 EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
+EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);
+EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_matrix_set(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_matrix_get(Enesim_Renderer *r, Enesim_Matrix *m);

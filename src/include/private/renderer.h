@@ -51,13 +51,15 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer base;
 	struct {
 		Enesim_Color color;
-		Enesim_Renderer *rend;
+		Enesim_Renderer *rend; /* TODO */
 		float weight;
+		Enesim_Matrix original;
 	} stroke;
 
 	struct {
 		Enesim_Color color;
 		Enesim_Renderer *rend;
+		Enesim_Matrix original;
 	} fill;
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape;
@@ -134,8 +136,15 @@ static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
+void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enesim_Matrix *old_matrix);
+void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix);
 
+/* common shape renderer functions */
 void enesim_renderer_shape_init(Enesim_Renderer *r);
+Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r);
+Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r);
+void enesim_renderer_shape_cleanup(Enesim_Renderer *r);
+/* common gradient renderer functions */
 void enesim_renderer_gradient_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len);
 

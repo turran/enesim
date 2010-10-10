@@ -31,6 +31,57 @@ void enesim_renderer_shape_init(Enesim_Renderer *r)
 	s->stroke.color = 0xffffffff;
 	enesim_renderer_init(r);
 }
+
+void enesim_renderer_shape_cleanup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+
+	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	{
+		enesim_renderer_relative_unset(r, s->fill.rend, &s->fill.original);
+	}
+}
+
+Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+
+	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	{
+		enesim_renderer_relative_set(r, s->fill.rend, &s->fill.original);
+	}
+	return EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+
+	if (!enesim_renderer_shape_setup(r))
+		return EINA_FALSE;
+
+	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	{
+		if (!enesim_renderer_sw_setup(s->fill.rend))
+			return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+
+	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	{
+		enesim_renderer_sw_cleanup(s->fill.rend);
+	}
+	enesim_renderer_shape_cleanup(r);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -165,11 +165,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		rad = 0;
 
 	circ->irr0 = rad * 65536;
-	if (circ->base.fill.rend)
-	{
-		if (!enesim_renderer_sw_setup(circ->base.fill.rend))
-			return EINA_FALSE;
-	}
+
+	if (!enesim_renderer_shape_sw_setup(r))
+		return EINA_FALSE;
+
 	*fill = _outlined_fill_paint;
 
 	return EINA_TRUE;
@@ -179,8 +178,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 {
 	Circle *circ = (Circle *)r;
 
-	if (circ->base.fill.rend)
-		enesim_renderer_sw_cleanup(circ->base.fill.rend);
+	enesim_renderer_shape_sw_cleanup(r);
 }
 
 static void _free(Enesim_Renderer *r)

@@ -40,6 +40,40 @@ void enesim_renderer_init(Enesim_Renderer *r)
 	enesim_matrix_identity(&r->matrix.original);
 }
 
+void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
+		Enesim_Matrix *old_matrix)
+{
+	Enesim_Matrix matrix;
+	int ox, oy, oox, ooy;
+
+	if (!rel) return;
+
+	/* add the origin by the current origin */
+	enesim_renderer_origin_get(rel, &ox, &oy);
+	enesim_renderer_origin_get(r, &oox, &ooy);
+	enesim_renderer_origin_set(rel, ox + oox, oy + ooy);
+	/* TODO should we use the f16p16 matrix? */
+	/* multiply the matrix by the current transformation */
+	enesim_renderer_matrix_get(r, &matrix);
+	enesim_renderer_matrix_get(rel, old_matrix);
+	enesim_matrix_compose(old_matrix, &matrix, &matrix);
+	enesim_renderer_matrix_set(rel, &matrix);
+}
+
+void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
+		Enesim_Matrix *old_matrix)
+{
+	int ox, oy, oox, ooy;
+
+	if (!rel) return;
+
+	/* restore origin */
+	enesim_renderer_origin_get(rel, &ox, &oy);
+	enesim_renderer_origin_get(r, &oox, &ooy);
+	enesim_renderer_origin_set(rel, ox - oox, oy - ooy);
+	/* restore original matrix */
+	enesim_renderer_matrix_set(rel, old_matrix);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -255,4 +289,5 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		}
 	}
 	/* TODO set the format again */
+	enesim_renderer_sw_cleanup(r);
 }
