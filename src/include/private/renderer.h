@@ -38,7 +38,7 @@ struct _Enesim_Renderer
 	void *data;
 	/* the renderer common properties */
 	Enesim_Color color;
-	int ox, oy; /* the origin */
+	float ox, oy; /* the origin */
 	struct {
 		Enesim_Matrix original;
 		Enesim_F16p16_Matrix values;
@@ -60,6 +60,7 @@ typedef struct _Enesim_Renderer_Shape
 		Enesim_Color color;
 		Enesim_Renderer *rend;
 		Enesim_Matrix original;
+		float ox, oy;
 	} fill;
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape;
@@ -85,20 +86,28 @@ static inline void renderer_identity_setup(Enesim_Renderer *r, int x, int y,
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
-	x -= r->ox;
-	y -= r->oy;
+	ox = eina_f16p16_float_from(r->ox);
+	oy = eina_f16p16_float_from(r->oy);
+
 	*fpx = eina_f16p16_int_from(x);
 	*fpy = eina_f16p16_int_from(y);
+
+	*fpx = eina_f16p16_sub(*fpx, ox);
+	*fpy = eina_f16p16_sub(*fpy, oy);
 }
 
+/*
+ * x' = (xx * x) + (xy * y) + xz;
+ * y' = (yx * x) + (yy * y) + yz;
+ */
 static inline void renderer_affine_setup(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
 {
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
-	ox = eina_f16p16_int_from(r->ox);
-	oy = eina_f16p16_int_from(r->oy);
+	ox = eina_f16p16_float_from(r->ox);
+	oy = eina_f16p16_float_from(r->oy);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
@@ -112,14 +121,19 @@ static inline void renderer_affine_setup(Enesim_Renderer *r, int x, int y,
 	*fpy = eina_f16p16_sub(*fpy, oy);
 }
 
+/*
+ * x' = (xx * x) + (xy * y) + xz;
+ * y' = (yx * x) + (yy * y) + yz;
+ * z' = (zx * x) + (zy * y) + zz;
+ */
 static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy, Eina_F16p16 *fpz)
 {
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
-	ox = eina_f16p16_int_from(r->ox);
-	oy = eina_f16p16_int_from(r->oy);
+	ox = eina_f16p16_float_from(r->ox);
+	oy = eina_f16p16_float_from(r->oy);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
@@ -136,8 +150,8 @@ static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
-void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enesim_Matrix *old_matrix);
-void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix);
+void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, float *old_ox, float *old_oy);
+void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, float old_ox, float old_oy);
 
 /* common shape renderer functions */
 void enesim_renderer_shape_init(Enesim_Renderer *r);

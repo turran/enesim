@@ -188,7 +188,7 @@ static void _noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_
 	src = enesim_surface_data_get(s->s);
 	sstride = enesim_surface_stride_get(s->s);
 	x -= r->ox;
-	src += sstride * (y - r->oy) + x;
+	src += sstride * (int)(y - r->oy) + x;
 	while (len--)
 	{
 		if (x >= r->ox && x < r->ox + s->w)

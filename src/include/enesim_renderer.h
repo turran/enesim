@@ -49,8 +49,8 @@ EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
 EAPI void enesim_renderer_matrix_set(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_matrix_get(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_delete(Enesim_Renderer *r);
-EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, int x, int y);
-EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, int *x, int *y);
+EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, float x, float y);
+EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, float *x, float *y);
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);

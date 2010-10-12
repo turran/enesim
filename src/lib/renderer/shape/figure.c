@@ -667,13 +667,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 		o->changed = 0;
 	}
 
-	if (f->fill.rend &&
-			((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
-			(f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-	{
-		if (!enesim_renderer_sw_setup(f->fill.rend))
-			return 0;
-	}
+	if (!enesim_renderer_shape_sw_setup(p))
+		return EINA_FALSE;
+
 	/*
 	 if (f->stroke.rend &&
 	 ((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) || (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
@@ -693,9 +689,11 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 	return 1;
 }
 
-static void _state_cleanup(Enesim_Renderer *p)
+static void _state_cleanup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
+	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *)r;
+
+	enesim_renderer_shape_sw_cleanup(r);
 
 	/*
 	 if (f->stroke.rend &&
@@ -703,10 +701,6 @@ static void _state_cleanup(Enesim_Renderer *p)
 			(f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 		 enesim_renderer_sw_cleanup(f->stroke.paint);
 	 */
-	if (f->fill.rend &&
-			((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
-			(f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-		enesim_renderer_sw_cleanup(f->fill.rend);
 }
 
 /*============================================================================*

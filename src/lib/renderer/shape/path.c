@@ -217,7 +217,7 @@ static void _cubic_to(Enesim_Renderer *p, float ctrl_x0, float ctrl_y0,
 	o->last_ctrl_y = y23;
 }
 
-static void _span(Enesim_Renderer *p, int x, int y, int len, unsigned int *dst)
+static void _span(Enesim_Renderer *p, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Path *o = (Path *) p;
 
@@ -243,7 +243,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 
 	o->figure->matrix = p->matrix;
 
-	if (!enesim_renderer_sw_setup(o->figure))
+	if (!enesim_renderer_shape_sw_setup(o->figure))
 		return EINA_FALSE;
 
 	*fill = _span;
@@ -255,7 +255,7 @@ static void _state_cleanup(Enesim_Renderer *p)
 {
 	Path *o = (Path *) p;
 
-	enesim_renderer_sw_cleanup(o->figure);
+	enesim_renderer_shape_sw_cleanup(o->figure);
 }
 
 #if 0

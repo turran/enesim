@@ -39,7 +39,7 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r)
 	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
 			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		enesim_renderer_relative_unset(r, s->fill.rend, &s->fill.original);
+		enesim_renderer_relative_unset(r, s->fill.rend, &s->fill.original, s->fill.ox, s->fill.oy);
 	}
 }
 
@@ -50,7 +50,7 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r)
 	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
 			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		enesim_renderer_relative_set(r, s->fill.rend, &s->fill.original);
+		enesim_renderer_relative_set(r, s->fill.rend, &s->fill.original, &s->fill.ox, &s->fill.oy);
 	}
 	return EINA_TRUE;
 }

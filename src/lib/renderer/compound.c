@@ -31,6 +31,7 @@ typedef struct _Layer
 {
 	Enesim_Compositor_Span span;
 	Enesim_Matrix original;
+	float ox, oy;
 	Enesim_Renderer *r;
 } Layer;
 
@@ -68,9 +69,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		Layer *l = eina_list_data_get(ll);
 		int ox, oy, oox, ooy;
 
+		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
 		if (!enesim_renderer_sw_setup(l->r))
+		{
+			enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
 			return EINA_FALSE;
-		enesim_renderer_relative_set(r, l->r, &l->original);
+		}
 	}
 	*fill = _span_identity;
 
@@ -88,7 +92,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 		Layer *l = eina_list_data_get(ll);
 		int ox, oy, oox, ooy;
 
-		enesim_renderer_relative_unset(r, l->r, &l->original);
+		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
 		enesim_renderer_sw_cleanup(l->r);
 	}
 }

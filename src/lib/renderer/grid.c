@@ -227,15 +227,16 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	g->wwt = eina_f16p16_int_from(g->wt);
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		*fill = _span_identity;
+		//*fill = _span_identity;
+		*fill = _span_affine;
 	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
 		*fill = _span_affine;
 	else
-		fill = _span_projective;
+		*fill = _span_projective;
 	return EINA_TRUE;
 }
 
-static void _free(Grid *g)
+static void _free(Enesim_Renderer *r)
 {
 
 }

@@ -328,13 +328,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 		}
 	}
 
-	if (ellipse->base.fill.rend &&
-	    ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
-	     (ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-	{
-		if (!enesim_renderer_sw_setup(ellipse->base.fill.rend))
-			return EINA_FALSE;
-	}
+	if (!enesim_renderer_shape_sw_setup(p))
+		return EINA_FALSE;
 
 	*fill = _span_color_outlined_paint_filled_proj;
 	if (p->matrix.type == ENESIM_MATRIX_AFFINE || p->matrix.type == ENESIM_MATRIX_IDENTITY)
@@ -347,10 +342,7 @@ static void _state_cleanup(Enesim_Renderer *p)
 {
 	Ellipse *ellipse = (Ellipse *) p;
 
-	if (ellipse->base.fill.rend &&
-	    ((ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) ||
-	     (ellipse->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-		enesim_renderer_sw_cleanup(ellipse->base.fill.rend);
+	enesim_renderer_shape_sw_cleanup(p);
 }
 
 static void _free(Enesim_Renderer *p)

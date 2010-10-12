@@ -41,36 +41,35 @@ void enesim_renderer_init(Enesim_Renderer *r)
 }
 
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix)
+		Enesim_Matrix *old_matrix, float *old_ox, float *old_oy)
 {
-	Enesim_Matrix matrix;
-	int ox, oy, oox, ooy;
+	Enesim_Matrix rel_matrix, r_matrix;
+	float r_ox, r_oy;
+	float nox, noy;
 
 	if (!rel) return;
 
-	/* add the origin by the current origin */
-	enesim_renderer_origin_get(rel, &ox, &oy);
-	enesim_renderer_origin_get(r, &oox, &ooy);
-	enesim_renderer_origin_set(rel, ox + oox, oy + ooy);
 	/* TODO should we use the f16p16 matrix? */
 	/* multiply the matrix by the current transformation */
-	enesim_renderer_matrix_get(r, &matrix);
+	enesim_renderer_matrix_get(r, &r_matrix);
 	enesim_renderer_matrix_get(rel, old_matrix);
-	enesim_matrix_compose(old_matrix, &matrix, &matrix);
-	enesim_renderer_matrix_set(rel, &matrix);
+	enesim_matrix_compose(old_matrix, &r_matrix, &rel_matrix);
+	enesim_renderer_matrix_set(rel, &rel_matrix);
+	/* add the origin by the current origin */
+	enesim_renderer_origin_get(rel, old_ox, old_oy);
+	enesim_renderer_origin_get(r, &r_ox, &r_oy);
+	enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
+	enesim_renderer_origin_set(rel, nox, noy);
+	//printf("setting origin %p %g %g to %g %g (%g %g)\n", rel, *old_ox, *old_oy, nox + r_ox, noy + r_oy, nox, noy);
 }
 
 void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix)
+		Enesim_Matrix *old_matrix, float old_ox, float old_oy)
 {
-	int ox, oy, oox, ooy;
-
 	if (!rel) return;
 
 	/* restore origin */
-	enesim_renderer_origin_get(rel, &ox, &oy);
-	enesim_renderer_origin_get(r, &oox, &ooy);
-	enesim_renderer_origin_set(rel, ox - oox, oy - ooy);
+	enesim_renderer_origin_set(rel, old_ox, old_oy);
 	/* restore original matrix */
 	enesim_renderer_matrix_set(rel, old_matrix);
 }
@@ -180,7 +179,7 @@ EAPI void enesim_renderer_delete(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, int x, int y)
+EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, float x, float y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	r->ox = x;
@@ -190,7 +189,7 @@ EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, int x, int y)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, int *x, int *y)
+EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, float *x, float *y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (x) *x = r->ox;
@@ -230,8 +229,6 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	uint32_t *ddata;
 	int stride;
 	Enesim_Format dfmt;
-	Eina_F16p16 ox;
-	Eina_F16p16 oy;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
@@ -250,9 +247,6 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		ch = clip->h;
 	}
 
-	ox = eina_f16p16_int_from(r->ox);
-	oy = eina_f16p16_int_from(r->oy);
-
 	dfmt = enesim_surface_format_get(s);
 	ddata = enesim_surface_data_get(s);
 	stride = enesim_surface_stride_get(s);
@@ -267,7 +261,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		while (ch--)
 		{
 			fill(r, cx, cy, cw, ddata);
-			y++;
+			cy++;
 			ddata += stride;
 		}
 	}
