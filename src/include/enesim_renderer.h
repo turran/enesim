@@ -29,6 +29,8 @@ typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst);
 
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
+typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Eina_Rectangle *rect);
+
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill);
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
@@ -37,6 +39,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Boundings boundings;
 };
 
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
@@ -55,6 +58,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
 /**
  * @defgroup Enesim_Renderer_Shapes_Group Shapes
  * @{

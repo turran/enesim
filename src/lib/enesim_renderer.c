@@ -215,6 +215,16 @@ EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
 }
 
 /**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (rect && r->boundings) r->boundings(r, rect);
+}
+
+/**
  * To be documented
  * FIXME: To be fixed
  * What about the mask?

@@ -31,7 +31,10 @@ struct _Enesim_Renderer
 {
 	EINA_MAGIC;
 	int type_id;
+	/* common functions */
 	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Boundings boundings;
+	/* software backend */
 	Enesim_Renderer_Sw_Fill sw_fill;
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
