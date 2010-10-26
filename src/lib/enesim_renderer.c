@@ -170,7 +170,7 @@ EAPI void enesim_renderer_matrix_get(Enesim_Renderer *r, Enesim_Matrix *m)
 EAPI void enesim_renderer_delete(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	enesim_renderer_sw_cleanup(r);
+	//enesim_renderer_sw_cleanup(r);
 	if (r->free)
 		r->free(r);
 	free(r);

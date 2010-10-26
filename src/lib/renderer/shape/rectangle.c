@@ -605,7 +605,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		rect->sw = sw;
 	}
 
-	enesim_renderer_shape_sw_setup(r);
+	if (!enesim_renderer_shape_sw_setup(r))
+		return EINA_FALSE;
+
 	*fill = _span_rounded_color_outlined_paint_filled_proj;
 	if (r->matrix.type == ENESIM_MATRIX_AFFINE || r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_rounded_color_outlined_paint_filled_affine;

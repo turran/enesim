@@ -29,11 +29,18 @@ typedef struct _Compound
 
 typedef struct _Layer
 {
+	Enesim_Renderer *r;
+	Enesim_Rop rop;
+	/* generate at state setup */
 	Enesim_Compositor_Span span;
 	Enesim_Matrix original;
 	float ox, oy;
-	Enesim_Renderer *r;
 } Layer;
+
+static void _span_compositor_wrapper(Enesim_Renderer *r)
+{
+
+}
 
 static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
@@ -53,7 +60,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 		else
 		{
 			l->r->sw_fill(l->r, x, y, len, tmp);
-			l->span(dst, len, tmp, 0, NULL);
+			l->span(dst, len, tmp, l->r->color, NULL);
 		}
 	}
 }
@@ -67,14 +74,22 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
+		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
 		int ox, oy, oox, ooy;
 
+		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
 		if (!enesim_renderer_sw_setup(l->r))
 		{
 			enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
 			return EINA_FALSE;
 		}
+		/* set the span given the color */
+		/* FIXME fix the resulting format */
+		/* FIXME what about the surface formats here? */
+		/* FIXME fix the simplest case (fill) */
+		l->span = enesim_compositor_span_get(l->rop, &fmt, ENESIM_FORMAT_ARGB8888,
+			l->r->color, ENESIM_FORMAT_NONE);
 	}
 	*fill = _span_identity;
 
@@ -128,17 +143,11 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 {
 	Compound *c = (Compound *)r;
 	Layer *l;
-	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
-	/* FIXME fix the resulting format */
 
 	l = malloc(sizeof(Layer));
 	l->r = rend;
-	/* FIXME what about the surface formats here? */
-	if (rop != ENESIM_FILL)
-		l->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_ARGB8888,
-				ENESIM_COLOR_FULL, ENESIM_FORMAT_NONE);
-	else
-		l->span = NULL;
+	l->rop = rop;
+
 	c->layers = eina_list_append(c->layers, l);
 }
 
