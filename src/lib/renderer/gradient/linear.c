@@ -1,5 +1,5 @@
 /* ENESIM - Direct Rendering Library
- * Copyright (C) 2007-2008 Jorge Luis Zapata
+ * Copyright (C) 2007-2010 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -138,6 +138,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * FIXME
+ * To be documented
+ */
 EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
 {
 	Linear *l;
@@ -152,7 +156,10 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
 
 	return r;
 }
-
+/**
+ * FIXME
+ * To be documented
+ */
 EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, float x0,
 		float y0, float x1, float y1)
 {

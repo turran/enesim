@@ -26,6 +26,7 @@
 
 /* eina fixed point helpers, this should go to eina some day */
 #define EINA_F16P16_ONE (1 << 16)
+#define EINA_F16P16_HALF (1 << 15)
 
 struct _Enesim_Renderer
 {
