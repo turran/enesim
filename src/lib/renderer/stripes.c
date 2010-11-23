@@ -26,7 +26,7 @@ struct _Stripes {
 
 	struct {
 		Enesim_Color color;
-		int thickness;
+		double thickness;
 	} s0, s1;
 
 	int hh0, hh;
@@ -200,7 +200,7 @@ EAPI Enesim_Color enesim_renderer_stripes_even_color_get(Enesim_Renderer *r)
  * @param[in] thickness The even stripes thickness
  */
 EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
-		float thickness)
+		double thickness)
 {
 	Stripes *st;
 
@@ -214,7 +214,7 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
  * @param[in] r The stripes renderer
  * @param[in] thickness The even stripes thickness
  */
-EAPI float enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r)
+EAPI double enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r)
 {
 	Stripes *st;
 
@@ -252,7 +252,7 @@ EAPI Enesim_Color enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r)
  * @param[in] thickness The odd stripes thickness
  */
 EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
-		float thickness)
+		double thickness)
 {
 	Stripes *st;
 
@@ -266,7 +266,7 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
  * @param[in] r The stripes renderer
  * @param[in] thickness The odd stripes thickness
  */
-EAPI float enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r)
+EAPI double enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r)
 {
 	Stripes *st;
 

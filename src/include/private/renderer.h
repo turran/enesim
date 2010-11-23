@@ -42,7 +42,7 @@ struct _Enesim_Renderer
 	void *data;
 	/* the renderer common properties */
 	Enesim_Color color;
-	float ox, oy; /* the origin */
+	double ox, oy; /* the origin */
 	struct {
 		Enesim_Matrix original;
 		Enesim_F16p16_Matrix values;
@@ -56,7 +56,7 @@ typedef struct _Enesim_Renderer_Shape
 	struct {
 		Enesim_Color color;
 		Enesim_Renderer *rend; /* TODO */
-		float weight;
+		double weight;
 		Enesim_Matrix original;
 	} stroke;
 
@@ -64,7 +64,7 @@ typedef struct _Enesim_Renderer_Shape
 		Enesim_Color color;
 		Enesim_Renderer *rend;
 		Enesim_Matrix original;
-		float ox, oy;
+		double ox, oy;
 	} fill;
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape;
@@ -154,8 +154,8 @@ static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
-void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, float *old_ox, float *old_oy);
-void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, float old_ox, float old_oy);
+void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, double *old_ox, double *old_oy);
+void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, double old_ox, double old_oy);
 
 /* common shape renderer functions */
 void enesim_renderer_shape_init(Enesim_Renderer *r);

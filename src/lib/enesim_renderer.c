@@ -41,11 +41,11 @@ void enesim_renderer_init(Enesim_Renderer *r)
 }
 
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix, float *old_ox, float *old_oy)
+		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy)
 {
 	Enesim_Matrix rel_matrix, r_matrix;
-	float r_ox, r_oy;
-	float nox, noy;
+	double r_ox, r_oy;
+	double nox, noy;
 
 	if (!rel) return;
 
@@ -64,7 +64,7 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 }
 
 void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix, float old_ox, float old_oy)
+		Enesim_Matrix *old_matrix, double old_ox, double old_oy)
 {
 	if (!rel) return;
 
@@ -179,7 +179,7 @@ EAPI void enesim_renderer_delete(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, float x, float y)
+EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	r->ox = x;
@@ -189,7 +189,7 @@ EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, float x, float y)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, float *x, float *y)
+EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (x) *x = r->ox;

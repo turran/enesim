@@ -89,7 +89,7 @@ void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, float weight)
+EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double weight)
 {
 	Enesim_Renderer_Shape *s;
 

@@ -52,8 +52,8 @@ EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
 EAPI void enesim_renderer_matrix_set(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_matrix_get(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_delete(Enesim_Renderer *r);
-EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, float x, float y);
-EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, float *x, float *y);
+EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y);
+EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y);
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
@@ -70,7 +70,7 @@ typedef enum _Enesim_Shape_Draw_Mode
 	ENESIM_SHAPE_DRAW_MODE_STROKE_FILL = 2,
 } Enesim_Shape_Draw_Mode;
 
-EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, float weight);
+EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double weight);
 EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
 EAPI void enesim_renderer_shape_outline_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color fill_color);
@@ -87,7 +87,7 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *p, unsigned int 
 EAPI unsigned int enesim_renderer_rectangle_height_get(Enesim_Renderer *p);
 EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, unsigned int w, unsigned int h);
 EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *p, unsigned int *w, unsigned int *h);
-EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, float radius);
+EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, double radius);
 EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p, Eina_Bool tl, Eina_Bool tr, Eina_Bool bl, Eina_Bool br);
 /**
  * @}
@@ -97,8 +97,8 @@ EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p, Eina_Bool tl
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void);
 EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, float x, float y);
 EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, float *x, float *y);
-EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, float radius);
-EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, float *radius);
+EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius);
+EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius);
 /**
  * @}
  * @defgroup Enesim_Renderer_Ellipse_Group Ellipse
@@ -196,12 +196,12 @@ EAPI void enesim_renderer_transition_offset_set(Enesim_Renderer *r, int x, int y
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void);
 EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI Enesim_Color enesim_renderer_stripes_even_color_get(Enesim_Renderer *r);
-EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r, float thickness);
-EAPI float enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r, double thickness);
+EAPI double enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI Enesim_Color enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r);
-EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,	float thickness);
-EAPI float enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,	double thickness);
+EAPI double enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r);
 /**
  * @}
  * @defgroup Enesim_Renderer_Dispmap_Group Displacement Map

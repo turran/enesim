@@ -26,7 +26,7 @@ typedef struct _Rectangle {
 
 	int w, h;
 	struct {
-		float radius;
+		double radius;
 		Eina_Bool tl : 1;
 		Eina_Bool tr : 1;
 		Eina_Bool bl : 1;
@@ -576,7 +576,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	if (1)
 	{
-		float rad;
+		double rad;
 		int sw;
 
 		rad = rect->corner.radius;
@@ -720,7 +720,7 @@ EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *p, unsigned int *w
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, float radius)
+EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, double radius)
 {
 	Rectangle *rect = (Rectangle *) p;
 	if (!rect) return;

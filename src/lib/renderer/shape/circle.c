@@ -24,7 +24,7 @@ typedef struct _Circle {
 	Enesim_Renderer_Shape base;
 
 	float x, y;
-	float r;
+	double r;
 
 	int xx0, yy0;
 	int rr0, irr0;
@@ -239,7 +239,7 @@ EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, float *x, float 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, float radius)
+EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
 {
 	Circle *circ;
 
@@ -253,7 +253,7 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, float radius)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, float *radius)
+EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius)
 {
 	Circle *circ;
 
