@@ -24,8 +24,8 @@ typedef struct _Ellipse Ellipse;
 struct _Ellipse {
 	Enesim_Renderer_Shape base;
 
-	float x, y;
-	float rx, ry;
+	double x, y;
+	double rx, ry;
 
 	int xx0, yy0;
 	int rr0_x, rr0_y;
@@ -273,8 +273,8 @@ static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, in
 static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 {
 	Ellipse *ellipse = (Ellipse *) p;
-	float rx, ry;
-	float sw;
+	double rx, ry;
+	double sw;
 
 	if (!ellipse || (ellipse->rx < 1) || (ellipse->ry < 1))
 		return EINA_FALSE;
@@ -381,7 +381,7 @@ EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, float x, float y)
+EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, double x, double y)
 {
 	Ellipse *ellipse;
 
@@ -396,7 +396,7 @@ EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, float x, float 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, float *x, float *y)
+EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, double *x, double *y)
 {
 	Ellipse *ellipse = (Ellipse *)p;
 
@@ -408,7 +408,7 @@ EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, float *x, float
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, float radius_x, float radius_y)
+EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, double radius_x, double radius_y)
 {
 	Ellipse *ellipse;
 
@@ -428,10 +428,51 @@ EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, float radius_x, 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, float *radius_x, float *radius_y)
+EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, double *radius_x, double *radius_y)
 {
 	Ellipse *ellipse = (Ellipse *)p;
 
 	if (radius_x) *radius_x = ellipse->rx;
 	if (radius_y) *radius_y = ellipse->ry;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *p, double x)
+{
+	Ellipse *ellipse = (Ellipse *)p;
+	ellipse->x = x;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *p, double y)
+{
+	Ellipse *ellipse = (Ellipse *)p;
+	ellipse->y = y;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *p, double r)
+{
+	Ellipse *ellipse = (Ellipse *)p;
+	ellipse->rx = r;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *p, double r)
+{
+	Ellipse *ellipse = (Ellipse *)p;
+	ellipse->ry = r;
+}
+

@@ -23,7 +23,7 @@
 typedef struct _Circle {
 	Enesim_Renderer_Shape base;
 
-	float x, y;
+	double x, y;
 	double r;
 
 	int xx0, yy0;
@@ -143,8 +143,8 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Circle *circ = (Circle *)r;
-	float rad;
-	float sw;
+	double rad;
+	double sw;
 
 	if (!circ || (circ->r < 1))
 		return EINA_FALSE;
@@ -211,11 +211,37 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 
 	return r;
 }
+
+
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, float x, float y)
+EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
+{
+	Circle *circ;
+
+	circ = (Circle *)r;
+	circ->x = x;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
+{
+	Circle *circ;
+
+	circ = (Circle *)r;
+	circ->y = y;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double y)
 {
 	Circle *circ;
 
@@ -227,7 +253,7 @@ EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, float x, float y
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, float *x, float *y)
+EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, double *y)
 {
 	Circle *circ;
 

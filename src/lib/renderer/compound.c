@@ -168,3 +168,19 @@ EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r)
 		list = eina_list_remove_list(list, l);
 	}
 }
+
+/**
+ *
+ */
+EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
+		Eina_List *list)
+{
+	Enesim_Renderer_Compound_Layer *layer;
+	Eina_List *l;
+	Compound *c = (Compound *)r;
+
+	EINA_LIST_FOREACH(list, l, layer)
+	{
+		enesim_renderer_compound_layer_add(r, layer->renderer, layer->rop);
+	}
+}

@@ -95,8 +95,10 @@ EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p, Eina_Bool tl
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void);
-EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, float x, float y);
-EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, float *x, float *y);
+EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x);
+EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y);
+EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double y);
+EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, double *y);
 EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius);
 EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius);
 /**
@@ -105,18 +107,36 @@ EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius);
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void);
-EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, float x, float y);
-EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, float *x, float *y);
-EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, float radius_x, float radius_y);
-EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, float *radius_x, float *radius_y);
+
+EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *p, double x);
+EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *p, double y);
+EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *p, double r);
+EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *p, double r);
+EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, double x, double y);
+EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, double *x, double *y);
+EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, double radius_x, double radius_y);
+EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, double *radius_x, double *radius_y);
 /**
  * @}
  * @defgroup Enesim_Renderer_Figure_Group Figure
  * @{
  */
+
+typedef struct _Enesim_Renderer_Figure_Polygon
+{
+	Eina_List *vertices;
+} Enesim_Renderer_Figure_Polygon;
+
+typedef struct _Enesim_Renderer_Figure_Vertex
+{
+	double x;
+	double y;
+} Enesim_Renderer_Figure_Vertex;
+
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void);
 EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p);
-EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p, float x, float y);
+EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *p, Eina_List *polygons);
+EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p, double x, double y);
 EAPI void enesim_renderer_figure_extents_get(Enesim_Renderer *p, int *lx, int *ty, int *rx, int *by);
 EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p);
 /**
@@ -266,6 +286,13 @@ EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r);
  * @defgroup Enesim_Renderer_Compound_Group Compound
  * @{
  */
+
+typedef struct _Enesim_Renderer_Compound_Layer
+{
+	Enesim_Renderer *renderer;
+	Enesim_Rop rop;
+} Enesim_Renderer_Compound_Layer;
+
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer *rend, Enesim_Rop rop);

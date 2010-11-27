@@ -45,7 +45,7 @@
 typedef struct _Point2D Point2D;
 struct _Point2D
 {
-	float x, y;
+	double x, y;
 };
 
 typedef struct _Polygon_Vertex Polygon_Vertex;
@@ -764,7 +764,7 @@ EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p)
  * FIXME: To be fixed
  */
 EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
-		float x, float y)
+		double x, double y)
 {
 	Enesim_Renderer_Shape *f;
 	Figure *o;
@@ -866,6 +866,28 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p)
 	o->vectors = NULL;
 	o->changed = 1;
 }
+
+EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list)
+{
+	Enesim_Renderer_Figure_Polygon *polygon;
+	Eina_List *l1;
+	Figure *f;
+
+	f = (Figure *)r;
+
+	EINA_LIST_FOREACH(list, l1, polygon)
+	{
+		Eina_List *l2;
+		Enesim_Renderer_Figure_Vertex *vertex;
+
+		printf("adding a polygon\n");
+		EINA_LIST_FOREACH(list, l2, vertex)
+		{
+			printf("adding a vertex\n");
+		}
+	}
+}
+
 
 #if 0
 int
