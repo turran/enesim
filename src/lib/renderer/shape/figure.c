@@ -867,6 +867,10 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p)
 	o->changed = 1;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list)
 {
 	Enesim_Renderer_Figure_Polygon *polygon;
@@ -874,16 +878,16 @@ EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list
 	Figure *f;
 
 	f = (Figure *)r;
-
+	enesim_renderer_figure_clear(r);
 	EINA_LIST_FOREACH(list, l1, polygon)
 	{
 		Eina_List *l2;
 		Enesim_Renderer_Figure_Vertex *vertex;
 
-		printf("adding a polygon\n");
-		EINA_LIST_FOREACH(list, l2, vertex)
+		enesim_renderer_figure_polygon_add(r);
+		EINA_LIST_FOREACH(polygon->vertices, l2, vertex)
 		{
-			printf("adding a vertex\n");
+			enesim_renderer_figure_polygon_vertex_add(r, vertex->x, vertex->y);
 		}
 	}
 }

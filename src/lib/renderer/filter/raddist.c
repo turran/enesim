@@ -25,8 +25,8 @@ typedef struct _Raddist
 {
 	Enesim_Renderer base;
 	Enesim_Surface *src;
-	float scale;
-	float radius;
+	double scale;
+	double radius;
 	/* the x and y origin of the circle */
 	int orx, ory;
 } Raddist;
@@ -36,7 +36,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 {
 	Raddist *rd = (Raddist *)r;
 	uint32_t *end = dst + len;
-	float r_inv;
+	double r_inv;
 	uint32_t *src;
 	int sw, sh;
 	int sstride;
@@ -56,7 +56,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 sxx, syy;
 		uint32_t p0;
 		int sx, sy;
-		float r = hypot(x, y);
+		double r = hypot(x, y);
 
 		r = (((rd->scale * (rd->radius - r)) + r) * r_inv);
 		sxx = eina_f16p16_float_from((r * x) + rd->orx);
@@ -101,7 +101,7 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 	return r;
 }
 
-EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, float radius)
+EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius)
 {
 	Raddist *rd = (Raddist *)r;
 
@@ -110,7 +110,7 @@ EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, float radius)
 	rd->radius = radius;
 }
 
-EAPI void enesim_renderer_raddist_scale_set(Enesim_Renderer *r, float scale)
+EAPI void enesim_renderer_raddist_scale_set(Enesim_Renderer *r, double scale)
 {
 	Raddist *rd = (Raddist *)r;
 
@@ -119,7 +119,7 @@ EAPI void enesim_renderer_raddist_scale_set(Enesim_Renderer *r, float scale)
 	rd->scale = scale;
 }
 
-EAPI float enesim_renderer_raddist_scale_get(Enesim_Renderer *r)
+EAPI double enesim_renderer_raddist_scale_get(Enesim_Renderer *r)
 {
 	Raddist *rd = (Raddist *)r;
 	return rd->scale;

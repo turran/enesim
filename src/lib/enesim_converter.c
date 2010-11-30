@@ -48,7 +48,7 @@ void enesim_converter_span_register(Enesim_Converter_1D cnv,
 void enesim_converter_surface_register(Enesim_Converter_2D cnv,
 		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt)
 {
-	printf("registering converter dfmt = %d sfmt = %d\n", dfmt, sfmt);
+	//printf("registering converter dfmt = %d sfmt = %d\n", dfmt, sfmt);
 	_converters_2d[dfmt][angle][sfmt] = cnv;
 }
 

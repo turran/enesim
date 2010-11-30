@@ -11,7 +11,7 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_renderer.la
 
 libenesim_renderer_la_SOURCES = \
-surface.c \
+image.c \
 checker.c \
 hswitch.c \
 stripes.c \

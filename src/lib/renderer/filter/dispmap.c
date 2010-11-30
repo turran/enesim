@@ -30,7 +30,7 @@ typedef struct _Dispamp
 	Enesim_Surface *src;
 	Enesim_Channel x_channel;
 	Enesim_Channel y_channel;
-	float scale;
+	double scale;
 	/* The state variables */
 	Eina_F16p16 s_scale;
 } Dispmap;
@@ -251,7 +251,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	if (!d->map || !d->src) return EINA_FALSE;
 
 	*fill = _spans[d->x_channel][d->y_channel][r->matrix.type];
-	if (*fill) return EINA_FALSE;
+	if (!*fill) return EINA_FALSE;
 
 	d->s_scale = eina_f16p16_float_from(d->scale);
 
@@ -345,7 +345,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_src_get(Enesim_Renderer *r)
 /**
  *
  */
-EAPI void enesim_renderer_dispmap_scale_set(Enesim_Renderer *r, float scale)
+EAPI void enesim_renderer_dispmap_scale_set(Enesim_Renderer *r, double scale)
 {
 	Dispmap *d = (Dispmap *)r;
 
@@ -354,7 +354,7 @@ EAPI void enesim_renderer_dispmap_scale_set(Enesim_Renderer *r, float scale)
 /**
  *
  */
-EAPI float enesim_renderer_dispmap_scale_get(Enesim_Renderer *r)
+EAPI double enesim_renderer_dispmap_scale_get(Enesim_Renderer *r)
 {
 	Dispmap *d = (Dispmap *)r;
 

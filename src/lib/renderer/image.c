@@ -25,7 +25,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Surface
+typedef struct _Image
 {
 	Enesim_Renderer base;
 	Enesim_Surface *s;
@@ -33,7 +33,7 @@ typedef struct _Surface
 	unsigned int w, h;
 	int *yoff;
 	int *xoff;
-} Surface;
+} Image;
 
 static inline void _offsets(unsigned int cs, unsigned int cl, unsigned int sl, int *off)
 {
@@ -104,7 +104,7 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 
 static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 	uint32_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
@@ -136,7 +136,7 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 
 static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 	uint32_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
@@ -174,7 +174,7 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 
 static void _noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 	uint32_t sstride;
 	uint32_t *src;
 
@@ -203,7 +203,7 @@ static void _noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 	if (s->xoff)
 	{
 		free(s->xoff);
@@ -220,7 +220,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	int sw, sh;
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 
 	if (s->w < 1 || s->h < 1)
 		return EINA_FALSE;
@@ -267,12 +267,12 @@ static void _free(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Renderer * enesim_renderer_surface_new(void)
+EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 {
 	Enesim_Renderer *r;
-	Surface *s;
+	Image *s;
 
-	s = calloc(1, sizeof(Surface));
+	s = calloc(1, sizeof(Image));
 	r = (Enesim_Renderer *)s;
 
 	enesim_renderer_init(r);
@@ -286,9 +286,9 @@ EAPI Enesim_Renderer * enesim_renderer_surface_new(void)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_surface_x_set(Enesim_Renderer *r, int x)
+EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 
 	if (s->x == x)
 		return;
@@ -298,9 +298,9 @@ EAPI void enesim_renderer_surface_x_set(Enesim_Renderer *r, int x)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_surface_y_set(Enesim_Renderer *r, int y)
+EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 
 	if (s->y == y)
 		return;
@@ -310,9 +310,9 @@ EAPI void enesim_renderer_surface_y_set(Enesim_Renderer *r, int y)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_surface_w_set(Enesim_Renderer *r, int w)
+EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 
 	if (s->w == w)
 		return;
@@ -322,9 +322,9 @@ EAPI void enesim_renderer_surface_w_set(Enesim_Renderer *r, int w)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_surface_h_set(Enesim_Renderer *r, int h)
+EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 
 	if (s->h == h)
 		return;
@@ -334,9 +334,9 @@ EAPI void enesim_renderer_surface_h_set(Enesim_Renderer *r, int h)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_surface_src_set(Enesim_Renderer *r, Enesim_Surface *src)
+EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
-	Surface *s = (Surface *)r;
+	Image *s = (Image *)r;
 
 	s->s = src;
 }
