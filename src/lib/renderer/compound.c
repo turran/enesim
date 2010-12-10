@@ -34,7 +34,7 @@ typedef struct _Layer
 	/* generate at state setup */
 	Enesim_Compositor_Span span;
 	Enesim_Matrix original;
-	float ox, oy;
+	double ox, oy;
 } Layer;
 
 static void _span_compositor_wrapper(Enesim_Renderer *r)
@@ -75,7 +75,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
-		int ox, oy, oox, ooy;
+		double ox, oy, oox, ooy;
 
 		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
@@ -105,7 +105,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
-		int ox, oy, oox, ooy;
+		double ox, oy, oox, ooy;
 
 		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
 		enesim_renderer_sw_cleanup(l->r);

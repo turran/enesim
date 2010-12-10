@@ -51,10 +51,10 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 
 	/* TODO should we use the f16p16 matrix? */
 	/* multiply the matrix by the current transformation */
-	enesim_renderer_matrix_get(r, &r_matrix);
-	enesim_renderer_matrix_get(rel, old_matrix);
+	enesim_renderer_transformation_get(r, &r_matrix);
+	enesim_renderer_transformation_get(rel, old_matrix);
 	enesim_matrix_compose(old_matrix, &r_matrix, &rel_matrix);
-	enesim_renderer_matrix_set(rel, &rel_matrix);
+	enesim_renderer_transformation_set(rel, &rel_matrix);
 	/* add the origin by the current origin */
 	enesim_renderer_origin_get(rel, old_ox, old_oy);
 	enesim_renderer_origin_get(r, &r_ox, &r_oy);
@@ -71,7 +71,7 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
 	/* restore origin */
 	enesim_renderer_origin_set(rel, old_ox, old_oy);
 	/* restore original matrix */
-	enesim_renderer_matrix_set(rel, old_matrix);
+	enesim_renderer_transformation_set(rel, old_matrix);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -141,7 +141,7 @@ EAPI void * enesim_renderer_data_get(Enesim_Renderer *r)
  * @param[in] r The renderer to set the transformation matrix on
  * @param[in] m The transformation matrix to set
  */
-EAPI void enesim_renderer_matrix_set(Enesim_Renderer *r, Enesim_Matrix *m)
+EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *m)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
@@ -157,7 +157,7 @@ EAPI void enesim_renderer_matrix_set(Enesim_Renderer *r, Enesim_Matrix *m)
 	r->matrix.type = enesim_f16p16_matrix_type_get(&r->matrix.values);
 }
 
-EAPI void enesim_renderer_matrix_get(Enesim_Renderer *r, Enesim_Matrix *m)
+EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 

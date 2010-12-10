@@ -647,7 +647,6 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 		return NULL;
 
 	p = (Enesim_Renderer *) rect;
-	p->type_id = RECTANGLE_RENDERER;
 	enesim_renderer_shape_init(p);
 	p->free = _free;
 	p->sw_cleanup = _state_cleanup;

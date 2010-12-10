@@ -20,6 +20,7 @@
 /**
  * @todo
  * - Optimize the case where both colors are the same
+ * - There's a bug on the affine renderer, easily reproducible whenever we scale
  */
 /*============================================================================*
  *                                  Local                                     *
@@ -97,7 +98,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx;
-		uint32_t color[2] = { s->color1, s->color2};
+		uint32_t color[2] = {s->color1, s->color2};
 		uint32_t p0;
 		int sx, sy;
 
@@ -123,7 +124,6 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 		if (sxx >= ww)
 		{
 			p0 = color[0];
-
 			/* antialias the borders */
 			if (sy == 0 || sy == s->sh)
 			{
@@ -143,6 +143,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 		else
 		{
 			p0 = color[1];
+
 			/* antialias the borders */
 			if (sy == 0 || sy == s->sh)
 			{

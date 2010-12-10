@@ -31,7 +31,9 @@
 struct _Enesim_Renderer
 {
 	EINA_MAGIC;
+	/* FIXME remove this */
 	int type_id;
+	/* FIXME why dont have a descriptor pointer directly? */
 	/* common functions */
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
@@ -165,14 +167,5 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r);
 /* common gradient renderer functions */
 void enesim_renderer_gradient_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len);
-
-/* TODO remove this */
-/* some built-in renderer type identifiers */
-#define SURFACE_RENDERER (1)
-//#define FIGURE_RENDERER (2)
-#define IMAGE_RENDERER (3)
-#define RECTANGLE_RENDERER (1 << 8)
-#define CIRCLE_RENDERER (2 << 8)
-#define ELLIPSE_RENDERER (3 << 8)
 
 #endif

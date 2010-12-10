@@ -369,7 +369,6 @@ EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 		return NULL;
 	p = (Enesim_Renderer *) ellipse;
 
-	p->type_id = ELLIPSE_RENDERER;
 	enesim_renderer_shape_init(p);
 	p->free = _free;
 	p->sw_cleanup = _state_cleanup;
