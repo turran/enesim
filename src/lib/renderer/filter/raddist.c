@@ -110,16 +110,16 @@ EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius)
 	rd->radius = radius;
 }
 
-EAPI void enesim_renderer_raddist_scale_set(Enesim_Renderer *r, double scale)
+EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor)
 {
 	Raddist *rd = (Raddist *)r;
 
-	if (scale > 1.0)
-		scale = 1.0;
-	rd->scale = scale;
+	if (factor > 1.0)
+		factor = 1.0;
+	rd->scale = factor;
 }
 
-EAPI double enesim_renderer_raddist_scale_get(Enesim_Renderer *r)
+EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 {
 	Raddist *rd = (Raddist *)r;
 	return rd->scale;

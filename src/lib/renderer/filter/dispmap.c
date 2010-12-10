@@ -345,16 +345,16 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_src_get(Enesim_Renderer *r)
 /**
  *
  */
-EAPI void enesim_renderer_dispmap_scale_set(Enesim_Renderer *r, double scale)
+EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor)
 {
 	Dispmap *d = (Dispmap *)r;
 
-	d->scale = scale;
+	d->scale = factor;
 }
 /**
  *
  */
-EAPI double enesim_renderer_dispmap_scale_get(Enesim_Renderer *r)
+EAPI double enesim_renderer_dispmap_factor_get(Enesim_Renderer *r)
 {
 	Dispmap *d = (Dispmap *)r;
 

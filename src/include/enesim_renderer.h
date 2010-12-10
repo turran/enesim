@@ -240,7 +240,7 @@ typedef enum _Enesim_Channel
 EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void);
 EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *map);
 EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src);
-EAPI void enesim_renderer_dispmap_scale_set(Enesim_Renderer *r, double scale);
+EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor);
 EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
 EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
 /**
@@ -250,7 +250,7 @@ EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r, Enesim_Chann
  */
 EAPI Enesim_Renderer * enesim_renderer_raddist_new(void);
 EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius);
-EAPI void enesim_renderer_raddist_scale_set(Enesim_Renderer *r, double scale);
+EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor);
 EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox);
 EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy);
