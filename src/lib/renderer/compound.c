@@ -65,10 +65,26 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	}
 }
 
+static void _span_identity_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+{
+	Compound *c = (Compound *)r;
+	Eina_List *ll;
+	uint32_t *tmp = alloca(sizeof(uint32_t) * len);
+
+	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	{
+		Layer *l;
+
+		l = eina_list_data_get(ll);
+		l->r->sw_fill(l->r, x, y, len, dst);
+	}
+}
+
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Compound *c = (Compound *)r;
 	Eina_List *ll;
+	Eina_Bool only_fill = EINA_TRUE;
 
 	/* setup every layer */
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
@@ -88,10 +104,21 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
 		/* FIXME fix the simplest case (fill) */
-		l->span = enesim_compositor_span_get(l->rop, &fmt, ENESIM_FORMAT_ARGB8888,
-			l->r->color, ENESIM_FORMAT_NONE);
+		if (l->rop != ENESIM_FILL || l->r->color != ENESIM_COLOR_FULL)
+		{
+			l->span = enesim_compositor_span_get(l->rop, &fmt, ENESIM_FORMAT_ARGB8888,
+					l->r->color, ENESIM_FORMAT_NONE);
+			only_fill = EINA_FALSE;
+		}
 	}
-	*fill = _span_identity;
+	if (only_fill)
+	{
+		*fill = _span_identity_only_fill;
+	}
+	else
+	{
+		*fill = _span_identity;
+	}
 
 	return EINA_TRUE;
 }

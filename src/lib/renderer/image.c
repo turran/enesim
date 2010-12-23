@@ -171,7 +171,6 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 	}
 }
 
-
 static void _noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Image *s = (Image *)r;

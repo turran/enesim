@@ -30,7 +30,6 @@
  * - Add a surface iterator
  * - Normalize the occurences of argb, colors, etc. Always premul or flat
  * argb8888?
- * - Be able to pass an Eina_Allocator to surface_new
  */
 typedef struct _Enesim_Surface 	Enesim_Surface; /**< Surface Handler */
 
