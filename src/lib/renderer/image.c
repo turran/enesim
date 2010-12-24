@@ -177,7 +177,7 @@ static void _noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_
 	uint32_t sstride;
 	uint32_t *src;
 
-	if (y < r->oy || y > r->oy + s->w)
+	if (y < r->oy || y > r->oy + s->h)
 	{
 		while (len--)
 			*dst++ = 0;
