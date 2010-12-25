@@ -38,6 +38,7 @@ void enesim_renderer_init(Enesim_Renderer *r)
 	r->color = ENESIM_COLOR_FULL;
 	enesim_f16p16_matrix_identity(&r->matrix.values);
 	enesim_matrix_identity(&r->matrix.original);
+	r->matrix.type = ENESIM_MATRIX_IDENTITY;
 }
 
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
@@ -45,7 +46,7 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 {
 	Enesim_Matrix rel_matrix, r_matrix;
 	double r_ox, r_oy;
-	double nox, noy;
+	float nox, noy;
 
 	if (!rel) return;
 

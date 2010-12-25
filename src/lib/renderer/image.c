@@ -171,7 +171,39 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 	}
 }
 
-static void _noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+{
+	Image *s = (Image *)r;
+	uint32_t sstride;
+	uint8_t *src;
+
+	if (y < r->oy || y > r->oy + s->h)
+	{
+		while (len--)
+			*dst++ = 0;
+		return;
+	}
+
+	src = enesim_surface_data_get(s->s);
+	sstride = enesim_surface_stride_get(s->s);
+	x -= r->ox;
+	src += sstride * (int)(y - r->oy) + x;
+	while (len--)
+	{
+		if (x >= r->ox && x < r->ox + s->w)
+		{
+			uint8_t a = *src;
+			*dst = a << 24 | a << 16 | a << 8 | a;
+		}
+		else
+			*dst = 0;
+		x++;
+		dst++;
+		src++;
+	}
+}
+
+static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Image *s = (Image *)r;
 	uint32_t sstride;
@@ -246,7 +278,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	}
 	else
 	{
-		*fill = _noscale;
+		*fill = _argb8888_to_argb8888_noscale;
 	}
 	return EINA_TRUE;
 }
