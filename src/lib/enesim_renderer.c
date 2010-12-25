@@ -196,6 +196,46 @@ EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y)
 	if (x) *x = r->ox;
 	if (y) *y = r->oy;
 }
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->ox = x;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (x) *x = r->ox;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->oy = y;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (y) *y = r->oy;
+}
 /**
  * To  be documented
  * FIXME: To be fixed
