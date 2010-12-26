@@ -139,6 +139,15 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 	}
 }
 
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	Circle *circ = (Circle *)r;
+
+	rect->x = circ->x - circ->r;
+	rect->y = circ->y - circ->r;
+	rect->w = circ->x + circ->r;
+	rect->h = circ->y + circ->r;
+}
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
@@ -208,6 +217,7 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 	r->sw_setup = _state_setup;
 	r->sw_cleanup = _state_cleanup;
 	r->free = _free;
+	r->boundings = _boundings;
 
 	return r;
 }
