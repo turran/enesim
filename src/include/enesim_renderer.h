@@ -63,6 +63,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
+EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
 /**
  * @defgroup Enesim_Renderer_Shapes_Group Shapes
  * @{

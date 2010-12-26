@@ -199,7 +199,6 @@ src/lib/renderer/gradient/Makefile
 src/lib/renderer/shape/Makefile
 src/lib/renderer/filter/Makefile
 src/lib/util/Makefile
-data/Makefile
 ],[
 ])
 

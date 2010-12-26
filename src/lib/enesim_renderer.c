@@ -266,6 +266,24 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 }
 
 /**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (rect && r->boundings)
+	{
+		Enesim_Quad q;
+
+		 r->boundings(r, rect);
+		enesim_matrix_rect_transform(&r->matrix.original, rect, &q);
+		enesim_matrix_quad_rectangle_to(&q, rect);
+	}
+}
+
+/**
  * To be documented
  * FIXME: To be fixed
  * What about the mask?
