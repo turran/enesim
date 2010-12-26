@@ -138,6 +138,34 @@ static void _state_cleanup(Enesim_Renderer *r)
 		enesim_renderer_sw_cleanup(l->r);
 	}
 }
+
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	Compound *c = (Compound *)r;
+	Eina_List *ll;
+
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = 0;
+	rect->h = 0;
+	/* cleanup every layer */
+	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	{
+		Layer *l = eina_list_data_get(ll);
+		Enesim_Renderer *lr = l->r;
+		Eina_Rectangle tmp;
+
+		if (lr->boundings)
+		{
+			/* check if it is greater */
+			lr->boundings(lr, &tmp);
+			if (tmp.x < rect->x) rect->x = tmp.x;
+			if (tmp.y < rect->y) rect->y = tmp.y;
+			if (tmp.w > rect->w) rect->w = tmp.w;
+			if (tmp.h > rect->h) rect->h = tmp.h;
+		}
+	}
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -156,6 +184,7 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 	enesim_renderer_init(r);
 	r->sw_setup = _state_setup;
 	r->sw_cleanup = _state_cleanup;
+	r->boundings = _boundings;
 
 	return r;
 }
