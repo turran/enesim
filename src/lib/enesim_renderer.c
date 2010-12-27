@@ -284,10 +284,15 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 	if (rect && r->boundings)
 	{
 		Enesim_Quad q;
+		Enesim_Matrix m;
 
-		 r->boundings(r, rect);
-		enesim_matrix_rect_transform(&r->matrix.original, rect, &q);
+		r->boundings(r, rect);
+		enesim_matrix_inverse(&r->matrix.original, &m);
+		//enesim_matrix_rect_transform(&r->matrix.original, rect, &q);
+		enesim_matrix_rect_transform(&m, rect, &q);
 		enesim_quad_rectangle_to(&q, rect);
+		rect->x += r->ox;
+		rect->y += r->oy;
 	}
 	else
 	{

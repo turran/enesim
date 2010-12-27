@@ -627,6 +627,16 @@ static void _state_cleanup(Enesim_Renderer *r)
 static void _free(Enesim_Renderer *p)
 {
 }
+
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	Rectangle *rct = (Rectangle *)r;
+
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = rct->w;
+	rect->h = rct->h;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -651,6 +661,7 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 	p->free = _free;
 	p->sw_cleanup = _state_cleanup;
 	p->sw_setup = _state_setup;
+	p->boundings = _boundings;
 
 	return p;
 }
