@@ -74,6 +74,7 @@ typedef struct _Enesim_Renderer_Shape
 typedef struct _Enesim_Renderer_Gradient
 {
 	Enesim_Renderer base;
+	Enesim_Renderer_Gradient_Mode mode;
 	uint32_t *src;
 	int slen;
 	Eina_List *stops;

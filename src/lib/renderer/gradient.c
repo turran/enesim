@@ -23,7 +23,7 @@
 typedef struct _Stop
 {
 	Enesim_Color color;
-	float pos;
+	double pos;
 	/* TODO replace float with Eina_F16p16 */
 } Stop;
 /*============================================================================*
@@ -84,7 +84,7 @@ void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
  *                                   API                                      *
  *============================================================================*/
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
-		float pos)
+		double pos)
 {
 	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
 	Stop *s;
@@ -123,7 +123,47 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
 	}
 }
 
+/**
+ *
+ */
 EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r)
 {
 
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
+		Eina_List *list)
+{
+	Enesim_Renderer_Gradient_Stop *stop;
+	Eina_List *l;
+	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
+
+	EINA_LIST_FOREACH(list, l, stop)
+	{
+		enesim_renderer_gradient_stop_add(r, stop->color, stop->pos);
+	}
+}
+
+/**
+ *
+ */
+EAPI Enesim_Renderer_Gradient_Mode enesim_renderer_gradient_mode_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
+
+	return g->mode;
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
+		Enesim_Renderer_Gradient_Mode mode)
+{
+	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
+
+	g->mode = mode;
 }

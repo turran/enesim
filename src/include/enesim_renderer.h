@@ -278,15 +278,47 @@ EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persi
 EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq);
 EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, float freq);
 
-EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void);
-EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, float x0,
-		float y0, float x1, float y1);
 
+/**
+ * @}
+ * @defgroup Enesim_Renderer_Gradient_Group Gradient
+ * @{
+ */
+
+typedef enum _Enesim_Renderer_Gradient_Mode
+{
+	ENESIM_GRADIENT_RESTRICT,
+	ENESIM_GRADIENT_PAD,
+	ENESIM_GRADIENT_REFLECT,
+	ENESIM_GRADIENT_REPEAT,
+} Enesim_Renderer_Gradient_Mode;
+
+typedef struct _Enesim_Renderer_Gradient_Stop
+{
+	Enesim_Color color;
+	double pos;
+} Enesim_Renderer_Gradient_Stop;
 
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
-		float pos);
+		double pos);
 EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r);
+EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
+		Eina_List *list);
+EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode mode);
 /**
+ * @defgroup Enesim_Renderer_Gradient_Linear_Group Linear
+ * @{
+ */
+EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void);
+EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0);
+EAPI void enesim_renderer_gradient_linear_y0_set(Enesim_Renderer *r, double y0);
+EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1);
+EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1);
+EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
+		double y0, double x1, double y1);
+
+/**
+ * @}
  * @}
  * @defgroup Enesim_Renderer_Compound_Group Compound
  * @{
@@ -302,6 +334,8 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer *rend, Enesim_Rop rop);
 EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r);
+EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
+		Eina_List *list);
 /**
  * @}
  * @defgroup Enesim_Renderer_Grid_Group Grid

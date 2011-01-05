@@ -23,50 +23,108 @@
 typedef struct _Linear
 {
 	Enesim_Renderer_Gradient base;
-	float x0, x1, y0, y1;
+	double x0, x1, y0, y1;
 	Eina_F16p16 fx0, fx1, fy0, fy1;
 	Eina_F16p16 ayx, ayy;
 } Linear;
 
-static void _argb8888_pad_span(Enesim_Renderer *r, int x, int y,
+static inline Eina_F16p16 _linear_distance(Linear *l, Eina_F16p16 x,
+		Eina_F16p16 y)
+{
+	Eina_F16p16 a, b;
+
+	a = eina_f16p16_mul(l->ayx, (x - l->fx0 + 32768));
+	b = eina_f16p16_mul(l->ayy, (y - l->fy0 + 32768));
+	return eina_f16p16_sub(eina_f16p16_add(a, b), 32768);
+}
+
+static inline uint32_t _linear_pad(Enesim_Renderer_Gradient *g, Eina_F16p16 p)
+{
+	int fp;
+	uint32_t v;
+
+	fp = eina_f16p16_int_to(p);
+	if (fp < 0)
+	{
+		v = g->src[0];
+	}
+	else if (fp >= g->slen - 1)
+	{
+		v = g->src[g->slen - 1];
+	}
+	else
+	{
+		uint16_t a;
+
+		a = eina_f16p16_fracc_get(p) >> 8;
+		v = argb8888_interp_256(1 + a, g->src[fp + 1], g->src[fp]);
+	}
+
+	return v;
+}
+
+static void _argb8888_pad_span_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Linear *l = (Linear *)r;
 	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)l;
 	uint32_t *end = dst + len;
-	Eina_F16p16 yy;
-	Eina_F16p16 fx, fy;
+	Eina_F16p16 xx, yy;
 
-	fx = eina_f16p16_int_from(x);
-	fy = eina_f16p16_int_from(y);
-	yy = eina_f16p16_mul(l->ayx, (fx - l->fx0 + 32768)) +
-			eina_f16p16_mul(l->ayy, (fy - l->fy0 + 32768)) - 32768;
-	//printf("yy = %d\n", eina_f16p16_int_to(yy));
+	renderer_affine_setup(r, x, y, &xx, &yy);
 	while (dst < end)
 	{
-		int sy;
+		Eina_F16p16 d;
 		uint32_t p0;
 
-		sy = eina_f16p16_int_to(yy);
-		//printf("%d\n", sy);
-		if (sy < 0)
-		{
-			p0 = g->src[0];
-		}
-		else if (sy >= g->slen - 1)
-		{
-			p0 = g->src[g->slen - 1];
-		}
-		else
-		{
-			uint16_t a;
+		d = _linear_distance(l, xx, yy);
+		*dst++ = _linear_pad(g, d);
+		yy += r->matrix.values.yx;
+		xx += r->matrix.values.xx;
+	}
+}
 
-			a = eina_f16p16_fracc_get(yy) >> 8;
-			//printf("CALLED %d %08x %08x %d %08x\n", sy, g->src[sy + 1], g->src[sy], a, *g->src);
-			p0 = argb8888_interp_256(1 + a, g->src[sy + 1], g->src[sy]);
-		}
-		*dst++ = p0;
-		yy += l->ayx;
+static void _argb8888_pad_span_projective(Enesim_Renderer *r, int x, int y,
+		unsigned int len, uint32_t *dst)
+{
+	Linear *l = (Linear *)r;
+	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)l;
+	uint32_t *end = dst + len;
+	Eina_F16p16 xx, yy, zz;
+
+	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
+	while (dst < end)
+	{
+		Eina_F16p16 syy, sxx;
+		Eina_F16p16 d;
+		uint32_t p0;
+
+		syy = ((((int64_t)yy) << 16) / zz);
+		sxx = ((((int64_t)xx) << 16) / zz);
+
+		d = _linear_distance(l, sxx, syy);
+		*dst++ = _linear_pad(g, d);
+		yy += r->matrix.values.yx;
+		xx += r->matrix.values.xx;
+		zz += r->matrix.values.zx;
+	}
+}
+
+static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
+		unsigned int len, uint32_t *dst)
+{
+	Linear *l = (Linear *)r;
+	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)l;
+	uint32_t *end = dst + len;
+	Eina_F16p16 xx, yy;
+	Eina_F16p16 d;
+
+	renderer_identity_setup(r, x, y, &xx, &yy);
+	d = _linear_distance(l, xx, yy);
+	while (dst < end)
+	{
+		*dst++ = _linear_pad(g, d);
+		d += l->ayx;
 	}
 	/* FIXME is there some mmx bug there? the interp_256 already calls this
 	 * but the float support is fucked up
@@ -87,15 +145,16 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	Eina_F16p16 x0, x1, y0, y1;
 	Eina_F16p16 f;
 
-	f = eina_f16p16_mul(r->matrix.values.xx, r->matrix.values.yy) -
-			eina_f16p16_mul(r->matrix.values.xy, r->matrix.values.yx);
-	/* TODO check that (xx * yy) - (xy * yx) < epsilon */
-	f = ((int64_t)f << 16) / 65536;
+#define MATRIX 0
 	x0 = eina_f16p16_float_from(l->x0);
 	x1 = eina_f16p16_float_from(l->x1);
 	y0 = eina_f16p16_float_from(l->y0);
 	y1 = eina_f16p16_float_from(l->y1);
-
+#if MATRIX
+	f = eina_f16p16_mul(r->matrix.values.xx, r->matrix.values.yy) -
+			eina_f16p16_mul(r->matrix.values.xy, r->matrix.values.yx);
+	/* TODO check that (xx * yy) - (xy * yx) < epsilon */
+	f = ((int64_t)f << 16) / 65536;
 	/* apply the transformation on each point */
 	l->fx0 = eina_f16p16_mul(r->matrix.values.yy, x0) -
 			eina_f16p16_mul(eina_f16p16_mul(r->matrix.values.xy, y0), f) -
@@ -109,29 +168,26 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	l->fy1 = eina_f16p16_mul(r->matrix.values.yx, x1) -
 			eina_f16p16_mul(eina_f16p16_mul(r->matrix.values.xx, y1), f) -
 			r->matrix.values.yz;
-#if 0
-	printf("x0 %d y0 %d x1 %d y1 %d %d\n",
-		eina_f16p16_int_to(l->fx0), 
-		eina_f16p16_int_to(l->fy0), 
-		eina_f16p16_int_to(l->fx1), 
-		eina_f16p16_int_to(l->fy1),
-		eina_f16p16_int_to(f));
-#endif
 	/* get the length of the transformed points */
 	x0 = l->fx1 - l->fx0;
 	y0 = l->fy1 - l->fy0;
+#else
+	x0 = x1 - x0;
+	y0 = y1 - y0;
+#endif
 
 	/* we need to use floats because of the limitation of 16.16 values */
 	f = eina_f16p16_float_from(hypot(eina_f16p16_float_to(x0), eina_f16p16_float_to(y0)));
 	f += 32768;
-	//printf("len = %d %d\n", eina_f16p16_int_to(f), f);
 	l->ayx = ((int64_t)x0 << 16) / f;
 	l->ayy = ((int64_t)y0 << 16) / f;
 	/* TODO check that the difference between x0 - x1 and y0 - y1 is
 	 * < tolerance
 	 */
 	enesim_renderer_gradient_state_setup(r, eina_f16p16_int_to(f));
-	*fill = _argb8888_pad_span;
+	//*fill = _argb8888_pad_span_identity;
+	*fill = _argb8888_pad_span_affine;
+	*fill = _argb8888_pad_span_projective;
 
 	return EINA_TRUE;
 }
@@ -160,8 +216,8 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, float x0,
-		float y0, float x1, float y1)
+EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
+		double y0, double x1, double y1)
 {
 	Linear *l = (Linear *)r;
 
@@ -170,3 +226,48 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, float x0,
 	l->y0 = y0;
 	l->y1 = y1;
 }
+
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0)
+{
+	Linear *l = (Linear *)r;
+
+	l->x0 = x0;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_linear_y0_set(Enesim_Renderer *r, double y0)
+{
+	Linear *l = (Linear *)r;
+
+	l->y0 = y0;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1)
+{
+	Linear *l = (Linear *)r;
+
+	l->x1 = x1;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1)
+{
+	Linear *l = (Linear *)r;
+
+	l->y1 = y1;
+}
+
