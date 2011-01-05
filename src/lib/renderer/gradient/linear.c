@@ -185,9 +185,20 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	 * < tolerance
 	 */
 	enesim_renderer_gradient_state_setup(r, eina_f16p16_int_to(f));
-	//*fill = _argb8888_pad_span_identity;
-	*fill = _argb8888_pad_span_affine;
-	*fill = _argb8888_pad_span_projective;
+	switch (r->matrix.type)
+	{
+		case ENESIM_MATRIX_IDENTITY:
+		*fill = _argb8888_pad_span_identity;
+		break;
+
+		case ENESIM_MATRIX_AFFINE:
+		*fill = _argb8888_pad_span_affine;
+		break;
+
+		case ENESIM_MATRIX_PROJECTIVE:
+		*fill = _argb8888_pad_span_projective;
+		break;
+	}
 
 	return EINA_TRUE;
 }
