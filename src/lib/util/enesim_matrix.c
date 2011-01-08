@@ -478,10 +478,10 @@ EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
 	ymax = ymax > QUAD_Y2(q) ? ymax : QUAD_Y2(q);
 	ymax = ymax > QUAD_Y3(q) ? ymax : QUAD_Y3(q);
 
-	r->x = trunc(xmin);
-	r->w = trunc(xmax) - r->x;
-	r->y = trunc(ymin);
-	r->h = trunc(ymax) - r->y;
+	r->x = lround(xmin);
+	r->w = lround(xmax) - r->x;
+	r->y = lround(ymin);
+	r->h = lround(ymax) - r->y;
 }
 /**
  * To be documented

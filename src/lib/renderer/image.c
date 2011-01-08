@@ -232,6 +232,25 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	}
 }
 
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	Image *s = (Image *)r;
+	if (!s->s)
+	{
+		rect->x = 0;
+		rect->y = 0;
+		rect->w = 0;
+		rect->h = 0;
+	}
+	else
+	{
+		rect->x = s->x;
+		rect->y = s->y;
+		rect->w = s->w;
+		rect->h = s->h;
+	}
+}
+
 static void _state_cleanup(Enesim_Renderer *r)
 {
 	Image *s = (Image *)r;
@@ -287,7 +306,6 @@ static void _free(Enesim_Renderer *r)
 {
 	_state_cleanup(r);
 }
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -310,6 +328,7 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 	r->free = _free;
 	r->sw_cleanup = _state_cleanup;
 	r->sw_setup = _state_setup;
+	r->boundings = _boundings;
 
 	return r;
 }

@@ -257,7 +257,7 @@ EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
 }
 
 /**
- * To  be documented
+ * Gets the bounding box of the renderer on its own coordinate space
  * FIXME: To be fixed
  */
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
@@ -277,7 +277,8 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect,
+		int x, int y)
 {
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -287,12 +288,11 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 		Enesim_Matrix m;
 
 		r->boundings(r, rect);
+		rect->x += lround(r->ox);
+		rect->y += lround(r->oy);
 		enesim_matrix_inverse(&r->matrix.original, &m);
-		//enesim_matrix_rect_transform(&r->matrix.original, rect, &q);
 		enesim_matrix_rect_transform(&m, rect, &q);
 		enesim_quad_rectangle_to(&q, rect);
-		rect->x += r->ox;
-		rect->y += r->oy;
 	}
 	else
 	{
@@ -301,6 +301,8 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 		rect->w = 0;
 		rect->h = 0;
 	}
+	rect->x -= x;
+	rect->y -= y;
 }
 
 /**

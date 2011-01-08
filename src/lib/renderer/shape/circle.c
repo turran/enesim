@@ -145,8 +145,7 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 
 	rect->x = circ->x - circ->r;
 	rect->y = circ->y - circ->r;
-	rect->w = circ->x + circ->r;
-	rect->h = circ->y + circ->r;
+	rect->w = rect->h = circ->r * 2;
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
