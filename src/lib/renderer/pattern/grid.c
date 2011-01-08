@@ -240,6 +240,14 @@ static void _free(Enesim_Renderer *r)
 {
 
 }
+
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	rect->x = INT_MIN;
+	rect->y = INT_MIN;
+	rect->w = INT_MAX;
+	rect->h = INT_MAX;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -271,6 +279,7 @@ EAPI Enesim_Renderer * enesim_renderer_grid_new(void)
 	r->free = _free;
 	r->sw_cleanup = _state_cleanup;
 	r->sw_setup = _state_setup;
+	r->boundings = _boundings;
 
 	return r;
 }

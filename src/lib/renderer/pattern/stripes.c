@@ -151,18 +151,19 @@ static void _destroy(Enesim_Renderer *p)
 {
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *bounds)
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
-	bounds->x = -1;
-	bounds->y = -1;
-	bounds->w = -1;
-	bounds->h = -1;
+	rect->x = INT_MIN;
+	rect->y = INT_MIN;
+	rect->w = INT_MAX;
+	rect->h = INT_MAX;
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	.sw_setup = _setup_state,
 	.sw_cleanup = _cleanup_state,
 	.free = _destroy,
+	.boundings = _boundings,
 };
 
 /*============================================================================*

@@ -9,5 +9,4 @@ noinst_LTLIBRARIES = libenesim_util.la
 
 libenesim_util_la_SOURCES = \
 enesim_curve_decasteljau.c \
-enesim_matrix.c \
 enesim_perlin.c
