@@ -177,7 +177,7 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 	uint32_t sstride;
 	uint8_t *src;
 
-	if (y < r->oy || y > r->oy + s->h)
+	if (y < r->oy || y >= r->oy + s->h)
 	{
 		while (len--)
 			*dst++ = 0;
@@ -209,7 +209,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	uint32_t sstride;
 	uint32_t *src;
 
-	if (y < r->oy || y > r->oy + s->h)
+	if (y < r->oy || y >= r->oy + s->h)
 	{
 		while (len--)
 			*dst++ = 0;
