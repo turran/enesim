@@ -9,6 +9,7 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_renderer_shape.la
 
 libenesim_renderer_shape_la_SOURCES = \
+shape.c \
 rectangle.c \
 circle.c \
 ellipse.c \

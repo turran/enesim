@@ -10,4 +10,5 @@ noinst_LTLIBRARIES = libenesim_renderer_gradient.la
 
 libenesim_renderer_gradient_la_SOURCES = \
 linear.c \
-radial.c
+radial.c \
+gradient.c

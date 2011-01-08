@@ -198,6 +198,8 @@ src/lib/renderer/Makefile
 src/lib/renderer/gradient/Makefile
 src/lib/renderer/shape/Makefile
 src/lib/renderer/filter/Makefile
+src/lib/renderer/pattern/Makefile
+src/lib/renderer/other/Makefile
 src/lib/util/Makefile
 ],[
 ])
