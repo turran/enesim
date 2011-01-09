@@ -84,6 +84,28 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		return EINA_FALSE;
 	return EINA_TRUE;
 }
+
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	Raddist *rd = (Raddist *)r;
+	if (!rd->src)
+	{
+		rect->x = 0;
+		rect->y = 0;
+		rect->w = 0;
+		rect->h = 0;
+	}
+	else
+	{
+		int sw, sh;
+
+		enesim_surface_size_get(rd->src, &sw, &sh);
+		rect->x = 0;
+		rect->y = 0;
+		rect->w = sw;
+		rect->h = sh;
+	}
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -97,6 +119,7 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 	r = (Enesim_Renderer *)rd;
 	enesim_renderer_init(r);
 	r->sw_setup = _state_setup;
+	r->boundings = _boundings;
 
 	return r;
 }

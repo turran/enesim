@@ -183,10 +183,10 @@ EAPI void enesim_matrix_point_transform(Enesim_Matrix *m, float x, float y, floa
 	{
 		if (xr)
 			*xr = (x * MATRIX_XX(m) + y * MATRIX_XY(m) + MATRIX_XZ(m)) /
-				(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + 1);
+				(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + MATRIX_ZZ(m));
 		if (yr)
 			*yr = (x * MATRIX_YX(m) + y * MATRIX_YY(m) + MATRIX_YZ(m)) /
-				(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + 1);
+				(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + MATRIX_ZZ(m));
 	}
 }
 /**

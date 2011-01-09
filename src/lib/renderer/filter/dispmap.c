@@ -257,6 +257,30 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	return EINA_TRUE;
 }
+
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	Dispmap *d = (Dispmap *)r;
+	if (!d->src || !d->map)
+	{
+		rect->x = 0;
+		rect->y = 0;
+		rect->w = 0;
+		rect->h = 0;
+	}
+	else
+	{
+		int sw, sh;
+		int mw, mh;
+
+		enesim_surface_size_get(d->src, &sw, &sh);
+		enesim_surface_size_get(d->map, &mw, &mh);
+		rect->x = 0;
+		rect->y = 0;
+		rect->w = mw < sw ? mw : sw;
+		rect->h = mh < sh ? mh : sh;
+	}
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -279,12 +303,13 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 	r = (Enesim_Renderer *)d;
 	enesim_renderer_init(r);
 	r->sw_setup = _state_setup;
+	r->boundings = _boundings;
 
 	return r;
 }
 /**
  * Sets the channel to use as the x coordinate displacement
- * @param[in] r The displacement map renderer 
+ * @param[in] r The displacement map renderer
  * @param[in] channel The channel to use
  */
 EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r,
@@ -296,7 +321,7 @@ EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r,
 }
 /**
  * Sets the channel to use as the y coordinate displacement
- * @param[in] r The displacement map renderer 
+ * @param[in] r The displacement map renderer
  * @param[in] channel The channel to use
  */
 EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r,

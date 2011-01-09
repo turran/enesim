@@ -42,6 +42,16 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Boundings boundings;
 };
 
+/**< Flags that specify what a renderer supports */
+typedef enum Enesim_Renderer_Flag
+{
+	ENESIM_RENDERER_FLAG_AFFINE = 		(1 << 0), /**< Affine transformation */
+	ENESIM_RENDERER_FLAG_PERSPECTIVE = 	(1 << 1), /**< Perspective transformations */
+	ENESIM_RENDERER_FLAG_COLORIZE = 	(1 << 2), /**< Use the renderer color directly */
+	ENESIM_RENDERER_FLAG_A8 = 		(1 << 3), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FLAG_ARGB8888 = 	(1 << 4), /**< Supports ARGB8888 surfaces */
+} Enesim_Renderer_Flag;
+
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data);
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
@@ -64,6 +74,7 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
 EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
+EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 /**
  * @defgroup Enesim_Renderer_Shapes_Group Shapes
  * @{

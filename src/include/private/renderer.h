@@ -31,8 +31,7 @@
 struct _Enesim_Renderer
 {
 	EINA_MAGIC;
-	/* FIXME remove this */
-	int type_id;
+	Enesim_Renderer_Flag flags;
 	/* FIXME why dont have a descriptor pointer directly? */
 	/* common functions */
 	Enesim_Renderer_Delete free;

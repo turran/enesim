@@ -78,7 +78,8 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
  *                                   API                                      *
  *============================================================================*/
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data)
@@ -96,7 +97,8 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	return r;
 }
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
 {
@@ -113,7 +115,8 @@ EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
 {
@@ -121,7 +124,8 @@ EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
 	if (r->sw_cleanup) r->sw_cleanup(r);
 }
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
 {
@@ -129,7 +133,8 @@ EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
 	return r->sw_fill;
 }
 /**
- *
+ * To be documented
+ * FIXME: To be fixed
  */
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r)
 {
@@ -159,6 +164,10 @@ EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *
 	r->matrix.type = enesim_f16p16_matrix_type_get(&r->matrix.values);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -176,6 +185,15 @@ EAPI void enesim_renderer_delete(Enesim_Renderer *r)
 	if (r->free)
 		r->free(r);
 	free(r);
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	*flags = r->flags;
 }
 /**
  * To be documented
