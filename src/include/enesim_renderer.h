@@ -53,7 +53,7 @@ typedef enum Enesim_Renderer_Flag
 } Enesim_Renderer_Flag;
 
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
-		*descriptor, void *data);
+		*descriptor, Enesim_Renderer_Flag flags, void *data);
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
 EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);
@@ -71,7 +71,7 @@ EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y);
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
 EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
@@ -81,9 +81,9 @@ EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
  */
 typedef enum _Enesim_Shape_Draw_Mode
 {
-	ENESIM_SHAPE_DRAW_MODE_FILL = 0,
-	ENESIM_SHAPE_DRAW_MODE_STROKE = 1,
-	ENESIM_SHAPE_DRAW_MODE_STROKE_FILL = 2,
+	ENESIM_SHAPE_DRAW_MODE_FILL,
+	ENESIM_SHAPE_DRAW_MODE_STROKE,
+	ENESIM_SHAPE_DRAW_MODE_STROKE_FILL,
 } Enesim_Shape_Draw_Mode;
 
 EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double weight);

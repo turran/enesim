@@ -147,7 +147,7 @@ static void _cleanup_state(Enesim_Renderer *p)
 {
 }
 
-static void _destroy(Enesim_Renderer *p)
+static void _free(Enesim_Renderer *p)
 {
 }
 
@@ -162,7 +162,7 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 static Enesim_Renderer_Descriptor _descriptor = {
 	.sw_setup = _setup_state,
 	.sw_cleanup = _cleanup_state,
-	.free = _destroy,
+	.free = _free,
 	.boundings = _boundings,
 };
 
@@ -176,6 +176,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 {
 	Enesim_Renderer *r;
+	Enesim_Renderer_Flag flags;
 	Stripes *st;
 
 	st = calloc(1, sizeof(Stripes));
@@ -184,7 +185,10 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	/* specific renderer setup */
 	st->s0.thickness = 1;
 	st->s1.thickness = 1;
-	r = enesim_renderer_new(&_descriptor, st);
+	flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+	r = enesim_renderer_new(&_descriptor, flags, st);
 	return r;
 }
 /**

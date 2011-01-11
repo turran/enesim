@@ -61,7 +61,6 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 	enesim_renderer_origin_get(r, &r_ox, &r_oy);
 	enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
 	enesim_renderer_origin_set(rel, nox, noy);
-	//printf("setting origin %p %g %g to %g %g (%g %g)\n", rel, *old_ox, *old_oy, nox + r_ox, noy + r_oy, nox, noy);
 }
 
 void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
@@ -82,7 +81,7 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
  * FIXME: To be fixed
  */
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
-		*descriptor, void *data)
+		*descriptor, Enesim_Renderer_Flag flags, void *data)
 {
 	Enesim_Renderer *r;
 
@@ -92,6 +91,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	r->sw_setup = descriptor->sw_setup;
 	r->sw_cleanup = descriptor->sw_cleanup;
 	r->free = descriptor->free;
+	r->flags = flags;
 	r->data = data;
 
 	return r;
@@ -268,10 +268,10 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	return r->color;
+	if (color) color = r->color;
 }
 
 /**
@@ -302,15 +302,18 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (rect && r->boundings)
 	{
-		Enesim_Quad q;
-		Enesim_Matrix m;
-
 		r->boundings(r, rect);
 		rect->x += lround(r->ox);
 		rect->y += lround(r->oy);
-		enesim_matrix_inverse(&r->matrix.original, &m);
-		enesim_matrix_rect_transform(&m, rect, &q);
-		enesim_quad_rectangle_to(&q, rect);
+		if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
+		{
+			Enesim_Quad q;
+			Enesim_Matrix m;
+
+			enesim_matrix_inverse(&r->matrix.original, &m);
+			enesim_matrix_rect_transform(&m, rect, &q);
+			enesim_quad_rectangle_to(&q, rect);
+		}
 	}
 	else
 	{
