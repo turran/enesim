@@ -30,7 +30,6 @@ typedef struct _Compound
 typedef struct _Layer
 {
 	Enesim_Renderer *r;
-	Enesim_Rop rop;
 	/* generate at state setup */
 	Enesim_Compositor_Span span;
 	Enesim_Matrix original;
@@ -91,7 +90,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
-		double ox, oy, oox, ooy;
 
 		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
@@ -104,9 +102,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
 		/* FIXME fix the simplest case (fill) */
-		if (l->rop != ENESIM_FILL || l->r->color != ENESIM_COLOR_FULL)
+		if (l->r->rop != ENESIM_FILL || l->r->color != ENESIM_COLOR_FULL)
 		{
-			l->span = enesim_compositor_span_get(l->rop, &fmt, ENESIM_FORMAT_ARGB8888,
+			l->span = enesim_compositor_span_get(l->r->rop, &fmt, ENESIM_FORMAT_ARGB8888,
 					l->r->color, ENESIM_FORMAT_NONE);
 			only_fill = EINA_FALSE;
 		}
@@ -132,7 +130,6 @@ static void _state_cleanup(Enesim_Renderer *r)
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
-		double ox, oy, oox, ooy;
 
 		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
 		enesim_renderer_sw_cleanup(l->r);
@@ -192,17 +189,15 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
  * Adds a layer
  * @param[in] r The compound renderer
  * @param[in] rend The renderer for the new layer
- * @param[in] rop The raster operation for the new layer
  */
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
-		Enesim_Renderer *rend, Enesim_Rop rop)
+		Enesim_Renderer *rend)
 {
 	Compound *c = (Compound *)r;
 	Layer *l;
 
 	l = malloc(sizeof(Layer));
 	l->r = rend;
-	l->rop = rop;
 
 	c->layers = eina_list_append(c->layers, l);
 }
@@ -231,12 +226,12 @@ EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r)
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list)
 {
-	Enesim_Renderer_Compound_Layer *layer;
+	Enesim_Renderer *rend;
 	Eina_List *l;
 	Compound *c = (Compound *)r;
 
-	EINA_LIST_FOREACH(list, l, layer)
+	EINA_LIST_FOREACH(list, l, rend)
 	{
-		enesim_renderer_compound_layer_add(r, layer->renderer, layer->rop);
+		enesim_renderer_compound_layer_add(r, rend);
 	}
 }

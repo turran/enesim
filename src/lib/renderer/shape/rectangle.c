@@ -464,7 +464,6 @@ static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *p, i
 	if ((rect->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
 		fpaint->sw_fill(fpaint, x, y, len, dst);
 	renderer_projective_setup(p, x, y, &xx, &yy, &zz);
-
 	while (d < e)
 	{
 		unsigned int q0 = 0;

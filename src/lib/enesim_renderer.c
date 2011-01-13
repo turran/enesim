@@ -36,6 +36,7 @@ void enesim_renderer_init(Enesim_Renderer *r)
 	r->ox = 0;
 	r->oy = 0;
 	r->color = ENESIM_COLOR_FULL;
+	r->rop = ENESIM_FILL;
 	enesim_f16p16_matrix_identity(&r->matrix.values);
 	enesim_matrix_identity(&r->matrix.original);
 	r->matrix.type = ENESIM_MATRIX_IDENTITY;
@@ -59,8 +60,10 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 	/* add the origin by the current origin */
 	enesim_renderer_origin_get(rel, old_ox, old_oy);
 	enesim_renderer_origin_get(r, &r_ox, &r_oy);
-	enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
-	enesim_renderer_origin_set(rel, nox, noy);
+	/* FIXME what to do with the origin? */
+	//enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
+	//enesim_renderer_origin_set(rel, nox, noy);
+	enesim_renderer_origin_set(rel, r_ox, r_oy);
 }
 
 void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
@@ -332,8 +335,7 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
  * What about the mask?
  */
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_Rectangle *clip,
-		int x, int y)
+		Eina_Rectangle *clip, int x, int y)
 {
 	Enesim_Compositor_Span span;
 	Enesim_Renderer_Sw_Fill fill;
@@ -358,7 +360,9 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		cw = clip->w;
 		ch = clip->h;
 	}
-
+	/* TODO we should clip agains the destination boundings
+	 * if we dont intersect just return
+	 */
 	dfmt = enesim_surface_format_get(s);
 	ddata = enesim_surface_data_get(s);
 	stride = enesim_surface_stride_get(s);
@@ -368,7 +372,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	cx -= x;
 	cy -= y;
 	/* fill the new span */
-	if ((rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
+	if ((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
 	{
 		while (ch--)
 		{
@@ -381,7 +385,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	{
 		uint32_t *fdata;
 
-		span = enesim_compositor_span_get(rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
 				r->color, ENESIM_FORMAT_NONE);
 
 		fdata = alloca(cw * sizeof(uint32_t));
@@ -396,4 +400,22 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	}
 	/* TODO set the format again */
 	enesim_renderer_sw_cleanup(r);
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->rop = rop;
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (rop) *rop = r->rop;
 }

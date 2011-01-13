@@ -69,12 +69,14 @@ EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x);
 EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y);
 EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y);
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y);
+		Eina_Rectangle *clip, int x, int y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
 EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
+EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
+EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
 /**
  * @defgroup Enesim_Renderer_Shapes_Group Shapes
  * @{
@@ -335,15 +337,9 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
  * @{
  */
 
-typedef struct _Enesim_Renderer_Compound_Layer
-{
-	Enesim_Renderer *renderer;
-	Enesim_Rop rop;
-} Enesim_Renderer_Compound_Layer;
-
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
-		Enesim_Renderer *rend, Enesim_Rop rop);
+		Enesim_Renderer *rend);
 EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list);
