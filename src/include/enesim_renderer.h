@@ -45,11 +45,12 @@ struct _Enesim_Renderer_Descriptor {
 /**< Flags that specify what a renderer supports */
 typedef enum Enesim_Renderer_Flag
 {
-	ENESIM_RENDERER_FLAG_AFFINE = 		(1 << 0), /**< Affine transformation */
-	ENESIM_RENDERER_FLAG_PERSPECTIVE = 	(1 << 1), /**< Perspective transformations */
-	ENESIM_RENDERER_FLAG_COLORIZE = 	(1 << 2), /**< Use the renderer color directly */
-	ENESIM_RENDERER_FLAG_A8 = 		(1 << 3), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FLAG_ARGB8888 = 	(1 << 4), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 0), /**< Affine transformation */
+	ENESIM_RENDERER_FLAG_PERSPECTIVE 	= (1 << 1), /**< Perspective transformations */
+	ENESIM_RENDERER_FLAG_COLORIZE 		= (1 << 2), /**< Use the renderer color directly */
+	ENESIM_RENDERER_FLAG_A8 		= (1 << 3), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 4), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FLAG_ROP 		= (1 << 5), /**< Can draw directly using the raster operation */
 } Enesim_Renderer_Flag;
 
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor

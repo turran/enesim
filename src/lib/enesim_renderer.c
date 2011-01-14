@@ -287,10 +287,10 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	if (rect && r->boundings) r->boundings(r, rect);
 	else
 	{
-		rect->x = 0;
-		rect->y = 0;
-		rect->w = 0;
-		rect->h = 0;
+		rect->x = INT_MIN;
+		rect->y = INT_MIN;
+		rect->w = INT_MAX;
+		rect->h = INT_MAX;
 	}
 }
 
@@ -317,16 +317,16 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 			enesim_matrix_rect_transform(&m, rect, &q);
 			enesim_quad_rectangle_to(&q, rect);
 		}
+		rect->x -= x;
+		rect->y -= y;
 	}
 	else
 	{
-		rect->x = 0;
-		rect->y = 0;
-		rect->w = 0;
-		rect->h = 0;
+		rect->x = INT_MIN;
+		rect->y = INT_MIN;
+		rect->w = INT_MAX;
+		rect->h = INT_MAX;
 	}
-	rect->x -= x;
-	rect->y -= y;
 }
 
 /**
@@ -339,6 +339,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Compositor_Span span;
 	Enesim_Renderer_Sw_Fill fill;
+	Eina_Rectangle boundings;
 	int cx = 0, cy = 0, ch, cw;
 	uint32_t *ddata;
 	int stride;
@@ -362,6 +363,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	}
 	/* TODO we should clip agains the destination boundings
 	 * if we dont intersect just return
+	 * enesim_renderer_destination_boundings(r, &boundings);
 	 */
 	dfmt = enesim_surface_format_get(s);
 	ddata = enesim_surface_data_get(s);

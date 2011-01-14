@@ -345,6 +345,16 @@ static void _state_cleanup(Enesim_Renderer *p)
 	enesim_renderer_shape_sw_cleanup(p);
 }
 
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	Ellipse *ellipse = (Ellipse *) r;
+
+	rect->x = ellipse->x - ellipse->rx;
+	rect->y = ellipse->y - ellipse->ry;
+	rect->w = ellipse->rx * 2;
+	rect->h = ellipse->ry * 2;
+}
+
 static void _free(Enesim_Renderer *p)
 {
 }
@@ -373,6 +383,7 @@ EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 	p->free = _free;
 	p->sw_cleanup = _state_cleanup;
 	p->sw_setup = _state_setup;
+	p->boundings = _boundings;
 
 	return p;
 }
