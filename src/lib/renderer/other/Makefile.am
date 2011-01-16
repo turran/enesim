@@ -9,6 +9,7 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_renderer_other.la
 
 libenesim_renderer_other_la_SOURCES = \
+background.c \
 importer.c \
 image.c \
 compound.c \

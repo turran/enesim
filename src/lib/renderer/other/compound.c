@@ -21,6 +21,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define OPTIMIZE
+
 typedef struct _Compound
 {
 	Enesim_Renderer base;
@@ -36,46 +38,62 @@ typedef struct _Layer
 	double ox, oy;
 } Layer;
 
-static void _span_compositor_wrapper(Enesim_Renderer *r)
-{
-
-}
-
-static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Compound *c = (Compound *)r;
 	Eina_List *ll;
+	Eina_Rectangle span;
 	uint32_t *tmp = alloca(sizeof(uint32_t) * len);
 
+	eina_rectangle_coords_from(&span, x, y, len, 1);
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
 
 		l = eina_list_data_get(ll);
+
 		if (!l->span)
 		{
+			Eina_Rectangle lboundings;
+#ifdef OPTIMIZE
+			enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
+			if (!eina_rectangle_intersection(&lboundings, &span)) continue;
+			l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
+#else
 			l->r->sw_fill(l->r, x, y, len, dst);
+#endif
 		}
 		else
 		{
+			/* FIXME optmize this case too, for this we must memset whole tmp buffer */
 			l->r->sw_fill(l->r, x, y, len, tmp);
 			l->span(dst, len, tmp, l->r->color, NULL);
 		}
 	}
 }
 
-static void _span_identity_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Compound *c = (Compound *)r;
 	Eina_List *ll;
+	Eina_Rectangle span;
 	uint32_t *tmp = alloca(sizeof(uint32_t) * len);
 
+	eina_rectangle_coords_from(&span, x, y, len, 1);
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
+		Eina_Rectangle lboundings;
 
 		l = eina_list_data_get(ll);
+
+#ifdef OPTIMIZE
+		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
+		if (!eina_rectangle_intersection(&lboundings, &span)) continue;
+		l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
+#else
 		l->r->sw_fill(l->r, x, y, len, dst);
+#endif
 	}
 }
 
@@ -111,11 +129,11 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	}
 	if (only_fill)
 	{
-		*fill = _span_identity_only_fill;
+		*fill = _span_only_fill;
 	}
 	else
 	{
-		*fill = _span_identity;
+		*fill = _span;
 	}
 
 	return EINA_TRUE;

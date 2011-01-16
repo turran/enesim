@@ -61,9 +61,12 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 	enesim_renderer_origin_get(rel, old_ox, old_oy);
 	enesim_renderer_origin_get(r, &r_ox, &r_oy);
 	/* FIXME what to do with the origin? */
-	//enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
-	//enesim_renderer_origin_set(rel, nox, noy);
-	enesim_renderer_origin_set(rel, r_ox, r_oy);
+#if 0
+	enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
+	enesim_renderer_origin_set(rel, nox, noy);
+#else
+	enesim_renderer_origin_set(rel, *old_ox - r_ox, *old_oy - r_oy);
+#endif
 }
 
 void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
@@ -287,8 +290,8 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	if (rect && r->boundings) r->boundings(r, rect);
 	else
 	{
-		rect->x = INT_MIN;
-		rect->y = INT_MIN;
+		rect->x = INT_MIN / 2;
+		rect->y = INT_MIN / 2;
 		rect->w = INT_MAX;
 		rect->h = INT_MAX;
 	}
@@ -322,8 +325,8 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 	}
 	else
 	{
-		rect->x = INT_MIN;
-		rect->y = INT_MIN;
+		rect->x = INT_MIN / 2;
+		rect->y = INT_MIN / 2;
 		rect->w = INT_MAX;
 		rect->h = INT_MAX;
 	}
@@ -340,7 +343,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Compositor_Span span;
 	Enesim_Renderer_Sw_Fill fill;
 	Eina_Rectangle boundings;
-	int cx = 0, cy = 0, ch, cw;
+	Eina_Rectangle final;
 	uint32_t *ddata;
 	int stride;
 	Enesim_Format dfmt;
@@ -353,33 +356,40 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	if (!fill) return;
 
 	if (!clip)
-		enesim_surface_size_get(s, &cw, &ch);
+	{
+		final.x = 0;
+		final.y = 0;
+		enesim_surface_size_get(s, &final.w, &final.h);
+	}
 	else
 	{
-		cx = clip->x;
-		cy = clip->y;
-		cw = clip->w;
-		ch = clip->h;
+		final.x = clip->x;
+		final.y = clip->y;
+		final.w = clip->w;
+		final.h = clip->h;
 	}
-	/* TODO we should clip agains the destination boundings
-	 * if we dont intersect just return
-	 * enesim_renderer_destination_boundings(r, &boundings);
-	 */
+	/* clip against the destination rectangle */
+	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
+	if (!eina_rectangle_intersection(&final, &boundings))
+	{
+		printf("destination rectangle does not intersect\n");
+		return;
+	}
 	dfmt = enesim_surface_format_get(s);
 	ddata = enesim_surface_data_get(s);
 	stride = enesim_surface_stride_get(s);
-	ddata = ddata + (cy * stride) + cx;
+	ddata = ddata + (final.y * stride) + final.x;
 
 	/* translate the origin */
-	cx -= x;
-	cy -= y;
+	final.x -= x;
+	final.y -= y;
 	/* fill the new span */
 	if ((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
 	{
-		while (ch--)
+		while (final.h--)
 		{
-			fill(r, cx, cy, cw, ddata);
-			cy++;
+			fill(r, final.x, final.y, final.w, ddata);
+			final.y++;
 			ddata += stride;
 		}
 	}
@@ -390,13 +400,13 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
 				r->color, ENESIM_FORMAT_NONE);
 
-		fdata = alloca(cw * sizeof(uint32_t));
-		while (ch--)
+		fdata = alloca(final.w * sizeof(uint32_t));
+		while (final.h--)
 		{
-			fill(r, cx, cy, cw, fdata);
-			cy++;
+			fill(r, final.x, final.y, final.w, fdata);
+			final.y++;
 			/* compose the filled and the destination spans */
-			span(ddata, cw, fdata, r->color, NULL);
+			span(ddata, final.w, fdata, r->color, NULL);
 			ddata += stride;
 		}
 	}

@@ -365,6 +365,15 @@ EAPI Enesim_Color enesim_renderer_grid_border_color_get(Enesim_Renderer *r);
 
 /**
  * @}
+ * @defgroup Enesim_Renderer_Background_Group Background
+ * @{
+ */
+EAPI Enesim_Renderer * enesim_renderer_background_new(void);
+EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
+		Enesim_Color color);
+
+/**
+ * @}
  * @}
  */
 

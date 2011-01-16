@@ -151,21 +151,11 @@ static void _free(Enesim_Renderer *p)
 {
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
-{
-	rect->x = INT_MIN;
-	rect->y = INT_MIN;
-	rect->w = INT_MAX;
-	rect->h = INT_MAX;
-}
-
 static Enesim_Renderer_Descriptor _descriptor = {
 	.sw_setup = _setup_state,
 	.sw_cleanup = _cleanup_state,
 	.free = _free,
-	.boundings = _boundings,
 };
-
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
