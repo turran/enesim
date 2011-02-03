@@ -88,6 +88,7 @@ static void _free(Enesim_Pool *p)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+#if 0
 EAPI Enesim_Pool * enesim_pool_equanime_get(Equanime *eq, Equ_Host *h)
 {
 #if BUILD_EQUANIME
@@ -140,6 +141,7 @@ EAPI Eina_Bool enesim_pool_equanime_buffer_format(Enesim_Buffer_Format fmt, Equ_
 	return EINA_FALSE;
 #endif
 }
+#endif
 
 #if 0
 Enesim_Equanime_Buffer

@@ -40,6 +40,7 @@ void enesim_renderer_init(Enesim_Renderer *r)
 	enesim_f16p16_matrix_identity(&r->matrix.values);
 	enesim_matrix_identity(&r->matrix.original);
 	r->matrix.type = ENESIM_MATRIX_IDENTITY;
+	r->prv_data = eina_hash_string_superfast_new(NULL);
 }
 
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
@@ -277,7 +278,7 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (color) color = r->color;
+	if (color) *color = r->color;
 }
 
 /**
@@ -431,3 +432,24 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (rop) *rop = r->rop;
 }
+
+/**
+ *
+ */
+EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	eina_hash_add(r->prv_data, name, data);
+}
+
+/**
+ *
+ */
+EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	return eina_hash_find(r->prv_data, name);
+}
+

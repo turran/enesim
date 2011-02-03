@@ -42,6 +42,8 @@ struct _Enesim_Renderer
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	void *data;
+	/* the private data */
+	Eina_Hash *prv_data;
 	/* the renderer common properties */
 	Enesim_Color color;
 	double ox, oy; /* the origin */
