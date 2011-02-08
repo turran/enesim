@@ -21,7 +21,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define OPTIMIZE
+//#define OPTIMIZE
 
 typedef struct _Compound
 {
@@ -43,8 +43,12 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 	Compound *c = (Compound *)r;
 	Eina_List *ll;
 	Eina_Rectangle span;
-	uint32_t *tmp = alloca(sizeof(uint32_t) * len);
+	uint32_t *tmp;
+	size_t tmp_size;
 
+	tmp_size = sizeof(uint32_t) * len;
+	tmp = alloca(tmp_size);
+	memset(tmp, 0, tmp_size);
 	eina_rectangle_coords_from(&span, x, y, len, 1);
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
@@ -214,7 +218,7 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 	Compound *c = (Compound *)r;
 	Layer *l;
 
-	l = malloc(sizeof(Layer));
+	l = calloc(1, sizeof(Layer));
 	l->r = rend;
 
 	c->layers = eina_list_append(c->layers, l);
