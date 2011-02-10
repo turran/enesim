@@ -29,12 +29,11 @@
 typedef struct _Path Path;
 struct _Path
 {
-   Enesim_Renderer_Shape   base;
-
-   Enesim_Renderer   *figure;
-   float   last_x, last_y;
-   float   last_ctrl_x, last_ctrl_y;
-
+	Enesim_Renderer_Shape base;
+	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Renderer *figure;
+	float   last_x, last_y;
+	float   last_ctrl_x, last_ctrl_y;
 // ....  geom_transform?
 };
 
@@ -221,7 +220,7 @@ static void _span(Enesim_Renderer *p, int x, int y, unsigned int len, uint32_t *
 {
 	Path *o = (Path *) p;
 
-	o->figure->sw_fill(o->figure, x, y, len, dst);
+	o->fill(o->figure, x, y, len, dst);
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
@@ -229,6 +228,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 	Path *o = (Path *) p;
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 
+	printf("setting up the path\n");
 	if (!p)
 		return EINA_FALSE;
 	if (!o->figure)
@@ -243,31 +243,39 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 
 	o->figure->matrix = p->matrix;
 
-	if (!enesim_renderer_shape_sw_setup(o->figure))
+	if (!enesim_renderer_sw_setup(o->figure))
+	{
+		printf("ok? 0\n");
 		return EINA_FALSE;
+	}
+
+	o->fill = enesim_renderer_sw_fill_get(o->figure);
+	if (!o->fill)
+	{
+		printf("ok? 1\n");
+		return EINA_FALSE;
+	}
 
 	*fill = _span;
+	printf("everything went ok %p\n", fill);
 
 	return EINA_TRUE;
 }
 
-static void _state_cleanup(Enesim_Renderer *p)
+static void _state_cleanup(Enesim_Renderer *r)
 {
-	Path *o = (Path *) p;
+	Path *p = (Path *)r;
 
-	enesim_renderer_shape_sw_cleanup(o->figure);
+	enesim_renderer_shape_sw_cleanup(p->figure);
 }
 
-#if 0
-static void path_destroy(Enesim_Renderer *p)
+static void _path_boundings(Enesim_Renderer *r, Eina_Rectangle *boundings)
 {
-	Path *o = (Path *)p;
+	Path *p = (Path *) r;
 
-	paint_free(o->figure);
-	free(o);
+	if (!p->figure) return;
+	enesim_renderer_boundings(p->figure, boundings);
 }
-#endif
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -299,6 +307,7 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 	enesim_renderer_shape_init(p);
 	p->sw_setup = _state_setup;
 	p->sw_cleanup = _state_cleanup;
+	p->boundings = _path_boundings;
 
 	return p;
 }
@@ -321,6 +330,7 @@ EAPI void enesim_renderer_path_line_to(Enesim_Renderer *p, float x, float y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;
+	printf("adding line %g %g\n", x, y);
 	_line_to(p, x, y);
 }
 /**
@@ -369,20 +379,6 @@ EAPI void enesim_renderer_path_scubic_to(Enesim_Renderer *p, float ctrl_x,
 }
 /**
  * To be documented
- * FIXME do this more efficiently.. but for now:
- */
-EAPI void enesim_renderer_path_extents_get(Enesim_Renderer *p, int *lx,
-		int *ty, int *rx, int *by)
-{
-	Enesim_Renderer_Shape *f;
-	Path *o;
-
-	o = (Path *) p;
-
-	enesim_renderer_figure_extents_get(o->figure, lx, ty, rx, by);
-}
-/**
- * To be documented
  * FIXME: To be fixed
  */
 EAPI void enesim_renderer_path_clear(Enesim_Renderer *p)
@@ -398,18 +394,3 @@ EAPI void enesim_renderer_path_clear(Enesim_Renderer *p)
 	o->last_ctrl_x = 0;
 	o->last_ctrl_y = 0;
 }
-
-#if 0
-int
-paint_is_path(Enesim_Renderer *p)
-{
-	Enesim_Renderer_Shape *f;
-
-	if (!p || !p->type) return 0;
-	if (p->type->id != SHAPE_PAINT) return 0;
-	f = (Enesim_Renderer_Shape *)p;
-	if (!f || (f->id != PATH_PAINT)) return 0;
-	return 1;
-}
-#endif
-

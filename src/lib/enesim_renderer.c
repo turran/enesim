@@ -61,11 +61,15 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 	/* add the origin by the current origin */
 	enesim_renderer_origin_get(rel, old_ox, old_oy);
 	enesim_renderer_origin_get(r, &r_ox, &r_oy);
-	/* FIXME what to do with the origin? */
-#if 0
+	/* FIXME what to do with the origin?
+	 * - if we use the first case we are also translating the rel origin to the
+	 * parent origin * old_matrix
+	 */
+#if 1
 	enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
 	enesim_renderer_origin_set(rel, nox, noy);
 #else
+	//printf("setting new origin %g %g\n", *old_ox - r_ox, *old_oy - r_oy);
 	enesim_renderer_origin_set(rel, *old_ox - r_ox, *old_oy - r_oy);
 #endif
 }
@@ -119,6 +123,7 @@ EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
 		r->sw_fill = fill;
 		return EINA_TRUE;
 	}
+	WRN("Setup on %p failed", r);
 	return EINA_FALSE;
 }
 /**

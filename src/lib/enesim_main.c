@@ -71,6 +71,16 @@ EAPI void enesim_shutdown(void)
 }
 
 /**
+ *
+ */
+EAPI void enesim_version(unsigned int *major, unsigned int *minor, unsigned int *micro)
+{
+	if (major) *major = VERSION_MAJOR;
+	if (minor) *minor = VERSION_MINOR;
+	if (micro) *micro = VERSION_MICRO;
+}
+
+/**
  * Gets the string based name of a format
  * @param f The format to get the name from
  * @return The name of the format

@@ -65,7 +65,9 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 	}
 	if ((circ->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner
 			&& fpaint)
+	{
 		fpaint->sw_fill(fpaint, x, y, len, dst);
+	}
 
         renderer_affine_setup(r, x, y, &xx, &yy);
 	xx -= xx0;

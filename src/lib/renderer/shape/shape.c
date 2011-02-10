@@ -60,13 +60,18 @@ Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r)
 	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
 
 	if (!enesim_renderer_shape_setup(r))
+	{
+		WRN("Shape setup on %p failed", r);
 		return EINA_FALSE;
-
+	}
 	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
 			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
 		if (!enesim_renderer_sw_setup(s->fill.rend))
+		{
+			WRN("Shape setup on fill renderer %p of %p failed", s->fill.rend, r);
 			return EINA_FALSE;
+		}
 	}
 	return EINA_TRUE;
 }

@@ -441,7 +441,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
-
+	
 	edges = alloca(nvectors * sizeof(Polygon_Edge));
 	edge = edges;
 	while (n < nvectors)
@@ -574,10 +574,17 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 	Figure *o = (Figure *) p;
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 
+	printf("setting up the figure\n");
 	if (!f || !o)
-		return 0;
+	{
+		printf("figure cannot setup 0\n");
+		return EINA_FALSE;
+	}
 	if (!o->polys)
-		return 0;
+	{
+		printf("figure cannot setup 1\n");
+		return EINA_FALSE;
+	}
 
 	if (o->changed)
 	{
@@ -589,8 +596,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 		poly = o->polys;
 		while (poly)
 		{
+			printf("one ply %p\n", poly);
 			if (!poly->vertices || (poly->nverts < 3))
-				return 0;
+			{
+				printf("Not enough vertices %d\n", poly->nverts);
+				return EINA_FALSE;
+			}
 			nvectors += poly->nverts;
 			if ((poly->last->v.x == poly->vertices->v.x) &&
 					(poly->last->v.y == poly->vertices->v.y))
@@ -600,7 +611,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 
 		o->vectors = calloc(nvectors, sizeof(Polygon_Vector));
 		if (!o->vectors)
-			return 0;
+		{
+			printf("Not enough vectors\n");
+			return EINA_FALSE;
+		}
 
 		o->nvectors = nvectors;
 		poly = o->polys;
@@ -668,7 +682,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 	}
 
 	if (!enesim_renderer_shape_sw_setup(p))
+	{
+		printf("figure cannot setup\n");
 		return EINA_FALSE;
+	}
 
 	/*
 	 if (f->stroke.rend &&
@@ -679,14 +696,15 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 	 */
 
 	*fill = figure_stroke_fill_paint_proj;
-	if (!p->matrix.type == ENESIM_MATRIX_PROJECTIVE)
+	if (p->matrix.type != ENESIM_MATRIX_PROJECTIVE)
 	{
 		*fill = figure_stroke_fill_paint_affine;
 		if (p->matrix.values.yx == 0)
 			*fill = figure_stroke_fill_paint_affine_simple;
 	}
+	printf("fill = %p\n", fill);
 
-	return 1;
+	return EINA_TRUE;
 }
 
 static void _state_cleanup(Enesim_Renderer *r)
@@ -703,6 +721,20 @@ static void _state_cleanup(Enesim_Renderer *r)
 	 */
 }
 
+static void _figure_boundings(Enesim_Renderer *r, Eina_Rectangle *boundings)
+{
+	Figure *o;
+
+	o = (Figure *)r;
+
+	// for now.. but do this better later
+	if (!enesim_renderer_state_setup(r))
+		return;
+	boundings->x = (o->lxx - 0xffff) >> 16;
+	boundings->y = (o->tyy - 0xffff) >> 16;
+	boundings->w = ((o->rxx - 0xffff) >> 16) - boundings->x + 1;
+	boundings->h = ((o->byy - 0xffff) >> 16) - boundings->y + 1;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -727,6 +759,7 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 	enesim_renderer_shape_init(p);
 	p->sw_setup = _state_setup;
 	p->sw_cleanup = _state_cleanup;
+	//p->boundings = _figure_boundings;
 	p->free = _free;
 
 	return p;
@@ -786,6 +819,7 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
 	vertex->v.x = x;
 	vertex->v.y = y;
 
+	printf("adding vertex\n");
 	if (!poly->vertices)
 	{
 		poly->vertices = poly->last = vertex;
@@ -797,39 +831,6 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
 	poly->last = vertex;
 	poly->nverts++;
 	o->changed = 1;
-}
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_figure_extents_get(Enesim_Renderer *p, int *lx,
-		int *ty, int *rx, int *by)
-{
-	Enesim_Renderer_Shape *f;
-	Figure *o;
-
-	o = (Figure *) p;
-
-	// for now.. but do this better later
-	if (!enesim_renderer_sw_setup(p))
-	{
-		if (lx)
-			*lx = 0;
-		if (rx)
-			*rx = 0;
-		if (ty)
-			*ty = 0;
-		if (by)
-			*by = 0;
-	}
-	if (lx)
-		*lx = (o->lxx - 0xffff) >> 16;
-	if (rx)
-		*lx = (o->rxx + 0xffff) >> 16;
-	if (ty)
-		*ty = (o->tyy - 0xffff) >> 16;
-	if (by)
-		*by = (o->byy + 0xffff) >> 16;
 }
 /**
  * To be documented

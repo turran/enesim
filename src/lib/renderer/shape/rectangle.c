@@ -570,8 +570,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Rectangle *rect = (Rectangle *)r;
 
+	printf("setting up the rectangle\n");
 	if (!rect || (rect->w < 1) || (rect->h < 1))
+	{
+		printf("rect cannot setup\n");
 		return EINA_FALSE;
+	}
 
 	if (1)
 	{
@@ -605,7 +609,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	}
 
 	if (!enesim_renderer_shape_sw_setup(r))
+	{
+		printf("rect cannot setup 2\n");
 		return EINA_FALSE;
+	}
 
 	*fill = _span_rounded_color_outlined_paint_filled_proj;
 	if (r->matrix.type == ENESIM_MATRIX_AFFINE || r->matrix.type == ENESIM_MATRIX_IDENTITY)

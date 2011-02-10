@@ -24,7 +24,9 @@ VMIC=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $3);}'`
 SNAP=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $4);}'`
 version_info=`expr $VMAJ + $VMIN`":$VMIC:$VMIN"
 AC_SUBST(version_info)
-
+AC_DEFINE_UNQUOTED(VERSION_MAJOR, ${VMAJ}, [Major version])
+AC_DEFINE_UNQUOTED(VERSION_MINOR, ${VMIN}, [Minor version])
+AC_DEFINE_UNQUOTED(VERSION_MICRO, ${VMIC}, [Micro version])
 
 ### Additional options to configure
 

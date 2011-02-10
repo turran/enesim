@@ -159,7 +159,6 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void);
 EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p);
 EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *p, Eina_List *polygons);
 EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p, double x, double y);
-EAPI void enesim_renderer_figure_extents_get(Enesim_Renderer *p, int *lx, int *ty, int *rx, int *by);
 EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p);
 /**
  * @}
@@ -177,8 +176,6 @@ EAPI void enesim_renderer_path_cubic_to(Enesim_Renderer *p, float ctrl_x0,
 		float y);
 EAPI void enesim_renderer_path_scubic_to(Enesim_Renderer *p, float ctrl_x, float ctrl_y,
 		float x, float y);
-EAPI void enesim_renderer_path_extents_get(Enesim_Renderer *p, int *lx, int *ty, int *rx,
-		int *by);
 EAPI void enesim_renderer_path_clear(Enesim_Renderer *p);
 /**
  * @}
