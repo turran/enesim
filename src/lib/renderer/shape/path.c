@@ -228,7 +228,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 	Path *o = (Path *) p;
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 
-	printf("setting up the path\n");
 	if (!p)
 		return EINA_FALSE;
 	if (!o->figure)
@@ -245,19 +244,16 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 
 	if (!enesim_renderer_sw_setup(o->figure))
 	{
-		printf("ok? 0\n");
 		return EINA_FALSE;
 	}
 
 	o->fill = enesim_renderer_sw_fill_get(o->figure);
 	if (!o->fill)
 	{
-		printf("ok? 1\n");
 		return EINA_FALSE;
 	}
 
 	*fill = _span;
-	printf("everything went ok %p\n", fill);
 
 	return EINA_TRUE;
 }
@@ -330,7 +326,6 @@ EAPI void enesim_renderer_path_line_to(Enesim_Renderer *p, float x, float y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;
-	printf("adding line %g %g\n", x, y);
 	_line_to(p, x, y);
 }
 /**

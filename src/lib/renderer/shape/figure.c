@@ -574,15 +574,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 	Figure *o = (Figure *) p;
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 
-	printf("setting up the figure\n");
 	if (!f || !o)
 	{
-		printf("figure cannot setup 0\n");
 		return EINA_FALSE;
 	}
 	if (!o->polys)
 	{
-		printf("figure cannot setup 1\n");
 		return EINA_FALSE;
 	}
 
@@ -596,10 +593,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 		poly = o->polys;
 		while (poly)
 		{
-			printf("one ply %p\n", poly);
 			if (!poly->vertices || (poly->nverts < 3))
 			{
-				printf("Not enough vertices %d\n", poly->nverts);
+				WRN("Not enough vertices %d", poly->nverts);
 				return EINA_FALSE;
 			}
 			nvectors += poly->nverts;
@@ -612,7 +608,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 		o->vectors = calloc(nvectors, sizeof(Polygon_Vector));
 		if (!o->vectors)
 		{
-			printf("Not enough vectors\n");
 			return EINA_FALSE;
 		}
 
@@ -683,17 +678,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 
 	if (!enesim_renderer_shape_sw_setup(p))
 	{
-		printf("figure cannot setup\n");
 		return EINA_FALSE;
 	}
-
-	/*
-	 if (f->stroke.rend &&
-	 ((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) || (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-	 {
-	 if (!enesim_renderer_sw_setup(f->stroke.paint)) return 0;
-	 }
-	 */
 
 	*fill = figure_stroke_fill_paint_proj;
 	if (p->matrix.type != ENESIM_MATRIX_PROJECTIVE)
@@ -702,7 +688,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 		if (p->matrix.values.yx == 0)
 			*fill = figure_stroke_fill_paint_affine_simple;
 	}
-	printf("fill = %p\n", fill);
 
 	return EINA_TRUE;
 }
@@ -728,7 +713,7 @@ static void _figure_boundings(Enesim_Renderer *r, Eina_Rectangle *boundings)
 	o = (Figure *)r;
 
 	// for now.. but do this better later
-	if (!enesim_renderer_state_setup(r))
+	if (!enesim_renderer_sw_setup(r))
 		return;
 	boundings->x = (o->lxx - 0xffff) >> 16;
 	boundings->y = (o->tyy - 0xffff) >> 16;
@@ -759,7 +744,7 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 	enesim_renderer_shape_init(p);
 	p->sw_setup = _state_setup;
 	p->sw_cleanup = _state_cleanup;
-	//p->boundings = _figure_boundings;
+	p->boundings = _figure_boundings;
 	p->free = _free;
 
 	return p;
@@ -819,7 +804,6 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
 	vertex->v.x = x;
 	vertex->v.y = y;
 
-	printf("adding vertex\n");
 	if (!poly->vertices)
 	{
 		poly->vertices = poly->last = vertex;
