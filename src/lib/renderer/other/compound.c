@@ -17,7 +17,10 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
-
+/**
+ * @todo
+ * - Handle the case whenever the renderer supports the ROP itself 
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -32,7 +35,7 @@ typedef struct _Compound
 typedef struct _Layer
 {
 	Enesim_Renderer *r;
-	/* generate at state setup */
+	/* generated at state setup */
 	Enesim_Compositor_Span span;
 	Enesim_Matrix original;
 	double ox, oy;
@@ -167,7 +170,6 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	rect->y = 0;
 	rect->w = 0;
 	rect->h = 0;
-	/* cleanup every layer */
 	for (ll = c->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
@@ -185,6 +187,35 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 		}
 	}
 }
+
+static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Compound *c = (Compound *)r;
+	Enesim_Renderer_Flag f = 0xffffffff;
+	Eina_List *ll;
+
+	if (!c->layers)
+	{
+		*flags = 0;
+		return;
+	}
+
+	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	{
+		Layer *l = eina_list_data_get(ll);
+		Enesim_Renderer *lr = l->r;
+		Enesim_Renderer_Flag tmp;
+
+		/* intersect with every flag */
+		if (lr->flags)
+		{
+			lr->flags(lr, &tmp);
+			f &= tmp;
+		}
+	}
+	*flags = f;
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -204,6 +235,7 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 	r->sw_setup = _state_setup;
 	r->sw_cleanup = _state_cleanup;
 	r->boundings = _boundings;
+	r->flags = _compound_flags;
 
 	return r;
 }

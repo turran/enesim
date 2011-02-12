@@ -1,5 +1,3 @@
-+ Split the 'host cpu' implementation into another library, mainly to add support
-  there for different cpus.
-+ Remove the primitives
-+ What to do with the extender "classes", place them into eina?
-+ Move every error to eina's error
++ Fix every renderer to use the normal "external" way to define a new renderer
++ Make use of the flags on the surface draw function
+

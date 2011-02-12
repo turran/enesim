@@ -22,25 +22,6 @@
  * @defgroup Enesim_Renderer_Group Renderer
  * @{
  */
-typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
-typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
-
-typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst);
-
-typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Eina_Rectangle *rect);
-
-typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
-		Enesim_Renderer_Sw_Fill *fill);
-typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
-
-struct _Enesim_Renderer_Descriptor {
-	Enesim_Renderer_Sw_Setup sw_setup;
-	Enesim_Renderer_Sw_Cleanup sw_cleanup;
-	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Boundings boundings;
-};
 
 /**< Flags that specify what a renderer supports */
 typedef enum Enesim_Renderer_Flag
@@ -53,8 +34,29 @@ typedef enum Enesim_Renderer_Flag
 	ENESIM_RENDERER_FLAG_ROP 		= (1 << 5), /**< Can draw directly using the raster operation */
 } Enesim_Renderer_Flag;
 
+typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
+typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
+
+typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
+		unsigned int len, uint32_t *dst);
+
+typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
+typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Eina_Rectangle *rect);
+typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
+typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Fill *fill);
+typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
+
+struct _Enesim_Renderer_Descriptor {
+	Enesim_Renderer_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Boundings boundings;
+	Enesim_Renderer_Flags flags;
+};
+
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
-		*descriptor, Enesim_Renderer_Flag flags, void *data);
+		*descriptor, void *data);
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
 EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);

@@ -63,6 +63,24 @@ static Eina_Bool _setup_state(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	return EINA_TRUE;
 }
 
+static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Background *thiz;
+
+	thiz = _background_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_RENDERER_FLAG_ROP;
+
+}
+
 static void _cleanup_state(Enesim_Renderer *p)
 {
 }
@@ -74,9 +92,9 @@ static void _free(Enesim_Renderer *p)
 static Enesim_Renderer_Descriptor _descriptor = {
 	.sw_setup = _setup_state,
 	.sw_cleanup = _cleanup_state,
+	.flags = _background_flags,
 	.free = _free,
 };
-
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -87,17 +105,11 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Flag flags;
 	Background *bkg;
 
 	bkg = calloc(1, sizeof(Background));
 	if (!bkg) return NULL;
-	/* specific renderer setup */
-	flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PERSPECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_ROP;
-	r = enesim_renderer_new(&_descriptor, flags, bkg);
+	r = enesim_renderer_new(&_descriptor, bkg);
 	return r;
 }
 /**

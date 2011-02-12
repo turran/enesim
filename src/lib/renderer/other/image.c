@@ -25,14 +25,32 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_IMAGE_MAGIC 0xe7e51421
+#define ENESIM_RENDERER_IMAGE_CHECK(d)\
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_IMAGE_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_IMAGE_MAGIC);\
+	} while(0)
+
+#define ENESIM_RENDERER_IMAGE_MAGIC_CHECK_RETURN(d, ret)\
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_IMAGE_MAGIC)) {\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_IMAGE_MAGIC);\
+			return ret;\
+		}\
+	} while(0)
+
 typedef struct _Image
 {
 	Enesim_Renderer base;
+	EINA_MAGIC;
 	Enesim_Surface *s;
 	int x, y;
 	unsigned int w, h;
 	int *yoff;
 	int *xoff;
+	Enesim_Compositor_Point point;
+	Enesim_Compositor_Span span;
 } Image;
 
 static inline void _offsets(unsigned int cs, unsigned int cl, unsigned int sl, int *off)
@@ -43,6 +61,17 @@ static inline void _offsets(unsigned int cs, unsigned int cl, unsigned int sl, i
 	{
 		off[c] = ((c + cs) * sl) / cl;
 	}
+}
+
+static inline Image * _image_get(Enesim_Renderer *r)
+{
+	Image *thiz;
+
+	if (!r) return NULL;
+	thiz = (Image *)r;
+	ENESIM_RENDERER_IMAGE_MAGIC_CHECK_RETURN(thiz, NULL);
+
+	return thiz;
 }
 
 #if 0
@@ -209,6 +238,13 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	uint32_t sstride;
 	uint32_t *src;
 
+	src = enesim_surface_data_get(s->s);
+	sstride = enesim_surface_stride_get(s->s);
+	x -= r->ox;
+	src += sstride * (int)(y - r->oy) + x;
+#if 0
+	s->span(dst, len, src, r->color, NULL); 
+#else
 	if (y < r->oy || y >= r->oy + s->h)
 	{
 		while (len--)
@@ -216,10 +252,6 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 		return;
 	}
 
-	src = enesim_surface_data_get(s->s);
-	sstride = enesim_surface_stride_get(s->s);
-	x -= r->ox;
-	src += sstride * (int)(y - r->oy) + x;
 	while (len--)
 	{
 		if (x >= r->ox && x < r->ox + s->w)
@@ -230,6 +262,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 		dst++;
 		src++;
 	}
+#endif
 }
 
 static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
@@ -269,8 +302,11 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	int sw, sh;
 	Image *s = (Image *)r;
+	Enesim_Rop rop;
+	Enesim_Color color;
+	Enesim_Format fmt; 
+	int sw, sh;
 
 	if (s->w < 1 || s->h < 1)
 		return EINA_FALSE;
@@ -281,10 +317,25 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	_state_cleanup(r);
 	if (!s->s)
 		return EINA_FALSE;
+
 	enesim_surface_size_get(s->s, &sw, &sh);
+	enesim_renderer_rop_get(r, &rop);
+	enesim_renderer_color_get(r, &color);
+	/* FIXME we need to use the format from the destination surface */
+	fmt = ENESIM_FORMAT_ARGB8888;
 
 	if (sw != s->w && sh != s->h)
 	{
+		/* as we need to scale we can only use the point compositor */
+		s->point = enesim_compositor_point_get(rop, &fmt,
+				ENESIM_FORMAT_ARGB8888, color, ENESIM_FORMAT_NONE);
+		if (!s->point)
+		{
+			WRN("Not suitable point compositor for sfmt %d and color %08x",
+					fmt, color);
+			return EINA_FALSE;
+		}
+
 		s->xoff = malloc(sizeof(int) * s->w);
 		s->yoff = malloc(sizeof(int) * s->h);
 		_offsets(s->x, s->w, sw, s->xoff);
@@ -297,9 +348,34 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	}
 	else
 	{
+		/* we can use directly a span compositor */
+		s->span = enesim_compositor_span_get(rop, &fmt,
+				ENESIM_FORMAT_ARGB8888, color, ENESIM_FORMAT_NONE);
+		if (!s->span)
+		{
+			WRN("Not suitable span compositor for sfmt %d and color %08x",
+					fmt, color);
+			return EINA_FALSE;
+		}
 		*fill = _argb8888_to_argb8888_noscale;
 	}
 	return EINA_TRUE;
+}
+
+static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Image *thiz;
+
+	thiz = _image_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
 static void _free(Enesim_Renderer *r)
@@ -319,16 +395,18 @@ static void _free(Enesim_Renderer *r)
 EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 {
 	Enesim_Renderer *r;
-	Image *s;
+	Image *thiz;
 
-	s = calloc(1, sizeof(Image));
-	r = (Enesim_Renderer *)s;
+	thiz = calloc(1, sizeof(Image));
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMAGE_MAGIC);
 
+	r = (Enesim_Renderer *)thiz;
 	enesim_renderer_init(r);
 	r->free = _free;
 	r->sw_cleanup = _state_cleanup;
 	r->sw_setup = _state_setup;
 	r->boundings = _boundings;
+	r->flags = _image_flags;
 
 	return r;
 }
@@ -338,11 +416,11 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
  */
 EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 
-	if (s->x == x)
-		return;
-	s->x = x;
+	thiz = _image_get(r);
+	if (!thiz) return;
+	thiz->x = x;
 }
 /**
  * To be documented
@@ -350,11 +428,11 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x)
  */
 EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 
-	if (s->y == y)
-		return;
-	s->y = y;
+	thiz = _image_get(r);
+	if (!thiz) return;
+	thiz->y = y;
 }
 /**
  * To be documented
@@ -362,11 +440,11 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y)
  */
 EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 
-	if (s->w == w)
-		return;
-	s->w = w;
+	thiz = _image_get(r);
+	if (!thiz) return;
+	thiz->w = w;
 }
 /**
  * To be documented
@@ -374,11 +452,11 @@ EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w)
  */
 EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 
-	if (s->h == h)
-		return;
-	s->h = h;
+	thiz = _image_get(r);
+	if (!thiz) return;
+	thiz->h = h;
 }
 /**
  * To be documented
@@ -386,7 +464,9 @@ EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h)
  */
 EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 
-	s->s = src;
+	thiz = _image_get(r);
+	if (!thiz) return;
+	thiz->s = src;
 }

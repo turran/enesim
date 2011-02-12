@@ -147,13 +147,35 @@ static void _cleanup_state(Enesim_Renderer *p)
 {
 }
 
-static void _free(Enesim_Renderer *p)
+static void _stripes_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
+	Stripes *thiz;
+
+	thiz = _stripes_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static void _free(Enesim_Renderer *r)
+{
+	Stripes *st;
+
+	st = _stripes_get(r);
+	if (!st) return;
+	free(st);
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	.sw_setup = _setup_state,
 	.sw_cleanup = _cleanup_state,
+	.flags = _stripes_flags,
 	.free = _free,
 };
 /*============================================================================*
@@ -166,7 +188,6 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Flag flags;
 	Stripes *st;
 
 	st = calloc(1, sizeof(Stripes));
@@ -175,10 +196,8 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	/* specific renderer setup */
 	st->s0.thickness = 1;
 	st->s1.thickness = 1;
-	flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PERSPECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
-	r = enesim_renderer_new(&_descriptor, flags, st);
+	r = enesim_renderer_new(&_descriptor, st);
+
 	return r;
 }
 /**

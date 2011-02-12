@@ -20,7 +20,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_MAGIC_RENDERER 0xe7e51402
+#define ENESIM_MAGIC_RENDERER 0xe7e51420
 #define ENESIM_MAGIC_CHECK_RENDERER(d)\
 	do {\
 		if (!EINA_MAGIC_CHECK(d, ENESIM_MAGIC_RENDERER))\
@@ -92,17 +92,19 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
  * FIXME: To be fixed
  */
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
-		*descriptor, Enesim_Renderer_Flag flags, void *data)
+		*descriptor, void *data)
 {
 	Enesim_Renderer *r;
 
-	r = malloc(sizeof(Enesim_Renderer));
+	r = calloc(1, sizeof(Enesim_Renderer));
 	enesim_renderer_init(r);
 	r->boundings = descriptor->boundings;
+	if (!r->boundings) WRN("No bounding() function available");
+	r->flags = descriptor->flags;
+	if (!r->flags) WRN("No flags() function available");
 	r->sw_setup = descriptor->sw_setup;
 	r->sw_cleanup = descriptor->sw_cleanup;
 	r->free = descriptor->free;
-	r->flags = flags;
 	r->data = data;
 
 	return r;
@@ -123,7 +125,7 @@ EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
 		r->sw_fill = fill;
 		return EINA_TRUE;
 	}
-	WRN("Setup on %p failed", r);
+	WRN("Setup callback on %p failed", r);
 	return EINA_FALSE;
 }
 /**
@@ -205,7 +207,12 @@ EAPI void enesim_renderer_delete(Enesim_Renderer *r)
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	*flags = r->flags;
+	if (r->flags)
+	{
+		r->flags(r, flags);
+		return;
+	}
+	*flags = 0;
 }
 /**
  * To be documented
@@ -348,6 +355,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Compositor_Span span;
 	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Renderer_Flag flags;
 	Eina_Rectangle boundings;
 	Eina_Rectangle final;
 	uint32_t *ddata;
@@ -378,8 +386,8 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
 	if (!eina_rectangle_intersection(&final, &boundings))
 	{
-		printf("destination rectangle does not intersect\n");
-		return;
+		WRN("The renderer %p boundings does not intersect on the destination rectangle", r);
+		goto end;
 	}
 	dfmt = enesim_surface_format_get(s);
 	ddata = enesim_surface_data_get(s);
@@ -389,6 +397,9 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* translate the origin */
 	final.x -= x;
 	final.y -= y;
+
+	enesim_renderer_flags(r, &flags);
+	/* TODO use the flags to optimize the rendering */
 	/* fill the new span */
 	if ((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
 	{
@@ -402,11 +413,15 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	else
 	{
 		uint32_t *fdata;
+		size_t len;
 
 		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
 				r->color, ENESIM_FORMAT_NONE);
 
-		fdata = alloca(final.w * sizeof(uint32_t));
+		len = final.w * sizeof(uint32_t);
+		fdata = alloca(len);
+		memset(fdata, 0, len);
+		
 		while (final.h--)
 		{
 			fill(r, final.x, final.y, final.w, fdata);
@@ -417,6 +432,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		}
 	}
 	/* TODO set the format again */
+end:
 	enesim_renderer_sw_cleanup(r);
 }
 
