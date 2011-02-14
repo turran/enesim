@@ -243,7 +243,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	x -= r->ox;
 	src += sstride * (int)(y - r->oy) + x;
 #if 0
-	s->span(dst, len, src, r->color, NULL); 
+	s->span(dst, len, src, r->color, NULL);
 #else
 	if (y < r->oy || y >= r->oy + s->h)
 	{
@@ -251,7 +251,6 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 			*dst++ = 0;
 		return;
 	}
-
 	while (len--)
 	{
 		if (x >= r->ox && x < r->ox + s->w)
@@ -264,8 +263,10 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	}
 #endif
 }
-
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static void _image_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
 	Image *s = (Image *)r;
 	if (!s->s)
@@ -284,7 +285,7 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	}
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _image_state_cleanup(Enesim_Renderer *r)
 {
 	Image *s = (Image *)r;
 	if (s->xoff)
@@ -300,46 +301,47 @@ static void _state_cleanup(Enesim_Renderer *r)
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 	Enesim_Rop rop;
 	Enesim_Color color;
-	Enesim_Format fmt; 
+	Enesim_Format fmt;
 	int sw, sh;
 
-	if (s->w < 1 || s->h < 1)
+	thiz = _image_get(r);
+	if (thiz->w < 1 || thiz->h < 1)
 		return EINA_FALSE;
 
-	if (!s->s)
+	if (!thiz->s)
 		return EINA_FALSE;
 
-	_state_cleanup(r);
-	if (!s->s)
+	_image_state_cleanup(r);
+	if (!thiz->s)
 		return EINA_FALSE;
 
-	enesim_surface_size_get(s->s, &sw, &sh);
+	enesim_surface_size_get(thiz->s, &sw, &sh);
 	enesim_renderer_rop_get(r, &rop);
 	enesim_renderer_color_get(r, &color);
 	/* FIXME we need to use the format from the destination surface */
 	fmt = ENESIM_FORMAT_ARGB8888;
 
-	if (sw != s->w && sh != s->h)
+	if (sw != thiz->w && sh != thiz->h)
 	{
 		/* as we need to scale we can only use the point compositor */
-		s->point = enesim_compositor_point_get(rop, &fmt,
+		thiz->point = enesim_compositor_point_get(rop, &fmt,
 				ENESIM_FORMAT_ARGB8888, color, ENESIM_FORMAT_NONE);
-		if (!s->point)
+		if (!thiz->point)
 		{
 			WRN("Not suitable point compositor for sfmt %d and color %08x",
 					fmt, color);
 			return EINA_FALSE;
 		}
 
-		s->xoff = malloc(sizeof(int) * s->w);
-		s->yoff = malloc(sizeof(int) * s->h);
-		_offsets(s->x, s->w, sw, s->xoff);
-		_offsets(s->y, s->h, sh, s->yoff);
+		thiz->xoff = malloc(sizeof(int) * thiz->w);
+		thiz->yoff = malloc(sizeof(int) * thiz->h);
+		_offsets(thiz->x, thiz->w, sw, thiz->xoff);
+		_offsets(thiz->y, thiz->h, sh, thiz->yoff);
 
 		if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 			*fill = _scale_fast_identity;
@@ -349,9 +351,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	else
 	{
 		/* we can use directly a span compositor */
-		s->span = enesim_compositor_span_get(rop, &fmt,
+		thiz->span = enesim_compositor_span_get(rop, &fmt,
 				ENESIM_FORMAT_ARGB8888, color, ENESIM_FORMAT_NONE);
-		if (!s->span)
+		if (!thiz->span)
 		{
 			WRN("Not suitable span compositor for sfmt %d and color %08x",
 					fmt, color);
@@ -376,11 +378,13 @@ static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PERSPECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
+			//| ENESIM_RENDERER_FLAG_COLORIZE
+			//| ENESIM_RENDERER_FLAG_ROP;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _image_free(Enesim_Renderer *r)
 {
-	_state_cleanup(r);
+	_image_state_cleanup(r);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -402,10 +406,10 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 
 	r = (Enesim_Renderer *)thiz;
 	enesim_renderer_init(r);
-	r->free = _free;
-	r->sw_cleanup = _state_cleanup;
-	r->sw_setup = _state_setup;
-	r->boundings = _boundings;
+	r->free = _image_free;
+	r->sw_cleanup = _image_state_cleanup;
+	r->sw_setup = _image_state_setup;
+	r->boundings = _image_boundings;
 	r->flags = _image_flags;
 
 	return r;
