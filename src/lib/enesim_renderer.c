@@ -399,9 +399,10 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	final.y -= y;
 
 	enesim_renderer_flags(r, &flags);
-	/* TODO use the flags to optimize the rendering */
 	/* fill the new span */
-	if ((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
+	if (((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
+			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->color == ENESIM_COLOR_FULL))
+			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (flags & ENESIM_RENDERER_FLAG_COLORIZE)))
 	{
 		while (final.h--)
 		{
@@ -420,10 +421,10 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 		len = final.w * sizeof(uint32_t);
 		fdata = alloca(len);
-		memset(fdata, 0, len);
 		
 		while (final.h--)
 		{
+			memset(fdata, 0, len);
 			fill(r, final.x, final.y, final.w, fdata);
 			final.y++;
 			/* compose the filled and the destination spans */

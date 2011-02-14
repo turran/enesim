@@ -41,19 +41,28 @@ typedef struct _Layer
 	double ox, oy;
 } Layer;
 
+static inline Compound * _compound_get(Enesim_Renderer *r)
+{
+	Compound *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	return thiz;
+}
+
 static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Compound *c = (Compound *)r;
+	Compound *thiz;
 	Eina_List *ll;
 	Eina_Rectangle span;
 	uint32_t *tmp;
 	size_t tmp_size;
 
+	thiz = _compound_get(r);
 	tmp_size = sizeof(uint32_t) * len;
 	tmp = alloca(tmp_size);
 	memset(tmp, 0, tmp_size);
 	eina_rectangle_coords_from(&span, x, y, len, 1);
-	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
 
@@ -81,13 +90,16 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 
 static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Compound *c = (Compound *)r;
+	Compound *thiz;
 	Eina_List *ll;
 	Eina_Rectangle span;
-	uint32_t *tmp = alloca(sizeof(uint32_t) * len);
+	uint32_t *tmp;
 
+
+	thiz = _compound_get(r);
+	tmp = alloca(sizeof(uint32_t) * len);
 	eina_rectangle_coords_from(&span, x, y, len, 1);
-	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
 		Eina_Rectangle lboundings;
@@ -104,14 +116,18 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Compound *c = (Compound *)r;
+	Compound *thiz;
 	Eina_List *ll;
 	Eina_Bool only_fill = EINA_TRUE;
 
+	thiz = _compound_get(r);
 	/* setup every layer */
-	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
@@ -146,13 +162,14 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	return EINA_TRUE;
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _compound_state_cleanup(Enesim_Renderer *r)
 {
-	Compound *c = (Compound *)r;
+	Compound *thiz;
 	Eina_List *ll;
 
+	thiz = _compound_get(r);
 	/* cleanup every layer */
-	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
 
@@ -161,16 +178,17 @@ static void _state_cleanup(Enesim_Renderer *r)
 	}
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _compound_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
-	Compound *c = (Compound *)r;
+	Compound *thiz;
 	Eina_List *ll;
 
 	rect->x = 0;
 	rect->y = 0;
 	rect->w = 0;
 	rect->h = 0;
-	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	thiz = _compound_get(r);
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Renderer *lr = l->r;
@@ -190,17 +208,18 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 
 static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Compound *c = (Compound *)r;
+	Compound *thiz;
 	Enesim_Renderer_Flag f = 0xffffffff;
 	Eina_List *ll;
 
-	if (!c->layers)
+	thiz = _compound_get(r);
+	if (!thiz->layers)
 	{
 		*flags = 0;
 		return;
 	}
 
-	for (ll = c->layers; ll; ll = eina_list_next(ll))
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Renderer *lr = l->r;
@@ -216,6 +235,21 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	*flags = f;
 }
 
+static void _compound_free(Enesim_Renderer *r)
+{
+	Compound *thiz;
+
+	thiz = _compound_get(r);
+	enesim_renderer_compound_clear(r);
+	free(thiz);
+}
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _compound_state_setup,
+	.sw_cleanup = _compound_state_cleanup,
+	.flags = _compound_flags,
+	.free = _compound_free,
+};
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -225,17 +259,13 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
  */
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 {
-	Compound *c;
+	Compound *thiz;
 	Enesim_Renderer *r;
 
-	c = calloc(1, sizeof(Compound));
+	thiz = calloc(1, sizeof(Compound));
+	if (!thiz) return NULL;
 
-	r = (Enesim_Renderer *)c;
-	enesim_renderer_init(r);
-	r->sw_setup = _state_setup;
-	r->sw_cleanup = _state_cleanup;
-	r->boundings = _boundings;
-	r->flags = _compound_flags;
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }
@@ -247,13 +277,14 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer *rend)
 {
-	Compound *c = (Compound *)r;
+	Compound *thiz;
 	Layer *l;
 
+	thiz = _compound_get(r);
 	l = calloc(1, sizeof(Layer));
 	l->r = rend;
 
-	c->layers = eina_list_append(c->layers, l);
+	thiz->layers = eina_list_append(thiz->layers, l);
 }
 
 /**
@@ -262,15 +293,16 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r)
 {
+	Compound *thiz;
 	Layer *layer;
-	Eina_List *list;
 	Eina_List *l;
 	Eina_List *l_next;
 
-	EINA_LIST_FOREACH_SAFE(list, l, l_next, layer)
+	thiz = _compound_get(r);
+	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
 		free(layer);
-		list = eina_list_remove_list(list, l);
+		thiz->layers = eina_list_remove_list(thiz->layers, l);
 	}
 }
 
@@ -280,10 +312,11 @@ EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r)
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list)
 {
+	Compound *thiz;
 	Enesim_Renderer *rend;
 	Eina_List *l;
-	Compound *c = (Compound *)r;
 
+	enesim_renderer_compound_clear(r);
 	EINA_LIST_FOREACH(list, l, rend)
 	{
 		enesim_renderer_compound_layer_add(r, rend);
