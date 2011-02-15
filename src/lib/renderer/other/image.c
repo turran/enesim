@@ -390,12 +390,17 @@ static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _image_free(Enesim_Renderer *r)
 {
+	Image *thiz;
+
+	thiz = _image_get(r);
 	_image_state_cleanup(r);
+	free(thiz);
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	.sw_setup = _image_state_setup,
 	.sw_cleanup = _image_state_cleanup,
+	.boundings = _image_boundings,
 	.flags = _image_flags,
 	.free = _image_free,
 };

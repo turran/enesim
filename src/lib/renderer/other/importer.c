@@ -22,11 +22,19 @@
  *============================================================================*/
 typedef struct _Importer
 {
-	Enesim_Renderer base;
 	Enesim_Buffer_Data cdata;
 	Enesim_Buffer_Format cfmt;
 	Enesim_Angle angle;
 } Importer;
+
+static inline Importer * _importer_get(Enesim_Renderer *r)
+{
+	Importer *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+
+	return thiz;
+}
 
 static void _span_argb8888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
@@ -84,13 +92,16 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigne
 		dst++;
 	}
 }
-
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _importer_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Importer *i = (Importer *)r;
+	Importer *thiz;
 
+	thiz = _importer_get(r);
 	/* TODO use a LUT for this */
-	switch (i->cfmt)
+	switch (thiz->cfmt)
 	{
 		case ENESIM_CONVERTER_ARGB8888:
 		*fill = _span_argb8888_none_argb8888;
@@ -109,6 +120,41 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	}
 	return EINA_TRUE;
 }
+
+static void _importer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	/* TODO check that we have an image set, if so
+	 * return the size of that image
+	 */
+}
+
+static void _importer_free(Enesim_Renderer *r)
+{
+	Importer *thiz;
+
+	thiz = _importer_get(r);
+	free(thiz);
+}
+
+static void _importer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Importer *thiz;
+
+	thiz = _importer_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _importer_state_setup,
+	.flags = _importer_flags,
+	.boundings = _importer_boundings,
+	.free = _importer_free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -124,14 +170,14 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
  */
 EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 {
-	Importer *i;
+	Importer *thiz;
 	Enesim_Renderer *r;
 
-	i = calloc(1, sizeof(Importer));
+	thiz = calloc(1, sizeof(Importer));
+	if (!thiz) return NULL;
 
-	r = (Enesim_Renderer *)i;
-	enesim_renderer_init(r);
-	r->sw_setup = _state_setup;
+	r = enesim_renderer_new(&_descriptor, thiz);
+
 	return r;
 }
 /**
@@ -141,9 +187,10 @@ EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
  */
 EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle angle)
 {
-	Importer *i = (Importer *)r;
+	Importer *thiz;
 
-	i->angle = angle;
+	thiz = _importer_get(r);
+	thiz->angle = angle;
 }
 /**
  * Sets the data to import pixels from
@@ -152,9 +199,10 @@ EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle an
  */
 EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Buffer_Data *cdata)
 {
-	Importer *i = (Importer *)r;
+	Importer *thiz;
 
-	i->cdata = *cdata;
+	thiz = _importer_get(r);
+	thiz->cdata = *cdata;
 }
 /**
  * Sets the format
@@ -163,7 +211,8 @@ EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Buffer_Da
  */
 EAPI void enesim_renderer_importer_format_set(Enesim_Renderer *r, Enesim_Buffer_Format fmt)
 {
-	Importer *i = (Importer *)r;
+	Importer *thiz;
 
-	i->cfmt = fmt;
+	thiz = _importer_get(r);
+	thiz->cfmt = fmt;
 }

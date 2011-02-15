@@ -1,3 +1,7 @@
 + Fix every renderer to use the normal "external" way to define a new renderer
 + Make use of the flags on the surface draw function
++ Given that we'll change every rennderer to use the API to define a new renderer instead
+  of using the internals, we need to optimize and avoid the need to always call
+  enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
+  to receive the data already fetch with enesim_renderer_data_get(r) but on the surface_draw
 
