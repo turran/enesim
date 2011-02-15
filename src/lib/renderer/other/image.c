@@ -42,7 +42,6 @@
 
 typedef struct _Image
 {
-	Enesim_Renderer base;
 	EINA_MAGIC;
 	Enesim_Surface *s;
 	int x, y;
@@ -67,8 +66,7 @@ static inline Image * _image_get(Enesim_Renderer *r)
 {
 	Image *thiz;
 
-	if (!r) return NULL;
-	thiz = (Image *)r;
+	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_IMAGE_MAGIC_CHECK_RETURN(thiz, NULL);
 
 	return thiz;
@@ -133,29 +131,30 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 
 static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 	uint32_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
 
+	thiz = _image_get(r);
 	y -= r->oy;
 	x -= r->ox;
 
-	if (y < 0 || y >= s->h)
+	if (y < 0 || y >= thiz->h)
 	{
 		while (len--)
 			*dst++ = 0;
 		return;
 	}
 
-	src = enesim_surface_data_get(s->s);
-	sstride = enesim_surface_stride_get(s->s);
-	src += sstride * s->yoff[y];
+	src = enesim_surface_data_get(thiz->s);
+	sstride = enesim_surface_stride_get(thiz->s);
+	src += sstride * thiz->yoff[y];
 
 	while (len--)
 	{
-		if (x >= 0 && x < s->w)
-			*dst = *(src + s->xoff[x]);
+		if (x >= 0 && x < thiz->w)
+			*dst = *(src + thiz->xoff[x]);
 		else
 			*dst = 0;
 		x++;
@@ -165,18 +164,19 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 
 static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 	uint32_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
 	Eina_F16p16 xx, yy;
 	int sw, sh;
 
+	thiz = _image_get(r);
 	renderer_affine_setup(r, x, y, &xx, &yy);
 
-	src = enesim_surface_data_get(s->s);
-	enesim_surface_size_get(s->s, &sw, &sh);
-	sstride = enesim_surface_stride_get(s->s);
+	src = enesim_surface_data_get(thiz->s);
+	enesim_surface_size_get(thiz->s, &sw, &sh);
+	sstride = enesim_surface_stride_get(thiz->s);
 
 
 	while (len--)
@@ -187,10 +187,10 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 		x = eina_f16p16_int_to(xx);
 		y = eina_f16p16_int_to(yy);
 
-		if (x >= 0 && x < s->w && y >= 0 && y < s->h)
+		if (x >= 0 && x < thiz->w && y >= 0 && y < thiz->h)
 		{
-			sy = s->yoff[y];
-			sx = s->xoff[x];
+			sy = thiz->yoff[y];
+			sx = thiz->xoff[x];
 			p0 = argb8888_sample_good(src, sstride, sw, sh, xx, yy, sx, sy);
 		}
 
@@ -202,24 +202,25 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 
 static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 	uint32_t sstride;
 	uint8_t *src;
 
-	if (y < r->oy || y >= r->oy + s->h)
+	thiz = _image_get(r);
+	if (y < r->oy || y >= r->oy + thiz->h)
 	{
 		while (len--)
 			*dst++ = 0;
 		return;
 	}
 
-	src = enesim_surface_data_get(s->s);
-	sstride = enesim_surface_stride_get(s->s);
+	src = enesim_surface_data_get(thiz->s);
+	sstride = enesim_surface_stride_get(thiz->s);
 	x -= r->ox;
 	src += sstride * (int)(y - r->oy) + x;
 	while (len--)
 	{
-		if (x >= r->ox && x < r->ox + s->w)
+		if (x >= r->ox && x < r->ox + thiz->w)
 		{
 			uint8_t a = *src;
 			*dst = a << 24 | a << 16 | a << 8 | a;
@@ -234,18 +235,19 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 
 static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *s = (Image *)r;
+	Image *thiz;
 	uint32_t sstride;
 	uint32_t *src;
 
-	src = enesim_surface_data_get(s->s);
-	sstride = enesim_surface_stride_get(s->s);
+ 	thiz = _image_get(r);
+	src = enesim_surface_data_get(thiz->s);
+	sstride = enesim_surface_stride_get(thiz->s);
 	x -= r->ox;
 	src += sstride * (int)(y - r->oy) + x;
 #if 0
-	s->span(dst, len, src, r->color, NULL);
+	thiz->span(dst, len, src, r->color, NULL);
 #else
-	if (y < r->oy || y >= r->oy + s->h)
+	if (y < r->oy || y >= r->oy + thiz->h)
 	{
 		while (len--)
 			*dst++ = 0;
@@ -253,7 +255,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	}
 	while (len--)
 	{
-		if (x >= r->ox && x < r->ox + s->w)
+		if (x >= r->ox && x < r->ox + thiz->w)
 			*dst = *src;
 		else
 			*dst = 0;
@@ -268,8 +270,10 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
  *----------------------------------------------------------------------------*/
 static void _image_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
-	Image *s = (Image *)r;
-	if (!s->s)
+	Image *thiz;
+
+	thiz = _image_get(r);
+	if (!thiz->s)
 	{
 		rect->x = 0;
 		rect->y = 0;
@@ -278,26 +282,28 @@ static void _image_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	}
 	else
 	{
-		rect->x = s->x;
-		rect->y = s->y;
-		rect->w = s->w;
-		rect->h = s->h;
+		rect->x = thiz->x;
+		rect->y = thiz->y;
+		rect->w = thiz->w;
+		rect->h = thiz->h;
 	}
 }
 
 static void _image_state_cleanup(Enesim_Renderer *r)
 {
-	Image *s = (Image *)r;
-	if (s->xoff)
+	Image *thiz;
+
+	thiz = _image_get(r);
+	if (thiz->xoff)
 	{
-		free(s->xoff);
-		s->xoff = NULL;
+		free(thiz->xoff);
+		thiz->xoff = NULL;
 	}
 
-	if (s->yoff)
+	if (thiz->yoff)
 	{
-		free(s->yoff);
-		s->yoff = NULL;
+		free(thiz->yoff);
+		thiz->yoff = NULL;
 	}
 }
 
@@ -386,6 +392,13 @@ static void _image_free(Enesim_Renderer *r)
 {
 	_image_state_cleanup(r);
 }
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _image_state_setup,
+	.sw_cleanup = _image_state_cleanup,
+	.flags = _image_flags,
+	.free = _image_free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -402,15 +415,10 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 	Image *thiz;
 
 	thiz = calloc(1, sizeof(Image));
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMAGE_MAGIC);
+	if (!thiz) return NULL;
 
-	r = (Enesim_Renderer *)thiz;
-	enesim_renderer_init(r);
-	r->free = _image_free;
-	r->sw_cleanup = _image_state_cleanup;
-	r->sw_setup = _image_state_setup;
-	r->boundings = _image_boundings;
-	r->flags = _image_flags;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMAGE_MAGIC);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

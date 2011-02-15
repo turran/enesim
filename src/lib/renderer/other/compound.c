@@ -28,7 +28,6 @@
 
 typedef struct _Compound
 {
-	Enesim_Renderer base;
 	Eina_List *layers;
 } Compound;
 
