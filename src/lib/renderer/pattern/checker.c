@@ -27,22 +27,35 @@
  *============================================================================*/
 typedef struct _Checker
 {
-	Enesim_Renderer base;
 	Enesim_Color color1;
 	Enesim_Color color2;
 	int sw;
 	int sh;
 } Checker;
 
+Checker * _checker_get(Enesim_Renderer *r)
+{
+	Checker *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	return thiz;
+}
+
 static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Checker *s = (Checker *)r;
-	int w2 = s->sw * 2;
-	int h2 = s->sh * 2;
-	uint32_t color[2] = {s->color1, s->color2};
+	Checker *thiz;
+	Eina_F16p16 yy, xx;
+	int w2;
+	int h2;;
+	uint32_t color[2];
 	uint32_t *end = dst + len;
 	int sy;
-	Eina_F16p16 yy, xx;
+
+	thiz = _checker_get(r);
+	w2 = thiz->sw * 2;
+	h2 = thiz->sh * 2;
+	color[0] = thiz->color1;
+	color[1] = thiz->color2;
 
 	/* translate to the origin */
 	renderer_identity_setup(r, x, y, &xx, &yy);
@@ -53,10 +66,10 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 		sy += h2;
 	}
 	/* swap the colors */
-	if (sy >= s->sh)
+	if (sy >= thiz->sh)
 	{
-		color[0] = s->color2;
-		color[1] = s->color1;
+		color[0] = thiz->color2;
+		color[1] = thiz->color1;
 	}
 	while (dst < end)
 	{
@@ -69,7 +82,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 			sx += w2;
 		}
 		/* choose the correct color */
-		if (sx >= s->sw)
+		if (sx >= thiz->sw)
 		{
 			p0 = color[0];
 		}
@@ -84,21 +97,22 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 
 static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 	Eina_F16p16 yy, xx, ww, hh, ww2, hh2;
 	uint32_t *end = dst + len;
 
+	thiz = _checker_get(r);
 	renderer_affine_setup(r, x, y, &xx, &yy);
 	/* TODO move this to the state setup */
-	ww = eina_f16p16_int_from(s->sw);
+	ww = eina_f16p16_int_from(thiz->sw);
 	ww2 = ww * 2;
-	hh = eina_f16p16_int_from(s->sh);
+	hh = eina_f16p16_int_from(thiz->sh);
 	hh2 = hh * 2;
 
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx;
-		uint32_t color[2] = {s->color1, s->color2};
+		uint32_t color[2] = {thiz->color1, thiz->color2};
 		uint32_t p0;
 		int sx, sy;
 
@@ -118,21 +132,21 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 		/* choose the correct color */
 		if (syy >= hh)
 		{
-			color[0] = s->color2;
-			color[1] = s->color1;
+			color[0] = thiz->color2;
+			color[1] = thiz->color1;
 		}
 		if (sxx >= ww)
 		{
 			p0 = color[0];
 			/* antialias the borders */
-			if (sy == 0 || sy == s->sh)
+			if (sy == 0 || sy == thiz->sh)
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
 				p0 = INTERP_256(a, p0, color[1]);
 			}
-			if (sx == 0 || sx == s->sw)
+			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
@@ -145,14 +159,14 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 			p0 = color[1];
 
 			/* antialias the borders */
-			if (sy == 0 || sy == s->sh)
+			if (sy == 0 || sy == thiz->sh)
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
 				p0 = INTERP_256(a, p0, color[0]);
 			}
-			if (sx == 0 || sx == s->sw)
+			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
@@ -168,22 +182,23 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 	Eina_F16p16 yy, xx, ww, hh, ww2, hh2, zz;
 	uint32_t *end = dst + len;
 
+	thiz = _checker_get(r);
 	/* translate to the origin */
 	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
 	/* TODO move this to the state setup */
-	ww = eina_f16p16_int_from(s->sw);
+	ww = eina_f16p16_int_from(thiz->sw);
 	ww2 = ww * 2;
-	hh = eina_f16p16_int_from(s->sh);
+	hh = eina_f16p16_int_from(thiz->sh);
 	hh2 = hh * 2;
 
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx, syyy, sxxx;
-		uint32_t color[2] = { s->color1, s->color2};
+		uint32_t color[2] = { thiz->color1, thiz->color2};
 		uint32_t p0;
 		int sx, sy;
 
@@ -205,22 +220,22 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 		/* choose the correct color */
 		if (syy >= hh)
 		{
-			color[0] = s->color2;
-			color[1] = s->color1;
+			color[0] = thiz->color2;
+			color[1] = thiz->color1;
 		}
 		if (sxx >= ww)
 		{
 			p0 = color[0];
 
 			/* antialias the borders */
-			if (sy == 0 || sy == s->sh)
+			if (sy == 0 || sy == thiz->sh)
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
 				p0 = INTERP_256(a, p0, color[1]);
 			}
-			if (sx == 0 || sx == s->sw)
+			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
@@ -232,14 +247,14 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 		{
 			p0 = color[1];
 			/* antialias the borders */
-			if (sy == 0 || sy == s->sh)
+			if (sy == 0 || sy == thiz->sh)
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
 				p0 = INTERP_256(a, p0, color[0]);
 			}
-			if (sx == 0 || sx == s->sw)
+			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
@@ -253,15 +268,19 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 		*dst++ = p0;
 	}
 }
-
-static void _state_cleanup(Enesim_Renderer *r)
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static void _checker_state_cleanup(Enesim_Renderer *r)
 {
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _checker_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Checker *c = (Checker *)r;
+	Checker *thiz;
+
+	thiz = _checker_get(r);
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_identity;
@@ -272,10 +291,36 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	return EINA_TRUE;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _checker_free(Enesim_Renderer *r)
 {
+	Checker *thiz;
 
+	thiz = _checker_get(r);
+	free(thiz);
 }
+
+static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Checker *thiz;
+
+	thiz = _checker_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _checker_state_setup,
+	.sw_cleanup = _checker_state_cleanup,
+	.flags = _checker_flags,
+	.free = _checker_free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -289,19 +334,15 @@ static void _free(Enesim_Renderer *r)
 EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
 {
 	Enesim_Renderer *r;
-	Checker *s;
+	Checker *thiz;
 
-	s = calloc(1, sizeof(Checker));
-	if (!s) return NULL;
+	thiz = calloc(1, sizeof(Checker));
+	if (!thiz) return NULL;
+
 	/* specific renderer setup */
-	s->sw = 1;
-	s->sh = 1;
-	/* common renderer setup */
-	r = (Enesim_Renderer *)s;
-	enesim_renderer_init(r);
-	r->free = _free;
-	r->sw_cleanup = _state_cleanup;
-	r->sw_setup = _state_setup;
+	thiz->sw = 1;
+	thiz->sh = 1;
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }
@@ -312,9 +353,11 @@ EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
  */
 EAPI void enesim_renderer_checker_even_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	s->color1 = color;
+	thiz = _checker_get(r);
+
+	thiz->color1 = color;
 }
 /**
  * Gets the color of the even squares
@@ -323,9 +366,11 @@ EAPI void enesim_renderer_checker_even_color_set(Enesim_Renderer *r, Enesim_Colo
  */
 EAPI Enesim_Color enesim_renderer_checker_even_color_get(Enesim_Renderer *r)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	return s->color1;
+	thiz = _checker_get(r);
+
+	return thiz->color1;
 }
 /**
  * Sets the color of the odd squares
@@ -334,9 +379,11 @@ EAPI Enesim_Color enesim_renderer_checker_even_color_get(Enesim_Renderer *r)
  */
 EAPI void enesim_renderer_checker_odd_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	s->color2 = color;
+	thiz = _checker_get(r);
+
+	thiz->color2 = color;
 }
 /**
  * Gets the color of the odd squares
@@ -345,9 +392,11 @@ EAPI void enesim_renderer_checker_odd_color_set(Enesim_Renderer *r, Enesim_Color
  */
 EAPI Enesim_Color enesim_renderer_checker_odd_color_get(Enesim_Renderer *r)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	return s->color2;
+	thiz = _checker_get(r);
+
+	return thiz->color2;
 }
 /**
  * Sets the width of the checker rectangles
@@ -355,9 +404,11 @@ EAPI Enesim_Color enesim_renderer_checker_odd_color_get(Enesim_Renderer *r)
  */
 EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	s->sw = width;
+	thiz = _checker_get(r);
+
+	thiz->sw = width;
 }
 /**
  * Gets the width of the checker rectangles
@@ -365,9 +416,11 @@ EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
  */
 EAPI int enesim_renderer_checker_width_get(Enesim_Renderer *r)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	return s->sw;
+	thiz = _checker_get(r);
+
+	return thiz->sw;
 }
 /**
  * Sets the height of the checker rectangles
@@ -375,9 +428,11 @@ EAPI int enesim_renderer_checker_width_get(Enesim_Renderer *r)
  */
 EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	s->sh = height;
+	thiz = _checker_get(r);
+
+	thiz->sh = height;
 }
 /**
  * Gets the height of the checker rectangles
@@ -385,8 +440,10 @@ EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
  */
 EAPI int enesim_renderer_checker_heigth_get(Enesim_Renderer *r)
 {
-	Checker *s = (Checker *)r;
+	Checker *thiz;
 
-	return s->sh;
+	thiz = _checker_get(r);
+
+	return thiz->sh;
 }
 

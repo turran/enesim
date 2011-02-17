@@ -22,7 +22,6 @@
  *============================================================================*/
 typedef struct _Perlin
 {
-	Enesim_Renderer base;
 	struct {
 		float val;
 		Eina_F16p16 *coeff;
@@ -31,12 +30,22 @@ typedef struct _Perlin
 	int octaves;
 } Perlin;
 
+static inline Perlin * _perlin_get(Enesim_Renderer *r)
+{
+	Perlin *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+
+	return thiz;
+}
+
 static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
 
+	thiz = _perlin_get(r);
 	/* end of state setup */
 	renderer_affine_setup(r, x, y, &xx, &yy);
 	while (dst < end)
@@ -45,8 +54,8 @@ static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int
 		uint32_t p0;
 		uint8_t c;
 
-		per = enesim_perlin_get(xx, yy, p->octaves, p->xfreq.coeff,
-				p->yfreq.coeff, p->ampl.coeff);
+		per = enesim_perlin_get(xx, yy, thiz->octaves, thiz->xfreq.coeff,
+				thiz->yfreq.coeff, thiz->ampl.coeff);
 		c = ((per & 0x1ffff) >> 9);
 		/* FIXME the dispmap uses a and b for x and y displacement, we must
 		 * define a better way for that, so this renderer can actually build
@@ -61,11 +70,12 @@ static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int
 
 static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 *freq, *ampl, per;
 
+	thiz = _perlin_get(r);
 	/* end of state setup */
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
@@ -75,8 +85,8 @@ static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned i
 		uint32_t p0;
 		uint8_t c;
 
-		per = enesim_perlin_get(xx, yy, p->octaves, p->xfreq.coeff,
-				p->yfreq.coeff, p->ampl.coeff);
+		per = enesim_perlin_get(xx, yy, thiz->octaves, thiz->xfreq.coeff,
+				thiz->yfreq.coeff, thiz->ampl.coeff);
 		c = ((per & 0x1ffff) >> 9);
 		/* FIXME the dispmap uses a and b for x and y displacement, we must
 		 * define a better way for that, so this renderer can actually build
@@ -86,46 +96,74 @@ static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned i
 		xx += 65536;
 	}
 }
-
-static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint8_t *dst)
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _perlin_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 
-}
-
-static void _state_cleanup(Enesim_Renderer *r)
-{
-
-}
-
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
-{
-	Perlin *p = (Perlin *)r;
-
-	if (p->xfreq.coeff)
+	thiz = _perlin_get(r);
+	if (thiz->xfreq.coeff)
 	{
-		free(p->xfreq.coeff);
-		free(p->yfreq.coeff);
-		free(p->ampl.coeff);
+		free(thiz->xfreq.coeff);
+		free(thiz->yfreq.coeff);
+		free(thiz->ampl.coeff);
 	}
-	p->xfreq.coeff = malloc((sizeof(Eina_F16p16) * p->octaves));
-	p->yfreq.coeff = malloc((sizeof(Eina_F16p16) * p->octaves));
-	p->ampl.coeff = malloc((sizeof(Eina_F16p16) * p->octaves));
-	enesim_perlin_coeff_set(p->octaves, p->persistence, p->xfreq.val,
-		p->yfreq.val, p->ampl.val, p->xfreq.coeff, p->yfreq.coeff,
-		p->ampl.coeff);
+	thiz->xfreq.coeff = malloc((sizeof(Eina_F16p16) * thiz->octaves));
+	thiz->yfreq.coeff = malloc((sizeof(Eina_F16p16) * thiz->octaves));
+	thiz->ampl.coeff = malloc((sizeof(Eina_F16p16) * thiz->octaves));
+	enesim_perlin_coeff_set(thiz->octaves, thiz->persistence, thiz->xfreq.val,
+		thiz->yfreq.val, thiz->ampl.val, thiz->xfreq.coeff, thiz->yfreq.coeff,
+		thiz->ampl.coeff);
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		*fill = _argb8888_span_identity;
-	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
-		*fill = _argb8888_span_affine;
 	return EINA_TRUE;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _perlin_state_cleanup(Enesim_Renderer *r)
 {
+	Perlin *thiz;
 
+	thiz = _perlin_get(r);
+	if (thiz->xfreq.coeff)
+		free(thiz->xfreq.coeff);
+	if (thiz->yfreq.coeff)
+		free(thiz->yfreq.coeff);
+	if (thiz->ampl.coeff)
+		free(thiz->ampl.coeff);
 }
+
+static void _perlin_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Perlin *thiz;
+
+	thiz = _perlin_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static void _perlin_free(Enesim_Renderer *r)
+{
+	Perlin *thiz;
+
+	thiz = _perlin_get(r);
+	_perlin_state_cleanup(r);
+	free(thiz);
+}
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _perlin_state_setup,
+	.sw_cleanup = _perlin_state_cleanup,
+	.flags = _perlin_flags,
+	.free = _perlin_free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -139,18 +177,14 @@ static void _free(Enesim_Renderer *r)
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 {
 	Enesim_Renderer *r;
-	Perlin *p;
+	Perlin *thiz;
 
-	p = calloc(1, sizeof(Perlin));
-	p->xfreq.val = 1; /* 1 2 4 8 ... */
-	p->yfreq.val = 1; /* 1 2 4 8 ... */
-	p->ampl.val = 1; /* p p2 p3 p4 ... */
-	r = (Enesim_Renderer *)p;
+	thiz = calloc(1, sizeof(Perlin));
+	thiz->xfreq.val = 1; /* 1 2 4 8 ... */
+	thiz->yfreq.val = 1; /* 1 2 4 8 ... */
+	thiz->ampl.val = 1; /* p p2 p3 p4 ... */
 
-	enesim_renderer_init(r);
-	r->free = _free;
-	r->sw_cleanup = _state_cleanup;
-	r->sw_setup = _state_setup;
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }
@@ -160,9 +194,10 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
  */
 EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int octaves)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 
-	p->octaves = octaves;
+	thiz = _perlin_get(r);
+	thiz->octaves = octaves;
 }
 /**
  * To be documented
@@ -170,9 +205,10 @@ EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int oc
  */
 EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persistence)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 
-	p->persistence = persistence;
+	thiz = _perlin_get(r);
+	thiz->persistence = persistence;
 }
 /**
  * To be documented
@@ -180,9 +216,10 @@ EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persi
  */
 EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, float ampl)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 
-	p->ampl.val = ampl;
+	thiz = _perlin_get(r);
+	thiz->ampl.val = ampl;
 }
 /**
  * To be documented
@@ -190,9 +227,10 @@ EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, float ampl)
  */
 EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 
-	p->xfreq.val = freq;
+	thiz = _perlin_get(r);
+	thiz->xfreq.val = freq;
 }
 /**
  * To be documented
@@ -200,7 +238,8 @@ EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq)
  */
 EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, float freq)
 {
-	Perlin *p = (Perlin *)r;
+	Perlin *thiz;
 
-	p->yfreq.val = freq;
+	thiz = _perlin_get(r);
+	thiz->yfreq.val = freq;
 }

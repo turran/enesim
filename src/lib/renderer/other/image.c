@@ -317,14 +317,18 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill 
 
 	thiz = _image_get(r);
 	if (thiz->w < 1 || thiz->h < 1)
+	{
+		WRN("Wrong size %d %d", thiz->w, thiz->h);
 		return EINA_FALSE;
+	}
 
 	if (!thiz->s)
+	{
+		WRN("No surface set");
 		return EINA_FALSE;
+	}
 
 	_image_state_cleanup(r);
-	if (!thiz->s)
-		return EINA_FALSE;
 
 	enesim_surface_size_get(thiz->s, &sw, &sh);
 	enesim_renderer_rop_get(r, &rop);
