@@ -38,74 +38,7 @@
 #define ERR(...) EINA_LOG_DOM_ERR(enesim_log, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(enesim_log, __VA_ARGS__)
 #define DBG(...) EINA_LOG_DOM_DBG(enesim_log, __VA_ARGS__)
-extern int enesim_log; 
-
-#define DEBUG
-/* Magic values for each system */
-typedef enum
-{
-	ENESIM_MAGIC  = 0x10000000,
-	ENESIM_RENDERER_MAGIC = 0x11000000,
-	ENESIM_RENDERER_FILLCOLOR_MAGIC = 0x11100000,
-	ENESIM_RENDERER_FILLSURFACE_MAGIC = 0x11200000,
-	ENESIM_RASTERIZER_MAGIC = 0x12000000,
-	ENESIM_RASTERIZER_KIIA_MAGIC = 0x12100000,
-	ENESIM_RASTERIZER_CPSC_MAGIC = 0x12200000,
-	ENESIM_SURFACE_MAGIC = 0x13000000,
-	ENESIM_TRANSFORMATION_MAGIC = 0x14000000
-} Enesim_Magic;
-
-/* Debugging routines
- * ASSERT will abort the program execution
- * ERROR will set the error and return false
- */
-#ifndef DEBUG
-#define ENESIM_MAGIC_CHECK(p, m)
-#define ENESIM_MAGIC_SET(p, m)
-#define ENESIM_ASSERT(cond, err)
-#define ENESIM_ERROR(err) \
-	/* enesim_error_set(err);*/  \
-	return EINA_FALSE; \
-#define ENESIM_ERROR_COND(err, cond) \
-	if (!(cond)) \
-	{ \
-		ENESIM_ERROR(err);
-	}
-#else
-
-#define ENESIM_MAGIC_SET(p, m) \
-	p->magic = m;
-#define ENESIM_MAGIC_CHECK(p, m) \
-	if (p->magic != m) \
-	{ \
-		/*fprintf(stderr, "[Enesim] Magic Failed. %s at %s:%d - %s():\n", enesim_error_to_str(ENESIM_ERROR_HANDLE_INVALID), __FILE__, __LINE__, __FUNCTION__); */ \
-		abort(); \
-	}
-
-#define ENESIM_ERROR(err) \
-	/* fprintf(stderr, "[Enesim] %s at %s:%d - %s():\n", enesim_error_to_str(err), __FILE__, __LINE__, __FUNCTION__); */ \
-	/* enesim_error_set(err); */ \
-	return EINA_FALSE; \
-
-#define ENESIM_ERROR_COND(err, cond) \
-	if (!(cond)) \
-	{ \
-		ENESIM_ERROR(err) \
-	}
-#define ENESIM_ASSERT(cond, err) \
-	if (!(cond)) \
-	{ \
-		/* fprintf(stderr, "[Enesim] %s at %s:%d - %s():\n", enesim_error_to_str(err), __FILE__, __LINE__, __FUNCTION__); */ \
-		abort(); \
-	}
-#endif
-
-#ifdef MIN
-#undef MIN
-#endif
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-
-/* FIXME move the above to other place */
+extern int enesim_log;
 
 /**
  * To be documented
@@ -152,8 +85,6 @@ typedef __m64 mmx_t;
 typedef __m128i sse2_t;
 #endif
 
-
-
 #include "extender_int.h"
 // #include "extender_float.h"
 #include "private/curve.h"
@@ -168,4 +99,5 @@ typedef __m128i sse2_t;
 #include "private/surface.h"
 #include "private/converter.h"
 /** @} */
+
 #endif
