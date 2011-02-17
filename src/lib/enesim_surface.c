@@ -63,6 +63,7 @@ enesim_surface_new_data_from(Enesim_Backend b, Enesim_Format fmt,
 	Enesim_Surface *s;
 	Enesim_Buffer_Format buf_fmt;
 
+	if ((!w) || (!h)) return NULL;
 	if (!_format_to_buffer_format(fmt, &buf_fmt))
 		return NULL;
 
@@ -88,6 +89,7 @@ enesim_surface_new_pool_from(Enesim_Backend b, Enesim_Format f,
 	Enesim_Surface *s;
 	Enesim_Buffer_Format buf_fmt;
 
+	if ((!w) || (!h)) return NULL;
 	if (!p) return enesim_surface_new(b, f, w, h);
 	
 	if (!_format_to_buffer_format(f, &buf_fmt))
