@@ -61,13 +61,13 @@ typedef struct _Rectangle {
 				if (sx < 0) \
 				{ \
 					if (c1 != c3) \
-						c1 = INTERP_256(ay, c3, c1); \
+						c1 = argb8888_interp_256(ay, c3, c1); \
 					c0 = c2 = c3 = c1; \
 				} \
 				if (sy < 0) \
 				{ \
 					if (c2 != c3) \
-						c2 = INTERP_256(ax, c3, c2); \
+						c2 = argb8888_interp_256(ax, c3, c2); \
 					c0 = c1 = c3 = c2; \
 				} \
 			} \
@@ -90,13 +90,13 @@ typedef struct _Rectangle {
 				if (sx < 0) \
 				{ \
 					if (c1 != c3) \
-						c1 = INTERP_256(ay, c3, c1); \
+						c1 = argb8888_interp_256(ay, c3, c1); \
 					c0 = c2 = c3 = c1; \
 				} \
 				if ((sy + 1) == sh) \
 				{ \
 					if (c0 != c1) \
-						c0 = INTERP_256(ax, c1, c0); \
+						c0 = argb8888_interp_256(ax, c1, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 			} \
@@ -122,13 +122,13 @@ typedef struct _Rectangle {
 				if ((sx + 1) == sw) \
 				{ \
 					if (c0 != c2) \
-						c0 = INTERP_256(ay, c2, c0); \
+						c0 = argb8888_interp_256(ay, c2, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 				if (sy < 0) \
 				{ \
 					if (c2 != c3) \
-						c2 = INTERP_256(ax, c3, c2); \
+						c2 = argb8888_interp_256(ax, c3, c2); \
 					c0 = c1 = c3 = c2; \
 				} \
 			} \
@@ -151,13 +151,13 @@ typedef struct _Rectangle {
 				if ((sx + 1) == sw) \
 				{ \
 					if (c0 != c2) \
-						c0 = INTERP_256(ay, c2, c0); \
+						c0 = argb8888_interp_256(ay, c2, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 				if ((sy + 1) == sh) \
 				{ \
 					if (c0 != c1) \
-						c0 = INTERP_256(ax, c1, c0); \
+						c0 = argb8888_interp_256(ax, c1, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 			} \
@@ -185,13 +185,13 @@ typedef struct _Rectangle {
 				if (sx < stw) \
 				{ \
 					if (c1 != c3) \
-						c1 = INTERP_256(ay, c3, c1); \
+						c1 = argb8888_interp_256(ay, c3, c1); \
 					c0 = c2 = c3 = c1; \
 				} \
 				if (sy < stw) \
 				{ \
 					if (c2 != c3) \
-						c2 = INTERP_256(ax, c3, c2); \
+						c2 = argb8888_interp_256(ax, c3, c2); \
 					c0 = c1 = c3 = c2; \
 				} \
 			} \
@@ -214,13 +214,13 @@ typedef struct _Rectangle {
 				if (sx < stw) \
 				{ \
 					if (c1 != c3) \
-						c1 = INTERP_256(ay, c3, c1); \
+						c1 = argb8888_interp_256(ay, c3, c1); \
 					c0 = c2 = c3 = c1; \
 				} \
 				if ((sy + 1 + stw) == sh) \
 				{ \
 					if (c0 != c1) \
-						c0 = INTERP_256(ax, c1, c0); \
+						c0 = argb8888_interp_256(ax, c1, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 			} \
@@ -246,13 +246,13 @@ typedef struct _Rectangle {
 				if ((sx + 1 + stw) == sw) \
 				{ \
 					if (c0 != c2) \
-						c0 = INTERP_256(ay, c2, c0); \
+						c0 = argb8888_interp_256(ay, c2, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 				if (sy < stw) \
 				{ \
 					if (c2 != c3) \
-						c2 = INTERP_256(ax, c3, c2); \
+						c2 = argb8888_interp_256(ax, c3, c2); \
 					c0 = c1 = c3 = c2; \
 				} \
 			} \
@@ -275,13 +275,13 @@ typedef struct _Rectangle {
 				if ((sx + 1 + stw) == sw) \
 				{ \
 					if (c0 != c2) \
-						c0 = INTERP_256(ay, c2, c0); \
+						c0 = argb8888_interp_256(ay, c2, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 				if ((sy + 1 + stw) == sh) \
 				{ \
 					if (c0 != c1) \
-						c0 = INTERP_256(ax, c1, c0); \
+						c0 = argb8888_interp_256(ax, c1, c0); \
 					c1 = c2 = c3 = c0; \
 				} \
 			} \
@@ -371,11 +371,11 @@ static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *p,
 			EVAL_ROUND_OUTER_CORNERS(op0,op1,op2,op3)
 
 			if (op0 != op1)
-				op0 = INTERP_256(ax, op1, op0);
+				op0 = argb8888_interp_256(ax, op1, op0);
 			if (op2 != op3)
-				op2 = INTERP_256(ax, op3, op2);
+				op2 = argb8888_interp_256(ax, op3, op2);
 			if (op0 != op2)
-				op0 = INTERP_256(ay, op2, op0);
+				op0 = argb8888_interp_256(ay, op2, op0);
 
 			if (ca < 256)
 				op0 = argb8888_mul_256(ca, op0);
@@ -410,14 +410,14 @@ static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *p,
 				EVAL_ROUND_INNER_CORNERS(p0,p1,p2,p3)
 
 				if (p0 != p1)
-					p0 = INTERP_256(ax, p1, p0);
+					p0 = argb8888_interp_256(ax, p1, p0);
 				if (p2 != p3)
-					p2 = INTERP_256(ax, p3, p2);
+					p2 = argb8888_interp_256(ax, p3, p2);
 				if (p0 != p2)
-					p0 = INTERP_256(ay, p2, p0);
+					p0 = argb8888_interp_256(ay, p2, p0);
 
 				if (ca < 256)
-					p0 = INTERP_256(ca, p0, op0);
+					p0 = argb8888_interp_256(ca, p0, op0);
 			}
 			q0 = p0;
 		}
@@ -507,11 +507,11 @@ static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *p, i
 				EVAL_ROUND_OUTER_CORNERS(op0,op1,op2,op3)
 
 				if (op0 != op1)
-					op0 = INTERP_256(ax, op1, op0);
+					op0 = argb8888_interp_256(ax, op1, op0);
 				if (op2 != op3)
-					op2 = INTERP_256(ax, op3, op2);
+					op2 = argb8888_interp_256(ax, op3, op2);
 				if (op0 != op2)
-					op0 = INTERP_256(ay, op2, op0);
+					op0 = argb8888_interp_256(ay, op2, op0);
 
 				if (ca < 256)
 					op0 = argb8888_mul_256(ca, op0);
@@ -546,14 +546,14 @@ static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *p, i
 					EVAL_ROUND_INNER_CORNERS(p0,p1,p2,p3)
 
 					if (p0 != p1)
-						p0 = INTERP_256(ax, p1, p0);
+						p0 = argb8888_interp_256(ax, p1, p0);
 					if (p2 != p3)
-						p2 = INTERP_256(ax, p3, p2);
+						p2 = argb8888_interp_256(ax, p3, p2);
 					if (p0 != p2)
-						p0 = INTERP_256(ay, p2, p0);
+						p0 = argb8888_interp_256(ay, p2, p0);
 
 					if (ca < 256)
-						p0 = INTERP_256(ca, p0, op0);
+						p0 = argb8888_interp_256(ca, p0, op0);
 				}
 				q0 = p0;
 			}

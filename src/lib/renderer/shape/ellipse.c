@@ -141,7 +141,7 @@ static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *p, int x, 
 				}
 
 				if (a < 256)
-					p0 = INTERP_256(a, p0, op0);
+					p0 = argb8888_interp_256(a, p0, op0);
 			}
 			q0 = p0;
 		}
@@ -258,7 +258,7 @@ static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, in
 					}
 
 					if (a < 256)
-						p0 = INTERP_256(a, p0, op0);
+						p0 = argb8888_interp_256(a, p0, op0);
 				}
 				q0 = p0;
 			}

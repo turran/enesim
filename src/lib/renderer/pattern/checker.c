@@ -144,14 +144,14 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[1]);
+				p0 = argb8888_interp_256(a, p0, color[1]);
 			}
 			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[1]);
+				p0 = argb8888_interp_256(a, p0, color[1]);
 			}
 		}
 		else
@@ -164,14 +164,14 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[0]);
+				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[0]);
+				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 		}
 		yy += r->matrix.values.yx;
@@ -233,14 +233,14 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[1]);
+				p0 = argb8888_interp_256(a, p0, color[1]);
 			}
 			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[1]);
+				p0 = argb8888_interp_256(a, p0, color[1]);
 			}
 		}
 		else
@@ -252,14 +252,14 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[0]);
+				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 			if (sx == 0 || sx == thiz->sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, color[0]);
+				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 		}
 		yy += r->matrix.values.yx;

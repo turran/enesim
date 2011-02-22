@@ -116,9 +116,9 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 				if ((sx + 1) < sw)
 					p3 = *(ssrc + sstride + 1);
 			}
-			p0 = INTERP_256(128, p1, p0);
-			p2 = INTERP_256(128, p3, p2);
-			p0 = INTERP_256(128, p2, p0);
+			p0 = argb8888_interp_256(128, p1, p0);
+			p2 = argb8888_interp_256(128, p3, p2);
+			p0 = argb8888_interp_256(128, p2, p0);
 			*dst = p0;
 		}
 		else

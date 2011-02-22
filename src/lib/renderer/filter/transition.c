@@ -61,7 +61,7 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	{
 		uint32_t p0 = *d, p1 = *buf;
 
-		*d++ = INTERP_256(interp, p1, p0);
+		*d++ = argb8888_interp_256(interp, p1, p0);
 		buf++;
 	}
 }

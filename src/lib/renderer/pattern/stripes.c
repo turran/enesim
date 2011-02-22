@@ -66,7 +66,7 @@ static void _span_projective(Enesim_Renderer *p, int x, int y,
 		{
 			int a = 1 + ((syy & 0xffff) >> 8);
 
-			p0 = INTERP_256(a, c0, c1);
+			p0 = argb8888_interp_256(a, c0, c1);
 		}
 		if (syy >= hh0)
 		{
@@ -75,7 +75,7 @@ static void _span_projective(Enesim_Renderer *p, int x, int y,
 			{
 				int a = 1 + ((syy & 0xffff) >> 8);
 
-				p0 = INTERP_256(a, c1, c0);
+				p0 = argb8888_interp_256(a, c1, c0);
 			}
 		}
 		*d++ = p0;
@@ -108,7 +108,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y,
 		{
 			int a = 1 + ((syy & 0xffff) >> 8);
 
-			p0 = INTERP_256(a, c0, c1);
+			p0 = argb8888_interp_256(a, c0, c1);
 		}
 		if (syy >= hh0)
 		{
@@ -117,7 +117,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y,
 			{
 				int a = 1 + ((syy & 0xffff) >> 8);
 
-				p0 = INTERP_256(a, c1, c0);
+				p0 = argb8888_interp_256(a, c1, c0);
 			}
 		}
 		*d++ = p0;

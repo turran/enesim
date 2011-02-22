@@ -193,8 +193,6 @@ typedef union
 } mmx_td;
 #endif
 
-/* FIXME remove this */
-#define INTERP_256 argb8888_interp_256
 /*
  * r = (c0 - c1) * a + c1
  * a = 0 => r = c1

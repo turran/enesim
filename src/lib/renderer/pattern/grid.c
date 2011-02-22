@@ -79,14 +79,14 @@ static inline uint32_t _grid(Grid *g, Eina_F16p16 yy, Eina_F16p16 xx)
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, g->outside.color);
+				p0 = argb8888_interp_256(a, p0, g->outside.color);
 			}
 			else if (sx == (g->inside.w - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = INTERP_256(a, g->outside.color, p0);
+				p0 = argb8888_interp_256(a, g->outside.color, p0);
 
 			}
 			if (sy == 0)
@@ -94,14 +94,14 @@ static inline uint32_t _grid(Grid *g, Eina_F16p16 yy, Eina_F16p16 xx)
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = INTERP_256(a, p0, g->outside.color);
+				p0 = argb8888_interp_256(a, p0, g->outside.color);
 			}
 			else if (sy == (g->inside.h - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = INTERP_256(a, g->outside.color, p0);
+				p0 = argb8888_interp_256(a, g->outside.color, p0);
 			}
 		}
 	}
