@@ -570,10 +570,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Rectangle *rect = (Rectangle *)r;
 
-	printf("setting up the rectangle\n");
 	if (!rect || (rect->w < 1) || (rect->h < 1))
 	{
-		printf("rect cannot setup\n");
 		return EINA_FALSE;
 	}
 

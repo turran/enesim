@@ -207,7 +207,11 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 	uint8_t *src;
 
 	thiz = _image_get(r);
-	if (y < r->oy || y >= r->oy + thiz->h)
+	/* FIXME we should not implement this case */
+	x -= r->ox;
+	y -= r->oy;
+	/* FIXME we should not implement this case */
+	if (y < 0 || y >= thiz->h)
 	{
 		while (len--)
 			*dst++ = 0;
@@ -216,11 +220,10 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 
 	src = enesim_surface_data_get(thiz->s);
 	sstride = enesim_surface_stride_get(thiz->s);
-	x -= r->ox;
-	src += sstride * (int)(y - r->oy) + x;
+	src += (sstride * y) + x;
 	while (len--)
 	{
-		if (x >= r->ox && x < r->ox + thiz->w)
+		if (x >= 0 && x < thiz->w)
 		{
 			uint8_t a = *src;
 			*dst = a << 24 | a << 16 | a << 8 | a;
@@ -240,19 +243,22 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	uint32_t *src;
 
  	thiz = _image_get(r);
-	src = enesim_surface_data_get(thiz->s);
-	sstride = enesim_surface_stride_get(thiz->s);
 	x -= r->ox;
-	src += sstride * (int)(y - r->oy) + x;
-#if 0
-	thiz->span(dst, len, src, r->color, NULL);
-#else
-	if (y < r->oy || y >= r->oy + thiz->h)
+	y -= r->oy;
+	/* FIXME we should not implement this case */
+	if (y < 0 || y >= thiz->h)
 	{
 		while (len--)
 			*dst++ = 0;
 		return;
 	}
+
+	src = enesim_surface_data_get(thiz->s);
+	sstride = enesim_surface_stride_get(thiz->s);
+	src += (sstride * y) + x;
+#if 1
+	thiz->span(dst, len, src, r->color, NULL);
+#else
 	while (len--)
 	{
 		if (x >= r->ox && x < r->ox + thiz->w)

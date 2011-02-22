@@ -24,8 +24,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-//#define OPTIMIZE
-
 typedef struct _Compound
 {
 	Eina_List *layers;
@@ -59,30 +57,28 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 	thiz = _compound_get(r);
 	tmp_size = sizeof(uint32_t) * len;
 	tmp = alloca(tmp_size);
-	memset(tmp, 0, tmp_size);
 	eina_rectangle_coords_from(&span, x, y, len, 1);
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
+		Eina_Rectangle lboundings;
+		unsigned int offset;
 
 		l = eina_list_data_get(ll);
 
+		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
+		if (!eina_rectangle_intersection(&lboundings, &span)) continue;
+		offset = lboundings.x - span.x;
+
 		if (!l->span)
 		{
-			Eina_Rectangle lboundings;
-#ifdef OPTIMIZE
-			enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
-			if (!eina_rectangle_intersection(&lboundings, &span)) continue;
-			l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
-#else
-			l->r->sw_fill(l->r, x, y, len, dst);
-#endif
+			l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + offset);
 		}
 		else
 		{
-			/* FIXME optmize this case too, for this we must memset whole tmp buffer */
-			l->r->sw_fill(l->r, x, y, len, tmp);
-			l->span(dst, len, tmp, l->r->color, NULL);
+			memset(tmp, 0, lboundings.w * sizeof(uint32_t));
+			l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, tmp);
+			l->span(dst + offset, lboundings.w, tmp, l->r->color, NULL);
 		}
 	}
 }
@@ -92,11 +88,8 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 	Compound *thiz;
 	Eina_List *ll;
 	Eina_Rectangle span;
-	uint32_t *tmp;
-
 
 	thiz = _compound_get(r);
-	tmp = alloca(sizeof(uint32_t) * len);
 	eina_rectangle_coords_from(&span, x, y, len, 1);
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
@@ -105,13 +98,9 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 
 		l = eina_list_data_get(ll);
 
-#ifdef OPTIMIZE
 		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
 		if (!eina_rectangle_intersection(&lboundings, &span)) continue;
 		l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
-#else
-		l->r->sw_fill(l->r, x, y, len, dst);
-#endif
 	}
 }
 
