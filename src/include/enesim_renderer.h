@@ -23,7 +23,7 @@
  * @{
  */
 
-/**< Flags that specify what a renderer supports */
+/** Flags that specify what a renderer supports */
 typedef enum Enesim_Renderer_Flag
 {
 	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 0), /**< Affine transformation */

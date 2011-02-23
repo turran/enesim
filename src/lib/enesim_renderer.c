@@ -421,7 +421,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 		len = final.w * sizeof(uint32_t);
 		fdata = alloca(len);
-		
+
 		while (final.h--)
 		{
 			memset(fdata, 0, len);
@@ -438,7 +438,8 @@ end:
 }
 
 /**
- *
+ * To  be documented
+ * FIXME: To be fixed
  */
 EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
 {
@@ -447,7 +448,8 @@ EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
 }
 
 /**
- *
+ * To  be documented
+ * FIXME: To be fixed
  */
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 {
@@ -456,22 +458,22 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 }
 
 /**
- *
+ * To  be documented
+ * FIXME: To be fixed
  */
 EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-
 	eina_hash_add(r->prv_data, name, data);
 }
 
 /**
- *
+ * To  be documented
+ * FIXME: To be fixed
  */
 EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-
 	return eina_hash_find(r->prv_data, name);
 }
 
