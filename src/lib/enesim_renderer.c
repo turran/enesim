@@ -17,6 +17,14 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+/**
+ * @todo
+ * - Add a way to retrieve the damaged area between two different state_setup
+ * i.e state_setup, state_cleanup, property_changes .... , damage_get,
+ * state_setup, state_cleanup ... etc
+ * something like: void (*damages)(Enesim_Renderer *r, Eina_List **damages);
+ *
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -26,6 +34,48 @@
 		if (!EINA_MAGIC_CHECK(d, ENESIM_MAGIC_RENDERER))\
 			EINA_MAGIC_FAIL(d, ENESIM_MAGIC_RENDERER);\
 	} while(0)
+
+static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
+		Enesim_Renderer_Flag flags)
+{
+	if (((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
+			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->color == ENESIM_COLOR_FULL))
+			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (flags & ENESIM_RENDERER_FLAG_COLORIZE)))
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
+		uint32_t *ddata, uint32_t stride,
+		uint32_t *tmp, size_t len, Eina_Rectangle *area)
+{
+	uint32_t *fdata;
+
+	while (area->h--)
+	{
+		memset(tmp, 0, len);
+		fill(r, area->x, area->y, area->w, fdata);
+		area->y++;
+		/* compose the filled and the destination spans */
+		span(ddata, area->w, tmp, r->color, NULL);
+		ddata += stride;
+	}
+}
+
+static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Fill fill, uint32_t *ddata,
+		uint32_t stride, Eina_Rectangle *area)
+{
+	while (area->h--)
+	{
+		fill(r, area->x, area->y, area->w, ddata);
+		area->y++;
+		ddata += stride;
+	}
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -346,14 +396,17 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
- * What about the mask?
+ * Draw a renderer into a surface
+ * @param[in] r The renderer to draw
+ * @param[in] s The surface to draw the renderer into
+ * @param[in] clip The area on the destination surface to limit the drawing
+ * @param[in] x The x origin of the destination surface
+ * @param[in] y The y origin of the destination surface
+ * TODO What about the mask?
  */
 EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *clip, int x, int y)
 {
-	Enesim_Compositor_Span span;
 	Enesim_Renderer_Sw_Fill fill;
 	Enesim_Renderer_Flag flags;
 	Eina_Rectangle boundings;
@@ -367,7 +420,7 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	if (!enesim_renderer_sw_setup(r)) return;
 	fill = enesim_renderer_sw_fill_get(r);
-	if (!fill) return;
+	if (!fill) goto end;
 
 	if (!clip)
 	{
@@ -377,10 +430,21 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	}
 	else
 	{
+		Eina_Rectangle surface_size;
+
 		final.x = clip->x;
 		final.y = clip->y;
 		final.w = clip->w;
 		final.h = clip->h;
+		surface_size.x = 0;
+		surface_size.y = 0;
+		enesim_surface_size_get(s, &surface_size.w, &surface_size.h);
+		if (!eina_rectangle_intersection(&final, &surface_size))
+		{
+			WRN("The renderer %p boundings does not intersect with the surface", r);
+			goto end;
+		}
+		
 	}
 	/* clip against the destination rectangle */
 	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
@@ -400,39 +464,134 @@ EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_renderer_flags(r, &flags);
 	/* fill the new span */
-	if (((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
-			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->color == ENESIM_COLOR_FULL))
-			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (flags & ENESIM_RENDERER_FLAG_COLORIZE)))
+	if (_is_sw_draw_composed(r, flags))
 	{
-		while (final.h--)
-		{
-			fill(r, final.x, final.y, final.w, ddata);
-			final.y++;
-			ddata += stride;
-		}
-	}
-	else
-	{
+		Enesim_Compositor_Span span;
 		uint32_t *fdata;
 		size_t len;
 
 		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
 				r->color, ENESIM_FORMAT_NONE);
-
+		if (!span)
+		{
+			WRN("No suitable span compositor to render %p with rop "
+					"%d and color %08x", r, r->rop, r->color);
+			goto end;
+		}
 		len = final.w * sizeof(uint32_t);
 		fdata = alloca(len);
-
-		while (final.h--)
-		{
-			memset(fdata, 0, len);
-			fill(r, final.x, final.y, final.w, fdata);
-			final.y++;
-			/* compose the filled and the destination spans */
-			span(ddata, final.w, fdata, r->color, NULL);
-			ddata += stride;
-		}
+		_sw_surface_draw_composed(r, fill, span, ddata, stride, fdata, len, &final);
+	}
+	else
+	{
+		_sw_surface_draw_simple(r, fill, ddata, stride, &final);
 	}
 	/* TODO set the format again */
+end:
+	enesim_renderer_sw_cleanup(r);
+}
+
+/**
+ * Draw a renderer into a surface
+ * @param[in] r The renderer to draw
+ * @param[in] s The surface to draw the renderer into
+ * @param[in] clips A list of clips area on the destination surface to limit the drawing
+ * @param[in] x The x origin of the destination surface
+ * @param[in] y The y origin of the destination surface
+ */
+EAPI void enesim_renderer_surface_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
+		Eina_List *clips, int x, int y)
+{
+	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Renderer_Flag flags;
+	Eina_Rectangle boundings;
+	Eina_Rectangle surface_size;
+	uint32_t *ddata;
+	int stride;
+	Enesim_Format dfmt;
+
+	if (!clips)
+	{
+		enesim_renderer_surface_draw(r, s, NULL, x, y);
+		return;
+	}
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	ENESIM_MAGIC_CHECK_SURFACE(s);
+
+	/* setup the common parameters */
+	if (!enesim_renderer_sw_setup(r)) return;
+	fill = enesim_renderer_sw_fill_get(r);
+	if (!fill) goto end;
+	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
+	surface_size.x = 0;
+	surface_size.y = 0;
+	enesim_surface_size_get(s, &surface_size.w, &surface_size.h);
+	dfmt = enesim_surface_format_get(s);
+	ddata = enesim_surface_data_get(s);
+	stride = enesim_surface_stride_get(s);
+	enesim_renderer_flags(r, &flags);
+
+	if (_is_sw_draw_composed(r, flags))
+	{
+		Enesim_Compositor_Span span;
+		Eina_Rectangle *clip;
+		Eina_List *l;
+
+		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+				r->color, ENESIM_FORMAT_NONE);
+		if (!span)
+		{
+			WRN("No suitable span compositor to render %p with rop "
+					"%d and color %08x", r, r->rop, r->color);
+			goto end;
+		}
+		/* iterate over the list of clips */
+		EINA_LIST_FOREACH(clips, l, clip)
+		{
+			Eina_Rectangle final;
+			size_t len;
+			uint32_t *fdata;
+
+
+			if (!eina_rectangle_intersection(&final, &surface_size))
+				continue;
+			if (!eina_rectangle_intersection(&final, &boundings))
+				continue;
+			ddata = ddata + (final.y * stride) + final.x;
+			/* translate the origin */
+			final.x -= x;
+			final.y -= y;
+			/* now render */
+			len = final.w * sizeof(uint32_t);
+			fdata = alloca(len);
+			_sw_surface_draw_composed(r, fill, span, ddata, stride,
+					fdata, len, &final);
+		}
+	}
+	else
+	{
+		Eina_Rectangle *clip;
+		Eina_List *l;
+
+		/* iterate over the list of clips */
+		EINA_LIST_FOREACH(clips, l, clip)
+		{
+			Eina_Rectangle final;
+
+			final = *clip;
+			if (!eina_rectangle_intersection(&final, &surface_size))
+				continue;
+			if (!eina_rectangle_intersection(&final, &boundings))
+				continue;
+			ddata = ddata + (final.y * stride) + final.x;
+			/* translate the origin */
+			final.x -= x;
+			final.y -= y;
+			/* now render */
+			_sw_surface_draw_simple(r, fill, ddata, stride, &final);
+		}
+	}
 end:
 	enesim_renderer_sw_cleanup(r);
 }
