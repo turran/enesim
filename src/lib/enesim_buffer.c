@@ -195,6 +195,7 @@ enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 		break;
 
 		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_CONVERTER_BGR888:
 		return w * h * 3;
 		break;
 
@@ -253,6 +254,7 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt)
 		return 8;
 
 		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_CONVERTER_BGR888:
 		return 24;
 
 		default:

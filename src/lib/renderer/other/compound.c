@@ -124,6 +124,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
 		if (!enesim_renderer_sw_setup(l->r))
 		{
+			DBG("Child renderer %p can not setup", l->r);
 			enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
 			return EINA_FALSE;
 		}

@@ -33,6 +33,7 @@ void enesim_converter_init(void)
 {
 	enesim_converter_argb8888_init();
 	enesim_converter_rgb888_init();
+	enesim_converter_bgr888_init();
 	enesim_converter_rgb565_init();
 }
 void enesim_converter_shutdown(void)

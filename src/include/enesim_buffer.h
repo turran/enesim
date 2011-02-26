@@ -24,7 +24,7 @@
  *
  * @todo
  */
-typedef struct _Enesim_Buffer 	Enesim_Buffer; /**< Buffer Handler */
+typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
 
 /*
  * ENESIM_CONVERTER_FORMAT_A8
@@ -48,6 +48,7 @@ typedef enum _Enesim_Buffer_Format
 	ENESIM_CONVERTER_ARGB8888,
 	ENESIM_CONVERTER_ARGB8888_PRE,
 	ENESIM_CONVERTER_RGB888,
+	ENESIM_CONVERTER_BGR888,
 	ENESIM_CONVERTER_A8,
 	ENESIM_CONVERTER_GRAY,
 	ENESIM_CONVERTER_FORMATS
@@ -71,11 +72,14 @@ typedef struct _Enesim_Buffer_A8
 	int plane0_stride;
 } Enesim_Buffer_A8;
 
-typedef struct _Enesim_Buffer_Rgb888
+struct _Enesim_Buffer_24bpp
 {
 	uint8_t *plane0;
 	int plane0_stride;
-} Enesim_Buffer_Rgb888;
+};
+
+typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Rgb888;
+typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Bgr888;
 
 typedef union _Enesim_Buffer_Data
 {
@@ -84,6 +88,7 @@ typedef union _Enesim_Buffer_Data
 	Enesim_Buffer_Rgb565 rgb565;
 	Enesim_Buffer_A8 a8;
 	Enesim_Buffer_Rgb888 rgb888;
+	Enesim_Buffer_Bgr888 bgr888;
 } Enesim_Buffer_Data;
 
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Backend b, Enesim_Buffer_Format f, uint32_t w, uint32_t h);

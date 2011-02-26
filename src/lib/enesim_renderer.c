@@ -23,6 +23,8 @@
  * i.e state_setup, state_cleanup, property_changes .... , damage_get,
  * state_setup, state_cleanup ... etc
  * something like: void (*damages)(Enesim_Renderer *r, Eina_List **damages);
+ * - Add a class name to the description
+ * - Add a way to get/set such description
  *
  */
 /*============================================================================*
