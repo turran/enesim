@@ -25,6 +25,10 @@
  * something like: void (*damages)(Enesim_Renderer *r, Eina_List **damages);
  * - Add a class name to the description
  * - Add a way to get/set such description
+ * - Add a multi cpu render, send each span to a different CPU. One way is to
+ *   use a queue, we initialize every thread on startup and me them sleep
+ *   then wakeup when the function is called and start enqueueing the span
+ *   renders
  *
  */
 /*============================================================================*
