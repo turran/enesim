@@ -107,6 +107,17 @@ EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double we
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_shape_outline_weight_get(Enesim_Renderer *r, double *weight)
+{
+	Enesim_Renderer_Shape *s;
+
+	s = (Enesim_Renderer_Shape *)r;
+	if (weight) *weight = s->stroke.weight;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape *s;
