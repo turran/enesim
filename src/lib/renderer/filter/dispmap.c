@@ -25,7 +25,6 @@
  *============================================================================*/
 typedef struct _Dispamp
 {
-	Enesim_Renderer base;
 	Enesim_Surface *map;
 	Enesim_Surface *src;
 	Enesim_Channel x_channel;
@@ -34,6 +33,14 @@ typedef struct _Dispamp
 	/* The state variables */
 	Eina_F16p16 s_scale;
 } Dispmap;
+
+static inline Dispmap * _dispmap_get(Enesim_Renderer *r)
+{
+	Dispmap *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	return thiz;
+}
 
 /* TODO Move this to a common header */
 static inline uint8_t _argb8888_alpha(uint32_t argb8888)
@@ -73,7 +80,7 @@ static inline Eina_F16p16 _displace(Eina_F16p16 coord, uint8_t distance, Eina_F1
 static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Dispmap *d = (Dispmap *)r;
+	Dispmap *d;
 	uint32_t *end = dst + len;
 	uint32_t *map, *src;
 	int mstride;
@@ -81,6 +88,7 @@ static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 	int sw, sh, mw, mh;
 	Eina_F16p16 xx, yy;
 
+	d = _dispmap_get(r);
 	/* setup the parameters */
 	enesim_surface_size_get(d->src, &sw, &sh);
 	enesim_surface_size_get(d->map, &mw, &mh);
@@ -124,7 +132,7 @@ next:
 static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Dispmap *d = (Dispmap *)r;
+	Dispmap *d;
 	uint32_t *end = dst + len;
 	uint32_t *map, *src;
 	int mstride;
@@ -132,6 +140,7 @@ static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 	int sw, sh, mw, mh;
 	Eina_F16p16 xx, yy;
 
+	d = _dispmap_get(r);
 	/* setup the parameters */
 	enesim_surface_size_get(d->src, &sw, &sh);
 	enesim_surface_size_get(d->map, &mw, &mh);
@@ -176,7 +185,7 @@ next:
 static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 		int y, unsigned int len, uint32_t *dst)				\
 {										\
-	Dispmap *d = (Dispmap *)r;						\
+	Dispmap *d;								\
 	uint32_t *end = dst + len;						\
 	uint32_t *map, *src;							\
 	int mstride;								\
@@ -184,6 +193,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 	int sw, sh, mw, mh;							\
 	Eina_F16p16 xx, yy;							\
 										\
+	d = _dispmap_get(r);							\
 	/* setup the parameters */						\
 	enesim_surface_size_get(d->src, &sw, &sh);				\
 	enesim_surface_size_get(d->map, &mw, &mh);				\
@@ -246,8 +256,9 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Dispmap *d = (Dispmap *)r;
+	Dispmap *d;
 
+	d = _dispmap_get(r);
 	if (!d->map || !d->src) return EINA_FALSE;
 
 	*fill = _spans[d->x_channel][d->y_channel][r->matrix.type];
@@ -260,7 +271,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
-	Dispmap *d = (Dispmap *)r;
+	Dispmap *d;
+
+	d = _dispmap_get(r);
 	if (!d->src || !d->map)
 	{
 		rect->x = 0;
@@ -281,6 +294,37 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 		rect->h = mh < sh ? mh : sh;
 	}
 }
+
+static void _dispmap_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Dispmap *thiz;
+
+	thiz = _dispmap_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static void _free(Enesim_Renderer *r)
+{
+	Dispmap *thiz;
+
+	thiz = _dispmap_get(r);
+	free(thiz);
+}
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _state_setup,
+	.sw_cleanup = _state_cleanup,
+	.boundings = _boundings,
+	.flags = _dispmap_flags,
+	.free = _free,
+};
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -291,19 +335,16 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
  */
 EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 {
-	Dispmap *d;
+	Dispmap *thiz;
 	Enesim_Renderer *r;
 
-	d = calloc(1, sizeof(Dispmap));
-	if (!d) return NULL;
+	thiz = calloc(1, sizeof(Dispmap));
+	if (!thiz) return NULL;
 	/* specific renderer setup */
-	d->x_channel = ENESIM_CHANNEL_RED;
-	d->y_channel = ENESIM_CHANNEL_GREEN;
+	thiz->x_channel = ENESIM_CHANNEL_RED;
+	thiz->y_channel = ENESIM_CHANNEL_GREEN;
 	/* common renderer setup */
-	r = (Enesim_Renderer *)d;
-	enesim_renderer_init(r);
-	r->sw_setup = _state_setup;
-	r->boundings = _boundings;
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

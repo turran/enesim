@@ -165,11 +165,11 @@ static void _stripes_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _free(Enesim_Renderer *r)
 {
-	Stripes *st;
+	Stripes *thiz;
 
-	st = _stripes_get(r);
-	if (!st) return;
-	free(st);
+	thiz = _stripes_get(r);
+	if (!thiz) return;
+	free(thiz);
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {

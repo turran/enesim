@@ -4,4 +4,26 @@
   of using the internals, we need to optimize and avoid the need to always call
   enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
   to receive the data already fetch with enesim_renderer_data_get(r) but on the surface_draw
-
+  The renderers already done are:
+	gradient/gradient.c
+	gradient/linear.c
+	gradient/radial.c
+	shape/path.c
+	shape/shape.c
+	shape/circle.c
+	shape/ellipse.c
+	shape/figure.c
+	shape/rectangle.c
+	filter/hswitch.c
+	D filter/dispmap.c
+	D filter/transition.c
+	filter/raddist.c
+	D pattern/grid.c
+	D pattern/stripes.c
+	D pattern/checker.c
+	D other/importer.c
+	D other/perlin.c
+	D other/image.c
+	D other/compound.c
+	D other/background.c
++ Change very renderer to use *thiz* as the variable for itself

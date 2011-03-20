@@ -21,7 +21,6 @@
  *                                  Local                                     *
  *============================================================================*/
 typedef struct _Transition {
-	Enesim_Renderer base;
 
 	int interp;
 	struct {
@@ -35,13 +34,26 @@ typedef struct _Transition {
 	} r0, r1;
 } Transition;
 
+static inline Transition * _transition_get(Enesim_Renderer *r)
+{
+	Transition *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	return thiz;
+}
+
 static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Transition *t = (Transition *)r;
-	Enesim_Renderer *s0 = t->r0.rend, *s1 = t->r1.rend;
-	int interp = t->interp;
+	Transition *t;
+	Enesim_Renderer *s0, *s1;
+	int interp ;
 	unsigned int *d = dst, *e = d + len;
 	unsigned int *buf;
+
+	t = _transition_get(r);
+	s0 = t->r0.rend;
+	s1 = t->r1.rend;
+	interp = t->interp;
 
 	if (interp == 0)
 	{
@@ -68,8 +80,9 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Transition *t = (Transition *)r;
+	Transition *t;
 
+	t = _transition_get(r);
 	if (!t || !t->r0.rend || !t->r1.rend)
 		return EINA_FALSE;
 
@@ -105,8 +118,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Transition *trans = (Transition *)r;
+	Transition *trans;
 
+	trans = _transition_get(r);
 	enesim_renderer_sw_cleanup(trans->r0.rend);
 	enesim_renderer_sw_cleanup(trans->r1.rend);
 	/* restore the original matrices
@@ -120,9 +134,42 @@ static void _state_cleanup(Enesim_Renderer *r)
 	}
 }
 
+static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	printf("transition boudings FIXME\n");
+}
+
+static void _transition_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Transition *thiz;
+
+	thiz = _transition_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PERSPECTIVE;
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
 static void _free(Enesim_Renderer *r)
 {
+	Transition *thiz;
+
+	thiz = _transition_get(r);
+	free(thiz);
 }
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _state_setup,
+	.sw_cleanup = _state_cleanup,
+	.boundings = _boundings,
+	.flags = _transition_flags,
+	.free = _free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -136,15 +183,11 @@ static void _free(Enesim_Renderer *r)
 EAPI Enesim_Renderer * enesim_renderer_transition_new(void)
 {
 	Enesim_Renderer *r;
-	Transition *t;
+	Transition *thiz;
 
-	t = calloc(1, sizeof(Transition));
-	r = (Enesim_Renderer *)t;
-
-	enesim_renderer_init(r);
-	r->sw_setup = _state_setup;
-	r->sw_cleanup = _state_cleanup;
-	r->free = _free;
+	thiz = calloc(1, sizeof(Transition));
+	if (!thiz) return NULL;
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }
@@ -157,8 +200,9 @@ EAPI Enesim_Renderer * enesim_renderer_transition_new(void)
  */
 EAPI void enesim_renderer_transition_value_set(Enesim_Renderer *r, float interp_value)
 {
-	Transition *t = (Transition *)r;
+	Transition *t;
 
+	t = _transition_get(r);
 	if (interp_value < 0.0000001)
 		interp_value = 0;
 	if (interp_value > 0.999999)
@@ -176,9 +220,9 @@ EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Rende
 {
 	Transition *t;
 
+	t = _transition_get(r);
 	if (r0 == r)
 		return;
-	t = (Transition *)r;
 	if (t->r0.rend == r0)
 		return;
 	t->r0.rend = r0;
@@ -192,9 +236,9 @@ EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Rende
 {
 	Transition *t;
 
+	t = _transition_get(r);
 	if (r1 == r)
 		return;
-	t = (Transition *)r;
 	if (t->r1.rend == r1)
 		return;
 	t->r1.rend = r1;
@@ -206,8 +250,9 @@ EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Rende
  */
 EAPI void enesim_renderer_transition_offset_set(Enesim_Renderer *r, int x, int y)
 {
-	Transition *t = (Transition *)r;
+	Transition *t;
 
+	t = _transition_get(r);
 	if ((t->offset.x == x) && (t->offset.y == y))
 		return;
 	t->offset.x = x;

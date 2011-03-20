@@ -95,7 +95,7 @@ static void _background_free(Enesim_Renderer *r)
 	Background *thiz;
 
 	thiz = _background_get(r);
-	free(thiz);	
+	free(thiz);
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {

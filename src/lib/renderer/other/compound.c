@@ -19,7 +19,7 @@
 #include "enesim_private.h"
 /**
  * @todo
- * - Handle the case whenever the renderer supports the ROP itself 
+ * - Handle the case whenever the renderer supports the ROP itself
  */
 /*============================================================================*
  *                                  Local                                     *
