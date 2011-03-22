@@ -30,14 +30,22 @@ typedef struct _Hswitch
 	float step;
 } Hswitch;
 
+static inline Hswitch * _hswitch_get(Enesim_Renderer *r)
+{
+	Hswitch *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	return thiz;
+}
 
 static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 	uint32_t *end = dst + len;
 	Eina_F16p16 mmx;
 	int mx;
 
+	hs = _hswitch_get(r);
 	mmx = eina_f16p16_float_from(hs->w - (float)(hs->w * hs->step));
 	mx = eina_f16p16_int_to(mmx);
 	while (dst < end)
@@ -69,11 +77,12 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 
 static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 	uint32_t *end = dst + len;
 	Eina_F16p16 mmx, xx, yy;
 	int mx;
 
+	hs = _hswitch_get(r);
 	yy = eina_f16p16_int_from(y);
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_mul(r->matrix.values.yx, xx) +
@@ -119,10 +128,11 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 	int mx;
 	Eina_Rectangle ir, dr;
 
+	hs = _hswitch_get(r);
 	eina_rectangle_coords_from(&ir, x, y, len, 1);
 	eina_rectangle_coords_from(&dr, 0, 0, hs->w, hs->h);
 	if (!eina_rectangle_intersection(&ir, &dr))
@@ -159,15 +169,11 @@ static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	}
 }
 
-static void _free(Enesim_Renderer *r)
-{
-
-}
-
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Hswitch *h = (Hswitch *)r;
+	Hswitch *h;
 
+	h = _hswitch_get(r);
 	if (!h->lrend || !h->rrend)
 		return EINA_FALSE;
 	if (!enesim_renderer_sw_setup(h->lrend))
@@ -178,6 +184,20 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	*fill = _affine_good;
 	return EINA_TRUE;
 }
+
+static void _free(Enesim_Renderer *r)
+{
+	Hswitch *thiz;
+
+	thiz = _hswitch_get(r);
+	free(thiz);
+}
+
+
+static Enesim_Renderer_Descriptor _descriptor = {
+	.sw_setup = _state_setup,
+	.free = _free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -193,14 +213,11 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
  */
 EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void)
 {
+	Hswitch *thiz;
 	Enesim_Renderer *r;
-	Hswitch *h;
 
-	h = calloc(1, sizeof(Hswitch));
-	r = (Enesim_Renderer *)h;
-	enesim_renderer_init(r);
-	r->free = _free;
-	r->sw_setup = _state_setup;
+	thiz = calloc(1, sizeof(Hswitch));
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }
@@ -211,8 +228,9 @@ EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void)
  */
 EAPI void enesim_renderer_hswitch_w_set(Enesim_Renderer *r, int w)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 
+	hs = _hswitch_get(r);
 	if (hs->w == w)
 		return;
 	hs->w = w;
@@ -224,8 +242,9 @@ EAPI void enesim_renderer_hswitch_w_set(Enesim_Renderer *r, int w)
  */
 EAPI void enesim_renderer_hswitch_h_set(Enesim_Renderer *r, int h)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 
+	hs = _hswitch_get(r);
 	if (hs->h == h)
 		return;
 	hs->h = h;
@@ -238,8 +257,9 @@ EAPI void enesim_renderer_hswitch_h_set(Enesim_Renderer *r, int h)
 EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
 		Enesim_Renderer *left)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 
+	hs = _hswitch_get(r);
 	hs->lrend = left;
 }
 /**
@@ -250,8 +270,9 @@ EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
 EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
 		Enesim_Renderer *right)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 
+	hs = _hswitch_get(r);
 	hs->rrend = right;
 }
 /**
@@ -262,11 +283,12 @@ EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, float step)
 {
-	Hswitch *hs = (Hswitch *)r;
+	Hswitch *hs;
 
 	if (step < 0)
 		step = 0;
 	else if (step > 1)
 		step = 1;
+	hs = _hswitch_get(r);
 	hs->step = step;
 }

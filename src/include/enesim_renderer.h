@@ -215,13 +215,13 @@ EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
  */
 EAPI Enesim_Renderer * enesim_renderer_checker_new(void);
 EAPI void enesim_renderer_checker_even_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI Enesim_Color enesim_renderer_checker_even_color_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_checker_even_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_checker_odd_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI Enesim_Color enesim_renderer_checker_odd_color_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_checker_odd_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width);
-EAPI int enesim_renderer_checker_width_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_checker_width_get(Enesim_Renderer *r, int *width);
 EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height);
-EAPI int enesim_renderer_checker_height_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_checker_height_get(Enesim_Renderer *r, int *height);
 /**
  * @}
  * @defgroup Enesim_Renderer_Transition_Group Transition
@@ -239,13 +239,13 @@ EAPI void enesim_renderer_transition_offset_set(Enesim_Renderer *r, int x, int y
  */
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void);
 EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI Enesim_Color enesim_renderer_stripes_even_color_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r, double thickness);
-EAPI double enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double *thickness);
 EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI Enesim_Color enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,	double thickness);
-EAPI double enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *thickness);
 /**
  * @}
  * @defgroup Enesim_Renderer_Dispmap_Group Displacement Map

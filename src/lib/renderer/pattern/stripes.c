@@ -20,15 +20,14 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Stripes Stripes;
-struct _Stripes {
+typedef struct _Stripes {
 	struct {
 		Enesim_Color color;
 		double thickness;
 	} s0, s1;
 
 	int hh0, hh;
-};
+} Stripes;
 
 static inline Stripes * _stripes_get(Enesim_Renderer *r)
 {
@@ -216,14 +215,14 @@ EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
 /**
  * Gets the color of the even stripes
  * @param[in] r The stripes renderer
- * @return The even stripes color
+ * @param[out] color The even stripes color
  */
-EAPI Enesim_Color enesim_renderer_stripes_even_color_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	Stripes *st;
 
 	st = _stripes_get(r);
-	return st->s0.color;
+	if (color) *color = st->s0.color;
 }
 /**
  * Sets the thickness of the even stripes
@@ -243,14 +242,14 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
 /**
  * Gets the thickness of the even stripes
  * @param[in] r The stripes renderer
- * @param[in] thickness The even stripes thickness
+ * @param[out] thickness The even stripes thickness
  */
-EAPI double enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double *thickness)
 {
 	Stripes *st;
 
 	st = _stripes_get(r);
-	return st->s0.thickness;
+	if (thickness) *thickness = st->s0.thickness;
 }
 /**
  * Sets the color of the odd stripes
@@ -268,14 +267,14 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 /**
  * Gets the color of the odd stripes
  * @param[in] r The stripes renderer
- * @return The odd stripes color
+ * @param[out]color The odd stripes color
  */
-EAPI Enesim_Color enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	Stripes *st;
 
 	st = _stripes_get(r);
-	return st->s1.color;
+	if (color) *color = st->s1.color;
 }
 /**
  * Sets the thickness of the odd stripes
@@ -295,13 +294,13 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
 /**
  * Gets the thickness of the odd stripes
  * @param[in] r The stripes renderer
- * @param[in] thickness The odd stripes thickness
+ * @param[out] thickness The odd stripes thickness
  */
-EAPI double enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *thickness)
 {
 	Stripes *st;
 
 	st = _stripes_get(r);
-	return st->s1.thickness;
+	if (thickness) *thickness = st->s1.thickness;
 }
 

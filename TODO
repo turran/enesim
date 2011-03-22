@@ -14,10 +14,10 @@
 	shape/ellipse.c
 	shape/figure.c
 	shape/rectangle.c
-	filter/hswitch.c
+	D filter/hswitch.c
 	D filter/dispmap.c
 	D filter/transition.c
-	filter/raddist.c
+	D filter/raddist.c
 	D pattern/grid.c
 	D pattern/stripes.c
 	D pattern/checker.c

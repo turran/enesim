@@ -191,6 +191,23 @@ static void _state_cleanup(Enesim_Renderer *r)
 	enesim_renderer_shape_sw_cleanup(r);
 }
 
+static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Circle *thiz;
+
+	//thiz = _circle_get(r);
+	thiz = (Circle *)r;
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
 static void _free(Enesim_Renderer *r)
 {
 }
