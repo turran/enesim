@@ -58,12 +58,10 @@ static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
 		uint32_t *ddata, uint32_t stride,
 		uint32_t *tmp, size_t len, Eina_Rectangle *area)
 {
-	uint32_t *fdata;
-
 	while (area->h--)
 	{
 		memset(tmp, 0, len);
-		fill(r, area->x, area->y, area->w, fdata);
+		fill(r, area->x, area->y, area->w, tmp);
 		area->y++;
 		/* compose the filled and the destination spans */
 		span(ddata, area->w, tmp, r->color, NULL);
