@@ -683,11 +683,11 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *p, unsigned int w
  * To be documented
  * FIXME: To be fixed
  */
-EAPI unsigned int enesim_renderer_rectangle_width_get(Enesim_Renderer *p)
+EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *p, unsigned int *w)
 {
 	Rectangle *rect = (Rectangle *)p;
 
-	return rect->w;
+	if (w) *w = rect->w;
 }
 /**
  * To be documented
@@ -703,11 +703,11 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *p, unsigned int 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI unsigned int enesim_renderer_rectangle_height_get(Enesim_Renderer *p)
+EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *p, unsigned int *h)
 {
 	Rectangle *rect = (Rectangle *)p;
 
-	return rect->h;
+	if (h) *h = rect->h;
 }
 /**
  * To be documented

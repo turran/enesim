@@ -326,12 +326,12 @@ EAPI void enesim_renderer_grid_inside_width_set(Enesim_Renderer *r, unsigned int
  * @param[in] r The grid renderer
  * @return The width
  */
-EAPI unsigned int enesim_renderer_grid_inside_width_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_grid_inside_width_get(Enesim_Renderer *r, unsigned int *iw)
 {
 	Grid *thiz;
 
 	thiz = _grid_get(r);
-	return thiz->inside.w;
+	if (iw) *iw = thiz->inside.w;
 }
 /**
  * Sets the height of the inner box of a grid renderer
@@ -351,12 +351,12 @@ EAPI void enesim_renderer_grid_inside_height_set(Enesim_Renderer *r, unsigned in
  * @param[in] r The grid renderer
  * @return The height
  */
-EAPI unsigned int enesim_renderer_grid_inside_height_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_grid_inside_height_get(Enesim_Renderer *r, unsigned int *ih)
 {
 	Grid *thiz;
 
 	thiz = _grid_get(r);
-	return thiz->inside.h;
+	if (ih) *ih = thiz->inside.h;
 }
 /**
  * Sers the color of the inner box of a grid renderer
@@ -375,12 +375,12 @@ EAPI void enesim_renderer_grid_inside_color_set(Enesim_Renderer *r, Enesim_Color
  * @param[in] r The grid renderer
  * @return The color
  */
-EAPI Enesim_Color enesim_renderer_grid_inside_color_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_grid_inside_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	Grid *thiz;
 
 	thiz = _grid_get(r);
-	return thiz->inside.color;
+	if (color) *color = thiz->inside.color;
 }
 /**
  * Sets the horizontal thickness of the border of a grid renderer
@@ -399,12 +399,12 @@ EAPI void enesim_renderer_grid_border_hthickness_set(Enesim_Renderer *r, unsigne
  * @param[in] r The grid renderer
  * @return The horizontal thickness
  */
-EAPI unsigned int enesim_renderer_grid_border_hthickness_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_grid_border_hthickness_get(Enesim_Renderer *r, unsigned int *h)
 {
 	Grid *thiz;
 
 	thiz = _grid_get(r);
-	return thiz->outside.h;
+	if (h) *h = thiz->outside.h;
 }
 /**
  * Sets the vertical thickness of the border of a grid renderer
@@ -423,12 +423,12 @@ EAPI void enesim_renderer_grid_border_vthickness_set(Enesim_Renderer *r, unsigne
  * @param[in] r The grid renderer
  * @return The vertical thickness
  */
-EAPI unsigned int enesim_renderer_grid_border_vthickness_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_grid_border_vthickness_get(Enesim_Renderer *r, unsigned int *v)
 {
 	Grid *thiz;
 
 	thiz = _grid_get(r);
-	return thiz->outside.w;
+	if (v) *v = thiz->outside.w;
 }
 /**
  * Sets the color of the border of a grid renderer
@@ -447,11 +447,11 @@ EAPI void enesim_renderer_grid_border_color_set(Enesim_Renderer *r, Enesim_Color
  * @param[in] r The grid renderer
  * @return The color
  */
-EAPI Enesim_Color enesim_renderer_grid_border_color_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_grid_border_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	Grid *thiz;
 
 	thiz = _grid_get(r);
-	return thiz->outside.color;
+	if (color) *color = thiz->outside.color;
 }
 
