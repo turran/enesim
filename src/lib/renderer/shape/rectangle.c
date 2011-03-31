@@ -744,6 +744,51 @@ EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, double
 		return;
 	rect->corner.radius = radius;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
+{
+	Rectangle *rect = (Rectangle *)r;
+
+	rect->corner.tl = rounded;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
+{
+	Rectangle *rect = (Rectangle *)r;
+
+	rect->corner.tr = rounded;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
+{
+	Rectangle *rect = (Rectangle *)r;
+
+	rect->corner.bl = rounded;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
+{
+	Rectangle *rect = (Rectangle *)r;
+
+	rect->corner.br = rounded;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed

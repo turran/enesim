@@ -499,7 +499,7 @@ end:
  * Draw a renderer into a surface
  * @param[in] r The renderer to draw
  * @param[in] s The surface to draw the renderer into
- * @param[in] clips A list of clips area on the destination surface to limit the drawing
+ * @param[in] clips A list of clipping areas on the destination surface to limit the drawing
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  */
@@ -508,11 +508,11 @@ EAPI void enesim_renderer_surface_draw_list(Enesim_Renderer *r, Enesim_Surface *
 {
 	Enesim_Renderer_Sw_Fill fill;
 	Enesim_Renderer_Flag flags;
+	Enesim_Format dfmt;
 	Eina_Rectangle boundings;
 	Eina_Rectangle surface_size;
 	uint32_t *ddata;
 	int stride;
-	Enesim_Format dfmt;
 
 	if (!clips)
 	{
@@ -640,3 +640,34 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
 	return eina_hash_find(r->prv_data, name);
 }
 
+/*
+ * We should implement a threaded rendering, something like:
+ * typedef struct _Enesim_Renderer_Sw_Operation
+ * {
+ * 	Enesim_Renderer *r;
+ * 	uint32_t *dst;
+ *	int x;
+ *	int y;
+ *	int len;
+ * } Enesim_Renderer_Sw_Operation;
+ *
+ * typedef struct _Enesim_Renderer_Thread
+ * {
+ *	// lock, barrier or something like that
+ *	int cpu; // cpu idx;
+ * } Enesim_Renderer_Thread;
+ *
+EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Eina_Rectangle *clip, int x, int y)
+ *
+ * } Enesim_Renderer_Operation;
+ * enesim_renderer_threadad_surface_draw()
+ * {
+ *	same code as the others, but instead of calling the real fill function
+ *	just enqueue it
+ * }
+ * enesim_renderer_init()
+ * {
+ * 	create all the renderer threads
+ * }
+ */
