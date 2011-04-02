@@ -556,20 +556,21 @@ EAPI void enesim_renderer_surface_draw_list(Enesim_Renderer *r, Enesim_Surface *
 			Eina_Rectangle final;
 			size_t len;
 			uint32_t *fdata;
+			uint32_t *rdata;
 
-
+			final = *clip;
 			if (!eina_rectangle_intersection(&final, &surface_size))
 				continue;
 			if (!eina_rectangle_intersection(&final, &boundings))
 				continue;
-			ddata = ddata + (final.y * stride) + final.x;
+			rdata = ddata + (final.y * stride) + final.x;
 			/* translate the origin */
 			final.x -= x;
 			final.y -= y;
 			/* now render */
 			len = final.w * sizeof(uint32_t);
 			fdata = alloca(len);
-			_sw_surface_draw_composed(r, fill, span, ddata, stride,
+			_sw_surface_draw_composed(r, fill, span, rdata, stride,
 					fdata, len, &final);
 		}
 	}
@@ -582,18 +583,19 @@ EAPI void enesim_renderer_surface_draw_list(Enesim_Renderer *r, Enesim_Surface *
 		EINA_LIST_FOREACH(clips, l, clip)
 		{
 			Eina_Rectangle final;
+			uint32_t *rdata;
 
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, &surface_size))
 				continue;
 			if (!eina_rectangle_intersection(&final, &boundings))
 				continue;
-			ddata = ddata + (final.y * stride) + final.x;
+			rdata = ddata + (final.y * stride) + final.x;
 			/* translate the origin */
 			final.x -= x;
 			final.y -= y;
 			/* now render */
-			_sw_surface_draw_simple(r, fill, ddata, stride, &final);
+			_sw_surface_draw_simple(r, fill, rdata, stride, &final);
 		}
 	}
 end:
