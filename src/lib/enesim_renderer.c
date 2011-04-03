@@ -29,6 +29,8 @@
  *   use a queue, we initialize every thread on startup and me them sleep
  *   then wakeup when the function is called and start enqueueing the span
  *   renders
+ * - Add a scale tranform property, every renderer should multiply its
+ *   coordinates and lengths by this multiplier
  *
  */
 /*============================================================================*
@@ -354,7 +356,16 @@ EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (rect && r->boundings) r->boundings(r, rect);
+	if (rect && r->boundings)
+	{
+		 r->boundings(r, rect);
+		/* TODO the origin should be translated to r->ox, r->oy */
+#if 0
+		/* move by the origin */
+		rect->x -= lround(r->ox);
+		rect->y -= lround(r->oy);
+#endif
+	}
 	else
 	{
 		rect->x = INT_MIN / 2;
@@ -376,6 +387,7 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 	if (rect && r->boundings)
 	{
 		r->boundings(r, rect);
+		/* TODO whenever the renderer is already translated, remove this code */
 		rect->x += lround(r->ox);
 		rect->y += lround(r->oy);
 		if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
