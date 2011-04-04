@@ -350,8 +350,35 @@ EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 }
 
 /**
- * Gets the bounding box of the renderer on its own coordinate space
- * FIXME: To be fixed
+ * Gets the bounding box of the renderer on its own coordinate space translated
+ * by the origin
+ * @param[in] r The renderer to get the boundings from
+ * @param[out] rect The rectangle to store the boundings
+ */
+EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (rect && r->boundings)
+	{
+		 r->boundings(r, rect);
+		/* move by the origin */
+		rect->x -= lround(r->ox);
+		rect->y -= lround(r->oy);
+	}
+	else
+	{
+		rect->x = INT_MIN / 2;
+		rect->y = INT_MIN / 2;
+		rect->w = INT_MAX;
+		rect->h = INT_MAX;
+	}
+}
+
+/**
+ * Gets the bounding box of the renderer on its own coordinate space without
+ * adding the origin translation
+ * @param[in] r The renderer to get the boundings from
+ * @param[out] rect The rectangle to store the boundings
  */
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
@@ -359,12 +386,6 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	if (rect && r->boundings)
 	{
 		 r->boundings(r, rect);
-		/* TODO the origin should be translated to r->ox, r->oy */
-#if 0
-		/* move by the origin */
-		rect->x -= lround(r->ox);
-		rect->y -= lround(r->oy);
-#endif
 	}
 	else
 	{
@@ -387,7 +408,6 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 	if (rect && r->boundings)
 	{
 		r->boundings(r, rect);
-		/* TODO whenever the renderer is already translated, remove this code */
 		rect->x += lround(r->ox);
 		rect->y += lround(r->oy);
 		if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
