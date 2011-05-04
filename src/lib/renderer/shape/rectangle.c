@@ -572,6 +572,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	if (!rect || (rect->w < 1) || (rect->h < 1))
 	{
+		WRN("Invalid size %d %d", rect->w, rect->h);
 		return EINA_FALSE;
 	}
 
