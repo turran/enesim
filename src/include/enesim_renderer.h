@@ -41,6 +41,7 @@ typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst);
 
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
+typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Eina_Rectangle *rect);
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
@@ -53,6 +54,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
 	Enesim_Renderer_Flags flags;
+	Enesim_Renderer_Inside is_inside;
 };
 
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
@@ -86,6 +88,7 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
+EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 /**
  * @defgroup Enesim_Renderer_Shapes_Group Shapes
  * @{

@@ -154,6 +154,8 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 
 	r = calloc(1, sizeof(Enesim_Renderer));
 	enesim_renderer_init(r);
+	r->is_inside = descriptor->is_inside;
+	if (!r->is_inside) WRN("No is_inside() function available");
 	r->boundings = descriptor->boundings;
 	if (!r->boundings) WRN("No bounding() function available");
 	r->flags = descriptor->flags;
@@ -652,6 +654,17 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (rop) *rop = r->rop;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (r->is_inside) return r->is_inside(r, x, y);
+	return EINA_TRUE;
 }
 
 /**

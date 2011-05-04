@@ -24,7 +24,7 @@
  */
 
 
-/* eina fixed point helpers, this should go to eina some day */
+/* TODO eina fixed point helpers, this should go to eina some day */
 #define EINA_F16P16_ONE (1 << 16)
 #define EINA_F16P16_HALF (1 << 15)
 
@@ -37,6 +37,7 @@ struct _Enesim_Renderer
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
 	Enesim_Renderer_Flags flags;
+	Enesim_Renderer_Inside is_inside;
 	/* software backend */
 	Enesim_Renderer_Sw_Fill sw_fill;
 	Enesim_Renderer_Sw_Setup sw_setup;
