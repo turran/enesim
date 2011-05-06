@@ -38,10 +38,10 @@ static inline Importer * _importer_get(Enesim_Renderer *r)
 
 static void _span_argb8888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Importer *i = (Importer *)r;
-	uint32_t *ssrc = i->cdata.argb8888.plane0;
+	Importer *thiz = (Importer *)r;
+	uint32_t *ssrc = thiz->cdata.argb8888.plane0;
 
-	ssrc = ssrc + (i->cdata.argb8888.plane0_stride * y) + x;
+	ssrc = ssrc + (thiz->cdata.argb8888.plane0_stride * y) + x;
 	while (len--)
 	{
 		uint16_t a = (*ssrc >> 24) + 1;
@@ -61,10 +61,12 @@ static void _span_argb8888_none_argb8888(Enesim_Renderer *r, int x, int y, unsig
 
 static void _span_a8_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Importer *i = (Importer *)r;
-	uint8_t *ssrc = i->cdata.a8.plane0;
+	Importer *thiz;
+	uint8_t *ssrc;
 
-	ssrc = ssrc + (i->cdata.a8.plane0_stride * y) + x;
+	thiz = _importer_get(r);
+ 	ssrc = thiz->cdata.a8.plane0;
+	ssrc = ssrc + (thiz->cdata.a8.plane0_stride * y) + x;
 	while (len--)
 	{
 		*dst = *ssrc << 24;;
@@ -76,10 +78,12 @@ static void _span_a8_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned in
 
 static void _span_rgb888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Importer *i = (Importer *)r;
-	uint8_t *ssrc = i->cdata.rgb888.plane0;
+	Importer *thiz;
+	uint8_t *ssrc;
 
-	ssrc = ssrc + (i->cdata.rgb888.plane0_stride * y * 3) + (x * 3);
+	thiz = _importer_get(r);
+ 	ssrc = thiz->cdata.rgb888.plane0;
+	ssrc = ssrc + (thiz->cdata.rgb888.plane0_stride * y * 3) + (x * 3);
 	while (len--)
 	{
 		uint8_t r, g, b;
