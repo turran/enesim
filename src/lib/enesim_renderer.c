@@ -31,6 +31,8 @@
  *   renders
  * - Add a scale tranform property, every renderer should multiply its
  *   coordinates and lengths by this multiplier
+ * - The boundings should return an Enesim_Rectangle, not an Eina_Rectangle
+ *   we need to handle the coordinates correctly
  *
  */
 /*============================================================================*
