@@ -28,9 +28,9 @@ typedef struct _Transition {
 	} offset;
 
 	struct {
-		Enesim_F16p16_Matrix m;
-		Enesim_Matrix_Type mtype;
-		Enesim_Renderer *rend;
+		Enesim_Matrix original;
+		double ox, oy;
+		Enesim_Renderer *r;
 	} r0, r1;
 } Transition;
 
@@ -51,8 +51,8 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	unsigned int *buf;
 
 	t = _transition_get(r);
-	s0 = t->r0.rend;
-	s1 = t->r1.rend;
+	s0 = t->r0.r;
+	s1 = t->r1.r;
 	interp = t->interp;
 
 	if (interp == 0)
@@ -83,55 +83,33 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	Transition *t;
 
 	t = _transition_get(r);
-	if (!t || !t->r0.rend || !t->r1.rend)
+	if (!t || !t->r0.r || !t->r1.r)
 		return EINA_FALSE;
 
-	/* compound the matrices of the transition renderer and each
-	 * child renderer
-	 */
-	if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
-	{
-		/* keep the original matrix values for later */
-		t->r0.m = t->r0.rend->matrix.values;
-		t->r0.mtype = t->r0.rend->matrix.type;
-		t->r1.m = t->r1.rend->matrix.values;
-		t->r1.mtype = t->r1.rend->matrix.type;
-
-		enesim_f16p16_matrix_compose(&t->r0.m, &r->matrix.values,
-				&t->r0.rend->matrix.values);
-		t->r0.rend->matrix.type = enesim_f16p16_matrix_type_get(
-				&t->r0.rend->matrix.values);
-		enesim_f16p16_matrix_compose(&t->r1.m, &r->matrix.values,
-				&t->r1.rend->matrix.values);
-		t->r1.rend->matrix.type = enesim_f16p16_matrix_type_get(
-				&t->r1.rend->matrix.values);
-	}
-	if (!enesim_renderer_sw_setup(t->r0.rend))
-		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(t->r1.rend))
-		return EINA_FALSE;
+	enesim_renderer_relative_set(r, t->r0.r, &t->r0.original, &t->r0.ox, &t->r0.oy);
+	enesim_renderer_relative_set(r, t->r1.r, &t->r1.original, &t->r1.ox, &t->r1.oy);
+	if (!enesim_renderer_sw_setup(t->r0.r))
+		goto end;
+	if (!enesim_renderer_sw_setup(t->r1.r))
+		goto end;
 
 	*fill = _span_general;
 
 	return EINA_TRUE;
+end:
+	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy);
+	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy);
 }
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Transition *trans;
+	Transition *t;
 
-	trans = _transition_get(r);
-	enesim_renderer_sw_cleanup(trans->r0.rend);
-	enesim_renderer_sw_cleanup(trans->r1.rend);
-	/* restore the original matrices
-	 */
-	if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
-	{
-		trans->r0.rend->matrix.values = trans->r0.m;
-		trans->r0.rend->matrix.type = trans->r0.mtype;
-		trans->r1.rend->matrix.values = trans->r1.m;
-		trans->r1.rend->matrix.type = trans->r1.mtype;
-	}
+	t = _transition_get(r);
+	enesim_renderer_sw_cleanup(t->r0.r);
+	enesim_renderer_sw_cleanup(t->r1.r);
+	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy);
+	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy);
 }
 
 static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
@@ -146,11 +124,11 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	rect->w = 0;
 	rect->h = 0;
 
-	if (!trans->r0.rend) return;
-	if (!trans->r1.rend) return;
+	if (!trans->r0.r) return;
+	if (!trans->r1.r) return;
 
-	enesim_renderer_boundings(trans->r0.rend, &r0_rect);
-	enesim_renderer_boundings(trans->r1.rend, &r1_rect);
+	enesim_renderer_boundings(trans->r0.r, &r0_rect);
+	enesim_renderer_boundings(trans->r1.r, &r1_rect);
 
 	rect->x = r0_rect.x < r1_rect.x ? r0_rect.x : r1_rect.x;
 	rect->y = r0_rect.y < r1_rect.y ? r0_rect.y : r1_rect.y;
@@ -243,9 +221,9 @@ EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Rende
 	t = _transition_get(r);
 	if (r0 == r)
 		return;
-	if (t->r0.rend == r0)
+	if (t->r0.r == r0)
 		return;
-	t->r0.rend = r0;
+	t->r0.r = r0;
 }
 /**
  * Sets the target renderer
@@ -259,9 +237,9 @@ EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Rende
 	t = _transition_get(r);
 	if (r1 == r)
 		return;
-	if (t->r1.rend == r1)
+	if (t->r1.r == r1)
 		return;
-	t->r1.rend = r1;
+	t->r1.r = r1;
 }
 /**
  * To be documented
