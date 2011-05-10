@@ -136,7 +136,26 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 {
-	printf("transition boudings FIXME\n");
+	Transition *trans;
+	Eina_Rectangle r0_rect;
+	Eina_Rectangle r1_rect;
+
+	trans = _transition_get(r);
+	rect->x = 0;
+	rect->y = 0;
+	rect->w = 0;
+	rect->h = 0;
+
+	if (!trans->r0.rend) return;
+	if (!trans->r1.rend) return;
+
+	enesim_renderer_boundings(trans->r0.rend, &r0_rect);
+	enesim_renderer_boundings(trans->r1.rend, &r1_rect);
+
+	rect->x = r0_rect.x < r1_rect.x ? r0_rect.x : r1_rect.x;
+	rect->y = r0_rect.y < r1_rect.y ? r0_rect.y : r1_rect.y;
+	rect->w = r0_rect.w > r1_rect.w ? r0_rect.w : r1_rect.w;
+	rect->h = r0_rect.h > r1_rect.h ? r0_rect.h : r1_rect.h;
 }
 
 static void _transition_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -194,22 +213,23 @@ EAPI Enesim_Renderer * enesim_renderer_transition_new(void)
 /**
  * Sets the transition level
  * @param[in] r The transition renderer
- * @param[in] interp_value The transition level. A value of 0 will render
+ * @param[in] level The transition level. A value of 0 will render
  * the source renderer, a value of 1 will render the target renderer
  * and any other value will inteprolate between both renderers
  */
-EAPI void enesim_renderer_transition_value_set(Enesim_Renderer *r, float interp_value)
+EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level)
 {
 	Transition *t;
 
+	printf("transition level = %g\n", level);
 	t = _transition_get(r);
-	if (interp_value < 0.0000001)
-		interp_value = 0;
-	if (interp_value > 0.999999)
-		interp_value = 1;
-	if (t->interp == interp_value)
+	if (level < 0.0000001)
+		level = 0;
+	if (level > 0.999999)
+		level = 1;
+	if (t->interp == level)
 		return;
-	t->interp = 1 + (255 * interp_value);
+	t->interp = 1 + (255 * level);
 }
 /**
  * Sets the source renderer

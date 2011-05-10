@@ -236,7 +236,7 @@ EAPI void enesim_renderer_checker_height_get(Enesim_Renderer *r, int *height);
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_transition_new(void);
-EAPI void enesim_renderer_transition_value_set(Enesim_Renderer *r, float interp_value);
+EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level);
 EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Renderer *r0);
 EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Renderer *r1);
 EAPI void enesim_renderer_transition_offset_set(Enesim_Renderer *r, int x, int y);
