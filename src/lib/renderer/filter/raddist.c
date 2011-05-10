@@ -47,6 +47,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 	uint32_t *src;
 	int sw, sh;
 	int sstride;
+	double ox, oy;
 
 	rd = _raddist_get(r);
 	/* setup the parameters */
@@ -55,6 +56,10 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 	src = enesim_surface_data_get(rd->src);
 	/* FIXME move this to the setup */
 	r_inv = 1.0f / rd->radius;
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	x -= ox;
+	y -= oy;
 
 	x -= rd->orx;
 	y -= rd->ory;
