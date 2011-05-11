@@ -83,13 +83,16 @@ EAPI void enesim_matrix_inverse(Enesim_Matrix *m, Enesim_Matrix *m2);
 EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a);
 
 EAPI void enesim_matrix_point_transform(Enesim_Matrix *m, float x, float y, float *xr, float *yr);
-EAPI void enesim_matrix_rect_transform(Enesim_Matrix *m, Eina_Rectangle *r, Enesim_Quad *q);
+EAPI void enesim_matrix_eina_rectangle_transform(Enesim_Matrix *m, Eina_Rectangle *r, Enesim_Quad *q);
+EAPI void enesim_matrix_rectangle_transform(Enesim_Matrix *m, Enesim_Rectangle *r, Enesim_Quad *q);
 
 EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m, Enesim_Quad *src, Enesim_Quad *dst);
 EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m, Enesim_Quad *q);
 EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m, Enesim_Quad *q);
 
 EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
+		Enesim_Rectangle *r);
+EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
 		Eina_Rectangle *r);
 EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
 		Eina_Rectangle *r);

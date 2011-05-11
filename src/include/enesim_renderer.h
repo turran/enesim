@@ -27,7 +27,7 @@
 typedef enum Enesim_Renderer_Flag
 {
 	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 0), /**< Affine transformation */
-	ENESIM_RENDERER_FLAG_PERSPECTIVE 	= (1 << 1), /**< Perspective transformations */
+	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 1), /**< Perspective transformations */
 	ENESIM_RENDERER_FLAG_COLORIZE 		= (1 << 2), /**< Use the renderer color directly */
 	ENESIM_RENDERER_FLAG_A8 		= (1 << 3), /**< Supports A8 surfaces */
 	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 4), /**< Supports ARGB8888 surfaces */
@@ -42,7 +42,7 @@ typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
 
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
-typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Eina_Rectangle *rect);
+typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *rect);
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill);
@@ -82,8 +82,8 @@ EAPI void enesim_renderer_surface_draw_list(Enesim_Renderer *r, Enesim_Surface *
 		Eina_List *clips, int x, int y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
-EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Eina_Rectangle *rect);
+EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
+EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
@@ -353,6 +353,8 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
 
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
+		Enesim_Renderer *rend);
+EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 		Enesim_Renderer *rend);
 EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,

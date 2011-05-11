@@ -112,11 +112,11 @@ static void _state_cleanup(Enesim_Renderer *r)
 	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy);
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Transition *trans;
-	Eina_Rectangle r0_rect;
-	Eina_Rectangle r1_rect;
+	Enesim_Rectangle r0_rect;
+	Enesim_Rectangle r1_rect;
 
 	trans = _transition_get(r);
 	rect->x = 0;
@@ -148,7 +148,7 @@ static void _transition_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	}
 
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PERSPECTIVE;
+			ENESIM_RENDERER_FLAG_PROJECTIVE;
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 

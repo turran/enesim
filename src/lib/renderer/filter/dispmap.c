@@ -269,7 +269,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	return EINA_TRUE;
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Dispmap *thiz;
 

@@ -265,7 +265,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 	enesim_renderer_shape_sw_cleanup(p->figure);
 }
 
-static void _path_boundings(Enesim_Renderer *r, Eina_Rectangle *boundings)
+static void _path_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Path *p = (Path *) r;
 

@@ -706,7 +706,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 	 */
 }
 
-static void _figure_boundings(Enesim_Renderer *r, Eina_Rectangle *boundings)
+static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Figure *o;
 

@@ -274,7 +274,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static void _image_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _image_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Image *thiz;
 
@@ -392,7 +392,7 @@ static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	}
 
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 			//| ENESIM_RENDERER_FLAG_COLORIZE
 			//| ENESIM_RENDERER_FLAG_ROP;

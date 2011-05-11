@@ -633,7 +633,7 @@ static void _free(Enesim_Renderer *p)
 {
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Rectangle *rct = (Rectangle *)r;
 
@@ -650,7 +650,7 @@ static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
  *============================================================================*/
 /**
  * Creates a new rectangle renderer
- * @return The new renderer 
+ * @return The new renderer
  */
 EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 {

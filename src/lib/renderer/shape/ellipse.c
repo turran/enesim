@@ -345,7 +345,7 @@ static void _state_cleanup(Enesim_Renderer *p)
 	enesim_renderer_shape_sw_cleanup(p);
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Ellipse *ellipse = (Ellipse *) r;
 

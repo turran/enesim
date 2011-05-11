@@ -125,7 +125,7 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 	return EINA_TRUE;
 }
 
-static void _importer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _importer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	/* TODO check that we have an image set, if so
 	 * return the size of that image

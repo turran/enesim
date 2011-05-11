@@ -174,7 +174,7 @@ static void _compound_state_cleanup(Enesim_Renderer *r)
 	}
 }
 
-static void _compound_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Compound *thiz;
 	Eina_List *ll;
@@ -188,7 +188,7 @@ static void _compound_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Renderer *lr = l->r;
-		Eina_Rectangle tmp;
+		Enesim_Rectangle tmp;
 
 		if (lr->boundings)
 		{
@@ -282,6 +282,29 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 	l->r = rend;
 
 	thiz->layers = eina_list_append(thiz->layers, l);
+}
+
+
+/**
+ *
+ */
+EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
+		Enesim_Renderer *rend)
+{
+	Compound *thiz;
+	Layer *layer;
+	Eina_List *l;
+	Eina_List *l_next;
+
+	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
+	{
+		if (layer->r == rend)
+		{
+			free(layer);
+			thiz->layers = eina_list_remove_list(thiz->layers, l);
+			break;
+		}
+	}
 }
 
 /**

@@ -193,7 +193,19 @@ EAPI void enesim_matrix_point_transform(Enesim_Matrix *m, float x, float y, floa
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_rect_transform(Enesim_Matrix *m, Eina_Rectangle *r, Enesim_Quad *q)
+EAPI void enesim_matrix_eina_rectangle_transform(Enesim_Matrix *m, Eina_Rectangle *r, Enesim_Quad *q)
+{
+	enesim_matrix_point_transform(m, r->x, r->y, &q->x0, &q->y0);
+	enesim_matrix_point_transform(m, r->x + r->w, r->y, &q->x1, &q->y1);
+	enesim_matrix_point_transform(m, r->x + r->w, r->y + r->h, &q->x2, &q->y2);
+	enesim_matrix_point_transform(m, r->x, r->y + r->h, &q->x3, &q->y3);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_matrix_rectangle_transform(Enesim_Matrix *m, Enesim_Rectangle *r, Enesim_Quad *q)
 {
 	enesim_matrix_point_transform(m, r->x, r->y, &q->x0, &q->y0);
 	enesim_matrix_point_transform(m, r->x + r->w, r->y, &q->x1, &q->y1);
@@ -456,7 +468,7 @@ EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
+EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
 		Eina_Rectangle *r)
 {
 	float xmin, ymin, xmax, ymax;
@@ -482,6 +494,38 @@ EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
 	r->w = lround(xmax) - r->x;
 	r->y = lround(ymin);
 	r->h = lround(ymax) - r->y;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
+		Enesim_Rectangle *r)
+{
+	float xmin, ymin, xmax, ymax;
+	/* FIXME this code is very ugly, for sure there must be a better
+	 * implementation */
+	xmin = QUAD_X0(q) < QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
+	xmin = xmin < QUAD_X2(q) ? xmin : QUAD_X2(q);
+	xmin = xmin < QUAD_X3(q) ? xmin : QUAD_X3(q);
+
+	ymin = QUAD_Y0(q) < QUAD_Y1(q) ? QUAD_Y0(q) : QUAD_Y1(q);
+	ymin = ymin < QUAD_Y2(q) ? ymin : QUAD_Y2(q);
+	ymin = ymin < QUAD_Y3(q) ? ymin : QUAD_Y3(q);
+
+	xmax = QUAD_X0(q) > QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
+	xmax = xmax > QUAD_X2(q) ? xmax : QUAD_X2(q);
+	xmax = xmax > QUAD_X3(q) ? xmax : QUAD_X3(q);
+
+	ymax = QUAD_Y0(q) > QUAD_Y1(q) ? QUAD_Y0(q) : QUAD_Y1(q);
+	ymax = ymax > QUAD_Y2(q) ? ymax : QUAD_Y2(q);
+	ymax = ymax > QUAD_Y3(q) ? ymax : QUAD_Y3(q);
+
+	r->x = xmin;
+	r->w = xmax - r->x;
+	r->y = ymin;
+	r->h = ymax - r->y;
 }
 /**
  * To be documented

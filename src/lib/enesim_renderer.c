@@ -31,8 +31,6 @@
  *   renders
  * - Add a scale tranform property, every renderer should multiply its
  *   coordinates and lengths by this multiplier
- * - The boundings should return an Enesim_Rectangle, not an Eina_Rectangle
- *   we need to handle the coordinates correctly
  *
  */
 /*============================================================================*
@@ -359,23 +357,15 @@ EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
  * @param[in] r The renderer to get the boundings from
  * @param[out] rect The rectangle to store the boundings
  */
-EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (rect && r->boundings)
-	{
-		 r->boundings(r, rect);
-		/* move by the origin */
-		rect->x -= lround(r->ox);
-		rect->y -= lround(r->oy);
-	}
-	else
-	{
-		rect->x = INT_MIN / 2;
-		rect->y = INT_MIN / 2;
-		rect->w = INT_MAX;
-		rect->h = INT_MAX;
-	}
+	if (!boundings) return;
+
+	enesim_renderer_boundings(r, boundings);
+	/* move by the origin */
+	boundings->x -= r->ox;
+	boundings->y -= r->oy;
 }
 
 /**
@@ -384,10 +374,12 @@ EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Eina_Rectangl
  * @param[in] r The renderer to get the boundings from
  * @param[out] rect The rectangle to store the boundings
  */
-EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (rect && r->boundings)
+	if (!rect) return;
+
+	if (r->boundings)
 	{
 		 r->boundings(r, rect);
 	}
@@ -408,31 +400,28 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 		int x, int y)
 {
 
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (rect && r->boundings)
-	{
-		r->boundings(r, rect);
-		rect->x += lround(r->ox);
-		rect->y += lround(r->oy);
-		if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
-		{
-			Enesim_Quad q;
-			Enesim_Matrix m;
+	Enesim_Rectangle boundings;
 
-			enesim_matrix_inverse(&r->matrix.original, &m);
-			enesim_matrix_rect_transform(&m, rect, &q);
-			enesim_quad_rectangle_to(&q, rect);
-		}
-		rect->x -= x;
-		rect->y -= y;
-	}
-	else
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	if (!rect) return;
+
+	enesim_renderer_boundings(r, &boundings);
+	boundings.x += r->ox;
+	boundings.y += r->oy;
+	if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
 	{
-		rect->x = INT_MIN / 2;
-		rect->y = INT_MIN / 2;
-		rect->w = INT_MAX;
-		rect->h = INT_MAX;
+		Enesim_Quad q;
+		Enesim_Matrix m;
+
+		enesim_matrix_inverse(&r->matrix.original, &m);
+		enesim_matrix_rectangle_transform(&m, &boundings, &q);
+		enesim_quad_rectangle_to(&q, &boundings);
 	}
+	rect->x = lround(boundings.x) - x;
+	rect->y = lround(boundings.y) - y;
+	rect->w = lround(boundings.w);
+	rect->h = lround(boundings.h);
 }
 
 /**

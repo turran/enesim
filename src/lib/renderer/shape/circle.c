@@ -141,13 +141,13 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 	}
 }
 
-static void _boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Circle *circ = (Circle *)r;
 
-	rect->x = lrint(circ->x - circ->r);
-	rect->y = lrint(circ->y - circ->r);
-	rect->w = rect->h = lrint(circ->r * 2);
+	rect->x = circ->x - circ->r;
+	rect->y = circ->y - circ->r;
+	rect->w = rect->h = circ->r * 2;
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
@@ -204,7 +204,7 @@ static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	}
 
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PERSPECTIVE |
+			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
