@@ -97,8 +97,10 @@ static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 	map = enesim_surface_data_get(thiz->map);
 	src = enesim_surface_data_get(thiz->src);
 
+	renderer_identity_setup(r, x, y, &xx, &yy);
+	x = eina_f16p16_int_to(xx);
+	y = eina_f16p16_int_to(yy);
 	map = map + (mstride * y) + x;
-	yy = eina_f16p16_int_from(y);
 
 	while (dst < end)
 	{
@@ -108,10 +110,10 @@ static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 		uint16_t m0;
 		uint16_t m1;
 
+		/* TODO fix this, no need for it */
+		x = eina_f16p16_int_to(xx);
 		if (x < 0 || x >= mw || y < 0 || y >= mh)
 			goto next;
-
-		xx = eina_f16p16_int_from(x);
 
 		m0 = *map >> 24;
 		m1 = *map & 0xff;
@@ -149,8 +151,10 @@ static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 	map = enesim_surface_data_get(thiz->map);
 	src = enesim_surface_data_get(thiz->src);
 
+	renderer_identity_setup(r, x, y, &xx, &yy);
+	x = eina_f16p16_int_to(xx);
+	y = eina_f16p16_int_to(yy);
 	map = map + (mstride * y) + x;
-	yy = eina_f16p16_int_from(y);
 
 	while (dst < end)
 	{
@@ -160,10 +164,10 @@ static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 		uint16_t m0;
 		uint16_t m1;
 
+		/* TODO fix this, no need for it */
+		x = eina_f16p16_int_to(xx);
 		if (x < 0 || x >= mw || y < 0 || y >= mh)
 			goto next;
-
-		xx = eina_f16p16_int_from(x);
 
 		m0 = (*map >> 16) & 0xff;
 		m1 = (*map >> 8) & 0xff;
@@ -177,7 +181,7 @@ static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 next:
 		*dst++ = p0;
 		map++;
-		x++;
+		xx += EINA_F16P16_ONE;
 	}
 }
 
