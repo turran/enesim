@@ -170,7 +170,7 @@ EAPI void enesim_matrix_f16p16_matrix_to(Enesim_Matrix *m,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_point_transform(Enesim_Matrix *m, float x, float y, float *xr, float *yr)
+EAPI void enesim_matrix_point_transform(Enesim_Matrix *m, double x, double y, double *xr, double *yr)
 {
 	if (!MATRIX_ZX(m) && !MATRIX_ZY(m))
 	{

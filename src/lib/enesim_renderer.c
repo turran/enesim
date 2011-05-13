@@ -104,7 +104,7 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 {
 	Enesim_Matrix rel_matrix, r_matrix;
 	double r_ox, r_oy;
-	float nox, noy;
+	double nox, noy;
 
 	if (!rel) return;
 

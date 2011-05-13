@@ -190,15 +190,12 @@ static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 		Enesim_Renderer *lr = l->r;
 		Enesim_Rectangle tmp;
 
-		if (lr->boundings)
-		{
-			/* check if it is greater */
-			lr->boundings(lr, &tmp);
-			if (tmp.x < rect->x) rect->x = tmp.x;
-			if (tmp.y < rect->y) rect->y = tmp.y;
-			if (tmp.w > rect->w) rect->w = tmp.w;
-			if (tmp.h > rect->h) rect->h = tmp.h;
-		}
+		enesim_renderer_boundings(lr, &tmp);
+		/* check if it is greater */
+		if (tmp.x < rect->x) rect->x = tmp.x;
+		if (tmp.y < rect->y) rect->y = tmp.y;
+		if (tmp.w > rect->w) rect->w = tmp.w;
+		if (tmp.h > rect->h) rect->h = tmp.h;
 	}
 }
 
@@ -296,12 +293,13 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 	Eina_List *l;
 	Eina_List *l_next;
 
+	thiz = _compound_get(r);
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
 		if (layer->r == rend)
 		{
-			free(layer);
 			thiz->layers = eina_list_remove_list(thiz->layers, l);
+			free(layer);
 			break;
 		}
 	}
@@ -321,8 +319,8 @@ EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r)
 	thiz = _compound_get(r);
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
-		free(layer);
 		thiz->layers = eina_list_remove_list(thiz->layers, l);
+		free(layer);
 	}
 }
 
