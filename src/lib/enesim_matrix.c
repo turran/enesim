@@ -547,9 +547,9 @@ EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_coords_get(Enesim_Quad *q, float *x1, float *y1,
-		float *x2, float *y2, float *x3, float *y3, float *x4,
-		float *y4)
+EAPI void enesim_quad_coords_get(Enesim_Quad *q, double *x1, double *y1,
+		double *x2, double *y2, double *x3, double *y3, double *x4,
+		double *y4)
 {
 	if (x1) *x1 = q->x0;
 	if (y1) *y1 = q->y0;
@@ -564,9 +564,9 @@ EAPI void enesim_quad_coords_get(Enesim_Quad *q, float *x1, float *y1,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_coords_set(Enesim_Quad *q, float x1,
-		float y1, float x2, float y2, float x3, float y3, float x4,
-		float y4)
+EAPI void enesim_quad_coords_set(Enesim_Quad *q, double x1,
+		double y1, double x2, double y2, double x3, double y3, double x4,
+		double y4)
 {
 	QUAD_X0(q) = x1;
 	QUAD_Y0(q) = y1;

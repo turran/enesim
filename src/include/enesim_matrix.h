@@ -50,10 +50,10 @@ typedef struct _Enesim_F16p16_Matrix
 
 typedef struct _Enesim_Quad
 {
-	float x0, y0;
-	float x1, y1;
-	float x2, y2;
-	float x3, y3;
+	double x0, y0;
+	double x1, y1;
+	double x2, y2;
+	double x3, y3;
 } Enesim_Quad; /**< Quadrangle handler */
 
 EAPI Enesim_Matrix_Type enesim_matrix_type_get(Enesim_Matrix *m);
@@ -96,11 +96,11 @@ EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
 		Eina_Rectangle *r);
 EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
 		Eina_Rectangle *r);
-EAPI void enesim_quad_coords_set(Enesim_Quad *q, float x1, float y1, float x2,
-		float y2, float x3, float y3, float x4, float y4);
-EAPI void enesim_quad_coords_get(Enesim_Quad *q, float *x1, float *y1,
-		float *x2, float *y2, float *x3, float *y3, float *x4,
-		float *y4);
+EAPI void enesim_quad_coords_set(Enesim_Quad *q, double x1, double y1, double x2,
+		double y2, double x3, double y3, double x4, double y4);
+EAPI void enesim_quad_coords_get(Enesim_Quad *q, double *x1, double *y1,
+		double *x2, double *y2, double *x3, double *y3, double *x4,
+		double *y4);
 /**
  * @}
  */
