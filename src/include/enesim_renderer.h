@@ -389,6 +389,26 @@ EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
 
 /**
  * @}
+ * @defgroup Enesim_Renderer_Clipper_Group Clipper
+ * @{
+ */
+
+EAPI Enesim_Renderer * enesim_renderer_clipper_new(void);
+EAPI void enesim_renderer_clipper_content_set(Enesim_Renderer *r,
+		Enesim_Renderer *content);
+EAPI void enesim_renderer_clipper_content_get(Enesim_Renderer *r,
+		Enesim_Renderer **content);
+EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
+		double width);
+EAPI void enesim_renderer_clipper_width_get(Enesim_Renderer *r,
+		double *width);
+EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
+		double height);
+EAPI void enesim_renderer_clipper_height_get(Enesim_Renderer *r,
+		double *height);
+
+/**
+ * @}
  * @}
  */
 
