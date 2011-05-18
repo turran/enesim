@@ -20,7 +20,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Ellipse Ellipse;
+typedef struct _Ellipse Enesim_Renderer_Ellipse;
 struct _Ellipse {
 	Enesim_Renderer_Shape base;
 
@@ -38,7 +38,7 @@ struct _Ellipse {
 
 static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *p, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Ellipse *ellipse = (Ellipse *) p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *) p;
 	int axx = p->matrix.values.xx, axy = p->matrix.values.xy, axz = p->matrix.values.xz;
 	int ayx = p->matrix.values.yx, ayy = p->matrix.values.yy, ayz = p->matrix.values.yz;
 	int do_inner = ellipse->do_inner;
@@ -154,7 +154,7 @@ static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *p, int x, 
 static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Ellipse *ellipse = (Ellipse *) p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *) p;
 	int axx = p->matrix.values.xx, axy = p->matrix.values.xy, axz = p->matrix.values.xz;
 	int ayx = p->matrix.values.yx, ayy = p->matrix.values.yy, ayz = p->matrix.values.yz;
 	int azx = p->matrix.values.zx, azy = p->matrix.values.zy, azz = p->matrix.values.zz;
@@ -272,7 +272,7 @@ static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, in
 
 static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 {
-	Ellipse *ellipse = (Ellipse *) p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *) p;
 	double rx, ry;
 	double sw;
 
@@ -340,14 +340,14 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 
 static void _state_cleanup(Enesim_Renderer *p)
 {
-	Ellipse *ellipse = (Ellipse *) p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *) p;
 
 	enesim_renderer_shape_sw_cleanup(p);
 }
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	Ellipse *ellipse = (Ellipse *) r;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *) r;
 
 	rect->x = ellipse->x - ellipse->rx;
 	rect->y = ellipse->y - ellipse->ry;
@@ -372,9 +372,9 @@ static void _free(Enesim_Renderer *p)
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 {
 	Enesim_Renderer *p;
-	Ellipse *ellipse;
+	Enesim_Renderer_Ellipse *ellipse;
 
-	ellipse = calloc(1, sizeof(Ellipse));
+	ellipse = calloc(1, sizeof(Enesim_Renderer_Ellipse));
 	if (!ellipse)
 		return NULL;
 	p = (Enesim_Renderer *) ellipse;
@@ -393,9 +393,9 @@ EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
  */
 EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, double x, double y)
 {
-	Ellipse *ellipse;
+	Enesim_Renderer_Ellipse *ellipse;
 
-	ellipse = (Ellipse *) p;
+	ellipse = (Enesim_Renderer_Ellipse *) p;
 	if (!ellipse) return;
 	if ((ellipse->x == x) && (ellipse->y == y))
 		return;
@@ -408,7 +408,7 @@ EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, double x, doubl
  */
 EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, double *x, double *y)
 {
-	Ellipse *ellipse = (Ellipse *)p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *)p;
 
 	if (x) *x = ellipse->x;
 	if (y) *y = ellipse->y;
@@ -420,9 +420,9 @@ EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, double *x, doub
  */
 EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, double radius_x, double radius_y)
 {
-	Ellipse *ellipse;
+	Enesim_Renderer_Ellipse *ellipse;
 
-	ellipse = (Ellipse *) p;
+	ellipse = (Enesim_Renderer_Ellipse *) p;
 	if (!ellipse) return;
 	if (radius_x < 0.9999999)
 		radius_x = 1;
@@ -440,7 +440,7 @@ EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, double radius_x,
  */
 EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, double *radius_x, double *radius_y)
 {
-	Ellipse *ellipse = (Ellipse *)p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *)p;
 
 	if (radius_x) *radius_x = ellipse->rx;
 	if (radius_y) *radius_y = ellipse->ry;
@@ -452,7 +452,7 @@ EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, double *radius_x
  */
 EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *p, double x)
 {
-	Ellipse *ellipse = (Ellipse *)p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *)p;
 	ellipse->x = x;
 }
 
@@ -462,7 +462,7 @@ EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *p, double x)
  */
 EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *p, double y)
 {
-	Ellipse *ellipse = (Ellipse *)p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *)p;
 	ellipse->y = y;
 }
 
@@ -472,7 +472,7 @@ EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *p, double y)
  */
 EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *p, double r)
 {
-	Ellipse *ellipse = (Ellipse *)p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *)p;
 	ellipse->rx = r;
 }
 
@@ -482,7 +482,7 @@ EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *p, double r)
  */
 EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *p, double r)
 {
-	Ellipse *ellipse = (Ellipse *)p;
+	Enesim_Renderer_Ellipse *ellipse = (Enesim_Renderer_Ellipse *)p;
 	ellipse->ry = r;
 }
 

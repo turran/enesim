@@ -31,6 +31,8 @@
  *   renders
  * - Add a scale tranform property, every renderer should multiply its
  *   coordinates and lengths by this multiplier
+ * - Change every internal struct on Enesim to have the correct prefix
+ *   looks like we are having issues with mingw
  *
  */
 /*============================================================================*

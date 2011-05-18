@@ -158,8 +158,6 @@ static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 	*fpy = eina_f16p16_sub(*fpy, oy);
 }
 
-Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r);
-void enesim_renderer_sw_cleanup(Enesim_Renderer *r);
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, double *old_ox, double *old_oy);
 void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, double old_ox, double old_oy);
 

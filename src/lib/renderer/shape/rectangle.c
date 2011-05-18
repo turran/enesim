@@ -38,7 +38,7 @@ typedef struct _Rectangle {
 	int rr0, irr0;
 	int sw;
 	unsigned char do_inner :1;
-} Rectangle;
+} Enesim_Renderer_Rectangle;
 
 #define EVAL_ROUND_OUTER_CORNERS(c0,c1,c2,c3) \
 		if (lxx < 0) \
@@ -290,14 +290,14 @@ typedef struct _Rectangle {
 static void _span_norounded_nooutlined_paint_filled_identity(Enesim_Renderer *r, int x,
 		int y, unsigned int len, uint32_t *dst)
 {
-	Rectangle *rect = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)r;
 
 }
 
 static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Rectangle *rect = (Rectangle *) p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *) p;
 	int sw = rect->w, sh = rect->h;
 	int axx = p->matrix.values.xx, axy = p->matrix.values.xy, axz = p->matrix.values.xz;
 	int ayx = p->matrix.values.yx, ayy = p->matrix.values.yy, ayz = p->matrix.values.yz;
@@ -430,7 +430,7 @@ static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *p,
 static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Rectangle *rect = (Rectangle *) p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *) p;
 	int sw = rect->w, sh = rect->h;
 	int axx = p->matrix.values.xx, axy = p->matrix.values.xy, axz = p->matrix.values.xz;
 	int ayx = p->matrix.values.yx, ayy = p->matrix.values.yy, ayz = p->matrix.values.yz;
@@ -568,7 +568,7 @@ static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *p, i
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Rectangle *rect = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)r;
 
 	if (!rect || (rect->w < 1) || (rect->h < 1))
 	{
@@ -622,7 +622,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Rectangle *rect = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)r;
 
 	enesim_renderer_shape_sw_cleanup(r);
 //	if (rect->stroke.paint)
@@ -635,7 +635,7 @@ static void _free(Enesim_Renderer *p)
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	Rectangle *rct = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rct = (Enesim_Renderer_Rectangle *)r;
 
 	rect->x = 0;
 	rect->y = 0;
@@ -655,9 +655,9 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 {
 	Enesim_Renderer *p;
-	Rectangle *rect;
+	Enesim_Renderer_Rectangle *rect;
 
-	rect = calloc(1, sizeof(Rectangle));
+	rect = calloc(1, sizeof(Enesim_Renderer_Rectangle));
 	if (!rect)
 		return NULL;
 
@@ -676,7 +676,7 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
  */
 EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *p, unsigned int w)
 {
-	Rectangle *rect = (Rectangle *)p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)p;
 
 	rect->w = w;
 }
@@ -686,7 +686,7 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *p, unsigned int w
  */
 EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *p, unsigned int *w)
 {
-	Rectangle *rect = (Rectangle *)p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)p;
 
 	if (w) *w = rect->w;
 }
@@ -696,7 +696,7 @@ EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *p, unsigned int *
  */
 EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *p, unsigned int h)
 {
-	Rectangle *rect = (Rectangle *)p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)p;
 
 	rect->h = h;
 }
@@ -706,7 +706,7 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *p, unsigned int 
  */
 EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *p, unsigned int *h)
 {
-	Rectangle *rect = (Rectangle *)p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)p;
 
 	if (h) *h = rect->h;
 }
@@ -716,7 +716,7 @@ EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *p, unsigned int 
  */
 EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, unsigned int w, unsigned int h)
 {
-	Rectangle *rect = (Rectangle *)p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)p;
 	rect->w = w;
 	rect->h = h;
 }
@@ -726,7 +726,7 @@ EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, unsigned int w,
  */
 EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *p, unsigned int *w, unsigned int *h)
 {
-	Rectangle *rect = (Rectangle *) p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *) p;
 
 	if (w) *w = rect->w;
 	if (h) *h = rect->h;
@@ -737,7 +737,7 @@ EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *p, unsigned int *w
  */
 EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, double radius)
 {
-	Rectangle *rect = (Rectangle *) p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *) p;
 	if (!rect) return;
 	if (radius < 0)
 		radius = 0;
@@ -752,7 +752,7 @@ EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *p, double
  */
 EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
-	Rectangle *rect = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)r;
 
 	rect->corner.tl = rounded;
 }
@@ -763,7 +763,7 @@ EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina
  */
 EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
-	Rectangle *rect = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)r;
 
 	rect->corner.tr = rounded;
 }
@@ -774,7 +774,7 @@ EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Ein
  */
 EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
-	Rectangle *rect = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)r;
 
 	rect->corner.bl = rounded;
 }
@@ -785,7 +785,7 @@ EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, E
  */
 EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
-	Rectangle *rect = (Rectangle *)r;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)r;
 
 	rect->corner.br = rounded;
 }
@@ -797,7 +797,7 @@ EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, 
 EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *p,
 		Eina_Bool tl, Eina_Bool tr, Eina_Bool bl, Eina_Bool br)
 {
-	Rectangle *rect = (Rectangle *)p;
+	Enesim_Renderer_Rectangle *rect = (Enesim_Renderer_Rectangle *)p;
 	if (!rect) return;
 
 	if ((rect->corner.tl == tl) && (rect->corner.tr == tr) &&
