@@ -33,6 +33,9 @@
  *   coordinates and lengths by this multiplier
  * - Change every internal struct on Enesim to have the correct prefix
  *   looks like we are having issues with mingw
+ * - We have some overlfow on the coordinates whenever we want to trasnlate or
+ *   transform boundings, we need to fix the maximum and minimum for a
+ *   coordinate and length
  *
  */
 /*============================================================================*
@@ -366,8 +369,10 @@ EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectan
 
 	enesim_renderer_boundings(r, boundings);
 	/* move by the origin */
-	boundings->x -= r->ox;
-	boundings->y -= r->oy;
+	if (boundings->x != INT_MIN / 2)
+		boundings->x -= r->ox;
+	if (boundings->y != INT_MIN / 2)
+		boundings->y -= r->oy;
 }
 
 /**
@@ -409,8 +414,10 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 	if (!rect) return;
 
 	enesim_renderer_boundings(r, &boundings);
-	boundings.x += r->ox;
-	boundings.y += r->oy;
+	if (boundings.x != INT_MIN / 2)
+		boundings.x += r->ox;
+	if (boundings.y != INT_MIN / 2)
+		boundings.y += r->oy;
 	if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Quad q;

@@ -56,6 +56,7 @@ static void _span(Enesim_Renderer *r, int x, int y,
 
 static _content_cleanup(Enesim_Renderer_Clipper *thiz)
 {
+	enesim_renderer_sw_cleanup(thiz->content);
 	enesim_renderer_origin_set(thiz->content, thiz->old_x, thiz->old_y);
 	enesim_renderer_transformation_set(thiz->content, &thiz->old_matrix);
 	/* FIXME add the rop */
