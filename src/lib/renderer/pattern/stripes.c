@@ -20,18 +20,18 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Stripes {
+typedef struct _Enesim_Renderer_Stripes {
 	struct {
 		Enesim_Color color;
 		double thickness;
 	} s0, s1;
 
 	int hh0, hh;
-} Stripes;
+} Enesim_Renderer_Stripes;
 
-static inline Stripes * _stripes_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
 {
-	Stripes *s;
+	Enesim_Renderer_Stripes *s;
 
 	s = enesim_renderer_data_get(r);
 	return s;
@@ -40,7 +40,7 @@ static inline Stripes * _stripes_get(Enesim_Renderer *r)
 static void _span_projective(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Stripes *st = _stripes_get(p);
+	Enesim_Renderer_Stripes *st = _stripes_get(p);
 	int hh = st->hh, hh0 = st->hh0, h0 = hh0 >> 16;
 	unsigned int c0 = st->s0.color, c1 = st->s1.color;
 	unsigned int *d = dst, *e = d + len;
@@ -86,7 +86,7 @@ static void _span_projective(Enesim_Renderer *p, int x, int y,
 static void _span_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Stripes *st = _stripes_get(r);
+	Enesim_Renderer_Stripes *st = _stripes_get(r);
 	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
 	int hh = st->hh, hh0 = st->hh0, h0 = hh0 >> 16;
 	unsigned int c0 = st->s0.color, c1 = st->s1.color;
@@ -126,7 +126,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y,
 
 static Eina_Bool _setup_state(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Stripes *st = _stripes_get(r);
+	Enesim_Renderer_Stripes *st = _stripes_get(r);
 
 	if (!st)
 		return EINA_FALSE;
@@ -148,7 +148,7 @@ static void _cleanup_state(Enesim_Renderer *p)
 
 static void _stripes_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Stripes *thiz;
+	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
 	if (!thiz)
@@ -164,7 +164,7 @@ static void _stripes_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _free(Enesim_Renderer *r)
 {
-	Stripes *thiz;
+	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
 	if (!thiz) return;
@@ -187,9 +187,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 {
 	Enesim_Renderer *r;
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
-	st = calloc(1, sizeof(Stripes));
+	st = calloc(1, sizeof(Enesim_Renderer_Stripes));
 	if (!st)
 		return NULL;
 	/* specific renderer setup */
@@ -207,7 +207,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
 		Enesim_Color color)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	st->s0.color = color;
@@ -219,7 +219,7 @@ EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	if (color) *color = st->s0.color;
@@ -232,7 +232,7 @@ EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Colo
 EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
 		double thickness)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	if (thickness < 0.99999)
@@ -246,7 +246,7 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double *thickness)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	if (thickness) *thickness = st->s0.thickness;
@@ -259,7 +259,7 @@ EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double 
 EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 		Enesim_Color color)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	st->s1.color = color;
@@ -271,7 +271,7 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	if (color) *color = st->s1.color;
@@ -284,7 +284,7 @@ EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color
 EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
 		double thickness)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	if (thickness < 0.99999)
@@ -298,7 +298,7 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *thickness)
 {
-	Stripes *st;
+	Enesim_Renderer_Stripes *st;
 
 	st = _stripes_get(r);
 	if (thickness) *thickness = st->s1.thickness;

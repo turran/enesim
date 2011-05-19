@@ -20,7 +20,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Grid
+typedef struct _Enesim_Renderer_Grid
 {
 	struct {
 		Enesim_Color color;
@@ -34,17 +34,17 @@ typedef struct _Grid
 	Eina_F16p16 hi;
 	Eina_F16p16 wwt;
 	Eina_F16p16 hht;
-} Grid;
+} Enesim_Renderer_Grid;
 
-static inline Grid * _grid_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Grid * _grid_get(Enesim_Renderer *r)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
 }
 
-static inline uint32_t _grid(Grid *g, Eina_F16p16 yy, Eina_F16p16 xx)
+static inline uint32_t _grid(Enesim_Renderer_Grid *g, Eina_F16p16 yy, Eina_F16p16 xx)
 {
 	Eina_F16p16 syy;
 	int sy;
@@ -118,7 +118,7 @@ static inline uint32_t _grid(Grid *g, Eina_F16p16 yy, Eina_F16p16 xx)
 
 static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Grid *g;
+	Enesim_Renderer_Grid *g;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx;
@@ -172,7 +172,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 
 static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Grid *g;
+	Enesim_Renderer_Grid *g;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx;
@@ -194,7 +194,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Grid *g;
+	Enesim_Renderer_Grid *g;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx, zz;
@@ -226,7 +226,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Grid *g;
+	Enesim_Renderer_Grid *g;
 
 	g = _grid_get(r);
 	if (!g->inside.w || !g->inside.h || !g->outside.w || !g->outside.h)
@@ -249,7 +249,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _grid_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	if (!thiz)
@@ -265,7 +265,7 @@ static void _grid_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _free(Enesim_Renderer *r)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	free(thiz);
@@ -294,9 +294,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_grid_new(void)
 {
 	Enesim_Renderer *r;
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
-	thiz = calloc(1, sizeof(Grid));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Grid));
 	/* specific renderer setup */
 	thiz->inside.w = 1;
 	thiz->inside.h = 1;
@@ -314,7 +314,7 @@ EAPI Enesim_Renderer * enesim_renderer_grid_new(void)
  */
 EAPI void enesim_renderer_grid_inside_width_set(Enesim_Renderer *r, unsigned int width)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 
 	thiz = _grid_get(r);
@@ -328,7 +328,7 @@ EAPI void enesim_renderer_grid_inside_width_set(Enesim_Renderer *r, unsigned int
  */
 EAPI void enesim_renderer_grid_inside_width_get(Enesim_Renderer *r, unsigned int *iw)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	if (iw) *iw = thiz->inside.w;
@@ -340,7 +340,7 @@ EAPI void enesim_renderer_grid_inside_width_get(Enesim_Renderer *r, unsigned int
  */
 EAPI void enesim_renderer_grid_inside_height_set(Enesim_Renderer *r, unsigned int height)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	thiz->inside.h = height;
@@ -353,7 +353,7 @@ EAPI void enesim_renderer_grid_inside_height_set(Enesim_Renderer *r, unsigned in
  */
 EAPI void enesim_renderer_grid_inside_height_get(Enesim_Renderer *r, unsigned int *ih)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	if (ih) *ih = thiz->inside.h;
@@ -365,7 +365,7 @@ EAPI void enesim_renderer_grid_inside_height_get(Enesim_Renderer *r, unsigned in
  */
 EAPI void enesim_renderer_grid_inside_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	thiz->inside.color = color;
@@ -377,7 +377,7 @@ EAPI void enesim_renderer_grid_inside_color_set(Enesim_Renderer *r, Enesim_Color
  */
 EAPI void enesim_renderer_grid_inside_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	if (color) *color = thiz->inside.color;
@@ -389,7 +389,7 @@ EAPI void enesim_renderer_grid_inside_color_get(Enesim_Renderer *r, Enesim_Color
  */
 EAPI void enesim_renderer_grid_border_hthickness_set(Enesim_Renderer *r, unsigned int hthickness)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	thiz->outside.h = hthickness;
@@ -401,7 +401,7 @@ EAPI void enesim_renderer_grid_border_hthickness_set(Enesim_Renderer *r, unsigne
  */
 EAPI void enesim_renderer_grid_border_hthickness_get(Enesim_Renderer *r, unsigned int *h)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	if (h) *h = thiz->outside.h;
@@ -413,7 +413,7 @@ EAPI void enesim_renderer_grid_border_hthickness_get(Enesim_Renderer *r, unsigne
  */
 EAPI void enesim_renderer_grid_border_vthickness_set(Enesim_Renderer *r, unsigned int vthickness)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	thiz->outside.w = vthickness;
@@ -425,7 +425,7 @@ EAPI void enesim_renderer_grid_border_vthickness_set(Enesim_Renderer *r, unsigne
  */
 EAPI void enesim_renderer_grid_border_vthickness_get(Enesim_Renderer *r, unsigned int *v)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	if (v) *v = thiz->outside.w;
@@ -437,7 +437,7 @@ EAPI void enesim_renderer_grid_border_vthickness_get(Enesim_Renderer *r, unsigne
  */
 EAPI void enesim_renderer_grid_border_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	thiz->outside.color = color;
@@ -449,7 +449,7 @@ EAPI void enesim_renderer_grid_border_color_set(Enesim_Renderer *r, Enesim_Color
  */
 EAPI void enesim_renderer_grid_border_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
-	Grid *thiz;
+	Enesim_Renderer_Grid *thiz;
 
 	thiz = _grid_get(r);
 	if (color) *color = thiz->outside.color;

@@ -40,7 +40,7 @@
 		}\
 	} while(0)
 
-typedef struct _Image
+typedef struct _Enesim_Renderer_Image
 {
 	EINA_MAGIC;
 	Enesim_Surface *s;
@@ -50,7 +50,7 @@ typedef struct _Image
 	int *xoff;
 	Enesim_Compositor_Point point;
 	Enesim_Compositor_Span span;
-} Image;
+} Enesim_Renderer_Image;
 
 static inline void _offsets(unsigned int cs, unsigned int cl, unsigned int sl, int *off)
 {
@@ -62,9 +62,9 @@ static inline void _offsets(unsigned int cs, unsigned int cl, unsigned int sl, i
 	}
 }
 
-static inline Image * _image_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Image * _image_get(Enesim_Renderer *r)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_IMAGE_MAGIC_CHECK_RETURN(thiz, NULL);
@@ -131,7 +131,7 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 
 static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 	uint32_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
@@ -164,7 +164,7 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 
 static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 	uint32_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
@@ -202,7 +202,7 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 
 static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 	uint32_t sstride;
 	uint8_t *src;
 
@@ -238,7 +238,7 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 
 static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 	uint32_t sstride;
 	uint32_t *src;
 
@@ -276,7 +276,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
  *----------------------------------------------------------------------------*/
 static void _image_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (!thiz->s)
@@ -297,7 +297,7 @@ static void _image_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 
 static void _image_state_cleanup(Enesim_Renderer *r)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (thiz->xoff)
@@ -315,7 +315,7 @@ static void _image_state_cleanup(Enesim_Renderer *r)
 
 static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 	Enesim_Rop rop;
 	Enesim_Color color;
 	Enesim_Format fmt;
@@ -382,7 +382,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill 
 
 static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (!thiz)
@@ -400,7 +400,7 @@ static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _image_free(Enesim_Renderer *r)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	_image_state_cleanup(r);
@@ -427,9 +427,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 {
 	Enesim_Renderer *r;
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
-	thiz = calloc(1, sizeof(Image));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Image));
 	if (!thiz) return NULL;
 
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMAGE_MAGIC);
@@ -443,7 +443,7 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
  */
 EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (!thiz) return;
@@ -455,7 +455,7 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x)
  */
 EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (!thiz) return;
@@ -467,7 +467,7 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y)
  */
 EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (!thiz) return;
@@ -479,7 +479,7 @@ EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w)
  */
 EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (!thiz) return;
@@ -491,7 +491,7 @@ EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h)
  */
 EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
-	Image *thiz;
+	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
 	if (!thiz) return;

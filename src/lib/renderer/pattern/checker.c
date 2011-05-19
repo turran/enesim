@@ -25,17 +25,17 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Checker
+typedef struct _Enesim_Renderer_Checker
 {
 	Enesim_Color color1;
 	Enesim_Color color2;
 	int sw;
 	int sh;
-} Checker;
+} Enesim_Renderer_Checker;
 
-Checker * _checker_get(Enesim_Renderer *r)
+Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
@@ -43,7 +43,7 @@ Checker * _checker_get(Enesim_Renderer *r)
 
 static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx;
 	int w2;
 	int h2;;
@@ -97,7 +97,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 
 static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx, ww, hh, ww2, hh2;
 	uint32_t *end = dst + len;
 
@@ -182,7 +182,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx, ww, hh, ww2, hh2, zz;
 	uint32_t *end = dst + len;
 
@@ -278,7 +278,7 @@ static void _checker_state_cleanup(Enesim_Renderer *r)
 
 static Eina_Bool _checker_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 
@@ -293,7 +293,7 @@ static Eina_Bool _checker_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fil
 
 static void _checker_free(Enesim_Renderer *r)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 	free(thiz);
@@ -301,7 +301,7 @@ static void _checker_free(Enesim_Renderer *r)
 
 static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 	if (!thiz)
@@ -334,9 +334,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
 {
 	Enesim_Renderer *r;
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
-	thiz = calloc(1, sizeof(Checker));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Checker));
 	if (!thiz) return NULL;
 
 	/* specific renderer setup */
@@ -353,7 +353,7 @@ EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
  */
 EAPI void enesim_renderer_checker_even_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 
@@ -366,7 +366,7 @@ EAPI void enesim_renderer_checker_even_color_set(Enesim_Renderer *r, Enesim_Colo
  */
 EAPI void enesim_renderer_checker_even_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 	if (color) *color = thiz->color1;
@@ -378,7 +378,7 @@ EAPI void enesim_renderer_checker_even_color_get(Enesim_Renderer *r, Enesim_Colo
  */
 EAPI void enesim_renderer_checker_odd_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 
@@ -391,7 +391,7 @@ EAPI void enesim_renderer_checker_odd_color_set(Enesim_Renderer *r, Enesim_Color
  */
 EAPI void enesim_renderer_checker_odd_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 	if (color) *color = thiz->color2;
@@ -402,7 +402,7 @@ EAPI void enesim_renderer_checker_odd_color_get(Enesim_Renderer *r, Enesim_Color
  */
 EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 
@@ -414,7 +414,7 @@ EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
  */
 EAPI void enesim_renderer_checker_width_get(Enesim_Renderer *r, int *width)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 	if (width) *width = thiz->sw;
@@ -425,7 +425,7 @@ EAPI void enesim_renderer_checker_width_get(Enesim_Renderer *r, int *width)
  */
 EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 
@@ -437,7 +437,7 @@ EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
  */
 EAPI void enesim_renderer_checker_heigth_get(Enesim_Renderer *r, int *height)
 {
-	Checker *thiz;
+	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
 	if (height) *height = thiz->sh;

@@ -28,11 +28,11 @@ typedef struct _Perlin
 	} xfreq, yfreq, ampl;
 	float persistence;
 	int octaves;
-} Perlin;
+} Enesim_Renderer_Perlin;
 
-static inline Perlin * _perlin_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Perlin * _perlin_get(Enesim_Renderer *r)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 
@@ -41,7 +41,7 @@ static inline Perlin * _perlin_get(Enesim_Renderer *r)
 
 static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
 
@@ -70,7 +70,7 @@ static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int
 
 static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 *freq, *ampl, per;
@@ -101,7 +101,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned i
  *----------------------------------------------------------------------------*/
 static Eina_Bool _perlin_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	if (thiz->xfreq.coeff)
@@ -124,7 +124,7 @@ static Eina_Bool _perlin_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill
 
 static void _perlin_state_cleanup(Enesim_Renderer *r)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	if (thiz->xfreq.coeff)
@@ -137,7 +137,7 @@ static void _perlin_state_cleanup(Enesim_Renderer *r)
 
 static void _perlin_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	if (!thiz)
@@ -151,7 +151,7 @@ static void _perlin_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _perlin_free(Enesim_Renderer *r)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	_perlin_state_cleanup(r);
@@ -177,9 +177,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 {
 	Enesim_Renderer *r;
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
-	thiz = calloc(1, sizeof(Perlin));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Perlin));
 	thiz->xfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->yfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->ampl.val = 1; /* p p2 p3 p4 ... */
@@ -194,7 +194,7 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
  */
 EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int octaves)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	thiz->octaves = octaves;
@@ -205,7 +205,7 @@ EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int oc
  */
 EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persistence)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	thiz->persistence = persistence;
@@ -216,7 +216,7 @@ EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persi
  */
 EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, float ampl)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	thiz->ampl.val = ampl;
@@ -227,7 +227,7 @@ EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, float ampl)
  */
 EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	thiz->xfreq.val = freq;
@@ -238,7 +238,7 @@ EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq)
  */
 EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, float freq)
 {
-	Perlin *thiz;
+	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
 	thiz->yfreq.val = freq;

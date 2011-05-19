@@ -20,19 +20,17 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Background Background;
-
-struct _Background {
+typedef struct _Enesim_Renderer_Background {
 	/* the properties */
 	Enesim_Color color;
 	/* generated at state setup */
 	Enesim_Color final_color;
 	Enesim_Compositor_Span span;
-};
+} Enesim_Renderer_Background;
 
-static inline Background * _background_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
 {
-	Background *thiz;
+	Enesim_Renderer_Background *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
@@ -40,7 +38,7 @@ static inline Background * _background_get(Enesim_Renderer *r)
 static void _span(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Background *thiz = _background_get(p);
+	Enesim_Renderer_Background *thiz = _background_get(p);
 
 	thiz->span(dst, len, NULL, thiz->final_color, NULL);
 }
@@ -49,7 +47,7 @@ static void _span(Enesim_Renderer *p, int x, int y,
  *----------------------------------------------------------------------------*/
 static Eina_Bool _background_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Background *thiz;
+	Enesim_Renderer_Background *thiz;
 	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
 	Enesim_Rop rop;
 	Enesim_Color final_color, rend_color;
@@ -74,7 +72,7 @@ static void _background_state_cleanup(Enesim_Renderer *r)
 
 static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Background *thiz;
+	Enesim_Renderer_Background *thiz;
 
 	thiz = _background_get(r);
 	if (!thiz)
@@ -92,7 +90,7 @@ static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _background_free(Enesim_Renderer *r)
 {
-	Background *thiz;
+	Enesim_Renderer_Background *thiz;
 
 	thiz = _background_get(r);
 	free(thiz);
@@ -114,9 +112,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 {
 	Enesim_Renderer *r;
-	Background *thiz;
+	Enesim_Renderer_Background *thiz;
 
-	thiz = calloc(1, sizeof(Background));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Background));
 	if (!thiz) return NULL;
 	r = enesim_renderer_new(&_descriptor, thiz);
 	return r;
@@ -129,7 +127,7 @@ EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
 		Enesim_Color color)
 {
-	Background *thiz;
+	Enesim_Renderer_Background *thiz;
 
 	thiz = _background_get(r);
 	thiz->color = color;
