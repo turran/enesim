@@ -69,6 +69,14 @@ AC_HEADER_STDC
 AC_C_CONST
 AC_C_BIGENDIAN
 
+ENESIM_BUILD=""
+case "$host_os" in
+   mingw*)
+      ENESIM_BUILD="-DENESIM_BUILD"
+   ;;
+esac
+AC_SUBST(ENESIM_BUILD)
+
 
 ### Checks for linker characteristics
 

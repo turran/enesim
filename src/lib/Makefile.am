@@ -6,6 +6,7 @@ Makefile.in
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
+@ENESIM_BUILD@ \
 @ENESIM_CFLAGS@
 
 lib_LTLIBRARIES = libenesim.la

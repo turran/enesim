@@ -27,13 +27,13 @@
  * @{
  */
 
+#include "config.h"
+
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>
 /* TODO remove all assert statements */
 #include <assert.h>
-
-#include "config.h"
 
 #define ERR(...) EINA_LOG_DOM_ERR(enesim_log, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(enesim_log, __VA_ARGS__)
