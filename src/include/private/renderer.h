@@ -30,7 +30,7 @@
 
 struct _Enesim_Renderer
 {
-	EINA_MAGIC;
+	EINA_MAGIC
 	Enesim_Rop rop;
 	/* FIXME why dont have a descriptor pointer directly? */
 	/* common functions */

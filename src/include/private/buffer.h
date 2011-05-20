@@ -27,7 +27,7 @@
 
 struct _Enesim_Buffer
 {
-	EINA_MAGIC;
+	EINA_MAGIC
 	uint32_t w;
 	uint32_t h;
 	Enesim_Buffer_Data data;
