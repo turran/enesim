@@ -49,7 +49,7 @@ static void PT_C(argb8888, blend)(uint32_t *d,
 	blend_mmx(d, r0, r1);
 	_mm_empty();
 #else
-	argb8888_blend(d, a, color);
+	argb8888_blend(d, a16, color);
 #endif
 }
 
