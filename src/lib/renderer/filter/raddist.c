@@ -21,18 +21,18 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Raddist
+typedef struct _Enesim_Renderer_Raddist
 {
 	Enesim_Surface *src;
 	double scale;
 	double radius;
 	/* the x and y origin of the circle */
 	int orx, ory;
-} Raddist;
+} Enesim_Renderer_Raddist;
 
-static inline Raddist * _raddist_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Raddist * _raddist_get(Enesim_Renderer *r)
 {
-	Raddist *thiz;
+	Enesim_Renderer_Raddist *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
@@ -41,7 +41,7 @@ static inline Raddist * _raddist_get(Enesim_Renderer *r)
 static void _span_identity(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 	uint32_t *end = dst + len;
 	double r_inv;
 	uint32_t *src;
@@ -86,7 +86,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	rd = _raddist_get(r);
 	if (!rd->src) return EINA_FALSE;
@@ -101,7 +101,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	rd = _raddist_get(r);
 	if (!rd->src)
@@ -125,7 +125,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 
 static void _raddist_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Raddist *thiz;
+	Enesim_Renderer_Raddist *thiz;
 
 	thiz = _raddist_get(r);
 	if (!thiz)
@@ -139,7 +139,7 @@ static void _raddist_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _free(Enesim_Renderer *r)
 {
-	Raddist *thiz;
+	Enesim_Renderer_Raddist *thiz;
 
 	thiz = _raddist_get(r);
 	free(thiz);
@@ -156,10 +156,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
  *============================================================================*/
 EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 {
-	Raddist *thiz;
+	Enesim_Renderer_Raddist *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Raddist));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Raddist));
 	r = enesim_renderer_new(&_descriptor, thiz);
 	
 	return r;
@@ -167,7 +167,7 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 
 EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	if (!radius)
 		radius = 1;
@@ -177,7 +177,7 @@ EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius)
 
 EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	rd = _raddist_get(r);
 	if (factor > 1.0)
@@ -187,7 +187,7 @@ EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor)
 
 EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	rd = _raddist_get(r);
 	return rd->scale;
@@ -195,7 +195,7 @@ EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 
 EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	rd = _raddist_get(r);
 	rd->src = src;
@@ -203,7 +203,7 @@ EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 
 EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	rd = _raddist_get(r);
 	rd->orx = ox;
@@ -211,7 +211,7 @@ EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
 
 EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy)
 {
-	Raddist *rd;
+	Enesim_Renderer_Raddist *rd;
 
 	rd = _raddist_get(r);
 	rd->ory = oy;

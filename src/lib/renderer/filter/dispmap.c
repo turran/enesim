@@ -32,11 +32,11 @@ typedef struct _Dispamp
 	double scale;
 	/* The state variables */
 	Eina_F16p16 s_scale;
-} Dispmap;
+} Enesim_Renderer_Dispmap;
 
-static inline Dispmap * _dispmap_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Dispmap * _dispmap_get(Enesim_Renderer *r)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
@@ -80,7 +80,7 @@ static inline Eina_F16p16 _displace(Eina_F16p16 coord, uint8_t distance, Eina_F1
 static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 	uint32_t *end = dst + len;
 	uint32_t *map, *src;
 	int mstride;
@@ -134,7 +134,7 @@ next:
 static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 	uint32_t *end = dst + len;
 	uint32_t *map, *src;
 	int mstride;
@@ -189,7 +189,7 @@ next:
 static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 		int y, unsigned int len, uint32_t *dst)				\
 {										\
-	Dispmap *thiz;								\
+	Enesim_Renderer_Dispmap *thiz;								\
 	uint32_t *end = dst + len;						\
 	uint32_t *map, *src;							\
 	int mstride;								\
@@ -260,7 +260,7 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 	if (!thiz->map || !thiz->src) return EINA_FALSE;
@@ -275,7 +275,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 	if (!thiz->src || !thiz->map)
@@ -301,7 +301,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 
 static void _dispmap_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 	if (!thiz)
@@ -316,7 +316,7 @@ static void _dispmap_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _free(Enesim_Renderer *r)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 	free(thiz);
@@ -339,10 +339,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
  */
 EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Dispmap));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Dispmap));
 	if (!thiz) return NULL;
 	/* specific renderer setup */
 	thiz->x_channel = ENESIM_CHANNEL_RED;
@@ -360,7 +360,7 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r,
 	Enesim_Channel channel)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 
@@ -374,7 +374,7 @@ EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r,
 EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r,
 	Enesim_Channel channel)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 
@@ -385,7 +385,7 @@ EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *map)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 
@@ -396,7 +396,7 @@ EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *ma
  */
 EAPI Enesim_Surface * enesim_renderer_dispmap_map_get(Enesim_Renderer *r)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 
@@ -407,7 +407,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_map_get(Enesim_Renderer *r)
  */
 EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 
@@ -418,7 +418,7 @@ EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *sr
  */
 EAPI Enesim_Surface * enesim_renderer_dispmap_src_get(Enesim_Renderer *r)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 
@@ -429,7 +429,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_src_get(Enesim_Renderer *r)
  */
 EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 
@@ -440,7 +440,7 @@ EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor)
  */
 EAPI double enesim_renderer_dispmap_factor_get(Enesim_Renderer *r)
 {
-	Dispmap *thiz;
+	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
 

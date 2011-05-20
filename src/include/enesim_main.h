@@ -16,19 +16,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENESIM_CORE_H_
-#define ENESIM_CORE_H_
+#ifndef ENESIM_MAIN_H_
+#define ENESIM_MAIN_H_
 
 /**
  * @defgroup Enesim_Main_Group Main
  * @{
  */
-
-typedef uint32_t Enesim_Argb; /**< ARGB color without premultiplication */
-typedef uint32_t Enesim_Color; /**< Internal representation of an ARGB color */
-#define ENESIM_COLOR_FULL 0xffffffff /**< Simple definition of a full (opaque white) color */
-
-typedef uint8_t Enesim_Alpha;
 
 typedef enum _Enesim_Angle
 {

@@ -12,6 +12,7 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libenesim.la
 
 libenesim_la_SOURCES = \
+enesim_color.c \
 enesim_main.c \
 enesim_matrix.c \
 enesim_buffer.c \
