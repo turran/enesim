@@ -78,8 +78,8 @@ struct _Contour_Polygon
 	Contour_Polygon *next;
 };
 
-typedef struct _Figure Figure;
-struct _Figure
+typedef struct _Enesim_Renderer_Figure Enesim_Renderer_Figure;
+struct _Enesim_Renderer_Figure
 {
 	Enesim_Renderer_Shape base;
 
@@ -100,7 +100,7 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *p, int x,
 		int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
-	Figure *o = (Figure *) p;
+	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
 	unsigned int fcolor = f->fill.color;
 	unsigned int scolor = f->stroke.color;
 	Enesim_Renderer *fpaint = f->fill.rend;
@@ -257,7 +257,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
-	Figure *o = (Figure *) p;
+	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
 	unsigned int fcolor = f->fill.color;
 	unsigned int scolor = f->stroke.color;
 	Enesim_Renderer *fpaint = f->fill.rend;
@@ -422,7 +422,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
-	Figure *o = (Figure *) p;
+	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
 	unsigned int fcolor = f->fill.color;
 	unsigned int scolor = f->stroke.color;
 	Enesim_Renderer *fpaint = f->fill.rend;
@@ -571,7 +571,7 @@ static void _free(Enesim_Renderer *p)
 
 static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 {
-	Figure *o = (Figure *) p;
+	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
 	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
 
 	if (!f || !o)
@@ -708,9 +708,9 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
-	Figure *o;
+	Enesim_Renderer_Figure *o;
 
-	o = (Figure *)r;
+	o = (Enesim_Renderer_Figure *)r;
 
 	// for now.. but do this better later
 	if (!enesim_renderer_sw_setup(r))
@@ -734,9 +734,9 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 {
 	Enesim_Renderer *p;
 	Enesim_Renderer_Shape *f;
-	Figure *o;
+	Enesim_Renderer_Figure *o;
 
-	o = calloc(1, sizeof(Figure));
+	o = calloc(1, sizeof(Enesim_Renderer_Figure));
 	if (!o)
 		return NULL;
 
@@ -756,10 +756,10 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p)
 {
 	Enesim_Renderer_Shape *f;
-	Figure *o;
+	Enesim_Renderer_Figure *o;
 	Contour_Polygon *poly;
 
-	o = (Figure *) p;
+	o = (Enesim_Renderer_Figure *) p;
 
 	poly = calloc(1, sizeof(Contour_Polygon));
 	if (!poly)
@@ -785,11 +785,11 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
 		double x, double y)
 {
 	Enesim_Renderer_Shape *f;
-	Figure *o;
+	Enesim_Renderer_Figure *o;
 	Contour_Polygon *poly;
 	Polygon_Vertex *vertex;
 
-	o = (Figure *) p;
+	o = (Enesim_Renderer_Figure *) p;
 
 	if (!o->polys)
 		return; // maybe just add one instead
@@ -823,11 +823,11 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
 EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p)
 {
 	Enesim_Renderer_Shape *f;
-	Figure *o;
+	Enesim_Renderer_Figure *o;
 	Contour_Polygon *c, *nc;
 	Polygon_Vertex *v, *nv;
 
-	o = (Figure *) p;
+	o = (Enesim_Renderer_Figure *) p;
 
 	if (!o->polys)
 		return;
@@ -860,9 +860,9 @@ EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list
 {
 	Enesim_Renderer_Figure_Polygon *polygon;
 	Eina_List *l1;
-	Figure *f;
+	Enesim_Renderer_Figure *f;
 
-	f = (Figure *)r;
+	f = (Enesim_Renderer_Figure *)r;
 	enesim_renderer_figure_clear(r);
 	EINA_LIST_FOREACH(list, l1, polygon)
 	{

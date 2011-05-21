@@ -20,7 +20,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Circle {
+typedef struct _Enesim_Renderer_Circle {
 	Enesim_Renderer_Shape base;
 
 	double x, y;
@@ -29,12 +29,12 @@ typedef struct _Circle {
 	int xx0, yy0;
 	int rr0, irr0;
 	unsigned char do_inner :1;
-} Circle;
+} Enesim_Renderer_Circle;
 
 static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Circle *circ = (Circle *)r;
+	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
 	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
 	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
 	int do_inner = circ->do_inner;
@@ -143,7 +143,7 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	Circle *circ = (Circle *)r;
+	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
 
 	rect->x = circ->x - circ->r;
 	rect->y = circ->y - circ->r;
@@ -152,7 +152,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Circle *circ = (Circle *)r;
+	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
 	double rad;
 	double sw;
 
@@ -186,17 +186,17 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Circle *circ = (Circle *)r;
+	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
 
 	enesim_renderer_shape_sw_cleanup(r);
 }
 
 static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Circle *thiz;
+	Enesim_Renderer_Circle *thiz;
 
 	//thiz = _circle_get(r);
-	thiz = (Circle *)r;
+	thiz = (Enesim_Renderer_Circle *)r;
 	if (!thiz)
 	{
 		*flags = 0;
@@ -224,9 +224,9 @@ static void _free(Enesim_Renderer *r)
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 {
 	Enesim_Renderer *r;
-	Circle *circ;
+	Enesim_Renderer_Circle *circ;
 
-	circ = calloc(1, sizeof(Circle));
+	circ = calloc(1, sizeof(Enesim_Renderer_Circle));
 	if (!circ)
 		return NULL;
 
@@ -247,9 +247,9 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
  */
 EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
 {
-	Circle *circ;
+	Enesim_Renderer_Circle *circ;
 
-	circ = (Circle *)r;
+	circ = (Enesim_Renderer_Circle *)r;
 	circ->x = x;
 }
 
@@ -259,9 +259,9 @@ EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
  */
 EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
 {
-	Circle *circ;
+	Enesim_Renderer_Circle *circ;
 
-	circ = (Circle *)r;
+	circ = (Enesim_Renderer_Circle *)r;
 	circ->y = y;
 }
 
@@ -271,9 +271,9 @@ EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
  */
 EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double y)
 {
-	Circle *circ;
+	Enesim_Renderer_Circle *circ;
 
-	circ = (Circle *)r;
+	circ = (Enesim_Renderer_Circle *)r;
 	circ->x = x;
 	circ->y = y;
 }
@@ -283,9 +283,9 @@ EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double
  */
 EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, double *y)
 {
-	Circle *circ;
+	Enesim_Renderer_Circle *circ;
 
-	circ = (Circle *)r;
+	circ = (Enesim_Renderer_Circle *)r;
 	if (x) *x = circ->x;
 	if (y) *y = circ->y;
 }
@@ -295,9 +295,9 @@ EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, doubl
  */
 EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
 {
-	Circle *circ;
+	Enesim_Renderer_Circle *circ;
 
-	circ = (Circle *)r;
+	circ = (Enesim_Renderer_Circle *)r;
 	if (radius < 1)
 		radius = 1;
 	circ->r = radius;
@@ -309,8 +309,8 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
  */
 EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius)
 {
-	Circle *circ;
+	Enesim_Renderer_Circle *circ;
 
-	circ = (Circle *)r;
+	circ = (Enesim_Renderer_Circle *)r;
 	if (radius) *radius = circ->r;
 }
