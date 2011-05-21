@@ -72,6 +72,7 @@ typedef struct _Enesim_Renderer_Shape
 		double ox, oy;
 	} fill;
 	Enesim_Shape_Draw_Mode draw_mode;
+	void *data;
 } Enesim_Renderer_Shape;
 
 typedef struct _Enesim_Renderer_Gradient
@@ -162,10 +163,12 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enes
 void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, double old_ox, double old_oy);
 
 /* common shape renderer functions */
+Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descriptor, void *data);
 void enesim_renderer_shape_init(Enesim_Renderer *r);
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r);
 Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r);
 void enesim_renderer_shape_cleanup(Enesim_Renderer *r);
+void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
 /* common gradient renderer functions */
 void enesim_renderer_gradient_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len);

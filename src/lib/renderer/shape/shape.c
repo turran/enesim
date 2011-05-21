@@ -20,9 +20,28 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static inline Enesim_Renderer_Shape * _background_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	return thiz;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descriptor, void *data)
+{
+	Enesim_Renderer *r;
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Renderer_Shape));
+	thiz->data = data;
+	if (!thiz) return NULL;
+	r = enesim_renderer_new(descriptor, thiz);
+	return r;
+}
+
 void enesim_renderer_shape_init(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
@@ -86,6 +105,13 @@ void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r)
 		enesim_renderer_sw_cleanup(s->fill.rend);
 	}
 	enesim_renderer_shape_cleanup(r);
+}
+
+void * enesim_renderer_shape_data_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+
+	return s->data;
 }
 /*============================================================================*
  *                                   API                                      *
