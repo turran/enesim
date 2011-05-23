@@ -90,20 +90,6 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void enesim_renderer_init(Enesim_Renderer *r)
-{
-	EINA_MAGIC_SET(r, ENESIM_MAGIC_RENDERER);
-	/* common properties */
-	r->ox = 0;
-	r->oy = 0;
-	r->color = ENESIM_COLOR_FULL;
-	r->rop = ENESIM_FILL;
-	enesim_f16p16_matrix_identity(&r->matrix.values);
-	enesim_matrix_identity(&r->matrix.original);
-	r->matrix.type = ENESIM_MATRIX_IDENTITY;
-	r->prv_data = eina_hash_string_superfast_new(NULL);
-}
-
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy)
 {
@@ -157,18 +143,29 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 {
 	Enesim_Renderer *r;
 
+	if (!descriptor) return NULL;
+
 	r = calloc(1, sizeof(Enesim_Renderer));
-	enesim_renderer_init(r);
-	r->is_inside = descriptor->is_inside;
-	if (!r->is_inside) WRN("No is_inside() function available");
-	r->boundings = descriptor->boundings;
-	if (!r->boundings) WRN("No bounding() function available");
-	r->flags = descriptor->flags;
-	if (!r->flags) WRN("No flags() function available");
-	r->sw_setup = descriptor->sw_setup;
-	r->sw_cleanup = descriptor->sw_cleanup;
-	r->free = descriptor->free;
+	/* first check the passed in functions */
+	if (!descriptor->is_inside) WRN("No is_inside() function available");
+	if (!descriptor->boundings) WRN("No bounding() function available");
+	if (!descriptor->flags) WRN("No flags() function available");
+	if (!descriptor->sw_setup) WRN("No sw_setup() function available");
+	if (!descriptor->sw_cleanup) WRN("No sw_setup() function available");
+	if (!descriptor->free) WRN("No sw_setup() function available");
+	r->descriptor = descriptor;
 	r->data = data;
+	/* now initialize the renderer common properties */
+	EINA_MAGIC_SET(r, ENESIM_MAGIC_RENDERER);
+	/* common properties */
+	r->ox = 0;
+	r->oy = 0;
+	r->color = ENESIM_COLOR_FULL;
+	r->rop = ENESIM_FILL;
+	enesim_f16p16_matrix_identity(&r->matrix.values);
+	enesim_matrix_identity(&r->matrix.original);
+	r->matrix.type = ENESIM_MATRIX_IDENTITY;
+	r->prv_data = eina_hash_string_superfast_new(NULL);
 
 	return r;
 }
@@ -182,8 +179,8 @@ EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
 	Eina_Bool ret;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!r->sw_setup) return EINA_TRUE;
-	if (r->sw_setup(r, &fill))
+	if (!r->descriptor->sw_setup) return EINA_TRUE;
+	if (r->descriptor->sw_setup(r, &fill))
 	{
 		r->sw_fill = fill;
 		return EINA_TRUE;
@@ -198,7 +195,7 @@ EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
 EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->sw_cleanup) r->sw_cleanup(r);
+	if (r->descriptor->sw_cleanup) r->descriptor->sw_cleanup(r);
 }
 /**
  * To be documented
@@ -258,9 +255,8 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 EAPI void enesim_renderer_delete(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	//enesim_renderer_sw_cleanup(r);
-	if (r->free)
-		r->free(r);
+	if (r->descriptor->free)
+		r->descriptor->free(r);
 	free(r);
 }
 /**
@@ -270,9 +266,9 @@ EAPI void enesim_renderer_delete(Enesim_Renderer *r)
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->flags)
+	if (r->descriptor->flags)
 	{
-		r->flags(r, flags);
+		r->descriptor->flags(r, flags);
 		return;
 	}
 	*flags = 0;
@@ -386,9 +382,9 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!rect) return;
 
-	if (r->boundings)
+	if (r->descriptor->boundings)
 	{
-		 r->boundings(r, rect);
+		 r->descriptor->boundings(r, rect);
 	}
 	else
 	{
@@ -663,7 +659,7 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->is_inside) return r->is_inside(r, x, y);
+	if (r->descriptor->is_inside) return r->descriptor->is_inside(r, x, y);
 	return EINA_TRUE;
 }
 

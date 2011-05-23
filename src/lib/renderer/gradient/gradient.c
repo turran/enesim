@@ -52,15 +52,6 @@ Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Descriptor *descr
 	return r;
 }
 
-void enesim_renderer_gradient_init(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Gradient *thiz;
-
-	thiz = _gradient_get(r);
-	thiz->stops = NULL;
-	enesim_renderer_init(r);
-}
-
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
 {
 	Enesim_Renderer_Gradient *thiz;

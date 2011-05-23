@@ -20,14 +20,23 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Radial
+typedef struct _Enesim_Renderer_Gradient_Radial
 {
-	Enesim_Renderer_Gradient base;
 	struct {
 		float x, y;
 	} center, radius;
-} Radial;
+} Enesim_Renderer_Gradient_Radial;
 
+static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = enesim_renderer_gradient_data_get(r);
+	return thiz;
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
 static void _state_cleanup(Enesim_Renderer *r)
 {
 
@@ -36,6 +45,11 @@ static void _state_cleanup(Enesim_Renderer *r)
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 }
+
+static Enesim_Renderer_Descriptor _radial_descriptor = {
+	.sw_setup = _state_setup,
+	.sw_cleanup = _state_cleanup,
+};
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -45,15 +59,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
  */
 EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 {
-	Radial *l;
+	Enesim_Renderer_Gradient_Radial *thiz;
 	Enesim_Renderer *r;
 
-	l = calloc(1, sizeof(Radial));
-
-	r = (Enesim_Renderer *)l;
-	enesim_renderer_gradient_init(r);
-	r->sw_setup = _state_setup;
-	r->sw_cleanup = _state_cleanup;
+	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient_Radial));
+	if (!thiz) return NULL;
+	r = enesim_renderer_gradient_new(&_radial_descriptor, thiz);
 
 	return r;
 }
@@ -63,9 +74,10 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
  */
 EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, float v)
 {
-	Radial *rad = (Radial *)r;
+	Enesim_Renderer_Gradient_Radial *thiz;
 
-	rad->center.x = v;
+	thiz = _radial_get(r);
+	thiz->center.x = v;
 }
 /**
  * FIXME
@@ -73,9 +85,10 @@ EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, float
  */
 EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, float v)
 {
-	Radial *rad = (Radial *)r;
+	Enesim_Renderer_Gradient_Radial *thiz;
 
-	rad->center.y = v;
+	thiz = _radial_get(r);
+	thiz->center.y = v;
 }
 /**
  * FIXME
@@ -83,9 +96,10 @@ EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, float
  */
 EAPI void enesim_renderer_gradient_radial_radius_y_set(Enesim_Renderer *r, float v)
 {
-	Radial *rad = (Radial *)r;
+	Enesim_Renderer_Gradient_Radial *thiz;
 
-	rad->radius.y = v;
+	thiz = _radial_get(r);
+	thiz->radius.y = v;
 }
 /**
  * FIXME
@@ -93,8 +107,9 @@ EAPI void enesim_renderer_gradient_radial_radius_y_set(Enesim_Renderer *r, float
  */
 EAPI void enesim_renderer_gradient_radial_radius_x_set(Enesim_Renderer *r, float v)
 {
-	Radial *rad = (Radial *)r;
+	Enesim_Renderer_Gradient_Radial *thiz;
 
-	rad->radius.x = v;
+	thiz = _radial_get(r);
+	thiz->radius.x = v;
 }
 

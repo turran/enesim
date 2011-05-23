@@ -219,11 +219,8 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		Enesim_Renderer_Flag tmp;
 
 		/* intersect with every flag */
-		if (lr->flags)
-		{
-			lr->flags(lr, &tmp);
-			f &= tmp;
-		}
+		enesim_renderer_flags(lr, &tmp);
+		f &= tmp;
 	}
 	*flags = f;
 }

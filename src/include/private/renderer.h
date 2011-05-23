@@ -31,21 +31,8 @@
 struct _Enesim_Renderer
 {
 	EINA_MAGIC
-	Enesim_Rop rop;
-	/* FIXME why dont have a descriptor pointer directly? */
-	/* common functions */
-	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Boundings boundings;
-	Enesim_Renderer_Flags flags;
-	Enesim_Renderer_Inside is_inside;
-	/* software backend */
-	Enesim_Renderer_Sw_Fill sw_fill;
-	Enesim_Renderer_Sw_Setup sw_setup;
-	Enesim_Renderer_Sw_Cleanup sw_cleanup;
-	void *data;
-	/* the private data */
-	Eina_Hash *prv_data;
 	/* the renderer common properties */
+	Enesim_Rop rop;
 	Enesim_Color color;
 	double ox, oy; /* the origin */
 	struct {
@@ -53,6 +40,13 @@ struct _Enesim_Renderer
 		Enesim_F16p16_Matrix values;
 		Enesim_Matrix_Type type;
 	} matrix;
+	/* the private data */
+	Eina_Hash *prv_data;
+	/* the descriptor */
+	Enesim_Renderer_Descriptor *descriptor;
+	void *data;
+	/* backend data */
+	Enesim_Renderer_Sw_Fill sw_fill;
 };
 
 typedef struct _Enesim_Renderer_Shape
@@ -94,7 +88,6 @@ static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p
 static inline void renderer_identity_setup(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
 {
-	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
 	ox = eina_f16p16_float_from(r->ox);
@@ -171,7 +164,6 @@ void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
 /* common gradient renderer functions */
 Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Descriptor *descriptor, void *data);
 void * enesim_renderer_gradient_data_get(Enesim_Renderer *r);
-void enesim_renderer_gradient_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len);
 void enesim_renderer_gradient_pixels_get(Enesim_Renderer *r, uint32_t **pixels, unsigned int *len);
 
