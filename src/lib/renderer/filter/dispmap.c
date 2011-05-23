@@ -246,12 +246,7 @@ next:										\
 DISPMAP_AFFINE(r, g, _argb8888_red, _argb8888_green);
 DISPMAP_AFFINE(a, b, _argb8888_alpha, _argb8888_blue);
 
-static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNELS][ENESIM_CHANNELS][ENESIM_MATRIX_TYPES] = {
-	[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_IDENTITY] = _argb8888_a_b_span_identity,
-	[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_AFFINE] = _argb8888_a_b_span_affine,
-	[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_IDENTITY] = _argb8888_r_g_span_identity,
-	[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_AFFINE] = _argb8888_r_g_span_affine,
-};
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNELS][ENESIM_CHANNELS][ENESIM_MATRIX_TYPES];
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
@@ -342,9 +337,23 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 {
 	Enesim_Renderer_Dispmap *thiz;
 	Enesim_Renderer *r;
+	static Eina_Bool spans_initialized = EINA_FALSE;
+
+	if (spans_initialized == EINA_FALSE) {
+		spans_initialized = EINA_TRUE;
+		_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_IDENTITY]
+			= _argb8888_a_b_span_identity;
+		_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_AFFINE]
+			= _argb8888_a_b_span_affine;
+		_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_IDENTITY]
+			= _argb8888_r_g_span_identity;
+		_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_AFFINE]
+			= _argb8888_r_g_span_affine;
+	}
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Dispmap));
 	if (!thiz) return NULL;
+
 	/* specific renderer setup */
 	thiz->x_channel = ENESIM_CHANNEL_RED;
 	thiz->y_channel = ENESIM_CHANNEL_GREEN;
