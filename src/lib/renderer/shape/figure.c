@@ -597,7 +597,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = _figure_get(r);
-	if (!thiz || !thiz)
+	if (!thiz)
 	{
 		return EINA_FALSE;
 	}
@@ -845,8 +845,7 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
 	Contour_Polygon *c, *nc;
 	Polygon_Vertex *v, *nv;
 
-	thiz = (Enesim_Renderer_Figure *) r;
-
+	thiz = _figure_get(r);
 	if (!thiz->polys)
 		return;
 	c = thiz->polys;
