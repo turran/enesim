@@ -662,10 +662,12 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *thiz)
 }
 
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {
-	.sw_setup = _state_setup,
-	.sw_cleanup = _state_cleanup,
-	.boundings = _boundings,
-	.free = _free,
+	/* .sw_setup =   */ _state_setup,
+	/* .sw_cleanup = */ _state_cleanup,
+	/* .free =       */ _free,
+	/* .boundings =  */ _boundings,
+	/* .flags =      */ NULL,
+	/* .is_inside =  */ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

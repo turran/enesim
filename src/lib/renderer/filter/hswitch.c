@@ -195,8 +195,12 @@ static void _free(Enesim_Renderer *r)
 
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	.sw_setup = _state_setup,
-	.free = _free,
+	/* .sw_setup =   */ _state_setup,
+	/* .sw_cleanup = */ NULL,
+	/* .free =       */ _free,
+	/* .boundings =  */ NULL,
+	/* .flags =      */ NULL,
+	/* .is_inside =  */ 0
 };
 /*============================================================================*
  *                                 Global                                     *

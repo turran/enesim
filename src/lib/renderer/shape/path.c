@@ -299,9 +299,12 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 }
 
 static Enesim_Renderer_Descriptor _path_descriptor = {
-	.sw_setup = _state_setup,
-	.sw_cleanup = _state_cleanup,
-	.boundings = _boundings,
+	/* .sw_setup =   */ _state_setup,
+	/* .sw_cleanup = */ _state_cleanup,
+	/* .free =       */ NULL,
+	/* .boundings =  */ _boundings,
+	/* .flags =      */ NULL,
+	/* .is_inside =  */ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

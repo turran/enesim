@@ -42,7 +42,7 @@
 
 typedef struct _Enesim_Renderer_Image
 {
-	EINA_MAGIC;
+	EINA_MAGIC
 	Enesim_Surface *s;
 	int x, y;
 	unsigned int w, h;
@@ -408,11 +408,12 @@ static void _image_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	.sw_setup = _image_state_setup,
-	.sw_cleanup = _image_state_cleanup,
-	.boundings = _image_boundings,
-	.flags = _image_flags,
-	.free = _image_free,
+	/* .sw_setup =   */ _image_state_setup,
+	/* .sw_cleanup = */ _image_state_cleanup,
+	/* .free =       */ _image_free,
+	/* .boundings =  */ _image_boundings,
+	/* .flags =      */ _image_flags,
+	/* .is_inside =  */ 0
 };
 /*============================================================================*
  *                                 Global                                     *

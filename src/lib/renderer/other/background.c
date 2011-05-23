@@ -98,10 +98,12 @@ static void _background_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	.sw_setup = _background_state_setup,
-	.sw_cleanup = _background_state_cleanup,
-	.flags = _background_flags,
-	.free = _background_free,
+	/* .sw_setup =   */ _background_state_setup,
+	/* .sw_cleanup = */ _background_state_cleanup,
+	/* .free =       */ _background_free,
+	/* .boundings =  */ NULL,
+	/* .flags =      */ _background_flags,
+	/* .is_inside =  */ 0
 };
 /*============================================================================*
  *                                   API                                      *

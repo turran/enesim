@@ -271,7 +271,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
-	Enesim_Renderer *fpaint;;
+	Enesim_Renderer *fpaint;
 	int stroke = 0;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
@@ -441,7 +441,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
-	Enesim_Renderer *fpaint;;
+	Enesim_Renderer *fpaint;
 	int stroke = 0;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
@@ -745,10 +745,12 @@ static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 }
 
 static Enesim_Renderer_Descriptor _figure_descriptor = {
-	.sw_setup = _state_setup,
-	.sw_cleanup = _state_cleanup,
-	.boundings = _figure_boundings,
-	.free = _free,
+	/* .sw_setup =   */ _state_setup,
+	/* .sw_cleanup = */ _state_cleanup,
+	/* .free =       */ _free,
+	/* .boundings =  */ _figure_boundings,
+	/* .flags =      */ NULL,
+	/* .is_inside =  */ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

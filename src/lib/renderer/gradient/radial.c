@@ -47,8 +47,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 }
 
 static Enesim_Renderer_Descriptor _radial_descriptor = {
-	.sw_setup = _state_setup,
-	.sw_cleanup = _state_cleanup,
+	/* .sw_setup =   */ _state_setup,
+	/* .sw_cleanup = */ _state_cleanup,
+	/* .free =       */ NULL,
+	/* .boundings =  */ NULL,
+	/* .flags =      */ NULL,
+	/* .is_inside =  */ 0
 };
 /*============================================================================*
  *                                   API                                      *

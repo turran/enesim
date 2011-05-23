@@ -46,7 +46,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx;
 	int w2;
-	int h2;;
+	int h2;
 	uint32_t color[2];
 	uint32_t *end = dst + len;
 	int sy;
@@ -316,10 +316,12 @@ static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	.sw_setup = _checker_state_setup,
-	.sw_cleanup = _checker_state_cleanup,
-	.flags = _checker_flags,
-	.free = _checker_free,
+	/* .sw_setup =   */ _checker_state_setup,
+	/* .sw_cleanup = */ _checker_state_cleanup,
+	/* .free =       */ _checker_free,
+	/* .boundings =  */ NULL,
+	/* .flags =      */ _checker_flags,
+	/* .is_inside =  */ 0
 };
 /*============================================================================*
  *                                 Global                                     *

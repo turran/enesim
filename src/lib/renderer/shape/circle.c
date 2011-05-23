@@ -230,11 +230,12 @@ static void _free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _circle_descriptor = {
-	.sw_setup = _state_setup,
-	.sw_cleanup = _state_cleanup,
-	.flags = _flags,
-	.boundings = _boundings,
-	.free = _free,
+	/* .sw_setup =   */ _state_setup,
+	/* .sw_cleanup = */ _state_cleanup,
+	/* .free =       */ _free,
+	/* .boundings =  */ _boundings,
+	/* .flags =      */ _flags,
+	/* .is_inside =  */ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

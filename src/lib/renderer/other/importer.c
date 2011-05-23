@@ -154,10 +154,12 @@ static void _importer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	.sw_setup = _importer_state_setup,
-	.flags = _importer_flags,
-	.boundings = _importer_boundings,
-	.free = _importer_free,
+	/* .sw_setup =   */ _importer_state_setup,
+	/* .sw_cleanup = */ NULL,
+	/* .free =       */ _importer_free,
+	/* .boundings =  */ _importer_boundings,
+	/* .flags =      */ _importer_flags,
+	/* .is_inside =  */ 0
 };
 /*============================================================================*
  *                                 Global                                     *

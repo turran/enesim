@@ -90,8 +90,10 @@ static void _data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
  *============================================================================*/
 /* The main enesim pool */
 Enesim_Pool enesim_default_pool = {
-	.data_alloc = _data_alloc,
-	.data_free = _data_free,
+	/* EINA_MAGIC =  */ 0,
+	/* .data_alloc = */ _data_alloc,
+	/* .data_free =  */ _data_free,
+	/* .free =       */ NULL
 };
 
 Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
