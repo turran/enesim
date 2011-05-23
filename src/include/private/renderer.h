@@ -57,7 +57,6 @@ struct _Enesim_Renderer
 
 typedef struct _Enesim_Renderer_Shape
 {
-	Enesim_Renderer base;
 	struct {
 		Enesim_Color color;
 		Enesim_Renderer *rend; /* TODO */
@@ -82,6 +81,7 @@ typedef struct _Enesim_Renderer_Gradient
 	uint32_t *src;
 	int slen;
 	Eina_List *stops;
+	void *data;
 } Enesim_Renderer_Gradient;
 
 /* Helper functions needed by other renderers */
@@ -164,13 +164,15 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, E
 
 /* common shape renderer functions */
 Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descriptor, void *data);
-void enesim_renderer_shape_init(Enesim_Renderer *r);
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r);
 Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r);
 void enesim_renderer_shape_cleanup(Enesim_Renderer *r);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
 /* common gradient renderer functions */
+Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Descriptor *descriptor, void *data);
+void * enesim_renderer_gradient_data_get(Enesim_Renderer *r);
 void enesim_renderer_gradient_init(Enesim_Renderer *r);
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len);
+void enesim_renderer_gradient_pixels_get(Enesim_Renderer *r, uint32_t **pixels, unsigned int *len);
 
 #endif

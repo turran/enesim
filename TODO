@@ -8,12 +8,12 @@
 	gradient/gradient.c
 	gradient/linear.c
 	gradient/radial.c
-	shape/path.c
-	shape/shape.c
-	shape/circle.c
-	shape/ellipse.c
-	shape/figure.c
-	shape/rectangle.c
+	D shape/path.c
+	D shape/shape.c
+	D shape/circle.c
+	D shape/ellipse.c
+	D shape/figure.c
+	D shape/rectangle.c
 	D filter/hswitch.c
 	D filter/dispmap.c
 	D filter/transition.c
@@ -29,3 +29,9 @@
 + Change very renderer to use *thiz* as the variable for itself
 + Rename every enesim_renderer_surface_draw() with enesim_renderer_draw()
 + Implement a threaded draw() function
++ We need to get rid of the hypot function, it is used on a lot places
+  but with f16p16 values
++ We need to use the real types on the rendering functions
++ We need to simplify the real rendering functions into its own
+  c file with its own struct, this way in the future we can reuse the
+  algorithm for other backends

@@ -20,7 +20,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static inline Enesim_Renderer_Shape * _background_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -38,57 +38,55 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 	thiz = calloc(1, sizeof(Enesim_Renderer_Shape));
 	thiz->data = data;
 	if (!thiz) return NULL;
+	/* set default properties */
+	thiz->fill.color = 0xffffffff;
+	thiz->stroke.color = 0xffffffff;
+
 	r = enesim_renderer_new(descriptor, thiz);
 	return r;
 }
 
-void enesim_renderer_shape_init(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
-
-	s->fill.color = 0xffffffff;
-	s->stroke.color = 0xffffffff;
-	enesim_renderer_init(r);
-}
-
 void enesim_renderer_shape_cleanup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+	Enesim_Renderer_Shape *thiz;
 
-	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	thiz = _shape_get(r);
+	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		enesim_renderer_relative_unset(r, s->fill.rend, &s->fill.original, s->fill.ox, s->fill.oy);
+		enesim_renderer_relative_unset(r, thiz->fill.rend, &thiz->fill.original, thiz->fill.ox, thiz->fill.oy);
 	}
 }
 
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+	Enesim_Renderer_Shape *thiz;
 
-	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	thiz = _shape_get(r);
+	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		enesim_renderer_relative_set(r, s->fill.rend, &s->fill.original, &s->fill.ox, &s->fill.oy);
+		enesim_renderer_relative_set(r, thiz->fill.rend, &thiz->fill.original, &thiz->fill.ox, &thiz->fill.oy);
 	}
 	return EINA_TRUE;
 }
 
 Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+	Enesim_Renderer_Shape *thiz;
 
+	thiz = _shape_get(r);
 	if (!enesim_renderer_shape_setup(r))
 	{
 		WRN("Shape setup on %p failed", r);
 		return EINA_FALSE;
 	}
-	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		if (!enesim_renderer_sw_setup(s->fill.rend))
+		if (!enesim_renderer_sw_setup(thiz->fill.rend))
 		{
-			WRN("Shape setup on fill renderer %p of %p failed", s->fill.rend, r);
+			WRN("Shape setup on fill renderer %p of %p failed", thiz->fill.rend, r);
 			return EINA_FALSE;
 		}
 	}
@@ -97,21 +95,23 @@ Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r)
 
 void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+	Enesim_Renderer_Shape *thiz;
 
-	if (s->fill.rend && (s->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(s->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+	thiz = _shape_get(r);
+	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
+			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		enesim_renderer_sw_cleanup(s->fill.rend);
+		enesim_renderer_sw_cleanup(thiz->fill.rend);
 	}
 	enesim_renderer_shape_cleanup(r);
 }
 
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *s = (Enesim_Renderer_Shape *)r;
+	Enesim_Renderer_Shape *thiz;
 
-	return s->data;
+	thiz = _shape_get(r);
+	return thiz->data;
 }
 /*============================================================================*
  *                                   API                                      *
@@ -122,12 +122,12 @@ void * enesim_renderer_shape_data_get(Enesim_Renderer *r)
  */
 EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double weight)
 {
-	Enesim_Renderer_Shape *s;
+	Enesim_Renderer_Shape *thiz;
 
 	if (weight < 1)
 		weight = 1;
-	s = (Enesim_Renderer_Shape *)r;
-	s->stroke.weight = weight;
+	thiz = _shape_get(r);
+	thiz->stroke.weight = weight;
 }
 /**
  * To be documented
@@ -135,10 +135,10 @@ EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double we
  */
 EAPI void enesim_renderer_shape_outline_weight_get(Enesim_Renderer *r, double *weight)
 {
-	Enesim_Renderer_Shape *s;
+	Enesim_Renderer_Shape *thiz;
 
-	s = (Enesim_Renderer_Shape *)r;
-	if (weight) *weight = s->stroke.weight;
+	thiz = _shape_get(r);
+	if (weight) *weight = thiz->stroke.weight;
 }
 /**
  * To be documented
@@ -146,10 +146,21 @@ EAPI void enesim_renderer_shape_outline_weight_get(Enesim_Renderer *r, double *w
  */
 EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Enesim_Renderer_Shape *s;
+	Enesim_Renderer_Shape *thiz;
 
-	s = (Enesim_Renderer_Shape *)r;
-	s->stroke.color = color;
+	thiz = _shape_get(r);
+	thiz->stroke.color = color;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_outline_color_get(Enesim_Renderer *r, Enesim_Color *color)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*color = thiz->stroke.color;
 }
 /**
  * To be documented
@@ -157,10 +168,21 @@ EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Col
  */
 EAPI void enesim_renderer_shape_outline_renderer_set(Enesim_Renderer *r, Enesim_Renderer *outline)
 {
-	Enesim_Renderer_Shape *s;
+	Enesim_Renderer_Shape *thiz;
 
-	s = (Enesim_Renderer_Shape *)r;
-	s->stroke.rend = outline;
+	thiz = _shape_get(r);
+	thiz->stroke.rend = outline;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_outline_renderer_get(Enesim_Renderer *r, Enesim_Renderer **outline)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*outline = thiz->stroke.rend;
 }
 /**
  * To be documented
@@ -168,10 +190,21 @@ EAPI void enesim_renderer_shape_outline_renderer_set(Enesim_Renderer *r, Enesim_
  */
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
-	Enesim_Renderer_Shape *s;
+	Enesim_Renderer_Shape *thiz;
 
-	s = (Enesim_Renderer_Shape *)r;
-	s->fill.color = color;
+	thiz = _shape_get(r);
+	thiz->fill.color = color;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_fill_color_get(Enesim_Renderer *r, Enesim_Color *color)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*color = thiz->fill.color;
 }
 /**
  * To be documented
@@ -179,10 +212,21 @@ EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color 
  */
 EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *fill)
 {
-	Enesim_Renderer_Shape *s;
+	Enesim_Renderer_Shape *thiz;
 
-	s = (Enesim_Renderer_Shape *)r;
-	s->fill.rend = fill;
+	thiz = _shape_get(r);
+	thiz->fill.rend = fill;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r, Enesim_Renderer **fill)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*fill = thiz->fill.rend;
 }
 /**
  * To be documented
@@ -190,8 +234,21 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
  */
 EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_Draw_Mode draw_mode)
 {
-	Enesim_Renderer_Shape *s;
+	Enesim_Renderer_Shape *thiz;
 
-	s = (Enesim_Renderer_Shape *)r;
-	s->draw_mode = draw_mode;
+	thiz = _shape_get(r);
+	thiz->draw_mode = draw_mode;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_Draw_Mode *draw_mode)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*draw_mode = thiz->draw_mode;
+}
+

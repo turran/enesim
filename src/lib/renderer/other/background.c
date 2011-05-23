@@ -35,6 +35,7 @@ static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
 }
+
 static void _span(Enesim_Renderer *p, int x, int y,
 		unsigned int len, uint32_t *dst)
 {

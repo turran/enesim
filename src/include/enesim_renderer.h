@@ -103,10 +103,15 @@ typedef enum _Enesim_Shape_Draw_Mode
 EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double weight);
 EAPI void enesim_renderer_shape_outline_weight_get(Enesim_Renderer *r, double *weight);
 EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
+EAPI void enesim_renderer_shape_outline_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_shape_outline_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
+EAPI void enesim_renderer_shape_outline_renderer_get(Enesim_Renderer *r, Enesim_Renderer **o);
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color fill_color);
+EAPI void enesim_renderer_shape_fill_color_get(Enesim_Renderer *r, Enesim_Color *fill_color);
 EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *f);
+EAPI void enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r, Enesim_Renderer **fill);
 EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_Draw_Mode draw_mode);
+EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_Draw_Mode *draw_mode);
 /**
  * @defgroup Enesim_Renderer_Rectangle_Group Rectangle
  * @{

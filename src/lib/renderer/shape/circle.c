@@ -21,41 +21,54 @@
  *                                  Local                                     *
  *============================================================================*/
 typedef struct _Enesim_Renderer_Circle {
-	Enesim_Renderer_Shape base;
-
+	/* public properties */
 	double x, y;
 	double r;
-
+	/* internal state */
 	int xx0, yy0;
 	int rr0, irr0;
 	unsigned char do_inner :1;
 } Enesim_Renderer_Circle;
 
+static inline Enesim_Renderer_Circle * _circle_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Circle *thiz;
+
+	thiz = enesim_renderer_shape_data_get(r);
+	return thiz;
+}
+
 static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
+	Enesim_Renderer_Circle *thiz = _circle_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *fpaint;
 	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
 	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
-	int do_inner = circ->do_inner;
-	unsigned int ocolor = circ->base.stroke.color;
-	unsigned int icolor = circ->base.fill.color;
-	int rr0 = circ->rr0, rr1 = rr0 + 65536;
-	int irr0 = circ->irr0, irr1 = irr0 + 65536;
+	int do_inner = thiz->do_inner;
+	unsigned int ocolor;
+	unsigned int icolor;
+	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
+	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
 	int rr2 = rr1 * 1.41421357, irr2 = irr1 * 1.41421357; // sqrt(2)
-	int xx0 = circ->xx0, yy0 = circ->yy0;
-	Enesim_Renderer *fpaint = circ->base.fill.rend;
+	int xx0 = thiz->xx0, yy0 = thiz->yy0;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy;
 	int fill_only = 0;
 
-	if (circ->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+	enesim_renderer_shape_outline_color_get(r, &ocolor);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+ 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		icolor = 0;
 		fpaint = NULL;
 	}
 
-	if (circ->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		ocolor = icolor;
 		fill_only = 1;
@@ -63,7 +76,7 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 		if (fpaint)
 			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
-	if ((circ->base.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner
+	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner
 			&& fpaint)
 	{
 		fpaint->sw_fill(fpaint, x, y, len, dst);
@@ -140,41 +153,45 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 		yy += ayx;
 	}
 }
-
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
+	Enesim_Renderer_Circle *thiz;
 
-	rect->x = circ->x - circ->r;
-	rect->y = circ->y - circ->r;
-	rect->w = rect->h = circ->r * 2;
+	thiz = _circle_get(r);
+	rect->x = thiz->x - thiz->r;
+	rect->y = thiz->y - thiz->r;
+	rect->w = rect->h = thiz->r * 2;
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
+	Enesim_Renderer_Circle *thiz;
 	double rad;
 	double sw;
 
-	if (!circ || (circ->r < 1))
+	thiz = _circle_get(r);
+	if (!thiz || (thiz->r < 1))
 		return EINA_FALSE;
 
-	circ->rr0 = 65536 * (circ->r - 1);
-	circ->xx0 = 65536 * (circ->x - 0.5);
-	circ->yy0 = 65536 * (circ->y - 0.5);
+	thiz->rr0 = 65536 * (thiz->r - 1);
+	thiz->xx0 = 65536 * (thiz->x - 0.5);
+	thiz->yy0 = 65536 * (thiz->y - 0.5);
 
-	sw = circ->base.stroke.weight;
-	circ->do_inner = 1;
-	if (sw >= (circ->r - 1))
+	enesim_renderer_shape_outline_weight_get(r, &sw);
+	thiz->do_inner = 1;
+	if (sw >= (thiz->r - 1))
 	{
 		sw = 0;
-		circ->do_inner = 0;
+		thiz->do_inner = 0;
 	}
-	rad = circ->r - 1 - sw;
+	rad = thiz->r - 1 - sw;
 	if (rad < 0.0039)
 		rad = 0;
 
-	circ->irr0 = rad * 65536;
+	thiz->irr0 = rad * 65536;
 
 	if (!enesim_renderer_shape_sw_setup(r))
 		return EINA_FALSE;
@@ -186,8 +203,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Circle *circ = (Enesim_Renderer_Circle *)r;
+	Enesim_Renderer_Circle *thiz;
 
+	thiz = _circle_get(r);
 	enesim_renderer_shape_sw_cleanup(r);
 }
 
@@ -195,8 +213,7 @@ static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Circle *thiz;
 
-	//thiz = _circle_get(r);
-	thiz = (Enesim_Renderer_Circle *)r;
+	thiz = _circle_get(r);
 	if (!thiz)
 	{
 		*flags = 0;
@@ -211,6 +228,14 @@ static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 static void _free(Enesim_Renderer *r)
 {
 }
+
+static Enesim_Renderer_Descriptor _circle_descriptor = {
+	.sw_setup = _state_setup,
+	.sw_cleanup = _state_cleanup,
+	.flags = _flags,
+	.boundings = _boundings,
+	.free = _free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -223,20 +248,12 @@ static void _free(Enesim_Renderer *r)
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 {
+	Enesim_Renderer_Circle *thiz;
 	Enesim_Renderer *r;
-	Enesim_Renderer_Circle *circ;
 
-	circ = calloc(1, sizeof(Enesim_Renderer_Circle));
-	if (!circ)
-		return NULL;
-
-	r = (Enesim_Renderer *)circ;
-	enesim_renderer_shape_init(r);
-	r->sw_setup = _state_setup;
-	r->sw_cleanup = _state_cleanup;
-	r->free = _free;
-	r->boundings = _boundings;
-
+	thiz = calloc(1, sizeof(Enesim_Renderer_Circle));
+	if (!thiz) return NULL;
+	r = enesim_renderer_shape_new(&_circle_descriptor, thiz);
 	return r;
 }
 
@@ -247,10 +264,10 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
  */
 EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
 {
-	Enesim_Renderer_Circle *circ;
+	Enesim_Renderer_Circle *thiz;
 
-	circ = (Enesim_Renderer_Circle *)r;
-	circ->x = x;
+	thiz = _circle_get(r);
+	thiz->x = x;
 }
 
 /**
@@ -259,10 +276,10 @@ EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
  */
 EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
 {
-	Enesim_Renderer_Circle *circ;
+	Enesim_Renderer_Circle *thiz;
 
-	circ = (Enesim_Renderer_Circle *)r;
-	circ->y = y;
+	thiz = _circle_get(r);
+	thiz->y = y;
 }
 
 /**
@@ -271,11 +288,11 @@ EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
  */
 EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double y)
 {
-	Enesim_Renderer_Circle *circ;
+	Enesim_Renderer_Circle *thiz;
 
-	circ = (Enesim_Renderer_Circle *)r;
-	circ->x = x;
-	circ->y = y;
+	thiz = _circle_get(r);
+	thiz->x = x;
+	thiz->y = y;
 }
 /**
  * To be documented
@@ -283,11 +300,11 @@ EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double
  */
 EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, double *y)
 {
-	Enesim_Renderer_Circle *circ;
+	Enesim_Renderer_Circle *thiz;
 
-	circ = (Enesim_Renderer_Circle *)r;
-	if (x) *x = circ->x;
-	if (y) *y = circ->y;
+	thiz = _circle_get(r);
+	if (x) *x = thiz->x;
+	if (y) *y = thiz->y;
 }
 /**
  * To be documented
@@ -295,12 +312,12 @@ EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, doubl
  */
 EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
 {
-	Enesim_Renderer_Circle *circ;
+	Enesim_Renderer_Circle *thiz;
 
-	circ = (Enesim_Renderer_Circle *)r;
+	thiz = _circle_get(r);
 	if (radius < 1)
 		radius = 1;
-	circ->r = radius;
+	thiz->r = radius;
 }
 
 /**
@@ -309,8 +326,8 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
  */
 EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius)
 {
-	Enesim_Renderer_Circle *circ;
+	Enesim_Renderer_Circle *thiz;
 
-	circ = (Enesim_Renderer_Circle *)r;
-	if (radius) *radius = circ->r;
+	thiz = _circle_get(r);
+	if (radius) *radius = thiz->r;
 }

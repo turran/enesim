@@ -26,36 +26,62 @@ typedef struct _Stop
 	double pos;
 	/* TODO replace float with Eina_F16p16 */
 } Stop;
+
+static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	return thiz;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Descriptor *descriptor, void *data)
+{
+	Enesim_Renderer *r;
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient));
+	thiz->data = data;
+	if (!thiz) return NULL;
+	/* set default properties */
+	thiz->stops = NULL;
+
+	r = enesim_renderer_new(descriptor, thiz);
+	return r;
+}
+
 void enesim_renderer_gradient_init(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
-	g->stops = NULL;
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	thiz->stops = NULL;
 	enesim_renderer_init(r);
 }
 
 void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
 {
-	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
+	Enesim_Renderer_Gradient *thiz;
 	Eina_List *tmp;
 	Stop *curr, *next;
 	Eina_F16p16 xx, inc;
 	int end = len;
 	uint32_t *dst;
 
+	thiz = _gradient_get(r);
 	/* TODO check that we have at least two stops */
 	/* TODO check that we have one at 0 and one at 1 */
-	curr = eina_list_data_get(g->stops);
-	tmp = eina_list_next(g->stops);
+	curr = eina_list_data_get(thiz->stops);
+	tmp = eina_list_next(thiz->stops);
 	next = eina_list_data_get(tmp);
 	/* Check that we dont divide by 0 */
 	inc = eina_f16p16_float_from(1.0 / ((next->pos - curr->pos) * len));
 	xx = 0;
 
-	g->src = dst = malloc(sizeof(uint32_t) * len);
-	memset(g->src, 0xff, len);
+	thiz->src = dst = malloc(sizeof(uint32_t) * len);
+	memset(thiz->src, 0xff, len);
 	/* FIXME Im not sure if we increment xx by the 1 / ((next - curr) * len) value
 	 * as it might not be too accurate
 	 */
@@ -78,7 +104,24 @@ void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
 		*dst++ = p0;
 		xx += inc;
 	}
-	g->slen = len;
+	thiz->slen = len;
+}
+
+void enesim_renderer_gradient_pixels_get(Enesim_Renderer *r, uint32_t **pixels, unsigned int *len)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	*pixels = thiz->src;
+	*len = thiz->slen;
+}
+
+void * enesim_renderer_gradient_data_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	return thiz->data;
 }
 /*============================================================================*
  *                                   API                                      *
@@ -86,7 +129,7 @@ void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
 		double pos)
 {
-	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
+	Enesim_Renderer_Gradient *thiz;
 	Stop *s;
 
 	if (pos < 0)
@@ -94,32 +137,33 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
 	else if (pos > 1)
 		pos = 1;
 
+	thiz = _gradient_get(r);
 	s = malloc(sizeof(Stop));
 	s->color = c;
 	s->pos = pos;
 	/* if pos == 0.0 set to first */
 	if (pos == 0.0)
 	{
-		g->stops = eina_list_prepend(g->stops, s);
+		thiz->stops = eina_list_prepend(thiz->stops, s);
 	}
 	/* if pos == 1.0 set to last */
 	else if (pos == 1.0)
 	{
-		g->stops = eina_list_append(g->stops, s);
+		thiz->stops = eina_list_append(thiz->stops, s);
 	}
 	/* else iterate until pos > prev && pos < next */
 	else
 	{
 		Eina_List *tmp;
 
-		for (tmp = g->stops; tmp; tmp = eina_list_next(tmp))
+		for (tmp = thiz->stops; tmp; tmp = eina_list_next(tmp))
 		{
 			Stop *p = eina_list_data_get(tmp);
 
 			if (p->pos > s->pos)
 				break;
 		}
-		g->stops = eina_list_append_relative_list(g->stops, s, tmp);
+		thiz->stops = eina_list_append_relative_list(thiz->stops, s, tmp);
 	}
 }
 
@@ -137,10 +181,11 @@ EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r)
 EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 		Eina_List *list)
 {
+	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Stop *stop;
 	Eina_List *l;
-	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
 
+	thiz = _gradient_get(r);
 	EINA_LIST_FOREACH(list, l, stop)
 	{
 		enesim_renderer_gradient_stop_add(r, stop->color, stop->pos);
@@ -152,9 +197,10 @@ EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
  */
 EAPI Enesim_Renderer_Gradient_Mode enesim_renderer_gradient_mode_get(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
+	Enesim_Renderer_Gradient *thiz;
 
-	return g->mode;
+	thiz = _gradient_get(r);
+	return thiz->mode;
 }
 
 /**
@@ -163,7 +209,8 @@ EAPI Enesim_Renderer_Gradient_Mode enesim_renderer_gradient_mode_get(Enesim_Rend
 EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 		Enesim_Renderer_Gradient_Mode mode)
 {
-	Enesim_Renderer_Gradient *g = (Enesim_Renderer_Gradient *)r;
+	Enesim_Renderer_Gradient *thiz;
 
-	g->mode = mode;
+	thiz = _gradient_get(r);
+	thiz->mode = mode;
 }

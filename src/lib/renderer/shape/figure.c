@@ -81,8 +81,6 @@ struct _Contour_Polygon
 typedef struct _Enesim_Renderer_Figure Enesim_Renderer_Figure;
 struct _Enesim_Renderer_Figure
 {
-	Enesim_Renderer_Shape base;
-
 	Contour_Polygon *polys, *last;
 	int npolys;
 
@@ -96,28 +94,41 @@ struct _Enesim_Renderer_Figure
 	unsigned char changed :1;
 };
 
-static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *p, int x,
+static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = enesim_renderer_shape_data_get(r);
+	return thiz;
+}
+
+static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 		int y, unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
-	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
-	unsigned int fcolor = f->fill.color;
-	unsigned int scolor = f->stroke.color;
-	Enesim_Renderer *fpaint = f->fill.rend;
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint;
 	int stroke = 0;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
-	Polygon_Vector *v = o->vectors;
-	int nvectors = o->nvectors, n = 0, nedges = 0;
+	Polygon_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 
-	int axx = p->matrix.values.xx, axy = p->matrix.values.xy, axz =
-			p->matrix.values.xz;
-	int ayy = p->matrix.values.yy, ayz = p->matrix.values.yz;
+	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz =
+			r->matrix.values.xz;
+	int ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	if ((((yy >> 16) + 1) < (o->tyy >> 16)) ||
-			((yy >> 16) > (1 + (o->byy >> 16))))
+	enesim_renderer_shape_outline_color_get(r, &scolor);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+ 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
+			((yy >> 16) > (1 + (thiz->byy >> 16))))
 	{
 get_out:
 		while (d < e)
@@ -125,20 +136,20 @@ get_out:
 		return;
 	}
 
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
 			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
 			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		fcolor = 0;
 		fpaint = NULL;
@@ -253,30 +264,35 @@ get_out:
 	}
 }
 
-static void figure_stroke_fill_paint_affine(Enesim_Renderer *p, int x, int y,
+static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
-	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
-	unsigned int fcolor = f->fill.color;
-	unsigned int scolor = f->stroke.color;
-	Enesim_Renderer *fpaint = f->fill.rend;
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint;;
 	int stroke = 0;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
-	Polygon_Vector *v = o->vectors;
-	int nvectors = o->nvectors, n = 0, nedges = 0;
+	Polygon_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	int y0, y1;
 
-	int axx = p->matrix.values.xx, axy = p->matrix.values.xy, axz =
-			p->matrix.values.xz;
-	int ayx = p->matrix.values.yx, ayy = p->matrix.values.yy, ayz =
-			p->matrix.values.yz;
+	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz =
+			r->matrix.values.xz;
+	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz =
+			r->matrix.values.yz;
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	if (((ayx <= 0) && ((yy >> 16) + 1 < (o->tyy >> 16))) || ((ayx >= 0)
-			&& ((yy >> 16) > 1 + (o->byy >> 16))))
+	enesim_renderer_shape_outline_color_get(r, &scolor);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+ 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	if (((ayx <= 0) && ((yy >> 16) + 1 < (thiz->tyy >> 16))) || ((ayx >= 0)
+			&& ((yy >> 16) > 1 + (thiz->byy >> 16))))
 	{
 		while (d < e)
 			*d++ = 0;
@@ -331,20 +347,20 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *p, int x, int y,
 		v++;
 	}
 
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
 			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
 			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		fcolor = 0;
 		fpaint = NULL;
@@ -418,30 +434,35 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *p, int x, int y,
 	}
 }
 
-static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
+static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
-	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
-	unsigned int fcolor = f->fill.color;
-	unsigned int scolor = f->stroke.color;
-	Enesim_Renderer *fpaint = f->fill.rend;
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint;;
 	int stroke = 0;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
-	Polygon_Vector *v = o->vectors;
-	int nvectors = o->nvectors, n = 0;
+	Polygon_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0;
 
-	int axx = p->matrix.values.xx, axy = p->matrix.values.xy, axz =
-			p->matrix.values.xz;
-	int ayx = p->matrix.values.yx, ayy = p->matrix.values.yy, ayz =
-			p->matrix.values.yz;
-	int azx = p->matrix.values.zx, azy = p->matrix.values.zy, azz =
-			p->matrix.values.zz;
+	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz =
+			r->matrix.values.xz;
+	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz =
+			r->matrix.values.yz;
+	int azx = r->matrix.values.zx, azy = r->matrix.values.zy, azz =
+			r->matrix.values.zz;
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
 	
+	enesim_renderer_shape_outline_color_get(r, &scolor);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+ 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
 	edges = alloca(nvectors * sizeof(Polygon_Edge));
 	edge = edges;
 	while (n < nvectors)
@@ -471,20 +492,20 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
 		edge++;
 	}
 
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
 			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
 			fpaint->sw_fill(fpaint, x, y, len, dst);
 	}
-	if (f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		fcolor = 0;
 		fpaint = NULL;
@@ -563,34 +584,36 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *p, int x, int y,
 		zz += azx;
 	}
 }
-
-static void _free(Enesim_Renderer *p)
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static void _free(Enesim_Renderer *r)
 {
-	enesim_renderer_figure_clear(p);
+	enesim_renderer_figure_clear(r);
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Enesim_Renderer_Figure *o = (Enesim_Renderer_Figure *) p;
-	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *) p;
+	Enesim_Renderer_Figure *thiz;
 
-	if (!f || !o)
+	thiz = _figure_get(r);
+	if (!thiz || !thiz)
 	{
 		return EINA_FALSE;
 	}
-	if (!o->polys)
+	if (!thiz->polys)
 	{
 		return EINA_FALSE;
 	}
 
-	if (o->changed)
+	if (thiz->changed)
 	{
 		Contour_Polygon *poly;
 		int nvectors = 0;
 		Polygon_Vector *vec;
 
-		free(o->vectors);
-		poly = o->polys;
+		free(thiz->vectors);
+		poly = thiz->polys;
 		while (poly)
 		{
 			if (!poly->vertices || (poly->nverts < 3))
@@ -605,19 +628,19 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 			poly = poly->next;
 		}
 
-		o->vectors = calloc(nvectors, sizeof(Polygon_Vector));
-		if (!o->vectors)
+		thiz->vectors = calloc(nvectors, sizeof(Polygon_Vector));
+		if (!thiz->vectors)
 		{
 			return EINA_FALSE;
 		}
 
-		o->nvectors = nvectors;
-		poly = o->polys;
-		vec = o->vectors;
-		o->lxx = 65536;
-		o->rxx = -65536;
-		o->tyy = 65536;
-		o->byy = -65536;
+		thiz->nvectors = nvectors;
+		poly = thiz->polys;
+		vec = thiz->vectors;
+		thiz->lxx = 65536;
+		thiz->rxx = -65536;
+		thiz->tyy = 65536;
+		thiz->byy = -65536;
 		while (poly)
 		{
 			Polygon_Vertex *v, *nv;
@@ -657,15 +680,15 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 				vec->xx1 = x1 * 65536;
 				vec->yy1 = y1 * 65536;
 
-				if (vec->yy0 < o->tyy)
-					o->tyy = vec->yy0;
-				if (vec->yy0 > o->byy)
-					o->byy = vec->yy0;
+				if (vec->yy0 < thiz->tyy)
+					thiz->tyy = vec->yy0;
+				if (vec->yy0 > thiz->byy)
+					thiz->byy = vec->yy0;
 
-				if (vec->xx0 < o->lxx)
-					o->lxx = vec->xx0;
-				if (vec->xx0 > o->rxx)
-					o->rxx = vec->xx0;
+				if (vec->xx0 < thiz->lxx)
+					thiz->lxx = vec->xx0;
+				if (vec->xx0 > thiz->rxx)
+					thiz->rxx = vec->xx0;
 
 				n++;
 				vec++;
@@ -673,19 +696,19 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 			}
 			poly = poly->next;
 		}
-		o->changed = 0;
+		thiz->changed = 0;
 	}
 
-	if (!enesim_renderer_shape_sw_setup(p))
+	if (!enesim_renderer_shape_sw_setup(r))
 	{
 		return EINA_FALSE;
 	}
 
 	*fill = figure_stroke_fill_paint_proj;
-	if (p->matrix.type != ENESIM_MATRIX_PROJECTIVE)
+	if (r->matrix.type != ENESIM_MATRIX_PROJECTIVE)
 	{
 		*fill = figure_stroke_fill_paint_affine;
-		if (p->matrix.values.yx == 0)
+		if (r->matrix.values.yx == 0)
 			*fill = figure_stroke_fill_paint_affine_simple;
 	}
 
@@ -694,32 +717,39 @@ static Eina_Bool _state_setup(Enesim_Renderer *p, Enesim_Renderer_Sw_Fill *fill)
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *f = (Enesim_Renderer_Shape *)r;
+	Enesim_Renderer_Shape *thiz;
 
 	enesim_renderer_shape_sw_cleanup(r);
 
 	/*
-	 if (f->stroke.rend &&
-			((f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
-			(f->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-		 enesim_renderer_sw_cleanup(f->stroke.paint);
+	 if (thiz->stroke.rend &&
+			((thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
+			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+		 enesim_renderer_sw_cleanup(thiz->stroke.paint);
 	 */
 }
 
 static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
-	Enesim_Renderer_Figure *o;
+	Enesim_Renderer_Figure *thiz;
 
-	o = (Enesim_Renderer_Figure *)r;
+	thiz = _figure_get(r);
 
 	// for now.. but do this better later
 	if (!enesim_renderer_sw_setup(r))
 		return;
-	boundings->x = (o->lxx - 0xffff) >> 16;
-	boundings->y = (o->tyy - 0xffff) >> 16;
-	boundings->w = ((o->rxx - 0xffff) >> 16) - boundings->x + 1;
-	boundings->h = ((o->byy - 0xffff) >> 16) - boundings->y + 1;
+	boundings->x = (thiz->lxx - 0xffff) >> 16;
+	boundings->y = (thiz->tyy - 0xffff) >> 16;
+	boundings->w = ((thiz->rxx - 0xffff) >> 16) - boundings->x + 1;
+	boundings->h = ((thiz->byy - 0xffff) >> 16) - boundings->y + 1;
 }
+
+static Enesim_Renderer_Descriptor _figure_descriptor = {
+	.sw_setup = _state_setup,
+	.sw_cleanup = _state_cleanup,
+	.boundings = _figure_boundings,
+	.free = _free,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -732,68 +762,57 @@ static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
  */
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 {
-	Enesim_Renderer *p;
-	Enesim_Renderer_Shape *f;
-	Enesim_Renderer_Figure *o;
+	Enesim_Renderer *r;
+	Enesim_Renderer_Figure *thiz;
 
-	o = calloc(1, sizeof(Enesim_Renderer_Figure));
-	if (!o)
-		return NULL;
-
-	p = (Enesim_Renderer *) o;
-	enesim_renderer_shape_init(p);
-	p->sw_setup = _state_setup;
-	p->sw_cleanup = _state_cleanup;
-	p->boundings = _figure_boundings;
-	p->free = _free;
-
-	return p;
+	thiz = calloc(1, sizeof(Enesim_Renderer_Figure));
+	if (!thiz) return NULL;
+	r = enesim_renderer_shape_new(&_figure_descriptor, thiz);
+	return r;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p)
+EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *f;
-	Enesim_Renderer_Figure *o;
+	Enesim_Renderer_Figure *thiz;
 	Contour_Polygon *poly;
 
-	o = (Enesim_Renderer_Figure *) p;
+	thiz = _figure_get(r);
 
 	poly = calloc(1, sizeof(Contour_Polygon));
 	if (!poly)
 		return;
 
-	if (!o->polys)
+	if (!thiz->polys)
 	{
-		o->polys = o->last = poly;
-		o->npolys++;
-		o->changed = 1;
+		thiz->polys = thiz->last = poly;
+		thiz->npolys++;
+		thiz->changed = 1;
 		return;
 	}
-	o->last->next = poly;
-	o->last = poly;
-	o->npolys++;
-	o->changed = 1;
+	thiz->last->next = poly;
+	thiz->last = poly;
+	thiz->npolys++;
+	thiz->changed = 1;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
+EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 		double x, double y)
 {
-	Enesim_Renderer_Shape *f;
-	Enesim_Renderer_Figure *o;
+	Enesim_Renderer_Figure *thiz;
 	Contour_Polygon *poly;
 	Polygon_Vertex *vertex;
 
-	o = (Enesim_Renderer_Figure *) p;
+	thiz = _figure_get(r);
 
-	if (!o->polys)
+	if (!thiz->polys)
 		return; // maybe just add one instead
-	poly = o->last;
+	poly = thiz->last;
 	if (poly->last &&
 			(fabs(poly->last->v.x - x) < (1 / 256.0)) &&
 			(fabs(poly->last->v.y - y) < (1 / 256.0)))
@@ -808,30 +827,29 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p,
 	{
 		poly->vertices = poly->last = vertex;
 		poly->nverts++;
-		o->changed = 1;
+		thiz->changed = 1;
 		return;
 	}
 	poly->last->next = vertex;
 	poly->last = vertex;
 	poly->nverts++;
-	o->changed = 1;
+	thiz->changed = 1;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p)
+EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *f;
-	Enesim_Renderer_Figure *o;
+	Enesim_Renderer_Figure *thiz;
 	Contour_Polygon *c, *nc;
 	Polygon_Vertex *v, *nv;
 
-	o = (Enesim_Renderer_Figure *) p;
+	thiz = (Enesim_Renderer_Figure *) r;
 
-	if (!o->polys)
+	if (!thiz->polys)
 		return;
-	c = o->polys;
+	c = thiz->polys;
 	while (c)
 	{
 		v = c->vertices;
@@ -845,11 +863,11 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p)
 		free(c);
 		c = nc;
 	}
-	o->polys = o->last = NULL;
-	o->npolys = 0;
-	free(o->vectors);
-	o->vectors = NULL;
-	o->changed = 1;
+	thiz->polys = thiz->last = NULL;
+	thiz->npolys = 0;
+	free(thiz->vectors);
+	thiz->vectors = NULL;
+	thiz->changed = 1;
 }
 
 /**
@@ -860,9 +878,9 @@ EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list
 {
 	Enesim_Renderer_Figure_Polygon *polygon;
 	Eina_List *l1;
-	Enesim_Renderer_Figure *f;
+	Enesim_Renderer_Figure *thiz;
 
-	f = (Enesim_Renderer_Figure *)r;
+	thiz = _figure_get(r);
 	enesim_renderer_figure_clear(r);
 	EINA_LIST_FOREACH(list, l1, polygon)
 	{
@@ -880,14 +898,14 @@ EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list
 
 #if 0
 int
-paint_is_polygon(Enesim_Renderer *p)
+paint_is_polygon(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape *f;
+	Enesim_Renderer_Shape *thiz;
 
-	if (!p || !p->type) return 0;
-	if (p->type->id != SHAPE_PAINT) return 0;
-	f = (Enesim_Renderer_Shape *)p;
-	if (!f || (f->id != POLYGON_PAINT)) return 0;
+	if (!r || !r->type) return 0;
+	if (r->type->id != SHAPE_PAINT) return 0;
+	thiz = (Enesim_Renderer_Shape *)r;
+	if (!thiz || (thiz->id != POLYGON_PAINT)) return 0;
 	return 1;
 }
 #endif
