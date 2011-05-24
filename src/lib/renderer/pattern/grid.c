@@ -44,22 +44,22 @@ static inline Enesim_Renderer_Grid * _grid_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static inline uint32_t _grid(Enesim_Renderer_Grid *g, Eina_F16p16 yy, Eina_F16p16 xx)
+static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F16p16 xx)
 {
 	Eina_F16p16 syy;
 	int sy;
 	uint32_t p0;
 
 	/* normalize the modulo */
-	syy = (yy % g->hht);
+	syy = (yy % thiz->hht);
 	if (syy < 0)
-		syy += g->hht;
+		syy += thiz->hht;
 	/* simplest case, we are on the grid border
 	 * the whole line will be outside color */
 	sy = eina_f16p16_int_to(syy);
-	if (syy >= g->hi)
+	if (syy >= thiz->hi)
 	{
-		p0 = g->outside.color;
+		p0 = thiz->outside.color;
 	}
 	else
 	{
@@ -67,33 +67,33 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *g, Eina_F16p16 yy, Eina_F16p1
 		int sx;
 
 		/* normalize the modulo */
-		sxx = (xx % g->wwt);
+		sxx = (xx % thiz->wwt);
 		if (sxx < 0)
-			sxx += g->wwt;
+			sxx += thiz->wwt;
 
 		sx = eina_f16p16_int_to(sxx);
-		if (sxx >= g->wi)
+		if (sxx >= thiz->wi)
 		{
-			p0 = g->outside.color;
+			p0 = thiz->outside.color;
 		}
 		/* totally inside */
 		else
 		{
-			p0 = g->inside.color;
+			p0 = thiz->inside.color;
 			/* antialias the inner square */
 			if (sx == 0)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, g->outside.color);
+				p0 = argb8888_interp_256(a, p0, thiz->outside.color);
 			}
-			else if (sx == (g->inside.w - 1))
+			else if (sx == (thiz->inside.w - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, g->outside.color, p0);
+				p0 = argb8888_interp_256(a, thiz->outside.color, p0);
 
 			}
 			if (sy == 0)
@@ -101,14 +101,14 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *g, Eina_F16p16 yy, Eina_F16p1
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, g->outside.color);
+				p0 = argb8888_interp_256(a, p0, thiz->outside.color);
 			}
-			else if (sy == (g->inside.h - 1))
+			else if (sy == (thiz->inside.h - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, g->outside.color, p0);
+				p0 = argb8888_interp_256(a, thiz->outside.color, p0);
 			}
 		}
 	}
@@ -118,34 +118,34 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *g, Eina_F16p16 yy, Eina_F16p1
 
 static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Grid *g;
+	Enesim_Renderer_Grid *thiz;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx;
 
-	g = _grid_get(r);
+	thiz = _grid_get(r);
 #if 0
 	renderer_identity_setup(r, x, y, &xx, &yy);
 	while (dst < end)
 	{
 		uint32_t p0;
 
-		p0 = _grid(g, yy, xx);
+		p0 = _grid(thiz, yy, xx);
 
 		xx += EINA_F16P16_ONE;
 		*dst++ = p0;
 	}
 #else
-	sy = (y % g->ht);
+	sy = (y % thiz->ht);
 	if (sy < 0)
 	{
-		sy += g->ht;
+		sy += thiz->ht;
 	}
 	/* simplest case, all the span is outside */
-	if (sy >= g->inside.h)
+	if (sy >= thiz->inside.h)
 	{
 		while (dst < end)
-			*dst++ = g->outside.color;
+			*dst++ = thiz->outside.color;
 	}
 	/* we swap between the two */
 	else
@@ -154,14 +154,14 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 		{
 			int sx;
 
-			sx = (x % g->wt);
+			sx = (x % thiz->wt);
 			if (sx < 0)
-				sx += g->wt;
+				sx += thiz->wt;
 
-			if (sx >= g->inside.w)
-				*dst = g->outside.color;
+			if (sx >= thiz->inside.w)
+				*dst = thiz->outside.color;
 			else
-				*dst = g->inside.color;
+				*dst = thiz->inside.color;
 
 			dst++;
 			x++;
@@ -172,19 +172,19 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 
 static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Grid *g;
+	Enesim_Renderer_Grid *thiz;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx;
 
-	g = _grid_get(r);
+	thiz = _grid_get(r);
 	renderer_affine_setup(r, x, y, &xx, &yy);
 
 	while (dst < end)
 	{
 		uint32_t p0;
 
-		p0 = _grid(g, yy, xx);
+		p0 = _grid(thiz, yy, xx);
 
 		yy += r->matrix.values.yx;
 		xx += r->matrix.values.xx;
@@ -194,12 +194,12 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Grid *g;
+	Enesim_Renderer_Grid *thiz;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx, zz;
 
-	g = _grid_get(r);
+	thiz = _grid_get(r);
 	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
 
 	while (dst < end)
@@ -210,7 +210,7 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 		syy = ((((int64_t)yy) << 16) / zz);
 		sxx = ((((int64_t)xx) << 16) / zz);
 
-		p0 = _grid(g, syy, sxx);
+		p0 = _grid(thiz, syy, sxx);
 
 		yy += r->matrix.values.yx;
 		xx += r->matrix.values.xx;
@@ -226,16 +226,16 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Enesim_Renderer_Grid *g;
+	Enesim_Renderer_Grid *thiz;
 
-	g = _grid_get(r);
-	if (!g->inside.w || !g->inside.h || !g->outside.w || !g->outside.h)
+	thiz = _grid_get(r);
+	if (!thiz->inside.w || !thiz->inside.h || !thiz->outside.w || !thiz->outside.h)
 		return EINA_FALSE;
 
-	g->ht = g->inside.h + g->outside.h;
-	g->wt = g->inside.w + g->outside.w;
-	g->hht = eina_f16p16_int_from(g->ht);
-	g->wwt = eina_f16p16_int_from(g->wt);
+	thiz->ht = thiz->inside.h + thiz->outside.h;
+	thiz->wt = thiz->inside.w + thiz->outside.w;
+	thiz->hht = eina_f16p16_int_from(thiz->ht);
+	thiz->wwt = eina_f16p16_int_from(thiz->wt);
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		//*fill = _span_identity;
