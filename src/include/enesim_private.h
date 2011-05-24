@@ -72,25 +72,32 @@ static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
 #include <math.h>
 /* SIMD intrinsics */
 #ifdef EFL_HAVE_MMX
-#include <mmintrin.h>
-typedef __m64 mmx_t;
+#define LIBARGB_MMX 1
+#else
+#define LIBARGB_MMX 0
 #endif
 
 #ifdef  EFL_HAVE_SSE
-#include <xmmintrin.h>
+#define LIBARGB_SSE 1
+#else
+#define LIBARGB_SSE 0
 #endif
 
 #ifdef EFL_HAVE_SSE2
-#include <emmintrin.h>
-typedef __m128i sse2_t;
+#define LIBARGB_SSE2 1
+#else
+#define LIBARGB_SSE2 0
 #endif
+
+#define LIBARGB_DEBUG 0
+
+#include "libargb.h"
 
 #include "extender_int.h"
 // #include "extender_float.h"
 #include "private/curve.h"
 /* now the surface format backends */
 #include "private/format.h"
-#include "private/format_argb8888.h"
 #include "private/compositor.h"
 #include "private/matrix.h"
 #include "private/renderer.h"

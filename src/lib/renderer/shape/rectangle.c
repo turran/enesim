@@ -304,7 +304,7 @@ static void _span_norounded_nooutlined_paint_filled_identity(Enesim_Renderer *r,
 static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Rectangle *thiz;
+	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	int sw = thiz->w, sh = thiz->h;
 	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
