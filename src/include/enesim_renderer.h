@@ -351,6 +351,17 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
 
 /**
  * @}
+ * @defgroup Enesim_Renderer_Gradient_Linear_Group Radial
+ * @{
+ */
+EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void);
+EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, double v);
+EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, double v);
+EAPI void enesim_renderer_gradient_radial_radius_y_set(Enesim_Renderer *r, double v);
+EAPI void enesim_renderer_gradient_radial_radius_x_set(Enesim_Renderer *r, double v);
+
+/**
+ * @}
  * @}
  * @defgroup Enesim_Renderer_Compound_Group Compound
  * @{
