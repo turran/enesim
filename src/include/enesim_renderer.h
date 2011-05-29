@@ -337,6 +337,8 @@ EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 		Eina_List *list);
 EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode mode);
+EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode *mode);
+
 /**
  * @defgroup Enesim_Renderer_Gradient_Linear_Group Linear
  * @{

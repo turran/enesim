@@ -117,6 +117,10 @@ void * enesim_renderer_gradient_data_get(Enesim_Renderer *r)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * FIXME
+ * To be documented
+ */
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
 		double pos)
 {
@@ -159,7 +163,8 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
 }
 
 /**
- *
+ * FIXME
+ * To be documented
  */
 EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r)
 {
@@ -167,7 +172,8 @@ EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r)
 }
 
 /**
- *
+ * FIXME
+ * To be documented
  */
 EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 		Eina_List *list)
@@ -184,18 +190,8 @@ EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 }
 
 /**
- *
- */
-EAPI Enesim_Renderer_Gradient_Mode enesim_renderer_gradient_mode_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Gradient *thiz;
-
-	thiz = _gradient_get(r);
-	return thiz->mode;
-}
-
-/**
- *
+ * FIXME
+ * To be documented
  */
 EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 		Enesim_Renderer_Gradient_Mode mode)
@@ -204,4 +200,16 @@ EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 
 	thiz = _gradient_get(r);
 	thiz->mode = mode;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode *mode)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	*mode = thiz->mode;
 }

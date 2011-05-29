@@ -48,15 +48,16 @@ static inline void _get_focis(double cx, double cy, double a, double b,
 {
 	double c;
 
-	printf("a = %g, b = %g\n", a, b);
+	//printf("a = %g, b = %g\n", a, b);
 	c = sqrt((a * a) - (b * b));
-	printf("c = %g\n", c);
+	//printf("c = %g\n", c);
 	*f1x = cx - c;
 	*f1y = cy;
 	*f2x = cx + c;
 	*f2y = cy;
 	*max = 2 * a;
 	*min = 2 * c;
+	//printf("f1 %g %g, f2 %g %g min %g max %g\n", *f1x, *f1y, *f2x, *f2y, *min, *max);
 }
 
 static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz, Eina_F16p16 x,
@@ -79,9 +80,9 @@ static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz
 	d2 = b - thiz->f2.y;
 
 	r += hypot(d1, d2);
+	//printf("old distance = %g\n", r);
 	r -= thiz->min;
 
-	printf("distance = %g\n", r);
 
 	return eina_f16p16_float_from(r);
 }
@@ -97,7 +98,7 @@ static inline uint32_t _radial_pad(Enesim_Renderer *r, Eina_F16p16 p)
 	thiz = _radial_get(r);
 	enesim_renderer_gradient_pixels_get(r, &data, &data_length);
 	fp = eina_f16p16_int_to(p);
-	printf("fp2 = %d\n", fp);
+	//printf("fp2 = %d\n", fp);
 	if (fp < 0)
 	{
 		v = data[0];
@@ -130,6 +131,8 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
 	while (dst < end)
 	{
 		d = _radial_distance(thiz, xx, yy);
+		//printf("distance for %g %g = %g\n", eina_f16p16_float_to(xx), eina_f16p16_float_to(yy),
+		//		eina_f16p16_float_to(d));
 		*dst++ = _radial_pad(r, d);
 		xx += EINA_F16P16_ONE;
 	}
@@ -165,17 +168,29 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 				thiz->radius.x, &thiz->f1.y, &thiz->f1.x,
 				&thiz->f2.y, &thiz->f2.x, &thiz->min, &thiz->max);
 	}
-	printf("distance = %g (%g %g)\n", thiz->max - thiz->min, thiz->max, thiz->min);
+	//printf("generating span for = %g (%g %g)\n", thiz->max - thiz->min, thiz->max, thiz->min);
 	enesim_renderer_gradient_state_setup(r, lrint(thiz->max - thiz->min));
 	*fill = _argb8888_pad_span_identity;
 	return EINA_TRUE;
+}
+
+static void _radial_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = _radial_get(r);
+
+	boundings->x = thiz->center.x - thiz->radius.x;
+	boundings->y = thiz->center.y - thiz->radius.y;
+	boundings->w = thiz->radius.x * 2;
+	boundings->h = thiz->radius.y * 2;
 }
 
 static Enesim_Renderer_Descriptor _radial_descriptor = {
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup,
 	/* .free =       */ NULL,
-	/* .boundings =  */ NULL,
+	/* .boundings =  */ _radial_boundings,
 	/* .flags =      */ NULL,
 	/* .is_inside =  */ 0
 };
