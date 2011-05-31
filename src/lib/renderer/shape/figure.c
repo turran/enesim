@@ -122,7 +122,7 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_shape_outline_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
 	enesim_renderer_shape_fill_color_get(r, &fcolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -286,7 +286,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_shape_outline_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
 	enesim_renderer_shape_fill_color_get(r, &fcolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -458,7 +458,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
 	
-	enesim_renderer_shape_outline_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
 	enesim_renderer_shape_fill_color_get(r, &fcolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);

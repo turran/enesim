@@ -120,7 +120,7 @@ void * enesim_renderer_shape_data_get(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double weight)
+EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -133,7 +133,7 @@ EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double we
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_outline_weight_get(Enesim_Renderer *r, double *weight)
+EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *weight)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -144,7 +144,7 @@ EAPI void enesim_renderer_shape_outline_weight_get(Enesim_Renderer *r, double *w
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Color color)
+EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -155,7 +155,7 @@ EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Col
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_outline_color_get(Enesim_Renderer *r, Enesim_Color *color)
+EAPI void enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -166,23 +166,23 @@ EAPI void enesim_renderer_shape_outline_color_get(Enesim_Renderer *r, Enesim_Col
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_outline_renderer_set(Enesim_Renderer *r, Enesim_Renderer *outline)
+EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *stroke)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
-	thiz->stroke.rend = outline;
+	thiz->stroke.rend = stroke;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_outline_renderer_get(Enesim_Renderer *r, Enesim_Renderer **outline)
+EAPI void enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r, Enesim_Renderer **stroke)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
-	*outline = thiz->stroke.rend;
+	*stroke = thiz->stroke.rend;
 }
 /**
  * To be documented

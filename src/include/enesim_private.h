@@ -78,13 +78,13 @@ static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
 #endif
 
 #ifdef  EFL_HAVE_SSE
-#define LIBARGB_SSE 1
+#define LIBARGB_SSE 0
 #else
 #define LIBARGB_SSE 0
 #endif
 
 #ifdef EFL_HAVE_SSE2
-#define LIBARGB_SSE2 1
+#define LIBARGB_SSE2 0
 #else
 #define LIBARGB_SSE2 0
 #endif

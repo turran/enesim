@@ -245,14 +245,14 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	if (!thiz->figure)
 		return EINA_FALSE; // should just not draw
 
-	enesim_renderer_shape_outline_weight_get(r, &stroke_weight);
-	enesim_renderer_shape_outline_weight_set(thiz->figure, stroke_weight);
+	enesim_renderer_shape_stroke_weight_get(r, &stroke_weight);
+	enesim_renderer_shape_stroke_weight_set(thiz->figure, stroke_weight);
 
-	enesim_renderer_shape_outline_color_get(r, &stroke_color);
-	enesim_renderer_shape_outline_color_set(thiz->figure, stroke_color);
+	enesim_renderer_shape_stroke_color_get(r, &stroke_color);
+	enesim_renderer_shape_stroke_color_set(thiz->figure, stroke_color);
 
-	enesim_renderer_shape_outline_renderer_get(r, &stroke_renderer);
-	enesim_renderer_shape_outline_renderer_set(thiz->figure, stroke_renderer);
+	enesim_renderer_shape_stroke_renderer_get(r, &stroke_renderer);
+	enesim_renderer_shape_stroke_renderer_set(thiz->figure, stroke_renderer);
 
 	enesim_renderer_shape_fill_color_get(r, &fill_color);
 	enesim_renderer_shape_fill_color_set(thiz->figure, fill_color);

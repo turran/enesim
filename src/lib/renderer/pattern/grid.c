@@ -288,7 +288,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 /**
  * Creates a new grid renderer
  *
- * A grid renderer is composed of an inside box and an outside outline.
+ * A grid renderer is composed of an inside box and an outside stroke.
  * Both, the inside and outside elements can be configurable through the
  * color, width and height.
  * @return The renderer

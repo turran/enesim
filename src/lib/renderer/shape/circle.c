@@ -38,7 +38,7 @@ static inline Enesim_Renderer_Circle * _circle_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
+static void _stroked_fill_paint(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Circle *thiz = _circle_get(r);
@@ -57,7 +57,7 @@ static void _outlined_fill_paint(Enesim_Renderer *r, int x, int y,
 	int xx, yy;
 	int fill_only = 0;
 
-	enesim_renderer_shape_outline_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -180,7 +180,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	thiz->xx0 = 65536 * (thiz->x - 0.5);
 	thiz->yy0 = 65536 * (thiz->y - 0.5);
 
-	enesim_renderer_shape_outline_weight_get(r, &sw);
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	thiz->do_inner = 1;
 	if (sw >= (thiz->r - 1))
 	{
@@ -196,7 +196,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	if (!enesim_renderer_shape_sw_setup(r))
 		return EINA_FALSE;
 
-	*fill = _outlined_fill_paint;
+	*fill = _stroked_fill_paint;
 
 	return EINA_TRUE;
 }

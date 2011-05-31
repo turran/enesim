@@ -100,12 +100,12 @@ typedef enum _Enesim_Shape_Draw_Mode
 	ENESIM_SHAPE_DRAW_MODE_STROKE_FILL,
 } Enesim_Shape_Draw_Mode;
 
-EAPI void enesim_renderer_shape_outline_weight_set(Enesim_Renderer *r, double weight);
-EAPI void enesim_renderer_shape_outline_weight_get(Enesim_Renderer *r, double *weight);
-EAPI void enesim_renderer_shape_outline_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
-EAPI void enesim_renderer_shape_outline_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_shape_outline_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
-EAPI void enesim_renderer_shape_outline_renderer_get(Enesim_Renderer *r, Enesim_Renderer **o);
+EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight);
+EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *weight);
+EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
+EAPI void enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r, Enesim_Color *color);
+EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
+EAPI void enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r, Enesim_Renderer **o);
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color fill_color);
 EAPI void enesim_renderer_shape_fill_color_get(Enesim_Renderer *r, Enesim_Color *fill_color);
 EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *f);

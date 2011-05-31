@@ -42,7 +42,7 @@ static inline Enesim_Renderer_Ellipse * _ellipse_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
 	Enesim_Renderer *fpaint;
@@ -67,7 +67,7 @@ static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *r, int x, 
 	int xx, yy;
 	int fill_only = 0;
 
-	enesim_renderer_shape_outline_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -162,7 +162,7 @@ static void _span_color_outlined_paint_filled_affine(Enesim_Renderer *r, int x, 
 	}
 }
 
-static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *r, int x, int y,
+static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
@@ -189,7 +189,7 @@ static void _span_color_outlined_paint_filled_proj(Enesim_Renderer *r, int x, in
 	int xx, yy, zz;
 	int fill_only = 0;
 
-	enesim_renderer_shape_outline_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &ocolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -316,7 +316,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		thiz->fyyp = 65536 * sqrt(fabs((ry * ry) - (rx * rx)));
 		thiz->cc0 = 2 * thiz->rr0_y;
 	}
-	enesim_renderer_shape_outline_weight_get(r, &sw);
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	thiz->do_inner = 1;
 	if ((sw >= (thiz->rx - 1)) || (sw >= (thiz->ry - 1)))
 	{
@@ -347,9 +347,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	if (!enesim_renderer_shape_sw_setup(r))
 		return EINA_FALSE;
 
-	*fill = _span_color_outlined_paint_filled_proj;
+	*fill = _span_color_stroked_paint_filled_proj;
 	if (r->matrix.type == ENESIM_MATRIX_AFFINE || r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		*fill = _span_color_outlined_paint_filled_affine;
+		*fill = _span_color_stroked_paint_filled_affine;
 
 	return EINA_TRUE;
 }

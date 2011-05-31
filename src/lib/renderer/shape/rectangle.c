@@ -294,14 +294,14 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_norounded_nooutlined_paint_filled_identity(Enesim_Renderer *r, int x,
+static void _span_norounded_nostroked_paint_filled_identity(Enesim_Renderer *r, int x,
 		int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 }
 
-static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *r, int x, int y,
+static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -323,7 +323,7 @@ static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *r,
 	int fill_only = 0;
 	char bl = thiz->corner.bl, br = thiz->corner.br, tl = thiz->corner.tl, tr = thiz->corner.tr;
 
-	enesim_renderer_shape_outline_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -440,7 +440,7 @@ static void _span_rounded_color_outlined_paint_filled_affine(Enesim_Renderer *r,
 	}
 }
 
-static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *r, int x, int y,
+static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Rectangle *thiz;
@@ -463,7 +463,7 @@ static void _span_rounded_color_outlined_paint_filled_proj(Enesim_Renderer *r, i
 	int fill_only = 0;
 	char bl = thiz->corner.bl, br = thiz->corner.br, tl = thiz->corner.tl, tr = thiz->corner.tr;
 
-	enesim_renderer_shape_outline_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -611,7 +611,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	thiz->rxx0 = (thiz->w - rad - 1) * 65536;
 	thiz->byy0 = (thiz->h - rad - 1) * 65536;
 
-	enesim_renderer_shape_outline_weight_get(r, &sw);
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	thiz->do_inner = 1;
 	if ((sw >= (thiz->w / 2.0)) || (sw >= (thiz->h / 2.0)))
 	{
@@ -631,9 +631,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		return EINA_FALSE;
 	}
 
-	*fill = _span_rounded_color_outlined_paint_filled_proj;
+	*fill = _span_rounded_color_stroked_paint_filled_proj;
 	if (r->matrix.type == ENESIM_MATRIX_AFFINE || r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		*fill = _span_rounded_color_outlined_paint_filled_affine;
+		*fill = _span_rounded_color_stroked_paint_filled_affine;
 
 	return EINA_TRUE;
 }
