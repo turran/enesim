@@ -20,11 +20,25 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Enesim_Renderer_Gradient
+{
+	/* properties */
+	Enesim_Renderer_Gradient_Mode mode;
+	/* generated at state setup */
+	uint32_t *src;
+	int slen;
+	Eina_List *stops;
+	/* private */
+	Enesim_Renderer_Gradient_Descriptor *descriptor;
+	void *data;
+} Enesim_Renderer_Gradient;
+
+typedef Enesim_Color (*Enesim_Renderer_Gradient_Color_Get)(Enesim_Renderer_Gradient *thiz, Eina_F16p16 distance);
+
 typedef struct _Stop
 {
 	Enesim_Color color;
 	double pos;
-	/* TODO replace float with Eina_F16p16 */
 } Stop;
 
 static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
@@ -34,45 +48,228 @@ static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Descriptor *descriptor, void *data)
+
+static inline uint32_t _pad_color_get(Enesim_Renderer_Gradient *thiz, Eina_F16p16 p)
 {
-	Enesim_Renderer *r;
-	Enesim_Renderer_Gradient *thiz;
+	int fp;
+	uint32_t v;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient));
-	thiz->data = data;
-	if (!thiz) return NULL;
-	/* set default properties */
-	thiz->stops = NULL;
+	fp = eina_f16p16_int_to(p);
+	if (fp < 0)
+	{
+		v = thiz->src[0];
+	}
+	else if (fp >= thiz->slen - 1)
+	{
+		v = thiz->src[thiz->slen - 1];
+	}
+	else
+	{
+		uint16_t a;
 
-	r = enesim_renderer_new(descriptor, thiz);
-	return r;
+		a = eina_f16p16_fracc_get(p) >> 8;
+		v = argb8888_interp_256(1 + a, thiz->src[fp + 1], thiz->src[fp]);
+	}
+
+	return v;
 }
 
-void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
+static inline uint32_t _restrict_color_get(Enesim_Renderer_Gradient *thiz, Eina_F16p16 p)
+{
+	int fp;
+	uint32_t v;
+
+	fp = eina_f16p16_int_to(p);
+	if (fp < 0)
+	{
+		/* FIXME also AA the border */
+		v = 0;
+	}
+	else if (fp >= thiz->slen - 1)
+	{
+		/* FIXME also AA the border */
+		v = 0;
+	}
+	else
+	{
+		uint16_t a;
+
+		a = eina_f16p16_fracc_get(p) >> 8;
+		v = argb8888_interp_256(1 + a, thiz->src[fp + 1], thiz->src[fp]);
+	}
+
+	return v;
+}
+
+static inline uint32_t _reflect_color_get(Enesim_Renderer_Gradient *thiz, Eina_F16p16 p)
+{
+	return 0xff000000;
+}
+
+static inline uint32_t _repeat_color_get(Enesim_Renderer_Gradient *thiz, Eina_F16p16 p)
+{
+	int fp;
+	int fp_next;
+	uint32_t v;
+	uint16_t a;
+
+	fp = eina_f16p16_int_to(p);
+	fp = fp % thiz->slen;
+	fp_next = (fp + 1) % thiz->slen;
+
+	a = eina_f16p16_fracc_get(p) >> 8;
+	v = argb8888_interp_256(1 + a, thiz->src[fp_next], thiz->src[fp]);
+
+	return v;
+}
+
+#define GRADIENT_PROJECTIVE(mode) \
+static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
+		int x,	int y, 	unsigned int len, uint32_t *dst)	\
+{									\
+	Enesim_Renderer_Gradient *thiz;					\
+	uint32_t *end = dst + len;					\
+	Eina_F16p16 xx, yy, zz;						\
+									\
+	thiz = _gradient_get(r);					\
+	renderer_projective_setup(r, x, y, &xx, &yy, &zz);		\
+	while (dst < end)						\
+	{								\
+		Eina_F16p16 syy, sxx;					\
+		Eina_F16p16 d;						\
+		uint32_t p0;						\
+									\
+		syy = ((((int64_t)yy) << 16) / zz);			\
+		sxx = ((((int64_t)xx) << 16) / zz);			\
+									\
+		d = thiz->descriptor->distance(r, sxx, syy);		\
+		*dst++ = _##mode##_color_get(thiz, d);			\
+		yy += r->matrix.values.yx;				\
+		xx += r->matrix.values.xx;				\
+		zz += r->matrix.values.zx;				\
+	}								\
+}
+
+#define GRADIENT_IDENTITY(mode) \
+static void _argb8888_##mode##_span_identity(Enesim_Renderer *r, int x,	\
+		int y, 	unsigned int len, uint32_t *dst)		\
+{									\
+	Enesim_Renderer_Gradient *thiz;					\
+	uint32_t *end = dst + len;					\
+	Eina_F16p16 xx, yy;						\
+									\
+	thiz = _gradient_get(r);					\
+	renderer_identity_setup(r, x, y, &xx, &yy);			\
+	while (dst < end)						\
+	{								\
+		Eina_F16p16 d;						\
+		d = thiz->descriptor->distance(r, xx, yy);		\
+		*dst++ = _##mode##_color_get(thiz, d);			\
+		xx += EINA_F16P16_ONE;					\
+	}								\
+	/* FIXME is there some mmx bug there? the interp_256 already calls this \
+	 * but the float support is fucked up				\
+	 */								\
+}
+
+#define GRADIENT_AFFINE(mode) \
+static void _argb8888_##mode##_span_affine(Enesim_Renderer *r, int x,	\
+		int y, 	unsigned int len, uint32_t *dst)		\
+{									\
+	Enesim_Renderer_Gradient *thiz;					\
+	uint32_t *end = dst + len;					\
+	Eina_F16p16 xx, yy;						\
+									\
+	thiz = _gradient_get(r);					\
+	renderer_affine_setup(r, x, y, &xx, &yy);			\
+	while (dst < end)						\
+	{								\
+		Eina_F16p16 d;						\
+		uint32_t p0;						\
+									\
+		d = thiz->descriptor->distance(r, xx, yy);		\
+		*dst++ = _##mode##_color_get(thiz, d);			\
+		yy += r->matrix.values.yx;				\
+		xx += r->matrix.values.xx;				\
+	}								\
+}
+
+GRADIENT_PROJECTIVE(restrict);
+GRADIENT_PROJECTIVE(repeat);
+GRADIENT_PROJECTIVE(pad);
+GRADIENT_PROJECTIVE(reflect);
+
+GRADIENT_IDENTITY(restrict);
+GRADIENT_IDENTITY(repeat);
+GRADIENT_IDENTITY(pad);
+GRADIENT_IDENTITY(reflect);
+
+GRADIENT_AFFINE(restrict);
+GRADIENT_AFFINE(repeat);
+GRADIENT_AFFINE(pad);
+GRADIENT_AFFINE(reflect);
+
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_GRADIENT_MODES][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Gradient_Color_Get _color_get[ENESIM_GRADIENT_MODES];
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static void _gradient_state_cleanup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	if (thiz->src)
+	{
+		free(thiz->src);
+		thiz->src = NULL;
+	}
+	thiz->slen = 0;
+}
+
+static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Eina_List *tmp;
 	Stop *curr, *next;
 	Eina_F16p16 xx, inc;
-	int end = len;
+	int end;
 	uint32_t *dst;
 
 	thiz = _gradient_get(r);
-	/* TODO check that we have at least two stops */
+	/* check that we have at least two stops */
+	if (eina_list_count(thiz->stops) < 2)
+		return EINA_FALSE;
+	/* setup the implementation */
+	*fill = NULL;
+	if (!thiz->descriptor->sw_setup(r, fill))
+	{
+		free(thiz->src);
+		thiz->src = NULL;
+		return EINA_FALSE;
+	}
+	if (!*fill)
+	{
+		Enesim_Matrix m;
+
+		enesim_renderer_transformation_get(r, &m);
+		*fill = _spans[thiz->mode][enesim_matrix_type_get(&m)];
+	}
+	/* get the length */
+	thiz->slen = thiz->descriptor->length(r);
+	printf("using length of %d\n", thiz->slen);
+
 	/* TODO check that we have one at 0 and one at 1 */
 	curr = eina_list_data_get(thiz->stops);
 	tmp = eina_list_next(thiz->stops);
 	next = eina_list_data_get(tmp);
 	/* Check that we dont divide by 0 */
-	inc = eina_f16p16_float_from(1.0 / ((next->pos - curr->pos) * len));
+	inc = eina_f16p16_double_from(1.0 / ((next->pos - curr->pos) * thiz->slen));
 	xx = 0;
 
-	thiz->src = dst = malloc(sizeof(uint32_t) * len);
-	memset(thiz->src, 0xff, len);
+	end = thiz->slen;
+	thiz->src = dst = malloc(sizeof(uint32_t) * thiz->slen);
+	memset(thiz->src, 0xff, thiz->slen);
 	/* FIXME Im not sure if we increment xx by the 1 / ((next - curr) * len) value
 	 * as it might not be too accurate
 	 */
@@ -87,7 +284,7 @@ void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
 			tmp = eina_list_next(tmp);
 			curr = next;
 			next = eina_list_data_get(tmp);
-			inc = eina_f16p16_float_from(1.0 / ((next->pos - curr->pos) * len));
+			inc = eina_f16p16_double_from(1.0 / ((next->pos - curr->pos) * thiz->slen));
 			xx = 0;
 		}
 		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
@@ -95,16 +292,105 @@ void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len)
 		*dst++ = p0;
 		xx += inc;
 	}
-	thiz->slen = len;
+	return EINA_TRUE;
 }
 
-void enesim_renderer_gradient_pixels_get(Enesim_Renderer *r, uint32_t **pixels, unsigned int *len)
+static void _gradient_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Gradient *thiz;
 
 	thiz = _gradient_get(r);
-	*pixels = thiz->src;
-	*len = thiz->slen;
+	if (thiz->mode == ENESIM_GRADIENT_RESTRICT && thiz->descriptor->boundings)
+	{
+		thiz->descriptor->boundings(r, boundings);
+	}
+	else
+	{
+		boundings->x = INT_MIN / 2;
+		boundings->y = INT_MIN / 2;
+		boundings->w = INT_MAX;
+		boundings->h = INT_MAX;
+	}
+}
+
+static void _gradient_free(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	if (thiz->src)
+		free(thiz->src);
+	if (thiz->descriptor->free)
+		thiz->descriptor->free(r);
+	free(thiz);
+}
+
+static void _gradient_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+}
+
+static Enesim_Renderer_Descriptor _gradient_descriptor = {
+	/* .sw_setup =   */ _gradient_state_setup,
+	/* .sw_cleanup = */ _gradient_state_cleanup,
+	/* .free =       */ _gradient_free,
+	/* .boundings =  */ _gradient_boundings,
+	/* .flags =      */ _gradient_flags,
+	/* .is_inside =  */ NULL
+};
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descriptor *gdescriptor, void *data)
+{
+	Enesim_Renderer *r;
+	Enesim_Renderer_Gradient *thiz;
+	static Eina_Bool spans_initialized = EINA_FALSE;
+
+	if (!spans_initialized)
+	{
+		spans_initialized = EINA_TRUE;
+		/* first the span functions */
+		_spans[ENESIM_GRADIENT_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
+		_spans[ENESIM_GRADIENT_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
+		_spans[ENESIM_GRADIENT_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
+		_spans[ENESIM_GRADIENT_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
+		_spans[ENESIM_GRADIENT_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
+		_spans[ENESIM_GRADIENT_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
+		_spans[ENESIM_GRADIENT_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
+		_spans[ENESIM_GRADIENT_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
+		_spans[ENESIM_GRADIENT_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
+		_spans[ENESIM_GRADIENT_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
+		_spans[ENESIM_GRADIENT_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
+		_spans[ENESIM_GRADIENT_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+		/* now the color get functions */
+		_color_get[ENESIM_GRADIENT_PAD] = _pad_color_get;
+		_color_get[ENESIM_GRADIENT_REFLECT] = _reflect_color_get;
+		_color_get[ENESIM_GRADIENT_RESTRICT] = _restrict_color_get;
+		_color_get[ENESIM_GRADIENT_REPEAT] = _repeat_color_get;
+	}
+	if (!gdescriptor->distance)
+	{
+		ERR("No suitable gradient distance function");
+		return NULL;
+	}
+	if (!gdescriptor->length)
+	{
+		ERR("No suitable gradient length function");
+		return NULL;
+	}
+
+	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient));
+	thiz->data = data;
+	thiz->descriptor = gdescriptor;
+	if (!thiz) return NULL;
+	/* set default properties */
+	thiz->stops = NULL;
+
+	r = enesim_renderer_new(&_gradient_descriptor, thiz);
+	return r;
 }
 
 void * enesim_renderer_gradient_data_get(Enesim_Renderer *r)
@@ -113,6 +399,14 @@ void * enesim_renderer_gradient_data_get(Enesim_Renderer *r)
 
 	thiz = _gradient_get(r);
 	return thiz->data;
+}
+
+Enesim_Color enesim_renderer_gradient_color_get(Enesim_Renderer *r, Eina_F16p16 pos)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	return _color_get[thiz->mode](thiz, pos);
 }
 /*============================================================================*
  *                                   API                                      *

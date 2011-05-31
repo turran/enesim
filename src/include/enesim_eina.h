@@ -1,5 +1,5 @@
 /* ENESIM - Direct Rendering Library
- * Copyright (C) 2007-2008 Jorge Luis Zapata
+ * Copyright (C) 2007-2011 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,35 +15,29 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _ENESIM_EXTENDER_H
-#define _ENESIM_EXTENDER_H
+#ifndef ENESIM_EINA_H_
+#define ENESIM_EINA_H_
 
-typedef struct _Enesim_Extender_Int
-{
-	int max;
-	int min;
-} Enesim_Extender_Int;
+/* Here we put all the stuff that should be moved to eina */
 
-static inline void enesim_extender_int_reset(Enesim_Extender_Int *e)
+#define EINA_F16P16_ONE (1 << 16)
+#define EINA_F16P16_HALF (1 << 15)
+
+static inline Eina_F16p16 eina_f16p16_double_from(double v)
 {
-	e->min = INT_MAX;
-	e->max = INT_MIN;
+   Eina_F16p16 r;
+
+   r = (Eina_F16p16)(v * 65536.0f + (v < 0 ? -0.5f : 0.5f));
+   return r;
+
 }
 
-static inline void enesim_extender_int_add(Enesim_Extender_Int *e, int start, int end)
+static inline double eina_f16p16_double_to(Eina_F16p16 v)
 {
-	if (start < e->min)
-		e->min = start;
-	if (end > e->max)
-		e->max = end;
-}
+   double r;
 
-static inline void enesim_extender_int_unsorted_add(Enesim_Extender_Int *e, int start, int end)
-{
-	if (start <= end)
-		enesim_extender_int_add(e, start, end);
-	else
-		enesim_extender_int_add(e, end, start);
+   r = v / 65536.0f;
+   return r;
 }
 
 #endif

@@ -31,15 +31,15 @@ struct _Enesim_Renderer_Path
 {
 	Enesim_Renderer_Sw_Fill fill;
 	Enesim_Renderer *figure;
-	float   last_x, last_y;
-	float   last_ctrl_x, last_ctrl_y;
+	double last_x, last_y;
+	double last_ctrl_x, last_ctrl_y;
 // ....  geom_transform?
 };
 
-static void _quadratic_to(Enesim_Renderer *r, float ctrl_x, float ctrl_y,
-		float x, float y);
-static void _cubic_to(Enesim_Renderer *r, float ctrl_x0, float ctrl_y0,
-		float ctrl_x, float ctrl_y, float x, float y);
+static void _quadratic_to(Enesim_Renderer *r, double ctrl_x, double ctrl_y,
+		double x, double y);
+static void _cubic_to(Enesim_Renderer *r, double ctrl_x0, double ctrl_y0,
+		double ctrl_x, double ctrl_y, double x, double y);
 
 static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
 {
@@ -50,7 +50,7 @@ static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
 }
 
 
-static void _move_to(Enesim_Renderer *r, float x, float y)
+static void _move_to(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -64,7 +64,7 @@ static void _move_to(Enesim_Renderer *r, float x, float y)
 	thiz->last_ctrl_y = y;
 }
 
-static void _line_to(Enesim_Renderer *r, float x, float y)
+static void _line_to(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -78,8 +78,8 @@ static void _line_to(Enesim_Renderer *r, float x, float y)
 }
 
 /* these subdiv approximations need to be done more carefully */
-static void _quadratic_to(Enesim_Renderer *r, float ctrl_x, float ctrl_y,
-		float x, float y)
+static void _quadratic_to(Enesim_Renderer *r, double ctrl_x, double ctrl_y,
+		double x, double y)
 {
 	Enesim_Renderer_Path *thiz;
 	double x0, y0, x1, y1, x01, y01;
@@ -122,7 +122,7 @@ static void _quadratic_to(Enesim_Renderer *r, float ctrl_x, float ctrl_y,
 	thiz->last_ctrl_y = y1;
 }
 
-static void _squadratic_to(Enesim_Renderer *r, float x, float y)
+static void _squadratic_to(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Path *thiz;
 	double x0, y0, cx0, cy0;
@@ -143,8 +143,8 @@ static void _squadratic_to(Enesim_Renderer *r, float x, float y)
 	thiz->last_ctrl_y = cy0;
 }
 
-static void _scubic_to(Enesim_Renderer *r, float ctrl_x, float ctrl_y, float x,
-		float y)
+static void _scubic_to(Enesim_Renderer *r, double ctrl_x, double ctrl_y, double x,
+		double y)
 {
 	Enesim_Renderer_Path *thiz;
 	double x0, y0, cx0, cy0;
@@ -165,8 +165,8 @@ static void _scubic_to(Enesim_Renderer *r, float ctrl_x, float ctrl_y, float x,
 	thiz->last_ctrl_y = ctrl_y;
 }
 
-static void _cubic_to(Enesim_Renderer *r, float ctrl_x0, float ctrl_y0,
-		float ctrl_x, float ctrl_y, float x, float y)
+static void _cubic_to(Enesim_Renderer *r, double ctrl_x0, double ctrl_y0,
+		double ctrl_x, double ctrl_y, double x, double y)
 {
 	Enesim_Renderer_Path *thiz;
 	double x0, y0, x01, y01, x23, y23;
@@ -338,7 +338,7 @@ err_figure:
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_path_move_to(Enesim_Renderer *r, float x, float y)
+EAPI void enesim_renderer_path_move_to(Enesim_Renderer *r, double x, double y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;
@@ -349,7 +349,7 @@ EAPI void enesim_renderer_path_move_to(Enesim_Renderer *r, float x, float y)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_path_line_to(Enesim_Renderer *r, float x, float y)
+EAPI void enesim_renderer_path_line_to(Enesim_Renderer *r, double x, double y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;
@@ -359,8 +359,8 @@ EAPI void enesim_renderer_path_line_to(Enesim_Renderer *r, float x, float y)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_path_squadratic_to(Enesim_Renderer *r, float x,
-		float y)
+EAPI void enesim_renderer_path_squadratic_to(Enesim_Renderer *r, double x,
+		double y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;
@@ -370,8 +370,8 @@ EAPI void enesim_renderer_path_squadratic_to(Enesim_Renderer *r, float x,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_path_quadratic_to(Enesim_Renderer *r, float ctrl_x,
-		float ctrl_y, float x, float y)
+EAPI void enesim_renderer_path_quadratic_to(Enesim_Renderer *r, double ctrl_x,
+		double ctrl_y, double x, double y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;
@@ -381,8 +381,8 @@ EAPI void enesim_renderer_path_quadratic_to(Enesim_Renderer *r, float ctrl_x,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_path_cubic_to(Enesim_Renderer *r, float ctrl_x0,
-		float ctrl_y0, float ctrl_x, float ctrl_y, float x, float y)
+EAPI void enesim_renderer_path_cubic_to(Enesim_Renderer *r, double ctrl_x0,
+		double ctrl_y0, double ctrl_x, double ctrl_y, double x, double y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;
@@ -392,8 +392,8 @@ EAPI void enesim_renderer_path_cubic_to(Enesim_Renderer *r, float ctrl_x0,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_path_scubic_to(Enesim_Renderer *r, float ctrl_x,
-		float ctrl_y, float x, float y)
+EAPI void enesim_renderer_path_scubic_to(Enesim_Renderer *r, double ctrl_x,
+		double ctrl_y, double x, double y)
 {
 	x = ((int) (2* x + 0.5)) / 2.0;
 	y = ((int) (2* y + 0.5)) / 2.0;

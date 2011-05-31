@@ -23,11 +23,6 @@
  * + add common parameters to the renderer here like transformation matrix and quality
  */
 
-
-/* TODO eina fixed point helpers, this should go to eina some day */
-#define EINA_F16P16_ONE (1 << 16)
-#define EINA_F16P16_HALF (1 << 15)
-
 struct _Enesim_Renderer
 {
 	EINA_MAGIC
@@ -68,16 +63,6 @@ typedef struct _Enesim_Renderer_Shape
 	void *data;
 } Enesim_Renderer_Shape;
 
-typedef struct _Enesim_Renderer_Gradient
-{
-	Enesim_Renderer base;
-	Enesim_Renderer_Gradient_Mode mode;
-	uint32_t *src;
-	int slen;
-	Eina_List *stops;
-	void *data;
-} Enesim_Renderer_Gradient;
-
 /* Helper functions needed by other renderers */
 static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
 		Eina_F16p16 cx, Eina_F16p16 cy, Eina_F16p16 cz)
@@ -90,8 +75,8 @@ static inline void renderer_identity_setup(Enesim_Renderer *r, int x, int y,
 {
 	Eina_F16p16 ox, oy;
 
-	ox = eina_f16p16_float_from(r->ox);
-	oy = eina_f16p16_float_from(r->oy);
+	ox = eina_f16p16_double_from(r->ox);
+	oy = eina_f16p16_double_from(r->oy);
 
 	*fpx = eina_f16p16_int_from(x);
 	*fpy = eina_f16p16_int_from(y);
@@ -110,8 +95,8 @@ static inline void renderer_affine_setup(Enesim_Renderer *r, int x, int y,
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
-	ox = eina_f16p16_float_from(r->ox);
-	oy = eina_f16p16_float_from(r->oy);
+	ox = eina_f16p16_double_from(r->ox);
+	oy = eina_f16p16_double_from(r->oy);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
@@ -136,8 +121,8 @@ static inline void renderer_projective_setup(Enesim_Renderer *r, int x, int y,
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
-	ox = eina_f16p16_float_from(r->ox);
-	oy = eina_f16p16_float_from(r->oy);
+	ox = eina_f16p16_double_from(r->ox);
+	oy = eina_f16p16_double_from(r->oy);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
@@ -162,9 +147,22 @@ Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r);
 void enesim_renderer_shape_cleanup(Enesim_Renderer *r);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
 /* common gradient renderer functions */
-Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Descriptor *descriptor, void *data);
+typedef Eina_F16p16 (*Enesim_Renderer_Gradient_Distance)(Enesim_Renderer *r, Eina_F16p16 x, Eina_F16p16 y);
+typedef int (*Enesim_Renderer_Gradient_Length)(Enesim_Renderer *r);
+
+typedef struct _Enesim_Renderer_Gradient_Descriptor
+{
+	Enesim_Renderer_Gradient_Distance distance;
+	Enesim_Renderer_Gradient_Length length;
+	Enesim_Renderer_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Boundings boundings;
+	Enesim_Renderer_Inside is_inside;
+} Enesim_Renderer_Gradient_Descriptor;
+
+Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descriptor *gdescriptor, void *data);
 void * enesim_renderer_gradient_data_get(Enesim_Renderer *r);
-void enesim_renderer_gradient_state_setup(Enesim_Renderer *r, int len);
-void enesim_renderer_gradient_pixels_get(Enesim_Renderer *r, uint32_t **pixels, unsigned int *len);
+Enesim_Color enesim_renderer_gradient_color_get(Enesim_Renderer *r, Eina_F16p16 pos);
 
 #endif

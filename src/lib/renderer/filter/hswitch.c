@@ -27,7 +27,7 @@ typedef struct _Hswitch
 	unsigned int h;
 	Enesim_Renderer *lrend;
 	Enesim_Renderer *rrend;
-	float step;
+	double step;
 } Hswitch;
 
 static inline Hswitch * _hswitch_get(Enesim_Renderer *r)
@@ -46,7 +46,7 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	int mx;
 
 	hs = _hswitch_get(r);
-	mmx = eina_f16p16_float_from(hs->w - (float)(hs->w * hs->step));
+	mmx = eina_f16p16_double_from(hs->w - (double)(hs->w * hs->step));
 	mx = eina_f16p16_int_to(mmx);
 	while (dst < end)
 	{
@@ -91,7 +91,7 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 			eina_f16p16_mul(r->matrix.values.xy, yy) + r->matrix.values.xz;
 
 	/* FIXME put this on the state setup */
-	mmx = eina_f16p16_float_from(hs->w - (float)(hs->w * hs->step));
+	mmx = eina_f16p16_double_from(hs->w - (double)(hs->w * hs->step));
 	mx = eina_f16p16_int_to(mmx);
 	while (dst < end)
 	{
@@ -285,7 +285,7 @@ EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
  * @param[in] step The step. A value of 0 will render the left
  * renderer, a value of 1 will render the right renderer
  */
-EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, float step)
+EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, double step)
 {
 	Hswitch *hs;
 

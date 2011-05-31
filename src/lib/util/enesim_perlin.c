@@ -124,17 +124,17 @@ EAPI Eina_F16p16 enesim_perlin_get(Eina_F16p16 xx, Eina_F16p16 yy,
 	return total;
 }
 
-EAPI void enesim_perlin_coeff_set(unsigned int octaves, float persistence,
-	float xfreq, float yfreq, float amplitude, Eina_F16p16 *xfreqcoeff,
+EAPI void enesim_perlin_coeff_set(unsigned int octaves, double persistence,
+	double xfreq, double yfreq, double amplitude, Eina_F16p16 *xfreqcoeff,
 	Eina_F16p16 *yfreqcoeff, Eina_F16p16 *amplcoeff)
 {
 	Eina_F16p16 per;
 	int i;
 
-	per = eina_f16p16_float_from(persistence);
-	xfreqcoeff[0] = eina_f16p16_mul(eina_f16p16_float_from(xfreq), 131072);
-	yfreqcoeff[0] = eina_f16p16_mul(eina_f16p16_float_from(yfreq), 131072);
-	amplcoeff[0] = eina_f16p16_mul(eina_f16p16_float_from(amplitude), per);
+	per = eina_f16p16_double_from(persistence);
+	xfreqcoeff[0] = eina_f16p16_mul(eina_f16p16_double_from(xfreq), 131072);
+	yfreqcoeff[0] = eina_f16p16_mul(eina_f16p16_double_from(yfreq), 131072);
+	amplcoeff[0] = eina_f16p16_mul(eina_f16p16_double_from(amplitude), per);
 	for (i = 1; i < octaves; i++)
 	{
 		xfreqcoeff[i] = eina_f16p16_mul(xfreqcoeff[i- 1], 131072);

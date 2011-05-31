@@ -22,9 +22,12 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Gradient_Linear
 {
+	/* public properties */
 	double x0, x1, y0, y1;
+	/* generated at state setup */
 	Eina_F16p16 fx0, fx1, fy0, fy1;
 	Eina_F16p16 ayx, ayy;
+	int length;
 } Enesim_Renderer_Gradient_Linear;
 
 static inline Enesim_Renderer_Gradient_Linear * _linear_get(Enesim_Renderer *r)
@@ -35,7 +38,7 @@ static inline Enesim_Renderer_Gradient_Linear * _linear_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static inline Eina_F16p16 _linear_distance(Enesim_Renderer_Gradient_Linear *thiz, Eina_F16p16 x,
+static Eina_F16p16 _linear_distance_internal(Enesim_Renderer_Gradient_Linear *thiz, Eina_F16p16 x,
 		Eina_F16p16 y)
 {
 	Eina_F16p16 a, b;
@@ -43,81 +46,6 @@ static inline Eina_F16p16 _linear_distance(Enesim_Renderer_Gradient_Linear *thiz
 	a = eina_f16p16_mul(thiz->ayx, (x - thiz->fx0 + 32768));
 	b = eina_f16p16_mul(thiz->ayy, (y - thiz->fy0 + 32768));
 	return eina_f16p16_sub(eina_f16p16_add(a, b), 32768);
-}
-
-static inline uint32_t _linear_pad(Enesim_Renderer *r, Eina_F16p16 p)
-{
-	int fp;
-	uint32_t v;
-	uint32_t *data;
-	int data_length;
-
-	enesim_renderer_gradient_pixels_get(r, &data, &data_length);
-	fp = eina_f16p16_int_to(p);
-	if (fp < 0)
-	{
-		v = data[0];
-	}
-	else if (fp >= data_length - 1)
-	{
-		v = data[data_length - 1];
-	}
-	else
-	{
-		uint16_t a;
-
-		a = eina_f16p16_fracc_get(p) >> 8;
-		v = argb8888_interp_256(1 + a, data[fp + 1], data[fp]);
-	}
-
-	return v;
-}
-
-static void _argb8888_pad_span_affine(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
-{
-	Enesim_Renderer_Gradient_Linear *thiz;
-	uint32_t *end = dst + len;
-	Eina_F16p16 xx, yy;
-
-	thiz = _linear_get(r);
-	renderer_affine_setup(r, x, y, &xx, &yy);
-	while (dst < end)
-	{
-		Eina_F16p16 d;
-		uint32_t p0;
-
-		d = _linear_distance(thiz, xx, yy);
-		*dst++ = _linear_pad(r, d);
-		yy += r->matrix.values.yx;
-		xx += r->matrix.values.xx;
-	}
-}
-
-static void _argb8888_pad_span_projective(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
-{
-	Enesim_Renderer_Gradient_Linear *thiz;
-	uint32_t *end = dst + len;
-	Eina_F16p16 xx, yy, zz;
-
-	thiz = _linear_get(r);
-	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
-	while (dst < end)
-	{
-		Eina_F16p16 syy, sxx;
-		Eina_F16p16 d;
-		uint32_t p0;
-
-		syy = ((((int64_t)yy) << 16) / zz);
-		sxx = ((((int64_t)xx) << 16) / zz);
-
-		d = _linear_distance(thiz, sxx, syy);
-		*dst++ = _linear_pad(r, d);
-		yy += r->matrix.values.yx;
-		xx += r->matrix.values.xx;
-		zz += r->matrix.values.zx;
-	}
 }
 
 static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
@@ -130,29 +58,39 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
 
 	thiz = _linear_get(r);
 	renderer_identity_setup(r, x, y, &xx, &yy);
-	d = _linear_distance(thiz, xx, yy);
+	d = _linear_distance_internal(thiz, xx, yy);
 	while (dst < end)
 	{
-		*dst++ = _linear_pad(r, d);
+		*dst++ = enesim_renderer_gradient_color_get(r, d);
 		d += thiz->ayx;
 	}
-	/* FIXME is there some mmx bug there? the interp_256 already calls this
-	 * but the float support is fucked up
-	 */
-#ifdef EFL_HAVE_MMX
-	_mm_empty();
-#endif
+}
+/*----------------------------------------------------------------------------*
+ *            The Enesim's gradient renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static int _linear_length(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+	return thiz->length;
 }
 
-/*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
- *----------------------------------------------------------------------------*/
-static void _state_cleanup(Enesim_Renderer *r)
+static Eina_F16p16 _linear_distance(Enesim_Renderer *r, Eina_F16p16 x,
+		Eina_F16p16 y)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+	return _linear_distance_internal(thiz, x, y);
+}
+
+static void _linear_state_cleanup(Enesim_Renderer *r)
 {
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _linear_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 	Eina_F16p16 x0, x1, y0, y1;
@@ -160,10 +98,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	thiz = _linear_get(r);
 #define MATRIX 0
-	x0 = eina_f16p16_float_from(thiz->x0);
-	x1 = eina_f16p16_float_from(thiz->x1);
-	y0 = eina_f16p16_float_from(thiz->y0);
-	y1 = eina_f16p16_float_from(thiz->y1);
+	x0 = eina_f16p16_double_from(thiz->x0);
+	x1 = eina_f16p16_double_from(thiz->x1);
+	y0 = eina_f16p16_double_from(thiz->y0);
+	y1 = eina_f16p16_double_from(thiz->y1);
 #if MATRIX
 	f = eina_f16p16_mul(r->matrix.values.xx, r->matrix.values.yy) -
 			eina_f16p16_mul(r->matrix.values.xy, r->matrix.values.yx);
@@ -191,38 +129,28 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 #endif
 
 	/* we need to use floats because of the limitation of 16.16 values */
-	f = eina_f16p16_float_from(hypot(eina_f16p16_float_to(x0), eina_f16p16_float_to(y0)));
+	f = eina_f16p16_double_from(hypot(eina_f16p16_double_to(x0), eina_f16p16_double_to(y0)));
 	f += 32768;
 	thiz->ayx = ((int64_t)x0 << 16) / f;
 	thiz->ayy = ((int64_t)y0 << 16) / f;
 	/* TODO check that the difference between x0 - x1 and y0 - y1 is
 	 * < tolerance
 	 */
-	enesim_renderer_gradient_state_setup(r, eina_f16p16_int_to(f));
-	switch (r->matrix.type)
-	{
-		case ENESIM_MATRIX_IDENTITY:
+	thiz->length = eina_f16p16_int_to(f);
+	/* just override the identity case */
+	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		*fill = _argb8888_pad_span_identity;
-		break;
-
-		case ENESIM_MATRIX_AFFINE:
-		*fill = _argb8888_pad_span_affine;
-		break;
-
-		case ENESIM_MATRIX_PROJECTIVE:
-		*fill = _argb8888_pad_span_projective;
-		break;
-	}
 
 	return EINA_TRUE;
 }
 
-static Enesim_Renderer_Descriptor _linear_descriptor = {
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup,
+static Enesim_Renderer_Gradient_Descriptor _linear_descriptor = {
+	/* .distance =   */ _linear_distance,
+	/* .length =     */ _linear_length,
+	/* .sw_setup =   */ _linear_state_setup,
+	/* .sw_cleanup = */ _linear_state_cleanup,
 	/* .free =       */ NULL,
 	/* .boundings =  */ NULL,
-	/* .flags =      */ NULL,
 	/* .is_inside =  */ 0
 };
 /*============================================================================*

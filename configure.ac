@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT([enesim], [0.0.6], [enesim-devel@googlegroups.com])
+AC_INIT([enesim], [0.0.7], [enesim-devel@googlegroups.com])
 AC_PREREQ([2.60])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])

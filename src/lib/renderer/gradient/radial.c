@@ -59,93 +59,45 @@ static inline void _get_focis(double cx, double cy, double a, double b,
 	*min = 2 * c;
 	//printf("f1 %g %g, f2 %g %g min %g max %g\n", *f1x, *f1y, *f2x, *f2y, *min, *max);
 }
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static int _radial_length(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
 
-static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz, Eina_F16p16 x,
+	thiz = _radial_get(r);
+	return lrint(thiz->max - thiz->min);
+}
+
+static Eina_F16p16 _radial_distance(Enesim_Renderer *r, Eina_F16p16 x,
 		Eina_F16p16 y)
 {
+	Enesim_Renderer_Gradient_Radial *thiz;
 	Eina_F16p16 res;
 	double a, b;
-	double r;
+	double ret;
 	double d1, d2;
 
-	a = eina_f16p16_float_to(x);
-	b = eina_f16p16_float_to(y);
+	thiz = _radial_get(r);
+	a = eina_f16p16_double_to(x);
+	b = eina_f16p16_double_to(y);
 
 	d1 = a - thiz->f1.x;
 	d2 = b - thiz->f1.y;
 
-	r = hypot(d1, d2);
+	ret = hypot(d1, d2);
 
 	d1 = a - thiz->f2.x;
 	d2 = b - thiz->f2.y;
 
-	r += hypot(d1, d2);
+	ret += hypot(d1, d2);
 	//printf("old distance = %g\n", r);
-	r -= thiz->min;
+	ret -= thiz->min;
 
-
-	return eina_f16p16_float_from(r);
+	return eina_f16p16_double_from(ret);
 }
 
-static inline uint32_t _radial_pad(Enesim_Renderer *r, Eina_F16p16 p)
-{
-	Enesim_Renderer_Gradient_Radial *thiz;
-	int fp;
-	uint32_t v;
-	uint32_t *data;
-	int data_length;
-
-	thiz = _radial_get(r);
-	enesim_renderer_gradient_pixels_get(r, &data, &data_length);
-	fp = eina_f16p16_int_to(p);
-	//printf("fp2 = %d\n", fp);
-	if (fp < 0)
-	{
-		v = data[0];
-	}
-	else if (fp >= data_length - 1)
-	{
-		v = data[data_length - 1];
-	}
-	else
-	{
-		uint16_t a;
-
-		a = eina_f16p16_fracc_get(p) >> 8;
-		v = argb8888_interp_256(1 + a, data[fp + 1], data[fp]);
-	}
-
-	return v;
-}
-
-static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
-{
-	Enesim_Renderer_Gradient_Radial *thiz;
-	uint32_t *end = dst + len;
-	Eina_F16p16 xx, yy;
-	Eina_F16p16 d;
-
-	thiz = _radial_get(r);
-	renderer_identity_setup(r, x, y, &xx, &yy);
-	while (dst < end)
-	{
-		d = _radial_distance(thiz, xx, yy);
-		//printf("distance for %g %g = %g\n", eina_f16p16_float_to(xx), eina_f16p16_float_to(yy),
-		//		eina_f16p16_float_to(d));
-		*dst++ = _radial_pad(r, d);
-		xx += EINA_F16P16_ONE;
-	}
-	/* FIXME is there some mmx bug there? the interp_256 already calls this
-	 * but the float support is fucked up
-	 */
-#ifdef EFL_HAVE_MMX
-	_mm_empty();
-#endif
-}
-/*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
- *----------------------------------------------------------------------------*/
 static void _state_cleanup(Enesim_Renderer *r)
 {
 }
@@ -169,8 +121,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 				&thiz->f2.y, &thiz->f2.x, &thiz->min, &thiz->max);
 	}
 	//printf("generating span for = %g (%g %g)\n", thiz->max - thiz->min, thiz->max, thiz->min);
-	enesim_renderer_gradient_state_setup(r, lrint(thiz->max - thiz->min));
-	*fill = _argb8888_pad_span_identity;
 	return EINA_TRUE;
 }
 
@@ -186,12 +136,13 @@ static void _radial_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 	boundings->h = thiz->radius.y * 2;
 }
 
-static Enesim_Renderer_Descriptor _radial_descriptor = {
+static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
+	/* .distance =   */ _radial_distance,
+	/* .length =     */ _radial_length,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup,
 	/* .free =       */ NULL,
 	/* .boundings =  */ _radial_boundings,
-	/* .flags =      */ NULL,
 	/* .is_inside =  */ 0
 };
 /*============================================================================*

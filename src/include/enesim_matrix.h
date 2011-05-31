@@ -22,7 +22,6 @@
  * @{
  * @todo
  * - Create all this Macros
- * - Replace all float * with Enesim_Matrix
  */
 #define ENESIM_MATRIX_XX(m) m[0]
 
@@ -36,9 +35,9 @@ typedef enum
 
 typedef struct _Enesim_Matrix
 {
-	float xx, xy, xz;
-	float yx, yy, yz;
-	float zx, zy, zz;
+	double xx, xy, xz;
+	double yx, yy, yz;
+	double zx, zy, zz;
 } Enesim_Matrix; /**< Floating point matrix handler */
 
 typedef struct _Enesim_F16p16_Matrix
@@ -57,11 +56,11 @@ typedef struct _Enesim_Quad
 } Enesim_Quad; /**< Quadrangle handler */
 
 EAPI Enesim_Matrix_Type enesim_matrix_type_get(Enesim_Matrix *m);
-EAPI void enesim_matrix_values_set(Enesim_Matrix *m, float a, float b, float c,
-		float d, float e, float f, float g, float h, float i);
-EAPI void enesim_matrix_values_get(Enesim_Matrix *m, float *a, float *b,
-		float *c, float *d, float *e, float *f, float *g, float *h,
-		float *i);
+EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double c,
+		double d, double e, double f, double g, double h, double i);
+EAPI void enesim_matrix_values_get(Enesim_Matrix *m, double *a, double *b,
+		double *c, double *d, double *e, double *f, double *g, double *h,
+		double *i);
 EAPI void enesim_matrix_fixed_values_get(Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
 		Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i);
@@ -72,13 +71,13 @@ EAPI void enesim_matrix_compose(Enesim_Matrix *m1, Enesim_Matrix *m2,
 		Enesim_Matrix *dst);
 EAPI void enesim_f16p16_matrix_compose(Enesim_F16p16_Matrix *m1,
 		Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
-EAPI void enesim_matrix_translate(Enesim_Matrix *t, float tx, float ty);
-EAPI void enesim_matrix_scale(Enesim_Matrix *t, float sx, float sy);
-EAPI void enesim_matrix_rotate(Enesim_Matrix *t, float rad);
+EAPI void enesim_matrix_translate(Enesim_Matrix *t, double tx, double ty);
+EAPI void enesim_matrix_scale(Enesim_Matrix *t, double sx, double sy);
+EAPI void enesim_matrix_rotate(Enesim_Matrix *t, double rad);
 EAPI void enesim_matrix_identity(Enesim_Matrix *t);
 
-EAPI float enesim_matrix_determinant(Enesim_Matrix *m);
-EAPI void enesim_matrix_divide(Enesim_Matrix *m, float scalar);
+EAPI double enesim_matrix_determinant(Enesim_Matrix *m);
+EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar);
 EAPI void enesim_matrix_inverse(Enesim_Matrix *m, Enesim_Matrix *m2);
 EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a);
 

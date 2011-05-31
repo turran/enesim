@@ -263,7 +263,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	*fill = _spans[thiz->x_channel][thiz->y_channel][r->matrix.type];
 	if (!*fill) return EINA_FALSE;
 
-	thiz->s_scale = eina_f16p16_float_from(thiz->scale);
+	thiz->s_scale = eina_f16p16_double_from(thiz->scale);
 
 	return EINA_TRUE;
 }
@@ -339,7 +339,8 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 	Enesim_Renderer *r;
 	static Eina_Bool spans_initialized = EINA_FALSE;
 
-	if (spans_initialized == EINA_FALSE) {
+	if (!spans_initialized)
+	{
 		spans_initialized = EINA_TRUE;
 		_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_IDENTITY]
 			= _argb8888_a_b_span_identity;

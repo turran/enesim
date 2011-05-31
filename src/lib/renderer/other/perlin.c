@@ -23,10 +23,10 @@
 typedef struct _Enesim_Renderer_Perlin
 {
 	struct {
-		float val;
+		double val;
 		Eina_F16p16 *coeff;
 	} xfreq, yfreq, ampl;
-	float persistence;
+	double persistence;
 	int octaves;
 } Enesim_Renderer_Perlin;
 
@@ -205,7 +205,7 @@ EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int oc
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persistence)
+EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, double persistence)
 {
 	Enesim_Renderer_Perlin *thiz;
 
@@ -216,7 +216,7 @@ EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persi
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, float ampl)
+EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, double ampl)
 {
 	Enesim_Renderer_Perlin *thiz;
 
@@ -227,7 +227,7 @@ EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, float ampl)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq)
+EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq)
 {
 	Enesim_Renderer_Perlin *thiz;
 
@@ -238,7 +238,7 @@ EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, float freq)
+EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, double freq)
 {
 	Enesim_Renderer_Perlin *thiz;
 

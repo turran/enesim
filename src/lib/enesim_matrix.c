@@ -40,23 +40,23 @@ static inline _quad_dump(Enesim_Quad *q)
  * http://www.devmaster.net/forums/showthread.php?t=5784
  */
 #define EXTRA_PRECISION
-static float _sin(float x)
+static double _sin(double x)
 {
-	const float B = 4/M_PI;
-	const float C = -4/(M_PI*M_PI);
+	const double B = 4/M_PI;
+	const double C = -4/(M_PI*M_PI);
 
-	float y = (B * x) + (C * x * fabsf(x));
+	double y = (B * x) + (C * x * fabsf(x));
 
 #ifdef EXTRA_PRECISION
 	//  const float Q = 0.775;
-	const float P = 0.225;
+	const double P = 0.225;
 
 	y = P * (y * fabsf(y) - y) + y; // Q * y + P * y * abs(y)
 #endif
 	return y;
 }
 
-static float _cos(float x)
+static double _cos(double x)
 {
 	x += M_PI_2;
 
@@ -110,8 +110,8 @@ EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(Enesim_F16p16_Matrix *m)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_values_set(Enesim_Matrix *m, float a, float b, float c,
-		float d, float e, float f, float g, float h, float i)
+EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double c,
+		double d, double e, double f, double g, double h, double i)
 {
 	MATRIX_XX(m) = a;
 	MATRIX_XY(m) = b;
@@ -127,8 +127,8 @@ EAPI void enesim_matrix_values_set(Enesim_Matrix *m, float a, float b, float c,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_values_get(Enesim_Matrix *m, float *a, float *b, float *c,
-		float *d, float *e, float *f, float *g, float *h, float *i)
+EAPI void enesim_matrix_values_get(Enesim_Matrix *m, double *a, double *b, double *c,
+		double *d, double *e, double *f, double *g, double *h, double *i)
 {
 	if (a) *a = MATRIX_XX(m);
 	if (b) *b = MATRIX_XY(m);
@@ -147,15 +147,15 @@ EAPI void enesim_matrix_fixed_values_get(Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
 		Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i)
 {
-	if (a) *a = eina_f16p16_float_from(MATRIX_XX(m));
-	if (b) *b = eina_f16p16_float_from(MATRIX_XY(m));
-	if (c) *c = eina_f16p16_float_from(MATRIX_XZ(m));
-	if (d) *d = eina_f16p16_float_from(MATRIX_YX(m));
-	if (e) *e = eina_f16p16_float_from(MATRIX_YY(m));
-	if (f) *f = eina_f16p16_float_from(MATRIX_YZ(m));
-	if (g) *g = eina_f16p16_float_from(MATRIX_ZX(m));
-	if (h) *h = eina_f16p16_float_from(MATRIX_ZY(m));
-	if (i) *i = eina_f16p16_float_from(MATRIX_ZZ(m));
+	if (a) *a = eina_f16p16_double_from(MATRIX_XX(m));
+	if (b) *b = eina_f16p16_double_from(MATRIX_XY(m));
+	if (c) *c = eina_f16p16_double_from(MATRIX_XZ(m));
+	if (d) *d = eina_f16p16_double_from(MATRIX_YX(m));
+	if (e) *e = eina_f16p16_double_from(MATRIX_YY(m));
+	if (f) *f = eina_f16p16_double_from(MATRIX_YZ(m));
+	if (g) *g = eina_f16p16_double_from(MATRIX_ZX(m));
+	if (h) *h = eina_f16p16_double_from(MATRIX_ZY(m));
+	if (i) *i = eina_f16p16_double_from(MATRIX_ZZ(m));
 }
 
 EAPI void enesim_matrix_f16p16_matrix_to(Enesim_Matrix *m,
@@ -218,7 +218,7 @@ EAPI void enesim_matrix_rectangle_transform(Enesim_Matrix *m, Enesim_Rectangle *
  */
 EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a)
 {
-	float a11, a12, a13, a21, a22, a23, a31, a32, a33;
+	double a11, a12, a13, a21, a22, a23, a31, a32, a33;
 
 	/* cofactor */
 	a11 = (MATRIX_YY(m) * MATRIX_ZZ(m)) - (MATRIX_YZ(m) * MATRIX_ZY(m));
@@ -250,9 +250,9 @@ EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI float enesim_matrix_determinant(Enesim_Matrix *m)
+EAPI double enesim_matrix_determinant(Enesim_Matrix *m)
 {
-	float det;
+	double det;
 
 	det = MATRIX_XX(m) * ((MATRIX_YY(m) * MATRIX_ZZ(m)) - (MATRIX_YZ(m) * MATRIX_ZY(m)));
 	det -= MATRIX_XY(m) * ((MATRIX_YX(m) * MATRIX_ZZ(m)) - (MATRIX_YZ(m) * MATRIX_ZX(m)));
@@ -264,7 +264,7 @@ EAPI float enesim_matrix_determinant(Enesim_Matrix *m)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_divide(Enesim_Matrix *m, float scalar)
+EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar)
 {
 	MATRIX_XX(m) /= scalar;
 	MATRIX_XY(m) /= scalar;
@@ -284,7 +284,7 @@ EAPI void enesim_matrix_divide(Enesim_Matrix *m, float scalar)
  */
 EAPI void enesim_matrix_inverse(Enesim_Matrix *m, Enesim_Matrix *m2)
 {
-	float scalar;
+	double scalar;
 
 	/* determinant */
 	scalar = enesim_matrix_determinant(m);
@@ -299,7 +299,7 @@ EAPI void enesim_matrix_inverse(Enesim_Matrix *m, Enesim_Matrix *m2)
  */
 EAPI void enesim_matrix_compose(Enesim_Matrix *m1, Enesim_Matrix *m2, Enesim_Matrix *dst)
 {
-	float a11, a12, a13, a21, a22, a23, a31, a32, a33;
+	double a11, a12, a13, a21, a22, a23, a31, a32, a33;
 
 	a11 = (MATRIX_XX(m1) * MATRIX_XX(m2)) + (MATRIX_XY(m1) * MATRIX_YX(m2)) + (MATRIX_XZ(m1) * MATRIX_ZX(m2));
 	a12 = (MATRIX_XX(m1) * MATRIX_XY(m2)) + (MATRIX_XY(m1) * MATRIX_YY(m2)) + (MATRIX_XZ(m1) * MATRIX_ZY(m2));
@@ -376,7 +376,7 @@ EAPI void enesim_f16p16_matrix_compose(Enesim_F16p16_Matrix *m1,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_translate(Enesim_Matrix *m, float tx, float ty)
+EAPI void enesim_matrix_translate(Enesim_Matrix *m, double tx, double ty)
 {
 	MATRIX_XX(m) = 1;
 	MATRIX_XY(m) = 0;
@@ -392,7 +392,7 @@ EAPI void enesim_matrix_translate(Enesim_Matrix *m, float tx, float ty)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_scale(Enesim_Matrix *m, float sx, float sy)
+EAPI void enesim_matrix_scale(Enesim_Matrix *m, double sx, double sy)
 {
 	MATRIX_XX(m) = sx;
 	MATRIX_XY(m) = 0;
@@ -407,9 +407,9 @@ EAPI void enesim_matrix_scale(Enesim_Matrix *m, float sx, float sy)
 /**
  * FIXME fix this, is incredible slow.
  */
-EAPI void enesim_matrix_rotate(Enesim_Matrix *m, float rad)
+EAPI void enesim_matrix_rotate(Enesim_Matrix *m, double rad)
 {
-	float c, s;
+	double c, s;
 #if 0
 	c = cosf(rad);
 	s = sinf(rad);
@@ -471,7 +471,7 @@ EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m)
 EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
 		Eina_Rectangle *r)
 {
-	float xmin, ymin, xmax, ymax;
+	double xmin, ymin, xmax, ymax;
 	/* FIXME this code is very ugly, for sure there must be a better
 	 * implementation */
 	xmin = QUAD_X0(q) < QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
@@ -503,7 +503,7 @@ EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
 EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
 		Enesim_Rectangle *r)
 {
-	float xmin, ymin, xmax, ymax;
+	double xmin, ymin, xmax, ymax;
 	/* FIXME this code is very ugly, for sure there must be a better
 	 * implementation */
 	xmin = QUAD_X0(q) < QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
@@ -584,8 +584,8 @@ EAPI void enesim_quad_coords_set(Enesim_Quad *q, double x1,
 EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m,
 		Enesim_Quad *q)
 {
-	float ex = QUAD_X0(q) - QUAD_X1(q) + QUAD_X2(q) - QUAD_X3(q); // x0 - x1 + x2 - x3
-	float ey = QUAD_Y0(q) - QUAD_Y1(q) + QUAD_Y2(q) - QUAD_Y3(q); // y0 - y1 + y2 - y3
+	double ex = QUAD_X0(q) - QUAD_X1(q) + QUAD_X2(q) - QUAD_X3(q); // x0 - x1 + x2 - x3
+	double ey = QUAD_Y0(q) - QUAD_Y1(q) + QUAD_Y2(q) - QUAD_Y3(q); // y0 - y1 + y2 - y3
 
 	/* paralellogram */
 	if (!ex && !ey)
@@ -607,11 +607,11 @@ EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m,
 	}
 	else
 	{
-		float dx1 = QUAD_X1(q) - QUAD_X2(q); // x1 - x2
-		float dx2 = QUAD_X3(q) - QUAD_X2(q); // x3 - x2
-		float dy1 = QUAD_Y1(q) - QUAD_Y2(q); // y1 - y2
-		float dy2 = QUAD_Y3(q) - QUAD_Y2(q); // y3 - y2
-		float den = (dx1 * dy2) - (dx2 * dy1);
+		double dx1 = QUAD_X1(q) - QUAD_X2(q); // x1 - x2
+		double dx2 = QUAD_X3(q) - QUAD_X2(q); // x3 - x2
+		double dy1 = QUAD_Y1(q) - QUAD_Y2(q); // y1 - y2
+		double dy2 = QUAD_Y3(q) - QUAD_Y2(q); // y3 - y2
+		double den = (dx1 * dy2) - (dx2 * dy1);
 
 		if (!den)
 			return EINA_FALSE;

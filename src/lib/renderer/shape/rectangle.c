@@ -651,14 +651,16 @@ static void _free(Enesim_Renderer *r)
 {
 }
 
-static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *thiz)
+static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
-	Enesim_Renderer_Rectangle *rct = (Enesim_Renderer_Rectangle *)r;
+	Enesim_Renderer_Rectangle *thiz;
 
-	thiz->x = 0;
-	thiz->y = 0;
-	thiz->w = rct->w;
-	thiz->h = rct->h;
+	thiz = _rectangle_get(r);
+
+	boundings->x = 0;
+	boundings->y = 0;
+	boundings->w = thiz->w;
+	boundings->h = thiz->h;
 }
 
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {

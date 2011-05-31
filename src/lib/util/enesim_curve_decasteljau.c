@@ -22,7 +22,7 @@
  *============================================================================*/
 static inline void midpoint_get(Eina_F16p16 c1, Eina_F16p16 c2, Eina_F16p16 *r)
 {
-	*r = eina_f16p16_float_from(eina_f16p16_float_to(eina_f16p16_add(c1, c2)) / 2);
+	*r = eina_f16p16_double_from(eina_f16p16_double_to(eina_f16p16_add(c1, c2)) / 2);
 }
 
 static void curve3_recursive(Eina_F16p16 x1, Eina_F16p16 y1, Eina_F16p16 x2,
@@ -44,7 +44,7 @@ static void curve3_recursive(Eina_F16p16 x1, Eina_F16p16 y1, Eina_F16p16 x2,
 	ry = abs(y1 + y3 - y2 - y2);
 	if ((rx + ry) <= (1 << 16))
 	{
-		cb(eina_f16p16_float_to(x123), eina_f16p16_float_to(y123), data);
+		cb(eina_f16p16_double_to(x123), eina_f16p16_double_to(y123), data);
 		return;
 	}
 	
@@ -54,18 +54,18 @@ static void curve3_recursive(Eina_F16p16 x1, Eina_F16p16 y1, Eina_F16p16 x2,
 /*============================================================================*
  *                                 Global                                     * 
  *============================================================================*/
-void enesim_curve3_decasteljau_generate(float x1, float y1, float x2, float y2,
-		float x3, float y3, Enesim_Curve_Vertex_Add_Callback cb, void *data)
+void enesim_curve3_decasteljau_generate(double x1, double y1, double x2, double y2,
+		double x3, double y3, Enesim_Curve_Vertex_Add_Callback cb, void *data)
 {
 	cb(x1, y1, data);
-	curve3_recursive(eina_f16p16_float_from(x1), eina_f16p16_float_from(y1),
-			eina_f16p16_float_from(x2), eina_f16p16_float_from(y2), 
-			eina_f16p16_float_from(x3), eina_f16p16_float_from(y3), 0, cb, data);
+	curve3_recursive(eina_f16p16_double_from(x1), eina_f16p16_double_from(y1),
+			eina_f16p16_double_from(x2), eina_f16p16_double_from(y2), 
+			eina_f16p16_double_from(x3), eina_f16p16_double_from(y3), 0, cb, data);
 	cb(x3, y3, data);
 }
 
-void enesim_curve4_decasteljau_generate(float x1, float y1, float x2, float y2,
-		float x3, float y3, float x4, float y4, Enesim_Curve_Vertex_Add_Callback
+void enesim_curve4_decasteljau_generate(double x1, double y1, double x2, double y2,
+		double x3, double y3, double x4, double y4, Enesim_Curve_Vertex_Add_Callback
 		cb, void *data)
 {
 	

@@ -184,16 +184,16 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p);
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_path_new(void);
-EAPI void enesim_renderer_path_move_to(Enesim_Renderer *p, float x, float y);
-EAPI void enesim_renderer_path_line_to(Enesim_Renderer *p, float x, float y);
-EAPI void enesim_renderer_path_squadratic_to(Enesim_Renderer *p, float x, float y);
-EAPI void enesim_renderer_path_quadratic_to(Enesim_Renderer *p, float ctrl_x,
-		float ctrl_y, float x, float y);
-EAPI void enesim_renderer_path_cubic_to(Enesim_Renderer *p, float ctrl_x0,
-		float ctrl_y0, float ctrl_x, float ctrl_y, float x,
-		float y);
-EAPI void enesim_renderer_path_scubic_to(Enesim_Renderer *p, float ctrl_x, float ctrl_y,
-		float x, float y);
+EAPI void enesim_renderer_path_move_to(Enesim_Renderer *p, double x, double y);
+EAPI void enesim_renderer_path_line_to(Enesim_Renderer *p, double x, double y);
+EAPI void enesim_renderer_path_squadratic_to(Enesim_Renderer *p, double x, double y);
+EAPI void enesim_renderer_path_quadratic_to(Enesim_Renderer *p, double ctrl_x,
+		double ctrl_y, double x, double y);
+EAPI void enesim_renderer_path_cubic_to(Enesim_Renderer *p, double ctrl_x0,
+		double ctrl_y0, double ctrl_x, double ctrl_y, double x,
+		double y);
+EAPI void enesim_renderer_path_scubic_to(Enesim_Renderer *p, double ctrl_x, double ctrl_y,
+		double x, double y);
 EAPI void enesim_renderer_path_clear(Enesim_Renderer *p);
 /**
  * @}
@@ -208,7 +208,7 @@ EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
 		Enesim_Renderer *left);
 EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
 		Enesim_Renderer *right);
-EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, float step);
+EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, double step);
 /**
  * @}
  * @defgroup Enesim_Renderer_Image_Group Image
@@ -306,9 +306,9 @@ EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer 
  */
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void);
 EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int octaves);
-EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, float persistence);
-EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, float freq);
-EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, float freq);
+EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, double persistence);
+EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq);
+EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, double freq);
 
 
 /**
@@ -323,6 +323,7 @@ typedef enum _Enesim_Renderer_Gradient_Mode
 	ENESIM_GRADIENT_PAD,
 	ENESIM_GRADIENT_REFLECT,
 	ENESIM_GRADIENT_REPEAT,
+	ENESIM_GRADIENT_MODES,
 } Enesim_Renderer_Gradient_Mode;
 
 typedef struct _Enesim_Renderer_Gradient_Stop

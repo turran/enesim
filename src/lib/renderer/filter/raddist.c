@@ -72,8 +72,8 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 		double r = hypot(x, y);
 
 		r = (((rd->scale * (rd->radius - r)) + r) * r_inv);
-		sxx = eina_f16p16_float_from((r * x) + rd->orx);
-		syy = eina_f16p16_float_from((r * y) + rd->ory);
+		sxx = eina_f16p16_double_from((r * x) + rd->orx);
+		syy = eina_f16p16_double_from((r * y) + rd->ory);
 
 		sy = (syy >> 16);
 		sx = (sxx >> 16);
