@@ -37,7 +37,7 @@ typedef Enesim_Color (*Enesim_Renderer_Gradient_Color_Get)(Enesim_Renderer_Gradi
 
 typedef struct _Stop
 {
-	Enesim_Color color;
+	Enesim_Argb argb;
 	double pos;
 } Stop;
 
@@ -288,7 +288,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 			xx = 0;
 		}
 		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
-		p0 = argb8888_interp_256(off, next->color, curr->color);
+		p0 = argb8888_interp_256(off, next->argb, curr->argb);
 		*dst++ = p0;
 		xx += inc;
 	}
@@ -415,12 +415,15 @@ Enesim_Color enesim_renderer_gradient_color_get(Enesim_Renderer *r, Eina_F16p16 
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
-		double pos)
+EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Stop *s;
+	double pos;
 
+	if (!stop) return;
+
+	pos = stop->pos;
 	if (pos < 0)
 		pos = 0;
 	else if (pos > 1)
@@ -428,7 +431,7 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Color c,
 
 	thiz = _gradient_get(r);
 	s = malloc(sizeof(Stop));
-	s->color = c;
+	s->argb = stop->argb;
 	s->pos = pos;
 	/* if pos == 0.0 set to first */
 	if (pos == 0.0)
@@ -479,7 +482,7 @@ EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 	thiz = _gradient_get(r);
 	EINA_LIST_FOREACH(list, l, stop)
 	{
-		enesim_renderer_gradient_stop_add(r, stop->color, stop->pos);
+		enesim_renderer_gradient_stop_add(r, stop);
 	}
 }
 

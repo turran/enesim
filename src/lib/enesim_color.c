@@ -27,6 +27,29 @@
  *                                   API                                      *
  *============================================================================*/
 /**
+ * FIXME
+ */
+EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c)
+{
+	Enesim_Argb argb;
+
+	argb8888_unpre_argb_from(&argb, c);
+	return argb;
+}
+
+/**
+ * FIXME
+ */
+EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb)
+{
+	Enesim_Color c;
+
+	argb8888_unpre_argb_to(argb, &c);
+	return c;
+}
+
+
+/**
  * Create a pixel from the given unpremultiplied components
  */
 EAPI void enesim_color_components_from(Enesim_Color *color,
