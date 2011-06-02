@@ -40,13 +40,13 @@ static inline Hswitch * _hswitch_get(Enesim_Renderer *r)
 
 static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 	uint32_t *end = dst + len;
 	Eina_F16p16 mmx;
 	int mx;
 
-	hs = _hswitch_get(r);
-	mmx = eina_f16p16_double_from(hs->w - (double)(hs->w * hs->step));
+	thiz = _hswitch_get(r);
+	mmx = eina_f16p16_double_from(thiz->w - (double)(thiz->w * thiz->step));
 	mx = eina_f16p16_int_to(mmx);
 	while (dst < end)
 	{
@@ -54,11 +54,11 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 
 		if (x > mx)
 		{
-			hs->rrend->sw_fill(hs->rrend, x, y, 1, &p0);
+			thiz->rrend->sw_fill(thiz->rrend, x, y, 1, &p0);
 		}
 		else if (x < mx)
 		{
-			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
+			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
 		}
 		else
 		{
@@ -66,8 +66,8 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 			uint16_t a;
 
 			a = 1 + ((mmx & 0xffff) >> 8);
-			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
-			hs->rrend->sw_fill(hs->rrend, 0, y, 1, &p1);
+			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
+			thiz->rrend->sw_fill(thiz->rrend, 0, y, 1, &p1);
 			p0 = argb8888_interp_256(a, p0, p1);
 		}
 		*dst++ = p0;
@@ -77,12 +77,12 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 
 static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 	uint32_t *end = dst + len;
 	Eina_F16p16 mmx, xx, yy;
 	int mx;
 
-	hs = _hswitch_get(r);
+	thiz = _hswitch_get(r);
 	yy = eina_f16p16_int_from(y);
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_mul(r->matrix.values.yx, xx) +
@@ -91,7 +91,7 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 			eina_f16p16_mul(r->matrix.values.xy, yy) + r->matrix.values.xz;
 
 	/* FIXME put this on the state setup */
-	mmx = eina_f16p16_double_from(hs->w - (double)(hs->w * hs->step));
+	mmx = eina_f16p16_double_from(thiz->w - (double)(thiz->w * thiz->step));
 	mx = eina_f16p16_int_to(mmx);
 	while (dst < end)
 	{
@@ -101,11 +101,11 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 		y = eina_f16p16_int_to(yy);
 		if (x > mx)
 		{
-			hs->rrend->sw_fill(hs->rrend, x, y, 1, &p0);
+			thiz->rrend->sw_fill(thiz->rrend, x, y, 1, &p0);
 		}
 		else if (x < mx)
 		{
-			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
+			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
 		}
 		/* FIXME, what should we use here? mmx or xx?
 		 * or better use a subpixel center?
@@ -116,8 +116,8 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 			uint16_t a;
 
 			a = 1 + ((xx & 0xffff) >> 8);
-			hs->lrend->sw_fill(hs->lrend, x, y, 1, &p0);
-			hs->rrend->sw_fill(hs->rrend, 0, y, 1, &p1);
+			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
+			thiz->rrend->sw_fill(thiz->rrend, 0, y, 1, &p1);
 			p0 = argb8888_interp_256(a, p1, p0);
 		}
 		*dst++ = p0;
@@ -128,60 +128,61 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 	int mx;
 	Eina_Rectangle ir, dr;
 
-	hs = _hswitch_get(r);
+	thiz = _hswitch_get(r);
 	eina_rectangle_coords_from(&ir, x, y, len, 1);
-	eina_rectangle_coords_from(&dr, 0, 0, hs->w, hs->h);
+	eina_rectangle_coords_from(&dr, 0, 0, thiz->w, thiz->h);
 	if (!eina_rectangle_intersection(&ir, &dr))
 		return;
 
-	mx = hs->w - (hs->w * hs->step);
+	mx = thiz->w - (thiz->w * thiz->step);
 	if (mx == 0)
 	{
-		hs->rrend->sw_fill(hs->rrend, ir.x, ir.y, ir.w, dst);
+		thiz->rrend->sw_fill(thiz->rrend, ir.x, ir.y, ir.w, dst);
 	}
-	else if (mx == hs->w)
+	else if (mx == thiz->w)
 	{
-		hs->lrend->sw_fill(hs->lrend, ir.x, ir.y, ir.w, dst);
+		thiz->lrend->sw_fill(thiz->lrend, ir.x, ir.y, ir.w, dst);
 	}
 	else
 	{
 		if (ir.x > mx)
 		{
-			hs->rrend->sw_fill(hs->rrend, ir.x, ir.y, ir.w, dst);
+			thiz->rrend->sw_fill(thiz->rrend, ir.x, ir.y, ir.w, dst);
 		}
 		else if (ir.x + ir.w < mx)
 		{
-			hs->lrend->sw_fill(hs->lrend, ir.x, ir.y, ir.w, dst);
+			thiz->lrend->sw_fill(thiz->lrend, ir.x, ir.y, ir.w, dst);
 		}
 		else
 		{
 			int w;
 
 			w = mx - ir.x;
-			hs->lrend->sw_fill(hs->lrend, ir.x, ir.y, w, dst);
+			thiz->lrend->sw_fill(thiz->lrend, ir.x, ir.y, w, dst);
 			dst += w;
-			hs->rrend->sw_fill(hs->rrend, 0, ir.y, ir.w + ir.x - mx , dst);
+			thiz->rrend->sw_fill(thiz->rrend, 0, ir.y, ir.w + ir.x - mx , dst);
 		}
 	}
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 {
-	Hswitch *h;
+	Hswitch *thiz;
 
-	h = _hswitch_get(r);
-	if (!h->lrend || !h->rrend)
+	thiz = _hswitch_get(r);
+	if (!thiz->lrend || !thiz->rrend)
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(h->lrend))
+	if (!enesim_renderer_sw_setup(thiz->lrend))
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(h->rrend))
+	if (!enesim_renderer_sw_setup(thiz->rrend))
 		return EINA_FALSE;
 
 	*fill = _affine_good;
+
 	return EINA_TRUE;
 }
 
@@ -232,12 +233,12 @@ EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void)
  */
 EAPI void enesim_renderer_hswitch_w_set(Enesim_Renderer *r, int w)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 
-	hs = _hswitch_get(r);
-	if (hs->w == w)
+	thiz = _hswitch_get(r);
+	if (thiz->w == w)
 		return;
-	hs->w = w;
+	thiz->w = w;
 }
 /**
  * Sets the height of the renderer window
@@ -246,12 +247,12 @@ EAPI void enesim_renderer_hswitch_w_set(Enesim_Renderer *r, int w)
  */
 EAPI void enesim_renderer_hswitch_h_set(Enesim_Renderer *r, int h)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 
-	hs = _hswitch_get(r);
-	if (hs->h == h)
+	thiz = _hswitch_get(r);
+	if (thiz->h == h)
 		return;
-	hs->h = h;
+	thiz->h = h;
 }
 /**
  * Sets the left renderer
@@ -261,10 +262,10 @@ EAPI void enesim_renderer_hswitch_h_set(Enesim_Renderer *r, int h)
 EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
 		Enesim_Renderer *left)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 
-	hs = _hswitch_get(r);
-	hs->lrend = left;
+	thiz = _hswitch_get(r);
+	thiz->lrend = left;
 }
 /**
  * Sets the right renderer
@@ -274,10 +275,10 @@ EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
 EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
 		Enesim_Renderer *right)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 
-	hs = _hswitch_get(r);
-	hs->rrend = right;
+	thiz = _hswitch_get(r);
+	thiz->rrend = right;
 }
 /**
  * Sets the step
@@ -287,12 +288,12 @@ EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, double step)
 {
-	Hswitch *hs;
+	Hswitch *thiz;
 
 	if (step < 0)
 		step = 0;
 	else if (step > 1)
 		step = 1;
-	hs = _hswitch_get(r);
-	hs->step = step;
+	thiz = _hswitch_get(r);
+	thiz->step = step;
 }
