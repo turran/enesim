@@ -353,7 +353,7 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
 
 /**
  * @}
- * @defgroup Enesim_Renderer_Gradient_Linear_Group Radial
+ * @defgroup Enesim_Renderer_Gradient_Radial_Group Radial
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void);
