@@ -438,7 +438,7 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
  * @param[in] y The y origin of the destination surface
  * TODO What about the mask?
  */
-EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
+EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *clip, int x, int y)
 {
 	Enesim_Renderer_Sw_Fill fill;
@@ -533,7 +533,7 @@ end:
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  */
-EAPI void enesim_renderer_surface_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
+EAPI void enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_List *clips, int x, int y)
 {
 	Enesim_Renderer_Sw_Fill fill;
@@ -546,7 +546,7 @@ EAPI void enesim_renderer_surface_draw_list(Enesim_Renderer *r, Enesim_Surface *
 
 	if (!clips)
 	{
-		enesim_renderer_surface_draw(r, s, NULL, x, y);
+		enesim_renderer_draw(r, s, NULL, x, y);
 		return;
 	}
 
@@ -700,7 +700,7 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  *	int cpu; // cpu idx;
  * } Enesim_Renderer_Thread;
  *
-EAPI void enesim_renderer_surface_draw(Enesim_Renderer *r, Enesim_Surface *s,
+EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *clip, int x, int y)
  *
  * } Enesim_Renderer_Operation;

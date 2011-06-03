@@ -26,7 +26,6 @@
 	D other/compound.c
 	D other/background.c
 + Change very renderer to use *thiz* as the variable for itself
-+ Rename every enesim_renderer_surface_draw() with enesim_renderer_draw()
 + Implement a threaded draw() function
 + We need to get rid of the hypot function, it is used on a lot places
   but with f16p16 values
