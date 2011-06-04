@@ -189,7 +189,7 @@ next:
 static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 		int y, unsigned int len, uint32_t *dst)				\
 {										\
-	Enesim_Renderer_Dispmap *thiz;								\
+	Enesim_Renderer_Dispmap *thiz;						\
 	uint32_t *end = dst + len;						\
 	uint32_t *map, *src;							\
 	int mstride;								\
@@ -203,8 +203,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
 	mstride = enesim_surface_stride_get(thiz->map);				\
 	sstride = enesim_surface_stride_get(thiz->src);				\
-	map = enesim_surface_data_get(thiz->map);					\
-	src = enesim_surface_data_get(thiz->src);					\
+	map = enesim_surface_data_get(thiz->map);				\
+	src = enesim_surface_data_get(thiz->src);				\
 										\
 	/* TODO move by the origin */						\
 	renderer_affine_setup(r, x, y, &xx, &yy);				\
@@ -224,8 +224,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 			goto next;						\
 										\
 		m0 = *(map + (mstride * y) + x);				\
+		m1 = yfunction(m0);						\
 		m0 = xfunction(m0);						\
-		m1 = yfunction(m1);						\
 										\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
