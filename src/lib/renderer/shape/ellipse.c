@@ -428,6 +428,7 @@ EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *r, double *x, doub
 {
 	Enesim_Renderer_Ellipse *thiz;
 
+	thiz = _ellipse_get(r);
 	if (x) *x = thiz->x;
 	if (y) *y = thiz->y;
 }

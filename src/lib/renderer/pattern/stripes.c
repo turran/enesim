@@ -130,8 +130,8 @@ static Eina_Bool _setup_state(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	if (!thiz)
 		return EINA_FALSE;
-	thiz->hh0 = thiz->s0.thickness * 65536;
-	thiz->hh = thiz->hh0 + (thiz->s1.thickness * 65536);
+	thiz->hh0 = (int)(thiz->s0.thickness * 65536);
+	thiz->hh = (int)(thiz->hh0 + (thiz->s1.thickness * 65536));
 
 	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_affine;

@@ -58,8 +58,8 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 	r_inv = 1.0f / rd->radius;
 
 	enesim_renderer_origin_get(r, &ox, &oy);
-	x -= ox;
-	y -= oy;
+	x -= (int)ox;
+	y -= (int)oy;
 
 	x -= rd->orx;
 	y -= rd->ory;

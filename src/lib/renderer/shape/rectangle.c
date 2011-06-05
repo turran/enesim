@@ -443,7 +443,7 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Rectangle *thiz;
+	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color ocolor;
 	Enesim_Color icolor;

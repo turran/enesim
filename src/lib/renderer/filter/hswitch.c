@@ -138,7 +138,7 @@ static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	if (!eina_rectangle_intersection(&ir, &dr))
 		return;
 
-	mx = thiz->w - (thiz->w * thiz->step);
+	mx = (int)(thiz->w - (thiz->w * thiz->step));
 	if (mx == 0)
 	{
 		thiz->rrend->sw_fill(thiz->rrend, ir.x, ir.y, ir.w, dst);
