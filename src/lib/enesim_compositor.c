@@ -222,6 +222,8 @@ EAPI Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 	{
 		return _span_mask_color_get(rop, dfmt, mfmt, color);
 	}
+
+	return NULL;
 }
 /**
  * To be documented
@@ -252,4 +254,6 @@ EAPI Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
 	{
 		return _point_mask_color_get(rop, dfmt, mfmt, color);
 	}
+
+	return NULL;
 }

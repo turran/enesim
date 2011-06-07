@@ -48,13 +48,12 @@ static void _span(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Clipper *thiz;
-	Enesim_Matrix_Type matrix_type;
 
  	thiz = _clipper_get(r);
 	thiz->content_fill(thiz->content, x, y, len, dst);
 }
 
-static _content_cleanup(Enesim_Renderer_Clipper *thiz)
+static void _content_cleanup(Enesim_Renderer_Clipper *thiz)
 {
 	enesim_renderer_sw_cleanup(thiz->content);
 	enesim_renderer_origin_set(thiz->content, thiz->old_x, thiz->old_y);

@@ -26,12 +26,13 @@
 /** Flags that specify what a renderer supports */
 typedef enum Enesim_Renderer_Flag
 {
-	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 0), /**< Affine transformation */
-	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 1), /**< Perspective transformations */
-	ENESIM_RENDERER_FLAG_COLORIZE 		= (1 << 2), /**< Use the renderer color directly */
-	ENESIM_RENDERER_FLAG_A8 		= (1 << 3), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 4), /**< Supports ARGB8888 surfaces */
-	ENESIM_RENDERER_FLAG_ROP 		= (1 << 5), /**< Can draw directly using the raster operation */
+	ENESIM_RENDERER_FLAG_TRANSLATE		= (1 << 0), /**< The renderer can be translated using the origin property */
+	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 1), /**< Affine transformation */
+	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 2), /**< Perspective transformations */
+	ENESIM_RENDERER_FLAG_COLORIZE 		= (1 << 3), /**< Use the renderer color directly */
+	ENESIM_RENDERER_FLAG_A8 		= (1 << 4), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 5), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FLAG_ROP 		= (1 << 6), /**< Can draw directly using the raster operation */
 } Enesim_Renderer_Flag;
 
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */

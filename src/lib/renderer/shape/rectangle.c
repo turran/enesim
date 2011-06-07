@@ -297,7 +297,6 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 static void _span_norounded_nostroked_paint_filled_identity(Enesim_Renderer *r, int x,
 		int y, unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Rectangle *thiz;
 
 }
 
@@ -640,8 +639,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Rectangle *thiz;
-
 	enesim_renderer_shape_sw_cleanup(r);
 //	if (thiz->stroke.paint)
 //		enesim_renderer_sw_cleanup(thiz->stroke.paint);
