@@ -90,6 +90,22 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+void enesim_renderer_relative_matrix_set(Enesim_Renderer *r, Enesim_Renderer *rel,
+		Enesim_Matrix *old_matrix)
+{
+	Enesim_Matrix rel_matrix, r_matrix;
+
+	/* the relativeness of the matrix should be done only if both
+	 * both renderers have the matrix flag set
+	 */
+	/* TODO should we use the f16p16 matrix? */
+	/* multiply the matrix by the current transformation */
+	enesim_renderer_transformation_get(r, &r_matrix);
+	enesim_renderer_transformation_get(rel, old_matrix);
+	enesim_matrix_compose(old_matrix, &r_matrix, &rel_matrix);
+	enesim_renderer_transformation_set(rel, &rel_matrix);
+}
+
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy)
 {

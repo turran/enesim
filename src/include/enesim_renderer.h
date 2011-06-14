@@ -33,6 +33,7 @@ typedef enum Enesim_Renderer_Flag
 	ENESIM_RENDERER_FLAG_A8 		= (1 << 4), /**< Supports A8 surfaces */
 	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 5), /**< Supports ARGB8888 surfaces */
 	ENESIM_RENDERER_FLAG_ROP 		= (1 << 6), /**< Can draw directly using the raster operation */
+	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 7), /**< Supports the quality property */
 } Enesim_Renderer_Flag;
 
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */

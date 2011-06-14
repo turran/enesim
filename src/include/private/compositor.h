@@ -21,19 +21,18 @@
 #define ENESIM_COMPOSITOR_SPAN(f) ((Enesim_Compositor_Span)(f))
 #define ENESIM_COMPOSITOR_POINT(f) ((Enesim_Compositor_Point)(f))
 
-#define PT_C(f, op) enesim_compositor_##f##_pt_color_##op
-#define PT_P(f, sf, op) enesim_compositor_##f##_pt_pixel_##sf##_##op
-#define PT_MC(f, mf, op) enesim_compositor_##f##_pt_mask_color_##mf##_##op
-#define PT_PC(f, sf, op) enesim_compositor_##f##_pt_pixel_color_##sf##_##op
-#define PT_PM(f, sf, mf, op) enesim_compositor_##f##_pt_pixel_mask_##sf##_##mf##_##op
-
-#define SP_C(f, op) enesim_compositor_##f##_sp_color_##op
-#define SP_P(f, sf, op) enesim_compositor_##f##_sp_pixel_##sf##_##op
-#define SP_MC(f, mf, op) enesim_compositor_##f##_sp_mask_color_##mf##_##op
-#define SP_PC(f, sf, op) enesim_compositor_##f##_sp_pixel_color_##sf##_##op
-#define SP_PM(f, sf, mf, op) enesim_compositor_##f##_sp_pixel_mask_##sf##_##mf##_##op
-
 void enesim_compositor_init(void);
 void enesim_compositor_shutdown(void);
+void enesim_compositor_span_color_register(Enesim_Compositor_Span sp,
+		Enesim_Rop rop, Enesim_Format dfmt);
+void enesim_compositor_span_pixel_register(Enesim_Compositor_Span sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt);
+void enesim_compositor_span_mask_color_register(Enesim_Compositor_Span sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format mfmt);
+void enesim_compositor_span_pixel_mask_register(Enesim_Compositor_Span sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt,
+		Enesim_Format mfmt);
+void enesim_compositor_span_pixel_color_register(Enesim_Compositor_Span sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt);
 
 #endif /* COMPOSITOR_H_*/

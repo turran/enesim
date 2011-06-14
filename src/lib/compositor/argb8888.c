@@ -180,7 +180,7 @@ void enesim_compositor_argb8888_init(void)
 			ENESIM_FILL, ENESIM_FORMAT_ARGB8888,
 			ENESIM_FORMAT_ARGB8888);
 	enesim_compositor_span_mask_color_register(
-			_argb8888_sp_none_color_a8_fill,
+			ENESIM_COMPOSITOR_SPAN(_argb8888_sp_none_color_a8_fill),
 			ENESIM_FILL, ENESIM_FORMAT_ARGB8888,
 			ENESIM_FORMAT_A8);
 	enesim_compositor_span_mask_color_register(
@@ -188,7 +188,7 @@ void enesim_compositor_argb8888_init(void)
 			ENESIM_BLEND, ENESIM_FORMAT_ARGB8888,
 			ENESIM_FORMAT_ARGB8888);
 	enesim_compositor_span_mask_color_register(
-			_argb8888_sp_none_color_a8_blend,
+			ENESIM_COMPOSITOR_SPAN(_argb8888_sp_none_color_a8_blend),
 			ENESIM_BLEND, ENESIM_FORMAT_ARGB8888,
 			ENESIM_FORMAT_A8);
 	/* pixel mask */

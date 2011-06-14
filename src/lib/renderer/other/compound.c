@@ -67,7 +67,10 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 		l = eina_list_data_get(ll);
 
 		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
-		if (!eina_rectangle_intersection(&lboundings, &span)) continue;
+		if (!eina_rectangle_intersection(&lboundings, &span))
+		{
+			continue;
+		}
 		offset = lboundings.x - span.x;
 
 		if (!l->span)
@@ -99,7 +102,10 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 		l = eina_list_data_get(ll);
 
 		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
-		if (!eina_rectangle_intersection(&lboundings, &span)) continue;
+		if (!eina_rectangle_intersection(&lboundings, &span))
+		{
+			continue;
+		}
 		l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
 	}
 }
@@ -120,6 +126,9 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
 
+		/* TODO check the flags and only generate the relative properties
+		 * for those supported
+		 */
 		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
 		if (!enesim_renderer_sw_setup(l->r))
