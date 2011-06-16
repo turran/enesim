@@ -430,7 +430,7 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 		boundings.x += r->ox;
 	if (boundings.y != INT_MIN / 2)
 		boundings.y += r->oy;
-	if (r->matrix.type != ENESIM_MATRIX_IDENTITY)
+	if (r->matrix.type != ENESIM_MATRIX_IDENTITY && boundings.w != INT_MAX && boundings.h != INT_MAX)
 	{
 		Enesim_Quad q;
 		Enesim_Matrix m;
