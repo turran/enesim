@@ -6,6 +6,7 @@ Makefile.in
 
 ENESIM_UTILHEADERS = \
 enesim_eina.h \
+enesim_error.h \
 enesim_main.h \
 enesim_color.h \
 enesim_rectangle.h \
