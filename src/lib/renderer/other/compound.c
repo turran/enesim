@@ -134,13 +134,13 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 		if (!enesim_renderer_sw_setup(l->r))
 		{
 			DBG("Child renderer %p can not setup", l->r);
-			do
+			for (; ll && ll != thiz->layers; ll = eina_list_prev(ll))
 			{
 				Layer *pl = eina_list_data_get(ll);
-				enesim_renderer_relative_unset(r, l->r, &l->original,
+				enesim_renderer_relative_unset(r, pl->r, &l->original,
 						 l->ox, l->oy);
 				ll = eina_list_prev(ll);
-			} while (ll != thiz->layers);
+			}
 
 			return EINA_FALSE;
 		}
@@ -337,7 +337,6 @@ EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r)
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list)
 {
-	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer *rend;
 	Eina_List *l;
 
