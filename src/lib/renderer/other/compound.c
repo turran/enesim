@@ -187,25 +187,35 @@ static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
+	double x1 = 0;
+	double y1 = 0;
+	double x2 = 0;
+	double y2 = 0;
 
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = 0;
-	rect->h = 0;
 	thiz = _compound_get(r);
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Renderer *lr = l->r;
+		double nx1, ny1, nx2, ny2;
 		Enesim_Rectangle tmp;
 
 		enesim_renderer_boundings(lr, &tmp);
-		/* check if it is greater */
-		if (tmp.x < rect->x) rect->x = tmp.x;
-		if (tmp.y < rect->y) rect->y = tmp.y;
-		if (tmp.w > rect->w) rect->w = tmp.w;
-		if (tmp.h > rect->h) rect->h = tmp.h;
+		nx1 = tmp.x;
+		ny1 = tmp.y;
+		nx2 = tmp.x + tmp.w - 1;
+		ny2 = tmp.y + tmp.h - 1;
+
+		/* pick the bigger area */
+		if (nx1 < x1) x1 = nx1;
+		if (ny1 < y1) y1 = ny1;
+		if (nx2 > x2) x2 = nx2;
+		if (ny2 > y2) y2 = ny2;
 	}
+	rect->x = x1;
+	rect->y = y1;
+	rect->w = x2 - x1 + 1;
+	rect->h = y2 - y1 + 1;
 }
 
 static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
