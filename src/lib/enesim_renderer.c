@@ -376,15 +376,22 @@ EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
  */
 EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
+	Enesim_Renderer_Flag flags;
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!boundings) return;
 
 	enesim_renderer_boundings(r, boundings);
+	enesim_renderer_flags(r, &flags);
 	/* move by the origin */
-	if (boundings->x != INT_MIN / 2)
-		boundings->x -= r->ox;
-	if (boundings->y != INT_MIN / 2)
-		boundings->y -= r->oy;
+#if LATER
+	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
+#endif
+	{
+		if (boundings->x != INT_MIN / 2)
+			boundings->x -= r->ox;
+		if (boundings->y != INT_MIN / 2)
+			boundings->y -= r->oy;
+	}
 }
 
 /**
@@ -420,24 +427,36 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 {
 
 	Enesim_Rectangle boundings;
+	Enesim_Renderer_Flag flags;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
 	if (!rect) return;
 
 	enesim_renderer_boundings(r, &boundings);
-	if (boundings.x != INT_MIN / 2)
-		boundings.x += r->ox;
-	if (boundings.y != INT_MIN / 2)
-		boundings.y += r->oy;
-	if (r->matrix.type != ENESIM_MATRIX_IDENTITY && boundings.w != INT_MAX && boundings.h != INT_MAX)
+	enesim_renderer_flags(r, &flags);
+#if LATER
+	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
+#endif
 	{
-		Enesim_Quad q;
-		Enesim_Matrix m;
+		if (boundings.x != INT_MIN / 2)
+			boundings.x += r->ox;
+		if (boundings.y != INT_MIN / 2)
+			boundings.y += r->oy;
+	}
+#if LATER
+	if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
+#endif
+	{
+		if (r->matrix.type != ENESIM_MATRIX_IDENTITY && boundings.w != INT_MAX && boundings.h != INT_MAX)
+		{
+			Enesim_Quad q;
+			Enesim_Matrix m;
 
-		enesim_matrix_inverse(&r->matrix.original, &m);
-		enesim_matrix_rectangle_transform(&m, &boundings, &q);
-		enesim_quad_rectangle_to(&q, &boundings);
+			enesim_matrix_inverse(&r->matrix.original, &m);
+			enesim_matrix_rectangle_transform(&m, &boundings, &q);
+			enesim_quad_rectangle_to(&q, &boundings);
+		}
 	}
 	rect->x = lround(boundings.x) - x;
 	rect->y = lround(boundings.y) - y;

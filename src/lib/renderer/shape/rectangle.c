@@ -644,6 +644,23 @@ static void _state_cleanup(Enesim_Renderer *r)
 //		enesim_renderer_sw_cleanup(thiz->stroke.paint);
 }
 
+static void _rectangle_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Enesim_Renderer_Rectangle *thiz;
+
+	thiz = _rectangle_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PROJECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
 static void _free(Enesim_Renderer *r)
 {
 }
@@ -665,7 +682,7 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .sw_cleanup = */ _state_cleanup,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
-	/* .flags =      */ NULL,
+	/* .flags =      */ _rectangle_flags,
 	/* .is_inside =  */ NULL
 };
 /*============================================================================*
