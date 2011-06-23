@@ -249,7 +249,7 @@ static void _compound_free(Enesim_Renderer *r)
 	Enesim_Renderer_Compound *thiz;
 
 	thiz = _compound_get(r);
-	enesim_renderer_compound_clear(r);
+	enesim_renderer_compound_layer_clear(r);
 	free(thiz);
 }
 
@@ -326,7 +326,7 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
  * Clears up all the layers
  * @param[in] r The compound renderer
  */
-EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r)
+EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Compound *thiz;
 	Layer *layer;
@@ -350,7 +350,7 @@ EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 	Enesim_Renderer *rend;
 	Eina_List *l;
 
-	enesim_renderer_compound_clear(r);
+	enesim_renderer_compound_layer_clear(r);
 	EINA_LIST_FOREACH(list, l, rend)
 	{
 		enesim_renderer_compound_layer_add(r, rend);

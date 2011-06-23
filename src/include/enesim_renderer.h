@@ -376,7 +376,7 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer *rend);
 EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 		Enesim_Renderer *rend);
-EAPI void enesim_renderer_compound_clear(Enesim_Renderer *r);
+EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list);
 /**
