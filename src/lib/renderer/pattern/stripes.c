@@ -269,7 +269,7 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 /**
  * Gets the color of the odd stripes
  * @param[in] r The stripes renderer
- * @param[out]color The odd stripes color
+ * @param[out] color The odd stripes color
  */
 EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {

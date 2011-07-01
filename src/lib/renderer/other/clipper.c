@@ -70,7 +70,11 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fil
 	double ox, oy;
 
  	thiz = _clipper_get(r);
-	if (!thiz->content) return EINA_FALSE;
+	if (!thiz->content)
+	{
+		printf("no content\n");
+		return EINA_FALSE;
+	}
 
 	enesim_renderer_origin_get(r, &ox, &oy);
 	enesim_renderer_origin_get(thiz->content, &thiz->old_x, &thiz->old_y);
@@ -81,6 +85,7 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fil
 	/* FIXME add the rop */
 	if (!enesim_renderer_sw_setup(thiz->content))
 	{
+		printf("content cannot setup\n");
 		/* restore the values */
 		_content_cleanup(thiz);
 		return EINA_FALSE;

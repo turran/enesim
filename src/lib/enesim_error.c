@@ -41,6 +41,18 @@ EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
 	return error;
 }
 
+EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char *file, const char *function, int line, char *fmt, va_list args)
+{
+	char str[PATH_MAX];
+	int num;
+
+	num = snprintf(str, PATH_MAX, "%s:%d %s ", file, line, function);
+	num += vsnprintf(str, PATH_MAX - num, fmt, args);
+	str[num] = '\n';
+
+	return enesim_error_add(error, str);
+}
+
 EAPI void enesim_error_delete(Enesim_Error *error)
 {
 	if (!error) return;
