@@ -71,8 +71,8 @@ typedef struct _Enesim_Renderer_Thread
 static unsigned int _num_cpus;
 static Enesim_Renderer_Thread *_threads;
 static Enesim_Renderer_Thread_Operation _op;
-static pthread_mutex_t _start;
-static pthread_cond_t _start_count;
+static pthread_barrier_t _start;
+static pthread_barrier_t _end;
 static int _running;
 #endif
 
@@ -169,13 +169,7 @@ static void * _thread_run(void *data)
 	Enesim_Renderer_Thread_Operation *op = &_op;
 
 	do {
-		//printf("thread trying to lock\n");
-		pthread_mutex_lock(&_start);
-		//printf("thread acquired lock\n");
-		pthread_cond_wait(&_start_count, &_start);
-		//printf("thread signal achieved\n");
-		pthread_mutex_unlock(&_start);
-		//printf("thread unlocking\n");
+		pthread_barrier_wait(&_start);
 		if (op->span)
 		{
 			uint32_t *tmp;
@@ -205,9 +199,7 @@ static void * _thread_run(void *data)
 
 		}
 		//printf("thread finished\n");
-		pthread_mutex_lock(&_start);
-		_running--;
-		pthread_mutex_unlock(&_start);
+		pthread_barrier_wait(&_end);
 	} while (1);
 
 	return NULL;
@@ -223,12 +215,11 @@ void enesim_renderer_init(void)
 	int i = 0;
 	pthread_attr_t attr;
 
-	pthread_mutex_init(&_start, NULL);
-	pthread_cond_init(&_start_count, NULL);
-
 	_num_cpus = eina_cpu_count();
 	_threads = malloc(sizeof(Enesim_Renderer_Thread) * _num_cpus);
 
+	pthread_barrier_init(&_start, NULL, _num_cpus + 1);
+	pthread_barrier_init(&_end, NULL, _num_cpus + 1);
 	pthread_attr_init(&attr);
 	for (i = 0; i < _num_cpus; i++)
 	{
@@ -249,7 +240,8 @@ void enesim_renderer_shutdown(void)
 #ifdef BUILD_PTHREAD
 	/* destroy the threads */
 	free(_threads);
-	pthread_mutex_destroy(&_start);
+	pthread_barrier_destroy(&_start);
+	pthread_barrier_destroy(&_end);
 #endif
 }
 
@@ -959,21 +951,9 @@ void enesim_renderer_threaded_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		}
 		_op.span = span;
 	}
-	pthread_mutex_lock(&_start);
-	_running = _num_cpus;
-	pthread_cond_broadcast(&_start_count);
-	pthread_mutex_unlock(&_start);
+	pthread_barrier_wait(&_start);
+	pthread_barrier_wait(&_end);
 
-	while (1)
-	{
-		pthread_mutex_lock(&_start);
-		if (_running == 0)
-		{
-			pthread_mutex_unlock(&_start);
-			break;
-		}
-		pthread_mutex_unlock(&_start);
-	}
 	/* TODO set the format again */
 end:
 	enesim_renderer_sw_cleanup(r);
