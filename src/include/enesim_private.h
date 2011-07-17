@@ -29,6 +29,11 @@
 
 #include "config.h"
 
+
+#if BUILD_PTHREAD
+#include <pthread.h>
+#endif
+
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>

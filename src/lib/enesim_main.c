@@ -42,6 +42,7 @@ EAPI int enesim_init(void)
 		 */
 		eina_init();
 		enesim_compositor_init();
+		enesim_renderer_init();
 		enesim_converter_init();
 		enesim_log = eina_log_domain_register("enesim", NULL);
 #ifdef EFL_HAVE_MMX
@@ -64,6 +65,7 @@ EAPI void enesim_shutdown(void)
 	{
 		eina_log_domain_unregister(enesim_log);
 		enesim_compositor_shutdown();
+		enesim_renderer_shutdown();
 		enesim_converter_shutdown();
 		eina_shutdown();
 	}

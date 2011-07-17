@@ -48,6 +48,34 @@
 			EINA_MAGIC_FAIL(d, ENESIM_MAGIC_RENDERER);\
 	} while(0)
 
+#ifdef BUILD_PTHREAD
+
+typedef struct _Enesim_Renderer_Thread_Operation
+{
+	/* common attributes */
+	Enesim_Renderer *renderer;
+	Enesim_Renderer_Sw_Fill fill;
+	uint32_t * dst;
+	unsigned int stride;
+	Eina_Rectangle area;
+	/* in case the renderer needs to use a composer */
+	Enesim_Compositor_Span span;
+} Enesim_Renderer_Thread_Operation;
+
+typedef struct _Enesim_Renderer_Thread
+{
+	int cpuidx;
+	pthread_t tid;
+} Enesim_Renderer_Thread;
+
+static unsigned int _num_cpus;
+static Enesim_Renderer_Thread *_threads;
+static Enesim_Renderer_Thread_Operation _op;
+static pthread_mutex_t _start;
+static pthread_cond_t _start_count;
+static int _running;
+#endif
+
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Flag flags)
 {
@@ -87,9 +115,144 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 		ddata += stride;
 	}
 }
+
+#ifdef BUILD_PTHREAD
+
+static inline void _sw_surface_draw_composed_threaded(Enesim_Renderer *r,
+		unsigned int thread,
+		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
+		uint32_t *ddata, uint32_t stride,
+		uint32_t *tmp, size_t len, Eina_Rectangle *area)
+{
+	int h = area->h;
+	int y = area->y;
+
+	while (h)
+	{
+		if (h % _num_cpus != thread) goto end;
+
+		memset(tmp, 0, len);
+		fill(r, area->x, y, area->w, tmp);
+		/* compose the filled and the destination spans */
+		span(ddata, area->w, tmp, r->color, NULL);
+end:
+		ddata += stride;
+		h--;
+		y++;
+	}
+}
+
+static inline void _sw_surface_draw_simple_threaded(Enesim_Renderer *r,
+		unsigned int thread,
+		Enesim_Renderer_Sw_Fill fill, uint32_t *ddata,
+		uint32_t stride, Eina_Rectangle *area)
+{
+	int h = area->h;
+	int y = area->y;
+
+	while (h)
+	{
+		if (h % _num_cpus != thread) goto end;
+
+		fill(r, area->x, y, area->w, ddata);
+end:
+		ddata += stride;
+		h--;
+		y++;
+	}
+}
+
+
+static void * _thread_run(void *data)
+{
+	Enesim_Renderer_Thread *thiz = data;
+	Enesim_Renderer_Thread_Operation *op = &_op;
+
+	do {
+		//printf("thread trying to lock\n");
+		pthread_mutex_lock(&_start);
+		//printf("thread acquired lock\n");
+		pthread_cond_wait(&_start_count, &_start);
+		//printf("thread signal achieved\n");
+		pthread_mutex_unlock(&_start);
+		//printf("thread unlocking\n");
+		if (op->span)
+		{
+			uint32_t *tmp;
+			size_t len;
+
+			len = op->area.w * sizeof(uint32_t);
+			tmp = malloc(len);
+			_sw_surface_draw_composed_threaded(op->renderer,
+					thiz->cpuidx,
+					op->fill,
+					op->span,
+					op->dst,
+					op->stride,
+					tmp,
+					len,
+					&op->area);
+			free(tmp);
+		}
+		else
+		{
+			_sw_surface_draw_simple_threaded(op->renderer,
+					thiz->cpuidx,
+					op->fill,
+					op->dst,
+					op->stride,
+					&op->area);
+
+		}
+		//printf("thread finished\n");
+		pthread_mutex_lock(&_start);
+		_running--;
+		pthread_mutex_unlock(&_start);
+	} while (1);
+
+	return NULL;
+}
+#endif
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+void enesim_renderer_init(void)
+{
+#ifdef BUILD_PTHREAD
+	int i = 0;
+	pthread_attr_t attr;
+
+	pthread_mutex_init(&_start, NULL);
+	pthread_cond_init(&_start_count, NULL);
+
+	_num_cpus = eina_cpu_count();
+	_threads = malloc(sizeof(Enesim_Renderer_Thread) * _num_cpus);
+
+	pthread_attr_init(&attr);
+	for (i = 0; i < _num_cpus; i++)
+	{
+		cpu_set_t cpu;
+
+		CPU_ZERO(&cpu);
+		CPU_SET(i, &cpu);
+		_threads[i].cpuidx = i;
+		pthread_create(&_threads[i].tid, &attr, _thread_run, (void *)&_threads[i]);
+		pthread_setaffinity_np(_threads[i].tid, sizeof(cpu_set_t), &cpu);
+
+	}
+#endif
+}
+
+void enesim_renderer_shutdown(void)
+{
+#ifdef BUILD_PTHREAD
+	/* destroy the threads */
+	free(_threads);
+	pthread_mutex_destroy(&_start);
+#endif
+}
+
 void enesim_renderer_relative_matrix_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 		Enesim_Matrix *old_matrix)
 {
@@ -465,6 +628,57 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 }
 
 /**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->rop = rop;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (rop) *rop = r->rop;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (r->descriptor->is_inside) return r->descriptor->is_inside(r, x, y);
+	return EINA_TRUE;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	eina_hash_add(r->prv_data, name, data);
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	return eina_hash_find(r->prv_data, name);
+}
+
+/**
  * Draw a renderer into a surface
  * @param[in] r The renderer to draw
  * @param[in] s The surface to draw the renderer into
@@ -513,7 +727,6 @@ EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 			WRN("The renderer %p boundings does not intersect with the surface", r);
 			goto end;
 		}
-		
 	}
 	/* clip against the destination rectangle */
 	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
@@ -667,85 +880,101 @@ end:
 	enesim_renderer_sw_cleanup(r);
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->rop = rop;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (rop) *rop = r->rop;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor->is_inside) return r->descriptor->is_inside(r, x, y);
-	return EINA_TRUE;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	eina_hash_add(r->prv_data, name, data);
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	return eina_hash_find(r->prv_data, name);
-}
-
-/*
- * We should implement a threaded rendering, something like:
- * typedef struct _Enesim_Renderer_Sw_Operation
- * {
- * 	Enesim_Renderer *r;
- * 	uint32_t *dst;
- *	int x;
- *	int y;
- *	int len;
- * } Enesim_Renderer_Sw_Operation;
- *
- * typedef struct _Enesim_Renderer_Thread
- * {
- *	// lock, barrier or something like that
- *	int cpu; // cpu idx;
- * } Enesim_Renderer_Thread;
- *
-EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
+void enesim_renderer_threaded_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *clip, int x, int y)
- *
- * } Enesim_Renderer_Operation;
- * enesim_renderer_threadad_surface_draw()
- * {
- *	same code as the others, but instead of calling the real fill function
- *	just enqueue it
- * }
- * enesim_renderer_init()
- * {
- * 	create all the renderer threads
- * }
- */
+{
+	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Renderer_Flag flags;
+	Eina_Rectangle boundings;
+	Eina_Rectangle final;
+	uint32_t *ddata;
+	int stride;
+	Enesim_Format dfmt;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	ENESIM_MAGIC_CHECK_SURFACE(s);
+
+	if (!enesim_renderer_sw_setup(r)) return;
+	fill = enesim_renderer_sw_fill_get(r);
+	if (!fill) goto end;
+
+	if (!clip)
+	{
+		final.x = 0;
+		final.y = 0;
+		enesim_surface_size_get(s, &final.w, &final.h);
+	}
+	else
+	{
+		Eina_Rectangle surface_size;
+
+		final.x = clip->x;
+		final.y = clip->y;
+		final.w = clip->w;
+		final.h = clip->h;
+		surface_size.x = 0;
+		surface_size.y = 0;
+		enesim_surface_size_get(s, &surface_size.w, &surface_size.h);
+		if (!eina_rectangle_intersection(&final, &surface_size))
+		{
+			WRN("The renderer %p boundings does not intersect with the surface", r);
+			goto end;
+		}
+	}
+	/* clip against the destination rectangle */
+	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
+	if (!eina_rectangle_intersection(&final, &boundings))
+	{
+		WRN("The renderer %p boundings does not intersect on the destination rectangle", r);
+		goto end;
+	}
+	dfmt = enesim_surface_format_get(s);
+	ddata = enesim_surface_data_get(s);
+	stride = enesim_surface_stride_get(s);
+	ddata = ddata + (final.y * stride) + final.x;
+
+	/* translate the origin */
+	final.x -= x;
+	final.y -= y;
+
+	enesim_renderer_flags(r, &flags);
+	/* fill the data needed for every threaded renderer */
+	_op.renderer = r;
+	_op.dst = ddata;
+	_op.stride = stride;
+	_op.area = final;
+	_op.fill = fill;
+
+	if (_is_sw_draw_composed(r, flags))
+	{
+		Enesim_Compositor_Span span;
+
+		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+				r->color, ENESIM_FORMAT_NONE);
+		if (!span)
+		{
+			WRN("No suitable span compositor to render %p with rop "
+					"%d and color %08x", r, r->rop, r->color);
+			goto end;
+		}
+		_op.span = span;
+	}
+	pthread_mutex_lock(&_start);
+	_running = _num_cpus;
+	pthread_cond_broadcast(&_start_count);
+	pthread_mutex_unlock(&_start);
+
+	while (1)
+	{
+		pthread_mutex_lock(&_start);
+		if (_running == 0)
+		{
+			pthread_mutex_unlock(&_start);
+			break;
+		}
+		pthread_mutex_unlock(&_start);
+	}
+	/* TODO set the format again */
+end:
+	enesim_renderer_sw_cleanup(r);
+}
