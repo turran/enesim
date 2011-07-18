@@ -159,12 +159,13 @@ static void _perlin_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .sw_setup =   */ _perlin_state_setup,
-	/* .sw_cleanup = */ _perlin_state_cleanup,
+	/* .version =    */ ENESIM_RENDERER_API,
 	/* .free =       */ _perlin_free,
 	/* .boundings =  */ NULL,
 	/* .flags =      */ _perlin_flags,
-	/* .is_inside =  */ 0
+	/* .is_inside =  */ NULL,
+	/* .sw_setup =   */ _perlin_state_setup,
+	/* .sw_cleanup = */ _perlin_state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

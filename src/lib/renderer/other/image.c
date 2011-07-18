@@ -408,12 +408,13 @@ static void _image_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .sw_setup =   */ _image_state_setup,
-	/* .sw_cleanup = */ _image_state_cleanup,
+	/* .version =    */ ENESIM_RENDERER_API,
 	/* .free =       */ _image_free,
 	/* .boundings =  */ _image_boundings,
 	/* .flags =      */ _image_flags,
-	/* .is_inside =  */ 0
+	/* .is_inside =  */ NULL,
+	/* .sw_setup =   */ _image_state_setup,
+	/* .sw_cleanup = */ _image_state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

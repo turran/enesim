@@ -172,12 +172,13 @@ static void _free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .sw_setup =   */ _setup_state,
-	/* .sw_cleanup = */ _cleanup_state,
+	/* .version =    */ ENESIM_RENDERER_API,
 	/* .free =       */ _free,
 	/* .boundings =  */ NULL,
 	/* .flags =      */ _stripes_flags,
-	/* .is_inside =  */ 0
+	/* .is_inside =  */ NULL,
+	/* .sw_setup =   */ _setup_state,
+	/* .sw_cleanup = */ _cleanup_state
 };
 /*============================================================================*
  *                                   API                                      *

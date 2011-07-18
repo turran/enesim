@@ -254,12 +254,13 @@ static void _compound_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .sw_setup =   */ _compound_state_setup,
-	/* .sw_cleanup = */ _compound_state_cleanup,
+	/* .version =    */ ENESIM_RENDERER_API,
 	/* .free =       */ _compound_free,
 	/* .boundings =  */ _compound_boundings,
 	/* .flags =      */ _compound_flags,
-	/* .is_inside =  */ 0
+	/* .is_inside =  */ NULL,
+	/* .sw_setup =   */ _compound_state_setup,
+	/* .sw_cleanup = */ _compound_state_cleanup
 };
 /*============================================================================*
  *                                   API                                      *

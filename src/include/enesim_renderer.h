@@ -23,6 +23,9 @@
  * @{
  */
 
+/** Renderer API/ABI version */
+#define ENESIM_RENDERER_API 0
+
 /** Flags that specify what a renderer supports */
 typedef enum Enesim_Renderer_Flag
 {
@@ -51,12 +54,15 @@ typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
 
 struct _Enesim_Renderer_Descriptor {
-	Enesim_Renderer_Sw_Setup sw_setup;
-	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* common */
+	unsigned int version;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Inside is_inside;
+	/* software based functions */
+	Enesim_Renderer_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 };
 
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor

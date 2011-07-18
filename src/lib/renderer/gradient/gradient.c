@@ -333,12 +333,13 @@ static void _gradient_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 }
 
 static Enesim_Renderer_Descriptor _gradient_descriptor = {
-	/* .sw_setup =   */ _gradient_state_setup,
-	/* .sw_cleanup = */ _gradient_state_cleanup,
+	/* .version =    */ ENESIM_RENDERER_API,
 	/* .free =       */ _gradient_free,
 	/* .boundings =  */ _gradient_boundings,
 	/* .flags =      */ _gradient_flags,
-	/* .is_inside =  */ NULL
+	/* .is_inside =  */ NULL,
+	/* .sw_setup =   */ _gradient_state_setup,
+	/* .sw_cleanup = */ _gradient_state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

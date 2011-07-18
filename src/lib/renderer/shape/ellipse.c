@@ -378,12 +378,13 @@ static void _free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _ellipse_descriptor = {
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup,
+	/* .version =    */ ENESIM_RENDERER_API,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ NULL,
-	/* .is_inside =  */ NULL
+	/* .is_inside =  */ NULL,
+	/* .sw_setup =   */ _state_setup,
+	/* .sw_cleanup = */ _state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

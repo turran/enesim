@@ -198,7 +198,6 @@ static void * _thread_run(void *data)
 					&op->area);
 
 		}
-		//printf("thread finished\n");
 		pthread_barrier_wait(&_end);
 	} while (1);
 
@@ -315,6 +314,10 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	Enesim_Renderer *r;
 
 	if (!descriptor) return NULL;
+	if (descriptor->version > ENESIM_RENDERER_API) {
+		ERR("API version %d is greater than %d", descriptor->version, ENESIM_RENDERER_API);
+		return NULL;
+	}
 
 	r = calloc(1, sizeof(Enesim_Renderer));
 	/* first check the passed in functions */
