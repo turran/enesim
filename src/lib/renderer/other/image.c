@@ -497,5 +497,6 @@ EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 
 	thiz = _image_get(r);
 	if (!thiz) return;
+
 	thiz->s = src;
 }

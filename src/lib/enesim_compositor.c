@@ -156,7 +156,38 @@ void enesim_compositor_init(void)
 }
 void enesim_compositor_shutdown(void)
 {
+	enesim_compositor_argb8888_shutdown();
+}
 
+void enesim_compositor_pt_color_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt)
+{
+	_comps.pt_color[rop][dfmt] = sp;
+}
+
+void enesim_compositor_pt_pixel_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt)
+{
+	_comps.pt_pixel[rop][dfmt][sfmt] = sp;
+}
+
+void enesim_compositor_pt_mask_color_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format mfmt)
+{
+	_comps.pt_mask_color[rop][dfmt][mfmt] = sp;
+}
+
+void enesim_compositor_pt_pixel_mask_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt,
+		Enesim_Format mfmt)
+{
+	_comps.pt_pixel_mask[rop][dfmt][sfmt][mfmt] = sp;
+}
+
+void enesim_compositor_pt_pixel_color_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt)
+{
+	_comps.pt_pixel_color[rop][dfmt][sfmt] = sp;
 }
 
 void enesim_compositor_span_color_register(Enesim_Compositor_Span sp,

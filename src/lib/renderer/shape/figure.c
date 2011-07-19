@@ -115,6 +115,7 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	Polygon_Edge *edges, *edge;
 	Polygon_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	double ox, oy;
 
 	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz =
 			r->matrix.values.xz;
@@ -126,6 +127,7 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	enesim_renderer_shape_fill_color_get(r, &fcolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_origin_get(r, &ox, &oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))

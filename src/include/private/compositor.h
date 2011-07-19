@@ -23,6 +23,19 @@
 
 void enesim_compositor_init(void);
 void enesim_compositor_shutdown(void);
+
+void enesim_compositor_pt_color_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt);
+void enesim_compositor_pt_pixel_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt);
+void enesim_compositor_pt_mask_color_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format mfmt);
+void enesim_compositor_pt_pixel_mask_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt,
+		Enesim_Format mfmt);
+void enesim_compositor_pt_pixel_color_register(Enesim_Compositor_Point sp,
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt);
+
 void enesim_compositor_span_color_register(Enesim_Compositor_Span sp,
 		Enesim_Rop rop, Enesim_Format dfmt);
 void enesim_compositor_span_pixel_register(Enesim_Compositor_Span sp,

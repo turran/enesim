@@ -22,6 +22,7 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Importer
 {
+	Enesim_Buffer *buffer;
 	Enesim_Buffer_Data cdata;
 	Enesim_Buffer_Format cfmt;
 	Enesim_Angle angle;
@@ -104,6 +105,10 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 	Enesim_Renderer_Importer *thiz;
 
 	thiz = _importer_get(r);
+	if (!thiz->buffer) return EINA_FALSE;
+
+	enesim_buffer_data_get(thiz->buffer, &thiz->cdata);
+	thiz->cfmt = enesim_buffer_format_get(thiz->buffer);
 	/* TODO use a LUT for this */
 	switch (thiz->cfmt)
 	{
@@ -127,9 +132,26 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 
 static void _importer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
-	/* TODO check that we have an image set, if so
-	 * return the size of that image
-	 */
+	Enesim_Renderer_Importer *thiz;
+
+	thiz = _importer_get(r);
+	if (thiz->buffer)
+	{
+		int w, h;
+
+		enesim_buffer_size_get(thiz->buffer, &w, &h);
+		rect->x = 0;
+		rect->y = 0;
+		rect->w = w;
+		rect->h = h;
+	}
+	else
+	{
+		rect->x = 0;
+		rect->y = 0;
+		rect->w = 0;
+		rect->h = 0;
+	}
 }
 
 static void _importer_free(Enesim_Renderer *r)
@@ -199,27 +221,17 @@ EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle an
 	thiz = _importer_get(r);
 	thiz->angle = angle;
 }
+
 /**
- * Sets the data to import pixels from
+ * Sets the buffer to import pixels from
  * @param[in] r The importer renderer
- * @param[in] cdata The data
+ * @param[in] buffer The buffer
  */
-EAPI void enesim_renderer_importer_data_set(Enesim_Renderer *r, Enesim_Buffer_Data *cdata)
+EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer *buffer)
 {
 	Enesim_Renderer_Importer *thiz;
 
 	thiz = _importer_get(r);
-	thiz->cdata = *cdata;
+	thiz->buffer = buffer;
 }
-/**
- * Sets the format
- * @param[in] r The importer renderer
- * @param[in] fmt The format
- */
-EAPI void enesim_renderer_importer_format_set(Enesim_Renderer *r, Enesim_Buffer_Format fmt)
-{
-	Enesim_Renderer_Importer *thiz;
 
-	thiz = _importer_get(r);
-	thiz->cfmt = fmt;
-}
