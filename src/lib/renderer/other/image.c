@@ -342,7 +342,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill 
 	/* FIXME we need to use the format from the destination surface */
 	fmt = ENESIM_FORMAT_ARGB8888;
 
-	if (sw != thiz->w && sh != thiz->h)
+	if (sw != thiz->w || sh != thiz->h)
 	{
 		/* as we need to scale we can only use the point compositor */
 		thiz->point = enesim_compositor_point_get(rop, &fmt,
