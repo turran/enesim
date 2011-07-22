@@ -238,6 +238,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	Enesim_Color fill_color;
 	Enesim_Renderer *fill_renderer;
 	Enesim_Shape_Draw_Mode draw_mode;
+	double ox, oy;
 
 	thiz = _path_get(r);
 	if (!thiz)
@@ -262,6 +263,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	enesim_renderer_shape_draw_mode_get(thiz->figure, &draw_mode);
 	enesim_renderer_shape_draw_mode_set(thiz->figure, draw_mode);
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	enesim_renderer_origin_set(thiz->figure, ox, oy);
 
 	thiz->figure->matrix = r->matrix;
 

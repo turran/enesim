@@ -129,6 +129,9 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	enesim_renderer_origin_get(r, &ox, &oy);
 
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
 	{
