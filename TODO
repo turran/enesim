@@ -5,7 +5,6 @@
   enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
   to receive the data already fetch with enesim_renderer_data_get(r) but on the surface_draw
 + Change very renderer to use *thiz* as the variable for itself
-+ Implement a threaded draw() function
 + We need to get rid of the hypot function, it is used on a lot places
   but with f16p16 values
 + We need to use the real types on the rendering functions

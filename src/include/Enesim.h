@@ -27,14 +27,8 @@
  * flexible design: all the steps of the rendering process have been abstracted
  * allowing applications to only use the functionality for the drawing
  * operations they may need, not forcing on how or what to draw.
- * @image html raster.png
- * @section features Features
- * - Multiple Rasterizers, with and without anti-alias.
- * - Multiple Scanline types.
- * - Point and Span based Drawers.
- * - Multiple raster operations.
- * - Multiple Surface formats, even multiple plane surface formats.
- * - Projective and affine Transformers.
+ * @section backends Backends
+ * - Software based
  *
  * @section dependencies Dependencies
  * - Eina
