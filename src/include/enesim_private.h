@@ -35,7 +35,7 @@
 #endif
 
 #if BUILD_OPENCL
-#include "CL/cl.h"
+#include "Enesim_OpenCL.h"
 #endif
 
 #include <string.h>

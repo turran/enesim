@@ -18,6 +18,11 @@
 #ifndef ENESIM_OPENCL_H_
 #define ENESIM_OPENCL_H_
 
+#include "Enesim.h"
+#include "CL/cl.h"
+
+#define ENESIM_OPENCL_KERNEL(k) #k
+
 EAPI Enesim_Pool * enesim_pool_opencl_new(void);
 
 #endif

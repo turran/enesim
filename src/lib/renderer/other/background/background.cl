@@ -1,3 +1,4 @@
+ENESIM_OPENCL_KERNEL(
 __kernel void background(__global image2d_t out, __global uint4 c)
 {
 	int x = get_global_id(0);
@@ -5,3 +6,4 @@ __kernel void background(__global image2d_t out, __global uint4 c)
 
 	write_imagef(out, (int2)(x, y), c);
 }
+);

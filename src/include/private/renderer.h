@@ -166,4 +166,12 @@ Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descript
 void * enesim_renderer_gradient_data_get(Enesim_Renderer *r);
 Enesim_Color enesim_renderer_gradient_color_get(Enesim_Renderer *r, Eina_F16p16 pos);
 
+/* sw backend */
+void enesim_renderer_sw_init(void);
+void enesim_renderer_sw_shutdown(void);
+void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
+		int x, int y, Enesim_Renderer_Flag flags);
+void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
+		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags);
+
 #endif
