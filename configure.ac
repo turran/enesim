@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT([enesim], [0.0.7], [enesim-devel@googlegroups.com])
+AC_INIT([enesim], [0.0.8], [enesim-devel@googlegroups.com])
 AC_PREREQ([2.60])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
@@ -40,19 +40,6 @@ AC_PROG_CC
 PKG_CHECK_MODULES(EINA, [eina >= 1.0.0])
 AC_ARG_WITH([equanime], AC_HELP_STRING([--with-equanime], [enable Equanime pool support]),
     [want_equanime="yes"], [want_equanime="no"])
-PKG_CHECK_MODULES(EQUANIME, [equanime], [have_equanime="yes"], [have_equanime="no"])
-
-if test "x$have_equanime" = "xyes" && test "x$want_equanime" = "xyes" ; then
-  build_equanime="yes"
-else
-  build_equanime="no"
-fi
-
-if test "x$build_equanime" = "xyes" ; then
-  AC_DEFINE(BUILD_EQUANIME, 1, [Build Equanime Pool])
-fi
-AM_CONDITIONAL(HAVE_EQUANIME, [test "x$build_equanime" = "xyes"])
-
 ### Checks for header files
 
 
@@ -147,6 +134,22 @@ AC_ARG_ENABLE(pthreads,
   ]
 )
 
+################################################################################
+##                                  Backends                                  ##
+################################################################################
+AC_CHECK_HEADERS(CL/cl.h, [have_cl_h="yes"], [have_cl_h="no"])
+AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [have_cl_l="yes"],[have_cl_l="no"])
+if test "x$have_cl_h" = "xyes" && test "x$have_cl_l" = "xyes"; then
+  build_opencl="yes"
+else
+  build_opencl="no"
+fi
+
+if test "x$build_opencl" = "xyes"; then
+  AC_DEFINE(BUILD_OPENCL, 1, [Build OpenCL Backend])
+fi
+AM_CONDITIONAL(HAVE_OPENCL, [test "x$build_opencl" = "xyes"])
+
 #######################################
 ## Link with pthread if needed
 AC_MSG_CHECKING(whether we should link with pthread)
@@ -205,7 +208,7 @@ AC_SUBST(ENESIM_LIBS)
 AC_OUTPUT([
 Makefile
 enesim.pc
-enesim_equanime.pc
+enesim_opencl.pc
 src/Makefile
 src/include/Makefile
 src/lib/Makefile
@@ -218,6 +221,7 @@ src/lib/renderer/shape/Makefile
 src/lib/renderer/filter/Makefile
 src/lib/renderer/pattern/Makefile
 src/lib/renderer/other/Makefile
+src/lib/renderer/other/background/Makefile
 src/lib/util/Makefile
 src/tests/Makefile
 ],[
@@ -258,7 +262,7 @@ echo "  Software..................................: yes"
 echo
 echo "Buffer Pools:"
 echo "  Eina......................................: yes"
-echo "  Equanime..................................: ${build_equanime}"
+echo "  OpenCL....................................: ${build_opencl}"
 echo
 echo "Installation Path...........................: ${prefix}"
 echo

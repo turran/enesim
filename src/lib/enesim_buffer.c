@@ -23,50 +23,45 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Eina_Bool enesim_buffer_setup(Enesim_Buffer *buf, Enesim_Backend b,
-		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
-		Enesim_Buffer_Data *data, Enesim_Pool *pool)
+Enesim_Buffer_Backend * enesim_buffer_backend_data_get(Enesim_Buffer *b)
 {
-	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
-	buf->w = w;
-	buf->h = h;
-	buf->format = fmt;
-	if (!pool)
-	{
-		if (data) buf->data = *data;
-	}
-	else
-	{
-		if (!enesim_pool_data_alloc(pool, data, b, fmt, w, h))
-			return EINA_FALSE;
-	}
-	buf->pool = pool;
-	return EINA_TRUE;
-}
-
-void enesim_buffer_cleanup(Enesim_Buffer *buf)
-{
-	if (buf->pool)
-	{
-		 enesim_pool_data_free(buf->pool, &buf->data, buf->backend,
-				buf->format);
-	}
+	return &b->buffer_backend;
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Enesim_Buffer *
-enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Buffer_Format fmt,
+EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
+		uint32_t w, uint32_t h, Enesim_Pool *p, Enesim_Buffer_Data *data)
+{
+	Enesim_Buffer *buf;
+	Enesim_Buffer_Backend buffer_backend;
+
+	if (!p)
+	{
+		p = enesim_pool_default_get();
+		if (!p) return NULL;
+	}
+
+	if (!enesim_pool_data_alloc(p, &buffer_backend, f, w, h))
+		return NULL;
+
+	buf = calloc(1, sizeof(Enesim_Buffer));
+	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
+	buf->w = w;
+	buf->h = h;
+	buf->buffer_backend = buffer_backend;
+	buf->format = f;
+	buf->pool = p;
+
+	return buf;
+}
+
+EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Buffer_Data *data)
 {
 	Enesim_Buffer *buf;
 
-	buf = calloc(1, sizeof(Enesim_Buffer));
-	if (!enesim_buffer_setup(buf, b, fmt, w, h, data, NULL))
-	{
-		free(buf);
-		return NULL;
-	}
+	buf = enesim_buffer_new_pool_and_data_from(f, w, h, NULL, data);
 
 	return buf;
 }
@@ -75,20 +70,29 @@ enesim_buffer_new_data_from(Enesim_Backend b, Enesim_Buffer_Format fmt,
  * FIXME: To be fixed
  */
 EAPI Enesim_Buffer *
-enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Buffer_Format f,
-		uint32_t w, uint32_t h, Enesim_Pool *p)
+enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w,
+		uint32_t h, Enesim_Pool *p)
 {
 	Enesim_Buffer *buf;
+	Enesim_Buffer_Backend buffer_backend;
 
-	if (!p) return enesim_buffer_new(b, f, w, h);
-
-	buf = calloc(1, sizeof(Enesim_Buffer));
-	if (!enesim_buffer_setup(buf, b, f, w, h, &buf->data, p))
+	if (!p)
 	{
-		free(buf);
-		return NULL;
+		p = enesim_pool_default_get();
+		if (!p) return NULL;
 	}
 
+	if (!enesim_pool_data_alloc(p, &buffer_backend, f, w, h))
+		return NULL;
+
+	buf = calloc(1, sizeof(Enesim_Buffer));
+	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
+	buf->w = w;
+	buf->h = h;
+	buf->buffer_backend = buffer_backend;
+	buf->format = f;
+	buf->pool = p;
+
 	return buf;
 }
 
@@ -96,12 +100,12 @@ enesim_buffer_new_pool_from(Enesim_Backend b, Enesim_Buffer_Format f,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Buffer *
-enesim_buffer_new(Enesim_Backend b, Enesim_Buffer_Format f, uint32_t w, uint32_t h)
+EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f,
+			uint32_t w, uint32_t h)
 {
 	Enesim_Buffer *buf;
 
-	buf = enesim_buffer_new_pool_from(b, f, w, h, &enesim_default_pool);
+	buf = enesim_buffer_new_pool_from(f, w, h, NULL);
 
 	return buf;
 }
@@ -109,8 +113,7 @@ enesim_buffer_new(Enesim_Backend b, Enesim_Buffer_Format f, uint32_t w, uint32_t
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void
-enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h)
+EAPI void enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	if (w) *w = b->w;
@@ -120,8 +123,7 @@ enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Buffer_Format
-enesim_buffer_format_get(const Enesim_Buffer *b)
+EAPI Enesim_Buffer_Format enesim_buffer_format_get(const Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	return b->format;
@@ -131,40 +133,43 @@ enesim_buffer_format_get(const Enesim_Buffer *b)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Backend
-enesim_buffer_backend_get(const Enesim_Buffer *b)
+EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
-	return b->backend;
+	return b->buffer_backend.backend;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void
-enesim_buffer_delete(Enesim_Buffer *b)
+EAPI void enesim_buffer_delete(Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 
-	enesim_buffer_cleanup(b);
+	enesim_pool_data_free(b->pool, &b->buffer_backend, b->format);
 	free(b);
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void
-enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Data *data)
+EAPI void enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Data *data)
 {
+	Enesim_Buffer_Backend *buffer_data;
+	Enesim_Buffer_Data *curr;
+
 	ENESIM_MAGIC_CHECK_BUFFER(b);
-	if (data) *data = b->data;
+	buffer_data = enesim_buffer_backend_data_get(b);
+	curr = &buffer_data->data.sw_data;
+
+	if (data) *data = *curr;
 }
 /**
  * Store a private data pointer into the buffer
  */
-EAPI void
-enesim_buffer_private_set(Enesim_Buffer *b, void *data)
+EAPI void enesim_buffer_private_set(Enesim_Buffer *b, void *data)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	b->user = data;
@@ -173,15 +178,13 @@ enesim_buffer_private_set(Enesim_Buffer *b, void *data)
 /**
  * Retrieve the private data pointer from the buffer
  */
-EAPI void *
-enesim_buffer_private_get(Enesim_Buffer *b)
+EAPI void * enesim_buffer_private_get(Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	return b->user;
 }
 
-EAPI size_t
-enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
+EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
 	switch (fmt)
 	{
@@ -203,7 +206,11 @@ enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 		case ENESIM_CONVERTER_GRAY:
 		return w * h;
 		break;
+
+		default:
+		return 0;
 	}
+	return 0;
 }
 
 /**

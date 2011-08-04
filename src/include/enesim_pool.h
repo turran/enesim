@@ -24,9 +24,10 @@
  */
 typedef struct _Enesim_Pool Enesim_Pool;
 
-EAPI Enesim_Pool * enesim_pool_eina_get(Eina_Mempool *mp);
+EAPI Enesim_Pool * enesim_pool_default_get(void);
+EAPI void enesim_pool_delete(Enesim_Pool *p);
 
-EAPI Eina_Bool enesim_pool_equanime_support(void);
+EAPI Enesim_Pool * enesim_pool_eina_new(Eina_Mempool *mp);
 
 /** @} */
 

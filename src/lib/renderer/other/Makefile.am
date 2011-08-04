@@ -1,3 +1,5 @@
+SUBDIRS = background
+
 MAINTAINERCLEANFILES = \
 Makefile.in
 
@@ -11,9 +13,15 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_renderer_other.la
 
 libenesim_renderer_other_la_SOURCES = \
-background.c \
 clipper.c \
 importer.c \
 image.c \
 compound.c \
 perlin.c
+
+libenesim_renderer_other_la_LIBADD = \
+background/libenesim_renderer_other_background.la
+
+libenesim_renderer_other_la_DEPENDENCIES = \
+background/libenesim_renderer_other_background.la
+

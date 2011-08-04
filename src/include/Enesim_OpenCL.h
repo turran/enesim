@@ -15,18 +15,9 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_EQUANIME_H_
-#define ENESIM_EQUANIME_H_
+#ifndef ENESIM_OPENCL_H_
+#define ENESIM_OPENCL_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-EAPI Enesim_Pool * enesim_pool_equanime_get(Equanime *eq, Equ_Host *h);
-EAPI Eina_Bool enesim_pool_equanime_buffer_format(Enesim_Buffer_Format fmt, Equ_Format *eq_fmt);
-
-#ifdef __cplusplus
-}
-#endif
+EAPI Enesim_Pool * enesim_pool_opencl_new(void);
 
 #endif

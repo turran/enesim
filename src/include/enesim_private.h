@@ -34,6 +34,10 @@
 #include <pthread.h>
 #endif
 
+#if BUILD_OPENCL
+#include "CL/cl.h"
+#endif
+
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>
@@ -105,8 +109,8 @@ static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
 #include "private/compositor.h"
 #include "private/matrix.h"
 #include "private/renderer.h"
-#include "private/pool.h"
 #include "private/buffer.h"
+#include "private/pool.h"
 #include "private/surface.h"
 #include "private/converter.h"
 /** @} */

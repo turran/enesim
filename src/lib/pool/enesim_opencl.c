@@ -21,91 +21,51 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Eina_Pool
+typedef struct _Enesim_OpenCL_Pool
 {
-	Eina_Mempool *mp;
-} Enesim_Eina_Pool;
+	cl_context context;
+	cl_command_queue queue;
+} Enesim_OpenCL_Pool;
 
 static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
-	Enesim_Buffer_Data *data;
-	Enesim_Eina_Pool *thiz = prv;
-	void *alloc_data;
-	size_t bytes;
+	Enesim_OpenCL_Pool *thiz = prv;
+	cl_mem i;
+	cl_int ret;
+	cl_image_format format;
 
-	buffer_backend->backend = ENESIM_BACKEND_SOFTWARE;
-	data = &buffer_backend->data.sw_data;
-	bytes = enesim_buffer_format_size_get(fmt, w, h);
-	alloc_data = eina_mempool_malloc(thiz->mp, bytes);
-	switch (fmt)
+	format.image_channel_order = CL_RGBA;
+	format.image_channel_data_type = CL_UNORM_INT8;
+	i = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
+			&format, w, h, 0, NULL, &ret);
+	if (ret != CL_SUCCESS)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
-		data->argb8888.plane0 = alloc_data;
-		data->argb8888.plane0_stride = w;
-		break;
-
-		case ENESIM_CONVERTER_ARGB8888_PRE:
-		data->argb8888_pre.plane0 = alloc_data;
-		data->argb8888_pre.plane0_stride = w;
-		break;
-
-		case ENESIM_CONVERTER_RGB565:
-		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w;
-		break;
-
-		case ENESIM_CONVERTER_RGB888:
-		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w;
-		break;
-
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
-		printf("TODO\n");
-		break;
+		printf("impossible to create the image\n");
+		return EINA_FALSE;
 	}
+	buffer_backend->data.opencl_data = i;
+	printf("Image created correctly\n");
 	return EINA_TRUE;
 }
 
 static void _data_free(void *prv, Enesim_Buffer_Backend *buffer_backend,
 		Enesim_Buffer_Format fmt)
 {
-	Enesim_Eina_Pool *thiz = prv;
-	Enesim_Buffer_Data *data;
-	data = &buffer_backend->data.sw_data;
-
-	switch (fmt)
-	{
-		case ENESIM_CONVERTER_ARGB8888:
-		eina_mempool_free(thiz->mp, data->argb8888_pre.plane0);
-		break;
-
-		case ENESIM_CONVERTER_ARGB8888_PRE:
-		eina_mempool_free(thiz->mp, data->argb8888_pre.plane0);
-		break;
-
-		case ENESIM_CONVERTER_RGB565:
-		case ENESIM_CONVERTER_RGB888:
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
-		printf("TODO\n");
-		break;
-	}
+	clReleaseMemObject(buffer_backend->data.opencl_data);
 }
 
 static void _free(void *prv)
 {
-	Enesim_Eina_Pool *thiz = prv;
+	Enesim_OpenCL_Pool *thiz = prv;
 
-	eina_mempool_del(thiz->mp);
 	free(thiz);
 }
 
 static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
-	/* .free =       */ NULL
+	/* .free =       */ _free,
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -113,13 +73,42 @@ static Enesim_Pool_Descriptor _descriptor = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Enesim_Pool * enesim_pool_eina_new(Eina_Mempool *mp)
+EAPI Enesim_Pool * enesim_pool_opencl_new(void)
 {
-	Enesim_Eina_Pool *thiz;
+	Enesim_OpenCL_Pool *thiz;
 	Enesim_Pool *p;
+	cl_context context;
+	cl_command_queue queue;
+	cl_device_id device_id;
+	cl_int ret;
+	cl_platform_id platform_id;
+	cl_uint ret_num_devices;
+	cl_uint ret_num_platforms;
 
-	thiz = calloc(1, sizeof(Enesim_Eina_Pool));
-	thiz->mp = mp;
+	clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+	ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1,
+            &device_id, &ret_num_devices);
+	if (ret != CL_SUCCESS)
+	{
+		printf("impossible to get the devices\n");
+ 		goto end;
+	}
+	context = clCreateContext(0, 1, &device_id, NULL, NULL, &ret);
+	if (ret != CL_SUCCESS)
+	{
+		printf("impossible to get the context\n");
+		goto end;
+	}
+	queue = clCreateCommandQueue(context, device_id, 0, &ret);
+	if (ret != CL_SUCCESS)
+	{
+		printf("impossible to get the command queue\n");
+		goto end;
+	}
+
+	printf("Everything went ok\n");
+	thiz = calloc(1, sizeof(Enesim_OpenCL_Pool));
+	thiz->context = context;
 
 	p = enesim_pool_new(&_descriptor, thiz);
 	if (!p)
@@ -129,4 +118,7 @@ EAPI Enesim_Pool * enesim_pool_eina_new(Eina_Mempool *mp)
 	}
 
 	return p;
+end:
+	return NULL;
 }
+

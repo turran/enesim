@@ -30,6 +30,9 @@ typedef struct _Enesim_Buffer_Backend
 	Enesim_Backend backend;
 	union {
 		Enesim_Buffer_Data sw_data;
+#if BUILD_OPENCL
+		cl_mem opencl_data;
+#endif
 	} data;
 } Enesim_Buffer_Backend;
 
@@ -38,15 +41,10 @@ struct _Enesim_Buffer
 	EINA_MAGIC
 	uint32_t w;
 	uint32_t h;
-	Enesim_Buffer_Data data;
 	Enesim_Format format;
-	Enesim_Backend backend;
+	Enesim_Buffer_Backend buffer_backend;
 	Enesim_Pool *pool;
 	void *user; /* user provided data */
 };
-
-Eina_Bool enesim_buffer_setup(Enesim_Buffer *buf, Enesim_Backend b,
-		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
-		Enesim_Buffer_Data *data, Enesim_Pool *pool);
 
 #endif

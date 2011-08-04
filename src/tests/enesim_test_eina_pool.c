@@ -15,19 +15,21 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	pool = enesim_pool_eina_get(mp);
+	pool = enesim_pool_eina_new(mp);
 	if (!pool)
 	{
 		printf("Failed to create the pool\n");
 		return 2;
 	}
 
-	surface = enesim_surface_new_pool_from(ENESIM_BACKEND_SOFTWARE, ENESIM_FORMAT_ARGB8888, 320, 240, pool);
+	surface = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888, 320, 240, pool);
 	if (!surface)
 	{
 		printf("Failed to create the surface\n");
 		return 3;
 	}
+	enesim_surface_delete(surface);
+	enesim_pool_delete(pool);
 
 	enesim_shutdown();
 

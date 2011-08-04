@@ -24,6 +24,6 @@ installed_headersdir = $(prefix)/include/enesim
 installed_headers_DATA = $(ENESIM_UTILHEADERS)
 include_HEADERS = Enesim.h
 
-if HAVE_EQUANIME
-include_HEADERS += Enesim_Equanime.h
+if HAVE_OPENCL
+include_HEADERS += Enesim_OpenCL.h
 endif

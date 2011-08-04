@@ -20,12 +20,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static inline void _surface_setup(Enesim_Surface *s, Enesim_Format fmt)
-{
-	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
-	s->format = fmt;
-}
-
 static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 		Enesim_Buffer_Format *buf_fmt)
 {
@@ -45,10 +39,13 @@ static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 		return EINA_FALSE;
 	}
 }
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Enesim_Buffer_Backend * enesim_surface_backend_data_get(Enesim_Surface *s)
+{
+	return enesim_buffer_backend_data_get(s->buffer);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -56,25 +53,24 @@ static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Surface *
-enesim_surface_new_data_from(Enesim_Backend b, Enesim_Format fmt,
+EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 		uint32_t w, uint32_t h, Enesim_Buffer_Data *data)
 {
 	Enesim_Surface *s;
+	Enesim_Buffer *b;
 	Enesim_Buffer_Format buf_fmt;
 
 	if ((!w) || (!h)) return NULL;
 	if (!_format_to_buffer_format(fmt, &buf_fmt))
 		return NULL;
 
+	b = enesim_buffer_new_data_from(buf_fmt, w, h, data);
+	if (!b) return NULL;
+
 	s = calloc(1, sizeof(Enesim_Surface));
-	if (!enesim_buffer_setup(&s->buffer, b,
-		buf_fmt, w, h, data, NULL))
-	{
-		free(s);
-		return NULL;
-	}
-	_surface_setup(s, fmt);
+	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
+	s->format = fmt;
+	s->buffer = b;
 
 	return s;
 }
@@ -82,27 +78,24 @@ enesim_surface_new_data_from(Enesim_Backend b, Enesim_Format fmt,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Surface *
-enesim_surface_new_pool_from(Enesim_Backend b, Enesim_Format f,
+EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p)
 {
 	Enesim_Surface *s;
+	Enesim_Buffer *b;
 	Enesim_Buffer_Format buf_fmt;
 
 	if ((!w) || (!h)) return NULL;
-	if (!p) return enesim_surface_new(b, f, w, h);
-	
 	if (!_format_to_buffer_format(f, &buf_fmt))
 		return NULL;
 
+	b = enesim_buffer_new_pool_from(f, w, h, p);
+	if (!b) return NULL;
+	
 	s = calloc(1, sizeof(Enesim_Surface));
-	if (!enesim_buffer_setup(&s->buffer, b, buf_fmt,
-			w, h, &s->buffer.data, p))
-	{
-		free(s);
-		return NULL;
-	}
-	_surface_setup(s, f);
+	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
+	s->format = f;
+	s->buffer = b;
 
 	return s;
 }
@@ -111,12 +104,11 @@ enesim_surface_new_pool_from(Enesim_Backend b, Enesim_Format f,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Surface *
-enesim_surface_new(Enesim_Backend b, Enesim_Format f, uint32_t w, uint32_t h)
+EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h)
 {
 	Enesim_Surface *s;
 
-	s = enesim_surface_new_pool_from(b, f, w, h, &enesim_default_pool);
+	s = enesim_surface_new_pool_from(f, w, h, NULL);
 
 	return s;
 }
@@ -128,8 +120,8 @@ EAPI void
 enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
-	if (w) *w = s->buffer.w;
-	if (h) *h = s->buffer.h;
+	if (w) *w = s->buffer->w;
+	if (h) *h = s->buffer->h;
 }
 /**
  * To be documented
@@ -148,7 +140,7 @@ EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s)
 EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
-	return s->buffer.backend;
+	return enesim_buffer_backend_get(s->buffer);
 }
 
 /**
@@ -160,39 +152,69 @@ enesim_surface_delete(Enesim_Surface *s)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	enesim_buffer_cleanup(&s->buffer);
+	enesim_buffer_delete(s->buffer);
 	free(s);
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void *
-enesim_surface_data_get(const Enesim_Surface *s)
+EAPI void * enesim_surface_data_get(const Enesim_Surface *s)
 {
+	Enesim_Buffer_Backend *b;
+	Enesim_Buffer_Data *data;
+
 	ENESIM_MAGIC_CHECK_SURFACE(s);
+	/* FIXME for now we keep this for compatibility reasons
+	 * until we found a way to write/read data from the
+	 * surface with and without copying
+	 */
+	b = enesim_surface_backend_data_get(s);
+	data = &b->data.sw_data;
 	switch (s->format)
 	{
 		case ENESIM_FORMAT_ARGB8888:
 		case ENESIM_FORMAT_ARGB8888_SPARSE:
 		case ENESIM_FORMAT_XRGB8888:
-		return s->buffer.data.argb8888_pre.plane0;
+		return data->argb8888_pre.plane0;
 
 		case ENESIM_FORMAT_A8:
-		return s->buffer.data.a8.plane0;
+		return data->a8.plane0;
 
 		default:
 		return NULL;
 	}
+	return NULL;
 }
 /**
  *
  */
-EAPI uint32_t
-enesim_surface_stride_get(Enesim_Surface *s)
+EAPI uint32_t enesim_surface_stride_get(Enesim_Surface *s)
 {
+	Enesim_Buffer_Backend *b;
+	Enesim_Buffer_Data *data;
+
 	ENESIM_MAGIC_CHECK_SURFACE(s);
-	return s->buffer.data.argb8888.plane0_stride;
+	/* FIXME for now we keep this for compatibility reasons
+	 * until we found a way to write/read data from the
+	 * surface with and without copying
+	 */
+	b = enesim_surface_backend_data_get(s);
+	data = &b->data.sw_data;
+	switch (s->format)
+	{
+		case ENESIM_FORMAT_ARGB8888:
+		case ENESIM_FORMAT_ARGB8888_SPARSE:
+		case ENESIM_FORMAT_XRGB8888:
+		return data->argb8888_pre.plane0_stride;
+
+		case ENESIM_FORMAT_A8:
+		return data->a8.plane0_stride;
+
+		default:
+		return 0;
+	}
+	return 0;
 }
 /**
  * Store a private data pointer into the surface

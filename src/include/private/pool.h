@@ -18,26 +18,39 @@
 #ifndef POOL_H_
 #define POOL_H_
 
-extern Enesim_Pool enesim_default_pool;
+typedef Eina_Bool (*Enesim_Pool_Data_Alloc)(void *prv,
+		Enesim_Buffer_Backend *buffer_backend,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
 
-typedef Eina_Bool (*Enesim_Pool_Data_Alloc)(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
-typedef void (*Enesim_Pool_Data_Free)(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt);
-typedef void (*Enesim_Pool_Free)(Enesim_Pool *p);
+typedef void (*Enesim_Pool_Data_Free)(void *prv,
+		Enesim_Buffer_Backend *buffer_backend,
+		Enesim_Buffer_Format fmt);
+
+typedef void (*Enesim_Pool_Data_From)(void *prv,
+		Enesim_Buffer_Backend *buffer_backend,
+		Enesim_Buffer_Data *src);
+
+typedef void (*Enesim_Pool_Free)(void *prv);
+
+typedef struct _Enesim_Pool_Descriptor
+{
+	Enesim_Pool_Data_Alloc data_alloc;
+	Enesim_Pool_Data_Free data_free;
+	Enesim_Pool_Data_From data_from;
+	Enesim_Pool_Free free;
+} Enesim_Pool_Descriptor;
 
 struct _Enesim_Pool
 {
 	EINA_MAGIC
-	Enesim_Pool_Data_Alloc data_alloc;
-	Enesim_Pool_Data_Free data_free;
-	Enesim_Pool_Free free;
+	Enesim_Pool_Descriptor *descriptor;
+	void *data;
 };
 
-Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
-void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt);
-void enesim_pool_free(Enesim_Pool *p);
+Enesim_Pool * enesim_pool_new(Enesim_Pool_Descriptor *descriptor, void *data);
+Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
+void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+		Enesim_Buffer_Format fmt);
 
 #endif

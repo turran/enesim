@@ -77,6 +77,7 @@ typedef enum _Enesim_Direction
 
 typedef enum _Enesim_Backend
 {
+	ENESIM_BACKEND_INVALID,
 	ENESIM_BACKEND_SOFTWARE,
 	ENESIM_BACKENDS
 } Enesim_Backend;

@@ -8,13 +8,16 @@ AM_CPPFLAGS = \
 @ENESIM_BUILD@ \
 @ENESIM_CFLAGS@
 
+lib_LTLIBRARIES =
 noinst_LTLIBRARIES = libenesim_pool.la
 
 libenesim_pool_la_SOURCES = \
-enesim_eina.c \
-enesim_equanime.c
+enesim_eina.c
 
-if HAVE_EQUANIME
-libenesim_pool_la_LIBADD_ = @EQUANIME_LIBS@
-libenesim_pool_la_CFLAGS = @EQUANIME_CFLAGS@
+if HAVE_OPENCL
+lib_LTLIBRARIES += libenesim_opencl.la
+libenesim_opencl_la_SOURCES = enesim_opencl.c
+libenesim_opencl_la_LIBADD = $(top_builddir)/src/lib/libenesim.la -lOpenCL
+libenesim_opencl_la_CFLAGS =
+libenesim_opencl_la_LDFLAGS = -no-undefined -version-info @version_info@
 endif

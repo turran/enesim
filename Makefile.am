@@ -17,7 +17,7 @@ build-stamp \
 configure-stamp \
 depcomp \
 enesim.pc \
-enesim_equanime.pc \
+enesim_opencl.pc \
 enesim_docs.tar.gz
 
 EXTRA_DIST = \
@@ -26,15 +26,16 @@ COPYING \
 gendoc \
 Doxyfile \
 README \
-enesim.pc.in
+enesim.pc.in \
+enesim_opencl.pc.in
 
 ACLOCAL_AMFLAGS = -I m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = enesim.pc
 
-if HAVE_EQUANIME
-pkgconfig_DATA += enesim_equanime.pc
+if HAVE_OPENCL
+pkgconfig_DATA += enesim_opencl.pc
 endif
 
 

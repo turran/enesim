@@ -20,16 +20,18 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static Eina_Bool _data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt,
-		uint32_t w, uint32_t h)
+/*----------------------------------------------------------------------------*
+ *                        The Enesim's pool interface                         *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
+	Enesim_Buffer_Data *data;
 	size_t bytes;
 	void *alloc_data;
 
-	if (be != ENESIM_BACKEND_SOFTWARE)
-		return EINA_FALSE;
-
+	buffer_backend->backend = ENESIM_BACKEND_SOFTWARE;
+	data = &buffer_backend->data.sw_data;
 	bytes = enesim_buffer_format_size_get(fmt, w, h);
 	alloc_data = calloc(bytes, sizeof(char));
 	switch (fmt)
@@ -62,11 +64,17 @@ static Eina_Bool _data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
 	return EINA_TRUE;
 }
 
-static void _data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt)
+static Eina_Bool _data_from(void *prv, Enesim_Buffer_Backend *buffer_backend,
+		Enesim_Buffer_Data *src)
 {
-	if (be != ENESIM_BACKEND_SOFTWARE)
-		return;
+
+}
+
+static void _data_free(void *prv, Enesim_Buffer_Backend *buffer_backend,
+		Enesim_Buffer_Format fmt)
+{
+	Enesim_Buffer_Data *data;
+	data = &buffer_backend->data.sw_data;
 	switch (fmt)
 	{
 		case ENESIM_CONVERTER_ARGB8888:
@@ -85,35 +93,72 @@ static void _data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
 		break;
 	}
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-/* The main enesim pool */
-Enesim_Pool enesim_default_pool = {
-	/* EINA_MAGIC =  */ 0,
+
+static void _free(void *data)
+{
+	
+}
+
+static Enesim_Pool_Descriptor _default_descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .free =       */ NULL
 };
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Enesim_Pool * enesim_pool_new(Enesim_Pool_Descriptor *descriptor, void *data)
+{
+	Enesim_Pool *p;
 
-Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt,
+	p = calloc(1, sizeof(Enesim_Pool));
+	p->descriptor = descriptor;
+	p->data = data;
+
+	return p;
+}
+
+Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h)
 {
-	if (p->data_alloc) return p->data_alloc(p, data, be, fmt, w, h);
-	return EINA_FALSE;
+	if (!p) return EINA_FALSE;
+	if (!p->descriptor) return EINA_FALSE;
+	if (!p->descriptor->data_alloc) return EINA_FALSE;
+
+	return p->descriptor->data_alloc(p->data, data, fmt, w, h);
 }
 
-void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
-		Enesim_Backend be, Enesim_Buffer_Format fmt)
+void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+		Enesim_Buffer_Format fmt)
 {
-	if (p->data_free) p->data_free(p, data, be, fmt);
+	if (!p) return;
+	if (!p->descriptor) return;
+	if (!p->descriptor->data_free) return;
+
+	p->descriptor->data_free(p->data, data, fmt);
 }
 
-void enesim_pool_free(Enesim_Pool *p)
-{
-	if (p->free) p->free(p);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI Enesim_Pool * enesim_pool_default_get(void)
+{
+	static Enesim_Pool *p = NULL;
+
+	if (!p)
+	{
+		p = enesim_pool_new(&_default_descriptor, NULL);
+	}
+	return p;
+}
+
+EAPI void enesim_pool_delete(Enesim_Pool *p)
+{
+	if (!p) return;
+	if (!p->descriptor) return;
+	if (!p->descriptor->free) return;
+
+	p->descriptor->free(p->data);
+	free(p);
+}
