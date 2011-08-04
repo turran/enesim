@@ -219,6 +219,7 @@ src/lib/renderer/filter/Makefile
 src/lib/renderer/pattern/Makefile
 src/lib/renderer/other/Makefile
 src/lib/util/Makefile
+src/tests/Makefile
 ],[
 ])
 

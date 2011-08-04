@@ -25,6 +25,14 @@
 			EINA_MAGIC_FAIL(d, ENESIM_MAGIC_BUFFER);\
 	} while(0)
 
+typedef struct _Enesim_Buffer_Backend
+{
+	Enesim_Backend backend;
+	union {
+		Enesim_Buffer_Data sw_data;
+	} data;
+} Enesim_Buffer_Backend;
+
 struct _Enesim_Buffer
 {
 	EINA_MAGIC

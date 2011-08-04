@@ -27,29 +27,71 @@ typedef struct _Enesim_Eina_Pool
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static void * _surface_new(Enesim_Pool *p,
-		Enesim_Backend be, Enesim_Format f,
+static Eina_Bool _data_alloc(Enesim_Pool *p, Enesim_Buffer_Data *data,
+		Enesim_Backend be, Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h)
 {
 	Enesim_Eina_Pool *pool = (Enesim_Eina_Pool *)p;
-	void *data;
+	void *alloc_data;
 	size_t bytes;
 
 	if (be != ENESIM_BACKEND_SOFTWARE)
-		return NULL;
+		return EINA_FALSE;
 
-	bytes = enesim_format_size_get(f, w, h);
-	data = eina_mempool_malloc(pool->mp, bytes);
+	bytes = enesim_buffer_format_size_get(fmt, w, h);
+	alloc_data = eina_mempool_malloc(pool->mp, bytes);
+	switch (fmt)
+	{
+		case ENESIM_CONVERTER_ARGB8888:
+		data->argb8888.plane0 = alloc_data;
+		data->argb8888.plane0_stride = w;
+		break;
 
-	return data;
+		case ENESIM_CONVERTER_ARGB8888_PRE:
+		data->argb8888_pre.plane0 = alloc_data;
+		data->argb8888_pre.plane0_stride = w;
+		break;
+
+		case ENESIM_CONVERTER_RGB565:
+		data->rgb565.plane0 = alloc_data;
+		data->rgb565.plane0_stride = w;
+		break;
+
+		case ENESIM_CONVERTER_RGB888:
+		data->rgb565.plane0 = alloc_data;
+		data->rgb565.plane0_stride = w;
+		break;
+
+		case ENESIM_CONVERTER_A8:
+		case ENESIM_CONVERTER_GRAY:
+		printf("TODO\n");
+		break;
+	}
+	return EINA_TRUE;
 }
 
-static void _surface_free(Enesim_Pool *p,
-		void *data)
+static void _data_free(Enesim_Pool *p, Enesim_Buffer_Data *data,
+		Enesim_Backend be, Enesim_Buffer_Format fmt)
 {
 	Enesim_Eina_Pool *pool = (Enesim_Eina_Pool *)p;
 
-	eina_mempool_free(pool->mp, data);
+	switch (fmt)
+	{
+		case ENESIM_CONVERTER_ARGB8888:
+		eina_mempool_free(pool->mp, data->argb8888_pre.plane0);
+		break;
+
+		case ENESIM_CONVERTER_ARGB8888_PRE:
+		eina_mempool_free(pool->mp, data->argb8888_pre.plane0);
+		break;
+
+		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_CONVERTER_A8:
+		case ENESIM_CONVERTER_GRAY:
+		printf("TODO\n");
+		break;
+	}
 }
 
 static void _free(Enesim_Pool *p)
@@ -73,8 +115,8 @@ EAPI Enesim_Pool * enesim_pool_eina_get(Eina_Mempool *mp)
 
 	pool = calloc(1, sizeof(Enesim_Eina_Pool));
 	pool->mp = mp;
-	pool->pool.data_alloc = _surface_new;
-	pool->pool.data_free = _surface_free;
+	pool->pool.data_alloc = _data_alloc;
+	pool->pool.data_free = _data_free;
 	pool->pool.free = _free;
 
 	return &pool->pool;
