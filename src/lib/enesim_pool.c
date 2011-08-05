@@ -70,15 +70,32 @@ static Eina_Bool _data_alloc(void *prv,
 static Eina_Bool _data_from(void *prv,
 		Enesim_Backend *backend,
 		void **backend_data,
+		Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *src)
 {
+	if (copy)
+	{
+		printf("TODO copy data\n");
+	}
+	else
+	{
+		Enesim_Buffer_Sw_Data *data;
 
+		*backend = ENESIM_BACKEND_SOFTWARE;
+		data = malloc(sizeof(Enesim_Buffer_Sw_Data));
+		*backend_data = data;
+		*data = *src;
+
+		return EINA_TRUE;
+	}
 }
 
 static void _data_free(void *prv, void *backend_data,
-		Enesim_Buffer_Format fmt)
+		Enesim_Buffer_Format fmt,
+		Eina_Bool external_allocated)
 {
 	Enesim_Buffer_Sw_Data *data = backend_data;
+	if (external_allocated) goto end;
 	switch (fmt)
 	{
 		case ENESIM_CONVERTER_ARGB8888:
@@ -96,11 +113,13 @@ static void _data_free(void *prv, void *backend_data,
 		printf("TODO\n");
 		break;
 	}
+end:
+	free(data);
 }
 
 static void _free(void *data)
 {
-	
+
 }
 
 static Enesim_Pool_Descriptor _default_descriptor = {
@@ -135,14 +154,26 @@ Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p,
 	return p->descriptor->data_alloc(p->data, backend, data, fmt, w, h);
 }
 
+Eina_Bool enesim_pool_data_from(Enesim_Pool *p, Enesim_Backend *backend, void **data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h, Eina_Bool copy,
+		Enesim_Buffer_Sw_Data *from)
+{
+	if (!p) return EINA_FALSE;
+	if (!p->descriptor) return EINA_FALSE;
+	if (!p->descriptor->data_alloc) return EINA_FALSE;
+
+	return p->descriptor->data_from(p->data, backend, data, fmt, w, h, copy, from);
+}
+
 void enesim_pool_data_free(Enesim_Pool *p, void *data,
-		Enesim_Buffer_Format fmt)
+		Enesim_Buffer_Format fmt,
+		Eina_Bool external_allocated)
 {
 	if (!p) return;
 	if (!p->descriptor) return;
 	if (!p->descriptor->data_free) return;
 
-	p->descriptor->data_free(p->data, data, fmt);
+	p->descriptor->data_free(p->data, data, fmt, external_allocated);
 }
 
 /*============================================================================*

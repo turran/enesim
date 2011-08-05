@@ -92,10 +92,10 @@ typedef union _Enesim_Buffer_Sw_Data
 } Enesim_Buffer_Sw_Data;
 
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f, uint32_t w, uint32_t h);
-EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Buffer_Sw_Data *data);
+EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Eina_Bool copy, Enesim_Buffer_Sw_Data *data);
 EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
-		uint32_t w, uint32_t h, Enesim_Pool *p, Enesim_Buffer_Sw_Data *data);
+		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy, Enesim_Buffer_Sw_Data *data);
 
 EAPI void enesim_buffer_delete(Enesim_Buffer *b);
 

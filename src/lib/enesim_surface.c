@@ -39,7 +39,7 @@ static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 		case ENESIM_FORMAT_XRGB8888:
 		*buf_fmt = ENESIM_CONVERTER_ARGB8888_PRE;
 		return EINA_TRUE;
-		
+
 		case ENESIM_FORMAT_A8:
 		*buf_fmt = ENESIM_CONVERTER_A8;
 		return EINA_TRUE;
@@ -64,7 +64,8 @@ void * enesim_surface_backend_data_get(Enesim_Surface *s)
  * FIXME: To be fixed
  */
 EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
-		uint32_t w, uint32_t h, Enesim_Buffer_Sw_Data *data)
+		uint32_t w, uint32_t h, Eina_Bool copy,
+		Enesim_Buffer_Sw_Data *data)
 {
 	Enesim_Surface *s;
 	Enesim_Buffer *b;
@@ -74,7 +75,7 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 	if (!_format_to_buffer_format(fmt, &buf_fmt))
 		return NULL;
 
-	b = enesim_buffer_new_data_from(buf_fmt, w, h, data);
+	b = enesim_buffer_new_data_from(buf_fmt, w, h, copy, data);
 	if (!b) return NULL;
 
 	s = calloc(1, sizeof(Enesim_Surface));
@@ -101,7 +102,7 @@ EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 
 	b = enesim_buffer_new_pool_from(f, w, h, p);
 	if (!b) return NULL;
-	
+
 	s = calloc(1, sizeof(Enesim_Surface));
 	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
 	s->format = f;

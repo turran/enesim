@@ -44,6 +44,7 @@ struct _Enesim_Buffer
 	Enesim_Backend backend;
 	void *backend_data;
 	Enesim_Pool *pool;
+	Eina_Bool external_allocated; /* whenever the user wants a buffer by not copying a sw buffer pointer this is true otherwise false */
 	void *user; /* user provided data */
 };
 
