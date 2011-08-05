@@ -25,16 +25,15 @@
 			EINA_MAGIC_FAIL(d, ENESIM_MAGIC_BUFFER);\
 	} while(0)
 
-typedef struct _Enesim_Buffer_Backend
-{
-	Enesim_Backend backend;
-	union {
-		Enesim_Buffer_Data sw_data;
 #if BUILD_OPENCL
-		cl_mem opencl_data;
+typedef struct _Enesim_Buffer_OpenCL_Data
+{
+	cl_mem mem;
+	cl_context context;
+	cl_device_id device;
+	cl_command_queue queue;
+} Enesim_Buffer_OpenCL_Data;
 #endif
-	} data;
-} Enesim_Buffer_Backend;
 
 struct _Enesim_Buffer
 {
@@ -42,7 +41,8 @@ struct _Enesim_Buffer
 	uint32_t w;
 	uint32_t h;
 	Enesim_Format format;
-	Enesim_Buffer_Backend buffer_backend;
+	Enesim_Backend backend;
+	void *backend_data;
 	Enesim_Pool *pool;
 	void *user; /* user provided data */
 };

@@ -23,12 +23,25 @@
  * + add common parameters to the renderer here like transformation matrix and quality
  */
 
+#if BUILD_OPENCL
+typedef struct _Enesim_Renderer_OpenCL_Data
+{
+	cl_kernel kernel;
+} Enesim_Renderer_OpenCL_Data;
+#endif
+
+typedef struct _Enesim_Renderer_Sw_Data
+{
+	Enesim_Renderer_Sw_Fill fill;
+} Enesim_Renderer_Sw_Data;
+
 struct _Enesim_Renderer
 {
 	EINA_MAGIC
 	/* the renderer common properties */
 	Enesim_Rop rop;
 	Enesim_Color color;
+	Enesim_Quality quality;
 	double ox, oy; /* the origin */
 	struct {
 		Enesim_Matrix original;
@@ -41,7 +54,11 @@ struct _Enesim_Renderer
 	Enesim_Renderer_Descriptor *descriptor;
 	void *data;
 	/* backend data */
-	Enesim_Renderer_Sw_Fill sw_fill;
+	/* given that we can use the same renderer to draw into a software
+	 * surface or opencl surface, we need an array to keep *ALL* the
+	 * possible data */
+	void *backend_data[ENESIM_BACKENDS];
+	Enesim_Renderer_Sw_Fill sw_fill; /* FIXME move this into the backends */
 };
 
 typedef struct _Enesim_Renderer_Shape
@@ -166,6 +183,9 @@ Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descript
 void * enesim_renderer_gradient_data_get(Enesim_Renderer *r);
 Enesim_Color enesim_renderer_gradient_color_get(Enesim_Renderer *r, Eina_F16p16 pos);
 
+void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);
+void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data);
+
 /* sw backend */
 void enesim_renderer_sw_init(void);
 void enesim_renderer_sw_shutdown(void);
@@ -174,4 +194,5 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags);
 
+/* opencl backend */
 #endif

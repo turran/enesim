@@ -26,16 +26,19 @@ typedef struct _Enesim_Eina_Pool
 	Eina_Mempool *mp;
 } Enesim_Eina_Pool;
 
-static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
+static Eina_Bool _data_alloc(void *prv,
+		Enesim_Backend *backend,
+		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
-	Enesim_Buffer_Data *data;
+	Enesim_Buffer_Sw_Data *data;
 	Enesim_Eina_Pool *thiz = prv;
 	void *alloc_data;
 	size_t bytes;
 
-	buffer_backend->backend = ENESIM_BACKEND_SOFTWARE;
-	data = &buffer_backend->data.sw_data;
+	*backend = ENESIM_BACKEND_SOFTWARE;
+	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
+	*backend_data = data;
 	bytes = enesim_buffer_format_size_get(fmt, w, h);
 	alloc_data = eina_mempool_malloc(thiz->mp, bytes);
 	switch (fmt)
@@ -68,12 +71,12 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
 	return EINA_TRUE;
 }
 
-static void _data_free(void *prv, Enesim_Buffer_Backend *buffer_backend,
+static void _data_free(void *prv,
+		void *backend_data,
 		Enesim_Buffer_Format fmt)
 {
 	Enesim_Eina_Pool *thiz = prv;
-	Enesim_Buffer_Data *data;
-	data = &buffer_backend->data.sw_data;
+	Enesim_Buffer_Sw_Data *data = backend_data;
 
 	switch (fmt)
 	{
@@ -105,6 +108,7 @@ static void _free(void *prv)
 static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
+	/* .data_from =  */ NULL,
 	/* .free =       */ NULL
 };
 /*============================================================================*

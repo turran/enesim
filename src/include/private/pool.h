@@ -19,16 +19,17 @@
 #define POOL_H_
 
 typedef Eina_Bool (*Enesim_Pool_Data_Alloc)(void *prv,
-		Enesim_Buffer_Backend *buffer_backend,
+		Enesim_Backend *backend,
+		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
 
 typedef void (*Enesim_Pool_Data_Free)(void *prv,
-		Enesim_Buffer_Backend *buffer_backend,
+		void **backend_data,
 		Enesim_Buffer_Format fmt);
 
 typedef void (*Enesim_Pool_Data_From)(void *prv,
-		Enesim_Buffer_Backend *buffer_backend,
-		Enesim_Buffer_Data *src);
+		void **backend_data,
+		Enesim_Buffer_Sw_Data *src);
 
 typedef void (*Enesim_Pool_Free)(void *prv);
 
@@ -48,9 +49,9 @@ struct _Enesim_Pool
 };
 
 Enesim_Pool * enesim_pool_new(Enesim_Pool_Descriptor *descriptor, void *data);
-Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Backend *backend, void **data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
-void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+void enesim_pool_data_free(Enesim_Pool *p, void *data,
 		Enesim_Buffer_Format fmt);
 
 #endif

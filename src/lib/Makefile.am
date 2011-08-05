@@ -41,3 +41,10 @@ converter/libenesim_converter.la \
 pool/libenesim_pool.la
 
 libenesim_la_LDFLAGS = -no-undefined -version-info @version_info@
+
+
+if HAVE_OPENCL
+libenesim_la_SOURCES += enesim_renderer_opencl.c
+libenesim_la_LIBADD += -lOpenCL
+endif 
+

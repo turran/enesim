@@ -79,7 +79,7 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 	Enesim_Converter_2D converter;
 	Enesim_Buffer_Format dfmt;
 	Enesim_Format sfmt;
-	Enesim_Buffer_Data data;
+	Enesim_Buffer_Sw_Data data;
 	void *sdata;
 
 	dfmt = enesim_buffer_format_get(dst);

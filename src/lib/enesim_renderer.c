@@ -60,7 +60,12 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		enesim_renderer_sw_draw(r, s, area, x, y, flags);
 		break;
 
+		case ENESIM_BACKEND_OPENCL:
+		enesim_renderer_opencl_draw(r, s, area, x, y, flags);
+		break;
+
 		default:
+		WRN("Backend not supported %d", b);
 		break;
 	}
 }
@@ -160,6 +165,17 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
 	/* restore original matrix */
 	enesim_renderer_transformation_set(rel, old_matrix);
 }
+
+/* FIXME expor this */
+void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b)
+{
+	return r->backend_data[b];
+}
+
+void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data)
+{
+	r->backend_data[b] = data;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -201,42 +217,6 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	r->prv_data = eina_hash_string_superfast_new(NULL);
 
 	return r;
-}
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Sw_Fill fill;
-
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!r->descriptor->sw_setup) return EINA_TRUE;
-	if (r->descriptor->sw_setup(r, &fill))
-	{
-		r->sw_fill = fill;
-		return EINA_TRUE;
-	}
-	WRN("Setup callback on %p failed", r);
-	return EINA_FALSE;
-}
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor->sw_cleanup) r->descriptor->sw_cleanup(r);
-}
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	return r->sw_fill;
 }
 /**
  * To be documented
@@ -318,6 +298,11 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s)
 			return EINA_TRUE;
 		}
 		break;
+
+		case ENESIM_BACKEND_OPENCL:
+		return enesim_renderer_opencl_setup(r, s);
+		break;
+
 		default:
 		break;
 	}

@@ -23,18 +23,19 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Buffer_Backend * enesim_buffer_backend_data_get(Enesim_Buffer *b)
+void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
 {
-	return &b->buffer_backend;
+	return b->backend_data;
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
-		uint32_t w, uint32_t h, Enesim_Pool *p, Enesim_Buffer_Data *data)
+		uint32_t w, uint32_t h, Enesim_Pool *p, Enesim_Buffer_Sw_Data *data)
 {
 	Enesim_Buffer *buf;
-	Enesim_Buffer_Backend buffer_backend;
+	Enesim_Backend backend;
+	void *backend_data;
 
 	if (!p)
 	{
@@ -42,14 +43,14 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 		if (!p) return NULL;
 	}
 
-	if (!enesim_pool_data_alloc(p, &buffer_backend, f, w, h))
+	if (!enesim_pool_data_alloc(p, &backend, &backend_data, f, w, h))
 		return NULL;
 
 	buf = calloc(1, sizeof(Enesim_Buffer));
 	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
 	buf->w = w;
 	buf->h = h;
-	buf->buffer_backend = buffer_backend;
+	buf->backend_data = backend_data;
 	buf->format = f;
 	buf->pool = p;
 
@@ -57,7 +58,7 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 }
 
 EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
-		uint32_t w, uint32_t h, Enesim_Buffer_Data *data)
+		uint32_t w, uint32_t h, Enesim_Buffer_Sw_Data *data)
 {
 	Enesim_Buffer *buf;
 
@@ -74,7 +75,8 @@ enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w,
 		uint32_t h, Enesim_Pool *p)
 {
 	Enesim_Buffer *buf;
-	Enesim_Buffer_Backend buffer_backend;
+	Enesim_Backend backend;
+	void *backend_data;
 
 	if (!p)
 	{
@@ -82,14 +84,15 @@ enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w,
 		if (!p) return NULL;
 	}
 
-	if (!enesim_pool_data_alloc(p, &buffer_backend, f, w, h))
+	if (!enesim_pool_data_alloc(p, &backend, &backend_data, f, w, h))
 		return NULL;
 
 	buf = calloc(1, sizeof(Enesim_Buffer));
 	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
 	buf->w = w;
 	buf->h = h;
-	buf->buffer_backend = buffer_backend;
+	buf->backend = backend;
+	buf->backend_data = backend_data;
 	buf->format = f;
 	buf->pool = p;
 
@@ -136,7 +139,7 @@ EAPI Enesim_Buffer_Format enesim_buffer_format_get(const Enesim_Buffer *b)
 EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
-	return b->buffer_backend.backend;
+	return b->backend;
 }
 
 /**
@@ -147,7 +150,7 @@ EAPI void enesim_buffer_delete(Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 
-	enesim_pool_data_free(b->pool, &b->buffer_backend, b->format);
+	enesim_pool_data_free(b->pool, b->backend_data, b->format);
 	free(b);
 }
 
@@ -155,14 +158,13 @@ EAPI void enesim_buffer_delete(Enesim_Buffer *b)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Data *data)
+EAPI void enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
 {
-	Enesim_Buffer_Backend *buffer_data;
-	Enesim_Buffer_Data *curr;
+	void *buffer_data;
+	Enesim_Buffer_Sw_Data *curr;
 
 	ENESIM_MAGIC_CHECK_BUFFER(b);
-	buffer_data = enesim_buffer_backend_data_get(b);
-	curr = &buffer_data->data.sw_data;
+	curr = b->backend_data;
 
 	if (data) *data = *curr;
 }

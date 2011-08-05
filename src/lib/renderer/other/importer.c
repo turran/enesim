@@ -23,7 +23,7 @@
 typedef struct _Enesim_Renderer_Importer
 {
 	Enesim_Buffer *buffer;
-	Enesim_Buffer_Data cdata;
+	Enesim_Buffer_Sw_Data cdata;
 	Enesim_Buffer_Format cfmt;
 	Enesim_Angle angle;
 } Enesim_Renderer_Importer;

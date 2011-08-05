@@ -43,14 +43,9 @@ static void _span(Enesim_Renderer *p, int x, int y,
 
 	thiz->span(dst, len, NULL, thiz->final_color, NULL);
 }
-/*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
- *----------------------------------------------------------------------------*/
-static Eina_Bool _background_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+
+static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesim_Renderer *r)
 {
-	Enesim_Renderer_Background *thiz;
-	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
-	Enesim_Rop rop;
 	Enesim_Color final_color, rend_color;
 
  	thiz = _background_get(r);
@@ -58,18 +53,59 @@ static Eina_Bool _background_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_
 	enesim_renderer_color_get(r, &rend_color);
 	/* TODO multiply the bkg color with the rend color and use that for the span
 	 */
-	enesim_renderer_rop_get(r, &rop);
 	thiz->final_color = final_color;
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _background_sw_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+{
+	Enesim_Renderer_Background *thiz;
+	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
+	Enesim_Rop rop;
+
+ 	thiz = _background_get(r);
+
+	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
+	enesim_renderer_rop_get(r, &rop);
 	thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
-			final_color, ENESIM_FORMAT_NONE);
+			thiz->final_color, ENESIM_FORMAT_NONE);
 	*fill = _span;
+
 	return EINA_TRUE;
 }
 
-static void _background_state_cleanup(Enesim_Renderer *r)
+#if BUILD_OPENCL
+static Eina_Bool _background_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		const char **program_name, const char **program_source,
+		size_t *program_length)
 {
+	Enesim_Renderer_Background *thiz;
+
+ 	thiz = _background_get(r);
+	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
+
+	*program_name = "background";
+	*program_source = 
+	#include "background.cl"
+	*program_length = strlen(*program_source);
+
+	return EINA_TRUE;
 }
 
+static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Background *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
+
+ 	thiz = _background_get(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	clSetKernelArg(rdata->kernel, 1, sizeof(cl_uint4), &thiz->final_color);
+
+	return EINA_TRUE;
+}
+#endif
 
 static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
@@ -98,13 +134,18 @@ static void _background_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .free =       */ _background_free,
-	/* .boundings =  */ NULL,
-	/* .flags =      */ _background_flags,
-	/* .is_inside =  */ NULL,
-	/* .sw_setup =   */ _background_state_setup,
-	/* .sw_cleanup = */ _background_state_cleanup
+	/* .version =               */ ENESIM_RENDERER_API,
+	/* .free =                  */ _background_free,
+	/* .boundings =             */ NULL,
+	/* .flags =                 */ _background_flags,
+	/* .is_inside =             */ NULL,
+	/* .sw_setup =              */ _background_sw_setup,
+	/* .sw_cleanup =            */ NULL,
+#if BUILD_OPENCL
+	/* .opencl_setup =          */ _background_opencl_setup,
+	/* .opencl_kernel_setup =   */ _background_opencl_kernel_setup,
+	/* .opencl_cleanup =        */ NULL,
+#endif
 };
 /*============================================================================*
  *                                   API                                      *

@@ -17,6 +17,10 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+/**
+ * @todo
+ * - In a near future we should move the API functions into global ones?
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -285,14 +289,14 @@ void enesim_renderer_sw_shutdown(void)
 void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y, Enesim_Renderer_Flag flags)
 {
-	Enesim_Buffer_Backend *buffer_data;
-	Enesim_Buffer_Data *data;
+	void *buffer_data;
+	Enesim_Buffer_Sw_Data *data;
 	Enesim_Format dfmt;
 	uint32_t *ddata;
 	size_t stride;
 
 	buffer_data = enesim_surface_backend_data_get(s);
-	data = &buffer_data->data.sw_data;
+	data = s->buffer->backend_data;
 	/* FIXME */
 	stride = data->argb8888_pre.plane0_stride;
 	ddata = data->argb8888_pre.plane0;
@@ -314,14 +318,14 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags)
 {
-	Enesim_Buffer_Backend *buffer_data;
-	Enesim_Buffer_Data *data;
+	void *buffer_data;
+	Enesim_Buffer_Sw_Data *data;
 	Enesim_Format dfmt;
 	uint32_t *ddata;
 	size_t stride;
 
 	dfmt = enesim_surface_format_get(s);
-	data = &buffer_data->data.sw_data;
+	data = s->buffer->backend_data;
 	/* FIXME */
 	stride = data->argb8888_pre.plane0_stride;
 	ddata = data->argb8888_pre.plane0;
@@ -391,3 +395,41 @@ end:
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Sw_Fill fill;
+
+	//ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (!r->descriptor->sw_setup) return EINA_TRUE;
+	if (r->descriptor->sw_setup(r, &fill))
+	{
+		r->sw_fill = fill;
+		return EINA_TRUE;
+	}
+	WRN("Setup callback on %p failed", r);
+	return EINA_FALSE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
+{
+	//ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (r->descriptor->sw_cleanup) r->descriptor->sw_cleanup(r);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
+{
+	//ENESIM_MAGIC_CHECK_RENDERER(r);
+	return r->sw_fill;
+}

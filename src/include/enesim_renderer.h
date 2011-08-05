@@ -53,6 +53,11 @@ typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill);
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
 
+typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r, Enesim_Surface *s,
+		const char **program_name, const char **program_source, size_t *program_length);
+typedef void (*Enesim_Renderer_OpenCL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
+typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s);
+
 struct _Enesim_Renderer_Descriptor {
 	/* common */
 	unsigned int version;
@@ -63,6 +68,10 @@ struct _Enesim_Renderer_Descriptor {
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* opencl based functions */
+	Enesim_Renderer_OpenCL_Setup opencl_setup;
+	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
+	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
 };
 
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor

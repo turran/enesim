@@ -17,6 +17,15 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+/**
+ * @todo
+ * - The function enesim_surface_data_get()
+ * should have this prototype:
+ * enesim_surface_data_get(Enesim_Surface *s, Eina_Bool copy);
+ * this way the pool knows whenever the data must map directly to the
+ * surface data itself (i.e host ptr to it) or be a copy of it, like
+ * when getting pixels data from an OpenGL texture
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -42,7 +51,8 @@ static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Buffer_Backend * enesim_surface_backend_data_get(Enesim_Surface *s)
+/* FIXME export this */
+void * enesim_surface_backend_data_get(Enesim_Surface *s)
 {
 	return enesim_buffer_backend_data_get(s->buffer);
 }
@@ -54,7 +64,7 @@ Enesim_Buffer_Backend * enesim_surface_backend_data_get(Enesim_Surface *s)
  * FIXME: To be fixed
  */
 EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
-		uint32_t w, uint32_t h, Enesim_Buffer_Data *data)
+		uint32_t w, uint32_t h, Enesim_Buffer_Sw_Data *data)
 {
 	Enesim_Surface *s;
 	Enesim_Buffer *b;
@@ -155,22 +165,21 @@ enesim_surface_delete(Enesim_Surface *s)
 	enesim_buffer_delete(s->buffer);
 	free(s);
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
  */
 EAPI void * enesim_surface_data_get(const Enesim_Surface *s)
 {
-	Enesim_Buffer_Backend *b;
-	Enesim_Buffer_Data *data;
+	Enesim_Buffer_Sw_Data *data;
 
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	/* FIXME for now we keep this for compatibility reasons
 	 * until we found a way to write/read data from the
 	 * surface with and without copying
 	 */
-	b = enesim_surface_backend_data_get(s);
-	data = &b->data.sw_data;
+	data = s->buffer->backend_data;
 	switch (s->format)
 	{
 		case ENESIM_FORMAT_ARGB8888:
@@ -186,21 +195,20 @@ EAPI void * enesim_surface_data_get(const Enesim_Surface *s)
 	}
 	return NULL;
 }
+
 /**
  *
  */
 EAPI uint32_t enesim_surface_stride_get(Enesim_Surface *s)
 {
-	Enesim_Buffer_Backend *b;
-	Enesim_Buffer_Data *data;
+	Enesim_Buffer_Sw_Data *data;
 
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	/* FIXME for now we keep this for compatibility reasons
 	 * until we found a way to write/read data from the
 	 * surface with and without copying
 	 */
-	b = enesim_surface_backend_data_get(s);
-	data = &b->data.sw_data;
+	data = s->buffer->backend_data;
 	switch (s->format)
 	{
 		case ENESIM_FORMAT_ARGB8888:
@@ -219,8 +227,7 @@ EAPI uint32_t enesim_surface_stride_get(Enesim_Surface *s)
 /**
  * Store a private data pointer into the surface
  */
-EAPI void
-enesim_surface_private_set(Enesim_Surface *s, void *data)
+EAPI void enesim_surface_private_set(Enesim_Surface *s, void *data)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	s->user = data;
@@ -229,8 +236,7 @@ enesim_surface_private_set(Enesim_Surface *s, void *data)
 /**
  * Retrieve the private data pointer from the surface
  */
-EAPI void *
-enesim_surface_private_get(Enesim_Surface *s)
+EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	return s->user;

@@ -23,15 +23,18 @@
 /*----------------------------------------------------------------------------*
  *                        The Enesim's pool interface                         *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
+static Eina_Bool _data_alloc(void *prv,
+		Enesim_Backend *backend,
+		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
-	Enesim_Buffer_Data *data;
+	Enesim_Buffer_Sw_Data *data;
 	size_t bytes;
 	void *alloc_data;
 
-	buffer_backend->backend = ENESIM_BACKEND_SOFTWARE;
-	data = &buffer_backend->data.sw_data;
+	*backend = ENESIM_BACKEND_SOFTWARE;
+	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
+	*backend_data = data;
 	bytes = enesim_buffer_format_size_get(fmt, w, h);
 	alloc_data = calloc(bytes, sizeof(char));
 	switch (fmt)
@@ -64,17 +67,18 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _data_from(void *prv, Enesim_Buffer_Backend *buffer_backend,
-		Enesim_Buffer_Data *src)
+static Eina_Bool _data_from(void *prv,
+		Enesim_Backend *backend,
+		void **backend_data,
+		Enesim_Buffer_Sw_Data *src)
 {
 
 }
 
-static void _data_free(void *prv, Enesim_Buffer_Backend *buffer_backend,
+static void _data_free(void *prv, void *backend_data,
 		Enesim_Buffer_Format fmt)
 {
-	Enesim_Buffer_Data *data;
-	data = &buffer_backend->data.sw_data;
+	Enesim_Buffer_Sw_Data *data = backend_data;
 	switch (fmt)
 	{
 		case ENESIM_CONVERTER_ARGB8888:
@@ -118,7 +122,9 @@ Enesim_Pool * enesim_pool_new(Enesim_Pool_Descriptor *descriptor, void *data)
 	return p;
 }
 
-Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p,
+		Enesim_Backend *backend,
+		void **data,
 		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h)
 {
@@ -126,10 +132,10 @@ Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Buffer_Backend *data,
 	if (!p->descriptor) return EINA_FALSE;
 	if (!p->descriptor->data_alloc) return EINA_FALSE;
 
-	return p->descriptor->data_alloc(p->data, data, fmt, w, h);
+	return p->descriptor->data_alloc(p->data, backend, data, fmt, w, h);
 }
 
-void enesim_pool_data_free(Enesim_Pool *p, Enesim_Buffer_Backend *data,
+void enesim_pool_data_free(Enesim_Pool *p, void *data,
 		Enesim_Buffer_Format fmt)
 {
 	if (!p) return;

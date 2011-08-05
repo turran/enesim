@@ -24,13 +24,16 @@
 typedef struct _Enesim_OpenCL_Pool
 {
 	cl_context context;
+	cl_device_id device;
 	cl_command_queue queue;
 } Enesim_OpenCL_Pool;
 
-static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
+static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
+		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
 	Enesim_OpenCL_Pool *thiz = prv;
+	Enesim_Buffer_OpenCL_Data *data;
 	cl_mem i;
 	cl_int ret;
 	cl_image_format format;
@@ -44,15 +47,24 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Buffer_Backend *buffer_backend,
 		printf("impossible to create the image\n");
 		return EINA_FALSE;
 	}
-	buffer_backend->data.opencl_data = i;
+	*backend = ENESIM_BACKEND_OPENCL;
+	data = malloc(sizeof(Enesim_Buffer_OpenCL_Data));
+	*backend_data = data;
+	data->mem = i;
+	data->context = thiz->context;
+	data->device = thiz->device;
+	data->queue = thiz->queue;
+
 	printf("Image created correctly\n");
 	return EINA_TRUE;
 }
 
-static void _data_free(void *prv, Enesim_Buffer_Backend *buffer_backend,
+static void _data_free(void *prv, void *backend_data,
 		Enesim_Buffer_Format fmt)
 {
-	clReleaseMemObject(buffer_backend->data.opencl_data);
+	Enesim_Buffer_OpenCL_Data *data = backend_data;
+
+	clReleaseMemObject(data->mem);
 }
 
 static void _free(void *prv)
@@ -65,6 +77,7 @@ static void _free(void *prv)
 static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
+	/* .data_from =  */ NULL,
 	/* .free =       */ _free,
 };
 /*============================================================================*
@@ -109,6 +122,8 @@ EAPI Enesim_Pool * enesim_pool_opencl_new(void)
 	printf("Everything went ok\n");
 	thiz = calloc(1, sizeof(Enesim_OpenCL_Pool));
 	thiz->context = context;
+	thiz->device = device_id;
+	thiz->queue = queue;
 
 	p = enesim_pool_new(&_descriptor, thiz);
 	if (!p)
