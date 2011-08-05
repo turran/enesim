@@ -218,6 +218,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 
 	return r;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -666,3 +667,70 @@ EAPI void enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 end:
 	enesim_renderer_cleanup(r, s);
 }
+
+#if 0
+/* Given how renderes are being developed outside enesim, we need to define a helper function that creates
+ * renderers based on others, just a wrapper for a renderer. For example, on a sw based renderer call the
+ * fill function of the wrapped renderer so the developers should not provide one. Or the setup function
+ * where we usually propagate the color, the origin or other properties into the wrapped renderer
+ */
+
+/* define the *must* implement functions */
+typedef struct _Enesim_Renderer_Wrapper_Descriptor
+{
+
+} Enesim_Rendere_Wrapper_Descriptor;
+
+static Eina_Bool _wrapper_sw_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+{
+}
+
+static void _wrapper_sw_cleanup(Enesim_Renderer *r)
+{
+}
+
+static Eina_Bool _wrapper_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		const char **program_name, const char **program_source,
+		size_t *program_length)
+{
+}
+
+static Eina_Bool _wrapper_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+}
+
+static void _wrapper_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+}
+
+static void _wrapper_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+{
+}
+
+static void _wrapper_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+}
+
+static void _wrapper_free(Enesim_Renderer *r)
+{
+}
+
+/**
+ * @param[in] wrapped The renderer to wrap
+ * @param[in] descriptor The descriptor to use to override the wrapped descriptor
+ * Every function being not NULL will be used to replace of the wrapped descriptor
+ * @param[in] wdescriptor The wrapper descriptor definition
+ */
+EAPI Enesim_Renderer * enesim_renderer_new_from_renderer(Enesim_Renderer *wrapped,
+		Enesim_Renderer_Descriptor *descriptor,
+		Enesim_Renderer_Wrapper_Descriptor *wdescriptor)
+{
+	Enesim_Renderer_Descriptor *new_descriptor;
+	Enesim_Renderer *r:
+
+	if (!wrapped) return NULL;
+
+}
+
+#endif
+

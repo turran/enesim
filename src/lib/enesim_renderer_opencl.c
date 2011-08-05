@@ -87,7 +87,6 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenCL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENCL, rdata);
-		
 	}
 	rdata->kernel = clCreateKernel(program, source_name, &error);
 	if (error != CL_SUCCESS)
@@ -119,6 +118,12 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	sdata = enesim_surface_backend_data_get(s);
 	error = clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
 	assert(error == CL_SUCCESS);
+	/* now setup the kernel on the renderer side */
+	if (r->descriptor->opencl_kernel_setup)
+	{
+		if (!r->descriptor->opencl_kernel_setup(r, s));
+			return EINA_FALSE;
+	}
 
 	global_ws = _roundup(local_ws, area->h);
 	/* launch it!!! */
