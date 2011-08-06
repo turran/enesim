@@ -30,8 +30,11 @@ enesim_renderer_dispmap.h \
 enesim_renderer_raddist.h \
 enesim_renderer_grid.h \
 enesim_renderer_stripes.h \
-enesim_renderer_image.h
-
+enesim_renderer_image.h \
+enesim_renderer_gradient.h \
+enesim_renderer_gradient_linear.h \
+enesim_renderer_gradient_radial.h \
+enesim_renderer_compound.h
 
 installed_headersdir = $(prefix)/include/enesim
 installed_headers_DATA = $(ENESIM_UTILHEADERS)

@@ -119,6 +119,10 @@ EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 #include "enesim_renderer_grid.h"
 #include "enesim_renderer_stripes.h"
 #include "enesim_renderer_image.h"
+#include "enesim_renderer_gradient.h"
+#include "enesim_renderer_gradient_linear.h"
+#include "enesim_renderer_gradient_radial.h"
+#include "enesim_renderer_compound.h"
 
 /**
  * @defgroup Enesim_Renderer_Hswitch_Group Horizontal Switch
@@ -166,72 +170,6 @@ EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq)
 EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, double freq);
 
 
-/**
- * @}
- * @defgroup Enesim_Renderer_Gradient_Group Gradient
- * @{
- */
-
-typedef enum _Enesim_Renderer_Gradient_Mode
-{
-	ENESIM_GRADIENT_RESTRICT,
-	ENESIM_GRADIENT_PAD,
-	ENESIM_GRADIENT_REFLECT,
-	ENESIM_GRADIENT_REPEAT,
-	ENESIM_GRADIENT_MODES,
-} Enesim_Renderer_Gradient_Mode;
-
-typedef struct _Enesim_Renderer_Gradient_Stop
-{
-	Enesim_Argb argb;
-	double pos;
-} Enesim_Renderer_Gradient_Stop;
-
-EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop);
-EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r);
-EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
-		Eina_List *list);
-EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode mode);
-EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode *mode);
-
-/**
- * @defgroup Enesim_Renderer_Gradient_Linear_Group Linear
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void);
-EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0);
-EAPI void enesim_renderer_gradient_linear_y0_set(Enesim_Renderer *r, double y0);
-EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1);
-EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1);
-EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
-		double y0, double x1, double y1);
-
-/**
- * @}
- * @defgroup Enesim_Renderer_Gradient_Radial_Group Radial
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void);
-EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, double v);
-EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, double v);
-EAPI void enesim_renderer_gradient_radial_radius_y_set(Enesim_Renderer *r, double v);
-EAPI void enesim_renderer_gradient_radial_radius_x_set(Enesim_Renderer *r, double v);
-
-/**
- * @}
- * @}
- * @defgroup Enesim_Renderer_Compound_Group Compound
- * @{
- */
-
-EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
-EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
-		Enesim_Renderer *rend);
-EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
-		Enesim_Renderer *rend);
-EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r);
-EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
-		Eina_List *list);
 /**
  * @}
  * @defgroup Enesim_Renderer_Background_Group Background
