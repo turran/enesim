@@ -67,6 +67,31 @@ static void _data_free(void *prv, void *backend_data,
 	clReleaseMemObject(data->mem);
 }
 
+static Eina_Bool _data_get(void *prv, void *backend_data,
+		Enesim_Buffer_Sw_Data *dst)
+{
+	Enesim_Buffer_OpenCL_Data *data = backend_data;
+	size_t origin[3];
+	size_t region[3];
+	size_t size;
+
+	origin[0] = 0;
+	origin[1] = 0;
+	origin[2] = 0;
+
+	region[0] = 0;
+	region[1] = 0;
+	region[2] = 0;
+
+	clGetImageInfo(data->mem, CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
+
+	dst->argb8888_pre.plane0 = malloc(size);
+	clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, 0, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
+	dst->argb8888_pre.plane0_stride = size / 4;
+
+	return EINA_TRUE;
+}
+
 static void _free(void *prv)
 {
 	Enesim_OpenCL_Pool *thiz = prv;
@@ -78,6 +103,7 @@ static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ NULL,
+	/* .data_get =   */ _data_get,
 	/* .free =       */ _free,
 };
 /*============================================================================*
