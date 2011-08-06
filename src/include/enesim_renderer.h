@@ -123,84 +123,14 @@ EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 #include "enesim_renderer_gradient_linear.h"
 #include "enesim_renderer_gradient_radial.h"
 #include "enesim_renderer_compound.h"
+#include "enesim_renderer_importer.h"
+#include "enesim_renderer_background.h"
+#include "enesim_renderer_perlin.h"
+#include "enesim_renderer_clipper.h"
+#include "enesim_renderer_transition.h"
+#include "enesim_renderer_hswitch.h"
 
 /**
- * @defgroup Enesim_Renderer_Hswitch_Group Horizontal Switch
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void);
-EAPI void enesim_renderer_hswitch_w_set(Enesim_Renderer *r, int w);
-EAPI void enesim_renderer_hswitch_h_set(Enesim_Renderer *r, int h);
-EAPI void enesim_renderer_hswitch_left_set(Enesim_Renderer *r,
-		Enesim_Renderer *left);
-EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
-		Enesim_Renderer *right);
-EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, double step);
-/**
- * @}
- */
-
-/**
- * @}
- * @defgroup Enesim_Renderer_Transition_Group Transition
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_transition_new(void);
-EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level);
-EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Renderer *r0);
-EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Renderer *r1);
-EAPI void enesim_renderer_transition_offset_set(Enesim_Renderer *r, int x, int y);
-/**
- * @}
- * @defgroup Enesim_Renderer_Importer_Group Importer
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_importer_new(void);
-EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle angle);
-EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer *buffer);
-/**
- * @}
- * @defgroup Enesim_Renderer_Perlin_Group Perlin
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_perlin_new(void);
-EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int octaves);
-EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, double persistence);
-EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq);
-EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, double freq);
-
-
-/**
- * @}
- * @defgroup Enesim_Renderer_Background_Group Background
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_background_new(void);
-EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
-		Enesim_Color color);
-
-/**
- * @}
- * @defgroup Enesim_Renderer_Clipper_Group Clipper
- * @{
- */
-
-EAPI Enesim_Renderer * enesim_renderer_clipper_new(void);
-EAPI void enesim_renderer_clipper_content_set(Enesim_Renderer *r,
-		Enesim_Renderer *content);
-EAPI void enesim_renderer_clipper_content_get(Enesim_Renderer *r,
-		Enesim_Renderer **content);
-EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
-		double width);
-EAPI void enesim_renderer_clipper_width_get(Enesim_Renderer *r,
-		double *width);
-EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
-		double height);
-EAPI void enesim_renderer_clipper_height_get(Enesim_Renderer *r,
-		double *height);
-
-/**
- * @}
  * @}
  */
 

@@ -34,7 +34,13 @@ enesim_renderer_image.h \
 enesim_renderer_gradient.h \
 enesim_renderer_gradient_linear.h \
 enesim_renderer_gradient_radial.h \
-enesim_renderer_compound.h
+enesim_renderer_compound.h \
+enesim_renderer_importer.h \
+enesim_renderer_background.h \
+enesim_renderer_perlin.h \
+enesim_renderer_clipper.h \
+enesim_renderer_transition.h \
+enesim_renderer_hswitch.h
 
 installed_headersdir = $(prefix)/include/enesim
 installed_headers_DATA = $(ENESIM_UTILHEADERS)
