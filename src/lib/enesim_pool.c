@@ -70,12 +70,14 @@ static Eina_Bool _data_alloc(void *prv,
 static Eina_Bool _data_from(void *prv,
 		Enesim_Backend *backend,
 		void **backend_data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
 		Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *src)
 {
 	if (copy)
 	{
 		ERR("Can't copy data TODO");
+		return EINA_FALSE;
 	}
 	else
 	{
