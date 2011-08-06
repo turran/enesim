@@ -99,6 +99,17 @@ static void _data_free(void *prv,
 	free(data);
 }
 
+static Eina_Bool _data_get(void *prv,
+		void *backend_data,
+		Enesim_Buffer_Sw_Data *dst)
+{
+	Enesim_Buffer_Sw_Data *data = backend_data;
+
+	*dst = *data;
+
+	return EINA_TRUE;
+}
+
 static void _free(void *prv)
 {
 	Enesim_Eina_Pool *thiz = prv;
@@ -111,6 +122,7 @@ static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ NULL,
+	/* .data_get =   */ _data_get,
 	/* .free =       */ NULL
 };
 /*============================================================================*

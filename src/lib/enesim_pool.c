@@ -129,6 +129,7 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 static Enesim_Pool_Descriptor _default_descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
+	/* .data_from =  */ _data_from,
 	/* .data_get =   */ _data_get,
 	/* .free =       */ NULL
 };
@@ -165,7 +166,11 @@ Eina_Bool enesim_pool_data_from(Enesim_Pool *p, Enesim_Backend *backend, void **
 {
 	if (!p) return EINA_FALSE;
 	if (!p->descriptor) return EINA_FALSE;
-	if (!p->descriptor->data_alloc) return EINA_FALSE;
+	if (!p->descriptor->data_from)
+	{
+		WRN("No data_from() implementation");
+		return EINA_FALSE;
+	}
 
 	return p->descriptor->data_from(p->data, backend, data, fmt, w, h, copy, from);
 }
@@ -175,7 +180,11 @@ Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
 {
 	if (!p) return EINA_FALSE;
 	if (!p->descriptor) return EINA_FALSE;
-	if (!p->descriptor->data_get) return EINA_FALSE;
+	if (!p->descriptor->data_get)
+	{
+		WRN("No data_get() implementation");
+		return EINA_FALSE;
+	}
 
 	return p->descriptor->data_get(p->data, data, dst);
 }
