@@ -17,15 +17,6 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
-/**
- * @todo
- * - The function enesim_surface_data_get()
- * should have this prototype:
- * enesim_surface_data_get(Enesim_Surface *s, Eina_Bool copy);
- * this way the pool knows whenever the data must map directly to the
- * surface data itself (i.e host ptr to it) or be a copy of it, like
- * when getting pixels data from an OpenGL texture
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -171,60 +162,34 @@ enesim_surface_delete(Enesim_Surface *s)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void * enesim_surface_data_get(const Enesim_Surface *s)
+EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_t *stride)
 {
-	Enesim_Buffer_Sw_Data *data;
+	Enesim_Buffer_Sw_Data sw_data;
 
+	if (!data) return EINA_FALSE;
 	ENESIM_MAGIC_CHECK_SURFACE(s);
-	/* FIXME for now we keep this for compatibility reasons
-	 * until we found a way to write/read data from the
-	 * surface with and without copying
-	 */
+	if (!enesim_buffer_data_get(s->buffer, &sw_data)) return EINA_FALSE;
+
 	data = s->buffer->backend_data;
 	switch (s->format)
 	{
 		case ENESIM_FORMAT_ARGB8888:
 		case ENESIM_FORMAT_ARGB8888_SPARSE:
 		case ENESIM_FORMAT_XRGB8888:
-		return data->argb8888_pre.plane0;
+		*data = sw_data.argb8888_pre.plane0;
+		if (stride) *stride = sw_data.argb8888_pre.plane0_stride;
 
 		case ENESIM_FORMAT_A8:
-		return data->a8.plane0;
+		*data = sw_data.a8.plane0;
+		if (stride) *stride = sw_data.a8.plane0_stride;
+		break;
 
 		default:
-		return NULL;
+		return EINA_FALSE;
 	}
-	return NULL;
+	return EINA_TRUE;
 }
 
-/**
- *
- */
-EAPI uint32_t enesim_surface_stride_get(Enesim_Surface *s)
-{
-	Enesim_Buffer_Sw_Data *data;
-
-	ENESIM_MAGIC_CHECK_SURFACE(s);
-	/* FIXME for now we keep this for compatibility reasons
-	 * until we found a way to write/read data from the
-	 * surface with and without copying
-	 */
-	data = s->buffer->backend_data;
-	switch (s->format)
-	{
-		case ENESIM_FORMAT_ARGB8888:
-		case ENESIM_FORMAT_ARGB8888_SPARSE:
-		case ENESIM_FORMAT_XRGB8888:
-		return data->argb8888_pre.plane0_stride;
-
-		case ENESIM_FORMAT_A8:
-		return data->a8.plane0_stride;
-
-		default:
-		return 0;
-	}
-	return 0;
-}
 /**
  * Store a private data pointer into the surface
  */

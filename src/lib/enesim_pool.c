@@ -117,14 +117,19 @@ end:
 	free(data);
 }
 
-static void _free(void *data)
+static Eina_Bool _data_get(void *prv, void *backend_data,
+		Enesim_Buffer_Sw_Data *dst)
 {
+	Enesim_Buffer_Sw_Data *data = backend_data;
+	*dst = *data;
 
+	return EINA_TRUE;
 }
 
 static Enesim_Pool_Descriptor _default_descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
+	/* .data_get =   */ _data_get,
 	/* .free =       */ NULL
 };
 /*============================================================================*
@@ -163,6 +168,16 @@ Eina_Bool enesim_pool_data_from(Enesim_Pool *p, Enesim_Backend *backend, void **
 	if (!p->descriptor->data_alloc) return EINA_FALSE;
 
 	return p->descriptor->data_from(p->data, backend, data, fmt, w, h, copy, from);
+}
+
+Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
+		Enesim_Buffer_Sw_Data *dst)
+{
+	if (!p) return EINA_FALSE;
+	if (!p->descriptor) return EINA_FALSE;
+	if (!p->descriptor->data_get) return EINA_FALSE;
+
+	return p->descriptor->data_get(p->data, data, dst);
 }
 
 void enesim_pool_data_free(Enesim_Pool *p, void *data,

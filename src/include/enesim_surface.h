@@ -40,13 +40,12 @@ EAPI void enesim_surface_delete(Enesim_Surface *s);
 
 EAPI void enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h);
 EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s);
-EAPI uint32_t enesim_surface_stride_get(Enesim_Surface *s);
 EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s);
 
 EAPI void enesim_surface_private_set(Enesim_Surface *s, void *data);
 EAPI void * enesim_surface_private_get(Enesim_Surface *s);
 
-EAPI void * enesim_surface_data_get(const Enesim_Surface *s);
+EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_t *stride);
 
 /** @} */ //End of Enesim_Surface_Group
 

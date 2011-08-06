@@ -162,15 +162,12 @@ EAPI void enesim_buffer_delete(Enesim_Buffer *b)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
+EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
 {
 	void *buffer_data;
-	Enesim_Buffer_Sw_Data *curr;
 
 	ENESIM_MAGIC_CHECK_BUFFER(b);
-	curr = b->backend_data;
-
-	if (data) *data = *curr;
+	return enesim_pool_data_get(b->pool, b->backend_data, data);
 }
 /**
  * Store a private data pointer into the buffer

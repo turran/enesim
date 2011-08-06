@@ -88,8 +88,7 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 		return;
 	}
 
-	src = enesim_surface_data_get(s->s);
-	sstride = enesim_surface_stride_get(s->s);
+	enesim_surface_data_get(s->s, &src, &stride);
 	enesim_surface_size_get(s->s, &sw, &sh);
 	sy = s->yoff[y - s->r.oy];
 	src += sstride * sy;
@@ -132,7 +131,7 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Image *thiz;
-	uint32_t sstride;
+	size_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
 
@@ -147,8 +146,7 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 		return;
 	}
 
-	src = enesim_surface_data_get(thiz->s);
-	sstride = enesim_surface_stride_get(thiz->s);
+	enesim_surface_data_get(thiz->s, &src, &sstride);
 	src += sstride * thiz->yoff[y];
 
 	while (len--)
@@ -165,7 +163,7 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Image *thiz;
-	uint32_t sstride;
+	size_t sstride;
 	uint32_t *src;
 	Eina_Rectangle ir, dr;
 	Eina_F16p16 xx, yy;
@@ -174,9 +172,8 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 	thiz = _image_get(r);
 	renderer_affine_setup(r, x, y, &xx, &yy);
 
-	src = enesim_surface_data_get(thiz->s);
+	enesim_surface_data_get(thiz->s, &src, &sstride);
 	enesim_surface_size_get(thiz->s, &sw, &sh);
-	sstride = enesim_surface_stride_get(thiz->s);
 
 
 	while (len--)
@@ -203,7 +200,7 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Image *thiz;
-	uint32_t sstride;
+	size_t sstride;
 	uint8_t *src;
 
 	thiz = _image_get(r);
@@ -218,8 +215,7 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 		return;
 	}
 
-	src = enesim_surface_data_get(thiz->s);
-	sstride = enesim_surface_stride_get(thiz->s);
+	enesim_surface_data_get(thiz->s, (uint32_t**)&src, &sstride);
 	src += (sstride * y) + x;
 	while (len--)
 	{
@@ -239,7 +235,7 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Image *thiz;
-	uint32_t sstride;
+	size_t sstride;
 	uint32_t *src;
 
  	thiz = _image_get(r);
@@ -253,8 +249,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 		return;
 	}
 
-	src = enesim_surface_data_get(thiz->s);
-	sstride = enesim_surface_stride_get(thiz->s);
+	enesim_surface_data_get(thiz->s, &src, &sstride);
 	src += (sstride * y) + x;
 #if 1
 	thiz->span(dst, len, src, r->color, NULL);

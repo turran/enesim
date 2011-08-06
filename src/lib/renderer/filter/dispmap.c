@@ -83,8 +83,8 @@ static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 	Enesim_Renderer_Dispmap *thiz;
 	uint32_t *end = dst + len;
 	uint32_t *map, *src;
-	int mstride;
-	int sstride;
+	size_t mstride;
+	size_t sstride;
 	int sw, sh, mw, mh;
 	Eina_F16p16 xx, yy;
 
@@ -92,10 +92,8 @@ static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 	/* setup the parameters */
 	enesim_surface_size_get(thiz->src, &sw, &sh);
 	enesim_surface_size_get(thiz->map, &mw, &mh);
-	mstride = enesim_surface_stride_get(thiz->map);
-	sstride = enesim_surface_stride_get(thiz->src);
-	map = enesim_surface_data_get(thiz->map);
-	src = enesim_surface_data_get(thiz->src);
+	enesim_surface_data_get(thiz->map, &map, &mstride);
+	enesim_surface_data_get(thiz->src, &src, &sstride);
 
 	renderer_identity_setup(r, x, y, &xx, &yy);
 	x = eina_f16p16_int_to(xx);
@@ -137,8 +135,8 @@ static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 	Enesim_Renderer_Dispmap *thiz;
 	uint32_t *end = dst + len;
 	uint32_t *map, *src;
-	int mstride;
-	int sstride;
+	size_t mstride;
+	size_t sstride;
 	int sw, sh, mw, mh;
 	Eina_F16p16 xx, yy;
 
@@ -146,10 +144,8 @@ static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 	/* setup the parameters */
 	enesim_surface_size_get(thiz->src, &sw, &sh);
 	enesim_surface_size_get(thiz->map, &mw, &mh);
-	mstride = enesim_surface_stride_get(thiz->map);
-	sstride = enesim_surface_stride_get(thiz->src);
-	map = enesim_surface_data_get(thiz->map);
-	src = enesim_surface_data_get(thiz->src);
+	enesim_surface_data_get(thiz->map, &map, &mstride);
+	enesim_surface_data_get(thiz->src, &src, &sstride);
 
 	renderer_identity_setup(r, x, y, &xx, &yy);
 	x = eina_f16p16_int_to(xx);
@@ -192,8 +188,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 	Enesim_Renderer_Dispmap *thiz;						\
 	uint32_t *end = dst + len;						\
 	uint32_t *map, *src;							\
-	int mstride;								\
-	int sstride;								\
+	size_t mstride;								\
+	size_t sstride;								\
 	int sw, sh, mw, mh;							\
 	Eina_F16p16 xx, yy;							\
 										\
@@ -201,10 +197,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
-	mstride = enesim_surface_stride_get(thiz->map);				\
-	sstride = enesim_surface_stride_get(thiz->src);				\
-	map = enesim_surface_data_get(thiz->map);				\
-	src = enesim_surface_data_get(thiz->src);				\
+	enesim_surface_data_get(thiz->map, &map, &mstride);			\
+	enesim_surface_data_get(thiz->src, &src, &sstride);			\
 										\
 	/* TODO move by the origin */						\
 	renderer_affine_setup(r, x, y, &xx, &yy);				\

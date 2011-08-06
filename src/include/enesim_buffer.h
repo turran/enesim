@@ -106,7 +106,7 @@ EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b);
 EAPI void enesim_buffer_private_set(Enesim_Buffer *b, void *data);
 EAPI void * enesim_buffer_private_get(Enesim_Buffer *b);
 
-EAPI void enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data);
+EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data);
 
 EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
 

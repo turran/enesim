@@ -80,7 +80,7 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 	Enesim_Buffer_Format dfmt;
 	Enesim_Format sfmt;
 	Enesim_Buffer_Sw_Data data;
-	void *sdata;
+	uint32_t *sdata;
 
 	dfmt = enesim_buffer_format_get(dst);
 	sfmt = enesim_surface_format_get(s);
@@ -89,7 +89,8 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 	if (!converter) return EINA_FALSE;
 
 	enesim_buffer_data_get(dst, &data);
-	sdata = enesim_surface_data_get(s);
+	/* FIXME check the stride too */
+	enesim_surface_data_get(s, &sdata, NULL);
 	/* TODO check the clip and x, y */
 	converter(&data, clip->w, clip->h, clip->w, sdata, clip->w, clip->h, clip->w);
 

@@ -52,8 +52,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 	rd = _raddist_get(r);
 	/* setup the parameters */
 	enesim_surface_size_get(rd->src, &sw, &sh);
-	sstride = enesim_surface_stride_get(rd->src);
-	src = enesim_surface_data_get(rd->src);
+	enesim_surface_data_get(rd->src, &src, &sstride);
 	/* FIXME move this to the setup */
 	r_inv = 1.0f / rd->radius;
 
