@@ -65,7 +65,7 @@ static Eina_Bool _data_alloc(void *prv,
 
 		case ENESIM_CONVERTER_A8:
 		case ENESIM_CONVERTER_GRAY:
-		printf("TODO\n");
+		ERR("Unsupported format %d", fmt);
 		break;
 	}
 	return EINA_TRUE;

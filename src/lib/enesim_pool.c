@@ -61,7 +61,7 @@ static Eina_Bool _data_alloc(void *prv,
 
 		case ENESIM_CONVERTER_A8:
 		case ENESIM_CONVERTER_GRAY:
-		printf("TODO\n");
+		ERR("Unsupported format %d", fmt);
 		break;
 	}
 	return EINA_TRUE;
@@ -75,7 +75,7 @@ static Eina_Bool _data_from(void *prv,
 {
 	if (copy)
 	{
-		printf("TODO copy data\n");
+		ERR("Can't copy data TODO");
 	}
 	else
 	{
@@ -110,7 +110,7 @@ static void _data_free(void *prv, void *backend_data,
 		case ENESIM_CONVERTER_RGB888:
 		case ENESIM_CONVERTER_A8:
 		case ENESIM_CONVERTER_GRAY:
-		printf("TODO\n");
+		ERR("Unsupported format %d", fmt);
 		break;
 	}
 end:

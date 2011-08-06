@@ -168,9 +168,12 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_
 
 	if (!data) return EINA_FALSE;
 	ENESIM_MAGIC_CHECK_SURFACE(s);
-	if (!enesim_buffer_data_get(s->buffer, &sw_data)) return EINA_FALSE;
+	if (!enesim_buffer_data_get(s->buffer, &sw_data))
+	{
+		WRN("Impossible to get the buffer data");
+		return EINA_FALSE;
+	}
 
-	data = s->buffer->backend_data;
 	switch (s->format)
 	{
 		case ENESIM_FORMAT_ARGB8888:
@@ -185,6 +188,7 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_
 		break;
 
 		default:
+		WRN("Unsupported format %d", s->format);
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
