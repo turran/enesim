@@ -111,9 +111,11 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *sdata;
 	cl_int error;
-	const size_t local_ws = 512; /* Number of work-items per work-group */
-	size_t global_ws;
+	size_t local_ws[2];
+	size_t global_ws[2];
+	size_t max_local;
 
+	printf("inside!!\n");
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 	sdata = enesim_surface_backend_data_get(s);
 	error = clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
@@ -121,13 +123,21 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	/* now setup the kernel on the renderer side */
 	if (r->descriptor->opencl_kernel_setup)
 	{
-		if (!r->descriptor->opencl_kernel_setup(r, s));
-			return EINA_FALSE;
+		if (!r->descriptor->opencl_kernel_setup(r, s))
+		{
+			printf("Cannot setup the kernel\n");
+			return;
+		}
 	}
+	clGetDeviceInfo(sdata->device, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t), &max_local, NULL);
+ 	local_ws[0] = 16; /* Number of work-items per work-group */
+ 	local_ws[1] = 16; /* Number of work-items per work-group */
 
-	global_ws = _roundup(local_ws, area->h);
+	global_ws[0] = _roundup(local_ws[0], area->w);
+	global_ws[1] = _roundup(local_ws[1], area->h);
+	printf("area %d %d [%d %d] [%d %d] %d\n", area->w, area->h, global_ws[0], global_ws[1], local_ws[0], local_ws[1], max_local);
 	/* launch it!!! */
-	error = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, 1, NULL, &global_ws, &local_ws, 0, NULL, NULL);
+	error = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, 2, NULL, global_ws, local_ws, 0, NULL, NULL);
 	if (error != CL_SUCCESS)
 	{
 		printf("4 error %d\n", error);

@@ -61,7 +61,7 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		break;
 
 		case ENESIM_BACKEND_OPENCL:
-#if BUIL_OPENCL
+#if BUILD_OPENCL
 		enesim_renderer_opencl_draw(r, s, area, x, y, flags);
 #endif
 		break;
