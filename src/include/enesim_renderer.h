@@ -113,6 +113,12 @@ EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 #include "enesim_renderer_ellipse.h"
 #include "enesim_renderer_figure.h"
 #include "enesim_renderer_path.h"
+#include "enesim_renderer_checker.h"
+#include "enesim_renderer_dispmap.h"
+#include "enesim_renderer_raddist.h"
+#include "enesim_renderer_grid.h"
+#include "enesim_renderer_stripes.h"
+#include "enesim_renderer_image.h"
 
 /**
  * @defgroup Enesim_Renderer_Hswitch_Group Horizontal Switch
@@ -128,30 +134,8 @@ EAPI void enesim_renderer_hswitch_right_set(Enesim_Renderer *r,
 EAPI void enesim_renderer_hswitch_step_set(Enesim_Renderer *r, double step);
 /**
  * @}
- * @defgroup Enesim_Renderer_Image_Group Image
- * @{
  */
-EAPI Enesim_Renderer * enesim_renderer_image_new(void);
-EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x);
-EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y);
-EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w);
-EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h);
-EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src);
-/**
- * @}
- * @defgroup Enesim_Renderer_Checker_Group Checker
- * @image html renderer_checker.png
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_checker_new(void);
-EAPI void enesim_renderer_checker_even_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_checker_even_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_checker_odd_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_checker_odd_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width);
-EAPI void enesim_renderer_checker_width_get(Enesim_Renderer *r, int *width);
-EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height);
-EAPI void enesim_renderer_checker_height_get(Enesim_Renderer *r, int *height);
+
 /**
  * @}
  * @defgroup Enesim_Renderer_Transition_Group Transition
@@ -162,52 +146,6 @@ EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level)
 EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Renderer *r0);
 EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Renderer *r1);
 EAPI void enesim_renderer_transition_offset_set(Enesim_Renderer *r, int x, int y);
-/**
- * @}
- * @defgroup Enesim_Renderer_Stripes_Group Stripes
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_stripes_new(void);
-EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r, double thickness);
-EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double *thickness);
-EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,	double thickness);
-EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *thickness);
-/**
- * @}
- * @defgroup Enesim_Renderer_Dispmap_Group Displacement Map
- * @{
- */
-
-typedef enum _Enesim_Channel
-{
-	ENESIM_CHANNEL_RED,
-	ENESIM_CHANNEL_GREEN,
-	ENESIM_CHANNEL_BLUE,
-	ENESIM_CHANNEL_ALPHA,
-	ENESIM_CHANNELS,
-} Enesim_Channel;
-
-EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void);
-EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *map);
-EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src);
-EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor);
-EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
-EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
-/**
- * @}
- * @defgroup Enesim_Renderer_Raddist_Group Radial Distortion
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_raddist_new(void);
-EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius);
-EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor);
-EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src);
-EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox);
-EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy);
 /**
  * @}
  * @defgroup Enesim_Renderer_Importer_Group Importer
@@ -294,25 +232,6 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list);
-/**
- * @}
- * @defgroup Enesim_Renderer_Grid_Group Grid
- * @{
- */
-EAPI Enesim_Renderer * enesim_renderer_grid_new(void);
-EAPI void enesim_renderer_grid_inside_width_set(Enesim_Renderer *r, unsigned int width);
-EAPI void enesim_renderer_grid_inside_width_get(Enesim_Renderer *r, unsigned int *width);
-EAPI void enesim_renderer_grid_inside_height_set(Enesim_Renderer *r, unsigned int height);
-EAPI void enesim_renderer_grid_inside_height_get(Enesim_Renderer *r, unsigned int *height);
-EAPI void enesim_renderer_grid_inside_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_grid_inside_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_grid_border_hthickness_set(Enesim_Renderer *r, unsigned int hthickness);
-EAPI void enesim_renderer_grid_border_hthickness_get(Enesim_Renderer *r, unsigned int *htickness);
-EAPI void enesim_renderer_grid_border_vthickness_set(Enesim_Renderer *r, unsigned int vthickness);
-EAPI void enesim_renderer_grid_border_vthickness_get(Enesim_Renderer *r, unsigned int *vthickness);
-EAPI void enesim_renderer_grid_border_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_grid_border_color_get(Enesim_Renderer *r, Enesim_Color *color);
-
 /**
  * @}
  * @defgroup Enesim_Renderer_Background_Group Background

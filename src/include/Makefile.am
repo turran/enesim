@@ -24,7 +24,14 @@ enesim_renderer_rectangle.h \
 enesim_renderer_circle.h \
 enesim_renderer_ellipse.h \
 enesim_renderer_figure.h \
-enesim_renderer_path.h
+enesim_renderer_path.h \
+enesim_renderer_checker.h \
+enesim_renderer_dispmap.h \
+enesim_renderer_raddist.h \
+enesim_renderer_grid.h \
+enesim_renderer_stripes.h \
+enesim_renderer_image.h
+
 
 installed_headersdir = $(prefix)/include/enesim
 installed_headers_DATA = $(ENESIM_UTILHEADERS)
