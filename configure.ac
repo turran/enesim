@@ -224,6 +224,7 @@ src/lib/renderer/pattern/Makefile
 src/lib/renderer/other/Makefile
 src/lib/renderer/other/background/Makefile
 src/lib/renderer/other/clipper/Makefile
+src/lib/renderer/other/compound/Makefile
 src/lib/renderer/other/image/Makefile
 src/lib/renderer/other/importer/Makefile
 src/lib/renderer/other/perlin/Makefile

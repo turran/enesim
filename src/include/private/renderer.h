@@ -48,6 +48,8 @@ struct _Enesim_Renderer
 		Enesim_F16p16_Matrix values;
 		Enesim_Matrix_Type type;
 	} matrix;
+	/* the wrapped renderer */
+	Enesim_Renderer *wrapper_renderer;
 	/* the private data */
 	Eina_Hash *prv_data;
 	/* the descriptor */

@@ -87,7 +87,7 @@ static Eina_Bool _background_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
 
 	*program_name = "background";
-	*program_source = 
+	*program_source =
 	#include "background.cl"
 	*program_length = strlen(*program_source);
 
@@ -100,9 +100,8 @@ static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surf
 	Enesim_Renderer_OpenCL_Data *rdata;
 
  	thiz = _background_get(r);
-	printf("setting up the kernel\n");
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	clSetKernelArg(rdata->kernel, 1, sizeof(cl_uint4), &thiz->final_color);
+	clSetKernelArg(rdata->kernel, 1, sizeof(cl_uchar4), &thiz->final_color);
 
 	return EINA_TRUE;
 }

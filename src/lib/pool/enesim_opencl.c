@@ -39,7 +39,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	cl_image_format format;
 
 	format.image_channel_order = CL_ARGB;
-	format.image_channel_data_type = CL_UNORM_INT8;
+	format.image_channel_data_type = CL_UNSIGNED_INT8;
 	i = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
 			&format, w, h, 0, NULL, &ret);
 	if (ret != CL_SUCCESS)
