@@ -218,10 +218,15 @@ src/lib/pool/Makefile
 src/lib/renderer/Makefile
 src/lib/renderer/gradient/Makefile
 src/lib/renderer/shape/Makefile
+src/lib/renderer/shape/rectangle/Makefile
 src/lib/renderer/filter/Makefile
 src/lib/renderer/pattern/Makefile
 src/lib/renderer/other/Makefile
 src/lib/renderer/other/background/Makefile
+src/lib/renderer/other/clipper/Makefile
+src/lib/renderer/other/image/Makefile
+src/lib/renderer/other/importer/Makefile
+src/lib/renderer/other/perlin/Makefile
 src/lib/util/Makefile
 src/tests/Makefile
 ],[
