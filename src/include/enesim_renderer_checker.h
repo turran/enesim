@@ -32,12 +32,6 @@ EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width);
 EAPI void enesim_renderer_checker_width_get(Enesim_Renderer *r, int *width);
 EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height);
 EAPI void enesim_renderer_checker_height_get(Enesim_Renderer *r, int *height);
-EAPI Enesim_Renderer * enesim_renderer_image_new(void);
-EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x);
-EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y);
-EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w);
-EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h);
-EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 
 /**
  * @}

@@ -20,8 +20,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Ellipse Enesim_Renderer_Ellipse;
-struct _Ellipse {
+typedef struct _Enesim_Renderer_Ellipse
 	double x, y;
 	double rx, ry;
 
@@ -32,7 +31,7 @@ struct _Ellipse {
 	int fxxp, fyyp;
 	int ifxxp, ifyyp;
 	unsigned char do_inner :1;
-};
+} Enesim_Renderer_Ellipse;
 
 static inline Enesim_Renderer_Ellipse * _ellipse_get(Enesim_Renderer *r)
 {
