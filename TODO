@@ -13,4 +13,5 @@
   algorithm for other backends
 + Split the hswitch and transition common parts into a common transition renderer
   with properties as src, target and step, that's all
++ Use the enesim_error for property set/get and for setup/cleanup/draw
 
