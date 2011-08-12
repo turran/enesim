@@ -21,6 +21,7 @@
  *                                  Local                                     *
  *============================================================================*/
 typedef struct _Enesim_Renderer_Ellipse
+{
 	double x, y;
 	double rx, ry;
 
