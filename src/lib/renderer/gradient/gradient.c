@@ -464,9 +464,19 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r)
+EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Stop *stop;
+	Eina_List *l;
+	Eina_List *l_next;
 
+	thiz = _gradient_get(r);
+	EINA_LIST_FOREACH_SAFE(thiz->stops, l, l_next, stop)
+	{
+		thiz->stops = eina_list_remove_list(thiz->stops, l);
+		free(stop);
+	}
 }
 
 /**

@@ -39,7 +39,7 @@ typedef struct _Enesim_Renderer_Gradient_Stop
 } Enesim_Renderer_Gradient_Stop;
 
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop);
-EAPI void enesim_renderer_gradient_clear(Enesim_Renderer *r);
+EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 		Eina_List *list);
 EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode mode);
