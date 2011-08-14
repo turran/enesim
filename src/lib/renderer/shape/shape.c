@@ -216,7 +216,7 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 
 	thiz = _shape_get(r);
 	if (thiz->fill.rend)
-		enesim_renderer_unref(thiz->fill.rend)
+		enesim_renderer_unref(thiz->fill.rend);
 	thiz->fill.rend = fill;
 	if (thiz->fill.rend)
 		thiz->fill.rend = enesim_renderer_ref(thiz->fill.rend);
