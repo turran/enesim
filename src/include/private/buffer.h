@@ -38,6 +38,7 @@ typedef struct _Enesim_Buffer_OpenCL_Data
 struct _Enesim_Buffer
 {
 	EINA_MAGIC
+	int ref;
 	uint32_t w;
 	uint32_t h;
 	Enesim_Format format;

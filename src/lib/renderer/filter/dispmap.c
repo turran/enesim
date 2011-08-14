@@ -394,19 +394,24 @@ EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *ma
 	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
-
+	if (thiz->map)
+		enesim_surface_unref(thiz->map);
 	thiz->map = map;
+	if (thiz->map)
+		thiz->map = enesim_surface_ref(thiz->map);
 }
 /**
  *
  */
-EAPI Enesim_Surface * enesim_renderer_dispmap_map_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_dispmap_map_get(Enesim_Renderer *r, Enesim_Surface **map)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
+	if (!map) return;
 	thiz = _dispmap_get(r);
-
-	return thiz->map;
+	*map = thiz->map;
+	if (thiz->map)
+		thiz->map = enesim_surface_ref(thiz->map);
 }
 /**
  *
@@ -416,19 +421,24 @@ EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = _dispmap_get(r);
-
+	if (thiz->src)
+		enesim_surface_unref(thiz->src);
 	thiz->src = src;
+	if (thiz->src)
+		thiz->src = enesim_surface_ref(thiz->src);
 }
 /**
  *
  */
-EAPI Enesim_Surface * enesim_renderer_dispmap_src_get(Enesim_Renderer *r)
+EAPI void enesim_renderer_dispmap_src_get(Enesim_Renderer *r, Enesim_Surface **src)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
+	if (!src) return;
 	thiz = _dispmap_get(r);
-
-	return thiz->src;
+	*src = thiz->src;
+	if (thiz->src)
+		thiz->src = enesim_surface_ref(thiz->src);
 }
 /**
  *

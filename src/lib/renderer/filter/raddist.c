@@ -197,10 +197,25 @@ EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 
 EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 
-	rd = _raddist_get(r);
-	rd->src = src;
+	thiz = _raddist_get(r);
+	if (thiz->src)
+		enesim_surface_unref(thiz->src);
+	thiz->src = src;
+	if (thiz->src)
+		thiz->src = enesim_surface_ref(thiz->src);
+}
+
+EAPI void enesim_renderer_raddist_src_get(Enesim_Renderer *r, Enesim_Surface **src)
+{
+	Enesim_Renderer_Raddist *thiz;
+
+	if (!src) return;
+	thiz = _raddist_get(r);
+	*src = thiz->src;
+	if (thiz->src)
+		thiz->src = enesim_surface_ref(thiz->src);
 }
 
 EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)

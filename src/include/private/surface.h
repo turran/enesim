@@ -28,6 +28,7 @@
 struct _Enesim_Surface
 {
 	EINA_MAGIC
+	int ref;
 	Enesim_Buffer *buffer;
 	Enesim_Format format;
 	void *user; /* user provided data */

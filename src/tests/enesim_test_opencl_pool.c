@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 		printf("Failed to create the surface\n");
 		return 3;
 	}
-	enesim_surface_delete(surface);
+	enesim_surface_unref(surface);
 	enesim_pool_delete(pool);
 
 	enesim_shutdown();

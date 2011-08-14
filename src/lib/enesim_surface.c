@@ -73,6 +73,7 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
 	s->format = fmt;
 	s->buffer = b;
+	s = enesim_surface_ref(s);
 
 	return s;
 }
@@ -98,6 +99,7 @@ EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
 	s->format = f;
 	s->buffer = b;
+	s = enesim_surface_ref(s);
 
 	return s;
 }
@@ -149,13 +151,26 @@ EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void
-enesim_surface_delete(Enesim_Surface *s)
+EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
+	s->ref++;
+	return s;
+}
 
-	enesim_buffer_delete(s->buffer);
-	free(s);
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_surface_unref(Enesim_Surface *s)
+{
+	ENESIM_MAGIC_CHECK_SURFACE(s);
+	s->ref--;
+	if (!s->ref)
+	{
+		enesim_buffer_unref(s->buffer);
+		free(s);
+	}
 }
 
 /**
@@ -213,20 +228,4 @@ EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 }
 
 #if 0
-EAPI void enesim_surface_ref(Enesim_Surface *s)
-{
-	ENESIM_MAGIC_CHECK_SURFACE(s);
-	s->ref++;
-}
-
-EAPI void enesim_surface_unref(Enesim_Surface *s)
-{
-	ENESIM_MAGIC_CHECK_SURFACE(s);
-	s->ref--;
-	if (!s->ref)
-	{
-		enesim_buffer_unref(s->buffer);
-		free(s);
-	}
-}
 #endif

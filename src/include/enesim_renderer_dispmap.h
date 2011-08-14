@@ -34,7 +34,9 @@ typedef enum _Enesim_Channel
 
 EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void);
 EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *map);
+EAPI void enesim_renderer_dispmap_map_get(Enesim_Renderer *r, Enesim_Surface **map);
 EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src);
+EAPI void enesim_renderer_dispmap_src_get(Enesim_Renderer *r, Enesim_Surface **src);
 EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor);
 EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
 EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r, Enesim_Channel channel);

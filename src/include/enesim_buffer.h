@@ -97,7 +97,8 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy, Enesim_Buffer_Sw_Data *data);
 
-EAPI void enesim_buffer_delete(Enesim_Buffer *b);
+EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b);
+EAPI void enesim_buffer_unref(Enesim_Buffer *b);
 
 EAPI void enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h);
 EAPI Enesim_Buffer_Format enesim_buffer_format_get(const Enesim_Buffer *b);

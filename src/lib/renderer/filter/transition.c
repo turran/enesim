@@ -99,6 +99,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 end:
 	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy);
 	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy);
+	return EINA_FALSE;
 }
 
 static void _state_cleanup(Enesim_Renderer *r)
@@ -201,7 +202,6 @@ EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level)
 {
 	Enesim_Renderer_Transition *t;
 
-	printf("transition level = %g\n", level);
 	t = _transition_get(r);
 	if (level < 0.0000001)
 		level = 0;
@@ -218,14 +218,18 @@ EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level)
  */
 EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Renderer *r0)
 {
-	Enesim_Renderer_Transition *t;
+	Enesim_Renderer_Transition *thiz;
 
-	t = _transition_get(r);
+	thiz = _transition_get(r);
 	if (r0 == r)
 		return;
-	if (t->r0.r == r0)
+	if (thiz->r0.r == r0)
 		return;
-	t->r0.r = r0;
+	if (thiz->r0.r)
+		enesim_renderer_unref(thiz->r0.r);
+	thiz->r0.r = r0;
+	if (thiz->r0.r)
+		thiz->r0.r = enesim_renderer_ref(thiz->r0.r);
 }
 /**
  * Sets the target renderer
@@ -234,14 +238,18 @@ EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Rende
  */
 EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Renderer *r1)
 {
-	Enesim_Renderer_Transition *t;
+	Enesim_Renderer_Transition *thiz;
 
-	t = _transition_get(r);
+	thiz = _transition_get(r);
 	if (r1 == r)
 		return;
-	if (t->r1.r == r1)
+	if (thiz->r1.r == r1)
 		return;
-	t->r1.r = r1;
+	if (thiz->r1.r)
+		enesim_renderer_unref(thiz->r1.r);
+	thiz->r1.r = r1;
+	if (thiz->r1.r)
+		thiz->r1.r = enesim_renderer_ref(thiz->r1.r);
 }
 /**
  * To be documented

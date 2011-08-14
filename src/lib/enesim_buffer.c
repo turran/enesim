@@ -55,6 +55,7 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 	buf->format = f;
 	buf->pool = p;
 	buf->external_allocated = !copy;
+	buf = enesim_buffer_ref(buf);
 
 	return buf;
 }
@@ -99,6 +100,7 @@ enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w,
 	buf->format = f;
 	buf->pool = p;
 	buf->external_allocated = EINA_FALSE;
+	buf = enesim_buffer_ref(buf);
 
 	return buf;
 }
@@ -150,12 +152,27 @@ EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_buffer_delete(Enesim_Buffer *b)
+EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b)
+{
+	ENESIM_MAGIC_CHECK_BUFFER(b);
+	b->ref++;
+	return b;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_buffer_unref(Enesim_Buffer *b)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 
-	enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
-	free(b);
+	b->ref--;
+	if (!b->ref)
+	{
+		enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
+		free(b);
+	}
 }
 
 /**

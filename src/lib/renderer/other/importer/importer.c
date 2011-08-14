@@ -232,6 +232,10 @@ EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer 
 	Enesim_Renderer_Importer *thiz;
 
 	thiz = _importer_get(r);
+	if (thiz->buffer)
+		enesim_buffer_unref(thiz->buffer);
 	thiz->buffer = buffer;
+	if (thiz->buffer)
+		thiz->buffer = enesim_buffer_ref(thiz->buffer);
 }
 
