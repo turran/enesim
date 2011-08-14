@@ -17,3 +17,8 @@
 + This one is important, is time to worry about the memory, given that renderers can go inside others
   and so forth, why not instead of doing enesim_delete we do enesim_ref/unref, this might do our lifes
   easier
+  already done:
+  other/compound
+  other/clipper
+  shape/shape
+  transition/transition

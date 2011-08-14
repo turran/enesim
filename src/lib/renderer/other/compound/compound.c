@@ -292,9 +292,11 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 	Enesim_Renderer_Compound *thiz;
 	Layer *l;
 
+	if (!rend) return;
 	thiz = _compound_get(r);
+
 	l = calloc(1, sizeof(Layer));
-	l->r = rend;
+	l->r = enesim_renderer_ref(rend);
 
 	thiz->layers = eina_list_append(thiz->layers, l);
 }
@@ -311,11 +313,14 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 	Eina_List *l;
 	Eina_List *l_next;
 
+	if (!rend) return;
 	thiz = _compound_get(r);
+
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
 		if (layer->r == rend)
 		{
+			enesim_renderer_unref(layer->r);
 			thiz->layers = eina_list_remove_list(thiz->layers, l);
 			free(layer);
 			break;
@@ -337,6 +342,7 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
 	thiz = _compound_get(r);
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
+		enesim_renderer_unref(layer->r);
 		thiz->layers = eina_list_remove_list(thiz->layers, l);
 		free(layer);
 	}

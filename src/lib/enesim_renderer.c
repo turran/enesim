@@ -217,6 +217,8 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	enesim_matrix_identity(&r->matrix.original);
 	r->matrix.type = ENESIM_MATRIX_IDENTITY;
 	r->prv_data = eina_hash_string_superfast_new(NULL);
+	/* always set the first reference */
+	r = enesim_renderer_ref(r);
 
 	return r;
 }
@@ -263,27 +265,22 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 
 	if (m) *m = r->matrix.original;
 }
+
 /**
- * Deletes a renderer
- * @param[in] r The renderer to delete
+ * To be documented
+ * FIXME: To be fixed
  */
-EAPI void enesim_renderer_delete(Enesim_Renderer *r)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor->free)
-		r->descriptor->free(r);
-	free(r);
-}
-
-#if 0
-
-EAPI void enesim_renderer_ref(Enesim_Renderer *r)
+EAPI Enesim_Renderer * enesim_renderer_ref(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	r->ref++;
-
+	return r;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -295,7 +292,6 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 		free(r);
 	}
 }
-#endif
 
 /**
  * To be documented

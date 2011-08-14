@@ -88,7 +88,11 @@ EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Rende
 		return;
 	if (t->r0.r == r0)
 		return;
+	if (thiz->r0.r)
+		enesim_renderer_unref(thiz->r0.r);
 	thiz->r0.r = r0;
+	if (thiz->r0.r)
+		enesim_renderer_ref(thiz->r0.r);
 }
 
 /**
@@ -105,6 +109,10 @@ EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Rende
 		return;
 	if (thiz->r1.r == r1)
 		return;
+	if (thiz->r1.r)
+		enesim_renderer_unref(thiz->r1.r);
 	thiz->r1.r = r1;
+	if (thiz->r1.r)
+		enesim_renderer_ref(thiz->r1.r);
 }
 

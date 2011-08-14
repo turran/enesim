@@ -38,6 +38,7 @@ typedef struct _Enesim_Renderer_Sw_Data
 struct _Enesim_Renderer
 {
 	EINA_MAGIC
+	int ref;
 	/* the renderer common properties */
 	Enesim_Rop rop;
 	Enesim_Color color;

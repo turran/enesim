@@ -215,7 +215,11 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->fill.rend)
+		enesim_renderer_unref(thiz->fill.rend)
 	thiz->fill.rend = fill;
+	if (thiz->fill.rend)
+		thiz->fill.rend = enesim_renderer_ref(thiz->fill.rend);
 }
 /**
  * To be documented
@@ -225,8 +229,11 @@ EAPI void enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r, Enesim_Ren
 {
 	Enesim_Renderer_Shape *thiz;
 
+	if (!fill) return;
 	thiz = _shape_get(r);
 	*fill = thiz->fill.rend;
+	if (thiz->fill.rend)
+		thiz->fill.rend = enesim_renderer_ref(thiz->fill.rend);
 }
 /**
  * To be documented

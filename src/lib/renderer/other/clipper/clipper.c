@@ -136,6 +136,8 @@ static void _clipper_free(Enesim_Renderer *r)
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = _clipper_get(r);
+	if (thiz->content)
+		enesim_renderer_unref(thiz->content);
 	free(thiz);
 }
 
@@ -166,24 +168,42 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
 	return r;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_clipper_content_set(Enesim_Renderer *r,
 		Enesim_Renderer *content)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = _clipper_get(r);
+	if (thiz->content) enesim_renderer_unref(thiz->content);
 	thiz->content = content;
+	if (thiz->content)
+		thiz->content = enesim_renderer_ref(thiz->content);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_clipper_content_get(Enesim_Renderer *r,
 		Enesim_Renderer **content)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = _clipper_get(r);
+	if (!content) return;
 	*content = thiz->content;
+	if (thiz->content)
+		thiz->content = enesim_renderer_ref(thiz->content);
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
 		double width)
 {
@@ -191,9 +211,12 @@ EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
 
 	thiz = _clipper_get(r);
 	thiz->width = width;
-
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_clipper_width_get(Enesim_Renderer *r,
 		double *width)
 {
@@ -203,6 +226,10 @@ EAPI void enesim_renderer_clipper_width_get(Enesim_Renderer *r,
 	*width = thiz->width;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
 		double height)
 {
@@ -213,6 +240,10 @@ EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
 
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_clipper_height_get(Enesim_Renderer *r,
 		double *height)
 {
