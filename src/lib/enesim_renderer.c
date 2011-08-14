@@ -275,6 +275,27 @@ EAPI void enesim_renderer_delete(Enesim_Renderer *r)
 	free(r);
 }
 
+#if 0
+
+EAPI void enesim_renderer_ref(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->ref++;
+
+}
+
+EAPI void enesim_renderer_unref(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->ref--;
+	if (!r->ref)
+	{
+		if (r->descriptor->free)
+			r->descriptor->free(r);
+		free(r);
+	}
+}
+#endif
 
 /**
  * To be documented
@@ -671,133 +692,3 @@ EAPI void enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 end:
 	enesim_renderer_cleanup(r, s);
 }
-
-#if 0
-/* Given how renderes are being developed outside enesim, we need to define a helper function that creates
- * renderers based on others, just a wrapper for a renderer. For example, on a sw based renderer call the
- * fill function of the wrapped renderer so the developers should not provide one. Or the setup function
- * where we usually propagate the color, the origin or other properties into the wrapped renderer
- */
-
-/* define the *must* implement functions */
-typedef struct _Enesim_Renderer_Wrapper_Descriptor
-{
-	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Boundings boundings;
-	Enesim_Renderer_Flags flags;
-	Enesim_Renderer_Inside is_inside;
-	Enesim_Renderer_Wrapper_Setup wrapper_setup;
-	Enesim_Renderer_Wrapper_Cleanup wrapper_cleanup;
-} Enesim_Rendere_Wrapper_Descriptor;
-
-#if BUILD_OPENCL
-
-static Eina_Bool _wrapper_sw_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
-{
-	Eina_Bool ret = EINA_TRUE;
-
-	if (r->wrapper_descriptor->setup)
-		ret = r->wrapper_descriptor->setup(r);
-	if (!ret)
-	{
-		return EINA_FALSE;
-	}
-	return enesim_renderer_sw_setup(r->wrapper_renderer, fill);
-}
-
-static void _wrapper_sw_cleanup(Enesim_Renderer *r)
-{
-	enesim_renderer_sw_cleanup(r->wrapper_renderer);
-	if (r->wrapper_descriptor->cleanup)
-		ret = r->wrapper_descriptor->cleanup(r);
-	if (!ret)
-	{
-		return EINA_FALSE;
-	}
-}
-
-static Eina_Bool _wrapper_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		const char **program_name, const char **program_source,
-		size_t *program_length)
-{
-	Eina_Bool ret = EINA_TRUE;
-
-	if (r->wrapper_descriptor->setup)
-		ret = r->wrapper_descriptor->setup(r);
-	if (!ret)
-	{
-		return EINA_FALSE;
-	}
-	return enesim_renderer_opencl_setup(r->wrapper_renderer, s,
-			program_name, program_source, program_length);
-}
-
-static Eina_Bool _wrapper_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	return enesim_renderer_opencl_kernel_setup(r->wrapper_renderer, s);
-}
-
-static void _wrapper_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	enesim_renderer_opencl_cleanup(r->wrapper_renderer, s);
-	if (r->wrapper_descriptor->cleanup)
-		r->wrapper_descriptor->cleanup(r);
-}
-#endif
-
-static void _wrapper_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
-{
-	if (r->wrapper_descriptor->boundings)
-		r->wrapper_descriptor->boundings(r, rect);
-	else
-		enesim_renderer_boundings(r->wrapper_renderer, rect);
-
-}
-
-static void _wrapper_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
-{
-	if (r->wrapper_descriptor->flags)
-		r->wrapper_descriptor->flags(r, flags);
-	else
-		enesim_renderer_flags(r->wrapper_renderer, flags);
-}
-
-static void _wrapper_free(Enesim_Renderer *r)
-{
-	if (r->wrapper_descriptor->free)
-		r->wrapper_descriptor->free(r);
-	enesim_renderer_delete(r->wrapper_renderer);
-}
-
-static Enesim_Renderer_Descriptor _wrapper_descriptor = {
-	/* .version =               */ ENESIM_RENDERER_API,
-	/* .free =                  */ _wrapper_free,
-	/* .boundings =             */ _wrapper_boundings,
-	/* .flags =                 */ _wrapper_flags,
-	/* .is_inside =             */ _wrapper_is_inside,
-	/* .sw_setup =              */ _wrapper_sw_setup,
-	/* .sw_cleanup =            */ _wrapper_sw_cleanup,
-#if BUILD_OPENCL
-	/* .opencl_setup =          */ _wrapper_opencl_setup,
-	/* .opencl_kernel_setup =   */ _wrapper_opencl_kernel_setup,
-	/* .opencl_cleanup =        */ _wrapper_opencl_cleanup,
-#endif
-};
-
-/**
- * @param[in] wrapped The renderer to wrap
- * @param[in] wdescriptor The wrapper descriptor definition
- */
-EAPI Enesim_Renderer * enesim_renderer_new_from_renderer(Enesim_Renderer *wrapped,
-		Enesim_Renderer_Wrapper_Descriptor *wdescriptor)
-{
-	Enesim_Renderer_Descriptor *new_descriptor;
-	Enesim_Renderer *r:
-
-	if (!wrapped) return NULL;
-	/* if we use the new here, we need to refactor the way we handle
-	 * inheritance
-	 */
-	enesim_renderer_new??
-}
-#endif

@@ -212,4 +212,21 @@ EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 	return s->user;
 }
 
+#if 0
+EAPI void enesim_surface_ref(Enesim_Surface *s)
+{
+	ENESIM_MAGIC_CHECK_SURFACE(s);
+	s->ref++;
+}
 
+EAPI void enesim_surface_unref(Enesim_Surface *s)
+{
+	ENESIM_MAGIC_CHECK_SURFACE(s);
+	s->ref--;
+	if (!s->ref)
+	{
+		enesim_buffer_unref(s->buffer);
+		free(s);
+	}
+}
+#endif

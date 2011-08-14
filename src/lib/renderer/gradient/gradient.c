@@ -257,7 +257,6 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 	}
 	/* get the length */
 	thiz->slen = thiz->descriptor->length(r);
-	printf("using length of %d\n", thiz->slen);
 
 	/* TODO check that we have one at 0 and one at 1 */
 	curr = eina_list_data_get(thiz->stops);
