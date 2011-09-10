@@ -15,6 +15,10 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
+/*
+ * The idea here is to make some common code to handle transition
+ * (renderers that need a step value to achieve something) renderers.
+ */
 #include "Enesim.h"
 #include "enesim_private.h"
 /*============================================================================*

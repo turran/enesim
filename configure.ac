@@ -219,6 +219,8 @@ src/lib/renderer/Makefile
 src/lib/renderer/gradient/Makefile
 src/lib/renderer/shape/Makefile
 src/lib/renderer/shape/rectangle/Makefile
+src/lib/renderer/filter/raddist/Makefile
+src/lib/renderer/filter/dispmap/Makefile
 src/lib/renderer/filter/Makefile
 src/lib/renderer/pattern/Makefile
 src/lib/renderer/other/Makefile

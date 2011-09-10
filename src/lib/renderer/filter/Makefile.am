@@ -1,3 +1,5 @@
+SUBDIRS = raddist dispmap
+
 MAINTAINERCLEANFILES = \
 Makefile.in
 
@@ -11,7 +13,15 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_renderer_filter.la
 
 libenesim_renderer_filter_la_SOURCES = \
-raddist.c \
-dispmap.c \
 hswitch.c \
 transition.c
+
+libenesim_renderer_filter_la_LIBADD = \
+raddist/libenesim_renderer_filter_raddist.la \
+dispmap/libenesim_renderer_filter_dispmap.la
+
+libenesim_renderer_filter_la_DEPENDENCIES = \
+raddist/libenesim_renderer_filter_raddist.la \
+dispmap/libenesim_renderer_filter_dispmap.la
+
+
