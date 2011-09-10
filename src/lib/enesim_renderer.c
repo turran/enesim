@@ -189,6 +189,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data)
 {
 	Enesim_Renderer *r;
+	Enesim_Renderer_Sw_Data *sw_data;
 
 	if (!descriptor) return NULL;
 	if (descriptor->version > ENESIM_RENDERER_API) {
@@ -232,38 +233,6 @@ EAPI void * enesim_renderer_data_get(Enesim_Renderer *r)
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
 	return r->data;
-}
-
-/**
- * Sets the transformation matrix of a renderer
- * @param[in] r The renderer to set the transformation matrix on
- * @param[in] m The transformation matrix to set
- */
-EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *m)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-
-	if (!m)
-	{
-		enesim_f16p16_matrix_identity(&r->matrix.values);
-		enesim_matrix_identity(&r->matrix.original);
-		r->matrix.type = ENESIM_MATRIX_IDENTITY;
-		return;
-	}
-	r->matrix.original = *m;
-	enesim_matrix_f16p16_matrix_to(m, &r->matrix.values);
-	r->matrix.type = enesim_f16p16_matrix_type_get(&r->matrix.values);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-
-	if (m) *m = r->matrix.original;
 }
 
 /**
@@ -365,6 +334,60 @@ EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	}
 	*flags = 0;
 }
+
+/**
+ * Sets the transformation matrix of a renderer
+ * @param[in] r The renderer to set the transformation matrix on
+ * @param[in] m The transformation matrix to set
+ */
+EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	if (!m)
+	{
+		enesim_f16p16_matrix_identity(&r->matrix.values);
+		enesim_matrix_identity(&r->matrix.original);
+		r->matrix.type = ENESIM_MATRIX_IDENTITY;
+		return;
+	}
+	r->matrix.original = *m;
+	enesim_matrix_f16p16_matrix_to(m, &r->matrix.values);
+	r->matrix.type = enesim_f16p16_matrix_type_get(&r->matrix.values);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	if (m) *m = r->matrix.original;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (r->name) free(r->name);
+	r->name = strdup(name);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	*name = r->name;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed

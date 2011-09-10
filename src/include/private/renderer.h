@@ -40,6 +40,7 @@ struct _Enesim_Renderer
 	EINA_MAGIC
 	int ref;
 	/* the renderer common properties */
+	char *name;
 	Enesim_Rop rop;
 	Enesim_Color color;
 	Enesim_Quality quality;
@@ -61,7 +62,6 @@ struct _Enesim_Renderer
 	 * surface or opencl surface, we need an array to keep *ALL* the
 	 * possible data */
 	void *backend_data[ENESIM_BACKENDS];
-	Enesim_Renderer_Sw_Fill sw_fill; /* FIXME move this into the backends */
 };
 
 typedef struct _Enesim_Renderer_Shape

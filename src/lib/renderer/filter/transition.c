@@ -45,6 +45,8 @@ static inline Enesim_Renderer_Transition * _transition_get(Enesim_Renderer *r)
 static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Transition *t;
+	Enesim_Renderer_Sw_Data *s0data;
+	Enesim_Renderer_Sw_Data *s1data;
 	Enesim_Renderer *s0, *s1;
 	int interp ;
 	unsigned int *d = dst, *e = d + len;
@@ -55,19 +57,21 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	s1 = t->r1.r;
 	interp = t->interp;
 
+	s0data = s0->backend_data[ENESIM_BACKEND_SOFTWARE];
+	s1data = s1->backend_data[ENESIM_BACKEND_SOFTWARE];
 	if (interp == 0)
 	{
-		s0->sw_fill(s0, x, y, len, d);
+		s0data->fill(s0, x, y, len, d);
 		return;
 	}
 	if (interp == 256)
 	{
-		s1->sw_fill(s1, t->offset.x + x, t->offset.y + y, len, d);
+		s1data->fill(s1, t->offset.x + x, t->offset.y + y, len, d);
 		return;
 	}
 	buf = alloca(len * sizeof(unsigned int));
-	s1->sw_fill(s1, t->offset.x + x, t->offset.y + y, len, buf);
-	s0->sw_fill(s0, x, y, len, d);
+	s1data->fill(s1, t->offset.x + x, t->offset.y + y, len, buf);
+	s0data->fill(s0, x, y, len, d);
 
 	while (d < e)
 	{

@@ -146,13 +146,23 @@ get_out:
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -357,13 +367,23 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -502,13 +522,23 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{

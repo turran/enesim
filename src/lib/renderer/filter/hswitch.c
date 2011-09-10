@@ -41,24 +41,29 @@ static inline Hswitch * _hswitch_get(Enesim_Renderer *r)
 static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Hswitch *thiz;
-	uint32_t *end = dst + len;
+	Enesim_Renderer_Sw_Data *ldata;
+	Enesim_Renderer_Sw_Data *rdata;
 	Eina_F16p16 mmx;
+	uint32_t *end = dst + len;
 	int mx;
 
 	thiz = _hswitch_get(r);
 	mmx = eina_f16p16_double_from(thiz->w - (double)(thiz->w * thiz->step));
 	mx = eina_f16p16_int_to(mmx);
+
+	ldata = thiz->lrend->backend_data[ENESIM_BACKEND_SOFTWARE];
+	rdata = thiz->rrend->backend_data[ENESIM_BACKEND_SOFTWARE];
 	while (dst < end)
 	{
 		uint32_t p0;
 
 		if (x > mx)
 		{
-			thiz->rrend->sw_fill(thiz->rrend, x, y, 1, &p0);
+			rdata->fill(thiz->rrend, x, y, 1, &p0);
 		}
 		else if (x < mx)
 		{
-			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
+			ldata->fill(thiz->lrend, x, y, 1, &p0);
 		}
 		else
 		{
@@ -66,8 +71,9 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 			uint16_t a;
 
 			a = 1 + ((mmx & 0xffff) >> 8);
-			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
-			thiz->rrend->sw_fill(thiz->rrend, 0, y, 1, &p1);
+
+			ldata->fill(thiz->lrend, x, y, 1, &p0);
+			rdata->fill(thiz->rrend, 0, y, 1, &p1);
 			p0 = argb8888_interp_256(a, p0, p1);
 		}
 		*dst++ = p0;
@@ -78,8 +84,10 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Hswitch *thiz;
-	uint32_t *end = dst + len;
+	Enesim_Renderer_Sw_Data *ldata;
+	Enesim_Renderer_Sw_Data *rdata;
 	Eina_F16p16 mmx, xx, yy;
+	uint32_t *end = dst + len;
 	int mx;
 
 	thiz = _hswitch_get(r);
@@ -93,6 +101,9 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 	/* FIXME put this on the state setup */
 	mmx = eina_f16p16_double_from(thiz->w - (double)(thiz->w * thiz->step));
 	mx = eina_f16p16_int_to(mmx);
+
+	ldata = thiz->lrend->backend_data[ENESIM_BACKEND_SOFTWARE];
+	rdata = thiz->rrend->backend_data[ENESIM_BACKEND_SOFTWARE];
 	while (dst < end)
 	{
 		uint32_t p0;
@@ -101,11 +112,11 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 		y = eina_f16p16_int_to(yy);
 		if (x > mx)
 		{
-			thiz->rrend->sw_fill(thiz->rrend, x, y, 1, &p0);
+			rdata->fill(thiz->rrend, x, y, 1, &p0);
 		}
 		else if (x < mx)
 		{
-			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
+			ldata->fill(thiz->lrend, x, y, 1, &p0);
 		}
 		/* FIXME, what should we use here? mmx or xx?
 		 * or better use a subpixel center?
@@ -116,8 +127,8 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 			uint16_t a;
 
 			a = 1 + ((xx & 0xffff) >> 8);
-			thiz->lrend->sw_fill(thiz->lrend, x, y, 1, &p0);
-			thiz->rrend->sw_fill(thiz->rrend, 0, y, 1, &p1);
+			ldata->fill(thiz->lrend, x, y, 1, &p0);
+			rdata->fill(thiz->rrend, 0, y, 1, &p1);
 			p0 = argb8888_interp_256(a, p1, p0);
 		}
 		*dst++ = p0;
@@ -129,8 +140,10 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Hswitch *thiz;
-	int mx;
+	Enesim_Renderer_Sw_Data *ldata;
+	Enesim_Renderer_Sw_Data *rdata;
 	Eina_Rectangle ir, dr;
+	int mx;
 
 	thiz = _hswitch_get(r);
 	eina_rectangle_coords_from(&ir, x, y, len, 1);
@@ -138,33 +151,35 @@ static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	if (!eina_rectangle_intersection(&ir, &dr))
 		return;
 
+	ldata = thiz->lrend->backend_data[ENESIM_BACKEND_SOFTWARE];
+	rdata = thiz->rrend->backend_data[ENESIM_BACKEND_SOFTWARE];
 	mx = (int)(thiz->w - (thiz->w * thiz->step));
 	if (mx == 0)
 	{
-		thiz->rrend->sw_fill(thiz->rrend, ir.x, ir.y, ir.w, dst);
+		rdata->fill(thiz->rrend, ir.x, ir.y, ir.w, dst);
 	}
 	else if (mx == thiz->w)
 	{
-		thiz->lrend->sw_fill(thiz->lrend, ir.x, ir.y, ir.w, dst);
+		ldata->fill(thiz->lrend, ir.x, ir.y, ir.w, dst);
 	}
 	else
 	{
 		if (ir.x > mx)
 		{
-			thiz->rrend->sw_fill(thiz->rrend, ir.x, ir.y, ir.w, dst);
+			rdata->fill(thiz->rrend, ir.x, ir.y, ir.w, dst);
 		}
 		else if (ir.x + ir.w < mx)
 		{
-			thiz->lrend->sw_fill(thiz->lrend, ir.x, ir.y, ir.w, dst);
+			ldata->fill(thiz->lrend, ir.x, ir.y, ir.w, dst);
 		}
 		else
 		{
 			int w;
 
 			w = mx - ir.x;
-			thiz->lrend->sw_fill(thiz->lrend, ir.x, ir.y, w, dst);
+			ldata->fill(thiz->lrend, ir.x, ir.y, w, dst);
 			dst += w;
-			thiz->rrend->sw_fill(thiz->rrend, 0, ir.y, ir.w + ir.x - mx , dst);
+			rdata->fill(thiz->rrend, 0, ir.y, ir.w + ir.x - mx , dst);
 		}
 	}
 }

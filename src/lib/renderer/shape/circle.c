@@ -74,12 +74,20 @@ static void _stroked_fill_paint(Enesim_Renderer *r, int x, int y,
 		fill_only = 1;
 		do_inner = 0;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner
 			&& fpaint)
 	{
-		fpaint->sw_fill(fpaint, x, y, len, dst);
+		Enesim_Renderer_Sw_Data *sdata;
+
+		sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+		sdata->fill(fpaint, x, y, len, dst);
 	}
 
         renderer_affine_setup(r, x, y, &xx, &yy);

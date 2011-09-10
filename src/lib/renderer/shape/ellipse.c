@@ -82,10 +82,20 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 		fill_only = 1;
 		do_inner = 0;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
-		fpaint->sw_fill(fpaint, x, y, len, dst);
+	{
+		Enesim_Renderer_Sw_Data *sdata;
+
+		sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+		sdata->fill(fpaint, x, y, len, dst);
+	}
 
 	renderer_affine_setup(r, x, y, &xx, &yy);
 
@@ -204,10 +214,20 @@ static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int
 		fill_only = 1;
 		do_inner = 0;
 		if (fpaint)
-			fpaint->sw_fill(fpaint, x, y, len, dst);
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata->fill(fpaint, x, y, len, dst);
+		}
 	}
 	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
-		fpaint->sw_fill(fpaint, x, y, len, dst);
+	{
+		Enesim_Renderer_Sw_Data *sdata;
+
+		sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+		sdata->fill(fpaint, x, y, len, dst);
+	}
 
 	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
 

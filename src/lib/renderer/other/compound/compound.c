@@ -61,6 +61,7 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
+		Enesim_Renderer_Sw_Data *ldata;
 		Eina_Rectangle lboundings;
 		unsigned int offset;
 
@@ -71,16 +72,17 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 		{
 			continue;
 		}
+		ldata = l->r->backend_data[ENESIM_BACKEND_SOFTWARE];
 		offset = lboundings.x - span.x;
 
 		if (!l->span)
 		{
-			l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + offset);
+			ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + offset);
 		}
 		else
 		{
 			memset(tmp, 0, lboundings.w * sizeof(uint32_t));
-			l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, tmp);
+			ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, tmp);
 			l->span(dst + offset, lboundings.w, tmp, l->r->color, NULL);
 		}
 	}
@@ -97,16 +99,18 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
+		Enesim_Renderer_Sw_Data *ldata;
 		Eina_Rectangle lboundings;
 
 		l = eina_list_data_get(ll);
 
+		ldata = l->r->backend_data[ENESIM_BACKEND_SOFTWARE];
 		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
 		if (!eina_rectangle_intersection(&lboundings, &span))
 		{
 			continue;
 		}
-		l->r->sw_fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
+		ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
 	}
 }
 

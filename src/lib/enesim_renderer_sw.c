@@ -183,12 +183,15 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 		Enesim_Format dfmt,
 		Enesim_Renderer_Flag flags)
 {
+	Enesim_Renderer_Sw_Data *sw_data;
+
+	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 	/* fill the data needed for every threaded renderer */
 	_op.renderer = r;
 	_op.dst = ddata;
 	_op.stride = stride;
 	_op.area = *area;
-	_op.fill = r->sw_fill;
+	_op.fill = sw_data->fill;
 	_op.span = NULL;
 
 	if (_is_sw_draw_composed(r, flags))
@@ -217,6 +220,9 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 		uint32_t *ddata, size_t stride, Enesim_Format dfmt,
 		Enesim_Renderer_Flag flags)
 {
+	Enesim_Renderer_Sw_Data *sw_data;
+
+	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 	if (_is_sw_draw_composed(r, flags))
 	{
 		Enesim_Compositor_Span span;
@@ -233,11 +239,11 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 		}
 		len = area->w * sizeof(uint32_t);
 		fdata = alloca(len);
-		_sw_surface_draw_composed(r, r->sw_fill, span, ddata, stride, fdata, len, area);
+		_sw_surface_draw_composed(r, sw_data->fill, span, ddata, stride, fdata, len, area);
 	}
 	else
 	{
-		_sw_surface_draw_simple(r, r->sw_fill, ddata, stride, area);
+		_sw_surface_draw_simple(r, sw_data->fill, ddata, stride, area);
 	}
 end:
 	return;
@@ -272,7 +278,6 @@ void enesim_renderer_sw_init(void)
 
 	}
 #endif
-
 }
 
 void enesim_renderer_sw_shutdown(void)
@@ -318,9 +323,10 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags)
 {
-	void *buffer_data;
+	Enesim_Renderer_Sw_Data *rswdata;
 	Enesim_Buffer_Sw_Data *data;
 	Enesim_Format dfmt;
+	void *buffer_data;
 	uint32_t *ddata;
 	size_t stride;
 
@@ -330,6 +336,8 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	stride = data->argb8888_pre.plane0_stride;
 	ddata = data->argb8888_pre.plane0;
 	ddata = ddata + (area->y * stride) + area->x;
+
+	rswdata = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
 	if (_is_sw_draw_composed(r, flags))
 	{
@@ -363,7 +371,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			/* now render */
 			len = final.w * sizeof(uint32_t);
 			fdata = alloca(len);
-			_sw_surface_draw_composed(r, r->sw_fill, span, rdata, stride,
+			_sw_surface_draw_composed(r, rswdata->fill, span, rdata, stride,
 					fdata, len, &final);
 		}
 	}
@@ -386,7 +394,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			final.x -= x;
 			final.y -= y;
 			/* now render */
-			_sw_surface_draw_simple(r, r->sw_fill, rdata, stride, &final);
+			_sw_surface_draw_simple(r, rswdata->fill, rdata, stride, &final);
 		}
 	}
 end:
@@ -407,7 +415,15 @@ EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
 	if (!r->descriptor->sw_setup) return EINA_TRUE;
 	if (r->descriptor->sw_setup(r, &fill))
 	{
-		r->sw_fill = fill;
+		Enesim_Renderer_Sw_Data *sw_data;
+
+		sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
+		if (!sw_data)
+		{
+			sw_data = calloc(1, sizeof(Enesim_Renderer_Sw_Data));
+			enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
+		}
+		sw_data->fill = fill;
 		return EINA_TRUE;
 	}
 	WRN("Setup callback on %p failed", r);
@@ -430,6 +446,9 @@ EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
  */
 EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Sw_Data *sw_data;
+
+	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 	//ENESIM_MAGIC_CHECK_RENDERER(r);
-	return r->sw_fill;
+	return sw_data->fill;
 }
