@@ -19,7 +19,7 @@
 #define ENESIM_RENDERER_SHAPE_H_
 
 /**
- * @defgroup Enesim_Renderer_Shapes_Group Shapes
+ * @defgroup Enesim_Renderer_Shape_Group Shapes
  * @ingroup Enesim_Renderer_Group
  * @{
  */

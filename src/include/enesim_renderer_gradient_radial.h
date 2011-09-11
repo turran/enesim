@@ -21,6 +21,7 @@
 /**
  * @}
  * @defgroup Enesim_Renderer_Gradient_Radial_Group Radial
+ * @ingroup Enesim_Renderer_Gradient_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void);

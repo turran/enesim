@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Gradient_Linear_Group Linear
+ * @ingroup Enesim_Renderer_Gradient_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void);
