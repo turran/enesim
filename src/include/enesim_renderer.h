@@ -99,19 +99,21 @@ EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x);
 EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x);
 EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y);
 EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y);
-EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_Rectangle *clip, int x, int y);
-EAPI void enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_List *clips, int x, int y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
+EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
+EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
+
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
-EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
-EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
+
+EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Eina_Rectangle *clip, int x, int y, Enesim_Error **error);
+EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
+		Eina_List *clips, int x, int y, Enesim_Error **error);
 
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_rectangle.h"

@@ -659,8 +659,8 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  * @param[in] y The y origin of the destination surface
  * TODO What about the mask?
  */
-EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_Rectangle *clip, int x, int y)
+EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Eina_Rectangle *clip, int x, int y, Enesim_Error **error)
 {
 	Enesim_Renderer_Flag flags;
 	Eina_Rectangle boundings;
@@ -669,7 +669,7 @@ EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	if (!enesim_renderer_setup(r, s)) return;
+	if (!enesim_renderer_setup(r, s)) return EINA_FALSE;
 
 	if (!clip)
 	{
@@ -703,6 +703,7 @@ EAPI void enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* TODO set the format again */
 end:
 	enesim_renderer_cleanup(r, s);
+	return EINA_TRUE;
 }
 
 /**
@@ -713,8 +714,8 @@ end:
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  */
-EAPI void enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_List *clips, int x, int y)
+EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
+		Eina_List *clips, int x, int y, Enesim_Error **error)
 {
 	Enesim_Renderer_Flag flags;
 	Eina_Rectangle boundings;
@@ -722,15 +723,15 @@ EAPI void enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 
 	if (!clips)
 	{
-		enesim_renderer_draw(r, s, NULL, x, y);
-		return;
+		enesim_renderer_draw(r, s, NULL, x, y, error);
+		return EINA_TRUE;
 	}
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
 	/* setup the common parameters */
-	if (!enesim_renderer_setup(r, s)) return;
+	if (!enesim_renderer_setup(r, s)) return EINA_FALSE;
 
 	_surface_boundings(s, &surface_size);
 	/* clip against the destination rectangle */
@@ -746,4 +747,5 @@ EAPI void enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	/* TODO set the format again */
 end:
 	enesim_renderer_cleanup(r, s);
+	return EINA_TRUE;
 }
