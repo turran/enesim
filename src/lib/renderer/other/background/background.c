@@ -59,6 +59,11 @@ static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesi
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _background_name(Enesim_Renderer *r)
+{
+	return "background";
+}
+
 static Eina_Bool _background_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -136,7 +141,7 @@ static void _background_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =               */ ENESIM_RENDERER_API,
-	/* .name =                  */ NULL,
+	/* .name =                  */ _background_name,
 	/* .free =                  */ _background_free,
 	/* .boundings =             */ NULL,
 	/* .flags =                 */ _background_flags,

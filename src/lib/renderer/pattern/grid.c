@@ -218,6 +218,13 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 		*dst++ = p0;
 	}
 }
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _grid_name(Enesim_Renderer *r)
+{
+	return "grid";
+}
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
@@ -274,7 +281,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _grid_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ NULL,
 	/* .flags =      */ _grid_flags,

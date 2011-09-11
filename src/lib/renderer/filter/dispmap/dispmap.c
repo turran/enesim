@@ -241,6 +241,13 @@ DISPMAP_AFFINE(r, g, _argb8888_red, _argb8888_green);
 DISPMAP_AFFINE(a, b, _argb8888_alpha, _argb8888_blue);
 
 static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNELS][ENESIM_CHANNELS][ENESIM_MATRIX_TYPES];
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _dispmap_name(Enesim_Renderer *r)
+{
+	return "dispmap";
+}
 
 static void _state_cleanup(Enesim_Renderer *r)
 {
@@ -314,7 +321,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _dispmap_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _dispmap_flags,

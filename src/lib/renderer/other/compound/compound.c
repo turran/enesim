@@ -117,6 +117,11 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _compound_name(Enesim_Renderer *r)
+{
+	return "compound";
+}
+
 static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -260,7 +265,7 @@ static void _compound_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _compound_name,
 	/* .free =       */ _compound_free,
 	/* .boundings =  */ _compound_boundings,
 	/* .flags =      */ _compound_flags,

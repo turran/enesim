@@ -82,6 +82,13 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 		x++;
 	}
 }
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _raddist_name(Enesim_Renderer *r)
+{
+	return "raddist";
+}
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
@@ -147,7 +154,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _raddist_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _raddist_flags,

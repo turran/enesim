@@ -751,7 +751,8 @@ end:
 }
 
 /**
- *
+ * To  be documented
+ * FIXME: To be fixed
  */
 EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, const char *file,
 		const char *function, int line, char *fmt, ...)

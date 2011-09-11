@@ -63,6 +63,11 @@ static void _content_cleanup(Enesim_Renderer_Clipper *thiz)
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _clipper_name(Enesim_Renderer *r)
+{
+	return "clipper";
+}
+
 static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -144,7 +149,7 @@ static void _clipper_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _clipper_name,
 	/* .free =       */ _clipper_free,
 	/* .boundings =  */ _clipper_boundings,
 	/* .flags =      */ _clipper_flags,

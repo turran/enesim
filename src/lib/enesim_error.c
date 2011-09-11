@@ -30,6 +30,10 @@ struct _Enesim_Error
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
 {
 	if (!error)
@@ -41,6 +45,10 @@ EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
 	return error;
 }
 
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char *file, const char *function, int line, char *fmt, va_list args)
 {
 	char str[PATH_MAX];
@@ -53,6 +61,10 @@ EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char 
 	return enesim_error_add(error, str);
 }
 
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_error_delete(Enesim_Error *error)
 {
 	char *str;
@@ -66,6 +78,10 @@ EAPI void enesim_error_delete(Enesim_Error *error)
 	free(error);
 }
 
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_error_dump(Enesim_Error *error)
 {
 	Eina_List *l;

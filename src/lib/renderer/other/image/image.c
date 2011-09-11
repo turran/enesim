@@ -269,6 +269,11 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _image_name(Enesim_Renderer *r)
+{
+	return "image";
+}
+
 static void _image_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Image *thiz;
@@ -405,7 +410,7 @@ static void _image_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _image_name,
 	/* .free =       */ _image_free,
 	/* .boundings =  */ _image_boundings,
 	/* .flags =      */ _image_flags,

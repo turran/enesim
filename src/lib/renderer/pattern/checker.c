@@ -271,6 +271,11 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _checker_name(Enesim_Renderer *r)
+{
+	return "checker";
+}
+
 static void _checker_state_cleanup(Enesim_Renderer *r)
 {
 
@@ -318,7 +323,7 @@ static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _checker_name,
 	/* .free =       */ _checker_free,
 	/* .boundings =  */ NULL,
 	/* .flags =      */ _checker_flags,

@@ -81,6 +81,13 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 		buf++;
 	}
 }
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _transition_name(Enesim_Renderer *r)
+{
+	return "transition";
+}
 
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
@@ -168,7 +175,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _transition_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _transition_flags,

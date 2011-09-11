@@ -100,6 +100,11 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigne
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char *_importer_name(Enesim_Renderer *r)
+{
+	return "importer";
+}
+
 static Eina_Bool _importer_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {

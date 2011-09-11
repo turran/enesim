@@ -123,6 +123,13 @@ static void _span_affine(Enesim_Renderer *r, int x, int y,
 		yy += ayx;
 	}
 }
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _stripes_name(Enesim_Renderer *r)
+{
+	return "stripes";
+}
 
 static Eina_Bool _setup_state(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
@@ -174,7 +181,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _stripes_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ NULL,
 	/* .flags =      */ _stripes_flags,

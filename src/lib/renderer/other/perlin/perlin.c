@@ -99,6 +99,11 @@ static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned i
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _perlin_name(Enesim_Renderer *r)
+{
+	return "perlin";
+}
+
 static Eina_Bool _perlin_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -161,7 +166,7 @@ static void _perlin_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _perlin_name,
 	/* .free =       */ _perlin_free,
 	/* .boundings =  */ NULL,
 	/* .flags =      */ _perlin_flags,
