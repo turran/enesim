@@ -622,6 +622,11 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _figure_name(Enesim_Renderer *r)
+{
+	return "figure";
+}
+
 static void _free(Enesim_Renderer *r)
 {
 	enesim_renderer_figure_clear(r);
@@ -782,7 +787,7 @@ static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 static Enesim_Renderer_Descriptor _figure_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _figure_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _figure_boundings,
 	/* .flags =      */ NULL,

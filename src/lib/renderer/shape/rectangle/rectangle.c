@@ -607,6 +607,11 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _rectangle_name(Enesim_Renderer *r)
+{
+	return "rectangle";
+}
+
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -701,7 +706,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _rectangle_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _rectangle_flags,

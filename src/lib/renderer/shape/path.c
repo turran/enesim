@@ -229,6 +229,11 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _path_name(Enesim_Renderer *r)
+{
+	return "path";
+}
+
 static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -305,7 +310,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 static Enesim_Renderer_Descriptor _path_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _path_name,
 	/* .free =       */ NULL,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ NULL,

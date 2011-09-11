@@ -164,6 +164,11 @@ static void _stroked_fill_paint(Enesim_Renderer *r, int x, int y,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _circle_name(Enesim_Renderer *r)
+{
+	return "circle";
+}
+
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Circle *thiz;
@@ -241,7 +246,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _circle_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _circle_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _flags,
