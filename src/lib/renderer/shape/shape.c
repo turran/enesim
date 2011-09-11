@@ -71,7 +71,8 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r)
 	return EINA_TRUE;
 }
 
-Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r)
+Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -84,7 +85,7 @@ Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r)
 	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
 			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		if (!enesim_renderer_sw_setup(thiz->fill.rend))
+		if (!enesim_renderer_sw_setup(thiz->fill.rend, s, error))
 		{
 			WRN("Shape setup on fill renderer %p of %p failed", thiz->fill.rend, r);
 			return EINA_FALSE;

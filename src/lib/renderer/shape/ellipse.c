@@ -308,7 +308,8 @@ static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Ellipse *thiz;
 	double rx, ry;
@@ -364,7 +365,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		thiz->icc0 = 2 * thiz->irr0_y;
 	}
 
-	if (!enesim_renderer_shape_sw_setup(r))
+	if (!enesim_renderer_shape_sw_setup(r, s, error))
 		return EINA_FALSE;
 
 	*fill = _span_color_stroked_paint_filled_proj;

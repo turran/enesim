@@ -163,7 +163,7 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, E
 /* common shape renderer functions */
 Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descriptor, void *data);
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r);
-Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r);
+Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error);
 void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r);
 void enesim_renderer_shape_cleanup(Enesim_Renderer *r);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);

@@ -117,7 +117,8 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
@@ -135,7 +136,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 		 */
 		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
-		if (!enesim_renderer_sw_setup(l->r))
+		if (!enesim_renderer_sw_setup(l->r, s, error))
 		{
 			DBG("Child renderer %p can not setup", l->r);
 			for (; ll && ll != thiz->layers; ll = eina_list_prev(ll))

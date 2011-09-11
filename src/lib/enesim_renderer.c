@@ -302,7 +302,7 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s)
+EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
 {
 	Enesim_Backend b;
 
@@ -313,7 +313,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s)
 		{
 			Enesim_Renderer_Sw_Fill fill;
 
-			if (!enesim_renderer_sw_setup(r)) return EINA_FALSE;
+			if (!enesim_renderer_sw_setup(r, s, error)) return EINA_FALSE;
 			fill = enesim_renderer_sw_fill_get(r);
 			if (!fill)
 			{
@@ -326,7 +326,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s)
 
 		case ENESIM_BACKEND_OPENCL:
 #if BUILD_OPENCL
-		return enesim_renderer_opencl_setup(r, s);
+		return enesim_renderer_opencl_setup(r, s, error);
 #endif
 		break;
 
@@ -669,7 +669,7 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	if (!enesim_renderer_setup(r, s)) return EINA_FALSE;
+	if (!enesim_renderer_setup(r, s, error)) return EINA_FALSE;
 
 	if (!clip)
 	{
@@ -731,7 +731,7 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
 	/* setup the common parameters */
-	if (!enesim_renderer_setup(r, s)) return EINA_FALSE;
+	if (!enesim_renderer_setup(r, s, error)) return EINA_FALSE;
 
 	_surface_boundings(s, &surface_size);
 	/* clip against the destination rectangle */

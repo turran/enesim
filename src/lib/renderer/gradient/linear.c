@@ -90,7 +90,8 @@ static void _linear_state_cleanup(Enesim_Renderer *r)
 
 }
 
-static Eina_Bool _linear_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _linear_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 	Eina_F16p16 x0, x1, y0, y1;

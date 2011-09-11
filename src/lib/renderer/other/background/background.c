@@ -59,7 +59,8 @@ static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesi
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _background_sw_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _background_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Background *thiz;
 	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
@@ -79,7 +80,7 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fil
 #if BUILD_OPENCL
 static Eina_Bool _background_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		const char **program_name, const char **program_source,
-		size_t *program_length)
+		size_t *program_length, Enesim_Error **error)
 {
 	Enesim_Renderer_Background *thiz;
 

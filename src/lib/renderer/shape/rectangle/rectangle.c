@@ -607,7 +607,8 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	double rad;
@@ -645,7 +646,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 	thiz->irr0 = rad * 65536;
 	thiz->sw = sw;
 
-	if (!enesim_renderer_shape_sw_setup(r))
+	if (!enesim_renderer_shape_sw_setup(r, s, error))
 	{
 		printf("thiz cannot setup 2\n");
 		return EINA_FALSE;

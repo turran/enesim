@@ -17,7 +17,7 @@ enesim_eina.c
 if HAVE_OPENCL
 lib_LTLIBRARIES += libenesim_opencl.la
 libenesim_opencl_la_SOURCES = enesim_opencl.c
-libenesim_opencl_la_LIBADD = $(top_builddir)/src/lib/libenesim.la -lOpenCL
+libenesim_opencl_la_LIBADD = -lenesim -lOpenCL
 libenesim_opencl_la_CFLAGS =
 libenesim_opencl_la_LDFLAGS = -no-undefined -version-info @version_info@
 endif

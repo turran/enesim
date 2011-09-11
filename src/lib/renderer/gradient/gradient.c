@@ -227,7 +227,8 @@ static void _gradient_state_cleanup(Enesim_Renderer *r)
 	thiz->slen = 0;
 }
 
-static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Eina_List *tmp;
@@ -242,7 +243,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fi
 		return EINA_FALSE;
 	/* setup the implementation */
 	*fill = NULL;
-	if (!thiz->descriptor->sw_setup(r, fill))
+	if (!thiz->descriptor->sw_setup(r, s, fill, error))
 	{
 		free(thiz->src);
 		thiz->src = NULL;

@@ -82,7 +82,8 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Transition *t;
 
@@ -92,9 +93,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	enesim_renderer_relative_set(r, t->r0.r, &t->r0.original, &t->r0.ox, &t->r0.oy);
 	enesim_renderer_relative_set(r, t->r1.r, &t->r1.original, &t->r1.ox, &t->r1.oy);
-	if (!enesim_renderer_sw_setup(t->r0.r))
+	if (!enesim_renderer_sw_setup(t->r0.r, s, error))
 		goto end;
-	if (!enesim_renderer_sw_setup(t->r1.r))
+	if (!enesim_renderer_sw_setup(t->r1.r, s, error))
 		goto end;
 
 	*fill = _span_general;

@@ -308,7 +308,8 @@ static void _image_state_cleanup(Enesim_Renderer *r)
 	}
 }
 
-static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Image *thiz;
 	Enesim_Rop rop;

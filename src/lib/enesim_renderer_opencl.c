@@ -33,13 +33,14 @@ static size_t _roundup(size_t local_size, size_t num)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s)
+Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Error **error)
 {
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *data;
 	Eina_Bool ret;
 	cl_program program;
-	cl_int error;
+	cl_int cl_err;
 	const char *source = NULL;
 	const char *source_name = NULL;
 	size_t source_size = 0;
@@ -52,20 +53,20 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s)
 	 * it every time, something like a token
 	 */
 	if (!r->descriptor->opencl_setup) return EINA_FALSE;
-	ret = r->descriptor->opencl_setup(r, s, &source_name, &source, &source_size);
+	ret = r->descriptor->opencl_setup(r, s, &source_name, &source, &source_size, error);
 	printf("loading the opencl description %s\n", source);
 	if (!ret) return EINA_FALSE;
 
-	program = clCreateProgramWithSource(data->context, 1, &source, &source_size, &error);
-	if (error != CL_SUCCESS)
+	program = clCreateProgramWithSource(data->context, 1, &source, &source_size, &cl_err);
+	if (cl_err != CL_SUCCESS)
 	{
-		printf("1 error %d\n", error);
+		printf("1 cl_err %d\n", cl_err);
 		exit(1);
 	}
 
 	/* build the program */
-	error = clBuildProgram(program, 1, &data->device, NULL, NULL, NULL);
-	if (error != CL_SUCCESS)
+	cl_err = clBuildProgram(program, 1, &data->device, NULL, NULL, NULL);
+	if (cl_err != CL_SUCCESS)
 	{
 		char *build_log;
 		size_t log_size;
@@ -88,10 +89,10 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s)
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenCL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENCL, rdata);
 	}
-	rdata->kernel = clCreateKernel(program, source_name, &error);
-	if (error != CL_SUCCESS)
+	rdata->kernel = clCreateKernel(program, source_name, &cl_err);
+	if (cl_err != CL_SUCCESS)
 	{
-		printf("3 error %d\n", error);
+		printf("3 cl_err %d\n", cl_err);
 		r->backend_data[ENESIM_BACKEND_OPENCL] = NULL;
 		free(rdata);
 		return EINA_FALSE;

@@ -83,7 +83,8 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Raddist *rd;
 

@@ -627,7 +627,8 @@ static void _free(Enesim_Renderer *r)
 	enesim_renderer_figure_clear(r);
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
 
@@ -734,7 +735,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 		thiz->changed = 0;
 	}
 
-	if (!enesim_renderer_shape_sw_setup(r))
+	if (!enesim_renderer_shape_sw_setup(r, s, error))
 	{
 		return EINA_FALSE;
 	}
@@ -771,7 +772,7 @@ static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 	thiz = _figure_get(r);
 
 	// for now.. but do this better later
-	if (!enesim_renderer_sw_setup(r))
+	if (!enesim_renderer_sw_setup(r, NULL, NULL))
 		return;
 	boundings->x = (thiz->lxx - 0xffff) >> 16;
 	boundings->y = (thiz->tyy - 0xffff) >> 16;

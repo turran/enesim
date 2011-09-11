@@ -174,7 +174,8 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	rect->w = rect->h = thiz->r * 2;
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Circle *thiz;
 	double rad;
@@ -201,7 +202,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
 
 	thiz->irr0 = rad * 65536;
 
-	if (!enesim_renderer_shape_sw_setup(r))
+	if (!enesim_renderer_shape_sw_setup(r, s, error))
 		return EINA_FALSE;
 
 	*fill = _stroked_fill_paint;

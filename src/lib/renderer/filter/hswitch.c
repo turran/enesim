@@ -184,16 +184,17 @@ static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	}
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Hswitch *thiz;
 
 	thiz = _hswitch_get(r);
 	if (!thiz->lrend || !thiz->rrend)
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(thiz->lrend))
+	if (!enesim_renderer_sw_setup(thiz->lrend, s, error))
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(thiz->rrend))
+	if (!enesim_renderer_sw_setup(thiz->rrend, s, error))
 		return EINA_FALSE;
 
 	*fill = _affine_good;

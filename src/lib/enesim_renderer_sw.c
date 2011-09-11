@@ -407,13 +407,14 @@ end:
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r)
+EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Error **error)
 {
 	Enesim_Renderer_Sw_Fill fill;
 
 	//ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!r->descriptor->sw_setup) return EINA_TRUE;
-	if (r->descriptor->sw_setup(r, &fill))
+	if (r->descriptor->sw_setup(r, s, &fill, error))
 	{
 		Enesim_Renderer_Sw_Data *sw_data;
 

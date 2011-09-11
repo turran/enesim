@@ -63,7 +63,8 @@ static void _content_cleanup(Enesim_Renderer_Clipper *thiz)
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fill *fill)
+static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Clipper *thiz;
 	Enesim_Matrix matrix;
@@ -83,7 +84,7 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Renderer_Sw_Fil
 	enesim_renderer_transformation_get(thiz->content, &thiz->old_matrix);
 	enesim_renderer_transformation_set(thiz->content, &matrix);
 	/* FIXME add the rop */
-	if (!enesim_renderer_sw_setup(thiz->content))
+	if (!enesim_renderer_sw_setup(thiz->content, s, error))
 	{
 		printf("content cannot setup\n");
 		/* restore the values */
