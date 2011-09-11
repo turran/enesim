@@ -749,3 +749,25 @@ end:
 	enesim_renderer_cleanup(r, s);
 	return EINA_TRUE;
 }
+
+/**
+ *
+ */
+EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, const char *file,
+		const char *function, int line, char *fmt, ...)
+{
+	va_list args;
+	char str[PATH_MAX];
+	int num;
+
+	if (!error)
+		return;
+
+	va_start(args, fmt);
+	num = snprintf(str, PATH_MAX, "%s:%d %s %s ", file, line, function, r->name);
+	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
+	str[num] = '\n';
+	va_end(args);
+
+	*error = enesim_error_add(*error, str);
+}

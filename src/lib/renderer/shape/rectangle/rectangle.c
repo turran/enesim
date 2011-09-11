@@ -617,7 +617,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz = _rectangle_get(r);
 	if (!thiz || (thiz->w < 1) || (thiz->h < 1))
 	{
-		WRN("Invalid size %d %d", thiz->w, thiz->h);
+		ENESIM_RENDERER_ERROR(r, error, "Invalid size %d %d", thiz->w, thiz->h);
 		return EINA_FALSE;
 	}
 
@@ -648,7 +648,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	if (!enesim_renderer_shape_sw_setup(r, s, error))
 	{
-		printf("thiz cannot setup 2\n");
+		ENESIM_RENDERER_ERROR(r, error, "Shape cannot setup");
 		return EINA_FALSE;
 	}
 

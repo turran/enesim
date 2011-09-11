@@ -23,6 +23,10 @@
  * @{
  */
 
+/** Helper macro to add an error on a renderer based function */
+#define ENESIM_RENDERER_ERROR(r, error, fmt, ...) \
+	enesim_renderer_error_add(r, error, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__);
+
 /** Renderer API/ABI version */
 #define ENESIM_RENDERER_API 0
 
@@ -118,6 +122,9 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *clip, int x, int y, Enesim_Error **error);
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_List *clips, int x, int y, Enesim_Error **error);
+
+EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, const char *file,
+		const char *function, int line, char *fmt, ...);
 
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_rectangle.h"

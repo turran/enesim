@@ -47,7 +47,7 @@ EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char 
 	int num;
 
 	num = snprintf(str, PATH_MAX, "%s:%d %s ", file, line, function);
-	num += vsnprintf(str, PATH_MAX - num, fmt, args);
+	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
 	str[num] = '\n';
 
 	return enesim_error_add(error, str);
@@ -59,4 +59,16 @@ EAPI void enesim_error_delete(Enesim_Error *error)
 
 	/* TODO free the list */
 	free(error);
+}
+
+EAPI void enesim_error_dump(Enesim_Error *error)
+{
+	Eina_List *l;
+	char *str;
+
+	if (!error) return;
+	EINA_LIST_FOREACH(error->trace, l, str)
+	{
+		printf("%s", str);
+	}
 }
