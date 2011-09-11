@@ -146,6 +146,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _raddist_flags,
@@ -163,7 +164,7 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Raddist));
 	r = enesim_renderer_new(&_descriptor, thiz);
-	
+
 	return r;
 }
 

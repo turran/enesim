@@ -304,6 +304,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 static Enesim_Renderer_Descriptor _path_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ NULL,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ NULL,

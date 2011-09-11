@@ -781,6 +781,7 @@ static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 static Enesim_Renderer_Descriptor _figure_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _free,
 	/* .boundings =  */ _figure_boundings,
 	/* .flags =      */ NULL,

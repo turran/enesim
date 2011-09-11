@@ -333,6 +333,7 @@ static void _gradient_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _gradient_free,
 	/* .boundings =  */ _gradient_boundings,
 	/* .flags =      */ _gradient_flags,

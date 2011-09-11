@@ -259,6 +259,7 @@ static void _compound_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _compound_free,
 	/* .boundings =  */ _compound_boundings,
 	/* .flags =      */ _compound_flags,

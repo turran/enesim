@@ -404,6 +404,7 @@ static void _image_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _image_free,
 	/* .boundings =  */ _image_boundings,
 	/* .flags =      */ _image_flags,

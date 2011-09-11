@@ -317,6 +317,7 @@ static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _checker_free,
 	/* .boundings =  */ NULL,
 	/* .flags =      */ _checker_flags,

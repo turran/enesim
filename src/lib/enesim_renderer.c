@@ -48,6 +48,13 @@
 			EINA_MAGIC_FAIL(d, ENESIM_MAGIC_RENDERER);\
 	} while(0)
 
+typedef struct _Enesim_Renderer_Factory
+{
+	int id;
+} Enesim_Renderer_Factory;
+
+static Eina_Hash *_factories = NULL;
+
 static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *area, int x, int y, Enesim_Renderer_Flag flags)
 {
@@ -97,16 +104,44 @@ static inline void _surface_boundings(Enesim_Surface *s, Eina_Rectangle *boundin
 	enesim_surface_size_get(s, &boundings->w, &boundings->h);
 }
 
+static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Factory *f;
+	char renderer_name[PATH_MAX];
+	const char *descriptor_name;
+
+	if (!_factories) return;
+	if (!r->descriptor->name)
+	{
+		descriptor_name = "unknown";
+	}
+	else
+	{
+		descriptor_name = r->descriptor->name(r);
+	}
+	f = eina_hash_find(_factories, descriptor_name);
+	if (!f)
+	{
+		f = calloc(1, sizeof(Enesim_Renderer_Factory));
+		eina_hash_add(_factories, descriptor_name, f);
+	}
+	/* assign a new name for it automatically */
+	snprintf(renderer_name, PATH_MAX, "%s%d", descriptor_name, f->id++);
+	enesim_renderer_name_set(r, renderer_name);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 void enesim_renderer_init(void)
 {
+	_factories = eina_hash_string_superfast_new(NULL);
 	enesim_renderer_sw_init();
 }
 
 void enesim_renderer_shutdown(void)
 {
+	eina_hash_free(_factories);
+	_factories = NULL;
 	enesim_renderer_sw_shutdown();
 }
 
@@ -220,6 +255,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	r->prv_data = eina_hash_string_superfast_new(NULL);
 	/* always set the first reference */
 	r = enesim_renderer_ref(r);
+	_enesim_renderer_factory_setup(r);
 
 	return r;
 }

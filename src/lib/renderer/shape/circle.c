@@ -240,6 +240,7 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _circle_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _flags,

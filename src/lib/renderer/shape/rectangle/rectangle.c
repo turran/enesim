@@ -700,6 +700,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _rectangle_flags,

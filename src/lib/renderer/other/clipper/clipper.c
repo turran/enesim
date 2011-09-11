@@ -143,6 +143,7 @@ static void _clipper_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
+	/* .name =       */ NULL,
 	/* .free =       */ _clipper_free,
 	/* .boundings =  */ _clipper_boundings,
 	/* .flags =      */ _clipper_flags,

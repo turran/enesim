@@ -135,6 +135,7 @@ static void _background_free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =               */ ENESIM_RENDERER_API,
+	/* .name =                  */ NULL,
 	/* .free =                  */ _background_free,
 	/* .boundings =             */ NULL,
 	/* .flags =                 */ _background_flags,

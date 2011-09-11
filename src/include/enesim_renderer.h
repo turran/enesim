@@ -45,6 +45,7 @@ typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Rend
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst);
 
+typedef const char * (*Enesim_Renderer_Name)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *rect);
@@ -61,6 +62,7 @@ typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Ene
 struct _Enesim_Renderer_Descriptor {
 	/* common */
 	unsigned int version;
+	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
 	Enesim_Renderer_Flags flags;
