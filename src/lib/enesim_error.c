@@ -55,9 +55,14 @@ EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char 
 
 EAPI void enesim_error_delete(Enesim_Error *error)
 {
+	char *str;
+
 	if (!error) return;
 
-	/* TODO free the list */
+	EINA_LIST_FREE(error->trace, str)
+	{
+		free(str);
+	}
 	free(error);
 }
 
