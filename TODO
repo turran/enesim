@@ -1,6 +1,4 @@
 + Make use of the flags on the surface draw function
-+ Given that we'll change every rennderer to use the API to define a new renderer instead
-  of using the internals
 + We need to optimize and avoid the need to always call
   enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
   to receive the data already fetch with enesim_renderer_data_get(r) but on the surface_draw
@@ -13,7 +11,6 @@
   algorithm for other backends
 + Split the hswitch and transition common parts into a common transition renderer
   with properties as src, target and step, that's all
-+ Use the enesim_error for property set/get and for setup/cleanup/draw
 + This one is important, is time to worry about the memory, given that renderers can go inside others
   and so forth, why not instead of doing enesim_delete we do enesim_ref/unref, this might do our lifes
   easier
@@ -22,3 +19,4 @@
   other/clipper
   shape/shape
   transition/transition
++ Normalize the stride/pitch

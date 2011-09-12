@@ -332,9 +332,20 @@ static void _gradient_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	thiz = _gradient_get(r);
 }
 
+static const char * _gradient_name(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	if (thiz->descriptor->name)
+		return thiz->descriptor->name(r);
+	else
+		return "gradient";
+}
+
 static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _gradient_name,
 	/* .free =       */ _gradient_free,
 	/* .boundings =  */ _gradient_boundings,
 	/* .flags =      */ _gradient_flags,

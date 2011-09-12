@@ -143,7 +143,10 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
 		if (!enesim_renderer_sw_setup(l->r, s, error))
 		{
-			DBG("Child renderer %p can not setup", l->r);
+			const char *name;
+
+			enesim_renderer_name_get(l->r, &name);
+			ENESIM_RENDERER_ERROR(r, error, "Child renderer %s can not setup", name);
 			for (; ll && ll != thiz->layers; ll = eina_list_prev(ll))
 			{
 				Layer *pl = eina_list_data_get(ll);

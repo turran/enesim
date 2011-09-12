@@ -66,8 +66,13 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
 	}
 }
 /*----------------------------------------------------------------------------*
- *            The Enesim's gradient renderer interface                       *
+ *            The Enesim's gradient renderer interface                        *
  *----------------------------------------------------------------------------*/
+static const char * _linear_name(Enesim_Renderer *r)
+{
+	return "linear";
+}
+
 static int _linear_length(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -148,6 +153,7 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 static Enesim_Renderer_Gradient_Descriptor _linear_descriptor = {
 	/* .distance =   */ _linear_distance,
 	/* .length =     */ _linear_length,
+	/* .name =       */ _linear_name,
 	/* .sw_setup =   */ _linear_state_setup,
 	/* .sw_cleanup = */ _linear_state_cleanup,
 	/* .free =       */ NULL,

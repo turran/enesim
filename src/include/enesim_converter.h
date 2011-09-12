@@ -27,8 +27,6 @@ EAPI Enesim_Buffer_Format enesim_converter_format_get(uint8_t aoffset, uint8_t a
 		uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen,
 		uint8_t boffset, uint8_t blen);
 
-EAPI uint8_t enesim_converter_format_depth_get(Enesim_Buffer_Format fmt);
-
 EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst,
 		Enesim_Angle angle,
 		Eina_Rectangle *clip,

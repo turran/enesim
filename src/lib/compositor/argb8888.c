@@ -216,10 +216,18 @@ static void _point_register(void)
 			_argb8888_pt_none_color_none_fill,
 			ENESIM_FILL,
 			ENESIM_FORMAT_ARGB8888);
+	enesim_compositor_pt_color_register(
+			_argb8888_pt_none_color_none_blend,
+			ENESIM_BLEND,
+			ENESIM_FORMAT_ARGB8888);
 	/* mask color */
 	enesim_compositor_pt_mask_color_register(
 			_argb8888_pt_none_color_argb8888_fill,
 			ENESIM_FILL, ENESIM_FORMAT_ARGB8888,
+			ENESIM_FORMAT_ARGB8888);
+	enesim_compositor_pt_mask_color_register(
+			_argb8888_pt_none_color_argb8888_blend,
+			ENESIM_BLEND, ENESIM_FORMAT_ARGB8888,
 			ENESIM_FORMAT_ARGB8888);
 	/* pixel mask */
 	enesim_compositor_pt_pixel_mask_register(
@@ -230,6 +238,10 @@ static void _point_register(void)
 	enesim_compositor_pt_pixel_register(
 			_argb8888_pt_argb8888_none_none_fill,
 			ENESIM_FILL, ENESIM_FORMAT_ARGB8888,
+			ENESIM_FORMAT_ARGB8888);
+	enesim_compositor_pt_pixel_register(
+			_argb8888_pt_argb8888_none_none_blend,
+			ENESIM_BLEND, ENESIM_FORMAT_ARGB8888,
 			ENESIM_FORMAT_ARGB8888);
 	/* pixel color */
 	enesim_compositor_pt_pixel_color_register(

@@ -33,5 +33,7 @@ struct _Enesim_Surface
 	Enesim_Format format;
 	void *user; /* user provided data */
 };
+	
+void * enesim_surface_backend_data_get(Enesim_Surface *s);
 
 #endif

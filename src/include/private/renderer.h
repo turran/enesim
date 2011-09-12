@@ -28,6 +28,15 @@ typedef struct _Enesim_Renderer_OpenCL_Data
 {
 	cl_kernel kernel;
 } Enesim_Renderer_OpenCL_Data;
+
+Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Error **error);
+void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
+void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
+		int x, int y, Enesim_Renderer_Flag flags);
+void enesim_renderer_opencl_init(void);
+void enesim_renderer_opencl_shutdown(void);
+
 #endif
 
 typedef struct _Enesim_Renderer_Sw_Data
@@ -175,6 +184,7 @@ typedef struct _Enesim_Renderer_Gradient_Descriptor
 {
 	Enesim_Renderer_Gradient_Distance distance;
 	Enesim_Renderer_Gradient_Length length;
+	Enesim_Renderer_Name name;
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	Enesim_Renderer_Delete free;

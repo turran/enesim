@@ -98,6 +98,11 @@ static Eina_F16p16 _radial_distance(Enesim_Renderer *r, Eina_F16p16 x,
 	return eina_f16p16_double_from(ret);
 }
 
+static const char * _radial_name(Enesim_Renderer *r)
+{
+	return "radial";
+}
+
 static void _state_cleanup(Enesim_Renderer *r)
 {
 }
@@ -140,6 +145,7 @@ static void _radial_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
 	/* .distance =   */ _radial_distance,
 	/* .length =     */ _radial_length,
+	/* .name =       */ _radial_name,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup,
 	/* .free =       */ NULL,

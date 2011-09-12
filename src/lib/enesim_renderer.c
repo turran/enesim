@@ -23,12 +23,7 @@
  * i.e state_setup, state_cleanup, property_changes .... , damage_get,
  * state_setup, state_cleanup ... etc
  * something like: void (*damages)(Enesim_Renderer *r, Eina_List **damages);
- * - Add a class name to the description
  * - Add a way to get/set such description
- * - Add a multi cpu render, send each span to a different CPU. One way is to
- *   use a queue, we initialize every thread on startup and me them sleep
- *   then wakeup when the function is called and start enqueueing the span
- *   renders
  * - Add a scale tranform property, every renderer should multiply its
  *   coordinates and lengths by this multiplier
  * - Change every internal struct on Enesim to have the correct prefix
@@ -224,7 +219,6 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Sw_Data *sw_data;
 
 	if (!descriptor) return NULL;
 	if (descriptor->version > ENESIM_RENDERER_API) {
@@ -313,10 +307,15 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		{
 			Enesim_Renderer_Sw_Fill fill;
 
-			if (!enesim_renderer_sw_setup(r, s, error)) return EINA_FALSE;
+			if (!enesim_renderer_sw_setup(r, s, error))
+			{
+				ENESIM_RENDERER_ERROR(r, error, "Software setup failed");
+				return EINA_FALSE;
+			}
 			fill = enesim_renderer_sw_fill_get(r);
 			if (!fill)
 			{
+				ENESIM_RENDERER_ERROR(r, error, "Even if the setup did not failed, there's no fill function");
 				enesim_renderer_sw_cleanup(r);
 				return EINA_FALSE;
 			}
@@ -326,7 +325,11 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 
 		case ENESIM_BACKEND_OPENCL:
 #if BUILD_OPENCL
-		return enesim_renderer_opencl_setup(r, s, error);
+		if (!enesim_renderer_opencl_setup(r, s, error))
+		{
+			ENESIM_RENDERER_ERROR(r, error, "OpenCL setup failed");
+			return EINA_FALSE;
+		}
 #endif
 		break;
 

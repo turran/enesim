@@ -183,7 +183,7 @@ static void _importer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ NULL,
+	/* .name =       */ _importer_name,
 	/* .free =       */ _importer_free,
 	/* .boundings =  */ _importer_boundings,
 	/* .flags =      */ _importer_flags,

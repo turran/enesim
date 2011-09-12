@@ -19,8 +19,7 @@
 #define CONVERTER_H_
 
 typedef void (*Enesim_Converter_2D)(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		uint32_t dpitch, uint32_t *src, uint32_t sw, uint32_t sh,
-		uint32_t spitch);
+		uint32_t *src, uint32_t sw, uint32_t sh, uint32_t spitch);
 
 typedef void (*Enesim_Converter_1D)(Enesim_Buffer_Sw_Data *data, uint32_t len, uint32_t *src);
 

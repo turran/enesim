@@ -60,7 +60,8 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 }
 
 static void _data_free(void *prv, void *backend_data,
-		Enesim_Buffer_Format fmt)
+		Enesim_Buffer_Format fmt,
+		Eina_Bool external_allocated)
 {
 	Enesim_Buffer_OpenCL_Data *data = backend_data;
 

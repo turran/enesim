@@ -4,11 +4,12 @@
  *                                  Local                                     *
  *============================================================================*/
 static void _2d_rgb888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		uint32_t dpitch, uint32_t *src, uint32_t sw, uint32_t sh,
+		uint32_t *src, uint32_t sw, uint32_t sh,
 		uint32_t spitch)
 {
 	uint8_t *dst = data->rgb888.plane0;
-	dpitch *= 3;
+	size_t dpitch = data->rgb888.plane0_stride;
+
 	while (dh--)
 	{
 		uint8_t *ddst = dst;

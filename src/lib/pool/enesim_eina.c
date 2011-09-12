@@ -65,6 +65,7 @@ static Eina_Bool _data_alloc(void *prv,
 
 		case ENESIM_CONVERTER_A8:
 		case ENESIM_CONVERTER_GRAY:
+		default:
 		ERR("Unsupported format %d", fmt);
 		break;
 	}
@@ -93,6 +94,7 @@ static void _data_free(void *prv,
 		case ENESIM_CONVERTER_RGB888:
 		case ENESIM_CONVERTER_A8:
 		case ENESIM_CONVERTER_GRAY:
+		default:
 		printf("TODO\n");
 		break;
 	}
@@ -101,6 +103,7 @@ static void _data_free(void *prv,
 
 static Eina_Bool _data_get(void *prv,
 		void *backend_data,
+		uint32_t w, uint32_t h,
 		Enesim_Buffer_Sw_Data *dst)
 {
 	Enesim_Buffer_Sw_Data *data = backend_data;
@@ -123,7 +126,7 @@ static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ NULL,
 	/* .data_get =   */ _data_get,
-	/* .free =       */ NULL
+	/* .free =       */ _free,
 };
 /*============================================================================*
  *                                 Global                                     *
