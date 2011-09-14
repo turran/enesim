@@ -23,7 +23,7 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Rectangle {
 	/* public properties */
-	int w, h;
+	double w, h;
 	struct {
 		double radius;
 		Eina_Bool tl : 1;
@@ -738,7 +738,7 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, unsigned int w)
+EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double w)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
@@ -749,7 +749,7 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, unsigned int w
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, unsigned int *w)
+EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *w)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
@@ -760,7 +760,7 @@ EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, unsigned int *
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, unsigned int h)
+EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double h)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
@@ -771,7 +771,7 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, unsigned int 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, unsigned int *h)
+EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, double *h)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
@@ -782,7 +782,7 @@ EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, unsigned int 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, unsigned int w, unsigned int h)
+EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double w, double h)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	thiz = _rectangle_get(r);
@@ -793,7 +793,7 @@ EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, unsigned int w,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, unsigned int *w, unsigned int *h)
+EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *w, double *h)
 {
 	Enesim_Renderer_Rectangle *thiz;
 

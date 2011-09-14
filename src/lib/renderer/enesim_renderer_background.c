@@ -94,7 +94,7 @@ static Eina_Bool _background_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	*program_name = "background";
 	*program_source =
-	#include "background.cl"
+	#include "enesim_renderer_background.cl"
 	*program_length = strlen(*program_source);
 
 	return EINA_TRUE;
