@@ -15,37 +15,12 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_EINA_H_
-#define ENESIM_EINA_H_
+#ifndef ENESIM_OPENGL_H_
+#define ENESIM_OPENGL_H_
 
-/* Here we put all the stuff that should be moved to eina */
+#include "Enesim.h"
 
-#define EINA_F16P16_ONE (1 << 16)
-#define EINA_F16P16_HALF (1 << 15)
-
-static inline Eina_F16p16 eina_f16p16_double_from(double v)
-{
-   Eina_F16p16 r;
-
-   r = (Eina_F16p16)(v * 65536.0f + (v < 0 ? -0.5f : 0.5f));
-   return r;
-
-}
-
-static inline double eina_f16p16_double_to(Eina_F16p16 v)
-{
-   double r;
-
-   r = v / 65536.0f;
-   return r;
-}
-
-static inline Eina_F16p16 eina_f16p16_hypot(Eina_F16p16 x, Eina_F16p16 y)
-{
-	x = eina_f16p16_mul(x, x);
-	y = eina_f16p16_mul(y, y);
-	x = eina_f16p16_add(x, y);
-	return eina_f16p16_sqrt(x);
-}
+EAPI Enesim_Pool * enesim_pool_opengl_new(void);
 
 #endif
+

@@ -124,7 +124,8 @@ static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		return;
 	}
 
-	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
 			ENESIM_RENDERER_FLAG_ROP;
@@ -172,7 +173,7 @@ EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 	return r;
 }
 /**
- * Sets the color of background
+ * Sets the color of the background
  * @param[in] r The background renderer
  * @param[in] color The background color
  */

@@ -39,6 +39,145 @@ typedef struct _Enesim_Renderer_Rectangle {
 	unsigned char do_inner :1;
 } Enesim_Renderer_Rectangle;
 
+#if 0
+static void inline _rectangle_outer_corners(Eina_F16p16 rr0, Eina_Bool tl, Eina_Bool tr, Eina_Bool br, Eina_Bool bl,
+		Eina_F16p16 lxx, Eina_F16p16 tyy, Eina_F16p16 rxx, Eina_F16p16 byy, uint16_t ax, uint16_t ay,
+		Eina_F16p16 sx, Eina_F16p16 sy, Eina_F16p16 sw, Eina_F16p16 sh)
+{
+	Eina_F16p16 rr1;
+	uint32_t c0, c1, c2, c3;
+	uint16_t ca;
+
+	rr1 = rr0 + EINA_F16P16_ONE;
+	if (lxx < 0)
+	{
+		if (tl && (tyy < 0))
+		{
+			if ((-lxx - tyy) >= rr0)
+			{
+				int rr = hypot(lxx, tyy);
+
+				ca = 0;
+				if (rr < rr1)
+				{
+					ca = 256;
+					if (rr > rr0)
+						ca = 256 - ((rr - rr0) >> 8);
+				}
+			}
+
+			if (sx < 0)
+			{
+				if (c1 != c3)
+					c1 = argb8888_interp_256(ay, c3, c1);
+				c0 = c2 = c3 = c1;
+			}
+			if (sy < 0)
+			{
+				if (c2 != c3)
+					c2 = argb8888_interp_256(ax, c3, c2);
+				c0 = c1 = c3 = c2;
+			}
+		}
+
+		if (bl && (byy > 0))
+		{
+			if ((-lxx + byy) >= rr0)
+			{
+				int rr = hypot(lxx, byy);
+
+				ca = 0;
+				if (rr < rr1)
+				{
+					ca = 256;
+					if (rr > rr0)
+						ca = 256 - ((rr - rr0) >> 8);
+				}
+			}
+
+			if (sx < 0)
+			{
+				if (c1 != c3)
+					c1 = argb8888_interp_256(ay, c3, c1);
+				c0 = c2 = c3 = c1;
+			}
+			if ((sy + 1) == sh)
+			{
+				if (c0 != c1)
+					c0 = argb8888_interp_256(ax, c1, c0);
+				c1 = c2 = c3 = c0;
+			}
+		}
+	}
+
+	if (rxx > 0)
+	{
+		if (tr && (tyy < 0))
+		{
+			if ((rxx - tyy) >= rr0)
+			{
+				int rr = hypot(rxx, tyy);
+
+				ca = 0;
+				if (rr < rr1)
+				{
+					ca = 256;
+					if (rr > rr0)
+						ca = 256 - ((rr - rr0) >> 8);
+				}
+			}
+
+			if ((sx + 1) == sw)
+			{
+				if (c0 != c2)
+					c0 = argb8888_interp_256(ay, c2, c0);
+				c1 = c2 = c3 = c0;
+			}
+			if (sy < 0)
+			{
+				if (c2 != c3)
+					c2 = argb8888_interp_256(ax, c3, c2);
+				c0 = c1 = c3 = c2;
+			}
+		}
+
+		if (br && (byy > 0))
+		{
+			if ((rxx + byy) >= rr0)
+			{
+				int rr = hypot(rxx, byy);
+
+				ca = 0;
+				if (rr < rr1)
+				{
+					ca = 256;
+					if (rr > rr0)
+						ca = 256 - ((rr - rr0) >> 8);
+				}
+			}
+
+			if ((sx + 1) == sw)
+			{
+				if (c0 != c2)
+					c0 = argb8888_interp_256(ay, c2, c0);
+				c1 = c2 = c3 = c0;
+			}
+			if ((sy + 1) == sh)
+			{
+				if (c0 != c1)
+					c0 = argb8888_interp_256(ax, c1, c0);
+				c1 = c2 = c3 = c0;
+			}
+		}
+	}
+}
+
+static void inline _rectangle_inner_corners(void)
+{
+
+}
+#endif
+
 #define EVAL_ROUND_OUTER_CORNERS(c0,c1,c2,c3) \
 		if (lxx < 0) \
 		{ \
@@ -294,20 +433,14 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_norounded_nostroked_paint_filled_identity(Enesim_Renderer *r, int x,
-		int y, unsigned int len, uint32_t *dst)
-{
-
-}
-
 static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	int sw = thiz->w, sh = thiz->h;
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
+	int axx = r->matrix.values.xx;
+	int ayx = r->matrix.values.yx;
 	int do_inner = thiz->do_inner;
 	unsigned int ocolor;
 	unsigned int icolor;
@@ -457,9 +590,9 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 	Enesim_Color ocolor;
 	Enesim_Color icolor;
 	int sw = thiz->w, sh = thiz->h;
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
-	int azx = r->matrix.values.zx, azy = r->matrix.values.zy, azz = r->matrix.values.zz;
+	int axx = r->matrix.values.xx;
+	int ayx = r->matrix.values.yx;
+	int azx = r->matrix.values.zx;
 	int do_inner = thiz->do_inner;
 	int stw = thiz->sw;
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
@@ -735,8 +868,9 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 	return r;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the width of the rectangle
+ * @param[in] r The rectangle renderer
+ * @param[in] w The rectangle width
  */
 EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double w)
 {
@@ -746,8 +880,9 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double w)
 	thiz->w = w;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Gets the width of the rectangle
+ * @param[in] r The rectangle renderer
+ * @param[out] w The rectangle width
  */
 EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *w)
 {
@@ -757,8 +892,9 @@ EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *w)
 	if (w) *w = thiz->w;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Sets the height of the rectangle
+ * @param[in] r The rectangle renderer
+ * @param[in] h The rectangle height
  */
 EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double h)
 {
@@ -768,8 +904,9 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double h)
 	thiz->h = h;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * Gets the height of the rectangle
+ * @param[in] r The rectangle renderer
+ * @param[out] h The rectangle height
  */
 EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, double *h)
 {

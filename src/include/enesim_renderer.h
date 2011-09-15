@@ -34,13 +34,14 @@
 typedef enum Enesim_Renderer_Flag
 {
 	ENESIM_RENDERER_FLAG_TRANSLATE		= (1 << 0), /**< The renderer can be translated using the origin property */
-	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 1), /**< Affine transformation */
-	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 2), /**< Perspective transformations */
-	ENESIM_RENDERER_FLAG_COLORIZE 		= (1 << 3), /**< Use the renderer color directly */
-	ENESIM_RENDERER_FLAG_A8 		= (1 << 4), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 5), /**< Supports ARGB8888 surfaces */
-	ENESIM_RENDERER_FLAG_ROP 		= (1 << 6), /**< Can draw directly using the raster operation */
-	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 7), /**< Supports the quality property */
+	ENESIM_RENDERER_FLAG_SCALE		= (1 << 1), /**< The renderer can be scaled using the scale property */
+	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 2), /**< Affine transformation */
+	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 3), /**< Perspective transformations */
+	ENESIM_RENDERER_FLAG_COLORIZE 		= (1 << 4), /**< Use the renderer color directly */
+	ENESIM_RENDERER_FLAG_A8 		= (1 << 5), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 6), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FLAG_ROP 		= (1 << 7), /**< Can draw directly using the raster operation */
+	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 8), /**< Supports the quality property */
 } Enesim_Renderer_Flag;
 
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
@@ -107,6 +108,12 @@ EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x);
 EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x);
 EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y);
 EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y);
+EAPI void enesim_renderer_scale_set(Enesim_Renderer *r, double x, double y);
+EAPI void enesim_renderer_scale_get(Enesim_Renderer *r, double *x, double *y);
+EAPI void enesim_renderer_x_scale_set(Enesim_Renderer *r, double x);
+EAPI void enesim_renderer_x_scale_get(Enesim_Renderer *r, double *x);
+EAPI void enesim_renderer_y_scale_set(Enesim_Renderer *r, double y);
+EAPI void enesim_renderer_y_scale_get(Enesim_Renderer *r, double *y);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);

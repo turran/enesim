@@ -433,7 +433,14 @@ EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name)
  */
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y)
 {
+	Enesim_Renderer_Flag flags;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	enesim_renderer_flags(r, &flags);
+#if LATER
+	if (!(flags & ENESIM_RENDERER_FLAG_TRANSLATE))
+		return;
+#endif
 	r->ox = x;
 	r->oy = y;
 }
@@ -454,7 +461,14 @@ EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y)
  */
 EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x)
 {
+	Enesim_Renderer_Flag flags;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	enesim_renderer_flags(r, &flags);
+#if LATER
+	if (!(flags & ENESIM_RENDERER_FLAG_TRANSLATE))
+		return;
+#endif
 	r->ox = x;
 }
 
@@ -474,7 +488,14 @@ EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x)
  */
 EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y)
 {
+	Enesim_Renderer_Flag flags;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	enesim_renderer_flags(r, &flags);
+#if LATER
+	if (!(flags & ENESIM_RENDERER_FLAG_TRANSLATE))
+		return;
+#endif
 	r->oy = y;
 }
 
@@ -486,6 +507,88 @@ EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (y) *y = r->oy;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_scale_set(Enesim_Renderer *r, double x, double y)
+{
+	Enesim_Renderer_Flag flags;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	enesim_renderer_flags(r, &flags);
+#if LATER
+	if (!(flags & ENESIM_RENDERER_FLAG_SCALE))
+		return;
+#endif
+	r->sx = x;
+	r->sy = y;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_scale_get(Enesim_Renderer *r, double *x, double *y)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (x) *x = r->sx;
+	if (y) *y = r->sy;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_x_scale_set(Enesim_Renderer *r, double x)
+{
+	Enesim_Renderer_Flag flags;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	enesim_renderer_flags(r, &flags);
+#if LATER
+	if (!(flags & ENESIM_RENDERER_FLAG_SCALE))
+		return;
+#endif
+	r->sx = x;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_x_scale_get(Enesim_Renderer *r, double *x)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (x) *x = r->sx;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_y_scale_set(Enesim_Renderer *r, double y)
+{
+	Enesim_Renderer_Flag flags;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	enesim_renderer_flags(r, &flags);
+#if LATER
+	if (!(flags & ENESIM_RENDERER_FLAG_SCALE))
+		return;
+#endif
+	r->sy = y;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_y_scale_get(Enesim_Renderer *r, double *y)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (y) *y = r->sy;
 }
 /**
  * To  be documented

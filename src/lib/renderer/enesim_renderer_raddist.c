@@ -141,7 +141,8 @@ static void _raddist_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		return;
 	}
 
-	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
 static void _free(Enesim_Renderer *r)

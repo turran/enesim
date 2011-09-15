@@ -54,6 +54,7 @@ struct _Enesim_Renderer
 	Enesim_Color color;
 	Enesim_Quality quality;
 	double ox, oy; /* the origin */
+	double sx, sy; /* the scale */
 	struct {
 		Enesim_Matrix original;
 		Enesim_F16p16_Matrix values;

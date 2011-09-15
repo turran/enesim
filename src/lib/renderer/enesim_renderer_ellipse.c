@@ -403,12 +403,29 @@ static void _free(Enesim_Renderer *r)
 {
 }
 
+static void _ellipse_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	Enesim_Renderer_Ellipse *thiz;
+
+	thiz = _ellipse_get(r);
+	if (!thiz)
+	{
+		*flags = 0;
+		return;
+	}
+
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PROJECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
 static Enesim_Renderer_Descriptor _ellipse_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
 	/* .name =       */ _ellipse_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _boundings,
-	/* .flags =      */ NULL,
+	/* .flags =      */ _ellipse_flags,
 	/* .is_inside =  */ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup

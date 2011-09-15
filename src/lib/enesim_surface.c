@@ -198,7 +198,7 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_
 		if (stride) *stride = sw_data.argb8888_pre.plane0_stride;
 
 		case ENESIM_FORMAT_A8:
-		*data = sw_data.a8.plane0;
+		*data = (uint32_t *)sw_data.a8.plane0;
 		if (stride) *stride = sw_data.a8.plane0_stride;
 		break;
 
@@ -226,6 +226,3 @@ EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	return s->user;
 }
-
-#if 0
-#endif
