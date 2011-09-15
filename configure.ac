@@ -150,6 +150,17 @@ if test "x$build_opencl" = "xyes"; then
 fi
 AM_CONDITIONAL(HAVE_OPENCL, [test "x$build_opencl" = "xyes"])
 
+dnl Check for glx
+AC_CHECK_HEADERS([GL/gl.h], [HAVE_GL="yes"], [HAVE_GL="no"])
+if test "x$HAVE_GL" = "xno"
+  build_opengl="no"
+then
+  build_opengl="yes"
+fi
+if test "x$build_opengl" = "xyes"; then
+  AC_DEFINE(BUILD_OPENGL, 1, [Build OpenGL Backend])
+fi
+AM_CONDITIONAL(HAVE_OPENGL, [test "x$build_opengl" = "xyes"])
 #######################################
 ## Link with pthread if needed
 AC_MSG_CHECKING(whether we should link with pthread)
@@ -257,6 +268,7 @@ echo
 echo "Buffer Pools:"
 echo "  Eina......................................: yes"
 echo "  OpenCL....................................: ${build_opencl}"
+echo "  OpenGL....................................: ${build_opengl}"
 echo
 echo "Installation Path...........................: ${prefix}"
 echo

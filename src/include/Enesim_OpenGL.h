@@ -19,6 +19,7 @@
 #define ENESIM_OPENGL_H_
 
 #include "Enesim.h"
+#include "GL/gl.h"
 
 EAPI Enesim_Pool * enesim_pool_opengl_new(void);
 

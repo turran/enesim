@@ -49,3 +49,8 @@ include_HEADERS = Enesim.h
 if HAVE_OPENCL
 include_HEADERS += Enesim_OpenCL.h
 endif
+
+if HAVE_OPENGL
+include_HEADERS += Enesim_OpenGL.h
+endif
+

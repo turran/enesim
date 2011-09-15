@@ -21,3 +21,12 @@ libenesim_opencl_la_LIBADD = -lenesim -lOpenCL
 libenesim_opencl_la_CFLAGS =
 libenesim_opencl_la_LDFLAGS = -no-undefined -version-info @version_info@
 endif
+
+if HAVE_OPENGL
+lib_LTLIBRARIES += libenesim_opengl.la
+libenesim_opengl_la_SOURCES = enesim_opengl.c
+libenesim_opengl_la_LIBADD = -lenesim -lGL
+libenesim_opengl_la_CFLAGS =
+libenesim_opengl_la_LDFLAGS = -no-undefined -version-info @version_info@
+endif
+

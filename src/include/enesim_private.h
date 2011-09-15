@@ -38,6 +38,12 @@
 #include "Enesim_OpenCL.h"
 #endif
 
+#if BUILD_OPENGL
+#define GL_GLEXT_PROTOTYPES
+#include "Enesim_OpenGL.h"
+#include "GL/glext.h"
+#endif
+
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>

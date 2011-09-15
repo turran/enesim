@@ -18,6 +18,12 @@
 
 #include "Enesim.h"
 #include "enesim_private.h"
+
+/**
+ * @todo
+ * - Create as many textures as we need to create the desired surface
+ *
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -25,6 +31,7 @@ typedef struct _Enesim_Buffer_OpenGL_Data
 {
 	GLuint texture;
 	GLuint fbo;
+	unsigned int num_textures;
 } Enesim_Buffer_OpenGL_Data;
 
 typedef struct _Enesim_OpenGL_Pool
@@ -40,13 +47,30 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 
 	data = malloc(sizeof(Enesim_Buffer_OpenGL_Data));
 	*backend_data = data;
-	glGenTexture(1, &data->texture);
-	glGenFramebuffersEXT(1, &data->fbo);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, data->fbo);
-	/* attach the texture to the first color attachment */
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-		GL_TEXTURE_2D, data->texture, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	switch (fmt)
+	{
+		case ENESIM_CONVERTER_ARGB8888:
+		case ENESIM_CONVERTER_ARGB8888_PRE:
+		glGenTextures(1, &data->texture);
+		glGenFramebuffersEXT(1, &data->fbo);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, data->fbo);
+		/* attach the texture to the first color attachment */
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+				GL_TEXTURE_2D, data->texture, 0);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		break;
+
+		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_CONVERTER_A8:
+		case ENESIM_CONVERTER_GRAY:
+		free(data);
+		return EINA_FALSE;
+		break;
+
+
+	}
 
 	return EINA_TRUE;
 }
@@ -62,6 +86,26 @@ static Eina_Bool _data_from(void *prv,
 	Enesim_OpenGL_Pool *thiz = prv;
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
 
+	if (!copy) return EINA_FALSE;
+
+	switch (fmt)
+	{
+		case ENESIM_CONVERTER_ARGB8888:
+		glBindTexture(GL_TEXTURE_2D, data->texture);
+        	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	        glPixelStorei(GL_UNPACK_ROW_LENGTH, w);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, src->argb8888.plane0);
+		break;
+
+		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_CONVERTER_A8:
+		case ENESIM_CONVERTER_GRAY:
+		return EINA_FALSE;
+		break;
+	}
+
 	return EINA_TRUE;
 }
 
@@ -70,22 +114,23 @@ static void _data_free(void *prv, void *backend_data,
 		Eina_Bool external_allocated)
 {
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
+
+	glDeleteTextures(1, &data->texture);
+	glDeleteFramebufferEXT(&data->fbo);
 }
 
-static Eina_Bool _data_get(void *prv, void *backend_data,
-		uint32_t w, uint32_t h,
-		Enesim_Buffer_Sw_Data *dst)
+static void _free(void *prv)
 {
-	//Enesim_Buffer_OpenGL_Data *data = backend_data;
+	Enesim_OpenGL_Pool *thiz = prv;
 
-	return EINA_TRUE;
+	free(thiz);
 }
 
 static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ _data_from,
-	/* .data_get =   */ _data_get,
+	/* .data_get =   */ NULL,
 	/* .free =       */ _free,
 };
 /*============================================================================*
