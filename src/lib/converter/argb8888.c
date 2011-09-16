@@ -4,16 +4,17 @@
  *                                  Local                                     *
  *============================================================================*/
 static void _2d_argb8888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		uint32_t *src, uint32_t sw, uint32_t sh,
-		uint32_t spitch)
+		void *sdata, uint32_t sw, uint32_t sh,
+		size_t spitch)
 {
-	uint32_t *dst = data->argb8888.plane0;
+	uint8_t *src = sdata;
+	uint8_t *dst = (uint8_t *)data->argb8888.plane0;
 	size_t dpitch = data->argb8888.plane0_stride;
 
 	while (dh--)
 	{
-		uint32_t *ddst = dst;
-		uint32_t *ssrc = src;
+		uint32_t *ddst = (uint32_t *)dst;
+		uint32_t *ssrc = (uint32_t *)src;
 		uint32_t ddw = dw;
 		while (ddw--)
 		{
@@ -38,28 +39,29 @@ static void _2d_argb8888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw,
 		src += spitch;
 	}
 }
-static void _1d_argb8888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t len, uint32_t *native)
+static void _1d_argb8888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t len, void *sdata)
 {
 	uint32_t *dst = data->argb8888.plane0;
+	uint32_t *src = sdata;
 
 	while (len--)
 	{
 		uint8_t pa;
 
-		pa = (*native >> 24);
+		pa = (*src >> 24);
 		if ((pa > 0) && (pa < 255))
 		{
 			*dst = (pa << 24)|
-				(((argb8888_red_get(*native) * 255) / pa) << 16) |
-				(((argb8888_green_get(*native) * 255) / pa) << 8) |
-				((argb8888_blue_get(*native) * 255) / pa);
+				(((argb8888_red_get(*src) * 255) / pa) << 16) |
+				(((argb8888_green_get(*src) * 255) / pa) << 8) |
+				((argb8888_blue_get(*src) * 255) / pa);
 		}
 		else
 		{
-			*dst = *native;
+			*dst = *src;
 		}
 		dst++;
-		native++;
+		src++;
 	}
 }
 

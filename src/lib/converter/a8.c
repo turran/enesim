@@ -4,16 +4,17 @@
  *                                  Local                                     *
  *============================================================================*/
 static void _1d_a8_none_argb8888(Enesim_Buffer_Sw_Data *data,
-		uint32_t len, uint32_t *native)
+		uint32_t len, void *sdata)
 {
 	uint8_t *dst = data->a8.plane0;
+	uint8_t *src = sdata;
 
 	while (len--)
 	{
-		*dst = *native >> 24;
+		*dst = *src >> 24;
 
 		dst++;
-		native++;
+		src++;
 	}
 }
 /*============================================================================*

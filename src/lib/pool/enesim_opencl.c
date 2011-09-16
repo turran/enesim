@@ -42,9 +42,10 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	format.image_channel_data_type = CL_UNSIGNED_INT8;
 	i = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
 			&format, w, h, 0, NULL, &ret);
+	}
 	if (ret != CL_SUCCESS)
 	{
-		printf("impossible to create the image\n");
+		printf("impossible to create the image %d\n", ret);
 		return EINA_FALSE;
 	}
 	*backend = ENESIM_BACKEND_OPENCL;
@@ -87,7 +88,7 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 	region[2] = 1;
 
 	clGetImageInfo(data->mem, CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
-
+	printf("row pitch %d\n", size);
 	dst->argb8888_pre.plane0 = calloc(size * h, sizeof(uint8_t));
 	ret = clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, 0, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
 	if (ret != CL_SUCCESS)
@@ -95,7 +96,7 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 		printf("Failed getting the surface\n");
 		return EINA_FALSE;
 	}
-	dst->argb8888_pre.plane0_stride = size / 4;
+	dst->argb8888_pre.plane0_stride = size;
 
 	return EINA_TRUE;
 }

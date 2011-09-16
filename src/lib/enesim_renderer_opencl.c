@@ -97,6 +97,7 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		free(rdata);
 		return EINA_FALSE;
 	}
+	printf("everything ok\n");
 
 	return EINA_TRUE;
 }

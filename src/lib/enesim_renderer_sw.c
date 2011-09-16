@@ -30,8 +30,8 @@ typedef struct _Enesim_Renderer_Thread_Operation
 	/* common attributes */
 	Enesim_Renderer *renderer;
 	Enesim_Renderer_Sw_Fill fill;
-	uint32_t * dst;
-	unsigned int stride;
+	uint8_t * dst;
+	size_t stride;
 	Eina_Rectangle area;
 	/* in case the renderer needs to use a composer */
 	Enesim_Compositor_Span span;
@@ -64,8 +64,8 @@ static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 
 static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
-		uint32_t *ddata, uint32_t stride,
-		uint32_t *tmp, size_t len, Eina_Rectangle *area)
+		uint8_t *ddata, size_t stride,
+		uint8_t *tmp, size_t len, Eina_Rectangle *area)
 {
 	while (area->h--)
 	{
@@ -79,8 +79,8 @@ static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
 }
 
 static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
-		Enesim_Renderer_Sw_Fill fill, uint32_t *ddata,
-		uint32_t stride, Eina_Rectangle *area)
+		Enesim_Renderer_Sw_Fill fill, uint8_t *ddata,
+		size_t stride, Eina_Rectangle *area)
 {
 	while (area->h--)
 	{
@@ -96,8 +96,8 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 static inline void _sw_surface_draw_composed_threaded(Enesim_Renderer *r,
 		unsigned int thread,
 		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
-		uint32_t *ddata, uint32_t stride,
-		uint32_t *tmp, size_t len, Eina_Rectangle *area)
+		uint8_t *ddata, size_t stride,
+		uint8_t *tmp, size_t len, Eina_Rectangle *area)
 {
 	int h = area->h;
 	int y = area->y;
@@ -119,8 +119,8 @@ end:
 
 static inline void _sw_surface_draw_simple_threaded(Enesim_Renderer *r,
 		unsigned int thread,
-		Enesim_Renderer_Sw_Fill fill, uint32_t *ddata,
-		uint32_t stride, Eina_Rectangle *area)
+		Enesim_Renderer_Sw_Fill fill, uint8_t *ddata,
+		size_t stride, Eina_Rectangle *area)
 {
 	int h = area->h;
 	int y = area->y;
@@ -146,7 +146,7 @@ static void * _thread_run(void *data)
 		pthread_barrier_wait(&_start);
 		if (op->span)
 		{
-			uint32_t *tmp;
+			uint8_t *tmp;
 			size_t len;
 
 			len = op->area.w * sizeof(uint32_t);
@@ -297,7 +297,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 	void *buffer_data;
 	Enesim_Buffer_Sw_Data *data;
 	Enesim_Format dfmt;
-	uint32_t *ddata;
+	uint8_t *ddata;
 	size_t stride;
 
 	buffer_data = enesim_surface_backend_data_get(s);
@@ -313,6 +313,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 	area->x -= x;
 	area->y -= y;
 
+	printf("stride = %d\n", stride);
 #ifdef BUILD_PTHREAD
 	_sw_draw_threaded(r, area, ddata, stride, dfmt, flags);
 #else
@@ -326,8 +327,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	Enesim_Renderer_Sw_Data *rswdata;
 	Enesim_Buffer_Sw_Data *data;
 	Enesim_Format dfmt;
-	void *buffer_data;
-	uint32_t *ddata;
+	uint8_t *ddata;
 	size_t stride;
 
 	dfmt = enesim_surface_format_get(s);
@@ -358,8 +358,8 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 		{
 			Eina_Rectangle final;
 			size_t len;
-			uint32_t *fdata;
-			uint32_t *rdata;
+			uint8_t *fdata;
+			uint8_t *rdata;
 
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
@@ -384,7 +384,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 		EINA_LIST_FOREACH(clips, l, clip)
 		{
 			Eina_Rectangle final;
-			uint32_t *rdata;
+			uint8_t *rdata;
 
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
