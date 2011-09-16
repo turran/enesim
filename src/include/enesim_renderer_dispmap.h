@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Dispmap_Group Displacement Map
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 

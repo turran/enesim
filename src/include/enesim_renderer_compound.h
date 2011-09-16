@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Compound_Group Compound
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 

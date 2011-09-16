@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Perlin_Group Perlin
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void);

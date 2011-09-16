@@ -30,6 +30,10 @@ void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *data)
@@ -60,6 +64,10 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 	return buf;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *data)

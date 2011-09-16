@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Hswitch_Group Horizontal Switch
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void);

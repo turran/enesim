@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Transition_Group Transition
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_transition_new(void);

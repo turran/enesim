@@ -29,6 +29,8 @@
  * operations they may need, not forcing on how or what to draw.
  * @section backends Backends
  * - Software based
+ * - OpenCL (experimental)
+ * - OpenGL (experimental)
  *
  * @section dependencies Dependencies
  * - Eina

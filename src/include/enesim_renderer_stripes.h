@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Stripes_Group Stripes
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void);

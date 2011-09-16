@@ -51,6 +51,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	{
 		case ENESIM_CONVERTER_ARGB8888:
 		case ENESIM_CONVERTER_ARGB8888_PRE:
+		data->num_textures = 1;
 		glGenTextures(1, &data->texture);
 		glGenFramebuffersEXT(1, &data->fbo);
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, data->fbo);

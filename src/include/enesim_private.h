@@ -18,17 +18,7 @@
 #ifndef _ENESIM_PRIVATE_H
 #define _ENESIM_PRIVATE_H
 
-/*
- * TODO replace all DATA32, DATA16, DATA8 with their standard definitions (inttypes.h)
- * TODO change fixed types from ints to int32_t (inttypes.h)
- */
-/**
- * @defgroup Enesim_Internal_Group Internal Implementation
- * @{
- */
-
 #include "config.h"
-
 
 #if BUILD_PTHREAD
 #include <pthread.h>
@@ -119,6 +109,5 @@ static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
 #include "private/pool.h"
 #include "private/surface.h"
 #include "private/converter.h"
-/** @} */
 
 #endif

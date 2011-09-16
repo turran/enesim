@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Importer_Group Importer
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_importer_new(void);

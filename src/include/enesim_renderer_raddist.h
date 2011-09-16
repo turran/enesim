@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Raddist_Group Radial Distortion
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_raddist_new(void);

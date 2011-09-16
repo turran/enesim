@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Grid_Group Grid
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_grid_new(void);

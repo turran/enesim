@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Background_Group Background
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_background_new(void);

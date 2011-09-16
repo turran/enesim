@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Clipper_Group Clipper
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 
