@@ -42,7 +42,6 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	format.image_channel_data_type = CL_UNSIGNED_INT8;
 	i = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
 			&format, w, h, 0, NULL, &ret);
-	}
 	if (ret != CL_SUCCESS)
 	{
 		printf("impossible to create the image %d\n", ret);
