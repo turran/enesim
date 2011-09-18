@@ -246,7 +246,7 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 	if (_is_sw_draw_composed(r, flags))
 	{
 		Enesim_Compositor_Span span;
-		uint32_t *fdata;
+		uint8_t *fdata;
 		size_t len;
 
 		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
@@ -376,7 +376,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			final.x -= x;
 			final.y -= y;
 			/* now render */
-			len = final.w * sizeof(uint32_t);
+			len = final.w * bpp;
 			fdata = alloca(len);
 			_sw_surface_draw_composed(r, rswdata->fill, span, rdata, stride,
 					fdata, len, &final);
