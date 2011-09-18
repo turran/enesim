@@ -177,7 +177,7 @@ EAPI void enesim_surface_unref(Enesim_Surface *s)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_t *stride)
+EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *stride)
 {
 	Enesim_Buffer_Sw_Data sw_data;
 
@@ -198,7 +198,7 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_
 		if (stride) *stride = sw_data.argb8888_pre.plane0_stride;
 
 		case ENESIM_FORMAT_A8:
-		*data = (uint32_t *)sw_data.a8.plane0;
+		*data = sw_data.a8.plane0;
 		if (stride) *stride = sw_data.a8.plane0_stride;
 		break;
 

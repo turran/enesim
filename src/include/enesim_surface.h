@@ -46,7 +46,7 @@ EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s);
 EAPI void enesim_surface_private_set(Enesim_Surface *s, void *data);
 EAPI void * enesim_surface_private_get(Enesim_Surface *s);
 
-EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, uint32_t **data, size_t *stride);
+EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *stride);
 
 /** @} */ //End of Enesim_Surface_Group
 

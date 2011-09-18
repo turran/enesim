@@ -48,7 +48,7 @@ typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
 typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
 
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst);
+		unsigned int len, void *dst);
 
 typedef const char * (*Enesim_Renderer_Name)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);

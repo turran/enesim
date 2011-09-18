@@ -93,7 +93,7 @@ static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
 		fill(r, area->x, area->y, area->w, tmp);
 		area->y++;
 		/* compose the filled and the destination spans */
-		span(ddata, area->w, tmp, r->color, NULL);
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->color, NULL);
 		ddata += stride;
 	}
 }
@@ -129,7 +129,7 @@ static inline void _sw_surface_draw_composed_threaded(Enesim_Renderer *r,
 		memset(tmp, 0, len);
 		fill(r, area->x, y, area->w, tmp);
 		/* compose the filled and the destination spans */
-		span(ddata, area->w, tmp, r->color, NULL);
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->color, NULL);
 end:
 		ddata += stride;
 		h--;
@@ -237,7 +237,7 @@ end:
 #else
 
 static void _sw_draw_no_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
-		uint32_t *ddata, size_t stride, Enesim_Format dfmt,
+		uint8_t *ddata, size_t stride, Enesim_Format dfmt,
 		Enesim_Renderer_Flag flags)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
@@ -319,7 +319,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 	size_t stride;
 	size_t bpp;
 
-	_sw_surface_setup(s, &dfmt, &ddata, &stride, &bpp);
+	_sw_surface_setup(s, &dfmt, (void **)&ddata, &stride, &bpp);
 	ddata = ddata + (area->y * stride) + (area->x * bpp);
 
 	/* translate the origin */
@@ -342,7 +342,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	size_t stride;
 	size_t bpp;
 
-	_sw_surface_setup(s, &dfmt, &ddata, &stride, &bpp);
+	_sw_surface_setup(s, &dfmt, (void *)&ddata, &stride, &bpp);
 	ddata = ddata + (area->y * stride) + (area->x * bpp);
 	rswdata = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
