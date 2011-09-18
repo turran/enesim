@@ -117,7 +117,7 @@ static void _data_free(void *prv, void *backend_data,
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
 
 	glDeleteTextures(1, &data->texture);
-	glDeleteFramebufferEXT(&data->fbo);
+	glDeleteFramebuffersEXT(1, &data->fbo);
 }
 
 static Eina_Bool _data_get(void *prv, void *backend_data,
