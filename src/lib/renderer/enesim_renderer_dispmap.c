@@ -98,7 +98,7 @@ static void _argb8888_a_b_span_identity(Enesim_Renderer *r, int x, int y,
 	renderer_identity_setup(r, x, y, &xx, &yy);
 	x = eina_f16p16_int_to(xx);
 	y = eina_f16p16_int_to(yy);
-	map = map + (mstride * y) + x;
+	map = argb8888_at(map, mstride, x, y);
 
 	while (dst < end)
 	{
@@ -150,7 +150,7 @@ static void _argb8888_r_g_span_identity(Enesim_Renderer *r, int x, int y,
 	renderer_identity_setup(r, x, y, &xx, &yy);
 	x = eina_f16p16_int_to(xx);
 	y = eina_f16p16_int_to(yy);
-	map = map + (mstride * y) + x;
+	map = argb8888_at(map, mstride, x, y);
 
 	while (dst < end)
 	{
@@ -187,7 +187,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 {										\
 	Enesim_Renderer_Dispmap *thiz;						\
 	uint32_t *end = dst + len;						\
-	uint32_t *map, *src;							\
+	uint32_t *src;								\
+	uint32_t *map;								\
 	size_t mstride;								\
 	size_t sstride;								\
 	int sw, sh, mw, mh;							\
@@ -208,6 +209,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 		Eina_F16p16 sxx, syy;						\
 		int sx, sy;							\
 		uint32_t p0 = 0;						\
+		uint32_t *m;							\
 		uint16_t m0;							\
 		uint16_t m1;							\
 										\
@@ -217,9 +219,9 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 		if (x < 0 || x >= mw || y < 0 || y >= mh)			\
 			goto next;						\
 										\
-		m0 = *(map + (mstride * y) + x);				\
-		m1 = yfunction(m0);						\
-		m0 = xfunction(m0);						\
+		m = argb8888_at(map, mstride, x, y);				\
+		m1 = yfunction(*m);						\
+		m0 = xfunction(*m);						\
 										\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\

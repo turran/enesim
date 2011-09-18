@@ -62,6 +62,26 @@ static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
+static inline void _sw_surface_setup(Enesim_Surface *s, Enesim_Format *dfmt, void **data, size_t *stride, size_t *bpp)
+{
+	Enesim_Buffer_Sw_Data *bdata;
+
+	bdata = enesim_surface_backend_data_get(s);
+	*dfmt = enesim_surface_format_get(s);
+	if (*dfmt != ENESIM_FORMAT_A8)
+	{
+		*stride = bdata->argb8888_pre.plane0_stride;
+		*data = bdata->argb8888_pre.plane0;
+		*bpp = 4;
+	}
+	else
+	{
+		*stride = bdata->a8.plane0_stride;
+		*data = bdata->a8.plane0;
+		*bpp = 1;
+	}
+}
+
 static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
 		uint8_t *ddata, size_t stride,
@@ -294,26 +314,18 @@ void enesim_renderer_sw_shutdown(void)
 void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y, Enesim_Renderer_Flag flags)
 {
-	void *buffer_data;
-	Enesim_Buffer_Sw_Data *data;
 	Enesim_Format dfmt;
 	uint8_t *ddata;
 	size_t stride;
+	size_t bpp;
 
-	buffer_data = enesim_surface_backend_data_get(s);
-	data = s->buffer->backend_data;
-	/* FIXME */
-	stride = data->argb8888_pre.plane0_stride;
-	ddata = data->argb8888_pre.plane0;
-
-	dfmt = enesim_surface_format_get(s);
-	ddata = ddata + (area->y * stride) + area->x;
+	_sw_surface_setup(s, &dfmt, &ddata, &stride, &bpp);
+	ddata = ddata + (area->y * stride) + (area->x * bpp);
 
 	/* translate the origin */
 	area->x -= x;
 	area->y -= y;
 
-	printf("stride = %d\n", stride);
 #ifdef BUILD_PTHREAD
 	_sw_draw_threaded(r, area, ddata, stride, dfmt, flags);
 #else
@@ -324,19 +336,14 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags)
 {
-	Enesim_Renderer_Sw_Data *rswdata;
-	Enesim_Buffer_Sw_Data *data;
 	Enesim_Format dfmt;
+	Enesim_Renderer_Sw_Data *rswdata;
 	uint8_t *ddata;
 	size_t stride;
+	size_t bpp;
 
-	dfmt = enesim_surface_format_get(s);
-	data = s->buffer->backend_data;
-	/* FIXME */
-	stride = data->argb8888_pre.plane0_stride;
-	ddata = data->argb8888_pre.plane0;
-	ddata = ddata + (area->y * stride) + area->x;
-
+	_sw_surface_setup(s, &dfmt, &ddata, &stride, &bpp);
+	ddata = ddata + (area->y * stride) + (area->x * bpp);
 	rswdata = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
 	if (_is_sw_draw_composed(r, flags))
@@ -364,7 +371,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
 				continue;
-			rdata = ddata + (final.y * stride) + final.x;
+			rdata = ddata + (final.y * stride) + (final.x * bpp);
 			/* translate the origin */
 			final.x -= x;
 			final.y -= y;
@@ -389,7 +396,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
 				continue;
-			rdata = ddata + (final.y * stride) + final.x;
+			rdata = ddata + (final.y * stride) + (final.x * bpp);
 			/* translate the origin */
 			final.x -= x;
 			final.y -= y;

@@ -54,9 +54,14 @@ static Eina_Bool _data_alloc(void *prv,
 		data->rgb565.plane0_stride = w * 2;
 		break;
 
+		case ENESIM_CONVERTER_BGR888:
+		data->bgr888.plane0 = alloc_data;
+		data->bgr888.plane0_stride = w * 3;
+		break;
+
 		case ENESIM_CONVERTER_RGB888:
-		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w * 3;
+		data->rgb888.plane0 = alloc_data;
+		data->rgb888.plane0_stride = w * 3;
 		break;
 
 		case ENESIM_CONVERTER_A8:
@@ -114,8 +119,21 @@ static void _data_free(void *prv, void *backend_data,
 		break;
 
 		case ENESIM_CONVERTER_RGB565:
+		free(data->rgb565.plane0);
+		break;
+
 		case ENESIM_CONVERTER_RGB888:
+		free(data->rgb888.plane0);
+		break;
+
+		case ENESIM_CONVERTER_BGR888:
+		free(data->bgr888.plane0);
+		break;
+
 		case ENESIM_CONVERTER_A8:
+		free(data->a8.plane0);
+		break;
+
 		case ENESIM_CONVERTER_GRAY:
 		ERR("Unsupported format %d", fmt);
 		break;

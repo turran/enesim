@@ -56,7 +56,6 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Backend b;
 
 	b = enesim_surface_backend_get(s);
-	printf("drawing %d\n", b);
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
@@ -65,7 +64,6 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 
 		case ENESIM_BACKEND_OPENCL:
 #if BUILD_OPENCL
-		printf("drawing opencl\n");
 		enesim_renderer_opencl_draw(r, s, area, x, y, flags);
 #endif
 		break;

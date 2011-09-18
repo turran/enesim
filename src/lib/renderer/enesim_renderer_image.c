@@ -147,7 +147,7 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 	}
 
 	enesim_surface_data_get(thiz->s, &src, &sstride);
-	src += sstride * thiz->yoff[y];
+	src = (uint32_t *)((uint8_t *)src + sstride * thiz->yoff[y]);
 
 	while (len--)
 	{
@@ -250,7 +250,7 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 	}
 
 	enesim_surface_data_get(thiz->s, &src, &sstride);
-	src += (sstride * y) + x;
+	src = argb8888_at(src, sstride, x, y);
 #if 1
 	thiz->span(dst, len, src, r->color, NULL);
 #else

@@ -46,7 +46,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y,
 	double r_inv;
 	uint32_t *src;
 	int sw, sh;
-	int sstride;
+	size_t sstride;
 	double ox, oy;
 
 	rd = _raddist_get(r);
