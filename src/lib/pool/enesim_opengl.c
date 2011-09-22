@@ -27,13 +27,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Buffer_OpenGL_Data
-{
-	GLuint texture;
-	GLuint fbo;
-	unsigned int num_textures;
-} Enesim_Buffer_OpenGL_Data;
-
 typedef struct _Enesim_OpenGL_Pool
 {
 } Enesim_OpenGL_Pool;
@@ -66,6 +59,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		case ENESIM_CONVERTER_RGB888:
 		case ENESIM_CONVERTER_A8:
 		case ENESIM_CONVERTER_GRAY:
+		default:
 		free(data);
 		return EINA_FALSE;
 		break;
@@ -85,10 +79,13 @@ static Eina_Bool _data_from(void *prv,
 		Enesim_Buffer_Sw_Data *src)
 {
 	Enesim_OpenGL_Pool *thiz = prv;
-	Enesim_Buffer_OpenGL_Data *data = backend_data;
+	Enesim_Buffer_OpenGL_Data *data;
 
 	if (!copy) return EINA_FALSE;
 
+	data = malloc(sizeof(Enesim_Buffer_OpenGL_Data));
+	glGenTextures(1, &data->texture);
+	*backend_data = data;
 	switch (fmt)
 	{
 		case ENESIM_CONVERTER_ARGB8888:
@@ -103,6 +100,7 @@ static Eina_Bool _data_from(void *prv,
 		case ENESIM_CONVERTER_RGB888:
 		case ENESIM_CONVERTER_A8:
 		case ENESIM_CONVERTER_GRAY:
+		default:
 		return EINA_FALSE;
 		break;
 	}

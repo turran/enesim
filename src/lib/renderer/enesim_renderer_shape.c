@@ -79,7 +79,7 @@ Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz = _shape_get(r);
 	if (!enesim_renderer_shape_setup(r))
 	{
-		WRN("Shape setup on %p failed", r);
+		ENESIM_RENDERER_ERROR(r, error, "Shape setup failed");
 		return EINA_FALSE;
 	}
 	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
@@ -87,7 +87,7 @@ Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	{
 		if (!enesim_renderer_sw_setup(thiz->fill.rend, s, error))
 		{
-			WRN("Shape setup on fill renderer %p of %p failed", thiz->fill.rend, r);
+			ENESIM_RENDERER_ERROR(r, error, "Fill renderer failed");
 			return EINA_FALSE;
 		}
 	}

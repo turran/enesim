@@ -39,6 +39,14 @@ void enesim_renderer_opencl_shutdown(void);
 
 #endif
 
+#if BUILD_OPENGL
+typedef struct _Enesim_Renderer_OpenGL_Data
+{
+
+} Enesim_Renderer_OpenGL_Data;
+#endif
+
+
 typedef struct _Enesim_Renderer_Sw_Data
 {
 	Enesim_Renderer_Sw_Fill fill;

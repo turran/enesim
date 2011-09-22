@@ -135,6 +135,7 @@ static void _data_free(void *prv, void *backend_data,
 		break;
 
 		case ENESIM_CONVERTER_GRAY:
+		default:
 		ERR("Unsupported format %d", fmt);
 		break;
 	}

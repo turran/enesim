@@ -35,6 +35,15 @@ typedef struct _Enesim_Buffer_OpenCL_Data
 } Enesim_Buffer_OpenCL_Data;
 #endif
 
+#if BUILD_OPENGL
+typedef struct _Enesim_Buffer_OpenGL_Data
+{
+	GLuint texture;
+	GLuint fbo;
+	unsigned int num_textures;
+} Enesim_Buffer_OpenGL_Data;
+#endif
+
 struct _Enesim_Buffer
 {
 	EINA_MAGIC

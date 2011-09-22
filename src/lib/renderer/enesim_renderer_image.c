@@ -128,12 +128,12 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 }
 #endif
 
-static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz;
 	size_t sstride;
 	uint32_t *src;
-	Eina_Rectangle ir, dr;
+	uint32_t *dst = ddata;
 
 	thiz = _image_get(r);
 	y -= r->oy;
@@ -146,8 +146,8 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 		return;
 	}
 
-	enesim_surface_data_get(thiz->s, &src, &sstride);
-	src = (uint32_t *)((uint8_t *)src + sstride * thiz->yoff[y]);
+	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
+	src = argb8888_at(src, sstride, thiz->yoff[y], 0);
 
 	while (len--)
 	{
@@ -160,19 +160,19 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 	}
 }
 
-static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz;
 	size_t sstride;
 	uint32_t *src;
-	Eina_Rectangle ir, dr;
+	uint32_t *dst = ddata;
 	Eina_F16p16 xx, yy;
 	int sw, sh;
 
 	thiz = _image_get(r);
 	renderer_affine_setup(r, x, y, &xx, &yy);
 
-	enesim_surface_data_get(thiz->s, &src, &sstride);
+	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	enesim_surface_size_get(thiz->s, &sw, &sh);
 
 
@@ -215,7 +215,7 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 		return;
 	}
 
-	enesim_surface_data_get(thiz->s, (uint32_t**)&src, &sstride);
+	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	src += (sstride * y) + x;
 	while (len--)
 	{
@@ -232,11 +232,12 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 	}
 }
 
-static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz;
 	size_t sstride;
 	uint32_t *src;
+	uint32_t *dst = ddata;
 
  	thiz = _image_get(r);
 	x -= r->ox;
@@ -249,22 +250,9 @@ static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsi
 		return;
 	}
 
-	enesim_surface_data_get(thiz->s, &src, &sstride);
+	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	src = argb8888_at(src, sstride, x, y);
-#if 1
 	thiz->span(dst, len, src, r->color, NULL);
-#else
-	while (len--)
-	{
-		if (x >= r->ox && x < r->ox + thiz->w)
-			*dst = *src;
-		else
-			*dst = 0;
-		x++;
-		dst++;
-		src++;
-	}
-#endif
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
