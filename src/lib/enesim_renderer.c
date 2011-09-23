@@ -103,17 +103,13 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Factory *f;
 	char renderer_name[PATH_MAX];
-	const char *descriptor_name;
+	const char *descriptor_name = NULL;
 
 	if (!_factories) return;
-	if (!r->descriptor->name)
-	{
-		descriptor_name = "unknown";
-	}
-	else
-	{
+	if (r->descriptor->name)
 		descriptor_name = r->descriptor->name(r);
-	}
+	if (!descriptor_name)
+		descriptor_name = "unknown";
 	f = eina_hash_find(_factories, descriptor_name);
 	if (!f)
 	{
