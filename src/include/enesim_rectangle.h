@@ -31,6 +31,14 @@ typedef struct _Enesim_Rectangle
 	double h;
 } Enesim_Rectangle;
 
+static inline Eina_Bool enesim_rectangle_is_inside(Enesim_Rectangle *r, double x, double y)
+{
+	if ((x - r->x >= 0) && (y - r->y >= 0) && (r->w - x >= 0) && (r->h - y >= 0))
+		return EINA_TRUE;
+	else
+		return EINA_FALSE;
+}
+
 /**
  * @}
  */
