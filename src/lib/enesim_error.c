@@ -36,6 +36,8 @@ struct _Enesim_Error
  */
 EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
 {
+	if (!string)
+		return NULL;
 	if (!error)
 	{
 		error = malloc(sizeof(Enesim_Error));
