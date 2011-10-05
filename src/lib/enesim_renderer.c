@@ -866,6 +866,7 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 	char str[PATH_MAX];
 	int num;
 
+	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!error)
 		return;
 
@@ -876,4 +877,15 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 	va_end(args);
 
 	*error = enesim_error_add(*error, str);
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Damage_Cb cb, void *data)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	/* TODO check if the renderer has changed */
+	/* TODO if so call the damage_get on the renderer */
 }
