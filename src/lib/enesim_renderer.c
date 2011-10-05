@@ -23,9 +23,11 @@
  * i.e state_setup, state_cleanup, property_changes .... , damage_get,
  * state_setup, state_cleanup ... etc
  * something like: void (*damages)(Enesim_Renderer *r, Eina_List **damages);
+ * Or better (to avoid the need to pass a list) just pass a function callback
+ * something like:
+ * void enesim_renderer_damages_get(Enesim_Renderer *r, (Eina_Bool)(Enesim_Rectangle *rect))
+ *
  * - Add a way to get/set such description
- * - Add a scale tranform property, every renderer should multiply its
- *   coordinates and lengths by this multiplier
  * - Change every internal struct on Enesim to have the correct prefix
  *   looks like we are having issues with mingw
  * - We have some overlfow on the coordinates whenever we want to trasnlate or
