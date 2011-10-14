@@ -139,20 +139,15 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 	y -= r->oy;
 	x -= r->ox;
 
-	if (y < 0 || y >= thiz->h)
-	{
-		while (len--)
-			*dst++ = 0;
-		return;
-	}
-
 	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
-	src = argb8888_at(src, sstride, thiz->yoff[y], 0);
+	src = argb8888_at(src, sstride, 0, thiz->yoff[y]);
 
 	while (len--)
 	{
 		if (x >= 0 && x < thiz->w)
+		{
 			*dst = *(src + thiz->xoff[x]);
+		}
 		else
 			*dst = 0;
 		x++;
@@ -174,7 +169,6 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 
 	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	enesim_surface_size_get(thiz->s, &sw, &sh);
-
 
 	while (len--)
 	{
