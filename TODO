@@ -20,3 +20,4 @@
   shape/shape
   transition/transition
 + Normalize the stride/pitch
++ Initialize every renderer to some sane vales
