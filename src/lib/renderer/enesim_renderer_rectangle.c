@@ -23,7 +23,8 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Rectangle {
 	/* public properties */
-	double w, h;
+	double width;
+	double height;
 	struct {
 		double radius;
 		Eina_Bool tl : 1;
@@ -32,6 +33,8 @@ typedef struct _Enesim_Renderer_Rectangle {
 		Eina_Bool br : 1;
 	} corner;
 	/* internal state */
+	double scaled_width;
+	double scaled_height;
 	int lxx0, rxx0;
 	int tyy0, byy0;
 	int rr0, irr0;
@@ -438,7 +441,7 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
-	int sw = thiz->w, sh = thiz->h;
+	int sw = thiz->scaled_width, sh = thiz->scaled_height;
 	int axx = r->matrix.values.xx;
 	int ayx = r->matrix.values.yx;
 	int do_inner = thiz->do_inner;
@@ -589,7 +592,7 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color ocolor;
 	Enesim_Color icolor;
-	int sw = thiz->w, sh = thiz->h;
+	int sw = thiz->scaled_width, sh = thiz->scaled_height;
 	int axx = r->matrix.values.xx;
 	int ayx = r->matrix.values.yx;
 	int azx = r->matrix.values.zx;
@@ -751,28 +754,37 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_Rectangle *thiz;
 	double rad;
 	double sw;
+	double sx, sy;
 
 	thiz = _rectangle_get(r);
-	if (!thiz || (thiz->w < 1) || (thiz->h < 1))
+	if (!thiz || (thiz->width < 1) || (thiz->height < 1))
 	{
-		ENESIM_RENDERER_ERROR(r, error, "Invalid size %d %d", thiz->w, thiz->h);
+		ENESIM_RENDERER_ERROR(r, error, "Invalid size %d %d", thiz->width, thiz->height);
+		return EINA_FALSE;
+	}
+	enesim_renderer_scale_get(r, &sx, &sy);
+	thiz->scaled_width = thiz->width * sx;
+	thiz->scaled_height = thiz->height * sy;
+	if ((thiz->scaled_width < 1) || (thiz->scaled_height < 1))
+	{
+		ENESIM_RENDERER_ERROR(r, error, "Invalid scaled size %d %d", thiz->scaled_width, thiz->scaled_height);
 		return EINA_FALSE;
 	}
 
 	rad = thiz->corner.radius;
-	if (rad > (thiz->w / 2.0))
-		rad = thiz->w / 2.0;
-	if (rad > (thiz->h / 2.0))
-		rad = thiz->h / 2.0;
+	if (rad > (thiz->scaled_width / 2.0))
+		rad = thiz->scaled_width / 2.0;
+	if (rad > (thiz->scaled_height / 2.0))
+		rad = thiz->scaled_height / 2.0;
 
 	thiz->rr0 = rad * 65536;
 	thiz->lxx0 = thiz->tyy0 = thiz->rr0;
-	thiz->rxx0 = (thiz->w - rad - 1) * 65536;
-	thiz->byy0 = (thiz->h - rad - 1) * 65536;
+	thiz->rxx0 = (thiz->scaled_width - rad - 1) * 65536;
+	thiz->byy0 = (thiz->scaled_height - rad - 1) * 65536;
 
 	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	thiz->do_inner = 1;
-	if ((sw >= (thiz->w / 2.0)) || (sw >= (thiz->h / 2.0)))
+	if ((sw >= (thiz->scaled_width / 2.0)) || (sw >= (thiz->scaled_height / 2.0)))
 	{
 		sw = 0;
 		thiz->do_inner = 0;
@@ -833,8 +845,8 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 	boundings->x = 0;
 	boundings->y = 0;
-	boundings->w = thiz->w;
-	boundings->h = thiz->h;
+	boundings->w = thiz->width;
+	boundings->h = thiz->height;
 }
 
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {
@@ -870,73 +882,73 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 /**
  * Sets the width of the rectangle
  * @param[in] r The rectangle renderer
- * @param[in] w The rectangle width
+ * @param[in] width The rectangle width
  */
-EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double w)
+EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double width)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->w = w;
+	thiz->width = width;
 }
 /**
  * Gets the width of the rectangle
  * @param[in] r The rectangle renderer
  * @param[out] w The rectangle width
  */
-EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *w)
+EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *width)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (w) *w = thiz->w;
+	if (width) *width = thiz->width;
 }
 /**
  * Sets the height of the rectangle
  * @param[in] r The rectangle renderer
- * @param[in] h The rectangle height
+ * @param[in] height The rectangle height
  */
-EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double h)
+EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double height)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->h = h;
+	thiz->height = height;
 }
 /**
  * Gets the height of the rectangle
  * @param[in] r The rectangle renderer
- * @param[out] h The rectangle height
+ * @param[out] height The rectangle height
  */
-EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, double *h)
+EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, double *height)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (h) *h = thiz->h;
+	if (height) *height = thiz->height;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double w, double h)
+EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double width, double height)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	thiz = _rectangle_get(r);
-	thiz->w = w;
-	thiz->h = h;
+	thiz->width = width;
+	thiz->height = height;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *w, double *h)
+EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *width, double *height)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (w) *w = thiz->w;
-	if (h) *h = thiz->h;
+	if (width) *width = thiz->width;
+	if (height) *height = thiz->height;
 }
 /**
  * To be documented

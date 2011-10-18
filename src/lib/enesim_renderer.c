@@ -239,6 +239,8 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	/* common properties */
 	r->ox = 0;
 	r->oy = 0;
+	r->sx = 1;
+	r->sy = 1;
 	r->color = ENESIM_COLOR_FULL;
 	r->rop = ENESIM_FILL;
 	enesim_f16p16_matrix_identity(&r->matrix.values);
