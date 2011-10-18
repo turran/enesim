@@ -885,7 +885,7 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Damage_Cb cb, void *data)
+EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	/* TODO check if the renderer has changed */

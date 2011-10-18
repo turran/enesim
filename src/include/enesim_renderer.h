@@ -53,8 +53,8 @@ typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double
 typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *rect);
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
-typedef Eina_Bool (*Enesim_Damage_Cb)(Enesim_Renderer *r, Enesim_Rectangle *area, void *data);
-typedef void (*Enesim_Damage)(Enesim_Renderer *r, Enesim_Damage_Cb cb, void *data);
+typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, Enesim_Rectangle *area, void *data);
+typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 /* software engine functions */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
