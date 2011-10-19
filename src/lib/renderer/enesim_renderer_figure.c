@@ -792,6 +792,7 @@ static Enesim_Renderer_Descriptor _figure_descriptor = {
 	/* .boundings =  */ _figure_boundings,
 	/* .flags =      */ NULL,
 	/* .is_inside =  */ NULL,
+	/* .damage =     */ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };

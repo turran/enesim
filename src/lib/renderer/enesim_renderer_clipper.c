@@ -154,6 +154,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings =  */ _clipper_boundings,
 	/* .flags =      */ _clipper_flags,
 	/* .is_inside =  */ NULL,
+	/* .damage =     */ NULL,
 	/* .sw_setup =   */ _clipper_state_setup,
 	/* .sw_cleanup = */ _clipper_state_cleanup
 };

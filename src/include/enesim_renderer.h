@@ -47,6 +47,7 @@ typedef enum Enesim_Renderer_Flag
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
 typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
 
+/* common descriptor functions */
 typedef const char * (*Enesim_Renderer_Name)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
@@ -56,7 +57,7 @@ typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, Enesim_Rectangle *area, void *data);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
-/* software engine functions */
+/* software engine descriptor functions */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *dst);
 
@@ -65,7 +66,7 @@ typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error);
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
-/* opencl engine functions */
+/* opencl engine descriptor functions */
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r, Enesim_Surface *s,
 		const char **program_name, const char **program_source, size_t *program_length,
 		Enesim_Error **error);
@@ -80,6 +81,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Boundings boundings;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Inside is_inside;
+	Enesim_Renderer_Damage damage;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;

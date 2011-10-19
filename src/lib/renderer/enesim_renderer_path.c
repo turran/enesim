@@ -315,6 +315,7 @@ static Enesim_Renderer_Descriptor _path_descriptor = {
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ NULL,
 	/* .is_inside =  */ NULL,
+	/* .damage =     */ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };

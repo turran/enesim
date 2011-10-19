@@ -147,6 +147,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings =             */ NULL,
 	/* .flags =                 */ _background_flags,
 	/* .is_inside =             */ NULL,
+	/* .damage =                */ NULL,
 	/* .sw_setup =              */ _background_sw_setup,
 	/* .sw_cleanup =            */ NULL,
 #if BUILD_OPENCL

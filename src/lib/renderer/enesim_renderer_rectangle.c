@@ -856,6 +856,7 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .boundings =  */ _boundings,
 	/* .flags =      */ _rectangle_flags,
 	/* .is_inside =  */ NULL,
+	/* .damage =     */ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };
