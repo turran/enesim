@@ -46,12 +46,13 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
 	Eina_Rectangle span;
 	uint32_t *tmp;
+	uint32_t *dst = ddata;
 	size_t tmp_size;
 
 	thiz = _compound_get(r);
@@ -88,11 +89,12 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *
 	}
 }
 
-static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
 	Eina_Rectangle span;
+	uint32_t *dst = ddata;
 
 	thiz = _compound_get(r);
 	eina_rectangle_coords_from(&span, x, y, len, 1);
@@ -266,13 +268,32 @@ static void _compound_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
+static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
+{
+	Enesim_Renderer_Compound *thiz;
+	Eina_List *ll;
+	Eina_Bool is_inside = EINA_FALSE;
+
+	thiz = _compound_get(r);
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
+	{
+		Layer *l = eina_list_data_get(ll);
+		Enesim_Renderer *lr = l->r;
+
+		/* intersect with every flag */
+		is_inside = enesim_renderer_is_inside(lr, x, y);
+		if (is_inside) break;
+	}
+	return is_inside;
+}
+
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
 	/* .name =       */ _compound_name,
 	/* .free =       */ _compound_free,
 	/* .boundings =  */ _compound_boundings,
 	/* .flags =      */ _compound_flags,
-	/* .is_inside =  */ NULL,
+	/* .is_inside =  */ _compound_is_inside,
 	/* .damage =     */ NULL,
 	/* .sw_setup =   */ _compound_state_setup,
 	/* .sw_cleanup = */ _compound_state_cleanup

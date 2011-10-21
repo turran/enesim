@@ -103,7 +103,7 @@ static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 }
 
 static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
-		int y, unsigned int len, uint32_t *dst)
+		int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Figure *thiz = _figure_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -111,6 +111,7 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
 	int stroke = 0;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
 	Polygon_Vector *v = thiz->vectors;
@@ -280,7 +281,7 @@ get_out:
 }
 
 static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
+		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Figure *thiz = _figure_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -288,6 +289,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
 	int stroke = 0;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
 	Polygon_Vector *v = thiz->vectors;
@@ -460,7 +462,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 }
 
 static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
+		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Figure *thiz = _figure_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -468,6 +470,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
 	int stroke = 0;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Polygon_Edge *edges, *edge;
 	Polygon_Vector *v = thiz->vectors;
@@ -785,12 +788,19 @@ static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 	boundings->h = ((thiz->byy - 0xffff) >> 16) - boundings->y + 1;
 }
 
+static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PROJECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
 static Enesim_Renderer_Descriptor _figure_descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
 	/* .name =       */ _figure_name,
 	/* .free =       */ _free,
 	/* .boundings =  */ _figure_boundings,
-	/* .flags =      */ NULL,
+	/* .flags =      */ _figure_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
 	/* .sw_setup =   */ _state_setup,

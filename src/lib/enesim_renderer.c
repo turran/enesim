@@ -34,6 +34,9 @@
  *   transform boundings, we need to fix the maximum and minimum for a
  *   coordinate and length
  *
+ * - Maybe checking the flags for every origin/value set is too much
+ * another option is to make every renderer responsable of changing the origin/scale/etc
+ * if the owned renderer handles that
  */
 /*============================================================================*
  *                                  Local                                     *
@@ -383,6 +386,7 @@ EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *m)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	Enesim_Renderer_Flag flags;
 
 	if (!m)
 	{
@@ -391,6 +395,9 @@ EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *
 		r->matrix.type = ENESIM_MATRIX_IDENTITY;
 		return;
 	}
+	enesim_renderer_flags(r, &flags);
+	if (!(flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE)))
+		return;
 	r->matrix.original = *m;
 	enesim_matrix_f16p16_matrix_to(m, &r->matrix.values);
 	r->matrix.type = enesim_f16p16_matrix_type_get(&r->matrix.values);
@@ -438,10 +445,8 @@ EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y)
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	enesim_renderer_flags(r, &flags);
-#if LATER
 	if (!(flags & ENESIM_RENDERER_FLAG_TRANSLATE))
 		return;
-#endif
 	r->ox = x;
 	r->oy = y;
 }
@@ -466,10 +471,8 @@ EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x)
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	enesim_renderer_flags(r, &flags);
-#if LATER
 	if (!(flags & ENESIM_RENDERER_FLAG_TRANSLATE))
 		return;
-#endif
 	r->ox = x;
 }
 
@@ -493,10 +496,8 @@ EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y)
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	enesim_renderer_flags(r, &flags);
-#if LATER
 	if (!(flags & ENESIM_RENDERER_FLAG_TRANSLATE))
 		return;
-#endif
 	r->oy = y;
 }
 
@@ -520,10 +521,8 @@ EAPI void enesim_renderer_scale_set(Enesim_Renderer *r, double x, double y)
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	enesim_renderer_flags(r, &flags);
-#if LATER
 	if (!(flags & ENESIM_RENDERER_FLAG_SCALE))
 		return;
-#endif
 	r->sx = x;
 	r->sy = y;
 }
@@ -548,10 +547,8 @@ EAPI void enesim_renderer_x_scale_set(Enesim_Renderer *r, double x)
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	enesim_renderer_flags(r, &flags);
-#if LATER
 	if (!(flags & ENESIM_RENDERER_FLAG_SCALE))
 		return;
-#endif
 	r->sx = x;
 }
 
@@ -575,10 +572,8 @@ EAPI void enesim_renderer_y_scale_set(Enesim_Renderer *r, double y)
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	enesim_renderer_flags(r, &flags);
-#if LATER
 	if (!(flags & ENESIM_RENDERER_FLAG_SCALE))
 		return;
-#endif
 	r->sy = y;
 }
 
@@ -625,9 +620,7 @@ EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectan
 	enesim_renderer_boundings(r, boundings);
 	enesim_renderer_flags(r, &flags);
 	/* move by the origin */
-#if LATER
 	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
-#endif
 	{
 		if (boundings->x != INT_MIN / 2)
 			boundings->x -= r->ox;
@@ -677,18 +670,14 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 
 	enesim_renderer_boundings(r, &boundings);
 	enesim_renderer_flags(r, &flags);
-#if LATER
 	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
-#endif
 	{
 		if (boundings.x != INT_MIN / 2)
 			boundings.x += r->ox;
 		if (boundings.y != INT_MIN / 2)
 			boundings.y += r->oy;
 	}
-#if LATER
 	if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
-#endif
 	{
 		if (r->matrix.type != ENESIM_MATRIX_IDENTITY && boundings.w != INT_MAX && boundings.h != INT_MAX)
 		{

@@ -30,8 +30,10 @@ struct _Background {
 	/* the content properties */
 	Enesim_Rop old_rop;
 	Enesim_Matrix old_matrix;
-	double old_x;
-	double old_y;
+	double old_ox;
+	double old_oy;
+	double old_sx;
+	double old_sy;
 	/* generated at state setup */
 	Enesim_Renderer_Sw_Fill content_fill;
 };
@@ -45,7 +47,7 @@ static inline Enesim_Renderer_Clipper * _clipper_get(Enesim_Renderer *r)
 }
 
 static void _span(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
+		unsigned int len, void *dst)
 {
 	Enesim_Renderer_Clipper *thiz;
 
@@ -55,9 +57,22 @@ static void _span(Enesim_Renderer *r, int x, int y,
 
 static void _content_cleanup(Enesim_Renderer_Clipper *thiz)
 {
+	Enesim_Renderer_Flag flags;
+
+	enesim_renderer_flags(thiz->content, &flags);
+	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
+	{
+		enesim_renderer_origin_set(thiz->content, thiz->old_ox, thiz->old_oy);
+	}
+	if (flags & ENESIM_RENDERER_FLAG_SCALE)
+	{
+		enesim_renderer_scale_set(thiz->content, thiz->old_sx, thiz->old_sy);
+	}
+	if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
+	{
+		enesim_renderer_transformation_set(thiz->content, &thiz->old_matrix);
+	}
 	enesim_renderer_sw_cleanup(thiz->content);
-	enesim_renderer_origin_set(thiz->content, thiz->old_x, thiz->old_y);
-	enesim_renderer_transformation_set(thiz->content, &thiz->old_matrix);
 	/* FIXME add the rop */
 }
 /*----------------------------------------------------------------------------*
@@ -73,7 +88,7 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Renderer_Clipper *thiz;
 	Enesim_Matrix matrix;
-	double ox, oy;
+	Enesim_Renderer_Flag flags;
 
  	thiz = _clipper_get(r);
 	if (!thiz->content)
@@ -81,13 +96,29 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		printf("no content\n");
 		return EINA_FALSE;
 	}
+	enesim_renderer_flags(thiz->content, &flags);
+	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
+	{
+		double ox, oy;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
-	enesim_renderer_origin_get(thiz->content, &thiz->old_x, &thiz->old_y);
-	enesim_renderer_origin_set(thiz->content, ox, oy);
-	enesim_renderer_transformation_get(r, &matrix);
-	enesim_renderer_transformation_get(thiz->content, &thiz->old_matrix);
-	enesim_renderer_transformation_set(thiz->content, &matrix);
+		enesim_renderer_origin_get(r, &ox, &oy);
+		enesim_renderer_origin_get(thiz->content, &thiz->old_ox, &thiz->old_oy);
+		enesim_renderer_origin_set(thiz->content, ox, oy);
+	}
+	if (flags & ENESIM_RENDERER_FLAG_SCALE)
+	{
+		double sx, sy;
+
+		enesim_renderer_scale_get(r, &sx, &sy);
+		enesim_renderer_scale_get(thiz->content, &thiz->old_sx, &thiz->old_sy);
+		enesim_renderer_scale_set(thiz->content, sx, sy);
+	}
+	if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
+	{
+		enesim_renderer_transformation_get(r, &matrix);
+		enesim_renderer_transformation_get(thiz->content, &thiz->old_matrix);
+		enesim_renderer_transformation_set(thiz->content, &matrix);
+	}
 	/* FIXME add the rop */
 	if (!enesim_renderer_sw_setup(thiz->content, s, error))
 	{
