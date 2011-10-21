@@ -125,6 +125,12 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 	snprintf(renderer_name, PATH_MAX, "%s%d", descriptor_name, f->id++);
 	enesim_renderer_name_set(r, renderer_name);
 }
+
+Eina_Bool _enesim_renderer_changed(Enesim_Renderer *r)
+{
+	/* TODO compare the current state and the old state */
+	/* if it has chanhged just retun a TRUE */
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/

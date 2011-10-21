@@ -68,8 +68,6 @@ struct _Enesim_Renderer
 		Enesim_F16p16_Matrix values;
 		Enesim_Matrix_Type type;
 	} matrix;
-	/* the wrapped renderer */
-	Enesim_Renderer *wrapper_renderer;
 	/* the private data */
 	Eina_Hash *prv_data;
 	/* the descriptor */
@@ -81,6 +79,20 @@ struct _Enesim_Renderer
 	 * possible data */
 	void *backend_data[ENESIM_BACKENDS];
 };
+
+typedef struct _Enesim_Renderer_State
+{
+	Enesim_Rop rop;
+	Enesim_Color color;
+	Enesim_Quality quality;
+	double ox, oy; /* the origin */
+	double sx, sy; /* the scale */
+	struct {
+		Enesim_Matrix original;
+		Enesim_F16p16_Matrix values;
+		Enesim_Matrix_Type type;
+	} matrix;
+} Enesim_Renderer_State;
 
 typedef struct _Enesim_Renderer_Shape
 {
@@ -100,6 +112,24 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Shape_Draw_Mode draw_mode;
 	void *data;
 } Enesim_Renderer_Shape;
+
+typedef struct _Enesim_Renderer_Shape_State
+{
+	struct {
+		Enesim_Color color;
+		Enesim_Renderer *rend; /* TODO */
+		double weight;
+		Enesim_Matrix original;
+	} stroke;
+
+	struct {
+		Enesim_Color color;
+		Enesim_Renderer *rend;
+		Enesim_Matrix original;
+		double ox, oy;
+	} fill;
+	Enesim_Shape_Draw_Mode draw_mode;
+} Enesim_Renderer_Shape_State;
 
 /* Helper functions needed by other renderers */
 static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
