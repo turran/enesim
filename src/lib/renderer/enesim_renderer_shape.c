@@ -96,7 +96,7 @@ Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r)
+void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -104,7 +104,7 @@ void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r)
 	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
 			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
-		enesim_renderer_sw_cleanup(thiz->fill.rend);
+		enesim_renderer_sw_cleanup(thiz->fill.rend, s);
 	}
 	enesim_renderer_shape_cleanup(r);
 }

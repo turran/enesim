@@ -165,7 +165,7 @@ static Eina_Bool _setup_state(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _cleanup_state(Enesim_Renderer *p)
+static void _cleanup_state(Enesim_Renderer *r, Enesim_Surface *s)
 {
 }
 

@@ -217,7 +217,7 @@ static Enesim_Renderer_Gradient_Color_Get _color_get[ENESIM_GRADIENT_MODES];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static void _gradient_state_cleanup(Enesim_Renderer *r)
+static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Gradient *thiz;
 

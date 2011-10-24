@@ -133,7 +133,7 @@ static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _perlin_state_cleanup(Enesim_Renderer *r)
+static void _perlin_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Perlin *thiz;
 
@@ -165,7 +165,6 @@ static void _perlin_free(Enesim_Renderer *r)
 	Enesim_Renderer_Perlin *thiz;
 
 	thiz = _perlin_get(r);
-	_perlin_state_cleanup(r);
 	free(thiz);
 }
 

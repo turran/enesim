@@ -102,7 +102,7 @@ static const char * _radial_name(Enesim_Renderer *r)
 	return "radial";
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 }
 

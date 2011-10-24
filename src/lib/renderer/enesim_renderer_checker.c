@@ -282,7 +282,7 @@ static const char * _checker_name(Enesim_Renderer *r)
 	return "checker";
 }
 
-static void _checker_state_cleanup(Enesim_Renderer *r)
+static void _checker_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 
 }

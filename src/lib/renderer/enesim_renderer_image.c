@@ -272,7 +272,7 @@ static void _image_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	}
 }
 
-static void _image_state_cleanup(Enesim_Renderer *r)
+static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Image *thiz;
 
@@ -311,7 +311,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	_image_state_cleanup(r);
+	_image_state_cleanup(r, s);
 
 	enesim_surface_size_get(thiz->s, &sw, &sh);
 	/* FIXME we need to use the format from the destination surface */
@@ -381,7 +381,6 @@ static void _image_free(Enesim_Renderer *r)
 	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
-	_image_state_cleanup(r);
 	free(thiz);
 }
 

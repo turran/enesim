@@ -203,7 +203,7 @@ static const char * _dispmap_name(Enesim_Renderer *r)
 	return "dispmap";
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 
 }

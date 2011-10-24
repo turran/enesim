@@ -230,7 +230,7 @@ static const char * _grid_name(Enesim_Renderer *r)
 	return "grid";
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 
 }

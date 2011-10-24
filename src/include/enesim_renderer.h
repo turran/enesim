@@ -78,7 +78,7 @@ typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error);
-typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r);
+typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 /* opencl engine descriptor functions */
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state, Enesim_Surface *s,

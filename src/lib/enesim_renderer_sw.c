@@ -434,9 +434,9 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
-void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
+void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	if (r->descriptor->sw_cleanup) r->descriptor->sw_cleanup(r);
+	if (r->descriptor->sw_cleanup) r->descriptor->sw_cleanup(r, s);
 }
 /*============================================================================*
  *                                   API                                      *

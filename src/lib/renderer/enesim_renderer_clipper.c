@@ -55,7 +55,7 @@ static void _span(Enesim_Renderer *r, int x, int y,
 	thiz->content_fill(thiz->content, x, y, len, dst);
 }
 
-static void _content_cleanup(Enesim_Renderer_Clipper *thiz)
+static void _content_cleanup(Enesim_Renderer_Clipper *thiz, Enesim_Surface *s)
 {
 	Enesim_Renderer_Flag flags;
 
@@ -72,7 +72,7 @@ static void _content_cleanup(Enesim_Renderer_Clipper *thiz)
 	{
 		enesim_renderer_transformation_set(thiz->content, &thiz->old_matrix);
 	}
-	enesim_renderer_sw_cleanup(thiz->content);
+	enesim_renderer_sw_cleanup(thiz->content, s);
 	/* FIXME add the rop */
 }
 /*----------------------------------------------------------------------------*
@@ -126,7 +126,7 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
 	{
 		printf("content cannot setup\n");
 		/* restore the values */
-		_content_cleanup(thiz);
+		_content_cleanup(thiz, s);
 		return EINA_FALSE;
 	}
 	*fill = _span;
@@ -134,14 +134,14 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _clipper_state_cleanup(Enesim_Renderer *r)
+static void _clipper_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = _clipper_get(r);
 	if (!thiz->content) return;
 
-	_content_cleanup(thiz);
+	_content_cleanup(thiz, s);
 }
 
 

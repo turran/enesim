@@ -222,12 +222,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Circle *thiz;
 
 	thiz = _circle_get(r);
-	enesim_renderer_shape_sw_cleanup(r);
+	enesim_renderer_shape_sw_cleanup(r, s);
 }
 
 static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)

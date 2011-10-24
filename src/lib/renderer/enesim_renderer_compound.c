@@ -191,7 +191,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _compound_state_cleanup(Enesim_Renderer *r)
+static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
@@ -202,7 +202,7 @@ static void _compound_state_cleanup(Enesim_Renderer *r)
 	{
 		Layer *l = eina_list_data_get(ll);
 
-		enesim_renderer_sw_cleanup(l->r);
+		enesim_renderer_sw_cleanup(l->r, s);
 		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
 	}
 }

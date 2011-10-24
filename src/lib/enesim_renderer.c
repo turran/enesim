@@ -396,7 +396,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 			if (!fill)
 			{
 				ENESIM_RENDERER_ERROR(r, error, "Even if the setup did not failed, there's no fill function");
-				enesim_renderer_sw_cleanup(r);
+				enesim_renderer_sw_cleanup(r, s);
 				return EINA_FALSE;
 			}
 			return EINA_TRUE;
@@ -432,7 +432,7 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
-		enesim_renderer_sw_cleanup(r);
+		enesim_renderer_sw_cleanup(r, s);
 		break;
 
 		default:

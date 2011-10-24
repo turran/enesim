@@ -91,7 +91,7 @@ static Eina_F16p16 _linear_distance(Enesim_Renderer *r, Eina_F16p16 x,
 	return _linear_distance_internal(thiz, x, y);
 }
 
-static void _linear_state_cleanup(Enesim_Renderer *r)
+static void _linear_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 
 }

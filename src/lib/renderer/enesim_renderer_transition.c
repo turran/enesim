@@ -117,13 +117,13 @@ end:
 	return EINA_FALSE;
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Transition *t;
 
 	t = _transition_get(r);
-	enesim_renderer_sw_cleanup(t->r0.r);
-	enesim_renderer_sw_cleanup(t->r1.r);
+	enesim_renderer_sw_cleanup(t->r0.r, s);
+	enesim_renderer_sw_cleanup(t->r1.r, s);
 	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy);
 	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy);
 }

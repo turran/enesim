@@ -299,12 +299,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _state_cleanup(Enesim_Renderer *r)
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
 
 	thiz = _path_get(r);
-	enesim_renderer_shape_sw_cleanup(thiz->figure);
+	enesim_renderer_shape_sw_cleanup(thiz->figure, s);
 }
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
