@@ -218,12 +218,12 @@ static void _cubic_to(Enesim_Renderer *r, double ctrl_x0, double ctrl_y0,
 	thiz->last_ctrl_y = y23;
 }
 
-static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Path *thiz;
 
 	thiz = _path_get(r);
-	thiz->fill(thiz->figure, x, y, len, dst);
+	thiz->fill(thiz->figure, x, y, len, ddata);
 }
 
 /*----------------------------------------------------------------------------*
@@ -234,16 +234,19 @@ static const char * _path_name(Enesim_Renderer *r)
 	return "path";
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
-	double stroke_weight;
 	Enesim_Color stroke_color;
 	Enesim_Renderer *stroke_renderer;
 	Enesim_Color fill_color;
 	Enesim_Renderer *fill_renderer;
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Matrix matrix;
+	double stroke_weight;
 	double ox, oy;
 
 	thiz = _path_get(r);
@@ -251,6 +254,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		return EINA_FALSE;
 	if (!thiz->figure)
 		return EINA_FALSE; // should just not draw
+
+	/* FIXME given that we now pass the state, there's no need to gt/set every property
+	 * just pass the state or set the values
+	 */
 
 	enesim_renderer_shape_stroke_weight_get(r, &stroke_weight);
 	enesim_renderer_shape_stroke_weight_set(thiz->figure, stroke_weight);
@@ -273,9 +280,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_renderer_origin_get(r, &ox, &oy);
 	enesim_renderer_origin_set(thiz->figure, ox, oy);
 
-	thiz->figure->matrix = r->matrix;
+	enesim_renderer_transformation_get(r, &matrix);
+	enesim_renderer_transformation_set(r, &matrix);
 
-	if (!enesim_renderer_sw_setup(thiz->figure, s, error))
+	if (!enesim_renderer_sw_setup(thiz->figure, state, s, error))
 	{
 		return EINA_FALSE;
 	}

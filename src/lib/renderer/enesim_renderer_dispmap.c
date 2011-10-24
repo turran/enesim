@@ -31,6 +31,7 @@ typedef struct _Dispamp
 	Enesim_Channel y_channel;
 	double scale;
 	/* The state variables */
+	Enesim_F16p16_Matrix matrix;
 	Eina_F16p16 s_scale;
 } Enesim_Renderer_Dispmap;
 
@@ -94,7 +95,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r, int x,	\
 	enesim_surface_data_get(thiz->map, (void **)&map, &mstride);		\
 	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
-	renderer_identity_setup(r, x, y, &xx, &yy);				\
+	enesim_renderer_identity_setup(r, x, y, &xx, &yy);			\
 	x = eina_f16p16_int_to(xx);						\
 	y = eina_f16p16_int_to(yy);						\
 	map = argb8888_at(map, mstride, x, y);					\
@@ -151,7 +152,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
 	/* TODO move by the origin */						\
-	renderer_affine_setup(r, x, y, &xx, &yy);				\
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);		\
 										\
 	while (dst < end)							\
 	{									\
@@ -183,8 +184,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
 next:										\
 		*dst++ = p0;							\
 		map++;								\
-		yy += r->matrix.values.yx;					\
-		xx += r->matrix.values.xx;					\
+		yy += thiz->matrix.yx;						\
+		xx += thiz->matrix.xx;						\
 	}									\
 }
 
@@ -207,7 +208,9 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Dispmap *thiz;
@@ -215,7 +218,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz = _dispmap_get(r);
 	if (!thiz->map || !thiz->src) return EINA_FALSE;
 
-	*fill = _spans[thiz->x_channel][thiz->y_channel][r->matrix.type];
+	enesim_matrix_f16p16_matrix_to(&state->transformation,
+			&thiz->matrix);
+	*fill = _spans[thiz->x_channel][thiz->y_channel][state->transformation_type];
 	if (!*fill) return EINA_FALSE;
 
 	thiz->s_scale = eina_f16p16_double_from(thiz->scale);

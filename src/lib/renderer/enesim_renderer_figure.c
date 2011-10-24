@@ -78,8 +78,7 @@ struct _Contour_Polygon
 	Contour_Polygon *next;
 };
 
-typedef struct _Enesim_Renderer_Figure Enesim_Renderer_Figure;
-struct _Enesim_Renderer_Figure
+typedef struct _Enesim_Renderer_Figure
 {
 	Contour_Polygon *polys, *last;
 	int npolys;
@@ -91,8 +90,9 @@ struct _Enesim_Renderer_Figure
 
 	int lxx, rxx, tyy, byy;
 
+	Enesim_F16p16_Matrix matrix;
 	unsigned char changed :1;
-};
+} Enesim_Renderer_Figure;
 
 static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 {
@@ -118,9 +118,9 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	double ox, oy;
 
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz =
-			r->matrix.values.xz;
-	int ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
@@ -150,7 +150,7 @@ get_out:
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -161,7 +161,7 @@ get_out:
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -296,10 +296,10 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	int y0, y1;
 
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz =
-			r->matrix.values.xz;
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz =
-			r->matrix.values.yz;
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz =
+			thiz->matrix.yz;
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 
@@ -372,7 +372,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -383,7 +383,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -476,12 +476,12 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	Polygon_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0;
 
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz =
-			r->matrix.values.xz;
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz =
-			r->matrix.values.yz;
-	int azx = r->matrix.values.zx, azy = r->matrix.values.zy, azz =
-			r->matrix.values.zz;
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz =
+			thiz->matrix.yz;
+	int azx = thiz->matrix.zx, azy = thiz->matrix.zy, azz =
+			thiz->matrix.zz;
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
@@ -528,7 +528,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -539,7 +539,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -635,7 +635,9 @@ static void _free(Enesim_Renderer *r)
 	enesim_renderer_figure_clear(r);
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
@@ -743,16 +745,19 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		thiz->changed = 0;
 	}
 
-	if (!enesim_renderer_shape_sw_setup(r, s, error))
+	if (!enesim_renderer_shape_sw_setup(r, state, s, error))
 	{
 		return EINA_FALSE;
 	}
 
+	enesim_matrix_f16p16_matrix_to(&state->transformation,
+			&thiz->matrix);
+
 	*fill = figure_stroke_fill_paint_proj;
-	if (r->matrix.type != ENESIM_MATRIX_PROJECTIVE)
+	if (state->transformation_type != ENESIM_MATRIX_PROJECTIVE)
 	{
 		*fill = figure_stroke_fill_paint_affine;
-		if (r->matrix.values.yx == 0)
+		if (&state->transformation.yx == 0)
 			*fill = figure_stroke_fill_paint_affine_simple;
 	}
 
@@ -779,8 +784,8 @@ static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 	thiz = _figure_get(r);
 
-	// for now.. but do this better later
-	if (!enesim_renderer_sw_setup(r, NULL, NULL))
+	/* FIXME split the setp on two functions */
+	if (!enesim_renderer_sw_setup(r, NULL, NULL, NULL))
 		return;
 	boundings->x = (thiz->lxx - 0xffff) >> 16;
 	boundings->y = (thiz->tyy - 0xffff) >> 16;

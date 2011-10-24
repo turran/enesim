@@ -74,7 +74,6 @@ static Eina_F16p16 _radial_distance(Enesim_Renderer *r, Eina_F16p16 x,
 		Eina_F16p16 y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
-	Eina_F16p16 res;
 	double a, b;
 	double ret;
 	double d1, d2;
@@ -107,7 +106,9 @@ static void _state_cleanup(Enesim_Renderer *r)
 {
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;

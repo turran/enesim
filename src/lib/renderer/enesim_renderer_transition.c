@@ -42,13 +42,14 @@ static inline Enesim_Renderer_Transition * _transition_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Transition *t;
 	Enesim_Renderer_Sw_Data *s0data;
 	Enesim_Renderer_Sw_Data *s1data;
 	Enesim_Renderer *s0, *s1;
 	int interp ;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	unsigned int *buf;
 
@@ -57,8 +58,8 @@ static void _span_general(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	s1 = t->r1.r;
 	interp = t->interp;
 
-	s0data = s0->backend_data[ENESIM_BACKEND_SOFTWARE];
-	s1data = s1->backend_data[ENESIM_BACKEND_SOFTWARE];
+	s0data = enesim_renderer_backend_data_get(s0, ENESIM_BACKEND_SOFTWARE);
+	s1data = enesim_renderer_backend_data_get(s1, ENESIM_BACKEND_SOFTWARE);
 	if (interp == 0)
 	{
 		s0data->fill(s0, x, y, len, d);
@@ -89,7 +90,9 @@ static const char * _transition_name(Enesim_Renderer *r)
 	return "transition";
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Transition *t;
@@ -100,9 +103,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_renderer_relative_set(r, t->r0.r, &t->r0.original, &t->r0.ox, &t->r0.oy);
 	enesim_renderer_relative_set(r, t->r1.r, &t->r1.original, &t->r1.ox, &t->r1.oy);
-	if (!enesim_renderer_sw_setup(t->r0.r, s, error))
+	if (!enesim_renderer_sw_setup(t->r0.r, state, s, error))
 		goto end;
-	if (!enesim_renderer_sw_setup(t->r1.r, s, error))
+	if (!enesim_renderer_sw_setup(t->r1.r, state, s, error))
 		goto end;
 
 	*fill = _span_general;
@@ -161,7 +164,7 @@ static void _transition_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	}
 
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE;
+			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 

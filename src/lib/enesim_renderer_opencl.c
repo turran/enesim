@@ -33,7 +33,9 @@ static size_t _roundup(size_t local_size, size_t num)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_OpenCL_Data *rdata;
@@ -53,7 +55,7 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	 * it every time, something like a token
 	 */
 	if (!r->descriptor->opencl_setup) return EINA_FALSE;
-	ret = r->descriptor->opencl_setup(r, s, &source_name, &source, &source_size, error);
+	ret = r->descriptor->opencl_setup(r, state, s, &source_name, &source, &source_size, error);
 	printf("loading the opencl description %s\n", source);
 	if (!ret) return EINA_FALSE;
 

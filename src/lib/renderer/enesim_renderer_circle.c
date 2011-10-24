@@ -25,6 +25,7 @@ typedef struct _Enesim_Renderer_Circle {
 	double x, y;
 	double r;
 	/* internal state */
+	Enesim_F16p16_Matrix matrix;
 	int xx0, yy0;
 	int rr0, irr0;
 	unsigned char do_inner :1;
@@ -39,13 +40,13 @@ static inline Enesim_Renderer_Circle * _circle_get(Enesim_Renderer *r)
 }
 
 static void _stroked_fill_paint(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
+		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Circle *thiz = _circle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *fpaint;
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
 	int do_inner = thiz->do_inner;
 	unsigned int ocolor;
 	unsigned int icolor;
@@ -53,6 +54,7 @@ static void _stroked_fill_paint(Enesim_Renderer *r, int x, int y,
 	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
 	int rr2 = rr1 * 1.41421357, irr2 = irr1 * 1.41421357; // sqrt(2)
 	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy;
 	int fill_only = 0;
@@ -77,7 +79,7 @@ static void _stroked_fill_paint(Enesim_Renderer *r, int x, int y,
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -86,11 +88,11 @@ static void _stroked_fill_paint(Enesim_Renderer *r, int x, int y,
 	{
 		Enesim_Renderer_Sw_Data *sdata;
 
-		sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 		sdata->fill(fpaint, x, y, len, dst);
 	}
 
-        renderer_affine_setup(r, x, y, &xx, &yy);
+        enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 	xx -= xx0;
 	yy -= yy0;
 	while (d < e)
@@ -179,7 +181,9 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	rect->w = rect->h = thiz->r * 2;
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Circle *thiz;
@@ -207,8 +211,11 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	thiz->irr0 = rad * 65536;
 
-	if (!enesim_renderer_shape_sw_setup(r, s, error))
+	if (!enesim_renderer_shape_sw_setup(r, state, s, error))
 		return EINA_FALSE;
+
+	enesim_matrix_f16p16_matrix_to(&state->transformation,
+			&thiz->matrix);
 
 	*fill = _stroked_fill_paint;
 
@@ -236,7 +243,6 @@ static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 

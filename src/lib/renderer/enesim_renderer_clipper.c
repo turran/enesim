@@ -83,7 +83,9 @@ static const char * _clipper_name(Enesim_Renderer *r)
 	return "clipper";
 }
 
-static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Clipper *thiz;
@@ -120,7 +122,7 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		enesim_renderer_transformation_set(thiz->content, &matrix);
 	}
 	/* FIXME add the rop */
-	if (!enesim_renderer_sw_setup(thiz->content, s, error))
+	if (!enesim_renderer_sw_setup(thiz->content, state, s, error))
 	{
 		printf("content cannot setup\n");
 		/* restore the values */

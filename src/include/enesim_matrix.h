@@ -55,22 +55,20 @@ typedef struct _Enesim_Quad
 	double x3, y3;
 } Enesim_Quad; /**< Quadrangle handler */
 
-EAPI Enesim_Matrix_Type enesim_matrix_type_get(Enesim_Matrix *m);
+EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m);
 EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double c,
 		double d, double e, double f, double g, double h, double i);
 EAPI void enesim_matrix_values_get(Enesim_Matrix *m, double *a, double *b,
 		double *c, double *d, double *e, double *f, double *g, double *h,
 		double *i);
-EAPI void enesim_matrix_fixed_values_get(Enesim_Matrix *m, Eina_F16p16 *a,
+EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
 		Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i);
-EAPI void enesim_matrix_f16p16_matrix_to(Enesim_Matrix *m,
+EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
 		Enesim_F16p16_Matrix *fm);
 
 EAPI void enesim_matrix_compose(Enesim_Matrix *m1, Enesim_Matrix *m2,
 		Enesim_Matrix *dst);
-EAPI void enesim_f16p16_matrix_compose(Enesim_F16p16_Matrix *m1,
-		Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
 EAPI void enesim_matrix_translate(Enesim_Matrix *t, double tx, double ty);
 EAPI void enesim_matrix_scale(Enesim_Matrix *t, double sx, double sy);
 EAPI void enesim_matrix_rotate(Enesim_Matrix *t, double rad);
@@ -88,6 +86,10 @@ EAPI void enesim_matrix_rectangle_transform(Enesim_Matrix *m, Enesim_Rectangle *
 EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m, Enesim_Quad *src, Enesim_Quad *dst);
 EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m, Enesim_Quad *q);
 EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m, Enesim_Quad *q);
+
+EAPI void enesim_f16p16_matrix_compose(Enesim_F16p16_Matrix *m1,
+		Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
+EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix *m);
 
 EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
 		Enesim_Rectangle *r);

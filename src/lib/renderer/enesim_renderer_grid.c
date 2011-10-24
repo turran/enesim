@@ -28,6 +28,7 @@ typedef struct _Enesim_Renderer_Grid
 		unsigned int h;
 	} inside, outside;
 	/* the state */
+	Enesim_F16p16_Matrix matrix;
 	int wt;
 	int ht;
 	Eina_F16p16 wi;
@@ -116,16 +117,17 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 }
 
 
-static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx;
 
 	thiz = _grid_get(r);
 #if 0
-	renderer_identity_setup(r, x, y, &xx, &yy);
+	enesim_renderer_identity_setup(r, x, y, &xx, &yy);
 	while (dst < end)
 	{
 		uint32_t p0;
@@ -170,15 +172,16 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 #endif
 }
 
-static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx;
 
 	thiz = _grid_get(r);
-	renderer_affine_setup(r, x, y, &xx, &yy);
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 
 	while (dst < end)
 	{
@@ -186,21 +189,22 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 
 		p0 = _grid(thiz, yy, xx);
 
-		yy += r->matrix.values.yx;
-		xx += r->matrix.values.xx;
+		yy += thiz->matrix.yx;
+		xx += thiz->matrix.xx;
 		*dst++ = p0;
 	}
 }
 
-static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	int sy;
 	Eina_F16p16 yy, xx, zz;
 
 	thiz = _grid_get(r);
-	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
 
 	while (dst < end)
 	{
@@ -212,9 +216,9 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 
 		p0 = _grid(thiz, syy, sxx);
 
-		yy += r->matrix.values.yx;
-		xx += r->matrix.values.xx;
-		zz += r->matrix.values.zx;
+		yy += thiz->matrix.yx;
+		xx += thiz->matrix.xx;
+		zz += thiz->matrix.zx;
 		*dst++ = p0;
 	}
 }
@@ -231,7 +235,9 @@ static void _state_cleanup(Enesim_Renderer *r)
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Grid *thiz;
@@ -245,13 +251,28 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz->hht = eina_f16p16_int_from(thiz->ht);
 	thiz->wwt = eina_f16p16_int_from(thiz->wt);
 
-	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		//*fill = _span_identity;
+	switch (state->transformation_type)
+	{
+		case ENESIM_MATRIX_IDENTITY:
+		*fill = _span_identity;
+		break;
+
+		case ENESIM_MATRIX_AFFINE:
+		enesim_matrix_f16p16_matrix_to(&state->transformation,
+				&thiz->matrix);
 		*fill = _span_affine;
-	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
-		*fill = _span_affine;
-	else
+		break;
+
+		case ENESIM_MATRIX_PROJECTIVE:
+		enesim_matrix_f16p16_matrix_to(&state->transformation,
+				&thiz->matrix);
 		*fill = _span_projective;
+		break;
+
+		default:
+		return EINA_FALSE;
+
+	}
 	return EINA_TRUE;
 }
 

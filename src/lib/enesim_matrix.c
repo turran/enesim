@@ -75,7 +75,7 @@ static double _cos(double x)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Matrix_Type enesim_matrix_type_get(Enesim_Matrix *m)
+EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m)
 {
 	if ((MATRIX_ZX(m) != 0) || (MATRIX_ZY(m) != 0) || (MATRIX_ZZ(m) != 1))
 		return ENESIM_MATRIX_PROJECTIVE;
@@ -92,7 +92,7 @@ EAPI Enesim_Matrix_Type enesim_matrix_type_get(Enesim_Matrix *m)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(Enesim_F16p16_Matrix *m)
+EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix *m)
 {
 	if ((MATRIX_ZX(m) != 0) || (MATRIX_ZY(m) != 0) || (MATRIX_ZZ(m) != 65536))
 		return ENESIM_MATRIX_PROJECTIVE;
@@ -143,7 +143,7 @@ EAPI void enesim_matrix_values_get(Enesim_Matrix *m, double *a, double *b, doubl
 /**
  * convert the transformation values to fixed point
  */
-EAPI void enesim_matrix_fixed_values_get(Enesim_Matrix *m, Eina_F16p16 *a,
+EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
 		Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i)
 {
@@ -158,7 +158,7 @@ EAPI void enesim_matrix_fixed_values_get(Enesim_Matrix *m, Eina_F16p16 *a,
 	if (i) *i = eina_f16p16_double_from(MATRIX_ZZ(m));
 }
 
-EAPI void enesim_matrix_f16p16_matrix_to(Enesim_Matrix *m,
+EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
 		Enesim_F16p16_Matrix *fm)
 {
 	enesim_matrix_fixed_values_get(m, &fm->xx, &fm->xy, &fm->xz,

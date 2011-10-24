@@ -22,12 +22,14 @@
  *============================================================================*/
 typedef struct _Hswitch
 {
-	Enesim_Renderer base;
+	/* properties */
 	unsigned int w;
 	unsigned int h;
 	Enesim_Renderer *lrend;
 	Enesim_Renderer *rrend;
 	double step;
+	/* private */
+	Enesim_F16p16_Matrix matrix;
 } Hswitch;
 
 static inline Hswitch * _hswitch_get(Enesim_Renderer *r)
@@ -51,8 +53,8 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	mmx = eina_f16p16_double_from(thiz->w - (double)(thiz->w * thiz->step));
 	mx = eina_f16p16_int_to(mmx);
 
-	ldata = thiz->lrend->backend_data[ENESIM_BACKEND_SOFTWARE];
-	rdata = thiz->rrend->backend_data[ENESIM_BACKEND_SOFTWARE];
+	ldata = enesim_renderer_backend_data_get(thiz->lrend, ENESIM_BACKEND_SOFTWARE);
+	rdata = enesim_renderer_backend_data_get(thiz->rrend, ENESIM_BACKEND_SOFTWARE);
 	while (dst < end)
 	{
 		uint32_t p0;
@@ -81,29 +83,25 @@ static void _generic_good(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	}
 }
 
-static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Hswitch *thiz;
 	Enesim_Renderer_Sw_Data *ldata;
 	Enesim_Renderer_Sw_Data *rdata;
 	Eina_F16p16 mmx, xx, yy;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	int mx;
 
 	thiz = _hswitch_get(r);
-	yy = eina_f16p16_int_from(y);
-	xx = eina_f16p16_int_from(x);
-	yy = eina_f16p16_mul(r->matrix.values.yx, xx) +
-			eina_f16p16_mul(r->matrix.values.yy, yy) + r->matrix.values.yz;
-	xx = eina_f16p16_mul(r->matrix.values.xx, xx) +
-			eina_f16p16_mul(r->matrix.values.xy, yy) + r->matrix.values.xz;
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 
 	/* FIXME put this on the state setup */
 	mmx = eina_f16p16_double_from(thiz->w - (double)(thiz->w * thiz->step));
 	mx = eina_f16p16_int_to(mmx);
 
-	ldata = thiz->lrend->backend_data[ENESIM_BACKEND_SOFTWARE];
-	rdata = thiz->rrend->backend_data[ENESIM_BACKEND_SOFTWARE];
+	ldata = enesim_renderer_backend_data_get(thiz->lrend, ENESIM_BACKEND_SOFTWARE);
+	rdata = enesim_renderer_backend_data_get(thiz->rrend, ENESIM_BACKEND_SOFTWARE);
 	while (dst < end)
 	{
 		uint32_t p0;
@@ -132,8 +130,8 @@ static void _affine_good(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 			p0 = argb8888_interp_256(a, p1, p0);
 		}
 		*dst++ = p0;
-		xx += r->matrix.values.xx;
-		yy += r->matrix.values.yx;
+		xx += thiz->matrix.xx;
+		yy += thiz->matrix.yx;
 	}
 }
 
@@ -151,8 +149,8 @@ static void _generic_fast(Enesim_Renderer *r, int x, int y, unsigned int len, ui
 	if (!eina_rectangle_intersection(&ir, &dr))
 		return;
 
-	ldata = thiz->lrend->backend_data[ENESIM_BACKEND_SOFTWARE];
-	rdata = thiz->rrend->backend_data[ENESIM_BACKEND_SOFTWARE];
+	ldata = enesim_renderer_backend_data_get(thiz->lrend, ENESIM_BACKEND_SOFTWARE);
+	rdata = enesim_renderer_backend_data_get(thiz->rrend, ENESIM_BACKEND_SOFTWARE);
 	mx = (int)(thiz->w - (thiz->w * thiz->step));
 	if (mx == 0)
 	{
@@ -189,7 +187,9 @@ static const char * _hswitch_name(Enesim_Renderer *r)
 	return "hswitch";
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Hswitch *thiz;
@@ -197,10 +197,13 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz = _hswitch_get(r);
 	if (!thiz->lrend || !thiz->rrend)
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(thiz->lrend, s, error))
+	if (!enesim_renderer_sw_setup(thiz->lrend, state, s, error))
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(thiz->rrend, s, error))
+	if (!enesim_renderer_sw_setup(thiz->rrend, state, s, error))
 		return EINA_FALSE;
+
+	enesim_matrix_f16p16_matrix_to(&state->transformation,
+			&thiz->matrix);
 
 	*fill = _affine_good;
 

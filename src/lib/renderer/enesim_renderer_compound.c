@@ -73,7 +73,7 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddat
 		{
 			continue;
 		}
-		ldata = l->r->backend_data[ENESIM_BACKEND_SOFTWARE];
+		ldata = enesim_renderer_backend_data_get(l->r, ENESIM_BACKEND_SOFTWARE);
 		offset = lboundings.x - span.x;
 
 		if (!l->span)
@@ -82,9 +82,12 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddat
 		}
 		else
 		{
+			Enesim_Color color;
+
+			enesim_renderer_color_get(l->r, &color);
 			memset(tmp, 0, lboundings.w * sizeof(uint32_t));
 			ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, tmp);
-			l->span(dst + offset, lboundings.w, tmp, l->r->color, NULL);
+			l->span(dst + offset, lboundings.w, tmp, color, NULL);
 		}
 	}
 }
@@ -106,7 +109,7 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 
 		l = eina_list_data_get(ll);
 
-		ldata = l->r->backend_data[ENESIM_BACKEND_SOFTWARE];
+		ldata = enesim_renderer_backend_data_get(l->r, ENESIM_BACKEND_SOFTWARE);
 		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
 		if (!eina_rectangle_intersection(&lboundings, &span))
 		{
@@ -124,7 +127,9 @@ static const char * _compound_name(Enesim_Renderer *r)
 	return "compound";
 }
 
-static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -136,6 +141,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
+		Enesim_Color color;
+		Enesim_Rop rop;
 		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
 
 		/* TODO check the flags and only generate the relative properties
@@ -143,7 +150,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		 */
 		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
-		if (!enesim_renderer_sw_setup(l->r, s, error))
+		if (!enesim_renderer_sw_setup(l->r, state, s, error))
 		{
 			const char *name;
 
@@ -163,10 +170,12 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
 		/* FIXME fix the simplest case (fill) */
-		if (l->r->rop != ENESIM_FILL || l->r->color != ENESIM_COLOR_FULL)
+		enesim_renderer_rop_get(l->r, &rop);
+		enesim_renderer_color_get(l->r, &color);
+		if (rop != ENESIM_FILL || color != ENESIM_COLOR_FULL)
 		{
-			l->span = enesim_compositor_span_get(l->r->rop, &fmt, ENESIM_FORMAT_ARGB8888,
-					l->r->color, ENESIM_FORMAT_NONE);
+			l->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_ARGB8888,
+					color, ENESIM_FORMAT_NONE);
 			only_fill = EINA_FALSE;
 		}
 	}

@@ -27,10 +27,15 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Checker
 {
+	/* properties */
 	Enesim_Color color1;
 	Enesim_Color color2;
 	int sw;
 	int sh;
+	/* private */
+	Enesim_F16p16_Matrix matrix;
+	Eina_F16p16 ww, hh;
+	Eina_F16p16 ww2, hh2;
 } Enesim_Renderer_Checker;
 
 Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
@@ -41,13 +46,14 @@ Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx;
 	int w2;
 	int h2;
 	uint32_t color[2];
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	int sy;
 
@@ -58,7 +64,7 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	color[1] = thiz->color2;
 
 	/* translate to the origin */
-	renderer_identity_setup(r, x, y, &xx, &yy);
+	enesim_renderer_identity_setup(r, x, y, &xx, &yy);
 	/* normalize the modulo */
 	sy = ((yy  >> 16) % h2);
 	if (sy < 0)
@@ -95,19 +101,19 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, u
 	}
 }
 
-static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx, ww, hh, ww2, hh2;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 
 	thiz = _checker_get(r);
-	renderer_affine_setup(r, x, y, &xx, &yy);
-	/* TODO move this to the state setup */
-	ww = eina_f16p16_int_from(thiz->sw);
-	ww2 = ww * 2;
-	hh = eina_f16p16_int_from(thiz->sh);
-	hh2 = hh * 2;
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	ww = thiz->ww;
+	ww2 = thiz->ww2;
+	hh = thiz->hh;
+	hh2 = thiz->hh2;
 
 	while (dst < end)
 	{
@@ -174,31 +180,31 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uin
 				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 		}
-		yy += r->matrix.values.yx;
-		xx += r->matrix.values.xx;
+		yy += thiz->matrix.yx;
+		xx += thiz->matrix.xx;
 		*dst++ = p0;
 	}
 }
 
-static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
-	Eina_F16p16 yy, xx, ww, hh, ww2, hh2, zz;
+	Eina_F16p16 yy, xx, zz, ww, hh, ww2, hh2;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 
 	thiz = _checker_get(r);
 	/* translate to the origin */
-	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
-	/* TODO move this to the state setup */
-	ww = eina_f16p16_int_from(thiz->sw);
-	ww2 = ww * 2;
-	hh = eina_f16p16_int_from(thiz->sh);
-	hh2 = hh * 2;
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	ww = thiz->ww;
+	ww2 = thiz->ww2;
+	hh = thiz->hh;
+	hh2 = thiz->hh2;
 
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx, syyy, sxxx;
-		uint32_t color[2] = { thiz->color1, thiz->color2};
+		uint32_t color[2] = {thiz->color1, thiz->color2};
 		uint32_t p0;
 		int sx, sy;
 
@@ -262,9 +268,9 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 		}
-		yy += r->matrix.values.yx;
-		xx += r->matrix.values.xx;
-		zz += r->matrix.values.zx;
+		yy += thiz->matrix.yx;
+		xx += thiz->matrix.xx;
+		zz += thiz->matrix.zx;
 		*dst++ = p0;
 	}
 }
@@ -281,19 +287,41 @@ static void _checker_state_cleanup(Enesim_Renderer *r)
 
 }
 
-static Eina_Bool _checker_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _checker_state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
+	thiz->ww = eina_f16p16_int_from(thiz->sw);
+	thiz->ww2 = thiz->ww * 2;
+	thiz->hh = eina_f16p16_int_from(thiz->sh);
+	thiz->hh2 = thiz->hh * 2;
 
-	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
+	switch (state->transformation_type)
+	{
+		case ENESIM_MATRIX_IDENTITY:
 		*fill = _span_identity;
-	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
+		break;
+
+		case ENESIM_MATRIX_AFFINE:
+		enesim_matrix_f16p16_matrix_to(&state->transformation,
+				&thiz->matrix);
 		*fill = _span_affine;
-	else
+		break;
+
+		case ENESIM_MATRIX_PROJECTIVE:
+		enesim_matrix_f16p16_matrix_to(&state->transformation,
+				&thiz->matrix);
 		*fill = _span_projective;
+		break;
+
+		default:
+		return EINA_FALSE;
+	}
+
 	return EINA_TRUE;
 }
 

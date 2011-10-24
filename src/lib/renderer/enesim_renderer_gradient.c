@@ -29,6 +29,7 @@ typedef struct _Enesim_Renderer_Gradient
 	int slen;
 	Eina_List *stops;
 	/* private */
+	Enesim_F16p16_Matrix matrix;
 	Enesim_Renderer_Gradient_Descriptor *descriptor;
 	void *data;
 } Enesim_Renderer_Gradient;
@@ -133,21 +134,21 @@ static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
 	Eina_F16p16 xx, yy, zz;						\
 									\
 	thiz = _gradient_get(r);					\
-	renderer_projective_setup(r, x, y, &xx, &yy, &zz);		\
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix,	\
+			&xx, &yy, &zz);					\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 syy, sxx;					\
 		Eina_F16p16 d;						\
-		uint32_t p0;						\
 									\
 		syy = ((((int64_t)yy) << 16) / zz);			\
 		sxx = ((((int64_t)xx) << 16) / zz);			\
 									\
 		d = thiz->descriptor->distance(r, sxx, syy);		\
 		*dst++ = _##mode##_color_get(thiz, d);			\
-		yy += r->matrix.values.yx;				\
-		xx += r->matrix.values.xx;				\
-		zz += r->matrix.values.zx;				\
+		yy += thiz->matrix.yx;					\
+		xx += thiz->matrix.xx;					\
+		zz += thiz->matrix.zx;					\
 	}								\
 }
 
@@ -161,7 +162,7 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r, int x,	\
 	Eina_F16p16 xx, yy;						\
 									\
 	thiz = _gradient_get(r);					\
-	renderer_identity_setup(r, x, y, &xx, &yy);			\
+	enesim_renderer_identity_setup(r, x, y, &xx, &yy);		\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
@@ -184,16 +185,15 @@ static void _argb8888_##mode##_span_affine(Enesim_Renderer *r, int x,	\
 	Eina_F16p16 xx, yy;						\
 									\
 	thiz = _gradient_get(r);					\
-	renderer_affine_setup(r, x, y, &xx, &yy);			\
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);	\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
-		uint32_t p0;						\
 									\
 		d = thiz->descriptor->distance(r, xx, yy);		\
 		*dst++ = _##mode##_color_get(thiz, d);			\
-		yy += r->matrix.values.yx;				\
-		xx += r->matrix.values.xx;				\
+		yy += thiz->matrix.yx;					\
+		xx += thiz->matrix.xx;					\
 	}								\
 }
 
@@ -230,7 +230,9 @@ static void _gradient_state_cleanup(Enesim_Renderer *r)
 	thiz->slen = 0;
 }
 
-static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -246,7 +248,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		return EINA_FALSE;
 	/* setup the implementation */
 	*fill = NULL;
-	if (!thiz->descriptor->sw_setup(r, s, fill, error))
+	if (!thiz->descriptor->sw_setup(r, state, s, fill, error))
 	{
 		free(thiz->src);
 		thiz->src = NULL;
@@ -254,10 +256,9 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	}
 	if (!*fill)
 	{
-		Enesim_Matrix m;
-
-		enesim_renderer_transformation_get(r, &m);
-		*fill = _spans[thiz->mode][enesim_matrix_type_get(&m)];
+		enesim_matrix_f16p16_matrix_to(&state->transformation,
+				&thiz->matrix);
+		*fill = _spans[thiz->mode][state->transformation_type];
 	}
 	/* get the length */
 	thiz->slen = thiz->descriptor->length(r);

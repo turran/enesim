@@ -22,9 +22,11 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Ellipse
 {
+	/* properties */
 	double x, y;
 	double rx, ry;
-
+	/* private */
+	Enesim_F16p16_Matrix matrix;
 	int xx0, yy0;
 	int rr0_x, rr0_y;
 	int irr0_x, irr0_y;
@@ -42,15 +44,15 @@ static inline Enesim_Renderer_Ellipse * _ellipse_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
 	Enesim_Renderer *fpaint;
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color ocolor;
 	Enesim_Color icolor;
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
 	int do_inner = thiz->do_inner;
 	int xx0 = thiz->xx0, yy0 = thiz->yy0;
 	int rr0_x = thiz->rr0_x, rr1_x = rr0_x + 65536;
@@ -63,6 +65,7 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 	int fxxm = xx0 - thiz->fxxp, fyym = yy0 - thiz->fyyp;
 	int ifxxp = xx0 + thiz->ifxxp, ifyyp = yy0 + thiz->ifyyp;
 	int ifxxm = xx0 - thiz->ifxxp, ifyym = yy0 - thiz->ifyyp;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy;
 	int fill_only = 0;
@@ -71,6 +74,12 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 	enesim_renderer_shape_fill_color_get(r, &icolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+#if 0
+	printf("matrix = %d %d %d - %d %d %d - %d %d %d\n",
+		thiz->matrix.xx, thiz->matrix.xy, thiz->matrix.xz,
+		thiz->matrix.yx, thiz->matrix.yy, thiz->matrix.yz,
+		thiz->matrix.zx, thiz->matrix.zy, thiz->matrix.zz);
+#endif
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		icolor = 0;
@@ -85,7 +94,7 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -93,11 +102,11 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 	{
 		Enesim_Renderer_Sw_Data *sdata;
 
-		sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 		sdata->fill(fpaint, x, y, len, dst);
 	}
 
-	renderer_affine_setup(r, x, y, &xx, &yy);
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 
 	while (d < e)
 	{
@@ -173,16 +182,16 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 }
 
 static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
+		unsigned int len, void  *ddata)
 {
 	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *fpaint;
 	Enesim_Color ocolor;
 	Enesim_Color icolor;
-	int axx = r->matrix.values.xx, axy = r->matrix.values.xy, axz = r->matrix.values.xz;
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
-	int azx = r->matrix.values.zx, azy = r->matrix.values.zy, azz = r->matrix.values.zz;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int azx = thiz->matrix.zx;
 	int do_inner = thiz->do_inner;
 	int xx0 = thiz->xx0, yy0 = thiz->yy0;
 	int rr0_x = thiz->rr0_x, rr1_x = rr0_x + 65536;
@@ -195,6 +204,7 @@ static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int
 	int fxxm = xx0 - thiz->fxxp, fyym = yy0 - thiz->fyyp;
 	int ifxxp = xx0 + thiz->ifxxp, ifyyp = yy0 + thiz->ifyyp;
 	int ifxxm = xx0 - thiz->ifxxp, ifyym = yy0 - thiz->ifyyp;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy, zz;
 	int fill_only = 0;
@@ -217,7 +227,7 @@ static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
-			sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 			sdata->fill(fpaint, x, y, len, dst);
 		}
 	}
@@ -225,11 +235,11 @@ static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int
 	{
 		Enesim_Renderer_Sw_Data *sdata;
 
-		sdata = fpaint->backend_data[ENESIM_BACKEND_SOFTWARE];
+		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 		sdata->fill(fpaint, x, y, len, dst);
 	}
 
-	renderer_projective_setup(r, x, y, &xx, &yy, &zz);
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
 
 	while (d < e)
 	{
@@ -313,7 +323,9 @@ static const char * _ellipse_name(Enesim_Renderer *r)
 	return "ellipse";
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Ellipse *thiz;
@@ -370,11 +382,13 @@ static Eina_Bool _state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		thiz->icc0 = 2 * thiz->irr0_y;
 	}
 
-	if (!enesim_renderer_shape_sw_setup(r, s, error))
+	if (!enesim_renderer_shape_sw_setup(r, state, s, error))
 		return EINA_FALSE;
 
+	enesim_matrix_f16p16_matrix_to(&state->transformation,
+			&thiz->matrix);
 	*fill = _span_color_stroked_paint_filled_proj;
-	if (r->matrix.type == ENESIM_MATRIX_AFFINE || r->matrix.type == ENESIM_MATRIX_IDENTITY)
+	if (state->transformation_type == ENESIM_MATRIX_AFFINE || state->transformation_type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_color_stroked_paint_filled_affine;
 
 	return EINA_TRUE;

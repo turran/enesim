@@ -49,15 +49,16 @@ static Eina_F16p16 _linear_distance_internal(Enesim_Renderer_Gradient_Linear *th
 }
 
 static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
+		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 d;
 
 	thiz = _linear_get(r);
-	renderer_identity_setup(r, x, y, &xx, &yy);
+	enesim_renderer_identity_setup(r, x, y, &xx, &yy);
 	d = _linear_distance_internal(thiz, xx, yy);
 	while (dst < end)
 	{
@@ -95,7 +96,9 @@ static void _linear_state_cleanup(Enesim_Renderer *r)
 
 }
 
-static Eina_Bool _linear_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -144,7 +147,7 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	 */
 	thiz->length = eina_f16p16_int_to(f);
 	/* just override the identity case */
-	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
+	if (state->transformation_type == ENESIM_MATRIX_IDENTITY)
 		*fill = _argb8888_pad_span_identity;
 
 	return EINA_TRUE;

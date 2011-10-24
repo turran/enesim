@@ -46,6 +46,8 @@ typedef struct _Enesim_Renderer_Image
 	Enesim_Surface *s;
 	int x, y;
 	unsigned int w, h;
+	/* private */
+	Enesim_F16p16_Matrix matrix;
 	int *yoff;
 	int *xoff;
 	Enesim_Compositor_Point point;
@@ -134,10 +136,12 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 	size_t sstride;
 	uint32_t *src;
 	uint32_t *dst = ddata;
+	double ox, oy;
 
 	thiz = _image_get(r);
-	y -= r->oy;
-	x -= r->ox;
+	enesim_renderer_origin_get(r, &ox, &oy);
+	y -= oy;
+	x -= ox;
 
 	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	src = argb8888_at(src, sstride, 0, thiz->yoff[y]);
@@ -165,7 +169,7 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 	int sw, sh;
 
 	thiz = _image_get(r);
-	renderer_affine_setup(r, x, y, &xx, &yy);
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 
 	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	enesim_surface_size_get(thiz->s, &sw, &sh);
@@ -186,8 +190,8 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 		}
 
 		*dst++ = p0;
-		yy += r->matrix.values.yx;
-		xx += r->matrix.values.xx;
+		yy += thiz->matrix.yx;
+		xx += thiz->matrix.xx;
 	}
 }
 
@@ -196,18 +200,12 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 	Enesim_Renderer_Image *thiz;
 	size_t sstride;
 	uint8_t *src;
+	double ox, oy;
 
 	thiz = _image_get(r);
-	/* FIXME we should not implement this case */
-	x -= r->ox;
-	y -= r->oy;
-	/* FIXME we should not implement this case */
-	if (y < 0 || y >= thiz->h)
-	{
-		while (len--)
-			*dst++ = 0;
-		return;
-	}
+	enesim_renderer_origin_get(r, &ox, &oy);
+	x -= ox;
+	y -= oy;
 
 	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	src += (sstride * y) + x;
@@ -229,24 +227,21 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz;
+	Enesim_Color color;
 	size_t sstride;
 	uint32_t *src;
 	uint32_t *dst = ddata;
+	double ox, oy;
 
  	thiz = _image_get(r);
-	x -= r->ox;
-	y -= r->oy;
-	/* FIXME we should not implement this case */
-	if (y < 0 || y >= thiz->h)
-	{
-		while (len--)
-			*dst++ = 0;
-		return;
-	}
+	enesim_renderer_origin_get(r, &ox, &oy);
+	enesim_renderer_color_get(r, &color);
+	x -= ox;
+	y -= oy;
 
 	enesim_surface_data_get(thiz->s, (void **)&src, &sstride);
 	src = argb8888_at(src, sstride, x, y);
-	thiz->span(dst, len, src, r->color, NULL);
+	thiz->span(dst, len, src, color, NULL);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -295,12 +290,11 @@ static void _image_state_cleanup(Enesim_Renderer *r)
 	}
 }
 
-static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _image_state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Image *thiz;
-	Enesim_Rop rop;
-	Enesim_Color color;
 	Enesim_Format fmt;
 	int sw, sh;
 
@@ -320,20 +314,18 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	_image_state_cleanup(r);
 
 	enesim_surface_size_get(thiz->s, &sw, &sh);
-	enesim_renderer_rop_get(r, &rop);
-	enesim_renderer_color_get(r, &color);
 	/* FIXME we need to use the format from the destination surface */
 	fmt = ENESIM_FORMAT_ARGB8888;
 
 	if (sw != thiz->w || sh != thiz->h)
 	{
 		/* as we need to scale we can only use the point compositor */
-		thiz->point = enesim_compositor_point_get(rop, &fmt,
-				ENESIM_FORMAT_ARGB8888, color, ENESIM_FORMAT_NONE);
+		thiz->point = enesim_compositor_point_get(state->rop, &fmt,
+				ENESIM_FORMAT_ARGB8888, state->color, ENESIM_FORMAT_NONE);
 		if (!thiz->point)
 		{
 			WRN("Not suitable point compositor for sfmt %d and color %08x",
-					fmt, color);
+					fmt, state->color);
 			return EINA_FALSE;
 		}
 
@@ -342,20 +334,24 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		_offsets(thiz->x, thiz->w, sw, thiz->xoff);
 		_offsets(thiz->y, thiz->h, sh, thiz->yoff);
 
-		if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
+		if (state->transformation_type == ENESIM_MATRIX_IDENTITY)
 			*fill = _scale_fast_identity;
-		else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
+		else if (state->transformation_type == ENESIM_MATRIX_AFFINE)
+		{
+			enesim_matrix_f16p16_matrix_to(&state->transformation,
+					&thiz->matrix);
 			*fill = _scale_fast_affine;
+		}
 	}
 	else
 	{
 		/* we can use directly a span compositor */
-		thiz->span = enesim_compositor_span_get(rop, &fmt,
-				ENESIM_FORMAT_ARGB8888, color, ENESIM_FORMAT_NONE);
+		thiz->span = enesim_compositor_span_get(state->rop, &fmt,
+				ENESIM_FORMAT_ARGB8888, state->color, ENESIM_FORMAT_NONE);
 		if (!thiz->span)
 		{
 			WRN("Not suitable span compositor for sfmt %d and color %08x",
-					fmt, color);
+					fmt, state->color);
 			return EINA_FALSE;
 		}
 		*fill = _argb8888_to_argb8888_noscale;
@@ -375,7 +371,6 @@ static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	}
 
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 			//| ENESIM_RENDERER_FLAG_COLORIZE
 			//| ENESIM_RENDERER_FLAG_ROP;

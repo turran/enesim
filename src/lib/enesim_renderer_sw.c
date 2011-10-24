@@ -53,8 +53,8 @@ static pthread_barrier_t _end;
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Flag flags)
 {
-	if (((r->rop == ENESIM_FILL) && (r->color == ENESIM_COLOR_FULL))
-			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->color == ENESIM_COLOR_FULL))
+	if (((r->current.rop == ENESIM_FILL) && (r->current.color == ENESIM_COLOR_FULL))
+			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->current.color == ENESIM_COLOR_FULL))
 			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (flags & ENESIM_RENDERER_FLAG_COLORIZE)))
 	{
 		return EINA_FALSE;
@@ -93,7 +93,7 @@ static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
 		fill(r, area->x, area->y, area->w, tmp);
 		area->y++;
 		/* compose the filled and the destination spans */
-		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->color, NULL);
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, NULL);
 		ddata += stride;
 	}
 }
@@ -205,7 +205,7 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
-	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
+	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 	/* fill the data needed for every threaded renderer */
 	_op.renderer = r;
 	_op.dst = ddata;
@@ -218,12 +218,12 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 	{
 		Enesim_Compositor_Span span;
 
-		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				r->color, ENESIM_FORMAT_NONE);
+		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+				r->current.color, ENESIM_FORMAT_NONE);
 		if (!span)
 		{
 			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->rop, r->color);
+					"%d and color %08x", r, r->curent.rop, r->current.color);
 			goto end;
 		}
 		_op.span = span;
@@ -236,25 +236,26 @@ end:
 }
 #else
 
-static void _sw_draw_no_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
+static void _sw_draw_no_threaded(Enesim_Renderer *r,
+		Eina_Rectangle *area,
 		uint8_t *ddata, size_t stride, Enesim_Format dfmt,
 		Enesim_Renderer_Flag flags)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
-	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
+	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 	if (_is_sw_draw_composed(r, flags))
 	{
 		Enesim_Compositor_Span span;
 		uint8_t *fdata;
 		size_t len;
 
-		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				r->color, ENESIM_FORMAT_NONE);
+		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+				r->current.color, ENESIM_FORMAT_NONE);
 		if (!span)
 		{
 			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->rop, r->color);
+					"%d and color %08x", r, r->current.rop, r->current.color);
 			goto end;
 		}
 		len = area->w * sizeof(uint32_t);
@@ -344,7 +345,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 
 	_sw_surface_setup(s, &dfmt, (void *)&ddata, &stride, &bpp);
 	ddata = ddata + (area->y * stride) + (area->x * bpp);
-	rswdata = r->backend_data[ENESIM_BACKEND_SOFTWARE];
+	rswdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 
 	if (_is_sw_draw_composed(r, flags))
 	{
@@ -352,12 +353,12 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 		Eina_Rectangle *clip;
 		Eina_List *l;
 
-		span = enesim_compositor_span_get(r->rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				r->color, ENESIM_FORMAT_NONE);
+		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+				r->current.color, ENESIM_FORMAT_NONE);
 		if (!span)
 		{
 			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->rop, r->color);
+					"%d and color %08x", r, r->current.rop, r->current.color);
 			goto end;
 		}
 		/* iterate over the list of clips */
@@ -407,21 +408,16 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 end:
 	return;
 }
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
+
+Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Sw_Fill fill;
 
-	//ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!r->descriptor->sw_setup) return EINA_TRUE;
-	if (r->descriptor->sw_setup(r, s, &fill, error))
+	if (r->descriptor->sw_setup(r, state, s, &fill, error))
 	{
 		Enesim_Renderer_Sw_Data *sw_data;
 
@@ -438,16 +434,13 @@ EAPI Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	return EINA_FALSE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
+void enesim_renderer_sw_cleanup(Enesim_Renderer *r)
 {
-	//ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (r->descriptor->sw_cleanup) r->descriptor->sw_cleanup(r);
 }
-
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
 /**
  * To be documented
  * FIXME: To be fixed

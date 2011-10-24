@@ -39,6 +39,7 @@ static inline Enesim_Renderer_Perlin * _perlin_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+#if 0
 static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Perlin *thiz;
@@ -62,15 +63,16 @@ static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int
 		 * displacement maps useful for dispmap renderer
 		 */
 		*dst++ = 0xff << 24 | c << 16 | c << 8 | c;
-		xx += r->matrix.values.xx;
-		yy += r->matrix.values.yx;
+		xx += thiz->matrix.xx;
+		yy += thiz->matrix.yx;
 	}
-
 }
+#endif
 
-static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Perlin *thiz;
+	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 *freq, *ampl, per;
@@ -104,7 +106,8 @@ static const char * _perlin_name(Enesim_Renderer *r)
 	return "perlin";
 }
 
-static Eina_Bool _perlin_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state, Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Perlin *thiz;
@@ -123,8 +126,10 @@ static Eina_Bool _perlin_state_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		thiz->yfreq.val, thiz->ampl.val, thiz->xfreq.coeff, thiz->yfreq.coeff,
 		thiz->ampl.coeff);
 
-	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
-		*fill = _argb8888_span_identity;
+	if (state->transformation_type != ENESIM_MATRIX_IDENTITY)
+		return EINA_FALSE;
+
+	*fill = _argb8888_span_identity;
 	return EINA_TRUE;
 }
 

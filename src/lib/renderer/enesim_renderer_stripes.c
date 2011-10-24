@@ -21,12 +21,14 @@
  *                                  Local                                     *
  *============================================================================*/
 typedef struct _Enesim_Renderer_Stripes {
+	/* properties */
 	struct {
 		Enesim_Color color;
 		double thickness;
 	} s0, s1;
-
+	/* private */
 	int hh0, hh;
+	Enesim_F16p16_Matrix matrix;
 } Enesim_Renderer_Stripes;
 
 static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
@@ -37,16 +39,17 @@ static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_projective(Enesim_Renderer *p, int x, int y,
-		unsigned int len, uint32_t *dst)
+static void _span_projective(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Stripes *thiz = _stripes_get(p);
+	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
 	unsigned int c0 = thiz->s0.color, c1 = thiz->s1.color;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx, zz;
 
-	renderer_projective_setup(p, x, y, &xx, &yy, &zz);
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
 
 	while (d < e)
 	{
@@ -78,22 +81,23 @@ static void _span_projective(Enesim_Renderer *p, int x, int y,
 			}
 		}
 		*d++ = p0;
-		yy += p->matrix.values.yx;
-		zz += p->matrix.values.zx;
+		yy += thiz->matrix.yx;
+		zz += thiz->matrix.zx;
 	}
 }
 
 static void _span_affine(Enesim_Renderer *r, int x, int y,
-		unsigned int len, uint32_t *dst)
+		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
-	int ayx = r->matrix.values.yx, ayy = r->matrix.values.yy, ayz = r->matrix.values.yz;
+	int ayx = thiz->matrix.yx;
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
 	unsigned int c0 = thiz->s0.color, c1 = thiz->s1.color;
+	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx;
 
-	renderer_affine_setup(r, x, y, &xx, &yy);
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 	while (d < e)
 	{
 		unsigned int p0 = c0;
@@ -102,7 +106,6 @@ static void _span_affine(Enesim_Renderer *r, int x, int y,
 		if (syy < 0)
 			syy += hh;
 		sy = syy >> 16;
-
 		if (sy == 0)
 		{
 			int a = 1 + ((syy & 0xffff) >> 8);
@@ -131,7 +134,9 @@ static const char * _stripes_name(Enesim_Renderer *r)
 	return "stripes";
 }
 
-static Eina_Bool _setup_state(Enesim_Renderer *r, Enesim_Surface *s,
+static Eina_Bool _setup_state(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
@@ -141,12 +146,22 @@ static Eina_Bool _setup_state(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz->hh0 = (int)(thiz->s0.thickness * 65536);
 	thiz->hh = (int)(thiz->hh0 + (thiz->s1.thickness * 65536));
 
-	if (r->matrix.type == ENESIM_MATRIX_IDENTITY)
+	enesim_matrix_f16p16_matrix_to(&state->transformation,
+			&thiz->matrix);
+	switch (state->transformation_type)
+	{
+		case ENESIM_MATRIX_IDENTITY:
+		case ENESIM_MATRIX_AFFINE:
 		*fill = _span_affine;
-	else if (r->matrix.type == ENESIM_MATRIX_AFFINE)
-		*fill = _span_affine;
-	else
+		break;
+
+		case ENESIM_MATRIX_PROJECTIVE:
 		*fill = _span_projective;
+		break;
+
+		default:
+		return EINA_FALSE;
+	}
 	return EINA_TRUE;
 }
 
