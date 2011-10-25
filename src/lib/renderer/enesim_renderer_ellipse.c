@@ -74,12 +74,7 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 	enesim_renderer_shape_fill_color_get(r, &icolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-#if 0
-	printf("matrix = %d %d %d - %d %d %d - %d %d %d\n",
-		thiz->matrix.xx, thiz->matrix.xy, thiz->matrix.xz,
-		thiz->matrix.yx, thiz->matrix.yy, thiz->matrix.yz,
-		thiz->matrix.zx, thiz->matrix.zy, thiz->matrix.zz);
-#endif
+
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		icolor = 0;
@@ -375,7 +370,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		thiz->ifxxp = 65536 * sqrt(fabs((rx * rx) - (ry * ry)));
 		thiz->ifyyp = 0;
 		thiz->icc0 = 2 * thiz->irr0_x;
-	} else
+	}
+	else
 	{
 		thiz->ifxxp = 0;
 		thiz->ifyyp = 65536 * sqrt(fabs((ry * ry) - (rx * rx)));
