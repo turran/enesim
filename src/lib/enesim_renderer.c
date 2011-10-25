@@ -111,8 +111,8 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 	const char *descriptor_name = NULL;
 
 	if (!_factories) return;
-	if (r->descriptor->name)
-		descriptor_name = r->descriptor->name(r);
+	if (r->descriptor.name)
+		descriptor_name = r->descriptor.name(r);
 	if (!descriptor_name)
 		descriptor_name = "unknown";
 	f = eina_hash_find(_factories, descriptor_name);
@@ -333,7 +333,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	if (!descriptor->sw_setup) WRN("No sw_setup() function available");
 	if (!descriptor->sw_cleanup) WRN("No sw_setup() function available");
 	if (!descriptor->free) WRN("No sw_setup() function available");
-	r->descriptor = descriptor;
+	r->descriptor = *descriptor;
 	r->data = data;
 	/* now initialize the renderer common properties */
 	EINA_MAGIC_SET(r, ENESIM_MAGIC_RENDERER);
@@ -390,8 +390,8 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 	r->ref--;
 	if (!r->ref)
 	{
-		if (r->descriptor->free)
-			r->descriptor->free(r);
+		if (r->descriptor.free)
+			r->descriptor.free(r);
 		free(r);
 	}
 }
@@ -479,9 +479,9 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor->flags)
+	if (r->descriptor.flags)
 	{
-		r->descriptor->flags(r, flags);
+		r->descriptor.flags(r, flags);
 		return;
 	}
 	*flags = 0;
@@ -747,9 +747,9 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!rect) return;
 
-	if (r->descriptor->boundings)
+	if (r->descriptor.boundings)
 	{
-		 r->descriptor->boundings(r, rect);
+		 r->descriptor.boundings(r, rect);
 	}
 	else
 	{
@@ -829,7 +829,7 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor->is_inside) return r->descriptor->is_inside(r, x, y);
+	if (r->descriptor.is_inside) return r->descriptor.is_inside(r, x, y);
 	return EINA_TRUE;
 }
 
@@ -989,12 +989,12 @@ Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 
 	/* if the renderer does not has the descriptor
 	 * function we assume it is always true */
-	if (r->descriptor->has_changed)
+	if (r->descriptor.has_changed)
 	{
 		/* first check if the common properties have changed */
 		if (!_enesim_renderer_common_changed(r))
 		{
-			ret = r->descriptor->has_changed(r);
+			ret = r->descriptor.has_changed(r);
 		}
 	}
 	return ret;
@@ -1010,9 +1010,9 @@ EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage
 
 	if (!cb) return;
 
-	if (r->descriptor->damage)
+	if (r->descriptor.damage)
 	{
-		r->descriptor->damage(r, cb, data);
+		r->descriptor.damage(r, cb, data);
 	}
 	else
 	{

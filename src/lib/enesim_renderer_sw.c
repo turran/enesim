@@ -418,8 +418,8 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Sw_Fill fill;
 
-	if (!r->descriptor->sw_setup) return EINA_TRUE;
-	if (r->descriptor->sw_setup(r, state, s, &fill, error))
+	if (!r->descriptor.sw_setup) return EINA_TRUE;
+	if (r->descriptor.sw_setup(r, state, s, &fill, error))
 	{
 		Enesim_Renderer_Sw_Data *sw_data;
 
@@ -438,7 +438,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	if (r->descriptor->sw_cleanup) r->descriptor->sw_cleanup(r, s);
+	if (r->descriptor.sw_cleanup) r->descriptor.sw_cleanup(r, s);
 }
 /*============================================================================*
  *                                   API                                      *

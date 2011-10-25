@@ -33,7 +33,7 @@ struct _Enesim_Renderer
 	Enesim_Rectangle current_boundings;
 	Enesim_Rectangle past_boundings;
 	/* the descriptor */
-	Enesim_Renderer_Descriptor *descriptor;
+	Enesim_Renderer_Descriptor descriptor;
 	void *data;
 	/* backend data */
 	/* given that we can use the same renderer to draw into a software

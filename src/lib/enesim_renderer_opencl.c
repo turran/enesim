@@ -54,8 +54,8 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 	 * we need a way to get a uniqueid of the program too to not compile
 	 * it every time, something like a token
 	 */
-	if (!r->descriptor->opencl_setup) return EINA_FALSE;
-	ret = r->descriptor->opencl_setup(r, state, s, &source_name, &source, &source_size, error);
+	if (!r->descriptor.opencl_setup) return EINA_FALSE;
+	ret = r->descriptor.opencl_setup(r, state, s, &source_name, &source, &source_size, error);
 	printf("loading the opencl description %s\n", source);
 	if (!ret) return EINA_FALSE;
 
@@ -125,9 +125,9 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	error = clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
 	assert(error == CL_SUCCESS);
 	/* now setup the kernel on the renderer side */
-	if (r->descriptor->opencl_kernel_setup)
+	if (r->descriptor.opencl_kernel_setup)
 	{
-		if (!r->descriptor->opencl_kernel_setup(r, s))
+		if (!r->descriptor.opencl_kernel_setup(r, s))
 		{
 			printf("Cannot setup the kernel\n");
 			return;
