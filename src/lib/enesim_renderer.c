@@ -1003,6 +1003,8 @@ Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 /**
  * To  be documented
  * FIXME: To be fixed
+ * We also need the same variants as the boundings() function, that is,
+ * _destination, _scaled and _translated
  */
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -1021,7 +1023,7 @@ EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage
 			return;
 		/* send the old bounds and the new one */
 		enesim_renderer_boundings(r, &current_boundings);
-		cb(r, &current_boundings, data);
-		cb(r, &r->past_boundings, data);
+		cb(r, &current_boundings, EINA_FALSE, data);
+		cb(r, &r->past_boundings, EINA_TRUE, data);
 	}
 }

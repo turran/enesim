@@ -59,6 +59,14 @@ typedef struct _Enesim_Renderer_State
 	Enesim_Matrix_Type transformation_type;
 } Enesim_Renderer_State;
 
+/**
+ * Callback function of the Enesim_Renderer_Damage descriptor function
+ * @param r
+ * @param area
+ * @param past
+ * @param data
+ */
+typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, Enesim_Rectangle *area, Eina_Bool past, void *data);
 /* common descriptor functions */
 typedef const char * (*Enesim_Renderer_Name)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
@@ -66,7 +74,6 @@ typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double
 typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *rect);
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
-typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, Enesim_Rectangle *area, void *data);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 /* software engine descriptor functions */

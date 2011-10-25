@@ -1,8 +1,8 @@
 #include "Enesim.h"
 
-Eina_Bool _damages(Enesim_Renderer *r, Enesim_Rectangle *damage, void *data)
+Eina_Bool _damages(Enesim_Renderer *r, Enesim_Rectangle *damage, Eina_Bool past, void *data)
 {
-	printf("damage recevied %" ENESIM_RECTANGLE_FORMAT "\n", ENESIM_RECTANGLE_ARGS(damage));
+	printf("(%d) damage recevied %" ENESIM_RECTANGLE_FORMAT "\n", past, ENESIM_RECTANGLE_ARGS(damage));
 	return EINA_TRUE;
 }
 
