@@ -83,6 +83,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 {
 	Enesim_Renderer *r;
 	Enesim_Renderer_Shape *thiz;
+	Enesim_Renderer_Descriptor pdescriptor;
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Shape));
 	thiz->data = data;
@@ -90,8 +91,23 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 	/* set default properties */
 	thiz->current.fill.color = thiz->past.fill.color = 0xffffffff;
 	thiz->current.stroke.color = thiz->past.stroke.color = 0xffffffff;
+	thiz->has_changed = descriptor->has_changed;
+	/* set the parent descriptor */
+	pdescriptor.version = ENESIM_RENDERER_API;
+	pdescriptor.name = descriptor->name;
+	pdescriptor.free = descriptor->free;
+	pdescriptor.boundings = descriptor->boundings;
+	pdescriptor.flags = descriptor->flags;
+	pdescriptor.is_inside = descriptor->is_inside;
+	pdescriptor.damage = descriptor->damage;
+	pdescriptor.has_changed = _enesim_renderer_shape_has_changed;
+	pdescriptor.sw_setup = descriptor->sw_setup;
+	pdescriptor.sw_cleanup = descriptor->sw_cleanup;
+	pdescriptor.opencl_setup = descriptor->opencl_setup;
+	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
+	pdescriptor.opencl_cleanup = descriptor->opencl_cleanup;
 
-	r = enesim_renderer_new(descriptor, thiz);
+	r = enesim_renderer_new(&pdescriptor, thiz);
 	return r;
 }
 

@@ -106,7 +106,6 @@ typedef Eina_Bool (*Enesim_Renderer_Shape_OpenCL_Setup)(Enesim_Renderer *r,
 /* FIXME use this descriptor */
 typedef struct _Enesim_Renderer_Shape_Descriptor {
 	/* common */
-	unsigned int version;
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
