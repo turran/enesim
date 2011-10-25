@@ -766,8 +766,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 
 static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Shape *thiz;
-
 	enesim_renderer_shape_cleanup(r, s);
 
 	/*

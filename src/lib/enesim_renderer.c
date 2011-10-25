@@ -126,7 +126,7 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 	enesim_renderer_name_set(r, renderer_name);
 }
 
-Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
+static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 {
 	/* the color */
 	if (r->current.color != r->past.color)

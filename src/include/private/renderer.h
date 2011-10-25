@@ -73,42 +73,55 @@ typedef struct _Enesim_Renderer_Sw_Data
 	Enesim_Renderer_Sw_Fill fill;
 } Enesim_Renderer_Sw_Data;
 
-typedef struct _Enesim_Renderer_Shape
-{
-	struct {
-		Enesim_Color color;
-		Enesim_Renderer *rend; /* TODO */
-		double weight;
-		Enesim_Matrix original;
-	} stroke;
-
-	struct {
-		Enesim_Color color;
-		Enesim_Renderer *rend;
-		Enesim_Matrix original;
-		double ox, oy;
-	} fill;
-	Enesim_Shape_Draw_Mode draw_mode;
-	void *data;
-} Enesim_Renderer_Shape;
 
 typedef struct _Enesim_Renderer_Shape_State
 {
 	struct {
 		Enesim_Color color;
-		Enesim_Renderer *rend; /* TODO */
+		Enesim_Renderer *r; /* TODO */
 		double weight;
-		Enesim_Matrix original;
 	} stroke;
 
 	struct {
 		Enesim_Color color;
-		Enesim_Renderer *rend;
-		Enesim_Matrix original;
-		double ox, oy;
+		Enesim_Renderer *r;
 	} fill;
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape_State;
+
+
+typedef Eina_Bool (*Enesim_Renderer_Shape_Sw_Setup)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
+		Enesim_Surface *s,
+		Enesim_Error **error);
+typedef Eina_Bool (*Enesim_Renderer_Shape_OpenCL_Setup)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
+		Enesim_Surface *s,
+		const char **program_name, const char **program_source,
+		size_t *program_length,
+		Enesim_Error **error);
+
+/* FIXME use this descriptor */
+typedef struct _Enesim_Renderer_Shape_Descriptor {
+	/* common */
+	unsigned int version;
+	Enesim_Renderer_Name name;
+	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Boundings boundings;
+	Enesim_Renderer_Flags flags;
+	Enesim_Renderer_Inside is_inside;
+	Enesim_Renderer_Damage damage;
+	Enesim_Renderer_Has_Changed has_changed;
+	/* software based functions */
+	Enesim_Renderer_Shape_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* opencl based functions */
+	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
+	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
+	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
+} Enesim_Renderer_Shape_Descriptor;
 
 /* Helper functions needed by other renderers */
 static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
