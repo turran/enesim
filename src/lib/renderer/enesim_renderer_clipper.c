@@ -122,7 +122,7 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
 		enesim_renderer_transformation_set(thiz->content, &matrix);
 	}
 	/* FIXME add the rop */
-	if (!enesim_renderer_sw_setup(thiz->content, state, s, error))
+	if (!enesim_renderer_setup(thiz->content, s, error))
 	{
 		printf("content cannot setup\n");
 		/* restore the values */
@@ -188,6 +188,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ _clipper_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _clipper_state_setup,
 	/* .sw_cleanup = */ _clipper_state_cleanup
 };

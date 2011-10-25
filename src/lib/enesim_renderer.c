@@ -126,10 +126,33 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 	enesim_renderer_name_set(r, renderer_name);
 }
 
-Eina_Bool _enesim_renderer_changed(Enesim_Renderer *r)
+Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 {
-	/* TODO compare the current state and the old state */
-	/* if it has chanhged just retun a TRUE */
+	/* the color */
+	if (r->current.color != r->past.color)
+		return EINA_TRUE;
+	/* the origin */
+	if (r->current.ox != r->past.ox || r->current.oy != r->past.oy)
+		return EINA_TRUE;
+	/* the scale */
+	if (r->current.sx != r->past.sx || r->current.sy != r->past.sy)
+		return EINA_TRUE;
+	/* the transformation */
+	if (r->current.transformation_type != r->past.transformation_type)
+		return EINA_TRUE;
+	
+	if (r->current.transformation.xx != r->past.transformation.xx ||
+			r->current.transformation.xy != r->past.transformation.xy ||
+			r->current.transformation.xz != r->past.transformation.xz ||
+			r->current.transformation.yx != r->past.transformation.yx ||
+			r->current.transformation.yx != r->past.transformation.yy ||
+			r->current.transformation.yz != r->past.transformation.yz ||
+			r->current.transformation.zx != r->past.transformation.zx ||
+			r->current.transformation.zy != r->past.transformation.zy ||
+			r->current.transformation.zz != r->past.transformation.zz)
+		return EINA_TRUE;
+
+	return EINA_FALSE;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -326,6 +349,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	r->current.transformation_type = ENESIM_MATRIX_IDENTITY;
 	r->past.transformation_type = ENESIM_MATRIX_IDENTITY;
 	/* private stuff */
+	enesim_rectangle_coords_from(&r->past_boundings, 0, 0, 0, 0);
 	r->prv_data = eina_hash_string_superfast_new(NULL);
 	/* always set the first reference */
 	r = enesim_renderer_ref(r);
@@ -949,9 +973,47 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
  * To  be documented
  * FIXME: To be fixed
  */
+Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
+{
+	Eina_Bool ret = EINA_TRUE;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	/* if the renderer does not has the descriptor
+	 * function we assume it is always true */
+	if (r->descriptor->has_changed)
+	{
+		/* first check if the common properties have changed */
+		if (!_enesim_renderer_common_changed(r))
+		{
+			ret = r->descriptor->has_changed(r);
+		}
+	}
+	return ret;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	/* TODO check if the renderer has changed */
-	/* TODO if so call the damage_get on the renderer */
+
+	if (!cb) return;
+
+	if (r->descriptor->damage)
+	{
+		r->descriptor->damage(r, cb, data);
+	}
+	else
+	{
+		Enesim_Rectangle current_boundings;
+		if (!enesim_renderer_has_changed(r))
+			return;
+		/* send the old bounds and the new one */
+		enesim_renderer_boundings(r, &current_boundings);
+		cb(r, &current_boundings, data);
+		cb(r, &r->past_boundings, data);
+	}
 }

@@ -202,6 +202,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ _importer_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _importer_state_setup,
 	/* .sw_cleanup = */ NULL
 };

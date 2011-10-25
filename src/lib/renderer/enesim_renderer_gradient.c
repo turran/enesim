@@ -356,6 +356,7 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .flags =      */ _gradient_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _gradient_state_setup,
 	/* .sw_cleanup = */ _gradient_state_cleanup
 };

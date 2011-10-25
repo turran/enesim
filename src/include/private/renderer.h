@@ -30,6 +30,7 @@ struct _Enesim_Renderer
 	Enesim_Renderer_State past;
 	/* the private data */
 	Eina_Hash *prv_data;
+	Enesim_Rectangle past_boundings;
 	/* the descriptor */
 	Enesim_Renderer_Descriptor *descriptor;
 	void *data;
@@ -128,10 +129,8 @@ void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, E
 
 /* common shape renderer functions */
 Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descriptor, void *data);
-Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r);
-Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r, const Enesim_Renderer_State *state, Enesim_Surface *s, Enesim_Error **error);
-void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
-void enesim_renderer_shape_cleanup(Enesim_Renderer *r);
+Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r, const Enesim_Renderer_State *state, Enesim_Surface *s, Enesim_Error **error);
+void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
 /* common gradient renderer functions */
 typedef Eina_F16p16 (*Enesim_Renderer_Gradient_Distance)(Enesim_Renderer *r, Eina_F16p16 x, Eina_F16p16 y);

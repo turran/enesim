@@ -33,6 +33,7 @@ typedef struct _Layer
 {
 	Enesim_Renderer *r;
 	/* generated at state setup */
+	Eina_Rectangle destination_boundings;
 	Enesim_Compositor_Span span;
 	Enesim_Matrix original;
 	double ox, oy;
@@ -68,7 +69,7 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddat
 
 		l = eina_list_data_get(ll);
 
-		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
+		lboundings = l->destination_boundings;
 		if (!eina_rectangle_intersection(&lboundings, &span))
 		{
 			continue;
@@ -110,7 +111,7 @@ static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, 
 		l = eina_list_data_get(ll);
 
 		ldata = enesim_renderer_backend_data_get(l->r, ENESIM_BACKEND_SOFTWARE);
-		enesim_renderer_destination_boundings(l->r, &lboundings, 0, 0);
+		lboundings = l->destination_boundings;
 		if (!eina_rectangle_intersection(&lboundings, &span))
 		{
 			continue;
@@ -150,7 +151,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		 */
 		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
-		if (!enesim_renderer_sw_setup(l->r, state, s, error))
+		if (!enesim_renderer_setup(l->r, s, error))
 		{
 			const char *name;
 
@@ -161,6 +162,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 				Layer *pl = eina_list_data_get(ll);
 				enesim_renderer_relative_unset(r, pl->r, &l->original,
 						 l->ox, l->oy);
+				enesim_renderer_cleanup(l->r, s);
 				ll = eina_list_prev(ll);
 			}
 
@@ -178,6 +180,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 					color, ENESIM_FORMAT_NONE);
 			only_fill = EINA_FALSE;
 		}
+		enesim_renderer_destination_boundings(l->r, &l->destination_boundings, 0, 0);
 	}
 	if (only_fill)
 	{
@@ -296,6 +299,19 @@ static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
 	return is_inside;
 }
 
+static void _compound_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
+{
+	Enesim_Renderer_Compound *thiz;
+	Eina_List *ll;
+	Layer *l;
+
+	thiz = _compound_get(r);
+	EINA_LIST_FOREACH(thiz->layers, ll, l)
+	{
+		enesim_renderer_damages_get(l->r, cb, data);
+	}
+}
+
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =    */ ENESIM_RENDERER_API,
 	/* .name =       */ _compound_name,
@@ -303,7 +319,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings =  */ _compound_boundings,
 	/* .flags =      */ _compound_flags,
 	/* .is_inside =  */ _compound_is_inside,
-	/* .damage =     */ NULL,
+	/* .damage =     */ _compound_damage,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _compound_state_setup,
 	/* .sw_cleanup = */ _compound_state_cleanup
 };

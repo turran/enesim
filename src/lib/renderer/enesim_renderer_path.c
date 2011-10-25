@@ -281,9 +281,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	enesim_renderer_origin_set(thiz->figure, ox, oy);
 
 	enesim_renderer_transformation_get(r, &matrix);
-	enesim_renderer_transformation_set(r, &matrix);
+	enesim_renderer_transformation_set(thiz->figure, &matrix);
 
-	if (!enesim_renderer_sw_setup(thiz->figure, state, s, error))
+	if (!enesim_renderer_setup(thiz->figure, s, error))
 	{
 		return EINA_FALSE;
 	}
@@ -304,7 +304,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Path *thiz;
 
 	thiz = _path_get(r);
-	enesim_renderer_shape_sw_cleanup(thiz->figure, s);
+	enesim_renderer_cleanup(thiz->figure, s);
 }
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
@@ -324,6 +324,7 @@ static Enesim_Renderer_Descriptor _path_descriptor = {
 	/* .flags =      */ NULL,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };

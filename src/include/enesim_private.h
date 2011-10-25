@@ -18,10 +18,16 @@
 #ifndef _ENESIM_PRIVATE_H
 #define _ENESIM_PRIVATE_H
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #if BUILD_PTHREAD
 #include <pthread.h>
+#endif
+
+#if HAVE_SCHED_H
+#include <sched.h>
 #endif
 
 #if BUILD_OPENCL

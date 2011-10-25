@@ -18,7 +18,13 @@ configure-stamp \
 depcomp \
 enesim.pc \
 enesim_opencl.pc \
-enesim_docs.tar.gz
+enesim_docs.tar.gz \
+m4/ltsugar.m4 \
+m4/libtool.m4 \
+m4/ltversion.m4 \
+m4/lt~obsolete.m4 \
+m4/ltoptions.m4
+
 
 EXTRA_DIST = \
 AUTHORS \

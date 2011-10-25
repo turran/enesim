@@ -46,7 +46,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 	return r;
 }
 
-void enesim_renderer_shape_cleanup(Enesim_Renderer *r)
+void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -55,10 +55,14 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r)
 			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
 		enesim_renderer_relative_unset(r, thiz->fill.rend, &thiz->fill.original, thiz->fill.ox, thiz->fill.oy);
+		enesim_renderer_cleanup(thiz->fill.rend, s);
 	}
 }
 
-Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r)
+Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -67,46 +71,13 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r)
 			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
 	{
 		enesim_renderer_relative_set(r, thiz->fill.rend, &thiz->fill.original, &thiz->fill.ox, &thiz->fill.oy);
-	}
-	return EINA_TRUE;
-}
-
-Eina_Bool enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		Enesim_Surface *s,
-		Enesim_Error **error)
-{
-	Enesim_Renderer_Shape *thiz;
-
-	thiz = _shape_get(r);
-	if (!enesim_renderer_shape_setup(r))
-	{
-		ENESIM_RENDERER_ERROR(r, error, "Shape setup failed");
-		return EINA_FALSE;
-	}
-	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-	{
-		if (!enesim_renderer_sw_setup(thiz->fill.rend, state, s, error))
+		if (!enesim_renderer_setup(thiz->fill.rend, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Fill renderer failed");
 			return EINA_FALSE;
 		}
 	}
 	return EINA_TRUE;
-}
-
-void enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	Enesim_Renderer_Shape *thiz;
-
-	thiz = _shape_get(r);
-	if (thiz->fill.rend && (thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
-	{
-		enesim_renderer_sw_cleanup(thiz->fill.rend, s);
-	}
-	enesim_renderer_shape_cleanup(r);
 }
 
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r)

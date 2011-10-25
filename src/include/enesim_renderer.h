@@ -96,6 +96,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Damage damage;
+	Enesim_Renderer_Has_Changed has_changed;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;

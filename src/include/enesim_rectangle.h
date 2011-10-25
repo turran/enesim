@@ -23,6 +23,9 @@
  * @todo
  */
 
+#define ENESIM_RECTANGLE_FORMAT "g %g - %gx%g"
+#define ENESIM_RECTANGLE_ARGS(r) (r)->x, (r)->y, (r)->w, (r)->h
+
 typedef struct _Enesim_Rectangle
 {
 	double x;
@@ -37,6 +40,14 @@ static inline Eina_Bool enesim_rectangle_is_inside(Enesim_Rectangle *r, double x
 		return EINA_TRUE;
 	else
 		return EINA_FALSE;
+}
+
+static inline void enesim_rectangle_coords_from(Enesim_Rectangle *r, double x, double y, double w, double h)
+{
+	r->x = x;
+	r->y = y;
+	r->w = w;
+	r->h = h;
 }
 
 /**

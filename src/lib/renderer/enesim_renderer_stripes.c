@@ -203,6 +203,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ _stripes_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _setup_state,
 	/* .sw_cleanup = */ _cleanup_state
 };

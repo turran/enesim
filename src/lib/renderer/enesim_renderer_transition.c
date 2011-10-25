@@ -102,18 +102,20 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 
 	enesim_renderer_relative_set(r, t->r0.r, &t->r0.original, &t->r0.ox, &t->r0.oy);
+	if (!enesim_renderer_setup(t->r0.r, s, error))
+		goto r0_end;
 	enesim_renderer_relative_set(r, t->r1.r, &t->r1.original, &t->r1.ox, &t->r1.oy);
-	if (!enesim_renderer_sw_setup(t->r0.r, state, s, error))
-		goto end;
-	if (!enesim_renderer_sw_setup(t->r1.r, state, s, error))
-		goto end;
+	if (!enesim_renderer_setup(t->r1.r, s, error))
+		goto r1_end;
 
 	*fill = _span_general;
 
 	return EINA_TRUE;
-end:
-	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy);
+r1_end:
 	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy);
+	enesim_renderer_cleanup(t->r0.r, s);
+r0_end:
+	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy);
 	return EINA_FALSE;
 }
 
@@ -122,9 +124,9 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Transition *t;
 
 	t = _transition_get(r);
-	enesim_renderer_sw_cleanup(t->r0.r, s);
-	enesim_renderer_sw_cleanup(t->r1.r, s);
+	enesim_renderer_cleanup(t->r0.r, s);
 	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy);
+	enesim_renderer_cleanup(t->r1.r, s);
 	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy);
 }
 
@@ -184,6 +186,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ _transition_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };

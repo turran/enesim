@@ -211,7 +211,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 
 	thiz->irr0 = rad * 65536;
 
-	if (!enesim_renderer_shape_sw_setup(r, state, s, error))
+	if (!enesim_renderer_shape_setup(r, state, s, error))
 		return EINA_FALSE;
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
@@ -227,7 +227,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Circle *thiz;
 
 	thiz = _circle_get(r);
-	enesim_renderer_shape_sw_cleanup(r, s);
+	enesim_renderer_shape_cleanup(r, s);
 }
 
 static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -258,6 +258,7 @@ static Enesim_Renderer_Descriptor _circle_descriptor = {
 	/* .flags =      */ _flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };

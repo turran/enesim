@@ -745,7 +745,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		thiz->changed = 0;
 	}
 
-	if (!enesim_renderer_shape_sw_setup(r, state, s, error))
+	if (!enesim_renderer_shape_setup(r, state, s, error))
 	{
 		return EINA_FALSE;
 	}
@@ -768,7 +768,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape *thiz;
 
-	enesim_renderer_shape_sw_cleanup(r, s);
+	enesim_renderer_shape_cleanup(r, s);
 
 	/*
 	 if (thiz->stroke.rend &&
@@ -808,6 +808,7 @@ static Enesim_Renderer_Descriptor _figure_descriptor = {
 	/* .flags =      */ _figure_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };

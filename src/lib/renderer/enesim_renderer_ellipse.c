@@ -382,7 +382,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		thiz->icc0 = 2 * thiz->irr0_y;
 	}
 
-	if (!enesim_renderer_shape_sw_setup(r, state, s, error))
+	if (!enesim_renderer_shape_setup(r, state, s, error))
 		return EINA_FALSE;
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
@@ -399,7 +399,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Ellipse *thiz;
 
 	thiz = _ellipse_get(r);
-	enesim_renderer_shape_sw_cleanup(r, s);
+	enesim_renderer_shape_cleanup(r, s);
 }
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
@@ -442,6 +442,7 @@ static Enesim_Renderer_Descriptor _ellipse_descriptor = {
 	/* .flags =      */ _ellipse_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ _state_cleanup
 };

@@ -15,8 +15,10 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "Enesim.h"
 #include "enesim_private.h"
+
 /**
  * @todo
  * - In a near future we should move the API functions into global ones?
@@ -129,7 +131,7 @@ static inline void _sw_surface_draw_composed_threaded(Enesim_Renderer *r,
 		memset(tmp, 0, len);
 		fill(r, area->x, y, area->w, tmp);
 		/* compose the filled and the destination spans */
-		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->color, NULL);
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, NULL);
 end:
 		ddata += stride;
 		h--;
@@ -223,7 +225,7 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 		if (!span)
 		{
 			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->curent.rop, r->current.color);
+					"%d and color %08x", r, r->current.rop, r->current.color);
 			goto end;
 		}
 		_op.span = span;

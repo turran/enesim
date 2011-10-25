@@ -9,7 +9,8 @@ AM_CPPFLAGS = \
 check_PROGRAMS = \
 enesim_test_eina_pool \
 enesim_test_renderer \
-enesim_test_renderer_error
+enesim_test_renderer_error \
+enesim_test_damages
 
 enesim_test_eina_pool_SOURCES = enesim_test_eina_pool.c
 enesim_test_eina_pool_DEPENDENCIES = $(top_builddir)/src/lib/libenesim.la
@@ -22,6 +23,10 @@ enesim_test_renderer_LDADD = $(top_builddir)/src/lib/libenesim.la @ENESIM_LIBS@
 enesim_test_renderer_error_SOURCES = enesim_test_renderer_error.c
 enesim_test_renderer_error_DEPENDENCIES = $(top_builddir)/src/lib/libenesim.la
 enesim_test_renderer_error_LDADD = $(top_builddir)/src/lib/libenesim.la @ENESIM_LIBS@
+
+enesim_test_damages_SOURCES = enesim_test_damages.c
+enesim_test_damages_DEPENDENCIES = $(top_builddir)/src/lib/libenesim.la
+enesim_test_damages_LDADD = $(top_builddir)/src/lib/libenesim.la @ENESIM_LIBS@
 
 if HAVE_OPENCL
 check_PROGRAMS += \

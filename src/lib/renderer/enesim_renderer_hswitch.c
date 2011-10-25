@@ -197,9 +197,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	thiz = _hswitch_get(r);
 	if (!thiz->lrend || !thiz->rrend)
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(thiz->lrend, state, s, error))
+	if (!enesim_renderer_setup(thiz->lrend, s, error))
 		return EINA_FALSE;
-	if (!enesim_renderer_sw_setup(thiz->rrend, state, s, error))
+	if (!enesim_renderer_setup(thiz->rrend, s, error))
 		return EINA_FALSE;
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
@@ -227,6 +227,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ NULL,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
+	/* .has_changed =*/ NULL,
 	/* .sw_setup =   */ _state_setup,
 	/* .sw_cleanup = */ NULL,
 };

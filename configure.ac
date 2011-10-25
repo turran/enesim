@@ -1,13 +1,23 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-AC_INIT([enesim], [0.0.12], [enesim-devel@googlegroups.com])
+m4_define([v_maj], [0])
+m4_define([v_min], [0])
+m4_define([v_mic], [12])
+m4_define([v_ver], [v_maj.v_min.v_mic])
+
+m4_define([lt_cur], m4_eval(v_maj + v_min))
+m4_define([lt_rev], v_mic)
+m4_define([lt_age], v_min)
+
+AC_INIT([enesim], [v_ver], [enesim-devel@googlegroups.com])
 AC_PREREQ([2.60])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_ISC_POSIX
+AC_USE_SYSTEM_EXTENSIONS
 
 AM_INIT_AUTOMAKE(1.6 dist-bzip2)
 AM_CONFIG_HEADER(src/include/config.h)
@@ -18,15 +28,11 @@ define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
 define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
 AC_PROG_LIBTOOL
 
-VMAJ=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $1);}'`
-VMIN=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $2);}'`
-VMIC=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $3);}'`
-SNAP=`echo $PACKAGE_VERSION | awk -F. '{printf("%s", $4);}'`
-version_info=`expr $VMAJ + $VMIN`":$VMIC:$VMIN"
+version_info="lt_cur:lt_rev:lt_age"
 AC_SUBST(version_info)
-AC_DEFINE_UNQUOTED(VERSION_MAJOR, ${VMAJ}, [Major version])
-AC_DEFINE_UNQUOTED(VERSION_MINOR, ${VMIN}, [Minor version])
-AC_DEFINE_UNQUOTED(VERSION_MICRO, ${VMIC}, [Micro version])
+AC_DEFINE_UNQUOTED([VERSION_MAJOR], [v_maj], [Major version])
+AC_DEFINE_UNQUOTED([VERSION_MINOR], [v_min], [Minor version])
+AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 
 ### Additional options to configure
 
@@ -64,6 +70,7 @@ case "$host_os" in
 esac
 AC_SUBST(ENESIM_BUILD)
 
+EFL_COMPILER_FLAG([-Wall])
 
 ### Checks for linker characteristics
 
@@ -208,7 +215,7 @@ EXAMPLE_LIBS="$PNG_LIBS"
 AC_SUBST(EXAMPLE_CFLAGS)
 AC_SUBST(EXAMPLE_LIBS)
 
-ENESIM_CFLAGS="$EINA_CFLAGS $EFL_SIMD_FLAGS $EFL_COVERAGE_CFLAGS $pthread_cflags -D_GNU_SOURCE -Wall"
+ENESIM_CFLAGS="$EINA_CFLAGS $EFL_SIMD_FLAGS $EFL_COVERAGE_CFLAGS $pthread_cflags"
 ENESIM_LIBS="$EINA_LIBS $EFL_COVERAGE_LIBS $pthread_libs"
 AC_SUBST(ENESIM_CFLAGS)
 AC_SUBST(ENESIM_LIBS)

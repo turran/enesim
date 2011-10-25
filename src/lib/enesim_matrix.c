@@ -22,13 +22,6 @@
  *                                  Local                                     *
  *============================================================================*/
 /* FIXME make this function on API */
-static void _matrix_debug(Enesim_Matrix *m)
-{
-	printf("XX = %f XY = %f XZ = %f\n", MATRIX_XX(m), MATRIX_XY(m), MATRIX_XZ(m));
-	printf("YX = %f YY = %f YZ = %f\n", MATRIX_YX(m), MATRIX_YY(m), MATRIX_YZ(m));
-	printf("ZX = %f ZY = %f ZZ = %f\n", MATRIX_ZX(m), MATRIX_ZY(m), MATRIX_ZZ(m));
-}
-/* FIXME make this function on API */
 static inline _quad_dump(Enesim_Quad *q)
 {
 	printf("Q = %f %f, %f %f, %f %f, %f %f\n", QUAD_X0(q), QUAD_Y0(q), QUAD_X1(q), QUAD_Y1(q), QUAD_X2(q), QUAD_Y2(q), QUAD_X3(q), QUAD_Y3(q), q[8]);
