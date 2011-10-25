@@ -29,11 +29,18 @@ int main(int argc, char **argv)
 	enesim_renderer_compound_layer_add(r1, r3);
 
 	/* before drawing check the damages */
+	printf("before drawing\n");
+	enesim_renderer_damages_get(r1, _damages, NULL);
+	s = enesim_surface_new(ENESIM_FORMAT_ARGB8888, 320, 240);
+	enesim_renderer_draw(r1, s, NULL, 0, 0, NULL);
+	/* check again, we should not have anything */
+	printf("after drawing\n");
 	enesim_renderer_damages_get(r1, _damages, NULL);
 
-	s = enesim_surface_new(ENESIM_FORMAT_ARGB8888, 320, 240);
+	printf("after writing\n");
+	enesim_renderer_rectangle_width_set(r2, 120.0);
+	enesim_renderer_damages_get(r1, _damages, NULL);
 
-	enesim_renderer_draw(r1, s, NULL, 0, 0, NULL);
 	enesim_shutdown();
 
 	return 0;

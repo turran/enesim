@@ -30,6 +30,7 @@ struct _Enesim_Renderer
 	Enesim_Renderer_State past;
 	/* the private data */
 	Eina_Hash *prv_data;
+	Enesim_Rectangle current_boundings;
 	Enesim_Rectangle past_boundings;
 	/* the descriptor */
 	Enesim_Renderer_Descriptor *descriptor;

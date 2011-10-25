@@ -205,8 +205,8 @@ static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		Layer *l = eina_list_data_get(ll);
 
-		enesim_renderer_sw_cleanup(l->r, s);
 		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
+		enesim_renderer_cleanup(l->r, s);
 	}
 }
 

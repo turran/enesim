@@ -140,12 +140,12 @@ Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 	/* the transformation */
 	if (r->current.transformation_type != r->past.transformation_type)
 		return EINA_TRUE;
-	
+
 	if (r->current.transformation.xx != r->past.transformation.xx ||
 			r->current.transformation.xy != r->past.transformation.xy ||
 			r->current.transformation.xz != r->past.transformation.xz ||
 			r->current.transformation.yx != r->past.transformation.yx ||
-			r->current.transformation.yx != r->past.transformation.yy ||
+			r->current.transformation.yy != r->past.transformation.yy ||
 			r->current.transformation.yz != r->past.transformation.yz ||
 			r->current.transformation.zx != r->past.transformation.zx ||
 			r->current.transformation.zy != r->past.transformation.zy ||
@@ -403,6 +403,7 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
 {
 	Enesim_Backend b;
+	Eina_Bool ret = EINA_TRUE;
 
 	b = enesim_surface_backend_get(s);
 	switch (b)
@@ -414,16 +415,17 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 			if (!enesim_renderer_sw_setup(r, &r->current, s, error))
 			{
 				ENESIM_RENDERER_ERROR(r, error, "Software setup failed");
-				return EINA_FALSE;
+				ret = EINA_FALSE;
+				break;
 			}
 			fill = enesim_renderer_sw_fill_get(r);
 			if (!fill)
 			{
 				ENESIM_RENDERER_ERROR(r, error, "Even if the setup did not failed, there's no fill function");
 				enesim_renderer_sw_cleanup(r, s);
-				return EINA_FALSE;
+				ret = EINA_FALSE;
+				break;
 			}
-			return EINA_TRUE;
 		}
 		break;
 
@@ -432,16 +434,17 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		if (!enesim_renderer_opencl_setup(r, &r->current, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "OpenCL setup failed");
-			return EINA_FALSE;
+			ret = EINA_FALSE;
 		}
 #endif
-		return EINA_TRUE;
 		break;
 
 		default:
 		break;
 	}
-	return EINA_FALSE;
+	enesim_renderer_boundings(r, &r->current_boundings);
+
+	return ret;
 }
 
 /**
@@ -462,6 +465,11 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		default:
 		break;
 	}
+	/* swap the states */
+	/* first stuff that needs to be freed */
+	if (r->past.name) free(r->past.name);
+	r->past = r->current;
+	r->past_boundings = r->current_boundings;
 }
 
 /**
