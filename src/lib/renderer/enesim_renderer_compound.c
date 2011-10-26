@@ -39,12 +39,52 @@ typedef struct _Layer
 	double ox, oy;
 } Layer;
 
+typedef struct _Enesim_Renderer_Compound_Damage_Data
+{
+	Enesim_Renderer *real_r;
+	Enesim_Renderer_Flag flags;
+	Enesim_Renderer_Damage_Cb real_cb;
+	void *real_data;
+} Enesim_Renderer_Compound_Damage_Data;
+
 static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Compound *thiz;
 
 	thiz = enesim_renderer_data_get(r);
 	return thiz;
+}
+
+static Eina_Bool _compound_destination_boundings_cb(Enesim_Renderer *r,
+		Enesim_Rectangle *area, Eina_Bool past, void *data)
+{
+	Enesim_Renderer_Compound_Damage_Data *ddata = data;
+	Eina_Rectangle dst_area;
+	Enesim_Rectangle real_area;
+
+	/* FIXME we should send the past and the current boundings */
+#if 0
+	/* translate, scale, transform, whatever, and send the area back */
+	if (past)
+	{
+		enesim_renderer_destination_boundings(r, ddata->flags,
+				&r->past, area, 0, 0, &real_area);
+	}
+	else
+	{
+		enesim_renderer_destination_boundings(r, ddata->flags,
+				&r->current, area, 0, 0, &real_area);
+	}
+#endif
+	enesim_renderer_destination_boundings(r, &dst_area, 0, 0);
+	real_area.x = dst_area.x;
+	real_area.y = dst_area.y;
+	real_area.w = dst_area.w;
+	real_area.h = dst_area.h;
+
+	//printf("compound returning %g %g %g %g\n", real_area.x, real_area.y, real_area.w, real_area.h);
+
+	return ddata->real_cb(ddata->real_r, &real_area, past, ddata->real_data);
 }
 
 static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
@@ -214,10 +254,10 @@ static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
-	double x1 = 0;
-	double y1 = 0;
-	double x2 = 0;
-	double y2 = 0;
+	int x1 = 0;
+	int y1 = 0;
+	int x2 = 0;
+	int y2 = 0;
 
 	thiz = _compound_get(r);
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
@@ -225,9 +265,9 @@ static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Renderer *lr = l->r;
 		double nx1, ny1, nx2, ny2;
-		Enesim_Rectangle tmp;
+		Eina_Rectangle tmp;
 
-		enesim_renderer_boundings(lr, &tmp);
+		enesim_renderer_destination_boundings(lr, &tmp, 0, 0);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w - 1;
@@ -302,13 +342,19 @@ static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
 static void _compound_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
+	Enesim_Renderer_Compound_Damage_Data ddata;
 	Eina_List *ll;
 	Layer *l;
 
 	thiz = _compound_get(r);
+
+	ddata.real_r = r;
+	ddata.real_cb = cb;
+	ddata.real_data = data;
 	EINA_LIST_FOREACH(thiz->layers, ll, l)
 	{
-		enesim_renderer_damages_get(l->r, cb, data);
+		enesim_renderer_flags(l->r, &ddata.flags);
+		enesim_renderer_damages_get(l->r, _compound_destination_boundings_cb, &ddata);
 	}
 }
 

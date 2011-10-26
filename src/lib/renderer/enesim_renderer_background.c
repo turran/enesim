@@ -26,6 +26,8 @@ typedef struct _Enesim_Renderer_Background {
 	/* generated at state setup */
 	Enesim_Color final_color;
 	Enesim_Compositor_Span span;
+	/* private */
+	Eina_Bool changed : 1;
 } Enesim_Renderer_Background;
 
 static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
@@ -85,6 +87,14 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
+static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Background *thiz;
+
+ 	thiz = _background_get(r);
+	thiz->changed = EINA_FALSE;	
+}
+
 #if BUILD_OPENCL
 static Eina_Bool _background_opencl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
@@ -116,6 +126,15 @@ static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surf
 
 	return EINA_TRUE;
 }
+
+static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Background *thiz;
+
+ 	thiz = _background_get(r);
+	thiz->changed = EINA_FALSE;
+}
+
 #endif
 
 static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -145,6 +164,16 @@ static void _background_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
+static Eina_Bool _background_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Background *thiz;
+
+	thiz = _background_get(r);
+	if (!thiz->changed) return EINA_FALSE;
+	/* FIXME */
+	return EINA_TRUE;
+}
+
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =               */ ENESIM_RENDERER_API,
 	/* .name =                  */ _background_name,
@@ -153,13 +182,13 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =                 */ _background_flags,
 	/* .is_inside =             */ NULL,
 	/* .damage =                */ NULL,
-	/* .has_changed =           */ NULL,
+	/* .has_changed =           */ _background_has_changed,
 	/* .sw_setup =              */ _background_sw_setup,
-	/* .sw_cleanup =            */ NULL,
+	/* .sw_cleanup =            */ _background_sw_cleanup,
 #if BUILD_OPENCL
 	/* .opencl_setup =          */ _background_opencl_setup,
 	/* .opencl_kernel_setup =   */ _background_opencl_kernel_setup,
-	/* .opencl_cleanup =        */ NULL,
+	/* .opencl_cleanup =        */ _background_opencl_cleanup,
 #endif
 };
 /*============================================================================*
@@ -191,5 +220,19 @@ EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
 
 	thiz = _background_get(r);
 	thiz->color = color;
+	thiz->changed = EINA_TRUE;
 }
+
+/**
+ *
+ */
+EAPI void enesim_renderer_background_color_get(Enesim_Renderer *r,
+		Enesim_Color *color)
+{
+	Enesim_Renderer_Background *thiz;
+
+	thiz = _background_get(r);
+	*color = thiz->color;
+}
+
 

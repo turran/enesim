@@ -72,7 +72,7 @@ static void _content_cleanup(Enesim_Renderer_Clipper *thiz, Enesim_Surface *s)
 	{
 		enesim_renderer_transformation_set(thiz->content, &thiz->old_matrix);
 	}
-	enesim_renderer_sw_cleanup(thiz->content, s);
+	enesim_renderer_cleanup(thiz->content, s);
 	/* FIXME add the rop */
 }
 /*----------------------------------------------------------------------------*

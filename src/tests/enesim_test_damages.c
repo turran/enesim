@@ -6,6 +6,12 @@ Eina_Bool _damages(Enesim_Renderer *r, Enesim_Rectangle *damage, Eina_Bool past,
 	return EINA_TRUE;
 }
 
+Eina_Bool _destination_damages(Enesim_Renderer *r, Eina_Rectangle *damage, Eina_Bool past, void *data)
+{
+	printf("(%d) destination damage recevied %d %d %d %d\n", past, damage->x, damage->y, damage->w, damage->h);
+	return EINA_TRUE;
+}
+
 int main(int argc, char **argv)
 {
 	Enesim_Renderer *r1, *r2, *r3;
@@ -30,16 +36,22 @@ int main(int argc, char **argv)
 
 	/* before drawing check the damages */
 	printf("before drawing\n");
+	printf("==============\n");
 	enesim_renderer_damages_get(r1, _damages, NULL);
+	enesim_renderer_destination_damages_get(r1, _destination_damages, NULL);
 	s = enesim_surface_new(ENESIM_FORMAT_ARGB8888, 320, 240);
 	enesim_renderer_draw(r1, s, NULL, 0, 0, NULL);
 	/* check again, we should not have anything */
 	printf("after drawing\n");
+	printf("=============\n");
 	enesim_renderer_damages_get(r1, _damages, NULL);
+	enesim_renderer_destination_damages_get(r1, _destination_damages, NULL);
 
 	printf("after writing\n");
+	printf("=============\n");
 	enesim_renderer_rectangle_width_set(r2, 120.0);
 	enesim_renderer_damages_get(r1, _damages, NULL);
+	enesim_renderer_destination_damages_get(r1, _destination_damages, NULL);
 
 	enesim_shutdown();
 
