@@ -14,25 +14,35 @@ AC_INIT([enesim], [v_ver], [enesim-devel@googlegroups.com])
 AC_PREREQ([2.60])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
-AC_ISC_POSIX
+AC_CONFIG_HEADERS([src/include/config.h])
 AC_USE_SYSTEM_EXTENSIONS
 
-AM_INIT_AUTOMAKE(1.6 dist-bzip2)
-AM_CONFIG_HEADER(src/include/config.h)
+AM_INIT_AUTOMAKE([1.6 dist-bzip2])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-AC_LIBTOOL_WIN32_DLL
-define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
-define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
-AC_PROG_LIBTOOL
+LT_PREREQ([2.2])
+LT_INIT([win32-dll])
 
 version_info="lt_cur:lt_rev:lt_age"
-AC_SUBST(version_info)
+AC_SUBST([version_info])
 AC_DEFINE_UNQUOTED([VERSION_MAJOR], [v_maj], [Major version])
 AC_DEFINE_UNQUOTED([VERSION_MINOR], [v_min], [Minor version])
 AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
+
+
+### Needed information
+
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+
+ENESIM_BUILD=""
+case "$host_os" in
+   mingw*)
+      ENESIM_BUILD="-DENESIM_BUILD"
+   ;;
+esac
+AC_SUBST([ENESIM_BUILD])
+
 
 ### Additional options to configure
 
@@ -43,9 +53,12 @@ AC_PROG_CC
 
 ### Checks for libraries
 
-PKG_CHECK_MODULES(EINA, [eina >= 1.0.0])
-AC_ARG_WITH([equanime], AC_HELP_STRING([--with-equanime], [enable Equanime pool support]),
-    [want_equanime="yes"], [want_equanime="no"])
+PKG_CHECK_MODULES([EINA], [eina >= 1.0.0])
+AC_ARG_WITH([equanime],
+   [AC_HELP_STRING([--with-equanime], [enable Equanime pool support])],
+   [want_equanime="yes"],
+   [want_equanime="no"])
+
 ### Checks for header files
 
 
@@ -61,14 +74,6 @@ AM_PROG_CC_STDC
 AC_HEADER_STDC
 AC_C_CONST
 AC_C_BIGENDIAN
-
-ENESIM_BUILD=""
-case "$host_os" in
-   mingw*)
-      ENESIM_BUILD="-DENESIM_BUILD"
-   ;;
-esac
-AC_SUBST(ENESIM_BUILD)
 
 EFL_COMPILER_FLAG([-Wall])
 
@@ -180,8 +185,8 @@ else
 fi
 
 
-AC_SUBST(pthread_cflags)
-AC_SUBST(pthread_libs)
+AC_SUBST([pthread_cflags])
+AC_SUBST([pthread_libs])
 
 
 ### Needed information
@@ -194,11 +199,11 @@ EFL_CHECK_CPU_ALTIVEC([have_altivec="yes"], [have_altivec="no"])
 
 # Add conditionals for every surface format but the argb8888_pre, it is
 # the core format and cannot be optional
-ENESIM_SURFACE_FORMAT(argb8888_unpre, [yes])
-ENESIM_SURFACE_FORMAT(rgb888_a8, [no])
-ENESIM_SURFACE_FORMAT(rgb565_xa5, [no])
-ENESIM_SURFACE_FORMAT(rgb565_b1a3, [yes])
-ENESIM_SURFACE_FORMAT(rgb888, [yes])
+ENESIM_SURFACE_FORMAT([argb8888_unpre], [yes])
+ENESIM_SURFACE_FORMAT([rgb888_a8], [no])
+ENESIM_SURFACE_FORMAT([rgb565_xa5], [no])
+ENESIM_SURFACE_FORMAT([rgb565_b1a3], [yes])
+ENESIM_SURFACE_FORMAT([rgb888], [yes])
 
 # Unit tests, coverage and benchmarking
 
@@ -212,13 +217,13 @@ EFL_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
 
 EXAMPLE_CFLAGS="$PNG_CFLAGS"
 EXAMPLE_LIBS="$PNG_LIBS"
-AC_SUBST(EXAMPLE_CFLAGS)
-AC_SUBST(EXAMPLE_LIBS)
+AC_SUBST([EXAMPLE_CFLAGS])
+AC_SUBST([EXAMPLE_LIBS])
 
 ENESIM_CFLAGS="$EINA_CFLAGS $EFL_SIMD_FLAGS $EFL_COVERAGE_CFLAGS $pthread_cflags"
 ENESIM_LIBS="$EINA_LIBS $EFL_COVERAGE_LIBS $pthread_libs"
-AC_SUBST(ENESIM_CFLAGS)
-AC_SUBST(ENESIM_LIBS)
+AC_SUBST([ENESIM_CFLAGS])
+AC_SUBST([ENESIM_LIBS])
 
 
 ## Make the debug preprocessor configurable
