@@ -37,6 +37,7 @@ typedef struct _Layer
 	Enesim_Compositor_Span span;
 	Enesim_Matrix original;
 	double ox, oy;
+	double sx, sy;
 } Layer;
 
 typedef struct _Enesim_Renderer_Compound_Damage_Data
@@ -190,7 +191,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		 * for those supported
 		 */
 		/* the position and the matrix */
-		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy);
+		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy, &l->sx, &l->sy);
 		if (!enesim_renderer_setup(l->r, s, error))
 		{
 			const char *name;
@@ -201,7 +202,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 			{
 				Layer *pl = eina_list_data_get(ll);
 				enesim_renderer_relative_unset(r, pl->r, &l->original,
-						 l->ox, l->oy);
+						 l->ox, l->oy, l->sx, l->sy);
 				enesim_renderer_cleanup(l->r, s);
 				ll = eina_list_prev(ll);
 			}
@@ -245,7 +246,7 @@ static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		Layer *l = eina_list_data_get(ll);
 
-		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy);
+		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy, l->sx, l->sy);
 		enesim_renderer_cleanup(l->r, s);
 	}
 }

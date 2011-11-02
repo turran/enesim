@@ -29,6 +29,7 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Matrix stroke_transformation;
 	Enesim_Matrix fill_transformation;
 	double fill_ox, fill_oy;
+	double fill_sx, fill_sy;
 	/* interface */
 	Enesim_Renderer_Has_Changed has_changed;
 	void *data;
@@ -122,7 +123,8 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		enesim_renderer_relative_unset(r, thiz->current.fill.r,
 				&thiz->fill_transformation,
-				thiz->fill_ox, thiz->fill_oy);
+				thiz->fill_ox, thiz->fill_oy,
+				thiz->fill_sx, thiz->fill_sy);
 		enesim_renderer_cleanup(thiz->current.fill.r, s);
 	}
 }
@@ -141,7 +143,8 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 	{
 		enesim_renderer_relative_set(r, thiz->current.fill.r,
 				&thiz->fill_transformation,
-				&thiz->fill_ox, &thiz->fill_oy);
+				&thiz->fill_ox, &thiz->fill_oy,
+				&thiz->fill_sx, &thiz->fill_sy);
 		if (!enesim_renderer_setup(thiz->current.fill.r, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Fill renderer failed");

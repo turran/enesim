@@ -299,7 +299,8 @@ void enesim_renderer_relative_matrix_set(Enesim_Renderer *r, Enesim_Renderer *re
 }
 
 void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy)
+		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy,
+		double *old_sx, double *old_sy)
 {
 	Enesim_Matrix rel_matrix, r_matrix;
 	double r_ox, r_oy;
@@ -307,35 +308,51 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 
 	if (!rel) return;
 
-	/* TODO should we use the f16p16 matrix? */
-	/* multiply the matrix by the current transformation */
-	enesim_renderer_transformation_get(r, &r_matrix);
-	enesim_renderer_transformation_get(rel, old_matrix);
-	enesim_matrix_compose(old_matrix, &r_matrix, &rel_matrix);
-	enesim_renderer_transformation_set(rel, &rel_matrix);
-	/* add the origin by the current origin */
-	enesim_renderer_origin_get(rel, old_ox, old_oy);
-	enesim_renderer_origin_get(r, &r_ox, &r_oy);
-	/* FIXME what to do with the origin?
-	 * - if we use the first case we are also translating the rel origin to the
-	 * parent origin * old_matrix
-	 */
+	if (r->current.transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		/* TODO should we use the f16p16 matrix? */
+		/* multiply the matrix by the current transformation */
+		enesim_renderer_transformation_get(r, &r_matrix);
+		enesim_renderer_transformation_get(rel, old_matrix);
+		enesim_matrix_compose(old_matrix, &r_matrix, &rel_matrix);
+		enesim_renderer_transformation_set(rel, &rel_matrix);
+		/* add the origin by the current origin */
+		enesim_renderer_origin_get(rel, old_ox, old_oy);
+		enesim_renderer_origin_get(r, &r_ox, &r_oy);
+		/* FIXME what to do with the origin?
+		 * - if we use the first case we are also translating the rel origin to the
+		 * parent origin * old_matrix
+		 */
 #if 1
-	enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
-	enesim_renderer_origin_set(rel, nox, noy);
+		enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
+		enesim_renderer_origin_set(rel, nox, noy);
 #else
-	//printf("setting new origin %g %g\n", *old_ox - r_ox, *old_oy - r_oy);
-	enesim_renderer_origin_set(rel, *old_ox - r_ox, *old_oy - r_oy);
+		//printf("setting new origin %g %g\n", *old_ox - r_ox, *old_oy - r_oy);
+		enesim_renderer_origin_set(rel, *old_ox - r_ox, *old_oy - r_oy);
 #endif
+	}
+	else
+	{
+		enesim_renderer_origin_get(rel, old_ox, old_oy);
+		enesim_renderer_origin_set(rel, r->current.ox + *old_ox, r->current.oy + *old_oy);
+
+		enesim_renderer_scale_get(rel, old_sx, old_sy);
+		enesim_renderer_scale_set(rel, r->current.sx * *old_sx, r->current.sy * *old_sy);
+
+		enesim_renderer_transformation_get(rel, old_matrix);
+	}
 }
 
 void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix, double old_ox, double old_oy)
+		Enesim_Matrix *old_matrix, double old_ox, double old_oy,
+		double old_sx, double old_sy)
 {
 	if (!rel) return;
 
 	/* restore origin */
 	enesim_renderer_origin_set(rel, old_ox, old_oy);
+	/* restore the scale */
+	enesim_renderer_scale_set(rel, old_sx, old_sy);
 	/* restore original matrix */
 	enesim_renderer_transformation_set(rel, old_matrix);
 }
