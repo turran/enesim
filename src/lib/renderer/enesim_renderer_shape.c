@@ -118,8 +118,7 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _shape_get(r);
 	if (thiz->current.fill.r &&
-			(thiz->current.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(thiz->current.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
 		enesim_renderer_relative_unset(r, thiz->current.fill.r,
 				&thiz->fill_transformation,
@@ -138,8 +137,7 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 
 	thiz = _shape_get(r);
 	if (thiz->current.fill.r &&
-			(thiz->current.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL ||
-			(thiz->current.draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)))
+			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
 		enesim_renderer_relative_set(r, thiz->current.fill.r,
 				&thiz->fill_transformation,

@@ -25,10 +25,11 @@
  */
 typedef enum _Enesim_Shape_Draw_Mode
 {
-	ENESIM_SHAPE_DRAW_MODE_FILL,
-	ENESIM_SHAPE_DRAW_MODE_STROKE,
-	ENESIM_SHAPE_DRAW_MODE_STROKE_FILL,
+	ENESIM_SHAPE_DRAW_MODE_FILL 	= (1 << 0),
+	ENESIM_SHAPE_DRAW_MODE_STROKE	= (1 << 1),
 } Enesim_Shape_Draw_Mode;
+
+#define ENESIM_SHAPE_DRAW_MODE_STROKE_FILL (ENESIM_SHAPE_DRAW_MODE_FILL | ENESIM_SHAPE_DRAW_MODE_STROKE)
 
 EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight);
 EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *weight);
