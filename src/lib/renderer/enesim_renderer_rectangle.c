@@ -46,7 +46,8 @@ typedef struct _Enesim_Renderer_Rectangle {
 } Enesim_Renderer_Rectangle;
 
 /* we assume tyy and lxx are inside the top left corner */
-static inline void _outer_top_left(int sx, int sy, uint16_t ax, uint16_t ay,
+static inline void _top_left(int sx, int sy, int stw,
+		uint16_t ax, uint16_t ay,
 		Eina_F16p16 lxx, Eina_F16p16 tyy, Eina_F16p16 rr0, Eina_F16p16 rr1,
 		uint32_t cout[4], uint16_t *ca)
 {
@@ -63,13 +64,13 @@ static inline void _outer_top_left(int sx, int sy, uint16_t ax, uint16_t ay,
 		}
 	}
 
-	if (sx < 0)
+	if (sx < stw)
 	{
 		if (cout[1] != cout[3])
 			cout[1] = argb8888_interp_256(ay, cout[3], cout[1]);
 		cout[0] = cout[2] = cout[3] = cout[1];
 	}
-	if (sy < 0)
+	if (sy < stw)
 	{
 		if (cout[2] != cout[3])
 			cout[2] = argb8888_interp_256(ax, cout[3], cout[2]);
@@ -77,7 +78,8 @@ static inline void _outer_top_left(int sx, int sy, uint16_t ax, uint16_t ay,
 	}
 }
 
-static inline void _outer_bottom_left(int sx, int sy, int sh, uint16_t ax, uint16_t ay,
+static inline void _bottom_left(int sx, int sy, int sh, int stw,
+		uint16_t ax, uint16_t ay,
 		Eina_F16p16 lxx, Eina_F16p16 byy, Eina_F16p16 rr0, Eina_F16p16 rr1,
 		uint32_t cout[4], uint16_t *ca)
 {
@@ -94,13 +96,13 @@ static inline void _outer_bottom_left(int sx, int sy, int sh, uint16_t ax, uint1
 		}
 	}
 
-	if (sx < 0)
+	if (sx < stw)
 	{
 		if (cout[1] != cout[3])
 			cout[1] = argb8888_interp_256(ay, cout[3], cout[1]);
 		cout[0] = cout[2] = cout[3] = cout[1];
 	}
-	if ((sy + 1) == sh)
+	if ((sy + 1 + stw) == sh)
 	{
 		if (cout[0] != cout[1])
 			cout[0] = argb8888_interp_256(ax, cout[1], cout[0]);
@@ -108,7 +110,8 @@ static inline void _outer_bottom_left(int sx, int sy, int sh, uint16_t ax, uint1
 	}
 }
 
-static inline void _outer_left_corners(int sx, int sy, int sh, uint16_t ax, uint16_t ay,
+static inline void _left_corners(int sx, int sy, int sh, int stw,
+		uint16_t ax, uint16_t ay,
 		Eina_Bool tl, Eina_Bool bl,
 		Eina_F16p16 lxx, Eina_F16p16 tyy, Eina_F16p16 byy,
 		Eina_F16p16 rr0, Eina_F16p16 rr1,
@@ -117,13 +120,14 @@ static inline void _outer_left_corners(int sx, int sy, int sh, uint16_t ax, uint
 	if (lxx < 0)
 	{
 		if (tl && (tyy < 0))
-			_outer_top_left(sx, sy, ax, ay, lxx, tyy, rr0, rr1, cout, ca);
+			_top_left(sx, sy, stw, ax, ay, lxx, tyy, rr0, rr1, cout, ca);
 		if (bl && (byy > 0))
-			_outer_bottom_left(sx, sy, sh, ax, ay, lxx, byy, rr0, rr1, cout, ca);
+			_bottom_left(sx, sy, sh, stw, ax, ay, lxx, byy, rr0, rr1, cout, ca);
 	}
 }
 
-static inline void _outer_top_right(int sx, int sy, int sw, uint16_t ax, uint16_t ay,
+static inline void _top_right(int sx, int sy, int sw, int stw,
+		uint16_t ax, uint16_t ay,
 		Eina_F16p16 rxx, Eina_F16p16 tyy,
 		Eina_F16p16 rr0, Eina_F16p16 rr1,
 		uint32_t cout[4], uint16_t *ca)
@@ -141,13 +145,13 @@ static inline void _outer_top_right(int sx, int sy, int sw, uint16_t ax, uint16_
 		}
 	}
 
-	if ((sx + 1) == sw)
+	if ((sx + 1 + stw) == sw)
 	{
 		if (cout[0] != cout[2])
 			cout[0] = argb8888_interp_256(ay, cout[2], cout[0]);
 		cout[1] = cout[2] = cout[3] = cout[0];
 	}
-	if (sy < 0)
+	if (sy < stw)
 	{
 		if (cout[2] != cout[3])
 			cout[2] = argb8888_interp_256(ax, cout[3], cout[2]);
@@ -155,7 +159,7 @@ static inline void _outer_top_right(int sx, int sy, int sw, uint16_t ax, uint16_
 	}
 }
 
-static inline void _outer_bottom_right(int sx, int sy, int sw, int sh,
+static inline void _bottom_right(int sx, int sy, int sw, int sh, int stw,
 		uint16_t ax, uint16_t ay,
 		Eina_F16p16 rxx, Eina_F16p16 byy,
 		Eina_F16p16 rr0, Eina_F16p16 rr1,
@@ -174,13 +178,13 @@ static inline void _outer_bottom_right(int sx, int sy, int sw, int sh,
 		}
 	}
 
-	if ((sx + 1) == sw)
+	if ((sx + 1 + stw) == sw)
 	{
 		if (cout[0] != cout[2])
 			cout[0] = argb8888_interp_256(ay, cout[2], cout[0]);
 		cout[1] = cout[2] = cout[3] = cout[0];
 	}
-	if ((sy + 1) == sh)
+	if ((sy + 1 + stw) == sh)
 	{
 		if (cout[0] != cout[1])
 			cout[0] = argb8888_interp_256(ax, cout[1], cout[0]);
@@ -188,7 +192,8 @@ static inline void _outer_bottom_right(int sx, int sy, int sw, int sh,
 	}
 }
 
-static inline void _outer_right_corners(int sx, int sy, int sw, int sh, uint16_t ax, uint16_t ay,
+static inline void _right_corners(int sx, int sy, int sw, int sh, int stw,
+		uint16_t ax, uint16_t ay,
 		Eina_Bool tr, Eina_Bool br,
 		Eina_F16p16 rxx, Eina_F16p16 tyy, Eina_F16p16 byy,
 		Eina_F16p16 rr0, Eina_F16p16 rr1,
@@ -197,9 +202,9 @@ static inline void _outer_right_corners(int sx, int sy, int sw, int sh, uint16_t
 	if (rxx > 0)
 	{
 		if (tr && (tyy < 0))
-			_outer_top_right(sx, sy, sw, ax, ay, rxx, tyy, rr0, rr1, cout, ca);
+			_top_right(sx, sy, sw, stw, ax, ay, rxx, tyy, rr0, rr1, cout, ca);
 		if (br && (byy > 0))
-			_outer_bottom_right(sx, sy, sw, sh, ax, ay, rxx, byy, rr0, rr1, cout, ca);
+			_bottom_right(sx, sy, sw, sh, stw, ax, ay, rxx, byy, rr0, rr1, cout, ca);
 	}
 }
 
@@ -209,256 +214,19 @@ static inline void _outer_corners(int sx, int sy, int sw, int sh, uint16_t ax, u
 		Eina_F16p16 rr0, Eina_F16p16 rr1,
 		uint32_t cout[4], uint16_t *ca)
 {
-	_outer_left_corners(sx, sy, sh, ax, ay, tl, bl, lxx, tyy, byy, rr0, rr1, cout, ca);
-	_outer_right_corners(sx, sy, sw, sh, ax, ay, tr, br, rxx, tyy, byy, rr0, rr1, cout, ca);
+	_left_corners(sx, sy, sh, 0, ax, ay, tl, bl, lxx, tyy, byy, rr0, rr1, cout, ca);
+	_right_corners(sx, sy, sw, sh, 0, ax, ay, tr, br, rxx, tyy, byy, rr0, rr1, cout, ca);
 }
 
-#define EVAL_ROUND_OUTER_CORNERS(c0,c1,c2,c3) \
-		if (lxx < 0) \
-		{ \
-			if (tl && (tyy < 0)) \
-			{ \
-				if ((-lxx - tyy) >= rr0) \
-				{ \
-					int rr = hypot(lxx, tyy); \
- \
-					ca = 0; \
-					if (rr < rr1) \
-					{ \
-						ca = 256; \
-						if (rr > rr0) \
-							ca = 256 - ((rr - rr0) >> 8); \
-					} \
-				} \
- \
-				if (sx < 0) \
-				{ \
-					if (c1 != c3) \
-						c1 = argb8888_interp_256(ay, c3, c1); \
-					c0 = c2 = c3 = c1; \
-				} \
-				if (sy < 0) \
-				{ \
-					if (c2 != c3) \
-						c2 = argb8888_interp_256(ax, c3, c2); \
-					c0 = c1 = c3 = c2; \
-				} \
-			} \
- \
-			if (bl && (byy > 0)) \
-			{ \
-				if ((-lxx + byy) >= rr0) \
-				{ \
-					int rr = hypot(lxx, byy); \
- \
-					ca = 0; \
-					if (rr < rr1) \
-					{ \
-						ca = 256; \
-						if (rr > rr0) \
-							ca = 256 - ((rr - rr0) >> 8); \
-					} \
-				} \
- \
-				if (sx < 0) \
-				{ \
-					if (c1 != c3) \
-						c1 = argb8888_interp_256(ay, c3, c1); \
-					c0 = c2 = c3 = c1; \
-				} \
-				if ((sy + 1) == sh) \
-				{ \
-					if (c0 != c1) \
-						c0 = argb8888_interp_256(ax, c1, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-			} \
-		} \
- \
-		if (rxx > 0) \
-		{ \
-			if (tr && (tyy < 0)) \
-			{ \
-				if ((rxx - tyy) >= rr0) \
-				{ \
-					int rr = hypot(rxx, tyy); \
- \
-					ca = 0; \
-					if (rr < rr1) \
-					{ \
-						ca = 256; \
-						if (rr > rr0) \
-							ca = 256 - ((rr - rr0) >> 8); \
-					} \
-				} \
- \
-				if ((sx + 1) == sw) \
-				{ \
-					if (c0 != c2) \
-						c0 = argb8888_interp_256(ay, c2, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-				if (sy < 0) \
-				{ \
-					if (c2 != c3) \
-						c2 = argb8888_interp_256(ax, c3, c2); \
-					c0 = c1 = c3 = c2; \
-				} \
-			} \
- \
-			if (br && (byy > 0)) \
-			{ \
-				if ((rxx + byy) >= rr0) \
-				{ \
-					int rr = hypot(rxx, byy); \
- \
-					ca = 0; \
-					if (rr < rr1) \
-					{ \
-						ca = 256; \
-						if (rr > rr0) \
-							ca = 256 - ((rr - rr0) >> 8); \
-					} \
-				} \
- \
-				if ((sx + 1) == sw) \
-				{ \
-					if (c0 != c2) \
-						c0 = argb8888_interp_256(ay, c2, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-				if ((sy + 1) == sh) \
-				{ \
-					if (c0 != c1) \
-						c0 = argb8888_interp_256(ax, c1, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-			} \
-		}
-
-
-#define EVAL_ROUND_INNER_CORNERS(c0,c1,c2,c3) \
-		if (lxx < 0) \
-		{ \
-			if (tl && (tyy < 0)) \
-			{ \
-				if ((-lxx - tyy) >= irr0) \
-				{ \
-					int rr = hypot(lxx, tyy); \
- \
-					ca = 0; \
-					if (rr < irr1) \
-					{ \
-						ca = 256; \
-						if (rr > irr0) \
-							ca = 256 - ((rr - irr0) >> 8); \
-					} \
-				} \
- \
-				if (sx < stw) \
-				{ \
-					if (c1 != c3) \
-						c1 = argb8888_interp_256(ay, c3, c1); \
-					c0 = c2 = c3 = c1; \
-				} \
-				if (sy < stw) \
-				{ \
-					if (c2 != c3) \
-						c2 = argb8888_interp_256(ax, c3, c2); \
-					c0 = c1 = c3 = c2; \
-				} \
-			} \
- \
-			if (bl && (byy > 0)) \
-			{ \
-				if ((-lxx + byy) >= irr0) \
-				{ \
-					int rr = hypot(lxx, byy); \
- \
-					ca = 0; \
-					if (rr < irr1) \
-					{ \
-						ca = 256; \
-						if (rr > irr0) \
-							ca = 256 - ((rr - irr0) >> 8); \
-					} \
-				} \
- \
-				if (sx < stw) \
-				{ \
-					if (c1 != c3) \
-						c1 = argb8888_interp_256(ay, c3, c1); \
-					c0 = c2 = c3 = c1; \
-				} \
-				if ((sy + 1 + stw) == sh) \
-				{ \
-					if (c0 != c1) \
-						c0 = argb8888_interp_256(ax, c1, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-			} \
-		} \
- \
-		if (rxx > 0) \
-		{ \
-			if (tr && (tyy < 0)) \
-			{ \
-				if ((rxx - tyy) >= irr0) \
-				{ \
-					int rr = hypot(rxx, tyy); \
- \
-					ca = 0; \
-					if (rr < irr1) \
-					{ \
-						ca = 256; \
-						if (rr > irr0) \
-							ca = 256 - ((rr - irr0) >> 8); \
-					} \
-				} \
- \
-				if ((sx + 1 + stw) == sw) \
-				{ \
-					if (c0 != c2) \
-						c0 = argb8888_interp_256(ay, c2, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-				if (sy < stw) \
-				{ \
-					if (c2 != c3) \
-						c2 = argb8888_interp_256(ax, c3, c2); \
-					c0 = c1 = c3 = c2; \
-				} \
-			} \
- \
-			if (br && (byy > 0)) \
-			{ \
-				if ((rxx + byy) >= irr0) \
-				{ \
-					int rr = hypot(rxx, byy); \
- \
-					ca = 0; \
-					if (rr < irr1) \
-					{ \
-						ca = 256; \
-						if (rr > irr0) \
-							ca = 256 - ((rr - irr0) >> 8); \
-					} \
-				} \
- \
-				if ((sx + 1 + stw) == sw) \
-				{ \
-					if (c0 != c2) \
-						c0 = argb8888_interp_256(ay, c2, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-				if ((sy + 1 + stw) == sh) \
-				{ \
-					if (c0 != c1) \
-						c0 = argb8888_interp_256(ax, c1, c0); \
-					c1 = c2 = c3 = c0; \
-				} \
-			} \
-		}
+static inline void _inner_corners(int sx, int sy, int sw, int sh, int stw, uint16_t ax, uint16_t ay,
+		Eina_Bool tl, Eina_Bool tr, Eina_Bool br, Eina_Bool bl,
+		Eina_F16p16 lxx, Eina_F16p16 rxx, Eina_F16p16 tyy, Eina_F16p16 byy,
+		Eina_F16p16 rr0, Eina_F16p16 rr1,
+		uint32_t cout[4], uint16_t *ca)
+{
+	_left_corners(sx, sy, sh, stw, ax, ay, tl, bl, lxx, tyy, byy, rr0, rr1, cout, ca);
+	_right_corners(sx, sy, sw, sh, stw, ax, ay, tr, br, rxx, tyy, byy, rr0, rr1, cout, ca);
+}
 
 static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 {
@@ -558,7 +326,6 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 				if ((sx + 1) < sw)
 					op3 = ocolor;
 			}
-#if 0
 			{
 				uint32_t cout[4] = { op0, op1, op2, op3 };
 				_outer_corners(sx, sy, sw, sh, ax, ay, tl, tr, br, bl,
@@ -570,9 +337,6 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 				op2 = cout[2];
 				op3 = cout[3];
 			}
-#else
-			EVAL_ROUND_OUTER_CORNERS(op0,op1,op2,op3)
-#endif
 
 			if (op0 != op1)
 				op0 = argb8888_interp_256(ax, op1, op0);
@@ -610,8 +374,17 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 					if ((sx + 1 + stw) < sw)
 						p3 = color;
 				}
+				{
+					uint32_t cout[4] = { p0, p1, p2, p3 };
+					_inner_corners(sx, sy, sw, sh, stw, ax, ay, tl, tr, br, bl,
+							lxx, rxx, tyy, byy, irr0, irr1, cout, &ca);
 
-				EVAL_ROUND_INNER_CORNERS(p0,p1,p2,p3)
+
+					p0 = cout[0];
+					p1 = cout[1];
+					p2 = cout[2];
+					p3 = cout[3];
+				}
 
 				if (p0 != p1)
 					p0 = argb8888_interp_256(ax, p1, p0);
@@ -726,7 +499,17 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 						op3 = ocolor;
 				}
 
-				EVAL_ROUND_OUTER_CORNERS(op0,op1,op2,op3)
+				{
+					uint32_t cout[4] = { op0, op1, op2, op3 };
+					_outer_corners(sx, sy, sw, sh, ax, ay, tl, tr, br, bl,
+							lxx, rxx, tyy, byy, rr0, rr1, cout, &ca);
+
+
+					op0 = cout[0];
+					op1 = cout[1];
+					op2 = cout[2];
+					op3 = cout[3];
+				}
 
 				if (op0 != op1)
 					op0 = argb8888_interp_256(ax, op1, op0);
@@ -765,7 +548,17 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 							p3 = color;
 					}
 
-					EVAL_ROUND_INNER_CORNERS(p0,p1,p2,p3)
+					{
+						uint32_t cout[4] = { p0, p1, p2, p3 };
+						_inner_corners(sx, sy, sw, sh, stw, ax, ay, tl, tr, br, bl,
+								lxx, rxx, tyy, byy, irr0, irr1, cout, &ca);
+
+
+						p0 = cout[0];
+						p1 = cout[1];
+						p2 = cout[2];
+						p3 = cout[3];
+					}
 
 					if (p0 != p1)
 						p0 = argb8888_interp_256(ax, p1, p0);
