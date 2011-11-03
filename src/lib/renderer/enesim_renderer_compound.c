@@ -20,6 +20,14 @@
 /**
  * @todo
  * - Handle the case whenever the renderer supports the ROP itself
+ * - Might be interesting to add two more functions for this renderer
+ *   this functions should set/add some callbacks for pre/post setup/cleanup
+ *   Basically the idea is that whenever the renderer is about to do the
+ *   setup on the childs, first call the pre setup, and then after do the
+ *   post setup, this is useful for cases like esvg or eon where this libraries
+ *   wrap in a way a compound renderer but we have to also store the list
+ *   of children added, so basically we iterate twice, one the compound itself
+ *   and one the compound-wrapper
  */
 /*============================================================================*
  *                                  Local                                     *
