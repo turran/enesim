@@ -81,9 +81,9 @@ static void _enesim_renderer_translated_boundings(Enesim_Renderer *r,
 	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
 	{
 		if (boundings->x != INT_MIN / 2)
-			boundings->x -= state->ox;
+			boundings->x += state->ox;
 		if (boundings->y != INT_MIN / 2)
-			boundings->y -= state->oy;
+			boundings->y += state->oy;
 	}
 }
 
@@ -112,10 +112,14 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 	/* scale */
 	if (flags & ENESIM_RENDERER_FLAG_SCALE)
 	{
+		if (boundings->x != INT_MIN / 2)
+			boundings->x *= state->sx;
+		if (boundings->y != INT_MIN / 2)
+			boundings->y *= state->sy;
 		if (boundings->w != INT_MAX)
-			boundings->w /= state->sx;
+			boundings->w *= state->sx;
 		if (boundings->y != INT_MAX)
-			boundings->h /= state->sy;
+			boundings->h *= state->sy;
 	}
 	/* translate */
 	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
@@ -382,6 +386,7 @@ void enesim_renderer_affine_setup(Enesim_Renderer *r, int x, int y,
 {
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
+	Eina_F16p16 sx, sy;
 
 	ox = eina_f16p16_double_from(r->current.ox);
 	oy = eina_f16p16_double_from(r->current.oy);
