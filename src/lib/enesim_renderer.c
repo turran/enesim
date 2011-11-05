@@ -95,6 +95,10 @@ static void _enesim_renderer_scaled_boundings(Enesim_Renderer *r,
 	/* scale it */
 	if (flags & ENESIM_RENDERER_FLAG_SCALE)
 	{
+		if (translated->x != INT_MIN / 2)
+			translated->x *= state->sx;
+		if (translated->y != INT_MIN / 2)
+			translated->y *= state->sy;
 		if (translated->w != INT_MAX)
 			translated->w *= state->sx;
 		if (translated->y != INT_MAX)
@@ -267,7 +271,7 @@ static Eina_Bool _enesim_renderer_destination_boundings_cb(Enesim_Renderer *r,
 		_enesim_renderer_destination_boundings(r, ddata->flags,
 				&r->current, area, 0, 0, &real_area);
 	}
-	
+
 	return ddata->real_cb(r, &real_area, past, ddata->real_data);
 }
 /*============================================================================*
@@ -330,6 +334,9 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
 #if 1
 		enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
 		enesim_renderer_origin_set(rel, nox, noy);
+
+		enesim_renderer_scale_get(rel, old_sx, old_sy);
+		enesim_renderer_scale_set(rel, r->current.sx * *old_sx, r->current.sy * *old_sy);
 #else
 		//printf("setting new origin %g %g\n", *old_ox - r_ox, *old_oy - r_oy);
 		enesim_renderer_origin_set(rel, *old_ox - r_ox, *old_oy - r_oy);
@@ -386,7 +393,6 @@ void enesim_renderer_affine_setup(Enesim_Renderer *r, int x, int y,
 {
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
-	Eina_F16p16 sx, sy;
 
 	ox = eina_f16p16_double_from(r->current.ox);
 	oy = eina_f16p16_double_from(r->current.oy);

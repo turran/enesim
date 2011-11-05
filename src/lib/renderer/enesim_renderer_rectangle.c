@@ -475,7 +475,7 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
 	xx = eina_f16p16_sub(xx, xx0);
 	yy = eina_f16p16_sub(yy, yy0);
-	
+
 	while (d < e)
 	{
 		unsigned int q0 = 0;
@@ -676,7 +676,7 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
 			&thiz->matrix);
-	//*fill = _span_rounded_color_stroked_paint_filled_proj;
+	*fill = _span_rounded_color_stroked_paint_filled_proj;
 	if (state->transformation_type == ENESIM_MATRIX_AFFINE || state->transformation_type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_rounded_color_stroked_paint_filled_affine;
 

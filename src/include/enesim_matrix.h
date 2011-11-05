@@ -25,7 +25,7 @@
  */
 
 #define ENESIM_MATRIX_FORMAT "g %g %g | %g %g %g | %g %g %g"
-#define ENESIM_MATRIX_ARGS(m) (m)->xx, (m)->xy, (m)->xz 	\
+#define ENESIM_MATRIX_ARGS(m) (m)->xx, (m)->xy, (m)->xz, 	\
 		(m)->yx, (m)->yy, (m)->yz,			\
 		(m)->zx, (m)->zy, (m)->zz
 
