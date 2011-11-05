@@ -305,7 +305,7 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 	{
 		unsigned int q0 = 0;
 
-		if (xx < ww0 && yy < hh0)
+		if (xx < ww0 && yy < hh0 && xx >= -EINA_F16P16_ONE && yy >= -EINA_F16P16_ONE)
 		{
 			int sx = xx >> 16;
 			int sy = yy >> 16;
@@ -485,7 +485,7 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 			int sxx = (((long long int)xx) << 16) / zz;
 			int syy = (((long long int)yy) << 16) / zz;
 
-			if (xx < ww0 && yy < hh0)
+			if (xx < ww0 && yy < hh0 && xx >= -EINA_F16P16_ONE && yy >= -EINA_F16P16_ONE)
 			{
 				int sx = sxx >> 16;
 				int sy = syy >> 16;

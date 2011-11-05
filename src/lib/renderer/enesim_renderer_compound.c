@@ -294,6 +294,12 @@ static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	rect->h = y2 - y1 + 1;
 }
 
+/* TODO later */
+static void _compound_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+{
+
+}
+
 static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Compound *thiz;
