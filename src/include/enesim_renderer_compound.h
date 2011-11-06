@@ -24,6 +24,8 @@
  * @{
  */
 
+typedef Eina_Bool (*Enesim_Renderer_Compound_Setup)(Enesim_Renderer *r, Enesim_Renderer *layer, void *data);
+
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer *rend);

@@ -34,7 +34,14 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Compound
 {
+	/* properties */
 	Eina_List *layers;
+	Enesim_Renderer_Compound_Setup pre_cb;
+	void *pre_data;
+	Enesim_Renderer_Compound_Setup post_cb;
+	void *post_data;
+	/* private */
+	Eina_Bool changed : 1;
 } Enesim_Renderer_Compound;
 
 typedef struct _Layer
@@ -200,6 +207,15 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		 */
 		/* the position and the matrix */
 		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy, &l->sx, &l->sy);
+		if (thiz->pre_cb)
+		{
+			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
+			{
+				enesim_renderer_relative_unset(r, l->r, &l->original,
+						 l->ox, l->oy, l->sx, l->sy);
+				break;
+			}
+		}
 		if (!enesim_renderer_setup(l->r, s, error))
 		{
 			const char *name;
@@ -257,6 +273,7 @@ static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy, l->sx, l->sy);
 		enesim_renderer_cleanup(l->r, s);
 	}
+	thiz->changed = EINA_FALSE;
 }
 
 static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
@@ -354,6 +371,31 @@ static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
 	return is_inside;
 }
 
+static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Compound *thiz;
+	Eina_Bool ret;
+
+	thiz = _compound_get(r);
+	ret = thiz->changed;
+	if (!ret)
+	{
+		Layer *l;
+		Eina_List *ll;
+
+		EINA_LIST_FOREACH(thiz->layers, ll, l)
+		{
+			if ((ret = enesim_renderer_has_changed(l->r)))
+				break;
+		}
+		return ret;
+	}
+	else
+	{
+		return ret;
+	}
+}
+
 static void _compound_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -381,7 +423,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ _compound_flags,
 	/* .is_inside =  */ _compound_is_inside,
 	/* .damage =     */ _compound_damage,
-	/* .has_changed =*/ NULL,
+	/* .has_changed =*/ _compound_has_changed,
 	/* .sw_setup =   */ _compound_state_setup,
 	/* .sw_cleanup = */ _compound_state_cleanup
 };
@@ -422,6 +464,7 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 	l->r = enesim_renderer_ref(rend);
 
 	thiz->layers = eina_list_append(thiz->layers, l);
+	thiz->changed = EINA_TRUE;
 }
 
 
@@ -449,6 +492,7 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 			break;
 		}
 	}
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -469,6 +513,7 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
 		thiz->layers = eina_list_remove_list(thiz->layers, l);
 		free(layer);
 	}
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -485,4 +530,25 @@ EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 	{
 		enesim_renderer_compound_layer_add(r, rend);
 	}
+}
+
+
+EAPI void enesim_renderer_compound_pre_setup_set(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Setup cb, void *data)
+{
+	Enesim_Renderer_Compound *thiz;
+
+	thiz = _compound_get(r);
+	thiz->pre_cb = cb;
+	thiz->pre_data = data;
+}
+
+EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Setup cb, void *data)
+{
+	Enesim_Renderer_Compound *thiz;
+
+	thiz = _compound_get(r);
+	thiz->post_cb = cb;
+	thiz->post_data = data;
 }

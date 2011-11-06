@@ -92,7 +92,7 @@ static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Background *thiz;
 
  	thiz = _background_get(r);
-	thiz->changed = EINA_FALSE;	
+	thiz->changed = EINA_FALSE;
 }
 
 #if BUILD_OPENCL

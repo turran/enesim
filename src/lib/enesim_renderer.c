@@ -1115,6 +1115,10 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 			ret = r->descriptor.has_changed(r);
 		}
 	}
+	if (ret)
+	{
+		DBG("The renderer %s has changed", r->current.name);
+	}
 	return ret;
 }
 
