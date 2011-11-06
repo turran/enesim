@@ -1,3 +1,6 @@
++ Add a pattern renderer. Basically it should just draw another renderer inifinitely, of course
+ if we want to restrict it to a specific area, then we should use a clipper? or maybe make the
+ pattern clip also? 
 + Make use of the flags on the surface draw function
 + We need to optimize and avoid the need to always call
   enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
