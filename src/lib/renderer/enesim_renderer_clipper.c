@@ -20,9 +20,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Background Enesim_Renderer_Clipper;
-
-struct _Background {
+typedef struct _Enesim_Renderer_Clipper {
 	/* the properties */
 	Enesim_Renderer *content;
 	double width;
@@ -36,7 +34,9 @@ struct _Background {
 	double old_sy;
 	/* generated at state setup */
 	Enesim_Renderer_Sw_Fill content_fill;
-};
+	/* private */
+	Eina_Bool changed : 1;
+} Enesim_Renderer_Clipper;
 
 static inline Enesim_Renderer_Clipper * _clipper_get(Enesim_Renderer *r)
 {
@@ -142,6 +142,7 @@ static void _clipper_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	if (!thiz->content) return;
 
 	_content_cleanup(thiz, s);
+	thiz->changed = EINA_FALSE;
 }
 
 
@@ -170,6 +171,14 @@ static void _clipper_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	rect->h = thiz->height;
 }
 
+static Eina_Bool _clipper_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = _clipper_get(r);
+	return thiz->changed;
+}
+
 static void _clipper_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
@@ -188,7 +197,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ _clipper_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
-	/* .has_changed =*/ NULL,
+	/* .has_changed =*/ _clipper_has_changed,
 	/* .sw_setup =   */ _clipper_state_setup,
 	/* .sw_cleanup = */ _clipper_state_cleanup
 };
@@ -224,6 +233,7 @@ EAPI void enesim_renderer_clipper_content_set(Enesim_Renderer *r,
 	thiz->content = content;
 	if (thiz->content)
 		thiz->content = enesim_renderer_ref(thiz->content);
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -253,6 +263,7 @@ EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
 
 	thiz = _clipper_get(r);
 	thiz->width = width;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -279,7 +290,7 @@ EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
 
 	thiz = _clipper_get(r);
 	thiz->height = height;
-
+	thiz->changed = EINA_TRUE;
 }
 
 /**
