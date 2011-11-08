@@ -26,6 +26,7 @@ typedef struct _Enesim_Renderer_Pattern_State
 	double y;
 	double width;
 	double height;
+	Enesim_Renderer *source;
 } Enesim_Renderer_Pattern_State;
 
 typedef struct _Enesim_Renderer_Pattern {
@@ -159,3 +160,179 @@ EAPI Enesim_Renderer * enesim_renderer_pattern_new(void)
 	return r;
 }
 
+/**
+ * Sets the width of the pattern
+ * @param[in] r The pattern renderer
+ * @param[in] width The pattern width
+ */
+EAPI void enesim_renderer_pattern_width_set(Enesim_Renderer *r, double width)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	thiz->current.width = width;
+	thiz->changed = EINA_TRUE;
+}
+/**
+ * Gets the width of the pattern
+ * @param[in] r The pattern renderer
+ * @param[out] w The pattern width
+ */
+EAPI void enesim_renderer_pattern_width_get(Enesim_Renderer *r, double *width)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	if (width) *width = thiz->current.width;
+}
+/**
+ * Sets the height of the pattern
+ * @param[in] r The pattern renderer
+ * @param[in] height The pattern height
+ */
+EAPI void enesim_renderer_pattern_height_set(Enesim_Renderer *r, double height)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	thiz->current.height = height;
+	thiz->changed = EINA_TRUE;
+}
+/**
+ * Gets the height of the pattern
+ * @param[in] r The pattern renderer
+ * @param[out] height The pattern height
+ */
+EAPI void enesim_renderer_pattern_height_get(Enesim_Renderer *r, double *height)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	if (height) *height = thiz->current.height;
+}
+
+/**
+ * Sets the x of the pattern
+ * @param[in] r The pattern renderer
+ * @param[in] x The pattern x coordinate
+ */
+EAPI void enesim_renderer_pattern_x_set(Enesim_Renderer *r, double x)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	thiz->current.x = x;
+	thiz->changed = EINA_TRUE;
+}
+/**
+ * Gets the x of the pattern
+ * @param[in] r The pattern renderer
+ * @param[out] w The pattern x coordinate
+ */
+EAPI void enesim_renderer_pattern_x_get(Enesim_Renderer *r, double *x)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	if (x) *x = thiz->current.x;
+}
+/**
+ * Sets the y of the pattern
+ * @param[in] r The pattern renderer
+ * @param[in] y The pattern y coordinate
+ */
+EAPI void enesim_renderer_pattern_y_set(Enesim_Renderer *r, double y)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	thiz->current.y = y;
+	thiz->changed = EINA_TRUE;
+}
+/**
+ * Gets the y of the pattern
+ * @param[in] r The pattern renderer
+ * @param[out] y The pattern y coordinate
+ */
+EAPI void enesim_renderer_pattern_y_get(Enesim_Renderer *r, double *y)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	if (y) *y = thiz->current.y;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_pattern_position_set(Enesim_Renderer *r, double x, double y)
+{
+	Enesim_Renderer_Pattern *thiz;
+	thiz = _pattern_get(r);
+	thiz->current.x = x;
+	thiz->current.y = y;
+	thiz->changed = EINA_TRUE;
+}
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_pattern_position_get(Enesim_Renderer *r, double *x, double *y)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	if (x) *x = thiz->current.x;
+	if (y) *y = thiz->current.y;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_pattern_size_set(Enesim_Renderer *r, double width, double height)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	thiz->current.width = width;
+	thiz->current.height = height;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_pattern_size_get(Enesim_Renderer *r, double *width, double *height)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	if (width) *width = thiz->current.width;
+	if (height) *height = thiz->current.height;
+}
+
+EAPI void enesim_renderer_pattern_source_set(Enesim_Renderer *r, Enesim_Renderer *source)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	if (thiz->current.source)
+		enesim_renderer_unref(thiz->current.source);
+	thiz->current.source = fill;
+	if (thiz->current.source)
+		thiz->current.source = enesim_renderer_ref(thiz->current.source);
+	thiz->changed = EINA_TRUE;
+}
+
+EAPI void enesim_renderer_pattern_source_get(Enesim_Renderer *r, Enesim_Renderer **source)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	*source = thiz->current.source;
+	if (thiz->current.source)
+		thiz->current.source = enesim_renderer_ref(thiz->current.source);
+}
