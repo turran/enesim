@@ -25,6 +25,8 @@ typedef struct _Enesim_Renderer_Shape
 	/* properties */
 	Enesim_Renderer_Shape_State current;
 	Enesim_Renderer_Shape_State past;
+	/* private */
+	Eina_Bool changed : 1;
 	/* needed for the state */
 	Enesim_Matrix stroke_transformation;
 	Enesim_Matrix fill_transformation;
@@ -45,6 +47,20 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 
 static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 {
+	/* we should first check if the fill renderer has changed */
+	if (thiz->current.fill.r)
+	{
+		if (enesim_renderer_has_changed(thiz->current.fill.r))
+		{
+			char *fill_name;
+
+			enesim_renderer_name_get(thiz->current.fill.r, &fill_name);
+			DBG("The fill renderer %s has changed", fill_name);
+			return EINA_TRUE;
+		}
+	}
+	if (!thiz->changed)
+		return EINA_FALSE;
 	/* the stroke */
 	/* color */
 	if (thiz->current.stroke.color != thiz->past.stroke.color)
@@ -68,14 +84,19 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
+	Eina_Bool ret = EINA_TRUE;
 
 	thiz = enesim_renderer_data_get(r);
-	if (_enesim_renderer_shape_changed(thiz))
-		return EINA_TRUE;
+	ret = _enesim_renderer_shape_changed(thiz);
+	if (ret)
+	{
+		return ret;
+	}
 	/* call the has_changed on the descriptor */
 	if (thiz->has_changed)
-		return thiz->has_changed(r);
-	return EINA_TRUE;
+		ret = thiz->has_changed(r);
+
+	return ret;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -126,6 +147,7 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 				thiz->fill_sx, thiz->fill_sy);
 		enesim_renderer_cleanup(thiz->current.fill.r, s);
 	}
+	thiz->past = thiz->current;
 }
 
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
@@ -174,7 +196,9 @@ EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double wei
 		weight = 1;
 	thiz = _shape_get(r);
 	thiz->current.stroke.weight = weight;
+	thiz->changed = EINA_TRUE;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -186,6 +210,7 @@ EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *we
 	thiz = _shape_get(r);
 	if (weight) *weight = thiz->current.stroke.weight;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -196,7 +221,9 @@ EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Colo
 
 	thiz = _shape_get(r);
 	thiz->current.stroke.color = color;
+	thiz->changed = EINA_TRUE;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -208,6 +235,7 @@ EAPI void enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r, Enesim_Colo
 	thiz = _shape_get(r);
 	*color = thiz->current.stroke.color;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -222,7 +250,9 @@ EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_R
 	thiz->current.stroke.r = stroke;
 	if (thiz->current.stroke.r)
 		thiz->current.stroke.r = enesim_renderer_ref(thiz->current.stroke.r);
+	thiz->changed = EINA_TRUE;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -234,6 +264,7 @@ EAPI void enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r, Enesim_R
 	thiz = _shape_get(r);
 	*stroke = thiz->current.stroke.r;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -244,7 +275,9 @@ EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color 
 
 	thiz = _shape_get(r);
 	thiz->current.fill.color = color;
+	thiz->changed = EINA_TRUE;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -256,6 +289,7 @@ EAPI void enesim_renderer_shape_fill_color_get(Enesim_Renderer *r, Enesim_Color 
 	thiz = _shape_get(r);
 	*color = thiz->current.fill.color;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -270,7 +304,9 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 	thiz->current.fill.r = fill;
 	if (thiz->current.fill.r)
 		thiz->current.fill.r = enesim_renderer_ref(thiz->current.fill.r);
+	thiz->changed = EINA_TRUE;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -285,6 +321,7 @@ EAPI void enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r, Enesim_Ren
 	if (thiz->current.fill.r)
 		thiz->current.fill.r = enesim_renderer_ref(thiz->current.fill.r);
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -295,6 +332,7 @@ EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_D
 
 	thiz = _shape_get(r);
 	thiz->current.draw_mode = draw_mode;
+	thiz->changed = EINA_TRUE;
 }
 
 /**

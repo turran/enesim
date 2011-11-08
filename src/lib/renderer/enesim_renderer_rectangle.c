@@ -21,8 +21,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Renderer_Rectangle {
-	/* public properties */
+typedef struct _Enesim_Renderer_Rectangle_State {
 	double width;
 	double height;
 	double x;
@@ -34,6 +33,12 @@ typedef struct _Enesim_Renderer_Rectangle {
 		Eina_Bool bl : 1;
 		Eina_Bool br : 1;
 	} corner;
+} Enesim_Renderer_Rectangle_State;
+
+typedef struct _Enesim_Renderer_Rectangle {
+	/* public properties */
+	Enesim_Renderer_Rectangle_State current;
+	Enesim_Renderer_Rectangle_State past;
 	/* internal state */
 	Eina_F16p16 ww;
 	Eina_F16p16 hh;
@@ -264,7 +269,7 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy;
 	int fill_only = 0;
-	char bl = thiz->corner.bl, br = thiz->corner.br, tl = thiz->corner.tl, tr = thiz->corner.tr;
+	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
 
 	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
@@ -440,7 +445,7 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy, zz;
 	int fill_only = 0;
-	char bl = thiz->corner.bl, br = thiz->corner.br, tl = thiz->corner.tl, tr = thiz->corner.tr;
+	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
 
 	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
@@ -620,13 +625,13 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	double scaled_y;
 
 	thiz = _rectangle_get(r);
-	if (!thiz || (thiz->width < 1) || (thiz->height < 1))
+	if (!thiz || (thiz->current.width < 1) || (thiz->current.height < 1))
 	{
-		ENESIM_RENDERER_ERROR(r, error, "Invalid size %d %d", thiz->width, thiz->height);
+		ENESIM_RENDERER_ERROR(r, error, "Invalid size %d %d", thiz->current.width, thiz->current.height);
 		return EINA_FALSE;
 	}
-	scaled_width = thiz->width * state->sx;
-	scaled_height = thiz->height * state->sy;
+	scaled_width = thiz->current.width * state->sx;
+	scaled_height = thiz->current.height * state->sy;
 
 	if ((scaled_width < 1) || (scaled_height < 1))
 	{
@@ -634,7 +639,7 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	rad = thiz->corner.radius;
+	rad = thiz->current.corner.radius;
 	if (rad > (scaled_width / 2.0))
 		rad = scaled_width / 2.0;
 	if (rad > (scaled_height / 2.0))
@@ -643,8 +648,8 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	thiz->ww = eina_f16p16_double_from(scaled_width);
 	thiz->hh = eina_f16p16_double_from(scaled_height);
 
-	scaled_x = thiz->x * state->sx;
-	scaled_y = thiz->y * state->sy;
+	scaled_x = thiz->current.x * state->sx;
+	scaled_y = thiz->current.y * state->sy;
 	thiz->xx = eina_f16p16_double_from(scaled_x);
 	thiz->yy = eina_f16p16_double_from(scaled_y);
 
@@ -690,6 +695,7 @@ static void _rectangle_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = _rectangle_get(r);
 
 	enesim_renderer_shape_cleanup(r, s);
+	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
 
@@ -721,10 +727,10 @@ static void _rectangle_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings
 
 	thiz = _rectangle_get(r);
 
-	boundings->x = thiz->x;
-	boundings->y = thiz->y;
-	boundings->w = thiz->width;
-	boundings->h = thiz->height;
+	boundings->x = thiz->current.x;
+	boundings->y = thiz->current.y;
+	boundings->w = thiz->current.width;
+	boundings->h = thiz->current.height;
 }
 
 static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
@@ -733,9 +739,26 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 
 	thiz = _rectangle_get(r);
 	if (!thiz->changed) return EINA_FALSE;
-	/* later we can have a real state of properties and check them
-	 * here, agains the past and current states */
-	return EINA_TRUE;
+
+	/* TODO check the shape properties */
+	/* the width */
+	if (thiz->current.width != thiz->past.height)
+		return EINA_TRUE;
+	/* the height */
+	if (thiz->current.height != thiz->past.height)
+		return EINA_TRUE;
+	/* the x */
+	if (thiz->current.x != thiz->past.x)
+		return EINA_TRUE;
+	/* the y */
+	if (thiz->current.y != thiz->past.y)
+		return EINA_TRUE;
+	/* the corners */
+	if ((thiz->current.corner.tl != thiz->past.corner.tl) || (thiz->current.corner.tr != thiz->past.corner.tr) ||
+	     (thiz->current.corner.bl != thiz->past.corner.bl) && (thiz->current.corner.br != thiz->past.corner.br))
+		return EINA_TRUE;
+
+	return EINA_FALSE;
 }
 
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {
@@ -780,7 +803,7 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double width)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->width = width;
+	thiz->current.width = width;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -793,7 +816,7 @@ EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *width)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (width) *width = thiz->width;
+	if (width) *width = thiz->current.width;
 }
 /**
  * Sets the height of the rectangle
@@ -805,7 +828,7 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double height
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->height = height;
+	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -818,7 +841,7 @@ EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, double *heigh
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (height) *height = thiz->height;
+	if (height) *height = thiz->current.height;
 }
 
 /**
@@ -831,7 +854,7 @@ EAPI void enesim_renderer_rectangle_x_set(Enesim_Renderer *r, double x)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->x = x;
+	thiz->current.x = x;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -844,7 +867,7 @@ EAPI void enesim_renderer_rectangle_x_get(Enesim_Renderer *r, double *x)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (x) *x = thiz->x;
+	if (x) *x = thiz->current.x;
 }
 /**
  * Sets the y of the rectangle
@@ -856,7 +879,7 @@ EAPI void enesim_renderer_rectangle_y_set(Enesim_Renderer *r, double y)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->y = y;
+	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -869,7 +892,7 @@ EAPI void enesim_renderer_rectangle_y_get(Enesim_Renderer *r, double *y)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (y) *y = thiz->y;
+	if (y) *y = thiz->current.y;
 }
 
 /**
@@ -880,8 +903,8 @@ EAPI void enesim_renderer_rectangle_position_set(Enesim_Renderer *r, double x, d
 {
 	Enesim_Renderer_Rectangle *thiz;
 	thiz = _rectangle_get(r);
-	thiz->x = x;
-	thiz->y = y;
+	thiz->current.x = x;
+	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -893,8 +916,8 @@ EAPI void enesim_renderer_rectangle_position_get(Enesim_Renderer *r, double *x, 
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (x) *x = thiz->x;
-	if (y) *y = thiz->y;
+	if (x) *x = thiz->current.x;
+	if (y) *y = thiz->current.y;
 }
 
 /**
@@ -905,8 +928,8 @@ EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double width, d
 {
 	Enesim_Renderer_Rectangle *thiz;
 	thiz = _rectangle_get(r);
-	thiz->width = width;
-	thiz->height = height;
+	thiz->current.width = width;
+	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -918,8 +941,8 @@ EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *width, 
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (width) *width = thiz->width;
-	if (height) *height = thiz->height;
+	if (width) *width = thiz->current.width;
+	if (height) *height = thiz->current.height;
 }
 /**
  * To be documented
@@ -932,9 +955,9 @@ EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *r, double
 	if (!thiz) return;
 	if (radius < 0)
 		radius = 0;
-	if (thiz->corner.radius == radius)
+	if (thiz->current.corner.radius == radius)
 		return;
-	thiz->corner.radius = radius;
+	thiz->current.corner.radius = radius;
 	thiz->changed = EINA_TRUE;
 }
 
@@ -947,7 +970,7 @@ EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->corner.tl = rounded;
+	thiz->current.corner.tl = rounded;
 	thiz->changed = EINA_TRUE;
 }
 
@@ -960,7 +983,7 @@ EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Ein
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->corner.tr = rounded;
+	thiz->current.corner.tr = rounded;
 	thiz->changed = EINA_TRUE;
 }
 
@@ -973,7 +996,7 @@ EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, E
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->corner.bl = rounded;
+	thiz->current.corner.bl = rounded;
 	thiz->changed = EINA_TRUE;
 }
 
@@ -986,7 +1009,7 @@ EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, 
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->corner.br = rounded;
+	thiz->current.corner.br = rounded;
 	thiz->changed = EINA_TRUE;
 }
 
@@ -1002,10 +1025,10 @@ EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *r,
 	thiz = _rectangle_get(r);
 	if (!thiz) return;
 
-	if ((thiz->corner.tl == tl) && (thiz->corner.tr == tr) &&
-	     (thiz->corner.bl == bl) && (thiz->corner.br == br))
+	if ((thiz->current.corner.tl == tl) && (thiz->current.corner.tr == tr) &&
+	     (thiz->current.corner.bl == bl) && (thiz->current.corner.br == br))
 		return;
-	thiz->corner.tl = tl;  thiz->corner.tr = tr;
-	thiz->corner.bl = bl;  thiz->corner.br = br;
+	thiz->current.corner.tl = tl;  thiz->current.corner.tr = tr;
+	thiz->current.corner.bl = bl;  thiz->current.corner.br = br;
 	thiz->changed = EINA_TRUE;
 }

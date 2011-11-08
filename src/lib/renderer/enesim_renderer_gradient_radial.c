@@ -99,7 +99,7 @@ static Eina_F16p16 _radial_distance(Enesim_Renderer *r, Eina_F16p16 x,
 
 static const char * _radial_name(Enesim_Renderer *r)
 {
-	return "radial";
+	return "gradient_radial";
 }
 
 static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)

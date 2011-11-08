@@ -27,6 +27,7 @@ typedef struct _Enesim_Renderer_Stripes {
 		double thickness;
 	} s0, s1;
 	/* private */
+	Eina_Bool changed : 1;
 	int hh0, hh;
 	Enesim_F16p16_Matrix matrix;
 } Enesim_Renderer_Stripes;
@@ -167,6 +168,10 @@ static Eina_Bool _setup_state(Enesim_Renderer *r,
 
 static void _cleanup_state(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer_Stripes *thiz;
+
+	thiz = _stripes_get(r);
+	thiz->changed = EINA_FALSE;
 }
 
 static void _stripes_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -186,6 +191,14 @@ static void _stripes_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
+static Eina_Bool _stripes_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Stripes *thiz;
+
+	thiz = _stripes_get(r);
+	return thiz->changed;
+}
+
 static void _free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
@@ -203,7 +216,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags =      */ _stripes_flags,
 	/* .is_inside =  */ NULL,
 	/* .damage =     */ NULL,
-	/* .has_changed =*/ NULL,
+	/* .has_changed =*/ _stripes_has_changed,
 	/* .sw_setup =   */ _setup_state,
 	/* .sw_cleanup = */ _cleanup_state
 };

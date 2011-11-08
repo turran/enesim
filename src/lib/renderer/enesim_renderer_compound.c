@@ -386,14 +386,16 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 		EINA_LIST_FOREACH(thiz->layers, ll, l)
 		{
 			if ((ret = enesim_renderer_has_changed(l->r)))
+			{
+				char *child_name;
+
+				enesim_renderer_name_get(l->r, &child_name);
+				DBG("The child %s has changed", child_name);
 				break;
+			}
 		}
-		return ret;
 	}
-	else
-	{
-		return ret;
-	}
+	return ret;
 }
 
 static void _compound_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)

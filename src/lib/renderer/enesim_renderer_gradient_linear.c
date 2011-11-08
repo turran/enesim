@@ -20,10 +20,21 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Enesim_Renderer_Gradient_Linear_State
+{
+	double x0;
+	double x1;
+	double y0;
+	double y1;
+} Enesim_Renderer_Gradient_Linear_State;
+
 typedef struct _Enesim_Renderer_Gradient_Linear
 {
 	/* public properties */
-	double x0, x1, y0, y1;
+	Enesim_Renderer_Gradient_Linear_State current;
+	Enesim_Renderer_Gradient_Linear_State past;
+	/* private */
+	Eina_Bool changed : 1;
 	/* generated at state setup */
 	Eina_F16p16 fx0, fx1, fy0, fy1;
 	Eina_F16p16 ayx, ayy;
@@ -71,7 +82,7 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
  *----------------------------------------------------------------------------*/
 static const char * _linear_name(Enesim_Renderer *r)
 {
-	return "linear";
+	return "gradient_linear";
 }
 
 static int _linear_length(Enesim_Renderer *r)
@@ -93,7 +104,11 @@ static Eina_F16p16 _linear_distance(Enesim_Renderer *r, Eina_F16p16 x,
 
 static void _linear_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer_Gradient_Linear *thiz;
 
+	thiz = _linear_get(r);
+	thiz->changed = EINA_FALSE;
+	thiz->past = thiz->current;
 }
 
 static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
@@ -107,10 +122,11 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 
 	thiz = _linear_get(r);
 #define MATRIX 0
-	x0 = eina_f16p16_double_from(thiz->x0);
-	x1 = eina_f16p16_double_from(thiz->x1);
-	y0 = eina_f16p16_double_from(thiz->y0);
-	y1 = eina_f16p16_double_from(thiz->y1);
+	x0 = eina_f16p16_double_from(thiz->current.x0);
+	x1 = eina_f16p16_double_from(thiz->current.x1);
+	y0 = eina_f16p16_double_from(thiz->current.y0);
+	y1 = eina_f16p16_double_from(thiz->current.y1);
+
 #if MATRIX
 	f = eina_f16p16_mul(r->matrix.values.xx, r->matrix.values.yy) -
 			eina_f16p16_mul(r->matrix.values.xy, r->matrix.values.yx);
@@ -153,15 +169,43 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
+Eina_Bool _linear_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+	if (!thiz->changed)
+		return EINA_FALSE;
+
+	if (thiz->current.x0 != thiz->past.x0)
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->current.x1 != thiz->past.x1)
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->current.y0 != thiz->past.y0)
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->current.y1 != thiz->past.y1)
+	{
+		return EINA_TRUE;
+	}
+	return EINA_FALSE;
+}
+
 static Enesim_Renderer_Gradient_Descriptor _linear_descriptor = {
-	/* .distance =   */ _linear_distance,
-	/* .length =     */ _linear_length,
-	/* .name =       */ _linear_name,
-	/* .sw_setup =   */ _linear_state_setup,
-	/* .sw_cleanup = */ _linear_state_cleanup,
-	/* .free =       */ NULL,
-	/* .boundings =  */ NULL,
-	/* .is_inside =  */ 0
+	/* .distance =    */ _linear_distance,
+	/* .length =      */ _linear_length,
+	/* .name =        */ _linear_name,
+	/* .sw_setup =    */ _linear_state_setup,
+	/* .sw_cleanup =  */ _linear_state_cleanup,
+	/* .free =        */ NULL,
+	/* .boundings =   */ NULL,
+	/* .is_inside =   */ NULL,
+	/* .has_changed = */ _linear_has_changed,
 };
 /*============================================================================*
  *                                   API                                      *
@@ -191,10 +235,11 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
 
 	thiz = _linear_get(r);
 
-	thiz->x0 = x0;
-	thiz->x1 = x1;
-	thiz->y0 = y0;
-	thiz->y1 = y1;
+	thiz->current.x0 = x0;
+	thiz->current.x1 = x1;
+	thiz->current.y0 = y0;
+	thiz->current.y1 = y1;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -206,7 +251,8 @@ EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0)
 	Enesim_Renderer_Gradient_Linear *thiz;
 
 	thiz = _linear_get(r);
-	thiz->x0 = x0;
+	thiz->current.x0 = x0;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -218,7 +264,8 @@ EAPI void enesim_renderer_gradient_linear_y0_set(Enesim_Renderer *r, double y0)
 	Enesim_Renderer_Gradient_Linear *thiz;
 
 	thiz = _linear_get(r);
-	thiz->y0 = y0;
+	thiz->current.y0 = y0;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -230,7 +277,8 @@ EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1)
 	Enesim_Renderer_Gradient_Linear *thiz;
 
 	thiz = _linear_get(r);
-	thiz->x1 = x1;
+	thiz->current.x1 = x1;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -242,6 +290,7 @@ EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1)
 	Enesim_Renderer_Gradient_Linear *thiz;
 
 	thiz = _linear_get(r);
-	thiz->y1 = y1;
+	thiz->current.y1 = y1;
+	thiz->changed = EINA_TRUE;
 }
 

@@ -226,19 +226,29 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 {
 	/* the rop */
 	if (r->current.rop != r->past.rop)
+	{
 		return EINA_TRUE;
+	}
 	/* the color */
 	if (r->current.color != r->past.color)
+	{
 		return EINA_TRUE;
+	}
 	/* the origin */
 	if (r->current.ox != r->past.ox || r->current.oy != r->past.oy)
+	{
 		return EINA_TRUE;
+	}
 	/* the scale */
 	if (r->current.sx != r->past.sx || r->current.sy != r->past.sy)
+	{
 		return EINA_TRUE;
+	}
 	/* the transformation */
 	if (r->current.transformation_type != r->past.transformation_type)
+	{
 		return EINA_TRUE;
+	}
 
 	if (r->current.transformation.xx != r->past.transformation.xx ||
 			r->current.transformation.xy != r->past.transformation.xy ||
@@ -249,7 +259,9 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 			r->current.transformation.zx != r->past.transformation.zx ||
 			r->current.transformation.zy != r->past.transformation.zy ||
 			r->current.transformation.zz != r->past.transformation.zz)
+	{
 		return EINA_TRUE;
+	}
 
 	return EINA_FALSE;
 }
