@@ -218,7 +218,7 @@ static Enesim_Renderer_Gradient_Color_Get _color_get[ENESIM_GRADIENT_MODES];
 
 static Eina_Bool _gradient_changed(Enesim_Renderer_Gradient *thiz)
 {
-	return EINA_FALSE;
+	return thiz->changed;
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -234,7 +234,7 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		thiz->src = NULL;
 	}
 	thiz->slen = 0;
-	thiz->changed = EINA_TRUE;
+	thiz->changed = EINA_FALSE;
 	if (thiz->descriptor->sw_cleanup)
 	{
 		thiz->descriptor->sw_cleanup(r, s);
