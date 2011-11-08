@@ -254,6 +254,7 @@ EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
 
 	thiz = _stripes_get(r);
 	thiz->s0.color = color;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * Gets the color of the even stripes
@@ -281,6 +282,7 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
 	if (thickness < 0.99999)
 		thickness = 1;
 	thiz->s0.thickness = thickness;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * Gets the thickness of the even stripes
@@ -306,6 +308,7 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 
 	thiz = _stripes_get(r);
 	thiz->s1.color = color;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * Gets the color of the odd stripes
@@ -333,6 +336,7 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
 	if (thickness < 0.99999)
 		thickness = 1;
 	thiz->s1.thickness = thickness;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * Gets the thickness of the odd stripes
