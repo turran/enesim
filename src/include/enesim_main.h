@@ -75,6 +75,15 @@ typedef enum _Enesim_Direction
 	ENESIM_DIRECTIONS
 } Enesim_Direction;
 
+typedef enum _Enesim_Repeat_Mode
+{
+	ENESIM_RESTRICT,
+	ENESIM_PAD,
+	ENESIM_REFLECT,
+	ENESIM_REPEAT,
+	ENESIM_REPEAT_MODES,
+} Enesim_Repeat_Mode;
+
 typedef enum _Enesim_Backend
 {
 	ENESIM_BACKEND_INVALID,

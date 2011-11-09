@@ -27,6 +27,7 @@ enesim_renderer_hswitch.c \
 enesim_renderer_image.c \
 enesim_renderer_importer.c \
 enesim_renderer_path.c \
+enesim_renderer_pattern.c \
 enesim_renderer_perlin.c \
 enesim_renderer_rectangle.c \
 enesim_renderer_raddist.c \

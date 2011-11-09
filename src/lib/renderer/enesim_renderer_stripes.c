@@ -20,12 +20,17 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Renderer_Stripes {
-	/* properties */
+typedef struct _Enesim_Renderer_Stripes_State {
 	struct {
 		Enesim_Color color;
 		double thickness;
 	} s0, s1;
+} Enesim_Renderer_Stripes_State;
+
+typedef struct _Enesim_Renderer_Stripes {
+	/* properties */
+	Enesim_Renderer_Stripes_State current;
+	Enesim_Renderer_Stripes_State past;
 	/* private */
 	Eina_Bool changed : 1;
 	int hh0, hh;
@@ -45,7 +50,7 @@ static void _span_projective(Enesim_Renderer *r, int x, int y,
 {
 	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
-	unsigned int c0 = thiz->s0.color, c1 = thiz->s1.color;
+	unsigned int c0 = thiz->current.s0.color, c1 = thiz->current.s1.color;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx, zz;
@@ -93,7 +98,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y,
 	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
 	int ayx = thiz->matrix.yx;
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
-	unsigned int c0 = thiz->s0.color, c1 = thiz->s1.color;
+	unsigned int c0 = thiz->current.s0.color, c1 = thiz->current.s1.color;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx;
@@ -144,8 +149,8 @@ static Eina_Bool _setup_state(Enesim_Renderer *r,
 
 	if (!thiz)
 		return EINA_FALSE;
-	thiz->hh0 = (int)(thiz->s0.thickness * 65536);
-	thiz->hh = (int)(thiz->hh0 + (thiz->s1.thickness * 65536));
+	thiz->hh0 = (int)(thiz->current.s0.thickness * 65536);
+	thiz->hh = (int)(thiz->hh0 + (thiz->current.s1.thickness * 65536));
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
 			&thiz->matrix);
@@ -171,6 +176,7 @@ static void _cleanup_state(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
+	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
 
@@ -196,7 +202,26 @@ static Eina_Bool _stripes_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
-	return thiz->changed;
+	if (!thiz->changed) return EINA_FALSE;
+
+	if (thiz->current.s0.color != thiz->past.s0.color)
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->current.s0.thickness != thiz->past.s0.thickness)
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->current.s1.color != thiz->past.s1.color)
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->current.s1.thickness != thiz->past.s1.thickness)
+	{
+		return EINA_TRUE;
+	}
+
+	return EINA_FALSE;
 }
 
 static void _free(Enesim_Renderer *r)
@@ -236,8 +261,8 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	if (!thiz)
 		return NULL;
 	/* specific renderer setup */
-	thiz->s0.thickness = 1;
-	thiz->s1.thickness = 1;
+	thiz->current.s0.thickness = 1;
+	thiz->current.s1.thickness = 1;
 	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
@@ -253,7 +278,7 @@ EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
-	thiz->s0.color = color;
+	thiz->current.s0.color = color;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -266,7 +291,7 @@ EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Colo
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
-	if (color) *color = thiz->s0.color;
+	if (color) *color = thiz->current.s0.color;
 }
 /**
  * Sets the thickness of the even stripes
@@ -281,7 +306,7 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
 	thiz = _stripes_get(r);
 	if (thickness < 0.99999)
 		thickness = 1;
-	thiz->s0.thickness = thickness;
+	thiz->current.s0.thickness = thickness;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -294,7 +319,7 @@ EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double 
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
-	if (thickness) *thickness = thiz->s0.thickness;
+	if (thickness) *thickness = thiz->current.s0.thickness;
 }
 /**
  * Sets the color of the odd stripes
@@ -307,7 +332,7 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
-	thiz->s1.color = color;
+	thiz->current.s1.color = color;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -320,7 +345,7 @@ EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
-	if (color) *color = thiz->s1.color;
+	if (color) *color = thiz->current.s1.color;
 }
 /**
  * Sets the thickness of the odd stripes
@@ -335,7 +360,7 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
 	thiz = _stripes_get(r);
 	if (thickness < 0.99999)
 		thickness = 1;
-	thiz->s1.thickness = thickness;
+	thiz->current.s1.thickness = thickness;
 	thiz->changed = EINA_TRUE;
 }
 /**
@@ -348,6 +373,6 @@ EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = _stripes_get(r);
-	if (thickness) *thickness = thiz->s1.thickness;
+	if (thickness) *thickness = thiz->current.s1.thickness;
 }
 

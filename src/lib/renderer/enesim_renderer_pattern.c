@@ -27,6 +27,7 @@ typedef struct _Enesim_Renderer_Pattern_State
 	double width;
 	double height;
 	Enesim_Renderer *source;
+	Enesim_Repeat_Mode repeat_mode;
 } Enesim_Renderer_Pattern_State;
 
 typedef struct _Enesim_Renderer_Pattern {
@@ -46,18 +47,36 @@ static inline Enesim_Renderer_Pattern * _pattern_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span(Enesim_Renderer *p, int x, int y,
+static void _repeat_span(Enesim_Renderer *p, int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
-	uint32_t *dst = ddata;
+
+}
+
+static void _pad_span(Enesim_Renderer *p, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
+
+}
+
+static void _restrict_span(Enesim_Renderer *p, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
+
+}
+
+static void _reflect_span(Enesim_Renderer *p, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
 
 }
 
 static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz, Enesim_Renderer *r)
 {
-	Enesim_Color final_color, rend_color;
-
  	thiz = _pattern_get(r);
 	return EINA_TRUE;
 }
@@ -79,7 +98,7 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
  	thiz = _pattern_get(r);
 
 	if (!_pattern_state_setup(thiz, r)) return EINA_FALSE;
-	*fill = _span;
+	*fill = _repeat_span;
 
 	return EINA_TRUE;
 }
@@ -89,6 +108,7 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Pattern *thiz;
 
  	thiz = _pattern_get(r);
+	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
 
@@ -119,6 +139,17 @@ static void _pattern_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
+static void _pattern_boundings(Enesim_Renderer *r, Enesim_Rectangle *bounds)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	bounds->x = thiz->current.x;
+	bounds->y = thiz->current.y;
+	bounds->w = thiz->current.width;
+	bounds->h = thiz->current.height;
+}
+
 static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -133,7 +164,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version =               */ ENESIM_RENDERER_API,
 	/* .name =                  */ _pattern_name,
 	/* .free =                  */ _pattern_free,
-	/* .boundings =             */ NULL,
+	/* .boundings =             */ _pattern_boundings,
 	/* .flags =                 */ _pattern_flags,
 	/* .is_inside =             */ NULL,
 	/* .damage =                */ NULL,
@@ -321,7 +352,7 @@ EAPI void enesim_renderer_pattern_source_set(Enesim_Renderer *r, Enesim_Renderer
 	thiz = _pattern_get(r);
 	if (thiz->current.source)
 		enesim_renderer_unref(thiz->current.source);
-	thiz->current.source = fill;
+	thiz->current.source = source;
 	if (thiz->current.source)
 		thiz->current.source = enesim_renderer_ref(thiz->current.source);
 	thiz->changed = EINA_TRUE;
@@ -336,3 +367,21 @@ EAPI void enesim_renderer_pattern_source_get(Enesim_Renderer *r, Enesim_Renderer
 	if (thiz->current.source)
 		thiz->current.source = enesim_renderer_ref(thiz->current.source);
 }
+
+EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	thiz->current.repeat_mode = mode;
+	thiz->changed = EINA_TRUE;
+}
+
+EAPI void enesim_renderer_pattern_repeat_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mode *mode)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = _pattern_get(r);
+	*mode = thiz->current.repeat_mode;
+}
+

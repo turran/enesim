@@ -23,7 +23,7 @@
 typedef struct _Enesim_Renderer_Gradient
 {
 	/* properties */
-	Enesim_Renderer_Gradient_Mode mode;
+	Enesim_Repeat_Mode mode;
 	/* generated at state setup */
 	uint32_t *src;
 	int slen;
@@ -213,8 +213,8 @@ GRADIENT_AFFINE(repeat);
 GRADIENT_AFFINE(pad);
 GRADIENT_AFFINE(reflect);
 
-static Enesim_Renderer_Sw_Fill _spans[ENESIM_GRADIENT_MODES][ENESIM_MATRIX_TYPES];
-static Enesim_Renderer_Gradient_Color_Get _color_get[ENESIM_GRADIENT_MODES];
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Gradient_Color_Get _color_get[ENESIM_REPEAT_MODES];
 
 static Eina_Bool _gradient_changed(Enesim_Renderer_Gradient *thiz)
 {
@@ -315,7 +315,7 @@ static void _gradient_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 	Enesim_Renderer_Gradient *thiz;
 
 	thiz = _gradient_get(r);
-	if (thiz->mode == ENESIM_GRADIENT_RESTRICT && thiz->descriptor->boundings)
+	if (thiz->mode == ENESIM_RESTRICT && thiz->descriptor->boundings)
 	{
 		thiz->descriptor->boundings(r, boundings);
 	}
@@ -400,23 +400,23 @@ Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descript
 	{
 		spans_initialized = EINA_TRUE;
 		/* first the span functions */
-		_spans[ENESIM_GRADIENT_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
-		_spans[ENESIM_GRADIENT_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
-		_spans[ENESIM_GRADIENT_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
-		_spans[ENESIM_GRADIENT_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
-		_spans[ENESIM_GRADIENT_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
-		_spans[ENESIM_GRADIENT_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
-		_spans[ENESIM_GRADIENT_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
-		_spans[ENESIM_GRADIENT_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
-		_spans[ENESIM_GRADIENT_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
-		_spans[ENESIM_GRADIENT_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
-		_spans[ENESIM_GRADIENT_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
-		_spans[ENESIM_GRADIENT_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
 		/* now the color get functions */
-		_color_get[ENESIM_GRADIENT_PAD] = _pad_color_get;
-		_color_get[ENESIM_GRADIENT_REFLECT] = _reflect_color_get;
-		_color_get[ENESIM_GRADIENT_RESTRICT] = _restrict_color_get;
-		_color_get[ENESIM_GRADIENT_REPEAT] = _repeat_color_get;
+		_color_get[ENESIM_PAD] = _pad_color_get;
+		_color_get[ENESIM_REFLECT] = _reflect_color_get;
+		_color_get[ENESIM_RESTRICT] = _restrict_color_get;
+		_color_get[ENESIM_REPEAT] = _repeat_color_get;
 	}
 	if (!gdescriptor->distance)
 	{
@@ -550,7 +550,7 @@ EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
  * To be documented
  */
 EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
-		Enesim_Renderer_Gradient_Mode mode)
+		Enesim_Repeat_Mode mode)
 {
 	Enesim_Renderer_Gradient *thiz;
 
@@ -563,7 +563,7 @@ EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode *mode)
+EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mode *mode)
 {
 	Enesim_Renderer_Gradient *thiz;
 

@@ -24,15 +24,6 @@
  * @{
  */
 
-typedef enum _Enesim_Renderer_Gradient_Mode
-{
-	ENESIM_GRADIENT_RESTRICT,
-	ENESIM_GRADIENT_PAD,
-	ENESIM_GRADIENT_REFLECT,
-	ENESIM_GRADIENT_REPEAT,
-	ENESIM_GRADIENT_MODES,
-} Enesim_Renderer_Gradient_Mode;
-
 typedef struct _Enesim_Renderer_Gradient_Stop
 {
 	Enesim_Argb argb;
@@ -43,8 +34,8 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_
 EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 		Eina_List *list);
-EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode mode);
-EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Renderer_Gradient_Mode *mode);
+EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode);
+EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mode *mode);
 
 /**
  * @}
