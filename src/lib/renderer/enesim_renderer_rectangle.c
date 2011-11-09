@@ -740,7 +740,6 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 	thiz = _rectangle_get(r);
 	if (!thiz->changed) return EINA_FALSE;
 
-	/* TODO check the shape properties */
 	/* the width */
 	if (thiz->current.width != thiz->past.height)
 		return EINA_TRUE;
