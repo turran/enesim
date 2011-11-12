@@ -624,6 +624,7 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	if (r->past.name && r->past.name != r->current.name) free(r->past.name);
 	r->past = r->current;
 	r->past_boundings = r->current_boundings;
+	DBG("Cleaning up the renderer %s", r->current.name);
 }
 
 /**

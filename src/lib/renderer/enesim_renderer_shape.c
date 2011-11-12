@@ -48,7 +48,8 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 {
 	/* we should first check if the fill renderer has changed */
-	if (thiz->current.fill.r)
+	if (thiz->current.fill.r &&
+			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
 		if (enesim_renderer_has_changed(thiz->current.fill.r))
 		{
@@ -138,6 +139,7 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+
 	if (thiz->current.fill.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{

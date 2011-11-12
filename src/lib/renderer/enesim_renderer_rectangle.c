@@ -738,6 +738,7 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
+
 	if (!thiz->changed) return EINA_FALSE;
 
 	/* the width */
@@ -754,7 +755,7 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 		return EINA_TRUE;
 	/* the corners */
 	if ((thiz->current.corner.tl != thiz->past.corner.tl) || (thiz->current.corner.tr != thiz->past.corner.tr) ||
-	     (thiz->current.corner.bl != thiz->past.corner.bl) && (thiz->current.corner.br != thiz->past.corner.br))
+	     (thiz->current.corner.bl != thiz->past.corner.bl) || (thiz->current.corner.br != thiz->past.corner.br))
 		return EINA_TRUE;
 
 	return EINA_FALSE;

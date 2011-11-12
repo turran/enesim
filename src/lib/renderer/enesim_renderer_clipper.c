@@ -139,10 +139,10 @@ static void _clipper_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = _clipper_get(r);
-	if (!thiz->content) return;
-
-	_content_cleanup(thiz, s);
 	thiz->changed = EINA_FALSE;
+
+	if (!thiz->content) return;
+	_content_cleanup(thiz, s);
 }
 
 
