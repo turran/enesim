@@ -174,9 +174,17 @@ static void _clipper_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 static Eina_Bool _clipper_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
+	Eina_Bool ret;
 
 	thiz = _clipper_get(r);
-	return thiz->changed;
+	ret = thiz->changed;
+	if (ret)
+	{
+		return EINA_TRUE;
+	}
+	if (thiz->content)
+		ret = enesim_renderer_has_changed(thiz->content);
+	return ret;
 }
 
 static void _clipper_free(Enesim_Renderer *r)

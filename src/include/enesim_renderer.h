@@ -76,7 +76,7 @@ typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *rect);
 /* TODO for later */
-typedef void (*Enesim_Renderer_Destination_Boundings)(Enesim_Renderer *r, Eina_Rectangle *dest);
+typedef void (*Enesim_Renderer_Destination_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *area, Eina_Rectangle *dest);
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
