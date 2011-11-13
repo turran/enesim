@@ -757,6 +757,9 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 	if ((thiz->current.corner.tl != thiz->past.corner.tl) || (thiz->current.corner.tr != thiz->past.corner.tr) ||
 	     (thiz->current.corner.bl != thiz->past.corner.bl) || (thiz->current.corner.br != thiz->past.corner.br))
 		return EINA_TRUE;
+	/* the corner radius */
+	if (thiz->current.corner.radius != thiz->past.corner.radius)
+		return EINA_TRUE;
 
 	return EINA_FALSE;
 }
