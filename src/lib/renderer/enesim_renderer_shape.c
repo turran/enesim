@@ -79,6 +79,9 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 	/* renderer */
 	if (thiz->current.fill.r != thiz->past.fill.r)
 		return EINA_TRUE;
+	/* draw mode */
+	if (thiz->current.draw_mode != thiz->past.draw_mode)
+		return EINA_TRUE;
 	return EINA_FALSE;
 }
 
