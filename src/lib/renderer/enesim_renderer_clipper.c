@@ -124,7 +124,10 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
 	/* FIXME add the rop */
 	if (!enesim_renderer_setup(thiz->content, s, error))
 	{
-		printf("content cannot setup\n");
+		const char *name;
+
+		enesim_renderer_name_get(thiz->content, &name);
+		ENESIM_RENDERER_ERROR(r, error, "Content renderer %s can not setup", name);
 		/* restore the values */
 		_content_cleanup(thiz, s);
 		return EINA_FALSE;
