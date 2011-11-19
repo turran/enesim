@@ -75,8 +75,7 @@ typedef const char * (*Enesim_Renderer_Name)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *rect);
-/* TODO for later */
-typedef void (*Enesim_Renderer_Destination_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *area, Eina_Rectangle *dest);
+typedef void (*Enesim_Renderer_Destination_Transform)(Enesim_Renderer *r, Enesim_Rectangle *area, Eina_Rectangle *dest);
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
@@ -106,6 +105,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
+	Enesim_Renderer_Destination_Transform destination_transform;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Damage damage;
@@ -154,8 +154,6 @@ EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
 
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
-EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
-EAPI void enesim_renderer_scaled_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);

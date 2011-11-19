@@ -123,6 +123,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 	pdescriptor.name = descriptor->name;
 	pdescriptor.free = descriptor->free;
 	pdescriptor.boundings = descriptor->boundings;
+	pdescriptor.destination_transform = descriptor->destination_transform;
 	pdescriptor.flags = descriptor->flags;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damage = descriptor->damage;

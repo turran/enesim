@@ -291,16 +291,17 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 }
 
 static Enesim_Renderer_Descriptor _path_descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _path_name,
-	/* .free =       */ NULL,
-	/* .boundings =  */ _boundings,
-	/* .flags =      */ NULL,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ NULL,
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _path_name,
+	/* .free = 			*/ NULL,
+	/* .boundings = 		*/ _boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ NULL,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ NULL,
+	/* .sw_setup = 			*/ _state_setup,
+	/* .sw_cleanup = 		*/ _state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

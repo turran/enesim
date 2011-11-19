@@ -724,13 +724,15 @@ static void _rectangle_free(Enesim_Renderer *r)
 static void _rectangle_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Rectangle *thiz;
+	double sx, sy;
 
 	thiz = _rectangle_get(r);
 
-	boundings->x = thiz->current.x;
-	boundings->y = thiz->current.y;
-	boundings->w = thiz->current.width;
-	boundings->h = thiz->current.height;
+	enesim_renderer_scale_get(r, &sx, &sy);
+	boundings->x = thiz->current.x * sx;
+	boundings->y = thiz->current.y * sy;
+	boundings->w = thiz->current.width * sx;
+	boundings->h = thiz->current.height * sy;
 }
 
 static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
@@ -765,16 +767,17 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _rectangle_name,
-	/* .free =       */ _rectangle_free,
-	/* .boundings =  */ _rectangle_boundings,
-	/* .flags =      */ _rectangle_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ _rectangle_has_changed,
-	/* .sw_setup =   */ _rectangle_state_setup,
-	/* .sw_cleanup = */ _rectangle_state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _rectangle_name,
+	/* .free = 			*/ _rectangle_free,
+	/* .boundings = 		*/ _rectangle_boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _rectangle_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _rectangle_has_changed,
+	/* .sw_setup = 			*/ _rectangle_state_setup,
+	/* .sw_cleanup = 		*/ _rectangle_state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

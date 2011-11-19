@@ -197,15 +197,16 @@ Eina_Bool _linear_has_changed(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Gradient_Descriptor _linear_descriptor = {
-	/* .distance =    */ _linear_distance,
-	/* .length =      */ _linear_length,
-	/* .name =        */ _linear_name,
-	/* .sw_setup =    */ _linear_state_setup,
-	/* .sw_cleanup =  */ _linear_state_cleanup,
-	/* .free =        */ NULL,
-	/* .boundings =   */ NULL,
-	/* .is_inside =   */ NULL,
-	/* .has_changed = */ _linear_has_changed,
+	/* .distance =  		*/ _linear_distance,
+	/* .length = 			*/ _linear_length,
+	/* .name = 			*/ _linear_name,
+	/* .sw_setup = 			*/ _linear_state_setup,
+	/* .sw_cleanup = 		*/ _linear_state_cleanup,
+	/* .free = 			*/ NULL,
+	/* .boundings = 		*/ NULL,
+	/* .destination_transform = 	*/ NULL,
+	/* .is_inside = 		*/ NULL,
+	/* .has_changed = 		*/ _linear_has_changed,
 };
 /*============================================================================*
  *                                   API                                      *

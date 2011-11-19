@@ -302,16 +302,17 @@ static void _free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _grid_name,
-	/* .free =       */ _free,
-	/* .boundings =  */ NULL,
-	/* .flags =      */ _grid_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ NULL,
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _grid_name,
+	/* .free = 			*/ _free,
+	/* .boundings = 		*/ NULL,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _grid_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ NULL,
+	/* .sw_setup = 			*/ _state_setup,
+	/* .sw_cleanup = 		*/ _state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

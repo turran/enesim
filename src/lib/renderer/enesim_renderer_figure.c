@@ -799,16 +799,17 @@ static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 }
 
 static Enesim_Renderer_Descriptor _figure_descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _figure_name,
-	/* .free =       */ _free,
-	/* .boundings =  */ _figure_boundings,
-	/* .flags =      */ _figure_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ NULL,
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _figure_name,
+	/* .free = 			*/ _free,
+	/* .boundings = 		*/ _figure_boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _figure_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ NULL,
+	/* .sw_setup = 			*/ _state_setup,
+	/* .sw_cleanup = 		*/ _state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

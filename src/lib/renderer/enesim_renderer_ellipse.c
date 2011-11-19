@@ -463,16 +463,17 @@ static void _ellipse_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 }
 
 static Enesim_Renderer_Descriptor _ellipse_descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _ellipse_name,
-	/* .free =       */ _free,
-	/* .boundings =  */ _boundings,
-	/* .flags =      */ _ellipse_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ _ellipse_has_changed,
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _ellipse_name,
+	/* .free = 			*/ _free,
+	/* .boundings =  		*/ _boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _ellipse_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _ellipse_has_changed,
+	/* .sw_setup = 			*/ _state_setup,
+	/* .sw_cleanup = 		*/ _state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

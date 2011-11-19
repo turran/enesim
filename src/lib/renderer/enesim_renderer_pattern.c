@@ -161,16 +161,17 @@ static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =               */ ENESIM_RENDERER_API,
-	/* .name =                  */ _pattern_name,
-	/* .free =                  */ _pattern_free,
-	/* .boundings =             */ _pattern_boundings,
-	/* .flags =                 */ _pattern_flags,
-	/* .is_inside =             */ NULL,
-	/* .damage =                */ NULL,
-	/* .has_changed =           */ _pattern_has_changed,
-	/* .sw_setup =              */ _pattern_sw_setup,
-	/* .sw_cleanup =            */ _pattern_sw_cleanup,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _pattern_name,
+	/* .free = 			*/ _pattern_free,
+	/* .boundings = 		*/ _pattern_boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _pattern_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _pattern_has_changed,
+	/* .sw_setup = 			*/ _pattern_sw_setup,
+	/* .sw_cleanup = 		*/ _pattern_sw_cleanup,
 };
 
 /*============================================================================*

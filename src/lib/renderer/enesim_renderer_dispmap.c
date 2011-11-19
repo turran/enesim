@@ -279,16 +279,17 @@ static void _free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _dispmap_name,
-	/* .free =       */ _free,
-	/* .boundings =  */ _boundings,
-	/* .flags =      */ _dispmap_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ NULL,
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _dispmap_name,
+	/* .free = 			*/ _free,
+	/* .boundings = 		*/ _boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _dispmap_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ NULL,
+	/* .sw_setup = 			*/ _state_setup,
+	/* .sw_cleanup = 		*/ _state_cleanup
 };
 /*============================================================================*
  *                                   API                                      *

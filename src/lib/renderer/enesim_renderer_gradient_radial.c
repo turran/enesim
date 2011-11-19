@@ -144,14 +144,16 @@ static void _radial_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 }
 
 static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
-	/* .distance =   */ _radial_distance,
-	/* .length =     */ _radial_length,
-	/* .name =       */ _radial_name,
-	/* .sw_setup =   */ _state_setup,
-	/* .sw_cleanup = */ _state_cleanup,
-	/* .free =       */ NULL,
-	/* .boundings =  */ _radial_boundings,
-	/* .is_inside =  */ 0
+	/* .distance = 			*/ _radial_distance,
+	/* .length = 			*/ _radial_length,
+	/* .name = 			*/ _radial_name,
+	/* .sw_setup = 			*/ _state_setup,
+	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .free = 			*/ NULL,
+	/* .boundings = 		*/ _radial_boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .is_inside = 		*/ NULL,
+	/* .has_changed = 		*/ NULL,
 };
 /*============================================================================*
  *                                   API                                      *

@@ -385,16 +385,17 @@ static void _image_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _image_name,
-	/* .free =       */ _image_free,
-	/* .boundings =  */ _image_boundings,
-	/* .flags =      */ _image_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ NULL,
-	/* .sw_setup =   */ _image_state_setup,
-	/* .sw_cleanup = */ _image_state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _image_name,
+	/* .free = 			*/ _image_free,
+	/* .boundings = 		*/ _image_boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _image_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ NULL,
+	/* .sw_setup = 			*/ _image_state_setup,
+	/* .sw_cleanup = 		*/ _image_state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

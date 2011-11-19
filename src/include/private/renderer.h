@@ -158,6 +158,7 @@ typedef struct _Enesim_Renderer_Gradient_Descriptor
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
+	Enesim_Renderer_Destination_Transform destination_transform;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Has_Changed has_changed;
 } Enesim_Renderer_Gradient_Descriptor;

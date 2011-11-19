@@ -72,40 +72,6 @@ static void _enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *bou
 	}
 }
 
-static void _enesim_renderer_translated_boundings(Enesim_Renderer *r,
-		Enesim_Renderer_Flag flags,
-		Enesim_Renderer_State *state,
-		Enesim_Rectangle *boundings)
-{
-	/* move by the origin */
-	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
-	{
-		if (boundings->x != INT_MIN / 2)
-			boundings->x += state->ox;
-		if (boundings->y != INT_MIN / 2)
-			boundings->y += state->oy;
-	}
-}
-
-static void _enesim_renderer_scaled_boundings(Enesim_Renderer *r,
-		Enesim_Renderer_Flag flags,
-		Enesim_Renderer_State *state,
-		Enesim_Rectangle *translated)
-{
-	/* scale it */
-	if (flags & ENESIM_RENDERER_FLAG_SCALE)
-	{
-		if (translated->x != INT_MIN / 2)
-			translated->x *= state->sx;
-		if (translated->y != INT_MIN / 2)
-			translated->y *= state->sy;
-		if (translated->w != INT_MAX)
-			translated->w *= state->sx;
-		if (translated->y != INT_MAX)
-			translated->h *= state->sy;
-	}
-}
-
 static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 		Enesim_Renderer_Flag flags,
 		Enesim_Renderer_State *state,
@@ -113,42 +79,40 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 		int x, int y,
 		Eina_Rectangle *destination)
 {
-	/* scale */
-	if (flags & ENESIM_RENDERER_FLAG_SCALE)
+	if (r->descriptor.destination_transform)
 	{
-		if (boundings->x != INT_MIN / 2)
-			boundings->x *= state->sx;
-		if (boundings->y != INT_MIN / 2)
-			boundings->y *= state->sy;
-		if (boundings->w != INT_MAX)
-			boundings->w *= state->sx;
-		if (boundings->y != INT_MAX)
-			boundings->h *= state->sy;
+		r->descriptor.destination_transform(r, boundings, destination);
 	}
-	/* translate */
-	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
+	else
 	{
-		if (boundings->x != INT_MIN / 2)
-			boundings->x += state->ox;
-		if (boundings->y != INT_MIN / 2)
-			boundings->y += state->oy;
-	}
-	if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
-	{
-		if (state->transformation_type != ENESIM_MATRIX_IDENTITY && boundings->w != INT_MAX && boundings->h != INT_MAX)
+		/* translate */
+		if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
 		{
-			Enesim_Quad q;
-			Enesim_Matrix m;
-
-			enesim_matrix_inverse(&state->transformation, &m);
-			enesim_matrix_rectangle_transform(&m, boundings, &q);
-			enesim_quad_rectangle_to(&q, boundings);
+			if (boundings->x != INT_MIN / 2)
+				boundings->x += state->ox;
+			if (boundings->y != INT_MIN / 2)
+				boundings->y += state->oy;
 		}
+		if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
+		{
+			if (state->transformation_type != ENESIM_MATRIX_IDENTITY && boundings->w != INT_MAX && boundings->h != INT_MAX)
+			{
+				Enesim_Quad q;
+				Enesim_Matrix m;
+
+				enesim_matrix_inverse(&state->transformation, &m);
+				enesim_matrix_rectangle_transform(&m, boundings, &q);
+				enesim_quad_rectangle_to(&q, boundings);
+			}
+			destination->x = lround(boundings->x);
+			destination->y = lround(boundings->y);
+			destination->w = lround(boundings->w);
+			destination->h = lround(boundings->h);
+		}
+
 	}
-	destination->x = lround(boundings->x) - x;
-	destination->y = lround(boundings->y) - y;
-	destination->w = lround(boundings->w);
-	destination->h = lround(boundings->h);
+	destination->x -= x;
+	destination->y -= y;
 }
 
 static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
@@ -879,39 +843,6 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	if (!rect) return;
 
 	_enesim_renderer_boundings(r, rect);
-}
-
-/**
- * Gets the bounding box of the renderer on its own coordinate space translated
- * by the origin
- * @param[in] r The renderer to get the boundings from
- * @param[out] rect The rectangle to store the boundings
- */
-EAPI void enesim_renderer_translated_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
-{
-	Enesim_Renderer_Flag flags;
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!boundings) return;
-
-	enesim_renderer_flags(r, &flags);
-	_enesim_renderer_boundings(r, boundings);
-	_enesim_renderer_translated_boundings(r, flags, &r->current, boundings);
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_scaled_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
-{
-	Enesim_Renderer_Flag flags;
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!boundings) return;
-
-	enesim_renderer_flags(r, &flags);
-	_enesim_renderer_boundings(r, boundings);
-	_enesim_renderer_translated_boundings(r, flags, &r->current, boundings);
-	_enesim_renderer_scaled_boundings(r, flags, &r->current, boundings);
 }
 
 /**

@@ -201,16 +201,17 @@ static void _clipper_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _clipper_name,
-	/* .free =       */ _clipper_free,
-	/* .boundings =  */ _clipper_boundings,
-	/* .flags =      */ _clipper_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ _clipper_has_changed,
-	/* .sw_setup =   */ _clipper_state_setup,
-	/* .sw_cleanup = */ _clipper_state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _clipper_name,
+	/* .free = 			*/ _clipper_free,
+	/* .boundings = 		*/ _clipper_boundings,
+	/* .destination_transform =	*/ NULL,
+	/* .flags = 			*/ _clipper_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _clipper_has_changed,
+	/* .sw_setup = 			*/ _clipper_state_setup,
+	/* .sw_cleanup = 		*/ _clipper_state_cleanup
 };
 /*============================================================================*
  *                                   API                                      *

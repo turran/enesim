@@ -381,16 +381,17 @@ static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _checker_name,
-	/* .free =       */ _checker_free,
-	/* .boundings =  */ NULL,
-	/* .flags =      */ _checker_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ _checker_has_changed,
-	/* .sw_setup =   */ _checker_state_setup,
-	/* .sw_cleanup = */ _checker_state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _checker_name,
+	/* .free = 			*/ _checker_free,
+	/* .boundings = 		*/ NULL,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _checker_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _checker_has_changed,
+	/* .sw_setup = 			*/ _checker_state_setup,
+	/* .sw_cleanup = 		*/ _checker_state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *

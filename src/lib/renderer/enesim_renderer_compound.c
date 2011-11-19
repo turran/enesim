@@ -418,16 +418,17 @@ static void _compound_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, v
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _compound_name,
-	/* .free =       */ _compound_free,
-	/* .boundings =  */ _compound_boundings,
-	/* .flags =      */ _compound_flags,
-	/* .is_inside =  */ _compound_is_inside,
-	/* .damage =     */ _compound_damage,
-	/* .has_changed =*/ _compound_has_changed,
-	/* .sw_setup =   */ _compound_state_setup,
-	/* .sw_cleanup = */ _compound_state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _compound_name,
+	/* .free = 			*/ _compound_free,
+	/* .boundings =  		*/ _compound_boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _compound_flags,
+	/* .is_inside = 		*/ _compound_is_inside,
+	/* .damage = 			*/ _compound_damage,
+	/* .has_changed = 		*/ _compound_has_changed,
+	/* .sw_setup = 			*/ _compound_state_setup,
+	/* .sw_cleanup = 		*/ _compound_state_cleanup
 };
 /*============================================================================*
  *                                   API                                      *

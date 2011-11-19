@@ -376,16 +376,17 @@ static Eina_Bool _gradient_has_changed(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _gradient_descriptor = {
-	/* .version =    */ ENESIM_RENDERER_API,
-	/* .name =       */ _gradient_name,
-	/* .free =       */ _gradient_free,
-	/* .boundings =  */ _gradient_boundings,
-	/* .flags =      */ _gradient_flags,
-	/* .is_inside =  */ NULL,
-	/* .damage =     */ NULL,
-	/* .has_changed =*/ _gradient_has_changed,
-	/* .sw_setup =   */ _gradient_state_setup,
-	/* .sw_cleanup = */ _gradient_state_cleanup
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _gradient_name,
+	/* .free = 			*/ _gradient_free,
+	/* .boundings = 		*/ _gradient_boundings,
+	/* .destination_transform = 	*/ NULL,
+	/* .flags = 			*/ _gradient_flags,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _gradient_has_changed,
+	/* .sw_setup = 			*/ _gradient_state_setup,
+	/* .sw_cleanup = 		*/ _gradient_state_cleanup
 };
 /*============================================================================*
  *                                 Global                                     *
