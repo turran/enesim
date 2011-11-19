@@ -104,12 +104,11 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 				enesim_matrix_rectangle_transform(&m, boundings, &q);
 				enesim_quad_rectangle_to(&q, boundings);
 			}
-			destination->x = lround(boundings->x);
-			destination->y = lround(boundings->y);
-			destination->w = lround(boundings->w);
-			destination->h = lround(boundings->h);
 		}
-
+		destination->x = lround(boundings->x);
+		destination->y = lround(boundings->y);
+		destination->w = lround(boundings->w);
+		destination->h = lround(boundings->h);
 	}
 	destination->x -= x;
 	destination->y -= y;
