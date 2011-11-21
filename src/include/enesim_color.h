@@ -38,6 +38,9 @@ EAPI void enesim_color_components_from(Enesim_Color *color,
 EAPI void enesim_color_components_to(Enesim_Color color,
 		Enesim_Format f, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
 
+EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
+EAPI void enesim_argb_components_to(Enesim_Argb argb, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
+
 /** @} */ //End of Enesim_Color_Group
 
 #endif /*ENESIM_COLOR_H_*/
