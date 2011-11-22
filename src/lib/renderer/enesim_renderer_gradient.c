@@ -84,13 +84,27 @@ static inline uint32_t _restrict_color_get(Enesim_Renderer_Gradient *thiz, Eina_
 	fp = eina_f16p16_int_to(p);
 	if (fp < 0)
 	{
-		/* FIXME also AA the border */
 		v = 0;
+		if (p >= -EINA_F16P16_ONE)
+		{
+			uint16_t a;
+
+			a = eina_f16p16_fracc_get(p) >> 8;
+			v = argb8888_interp_256(1 + a, thiz->src[0], 0);
+		}
 	}
 	else if (fp >= thiz->slen - 1)
 	{
-		/* FIXME also AA the border */
+		Eina_F16p16 slen = eina_f16p16_int_from(thiz->slen - 1);
+
 		v = 0;
+		if (p - slen <= EINA_F16P16_ONE)
+		{
+			uint16_t a;
+
+			a = eina_f16p16_fracc_get(p - slen) >> 8;
+			v = argb8888_interp_256(1 + a, 0, thiz->src[thiz->slen - 1]);
+		}
 	}
 	else
 	{
@@ -256,11 +270,16 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	thiz = _gradient_get(r);
 	/* check that we have at least two stops */
 	if (eina_list_count(thiz->stops) < 2)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "Less than two stops");
 		return EINA_FALSE;
+	}
 	/* setup the implementation */
 	*fill = NULL;
 	if (!thiz->descriptor->sw_setup(r, state, s, fill, error))
 	{
+		ENESIM_RENDERER_ERROR(r, error, "Gradient implementation failed");
+
 		free(thiz->src);
 		thiz->src = NULL;
 		return EINA_FALSE;
@@ -284,10 +303,17 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 
 	end = thiz->slen;
 	thiz->src = dst = malloc(sizeof(uint32_t) * thiz->slen);
+
+	/* FIXME fix the blow code, as the first/last stops might not be at 0/1
+	 * so we need to handle that case. Also try to avoid writing to the memory
+	 * twice
+	 */
+
 	memset(thiz->src, 0xff, thiz->slen);
 	/* FIXME Im not sure if we increment xx by the 1 / ((next - curr) * len) value
 	 * as it might not be too accurate
 	 */
+
 	while (end--)
 	{
 		uint16_t off;
@@ -307,6 +333,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		*dst++ = p0;
 		xx += inc;
 	}
+
 	return EINA_TRUE;
 }
 

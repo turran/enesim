@@ -123,7 +123,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	}
 	else
 	{
-		_get_focis(thiz->center.x, thiz->center.y, thiz->radius.y,
+		_get_focis(thiz->center.y, thiz->center.x, thiz->radius.y,
 				thiz->radius.x, &thiz->f1.y, &thiz->f1.x,
 				&thiz->f2.y, &thiz->f2.x, &thiz->min, &thiz->max);
 	}

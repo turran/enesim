@@ -1032,7 +1032,8 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 	va_start(args, fmt);
 	num = snprintf(str, PATH_MAX, "%s:%d %s %s ", file, line, function, r->current.name);
 	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
-	str[num] = '\n';
+	str[num++] = '\n';
+	str[num] = '\0';
 	va_end(args);
 
 	*error = enesim_error_add(*error, str);

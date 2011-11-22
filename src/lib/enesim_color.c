@@ -53,63 +53,36 @@ EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb)
  * Create a pixel from the given unpremultiplied components
  */
 EAPI void enesim_color_components_from(Enesim_Color *color,
-		Enesim_Format f, uint8_t a, uint8_t r, uint8_t g, uint8_t b)
+		uint8_t a, uint8_t r, uint8_t g, uint8_t b)
 {
-	switch (f)
-	{
-		case ENESIM_FORMAT_ARGB8888:
-		{
-			uint16_t alpha = a + 1;
-			*color = (a << 24) | (((r * alpha) >> 8) << 16)
+	uint16_t alpha = a + 1;
+	*color = (a << 24) | (((r * alpha) >> 8) << 16)
 					| (((g * alpha) >> 8) << 8)
 					| ((b * alpha) >> 8);
-		}
-		break;
-
-		case ENESIM_FORMAT_A8:
-		*color = a;
-		break;
-
-		default:
-		break;
-	}
 }
 
 /**
   * Extract the components from a color
  */
 EAPI void enesim_color_components_to(Enesim_Color color,
-		Enesim_Format f, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b)
+		uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b)
 {
-	switch (f)
+	uint8_t pa;
+
+	pa = (color >> 24);
+	if ((pa > 0) && (pa < 255))
 	{
-		case ENESIM_FORMAT_ARGB8888:
-		{
-			uint8_t pa;
-			pa = (color >> 24);
-			if ((pa > 0) && (pa < 255))
-			{
-				if (a) *a = pa;
-				if (r) *r = (argb8888_red_get(color) * 255) / pa;
-				if (g) *g = (argb8888_green_get(color) * 255) / pa;
-				if (b) *b = (argb8888_blue_get(color) * 255) / pa;
-			}
-			else
-			{
-				if (a) *a = pa;
-				if (r) *r = argb8888_red_get(color);
-				if (g) *g = argb8888_green_get(color);
-				if (b) *b = argb8888_blue_get(color);
-			}
-		}
-		break;
-
-		case ENESIM_FORMAT_A8:
-		if (a) *a = (uint8_t)color;
-		break;
-
-		default:
-		break;
+		if (a) *a = pa;
+		if (r) *r = (argb8888_red_get(color) * 255) / pa;
+		if (g) *g = (argb8888_green_get(color) * 255) / pa;
+		if (b) *b = (argb8888_blue_get(color) * 255) / pa;
+	}
+	else
+	{
+		if (a) *a = pa;
+		if (r) *r = argb8888_red_get(color);
+		if (g) *g = argb8888_green_get(color);
+		if (b) *b = argb8888_blue_get(color);
 	}
 }
 
