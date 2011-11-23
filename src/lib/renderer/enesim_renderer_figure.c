@@ -776,21 +776,6 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	 */
 }
 
-static void _figure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
-{
-	Enesim_Renderer_Figure *thiz;
-
-	thiz = _figure_get(r);
-
-	/* FIXME split the setp on two functions */
-	if (!enesim_renderer_sw_setup(r, NULL, NULL, NULL))
-		return;
-	boundings->x = (thiz->lxx - 0xffff) >> 16;
-	boundings->y = (thiz->tyy - 0xffff) >> 16;
-	boundings->w = ((thiz->rxx - 0xffff) >> 16) - boundings->x + 1;
-	boundings->h = ((thiz->byy - 0xffff) >> 16) - boundings->y + 1;
-}
-
 static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
@@ -802,7 +787,7 @@ static Enesim_Renderer_Descriptor _figure_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _figure_name,
 	/* .free = 			*/ _free,
-	/* .boundings = 		*/ _figure_boundings,
+	/* .boundings = 		*/ NULL,
 	/* .destination_transform = 	*/ NULL,
 	/* .flags = 			*/ _figure_flags,
 	/* .is_inside = 		*/ NULL,
@@ -954,19 +939,4 @@ EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list
 		}
 	}
 }
-
-
-#if 0
-int
-paint_is_polygon(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Shape *thiz;
-
-	if (!r || !r->type) return 0;
-	if (r->type->id != SHAPE_PAINT) return 0;
-	thiz = (Enesim_Renderer_Shape *)r;
-	if (!thiz || (thiz->id != POLYGON_PAINT)) return 0;
-	return 1;
-}
-#endif
 

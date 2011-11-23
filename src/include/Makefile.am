@@ -36,6 +36,7 @@ enesim_renderer_gradient_linear.h \
 enesim_renderer_gradient_radial.h \
 enesim_renderer_compound.h \
 enesim_renderer_importer.h \
+enesim_renderer_line.h \
 enesim_renderer_background.h \
 enesim_renderer_perlin.h \
 enesim_renderer_clipper.h \

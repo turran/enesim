@@ -189,6 +189,7 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 #include "enesim_renderer_gradient_radial.h"
 #include "enesim_renderer_compound.h"
 #include "enesim_renderer_importer.h"
+#include "enesim_renderer_line.h"
 #include "enesim_renderer_background.h"
 #include "enesim_renderer_pattern.h"
 #include "enesim_renderer_perlin.h"
