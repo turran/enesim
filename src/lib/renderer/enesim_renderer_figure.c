@@ -55,35 +55,33 @@ struct _Polygon_Vertex
 	Polygon_Vertex *next;
 };
 
-typedef struct _Polygon_Vector Polygon_Vector;
-struct _Polygon_Vector
+typedef struct _Enesim_Renderer_Figure_Vector
 {
 	int xx0, yy0, xx1, yy1;
 	int a, b, c;
-};
+} Enesim_Renderer_Figure_Vector;
 
-typedef struct _Polygon_Edge Polygon_Edge;
-struct _Polygon_Edge
+typedef struct _Enesim_Renderer_Figure_Edge
 {
 	int xx0, yy0, xx1, yy1;
 	int e, de;
-};
+} Enesim_Renderer_Figure_Edge;
 
-typedef struct _Contour_Polygon Contour_Polygon;
-struct _Contour_Polygon
+typedef struct _Enesim_Renderer_Figure_Contour Enesim_Renderer_Figure_Contour;
+struct _Enesim_Renderer_Figure_Contour
 {
 	Polygon_Vertex *vertices, *last;
 	int nverts;
 
-	Contour_Polygon *next;
+	Enesim_Renderer_Figure_Contour *next;
 };
 
 typedef struct _Enesim_Renderer_Figure
 {
-	Contour_Polygon *polys, *last;
+	Enesim_Renderer_Figure_Contour *polys, *last;
 	int npolys;
 
-	Polygon_Vector *vectors;
+	Enesim_Renderer_Figure_Vector *vectors;
 	int nvectors;
 
 	// ....  geom_transform?
@@ -113,8 +111,8 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	int stroke = 0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
-	Polygon_Edge *edges, *edge;
-	Polygon_Vector *v = thiz->vectors;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	double ox, oy;
 
@@ -172,7 +170,7 @@ get_out:
 		stroke = 1;
 	}
 
-	edges = alloca(nvectors * sizeof(Polygon_Edge));
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
 	edge = edges;
 	while (n < nvectors)
 	{
@@ -291,8 +289,8 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	int stroke = 0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
-	Polygon_Edge *edges, *edge;
-	Polygon_Vector *v = thiz->vectors;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	int y0, y1;
 
@@ -325,7 +323,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		y0 = y1;
 		y1 = yy >> 16;
 	}
-	edges = alloca(nvectors * sizeof(Polygon_Edge));
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
 	edge = edges;
 	while (n < nvectors)
 	{
@@ -472,8 +470,8 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	int stroke = 0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
-	Polygon_Edge *edges, *edge;
-	Polygon_Vector *v = thiz->vectors;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0;
 
 	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
@@ -491,7 +489,7 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 
-	edges = alloca(nvectors * sizeof(Polygon_Edge));
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
 	edge = edges;
 	while (n < nvectors)
 	{
@@ -654,9 +652,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 
 	if (thiz->changed)
 	{
-		Contour_Polygon *poly;
+		Enesim_Renderer_Figure_Contour *poly;
 		int nvectors = 0;
-		Polygon_Vector *vec;
+		Enesim_Renderer_Figure_Vector *vec;
 
 		free(thiz->vectors);
 		poly = thiz->polys;
@@ -674,7 +672,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 			poly = poly->next;
 		}
 
-		thiz->vectors = calloc(nvectors, sizeof(Polygon_Vector));
+		thiz->vectors = calloc(nvectors, sizeof(Enesim_Renderer_Figure_Vector));
 		if (!thiz->vectors)
 		{
 			return EINA_FALSE;
@@ -823,11 +821,11 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
-	Contour_Polygon *poly;
+	Enesim_Renderer_Figure_Contour *poly;
 
 	thiz = _figure_get(r);
 
-	poly = calloc(1, sizeof(Contour_Polygon));
+	poly = calloc(1, sizeof(Enesim_Renderer_Figure_Contour));
 	if (!poly)
 		return;
 
@@ -851,7 +849,7 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 		double x, double y)
 {
 	Enesim_Renderer_Figure *thiz;
-	Contour_Polygon *poly;
+	Enesim_Renderer_Figure_Contour *poly;
 	Polygon_Vertex *vertex;
 
 	thiz = _figure_get(r);
@@ -888,7 +886,7 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
-	Contour_Polygon *c, *nc;
+	Enesim_Renderer_Figure_Contour *c, *nc;
 	Polygon_Vertex *v, *nv;
 
 	thiz = _figure_get(r);

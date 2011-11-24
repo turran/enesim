@@ -30,10 +30,17 @@ typedef struct _Enesim_Renderer_Line_State
 
 typedef struct _Enesim_Renderer_Line
 {
+	/* properties */
 	Enesim_Renderer_Line_State current;
+	/* private */
 	Enesim_Renderer_Line_State past;
 	Eina_Bool changed : 1;
 	Enesim_F16p16_Matrix matrix;
+	Eina_F16p16 a01, b01, c01;
+	Eina_F16p16 a01_np, b01_np, c01_np;
+	Eina_F16p16 a01_nm, b01_nm, c01_nm;
+	Eina_F16p16 rr;
+	Eina_F16p16 lxx, rxx, tyy, byy;
 } Enesim_Renderer_Line;
 
 static inline Enesim_Renderer_Line * _line_get(Enesim_Renderer *r)
@@ -65,9 +72,65 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Line *thiz;
+	Eina_F16p16 x01_fp, y01_fp;
+	double x0, x1, y0, y1;
+	double x01, y01;
+	double len;
 
 	thiz = _line_get(r);
 
+	x0 = thiz->current.x0;
+	x1 = thiz->current.x1;
+	y0 = thiz->current.y0;
+	y1 = thiz->current.y1;
+
+	if (y1 < y0)
+	{
+		thiz->byy = eina_f16p16_double_from(y0);
+		thiz->tyy = eina_f16p16_double_from(y1);
+	}
+	else
+	{
+		thiz->byy = eina_f16p16_double_from(y1);
+		thiz->tyy = eina_f16p16_double_from(y0);
+	}
+
+	if (x1 < x0)
+	{
+		thiz->lxx = eina_f16p16_double_from(x0);
+		thiz->rxx = eina_f16p16_double_from(x1);
+	}
+	else
+	{
+		thiz->lxx = eina_f16p16_double_from(x1);
+		thiz->rxx = eina_f16p16_double_from(x0);
+	}
+
+	x01 = x1 - x0;
+	y01 = y1 - y0;
+
+	if ((len = hypot(x01, y01)) < 1)
+		return EINA_FALSE;
+#if 0
+   /* normalize to line length so that aa works well */
+   o->a01 = -(y01 * 65536) / len;
+   o->b01 = (x01 * 65536) / len;
+   o->c01 = (65536 * ((y1 * x0) - (x1 * y0))) / len;
+
+   o->a01_np = (x01 * 65536) / len;
+   o->b01_np = (y01 * 65536) / len;
+   o->c01_np = -(65536 * ((y0 * y01) + (x0 * x01))) / len;
+
+   o->a01_nm = -(x01 * 65536) / len;
+   o->b01_nm = -(y01 * 65536) / len;
+   o->c01_nm = (65536 * ((y1 * y01) + (x1 * x01))) / len;
+
+   o->rr = 32768 * (f->stroke.weight + 1);
+   if (o->rr < 32768) o->rr = 32768;
+
+   if (f->draw_mode != DRAW_MODE_STROKE)
+	return 0;
+#endif
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
 			&thiz->matrix);
 	*fill = _span;
