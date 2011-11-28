@@ -104,6 +104,7 @@ static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
 
 #include "libargb.h"
 
+#include "private/vector.h"
 #include "private/curve.h"
 /* now the surface format backends */
 #include "private/format.h"
