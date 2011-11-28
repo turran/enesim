@@ -101,9 +101,9 @@ static void _span(Enesim_Renderer *r, int x, int y,
 	xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	e01 = ((thiz->line.a * xx) >> 16) + ((thiz->line.b * yy) >> 16) + thiz->line.c;
-	e01_np = ((thiz->np.a * xx) >> 16) + ((thiz->np.b * yy) >> 16) + thiz->np.c;
-	e01_nm = ((thiz->nm.a * xx) >> 16) + ((thiz->nm.b * yy) >> 16) + thiz->nm.c;
+	e01 = enesim_f16p16_line_affine_setup(&thiz->line, xx, yy);
+	e01_np = enesim_f16p16_line_affine_setup(&thiz->np, xx, yy);
+	e01_nm = enesim_f16p16_line_affine_setup(&thiz->nm, xx, yy);
 
 	enesim_renderer_shape_stroke_color_get(r, &scolor);
 	enesim_renderer_shape_stroke_renderer_get(r, &srend);
