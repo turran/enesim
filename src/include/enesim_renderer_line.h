@@ -34,6 +34,9 @@ EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1);
 EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1);
 EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1);
 
+EAPI void enesim_renderer_line_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap cap);
+EAPI void enesim_renderer_line_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap *cap);
+
 /**
  * @}
  */

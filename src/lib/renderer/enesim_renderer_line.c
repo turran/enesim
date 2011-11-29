@@ -38,6 +38,7 @@ typedef struct _Enesim_Renderer_Line_State
 	double y0;
 	double x1;
 	double y1;
+	Enesim_Shape_Stroke_Cap cap;
 } Enesim_Renderer_Line_State;
 
 typedef struct _Enesim_Renderer_Line
@@ -65,92 +66,202 @@ static inline Enesim_Renderer_Line * _line_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span(Enesim_Renderer *r, int x, int y,
-		unsigned int len, void *ddata)
+static uint32_t _butt_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
+		Enesim_Renderer *srend, Enesim_Color scolor, uint32_t *d)
 {
-	Enesim_Renderer_Line *thiz;
-	Enesim_Renderer *srend = NULL;
-	Enesim_Color scolor;
-	Eina_F16p16 rr;
-	/* FIXME use eina_f16p16 */
-	long long int axx, axy, axz;
-	long long int ayx, ayy, ayz;
-	Eina_F16p16 d01;
-	Eina_F16p16 d01_np;
-	Eina_F16p16 d01_nm;
-	Eina_F16p16 e01;
-	Eina_F16p16 e01_np;
-	Eina_F16p16 e01_nm;
-	/* FIXME use eina_f16p16 */
-	long long int xx;
-	long long int yy;
-	uint32_t *dst = ddata;
-	uint32_t *d = dst;
-	uint32_t *e = d + len;
+	uint32_t p0 = 0;
 
-	thiz = _line_get(r);
-
-	rr = thiz->rr;
-	axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz = thiz->matrix.xz;
-	ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
-
-	d01 = ((thiz->line.a * axx) >> 16) + ((thiz->line.b * ayx) >> 16);
-	d01_np = ((thiz->np.a * axx) >> 16) + ((thiz->np.b * ayx) >> 16);
- 	d01_nm = ((thiz->nm.a * axx) >> 16) + ((thiz->nm.b * ayx) >> 16);
-
-	xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
-	yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
-
-	e01 = enesim_f16p16_line_affine_setup(&thiz->line, xx, yy);
-	e01_np = enesim_f16p16_line_affine_setup(&thiz->np, xx, yy);
-	e01_nm = enesim_f16p16_line_affine_setup(&thiz->nm, xx, yy);
-
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &srend);
-
-	if (srend)
+	if ((abs(e01) <= rr) && (e01_np >= 0) && (e01_nm >= 0))
 	{
-			Enesim_Renderer_Sw_Data *sdata;
+		int a = 256;
 
-			sdata = enesim_renderer_backend_data_get(srend, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(srend, x, y, len, ddata);
-	}
-
-	while (d < e)
-	{
-		uint32_t p0 = 0;
-
-		if ((abs(e01) <= rr) && (e01_np >= 0) && (e01_nm >= 0))
+		p0 = scolor;
+		if (srend)
 		{
-			int a = 256;
-
-			p0 = scolor;
-			if (srend)
-			{
-				p0 = *d;
-				if (scolor != 0xffffffff)
-					p0 = MUL4_SYM(p0, scolor);
-			}
-
-			/* anti-alias the edges */
-			if (((rr - e01) >> 16) == 0)
-				a = 1 + (((rr - e01) & 0xffff) >> 8);
-			if (((e01 + rr) >> 16) == 0)
-				a = (a * (1 + ((e01 + rr) & 0xffff))) >> 16;
-			if ((e01_np >> 16) == 0)
-				a = (a * (1 + (e01_np & 0xffff))) >> 16;
-			if ((e01_nm >> 16) == 0)
-				a = ((a * (1 + (e01_nm & 0xffff))) >> 16);
-
-			if (a < 256)
-				p0 = MUL_A_256(a, p0);
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(p0, scolor);
 		}
-		*d++ = p0;
-		e01 += d01;
-		e01_np += d01_np;
-		e01_nm += d01_nm;
+
+		/* anti-alias the edges */
+		if (((rr - e01) >> 16) == 0)
+			a = 1 + (((rr - e01) & 0xffff) >> 8);
+		if (((e01 + rr) >> 16) == 0)
+			a = (a * (1 + ((e01 + rr) & 0xffff))) >> 16;
+		if ((e01_np >> 16) == 0)
+			a = (a * (1 + (e01_np & 0xffff))) >> 16;
+		if ((e01_nm >> 16) == 0)
+			a = ((a * (1 + (e01_nm & 0xffff))) >> 16);
+
+		if (a < 256)
+			p0 = MUL_A_256(a, p0);
 	}
+
+	return p0;
 }
+
+static uint32_t _square_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
+		Enesim_Renderer *srend, Enesim_Color scolor, uint32_t *d)
+{
+	uint32_t p0 = 0;
+
+	if ((abs(e01) <= rr) && (e01_np >= -rr) && (e01_nm >= -rr))
+	{
+		int a = 256;
+
+		p0 = scolor;
+		if (srend)
+		{
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(p0, scolor);
+		}
+
+		/* anti-alias the edges */
+		if (((rr - e01) >> 16) == 0)
+			a = 1 + (((rr - e01) & 0xffff) >> 8);
+		if (((e01 + rr) >> 16) == 0)
+			a = (a * (1 + ((e01 + rr) & 0xffff))) >> 16;
+		if (((e01_np + rr) >> 16) == 0)
+			a = (a * (1 + ((e01_np + rr) & 0xffff))) >> 16;
+		if (((e01_nm + rr) >> 16) == 0)
+			a = ((a * (1 + ((e01_nm + rr) & 0xffff))) >> 16);
+
+		if (a < 256)
+			p0 = MUL_A_256(a, p0);
+	}
+
+	return p0;
+}
+
+static uint32_t _round_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
+		Enesim_Renderer *srend, Enesim_Color scolor, uint32_t *d)
+{
+	Eina_F16p16 yy;
+	uint32_t p0 = 0;
+
+	yy = abs(e01);
+	if ((yy <= rr) && (e01_np >= -rr) && (e01_nm >= -rr))
+	{
+		int a = 256;
+		Eina_F16p16 r;
+
+		p0 = scolor;
+		if (srend)
+		{
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(p0, scolor);
+		}
+
+		/* anti-alias the edges */
+		if (((rr - yy) >> 16) == 0)
+			a = 1 + (((rr - yy) & 0xffff) >> 8);
+
+		if (e01_np <= 0)
+		{
+			a = 0;
+			r = hypot(e01_np, yy);
+
+			/* FIXME anti-alias the edges */
+			if (r <= rr)
+			{
+				a = 255;
+			}
+		}
+		if (e01_nm <= 0)
+		{
+			a = 0;
+			r = hypot(e01_nm, yy);
+
+			/* FIXME anti-alias the edges */
+			if (r <= rr)
+			{
+				a = 255;
+			}
+		}
+
+		if (a < 256)
+			p0 = MUL_A_256(a, p0);
+	}
+
+	return p0;
+}
+
+#define LINE(cap, capfunction) \
+static void _span_##cap(Enesim_Renderer *r, int x, int y,			\
+		unsigned int len, void *ddata)					\
+{										\
+	Enesim_Renderer_Line *thiz;						\
+	Enesim_Renderer *srend = NULL;						\
+	Enesim_Color scolor;							\
+	Eina_F16p16 rr;								\
+	/* FIXME use eina_f16p16 */						\
+	long long int axx, axy, axz;						\
+	long long int ayx, ayy, ayz;						\
+	Eina_F16p16 d01;							\
+	Eina_F16p16 d01_np;							\
+	Eina_F16p16 d01_nm;							\
+	Eina_F16p16 e01;							\
+	Eina_F16p16 e01_np;							\
+	Eina_F16p16 e01_nm;							\
+	/* FIXME use eina_f16p16 */						\
+	long long int xx;							\
+	long long int yy;							\
+	uint32_t *dst = ddata;							\
+	uint32_t *d = dst;							\
+	uint32_t *e = d + len;							\
+										\
+	thiz = _line_get(r);							\
+										\
+	rr = thiz->rr;								\
+	axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz = thiz->matrix.xz;	\
+	ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;	\
+										\
+	d01 = eina_f16p16_mul(thiz->line.a, axx) +				\
+			eina_f16p16_mul(thiz->line.b, ayx);			\
+	d01_np = eina_f16p16_mul(thiz->np.a, axx) +				\
+			eina_f16p16_mul(thiz->np.b, ayx);			\
+	d01_nm = eina_f16p16_mul(thiz->nm.a, axx) +				\
+			eina_f16p16_mul(thiz->nm.b, ayx);			\
+										\
+	xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;	\
+	yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;	\
+										\
+	e01 = enesim_f16p16_line_affine_setup(&thiz->line, xx, yy);		\
+	e01_np = enesim_f16p16_line_affine_setup(&thiz->np, xx, yy);		\
+	e01_nm = enesim_f16p16_line_affine_setup(&thiz->nm, xx, yy);		\
+										\
+	enesim_renderer_shape_stroke_color_get(r, &scolor);			\
+	enesim_renderer_shape_stroke_renderer_get(r, &srend);			\
+										\
+	if (srend)								\
+	{									\
+			Enesim_Renderer_Sw_Data *sdata;				\
+										\
+			sdata = enesim_renderer_backend_data_get(srend,		\
+					ENESIM_BACKEND_SOFTWARE);		\
+			sdata->fill(srend, x, y, len, ddata);			\
+	}									\
+										\
+	while (d < e)								\
+	{									\
+		uint32_t p0 = 0;						\
+										\
+		p0 = capfunction(rr, e01, e01_np, e01_nm, srend, scolor, d);	\
+										\
+		*d++ = p0;							\
+		e01 += d01;							\
+		e01_np += d01_np;						\
+		e01_nm += d01_nm;						\
+	}									\
+}
+
+LINE(butt, _butt_line);
+LINE(round, _round_line);
+LINE(square, _square_line);
+
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_SHAPE_STROKE_CAPS];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -237,7 +348,8 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
 			&thiz->matrix);
-	*fill = _span;
+
+	*fill = _spans[thiz->current.cap];
 
 	return EINA_TRUE;
 }
@@ -296,6 +408,9 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 	/* y1 */
 	if (thiz->current.y1 != thiz->past.y1)
 		return EINA_TRUE;
+	/* cap */
+	if (thiz->current.cap != thiz->past.cap)
+		return EINA_TRUE;
 
 	return EINA_FALSE;
 }
@@ -328,6 +443,15 @@ EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 {
 	Enesim_Renderer *r;
 	Enesim_Renderer_Line *thiz;
+	static Eina_Bool spans_initialized = EINA_FALSE;
+
+	if (!spans_initialized)
+	{
+		spans_initialized = EINA_TRUE;
+		_spans[ENESIM_BUTT] = _span_butt;
+		_spans[ENESIM_ROUND] = _span_round;
+		_spans[ENESIM_SQUARE] = _span_square;
+	}
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Line));
 	if (!thiz) return NULL;
@@ -404,3 +528,20 @@ EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
 	thiz = _line_get(r);
 	*y1 = thiz->current.y1;
 }
+
+EAPI void enesim_renderer_line_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap cap)
+{
+	Enesim_Renderer_Line *thiz;
+
+	thiz = _line_get(r);
+	thiz->current.cap = cap;
+}
+
+EAPI void enesim_renderer_line_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap *cap)
+{
+	Enesim_Renderer_Line *thiz;
+
+	thiz = _line_get(r);
+	*cap = thiz->current.cap;
+}
+

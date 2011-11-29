@@ -31,6 +31,14 @@ typedef enum _Enesim_Shape_Draw_Mode
 
 #define ENESIM_SHAPE_DRAW_MODE_STROKE_FILL (ENESIM_SHAPE_DRAW_MODE_FILL | ENESIM_SHAPE_DRAW_MODE_STROKE)
 
+typedef enum _Enesim_Shape_Stroke_Cap
+{
+	ENESIM_BUTT,
+	ENESIM_ROUND,
+	ENESIM_SQUARE,
+	ENESIM_SHAPE_STROKE_CAPS,
+} Enesim_Shape_Stroke_Cap;
+
 EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight);
 EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *weight);
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
