@@ -163,10 +163,13 @@ static uint32_t _round_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np,
 			a = 0;
 			r = hypot(e01_np, yy);
 
-			/* FIXME anti-alias the edges */
 			if (r <= rr)
 			{
 				a = 255;
+				if (((rr -r) >> 16) == 0)
+				{
+					a = ((rr - r) & 0xffff) >> 8;
+				}
 			}
 		}
 		if (e01_nm <= 0)
@@ -174,10 +177,13 @@ static uint32_t _round_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np,
 			a = 0;
 			r = hypot(e01_nm, yy);
 
-			/* FIXME anti-alias the edges */
 			if (r <= rr)
 			{
 				a = 255;
+				if (((rr -r) >> 16) == 0)
+				{
+					a = ((rr - r) & 0xffff) >> 8;
+				}
 			}
 		}
 
