@@ -18,6 +18,17 @@
 #ifndef VECTOR_H_
 #define VECTOR_H_
 
+typedef struct _Enesim_Point
+{
+	double x;
+	double y;
+} Enesim_Point;
+
+typedef struct _Enesim_Polygon
+{
+	Eina_List *points;
+} Enesim_Polygon;
+
 typedef struct _Enesim_F16p16_Point
 {
 	Eina_F16p16 x;
