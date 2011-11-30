@@ -68,7 +68,7 @@ static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
 /*----------------------------------------------------------------------------*
  *                              Without stroke                                *
  *----------------------------------------------------------------------------*/
-/* For this case we simply pass the vertex/polygon directly to the figure */ 
+/* For this case we simply pass the vertex/polygon directly to the figure */
 static void _fill_only_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Renderer_Path *thiz = data;
@@ -107,7 +107,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	Enesim_Renderer_Path_Stroke_State *state = &thiz->stroke_state;
 	int c;
 
-	if (state->count < 3)
+	if (state->count < 2)
 	{
 		/* store the initial vertices */
 		switch (state->count)
@@ -147,17 +147,30 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	 * = -1 pointing opposite direction
 	 */
 
-	/* simplest convex case */
 	c = eina_f16p16_mul(state->x01, state->x12) + eina_f16p16_mul(state->y01, state->y12);
+	/* convex case */
 	if (c <= 0)
 	{
+		double x;
+		double y;
+
+		/* intersect the paralel and orthogonal lines */
+		/* or calculate the direction vector of the perpendicular lines and multiply by r */
 		printf("convex\n");
+		//enesim_renderer_figure_polygon_vertex_add(thiz->figure, x, y);
+		//enesim_renderer_figure_polygon_vertex_add(thiz->figure, x, y);
 	}
+	/* concave case */
 	else
 	{
+		double x;
+		double y;
+
+		/* intersect the paralel lines */
+		/* or calculate the bisector vector and multiply by r */
 		printf("concave\n");
+		//enesim_renderer_figure_polygon_vertex_add(thiz->figure, x, y);
 	}
-	/* complext concave case (we need to calculate the intersections */
 	/* we do have enough vertices, just swap them */
 	state->p0 = state->p1;
 	state->p1 = state->p2;
