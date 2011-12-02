@@ -218,7 +218,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 			case 1:
 			state->p1.x = x;
 			state->p1.y = y;
-			_do_normal(&state->n01, &state->p1, &state->p0);
+			_do_normal(&state->n01, &state->p0, &state->p1);
 
 			ox = state->r * state->n01.x;
 			oy = state->r * state->n01.y;
@@ -251,7 +251,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	/* get the normals of the new edge */
 	state->p2.x = x;
 	state->p2.y = y;
-	_do_normal(&state->n12, &state->p2, &state->p1);
+	_do_normal(&state->n12, &state->p1, &state->p2);
 
 	/* add the vertices of the new edge */
 	/* check if the previous edge and this one to see the concave/convex thing */
@@ -273,7 +273,6 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	{
 		/* TODO do the curve on the inset */
 		enesim_polygon_point_append(offset, &state->p1);
-
 	}
 	ox = state->r * state->n12.x;
 	oy = state->r * state->n12.y;
