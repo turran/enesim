@@ -195,6 +195,8 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	Enesim_Point i0, i1;
 	Eina_List *l;
 	int c;
+	double ox;
+	double oy;
 
 	l = eina_list_last(state->offset_polygons);
 	offset = eina_list_data_get(l);
@@ -218,20 +220,23 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 			state->p1.y = y;
 			_do_normal(&state->n01, &state->p1, &state->p0);
 
-			o0.x = state->p0.x + (state->r * state->n01.x);
-			o0.y = state->p0.y + (state->r * state->n01.y);
+			ox = state->r * state->n01.x;
+			oy = state->r * state->n01.y;
+
+			o0.x = state->p0.x + ox;
+			o0.y = state->p0.y + oy;
 			enesim_polygon_point_append(offset, &o0);
 
-			o1.x = state->p1.x + (state->r * state->n01.x);
-			o1.y = state->p1.y + (state->r * state->n01.y);
+			o1.x = state->p1.x + ox;
+			o1.y = state->p1.y + oy;
 			enesim_polygon_point_append(offset, &o1);
 
-			i0.x = state->p0.x + (state->r * -state->n01.x);
-			i0.y = state->p0.y + (state->r * -state->n01.y);
+			i0.x = state->p0.x - ox;
+			i0.y = state->p0.y - oy;
 			enesim_polygon_point_prepend(inset, &i0);
 
-			i1.x = state->p1.x + (state->r * -state->n01.x);
-			i1.y = state->p1.y + (state->r * -state->n01.y);
+			i1.x = state->p1.x - ox;
+			i1.y = state->p1.y - oy;
 			enesim_polygon_point_prepend(inset, &i1);
 
 			printf("inverse %g %g %g %g\n", i0.x, i0.y, i0.x, i1.y);
@@ -270,20 +275,23 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		enesim_polygon_point_append(offset, &state->p1);
 
 	}
-	o0.x = state->p1.x + (state->r * state->n12.x);
-	o0.y = state->p1.y + (state->r * state->n12.y);
+	ox = state->r * state->n12.x;
+	oy = state->r * state->n12.y;
+
+	o0.x = state->p1.x + ox;
+	o0.y = state->p1.y + oy;
 	enesim_polygon_point_append(offset, &o0);
 
-	o1.x = state->p2.x + (state->r * state->n12.x);
-	o1.y = state->p2.y + (state->r * state->n12.y);
+	o1.x = state->p2.x + ox;
+	o1.y = state->p2.y + oy;
 	enesim_polygon_point_append(offset, &o1);
 
-	i0.x = state->p1.x + (state->r * -state->n12.x);
-	i0.y = state->p1.y + (state->r * -state->n12.y);
+	i0.x = state->p1.x - ox;
+	i0.y = state->p1.y - oy;
 	enesim_polygon_point_prepend(inset, &i0);
 
-	i1.x = state->p2.x + (state->r * -state->n12.x);
-	i1.y = state->p2.y + (state->r * -state->n12.y);
+	i1.x = state->p2.x - ox;
+	i1.y = state->p2.y - oy;
 	enesim_polygon_point_prepend(inset, &i1);
 
 	state->p0 = state->p1;
@@ -723,7 +731,7 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 	r = enesim_renderer_figure_new();
 	if (!r) goto err_figure;
 	thiz->figure = r;
-	
+
 	r = enesim_renderer_shape_new(&_path_descriptor, thiz);
 	return r;
 
