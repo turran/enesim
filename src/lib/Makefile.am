@@ -1,4 +1,4 @@
-SUBDIRS = compositor converter pool renderer util
+SUBDIRS = compositor converter pool rasterizer renderer util
 
 MAINTAINERCLEANFILES = \
 Makefile.in

@@ -111,6 +111,7 @@ static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
 #include "private/format_argb8888_unpre.h"
 #include "private/compositor.h"
 #include "private/matrix.h"
+#include "private/rasterizer.h"
 #include "private/renderer.h"
 #include "private/buffer.h"
 #include "private/pool.h"

@@ -239,6 +239,7 @@ src/lib/compositor/Makefile
 src/lib/converter/Makefile
 src/lib/pool/Makefile
 src/lib/renderer/Makefile
+src/lib/rasterizer/Makefile
 src/lib/util/Makefile
 src/tests/Makefile
 ],[
