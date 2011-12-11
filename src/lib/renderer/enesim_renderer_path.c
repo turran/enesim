@@ -616,8 +616,8 @@ EAPI void enesim_renderer_path_move_to(Enesim_Renderer *r, double x, double y)
 	Enesim_Renderer_Path_Command cmd;
 
 	cmd.type = ENESIM_COMMAND_MOVE_TO;
-	cmd.definition.move_to.x = ((int) (2* x + 0.5)) / 2.0;
-	cmd.definition.move_to.y = ((int) (2* y + 0.5)) / 2.0;
+	cmd.definition.move_to.x = ((int) (2 * x + 0.5)) / 2.0;
+	cmd.definition.move_to.y = ((int) (2 * y + 0.5)) / 2.0;
 	enesim_renderer_path_command_add(r, &cmd);
 }
 
