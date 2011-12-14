@@ -42,6 +42,9 @@ struct _Enesim_Renderer
 	void *backend_data[ENESIM_BACKENDS];
 };
 
+void enesim_renderer_init(void);
+void enesim_renderer_shutdown(void);
+
 #if BUILD_OPENCL
 typedef struct _Enesim_Renderer_OpenCL_Data
 {

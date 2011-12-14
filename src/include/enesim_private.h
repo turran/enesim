@@ -46,10 +46,15 @@
 /* TODO remove all assert statements */
 #include <assert.h>
 
-#define ERR(...) EINA_LOG_DOM_ERR(enesim_log, __VA_ARGS__)
-#define WRN(...) EINA_LOG_DOM_WARN(enesim_log, __VA_ARGS__)
-#define DBG(...) EINA_LOG_DOM_DBG(enesim_log, __VA_ARGS__)
-extern int enesim_log;
+#ifdef ENESIM_DEFAULT_LOG_COLOR
+# undef ENESIM_DEFAULT_LOG_COLOR
+#endif
+#define ENESIM_DEFAULT_LOG_COLOR EINA_COLOR_LIGHTRED
+
+#define ERR(...) EINA_LOG_DOM_ERR(enesim_log_dom_global, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(enesim_log_dom_global, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(enesim_log_dom_global, __VA_ARGS__)
+extern int enesim_log_dom_global;
 
 /**
  * To be documented

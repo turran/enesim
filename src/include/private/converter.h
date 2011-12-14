@@ -26,6 +26,9 @@ typedef void (*Enesim_Converter_1D)(Enesim_Buffer_Sw_Data *data, uint32_t len, v
 #define ENESIM_CONVERTER_1D(f) ((Enesim_Converter_1D)(f))
 #define ENESIM_CONVERTER_2D(f) ((Enesim_Converter_2D)(f))
 
+void enesim_converter_init(void);
+void enesim_converter_shutdown(void);
+
 EAPI void enesim_converter_span_register(Enesim_Converter_1D cnv,
 		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt);
 EAPI void enesim_converter_surface_register(Enesim_Converter_2D cnv,
