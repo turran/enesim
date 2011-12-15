@@ -31,7 +31,6 @@ Enesim_Converter_2D_Lut _converters_2d;
  *============================================================================*/
 void enesim_converter_init(void)
 {
-	// TODO: Add prototypes for these functions.
 	enesim_converter_argb8888_init();
 	enesim_converter_rgb888_init();
 	enesim_converter_bgr888_init();

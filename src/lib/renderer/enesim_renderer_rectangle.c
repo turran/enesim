@@ -777,7 +777,10 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _rectangle_has_changed,
 	/* .sw_setup = 			*/ _rectangle_state_setup,
-	/* .sw_cleanup = 		*/ _rectangle_state_cleanup
+	/* .sw_cleanup = 		*/ _rectangle_state_cleanup,
+	/* .opencl_setup =		*/ NULL,
+	/* .opencl_kernel_setup =	*/ NULL,
+	/* .opencl_cleanup =		*/ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

@@ -433,7 +433,10 @@ static Enesim_Renderer_Descriptor _line_descriptor = {
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _line_has_changed,
 	/* .sw_setup = 			*/ _line_state_setup,
-	/* .sw_cleanup = 		*/ _line_state_cleanup
+	/* .sw_cleanup = 		*/ _line_state_cleanup,
+	/* .opencl_setup =		*/ NULL,
+	/* .opencl_kernel_setup =	*/ NULL,
+	/* .opencl_cleanup =		*/ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

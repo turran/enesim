@@ -428,7 +428,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .damage = 			*/ _compound_damage,
 	/* .has_changed = 		*/ _compound_has_changed,
 	/* .sw_setup = 			*/ _compound_state_setup,
-	/* .sw_cleanup = 		*/ _compound_state_cleanup
+	/* .sw_cleanup = 		*/ _compound_state_cleanup,
+	/* .opencl_setup =		*/ NULL,
+	/* .opencl_kernel_setup =	*/ NULL,
+	/* .opencl_cleanup =		*/ NULL
 };
 /*============================================================================*
  *                                   API                                      *

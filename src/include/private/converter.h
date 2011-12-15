@@ -29,6 +29,11 @@ typedef void (*Enesim_Converter_1D)(Enesim_Buffer_Sw_Data *data, uint32_t len, v
 void enesim_converter_init(void);
 void enesim_converter_shutdown(void);
 
+void enesim_converter_argb8888_init(void);
+void enesim_converter_rgb888_init(void);
+void enesim_converter_bgr888_init(void);
+void enesim_converter_rgb565_init(void);
+
 EAPI void enesim_converter_span_register(Enesim_Converter_1D cnv,
 		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt);
 EAPI void enesim_converter_surface_register(Enesim_Converter_2D cnv,

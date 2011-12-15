@@ -231,6 +231,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .has_changed = 		*/ NULL,
 	/* .sw_setup = 			*/ _state_setup,
 	/* .sw_cleanup = 		*/ NULL,
+	/* .opencl_setup =		*/ NULL,
+	/* .opencl_kernel_setup =	*/ NULL,
+	/* .opencl_cleanup =		*/ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

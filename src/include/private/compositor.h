@@ -24,6 +24,9 @@
 void enesim_compositor_init(void);
 void enesim_compositor_shutdown(void);
 
+void enesim_compositor_argb8888_init(void);
+void enesim_compositor_argb8888_shutdown(void);
+
 void enesim_compositor_pt_color_register(Enesim_Compositor_Point sp,
 		Enesim_Rop rop, Enesim_Format dfmt);
 void enesim_compositor_pt_pixel_register(Enesim_Compositor_Point sp,

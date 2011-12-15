@@ -289,7 +289,10 @@ static Enesim_Renderer_Descriptor _circle_descriptor = {
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _circle_has_changed,
 	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup
+	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .opencl_setup =		*/ NULL,
+	/* .opencl_kernel_setup =	*/ NULL,
+	/* .opencl_cleanup =		*/ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

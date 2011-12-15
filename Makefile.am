@@ -33,7 +33,15 @@ gendoc \
 Doxyfile \
 README \
 enesim.pc.in \
-enesim_opencl.pc.in
+enesim_opencl.pc.in \
+m4/efl_attribute.m4 \
+m4/efl_benchmark.m4 \
+m4/efl_compiler_flag.m4 \
+m4/efl_coverage.m4 \
+m4/efl_cpu.m4 \
+m4/efl_tests.m4 \
+m4/enesim_format.m4
+
 
 ACLOCAL_AMFLAGS = -I m4
 

@@ -413,7 +413,10 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _gradient_has_changed,
 	/* .sw_setup = 			*/ _gradient_state_setup,
-	/* .sw_cleanup = 		*/ _gradient_state_cleanup
+	/* .sw_cleanup = 		*/ _gradient_state_cleanup,
+	/* .opencl_setup =		*/ NULL,
+	/* .opencl_kernel_setup =	*/ NULL,
+	/* .opencl_cleanup =		*/ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

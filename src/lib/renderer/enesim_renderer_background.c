@@ -189,7 +189,11 @@ static Enesim_Renderer_Descriptor _descriptor = {
 #if BUILD_OPENCL
 	/* .opencl_setup =          */ _background_opencl_setup,
 	/* .opencl_kernel_setup =   */ _background_opencl_kernel_setup,
-	/* .opencl_cleanup =        */ _background_opencl_cleanup,
+	/* .opencl_cleanup =        */ _background_opencl_cleanup
+#else
+	/* .opencl_setup =          */ NULL,
+	/* .opencl_kernel_setup =   */ NULL,
+	/* .opencl_cleanup =        */ NULL
 #endif
 };
 /*============================================================================*
