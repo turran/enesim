@@ -370,7 +370,8 @@ static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		return;
 	}
 
-	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 			//| ENESIM_RENDERER_FLAG_COLORIZE
 			//| ENESIM_RENDERER_FLAG_ROP;
