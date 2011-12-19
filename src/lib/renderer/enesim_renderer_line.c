@@ -66,6 +66,16 @@ static inline Enesim_Renderer_Line * _line_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static void _line_setup(Enesim_F16p16_Line *l, Enesim_Point *p0, double vx, double vy, double len)
+{
+	Enesim_Line line;
+
+	enesim_line_direction_from(&line, p0, vx, vy);
+	l->a = eina_f16p16_double_from(line.a /= len);
+	l->b = eina_f16p16_double_from(line.b /= len);
+	l->c = eina_f16p16_double_from(line.c /= len);
+}
+
 static uint32_t _butt_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
 		Enesim_Renderer *srend, Enesim_Color scolor, uint32_t *d)
 {
@@ -282,8 +292,8 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Line *thiz;
-	Enesim_F16p16_Point p0, p1;
-	Eina_F16p16 vx, vy;
+	Enesim_Point p0, p1;
+	double vx, vy;
 	double x0, x1, y0, y1;
 	double x01, y01;
 	double len;
@@ -324,29 +334,20 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	if ((len = hypot(x01, y01)) < 1)
 		return EINA_FALSE;
 
-	vx = eina_f16p16_double_from(x01);
-	vy = eina_f16p16_double_from(y01);
-	p0.x = eina_f16p16_double_from(x0);
-	p0.y = eina_f16p16_double_from(y0);
-	p1.x = eina_f16p16_double_from(x1);
-	p1.y = eina_f16p16_double_from(y1);
+	vx = x01;
+	vy = y01;
+	p0.x = x0;
+	p0.y = y0;
+	p1.x = x1;
+	p1.y = y1;
 
 	/* normalize to line length so that aa works well */
 	/* the original line */
-	enesim_f16p16_line_f16p16_direction_from(&thiz->line, &p0, vx, vy);
-	thiz->line.a /= len;
-	thiz->line.b /= len;
-	thiz->line.c /= len;
+	_line_setup(&thiz->line, &p0, vx, vy, len);
 	/* the perpendicular line on the initial point */
-	enesim_f16p16_line_f16p16_direction_from(&thiz->np, &p0, -vy, vx);
-	thiz->np.a /= len;
-	thiz->np.b /= len;
-	thiz->np.c /= len;
+	_line_setup(&thiz->np, &p0, -vy, vx, len);
 	/* the perpendicular line on the last point */
-	enesim_f16p16_line_f16p16_direction_from(&thiz->nm, &p1, vy, -vx);
-	thiz->nm.a /= len;
-	thiz->nm.b /= len;
-	thiz->nm.c /= len;
+	_line_setup(&thiz->nm, &p1, vy, -vx, len);
 
 	enesim_renderer_shape_stroke_weight_get(r, &stroke);
 	thiz->rr = EINA_F16P16_HALF * (stroke + 1);
