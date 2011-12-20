@@ -135,7 +135,7 @@ EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 	if (!_format_to_buffer_format(f, &buf_fmt))
 		return NULL;
 
-	b = enesim_buffer_new_pool_from(f, w, h, p);
+	b = enesim_buffer_new_pool_from(buf_fmt, w, h, p);
 	if (!b) return NULL;
 
 	s = calloc(1, sizeof(Enesim_Surface));
