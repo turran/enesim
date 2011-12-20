@@ -36,8 +36,11 @@ typedef struct _Enesim_Surface 	Enesim_Surface; /**< Surface Handler */
 EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h);
 EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format f, uint32_t w, uint32_t h, Eina_Bool copy, Enesim_Buffer_Sw_Data *data);
 EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
+EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer);
 EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s);
 EAPI void enesim_surface_unref(Enesim_Surface *s);
+
+EAPI Enesim_Buffer * enesim_surface_buffer_get(Enesim_Surface *s);
 
 EAPI void enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h);
 EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s);

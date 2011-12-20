@@ -144,6 +144,8 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 		break;
 
 		default:
+		ENESIM_RENDERER_ERROR(r, error, "Invalid format %d", thiz->cfmt);
+		return EINA_FALSE;
 		break;
 	}
 	return EINA_TRUE;

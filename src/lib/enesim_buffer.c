@@ -55,6 +55,7 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
 	buf->w = w;
 	buf->h = h;
+	buf->backend = backend;
 	buf->backend_data = backend_data;
 	buf->format = f;
 	buf->pool = p;

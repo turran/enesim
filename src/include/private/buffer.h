@@ -50,7 +50,7 @@ struct _Enesim_Buffer
 	int ref;
 	uint32_t w;
 	uint32_t h;
-	Enesim_Format format;
+	Enesim_Buffer_Format format;
 	Enesim_Backend backend;
 	void *backend_data;
 	Enesim_Pool *pool;

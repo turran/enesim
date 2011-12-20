@@ -39,6 +39,24 @@ static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 		return EINA_FALSE;
 	}
 }
+static inline Eina_Bool _buffer_format_to_format(Enesim_Buffer_Format buf_fmt,
+		Enesim_Format *fmt)
+{
+	switch (buf_fmt)
+	{
+		case ENESIM_CONVERTER_ARGB8888_PRE:
+		*fmt = ENESIM_FORMAT_ARGB8888;
+		return EINA_TRUE;
+
+		case ENESIM_CONVERTER_A8:
+		*fmt = ENESIM_FORMAT_A8;
+		return EINA_TRUE;
+
+		default:
+		return EINA_FALSE;
+	}
+
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -50,6 +68,31 @@ void * enesim_surface_backend_data_get(Enesim_Surface *s)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
+{
+	Enesim_Surface *s;
+	Enesim_Buffer_Format buf_fmt;
+	Enesim_Format fmt;
+
+	if (!buffer) return NULL;
+
+	buf_fmt = enesim_buffer_format_get(buffer);
+	if (!_buffer_format_to_format(buf_fmt, &fmt))
+		return NULL;
+
+	s = calloc(1, sizeof(Enesim_Surface));
+	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
+	s->format = fmt;
+	s->buffer = enesim_buffer_ref(buffer);
+	s = enesim_surface_ref(s);
+
+	return s;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -207,6 +250,11 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *s
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
+}
+
+EAPI Enesim_Buffer * enesim_surface_buffer_get(Enesim_Surface *s)
+{
+	return enesim_buffer_ref(s->buffer);
 }
 
 /**
