@@ -20,7 +20,14 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_BACKGROUND_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_BACKGROUND_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_BACKGROUND_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Background {
+	EINA_MAGIC
 	/* the properties */
 	Enesim_Color color;
 	/* generated at state setup */
@@ -35,6 +42,8 @@ static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
 	Enesim_Renderer_Background *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_BACKGROUND_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -210,6 +219,7 @@ EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Background));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_BACKGROUND_MAGIC);
 	r = enesim_renderer_new(&_descriptor, thiz);
 	return r;
 }

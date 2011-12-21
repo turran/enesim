@@ -25,6 +25,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_CHECKER_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_CHECKER_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_CHECKER_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Checker_State
 {
 	Enesim_Color color1;
@@ -35,6 +41,7 @@ typedef struct _Enesim_Renderer_Checker_State
 
 typedef struct _Enesim_Renderer_Checker
 {
+	EINA_MAGIC
 	/* properties */
 	Enesim_Renderer_Checker_State current;
 	Enesim_Renderer_Checker_State past;
@@ -50,6 +57,8 @@ Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_CHECKER_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -413,6 +422,7 @@ EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Checker));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_CHECKER_MAGIC);
 
 	/* specific renderer setup */
 	thiz->current.sw = 1;
