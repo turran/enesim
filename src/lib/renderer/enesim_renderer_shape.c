@@ -198,8 +198,6 @@ EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double wei
 {
 	Enesim_Renderer_Shape *thiz;
 
-	if (weight < 1)
-		weight = 1;
 	thiz = _shape_get(r);
 	thiz->current.stroke.weight = weight;
 	thiz->changed = EINA_TRUE;
