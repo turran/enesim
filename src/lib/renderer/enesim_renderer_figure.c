@@ -20,6 +20,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_FIGURE_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_FIGURE_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_FIGURE_MAGIC);\
+	} while(0)
+
 #define MUL4_SYM(x, y) \
  ( ((((((x) >> 16) & 0xff00) * (((y) >> 16) & 0xff00)) + 0xff0000) & 0xff000000) + \
    ((((((x) >> 8) & 0xff00) * (((y) >> 16) & 0xff)) + 0xff00) & 0xff0000) + \
@@ -78,6 +84,7 @@ struct _Enesim_Renderer_Figure_Contour
 
 typedef struct _Enesim_Renderer_Figure
 {
+	EINA_MAGIC
 	Enesim_Renderer_Figure_Contour *polys, *last;
 	int npolys;
 
@@ -97,6 +104,8 @@ static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = enesim_renderer_shape_data_get(r);
+	ENESIM_RENDERER_FIGURE_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -814,6 +823,7 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Figure));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_FIGURE_MAGIC);
 	r = enesim_renderer_shape_new(&_figure_descriptor, thiz);
 	return r;
 }

@@ -20,8 +20,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_GRADIENT_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRADIENT_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRADIENT_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Gradient
 {
+	EINA_MAGIC
 	/* properties */
 	Enesim_Repeat_Mode mode;
 	/* generated at state setup */
@@ -48,6 +55,8 @@ static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
 	Enesim_Renderer_Gradient *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_GRADIENT_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -461,9 +470,11 @@ Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descript
 	}
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient));
+	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRADIENT_MAGIC);
+
 	thiz->data = data;
 	thiz->descriptor = gdescriptor;
-	if (!thiz) return NULL;
 	/* set default properties */
 	thiz->stops = NULL;
 

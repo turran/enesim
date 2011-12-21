@@ -20,6 +20,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_ELLIPSE_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_ELLIPSE_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_ELLIPSE_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Ellipse_State {
 	double x;
 	double y;
@@ -29,6 +35,7 @@ typedef struct _Enesim_Renderer_Ellipse_State {
 
 typedef struct _Enesim_Renderer_Ellipse
 {
+	EINA_MAGIC
 	/* properties */
 	Enesim_Renderer_Ellipse_State current;
 	Enesim_Renderer_Ellipse_State past;
@@ -49,6 +56,8 @@ static inline Enesim_Renderer_Ellipse * _ellipse_get(Enesim_Renderer *r)
 	Enesim_Renderer_Ellipse *thiz;
 
 	thiz = enesim_renderer_shape_data_get(r);
+	ENESIM_RENDERER_ELLIPSE_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -495,6 +504,7 @@ EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Ellipse));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_ELLIPSE_MAGIC);
 	r = enesim_renderer_shape_new(&_ellipse_descriptor, thiz);
 	return r;
 }
