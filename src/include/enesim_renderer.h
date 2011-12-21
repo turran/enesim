@@ -44,6 +44,8 @@ typedef enum Enesim_Renderer_Flag
 	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 8), /**< Supports the quality property */
 } Enesim_Renderer_Flag;
 
+#define ENESIM_RENDERER_FLAGS 9
+
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
 typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
 

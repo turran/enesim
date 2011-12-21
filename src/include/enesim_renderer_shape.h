@@ -23,6 +23,13 @@
  * @ingroup Enesim_Renderer_Group
  * @{
  */
+
+typedef enum _Enesim_Shape_Flag
+{
+	ENESIM_SHAPE_FLAG_FILL_RENDERER 	= (1 << (ENESIM_RENDERER_FLAGS + 0)),
+	ENESIM_SHAPE_FLAG_STROKE_RENDERER	= (1 << (ENESIM_RENDERER_FLAGS + 1)),
+} Enesim_Shape_Flag;
+
 typedef enum _Enesim_Shape_Draw_Mode
 {
 	ENESIM_SHAPE_DRAW_MODE_FILL 	= (1 << 0),

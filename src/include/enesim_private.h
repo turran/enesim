@@ -56,26 +56,6 @@
 #define DBG(...) EINA_LOG_DOM_DBG(enesim_log_dom_global, __VA_ARGS__)
 extern int enesim_log_dom_global;
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
-{
-
-	if ((x <= cx) && (x + *w > cx))
-	{
-		int x2;
-
-		x2 = x + *w;
-		*w = cx - x;
-		*rx = cx;
-		*rw = x2 - cx;
-		return 1;
-	}
-	return 0;
-}
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -108,6 +88,34 @@ static inline int enesim_hline_cut(int x, int *w, int *rx, int *rw, int cx)
 #define LIBARGB_DEBUG 0
 
 #include "libargb.h"
+
+/* define every magic herer  to track them easily */
+/* define here every renderer magic */
+#define ENESIM_RENDERER_BACKGROUND_MAGIC 0xe7e51430
+#define ENESIM_RENDERER_CHECKER_MAGIC 0xe7e51431
+#define ENESIM_RENDERER_CLIPPER_MAGIC 0xe7e51432
+#define ENESIM_RENDERER_COMPOUND_MAGIC 0xe7e51433
+#define ENESIM_RENDERER_DISPMAP_MAGIC 0xe7e51434
+#define ENESIM_RENDERER_GRADIENT_MAGIC 0xe7e51435
+#define ENESIM_RENDERER_GRID_MAGIC 0xe7e51436
+#define ENESIM_RENDERER_HSWITCH_MAGIC 0xe7e51437
+#define ENESIM_RENDERER_IMAGE_MAGIC 0xe7e51438
+#define ENESIM_RENDERER_IMPORTER_MAGIC 0xe7e51438
+#define ENESIM_RENDERER_PERLIN_MAGIC 0xe7e51439
+#define ENESIM_RENDERER_RADDIST_MAGIC 0xe7e51439
+#define ENESIM_RENDERER_SHAPE_MAGIC 0xe7e5143a
+#define ENESIM_RENDERER_STRIPES_MAGIC 0xe7e5143b
+#define ENESIM_RENDERER_TRANSITION_MAGIC 0xe7e5143c
+
+#define ENESIM_RENDERER_CIRCLE_MAGIC 0xe7e51440
+#define ENESIM_RENDERER_RECTANGLE_MAGIC 0xe7e51441
+#define ENESIM_RENDERER_ELLIPSE_MAGIC 0xe7e51442
+#define ENESIM_RENDERER_LINE_MAGIC 0xe7e51443
+#define ENESIM_RENDERER_FIGURE_MAGIC 0xe7e51444
+#define ENESIM_RENDERER_PATH_MAGIC 0xe7e51445
+
+#define ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC 0xe7e51450
+#define ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC 0xe7e51451
 
 #include "private/vector.h"
 #include "private/curve.h"
