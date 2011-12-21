@@ -20,7 +20,14 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_CLIPPER_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_CLIPPER_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_CLIPPER_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Clipper {
+	EINA_MAGIC
 	/* the properties */
 	Enesim_Renderer *content;
 	double width;
@@ -43,6 +50,8 @@ static inline Enesim_Renderer_Clipper * _clipper_get(Enesim_Renderer *r)
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_CLIPPER_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -230,6 +239,7 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Clipper));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_CLIPPER_MAGIC);
 	r = enesim_renderer_new(&_descriptor, thiz);
 	return r;
 }

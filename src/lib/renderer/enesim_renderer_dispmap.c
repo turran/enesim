@@ -23,8 +23,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Dispamp
+#define ENESIM_RENDERER_DISPMAP_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_DISPMAP_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_DISPMAP_MAGIC);\
+	} while(0)
+
+typedef struct _Enesim_Renderer_Dispmap
 {
+	EINA_MAGIC
 	Enesim_Surface *map;
 	Enesim_Surface *src;
 	Enesim_Channel x_channel;
@@ -40,6 +47,8 @@ static inline Enesim_Renderer_Dispmap * _dispmap_get(Enesim_Renderer *r)
 	Enesim_Renderer_Dispmap *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_DISPMAP_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -323,6 +332,7 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Dispmap));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_DISPMAP_MAGIC);
 
 	/* specific renderer setup */
 	thiz->x_channel = ENESIM_CHANNEL_RED;

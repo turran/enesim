@@ -32,8 +32,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_COMPOUND_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_COMPOUND_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_COMPOUND_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Compound
 {
+	EINA_MAGIC
 	/* properties */
 	Eina_List *layers;
 	Enesim_Renderer_Compound_Setup pre_cb;
@@ -68,6 +75,8 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	Enesim_Renderer_Compound *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_COMPOUND_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -447,6 +456,7 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Compound));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_COMPOUND_MAGIC);
 
 	r = enesim_renderer_new(&_descriptor, thiz);
 
