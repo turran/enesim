@@ -20,8 +20,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Gradient_Radial
 {
+	EINA_MAGIC
 	/* properties */
 	struct {
 		double x, y;
@@ -39,6 +46,8 @@ static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = enesim_renderer_gradient_data_get(r);
+	ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -169,6 +178,7 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient_Radial));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC);
 	r = enesim_renderer_gradient_new(&_radial_descriptor, thiz);
 
 	return r;

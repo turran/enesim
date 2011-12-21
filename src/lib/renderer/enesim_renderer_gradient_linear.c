@@ -20,6 +20,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Gradient_Linear_State
 {
 	double x0;
@@ -30,6 +36,7 @@ typedef struct _Enesim_Renderer_Gradient_Linear_State
 
 typedef struct _Enesim_Renderer_Gradient_Linear
 {
+	EINA_MAGIC
 	/* public properties */
 	Enesim_Renderer_Gradient_Linear_State current;
 	Enesim_Renderer_Gradient_Linear_State past;
@@ -46,6 +53,8 @@ static inline Enesim_Renderer_Gradient_Linear * _linear_get(Enesim_Renderer *r)
 	Enesim_Renderer_Gradient_Linear *thiz;
 
 	thiz = enesim_renderer_gradient_data_get(r);
+	ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -222,6 +231,7 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient_Linear));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC);
 	r = enesim_renderer_gradient_new(&_linear_descriptor, thiz);
 	return r;
 }
