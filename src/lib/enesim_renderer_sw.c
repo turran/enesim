@@ -16,6 +16,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eina includes sched.h for us, but does not set the _GNU_SOURCE
+ * flag, so basically we cant use CPU_ZERO, CPU_SET, etc
+ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef BUILD_PTHREAD
+#include <sched.h>
+#include <pthread.h>
+#endif
+
 #include "Enesim.h"
 #include "enesim_private.h"
 

@@ -787,7 +787,8 @@ static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_SHAPE_FLAG_FILL_RENDERER;
 }
 
 static Enesim_Renderer_Descriptor _figure_descriptor = {

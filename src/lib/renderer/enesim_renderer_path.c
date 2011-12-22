@@ -50,6 +50,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_PATH_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_PATH_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_PATH_MAGIC);\
+	} while(0)
+
 typedef void (*Enesim_Renderer_Path_Vertex_Add)(double x, double y, void *data);
 typedef void (*Enesim_Renderer_Path_Polygon_Add)(void *data);
 
@@ -66,6 +72,7 @@ typedef struct _Enesim_Renderer_Command_State
 
 typedef struct _Enesim_Renderer_Path
 {
+	EINA_MAGIC
 	/* properties */
 	Eina_List *commands;
 	/* private */
@@ -83,6 +90,8 @@ static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
 	Enesim_Renderer_Path *thiz;
 
 	thiz = enesim_renderer_shape_data_get(r);
+	ENESIM_RENDERER_PATH_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 /*----------------------------------------------------------------------------*
@@ -687,6 +696,14 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
+static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+{
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_SHAPE_FLAG_FILL_RENDERER;
+}
+
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Path *thiz;
@@ -731,6 +748,7 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Path));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_PATH_MAGIC);
 
 	r = enesim_renderer_line_new();
 	thiz->line = r;

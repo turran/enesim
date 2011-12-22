@@ -20,8 +20,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_HSWITCH_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_HSWITCH_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_HSWITCH_MAGIC);\
+	} while(0)
+
 typedef struct _Hswitch
 {
+	EINA_MAGIC
 	/* properties */
 	unsigned int w;
 	unsigned int h;
@@ -37,6 +44,8 @@ static inline Hswitch * _hswitch_get(Enesim_Renderer *r)
 	Hswitch *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_HSWITCH_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -254,6 +263,8 @@ EAPI Enesim_Renderer * enesim_renderer_hswitch_new(void)
 	Enesim_Renderer *r;
 
 	thiz = calloc(1, sizeof(Hswitch));
+	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_HSWITCH_MAGIC);
 	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;

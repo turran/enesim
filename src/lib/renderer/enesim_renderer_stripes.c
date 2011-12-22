@@ -20,6 +20,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_STRIPES_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_STRIPES_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_STRIPES_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Stripes_State {
 	struct {
 		Enesim_Color color;
@@ -28,6 +34,7 @@ typedef struct _Enesim_Renderer_Stripes_State {
 } Enesim_Renderer_Stripes_State;
 
 typedef struct _Enesim_Renderer_Stripes {
+	EINA_MAGIC
 	/* properties */
 	Enesim_Renderer_Stripes_State current;
 	Enesim_Renderer_Stripes_State past;
@@ -42,6 +49,8 @@ static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_STRIPES_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -262,8 +271,8 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Stripes));
-	if (!thiz)
-		return NULL;
+	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_STRIPES_MAGIC);
 	/* specific renderer setup */
 	thiz->current.s0.thickness = 1;
 	thiz->current.s1.thickness = 1;

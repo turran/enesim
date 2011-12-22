@@ -21,8 +21,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_RADDIST_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_RADDIST_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_RADDIST_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Raddist
 {
+	EINA_MAGIC
 	Enesim_Surface *src;
 	double scale;
 	double radius;
@@ -35,6 +42,8 @@ static inline Enesim_Renderer_Raddist * _raddist_get(Enesim_Renderer *r)
 	Enesim_Renderer_Raddist *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_RADDIST_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -181,6 +190,8 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 	Enesim_Renderer *r;
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Raddist));
+	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_RADDIST_MAGIC);
 	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;

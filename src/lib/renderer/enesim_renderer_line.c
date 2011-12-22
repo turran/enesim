@@ -20,6 +20,12 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_LINE_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_LINE_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_LINE_MAGIC);\
+	} while(0)
+
 /* FIXME use the ones from libargb */
 #define MUL_A_256(a, c) \
  ( (((((c) >> 8) & 0x00ff00ff) * (a)) & 0xff00ff00) + \
@@ -43,6 +49,7 @@ typedef struct _Enesim_Renderer_Line_State
 
 typedef struct _Enesim_Renderer_Line
 {
+	EINA_MAGIC
 	/* properties */
 	Enesim_Renderer_Line_State current;
 	/* private */
@@ -63,6 +70,8 @@ static inline Enesim_Renderer_Line * _line_get(Enesim_Renderer *r)
 	Enesim_Renderer_Line *thiz;
 
 	thiz = enesim_renderer_shape_data_get(r);
+	ENESIM_RENDERER_LINE_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -376,7 +385,8 @@ static void _line_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _line_free(Enesim_Renderer *r)
@@ -465,6 +475,7 @@ EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Line));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_LINE_MAGIC);
 	r = enesim_renderer_shape_new(&_line_descriptor, thiz);
 	return r;
 }
@@ -520,7 +531,6 @@ EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1)
 	thiz = _line_get(r);
 	*x1 = thiz->current.x1;
 }
-
 
 EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
 {

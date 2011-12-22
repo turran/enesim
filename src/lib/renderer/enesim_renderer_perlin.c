@@ -20,8 +20,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_PERLIN_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_PERLIN_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_PERLIN_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Perlin
 {
+	EINA_MAGIC
 	struct {
 		double val;
 		Eina_F16p16 *coeff;
@@ -35,6 +42,7 @@ static inline Enesim_Renderer_Perlin * _perlin_get(Enesim_Renderer *r)
 	Enesim_Renderer_Perlin *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	ENESIM_RENDERER_PERLIN_MAGIC_CHECK(thiz);
 
 	return thiz;
 }
@@ -200,6 +208,8 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 	Enesim_Renderer_Perlin *thiz;
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Perlin));
+	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_PERLIN_MAGIC);
 	thiz->xfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->yfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->ampl.val = 1; /* p p2 p3 p4 ... */

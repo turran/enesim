@@ -21,7 +21,14 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Renderer_Rectangle_State {
+#define ENESIM_RENDERER_RECTANGLE_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_RECTANGLE_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_RECTANGLE_MAGIC);\
+	} while(0)
+
+typedef struct _Enesim_Renderer_Rectangle_State
+{
 	double width;
 	double height;
 	double x;
@@ -35,7 +42,9 @@ typedef struct _Enesim_Renderer_Rectangle_State {
 	} corner;
 } Enesim_Renderer_Rectangle_State;
 
-typedef struct _Enesim_Renderer_Rectangle {
+typedef struct _Enesim_Renderer_Rectangle
+{
+	EINA_MAGIC
 	/* public properties */
 	Enesim_Renderer_Rectangle_State current;
 	Enesim_Renderer_Rectangle_State past;
@@ -242,6 +251,8 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = enesim_renderer_shape_data_get(r);
+	ENESIM_RENDERER_RECTANGLE_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -714,7 +725,8 @@ static void _rectangle_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_SHAPE_FLAG_FILL_RENDERER;
 }
 
 static void _rectangle_free(Enesim_Renderer *r)
@@ -799,6 +811,7 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Rectangle));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_RECTANGLE_MAGIC);
 	r = enesim_renderer_shape_new(&_rectangle_descriptor, thiz);
 	return r;
 }

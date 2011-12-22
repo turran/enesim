@@ -20,8 +20,15 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_GRID_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRID_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRID_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Renderer_Grid
 {
+	EINA_MAGIC
 	struct {
 		Enesim_Color color;
 		unsigned int w;
@@ -42,6 +49,8 @@ static inline Enesim_Renderer_Grid * _grid_get(Enesim_Renderer *r)
 	Enesim_Renderer_Grid *thiz;
 
 	thiz = enesim_renderer_data_get(r);
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRID_MAGIC);
+
 	return thiz;
 }
 
@@ -337,6 +346,8 @@ EAPI Enesim_Renderer * enesim_renderer_grid_new(void)
 	Enesim_Renderer_Grid *thiz;
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Grid));
+	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRID_MAGIC);
 	/* specific renderer setup */
 	thiz->inside.w = 1;
 	thiz->inside.h = 1;

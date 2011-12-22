@@ -20,12 +20,42 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static void _opengl_extensions_setup(void)
+{
+	char *extensions;
+
+	extensions  = (char *)glGetString(GL_EXTENSIONS);
+/*if( findString("GL_ARB_shader_objects",extensionList) &&
+      findString("GL_ARB_shading_language_100",extensionList) &&
+      findString("GL_ARB_vertex_shader",extensionList) &&
+      findString("GL_ARB_fragment_shader",extensionList) )
+"GL_EXT_geometry_shader4"
+*/
+
+}
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
+Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		Enesim_Error **error)
+{
+
+}
+
+void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+
+}
+
+void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
+		int x, int y, Enesim_Renderer_Flag flags)
+{
+
+}
+
 void enesim_renderer_opengl_init(void)
 {
 	/* maybe we should add a hash to match between kernel name and program */
@@ -35,4 +65,7 @@ void enesim_renderer_opengl_shutdown(void)
 {
 
 }
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
 
