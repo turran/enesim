@@ -49,7 +49,7 @@ AC_SUBST([ENESIM_BUILD])
 
 ### Checks for programs
 AC_PROG_CC
-
+PKG_PROG_PKG_CONFIG
 
 ### Checks for libraries
 
@@ -162,17 +162,59 @@ if test "x$build_opencl" = "xyes"; then
 fi
 AM_CONDITIONAL(HAVE_OPENCL, [test "x$build_opencl" = "xyes"])
 
-dnl Check for glx
-AC_CHECK_HEADERS([GL/gl.h], [HAVE_GL="yes"], [HAVE_GL="no"])
-if test "x$HAVE_GL" = "xno"
-  build_opengl="no"
-then
-  build_opengl="yes"
+dnl Check for opengl
+LIBS_save=${LIBS}
+LIBS="${LIBS} -lGL"
+AC_LINK_IFELSE(
+  [
+   AC_LANG_PROGRAM(
+     [[
+#include <GL/gl.h>
+     ]],
+     [[
+glGenFramebuffersEXT(0, NULL);
+     ]])
+  ],
+  [
+   build_opengl="yes"
+   opengl_libs="-lGL"
+  ],
+  [build_opengl="no"])
+LIBS=${LIBS_save}
+
+AC_MSG_CHECKING([whether glGenTextures is in libGL.a])
+AC_MSG_RESULT([${build_opengl}])
+
+if test "x${build_opengl}" = "xno" ; then
+  LIBS_save=${LIBS}
+  LIBS="${LIBS} -lopengl32"
+  AC_LINK_IFELSE(
+    [
+     AC_LANG_PROGRAM(
+       [[
+#include <GL/gl.h>
+       ]],
+       [[
+glGenFramebuffersEXT(0, NULL);
+       ]])
+    ],
+    [
+     build_opengl="yes"
+     opengl_libs="-lopengl32"
+    ],
+    [build_opengl="no"])
+  LIBS=${LIBS_save}
 fi
-if test "x$build_opengl" = "xyes"; then
-  AC_DEFINE(BUILD_OPENGL, 1, [Build OpenGL Backend])
+
+AC_MSG_CHECKING([whether glGenTextures is in libopengl32.a])
+AC_MSG_RESULT([${build_opengl}])
+
+AC_SUBST([opengl_libs])
+
+if test "x${build_opengl}" = "xyes"; then
+  AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
 fi
-AM_CONDITIONAL(HAVE_OPENGL, [test "x$build_opengl" = "xyes"])
+AM_CONDITIONAL([HAVE_OPENGL], [test "x$build_opengl" = "xyes"])
 #######################################
 ## Link with pthread if needed
 AC_MSG_CHECKING(whether we should link with pthread)

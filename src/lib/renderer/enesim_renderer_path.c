@@ -85,7 +85,7 @@ typedef struct _Enesim_Renderer_Path
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Path;
 
-static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Path * _enesim_path_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -97,7 +97,7 @@ static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
 /*----------------------------------------------------------------------------*
  *                              Without stroke                                *
  *----------------------------------------------------------------------------*/
-static void _path_vertex_add(double x, double y, void *data)
+static void _enesim_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Renderer_Path *thiz = data;
 	Enesim_Polygon *p;
@@ -111,7 +111,7 @@ static void _path_vertex_add(double x, double y, void *data)
 	enesim_polygon_point_append(p, &pt);
 }
 
-static void _path_polygon_add(void *data)
+static void _enesim_path_polygon_add(void *data)
 {
 	Enesim_Renderer_Path *thiz = data;
 	Enesim_Polygon *p;
@@ -120,14 +120,14 @@ static void _path_polygon_add(void *data)
 	thiz->polygons = eina_list_append(thiz->polygons, p);
 }
 
-static void _path_polygon_close(void *data)
+static void _enesim_path_polygon_close(void *data)
 {
 
 }
 /*----------------------------------------------------------------------------*
  *                                 Commands                                   *
  *----------------------------------------------------------------------------*/
-static void _move_to(Enesim_Renderer_Command_State *state,
+static void _enesim_move_to(Enesim_Renderer_Command_State *state,
 		double x, double y)
 {
 	state->polygon_add(state->data);
@@ -138,7 +138,7 @@ static void _move_to(Enesim_Renderer_Command_State *state,
 	state->last_ctrl_y = y;
 }
 
-static void _line_to(Enesim_Renderer_Command_State *state,
+static void _enesim_line_to(Enesim_Renderer_Command_State *state,
 		double x, double y)
 {
 	state->vertex_add(x, y, state->data);
@@ -149,7 +149,7 @@ static void _line_to(Enesim_Renderer_Command_State *state,
 }
 
 /* these subdiv approximations need to be done more carefully */
-static void _quadratic_to(Enesim_Renderer_Command_State *state,
+static void _enesim_quadratic_to(Enesim_Renderer_Command_State *state,
 		double ctrl_x, double ctrl_y,
 		double x, double y)
 {
@@ -178,20 +178,20 @@ static void _quadratic_to(Enesim_Renderer_Command_State *state,
 	x01 = (x0 + x1) / 2;
 	y01 = (y0 + y1) / 2;
 
-	_quadratic_to(state, x0, y0, x01, y01);
+	_enesim_quadratic_to(state, x0, y0, x01, y01);
 	state->last_x = x01;
 	state->last_y = y01;
 	state->last_ctrl_x = x0;
 	state->last_ctrl_y = y0;
 
-	_quadratic_to(state, x1, y1, x, y);
+	_enesim_quadratic_to(state, x1, y1, x, y);
 	state->last_x = x;
 	state->last_y = y;
 	state->last_ctrl_x = x1;
 	state->last_ctrl_y = y1;
 }
 
-static void _squadratic_to(Enesim_Renderer_Command_State *state,
+static void _enesim_squadratic_to(Enesim_Renderer_Command_State *state,
 		double x, double y)
 {
 	double x0, y0, cx0, cy0;
@@ -203,14 +203,14 @@ static void _squadratic_to(Enesim_Renderer_Command_State *state,
 	cx0 = (2 * x0) - cx0;
 	cy0 = (2 * y0) - cy0;
 
-	_quadratic_to(state, cx0, cy0, x, y);
+	_enesim_quadratic_to(state, cx0, cy0, x, y);
 	state->last_x = x;
 	state->last_y = y;
 	state->last_ctrl_x = cx0;
 	state->last_ctrl_y = cy0;
 }
 
-static void _cubic_to(Enesim_Renderer_Command_State *state,
+static void _enesim_cubic_to(Enesim_Renderer_Command_State *state,
 		double ctrl_x0, double ctrl_y0,
 		double ctrl_x, double ctrl_y,
 		double x, double y)
@@ -249,13 +249,13 @@ static void _cubic_to(Enesim_Renderer_Command_State *state,
 	xc = (xa + xb) / 2;
 	yc = (ya + yb) / 2;
 
-	_cubic_to(state, x01, y01, xa, ya, xc, yc);
+	_enesim_cubic_to(state, x01, y01, xa, ya, xc, yc);
 	state->last_x = xc;
 	state->last_y = yc;
 	state->last_ctrl_x = xa;
 	state->last_ctrl_y = ya;
 
-	_cubic_to(state, xb, yb, x23, y23, x, y);
+	_enesim_cubic_to(state, xb, yb, x23, y23, x, y);
 	state->last_x = x;
 	state->last_y = y;
 	state->last_ctrl_x = x23;
@@ -263,7 +263,7 @@ static void _cubic_to(Enesim_Renderer_Command_State *state,
 }
 
 
-static void _scubic_to(Enesim_Renderer_Command_State *state,
+static void _enesim_scubic_to(Enesim_Renderer_Command_State *state,
 		double ctrl_x, double ctrl_y,
 		double x, double y)
 {
@@ -276,7 +276,7 @@ static void _scubic_to(Enesim_Renderer_Command_State *state,
 	cx0 = (2 * x0) - cx0;
 	cy0 = (2 * y0) - cy0;
 
-	_cubic_to(state, cx0, cy0, ctrl_x, ctrl_y, x, y);
+	_enesim_cubic_to(state, cx0, cy0, ctrl_x, ctrl_y, x, y);
 	state->last_x = x;
 	state->last_y = y;
 	state->last_ctrl_x = ctrl_x;
@@ -286,7 +286,7 @@ static void _scubic_to(Enesim_Renderer_Command_State *state,
 /* code adapted from the moonlight sources
  * we need to fix it to match c89
  */
-static void _arc_to(Enesim_Renderer_Command_State *state, double rx, double ry, double angle,
+static void _enesim_arc_to(Enesim_Renderer_Command_State *state, double rx, double ry, double angle,
                    unsigned char large, unsigned char sweep, double x, double y)
 {
 	double sx, sy;
@@ -312,7 +312,7 @@ static void _arc_to(Enesim_Renderer_Command_State *state, double rx, double ry, 
 	ry = fabs(ry);
 	if ((rx < 0.5) || (ry < 0.5))
 	{
-		_line_to(state, x, y);
+		_enesim_line_to(state, x, y);
 		return;
 	}
 
@@ -447,7 +447,7 @@ static void _arc_to(Enesim_Renderer_Command_State *state, double rx, double ry, 
 		double c2x = ex + bcp * (cos_phi_rx * sin_theta2 + sin_phi_ry * cos_theta2);
 		double c2y = ey + bcp * (sin_phi_rx * sin_theta2 - cos_phi_ry * cos_theta2);
 
-		_cubic_to(state, c1x, c1y, c2x, c2y, ex, ey);
+		_enesim_cubic_to(state, c1x, c1y, c2x, c2y, ex, ey);
 
 		// next start point is the current end point (same for angle)
 		sx = ex;
@@ -459,12 +459,12 @@ static void _arc_to(Enesim_Renderer_Command_State *state, double rx, double ry, 
 	}
 }
 
-static void _close(Enesim_Renderer_Command_State *state)
+static void _enesim_close(Enesim_Renderer_Command_State *state)
 {
 
 }
 
-static void _path_generate_vertices(Eina_List *commands,
+static void _enesim_path_generate_vertices(Eina_List *commands,
 		Enesim_Renderer_Path_Vertex_Add vertex_add,
 		Enesim_Renderer_Path_Polygon_Add polygon_add,
 		void *data)
@@ -487,27 +487,27 @@ static void _path_generate_vertices(Eina_List *commands,
 		switch (cmd->type)
 		{
 			case ENESIM_COMMAND_MOVE_TO:
-			_move_to(&state, cmd->definition.move_to.x, cmd->definition.move_to.y);
+			_enesim_move_to(&state, cmd->definition.move_to.x, cmd->definition.move_to.y);
 			break;
 
 			case ENESIM_COMMAND_LINE_TO:
-			_line_to(&state, cmd->definition.line_to.x, cmd->definition.line_to.y);
+			_enesim_line_to(&state, cmd->definition.line_to.x, cmd->definition.line_to.y);
 			break;
 
 			case ENESIM_COMMAND_QUADRATIC_TO:
-			_quadratic_to(&state, cmd->definition.quadratic_to.ctrl_x,
+			_enesim_quadratic_to(&state, cmd->definition.quadratic_to.ctrl_x,
 					cmd->definition.quadratic_to.ctrl_y,
 					cmd->definition.quadratic_to.x,
 					cmd->definition.quadratic_to.y);
 			break;
 
 			case ENESIM_COMMAND_SQUADRATIC_TO:
-			_squadratic_to(&state, cmd->definition.squadratic_to.x,
+			_enesim_squadratic_to(&state, cmd->definition.squadratic_to.x,
 					cmd->definition.squadratic_to.y);
 			break;
 
 			case ENESIM_COMMAND_CUBIC_TO:
-			_cubic_to(&state, cmd->definition.cubic_to.ctrl_x0,
+			_enesim_cubic_to(&state, cmd->definition.cubic_to.ctrl_x0,
 					cmd->definition.cubic_to.ctrl_y0,
 					cmd->definition.cubic_to.ctrl_x1,
 					cmd->definition.cubic_to.ctrl_y1,
@@ -516,14 +516,14 @@ static void _path_generate_vertices(Eina_List *commands,
 			break;
 
 			case ENESIM_COMMAND_SCUBIC_TO:
-			_scubic_to(&state, cmd->definition.scubic_to.ctrl_x,
+			_enesim_scubic_to(&state, cmd->definition.scubic_to.ctrl_x,
 					cmd->definition.scubic_to.ctrl_y,
 					cmd->definition.scubic_to.x,
 					cmd->definition.scubic_to.y);
 			break;
 
 			case ENESIM_COMMAND_ARC_TO:
-			_arc_to(&state, cmd->definition.arc_to.rx,
+			_enesim_arc_to(&state, cmd->definition.arc_to.rx,
 					cmd->definition.arc_to.ry,
 					cmd->definition.arc_to.angle,
 					cmd->definition.arc_to.large,
@@ -533,7 +533,7 @@ static void _path_generate_vertices(Eina_List *commands,
 			break;
 
 			case ENESIM_COMMAND_CLOSE:
-			_close(&state);
+			_enesim_close(&state);
 			break;
 
 			default:
@@ -542,22 +542,22 @@ static void _path_generate_vertices(Eina_List *commands,
 	}
 }
 
-static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _enesim_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = _enesim_path_get(r);
 	thiz->fill(thiz->final_r, x, y, len, ddata);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _path_name(Enesim_Renderer *r)
+static const char * _enesim_path_name(Enesim_Renderer *r)
 {
 	return "path";
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
+static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
@@ -575,7 +575,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	Enesim_Shape_Draw_Mode draw_mode;
 	double stroke_weight;
 
-	thiz = _path_get(r);
+	thiz = _enesim_path_get(r);
 
 	/* TODO in the future the generation of polygons might depend also on the matrix used */
 	/* generate the list of points/polygons */
@@ -591,7 +591,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 			free(p);
 		}
 	}
-	_path_generate_vertices(thiz->commands, _path_vertex_add, _path_polygon_add, thiz);
+	_enesim_path_generate_vertices(thiz->commands, _enesim_path_vertex_add, _enesim_path_polygon_add, thiz);
 	/* check for the simplest case, a line (1 polygon, 2 points) */
 	npols = eina_list_count(thiz->polygons);
 	fverts = 0;
@@ -681,22 +681,22 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	{
 		return EINA_FALSE;
 	}
-	*fill = _span;
+	*fill = _enesim_span;
 	thiz->final_r = final_r;
 
 	return EINA_TRUE;
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _enesim_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = _enesim_path_get(r);
 	enesim_renderer_cleanup(thiz->figure, s);
 	thiz->changed = EINA_FALSE;
 }
 
-static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _enesim_path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
@@ -704,11 +704,11 @@ static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_SHAPE_FLAG_FILL_RENDERER;
 }
 
-static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+static void _enesim_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = _enesim_path_get(r);
 
 	/* FIXME fix this */
 	if (!thiz->figure) return;
@@ -717,7 +717,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 static Enesim_Renderer_Descriptor _path_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _path_name,
+	/* .name = 			*/ _enesim_path_name,
 	/* .free = 			*/ NULL,
 	/* .boundings = 		*/ NULL, // _boundings,
 	/* .destination_transform = 	*/ NULL,
@@ -725,8 +725,8 @@ static Enesim_Renderer_Descriptor _path_descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .sw_setup = 			*/ _enesim_state_setup,
+	/* .sw_cleanup = 		*/ _enesim_state_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL
@@ -774,7 +774,7 @@ EAPI void enesim_renderer_path_command_clear(Enesim_Renderer *r)
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_Command *c;
 
-	thiz = _path_get(r);
+	thiz = _enesim_path_get(r);
 	EINA_LIST_FREE(thiz->commands, c)
 	{
 		free(c);
@@ -790,7 +790,7 @@ EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Renderer_P
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_Command *new_command;
 
-	thiz = _path_get(r);
+	thiz = _enesim_path_get(r);
 
 	new_command = malloc(sizeof(Enesim_Renderer_Path_Command));
 	*new_command = *cmd;
