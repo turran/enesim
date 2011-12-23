@@ -71,6 +71,18 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 			return EINA_TRUE;
 		}
 	}
+	if (thiz->current.stroke.r &&
+			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+	{
+		if (enesim_renderer_has_changed(thiz->current.stroke.r))
+		{
+			char *stroke_name;
+
+			enesim_renderer_name_get(thiz->current.stroke.r, &stroke_name);
+			DBG("The stroke renderer %s has changed", stroke_name);
+			return EINA_TRUE;
+		}
+	}
 	if (!thiz->changed)
 		return EINA_FALSE;
 	/* the stroke */
@@ -80,10 +92,6 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 	/* weight */
 	if (thiz->current.stroke.weight != thiz->past.stroke.weight)
 		return EINA_TRUE;
-	/* renderer */
-	if (thiz->current.stroke.r != thiz->past.stroke.r)
-		return EINA_TRUE;
-	/* the fill */
 	/* color */
 	if (thiz->current.fill.color != thiz->past.fill.color)
 		return EINA_TRUE;

@@ -358,6 +358,12 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	/* the perpendicular line on the last point */
 	_line_setup(&thiz->nm, &p1, vy, -vx, len);
 
+	if (!enesim_renderer_shape_setup(r, state, s, error))
+	{
+		ENESIM_RENDERER_ERROR(r, error, "Shape cannot setup");
+		return EINA_FALSE;
+	}
+
 	enesim_renderer_shape_stroke_weight_get(r, &stroke);
 	thiz->rr = EINA_F16P16_HALF * (stroke + 1);
 	if (thiz->rr < EINA_F16P16_HALF) thiz->rr = EINA_F16P16_HALF;
