@@ -174,9 +174,11 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .sw_cleanup = 		*/ _pattern_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL
+	/* .opencl_cleanup =		*/ NULL,
+	/* .opengl_setup =          	*/ NULL,
+	/* .opengl_shader_setup = 	*/ NULL,
+	/* .opengl_cleanup =        	*/ NULL
 };
-
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

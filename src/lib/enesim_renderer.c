@@ -197,6 +197,19 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 	{
 		return EINA_TRUE;
 	}
+	/* the mask */
+	if (r->current.mask && !r->past.mask)
+		return EINA_TRUE;
+	if (!r->current.mask && r->past.mask)
+		return EINA_TRUE;
+	if (r->current.mask)
+	{
+		if (enesim_renderer_has_changed(r->current.mask))
+		{
+			DBG("The mask renderer %s has changed", r->current.name);
+			return EINA_TRUE;
+		}
+	}
 	/* the origin */
 	if (r->current.ox != r->past.ox || r->current.oy != r->past.oy)
 	{
@@ -881,6 +894,33 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (rop) *rop = r->current.rop;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (r->current.mask)
+		enesim_renderer_unref(r->current.mask);
+	r->current.mask = mask;
+	if (r->current.mask)
+		r->current.mask = enesim_renderer_ref(r->current.mask);
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (!mask) return;
+	*mask = r->current.mask;
+	if (r->current.mask)
+		r->current.mask = enesim_renderer_ref(r->current.mask);
 }
 
 /**

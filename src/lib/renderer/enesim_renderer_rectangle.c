@@ -64,6 +64,9 @@ typedef struct _Enesim_Renderer_Rectangle
 } Enesim_Renderer_Rectangle;
 
 /* we assume tyy and lxx are inside the top left corner */
+/* FIXME we should replace all the ints, we are losing precision as this renderer
+ * only handled integers coords
+ */
 static inline void _top_left(int sx, int sy, int stw,
 		uint16_t ax, uint16_t ay,
 		Eina_F16p16 lxx, Eina_F16p16 tyy, Eina_F16p16 rr0, Eina_F16p16 rr1,
@@ -792,7 +795,10 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .sw_cleanup = 		*/ _rectangle_state_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL
+	/* .opencl_cleanup =		*/ NULL,
+	/* .opengl_setup =          	*/ NULL,
+	/* .opengl_shader_setup = 	*/ NULL,
+	/* .opengl_cleanup =        	*/ NULL
 };
 /*============================================================================*
  *                                 Global                                     *

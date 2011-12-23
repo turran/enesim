@@ -39,41 +39,46 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#ifdef BUILD_PTHREAD
-typedef struct _Enesim_Renderer_Thread_Operation
-{
-	/* common attributes */
-	Enesim_Renderer *renderer;
-	Enesim_Renderer_Sw_Fill fill;
-	uint8_t * dst;
-	size_t stride;
-	Eina_Rectangle area;
-	/* in case the renderer needs to use a composer */
-	Enesim_Compositor_Span span;
-} Enesim_Renderer_Thread_Operation;
-
-typedef struct _Enesim_Renderer_Thread
-{
-	int cpuidx;
-	pthread_t tid;
-} Enesim_Renderer_Thread;
-
-static unsigned int _num_cpus;
-static Enesim_Renderer_Thread *_threads;
-static Enesim_Renderer_Thread_Operation _op;
-static pthread_barrier_t _start;
-static pthread_barrier_t _end;
-#endif
-
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Flag flags)
 {
-	if (((r->current.rop == ENESIM_FILL) && (r->current.color == ENESIM_COLOR_FULL))
-			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->current.color == ENESIM_COLOR_FULL))
-			|| ((flags & ENESIM_RENDERER_FLAG_ROP) && (flags & ENESIM_RENDERER_FLAG_COLORIZE)))
+#if 0
+	if (r->current.mask)
 	{
-		return EINA_FALSE;
+		*has_mask = EINA_TRUE;
+		if (flags & ENESIM_RENDERER_FLAG_MASK)
+			*needs_mask = EINA_FALSE;
+		else
+			*needs_mask = EINA_TRUE;
 	}
+	else
+	{
+		*has_mask = EINA_FALSE;
+	}
+
+	if (r->current.rop == ENESIM_FILL)
+	{
+		*has_rop = EINA_FALSE;
+		if (r->current.color == ENESIM_COLOR_FULL)
+		{
+
+		}
+	}
+	else
+	{
+		*has_rop = EINA_TRUE;
+	}
+#endif
+
+	/* fill rop and color is full, we use the simple draw function */
+	if ((r->current.rop == ENESIM_FILL) && (r->current.color == ENESIM_COLOR_FULL))
+		return EINA_FALSE;
+	/* the renderer can handle different rops and the color is full, use simple draw function */
+	if ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->current.color == ENESIM_COLOR_FULL))
+		return EINA_FALSE;
+	/* the renderer can handle different rops and also the color, use simple draw function */
+	if ((flags & ENESIM_RENDERER_FLAG_ROP) && (flags & ENESIM_RENDERER_FLAG_COLORIZE))
+		return EINA_FALSE;
 	return EINA_TRUE;
 }
 
@@ -97,13 +102,53 @@ static inline void _sw_surface_setup(Enesim_Surface *s, Enesim_Format *dfmt, voi
 	}
 }
 
-static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
-		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
+/* worst case, rop+color+mask(rop+color) */
+/* rop+color+mask */
+/* rop+mask */
+/* color+mask */
+/* mask */
+/* color */
+/* rop */
+
+static inline void _sw_surface_draw_rop_mask(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Fill fill,
+		Enesim_Renderer_Sw_Fill mask_fill,
+		Enesim_Compositor_Span span,
+		Enesim_Compositor_Span mask_span,
 		uint8_t *ddata, size_t stride,
-		uint8_t *tmp, size_t len, Eina_Rectangle *area)
+		uint8_t *tmp,
+		uint8_t *tmp_mask,
+		size_t len,
+		Eina_Rectangle *area)
 {
 	while (area->h--)
 	{
+		/* FIXME we should not memset this */
+		memset(tmp_mask, 0, len);
+		memset(tmp, 0, len);
+
+		fill(r, area->x, area->y, area->w, tmp);
+		fill_mask(r->current.mask, area->x, area->y, area->w, tmp_mask);
+		area->y++;
+		/* compose the filled and the destination spans */
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, (uint32_t *)tmp_mask);
+		ddata += stride;
+	}
+}
+
+/* rop = any (~FLAG_ROP)
+ * color = any (~FLAG_COLORIZE)
+ */
+static inline void _sw_surface_draw_rop(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Fill fill,
+		Enesim_Compositor_Span span,
+		uint8_t *ddata, size_t stride,
+		uint8_t *tmp, size_t len,
+		Eina_Rectangle *area)
+{
+	while (area->h--)
+	{
+		/* FIXME we should not memset this */
 		memset(tmp, 0, len);
 		fill(r, area->x, area->y, area->w, tmp);
 		area->y++;
@@ -113,6 +158,10 @@ static inline void _sw_surface_draw_composed(Enesim_Renderer *r,
 	}
 }
 
+/* rop = fill | any(FLAG_ROP)
+ * color = none | any(FLAG_COLORIZE)
+ * mask = none
+ */
 static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill fill, uint8_t *ddata,
 		size_t stride, Eina_Rectangle *area)
@@ -124,11 +173,36 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 		ddata += stride;
 	}
 }
-
-
+/*----------------------------------------------------------------------------*
+ *                            Threaded rendering                              *
+ *----------------------------------------------------------------------------*/
 #ifdef BUILD_PTHREAD
+typedef struct _Enesim_Renderer_Thread_Operation
+{
+	/* common attributes */
+	Enesim_Renderer *renderer;
+	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Renderer_Sw_Fill mask_fill;
+	uint8_t * dst;
+	size_t stride;
+	Eina_Rectangle area;
+	/* in case the renderer needs to use a composer */
+	Enesim_Compositor_Span span;
+} Enesim_Renderer_Thread_Operation;
 
-static inline void _sw_surface_draw_composed_threaded(Enesim_Renderer *r,
+typedef struct _Enesim_Renderer_Thread
+{
+	int cpuidx;
+	pthread_t tid;
+} Enesim_Renderer_Thread;
+
+static unsigned int _num_cpus;
+static Enesim_Renderer_Thread *_threads;
+static Enesim_Renderer_Thread_Operation _op;
+static pthread_barrier_t _start;
+static pthread_barrier_t _end;
+
+static inline void _sw_surface_draw_rop_threaded(Enesim_Renderer *r,
 		unsigned int thread,
 		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
 		uint8_t *ddata, size_t stride,
@@ -141,6 +215,7 @@ static inline void _sw_surface_draw_composed_threaded(Enesim_Renderer *r,
 	{
 		if (h % _num_cpus != thread) goto end;
 
+		/* FIXME we should not memset this */
 		memset(tmp, 0, len);
 		fill(r, area->x, y, area->w, tmp);
 		/* compose the filled and the destination spans */
@@ -186,7 +261,7 @@ static void * _thread_run(void *data)
 
 			len = op->area.w * sizeof(uint32_t);
 			tmp = malloc(len);
-			_sw_surface_draw_composed_threaded(op->renderer,
+			_sw_surface_draw_rop_threaded(op->renderer,
 					thiz->cpuidx,
 					op->fill,
 					op->span,
@@ -227,6 +302,7 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 	_op.stride = stride;
 	_op.area = *area;
 	_op.fill = sw_data->fill;
+	_op.mask_fill = NULL;
 	_op.span = NULL;
 
 	if (_is_sw_draw_composed(r, flags))
@@ -250,7 +326,9 @@ end:
 	return;
 }
 #else
-
+/*----------------------------------------------------------------------------*
+ *                          No threaded rendering                             *
+ *----------------------------------------------------------------------------*/
 static void _sw_draw_no_threaded(Enesim_Renderer *r,
 		Eina_Rectangle *area,
 		uint8_t *ddata, size_t stride, Enesim_Format dfmt,
@@ -275,7 +353,7 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r,
 		}
 		len = area->w * sizeof(uint32_t);
 		fdata = alloca(len);
-		_sw_surface_draw_composed(r, sw_data->fill, span, ddata, stride, fdata, len, area);
+		_sw_surface_draw_rop(r, sw_data->fill, span, ddata, stride, fdata, len, area);
 	}
 	else
 	{
@@ -285,8 +363,6 @@ end:
 	return;
 }
 #endif
-
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -325,7 +401,6 @@ void enesim_renderer_sw_shutdown(void)
 	pthread_barrier_destroy(&_end);
 #endif
 }
-
 
 void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y, Enesim_Renderer_Flag flags)
@@ -394,7 +469,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			/* now render */
 			len = final.w * bpp;
 			fdata = alloca(len);
-			_sw_surface_draw_composed(r, rswdata->fill, span, rdata, stride,
+			_sw_surface_draw_rop(r, rswdata->fill, span, rdata, stride,
 					fdata, len, &final);
 		}
 	}
@@ -431,6 +506,16 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Sw_Fill fill;
 
+	/* do the setup on the mask */
+	/* FIXME later this should be merged on the common renderer code */
+	if (r->current.mask)
+	{
+		if (!enesim_renderer_setup(r->current.mask, s, error))
+		{
+			WRN("Mask %s setup callback on %s failed", r->current.mask->current.name, r->current.name);
+			return EINA_FALSE;
+		}
+	}
 	if (!r->descriptor.sw_setup) return EINA_TRUE;
 	if (r->descriptor.sw_setup(r, state, s, &fill, error))
 	{
@@ -451,6 +536,12 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	/* do the setup on the mask */
+	/* FIXME later this should be merged on the common renderer code */
+	if (r->current.mask)
+	{
+		enesim_renderer_cleanup(r->current.mask, s);
+	}
 	if (r->descriptor.sw_cleanup) r->descriptor.sw_cleanup(r, s);
 }
 /*============================================================================*

@@ -53,7 +53,6 @@ void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y, Enesim_Renderer_Flag flags)
 {
-
 }
 
 void enesim_renderer_opengl_init(void)

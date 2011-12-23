@@ -58,6 +58,9 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 
 static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 {
+	/* FIXME handle the case where it had a stroke/fill and not now
+	 * or the opposite
+	 */
 	/* we should first check if the fill renderer has changed */
 	if (thiz->current.fill.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
@@ -153,6 +156,9 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 	pdescriptor.opencl_setup = descriptor->opencl_setup;
 	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
 	pdescriptor.opencl_cleanup = descriptor->opencl_cleanup;
+	pdescriptor.opengl_setup = descriptor->opengl_setup;
+	pdescriptor.opengl_shader_setup = descriptor->opengl_shader_setup;
+	pdescriptor.opengl_cleanup = descriptor->opengl_cleanup;
 
 	r = enesim_renderer_new(&pdescriptor, thiz);
 	return r;

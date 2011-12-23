@@ -34,6 +34,11 @@ enesim_test_opencl_pool \
 enesim_test_renderer_pool
 endif
 
+if HAVE_OPENCL
+check_PROGRAMS += \
+enesim_test_opengl_pool
+endif
+
 enesim_test_opencl_pool_SOURCES = enesim_test_opencl_pool.c
 enesim_test_opencl_pool_DEPENDENCIES = \
 $(top_builddir)/src/lib/libenesim.la \
@@ -42,6 +47,16 @@ enesim_test_opencl_pool_LDADD = \
 $(top_builddir)/src/lib/libenesim.la \
 $(top_builddir)/src/lib/pool/libenesim_opencl.la \
 @ENESIM_LIBS@
+
+enesim_test_opengl_pool_SOURCES = enesim_test_opengl_pool.c
+enesim_test_opengl_pool_DEPENDENCIES = \
+$(top_builddir)/src/lib/libenesim.la \
+$(top_builddir)/src/lib/pool/libenesim_opengl.la
+enesim_test_opengl_pool_LDADD = \
+$(top_builddir)/src/lib/libenesim.la \
+$(top_builddir)/src/lib/pool/libenesim_opengl.la \
+@ENESIM_LIBS@
+
 
 enesim_test_renderer_pool_SOURCES = enesim_test_renderer_pool.c
 enesim_test_renderer_pool_DEPENDENCIES = \
