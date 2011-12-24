@@ -71,6 +71,7 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	int axx = thiz->matrix.xx;
 	int ayx = thiz->matrix.yx;
 	int do_inner = thiz->do_inner;
+	Enesim_Color color;
 	unsigned int ocolor;
 	unsigned int icolor;
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
@@ -86,6 +87,13 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	enesim_renderer_shape_fill_color_get(r, &icolor);
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
 
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -203,6 +211,7 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 	int axx = thiz->matrix.xx;
 	int ayx = thiz->matrix.yx;
 	int do_inner = thiz->do_inner;
+	Enesim_Color color;
 	unsigned int ocolor;
 	unsigned int icolor;
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
@@ -217,6 +226,13 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
 
 	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
 	sdata->fill(spaint, x, y, len, dst);

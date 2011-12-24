@@ -61,11 +61,17 @@ static inline Enesim_Renderer_Ellipse * _ellipse_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+/* these span draw functions need to be optimized further
+ * eg. special cases are needed when transform == identity.
+ */
+
+/* stroke and/or fill with possibly a fill renderer */
+static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
 	Enesim_Renderer *fpaint;
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
 	Enesim_Color ocolor;
 	Enesim_Color icolor;
 	int axx = thiz->matrix.xx;
@@ -92,8 +98,20 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
  	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
+		if (rr0_x == irr0_x)  // if stroke weight 0 or too small radii
+		{
+			memset(dst, 0, len * sizeof (unsigned int));
+			return;
+		}
 		icolor = 0;
 		fpaint = NULL;
 	}
@@ -193,12 +211,242 @@ static void _span_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, i
 	}
 }
 
-static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int y,
+/* stroke with a renderer and possibly fill with color */
+static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
+	Enesim_Renderer *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int do_inner = thiz->do_inner;
+	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	int rr0_x = thiz->rr0_x, rr1_x = rr0_x + 65536;
+	int rr0_y = thiz->rr0_y, rr1_y = rr0_y + 65536;
+	int irr0_x = thiz->irr0_x, irr1_x = irr0_x + 65536;
+	int irr0_y = thiz->irr0_y, irr1_y = irr0_y + 65536;
+	int cc0 = thiz->cc0, cc1 = cc0 + 65536;
+	int icc0 = thiz->icc0, icc1 = icc0 + 65536;
+	int fxxp = xx0 + thiz->fxxp, fyyp = yy0 + thiz->fyyp;
+	int fxxm = xx0 - thiz->fxxp, fyym = yy0 - thiz->fyyp;
+	int ifxxp = xx0 + thiz->ifxxp, ifyyp = yy0 + thiz->ifyyp;
+	int ifxxm = xx0 - thiz->ifxxp, ifyym = yy0 - thiz->ifyyp;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	int xx, yy;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, dst);
+
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		icolor = 0;
+
+
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if ((abs(xx - xx0) <= rr1_x) && (abs(yy - yy0) <= rr1_y))
+		{
+			unsigned int op0 = *d, p0;
+			int a = 256;
+
+			if (ocolor != 0xffffffff)
+				op0 = argb8888_mul4_sym(op0, ocolor);
+
+			if (((abs(xx - xx0) >= (rr0_x / 2))) || ((abs(yy - yy0) >= (rr0_y
+					/ 2))))
+			{
+				int rr = hypot(xx - fxxp, yy - fyyp) + hypot(xx - fxxm, yy
+						- fyym);
+
+				a = 0;
+				if (rr < cc1)
+				{
+					a = 256;
+					if (rr > cc0)
+						a -= ((rr - cc0) >> 8);
+				}
+			}
+
+			if (a < 256)
+				op0 = argb8888_mul_256(a, op0);
+
+			p0 = op0;
+			if (do_inner && (abs(xx - xx0) <= irr1_x) && (abs(yy - yy0)
+					<= irr1_y))
+			{
+				p0 = icolor;
+				a = 256;
+				if (((abs(xx - xx0) >= (irr0_x / 2))) || ((abs(yy - yy0)
+						>= (irr0_y / 2))))
+				{
+					int rr = hypot(xx - ifxxp, yy - ifyyp) + hypot(xx - ifxxm,
+							yy - ifyym);
+
+					a = 0;
+					if (rr < icc1)
+					{
+						a = 256;
+						if (rr > icc0)
+							a -= ((rr - icc0) >> 8);
+					}
+				}
+
+				if (a < 256)
+					p0 = argb8888_interp_256(a, p0, op0);
+			}
+			q0 = p0;
+		}
+		*d++ = q0;
+		xx += axx;
+		yy += ayx;
+	}
+}
+
+/* stroke and fill with renderers */
+static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
+		 unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int do_inner = thiz->do_inner;
+	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	int rr0_x = thiz->rr0_x, rr1_x = rr0_x + 65536;
+	int rr0_y = thiz->rr0_y, rr1_y = rr0_y + 65536;
+	int irr0_x = thiz->irr0_x, irr1_x = irr0_x + 65536;
+	int irr0_y = thiz->irr0_y, irr1_y = irr0_y + 65536;
+	int cc0 = thiz->cc0, cc1 = cc0 + 65536;
+	int icc0 = thiz->icc0, icc1 = icc0 + 65536;
+	int fxxp = xx0 + thiz->fxxp, fyyp = yy0 + thiz->fyyp;
+	int fxxm = xx0 - thiz->fxxp, fyym = yy0 - thiz->fyyp;
+	int ifxxp = xx0 + thiz->ifxxp, ifyyp = yy0 + thiz->ifyyp;
+	int ifxxm = xx0 - thiz->ifxxp, ifyym = yy0 - thiz->ifyyp;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	unsigned int *sbuf, *s;
+	int xx, yy;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if ((abs(xx - xx0) <= rr1_x) && (abs(yy - yy0) <= rr1_y))
+		{
+			unsigned int op0 = *s, p0;
+			int a = 256;
+
+			if (ocolor != 0xffffffff)
+				op0 = argb8888_mul4_sym(op0, ocolor);
+
+			if (((abs(xx - xx0) >= (rr0_x / 2))) || ((abs(yy - yy0) >= (rr0_y
+					/ 2))))
+			{
+				int rr = hypot(xx - fxxp, yy - fyyp) + hypot(xx - fxxm, yy
+						- fyym);
+
+				a = 0;
+				if (rr < cc1)
+				{
+					a = 256;
+					if (rr > cc0)
+						a -= ((rr - cc0) >> 8);
+				}
+			}
+
+			if (a < 256)
+				op0 = argb8888_mul_256(a, op0);
+
+			p0 = op0;
+			if ((abs(xx - xx0) <= irr1_x) && (abs(yy - yy0) <= irr1_y))
+			{
+				p0 = *d;
+				if (icolor != 0xffffffff)
+					p0 = argb8888_mul4_sym(icolor, p0);
+				a = 256;
+				if (((abs(xx - xx0) >= (irr0_x / 2))) || ((abs(yy - yy0)
+						>= (irr0_y / 2))))
+				{
+					int rr = hypot(xx - ifxxp, yy - ifyyp) + hypot(xx - ifxxm,
+							yy - ifyym);
+
+					a = 0;
+					if (rr < icc1)
+					{
+						a = 256;
+						if (rr > icc0)
+							a -= ((rr - icc0) >> 8);
+					}
+				}
+
+				if (a < 256)
+					p0 = argb8888_interp_256(a, p0, op0);
+			}
+			q0 = p0;
+		}
+		*d++ = q0;
+		s++;
+		xx += axx;
+		yy += ayx;
+	}
+}
+
+
+static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void  *ddata)
 {
 	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *fpaint;
+	Enesim_Color color;
 	Enesim_Color ocolor;
 	Enesim_Color icolor;
 	int axx = thiz->matrix.xx;
@@ -222,11 +470,24 @@ static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int
 	int fill_only = 0;
 
 	enesim_renderer_shape_stroke_color_get(r, &ocolor);
-	enesim_renderer_shape_fill_color_get(r, &ocolor);
- 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
+		if (rr0_x == irr0_x)  // if stroke weight 0 or too small radii
+		{
+			memset(dst, 0, len * sizeof (unsigned int));
+			return;
+		}
 		icolor = 0;
 		fpaint = NULL;
 	}
@@ -327,6 +588,248 @@ static void _span_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int
 		zz += azx;
 	}
 }
+
+static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void  *ddata)
+{
+	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *fpaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int azx = thiz->matrix.zx;
+	int do_inner = thiz->do_inner;
+	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	int rr0_x = thiz->rr0_x, rr1_x = rr0_x + 65536;
+	int rr0_y = thiz->rr0_y, rr1_y = rr0_y + 65536;
+	int irr0_x = thiz->irr0_x, irr1_x = irr0_x + 65536;
+	int irr0_y = thiz->irr0_y, irr1_y = irr0_y + 65536;
+	int cc0 = thiz->cc0, cc1 = cc0 + 65536;
+	int icc0 = thiz->icc0, icc1 = icc0 + 65536;
+	int fxxp = xx0 + thiz->fxxp, fyyp = yy0 + thiz->fyyp;
+	int fxxm = xx0 - thiz->fxxp, fyym = yy0 - thiz->fyyp;
+	int ifxxp = xx0 + thiz->ifxxp, ifyyp = yy0 + thiz->ifyyp;
+	int ifxxm = xx0 - thiz->ifxxp, ifyym = yy0 - thiz->ifyyp;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	int xx, yy, zz;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+ 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		icolor = 0;
+
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if (zz)
+		{
+			int sxx = ((((long long int)xx) << 16) / zz);
+			int syy = ((((long long int)yy) << 16) / zz);
+
+			if ((abs(sxx - xx0) <= rr1_x) && (abs(syy - yy0) <= rr1_y))
+			{
+				unsigned int op0 = *d, p0;
+				int a = 256;
+
+				if (ocolor != 0xffffffff)
+					op0 = argb8888_mul4_sym(op0, ocolor);
+
+				if (((abs(sxx - xx0) >= (rr0_x / 2))) || ((abs(syy - yy0) >= (rr0_y / 2))))
+				{
+					int rr = hypot(sxx - fxxp, syy - fyyp) + hypot(sxx - fxxm, syy - fyym);
+
+					a = 0;
+					if (rr < cc1)
+					{
+						a = 256;
+						if (rr > cc0)
+							a -= ((rr - cc0) >> 8);
+					}
+				}
+
+				if (a < 256)
+					op0 = argb8888_mul_256(a, op0);
+
+				p0 = op0;
+				if (do_inner && (abs(sxx - xx0) <= irr1_x) && (abs(syy - yy0) <= irr1_y))
+				{
+					p0 = icolor;
+					if (fpaint)
+					{
+						p0 = *d;
+						if (icolor != 0xffffffff)
+							p0 = argb8888_mul4_sym(icolor, p0);
+					}
+
+					a = 256;
+					if (((abs(sxx - xx0) >= (irr0_x / 2))) || ((abs(syy - yy0) >= (irr0_y / 2))))
+					{
+						int rr = hypot(sxx - ifxxp, syy - ifyyp) + hypot(sxx - ifxxm, syy - ifyym);
+
+						a = 0;
+						if (rr < icc1)
+						{
+							a = 256;
+							if (rr > icc0)
+								a -= ((rr - icc0) >> 8);
+						}
+					}
+
+					if (a < 256)
+						p0 = argb8888_interp_256(a, p0, op0);
+				}
+				q0 = p0;
+			}
+		}
+		*d++ = q0;
+		xx += axx;
+		yy += ayx;
+		zz += azx;
+	}
+}
+
+static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void  *ddata)
+{
+	Enesim_Renderer_Ellipse *thiz = _ellipse_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int azx = thiz->matrix.zx;
+	int do_inner = thiz->do_inner;
+	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	int rr0_x = thiz->rr0_x, rr1_x = rr0_x + 65536;
+	int rr0_y = thiz->rr0_y, rr1_y = rr0_y + 65536;
+	int irr0_x = thiz->irr0_x, irr1_x = irr0_x + 65536;
+	int irr0_y = thiz->irr0_y, irr1_y = irr0_y + 65536;
+	int cc0 = thiz->cc0, cc1 = cc0 + 65536;
+	int icc0 = thiz->icc0, icc1 = icc0 + 65536;
+	int fxxp = xx0 + thiz->fxxp, fyyp = yy0 + thiz->fyyp;
+	int fxxm = xx0 - thiz->fxxp, fyym = yy0 - thiz->fyyp;
+	int ifxxp = xx0 + thiz->ifxxp, ifyyp = yy0 + thiz->ifyyp;
+	int ifxxm = xx0 - thiz->ifxxp, ifyym = yy0 - thiz->ifyyp;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	unsigned int *sbuf, *s;
+	int xx, yy, zz;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_fill_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if (zz)
+		{
+			int sxx = ((((long long int)xx) << 16) / zz);
+			int syy = ((((long long int)yy) << 16) / zz);
+
+			if ((abs(sxx - xx0) <= rr1_x) && (abs(syy - yy0) <= rr1_y))
+			{
+				unsigned int op0 = *s, p0;
+				int a = 256;
+
+				if (ocolor != 0xffffffff)
+					op0 = argb8888_mul4_sym(op0, ocolor);
+
+				if (((abs(sxx - xx0) >= (rr0_x / 2))) || ((abs(syy - yy0) >= (rr0_y / 2))))
+				{
+					int rr = hypot(sxx - fxxp, syy - fyyp) + hypot(sxx - fxxm, syy - fyym);
+
+					a = 0;
+					if (rr < cc1)
+					{
+						a = 256;
+						if (rr > cc0)
+							a -= ((rr - cc0) >> 8);
+					}
+				}
+
+				if (a < 256)
+					op0 = argb8888_mul_256(a, op0);
+
+				p0 = op0;
+				if ((abs(sxx - xx0) <= irr1_x) && (abs(syy - yy0) <= irr1_y))
+				{
+					p0 = *d;
+					if (icolor != 0xffffffff)
+						p0 = argb8888_mul4_sym(icolor, p0);
+
+					a = 256;
+					if (((abs(sxx - xx0) >= (irr0_x / 2))) || ((abs(syy - yy0) >= (irr0_y / 2))))
+					{
+						int rr = hypot(sxx - ifxxp, syy - ifyyp) + hypot(sxx - ifxxm, syy - ifyym);
+
+						a = 0;
+						if (rr < icc1)
+						{
+							a = 256;
+							if (rr > icc0)
+								a -= ((rr - icc0) >> 8);
+						}
+					}
+
+					if (a < 256)
+						p0 = argb8888_interp_256(a, p0, op0);
+				}
+				q0 = p0;
+			}
+		}
+		*d++ = q0;
+		s++;
+		xx += axx;
+		yy += ayx;
+		zz += azx;
+	}
+}
+
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -341,6 +844,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Ellipse *thiz;
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *spaint;
 	double rx, ry;
 	double sw;
 
@@ -400,9 +905,39 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
 			&thiz->matrix);
-	*fill = _span_color_stroked_paint_filled_proj;
-	if (state->transformation_type == ENESIM_MATRIX_AFFINE || state->transformation_type == ENESIM_MATRIX_IDENTITY)
-		*fill = _span_color_stroked_paint_filled_affine;
+
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+
+	if (state->transformation_type == ENESIM_MATRIX_AFFINE ||
+		 state->transformation_type == ENESIM_MATRIX_IDENTITY)
+	{
+		*fill = _stroke_fill_paint_affine;
+		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		{
+			Enesim_Renderer *fpaint;
+
+			*fill = _stroke_paint_fill_affine;
+			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			if (fpaint && thiz->do_inner &&
+					(draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				*fill = _stroke_paint_fill_paint_affine;
+		}
+	}
+	else
+	{
+		*fill = _stroke_fill_paint_proj;
+		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		{
+			Enesim_Renderer *fpaint;
+
+			*fill = _stroke_paint_fill_proj;
+			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			if (fpaint && thiz->do_inner &&
+					(draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				*fill = _stroke_paint_fill_paint_proj;
+		}
+	}
 
 	return EINA_TRUE;
 }
