@@ -63,8 +63,8 @@ static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesi
  	thiz = _background_get(r);
 	final_color = thiz->color;
 	enesim_renderer_color_get(r, &rend_color);
-	/* TODO multiply the bkg color with the rend color and use that for the span
-	 */
+	if (rend_color != ENESIM_COLOR_FULL)
+		final_color = argb8888_mul4_sym(rend_color, final_color);
 	thiz->final_color = final_color;
 	return EINA_TRUE;
 }
@@ -161,7 +161,8 @@ static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_ROP;
+			ENESIM_RENDERER_FLAG_ROP |
+			ENESIM_RENDERER_FLAG_COLORIZE;
 
 }
 
