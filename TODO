@@ -1,3 +1,8 @@
++ We should add a way to get the backend data from a renderer or surface. This is useful for
+  cases like the glx example where we need a way to render the texture inside a surface into
+  the final framebuffer. Another useful case might be on the future for a new way to define
+  renderers or extend them. Instead of calling the enesim_renderer_setup() as is, we might
+  want to get the backend data and manage that data directly
 + Add a pattern renderer. Basically it should just draw another renderer inifinitely, of course
  if we want to restrict it to a specific area, then we should use a clipper? or maybe make the
  pattern clip also? 
