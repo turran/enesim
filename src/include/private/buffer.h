@@ -39,7 +39,6 @@ typedef struct _Enesim_Buffer_OpenCL_Data
 typedef struct _Enesim_Buffer_OpenGL_Data
 {
 	GLuint texture;
-	GLuint fbo;
 	unsigned int num_textures;
 } Enesim_Buffer_OpenGL_Data;
 #endif

@@ -66,7 +66,7 @@ void enesim_renderer_opencl_shutdown(void);
 #if BUILD_OPENGL
 typedef struct _Enesim_Renderer_OpenGL_Data
 {
-
+	GLuint fbo;
 } Enesim_Renderer_OpenGL_Data;
 
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,

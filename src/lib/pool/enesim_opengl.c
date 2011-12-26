@@ -47,13 +47,10 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		case ENESIM_CONVERTER_ARGB8888_PRE:
 		data->num_textures = 1;
 		glGenTextures(1, &data->texture);
-		glGenFramebuffersEXT(1, &data->fbo);
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, data->fbo);
-		/* attach the texture to the first color attachment */
+		glBindTexture(GL_TEXTURE_2D, data->texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-				GL_TEXTURE_2D, data->texture, 0);
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 		break;
 
 		case ENESIM_CONVERTER_RGB565:
@@ -117,7 +114,6 @@ static void _data_free(void *prv, void *backend_data,
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
 
 	glDeleteTextures(1, &data->texture);
-	glDeleteFramebuffersEXT(1, &data->fbo);
 }
 
 static Eina_Bool _data_get(void *prv, void *backend_data,
@@ -177,6 +173,8 @@ EAPI Enesim_Pool * enesim_pool_opengl_new(void)
 	thiz = calloc(1, sizeof(Enesim_OpenGL_Pool));
 
 	p = enesim_pool_new(&_descriptor, thiz);
+	/* FIXME we should put a simple initializer */
+	glEnable(GL_TEXTURE_2D);
 	if (!p)
 	{
 		free(thiz);

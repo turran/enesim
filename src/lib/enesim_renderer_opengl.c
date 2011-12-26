@@ -17,9 +17,21 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+/*
+ * Shall we use only one framebuffer? One framebuffer per renderer?
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/* FIXME for debugging purposes */
+#define GLERR {\
+        GLenum err; \
+        err = glGetError(); \
+        printf("Error %d\n", err); \
+        }
+
+
+
 static void _opengl_extensions_setup(void)
 {
 	char *extensions;
@@ -43,6 +55,31 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Buffer_OpenGL_Data *sdata;
+	GLenum status;
+
+	sdata = enesim_surface_backend_data_get(s);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	if (!rdata)
+	{
+		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
+		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
+		glGenFramebuffersEXT(1, &rdata->fbo);
+	}
+	/* attach the texture to the first color attachment */
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, sdata->texture, 0);
+
+        status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+        {
+                printf("fb error %d\n", status);
+        }
+
+	/* TODO get the shader from the renderer implementation */
+	/* compile it */
+
 	return EINA_TRUE;
 }
 
@@ -50,6 +87,7 @@ void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
@@ -60,6 +98,21 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	/* create the geometry to render to */
+	/* FIXME for now */
+	glClearColor(0.0, 1.0, 0.0, 1.0);
+	glColor3f(1.0, 0.0, 0.0);
+	glBegin(GL_QUADS);
+                glVertex2d(area->x, area->y);
+                glVertex2d(area->x + area->w, area->y);
+                glVertex2d(area->x + area->w, area->y + area->h);
+                glVertex2d(area->x, area->y + area->h);
+        glEnd();
+
+	/* TODO get the compiled shader from the renderer backend data */
+	/* TODO run it on the renderer fbo */
 }
 
 void enesim_renderer_opengl_init(void)
@@ -71,6 +124,15 @@ void enesim_renderer_opengl_shutdown(void)
 {
 
 }
+
+/* we need a way to destroy the renderer data
+void enesim_renderer_opengl_delete(Enesim_Renderer *r)
+{
+	Enesim_Renderer_OpenGL_Data *rdata;
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	glDeleteFramebuffersEXT(1, &rdata->fbo);
+}
+*/
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
