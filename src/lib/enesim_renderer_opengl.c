@@ -42,17 +42,24 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {
-
+	Enesim_Renderer_OpenGL_Data *rdata;
+	return EINA_TRUE;
 }
 
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer_OpenGL_Data *rdata;
 
 }
 
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y, Enesim_Renderer_Flag flags)
 {
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Buffer_OpenGL_Data *sdata;
+
+	sdata = enesim_surface_backend_data_get(s);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 }
 
 void enesim_renderer_opengl_init(void)

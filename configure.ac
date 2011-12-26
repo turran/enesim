@@ -274,6 +274,7 @@ AC_OUTPUT([
 Makefile
 enesim.pc
 enesim_opencl.pc
+enesim_opengl.pc
 src/Makefile
 src/include/Makefile
 src/lib/Makefile

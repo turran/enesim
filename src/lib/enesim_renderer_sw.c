@@ -504,7 +504,8 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {
-	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Renderer_Sw_Fill fill = NULL;
+	Enesim_Renderer_Sw_Data *sw_data;
 
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
@@ -517,21 +518,27 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		}
 	}
 	if (!r->descriptor.sw_setup) return EINA_TRUE;
-	if (r->descriptor.sw_setup(r, state, s, &fill, error))
+	if (!r->descriptor.sw_setup(r, state, s, &fill, error))
 	{
-		Enesim_Renderer_Sw_Data *sw_data;
+		WRN("Setup callback on %s failed", r->current.name);
+		return EINA_FALSE;
 
-		sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
-		if (!sw_data)
-		{
-			sw_data = calloc(1, sizeof(Enesim_Renderer_Sw_Data));
-			enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
-		}
-		sw_data->fill = fill;
-		return EINA_TRUE;
 	}
-	WRN("Setup callback on %s failed", r->current.name);
-	return EINA_FALSE;
+	if (!fill)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "Even if the setup did not failed, there's no fill function");
+		enesim_renderer_sw_cleanup(r, s);
+		return EINA_FALSE;
+	}
+
+	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
+	if (!sw_data)
+	{
+		sw_data = calloc(1, sizeof(Enesim_Renderer_Sw_Data));
+		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
+	}
+	sw_data->fill = fill;
+	return EINA_TRUE;
 }
 
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)

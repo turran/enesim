@@ -39,6 +39,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	Enesim_Buffer_OpenGL_Data *data;
 
 	data = malloc(sizeof(Enesim_Buffer_OpenGL_Data));
+	*backend = ENESIM_BACKEND_OPENGL;
 	*backend_data = data;
 	switch (fmt)
 	{
@@ -85,6 +86,7 @@ static Eina_Bool _data_from(void *prv,
 
 	data = malloc(sizeof(Enesim_Buffer_OpenGL_Data));
 	glGenTextures(1, &data->texture);
+	*backend = ENESIM_BACKEND_OPENGL;
 	*backend_data = data;
 	switch (fmt)
 	{

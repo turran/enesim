@@ -52,6 +52,9 @@ if HAVE_OPENCL
 pkgconfig_DATA += enesim_opencl.pc
 endif
 
+if HAVE_OPENGL
+pkgconfig_DATA += enesim_opengl.pc
+endif
 
 .PHONY: coverage benchmark
 

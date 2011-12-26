@@ -36,8 +36,8 @@ static Eina_Bool _data_alloc(void *prv,
 	void *alloc_data;
 	size_t bytes;
 
-	*backend = ENESIM_BACKEND_SOFTWARE;
 	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
+	*backend = ENESIM_BACKEND_SOFTWARE;
 	*backend_data = data;
 	bytes = enesim_buffer_format_size_get(fmt, w, h);
 	alloc_data = eina_mempool_malloc(thiz->mp, bytes);

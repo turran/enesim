@@ -132,6 +132,12 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 		break;
 
+		case ENESIM_BACKEND_OPENGL:
+#if BUILD_OPENGL
+		enesim_renderer_opengl_draw(r, s, area, x, y, flags);
+#endif
+		break;
+
 		default:
 		WRN("Backend not supported %d", b);
 		break;
@@ -538,23 +544,11 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
+		if (!enesim_renderer_sw_setup(r, &r->current, s, error))
 		{
-			Enesim_Renderer_Sw_Fill fill;
-
-			if (!enesim_renderer_sw_setup(r, &r->current, s, error))
-			{
-				ENESIM_RENDERER_ERROR(r, error, "Software setup failed");
-				ret = EINA_FALSE;
-				break;
-			}
-			fill = enesim_renderer_sw_fill_get(r);
-			if (!fill)
-			{
-				ENESIM_RENDERER_ERROR(r, error, "Even if the setup did not failed, there's no fill function");
-				enesim_renderer_sw_cleanup(r, s);
-				ret = EINA_FALSE;
-				break;
-			}
+			ENESIM_RENDERER_ERROR(r, error, "Software setup failed");
+			ret = EINA_FALSE;
+			break;
 		}
 		break;
 
@@ -563,6 +557,16 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		if (!enesim_renderer_opencl_setup(r, &r->current, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "OpenCL setup failed");
+			ret = EINA_FALSE;
+		}
+#endif
+		break;
+
+		case ENESIM_BACKEND_OPENGL:
+#if BUILD_OPENGL
+		if (!enesim_renderer_opengl_setup(r, &r->current, s, error))
+		{
+			ENESIM_RENDERER_ERROR(r, error, "OpenGL setup failed");
 			ret = EINA_FALSE;
 		}
 #endif
