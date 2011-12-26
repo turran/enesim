@@ -102,6 +102,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	/* create the geometry to render to */
 	/* FIXME for now */
+	glEnable(GL_BLEND);
 	glClearColor(0.0, 1.0, 0.0, 1.0);
 	glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
