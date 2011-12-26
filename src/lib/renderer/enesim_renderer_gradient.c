@@ -270,10 +270,12 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient *thiz;
-	Eina_List *tmp;
-	Stop *curr, *next;
+	Stop *curr, *next, *last;
 	Eina_F16p16 xx, inc;
+	Eina_List *tmp;
+	int start;
 	int end;
+	int i;
 	uint32_t *dst;
 
 	thiz = _gradient_get(r);
@@ -302,28 +304,28 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	/* get the length */
 	thiz->slen = thiz->descriptor->length(r);
 
-	/* TODO check that we have one at 0 and one at 1 */
 	curr = eina_list_data_get(thiz->stops);
 	tmp = eina_list_next(thiz->stops);
 	next = eina_list_data_get(tmp);
+	last = eina_list_data_get(eina_list_last(thiz->stops));
+	/* TODO check that next->pos - curr->pos != 0 */
 	/* Check that we dont divide by 0 */
 	inc = eina_f16p16_double_from(1.0 / ((next->pos - curr->pos) * thiz->slen));
 	xx = 0;
 
-	end = thiz->slen;
-	thiz->src = dst = malloc(sizeof(uint32_t) * thiz->slen);
+	start = curr->pos * thiz->slen;
+	end = last->pos * thiz->slen;
 
-	/* FIXME fix the blow code, as the first/last stops might not be at 0/1
-	 * so we need to handle that case. Also try to avoid writing to the memory
-	 * twice
-	 */
+	thiz->src = dst = alloca(sizeof(uint32_t) * thiz->slen);
 
-	memset(thiz->src, 0xff, thiz->slen);
+	/* in case we dont start at 0.0 */
+	for (i = 0; i < start; i++)
+		*dst++ = 0x00ffffff;
+
 	/* FIXME Im not sure if we increment xx by the 1 / ((next - curr) * len) value
 	 * as it might not be too accurate
 	 */
-
-	while (end--)
+	for (i = start; i < end; i++)
 	{
 		uint16_t off;
 		uint32_t p0;
@@ -342,6 +344,9 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		*dst++ = p0;
 		xx += inc;
 	}
+	/* in case we dont end at 1.0 */
+	for (i = end; i < thiz->slen; i++)
+		*dst++ = 0x00ffffff;
 
 	return EINA_TRUE;
 }
