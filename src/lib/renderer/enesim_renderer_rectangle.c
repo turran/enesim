@@ -59,7 +59,7 @@ typedef struct _Enesim_Renderer_Rectangle
 	int lxx0, rxx0;
 	int tyy0, byy0;
 	int rr0, irr0;
-	int sw;
+	double sw;
 	unsigned char do_inner :1;
 } Enesim_Renderer_Rectangle;
 
@@ -259,7 +259,8 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, int x, int y,
+/* stroke and/or fill with possibly a fill renderer */
+static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -271,9 +272,13 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 	int axx = thiz->matrix.xx;
 	int ayx = thiz->matrix.yx;
 	int do_inner = thiz->do_inner;
+	Enesim_Color color;
 	unsigned int ocolor;
 	unsigned int icolor;
-	int stw = thiz->sw;
+	int stww = (thiz->sw) * 65536;
+	int stw = stww >> 16;
+	int iww = ww0 - (2 * stww);
+	int ihh = hh0 - (2 * stww);
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
 	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
 	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
@@ -287,8 +292,15 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 
 	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
- 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
 
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -324,7 +336,7 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 	{
 		unsigned int q0 = 0;
 
-		if (xx < ww0 && yy < hh0 && xx >= -EINA_F16P16_ONE && yy >= -EINA_F16P16_ONE)
+		if (xx < ww0 && yy < hh0 && xx > -EINA_F16P16_ONE && yy > -EINA_F16P16_ONE)
 		{
 			int sx = xx >> 16;
 			int sy = yy >> 16;
@@ -338,6 +350,9 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 			int lxx = xx - lxx0, rxx = xx - rxx0;
 			int tyy = yy - tyy0, byy = yy - byy0;
 
+			int ixx = xx - stww, iyy = yy - stww;
+			int ix = ixx >> 16, iy = iyy >> 16;
+
 			if (fill_only && fpaint)
 			{
 				ocolor = *d;
@@ -345,15 +360,21 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 					ocolor = argb8888_mul4_sym(icolor, ocolor);
 			}
 
+			if ((ww0 - xx) < 65536)
+				ax = 256 - ((ww0 - xx) >> 8);
+			if ((hh0 - yy) < 65536)
+				ay = 256 - ((hh0 - yy) >> 8);
+
+
 			if ((sx > -1) && (sy > -1))
 				op0 = ocolor;
-			if ((sy > -1) && ((sx + 1) < sw))
+			if ((sy > -1) && ((xx + 65536) < ww0))
 				op1 = ocolor;
-			if ((sy + 1) < sh)
+			if ((yy + 65536) < hh0)
 			{
 				if (sx > -1)
 					op2 = ocolor;
-				if ((sx + 1) < sw)
+				if ((xx + 65536) < ww0)
 					op3 = ocolor;
 			}
 			{
@@ -379,12 +400,13 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 				op0 = argb8888_mul_256(ca, op0);
 
 			p0 = op0;
-			if (do_inner && ((((unsigned) (sx - stw + 1)) < (sw - (2 * stw) + 1))
-				 && (((unsigned) (sy - stw + 1)) < (sh - (2 * stw) + 1))))
+
+			if ( do_inner && (ixx > -65536) && (iyy > -65536) &&
+				(ixx < iww) && (iyy < ihh) )
 			{
 				unsigned int p3 = p0, p2 = p0, p1 = p0;
-				unsigned int color = icolor;
 
+				color = icolor;
 				if (fpaint)
 				{
 					color = *d;
@@ -393,15 +415,22 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 				}
 
 				ca = 256;
-				if ((sx > (stw - 1)) & (sy > (stw - 1)))
+				ax = 1 + ((ixx & 0xffff) >> 8);
+				ay = 1 + ((iyy & 0xffff) >> 8);
+				if ((iww - ixx) < 65536)
+					ax = 256 - ((iww - ixx) >> 8);
+				if ((ihh - iyy) < 65536)
+					ay = 256 - ((ihh - iyy) >> 8);
+
+				if ((ix > -1) & (iy > -1))
 					p0 = color;
-				if ((sy > (stw - 1)) & ((sx + 1 + stw) < sw))
+				if ((iy > -1) && ((ixx + 65536) < iww))
 					p1 = color;
-				if ((sy + 1 + stw) < sh)
+				if ((iyy + 65536) < ihh)
 				{
-					if (sx > (stw - 1))
+					if (ix > -1)
 						p2 = color;
-					if ((sx + 1 + stw) < sw)
+					if ((ixx + 65536) < iww)
 						p3 = color;
 				}
 				{
@@ -434,22 +463,382 @@ static void _span_rounded_color_stroked_paint_filled_affine(Enesim_Renderer *r, 
 	}
 }
 
-static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, int x, int y,
+/* stroke with a renderer and possibly fill with color */
+static void _rounded_stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Color ocolor;
-	Enesim_Color icolor;
 	Eina_F16p16 ww0 = thiz->ww;
 	Eina_F16p16 hh0 = thiz->hh;
 	Eina_F16p16 xx0 = thiz->xx;
 	Eina_F16p16 yy0 = thiz->yy;
 	int axx = thiz->matrix.xx;
 	int ayx = thiz->matrix.yx;
+	int do_inner = thiz->do_inner;
+	Enesim_Color color;
+	unsigned int ocolor;
+	unsigned int icolor;
+	int stww = (thiz->sw) * 65536;
+	int stw = stww >> 16;
+	int iww = ww0 - (2 * stww);
+	int ihh = hh0 - (2 * stww);
+	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
+	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
+	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
+	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
+	Enesim_Renderer *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	int xx, yy;
+	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, dst);
+
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		icolor = 0;
+
+        enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	xx = eina_f16p16_sub(xx, xx0);
+	yy = eina_f16p16_sub(yy, yy0);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if (xx < ww0 && yy < hh0 && xx > -EINA_F16P16_ONE && yy > -EINA_F16P16_ONE)
+		{
+			int sx = xx >> 16;
+			int sy = yy >> 16;
+			int sw = ww0 >> 16;
+			int sh = hh0 >> 16;
+			int ca = 256;
+			unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
+			int ax = 1 + ((xx & 0xffff) >> 8);
+			int ay = 1 + ((yy & 0xffff) >> 8);
+
+			int lxx = xx - lxx0, rxx = xx - rxx0;
+			int tyy = yy - tyy0, byy = yy - byy0;
+
+			int ixx = xx - stww, iyy = yy - stww;
+			int ix = ixx >> 16, iy = iyy >> 16;
+
+			color = *d;
+			if (ocolor != 0xffffffff)
+				color = argb8888_mul4_sym(ocolor, color);
+
+			if ((ww0 - xx) < 65536)
+				ax = 256 - ((ww0 - xx) >> 8);
+			if ((hh0 - yy) < 65536)
+				ay = 256 - ((hh0 - yy) >> 8);
+
+
+			if ((sx > -1) && (sy > -1))
+				op0 = color;
+			if ((sy > -1) && ((xx + 65536) < ww0))
+				op1 = color;
+			if ((yy + 65536) < hh0)
+			{
+				if (sx > -1)
+					op2 = color;
+				if ((xx + 65536) < ww0)
+					op3 = color;
+			}
+			{
+				uint32_t cout[4] = { op0, op1, op2, op3 };
+				_outer_corners(sx, sy, sw, sh, ax, ay, tl, tr, br, bl,
+						lxx, rxx, tyy, byy, rr0, rr1, cout, &ca);
+
+
+				op0 = cout[0];
+				op1 = cout[1];
+				op2 = cout[2];
+				op3 = cout[3];
+			}
+
+			if (op0 != op1)
+				op0 = argb8888_interp_256(ax, op1, op0);
+			if (op2 != op3)
+				op2 = argb8888_interp_256(ax, op3, op2);
+			if (op0 != op2)
+				op0 = argb8888_interp_256(ay, op2, op0);
+
+			if (ca < 256)
+				op0 = argb8888_mul_256(ca, op0);
+
+			p0 = op0;
+
+			if ( do_inner && (ixx > -65536) && (iyy > -65536) &&
+				(ixx < iww) && (iyy < ihh) )
+			{
+				unsigned int p3 = p0, p2 = p0, p1 = p0;
+
+				color = icolor;
+				ca = 256;
+				ax = 1 + ((ixx & 0xffff) >> 8);
+				ay = 1 + ((iyy & 0xffff) >> 8);
+				if ((iww - ixx) < 65536)
+					ax = 256 - ((iww - ixx) >> 8);
+				if ((ihh - iyy) < 65536)
+					ay = 256 - ((ihh - iyy) >> 8);
+
+				if ((ix > -1) & (iy > -1))
+					p0 = color;
+				if ((iy > -1) && ((ixx + 65536) < iww))
+					p1 = color;
+				if ((iyy + 65536) < ihh)
+				{
+					if (ix > -1)
+						p2 = color;
+					if ((ixx + 65536) < iww)
+						p3 = color;
+				}
+				{
+					uint32_t cout[4] = { p0, p1, p2, p3 };
+					_inner_corners(sx, sy, sw, sh, stw, ax, ay, tl, tr, br, bl,
+							lxx, rxx, tyy, byy, irr0, irr1, cout, &ca);
+
+
+					p0 = cout[0];
+					p1 = cout[1];
+					p2 = cout[2];
+					p3 = cout[3];
+				}
+
+				if (p0 != p1)
+					p0 = argb8888_interp_256(ax, p1, p0);
+				if (p2 != p3)
+					p2 = argb8888_interp_256(ax, p3, p2);
+				if (p0 != p2)
+					p0 = argb8888_interp_256(ay, p2, p0);
+
+				if (ca < 256)
+					p0 = argb8888_interp_256(ca, p0, op0);
+			}
+			q0 = p0;
+		}
+		*d++ = q0;
+		xx += axx;
+		yy += ayx;
+	}
+}
+
+/* stroke and fill with renderers */
+static void _rounded_stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Eina_F16p16 ww0 = thiz->ww;
+	Eina_F16p16 hh0 = thiz->hh;
+	Eina_F16p16 xx0 = thiz->xx;
+	Eina_F16p16 yy0 = thiz->yy;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	Enesim_Color color;
+	unsigned int ocolor;
+	unsigned int icolor;
+	int stww = (thiz->sw) * 65536;
+	int stw = stww >> 16;
+	int iww = ww0 - (2 * stww);
+	int ihh = hh0 - (2 * stww);
+	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
+	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
+	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
+	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	unsigned int *sbuf, *s;
+	int xx, yy;
+	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+        enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	xx = eina_f16p16_sub(xx, xx0);
+	yy = eina_f16p16_sub(yy, yy0);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if (xx < ww0 && yy < hh0 && xx > -EINA_F16P16_ONE && yy > -EINA_F16P16_ONE)
+		{
+			int sx = xx >> 16;
+			int sy = yy >> 16;
+			int sw = ww0 >> 16;
+			int sh = hh0 >> 16;
+			int ca = 256;
+			unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
+			int ax = 1 + ((xx & 0xffff) >> 8);
+			int ay = 1 + ((yy & 0xffff) >> 8);
+
+			int lxx = xx - lxx0, rxx = xx - rxx0;
+			int tyy = yy - tyy0, byy = yy - byy0;
+
+			int ixx = xx - stww, iyy = yy - stww;
+			int ix = ixx >> 16, iy = iyy >> 16;
+
+			color = *s;
+			if (ocolor != 0xffffffff)
+				color = argb8888_mul4_sym(ocolor, color);
+
+			if ((ww0 - xx) < 65536)
+				ax = 256 - ((ww0 - xx) >> 8);
+			if ((hh0 - yy) < 65536)
+				ay = 256 - ((hh0 - yy) >> 8);
+
+
+			if ((sx > -1) && (sy > -1))
+				op0 = color;
+			if ((sy > -1) && ((xx + 65536) < ww0))
+				op1 = color;
+			if ((yy + 65536) < hh0)
+			{
+				if (sx > -1)
+					op2 = color;
+				if ((xx + 65536) < ww0)
+					op3 = color;
+			}
+			{
+				uint32_t cout[4] = { op0, op1, op2, op3 };
+				_outer_corners(sx, sy, sw, sh, ax, ay, tl, tr, br, bl,
+						lxx, rxx, tyy, byy, rr0, rr1, cout, &ca);
+
+
+				op0 = cout[0];
+				op1 = cout[1];
+				op2 = cout[2];
+				op3 = cout[3];
+			}
+
+			if (op0 != op1)
+				op0 = argb8888_interp_256(ax, op1, op0);
+			if (op2 != op3)
+				op2 = argb8888_interp_256(ax, op3, op2);
+			if (op0 != op2)
+				op0 = argb8888_interp_256(ay, op2, op0);
+
+			if (ca < 256)
+				op0 = argb8888_mul_256(ca, op0);
+
+			p0 = op0;
+
+			if ((ixx > -65536) && (iyy > -65536) &&
+				(ixx < iww) && (iyy < ihh))
+			{
+				unsigned int p3 = p0, p2 = p0, p1 = p0;
+
+				color = *d;
+				if (icolor != 0xffffffff)
+					color = argb8888_mul4_sym(icolor, color);
+				
+				ca = 256;
+				ax = 1 + ((ixx & 0xffff) >> 8);
+				ay = 1 + ((iyy & 0xffff) >> 8);
+				if ((iww - ixx) < 65536)
+					ax = 256 - ((iww - ixx) >> 8);
+				if ((ihh - iyy) < 65536)
+					ay = 256 - ((ihh - iyy) >> 8);
+
+				if ((ix > -1) & (iy > -1))
+					p0 = color;
+				if ((iy > -1) && ((ixx + 65536) < iww))
+					p1 = color;
+				if ((iyy + 65536) < ihh)
+				{
+					if (ix > -1)
+						p2 = color;
+					if ((ixx + 65536) < iww)
+						p3 = color;
+				}
+				{
+					uint32_t cout[4] = { p0, p1, p2, p3 };
+					_inner_corners(sx, sy, sw, sh, stw, ax, ay, tl, tr, br, bl,
+							lxx, rxx, tyy, byy, irr0, irr1, cout, &ca);
+
+
+					p0 = cout[0];
+					p1 = cout[1];
+					p2 = cout[2];
+					p3 = cout[3];
+				}
+
+				if (p0 != p1)
+					p0 = argb8888_interp_256(ax, p1, p0);
+				if (p2 != p3)
+					p2 = argb8888_interp_256(ax, p3, p2);
+				if (p0 != p2)
+					p0 = argb8888_interp_256(ay, p2, p0);
+
+				if (ca < 256)
+					p0 = argb8888_interp_256(ca, p0, op0);
+			}
+			q0 = p0;
+		}
+		*d++ = q0;
+		s++;
+		xx += axx;
+		yy += ayx;
+	}
+}
+
+/* stroke and/or fill with possibly a fill renderer */
+static void _rounded_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	Eina_F16p16 ww0 = thiz->ww;
+	Eina_F16p16 hh0 = thiz->hh;
+	Eina_F16p16 xx0 = thiz->xx;
+	Eina_F16p16 yy0 = thiz->yy;
+	int stww = (thiz->sw) * 65536;
+	int stw = stww >> 16;
+	int iww = ww0 - (2 * stww);
+	int ihh = hh0 - (2 * stww);
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
 	int azx = thiz->matrix.zx;
 	int do_inner = thiz->do_inner;
-	int stw = thiz->sw;
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
 	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
 	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
@@ -463,8 +852,15 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 
 	enesim_renderer_shape_stroke_color_get(r, &ocolor);
 	enesim_renderer_shape_fill_color_get(r, &icolor);
- 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
 
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -504,7 +900,7 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 			int sxx = (((long long int)xx) << 16) / zz;
 			int syy = (((long long int)yy) << 16) / zz;
 
-			if (xx < ww0 && yy < hh0 && xx >= -EINA_F16P16_ONE && yy >= -EINA_F16P16_ONE)
+			if (sxx < ww0 && syy < hh0 && sxx > -EINA_F16P16_ONE && syy > -EINA_F16P16_ONE)
 			{
 				int sx = sxx >> 16;
 				int sy = syy >> 16;
@@ -518,6 +914,9 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 				int lxx = sxx - lxx0, rxx = sxx - rxx0;
 				int tyy = syy - tyy0, byy = syy - byy0;
 
+				int ixx = sxx - stww, iyy = syy - stww;
+				int ix = ixx >> 16, iy = iyy >> 16;
+
 				if (fill_only && fpaint)
 				{
 					ocolor = *d;
@@ -525,15 +924,21 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 						ocolor = argb8888_mul4_sym(ocolor, icolor);
 				}
 
+
+				if ((ww0 - sxx) < 65536)
+					ax = 256 - ((ww0 - sxx) >> 8);
+				if ((hh0 - syy) < 65536)
+					ay = 256 - ((hh0 - syy) >> 8);
+
 				if ((sx > -1) && (sy > -1))
 					op0 = ocolor;
-				if ((sy > -1) && ((sx + 1) < sw))
+				if ((sy > -1) && ((sxx + 65536) < ww0))
 					op1 = ocolor;
-				if ((sy + 1) < sh)
+				if ((syy + 65536) < hh0)
 				{
 					if (sx > -1)
 						op2 = ocolor;
-					if ((sx + 1) < sw)
+					if ((sxx + 65536) < ww0)
 						op3 = ocolor;
 				}
 
@@ -560,12 +965,12 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 					op0 = argb8888_mul_256(ca, op0);
 
 				p0 = op0;
-				if (do_inner && ((((unsigned) (sx - stw + 1)) < (sw - (2 * stw) + 1))
-					 && (((unsigned) (sy - stw + 1)) < (sh - (2 * stw) + 1))))
+				if ( do_inner && (ixx > -65536) && (iyy > -65536) &&
+					(ixx < iww) && (iyy < ihh) )
 				{
 					unsigned int p3 = p0, p2 = p0, p1 = p0;
-					unsigned int color = icolor;
 
+					color = icolor;
 					if (fpaint)
 					{
 						color = *d;
@@ -574,15 +979,22 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 					}
 
 					ca = 256;
-					if ((sx > (stw - 1)) & (sy > (stw - 1)))
+					ax = 1 + ((ixx & 0xffff) >> 8);
+					ay = 1 + ((iyy & 0xffff) >> 8);
+					if ((iww - ixx) < 65536)
+						ax = 256 - ((iww - ixx) >> 8);
+					if ((ihh - iyy) < 65536)
+						ay = 256 - ((ihh - iyy) >> 8);
+
+					if ((ix > -1) & (iy > -1))
 						p0 = color;
-					if ((sy > (stw - 1)) & ((sx + 1 + stw) < sw))
+					if ((iy > -1) && ((ixx + 65536) < iww))
 						p1 = color;
-					if ((sy + 1 + stw) < sh)
+					if ((iyy + 65536) < ihh)
 					{
-						if (sx > (stw - 1))
+						if (ix > -1)
 							p2 = color;
-						if ((sx + 1 + stw) < sw)
+						if ((ixx + 65536) < iww)
 							p3 = color;
 					}
 
@@ -617,6 +1029,371 @@ static void _span_rounded_color_stroked_paint_filled_proj(Enesim_Renderer *r, in
 		zz += azx;
 	}
 }
+
+/* stroke with a renderer and possibly fill with color */
+static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	Eina_F16p16 ww0 = thiz->ww;
+	Eina_F16p16 hh0 = thiz->hh;
+	Eina_F16p16 xx0 = thiz->xx;
+	Eina_F16p16 yy0 = thiz->yy;
+	int stww = (thiz->sw) * 65536;
+	int stw = stww >> 16;
+	int iww = ww0 - (2 * stww);
+	int ihh = hh0 - (2 * stww);
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int azx = thiz->matrix.zx;
+	int do_inner = thiz->do_inner;
+	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
+	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
+	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
+	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
+	Enesim_Renderer *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	int xx, yy, zz;
+	int fill_only = 0;
+	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, dst);
+
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		icolor = 0;
+
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	xx = eina_f16p16_sub(xx, xx0);
+	yy = eina_f16p16_sub(yy, yy0);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if (zz)
+		{
+			int sxx = (((long long int)xx) << 16) / zz;
+			int syy = (((long long int)yy) << 16) / zz;
+
+			if (sxx < ww0 && syy < hh0 && sxx > -EINA_F16P16_ONE && syy > -EINA_F16P16_ONE)
+			{
+				int sx = sxx >> 16;
+				int sy = syy >> 16;
+				int sw = ww0 >> 16;
+				int sh = hh0 >> 16;
+				int ca = 256;
+				unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
+				int ax = 1 + ((sxx & 0xffff) >> 8);
+				int ay = 1 + ((syy & 0xffff) >> 8);
+
+				int lxx = sxx - lxx0, rxx = sxx - rxx0;
+				int tyy = syy - tyy0, byy = syy - byy0;
+
+				int ixx = sxx - stww, iyy = syy - stww;
+				int ix = ixx >> 16, iy = iyy >> 16;
+
+				color = *d;
+				if (ocolor != 0xffffffff)
+					color = argb8888_mul4_sym(ocolor, color);
+
+				if ((ww0 - sxx) < 65536)
+					ax = 256 - ((ww0 - sxx) >> 8);
+				if ((hh0 - syy) < 65536)
+					ay = 256 - ((hh0 - syy) >> 8);
+
+				if ((sx > -1) && (sy > -1))
+					op0 = ocolor;
+				if ((sy > -1) && ((sxx + 65536) < ww0))
+					op1 = ocolor;
+				if ((syy + 65536) < hh0)
+				{
+					if (sx > -1)
+						op2 = ocolor;
+					if ((sxx + 65536) < ww0)
+						op3 = ocolor;
+				}
+
+				{
+					uint32_t cout[4] = { op0, op1, op2, op3 };
+					_outer_corners(sx, sy, sw, sh, ax, ay, tl, tr, br, bl,
+							lxx, rxx, tyy, byy, rr0, rr1, cout, &ca);
+
+
+					op0 = cout[0];
+					op1 = cout[1];
+					op2 = cout[2];
+					op3 = cout[3];
+				}
+
+				if (op0 != op1)
+					op0 = argb8888_interp_256(ax, op1, op0);
+				if (op2 != op3)
+					op2 = argb8888_interp_256(ax, op3, op2);
+				if (op0 != op2)
+					op0 = argb8888_interp_256(ay, op2, op0);
+
+				if (ca < 256)
+					op0 = argb8888_mul_256(ca, op0);
+
+				p0 = op0;
+				if ( do_inner && (ixx > -65536) && (iyy > -65536) &&
+					(ixx < iww) && (iyy < ihh) )
+				{
+					unsigned int p3 = p0, p2 = p0, p1 = p0;
+
+					color = icolor;
+					ca = 256;
+					ax = 1 + ((ixx & 0xffff) >> 8);
+					ay = 1 + ((iyy & 0xffff) >> 8);
+					if ((iww - ixx) < 65536)
+						ax = 256 - ((iww - ixx) >> 8);
+					if ((ihh - iyy) < 65536)
+						ay = 256 - ((ihh - iyy) >> 8);
+
+					if ((ix > -1) & (iy > -1))
+						p0 = color;
+					if ((iy > -1) && ((ixx + 65536) < iww))
+						p1 = color;
+					if ((iyy + 65536) < ihh)
+					{
+						if (ix > -1)
+							p2 = color;
+						if ((ixx + 65536) < iww)
+							p3 = color;
+					}
+
+					{
+						uint32_t cout[4] = { p0, p1, p2, p3 };
+						_inner_corners(sx, sy, sw, sh, stw, ax, ay, tl, tr, br, bl,
+								lxx, rxx, tyy, byy, irr0, irr1, cout, &ca);
+
+
+						p0 = cout[0];
+						p1 = cout[1];
+						p2 = cout[2];
+						p3 = cout[3];
+					}
+
+					if (p0 != p1)
+						p0 = argb8888_interp_256(ax, p1, p0);
+					if (p2 != p3)
+						p2 = argb8888_interp_256(ax, p3, p2);
+					if (p0 != p2)
+						p0 = argb8888_interp_256(ay, p2, p0);
+
+					if (ca < 256)
+						p0 = argb8888_interp_256(ca, p0, op0);
+				}
+				q0 = p0;
+			}
+		}
+		*d++ = q0;
+		xx += axx;
+		yy += ayx;
+		zz += azx;
+	}
+}
+
+/* stroke and fill with renderers */
+static void _rounded_stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	Eina_F16p16 ww0 = thiz->ww;
+	Eina_F16p16 hh0 = thiz->hh;
+	Eina_F16p16 xx0 = thiz->xx;
+	Eina_F16p16 yy0 = thiz->yy;
+	int stww = (thiz->sw) * 65536;
+	int stw = stww >> 16;
+	int iww = ww0 - (2 * stww);
+	int ihh = hh0 - (2 * stww);
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int azx = thiz->matrix.zx;
+	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
+	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
+	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
+	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	unsigned int *sbuf, *s;
+	int xx, yy, zz;
+	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	xx = eina_f16p16_sub(xx, xx0);
+	yy = eina_f16p16_sub(yy, yy0);
+
+	while (d < e)
+	{
+		unsigned int q0 = 0;
+
+		if (zz)
+		{
+			int sxx = (((long long int)xx) << 16) / zz;
+			int syy = (((long long int)yy) << 16) / zz;
+
+			if (sxx < ww0 && syy < hh0 && sxx > -EINA_F16P16_ONE && syy > -EINA_F16P16_ONE)
+			{
+				int sx = sxx >> 16;
+				int sy = syy >> 16;
+				int sw = ww0 >> 16;
+				int sh = hh0 >> 16;
+				int ca = 256;
+				unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
+				int ax = 1 + ((sxx & 0xffff) >> 8);
+				int ay = 1 + ((syy & 0xffff) >> 8);
+
+				int lxx = sxx - lxx0, rxx = sxx - rxx0;
+				int tyy = syy - tyy0, byy = syy - byy0;
+
+				int ixx = sxx - stww, iyy = syy - stww;
+				int ix = ixx >> 16, iy = iyy >> 16;
+
+				color = *s;
+				if (ocolor != 0xffffffff)
+					color = argb8888_mul4_sym(ocolor, color);
+
+				if ((ww0 - sxx) < 65536)
+					ax = 256 - ((ww0 - sxx) >> 8);
+				if ((hh0 - syy) < 65536)
+					ay = 256 - ((hh0 - syy) >> 8);
+
+				if ((sx > -1) && (sy > -1))
+					op0 = color;
+				if ((sy > -1) && ((sxx + 65536) < ww0))
+					op1 = color;
+				if ((syy + 65536) < hh0)
+				{
+					if (sx > -1)
+						op2 = color;
+					if ((sxx + 65536) < ww0)
+						op3 = color;
+				}
+
+				{
+					uint32_t cout[4] = { op0, op1, op2, op3 };
+					_outer_corners(sx, sy, sw, sh, ax, ay, tl, tr, br, bl,
+							lxx, rxx, tyy, byy, rr0, rr1, cout, &ca);
+
+
+					op0 = cout[0];
+					op1 = cout[1];
+					op2 = cout[2];
+					op3 = cout[3];
+				}
+
+				if (op0 != op1)
+					op0 = argb8888_interp_256(ax, op1, op0);
+				if (op2 != op3)
+					op2 = argb8888_interp_256(ax, op3, op2);
+				if (op0 != op2)
+					op0 = argb8888_interp_256(ay, op2, op0);
+
+				if (ca < 256)
+					op0 = argb8888_mul_256(ca, op0);
+
+				p0 = op0;
+				if ((ixx > -65536) && (iyy > -65536) &&
+					(ixx < iww) && (iyy < ihh))
+				{
+					unsigned int p3 = p0, p2 = p0, p1 = p0;
+
+					color = *d;
+					if (icolor != 0xffffffff)
+						color = argb8888_mul4_sym(icolor, color);
+
+					ca = 256;
+					ax = 1 + ((ixx & 0xffff) >> 8);
+					ay = 1 + ((iyy & 0xffff) >> 8);
+					if ((iww - ixx) < 65536)
+						ax = 256 - ((iww - ixx) >> 8);
+					if ((ihh - iyy) < 65536)
+						ay = 256 - ((ihh - iyy) >> 8);
+
+					if ((ix > -1) & (iy > -1))
+						p0 = color;
+					if ((iy > -1) && ((ixx + 65536) < iww))
+						p1 = color;
+					if ((iyy + 65536) < ihh)
+					{
+						if (ix > -1)
+							p2 = color;
+						if ((ixx + 65536) < iww)
+							p3 = color;
+					}
+
+					{
+						uint32_t cout[4] = { p0, p1, p2, p3 };
+						_inner_corners(sx, sy, sw, sh, stw, ax, ay, tl, tr, br, bl,
+								lxx, rxx, tyy, byy, irr0, irr1, cout, &ca);
+
+
+						p0 = cout[0];
+						p1 = cout[1];
+						p2 = cout[2];
+						p3 = cout[3];
+					}
+
+					if (p0 != p1)
+						p0 = argb8888_interp_256(ax, p1, p0);
+					if (p2 != p3)
+						p2 = argb8888_interp_256(ax, p3, p2);
+					if (p0 != p2)
+						p0 = argb8888_interp_256(ay, p2, p0);
+
+					if (ca < 256)
+						p0 = argb8888_interp_256(ca, p0, op0);
+				}
+				q0 = p0;
+			}
+		}
+		*d++ = q0;
+		s++;
+		xx += axx;
+		yy += ayx;
+		zz += azx;
+	}
+}
+
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -631,6 +1408,8 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Rectangle *thiz;
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *spaint;
 	double rad;
 	double sw;
 	double scaled_width;
@@ -695,9 +1474,39 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
 			&thiz->matrix);
-	*fill = _span_rounded_color_stroked_paint_filled_proj;
-	if (state->transformation_type == ENESIM_MATRIX_AFFINE || state->transformation_type == ENESIM_MATRIX_IDENTITY)
-		*fill = _span_rounded_color_stroked_paint_filled_affine;
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+
+	if (state->transformation_type == ENESIM_MATRIX_AFFINE ||
+		 state->transformation_type == ENESIM_MATRIX_IDENTITY)
+	{
+		*fill = _rounded_stroke_fill_paint_affine;
+		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		{
+			Enesim_Renderer *fpaint;
+
+			*fill = _rounded_stroke_paint_fill_affine;
+			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			if (fpaint && thiz->do_inner &&
+					(draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				*fill = _rounded_stroke_paint_fill_paint_affine;
+		}
+	}
+	else
+	{
+		*fill = _rounded_stroke_fill_paint_proj;
+		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		{
+			Enesim_Renderer *fpaint;
+
+			*fill = _rounded_stroke_paint_fill_proj;
+			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			if (fpaint && thiz->do_inner &&
+					(draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				*fill = _rounded_stroke_paint_fill_paint_proj;
+		}
+	}
+
 
 	return EINA_TRUE;
 }
