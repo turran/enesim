@@ -30,8 +30,6 @@
         printf("Error %d\n", err); \
         }
 
-
-
 static void _opengl_extensions_setup(void)
 {
 	char *extensions;
@@ -56,7 +54,12 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
+	Eina_Bool ret;
 	GLenum status;
+	GLenum shader;
+	const char *source = NULL;
+	const char *source_name = NULL;
+	size_t source_size = 0;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -64,6 +67,26 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	{
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
+	}
+	if (!r->descriptor.opengl_setup) return EINA_FALSE;
+	ret = r->descriptor.opengl_setup(r, state, s, &source_name, &source, &source_size, error);
+	if (!ret) return EINA_FALSE;
+	/* setup the shaders */
+	shader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	glShaderSourceARB(shader, 1, &source, &source_size);
+	/* compile it */
+	glCompileShaderARB(shader);
+	if (!rdata->program)
+	{
+		rdata->program = glCreateProgramObjectARB();
+	}
+	/* attach the shader to the program */
+	glAttachObjectARB(rdata->program, shader);
+	/* link it */ 
+	glLinkProgramARB(rdata->program);
+ 
+	if (!rdata->fbo)
+	{
 		glGenFramebuffersEXT(1, &rdata->fbo);
 	}
 	/* attach the texture to the first color attachment */
@@ -77,8 +100,15 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
                 printf("fb error %d\n", status);
         }
 
+#if 0
+	// Use The Program Object Instead Of Fixed Function OpenGL
+	glUseProgramObjectARB(my_program);
+
 	/* TODO get the shader from the renderer implementation */
-	/* compile it */
+	glUseProgramObjectARB(my_program);
+	int my_vec3_location = glGetUniformLocationARB(my_program, "my_3d_vector");
+	glUniform3fARB(my_vec3_location, 1.0f, 4.0f, 3.0f);
+#endif
 
 	return EINA_TRUE;
 }

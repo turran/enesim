@@ -67,6 +67,8 @@ void enesim_renderer_opencl_shutdown(void);
 typedef struct _Enesim_Renderer_OpenGL_Data
 {
 	GLuint fbo;
+	GLenum shader;
+	GLenum program;
 } Enesim_Renderer_OpenGL_Data;
 
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,

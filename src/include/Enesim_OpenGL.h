@@ -18,6 +18,8 @@
 #ifndef ENESIM_OPENGL_H_
 #define ENESIM_OPENGL_H_
 
+#define ENESIM_OPENGL_SHADER(k) #k
+
 #include "Enesim.h"
 #include "GL/gl.h"
 

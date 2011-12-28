@@ -69,6 +69,7 @@ static void _data_free(void *prv, void *backend_data,
 }
 
 static Eina_Bool _data_get(void *prv, void *backend_data,
+		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h,
 		Enesim_Buffer_Sw_Data *dst)
 {

@@ -117,11 +117,11 @@ static void _data_free(void *prv, void *backend_data,
 }
 
 static Eina_Bool _data_get(void *prv, void *backend_data,
+		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h,
 		Enesim_Buffer_Sw_Data *dst)
 {
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
-#if 0
 	switch (fmt)
 	{
 		case ENESIM_CONVERTER_ARGB8888:
@@ -129,8 +129,8 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 		glBindTexture(GL_TEXTURE_2D, data->texture);
         	glPixelStorei(GL_PACK_ALIGNMENT, 4);
 	        glPixelStorei(GL_PACK_ROW_LENGTH, w);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, src->argb8888.plane0);
-		src->argb8888.plane0_stride = w * 4;
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, dst->argb8888.plane0);
+		dst->argb8888.plane0_stride = w * 4;
 		break;
 
 		case ENESIM_CONVERTER_RGB565:
@@ -141,7 +141,7 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 		return EINA_FALSE;
 		break;
 	}
-#endif
+
 	return EINA_FALSE;
 }
 

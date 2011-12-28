@@ -144,6 +144,7 @@ end:
 }
 
 static Eina_Bool _data_get(void *prv, void *backend_data,
+		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h,
 		Enesim_Buffer_Sw_Data *dst)
 {
@@ -203,6 +204,7 @@ Eina_Bool enesim_pool_data_from(Enesim_Pool *p, Enesim_Backend *backend, void **
 }
 
 Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
+		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h,
 		Enesim_Buffer_Sw_Data *dst)
 {
@@ -214,7 +216,7 @@ Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
 		return EINA_FALSE;
 	}
 
-	return p->descriptor->data_get(p->data, data, w, h, dst);
+	return p->descriptor->data_get(p->data, data, fmt, w, h, dst);
 }
 
 void enesim_pool_data_free(Enesim_Pool *p, void *data,
