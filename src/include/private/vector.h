@@ -34,6 +34,7 @@ typedef struct _Enesim_Line
 typedef struct _Enesim_Polygon
 {
 	Eina_List *points;
+	Eina_Bool closed : 1;
 } Enesim_Polygon;
 
 typedef struct _Enesim_F16p16_Point

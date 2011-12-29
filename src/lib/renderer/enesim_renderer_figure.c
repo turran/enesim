@@ -78,6 +78,7 @@ struct _Enesim_Renderer_Figure_Contour
 {
 	Polygon_Vertex *vertices, *last;
 	int nverts;
+	Eina_Bool closed : 1;
 
 	Enesim_Renderer_Figure_Contour *next;
 };
@@ -97,6 +98,7 @@ typedef struct _Enesim_Renderer_Figure
 
 	Enesim_F16p16_Matrix matrix;
 	unsigned char changed :1;
+	int draw_mode; // a temp workaround for dealing with 'closed'
 } Enesim_Renderer_Figure;
 
 static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
@@ -648,28 +650,33 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
+	Enesim_Shape_Draw_Mode draw_mode;
 
 	thiz = _figure_get(r);
-	if (!thiz)
+	if (!thiz || !thiz->polys)
 	{
 		return EINA_FALSE;
 	}
-	if (!thiz->polys)
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	if (draw_mode != thiz->draw_mode) // for 'close', not optimal but for now..
 	{
-		return EINA_FALSE;
+		thiz->changed = 1;
+		thiz->draw_mode = draw_mode;
 	}
-
 	if (thiz->changed)
 	{
 		Enesim_Renderer_Figure_Contour *poly;
 		int nvectors = 0;
 		Enesim_Renderer_Figure_Vector *vec;
+		int pclosed;
 
 		free(thiz->vectors);
 		poly = thiz->polys;
 		while (poly)
 		{
-			if (!poly->vertices || (poly->nverts < 3))
+			pclosed = 0;
+			if (!poly->vertices || (poly->nverts < 2) ||
+				 ((poly->nverts < 3) && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE)))
 			{
 				WRN("Not enough vertices %d", poly->nverts);
 				return EINA_FALSE;
@@ -677,6 +684,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 			nvectors += poly->nverts;
 			if ((poly->last->v.x == poly->vertices->v.x) &&
 					(poly->last->v.y == poly->vertices->v.y))
+			{ nvectors--; pclosed = 1; }
+			if (!poly->closed && (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) && !pclosed)
 				nvectors--;
 			poly = poly->next;
 		}
@@ -701,15 +710,21 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 			double x01, y01;
 			double len;
 			int n = 0, nverts = poly->nverts;
+			int sopen = !poly->closed;
 
+			pclosed = 0;
+			if (sopen && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE))
+				sopen = 0;
 			if ((poly->last->v.x == poly->vertices->v.x) &&
 					(poly->last->v.y == poly->vertices->v.y))
+			{ nverts--;  pclosed = 1; }
+			if (sopen && !pclosed)
 				nverts--;
 			v = poly->vertices;
 			while (n < nverts)
 			{
 				nv = v->next;
-				if (n == (poly->nverts - 1))
+				if ( (n == (poly->nverts - 1)) && !sopen )
 					nv = poly->vertices;
 				x0 = v->v.x;
 				y0 = v->v.y;
@@ -895,6 +910,27 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 	poly->last = vertex;
 	poly->nverts++;
 	thiz->changed = 1;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r, Eina_Bool close)
+{
+	Enesim_Renderer_Figure *thiz;
+	Enesim_Renderer_Figure_Contour *poly;
+
+	thiz = _figure_get(r);
+
+	if (!thiz || !thiz->polys)
+		return;
+	poly = thiz->last;
+	if (poly->closed != close)
+	{
+		poly->closed = close;
+		thiz->changed = 1;
+	}
 }
 /**
  * To be documented
