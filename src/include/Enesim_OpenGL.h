@@ -25,5 +25,13 @@
 
 EAPI Enesim_Pool * enesim_pool_opengl_new(void);
 
+#ifdef ENESIM_EXTENSION
+typedef struct _Enesim_Buffer_OpenGL_Data
+{
+	GLuint texture;
+	unsigned int num_textures;
+} Enesim_Buffer_OpenGL_Data;
+#endif
+
 #endif
 

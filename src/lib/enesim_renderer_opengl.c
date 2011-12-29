@@ -68,6 +68,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
 	}
+#if 0
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
 	ret = r->descriptor.opengl_setup(r, state, s, &source_name, &source, &source_size, error);
 	if (!ret) return EINA_FALSE;
@@ -84,6 +85,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	glAttachObjectARB(rdata->program, shader);
 	/* link it */ 
 	glLinkProgramARB(rdata->program);
+#endif
  
 	if (!rdata->fbo)
 	{
@@ -129,11 +131,12 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
+	printf("rendering\n");
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	/* create the geometry to render to */
 	/* FIXME for now */
 	glEnable(GL_BLEND);
-	glClearColor(0.0, 1.0, 0.0, 1.0);
 	glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
                 glVertex2d(area->x, area->y);
