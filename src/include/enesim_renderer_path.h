@@ -93,6 +93,11 @@ typedef struct _Enesim_Renderer_Command_Arc_To
 	Eina_Bool sweep;
 } Enesim_Renderer_Command_Arc_To;
 
+typedef struct _Enesim_Renderer_Command_Close
+{
+	Eina_Bool close;
+} Enesim_Renderer_Command_Close;
+
 typedef struct _Enesim_Renderer_Path_Command
 {
 	Enesim_Renderer_Path_Command_Type type;
@@ -104,6 +109,7 @@ typedef struct _Enesim_Renderer_Path_Command
 		Enesim_Renderer_Command_Scubic_To scubic_to;
 		Enesim_Renderer_Command_Cubic_To cubic_to;
 		Enesim_Renderer_Command_Arc_To arc_to;
+		Enesim_Renderer_Command_Close close;
 	} definition;
 } Enesim_Renderer_Path_Command;
 

@@ -58,11 +58,13 @@
 
 typedef void (*Enesim_Renderer_Path_Vertex_Add)(double x, double y, void *data);
 typedef void (*Enesim_Renderer_Path_Polygon_Add)(void *data);
+typedef void (*Enesim_Renderer_Path_Polygon_Close)(Eina_Bool close, void *data);
 
 typedef struct _Enesim_Renderer_Command_State
 {
 	Enesim_Renderer_Path_Vertex_Add vertex_add;
 	Enesim_Renderer_Path_Polygon_Add polygon_add;
+	Enesim_Renderer_Path_Polygon_Close polygon_close;
 	double last_x;
 	double last_y;
 	double last_ctrl_x;
@@ -79,7 +81,6 @@ typedef struct _Enesim_Renderer_Path
 	Eina_List *polygons;
 
 	Enesim_Renderer_Sw_Fill fill;
-	Enesim_Renderer *line;
 	Enesim_Renderer *figure; /* FOR NOW */
 	Enesim_Renderer *final_r;
 	Eina_Bool changed : 1;
@@ -120,9 +121,15 @@ static void _enesim_path_polygon_add(void *data)
 	thiz->polygons = eina_list_append(thiz->polygons, p);
 }
 
-static void _enesim_path_polygon_close(void *data)
+static void _enesim_path_polygon_close(Eina_Bool close, void *data)
 {
+	Enesim_Renderer_Path *thiz = data;
+	Enesim_Polygon *p;
+	Eina_List *last;
 
+	last = eina_list_last(thiz->polygons);
+	p = eina_list_data_get(last);
+	p->closed = close;
 }
 /*----------------------------------------------------------------------------*
  *                                 Commands                                   *
@@ -459,14 +466,15 @@ static void _enesim_arc_to(Enesim_Renderer_Command_State *state, double rx, doub
 	}
 }
 
-static void _enesim_close(Enesim_Renderer_Command_State *state)
+static void _enesim_close(Enesim_Renderer_Command_State *state, Eina_Bool close)
 {
-
+	state->polygon_close(close, state->data);
 }
 
 static void _enesim_path_generate_vertices(Eina_List *commands,
 		Enesim_Renderer_Path_Vertex_Add vertex_add,
 		Enesim_Renderer_Path_Polygon_Add polygon_add,
+		Enesim_Renderer_Path_Polygon_Close polygon_close,
 		void *data)
 {
 	Eina_List *l;
@@ -475,6 +483,7 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 
 	state.vertex_add = vertex_add;
 	state.polygon_add = polygon_add;
+	state.polygon_close = polygon_close;
 	state.last_x = 0;
 	state.last_y = 0;
 	state.last_ctrl_x = 0;
@@ -533,7 +542,7 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			break;
 
 			case ENESIM_COMMAND_CLOSE:
-			_enesim_close(&state);
+			_enesim_close(&state, cmd->definition.close.close);
 			break;
 
 			default:
@@ -565,8 +574,6 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer *final_r = NULL;
 	Enesim_Rasterizer *rz;
-	int npols;
-	int fverts;
 
 	Enesim_Color stroke_color;
 	Enesim_Renderer *stroke_renderer;
@@ -577,7 +584,7 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 
 	thiz = _enesim_path_get(r);
 
-	/* TODO in the future the generation of polygons might depend also on the matrix used */
+	/* TODO in the future the generation of polygons might depend also on the geometric matrix used */
 	/* generate the list of points/polygons */
 	if (thiz->changed)
 	{
@@ -591,41 +598,7 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 			free(p);
 		}
 	}
-	_enesim_path_generate_vertices(thiz->commands, _enesim_path_vertex_add, _enesim_path_polygon_add, thiz);
-	/* check for the simplest case, a line (1 polygon, 2 points) */
-	npols = eina_list_count(thiz->polygons);
-	fverts = 0;
-	if (npols)
-	{
-		Enesim_Polygon *p;
-
-		p = eina_list_data_get(thiz->polygons);
-		fverts = eina_list_count(p->points);
-	}
-	/* use the line renderer */
-	if (npols == 1 && fverts < 3)
-	{
-		Enesim_Polygon *poly;
-		Enesim_Point *p;
-		Enesim_Point pts[2] = {{0, 0}, {0, 0}};
-		Enesim_Point *pt = pts;
-		Eina_List *l;
-
-		final_r = thiz->line;
-		/* set the two coordinates */
-		poly = eina_list_data_get(thiz->polygons);
-		EINA_LIST_FOREACH(poly->points, l, p)
-		{
-			*pt = *p;
-			pt++;
-		}
-		enesim_renderer_line_x0_set(final_r, pts[0].x);
-		enesim_renderer_line_y0_set(final_r, pts[0].y);
-		enesim_renderer_line_x1_set(final_r, pts[1].x);
-		enesim_renderer_line_y1_set(final_r, pts[1].y);
-	}
-	/* FIXME for now we use the figure renderer */
-	else
+	_enesim_path_generate_vertices(thiz->commands, _enesim_path_vertex_add, _enesim_path_polygon_add, _enesim_path_polygon_close, thiz);
 	{
 		Enesim_Polygon *p;
 		Eina_List *l1;
@@ -643,6 +616,7 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 			{
 				enesim_renderer_figure_polygon_vertex_add(final_r, pt->x, pt->y);
 			}
+			enesim_renderer_figure_polygon_close(final_r, p->closed);
 		}
 	}
 
@@ -752,9 +726,6 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Path));
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_PATH_MAGIC);
-
-	r = enesim_renderer_line_new();
-	thiz->line = r;
 
 	r = enesim_renderer_figure_new();
 	if (!r) goto err_figure;
@@ -926,5 +897,6 @@ EAPI void enesim_renderer_path_close(Enesim_Renderer *r, Eina_Bool close)
 	Enesim_Renderer_Path_Command cmd;
 
 	cmd.type = ENESIM_COMMAND_CLOSE;
+	cmd.definition.close.close = close;
 	enesim_renderer_path_command_add(r, &cmd);
 }
