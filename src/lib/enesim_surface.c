@@ -60,11 +60,6 @@ static inline Eina_Bool _buffer_format_to_format(Enesim_Buffer_Format buf_fmt,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/* FIXME export this */
-void * enesim_surface_backend_data_get(Enesim_Surface *s)
-{
-	return enesim_buffer_backend_data_get(s->buffer);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -273,4 +268,12 @@ EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	return s->user;
+}
+
+/**
+ *
+ */
+EAPI void * enesim_surface_backend_data_get(Enesim_Surface *s)
+{
+	return enesim_buffer_backend_data_get(s->buffer);
 }

@@ -111,6 +111,12 @@ EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_D
 
 EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
 
+
+#ifdef ENESIM_EXTENSION
+EAPI void * enesim_buffer_backend_data_get(Enesim_Buffer *b);
+#endif
+
+
 /** @} */ //End of Enesim_Buffer_Group
 
 

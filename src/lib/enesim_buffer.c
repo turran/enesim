@@ -23,10 +23,6 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
-{
-	return b->backend_data;
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -297,3 +293,13 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt)
 		return 0;
 	}
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
+{
+	return b->backend_data;
+}
+
