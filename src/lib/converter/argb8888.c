@@ -72,12 +72,12 @@ void enesim_converter_argb8888_init(void)
 {
 	enesim_converter_surface_register(
 			ENESIM_CONVERTER_2D(_2d_argb8888_none_argb8888),
-			ENESIM_CONVERTER_ARGB8888,
+			ENESIM_BUFFER_FORMAT_ARGB8888,
 			ENESIM_ANGLE_0,
 			ENESIM_FORMAT_ARGB8888);
 	enesim_converter_span_register(
 			ENESIM_CONVERTER_1D(_1d_argb8888_none_argb8888),
-			ENESIM_CONVERTER_ARGB8888,
+			ENESIM_BUFFER_FORMAT_ARGB8888,
 			ENESIM_ANGLE_0,
 			ENESIM_FORMAT_ARGB8888);
 }

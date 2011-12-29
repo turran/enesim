@@ -28,11 +28,11 @@ static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 		case ENESIM_FORMAT_ARGB8888:
 		case ENESIM_FORMAT_ARGB8888_SPARSE:
 		case ENESIM_FORMAT_XRGB8888:
-		*buf_fmt = ENESIM_CONVERTER_ARGB8888_PRE;
+		*buf_fmt = ENESIM_BUFFER_FORMAT_ARGB8888_PRE;
 		return EINA_TRUE;
 
 		case ENESIM_FORMAT_A8:
-		*buf_fmt = ENESIM_CONVERTER_A8;
+		*buf_fmt = ENESIM_BUFFER_FORMAT_A8;
 		return EINA_TRUE;
 
 		default:
@@ -44,11 +44,11 @@ static inline Eina_Bool _buffer_format_to_format(Enesim_Buffer_Format buf_fmt,
 {
 	switch (buf_fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		*fmt = ENESIM_FORMAT_ARGB8888;
 		return EINA_TRUE;
 
-		case ENESIM_CONVERTER_A8:
+		case ENESIM_BUFFER_FORMAT_A8:
 		*fmt = ENESIM_FORMAT_A8;
 		return EINA_TRUE;
 

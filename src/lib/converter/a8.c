@@ -24,7 +24,7 @@ void enesim_converter_a8_init(void)
 {
 	enesim_converter_span_register(
 			ENESIM_CONVERTER_1D(_1d_a8_none_argb8888),
-			ENESIM_CONVERTER_A8,
+			ENESIM_BUFFER_FORMAT_A8,
 			ENESIM_ANGLE_0,
 			ENESIM_FORMAT_ARGB8888);
 }

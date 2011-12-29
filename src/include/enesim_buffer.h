@@ -27,14 +27,14 @@
 typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
 
 /*
- * ENESIM_CONVERTER_FORMAT_A8
+ * ENESIM_BUFFER_FORMAT_A8
  * +---------------+----------------+
  * |     Alpha     |      Alpha     |
  * +---------------+----------------+
  *         8                8
  * <------P0------>.<------P1------>.
  *
- * ENESIM_CONVERTER_FORMAT_b1A3
+ * ENESIM_BUFFER_FORMAT_b1A3
  * +-------+-------+--------+-------+
  * | Blink | Alpha |  Blink | Alpha |
  * +-------+-------+--------+-------+
@@ -44,14 +44,14 @@ typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
 
 typedef enum _Enesim_Buffer_Format
 {
-	ENESIM_CONVERTER_RGB565,
-	ENESIM_CONVERTER_ARGB8888,
-	ENESIM_CONVERTER_ARGB8888_PRE,
-	ENESIM_CONVERTER_RGB888,
-	ENESIM_CONVERTER_BGR888,
-	ENESIM_CONVERTER_A8,
-	ENESIM_CONVERTER_GRAY,
-	ENESIM_CONVERTER_FORMATS
+	ENESIM_BUFFER_FORMAT_RGB565,
+	ENESIM_BUFFER_FORMAT_ARGB8888,
+	ENESIM_BUFFER_FORMAT_ARGB8888_PRE,
+	ENESIM_BUFFER_FORMAT_RGB888,
+	ENESIM_BUFFER_FORMAT_BGR888,
+	ENESIM_BUFFER_FORMAT_A8,
+	ENESIM_BUFFER_FORMAT_GRAY,
+	ENESIM_BUFFER_FORMATS
 } Enesim_Buffer_Format;
 
 typedef struct _Enesim_Buffer_Argb8888

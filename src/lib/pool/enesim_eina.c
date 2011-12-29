@@ -43,28 +43,28 @@ static Eina_Bool _data_alloc(void *prv,
 	alloc_data = eina_mempool_malloc(thiz->mp, bytes);
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		data->argb8888.plane0 = alloc_data;
 		data->argb8888.plane0_stride = w;
 		break;
 
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		data->argb8888_pre.plane0 = alloc_data;
 		data->argb8888_pre.plane0_stride = w;
 		break;
 
-		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB565:
 		data->rgb565.plane0 = alloc_data;
 		data->rgb565.plane0_stride = w;
 		break;
 
-		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
 		data->rgb565.plane0 = alloc_data;
 		data->rgb565.plane0_stride = w;
 		break;
 
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		ERR("Unsupported format %d", fmt);
 		break;
@@ -82,18 +82,18 @@ static void _data_free(void *prv,
 
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		eina_mempool_free(thiz->mp, data->argb8888_pre.plane0);
 		break;
 
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		eina_mempool_free(thiz->mp, data->argb8888_pre.plane0);
 		break;
 
-		case ENESIM_CONVERTER_RGB565:
-		case ENESIM_CONVERTER_RGB888:
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		printf("TODO\n");
 		break;

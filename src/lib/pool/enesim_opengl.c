@@ -43,8 +43,8 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	*backend_data = data;
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		data->num_textures = 1;
 		glGenTextures(1, &data->texture);
 		glBindTexture(GL_TEXTURE_2D, data->texture);
@@ -53,10 +53,10 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		break;
 
-		case ENESIM_CONVERTER_RGB565:
-		case ENESIM_CONVERTER_RGB888:
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		free(data);
 		return EINA_FALSE;
@@ -87,18 +87,18 @@ static Eina_Bool _data_from(void *prv,
 	*backend_data = data;
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		glBindTexture(GL_TEXTURE_2D, data->texture);
         	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	        glPixelStorei(GL_UNPACK_ROW_LENGTH, w);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, src->argb8888.plane0);
 		break;
 
-		case ENESIM_CONVERTER_ARGB8888_PRE:
-		case ENESIM_CONVERTER_RGB565:
-		case ENESIM_CONVERTER_RGB888:
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		return EINA_FALSE;
 		break;
@@ -124,8 +124,8 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		glBindTexture(GL_TEXTURE_2D, data->texture);
         	glPixelStorei(GL_PACK_ALIGNMENT, 4);
 	        glPixelStorei(GL_PACK_ROW_LENGTH, w);
@@ -133,10 +133,10 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 		dst->argb8888.plane0_stride = w * 4;
 		break;
 
-		case ENESIM_CONVERTER_RGB565:
-		case ENESIM_CONVERTER_RGB888:
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		return EINA_FALSE;
 		break;

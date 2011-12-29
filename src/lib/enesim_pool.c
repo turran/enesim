@@ -39,37 +39,37 @@ static Eina_Bool _data_alloc(void *prv,
 	alloc_data = calloc(bytes, sizeof(char));
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		data->argb8888.plane0 = alloc_data;
 		data->argb8888.plane0_stride = w * 4;
 		break;
 
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		data->argb8888_pre.plane0 = alloc_data;
 		data->argb8888_pre.plane0_stride = w * 4;
 		break;
 
-		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB565:
 		data->rgb565.plane0 = alloc_data;
 		data->rgb565.plane0_stride = w * 2;
 		break;
 
-		case ENESIM_CONVERTER_BGR888:
+		case ENESIM_BUFFER_FORMAT_BGR888:
 		data->bgr888.plane0 = alloc_data;
 		data->bgr888.plane0_stride = w * 3;
 		break;
 
-		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
 		data->rgb888.plane0 = alloc_data;
 		data->rgb888.plane0_stride = w * 3;
 		break;
 
-		case ENESIM_CONVERTER_A8:
+		case ENESIM_BUFFER_FORMAT_A8:
 		data->a8.plane0 = alloc_data;
 		data->a8.plane0_stride = w;
 		break;
 
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		ERR("Unsupported format %d", fmt);
 		break;
@@ -110,31 +110,31 @@ static void _data_free(void *prv, void *backend_data,
 	if (external_allocated) goto end;
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		free(data->argb8888.plane0);
 		break;
 
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		free(data->argb8888_pre.plane0);
 		break;
 
-		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB565:
 		free(data->rgb565.plane0);
 		break;
 
-		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
 		free(data->rgb888.plane0);
 		break;
 
-		case ENESIM_CONVERTER_BGR888:
+		case ENESIM_BUFFER_FORMAT_BGR888:
 		free(data->bgr888.plane0);
 		break;
 
-		case ENESIM_CONVERTER_A8:
+		case ENESIM_BUFFER_FORMAT_A8:
 		free(data->a8.plane0);
 		break;
 
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		ERR("Unsupported format %d", fmt);
 		break;

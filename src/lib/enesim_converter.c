@@ -21,8 +21,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef Enesim_Converter_1D Enesim_Converter_1D_Lut[ENESIM_CONVERTER_FORMATS][ENESIM_ANGLES][ENESIM_FORMATS];
-typedef Enesim_Converter_2D Enesim_Converter_2D_Lut[ENESIM_CONVERTER_FORMATS][ENESIM_ANGLES][ENESIM_FORMATS];
+typedef Enesim_Converter_1D Enesim_Converter_1D_Lut[ENESIM_BUFFER_FORMATS][ENESIM_ANGLES][ENESIM_FORMATS];
+typedef Enesim_Converter_2D Enesim_Converter_2D_Lut[ENESIM_BUFFER_FORMATS][ENESIM_ANGLES][ENESIM_FORMATS];
 
 Enesim_Converter_1D_Lut _converters_1d;
 Enesim_Converter_2D_Lut _converters_2d;

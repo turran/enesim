@@ -139,15 +139,15 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 	/* TODO use a LUT for this */
 	switch (thiz->cfmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		*fill = _span_argb8888_none_argb8888;
 		break;
 
-		case ENESIM_CONVERTER_A8:
+		case ENESIM_BUFFER_FORMAT_A8:
 		*fill = _span_a8_none_argb8888;
 		break;
 
-		case ENESIM_CONVERTER_RGB888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
 		*fill = _span_rgb888_none_argb8888;
 		break;
 

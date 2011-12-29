@@ -217,22 +217,22 @@ EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, 
 {
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_ARGB8888:
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		return w * h * 4;
 		break;
 
-		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB565:
 		return w * h * 2;
 		break;
 
-		case ENESIM_CONVERTER_RGB888:
-		case ENESIM_CONVERTER_BGR888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_BGR888:
 		return w * h * 3;
 		break;
 
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		return w * h;
 		break;
 
@@ -253,20 +253,20 @@ EAPI Enesim_Buffer_Format enesim_buffer_format_rgb_get(uint8_t aoffset, uint8_t 
 {
 	if ((boffset == 0) && (blen == 5) && (goffset == 5) && (glen == 6) &&
 			(roffset == 11) && (rlen == 5) && (aoffset == 0) && (alen == 0))
-		return ENESIM_CONVERTER_RGB565;
+		return ENESIM_BUFFER_FORMAT_RGB565;
 
 	if ((boffset == 0) && (blen == 8) && (goffset == 8) && (glen == 8) &&
 			(roffset == 16) && (rlen == 8) && (aoffset == 24) && (alen == 8))
 	{
 		if (premul)
-			return ENESIM_CONVERTER_ARGB8888_PRE;
+			return ENESIM_BUFFER_FORMAT_ARGB8888_PRE;
 		else
-			return ENESIM_CONVERTER_ARGB8888;
+			return ENESIM_BUFFER_FORMAT_ARGB8888;
 	}
 
 	if ((boffset == 0) && (blen == 0) && (goffset == 0) && (glen == 0) &&
 			(roffset == 0) && (rlen == 0) && (aoffset == 0) && (alen == 8))
-		return ENESIM_CONVERTER_A8;
+		return ENESIM_BUFFER_FORMAT_A8;
 }
 
 /**
@@ -278,19 +278,19 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt)
 {
 	switch (fmt)
 	{
-		case ENESIM_CONVERTER_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB565:
 		return 16;
 
-		case ENESIM_CONVERTER_ARGB8888:
-		case ENESIM_CONVERTER_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		return 32;
 
-		case ENESIM_CONVERTER_A8:
-		case ENESIM_CONVERTER_GRAY:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
 		return 8;
 
-		case ENESIM_CONVERTER_RGB888:
-		case ENESIM_CONVERTER_BGR888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_BGR888:
 		return 24;
 
 		default:

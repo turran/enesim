@@ -36,7 +36,7 @@ void enesim_converter_rgb888_init(void)
 	/* TODO check if the cpu is the host */
 	enesim_converter_surface_register(
 			ENESIM_CONVERTER_2D(_2d_rgb888_none_argb8888),
-			ENESIM_CONVERTER_RGB888,
+			ENESIM_BUFFER_FORMAT_RGB888,
 			ENESIM_ANGLE_0,
 			ENESIM_FORMAT_ARGB8888);
 }
