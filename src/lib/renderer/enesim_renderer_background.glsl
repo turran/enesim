@@ -1,7 +1,8 @@
 ENESIM_OPENGL_SHADER(
-uniform vec4 color;
+uniform vec4 background_final_color;
 
 void main()
 {
-    gl_FragColor = color;
+    gl_FragColor = background_final_color;
 }
+);

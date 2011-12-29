@@ -68,6 +68,11 @@ static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesi
 	thiz->final_color = final_color;
 	return EINA_TRUE;
 }
+
+static void _background_state_cleanup(Enesim_Renderer_Background *thiz)
+{
+	thiz->changed = EINA_FALSE;
+}
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -141,9 +146,52 @@ static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Background *thiz;
 
  	thiz = _background_get(r);
-	thiz->changed = EINA_FALSE;
+	_background_state_cleanup(thiz);
+}
+#endif
+
+#if BUILD_OPENGL
+static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		const char **program_name, const char **program_source,
+		size_t *program_length, Enesim_Error **error)
+{
+	Enesim_Renderer_Background *thiz;
+
+ 	thiz = _background_get(r);
+	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
+
+	*program_name = "background";
+	*program_source =
+	#include "enesim_renderer_background.glsl"
+	*program_length = strlen(*program_source);
+
+	return EINA_TRUE;
 }
 
+static Eina_Bool _background_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Background *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int final_color;
+
+ 	thiz = _background_get(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
+	/* FIXME use the final color instead */
+	glUniform4fARB(final_color, 1.0, 0.0, 1.0, 1.0);
+
+	return EINA_TRUE;
+}
+
+static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Background *thiz;
+
+ 	thiz = _background_get(r);
+	_background_state_cleanup(thiz);
+}
 #endif
 
 static void _background_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -205,9 +253,15 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .opencl_kernel_setup =   */ NULL,
 	/* .opencl_cleanup =        */ NULL,
 #endif
+#if BUILD_OPENGL
+	/* .opengl_setup =          */ _background_opengl_setup,
+	/* .opengl_shader_setup =   */ _background_opengl_shader_setup,
+	/* .opengl_cleanup =        */ _background_opengl_cleanup
+#else
 	/* .opengl_setup =          */ NULL,
 	/* .opengl_shader_setup =   */ NULL,
 	/* .opengl_cleanup =        */ NULL
+#endif
 };
 /*============================================================================*
  *                                   API                                      *

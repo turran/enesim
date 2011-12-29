@@ -68,7 +68,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
 	}
-#if 0
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
 	ret = r->descriptor.opengl_setup(r, state, s, &source_name, &source, &source_size, error);
 	if (!ret) return EINA_FALSE;
@@ -85,7 +84,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	glAttachObjectARB(rdata->program, shader);
 	/* link it */ 
 	glLinkProgramARB(rdata->program);
-#endif
  
 	if (!rdata->fbo)
 	{
@@ -99,26 +97,24 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
         status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
         if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
         {
-                printf("fb error %d\n", status);
+		ENESIM_RENDERER_ERROR(r, error, "Impossible too setup the framebuffer %d", status);
         }
 
-#if 0
-	// Use The Program Object Instead Of Fixed Function OpenGL
-	glUseProgramObjectARB(my_program);
-
-	/* TODO get the shader from the renderer implementation */
-	glUseProgramObjectARB(my_program);
-	int my_vec3_location = glGetUniformLocationARB(my_program, "my_3d_vector");
-	glUniform3fARB(my_vec3_location, 1.0f, 4.0f, 3.0f);
-#endif
+	glUseProgramObjectARB(rdata->program);
+	if (r->descriptor.opengl_shader_setup)
+	{
+		if (!r->descriptor.opengl_shader_setup(r, s))
+		{
+			printf("Cannot setup the shader\n");
+			return EINA_FALSE;
+		}
+	}
 
 	return EINA_TRUE;
 }
 
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_OpenGL_Data *rdata;
-
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
@@ -131,22 +127,22 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
-	printf("rendering\n");
+	/* run it on the renderer fbo */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	/* get the compiled shader from the renderer backend data */
+	glUseProgramObjectARB(rdata->program);
 	/* create the geometry to render to */
-	/* FIXME for now */
 	glEnable(GL_BLEND);
-	glColor3f(1.0, 0.0, 0.0);
+	/* FIXME for now */
+	//glColor3f(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
                 glVertex2d(area->x, area->y);
                 glVertex2d(area->x + area->w, area->y);
                 glVertex2d(area->x + area->w, area->y + area->h);
                 glVertex2d(area->x, area->y + area->h);
         glEnd();
-
-	/* TODO get the compiled shader from the renderer backend data */
-	/* TODO run it on the renderer fbo */
+	glUseProgramObjectARB(0);
 }
 
 void enesim_renderer_opengl_init(void)
