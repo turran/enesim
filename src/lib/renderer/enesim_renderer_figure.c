@@ -111,11 +111,14 @@ static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
+/* affine simple */
+/* stroke and/or fill with possibly a fill renderer */
+static void _stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 		int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Figure *thiz = _figure_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
@@ -133,12 +136,7 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
- 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	enesim_renderer_origin_get(r, &ox, &oy);
-
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -146,39 +144,8 @@ static void figure_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
 	{
 get_out:
-		while (d < e)
-			*d++ = 0;
+		memset(d, 0, sizeof(unsigned int) * len);
 		return;
-	}
-
-	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
-	{
-		scolor = fcolor;
-		stroke = 0;
-		if (fpaint)
-		{
-			Enesim_Renderer_Sw_Data *sdata;
-
-			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(fpaint, x, y, len, dst);
-		}
-	}
-	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
-	{
-		stroke = 1;
-		if (fpaint)
-		{
-			Enesim_Renderer_Sw_Data *sdata;
-
-			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(fpaint, x, y, len, dst);
-		}
-	}
-	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
-	{
-		fcolor = 0;
-		fpaint = NULL;
-		stroke = 1;
 	}
 
 	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
@@ -216,6 +183,48 @@ get_out:
 	}
 	if (!nedges)
 		goto get_out;
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+	{
+		scolor = fcolor;
+		stroke = 0;
+		if (fpaint)
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+			sdata->fill(fpaint, x, y, len, dst);
+		}
+	}
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+	{
+		stroke = 1;
+		if (fpaint)
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+			sdata->fill(fpaint, x, y, len, dst);
+		}
+	}
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+	{
+		fcolor = 0;
+		fpaint = NULL;
+		stroke = 1;
+	}
 
 	while (d < e)
 	{
@@ -289,11 +298,330 @@ get_out:
 	}
 }
 
-static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
+/* stroke with a renderer and possibly fill with color */
+static void _stroke_paint_fill_affine_simple(Enesim_Renderer *r, int x,
+		int y, unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	double ox, oy;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
+	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
+			((yy >> 16) > (1 + (thiz->byy >> 16))))
+	{
+get_out:
+		memset(d, 0, sizeof(unsigned int) * len);
+		return;
+	}
+
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
+	edge = edges;
+	while (n < nvectors)
+	{
+		int xx0 = v->xx0, xx1 = v->xx1;
+		int yy0 = v->yy0, yy1 = v->yy1;
+
+		if (xx1 < xx0)
+		{
+			xx0 = xx1;
+			xx1 = v->xx0;
+		}
+		if (yy1 < yy0)
+		{
+			yy0 = yy1;
+			yy1 = v->yy0;
+		}
+		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff))))
+		{
+			edge->xx0 = xx0;
+			edge->xx1 = xx1;
+			edge->yy0 = yy0;
+			edge->yy1 = yy1;
+			edge->de = (v->a * (long long int) axx) >> 16;
+			edge->e = ((v->a * (long long int) xx) >> 16) +
+					((v->b * (long long int) yy) >> 16) +
+					v->c;
+			edge++;
+			nedges++;
+		}
+		n++;
+		v++;
+	}
+	if (!nedges)
+		goto get_out;
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		fcolor = 0;
+
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, dst);
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int count = 0;
+		int a = 0;
+
+		n = 0;
+		edge = edges;
+		while (n < nedges)
+		{
+			int ee = edge->e;
+
+			if ((yy >= edge->yy0) && (yy < edge->yy1))
+			{
+				count++;
+				if (ee < 0)
+					count -= 2;
+			}
+			if (ee < 0)
+				ee = -ee;
+
+			if ((ee < 65536) && ((xx + 0xffff) >= edge->xx0) && (xx
+					<= (0xffff + edge->xx1)))
+			{
+				if (a < 16384)
+					a = 65536 - ee;
+				else
+					a = (a + (65536 - ee)) / 2;
+			}
+
+			edge->e += edge->de;
+			edge++;
+			n++;
+		}
+
+		if (count)
+		{
+			p0 = fcolor;
+			if (a)
+			{
+				unsigned int q0 = p0;
+
+				p0 = *d;
+				if (scolor != 0xffffffff)
+					p0 = MUL4_SYM(scolor, p0);
+
+				if (a < 65536)
+					p0 = INTERP_65536(a, p0, q0);
+			}
+		}
+		else if (a)
+		{
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
+			if (a < 65536)
+				p0 = MUL_A_65536(a, p0);
+		}
+
+		*d++ = p0;
+		xx += axx;
+	}
+}
+
+/* stroke and fill with renderers */
+static void _stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int x,
+		int y, unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	double ox, oy;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
+	unsigned int *sbuf, *s;
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
+	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
+			((yy >> 16) > (1 + (thiz->byy >> 16))))
+	{
+get_out:
+		memset(d, 0, sizeof(unsigned int) * len);
+		return;
+	}
+
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
+	edge = edges;
+	while (n < nvectors)
+	{
+		int xx0 = v->xx0, xx1 = v->xx1;
+		int yy0 = v->yy0, yy1 = v->yy1;
+
+		if (xx1 < xx0)
+		{
+			xx0 = xx1;
+			xx1 = v->xx0;
+		}
+		if (yy1 < yy0)
+		{
+			yy0 = yy1;
+			yy1 = v->yy0;
+		}
+		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff))))
+		{
+			edge->xx0 = xx0;
+			edge->xx1 = xx1;
+			edge->yy0 = yy0;
+			edge->yy1 = yy1;
+			edge->de = (v->a * (long long int) axx) >> 16;
+			edge->e = ((v->a * (long long int) xx) >> 16) +
+					((v->b * (long long int) yy) >> 16) +
+					v->c;
+			edge++;
+			nedges++;
+		}
+		n++;
+		v++;
+	}
+	if (!nedges)
+		goto get_out;
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int count = 0;
+		int a = 0;
+
+		n = 0;
+		edge = edges;
+		while (n < nedges)
+		{
+			int ee = edge->e;
+
+			if ((yy >= edge->yy0) && (yy < edge->yy1))
+			{
+				count++;
+				if (ee < 0)
+					count -= 2;
+			}
+			if (ee < 0)
+				ee = -ee;
+
+			if ((ee < 65536) && ((xx + 0xffff) >= edge->xx0) && (xx
+					<= (0xffff + edge->xx1)))
+			{
+				if (a < 16384)
+					a = 65536 - ee;
+				else
+					a = (a + (65536 - ee)) / 2;
+			}
+
+			edge->e += edge->de;
+			edge++;
+			n++;
+		}
+
+		if (count)
+		{
+			p0 = *d;
+			if (fcolor != 0xffffffff)
+				p0 = MUL4_SYM(fcolor, p0);
+			if (a)
+			{
+				unsigned int q0 = p0;
+
+
+				p0 = *s;
+				if (scolor != 0xffffffff)
+					p0 = MUL4_SYM(scolor, p0);
+
+				if (a < 65536)
+					p0 = INTERP_65536(a, p0, q0);
+			}
+		}
+		else if (a)
+		{
+			p0 = *s;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
+			if (a < 65536)
+				p0 = MUL_A_65536(a, p0);
+		}
+
+		*d++ = p0;
+		s++;
+		xx += axx;
+	}
+}
+
+/* affine general */
+/* stroke and/or fill with possibly a fill renderer */
+static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Figure *thiz = _figure_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
@@ -304,6 +632,7 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	int y0, y1;
+	double ox, oy;
 
 	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
 			thiz->matrix.xz;
@@ -312,16 +641,14 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
- 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if (((ayx <= 0) && ((yy >> 16) + 1 < (thiz->tyy >> 16))) || ((ayx >= 0)
 			&& ((yy >> 16) > 1 + (thiz->byy >> 16))))
 	{
-		while (d < e)
-			*d++ = 0;
+		memset(d, 0, sizeof(unsigned int) * len);
 		return;
 	}
 
@@ -373,6 +700,18 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		v++;
 	}
 
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		scolor = fcolor;
@@ -462,7 +801,17 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 			}
 		}
 		else if (a)
-			p0 = MUL_A_65536(a, scolor);
+		{
+			p0 = scolor;
+			if (fpaint && !stroke)
+			{
+				p0 = *d;
+				if (fcolor != 0xffffffff)
+					p0 = MUL4_SYM(fcolor, p0);
+			}
+			if (a < 65536)
+				p0 = MUL_A_65536(a, p0);
+		}
 
 		*d++ = p0;
 		yy += ayx;
@@ -470,11 +819,365 @@ static void figure_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	}
 }
 
-static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+/* stroke with a renderer and possibly fill with color */
+static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Figure *thiz = _figure_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	int y0, y1;
+	double ox, oy;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz =
+			thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
+	if (((ayx <= 0) && ((yy >> 16) + 1 < (thiz->tyy >> 16))) || ((ayx >= 0)
+			&& ((yy >> 16) > 1 + (thiz->byy >> 16))))
+	{
+		memset(d, 0, sizeof(unsigned int) * len);
+		return;
+	}
+
+	len--;
+	y0 = yy >> 16;
+	y1 = yy + (len * ayx);
+	y1 = y1 >> 16;
+	if (y1 < y0)
+	{
+		y0 = y1;
+		y1 = yy >> 16;
+	}
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
+	edge = edges;
+	while (n < nvectors)
+	{
+		int xx0, yy0;
+		int xx1, yy1;
+
+		xx0 = v->xx0;
+		xx1 = v->xx1;
+		if (xx1 < xx0)
+		{
+			xx0 = xx1;
+			xx1 = v->xx0;
+		}
+		yy0 = v->yy0;
+		yy1 = v->yy1;
+		if (yy1 < yy0)
+		{
+			yy0 = yy1;
+			yy1 = v->yy0;
+		}
+		if ((y0 <= (yy1 >> 16)) && (y1 >= (yy0 >> 16)))
+		{
+			edge->xx0 = xx0;
+			edge->xx1 = xx1;
+			edge->yy0 = yy0;
+			edge->yy1 = yy1;
+			edge->de = ((v->a * (long long int) axx) >> 16) +
+					((v->b * (long long int) ayx) >> 16);
+			edge->e = ((v->a * (long long int) xx) >> 16) +
+					((v->b * (long long int) yy) >> 16) +
+					v->c;
+			edge++;
+			nedges++;
+		}
+		n++;
+		v++;
+	}
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		fcolor = 0;
+
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, dst);
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int count = 0;
+		int a = 0;
+
+		n = 0;
+		edge = edges;
+		while (n < nedges)
+		{
+			int ee = edge->e;
+
+			if (((yy + 0xffff) >= edge->yy0) &&
+					(yy <= (edge->yy1 + 0xffff)))
+			{
+				if ((yy >= edge->yy0) && (yy < edge->yy1))
+				{
+					count++;
+					if (ee < 0)
+						count -= 2;
+				}
+				if (ee < 0)
+					ee = -ee;
+				if ((ee < 65536) &&
+						((xx + 0xffff) >= edge->xx0) &&
+						(xx <= (0xffff + edge->xx1)))
+				{
+					if (a < 16384)
+						a = 65536 - ee;
+					else
+						a = (a + (65536 - ee)) / 2;
+				}
+			}
+
+			edge->e += edge->de;
+			edge++;
+			n++;
+		}
+
+		if (count)
+		{
+			p0 = fcolor;
+			if (a)
+			{
+				unsigned int q0 = p0;
+
+				p0 = *d;
+				if (scolor != 0xffffffff)
+					p0 = MUL4_SYM(scolor, p0);
+
+				if (a < 65536)
+					p0 = INTERP_65536(a, p0, q0);
+			}
+		}
+		else if (a)
+		{
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
+			if (a < 65536)
+				p0 = MUL_A_65536(a, p0);
+		}
+
+		*d++ = p0;
+		yy += ayx;
+		xx += axx;
+	}
+}
+
+/* stroke and fill with renderers */
+static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	int y0, y1;
+	double ox, oy;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz =
+			thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
+	unsigned int *sbuf, *s;
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
+	if (((ayx <= 0) && ((yy >> 16) + 1 < (thiz->tyy >> 16))) || ((ayx >= 0)
+			&& ((yy >> 16) > 1 + (thiz->byy >> 16))))
+	{
+		memset(d, 0, sizeof(unsigned int) * len);
+		return;
+	}
+
+	len--;
+	y0 = yy >> 16;
+	y1 = yy + (len * ayx);
+	y1 = y1 >> 16;
+	if (y1 < y0)
+	{
+		y0 = y1;
+		y1 = yy >> 16;
+	}
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
+	edge = edges;
+	while (n < nvectors)
+	{
+		int xx0, yy0;
+		int xx1, yy1;
+
+		xx0 = v->xx0;
+		xx1 = v->xx1;
+		if (xx1 < xx0)
+		{
+			xx0 = xx1;
+			xx1 = v->xx0;
+		}
+		yy0 = v->yy0;
+		yy1 = v->yy1;
+		if (yy1 < yy0)
+		{
+			yy0 = yy1;
+			yy1 = v->yy0;
+		}
+		if ((y0 <= (yy1 >> 16)) && (y1 >= (yy0 >> 16)))
+		{
+			edge->xx0 = xx0;
+			edge->xx1 = xx1;
+			edge->yy0 = yy0;
+			edge->yy1 = yy1;
+			edge->de = ((v->a * (long long int) axx) >> 16) +
+					((v->b * (long long int) ayx) >> 16);
+			edge->e = ((v->a * (long long int) xx) >> 16) +
+					((v->b * (long long int) yy) >> 16) +
+					v->c;
+			edge++;
+			nedges++;
+		}
+		n++;
+		v++;
+	}
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int count = 0;
+		int a = 0;
+
+		n = 0;
+		edge = edges;
+		while (n < nedges)
+		{
+			int ee = edge->e;
+
+			if (((yy + 0xffff) >= edge->yy0) &&
+					(yy <= (edge->yy1 + 0xffff)))
+			{
+				if ((yy >= edge->yy0) && (yy < edge->yy1))
+				{
+					count++;
+					if (ee < 0)
+						count -= 2;
+				}
+				if (ee < 0)
+					ee = -ee;
+				if ((ee < 65536) &&
+						((xx + 0xffff) >= edge->xx0) &&
+						(xx <= (0xffff + edge->xx1)))
+				{
+					if (a < 16384)
+						a = 65536 - ee;
+					else
+						a = (a + (65536 - ee)) / 2;
+				}
+			}
+
+			edge->e += edge->de;
+			edge++;
+			n++;
+		}
+
+		if (count)
+		{
+			p0 = *d;
+			if (fcolor != 0xffffffff)
+				p0 = MUL4_SYM(fcolor, p0);
+			if (a)
+			{
+				unsigned int q0 = p0;
+
+				p0 = *s;
+				if (scolor != 0xffffffff)
+					p0 = MUL4_SYM(scolor, p0);
+
+				if (a < 65536)
+					p0 = INTERP_65536(a, p0, q0);
+			}
+		}
+		else if (a)
+		{
+			p0 = *s;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
+			if (a < 65536)
+				p0 = MUL_A_65536(a, p0);
+		}
+
+		*d++ = p0;
+		s++;
+		yy += ayx;
+		xx += axx;
+	}
+}
+
+/* projective general */
+/* stroke and/or fill with possibly a fill renderer */
+static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
@@ -484,6 +1187,8 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	Enesim_Renderer_Figure_Edge *edges, *edge;
 	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0;
+	double ox, oy;
+	int xx0, yy0;
 
 	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
 			thiz->matrix.xz;
@@ -495,10 +1200,9 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
 	
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
- 	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx0 = eina_f16p16_double_from(ox);
+	yy0 = eina_f16p16_double_from(oy);
 
 	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
 	edge = edges;
@@ -529,6 +1233,17 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		edge++;
 	}
 
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		scolor = fcolor;
@@ -570,8 +1285,8 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		edge = edges;
 		if (zz)
 		{
-			syy = (((long long int) yy) << 16) / zz;
-			sxx = (((long long int) xx) << 16) / zz;
+			syy = ((((long long int) yy) << 16) / zz) - xx0;
+			sxx = ((((long long int) xx) << 16) / zz) - yy0;
 
 			while (n < nvectors)
 			{
@@ -623,7 +1338,17 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 				}
 			}
 			else if (a)
-				p0 = MUL_A_65536(a, scolor);
+			{
+				p0 = scolor;
+				if (fpaint && !stroke)
+				{
+					p0 = *d;
+					if (fcolor != 0xffffffff)
+						p0 = MUL4_SYM(fcolor, p0);
+				}
+				if (a < 65536)
+					p0 = MUL_A_65536(a, p0);
+			}
 		}
 		*d++ = p0;
 		xx += axx;
@@ -631,6 +1356,325 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		zz += azx;
 	}
 }
+
+/* stroke with a renderer and possibly fill with color */
+static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0;
+	double ox, oy;
+	int xx0, yy0;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz =
+			thiz->matrix.yz;
+	int azx = thiz->matrix.zx, azy = thiz->matrix.zy, azz =
+			thiz->matrix.zz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
+	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
+	
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx0 = eina_f16p16_double_from(ox);
+	yy0 = eina_f16p16_double_from(oy);
+
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
+	edge = edges;
+	while (n < nvectors)
+	{
+		edge->xx0 = v->xx0;
+		edge->xx1 = v->xx1;
+		if (edge->xx1 < edge->xx0)
+		{
+			edge->xx0 = edge->xx1;
+			edge->xx1 = v->xx0;
+		}
+		edge->yy0 = v->yy0;
+		edge->yy1 = v->yy1;
+		if (edge->yy1 < edge->yy0)
+		{
+			edge->yy0 = edge->yy1;
+			edge->yy1 = v->yy0;
+		}
+		edge->de = ((v->a * (long long int) axx) >> 16) +
+				((v->b * (long long int) ayx) >> 16) +
+				((v->c * (long long int) azx) >> 16);
+		edge->e = ((v->a * (long long int) xx) >> 16) +
+				((v->b * (long long int) yy) >> 16) +
+				((v->c * (long long int) zz) >> 16);
+		n++;
+		v++;
+		edge++;
+	}
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		fcolor = 0;
+
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, dst);
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int count = 0;
+		int a = 0;
+		int sxx, syy;
+
+		n = 0;
+		edge = edges;
+		if (zz)
+		{
+			syy = ((((long long int) yy) << 16) / zz) - xx0;
+			sxx = ((((long long int) xx) << 16) / zz) - yy0;
+
+			while (n < nvectors)
+			{
+				int ee = (((long long int) edge->e) << 16) / zz;
+
+				if (((syy + 0xffff) >= edge->yy0) &&
+						(syy <= (edge->yy1 + 0xffff)))
+				{
+					if ((syy >= edge->yy0) &&
+							(syy < edge->yy1))
+					{
+						count++;
+						if (ee < 0)
+							count -= 2;
+					}
+					if (ee < 0)
+						ee = -ee;
+					if ((ee < 65536) &&
+							((sxx + 0xffff) >= edge->xx0) &&
+							(sxx <= (0xffff + edge->xx1)))
+					{
+						if (a < 16384)
+							a = 65536 - ee;
+						else
+							a = (a + (65536 - ee)) / 2;
+					}
+				}
+				edge->e += edge->de;
+				edge++;
+				n++;
+			}
+			if (count)
+			{
+				p0 = fcolor;
+				if (a)
+				{
+					unsigned int q0 = p0;
+
+					p0 = *d;
+					if (scolor != 0xffffffff)
+						p0 = MUL4_SYM(scolor, p0);
+
+					if (a < 65536)
+						p0 = INTERP_65536(a, p0, q0);
+				}
+
+			}
+			else if (a)
+			{
+				p0 = *d;
+				if (scolor != 0xffffffff)
+					p0 = MUL4_SYM(scolor, p0);
+
+				if (a < 65536)
+					p0 = MUL_A_65536(a, p0);
+			}
+		}
+		*d++ = p0;
+		xx += axx;
+		yy += ayx;
+		zz += azx;
+	}
+}
+
+/* stroke and fill with renderers */
+static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Figure *thiz = _figure_get(r);
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	Enesim_Renderer_Figure_Edge *edges, *edge;
+	Enesim_Renderer_Figure_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0;
+	double ox, oy;
+	int xx0, yy0;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayx = thiz->matrix.yx, ayy = thiz->matrix.yy, ayz =
+			thiz->matrix.yz;
+	int azx = thiz->matrix.zx, azy = thiz->matrix.zy, azz =
+			thiz->matrix.zz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
+	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
+	unsigned int *sbuf, *s;
+	
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx0 = eina_f16p16_double_from(ox);
+	yy0 = eina_f16p16_double_from(oy);
+
+	edges = alloca(nvectors * sizeof(Enesim_Renderer_Figure_Edge));
+	edge = edges;
+	while (n < nvectors)
+	{
+		edge->xx0 = v->xx0;
+		edge->xx1 = v->xx1;
+		if (edge->xx1 < edge->xx0)
+		{
+			edge->xx0 = edge->xx1;
+			edge->xx1 = v->xx0;
+		}
+		edge->yy0 = v->yy0;
+		edge->yy1 = v->yy1;
+		if (edge->yy1 < edge->yy0)
+		{
+			edge->yy0 = edge->yy1;
+			edge->yy1 = v->yy0;
+		}
+		edge->de = ((v->a * (long long int) axx) >> 16) +
+				((v->b * (long long int) ayx) >> 16) +
+				((v->c * (long long int) azx) >> 16);
+		edge->e = ((v->a * (long long int) xx) >> 16) +
+				((v->b * (long long int) yy) >> 16) +
+				((v->c * (long long int) zz) >> 16);
+		n++;
+		v++;
+		edge++;
+	}
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int count = 0;
+		int a = 0;
+		int sxx, syy;
+
+		n = 0;
+		edge = edges;
+		if (zz)
+		{
+			syy = ((((long long int) yy) << 16) / zz) - xx0;
+			sxx = ((((long long int) xx) << 16) / zz) - yy0;
+
+			while (n < nvectors)
+			{
+				int ee = (((long long int) edge->e) << 16) / zz;
+
+				if (((syy + 0xffff) >= edge->yy0) &&
+						(syy <= (edge->yy1 + 0xffff)))
+				{
+					if ((syy >= edge->yy0) &&
+							(syy < edge->yy1))
+					{
+						count++;
+						if (ee < 0)
+							count -= 2;
+					}
+					if (ee < 0)
+						ee = -ee;
+					if ((ee < 65536) &&
+							((sxx + 0xffff) >= edge->xx0) &&
+							(sxx <= (0xffff + edge->xx1)))
+					{
+						if (a < 16384)
+							a = 65536 - ee;
+						else
+							a = (a + (65536 - ee)) / 2;
+					}
+				}
+				edge->e += edge->de;
+				edge++;
+				n++;
+			}
+			if (count)
+			{
+				p0 = *d;
+				if (fcolor != 0xffffffff)
+					p0 = MUL4_SYM(fcolor, p0);
+				if (a)
+				{
+					unsigned int q0 = p0;
+
+					p0 = *s;
+					if (scolor != 0xffffffff)
+						p0 = MUL4_SYM(scolor, p0);
+
+					if (a < 65536)
+						p0 = INTERP_65536(a, p0, q0);
+				}
+			}
+			else if (a)
+			{
+				p0 = *s;
+				if (scolor != 0xffffffff)
+					p0 = MUL4_SYM(scolor, p0);
+
+				if (a < 65536)
+					p0 = MUL_A_65536(a, p0);
+			}
+		}
+		*d++ = p0;
+		s++;
+		xx += axx;
+		yy += ayx;
+		zz += azx;
+	}
+}
+
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -651,6 +1695,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *spaint;
+	double sw;
 
 	thiz = _figure_get(r);
 	if (!thiz || !thiz->polys)
@@ -775,12 +1821,42 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
 			&thiz->matrix);
 
-	*fill = figure_stroke_fill_paint_proj;
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
 	if (state->transformation_type != ENESIM_MATRIX_PROJECTIVE)
 	{
-		*fill = figure_stroke_fill_paint_affine;
+		*fill = _stroke_fill_paint_affine;
 		if (&state->transformation.yx == 0)
-			*fill = figure_stroke_fill_paint_affine_simple;
+			*fill = _stroke_fill_paint_affine_simple;
+		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		{
+			Enesim_Renderer *fpaint;
+
+			*fill = _stroke_paint_fill_affine;
+			if (&state->transformation.yx == 0)
+				*fill = _stroke_paint_fill_affine_simple;
+
+			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+			{
+				*fill = _stroke_paint_fill_paint_affine;
+				if (&state->transformation.yx == 0)
+					*fill = _stroke_paint_fill_paint_affine_simple;
+			}
+		}
+	}
+	else
+	{
+		*fill = _stroke_fill_paint_proj;
+		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		{
+			Enesim_Renderer *fpaint;
+
+			*fill = _stroke_paint_fill_proj;
+			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				*fill = _stroke_paint_fill_paint_proj;
+		}
 	}
 
 	return EINA_TRUE;
