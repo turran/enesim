@@ -60,6 +60,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	const char *source = NULL;
 	const char *source_name = NULL;
 	size_t source_size = 0;
+	int compiled = 0;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -76,6 +77,13 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	glShaderSourceARB(shader, 1, &source, &source_size);
 	/* compile it */
 	glCompileShaderARB(shader);
+	glGetObjectParameterivARB(shader,GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
+	if (!compiled)
+	{
+		char log[PATH_MAX];
+		glGetInfoLogARB(shader, sizeof(log), NULL, log);
+		printf("Failed to compile %s\n", log);
+	}
 	if (!rdata->program)
 	{
 		rdata->program = glCreateProgramObjectARB();
@@ -123,6 +131,8 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
+	int width;
+	int height;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -136,11 +146,27 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	glEnable(GL_BLEND);
 	/* FIXME for now */
 	//glColor3f(1.0, 0.0, 0.0);
+
+	enesim_surface_size_get(s, &width, &height);
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	/* FIXME for now */
+	//glScalef(0.2, 0.2, 1.0);
+	glRotatef(30, 0.0, 0.0, 1.0);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, width, 0, height, -1, 1);
+
+	/* for later */
+	//glBlendEquationSeparate(ec, ea);
+	//glBlendFuncSeparate(fsc, fdc, fsa, fda);
+
 	glBegin(GL_QUADS);
-                glVertex2d(area->x, area->y);
-                glVertex2d(area->x + area->w, area->y);
-                glVertex2d(area->x + area->w, area->y + area->h);
-                glVertex2d(area->x, area->y + area->h);
+		glTexCoord2d(area->x, area->y);  glVertex2d(area->x, area->y);
+		glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
+		glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
+		glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
         glEnd();
 	glUseProgramObjectARB(0);
 }

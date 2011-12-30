@@ -48,6 +48,8 @@ typedef struct _Enesim_Renderer_Checker
 	/* private */
 	Eina_Bool changed : 1;
 	Enesim_F16p16_Matrix matrix;
+	Enesim_Color final_color1;
+	Enesim_Color final_color2;
 	Eina_F16p16 ww, hh;
 	Eina_F16p16 ww2, hh2;
 } Enesim_Renderer_Checker;
@@ -76,8 +78,8 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, v
 	thiz = _checker_get(r);
 	w2 = thiz->current.sw * 2;
 	h2 = thiz->current.sh * 2;
-	color[0] = thiz->current.color1;
-	color[1] = thiz->current.color2;
+	color[0] = thiz->final_color1;
+	color[1] = thiz->final_color2;
 
 	/* translate to the origin */
 	enesim_renderer_identity_setup(r, x, y, &xx, &yy);
@@ -90,8 +92,8 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, v
 	/* swap the colors */
 	if (sy >= thiz->current.sh)
 	{
-		color[0] = thiz->current.color2;
-		color[1] = thiz->current.color1;
+		color[0] = thiz->final_color2;
+		color[1] = thiz->final_color1;
 	}
 	while (dst < end)
 	{
@@ -134,7 +136,7 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, voi
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx;
-		uint32_t color[2] = {thiz->current.color1, thiz->current.color2};
+		uint32_t color[2] = {thiz->final_color1, thiz->final_color2};
 		uint32_t p0;
 		int sx, sy;
 
@@ -154,8 +156,8 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, voi
 		/* choose the correct color */
 		if (syy >= hh)
 		{
-			color[0] = thiz->current.color2;
-			color[1] = thiz->current.color1;
+			color[0] = thiz->final_color2;
+			color[1] = thiz->final_color1;
 		}
 		if (sxx >= ww)
 		{
@@ -220,7 +222,7 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx, syyy, sxxx;
-		uint32_t color[2] = {thiz->current.color1, thiz->current.color2};
+		uint32_t color[2] = {thiz->final_color1, thiz->final_color2};
 		uint32_t p0;
 		int sx, sy;
 
@@ -242,8 +244,8 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 		/* choose the correct color */
 		if (syy >= hh)
 		{
-			color[0] = thiz->current.color2;
-			color[1] = thiz->current.color1;
+			color[0] = thiz->final_color2;
+			color[1] = thiz->final_color1;
 		}
 		if (sxx >= ww)
 		{
@@ -290,6 +292,33 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 		*dst++ = p0;
 	}
 }
+
+static Eina_Bool _checker_state_setup(Enesim_Renderer_Checker *thiz, Enesim_Renderer *r)
+{
+	Enesim_Color final_color1;
+	Enesim_Color final_color2;
+	Enesim_Color rend_color;
+
+	final_color1 = thiz->current.color1;
+	final_color2 = thiz->current.color2;
+
+	enesim_renderer_color_get(r, &rend_color);
+	if (rend_color != ENESIM_COLOR_FULL)
+	{
+		final_color1 = argb8888_mul4_sym(rend_color, final_color1);
+		final_color2 = argb8888_mul4_sym(rend_color, final_color2);
+	}
+	thiz->final_color1 = final_color1;
+	thiz->final_color2 = final_color2;
+	return EINA_TRUE;
+}
+
+static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
+{
+	thiz->past = thiz->current;
+	thiz->changed = EINA_FALSE;
+}
+
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -298,16 +327,15 @@ static const char * _checker_name(Enesim_Renderer *r)
 	return "checker";
 }
 
-static void _checker_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
-	thiz->past = thiz->current;
-	thiz->changed = EINA_FALSE;
+	_checker_state_cleanup(thiz);
 }
 
-static Eina_Bool _checker_state_setup(Enesim_Renderer *r,
+static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
@@ -315,6 +343,8 @@ static Eina_Bool _checker_state_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = _checker_get(r);
+	_checker_state_setup(thiz, r);
+
 	thiz->ww = eina_f16p16_int_from(thiz->current.sw);
 	thiz->ww2 = thiz->ww * 2;
 	thiz->hh = eina_f16p16_int_from(thiz->current.sh);
@@ -386,8 +416,63 @@ static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_RENDERER_FLAG_COLORIZE;
 }
+
+#if BUILD_OPENGL
+static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		const char **program_name, const char **program_source,
+		size_t *program_length, Enesim_Error **error)
+{
+	Enesim_Renderer_Checker *thiz;
+
+ 	thiz = _checker_get(r);
+	if (!_checker_state_setup(thiz, r)) return EINA_FALSE;
+
+	*program_name = "checker";
+	*program_source =
+	#include "enesim_renderer_checker.glsl"
+	*program_length = strlen(*program_source);
+
+	return EINA_TRUE;
+}
+
+static Eina_Bool _checker_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Checker *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int odd_color;
+	int even_color;
+	int sw;
+	int sh;
+
+ 	thiz = _checker_get(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	even_color = glGetUniformLocationARB(rdata->program, "checker_even_color");
+	odd_color = glGetUniformLocationARB(rdata->program, "checker_odd_color");
+	sw = glGetUniformLocationARB(rdata->program, "checker_sw");
+	sh = glGetUniformLocationARB(rdata->program, "checker_sh");
+
+	/* FIXME use the final color instead */
+	glUniform4fARB(even_color, 1.0, 0.0, 0.0, 1.0);
+	glUniform4fARB(odd_color, 0.0, 0.0, 1.0, 1.0);
+	glUniform1i(sw, thiz->current.sw);
+	glUniform1i(sh, thiz->current.sh);
+
+	return EINA_TRUE;
+}
+
+static void _checker_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Checker *thiz;
+
+ 	thiz = _checker_get(r);
+	_checker_state_cleanup(thiz);
+}
+#endif
 
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
@@ -399,14 +484,20 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _checker_has_changed,
-	/* .sw_setup = 			*/ _checker_state_setup,
-	/* .sw_cleanup = 		*/ _checker_state_cleanup,
+	/* .sw_setup = 			*/ _checker_sw_setup,
+	/* .sw_cleanup = 		*/ _checker_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+#if BUILD_OPENGL
+	/* .opengl_setup =          	*/ _checker_opengl_setup,
+	/* .opengl_shader_setup =   	*/ _checker_opengl_shader_setup,
+	/* .opengl_cleanup =        	*/ _checker_opengl_cleanup
+#else
 	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup = 	*/ NULL,
+	/* .opengl_shader_setup =   	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
+#endif
 };
 /*============================================================================*
  *                                 Global                                     *

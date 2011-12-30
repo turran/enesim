@@ -60,7 +60,6 @@ static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesi
 {
 	Enesim_Color final_color, rend_color;
 
- 	thiz = _background_get(r);
 	final_color = thiz->color;
 	enesim_renderer_color_get(r, &rend_color);
 	if (rend_color != ENESIM_COLOR_FULL)
