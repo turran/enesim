@@ -9,14 +9,14 @@ void main()
 	vec4 colors[2];
 	vec4 p0;
 	vec4 p1;
-	float x;
-	float y;
+	int x;
+	int y;
 	float fx;
 	float fy;
 
  	// gl_FragCoord
- 	x = mod(floor(gl_TexCoord[0].x), checker_sw * 2);
-	y = mod(floor(gl_TexCoord[0].y), checker_sh * 2);
+ 	x = int(mod(gl_TexCoord[0].x, checker_sw * 2));
+	y = int(mod(gl_TexCoord[0].y, checker_sh * 2));
 	fx = fract(gl_TexCoord[0].x);
 	fy = fract(gl_TexCoord[0].y);
 	colors[0] = checker_even_color;
