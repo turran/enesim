@@ -275,6 +275,9 @@ void enesim_renderer_init(void)
 {
 	_factories = eina_hash_string_superfast_new(NULL);
 	enesim_renderer_sw_init();
+#if BUILD_OPENGL
+	enesim_renderer_opengl_init();
+#endif
 }
 
 void enesim_renderer_shutdown(void)

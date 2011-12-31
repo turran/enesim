@@ -23,6 +23,10 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Eina_Bool _fragment_shader_support = EINA_FALSE;
+static Eina_Bool _geometry_shader_support = EINA_FALSE;
+
+
 /* FIXME for debugging purposes */
 #define GLERR {\
         GLenum err; \
@@ -35,15 +39,15 @@ static void _opengl_extensions_setup(void)
 	char *extensions;
 
 	extensions  = (char *)glGetString(GL_EXTENSIONS);
-/*if( findString("GL_ARB_shader_objects",extensionList) &&
-      findString("GL_ARB_shading_language_100",extensionList) &&
-      findString("GL_ARB_vertex_shader",extensionList) &&
-      findString("GL_ARB_fragment_shader",extensionList) )
-"GL_EXT_geometry_shader4"
-*/
-
+	if (!strstr(extensions, "GL_ARB_shader_objects"))
+		return;
+	if (!strstr(extensions, "GL_ARB_shading_language_100"))
+		return;
+	if (strstr(extensions, "GL_ARB_fragment_shader"))
+		_fragment_shader_support = EINA_TRUE;
+	if (strstr(extensions, "GL_EXT_geometry_shader4"))
+		_geometry_shader_support = EINA_TRUE;
 }
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -174,6 +178,8 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 void enesim_renderer_opengl_init(void)
 {
 	/* maybe we should add a hash to match between kernel name and program */
+	_opengl_extensions_setup();
+	printf("Fragment shader %d Geometry shader %d\n", _fragment_shader_support, _geometry_shader_support);
 }
 
 void enesim_renderer_opengl_shutdown(void)
