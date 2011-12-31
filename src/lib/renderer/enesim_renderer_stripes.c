@@ -189,6 +189,7 @@ static Eina_Bool _stripes_sw_state(Enesim_Renderer *r,
 
 	if (!thiz)
 		return EINA_FALSE;
+	if (!_stripes_state_setup(thiz, r)) return EINA_FALSE;
 	thiz->hh0 = (int)(thiz->current.s0.thickness * 65536);
 	thiz->hh = (int)(thiz->hh0 + (thiz->current.s1.thickness * 65536));
 
