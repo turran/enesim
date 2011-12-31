@@ -456,9 +456,16 @@ static Eina_Bool _checker_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface
 	sw = glGetUniformLocationARB(rdata->program, "checker_sw");
 	sh = glGetUniformLocationARB(rdata->program, "checker_sh");
 
-	/* FIXME use the final color instead */
-	glUniform4fARB(even_color, 1.0, 0.0, 0.0, 1.0);
-	glUniform4fARB(odd_color, 0.0, 0.0, 1.0, 1.0);
+	glUniform4fARB(even_color,
+			argb8888_red_get(thiz->final_color1) / 255.0,
+			argb8888_green_get(thiz->final_color1) / 255.0,
+			argb8888_blue_get(thiz->final_color1) / 255.0,
+			argb8888_alpha_get(thiz->final_color1) / 255.0);
+	glUniform4fARB(odd_color,
+			argb8888_red_get(thiz->final_color2) / 255.0,
+			argb8888_green_get(thiz->final_color2) / 255.0,
+			argb8888_blue_get(thiz->final_color2) / 255.0,
+			argb8888_alpha_get(thiz->final_color2) / 255.0);
 	glUniform1i(sw, thiz->current.sw);
 	glUniform1i(sh, thiz->current.sh);
 

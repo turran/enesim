@@ -155,7 +155,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	/* FIXME for now */
-	//glScalef(0.2, 0.2, 1.0);
+	//glScalef(0.02, 0.02, 1.0);
 	glRotatef(30, 0.0, 0.0, 1.0);
 
 	glMatrixMode(GL_PROJECTION);

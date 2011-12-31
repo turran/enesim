@@ -311,9 +311,16 @@ static Eina_Bool _stripes_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface
 	even_thickness = glGetUniformLocationARB(rdata->program, "stripes_even_thickness");
 	odd_thickness = glGetUniformLocationARB(rdata->program, "stripes_odd_thickness");
 
-	/* FIXME use the final color instead */
-	glUniform4fARB(even_color, 1.0, 0.0, 0.0, 1.0);
-	glUniform4fARB(odd_color, 0.0, 0.0, 1.0, 1.0);
+	glUniform4fARB(even_color,
+			argb8888_red_get(thiz->final_color1) / 255.0,
+			argb8888_green_get(thiz->final_color1) / 255.0,
+			argb8888_blue_get(thiz->final_color1) / 255.0,
+			argb8888_alpha_get(thiz->final_color1) / 255.0);
+	glUniform4fARB(odd_color,
+			argb8888_red_get(thiz->final_color2) / 255.0,
+			argb8888_green_get(thiz->final_color2) / 255.0,
+			argb8888_blue_get(thiz->final_color2) / 255.0,
+			argb8888_alpha_get(thiz->final_color2) / 255.0);
 	glUniform1i(even_thickness, thiz->current.s0.thickness);
 	glUniform1i(odd_thickness, thiz->current.s1.thickness);
 

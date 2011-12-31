@@ -178,8 +178,11 @@ static Eina_Bool _background_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surf
  	thiz = _background_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
-	/* FIXME use the final color instead */
-	glUniform4fARB(final_color, 1.0, 0.0, 1.0, 1.0);
+	glUniform4fARB(final_color,
+			argb8888_red_get(thiz->final_color) / 255.0,
+			argb8888_green_get(thiz->final_color) / 255.0,
+			argb8888_blue_get(thiz->final_color) / 255.0,
+			argb8888_alpha_get(thiz->final_color) / 255.0);
 
 	return EINA_TRUE;
 }
