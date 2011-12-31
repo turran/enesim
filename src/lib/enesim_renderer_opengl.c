@@ -39,6 +39,7 @@ static void _opengl_extensions_setup(void)
 	char *extensions;
 
 	extensions  = (char *)glGetString(GL_EXTENSIONS);
+	if (!extensions) return;
 	if (!strstr(extensions, "GL_ARB_shader_objects"))
 		return;
 	if (!strstr(extensions, "GL_ARB_shading_language_100"))

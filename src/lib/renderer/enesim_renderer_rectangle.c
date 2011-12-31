@@ -88,13 +88,13 @@ static inline void _top_left(int sx, int sy, int stw,
 	if (sx < stw)
 	{
 		if (cout[1] != cout[3])
-			cout[1] = argb8888_interp_256(ay, cout[3], cout[1]);
+			cout[1] = argb8888_interp_256(ax, cout[3], cout[1]);
 		cout[0] = cout[2] = cout[3] = cout[1];
 	}
 	if (sy < stw)
 	{
 		if (cout[2] != cout[3])
-			cout[2] = argb8888_interp_256(ax, cout[3], cout[2]);
+			cout[2] = argb8888_interp_256(ay, cout[3], cout[2]);
 		cout[0] = cout[1] = cout[3] = cout[2];
 	}
 }
@@ -120,13 +120,13 @@ static inline void _bottom_left(int sx, int sy, int sh, int stw,
 	if (sx < stw)
 	{
 		if (cout[1] != cout[3])
-			cout[1] = argb8888_interp_256(ay, cout[3], cout[1]);
+			cout[1] = argb8888_interp_256(ax, cout[3], cout[1]);
 		cout[0] = cout[2] = cout[3] = cout[1];
 	}
 	if ((sy + 1 + stw) == sh)
 	{
 		if (cout[0] != cout[1])
-			cout[0] = argb8888_interp_256(ax, cout[1], cout[0]);
+			cout[0] = argb8888_interp_256(ay, cout[1], cout[0]);
 		cout[1] = cout[2] = cout[3] = cout[0];
 	}
 }
@@ -169,13 +169,13 @@ static inline void _top_right(int sx, int sy, int sw, int stw,
 	if ((sx + 1 + stw) == sw)
 	{
 		if (cout[0] != cout[2])
-			cout[0] = argb8888_interp_256(ay, cout[2], cout[0]);
+			cout[0] = argb8888_interp_256(ax, cout[2], cout[0]);
 		cout[1] = cout[2] = cout[3] = cout[0];
 	}
 	if (sy < stw)
 	{
 		if (cout[2] != cout[3])
-			cout[2] = argb8888_interp_256(ax, cout[3], cout[2]);
+			cout[2] = argb8888_interp_256(ay, cout[3], cout[2]);
 		cout[0] = cout[1] = cout[3] = cout[2];
 	}
 }
@@ -202,13 +202,13 @@ static inline void _bottom_right(int sx, int sy, int sw, int sh, int stw,
 	if ((sx + 1 + stw) == sw)
 	{
 		if (cout[0] != cout[2])
-			cout[0] = argb8888_interp_256(ay, cout[2], cout[0]);
+			cout[0] = argb8888_interp_256(ax, cout[2], cout[0]);
 		cout[1] = cout[2] = cout[3] = cout[0];
 	}
 	if ((sy + 1 + stw) == sh)
 	{
 		if (cout[0] != cout[1])
-			cout[0] = argb8888_interp_256(ax, cout[1], cout[0]);
+			cout[0] = argb8888_interp_256(ay, cout[1], cout[0]);
 		cout[1] = cout[2] = cout[3] = cout[0];
 	}
 }
@@ -342,7 +342,7 @@ static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 			int sy = yy >> 16;
 			int sw = ww0 >> 16;
 			int sh = hh0 >> 16;
-			int ca = 256;
+			uint16_t ca = 256;
 			unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
 			int ax = 1 + ((xx & 0xffff) >> 8);
 			int ay = 1 + ((yy & 0xffff) >> 8);
@@ -526,7 +526,7 @@ static void _rounded_stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 			int sy = yy >> 16;
 			int sw = ww0 >> 16;
 			int sh = hh0 >> 16;
-			int ca = 256;
+			uint16_t ca = 256;
 			unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
 			int ax = 1 + ((xx & 0xffff) >> 8);
 			int ay = 1 + ((yy & 0xffff) >> 8);
@@ -703,7 +703,7 @@ static void _rounded_stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, i
 			int sy = yy >> 16;
 			int sw = ww0 >> 16;
 			int sh = hh0 >> 16;
-			int ca = 256;
+			uint16_t ca = 256;
 			unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
 			int ax = 1 + ((xx & 0xffff) >> 8);
 			int ay = 1 + ((yy & 0xffff) >> 8);
@@ -906,7 +906,7 @@ static void _rounded_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 				int sy = syy >> 16;
 				int sw = ww0 >> 16;
 				int sh = hh0 >> 16;
-				int ca = 256;
+				uint16_t ca = 256;
 				unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
 				int ax = 1 + ((sxx & 0xffff) >> 8);
 				int ay = 1 + ((syy & 0xffff) >> 8);
@@ -1093,7 +1093,7 @@ static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 				int sy = syy >> 16;
 				int sw = ww0 >> 16;
 				int sh = hh0 >> 16;
-				int ca = 256;
+				uint16_t ca = 256;
 				unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
 				int ax = 1 + ((sxx & 0xffff) >> 8);
 				int ay = 1 + ((syy & 0xffff) >> 8);
@@ -1277,7 +1277,7 @@ static void _rounded_stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int
 				int sy = syy >> 16;
 				int sw = ww0 >> 16;
 				int sh = hh0 >> 16;
-				int ca = 256;
+				uint16_t ca = 256;
 				unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
 				int ax = 1 + ((sxx & 0xffff) >> 8);
 				int ay = 1 + ((syy & 0xffff) >> 8);
