@@ -18,6 +18,8 @@
 #include "Enesim.h"
 #include "enesim_private.h"
 
+/* Until we fix the new renderer */
+#define NEW_RENDERER 0
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -259,6 +261,164 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+#if NEW_RENDERER
+static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
+		void *ddata)
+{
+	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *fpaint;
+	Eina_F16p16 ww0 = thiz->ww;
+	Eina_F16p16 hh0 = thiz->hh;
+	Eina_F16p16 xx0 = thiz->xx;
+	Eina_F16p16 yy0 = thiz->yy;
+	int axx = thiz->matrix.xx;
+	int ayx = thiz->matrix.yx;
+	int do_inner = thiz->do_inner;
+	Enesim_Color color;
+	Enesim_Color ocolor;
+	Enesim_Color icolor;
+	int stww = (thiz->sw) * 65536;
+	int stw = stww >> 16;
+	int iww = ww0 - (2 * stww);
+	int ihh = hh0 - (2 * stww);
+	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
+	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
+	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
+	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	int xx, yy;
+	int fill_only = 0;
+	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
+
+	enesim_renderer_shape_stroke_color_get(r, &ocolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	enesim_renderer_shape_fill_color_get(r, &icolor);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		ocolor = argb8888_mul4_sym(color, ocolor);
+		icolor = argb8888_mul4_sym(color, icolor);
+	}
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+	{
+		icolor = 0;
+		fpaint = NULL;
+	}
+	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+	{
+		ocolor = icolor;
+		fill_only = 1;
+		do_inner = 0;
+		if (fpaint)
+		{
+			Enesim_Renderer_Sw_Data *sdata;
+
+			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+			sdata->fill(fpaint, x, y, len, dst);
+		}
+	}
+	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
+	{
+		Enesim_Renderer_Sw_Data *sdata;
+
+		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+		sdata->fill(fpaint, x, y, len, dst);
+	}
+
+        enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	xx = eina_f16p16_sub(xx, xx0);
+	yy = eina_f16p16_sub(yy, yy0);
+
+	while (d < e)
+	{
+		uint32_t q0 = 0;
+
+		if (xx < ww0 && yy < hh0 && xx > -EINA_F16P16_ONE && yy > -EINA_F16P16_ONE)
+		{
+			Eina_F16p16 lxx = xx - lxx0;
+			Eina_F16p16 rxx = xx - rxx0;
+			Eina_F16p16 tyy = yy - tyy0;
+			Eina_F16p16 byy = yy - byy0;
+			Eina_F16p16 ixx = xx - stww;
+			Eina_F16p16 iyy = yy - stww;
+			uint16_t ca = 256;
+			unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
+			uint16_t ax = 1 + ((xx & 0xffff) >> 8);
+			uint16_t ay = 1 + ((yy & 0xffff) >> 8);
+
+			if ((xx > 0) && (yy > 0))
+				op0 = ocolor;
+			if ((xx + EINA_F16P16_ONE) < ww0)
+				op1 = ocolor;
+			if ((yy + EINA_F16P16_ONE) < hh0)
+			{
+				if (xx > 0)
+					op2 = ocolor;
+				if ((xx + EINA_F16P16_ONE) < ww0)
+					op3 = ocolor;
+			}
+			if (op0 != op1)
+				op0 = argb8888_interp_256(ax, op1, op0);
+			if (op2 != op3)
+				op2 = argb8888_interp_256(ax, op3, op2);
+			if (op0 != op2)
+				op0 = argb8888_interp_256(ay, op2, op0);
+
+			if (ca < 256)
+				op0 = argb8888_mul_256(ca, op0);
+
+			p0 = op0;
+			if (do_inner && (ixx > -EINA_F16P16_ONE)
+					&& (iyy > -EINA_F16P16_ONE)
+					&& (ixx < iww) && (iyy < ihh))
+			{
+#if 0
+				unsigned int p3 = p0, p2 = p0, p1 = p0;
+				uint16_t iax = 1 + ((ixx & 0xffff) >> 8);
+				uint16_t iay = 1 + ((iyy & 0xffff) >> 8);
+
+				ca = 256;
+				if (fpaint)
+				{
+					color = *d;
+					if (icolor != 0xffffffff)
+						color = argb8888_mul4_sym(color, icolor);
+					icolor = color;
+				}
+				if ((ixx > 0) && (iyy > 0))
+					p0 = icolor;
+				if ((ixx + EINA_F16P16_ONE) < iww)
+					p1 = icolor;
+				if ((iyy + EINA_F16P16_ONE) < ihh)
+				{
+					if (ixx > 0)
+						p2 = icolor;
+					if ((ixx + EINA_F16P16_ONE) < iww)
+						p3 = icolor;
+				}
+				if (p0 != p1)
+					p0 = argb8888_interp_256(iax, p1, p0);
+				if (p2 != p3)
+					p2 = argb8888_interp_256(iax, p3, p2);
+				if (p0 != p2)
+					p0 = argb8888_interp_256(iay, p2, p0);
+				if (ca < 256)
+					p0 = argb8888_interp_256(ca, p0, op0);
+#endif
+			}
+			q0 = p0;
+		}
+		*d++ = q0;
+		xx += axx;
+		yy += ayx;
+	}
+}
+
+#else
 /* stroke and/or fill with possibly a fill renderer */
 static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *ddata)
@@ -1393,7 +1553,7 @@ static void _rounded_stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int
 		zz += azx;
 	}
 }
-
+#endif
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -1477,6 +1637,9 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
 
+#if NEW_RENDERER
+	*fill = _test_affine;
+#else
 	if (state->transformation_type == ENESIM_MATRIX_AFFINE ||
 		 state->transformation_type == ENESIM_MATRIX_IDENTITY)
 	{
@@ -1506,7 +1669,7 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 				*fill = _rounded_stroke_paint_fill_paint_proj;
 		}
 	}
-
+#endif
 
 	return EINA_TRUE;
 }
@@ -1594,7 +1757,11 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _rectangle_name,
 	/* .free = 			*/ _rectangle_free,
+#if NEW_RENDERER
+	/* .boundings = 		*/ NULL, //_rectangle_boundings,
+#else
 	/* .boundings = 		*/ _rectangle_boundings,
+#endif
 	/* .destination_transform = 	*/ NULL,
 	/* .flags = 			*/ _rectangle_flags,
 	/* .is_inside = 		*/ NULL,
