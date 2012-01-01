@@ -350,23 +350,18 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 			uint16_t ax = 1 + ((xx & 0xffff) >> 8);
 			uint16_t ay = 1 + ((yy & 0xffff) >> 8);
 
-			if ((xx > 0) && (yy > 0))
-				op0 = ocolor;
-			if ((xx + EINA_F16P16_ONE) < ww0)
-				op1 = ocolor;
-			if ((yy + EINA_F16P16_ONE) < hh0)
-			{
-				if (xx > 0)
-					op2 = ocolor;
-				if ((xx + EINA_F16P16_ONE) < ww0)
-					op3 = ocolor;
-			}
+			op0 = ocolor;
+			op1 = ocolor;
+			if (xx < 0)
+				op0 = argb8888_mul_256(ax, ocolor);
+			else if (ww0 - xx < EINA_F16P16_ONE)
+				op0 = argb8888_mul_256(256 - ax, ocolor);
+			if (yy < 0)
+				op1 = argb8888_mul_256(ax, ocolor);
+			else if (hh0 - yy < EINA_F16P16_ONE)
+				op1 = argb8888_mul_256(256 - ay, ocolor);
 			if (op0 != op1)
-				op0 = argb8888_interp_256(ax, op1, op0);
-			if (op2 != op3)
-				op2 = argb8888_interp_256(ax, op3, op2);
-			if (op0 != op2)
-				op0 = argb8888_interp_256(ay, op2, op0);
+				op0 = argb8888_interp_256(128, op1, op0);
 
 			if (ca < 256)
 				op0 = argb8888_mul_256(ca, op0);
@@ -376,7 +371,6 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 					&& (iyy > -EINA_F16P16_ONE)
 					&& (ixx < iww) && (iyy < ihh))
 			{
-#if 0
 				unsigned int p3 = p0, p2 = p0, p1 = p0;
 				uint16_t iax = 1 + ((ixx & 0xffff) >> 8);
 				uint16_t iay = 1 + ((iyy & 0xffff) >> 8);
@@ -389,26 +383,23 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 						color = argb8888_mul4_sym(color, icolor);
 					icolor = color;
 				}
-				if ((ixx > 0) && (iyy > 0))
-					p0 = icolor;
-				if ((ixx + EINA_F16P16_ONE) < iww)
-					p1 = icolor;
-				if ((iyy + EINA_F16P16_ONE) < ihh)
-				{
-					if (ixx > 0)
-						p2 = icolor;
-					if ((ixx + EINA_F16P16_ONE) < iww)
-						p3 = icolor;
-				}
+				p0 = icolor;
+				p1 = icolor;
+
+				if (ixx < 0)
+					p0 = argb8888_mul_256(iax, icolor);
+				else if (iww - ixx < EINA_F16P16_ONE)
+					p0 = argb8888_mul_256(256 - iax, icolor);
+				if (iyy < 0)
+					p1 = argb8888_mul_256(iax, icolor);
+				if (ihh - iyy < EINA_F16P16_ONE)
+					p1 = argb8888_mul_256(256 - iay, icolor);
+
 				if (p0 != p1)
-					p0 = argb8888_interp_256(iax, p1, p0);
-				if (p2 != p3)
-					p2 = argb8888_interp_256(iax, p3, p2);
-				if (p0 != p2)
-					p0 = argb8888_interp_256(iay, p2, p0);
+					p0 = argb8888_interp_256(128, p1, p0);
+
 				if (ca < 256)
 					p0 = argb8888_interp_256(ca, p0, op0);
-#endif
 			}
 			q0 = p0;
 		}
