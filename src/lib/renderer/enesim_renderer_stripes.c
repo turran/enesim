@@ -279,18 +279,25 @@ static void _free(Enesim_Renderer *r)
 static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		Enesim_Surface *s,
-		const char **program_name, const char **program_source,
-		size_t *program_length, Enesim_Error **error)
+		int *num_shaders,
+		Enesim_Renderer_OpenGL_Shader **shaders,
+		Enesim_Error **error)
 {
 	Enesim_Renderer_Stripes *thiz;
+	Enesim_Renderer_OpenGL_Shader *shader;
 
  	thiz = _stripes_get(r);
 	if (!_stripes_state_setup(thiz, r)) return EINA_FALSE;
 
-	*program_name = "stripes";
-	*program_source =
+	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
+	shader->type = ENESIM_SHADER_FRAGMENT;
+	shader->name = "stripes";
+	shader->source =
 	#include "enesim_renderer_stripes.glsl"
-	*program_length = strlen(*program_source);
+	shader->size = strlen(shader->source);
+
+	*shaders = shader;
+	*num_shaders = 1;
 
 	return EINA_TRUE;
 }

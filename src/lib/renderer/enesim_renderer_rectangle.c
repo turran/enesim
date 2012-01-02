@@ -262,6 +262,49 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 }
 
 #if NEW_RENDERER
+static uint32_t _rectangle_get_color(Eina_F16p16 xx, Eina_F16p16 yy, Eina_F16p16 ww0, Eina_F16p16 hh0,
+			Enesim_Color ocolor, Enesim_Color icolor)
+{
+	Enesim_Color xc, yc;
+	uint16_t ax = 1 + ((xx & 0xffff) >> 8);
+	uint16_t ay = 1 + ((yy & 0xffff) >> 8);
+
+	xc = icolor;
+	yc = icolor;
+	if (xx < 0)
+		xc = argb8888_interp_256(ax, ocolor, icolor);
+	else if (ww0 - xx < EINA_F16P16_ONE)
+		xc = argb8888_interp_256(256 - ax, ocolor, icolor);
+	if (yy < 0)
+		yc = argb8888_interp_256(ay, ocolor, icolor);
+	else if (hh0 - yy < EINA_F16P16_ONE)
+		yc = argb8888_interp_256(256 - ay, ocolor, icolor);
+	/* FIXME how to interpolate between the x and y? */
+	if (xc != yc)
+		xc = argb8888_interp_256(128, yc, xc);
+
+	return xc;
+}
+
+static uint16_t _rectangle_get_alpha(Eina_F16p16 xx, Eina_F16p16 yy, Eina_F16p16 rr0, Eina_F16p16 rr1)
+{
+	uint16_t ca = 256;
+
+	if ((xx + yy) >= rr0)
+	{
+		int rr = hypot(xx, yy);
+
+		ca = 0;
+		if (rr < rr1)
+		{
+			ca = 256;
+			if (rr > rr0)
+				ca = 256 - ((rr - rr0) >> 8);
+		}
+	}
+	return ca;
+}
+
 static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 		void *ddata)
 {
@@ -346,34 +389,30 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 			Eina_F16p16 ixx = xx - stww;
 			Eina_F16p16 iyy = yy - stww;
 			uint16_t ca = 256;
-			unsigned int op3 = 0, op2 = 0, op1 = 0, op0 = 0, p0;
-			uint16_t ax = 1 + ((xx & 0xffff) >> 8);
-			uint16_t ay = 1 + ((yy & 0xffff) >> 8);
+			unsigned int p0;
 
-			op0 = ocolor;
-			op1 = ocolor;
-			if (xx < 0)
-				op0 = argb8888_mul_256(ax, ocolor);
-			else if (ww0 - xx < EINA_F16P16_ONE)
-				op0 = argb8888_mul_256(256 - ax, ocolor);
-			if (yy < 0)
-				op1 = argb8888_mul_256(ay, ocolor);
-			else if (hh0 - yy < EINA_F16P16_ONE)
-				op1 = argb8888_mul_256(256 - ay, ocolor);
-			if (op0 != op1)
-				op0 = argb8888_interp_256(128, op1, op0);
-
+			p0 = _rectangle_get_color(xx, yy, ww0, hh0, 0, ocolor);
+			/* top left */
+			ca = _rectangle_get_alpha(-lxx, -tyy, rr0, rr1);
+			/* top right */
+#if 0
+			if (ca == 256)
+				ca = _rectangle_get_alpha(rxx, -tyy, rr0, rr1);
+			/* bottom right */
+			if (ca == 256)
+				ca = _rectangle_get_alpha(rxx, byy, rr0, rr1);
+			/* bottom left */
+			if (ca == 256)
+				ca = _rectangle_get_alpha(-lxx, byy, rr0, rr1);
+#endif
 			if (ca < 256)
-				op0 = argb8888_mul_256(ca, op0);
+				p0 = argb8888_mul_256(ca, p0);
 
-			p0 = op0;
 			if (do_inner && (ixx > -EINA_F16P16_ONE)
 					&& (iyy > -EINA_F16P16_ONE)
 					&& (ixx < iww) && (iyy < ihh))
 			{
-				unsigned int p3 = p0, p2 = p0, p1 = p0;
-				uint16_t iax = 1 + ((ixx & 0xffff) >> 8);
-				uint16_t iay = 1 + ((iyy & 0xffff) >> 8);
+				unsigned int op0;
 
 				ca = 256;
 				if (fpaint)
@@ -383,24 +422,11 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 						color = argb8888_mul4_sym(color, icolor);
 					icolor = color;
 				}
-				p1 = icolor;
-				p2 = icolor;
-
-				if (ixx < 0)
-					p1 = argb8888_interp_256(iax, p0, icolor);
-				else if (iww - ixx < EINA_F16P16_ONE)
-					p1 = argb8888_interp_256(256 - iax, p0, icolor);
-				if (iyy < 0)
-					p2 = argb8888_interp_256(iay, p0, icolor);
-				if (ihh - iyy < EINA_F16P16_ONE)
-					p2 = argb8888_interp_256(256 - iay, p0, icolor);
-
-				if (p1 != p2)
-					p1 = argb8888_interp_256(128, p2, p1);
+				op0 = _rectangle_get_color(ixx, iyy, iww, ihh, p0, icolor);
 
 				if (ca < 256)
-					p1 = argb8888_interp_256(ca, p0, op0);
-				p0 = p1;
+					op0 = argb8888_interp_256(ca, p0, op0);
+				p0 = op0;
 			}
 			q0 = p0;
 		}
@@ -1745,6 +1771,75 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		int *num_shaders,
+		Enesim_Renderer_OpenGL_Shader **shaders,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Rectangle *thiz;
+	Enesim_Renderer_OpenGL_Shader *shader;
+
+ 	thiz = _rectangle_get(r);
+
+	/* FIXME in order to generate the stroke we might need to call this twice
+	 * one for the outter rectangle and one for the inner
+	 */
+	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
+	shader->type = ENESIM_SHADER_GEOMETRY;
+	shader->name = "rectangle";
+	shader->source = 
+		"#version 120\n"
+		"#extension GL_EXT_geometry_shader4 : enable\n"
+	#include "enesim_renderer_rectangle.glsl"
+	shader->size = strlen(shader->source);
+
+	/* FIXME for now we should use the background renderer for the color */
+	/* if we have a renderer set use that one but render into another texture
+	 * if it has some geometric shader
+	 */
+
+	*shaders = shader;
+	*num_shaders = 1;
+
+	return EINA_TRUE;
+}
+
+static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Rectangle *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int width;
+	int height;
+	int x;
+	int y;
+
+ 	thiz = _rectangle_get(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+
+	x = glGetUniformLocationARB(rdata->program, "rectangle_x");
+	y = glGetUniformLocationARB(rdata->program, "rectangle_y");
+	width = glGetUniformLocationARB(rdata->program, "rectangle_width");
+	height = glGetUniformLocationARB(rdata->program, "rectangle_height");
+
+	glUniform1f(x, thiz->current.x);
+	glUniform1f(y, thiz->current.y);
+	glUniform1f(width, thiz->current.width);
+	glUniform1f(height, thiz->current.height);
+
+	return EINA_TRUE;
+}
+
+static void _rectangle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Rectangle *thiz;
+
+ 	thiz = _rectangle_get(r);
+}
+#endif
+
 static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _rectangle_name,
@@ -1752,7 +1847,7 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 #if NEW_RENDERER
 	/* .boundings = 		*/ NULL, //_rectangle_boundings,
 #else
-	/* .boundings = 		*/ _rectangle_boundings,
+	/* .boundings = 		*/ NULL, // _rectangle_boundings,
 #endif
 	/* .destination_transform = 	*/ NULL,
 	/* .flags = 			*/ _rectangle_flags,
@@ -1764,9 +1859,15 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+#if BUILD_OPENGL
+	/* .opengl_setup =          	*/ _rectangle_opengl_setup,
+	/* .opengl_shader_setup =   	*/ _rectangle_opengl_shader_setup,
+	/* .opengl_cleanup =        	*/ _rectangle_opengl_cleanup
+#else
 	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup = 	*/ NULL,
+	/* .opengl_shader_setup =   	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
+#endif
 };
 /*============================================================================*
  *                                 Global                                     *

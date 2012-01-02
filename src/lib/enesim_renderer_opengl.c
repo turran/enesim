@@ -49,6 +49,27 @@ static void _opengl_extensions_setup(void)
 	if (strstr(extensions, "GL_EXT_geometry_shader4"))
 		_geometry_shader_support = EINA_TRUE;
 }
+
+static void _opengl_rop_set(Enesim_Renderer *r)
+{
+	Enesim_Rop rop;
+
+	enesim_renderer_rop_get(r, &rop);
+	glBlendEquation(GL_FUNC_ADD);
+	switch (rop)
+	{
+		case ENESIM_BLEND:
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+
+		case ENESIM_FILL:
+		glBlendFunc(GL_ONE, GL_ZERO);
+		break;
+
+		default:
+		break;
+	}
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -58,14 +79,12 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer_OpenGL_Shader *shaders;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Eina_Bool ret;
 	GLenum status;
-	GLenum shader;
-	const char *source = NULL;
-	const char *source_name = NULL;
-	size_t source_size = 0;
-	int compiled = 0;
+	int i;
+	int num;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -75,29 +94,58 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
 	}
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
-	ret = r->descriptor.opengl_setup(r, state, s, &source_name, &source, &source_size, error);
+	ret = r->descriptor.opengl_setup(r, state, s, &num, &shaders, error);
 	if (!ret) return EINA_FALSE;
-	/* setup the shaders */
-	shader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-	glShaderSourceARB(shader, 1, &source, &source_size);
-	/* compile it */
-	glCompileShaderARB(shader);
-	glGetObjectParameterivARB(shader,GL_OBJECT_COMPILE_STATUS_ARB, &compiled);
-	if (!compiled)
-	{
-		char log[PATH_MAX];
-		glGetInfoLogARB(shader, sizeof(log), NULL, log);
-		printf("Failed to compile %s\n", log);
-	}
+
 	if (!rdata->program)
 	{
 		rdata->program = glCreateProgramObjectARB();
 	}
-	/* attach the shader to the program */
-	glAttachObjectARB(rdata->program, shader);
-	/* link it */ 
-	glLinkProgramARB(rdata->program);
- 
+
+	for (i = 0; i < num; i++)
+	{
+		Enesim_Renderer_OpenGL_Shader *shader;
+		GLenum st;
+		GLenum sh;
+		int ok = 0;
+
+		shader = &shaders[i];
+		if (shader->type == ENESIM_SHADER_GEOMETRY)
+		{
+			st = GL_GEOMETRY_SHADER_EXT;
+			//glProgramParameteriEXT(rdata->program, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_POINTS);
+		}
+		else if (shader->type == ENESIM_SHADER_FRAGMENT)
+			st = GL_FRAGMENT_SHADER_ARB;
+		else
+		{
+			return EINA_FALSE;
+		}
+		/* setup the shaders */
+		sh = glCreateShaderObjectARB(st);
+		glShaderSourceARB(sh, 1, (const GLcharARB **)&shader->source, (const GLint *)&shader->size);
+		/* compile it */
+		glCompileShaderARB(sh);
+		glGetObjectParameterivARB(sh, GL_OBJECT_COMPILE_STATUS_ARB, &ok);
+		if (!ok)
+		{
+			char log[PATH_MAX];
+			glGetInfoLogARB(sh, sizeof(log), NULL, log);
+			printf("Failed to compile %s\n", log);
+		}
+		/* attach the shader to the program */
+		glAttachObjectARB(rdata->program, sh);
+		/* link it */ 
+		glLinkProgramARB(rdata->program);
+		glGetObjectParameterivARB(rdata->program, GL_OBJECT_LINK_STATUS_ARB, &ok);
+		if (!ok)
+		{
+			char log[PATH_MAX];
+			glGetInfoLogARB(rdata->program, sizeof(log), NULL, log);
+			printf("Failed to link %s\n", log);
+		}
+	}
+
 	if (!rdata->fbo)
 	{
 		glGenFramebuffersEXT(1, &rdata->fbo);
@@ -163,9 +211,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	glLoadIdentity();
 	glOrtho(0, width, 0, height, -1, 1);
 
-	/* for later */
-	//glBlendEquationSeparate(ec, ea);
-	//glBlendFuncSeparate(fsc, fdc, fsa, fda);
+	_opengl_rop_set(r);
 
 	glBegin(GL_QUADS);
 		glTexCoord2d(area->x, area->y);  glVertex2d(area->x, area->y);

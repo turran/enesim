@@ -155,10 +155,25 @@ typedef void (*Enesim_Renderer_OpenCL_Cleanup)(Enesim_Renderer *r, Enesim_Surfac
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s);
 
 /* opengl backend descriptor functions */
+typedef enum _Enesim_Renderer_OpenGL_Shader_Type
+{
+	ENESIM_SHADER_GEOMETRY,
+	ENESIM_SHADER_FRAGMENT,
+	ENESIM_SHADERS,
+} Enesim_Renderer_OpenGL_Shader_Type;
+
+typedef struct _Enesim_Renerer_OpenGL_Shader
+{
+	Enesim_Renderer_OpenGL_Shader_Type type;
+	const char *name;
+	const char *source;
+	size_t size;
+} Enesim_Renderer_OpenGL_Shader;
+
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state, Enesim_Surface *s,
-		const char **program_name, const char **program_source,
-		size_t *program_length,
+		int *num_shaders,
+		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error);
 typedef void (*Enesim_Renderer_OpenGL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Shader_Setup)(Enesim_Renderer *r, Enesim_Surface *s);
