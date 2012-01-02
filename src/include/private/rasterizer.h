@@ -18,10 +18,19 @@
 #ifndef RASTERIZER_H_
 #define RASTERIZER_H_
 
-typedef struct _Enesim_Rasterizer
-{
+typedef Eina_Bool (*Enesim_Rasterizer_Setup)(Enesim_Renderer *r, Enesim_Polygon *p);
+typedef void (*Enesim_Rasterizer_Process)(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst);
+typedef void (*Enesim_Rasterizer_Cleanup)(Enesim_Renderer *r);
 
-} Enesim_Rasterizer;
+typedef struct _Enesim_Rasterizer_Descriptor
+{
+	Enesim_Rasterizer_Setup setup;
+	Enesim_Rasterizer_Process process;
+	Enesim_Rasterizer_Cleanup cleanup;
+} Enesim_Rasterizer_Descriptor;
+
+
+Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *data);
+void enesim_rasterizier_polygon_set(Enesim_Renderer *r, const Enesim_Polygon *p);
 
 #endif
-

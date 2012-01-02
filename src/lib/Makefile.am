@@ -20,6 +20,7 @@ enesim_main.c \
 enesim_matrix.c \
 enesim_buffer.c \
 enesim_surface.c \
+enesim_rasterizer.c \
 enesim_renderer.c \
 enesim_renderer_sw.c \
 enesim_converter.c \

@@ -17,6 +17,7 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+/* TODO whenever we append/prepend a new point, calculate the boundings */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -56,6 +57,12 @@ void enesim_polygon_point_prepend(Enesim_Polygon *ep, Enesim_Point *p)
 	new_point = _point_new(p->x, p->y);
 	ep->points = eina_list_prepend(ep->points, new_point);
 }
+
+void enesim_polygon_boundings(Enesim_Polygon *ep, Enesim_Rectangle *bounds)
+{
+
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

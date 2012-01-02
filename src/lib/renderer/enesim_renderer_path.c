@@ -573,7 +573,6 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer *final_r = NULL;
-	Enesim_Rasterizer *rz;
 
 	Enesim_Color stroke_color;
 	Enesim_Renderer *stroke_renderer;

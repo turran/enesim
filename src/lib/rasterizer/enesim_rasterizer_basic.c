@@ -20,6 +20,11 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Enesim_Rasterizer_Basic
+{
+
+} Enesim_Rasterizer_Basic;
+
 #define MUL4_SYM(x, y) \
  ( ((((((x) >> 16) & 0xff00) * (((y) >> 16) & 0xff00)) + 0xff0000) & 0xff000000) + \
    ((((((x) >> 8) & 0xff00) * (((y) >> 16) & 0xff)) + 0xff00) & 0xff0000) + \
@@ -564,9 +569,25 @@ static void figure_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	}
 }
 #endif
+/*----------------------------------------------------------------------------*
+ *                    The Enesim's rasterizer interface                       *
+ *----------------------------------------------------------------------------*/
+static Enesim_Rasterizer_Descriptor _descriptor = {
+
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Enesim_Renderer * enesim_rasterizer_basic_new(void)
+{
+	Enesim_Rasterizer_Basic *thiz;
+	Enesim_Renderer *r;
+
+	thiz = calloc(1, sizeof(Enesim_Rasterizer_Basic));
+
+	r = enesim_rasterizer_new(&_descriptor, thiz);
+	return r;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
