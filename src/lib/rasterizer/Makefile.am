@@ -11,7 +11,8 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_rasterizer.la
 
 libenesim_rasterizer_la_SOURCES = \
-enesim_rasterizer_basic.c
+enesim_rasterizer_basic.c \
+enesim_rasterizer_bifigure.c
 
 libenesim_rasterizer_la_LIBADD =
 

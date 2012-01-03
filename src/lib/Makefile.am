@@ -29,6 +29,7 @@ enesim_pool.c
 
 libenesim_la_LIBADD = \
 util/libenesim_util.la \
+rasterizer/libenesim_rasterizer.la \
 renderer/libenesim_renderer.la \
 compositor/libenesim_compositor.la \
 converter/libenesim_converter.la \

@@ -35,7 +35,16 @@ typedef struct _Enesim_Polygon
 {
 	Eina_List *points;
 	Eina_Bool closed : 1;
+	double xmax;
+	double xmin;
+	double ymax;
+	double ymin;
 } Enesim_Polygon;
+
+typedef struct _Enesim_Figure
+{
+	Eina_List *polygons;
+} Enesim_Figure;
 
 typedef struct _Enesim_F16p16_Point
 {
@@ -49,6 +58,18 @@ typedef struct _Enesim_F16p16_Line
 	Eina_F16p16 b;
 	Eina_F16p16 c;
 } Enesim_F16p16_Line;
+
+typedef struct _Enesim_F16p16_Vector
+{
+	int xx0, yy0, xx1, yy1;
+	int a, b, c;
+} Enesim_F16p16_Vector;
+
+typedef struct _Enesim_F16p16_Edge
+{
+	int xx0, yy0, xx1, yy1;
+	int e, de;
+} Enesim_F16p16_Edge;
 
 /* p0 the initial point
  * vx the x direction
@@ -79,8 +100,22 @@ static inline Eina_F16p16 enesim_f16p16_line_affine_setup(Enesim_F16p16_Line *l,
 	return ret;
 }
 
+Enesim_Point * enesim_point_new(void);
+Enesim_Point * enesim_point_new_from_coords(double x, double y);
+
 Enesim_Polygon * enesim_polygon_new(void);
-void enesim_polygon_point_append(Enesim_Polygon *ep, Enesim_Point *p);
-void enesim_polygon_point_prepend(Enesim_Polygon *ep, Enesim_Point *p);
+int enesim_polygon_point_count(Enesim_Polygon *thiz);
+void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, double y);
+void enesim_polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p);
+void enesim_polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p);
+void enesim_polygon_clear(Enesim_Polygon *thiz);
+void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close);
+void enesim_polygon_boundings(Enesim_Polygon *ep, Enesim_Rectangle *bounds);
+
+Enesim_Figure * enesim_figure_new(void);
+void enesim_figure_delete(Enesim_Figure *thiz);
+int enesim_figure_polygon_count(Enesim_Figure *thiz);
+void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p);
+void enesim_figure_clear(Enesim_Figure *thiz);
 
 #endif

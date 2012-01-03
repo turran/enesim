@@ -22,9 +22,16 @@
  *============================================================================*/
 typedef struct _Enesim_Rasterizer
 {
-	const Enesim_Polygon *polygon;
+	/* public */
+	const Enesim_Figure *figure;
+	/* private */
 	Eina_Bool changed : 1;
 	void *data;
+	/* interface */
+	Enesim_Renderer_Name name;
+	Enesim_Renderer_Delete free;
+	Enesim_Rasterizer_Sw_Setup sw_setup;
+	Enesim_Rasterizer_Sw_Cleanup sw_cleanup;
 } Enesim_Rasterizer;
 
 static inline Enesim_Rasterizer * _rasterizer_get(Enesim_Renderer *r)
@@ -39,26 +46,47 @@ static inline Enesim_Rasterizer * _rasterizer_get(Enesim_Renderer *r)
  *----------------------------------------------------------------------------*/
 static const char * _rasterizer_name(Enesim_Renderer *r)
 {
-	return "rasterizer";
+	Enesim_Rasterizer *thiz;
+
+	thiz = _rasterizer_get(r);
+	if (!thiz->name) return "rasterizer";
+	return thiz->name(r);
 }
 
-static Eina_Bool _rasterizer_state_setup(Enesim_Renderer *r,
+static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
-	/* TODO call our own setup */
-	return EINA_TRUE;
+	Enesim_Rasterizer *thiz;
+	Eina_Bool ret;
+
+	thiz = _rasterizer_get(r);
+	if (!thiz->sw_setup) return EINA_FALSE;
+	if (!thiz->figure) return EINA_FALSE;
+
+	if (!enesim_renderer_shape_setup(r, state, s, error))
+		return EINA_FALSE;
+	ret = thiz->sw_setup(r, state, thiz->figure, s, fill, error);
+	return ret;
 }
 
-static void _rasterizer_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Rasterizer *thiz;
 
 	thiz = _rasterizer_get(r);
-
 	enesim_renderer_shape_cleanup(r, s);
 	thiz->changed = EINA_FALSE;
+}
+
+static void _rasterizer_free(Enesim_Renderer *r)
+{
+	Enesim_Rasterizer *thiz;
+
+	thiz = _rasterizer_get(r);
+	if (thiz->free) thiz->free(r);
+	free(thiz);
 }
 
 static void _rasterizer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -66,11 +94,7 @@ static void _rasterizer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	Enesim_Rasterizer *thiz;
 
 	thiz = _rasterizer_get(r);
-}
-
-static void _rasterizer_free(Enesim_Renderer *r)
-{
-
+	/* TODO */
 }
 
 static void _rasterizer_boundings(Enesim_Renderer *r, Enesim_Renderer *boundings)
@@ -78,6 +102,7 @@ static void _rasterizer_boundings(Enesim_Renderer *r, Enesim_Renderer *boundings
 	Enesim_Rasterizer *thiz;
 
 	thiz = _rasterizer_get(r);
+	/* TODO */
 }
 
 static Eina_Bool _rasterizer_has_changed(Enesim_Renderer *r)
@@ -87,7 +112,6 @@ static Eina_Bool _rasterizer_has_changed(Enesim_Renderer *r)
 	thiz = _rasterizer_get(r);
 	return thiz->changed;
 }
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -105,8 +129,8 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 		/* .is_inside = 		*/ NULL,
 		/* .damage = 			*/ NULL,
 		/* .has_changed = 		*/ _rasterizer_has_changed,
-		/* .sw_setup = 			*/ _rasterizer_state_setup,
-		/* .sw_cleanup = 		*/ _rasterizer_state_cleanup,
+		/* .sw_setup = 			*/ _rasterizer_sw_setup,
+		/* .sw_cleanup = 		*/ _rasterizer_sw_cleanup,
 		/* .opencl_setup =		*/ NULL,
 		/* .opencl_kernel_setup =	*/ NULL,
 		/* .opencl_cleanup =		*/ NULL,
@@ -117,17 +141,29 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 
 	thiz = calloc(1, sizeof(Enesim_Rasterizer));
 	if (!thiz) return NULL;
-	r = enesim_renderer_shape_new(&pdescriptor, thiz);
+	thiz->name = d->name;
+	thiz->free = d->free;
+	thiz->sw_setup = d->sw_setup;
 	thiz->data = data;
+
+	r = enesim_renderer_shape_new(&pdescriptor, thiz);
 	return r;
 }
 
-void enesim_rasterizier_polygon_set(Enesim_Renderer *r, const Enesim_Polygon *p)
+void * enesim_rasterizer_data_get(Enesim_Renderer *r)
 {
 	Enesim_Rasterizer *thiz;
 
 	thiz = _rasterizer_get(r);
-	thiz->polygon = p;
+	return thiz->data;
+}
+
+void enesim_rasterizier_figure_set(Enesim_Renderer *r, const Enesim_Figure *f)
+{
+	Enesim_Rasterizer *thiz;
+
+	thiz = _rasterizer_get(r);
+	thiz->figure = f;
 	thiz->changed = EINA_TRUE;
 }
 /*============================================================================*
