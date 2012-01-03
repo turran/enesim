@@ -35,7 +35,8 @@ typedef struct _Enesim_Renderer_Figure
 	Enesim_Renderer *basic;
 	Enesim_Renderer *bifigure;
 	Enesim_Renderer *final;
-	unsigned char changed :1;
+	Enesim_Renderer_Sw_Fill final_fill;
+	Eina_Bool changed :1;
 } Enesim_Renderer_Figure;
 
 static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
@@ -46,6 +47,15 @@ static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 	ENESIM_RENDERER_FIGURE_MAGIC_CHECK(thiz);
 
 	return thiz;
+}
+
+static void _span(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	thiz->final_fill(thiz->final, x, y, len, ddata);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -70,17 +80,53 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *sr;
+	Enesim_Renderer *fr;
+	Enesim_Renderer_Sw_Data *sdata;
 	double sw;
 
 	thiz = _figure_get(r);
-	/* TODO no polys do nothing */
+	if (!enesim_figure_polygon_count(thiz->figure))
+	{
+		/* TODO no polys do nothing, error? ok? */
+		ENESIM_RENDERER_ERROR(r, error, "No points on the polygon, nothing to draw");
+		return EINA_FALSE;
+	}
 	if (!enesim_renderer_shape_setup(r, state, s, error))
 	{
 		return EINA_FALSE;
 	}
 
 	enesim_renderer_shape_stroke_weight_get(r, &sw);
-	/* FIXME pick up the correct renderer */
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	/* pick up the correct renderer */
+	if ((draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && sw >= 1.0)
+	{
+		/* FIXME not yet */
+		thiz->final = NULL;
+		/* TODO generate the stroke */
+	}
+	else
+	{
+		/* FIXME set the correct draw mode for this renderer */
+		thiz->final = thiz->basic;
+		enesim_rasterizer_figure_set(thiz->final, thiz->figure);
+	}
+	if (!thiz->final) return EINA_FALSE;
+
+	enesim_renderer_shape_stroke_renderer_get(r, &sr);
+	enesim_renderer_shape_stroke_renderer_set(thiz->final, sr);
+	enesim_renderer_shape_fill_renderer_get(r, &fr);
+	enesim_renderer_shape_fill_renderer_set(thiz->final, fr);
+
+	if (!enesim_renderer_setup(thiz->final, s, error))
+		return EINA_FALSE;
+
+	*fill = _span;
+
+	sdata = enesim_renderer_backend_data_get(thiz->final, ENESIM_BACKEND_SOFTWARE);
+	thiz->final_fill = sdata->fill;
+
 	return EINA_TRUE;
 }
 

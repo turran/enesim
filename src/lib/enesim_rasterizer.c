@@ -158,7 +158,7 @@ void * enesim_rasterizer_data_get(Enesim_Renderer *r)
 	return thiz->data;
 }
 
-void enesim_rasterizier_figure_set(Enesim_Renderer *r, const Enesim_Figure *f)
+void enesim_rasterizer_figure_set(Enesim_Renderer *r, const Enesim_Figure *f)
 {
 	Enesim_Rasterizer *thiz;
 

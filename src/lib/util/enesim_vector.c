@@ -116,7 +116,7 @@ void enesim_figure_delete(Enesim_Figure *thiz)
 
 void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p)
 {
-
+	thiz->polygons = eina_list_append(thiz->polygons, p);
 }
 
 int enesim_figure_polygon_count(Enesim_Figure *thiz)

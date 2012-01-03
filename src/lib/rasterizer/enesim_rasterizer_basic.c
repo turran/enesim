@@ -1671,6 +1671,9 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->changed = 1;
 		thiz->draw_mode = draw_mode;
 	}
+
+	/* Given that we share the figure which is stored on the parent, we need to know
+	 * if the figure is different or not ... */
 	if (thiz->changed)
 	{
 		Enesim_Polygon *p;
@@ -1689,16 +1692,16 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			Enesim_Point *first_point;
 			Enesim_Point *last_point;
 			int pclosed = 0;
-			int npt;
+			int npts;
 
-			npt = enesim_polygon_point_count(p);
-			if ((npt < 2) || 
-					((npt < 3) && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE)))
+			npts = enesim_polygon_point_count(p);
+			if ((npts < 2) || 
+					((npts < 3) && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE)))
 			{
-				WRN("Not enough vertices %d", npt);
+				WRN("Not enough vertices %d", npts);
 				return EINA_FALSE;
 			}
-			nvectors += npt;
+			nvectors += npts;
 			first_point = eina_list_data_get(p->points);
 			last_point = eina_list_data_get(eina_list_last(p->points));
 
@@ -1729,37 +1732,46 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		/* FIXME why this loop can't be done on the upper one? */
 		EINA_LIST_FOREACH(figure->polygons, l1, p)
 		{
+			Enesim_Point *first_point;
+			Enesim_Point *last_point;
 			Enesim_Point *pt;
 			Eina_List *l2;
-#if 0
-			Polygon_Vertex *v, *nv;
-			double x0, y0, x1, y1;
-			double x01, y01;
-			double len;
-			int n = 0, nverts = poly->nverts;
-			int sopen = !poly->closed;
+			int n = 0;
+			int nverts = enesim_polygon_point_count(p);
+			int sopen = !p->closed;
+			int pclosed = 0;
 
-			pclosed = 0;
 			if (sopen && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE))
 				sopen = 0;
-			if ((poly->last->v.x == poly->vertices->v.x) &&
-					(poly->last->v.y == poly->vertices->v.y))
-			{ nverts--;  pclosed = 1; }
+
+			first_point = eina_list_data_get(p->points);
+			last_point = eina_list_data_get(eina_list_last(p->points));
+
+			if ((last_point->x == first_point->x) &&
+					(last_point->y == first_point->y))
+			{
+				nverts--;
+				pclosed = 1;
+			}
 			if (sopen && !pclosed)
 				nverts--;
-			v = poly->vertices;
-#endif
 
-			EINA_LIST_FOREACH(p->points, l2, pt)
+			pt = first_point;
+			l2 = eina_list_next(p->points);
+			while (n < nverts)
 			{
-#if 0
-				nv = v->next;
-				if ( (n == (poly->nverts - 1)) && !sopen )
-					nv = poly->vertices;
-				x0 = v->v.x;
-				y0 = v->v.y;
-				x1 = nv->v.x;
-				y1 = nv->v.y;
+				Enesim_Point *npt;
+				double x0, y0, x1, y1;
+				double x01, y01;
+				double len;
+
+				npt = eina_list_data_get(l2);
+				if ((n == (enesim_polygon_point_count(p) - 1)) && !sopen)
+					npt = first_point;
+				x0 = pt->x;
+				y0 = pt->y;
+				x1 = npt->x;
+				y1 = npt->y;
 				x0 = ((int) (x0 * 256)) / 256.0;
 				x1 = ((int) (x1 * 256)) / 256.0;
 				y0 = ((int) (y0 * 256)) / 256.0;
@@ -1767,7 +1779,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				x01 = x1 - x0;
 				y01 = y1 - y0;
 				if ((len = hypot(x01, y01)) < (1 / 256.0))
-					return 0;
+					return EINA_FALSE;
 				len *= 1 + (1 / 16.0);
 				vec->a = -(y01 * 65536) / len;
 				vec->b = (x01 * 65536) / len;
@@ -1789,9 +1801,10 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 					thiz->rxx = vec->xx0;
 
 				n++;
+				l2 = eina_list_next(l2);
+				pt = npt;
+				
 				vec++;
-				v = nv;
-#endif
 			}
 		}
 		thiz->changed = 0;
