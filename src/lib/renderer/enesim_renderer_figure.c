@@ -32,9 +32,7 @@ typedef struct _Enesim_Renderer_Figure
 	Enesim_Figure *figure;
 	Enesim_Polygon *last_polygon;
 	Enesim_Point *last_point;
-	Enesim_Renderer *basic;
 	Enesim_Renderer *bifigure;
-	Enesim_Renderer *final;
 	Enesim_Renderer_Sw_Fill final_fill;
 	Eina_Bool changed :1;
 } Enesim_Renderer_Figure;
@@ -55,7 +53,7 @@ static void _span(Enesim_Renderer *r, int x, int y,
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = _figure_get(r);
-	thiz->final_fill(thiz->final, x, y, len, ddata);
+	thiz->final_fill(thiz->bifigure, x, y, len, ddata);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -103,28 +101,25 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	if ((draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && sw >= 1.0)
 	{
 		/* FIXME not yet */
-		thiz->final = NULL;
 		/* TODO generate the stroke */
 	}
 	else
 	{
 		/* FIXME set the correct draw mode for this renderer */
-		thiz->final = thiz->basic;
-		enesim_rasterizer_figure_set(thiz->final, thiz->figure);
+		enesim_rasterizer_figure_set(thiz->bifigure, thiz->figure);
 	}
-	if (!thiz->final) return EINA_FALSE;
 
 	enesim_renderer_shape_stroke_renderer_get(r, &sr);
-	enesim_renderer_shape_stroke_renderer_set(thiz->final, sr);
+	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, sr);
 	enesim_renderer_shape_fill_renderer_get(r, &fr);
-	enesim_renderer_shape_fill_renderer_set(thiz->final, fr);
+	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, fr);
 
-	if (!enesim_renderer_setup(thiz->final, s, error))
+	if (!enesim_renderer_setup(thiz->bifigure, s, error))
 		return EINA_FALSE;
 
 	*fill = _span;
 
-	sdata = enesim_renderer_backend_data_get(thiz->final, ENESIM_BACKEND_SOFTWARE);
+	sdata = enesim_renderer_backend_data_get(thiz->bifigure, ENESIM_BACKEND_SOFTWARE);
 	thiz->final_fill = sdata->fill;
 
 	return EINA_TRUE;
@@ -181,10 +176,7 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_FIGURE_MAGIC);
 	thiz->figure = enesim_figure_new();
-	thiz->basic = enesim_rasterizer_basic_new();
-	/* FIXME for later
 	thiz->bifigure = enesim_rasterizer_bifigure_new();
-	*/
 
 	r = enesim_renderer_shape_new(&_figure_descriptor, thiz);
 	return r;

@@ -20,16 +20,22 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RASTERIZER_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RASTERIZER_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RASTERIZER_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Rasterizer
 {
+	EINA_MAGIC
 	/* public */
-	const Enesim_Figure *figure;
 	/* private */
-	Eina_Bool changed : 1;
 	void *data;
 	/* interface */
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
+	Enesim_Rasterizer_Figure_Set figure_set;
 	Enesim_Rasterizer_Sw_Setup sw_setup;
 	Enesim_Rasterizer_Sw_Cleanup sw_cleanup;
 } Enesim_Rasterizer;
@@ -39,6 +45,8 @@ static inline Enesim_Rasterizer * _rasterizer_get(Enesim_Renderer *r)
 	Enesim_Rasterizer *thiz;
 
 	thiz = enesim_renderer_shape_data_get(r);
+	ENESIM_RASTERIZER_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 /*----------------------------------------------------------------------------*
@@ -63,11 +71,10 @@ static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 
 	thiz = _rasterizer_get(r);
 	if (!thiz->sw_setup) return EINA_FALSE;
-	if (!thiz->figure) return EINA_FALSE;
 
 	if (!enesim_renderer_shape_setup(r, state, s, error))
 		return EINA_FALSE;
-	ret = thiz->sw_setup(r, state, thiz->figure, s, fill, error);
+	ret = thiz->sw_setup(r, state, s, fill, error);
 	return ret;
 }
 
@@ -77,7 +84,6 @@ static void _rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _rasterizer_get(r);
 	enesim_renderer_shape_cleanup(r, s);
-	thiz->changed = EINA_FALSE;
 }
 
 static void _rasterizer_free(Enesim_Renderer *r)
@@ -94,7 +100,12 @@ static void _rasterizer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	Enesim_Rasterizer *thiz;
 
 	thiz = _rasterizer_get(r);
-	/* TODO */
+	/* FIXME we should use the rasterizer implementation flags */
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_AFFINE |
+			ENESIM_RENDERER_FLAG_PROJECTIVE |
+			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_RENDERER_FLAG_COLORIZE;
 }
 
 static void _rasterizer_boundings(Enesim_Renderer *r, Enesim_Renderer *boundings)
@@ -103,14 +114,6 @@ static void _rasterizer_boundings(Enesim_Renderer *r, Enesim_Renderer *boundings
 
 	thiz = _rasterizer_get(r);
 	/* TODO */
-}
-
-static Eina_Bool _rasterizer_has_changed(Enesim_Renderer *r)
-{
-	Enesim_Rasterizer *thiz;
-
-	thiz = _rasterizer_get(r);
-	return thiz->changed;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -128,7 +131,7 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 		/* .flags = 			*/ _rasterizer_flags,
 		/* .is_inside = 		*/ NULL,
 		/* .damage = 			*/ NULL,
-		/* .has_changed = 		*/ _rasterizer_has_changed,
+		/* .has_changed = 		*/ NULL,
 		/* .sw_setup = 			*/ _rasterizer_sw_setup,
 		/* .sw_cleanup = 		*/ _rasterizer_sw_cleanup,
 		/* .opencl_setup =		*/ NULL,
@@ -141,8 +144,10 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 
 	thiz = calloc(1, sizeof(Enesim_Rasterizer));
 	if (!thiz) return NULL;
+	EINA_MAGIC_SET(thiz, ENESIM_RASTERIZER_MAGIC);
 	thiz->name = d->name;
 	thiz->free = d->free;
+	thiz->figure_set = d->figure_set;
 	thiz->sw_setup = d->sw_setup;
 	thiz->data = data;
 
@@ -163,8 +168,8 @@ void enesim_rasterizer_figure_set(Enesim_Renderer *r, const Enesim_Figure *f)
 	Enesim_Rasterizer *thiz;
 
 	thiz = _rasterizer_get(r);
-	thiz->figure = f;
-	thiz->changed = EINA_TRUE;
+	if (thiz->figure_set)
+		thiz->figure_set(r, f);
 }
 /*============================================================================*
  *                                   API                                      *

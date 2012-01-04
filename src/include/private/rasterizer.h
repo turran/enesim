@@ -18,9 +18,9 @@
 #ifndef RASTERIZER_H_
 #define RASTERIZER_H_
 
+typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Figure *figure);
 typedef Eina_Bool (*Enesim_Rasterizer_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
-		const Enesim_Figure *figure,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error);
@@ -30,6 +30,7 @@ typedef struct _Enesim_Rasterizer_Descriptor
 {
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
+	Enesim_Rasterizer_Figure_Set figure_set;
 	Enesim_Rasterizer_Sw_Setup sw_setup;
 	Enesim_Rasterizer_Sw_Cleanup sw_cleanup;
 } Enesim_Rasterizer_Descriptor;
@@ -43,7 +44,6 @@ void enesim_rasterizer_basic_vectors_get(Enesim_Renderer *r, int *nvectors,
 		Enesim_F16p16_Vector **vectors);
 
 Enesim_Renderer * enesim_rasterizer_bifigure_new(void);
-void enesim_renderer_bifigure_over_polygons_set(Enesim_Renderer *r, Eina_List *polygons);
-void enesim_renderer_bifigure_under_polygons_set(Enesim_Renderer *r, Eina_List *polygons);
+void enesim_rasterizer_bifigure_over_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure);
 
 #endif

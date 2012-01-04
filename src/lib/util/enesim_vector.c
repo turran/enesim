@@ -75,6 +75,14 @@ void enesim_polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p)
 	_polygon_update_bounds(thiz, p);
 }
 
+void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, double y)
+{
+	Enesim_Point *p;
+
+	p = enesim_point_new_from_coords(x, y);
+	enesim_polygon_point_prepend(thiz, p);
+}
+
 void enesim_polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p)
 {
 	thiz->points = eina_list_prepend(thiz->points, p);
@@ -88,7 +96,19 @@ int enesim_polygon_point_count(Enesim_Polygon *thiz)
 
 void enesim_polygon_clear(Enesim_Polygon *thiz)
 {
+	Enesim_Point *pt;
+	EINA_LIST_FREE(thiz->points, pt)
+	{
+		free(pt);
+	}
+}
 
+void enesim_polygon_delete(Enesim_Polygon *thiz)
+{
+	Enesim_Point *pt;
+	EINA_LIST_FREE(thiz->points, pt)
+		free(pt);
+	free(thiz);
 }
 
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
@@ -111,7 +131,8 @@ Enesim_Figure * enesim_figure_new(void)
 
 void enesim_figure_delete(Enesim_Figure *thiz)
 {
-
+	enesim_figure_clear(thiz);
+	free(thiz);
 }
 
 void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p)
@@ -126,7 +147,11 @@ int enesim_figure_polygon_count(Enesim_Figure *thiz)
 
 void enesim_figure_clear(Enesim_Figure *thiz)
 {
-
+	Enesim_Polygon *p;
+	EINA_LIST_FREE(thiz->polygons, p)
+	{
+		enesim_polygon_delete(p);
+	}
 }
 /*============================================================================*
  *                                   API                                      *

@@ -44,24 +44,25 @@
 	  ((((c & 0xff) * a) >> 16) & 0xff) )
 
 
-#define ENESIM_RENDERER_BIFIGURE_MAGIC 0xe7e51446
-#define ENESIM_RENDERER_BIFIGURE_MAGIC_CHECK(d) \
+#define ENESIM_RASTERIZER_BIFIGURE_MAGIC_CHECK(d) \
 	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_BIFIGURE_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_BIFIGURE_MAGIC);\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RASTERIZER_BIFIGURE_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RASTERIZER_BIFIGURE_MAGIC);\
 	} while(0)
 
 
 typedef struct _Enesim_Rasterizer_BiFigure
 {
 	EINA_MAGIC
-	Enesim_Renderer *over, *under;
+	Enesim_Renderer *over;
+	Enesim_Renderer *under;
+	Enesim_Figure *over_figure;
+	Enesim_Figure *under_figure;
 
-	Eina_List *over_polys, *under_polys;
 	int tyy, byy;
 
 	Enesim_F16p16_Matrix matrix;
-	unsigned char changed :1;
+	Eina_Bool changed :1;
 } Enesim_Rasterizer_BiFigure;
 
 static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
@@ -69,13 +70,13 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 	Enesim_Rasterizer_BiFigure *thiz;
 
 	thiz = enesim_rasterizer_data_get(r);
-	ENESIM_RENDERER_BIFIGURE_MAGIC_CHECK(thiz);
+	ENESIM_RASTERIZER_BIFIGURE_MAGIC_CHECK(thiz);
 
 	return thiz;
 }
 
 static void _bifig_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x, int y,
-						 void *ddata, int len)
+		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
 
@@ -333,24 +334,24 @@ get_out:
 	}
 }
 
-static void _over_figure_span(Enesim_Renderer *r, int x, int y, unsigned int *dst, int len)
+static void _over_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	Enesim_Renderer_Sw_Fill fill;
 
 	thiz = _bifigure_get(r);
 	fill = enesim_renderer_sw_fill_get(thiz->over);
-	fill(thiz->over, x, y, len, dst);
+	fill(thiz->over, x, y, len, ddata);
 }
 
-static void _under_figure_span(Enesim_Renderer *r, int x, int y, unsigned int *dst, int len)
+static void _under_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	Enesim_Renderer_Sw_Fill fill;
 
 	thiz = _bifigure_get(r);
 	fill = enesim_renderer_sw_fill_get(thiz->under);
-	fill(thiz->under, x, y, len, dst);
+	fill(thiz->under, x, y, len, ddata);
 }
 
 /*----------------------------------------------------------------------------*
@@ -373,9 +374,19 @@ static void _bifigure_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
+static void _bifigure_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
+{
+	Enesim_Rasterizer_BiFigure *thiz;
+
+	thiz = _bifigure_get(r);
+	thiz->under_figure = figure;
+	if (figure && !thiz->under)
+		thiz->under = enesim_rasterizer_basic_new();
+	thiz->changed = EINA_TRUE;
+}
+
 static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
-		const Enesim_Figure *figure,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error)
@@ -388,10 +399,16 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	double sw;
 
 	thiz = _bifigure_get(r);
-	if (!thiz->over_polys && !thiz->under_polys)
-		return 0;
+	if (!thiz->under_figure && thiz->over_figure)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "No figure to rasterize");
+		return EINA_FALSE;
+	}
 	if (!thiz->over && !thiz->under)
-		return 0;
+	{
+		ENESIM_RENDERER_ERROR(r, error, "No rasterizers to use");
+		return EINA_FALSE;
+	}
 
 	enesim_renderer_color_get(r, &color);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -404,23 +421,26 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	if (thiz->changed)
 	{
 		/* generate the 'over' figure */
-		if (thiz->over_polys)
+		if (thiz->over_figure)
 		{
 			if (!thiz->over)
-				return 0;
-			/* FIXME for later */
-			//enesim_renderer_figure_polygons_realize(thiz->over, thiz->over_polys);
+			{
+				ENESIM_RENDERER_ERROR(r, error, "No over rasterizer");
+				return EINA_FALSE;
+			}
+			enesim_rasterizer_figure_set(thiz->over, thiz->over_figure);
 		}
 		/* generate the 'under' figure */
-		if (thiz->under_polys)
+		if (thiz->under_figure)
 		{
 			if (!thiz->under)
-				return 0;
-			/* FIXME for later */
-			//enesim_renderer_figure_polygons_realize(thiz->under, thiz->under_polys);
+			{
+				ENESIM_RENDERER_ERROR(r, error, "No under rasterizer");
+				return EINA_FALSE;
+			}
+			enesim_rasterizer_figure_set(thiz->under, thiz->under_figure);
 		}
-
-		thiz->changed = 0;
+		thiz->changed = EINA_FALSE;
 	}
 
 	/* setup the figures and get span funcs */
@@ -433,7 +453,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_shape_fill_renderer_set(thiz->over, spaint);
 		enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
 		if (!enesim_renderer_setup(thiz->over, s, error))
-			return 0;
+			return EINA_FALSE;
 		*fill = _over_figure_span;
 	}
 	else
@@ -450,7 +470,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
 			enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 			if (!enesim_renderer_setup(thiz->under, s, error))
-				return 0;
+				return EINA_FALSE;
 			*fill = _under_figure_span;
 		}
 		else  // stroke_weight > 1 and draw_mode != FILL
@@ -472,10 +492,10 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 					enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
 					enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);	
 					if (!enesim_renderer_setup(thiz->under, s, error))
-						return 0;
+						return EINA_FALSE;
 				}
 				if (!enesim_renderer_setup(thiz->over, s, error))
-					return 0;
+					return EINA_FALSE;
 
 				if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 				{
@@ -499,7 +519,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 				enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
 				enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 				if (!enesim_renderer_setup(thiz->under, s, error))
-					return 0;
+					return EINA_FALSE;
 				*fill = _under_figure_span;
 			}
 		}
@@ -516,6 +536,7 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Rasterizer_BiFigure *thiz;
 
 	thiz = _bifigure_get(r);
+	/* FIXME We need to check that the over or under renderers were actually setup */
 	if (thiz->over)
 		enesim_renderer_cleanup(thiz->over, s);
 	if (thiz->under)
@@ -560,6 +581,7 @@ static void _bifigure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 static Enesim_Rasterizer_Descriptor _descriptor = {
 	/* .name = 		*/ _bifigure_name,
 	/* .free = 		*/ _bifigure_free,
+	/* .figure_set =	*/ _bifigure_figure_set,
 	/* .sw_setup = 		*/ _bifigure_sw_setup,
 	/* .sw_cleanup = 	*/ _bifigure_sw_cleanup,
 };
@@ -574,34 +596,21 @@ Enesim_Renderer * enesim_rasterizer_bifigure_new(void)
 	thiz = calloc(1, sizeof(Enesim_Rasterizer_BiFigure));
 	if (!thiz) return NULL;
 
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_BIFIGURE_MAGIC);
+	EINA_MAGIC_SET(thiz, ENESIM_RASTERIZER_BIFIGURE_MAGIC);
 	r = enesim_rasterizer_new(&_descriptor, thiz);
 
 	return r;
 }
 
-void enesim_renderer_bifigure_over_polygons_set(Enesim_Renderer *r, Eina_List *polygons)
+void enesim_rasterizer_bifigure_over_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
 {
-	Enesim_Renderer_Figure_Polygon *polygon;
-	Eina_List *l1;
 	Enesim_Rasterizer_BiFigure *thiz;
 
 	thiz = _bifigure_get(r);
-	thiz->over_polys = polygons;
-	if (polygons && !thiz->over)
+	thiz->over_figure = figure;
+	if (figure && !thiz->over)
 		thiz->over = enesim_rasterizer_basic_new();
-	thiz->changed = 1;
-}
-
-void enesim_renderer_bifigure_under_polygons_set(Enesim_Renderer *r, Eina_List *polygons)
-{
-	Enesim_Rasterizer_BiFigure *thiz;
-
-	thiz = _bifigure_get(r);
-	thiz->under_polys = polygons;
-	if (polygons && !thiz->under)
-		thiz->under = enesim_rasterizer_basic_new();
-	thiz->changed = 1;
+	thiz->changed = EINA_TRUE;
 }
 /*============================================================================*
  *                                   API                                      *

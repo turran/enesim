@@ -104,9 +104,11 @@ Enesim_Point * enesim_point_new(void);
 Enesim_Point * enesim_point_new_from_coords(double x, double y);
 
 Enesim_Polygon * enesim_polygon_new(void);
+void enesim_polygon_delete(Enesim_Polygon *thiz);
 int enesim_polygon_point_count(Enesim_Polygon *thiz);
 void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, double y);
 void enesim_polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p);
+void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, double y);
 void enesim_polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p);
 void enesim_polygon_clear(Enesim_Polygon *thiz);
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close);

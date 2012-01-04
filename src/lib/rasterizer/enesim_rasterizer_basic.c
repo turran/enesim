@@ -43,12 +43,20 @@
 	  ((((c & 0xff00) * a) >> 16) & 0xff00) + \
 	  ((((c & 0xff) * a) >> 16) & 0xff) )
 
+#define ENESIM_RASTERIZER_BASIC_MAGIC_CHECK(d) \
+	do {\
+		if (!EINA_MAGIC_CHECK(d, ENESIM_RASTERIZER_BASIC_MAGIC))\
+			EINA_MAGIC_FAIL(d, ENESIM_RASTERIZER_BASIC_MAGIC);\
+	} while(0)
+
 typedef struct _Enesim_Rasterizer_Basic
 {
 	EINA_MAGIC
 	/* private */
 	Enesim_F16p16_Vector *vectors;
 	int nvectors;
+	Enesim_Figure *figure;
+	Eina_Bool changed : 1;
 
 	/* FIXME this are the boundings calculated at the setup
 	 * we either generate them at the Enesim_Polygon level
@@ -56,8 +64,6 @@ typedef struct _Enesim_Rasterizer_Basic
 	 */
 	int lxx, rxx, tyy, byy;
 	Enesim_F16p16_Matrix matrix;
-
-	unsigned char changed :1;
 	int draw_mode; // a temp workaround for dealing with 'closed'
 } Enesim_Rasterizer_Basic;
 
@@ -66,6 +72,8 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 	Enesim_Rasterizer_Basic *thiz;
 
 	thiz = enesim_rasterizer_data_get(r);
+	ENESIM_RASTERIZER_BASIC_MAGIC_CHECK(thiz);
+
 	return thiz;
 }
 
@@ -1651,9 +1659,17 @@ static void _basic_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
+static void _basic_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
+{
+	Enesim_Rasterizer_Basic *thiz;
+
+	thiz = _basic_get(r);
+	thiz->figure = figure;
+	thiz->changed = EINA_TRUE;
+}
+
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
-		const Enesim_Figure *figure,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error)
@@ -1664,16 +1680,12 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	double sw;
 
 	thiz = _basic_get(r);
-	/* FIXME thiz->draw_mode isnt set anywhere, maybe it got lost with so many refactorings */
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	if (draw_mode != thiz->draw_mode) // for 'close', not optimal but for now..
+	if (!thiz->figure)
 	{
-		thiz->changed = 1;
-		thiz->draw_mode = draw_mode;
+		ENESIM_RENDERER_ERROR(r, error, "No figure to rasterize");
+		return EINA_FALSE;
 	}
-
-	/* Given that we share the figure which is stored on the parent, we need to know
-	 * if the figure is different or not ... */
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (thiz->changed)
 	{
 		Enesim_Polygon *p;
@@ -1687,7 +1699,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			thiz->vectors = NULL;
 		}
 
-		EINA_LIST_FOREACH(figure->polygons, l1, p)
+		EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
 		{
 			Enesim_Point *first_point;
 			Enesim_Point *last_point;
@@ -1698,7 +1710,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			if ((npts < 2) || 
 					((npts < 3) && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE)))
 			{
-				WRN("Not enough vertices %d", npts);
+				ENESIM_RENDERER_ERROR(r, error, "Not enough points %d", npts);
 				return EINA_FALSE;
 			}
 			nvectors += npts;
@@ -1730,7 +1742,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->byy = -65536;
 
 		/* FIXME why this loop can't be done on the upper one? */
-		EINA_LIST_FOREACH(figure->polygons, l1, p)
+		EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
 		{
 			Enesim_Point *first_point;
 			Enesim_Point *last_point;
@@ -1779,7 +1791,10 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				x01 = x1 - x0;
 				y01 = y1 - y0;
 				if ((len = hypot(x01, y01)) < (1 / 256.0))
+				{
+					ENESIM_RENDERER_ERROR(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/256.0, x0, y0, x1, y1);
 					return EINA_FALSE;
+				}
 				len *= 1 + (1 / 16.0);
 				vec->a = -(y01 * 65536) / len;
 				vec->b = (x01 * 65536) / len;
@@ -1807,7 +1822,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				vec++;
 			}
 		}
-		thiz->changed = 0;
+		thiz->changed = EINA_FALSE;
 	}
 
 	enesim_matrix_f16p16_matrix_to(&state->transformation,
@@ -1861,6 +1876,7 @@ static void _basic_sw_cleanup(Enesim_Renderer *r)
 static Enesim_Rasterizer_Descriptor _descriptor = {
 	/* .name = 		*/ _basic_name,
 	/* .free = 		*/ _basic_free,
+	/* .figure_set =	*/ _basic_figure_set,
 	/* .sw_setup = 		*/ _basic_sw_setup,
 	/* .sw_cleanup = 	*/ _basic_sw_cleanup,
 };
@@ -1874,6 +1890,7 @@ Enesim_Renderer * enesim_rasterizer_basic_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Rasterizer_Basic));
 	r = enesim_rasterizer_new(&_descriptor, thiz);
+	EINA_MAGIC_SET(thiz, ENESIM_RASTERIZER_BASIC_MAGIC);
 
 	return r;
 }

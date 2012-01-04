@@ -117,6 +117,10 @@ extern int enesim_log_dom_global;
 #define ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC 0xe7e51450
 #define ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC 0xe7e51451
 
+#define ENESIM_RASTERIZER_MAGIC 0xe7e51460
+#define ENESIM_RASTERIZER_BASIC_MAGIC 0xe7e51461
+#define ENESIM_RASTERIZER_BIFIGURE_MAGIC 0xe7e51462
+
 #include "private/vector.h"
 #include "private/curve.h"
 /* now the surface format backends */
