@@ -29,7 +29,9 @@ EAPI Enesim_Pool * enesim_pool_opengl_new(void);
 typedef struct _Enesim_Renderer_OpenGL_Data
 {
 	GLuint fbo;
-	GLenum shader;
+	GLenum *shaders;
+	Enesim_Renderer_OpenGL_Shader_Type *shader_types;
+	int num_shaders;
 	GLenum program;
 } Enesim_Renderer_OpenGL_Data;
 

@@ -8,6 +8,7 @@ void main()
 {
 	//gl_Position = gl_ProjectionMatrix  * gl_Position;
 
+	gl_Position = gl_PositionIn[0];
 	gl_Position.xy = vec2(rectangle_x, rectangle_y);
 	EmitVertex();
 

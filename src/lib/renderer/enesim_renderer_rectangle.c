@@ -1787,7 +1787,8 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 	/* FIXME in order to generate the stroke we might need to call this twice
 	 * one for the outter rectangle and one for the inner
 	 */
-	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
+	*num_shaders = 2;
+	*shaders = shader = calloc(*num_shaders, sizeof(Enesim_Renderer_OpenGL_Shader));
 	shader->type = ENESIM_SHADER_GEOMETRY;
 	shader->name = "rectangle";
 	shader->source = 
@@ -1800,9 +1801,12 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 	/* if we have a renderer set use that one but render into another texture
 	 * if it has some geometric shader
 	 */
-
-	*shaders = shader;
-	*num_shaders = 1;
+	shader++;
+	shader->type = ENESIM_SHADER_FRAGMENT;
+	shader->name = "background";
+	shader->source = 
+	#include "enesim_renderer_background.glsl"
+	shader->size = strlen(shader->source);
 
 	return EINA_TRUE;
 }
@@ -1815,6 +1819,7 @@ static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surfa
 	int height;
 	int x;
 	int y;
+	int final_color;
 
  	thiz = _rectangle_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -1828,6 +1833,10 @@ static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surfa
 	glUniform1f(y, thiz->current.y);
 	glUniform1f(width, thiz->current.width);
 	glUniform1f(height, thiz->current.height);
+
+	/* FIXME set the background like this for now */
+	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
+	glUniform4fARB(final_color, 1.0, 1.0, 0.0, 1.0);
 
 	return EINA_TRUE;
 }

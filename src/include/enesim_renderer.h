@@ -157,6 +157,7 @@ typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Ene
 /* opengl backend descriptor functions */
 typedef enum _Enesim_Renderer_OpenGL_Shader_Type
 {
+	ENESIM_SHADER_VERTEX,
 	ENESIM_SHADER_GEOMETRY,
 	ENESIM_SHADER_FRAGMENT,
 	ENESIM_SHADERS,
