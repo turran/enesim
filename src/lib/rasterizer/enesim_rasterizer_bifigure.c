@@ -302,7 +302,7 @@ get_out:
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, p0, q0);
+				p0 = INTERP_65536(oa, scolor, q0);
 		}
 		else // outside over figure and not on its boundary
 		{

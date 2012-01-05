@@ -1772,6 +1772,10 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 }
 
 #if BUILD_OPENGL
+/* TODO instead of trying to do our own geometry shader it might be better
+ * to use the path renderer and only create a shader there, this will simplify the code
+ * given that at the end we'll generate vertices too
+ */
 static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		Enesim_Surface *s,
@@ -1791,6 +1795,7 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 	*shaders = shader = calloc(*num_shaders, sizeof(Enesim_Renderer_OpenGL_Shader));
 	shader->type = ENESIM_SHADER_GEOMETRY;
 	shader->name = "rectangle";
+		//"#version 150\n"
 	shader->source = 
 		"#version 120\n"
 		"#extension GL_EXT_geometry_shader4 : enable\n"
@@ -1803,9 +1808,9 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 	 */
 	shader++;
 	shader->type = ENESIM_SHADER_FRAGMENT;
-	shader->name = "background";
+	shader->name = "stripes";
 	shader->source = 
-	#include "enesim_renderer_background.glsl"
+	#include "enesim_renderer_stripes.glsl"
 	shader->size = strlen(shader->source);
 
 	return EINA_TRUE;
@@ -1819,7 +1824,6 @@ static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surfa
 	int height;
 	int x;
 	int y;
-	int final_color;
 
  	thiz = _rectangle_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -1835,8 +1839,22 @@ static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surfa
 	glUniform1f(height, thiz->current.height);
 
 	/* FIXME set the background like this for now */
-	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
-	glUniform4fARB(final_color, 1.0, 1.0, 0.0, 1.0);
+	{
+		int odd_color;
+		int even_color;
+		int odd_thickness;
+		int even_thickness;
+
+		even_color = glGetUniformLocationARB(rdata->program, "stripes_even_color");
+		odd_color = glGetUniformLocationARB(rdata->program, "stripes_odd_color");
+		even_thickness = glGetUniformLocationARB(rdata->program, "stripes_even_thickness");
+		odd_thickness = glGetUniformLocationARB(rdata->program, "stripes_odd_thickness");
+
+		glUniform4fARB(even_color, 1.0, 0.0, 0.0, 1.0);
+		glUniform4fARB(odd_color, 0.0, 0.0, 1.0, 1.0);
+		glUniform1i(even_thickness, 2.0);
+		glUniform1i(odd_thickness, 5.0);
+	}
 
 	return EINA_TRUE;
 }

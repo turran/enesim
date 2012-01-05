@@ -103,11 +103,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		/* FIXME not yet */
 		/* TODO generate the stroke */
 	}
-	else
-	{
-		/* FIXME set the correct draw mode for this renderer */
-		enesim_rasterizer_figure_set(thiz->bifigure, thiz->figure);
-	}
+	enesim_rasterizer_figure_set(thiz->bifigure, thiz->figure);
 
 	enesim_renderer_shape_stroke_renderer_get(r, &sr);
 	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, sr);

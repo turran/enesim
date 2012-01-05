@@ -30,8 +30,11 @@ static Eina_Bool _geometry_shader_support = EINA_FALSE;
 static const char _vertex_passthrough[] = "					\
 void main(void)									\
 {										\
-    gl_Position = ftransform();							\
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 		\
+	gl_TexCoord[0]  = gl_TextureMatrix[0] * gl_MultiTexCoord0;		\
 }";
+
+/* gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; */
 
 static Enesim_Renderer_OpenGL_Shader _vertex_shader = {
 	/* .type = 	*/ ENESIM_SHADER_VERTEX,
@@ -93,8 +96,9 @@ static Eina_Bool _shader_compile(GLenum program, Enesim_Renderer_OpenGL_Shader *
 	if (shader->type == ENESIM_SHADER_GEOMETRY)
 	{
 		st = GL_GEOMETRY_SHADER_EXT;
-		glProgramParameteriEXT(program, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_POINTS);
+		glProgramParameteriEXT(program, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
 		glProgramParameteriEXT(program, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
+		glProgramParameteriEXT(program, GL_GEOMETRY_VERTICES_OUT_EXT, 10);
 	}
 	else if (shader->type == ENESIM_SHADER_FRAGMENT)
 		st = GL_FRAGMENT_SHADER_ARB;
@@ -134,6 +138,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_OpenGL_Shader *shaders;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Eina_Bool has_vertex = EINA_FALSE;
+	Eina_Bool has_geometry = EINA_FALSE;
 	Eina_Bool ret;
 	GLenum status;
 	int ok = 0;
@@ -179,14 +184,20 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 
 		rdata->shaders[i] = sh;
 		rdata->shader_types[i] = shader->type;;
+		if (rdata->shader_types[i] == ENESIM_SHADER_GEOMETRY)
+			has_geometry = EINA_TRUE;
 		if (rdata->shader_types[i] == ENESIM_SHADER_VERTEX)
 			has_vertex = EINA_TRUE;
 	}
-	if (!has_vertex)
+	if (has_geometry)
 	{
-		GLenum sh;
-		/* FIXME we could have this already compiled */
-		_shader_compile(rdata->program, &_vertex_shader, &sh);
+		rdata->has_geometry = EINA_TRUE;
+		if (!has_vertex)
+		{
+			GLenum sh;
+			/* FIXME we could have this already compiled */
+			_shader_compile(rdata->program, &_vertex_shader, &sh);
+		}
 	}
 
 	/* link it */
@@ -271,13 +282,22 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	/* check the types of shaders
 	 * if only geometry then we need the common vertex
 	 */
-
-	glBegin(GL_QUADS);
-		glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
-		glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
-		glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
-		glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
-        glEnd();
+	if (rdata->has_geometry)
+	{
+		glBegin(GL_POINTS);
+			glVertex2d(area->x, area->y);
+		glEnd();
+	}
+	/* simplest case */
+	else
+	{
+		glBegin(GL_QUADS);
+			glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
+			glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
+			glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
+			glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
+		glEnd();
+	}
 	glUseProgramObjectARB(0);
 }
 

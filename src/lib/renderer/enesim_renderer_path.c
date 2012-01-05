@@ -81,6 +81,9 @@ typedef struct _Enesim_Renderer_Path_Strokeless_State
 
 typedef struct _Enesim_Renderer_Path_Stroke_State
 {
+	Enesim_Polygon *original_polygon;
+	Enesim_Polygon *offset_polygon;
+	Enesim_Polygon *inset_polygon;
 	Enesim_Figure *fill_figure;
 	Enesim_Figure *stroke_figure;
 	Enesim_Point first;
@@ -129,27 +132,20 @@ static void _do_normal(Enesim_Point *n, Enesim_Point *p0, Enesim_Point *p1)
 	f = 1.0 / hypot(dx, dy);
 	n->x = dy * f;
 	n->y = -dx * f;
-
-	printf("n = %g %g\n", dy, dx);
 }
 
 static void _stroke_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Renderer_Path_Stroke_State *thiz = data;
-	Enesim_Polygon *fill;
-	Enesim_Polygon *stroke;
+	Enesim_Polygon *inset = thiz->inset_polygon;
+	Enesim_Polygon *offset = thiz->offset_polygon;
 	Enesim_Point o0, o1;
 	Enesim_Point i0, i1;
-	Eina_List *last;
-	int c;
 	double ox;
 	double oy;
+	int c;
 
-	last = eina_list_last(thiz->fill_figure->polygons);
-	fill = eina_list_data_get(last);
-
-	last = eina_list_last(thiz->stroke_figure->polygons);
-	stroke = eina_list_data_get(last);
+	enesim_polygon_point_append_from_coords(thiz->original_polygon, x, y);
 
 	/* just store the first point */
 	if (thiz->count < 2)
@@ -160,7 +156,6 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 			thiz->first.x = thiz->p0.x = x;
 			thiz->first.y = thiz->p0.y = y;
 			thiz->count++;
-			printf("first %g %g\n", thiz->p0.x, thiz->p0.y);
 			return;
 
 			case 1:
@@ -173,25 +168,20 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 
 			o0.x = thiz->p0.x + ox;
 			o0.y = thiz->p0.y + oy;
-			enesim_polygon_point_append_from_coords(stroke, o0.x, o0.y);
+			enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
 
 			o1.x = thiz->p1.x + ox;
 			o1.y = thiz->p1.y + oy;
-			enesim_polygon_point_append_from_coords(stroke, o1.x, o1.y);
+			enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
 
-#if 0
 			i0.x = thiz->p0.x - ox;
 			i0.y = thiz->p0.y - oy;
-			enesim_polygon_point_append_from_coords(fill, i0.x, i0.y);
+			enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
 
 			i1.x = thiz->p1.x - ox;
 			i1.y = thiz->p1.y - oy;
-			enesim_polygon_point_append_from_coords(fill, i1.x, i1.y);
+			enesim_polygon_point_prepend_from_coords(inset, i1.x, i1.y);
 
-			printf("inverse %g %g %g %g\n", i0.x, i0.y, i1.x, i1.y);
-#endif
-			enesim_polygon_point_append_from_coords(fill, thiz->p0.x, thiz->p0.y);
-			enesim_polygon_point_append_from_coords(fill, thiz->p1.x, thiz->p1.y);
 			thiz->count++;
 			return;
 
@@ -218,36 +208,32 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	c = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
 	if (c <= 0)
 	{
-		/* TODO do the curve on the offset */
-		enesim_polygon_point_prepend_from_coords(fill, thiz->p1.x, thiz->p1.y);
+		/* TODO do the curve on the offset_polygon */
+		enesim_polygon_point_prepend_from_coords(inset, thiz->p1.x, thiz->p1.y);
 	}
 	else
 	{
-		/* TODO do the curve on the inset */
-		enesim_polygon_point_append_from_coords(stroke, thiz->p1.x, thiz->p1.y);
+		/* TODO do the curve on the inset_polygon */
+		enesim_polygon_point_append_from_coords(offset, thiz->p1.x, thiz->p1.y);
 	}
 	ox = thiz->r * thiz->n12.x;
 	oy = thiz->r * thiz->n12.y;
 
 	o0.x = thiz->p1.x + ox;
 	o0.y = thiz->p1.y + oy;
-	enesim_polygon_point_append_from_coords(stroke, o0.x, o0.y);
+	enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
 
 	o1.x = thiz->p2.x + ox;
 	o1.y = thiz->p2.y + oy;
-	enesim_polygon_point_append_from_coords(stroke, o1.x, o1.y);
+	enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
 
-#if 0
 	i0.x = thiz->p1.x - ox;
 	i0.y = thiz->p1.y - oy;
-	enesim_polygon_point_prepend_from_coords(fill, i0.x, i0.y);
+	enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
 
 	i1.x = thiz->p2.x - ox;
 	i1.y = thiz->p2.y - oy;
-	enesim_polygon_point_prepend_from_coords(fill, i1.x, i1.y);
-#endif
-	enesim_polygon_point_prepend_from_coords(fill, thiz->p0.x, thiz->p0.y);
-	enesim_polygon_point_prepend_from_coords(fill, thiz->p1.x, thiz->p1.y);
+	enesim_polygon_point_prepend_from_coords(inset, i1.x, i1.y);
 
 	thiz->p0 = thiz->p1;
 	thiz->p1 = thiz->p2;
@@ -266,41 +252,74 @@ static void _stroke_path_polygon_add(void *data)
 
 	p = enesim_polygon_new();
 	enesim_figure_polygon_append(thiz->fill_figure, p);
+	thiz->original_polygon = p;
 
 	p = enesim_polygon_new();
 	enesim_figure_polygon_append(thiz->stroke_figure, p);
+	thiz->offset_polygon = p;
+
+	p = enesim_polygon_new();
+	enesim_figure_polygon_append(thiz->stroke_figure, p);
+	thiz->inset_polygon = p;
 }
 
 static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 {
         Enesim_Renderer_Path_Stroke_State *thiz = data;
-	Enesim_Polygon *p;
-	Eina_List *last;
+	Enesim_Polygon *inset = thiz->inset_polygon;
+	Enesim_Polygon *offset = thiz->offset_polygon;
+	Enesim_Point o0, o1;
+	Enesim_Point i0, i1;
+	double ox;
+	double oy;
+	double c;
 
-	last = eina_list_last(thiz->fill_figure->polygons);
-	p = eina_list_data_get(last);
-	p->closed = close;
+	enesim_polygon_close(thiz->original_polygon, close);
 
-	last = eina_list_last(thiz->stroke_figure->polygons);
-	p = eina_list_data_get(last);
-	p->closed = close;
+	/* add the missing edge */
+	_do_normal(&thiz->n12, &thiz->p1, &thiz->first);
+
+	c = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
+	if (c <= 0)
+	{
+		/* TODO do the curve on the offset_polygon */
+		enesim_polygon_point_prepend_from_coords(inset, thiz->p1.x, thiz->p1.y);
+	}
+	else
+	{
+		/* TODO do the curve on the inset_polygon */
+		enesim_polygon_point_append_from_coords(offset, thiz->p1.x, thiz->p1.y);
+	}
+	ox = thiz->r * thiz->n12.x;
+	oy = thiz->r * thiz->n12.y;
+
+	o0.x = thiz->p1.x + ox;
+	o0.y = thiz->p1.y + oy;
+	enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
+
+	o1.x = thiz->first.x + ox;
+	o1.y = thiz->first.y + oy;
+	enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
+
+	i0.x = thiz->p1.x - ox;
+	i0.y = thiz->p1.y - oy;
+	enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
+
+	i1.x = thiz->first.x - ox;
+	i1.y = thiz->first.y - oy;
+	enesim_polygon_point_prepend_from_coords(inset, i1.x, i1.y);
 }
 
 static void _stroke_path_done(void *data)
 {
         Enesim_Renderer_Path_Stroke_State *thiz = data;
-	Enesim_Polygon *fill;
-	Enesim_Polygon *stroke;
-	Eina_List *last;
 
-	last = eina_list_last(thiz->fill_figure->polygons);
-	fill = eina_list_data_get(last);
-
-	last = eina_list_last(thiz->stroke_figure->polygons);
-	stroke = eina_list_data_get(last);
-
-	/* FOR NOW */
-	enesim_polygon_point_prepend_from_coords(fill, thiz->p1.x, thiz->p1.y);
+	/* TODO check that we are not closed */
+	/* FIXME for now, is not the same to close a polygon through a close
+	 * command that closing it like this
+	 */
+	enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
+	enesim_polygon_close(thiz->inset_polygon, EINA_TRUE);
 }
 /*----------------------------------------------------------------------------*
  *                              Without stroke                                *
@@ -845,13 +864,8 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 					_stroke_path_polygon_close,
 					_stroke_path_done,
 					 state->sx, state->sy, &st);
-			/* TODO this fill/stroke figure depends on the definition of the vertices being
-			 * given that the normal might change by defining the polygon CW or CCW
-			 * Maybe we should check the graham scan algorithm to know what normal to take
-			 * depending on the edge direction?
-			 */
-			enesim_rasterizer_figure_set(thiz->bifigure, thiz->stroke_figure);
-			enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, thiz->fill_figure);
+			enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
+			enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, thiz->stroke_figure);
 		} 
 		else
 		{
