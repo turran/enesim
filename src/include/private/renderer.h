@@ -88,7 +88,7 @@ typedef struct _Enesim_Renderer_Shape_State
 {
 	struct {
 		Enesim_Color color;
-		Enesim_Renderer *r; /* TODO */
+		Enesim_Renderer *r;
 		double weight;
 	} stroke;
 
@@ -112,6 +112,13 @@ typedef Eina_Bool (*Enesim_Renderer_Shape_OpenCL_Setup)(Enesim_Renderer *r,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Error **error);
+typedef Eina_Bool (*Enesim_Renderer_Shape_OpenGL_Setup)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
+		Enesim_Surface *s,
+		int *num_shaders,
+		Enesim_Renderer_OpenGL_Shader **shaders,
+		Enesim_Error **error);
 
 /* FIXME use this descriptor */
 typedef struct _Enesim_Renderer_Shape_Descriptor {
@@ -130,6 +137,10 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
 	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
+	/* opengl based functions */
+	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
+	Enesim_Renderer_OpenGL_Shader_Setup opengl_shader_setup;
+	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 } Enesim_Renderer_Shape_Descriptor;
 
 /* Helper functions needed by other renderers */

@@ -12,7 +12,6 @@ enesim_color.h \
 enesim_rectangle.h \
 enesim_buffer.h \
 enesim_surface.h \
-enesim_curve.h \
 enesim_converter.h \
 enesim_matrix.h \
 enesim_perlin.h \

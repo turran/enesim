@@ -18,12 +18,35 @@
 #ifndef _ENESIM_CURVE_H
 #define _ENESIM_CURVE_H
 
-typedef void (*Enesim_Curve_Vertex_Add_Callback)(double x, double y, void *data);
+typedef void (*Enesim_Curve_Vertex_Add)(double x, double y, void *data);
 
-void enesim_curve3_decasteljau_generate(double x1, double y1, double x2, double y2,
-		double x3, double y3, Enesim_Curve_Vertex_Add_Callback cb, void *data);
+typedef struct _Enesim_Curve_State
+{
+	Enesim_Curve_Vertex_Add vertex_add;
+	double last_x;
+	double last_y;
+	double last_ctrl_x;
+	double last_ctrl_y;
+	void *data;
+} Enesim_Curve_State;
 
-void enesim_curve4_decasteljau_generate(double x1, double y1, double x2, double y2,
-		double x3, double y3, double x4, double y4, Enesim_Curve_Vertex_Add_Callback
-		cb, void *data);
+void enesim_curve_line_to(Enesim_Curve_State *state,
+		double x, double y);
+void enesim_curve_quadratic_to(Enesim_Curve_State *state,
+		double ctrl_x, double ctrl_y,
+		double x, double y);
+void enesim_curve_squadratic_to(Enesim_Curve_State *state,
+		double x, double y);
+void enesim_curve_cubic_to(Enesim_Curve_State *state,
+		double ctrl_x0, double ctrl_y0,
+		double ctrl_x, double ctrl_y,
+		double x, double y);
+void enesim_curve_scubic_to(Enesim_Curve_State *state,
+		double ctrl_x, double ctrl_y,
+		double x, double y);
+void enesim_curve_arc_to(Enesim_Curve_State *state,
+		double rx, double ry, double angle,
+                unsigned char large, unsigned char sweep,
+		double x, double y);
+
 #endif
