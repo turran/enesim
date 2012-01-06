@@ -234,7 +234,6 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 				enesim_renderer_cleanup(thiz->current.fill.r, s);
 
 			}
-			
 			return EINA_FALSE;
 		}
 	}
@@ -412,3 +411,32 @@ EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_D
 	*draw_mode = thiz->current.draw_mode;
 }
 
+#if 0
+/* FIXME for later
+ * ot either here as a property, or through a common renderer because this property will
+ * be useful also for the gradient ....
+ */
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_geometry_transform_set(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+	/* check that the matrix is affine */
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_geometry_transform_get(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+}
+#endif

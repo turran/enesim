@@ -55,6 +55,28 @@ static void _span(Enesim_Renderer *r, int x, int y,
 	thiz = _figure_get(r);
 	thiz->final_fill(thiz->bifigure, x, y, len, ddata);
 }
+
+static void _generate_stroke(Enesim_Figure *f, Enesim_Figure *offset, Enesim_Figure *inset, double r)
+{
+	Enesim_Polygon *p;
+	Eina_List *l1;
+
+	EINA_LIST_FOREACH(f->polygons, l1, p)
+	{
+		Enesim_Point *pt;
+		Eina_List *l2;
+		Eina_List *l3;
+
+		/* generate the edges */
+		l2 = p->points;
+		EINA_LIST_FOREACH(l2, l3, pt)
+		{
+			/* from the previous edge to the new one generate the
+			 * outer/inner edges
+			 */
+		}
+	}
+}
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
