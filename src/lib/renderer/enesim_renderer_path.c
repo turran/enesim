@@ -130,6 +130,22 @@ static void _do_normal(Enesim_Point *n, Enesim_Point *p0, Enesim_Point *p1)
 	n->y = -dx * f;
 }
 
+static void _stroke_curve_append(double x, double y, void *data)
+{
+	Enesim_Polygon *p = data;
+
+	printf("adding vertex %g %g\n", x, y);
+	enesim_polygon_point_append_from_coords(p, x, y);
+}
+
+static void _stroke_curve_prepend(double x, double y, void *data)
+{
+	Enesim_Polygon *p = data;
+
+	printf("prepending vertex %g %g\n", x, y);
+	enesim_polygon_point_prepend_from_coords(p, x, y);
+}
+
 static void _stroke_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Renderer_Path_Stroke_State *thiz = data;
@@ -190,6 +206,14 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	thiz->p2.x = x;
 	thiz->p2.y = y;
 	_do_normal(&thiz->n12, &thiz->p1, &thiz->p2);
+	ox = thiz->r * thiz->n12.x;
+	oy = thiz->r * thiz->n12.y;
+
+	o0.x = thiz->p1.x + ox;
+	o0.y = thiz->p1.y + oy;
+
+	i0.x = thiz->p1.x - ox;
+	i0.y = thiz->p1.y - oy;
 
 	/* add the vertices of the new edge */
 	/* check if the previous edge and this one to see the concave/convex thing */
@@ -204,28 +228,52 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	c = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
 	if (c <= 0)
 	{
+#if 0
+		Enesim_Curve_State st;
+		Enesim_Point *p;
+		Eina_List *l;
+
+		l = eina_list_last(offset->points);
+		p = eina_list_data_get(l);
+		st.vertex_add = _stroke_curve_append;
+		st.last_x = p->x;
+		st.last_y = p->y;
+		st.last_ctrl_x = p->x;
+		st.last_ctrl_y = p->y;
+		st.data = offset;
+
+		printf("offset quadratic origin at %g %g to %g %g\n", p->x, p->y, o0.x, o0.y);
+		enesim_curve_squadratic_to(&st, o0.x, o0.y);
+#endif
 		/* TODO do the curve on the offset_polygon */
 		enesim_polygon_point_prepend_from_coords(inset, thiz->p1.x, thiz->p1.y);
 	}
 	else
 	{
+#if 0
+		Enesim_Curve_State st;
+		Enesim_Point *p;
+
+		p = eina_list_data_get(inset->points);
+		st.vertex_add = _stroke_curve_prepend;
+		st.last_x = p->x;
+		st.last_y = p->y;
+		st.last_ctrl_x = p->x;
+		st.last_ctrl_y = p->y;
+		st.data = inset;
+		enesim_curve_squadratic_to(&st, i0.x, i0.y);
+		printf("inset quadratic origin at %g %g to %g %g\n", p->x, p->y, i0.x, i0.y);
+#endif
 		/* TODO do the curve on the inset_polygon */
 		enesim_polygon_point_append_from_coords(offset, thiz->p1.x, thiz->p1.y);
 	}
-	ox = thiz->r * thiz->n12.x;
-	oy = thiz->r * thiz->n12.y;
-
-	o0.x = thiz->p1.x + ox;
-	o0.y = thiz->p1.y + oy;
 	enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
+	enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
 
 	o1.x = thiz->p2.x + ox;
 	o1.y = thiz->p2.y + oy;
 	enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
 
-	i0.x = thiz->p1.x - ox;
-	i0.y = thiz->p1.y - oy;
-	enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
 
 	i1.x = thiz->p2.x - ox;
 	i1.y = thiz->p2.y - oy;
