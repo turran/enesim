@@ -264,19 +264,8 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	glUseProgramObjectARB(rdata->program);
 	/* create the geometry to render to */
 	glEnable(GL_BLEND);
-	/* FIXME for now */
-	//glColor3f(1.0, 0.0, 0.0);
 
 	enesim_surface_size_get(s, &width, &height);
-	glMatrixMode(GL_TEXTURE);
-	glLoadIdentity();
-	/* FIXME for now */
-	//glScalef(0.02, 0.02, 1.0);
-	glRotatef(30, 0.0, 0.0, 1.0);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, 0, height, -1, 1);
 
 	_opengl_rop_set(r);
 	/* check the types of shaders
@@ -284,6 +273,23 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	 */
 	if (rdata->has_geometry)
 	{
+		int pixel_transform;
+
+		pixel_transform = glGetUniformLocationARB(rdata->program, "pixel_transform");
+		printf("pixel_transform = %d\n", pixel_transform);
+		if (pixel_transform >= 0)
+		{
+			double sx = 2.0/width;
+			double sy = 2.0/height;
+
+			//const GLfloat values[] = {-sx, 0, 0, 0, -sy, 0, 0, 0, 1};
+			const GLfloat values[] = {sx, 0, -1, 0, -sy, 1, 0, 0, 1};
+			glUniformMatrix3fv(pixel_transform, 1, GL_FALSE, values);
+			GLERR;
+		}
+		/* in this case we need to setup some common uniforms
+		 * like the pixel transformation, etc
+		 */
 		glBegin(GL_POINTS);
 			glVertex2d(area->x, area->y);
 		glEnd();
@@ -291,6 +297,16 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	/* simplest case */
 	else
 	{
+		glMatrixMode(GL_TEXTURE);
+		glLoadIdentity();
+		/* FIXME for now */
+		//glScalef(0.02, 0.02, 1.0);
+		glRotatef(30, 0.0, 0.0, 1.0);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, width, 0, height, -1, 1);
+
 		glBegin(GL_QUADS);
 			glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
 			glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
