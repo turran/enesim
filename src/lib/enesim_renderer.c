@@ -103,6 +103,11 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 				enesim_matrix_inverse(&state->transformation, &m);
 				enesim_matrix_rectangle_transform(&m, boundings, &q);
 				enesim_quad_rectangle_to(&q, boundings);
+				/* fix the antialias scaling */
+				boundings->x -= m.xx;
+				boundings->y -= m.yy;
+				boundings->w += m.xx;
+				boundings->h += m.yy;
 			}
 		}
 		destination->x = lround(boundings->x);

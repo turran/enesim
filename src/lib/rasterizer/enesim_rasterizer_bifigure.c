@@ -75,6 +75,136 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+#define SETUP_EDGES \
+	oedges = alloca(novectors * sizeof(Enesim_F16p16_Edge)); \
+	oedge = oedges; \
+	while (n < novectors) \
+	{ \
+		int xx0 = ov->xx0, xx1 = ov->xx1; \
+		int yy0 = ov->yy0, yy1 = ov->yy1; \
+ \
+		if (xx1 < xx0) \
+		{ \
+			xx0 = xx1; \
+			xx1 = ov->xx0; \
+		} \
+		if (yy1 < yy0) \
+		{ \
+			yy0 = yy1; \
+			yy1 = ov->yy0; \
+		} \
+		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff)))) \
+		{ \
+			oedge->xx0 = xx0; \
+			oedge->xx1 = xx1; \
+			oedge->yy0 = yy0; \
+			oedge->yy1 = yy1; \
+			oedge->de = (ov->a * (long long int) axx) >> 16; \
+			oedge->e = ((ov->a * (long long int) xx) >> 16) + \
+					((ov->b * (long long int) yy) >> 16) + \
+					ov->c; \
+			oedge++; \
+			noedges++; \
+		} \
+		n++; \
+		ov++; \
+	} \
+ \
+	uedges = alloca(nuvectors * sizeof(Enesim_F16p16_Edge)); \
+	uedge = uedges; \
+	while (m < nuvectors) \
+	{ \
+		int xx0 = uv->xx0, xx1 = uv->xx1; \
+		int yy0 = uv->yy0, yy1 = uv->yy1; \
+ \
+		if (xx1 < xx0) \
+		{ \
+			xx0 = xx1; \
+			xx1 = uv->xx0; \
+		} \
+		if (yy1 < yy0) \
+		{ \
+			yy0 = yy1; \
+			yy1 = uv->yy0; \
+		} \
+		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff)))) \
+		{ \
+			uedge->xx0 = xx0; \
+			uedge->xx1 = xx1; \
+			uedge->yy0 = yy0; \
+			uedge->yy1 = yy1; \
+			uedge->de = (uv->a * (long long int) axx) >> 16; \
+			uedge->e = ((uv->a * (long long int) xx) >> 16) + \
+					((uv->b * (long long int) yy) >> 16) + \
+					uv->c; \
+			uedge++; \
+			nuedges++; \
+		} \
+		m++; \
+		uv++; \
+	}
+
+
+#define EVAL_EDGES \
+		n = 0; \
+		uedge = uedges; \
+		while (n < nuedges) \
+		{ \
+			int ee = uedge->e; \
+ \
+			if ((yy >= uedge->yy0) && (yy < uedge->yy1)) \
+			{ \
+				ucount++; \
+				if (ee < 0) \
+					ucount -= 2; \
+			} \
+			if (ee < 0) \
+				ee = -ee; \
+ \
+			if ((ee < 65536) && ((xx + 0xffff) >= uedge->xx0) && \
+					(xx <= (0xffff + uedge->xx1))) \
+			{ \
+				if (ua < 16384) \
+					ua = 65536 - ee; \
+				else \
+					ua = (ua + (65536 - ee)) / 2; \
+			} \
+ \
+			uedge->e += uedge->de; \
+			uedge++; \
+			n++; \
+		} \
+ \
+		m = 0; \
+		oedge = oedges; \
+		while (m < noedges) \
+		{ \
+			int ee = oedge->e; \
+ \
+			if ((yy >= oedge->yy0) && (yy < oedge->yy1)) \
+			{ \
+				ocount++; \
+				if (ee < 0) \
+					ocount -= 2; \
+			} \
+			if (ee < 0) \
+				ee = -ee; \
+ \
+			if ((ee < 65536) && ((xx + 0xffff) >= oedge->xx0) && \
+					(xx <= (0xffff + oedge->xx1))) \
+			{ \
+				if (oa < 16384) \
+					oa = 65536 - ee; \
+				else \
+					oa = (oa + (65536 - ee)) / 2; \
+			} \
+ \
+			oedge->e += oedge->de; \
+			oedge++; \
+			m++; \
+		}
+
+
 static void _bifig_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -119,73 +249,7 @@ get_out:
 		return;
 	}
 
-	oedges = alloca(novectors * sizeof(Enesim_F16p16_Edge));
-	oedge = oedges;
-	while (n < novectors)
-	{
-		int xx0 = ov->xx0, xx1 = ov->xx1;
-		int yy0 = ov->yy0, yy1 = ov->yy1;
-
-		if (xx1 < xx0)
-		{
-			xx0 = xx1;
-			xx1 = ov->xx0;
-		}
-		if (yy1 < yy0)
-		{
-			yy0 = yy1;
-			yy1 = ov->yy0;
-		}
-		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff))))
-		{
-			oedge->xx0 = xx0;
-			oedge->xx1 = xx1;
-			oedge->yy0 = yy0;
-			oedge->yy1 = yy1;
-			oedge->de = (ov->a * (long long int) axx) >> 16;
-			oedge->e = ((ov->a * (long long int) xx) >> 16) +
-					((ov->b * (long long int) yy) >> 16) +
-					ov->c;
-			oedge++;
-			noedges++;
-		}
-		n++;
-		ov++;
-	}
-
-	uedges = alloca(nuvectors * sizeof(Enesim_F16p16_Edge));
-	uedge = uedges;
-	while (m < nuvectors)
-	{
-		int xx0 = uv->xx0, xx1 = uv->xx1;
-		int yy0 = uv->yy0, yy1 = uv->yy1;
-
-		if (xx1 < xx0)
-		{
-			xx0 = xx1;
-			xx1 = uv->xx0;
-		}
-		if (yy1 < yy0)
-		{
-			yy0 = yy1;
-			yy1 = uv->yy0;
-		}
-		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff))))
-		{
-			uedge->xx0 = xx0;
-			uedge->xx1 = xx1;
-			uedge->yy0 = yy0;
-			uedge->yy1 = yy1;
-			uedge->de = (uv->a * (long long int) axx) >> 16;
-			uedge->e = ((uv->a * (long long int) xx) >> 16) +
-					((uv->b * (long long int) yy) >> 16) +
-					uv->c;
-			uedge++;
-			nuedges++;
-		}
-		m++;
-		uv++;
-	}
+	SETUP_EDGES
 
 	if (!noedges && !nuedges)
 		goto get_out;
@@ -214,63 +278,7 @@ get_out:
 		int ucount = 0, ocount = 0;
 		int ua = 0, oa = 0;
 
-		n = 0;
-		uedge = uedges;
-		while (n < nuedges)
-		{
-			int ee = uedge->e;
-
-			if ((yy >= uedge->yy0) && (yy < uedge->yy1))
-			{
-				ucount++;
-				if (ee < 0)
-					ucount -= 2;
-			}
-			if (ee < 0)
-				ee = -ee;
-
-			if ((ee < 65536) && ((xx + 0xffff) >= uedge->xx0) && (xx
-					<= (0xffff + uedge->xx1)))
-			{
-				if (ua < 16384)
-					ua = 65536 - ee;
-				else
-					ua = (ua + (65536 - ee)) / 2;
-			}
-
-			uedge->e += uedge->de;
-			uedge++;
-			n++;
-		}
-
-		m = 0;
-		oedge = oedges;
-		while (m < noedges)
-		{
-			int ee = oedge->e;
-
-			if ((yy >= oedge->yy0) && (yy < oedge->yy1))
-			{
-				ocount++;
-				if (ee < 0)
-					ocount -= 2;
-			}
-			if (ee < 0)
-				ee = -ee;
-
-			if ((ee < 65536) && ((xx + 0xffff) >= oedge->xx0) && (xx
-					<= (0xffff + oedge->xx1)))
-			{
-				if (oa < 16384)
-					oa = 65536 - ee;
-				else
-					oa = (oa + (65536 - ee)) / 2;
-			}
-
-			oedge->e += oedge->de;
-			oedge++;
-			m++;
-		}
+		EVAL_EDGES
 
 		if (ocount)  // inside over figure
 			p0 = scolor;
@@ -333,6 +341,257 @@ get_out:
 		xx += axx;
 	}
 }
+
+static void _bifig_stroke_paint_fill_affine_simple(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+
+	Enesim_F16p16_Edge *oedges, *oedge;
+	Enesim_F16p16_Vector *ov;
+	int novectors, n = 0, noedges = 0;
+
+	Enesim_F16p16_Edge *uedges, *uedge;
+	Enesim_F16p16_Vector *uv;
+	int nuvectors, m = 0, nuedges = 0;
+
+	double ox, oy;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
+
+	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
+	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
+	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
+			((yy >> 16) > (1 + (thiz->byy >> 16))))
+	{
+get_out:
+		memset(d, 0, sizeof(unsigned int) * len);
+		return;
+	}
+
+	SETUP_EDGES
+
+	if (!noedges && !nuedges)
+		goto get_out;
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, dst);
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int ucount = 0, ocount = 0;
+		int ua = 0, oa = 0;
+
+		EVAL_EDGES
+
+		if (ocount)  // inside over figure
+		{
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+		}
+		else if (oa)  // on the outside boundary of the over figure
+		{
+			unsigned int q0 = 0;
+
+			if (ucount) // inside under figure
+				q0 = fcolor;
+			else if (ua) // on the outside boundary of the under figure
+			{
+				q0 = fcolor;
+				if (ua < 65536)
+					q0 = MUL_A_65536(ua, q0);	
+			}
+
+			if (oa < 65536)
+			{
+				color = *d;
+				if (scolor != 0xffffffff)
+					color = MUL4_SYM(scolor, color);
+				p0 = INTERP_65536(oa, color, q0);
+			}
+		}
+		else // outside over figure and not on its boundary
+		{
+			if (ucount)  // inside under figure
+				p0 = fcolor;
+			else if (ua) // on the outside boundary of the under figure
+			{
+				p0 = fcolor;
+				if (ua < 65536)
+					p0 = MUL_A_65536(ua, p0);
+			}
+		}
+		*d++ = p0;
+		xx += axx;
+	}
+}
+
+static void _bifig_stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint, *spaint;
+	Enesim_Renderer_Sw_Data *sdata;
+	uint32_t *dst = ddata;
+	unsigned int *d = dst, *e = d + len;
+	unsigned int *sbuf, *s;
+
+	Enesim_F16p16_Edge *oedges, *oedge;
+	Enesim_F16p16_Vector *ov;
+	int novectors, n = 0, noedges = 0;
+
+	Enesim_F16p16_Edge *uedges, *uedge;
+	Enesim_F16p16_Vector *uv;
+	int nuvectors, m = 0, nuedges = 0;
+
+	double ox, oy;
+
+	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
+			thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
+
+	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
+	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
+
+	enesim_renderer_origin_get(r, &ox, &oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
+	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
+			((yy >> 16) > (1 + (thiz->byy >> 16))))
+	{
+get_out:
+		memset(d, 0, sizeof(unsigned int) * len);
+		return;
+	}
+
+	SETUP_EDGES
+
+	if (!noedges && !nuedges)
+		goto get_out;
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+
+	enesim_renderer_color_get(r, &color);
+	if (color != 0xffffffff)
+	{
+		scolor = argb8888_mul4_sym(color, scolor);
+		fcolor = argb8888_mul4_sym(color, fcolor);
+	}
+
+	sbuf = alloca(len * sizeof(unsigned int));
+	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(spaint, x, y, len, sbuf);
+	s = sbuf;
+
+	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
+	sdata->fill(fpaint, x, y, len, dst);
+
+	while (d < e)
+	{
+		unsigned int p0 = 0;
+		int ucount = 0, ocount = 0;
+		int ua = 0, oa = 0;
+
+		EVAL_EDGES
+
+		if (ocount)  // inside over figure
+		{
+			p0 = *s;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+		}
+		else if (oa)  // on the outside boundary of the over figure
+		{
+			unsigned int q0 = 0;
+
+			if (ucount) // inside under figure
+			{
+				q0 = *d;
+				if (fcolor != 0xffffffff)
+					q0 = MUL4_SYM(fcolor, q0);
+			}
+			else if (ua) // on the outside boundary of the under figure
+			{
+				q0 = *d;
+				if (fcolor != 0xffffffff)
+					q0 = MUL4_SYM(fcolor, q0);
+				if (ua < 65536)
+					q0 = MUL_A_65536(ua, q0);	
+			}
+
+			if (oa < 65536)
+			{
+				color = *s;
+				if (scolor != 0xffffffff)
+					color = MUL4_SYM(scolor, color);
+				p0 = INTERP_65536(oa, color, q0);
+			}
+		}
+		else // outside over figure and not on its boundary
+		{
+			if (ucount)  // inside under figure
+			{
+				p0 = *d;
+				if (fcolor != 0xffffffff)
+					p0 = MUL4_SYM(fcolor, p0);
+			}
+			else if (ua) // on the outside boundary of the under figure
+			{
+				p0 = *d;
+				if (fcolor != 0xffffffff)
+					p0 = MUL4_SYM(fcolor, p0);
+				if (ua < 65536)
+					p0 = MUL_A_65536(ua, p0);
+			}
+		}
+		*d++ = p0;
+		s++;
+		xx += axx;
+	}
+}
+
 
 static void _over_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
@@ -502,7 +761,11 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 					enesim_matrix_f16p16_matrix_to(&state->transformation,
 									&thiz->matrix);
 					// need to define more cases, but for now...
-					*fill = _bifig_stroke_fill_paint_affine_simple;
+					*fill = _bifig_stroke_paint_fill_paint_affine_simple;
+					if (!spaint)
+						*fill = _bifig_stroke_fill_paint_affine_simple;
+					else if (!fpaint)
+						*fill = _bifig_stroke_paint_fill_affine_simple;
 				}
 				else
 					*fill = _over_figure_span;

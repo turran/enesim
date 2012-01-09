@@ -1874,7 +1874,7 @@ static Enesim_Renderer_Descriptor _rectangle_descriptor = {
 #if NEW_RENDERER
 	/* .boundings = 		*/ NULL, //_rectangle_boundings,
 #else
-	/* .boundings = 		*/ NULL, // _rectangle_boundings,
+	/* .boundings = 		*/ _rectangle_boundings,
 #endif
 	/* .destination_transform = 	*/ NULL,
 	/* .flags = 			*/ _rectangle_flags,
