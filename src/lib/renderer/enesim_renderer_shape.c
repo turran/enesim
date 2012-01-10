@@ -42,6 +42,9 @@ typedef struct _Enesim_Renderer_Shape
 	double stroke_ox, stroke_oy;
 	double stroke_sx, stroke_sy;
 	/* interface */
+	Enesim_Renderer_Shape_Sw_Setup sw_setup;
+	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
+	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_Has_Changed has_changed;
 	void *data;
 } Enesim_Renderer_Shape;
@@ -54,6 +57,47 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 	ENESIM_RENDERER_SHAPE_MAGIC_CHECK(thiz);
 
 	return thiz;
+}
+
+static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	if (!thiz->sw_setup) return EINA_FALSE;
+	return thiz->sw_setup(r, state, &thiz->current, s, fill, error);
+}
+
+static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		int *num_shaders,
+		Enesim_Renderer_OpenGL_Shader **shaders,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	if (!thiz->opengl_setup) return EINA_FALSE;
+	return thiz->opengl_setup(r, state, &thiz->current, s, num_shaders,
+		shaders, error);
+}
+
+static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state, Enesim_Surface *s,
+		const char **program_name, const char **program_source,
+		size_t *program_length,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	if (!thiz->opengl_setup) return EINA_FALSE;
+	return thiz->opencl_setup(r, state, &thiz->current, s,
+		program_name, program_source, program_length, error);
 }
 
 static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
@@ -127,7 +171,8 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descriptor, void *data)
+Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor,
+		void *data)
 {
 	Enesim_Renderer *r;
 	Enesim_Renderer_Shape *thiz;
@@ -141,6 +186,9 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 	thiz->current.fill.color = thiz->past.fill.color = 0xffffffff;
 	thiz->current.stroke.color = thiz->past.stroke.color = 0xffffffff;
 	thiz->has_changed = descriptor->has_changed;
+	thiz->sw_setup = descriptor->sw_setup;
+	thiz->opengl_setup = descriptor->opengl_setup;
+	thiz->opencl_setup = descriptor->opencl_setup;
 	/* set the parent descriptor */
 	pdescriptor.version = ENESIM_RENDERER_API;
 	pdescriptor.name = descriptor->name;
@@ -151,12 +199,12 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descript
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damage = descriptor->damage;
 	pdescriptor.has_changed = _enesim_renderer_shape_has_changed;
-	pdescriptor.sw_setup = descriptor->sw_setup;
+	pdescriptor.sw_setup = _enesim_renderer_shape_sw_setup;
 	pdescriptor.sw_cleanup = descriptor->sw_cleanup;
-	pdescriptor.opencl_setup = descriptor->opencl_setup;
+	pdescriptor.opencl_setup = _enesim_renderer_shape_opencl_setup;
 	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
 	pdescriptor.opencl_cleanup = descriptor->opencl_cleanup;
-	pdescriptor.opengl_setup = descriptor->opengl_setup;
+	pdescriptor.opengl_setup = _enesim_renderer_shape_opengl_setup;
 	pdescriptor.opengl_shader_setup = descriptor->opengl_shader_setup;
 	pdescriptor.opengl_cleanup = descriptor->opengl_cleanup;
 
@@ -410,33 +458,3 @@ EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_D
 	thiz = _shape_get(r);
 	*draw_mode = thiz->current.draw_mode;
 }
-
-#if 0
-/* FIXME for later
- * ot either here as a property, or through a common renderer because this property will
- * be useful also for the gradient ....
- */
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_shape_geometry_transform_set(Enesim_Renderer *r, Enesim_Matrix *m)
-{
-	/* check that the matrix is affine */
-	Enesim_Renderer_Shape *thiz;
-
-	thiz = _shape_get(r);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_shape_geometry_transform_get(Enesim_Renderer *r, Enesim_Matrix *m)
-{
-	Enesim_Renderer_Shape *thiz;
-
-	thiz = _shape_get(r);
-}
-#endif

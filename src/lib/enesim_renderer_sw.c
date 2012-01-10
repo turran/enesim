@@ -513,14 +513,14 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	{
 		if (!enesim_renderer_setup(r->current.mask, s, error))
 		{
-			WRN("Mask %s setup callback on %s failed", r->current.mask->current.name, r->current.name);
+			WRN("Mask %s setup callback on %s failed", r->current.mask->name, r->name);
 			return EINA_FALSE;
 		}
 	}
 	if (!r->descriptor.sw_setup) return EINA_TRUE;
 	if (!r->descriptor.sw_setup(r, state, s, &fill, error))
 	{
-		WRN("Setup callback on %s failed", r->current.name);
+		WRN("Setup callback on %s failed", r->name);
 		return EINA_FALSE;
 
 	}

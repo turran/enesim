@@ -547,6 +547,7 @@ static const char * _enesim_path_name(Enesim_Renderer *r)
 
 static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -678,8 +679,7 @@ static void _enesim_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 	enesim_renderer_boundings(thiz->bifigure, boundings);
 }
 
-static Enesim_Renderer_Descriptor _path_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
+static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .name = 			*/ _enesim_path_name,
 	/* .free = 			*/ NULL,
 	/* .boundings = 		*/ NULL, // _boundings,

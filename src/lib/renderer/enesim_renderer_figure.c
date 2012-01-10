@@ -95,6 +95,7 @@ static void _free(Enesim_Renderer *r)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -156,8 +157,7 @@ static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_SHAPE_FLAG_FILL_RENDERER;
 }
 
-static Enesim_Renderer_Descriptor _figure_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
+static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {
 	/* .name = 			*/ _figure_name,
 	/* .free = 			*/ _free,
 	/* .boundings = 		*/ NULL,

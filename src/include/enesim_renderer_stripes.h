@@ -26,11 +26,16 @@
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void);
 EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Color *color);
+EAPI void enesim_renderer_stripes_even_renderer_set(Enesim_Renderer *r, Enesim_Renderer *paint);
+EAPI void enesim_renderer_stripes_even_renderer_get(Enesim_Renderer *r, Enesim_Renderer **paint);
 EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r, double thickness);
 EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double *thickness);
+
 EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color *color);
-EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,	double thickness);
+EAPI void enesim_renderer_stripes_odd_renderer_set(Enesim_Renderer *r, Enesim_Renderer *paint);
+EAPI void enesim_renderer_stripes_odd_renderer_get(Enesim_Renderer *r, Enesim_Renderer **paint);
+EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r, double thickness);
 EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *thickness);
 
 /**

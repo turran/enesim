@@ -63,6 +63,7 @@ static const char * _rasterizer_name(Enesim_Renderer *r)
 
 static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -122,8 +123,7 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 {
 	Enesim_Renderer *r;
 	Enesim_Rasterizer *thiz;
-	Enesim_Renderer_Descriptor pdescriptor = {
-		/* .version = 			*/ ENESIM_RENDERER_API,
+	Enesim_Renderer_Shape_Descriptor pdescriptor = {
 		/* .name = 			*/ _rasterizer_name,
 		/* .free = 			*/ _rasterizer_free,
 		/* .boundings = 		*/ NULL,

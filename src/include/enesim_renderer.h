@@ -114,7 +114,6 @@ typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Rend
 
 typedef struct _Enesim_Renderer_State
 {
-	char *name;
 	Enesim_Rop rop;
 	Enesim_Color color;
 	Enesim_Quality quality;

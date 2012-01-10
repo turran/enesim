@@ -429,6 +429,7 @@ static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -532,8 +533,7 @@ static void _free(Enesim_Renderer *r)
 {
 }
 
-static Enesim_Renderer_Descriptor _circle_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
+static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .name = 			*/ _circle_name,
 	/* .free = 			*/ _free,
 	/* .boundings = 		*/ _boundings,

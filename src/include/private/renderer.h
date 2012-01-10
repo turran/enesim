@@ -25,6 +25,7 @@
 struct _Enesim_Renderer
 {
 	EINA_MAGIC
+	char *name;
 	int ref;
 	Enesim_Renderer_State current;
 	Enesim_Renderer_State past;
@@ -104,6 +105,7 @@ typedef Eina_Bool (*Enesim_Renderer_Shape_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error);
 typedef Eina_Bool (*Enesim_Renderer_Shape_OpenCL_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
@@ -126,6 +128,7 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
+	Enesim_Renderer_Destination_Transform destination_transform;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Damage damage;
@@ -162,10 +165,14 @@ void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel, Enes
 void enesim_renderer_relative_unset(Enesim_Renderer *r1, Enesim_Renderer *rel, Enesim_Matrix *old_matrix, double old_ox, double old_oy, double old_sx, double old_sy);
 
 /* common shape renderer functions */
-Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Descriptor *descriptor, void *data);
-Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r, const Enesim_Renderer_State *state, Enesim_Surface *s, Enesim_Error **error);
-void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
+Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor, void *data);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
+void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
+Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		Enesim_Error **error);
+
 /* common gradient renderer functions */
 typedef Eina_F16p16 (*Enesim_Renderer_Gradient_Distance)(Enesim_Renderer *r, Eina_F16p16 x, Eina_F16p16 y);
 typedef int (*Enesim_Renderer_Gradient_Length)(Enesim_Renderer *r);

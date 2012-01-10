@@ -217,7 +217,7 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 	{
 		if (enesim_renderer_has_changed(r->current.mask))
 		{
-			DBG("The mask renderer %s has changed", r->current.name);
+			DBG("The mask renderer %s has changed", r->name);
 			return EINA_TRUE;
 		}
 	}
@@ -609,10 +609,9 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	}
 	/* swap the states */
 	/* first stuff that needs to be freed */
-	if (r->past.name && r->past.name != r->current.name) free(r->past.name);
 	r->past = r->current;
 	r->past_boundings = r->current_boundings;
-	DBG("Cleaning up the renderer %s", r->current.name);
+	DBG("Cleaning up the renderer %s", r->name);
 }
 
 /**
@@ -664,6 +663,36 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 	if (m) *m = r->current.transformation;
 }
 
+#if 0
+/* FIXME for later
+ * ot either here as a property, or through a common renderer because this property will
+ * be useful also for the gradient ....
+ */
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_geometry_transform_set(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+	/* check that the matrix is affine */
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_geometry_transform_get(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+}
+#endif
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -671,8 +700,8 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->current.name) free(r->current.name);
-	r->current.name = strdup(name);
+	if (r->name) free(r->name);
+	r->name = strdup(name);
 }
 
 /**
@@ -682,7 +711,7 @@ EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	*name = r->current.name;
+	*name = r->name;
 }
 
 /**
@@ -1082,7 +1111,7 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 		return;
 
 	va_start(args, fmt);
-	num = snprintf(str, PATH_MAX, "%s:%d %s %s ", file, line, function, r->current.name);
+	num = snprintf(str, PATH_MAX, "%s:%d %s %s ", file, line, function, r->name);
 	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
 	str[num++] = '\n';
 	str[num] = '\0';
@@ -1113,7 +1142,7 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 	}
 	if (ret)
 	{
-		DBG("The renderer %s has changed", r->current.name);
+		DBG("The renderer %s has changed", r->name);
 	}
 	return ret;
 }
@@ -1165,3 +1194,27 @@ EAPI void enesim_renderer_destination_damages_get(Enesim_Renderer *r, Enesim_Ren
 	ddata.flags = flags;
 	enesim_renderer_damages_get(r, _enesim_renderer_destination_boundings_cb, &ddata);
 }
+
+#if 0
+/* FIXME for later
+EAPI void enesim_renderer_state_relative_calc(const Enesim_Renderer_State *rel, const Enesim_Renderer_State *s, Enesim_Renderer_State *nstate)
+{
+	/* TODO calculate the new origin */
+	/* TODO calculate the new scale */
+	/* TODO calculate the new transformation */
+	/* TODO calculate the new color */
+}
+
+ we should or either use this or the 
+void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
+		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy,
+		double *old_sx, double *old_sy)
+but instead of passing the old values as pointers, just pass a whole Enesim_Renderer_State *;
+or even better something like this:
+
+EAPI void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer_State *rel, Enesim_Renderer_State *old_state)
+
+and we need some kind of flags to use to know what to calculate, like the flags themselves? another
+flags like booleans?
+
+#endif

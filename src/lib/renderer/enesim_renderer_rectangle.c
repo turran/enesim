@@ -1582,6 +1582,7 @@ static const char * _rectangle_name(Enesim_Renderer *r)
 
 static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -1778,6 +1779,7 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
  */
 static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
@@ -1867,8 +1869,7 @@ static void _rectangle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 #endif
 
-static Enesim_Renderer_Descriptor _rectangle_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
+static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 	/* .name = 			*/ _rectangle_name,
 	/* .free = 			*/ _rectangle_free,
 #if NEW_RENDERER
