@@ -297,6 +297,7 @@ static const char * _line_name(Enesim_Renderer *r)
 
 static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -314,6 +315,12 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	x1 = thiz->current.x1;
 	y0 = thiz->current.y0;
 	y1 = thiz->current.y1;
+
+	if (state->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		enesim_matrix_point_transform(&state->geometry_transformation, x0, y0, &x0, &y0);
+		enesim_matrix_point_transform(&state->geometry_transformation, x1, y1, &x1, &y1);
+	}
 
 	if (y1 < y0)
 	{
@@ -439,8 +446,7 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 }
 
 
-static Enesim_Renderer_Descriptor _line_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
+static Enesim_Renderer_Shape_Descriptor _line_descriptor = {
 	/* .name = 			*/ _line_name,
 	/* .free = 			*/ _line_free,
 	/* .boundings = 		*/ NULL,// _line_boundings,

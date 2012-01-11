@@ -165,22 +165,23 @@ EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
  */
 EAPI void enesim_matrix_point_transform(Enesim_Matrix *m, double x, double y, double *xr, double *yr)
 {
+	double xrr, yrr;
+
 	if (!MATRIX_ZX(m) && !MATRIX_ZY(m))
 	{
-		if (xr)
-			*xr = (x * MATRIX_XX(m) + y * MATRIX_XY(m) + MATRIX_XZ(m));
-		if (yr)
-			*yr = (x * MATRIX_YX(m) + y * MATRIX_YY(m) + MATRIX_YZ(m));
+		xrr = (x * MATRIX_XX(m) + y * MATRIX_XY(m) + MATRIX_XZ(m));
+		yrr = (x * MATRIX_YX(m) + y * MATRIX_YY(m) + MATRIX_YZ(m));
 	}
 	else
 	{
-		if (xr)
-			*xr = (x * MATRIX_XX(m) + y * MATRIX_XY(m) + MATRIX_XZ(m)) /
-				(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + MATRIX_ZZ(m));
-		if (yr)
-			*yr = (x * MATRIX_YX(m) + y * MATRIX_YY(m) + MATRIX_YZ(m)) /
-				(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + MATRIX_ZZ(m));
+		xrr = (x * MATRIX_XX(m) + y * MATRIX_XY(m) + MATRIX_XZ(m)) /
+			(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + MATRIX_ZZ(m));
+		yrr = (x * MATRIX_YX(m) + y * MATRIX_YY(m) + MATRIX_YZ(m)) /
+			(x * MATRIX_ZX(m) + y * MATRIX_ZY(m) + MATRIX_ZZ(m));
 	}
+
+	if (xr) *xr = xrr;
+	if (yr) *yr = yrr;
 }
 /**
  * To be documented

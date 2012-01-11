@@ -57,9 +57,7 @@ typedef struct _Layer
 	/* generated at state setup */
 	Eina_Rectangle destination_boundings;
 	Enesim_Compositor_Span span;
-	Enesim_Matrix original;
-	double ox, oy;
-	double sx, sy;
+	Enesim_Renderer_State old;
 } Layer;
 
 typedef struct _Enesim_Renderer_Compound_Damage_Data
@@ -215,13 +213,12 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		 * for those supported
 		 */
 		/* the position and the matrix */
-		enesim_renderer_relative_set(r, l->r, &l->original, &l->ox, &l->oy, &l->sx, &l->sy);
+		enesim_renderer_relative_set(l->r, state, &l->old);
 		if (thiz->pre_cb)
 		{
 			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
 			{
-				enesim_renderer_relative_unset(r, l->r, &l->original,
-						 l->ox, l->oy, l->sx, l->sy);
+				enesim_renderer_relative_unset(l->r, &l->old);
 				break;
 			}
 		}
@@ -234,9 +231,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 			for (; ll && ll != thiz->layers; ll = eina_list_prev(ll))
 			{
 				Layer *pl = eina_list_data_get(ll);
-				enesim_renderer_relative_unset(r, pl->r, &l->original,
-						 l->ox, l->oy, l->sx, l->sy);
-				enesim_renderer_cleanup(l->r, s);
+				enesim_renderer_relative_unset(pl->r, &pl->old);
+				enesim_renderer_cleanup(pl->r, s);
 				ll = eina_list_prev(ll);
 			}
 
@@ -279,7 +275,7 @@ static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		Layer *l = eina_list_data_get(ll);
 
-		enesim_renderer_relative_unset(r, l->r, &l->original, l->ox, l->oy, l->sx, l->sy);
+		enesim_renderer_relative_unset(l->r, &l->old);
 		enesim_renderer_cleanup(l->r, s);
 	}
 	thiz->changed = EINA_FALSE;

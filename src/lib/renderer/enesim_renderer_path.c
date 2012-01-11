@@ -424,11 +424,19 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 		Enesim_Renderer_Path_Polygon_Add polygon_add,
 		Enesim_Renderer_Path_Polygon_Close polygon_close,
 		Enesim_Renderer_Path_Done path_done,
-		double scale_x, double scale_y, void *data)
+		double scale_x, double scale_y,
+		Enesim_Matrix *gm,
+		void *data)
 {
 	Eina_List *l;
 	Enesim_Renderer_Command_State state;
 	Enesim_Renderer_Path_Command *cmd;
+	double rx;
+	double ry;
+	double ctrl_x0;
+	double ctrl_y0;
+	double ctrl_x1;
+	double ctrl_y1;
 
 	state.vertex_add = vertex_add;
 	state.polygon_add = polygon_add;
@@ -452,6 +460,8 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			case ENESIM_COMMAND_MOVE_TO:
 			x = scale_x * cmd->definition.move_to.x;
 			y = scale_y * cmd->definition.move_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
 			_enesim_move_to(&state, x, y);
@@ -460,6 +470,8 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			case ENESIM_COMMAND_LINE_TO:
 			x = scale_x * cmd->definition.line_to.x;
 			y = scale_y * cmd->definition.line_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
 			enesim_curve_line_to(&state.st, x, y);
@@ -468,15 +480,21 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			case ENESIM_COMMAND_QUADRATIC_TO:
 			x = scale_x * cmd->definition.quadratic_to.x;
 			y = scale_y * cmd->definition.quadratic_to.y;
+			ctrl_x0 = scale_x * cmd->definition.quadratic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->definition.quadratic_to.ctrl_y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_quadratic_to(&state.st, scale_x * cmd->definition.quadratic_to.ctrl_x,
-					scale_y * cmd->definition.quadratic_to.ctrl_y, x, y);
+			enesim_curve_quadratic_to(&state.st, ctrl_x0, ctrl_y0, x, y);
 			break;
 
 			case ENESIM_COMMAND_SQUADRATIC_TO:
 			x = scale_x * cmd->definition.squadratic_to.x;
 			y = scale_y * cmd->definition.squadratic_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
 			enesim_curve_squadratic_to(&state.st, x, y);
@@ -485,32 +503,47 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			case ENESIM_COMMAND_CUBIC_TO:
 			x = scale_x * cmd->definition.cubic_to.x;
 			y = scale_y * cmd->definition.cubic_to.y;
+			ctrl_x0 = scale_x * cmd->definition.cubic_to.ctrl_x0;
+			ctrl_y0 = scale_y * cmd->definition.cubic_to.ctrl_y0;
+			ctrl_x1 = scale_x * cmd->definition.cubic_to.ctrl_x1;
+			ctrl_y1 = scale_y * cmd->definition.cubic_to.ctrl_y1;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+			enesim_matrix_point_transform(gm, ctrl_x1, ctrl_y1, &ctrl_x1, &ctrl_y1);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_cubic_to(&state.st, scale_x * cmd->definition.cubic_to.ctrl_x0,
-					scale_y * cmd->definition.cubic_to.ctrl_y0,
-					scale_x * cmd->definition.cubic_to.ctrl_x1,
-					scale_y * cmd->definition.cubic_to.ctrl_y1,
+			enesim_curve_cubic_to(&state.st,
+					ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1,
 					x, y);
 			break;
 
 			case ENESIM_COMMAND_SCUBIC_TO:
 			x = scale_x * cmd->definition.scubic_to.x;
 			y = scale_y * cmd->definition.scubic_to.y;
+			ctrl_x0 = scale_x * cmd->definition.scubic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->definition.scubic_to.ctrl_y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_scubic_to(&state.st, scale_x * cmd->definition.scubic_to.ctrl_x,
-					scale_y * cmd->definition.scubic_to.ctrl_y,
+			enesim_curve_scubic_to(&state.st, ctrl_x0, ctrl_y0,
 					x, y);
 			break;
 
 			case ENESIM_COMMAND_ARC_TO:
 			x = scale_x * cmd->definition.arc_to.x;
 			y = scale_y * cmd->definition.arc_to.y;
+			rx = scale_x * cmd->definition.arc_to.rx;
+			ry = scale_y * cmd->definition.arc_to.ry;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, rx, ry, &rx, &ry);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_arc_to(&state.st, scale_x * cmd->definition.arc_to.rx,
-					scale_y * cmd->definition.arc_to.ry,
+			enesim_curve_arc_to(&state.st,
+					rx, ry, 
 					cmd->definition.arc_to.angle,
 					cmd->definition.arc_to.large,
 					cmd->definition.arc_to.sweep,
@@ -592,7 +625,9 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 					_stroke_path_polygon_add,
 					_stroke_path_polygon_close,
 					_stroke_path_done,
-					 state->sx, state->sy, &st);
+					state->sx, state->sy,
+					&state->geometry_transformation,
+					&st);
 			enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 			enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, thiz->stroke_figure);
 		}
@@ -606,7 +641,9 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 					_strokeless_path_polygon_add,
 					_strokeless_path_polygon_close,
 					NULL,
-					state->sx, state->sy, &st);
+					state->sx, state->sy,
+					&state->geometry_transformation,
+					&st);
 			enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 		}
 		/* set the fill figure on the bifigure as its under polys */
@@ -679,6 +716,113 @@ static void _enesim_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 	enesim_renderer_boundings(thiz->bifigure, boundings);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Surface *s,
+		int *num_shaders,
+		Enesim_Renderer_OpenGL_Shader **shaders,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Path *thiz;
+ 	thiz = _enesim_path_get(r);
+
+	/*
+	 * On the gl version use the tesselator to generate the triangles and pass them
+	 * to the goemetry shader. Only tesselate again whenever something has changed
+	 */
+#if 0
+	tobj = gluNewTess();
+	gluTessCallback(tobj, GLU_TESS_VERTEX,
+			   (GLvoid (*) ()) &glVertex3dv);
+	gluTessCallback(tobj, GLU_TESS_BEGIN,
+			   (GLvoid (*) ()) &beginCallback);
+	gluTessCallback(tobj, GLU_TESS_END,
+			   (GLvoid (*) ()) &endCallback);
+	gluTessCallback(tobj, GLU_TESS_ERROR,
+			   (GLvoid (*) ()) &errorCallback);
+
+	/*  new callback routines registered by these calls */
+	void vertexCallback(GLvoid *vertex)
+	{
+		const GLdouble *pointer;
+
+		pointer = (GLdouble *) vertex;
+		glColor3dv(pointer+3);
+		glVertex3dv(vertex);
+	}
+
+	void combineCallback(GLdouble coords[3], 
+			     GLdouble *vertex_data[4],
+			     GLfloat weight[4], GLdouble **dataOut )
+	{
+		GLdouble *vertex;
+		int i;
+
+		vertex = (GLdouble *) malloc(6 * sizeof(GLdouble));
+		vertex[0] = coords[0];
+		vertex[1] = coords[1];
+		vertex[2] = coords[2];
+		for (i = 3; i < 7; i++)
+		vertex[i] = weight[0] * vertex_data[0][i] 
+			  + weight[1] * vertex_data[1][i]
+			  + weight[2] * vertex_data[2][i] 
+			  + weight[3] * vertex_data[3][i];
+		*dataOut = vertex;
+	}
+
+	/*  the callback routines registered by gluTessCallback() */
+
+	void beginCallback(GLenum which)
+	{
+	}
+
+	void endCallback(void)
+	{
+	}
+	// describe non-convex polygon
+	gluTessBeginPolygon(tess, user_data);
+		// first contour
+		gluTessBeginContour(tess);
+		gluTessVertex(tess, coords[0], vertex_data);
+		...
+		gluTessEndContour(tess);
+
+		// second contour
+		gluTessBeginContour(tess);
+		gluTessVertex(tess, coords[5], vertex_data);
+		...
+		gluTessEndContour(tess);
+		...
+	gluTessEndPolygon(tess);
+
+#endif
+	/* after tesselating we should have a structure with our triangles that we should
+	 * pass to the geometry shader through uniforms
+	 * the shader should only emit primitives and vertices
+	 */
+}
+
+static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int final_color;
+
+ 	thiz = _enesim_path_get(r);
+
+	return EINA_TRUE;
+}
+
+static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Path *thiz;
+
+ 	thiz = _enesim_path_get(r);
+	_path_state_cleanup(thiz);
+}
+#endif
+
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .name = 			*/ _enesim_path_name,
 	/* .free = 			*/ NULL,
@@ -693,9 +837,15 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup = 	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
+#if BUILD_OPENGL
+	/* .opengl_setup = 		*/ _path_opengl_setup,
+	/* .opengl_shader_setup =	*/ _path_opengl_shader_setup,
+	/* .opengl_cleanup =		*/ _path_opengl_cleanup
+#else
+	/* .opengl_setup = 		*/ NULL,
+	/* .opengl_shader_setup =	*/ NULL,
+	/* .opengl_cleanup = 		*/ NULL
+#endif
 };
 /*============================================================================*
  *                                 Global                                     *

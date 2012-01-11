@@ -40,12 +40,8 @@ typedef struct _Enesim_Renderer_Stripes {
 	Enesim_Renderer_Stripes_State current;
 	Enesim_Renderer_Stripes_State past;
 	/* private */
-	Enesim_Matrix even_transformation;
-	Enesim_Matrix odd_transformation;
-	double even_ox, even_oy;
-	double even_sx, even_sy;
-	double odd_ox, odd_oy;
-	double odd_sx, odd_sy;
+	Enesim_Renderer_State old_odd;
+	Enesim_Renderer_State old_even;
 	Eina_Bool changed : 1;
 	Enesim_Color final_color1;
 	Enesim_Color final_color2;
@@ -367,19 +363,13 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 
 	if (thiz->current.even.paint)
 	{
-		enesim_renderer_relative_set(r, thiz->current.even.paint,
-				&thiz->even_transformation,
-				&thiz->even_ox, &thiz->even_oy,
-				&thiz->even_sx, &thiz->even_sy);
+		enesim_renderer_relative_set(thiz->current.even.paint, state, &thiz->old_even);
 		if (!enesim_renderer_setup(thiz->current.even.paint, s, error))
 			return EINA_FALSE;
 	}
 	if (thiz->current.odd.paint)
 	{
-		enesim_renderer_relative_set(r, thiz->current.odd.paint,
-				&thiz->odd_transformation,
-				&thiz->odd_ox, &thiz->odd_oy,
-				&thiz->odd_sx, &thiz->odd_sy);
+		enesim_renderer_relative_set(thiz->current.odd.paint, state, &thiz->old_odd);
 		if (!enesim_renderer_setup(thiz->current.odd.paint, s, error))
 			return EINA_FALSE;
 	}
@@ -414,18 +404,12 @@ static void _stripes_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = _stripes_get(r);
 	if (thiz->current.even.paint)
 	{
-		enesim_renderer_relative_unset(r, thiz->current.even.paint,
-				&thiz->even_transformation,
-				thiz->even_ox, thiz->even_oy,
-				thiz->even_sx, thiz->even_sy);
+		enesim_renderer_relative_unset(thiz->current.even.paint, &thiz->old_even);
 		enesim_renderer_cleanup(thiz->current.even.paint, s);
 	}
 	if (thiz->current.odd.paint)
 	{
-		enesim_renderer_relative_unset(r, thiz->current.odd.paint,
-				&thiz->odd_transformation,
-				thiz->odd_ox, thiz->odd_oy,
-				thiz->odd_sx, thiz->odd_sy);
+		enesim_renderer_relative_unset(thiz->current.odd.paint, &thiz->old_odd);
 		enesim_renderer_cleanup(thiz->current.odd.paint, s);
 	}
 	thiz->past = thiz->current;

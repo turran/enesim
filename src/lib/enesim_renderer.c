@@ -249,6 +249,24 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 	{
 		return EINA_TRUE;
 	}
+	/* the geometry_transformation */
+	if (r->current.geometry_transformation_type != r->past.geometry_transformation_type)
+	{
+		return EINA_TRUE;
+	}
+
+	if (r->current.geometry_transformation.xx != r->past.geometry_transformation.xx ||
+			r->current.geometry_transformation.xy != r->past.geometry_transformation.xy ||
+			r->current.geometry_transformation.xz != r->past.geometry_transformation.xz ||
+			r->current.geometry_transformation.yx != r->past.geometry_transformation.yx ||
+			r->current.geometry_transformation.yy != r->past.geometry_transformation.yy ||
+			r->current.geometry_transformation.yz != r->past.geometry_transformation.yz ||
+			r->current.geometry_transformation.zx != r->past.geometry_transformation.zx ||
+			r->current.geometry_transformation.zy != r->past.geometry_transformation.zy ||
+			r->current.geometry_transformation.zz != r->past.geometry_transformation.zz)
+	{
+		return EINA_TRUE;
+	}
 
 	return EINA_FALSE;
 }
@@ -290,84 +308,6 @@ void enesim_renderer_shutdown(void)
 	eina_hash_free(_factories);
 	_factories = NULL;
 	enesim_renderer_sw_shutdown();
-}
-
-void enesim_renderer_relative_matrix_set(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix)
-{
-	Enesim_Matrix rel_matrix, r_matrix;
-
-	/* the relativeness of the matrix should be done only if both
-	 * both renderers have the matrix flag set
-	 */
-	/* TODO should we use the f16p16 matrix? */
-	/* multiply the matrix by the current transformation */
-	enesim_renderer_transformation_get(r, &r_matrix);
-	enesim_renderer_transformation_get(rel, old_matrix);
-	enesim_matrix_compose(old_matrix, &r_matrix, &rel_matrix);
-	enesim_renderer_transformation_set(rel, &rel_matrix);
-}
-
-void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy,
-		double *old_sx, double *old_sy)
-{
-	Enesim_Matrix rel_matrix, r_matrix;
-	double r_ox, r_oy;
-	double nox, noy;
-
-	if (!rel) return;
-
-	if (r->current.transformation_type != ENESIM_MATRIX_IDENTITY)
-	{
-		/* TODO should we use the f16p16 matrix? */
-		/* multiply the matrix by the current transformation */
-		enesim_renderer_transformation_get(r, &r_matrix);
-		enesim_renderer_transformation_get(rel, old_matrix);
-		enesim_matrix_compose(old_matrix, &r_matrix, &rel_matrix);
-		enesim_renderer_transformation_set(rel, &rel_matrix);
-		/* add the origin by the current origin */
-		enesim_renderer_origin_get(rel, old_ox, old_oy);
-		enesim_renderer_origin_get(r, &r_ox, &r_oy);
-		/* FIXME what to do with the origin?
-		 * - if we use the first case we are also translating the rel origin to the
-		 * parent origin * old_matrix
-		 */
-#if 1
-		enesim_matrix_point_transform(old_matrix, *old_ox + r_ox, *old_oy + r_oy, &nox, &noy);
-		enesim_renderer_origin_set(rel, nox, noy);
-
-		enesim_renderer_scale_get(rel, old_sx, old_sy);
-		enesim_renderer_scale_set(rel, r->current.sx * *old_sx, r->current.sy * *old_sy);
-#else
-		//printf("setting new origin %g %g\n", *old_ox - r_ox, *old_oy - r_oy);
-		enesim_renderer_origin_set(rel, *old_ox - r_ox, *old_oy - r_oy);
-#endif
-	}
-	else
-	{
-		enesim_renderer_origin_get(rel, old_ox, old_oy);
-		enesim_renderer_origin_set(rel, r->current.ox + *old_ox, r->current.oy + *old_oy);
-
-		enesim_renderer_scale_get(rel, old_sx, old_sy);
-		enesim_renderer_scale_set(rel, r->current.sx * *old_sx, r->current.sy * *old_sy);
-
-		enesim_renderer_transformation_get(rel, old_matrix);
-	}
-}
-
-void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix, double old_ox, double old_oy,
-		double old_sx, double old_sy)
-{
-	if (!rel) return;
-
-	/* restore origin */
-	enesim_renderer_origin_set(rel, old_ox, old_oy);
-	/* restore the scale */
-	enesim_renderer_scale_set(rel, old_sx, old_sy);
-	/* restore original matrix */
-	enesim_renderer_transformation_set(rel, old_matrix);
 }
 
 void enesim_renderer_identity_setup(Enesim_Renderer *r, int x, int y,
@@ -490,6 +430,10 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	enesim_matrix_identity(&r->past.transformation);
 	r->current.transformation_type = ENESIM_MATRIX_IDENTITY;
 	r->past.transformation_type = ENESIM_MATRIX_IDENTITY;
+	enesim_matrix_identity(&r->current.geometry_transformation);
+	enesim_matrix_identity(&r->past.geometry_transformation);
+	r->current.geometry_transformation_type = ENESIM_MATRIX_IDENTITY;
+	r->past.geometry_transformation_type = ENESIM_MATRIX_IDENTITY;
 	/* private stuff */
 	enesim_rectangle_coords_from(&r->past_boundings, 0, 0, 0, 0);
 	r->prv_data = eina_hash_string_superfast_new(NULL);
@@ -634,7 +578,7 @@ EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
  * @param[in] r The renderer to set the transformation matrix on
  * @param[in] m The transformation matrix to set
  */
-EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *m)
+EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	Enesim_Renderer_Flag flags;
@@ -663,35 +607,26 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 	if (m) *m = r->current.transformation;
 }
 
-#if 0
-/* FIXME for later
- * ot either here as a property, or through a common renderer because this property will
- * be useful also for the gradient ....
- */
-
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_geometry_transform_set(Enesim_Renderer *r, Enesim_Matrix *m)
+EAPI void enesim_renderer_geometry_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m)
 {
-	/* check that the matrix is affine */
-	Enesim_Renderer_Shape *thiz;
-
-	thiz = _shape_get(r);
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->current.geometry_transformation = *m;
+	r->current.geometry_transformation_type = enesim_matrix_type_get(&r->current.geometry_transformation);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_geometry_transform_get(Enesim_Renderer *r, Enesim_Matrix *m)
+EAPI void enesim_renderer_geometry_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m)
 {
-	Enesim_Renderer_Shape *thiz;
-
-	thiz = _shape_get(r);
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (m) *m = r->current.transformation;
 }
-#endif
 
 /**
  * To be documented
@@ -1195,26 +1130,57 @@ EAPI void enesim_renderer_destination_damages_get(Enesim_Renderer *r, Enesim_Ren
 	enesim_renderer_damages_get(r, _enesim_renderer_destination_boundings_cb, &ddata);
 }
 
-#if 0
-/* FIXME for later
-EAPI void enesim_renderer_state_relative_calc(const Enesim_Renderer_State *rel, const Enesim_Renderer_State *s, Enesim_Renderer_State *nstate)
+/* and we need some kind of flags to use to know what to calculate, like the flags themselves?
+ * another flags like booleans?
+ */
+EAPI void enesim_renderer_relative_set(Enesim_Renderer *r, const Enesim_Renderer_State *rel, Enesim_Renderer_State *old_state)
 {
-	/* TODO calculate the new origin */
+	if (!rel || !old_state) return;
+	*old_state = r->current;
+
 	/* TODO calculate the new scale */
+	/* TODO calculate the new origin */
 	/* TODO calculate the new transformation */
+	if (rel->transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Matrix r_matrix;
+		double nox, noy;
+		/* TODO should we use the f16p16 matrix? */
+
+		/* multiply the matrix by the current transformation */
+		enesim_matrix_compose(&old_state->transformation, &rel->transformation, &r_matrix);
+		enesim_renderer_transformation_set(r, &r_matrix);
+
+		/* FIXME what to do with the origin?
+		 * - if we use the first case we are also translating the rel origin to the
+		 * parent origin * old_matrix
+		 */
+		/* add the origin by the current origin */
+#if 1
+		enesim_matrix_point_transform(&old_state->transformation, old_state->ox + rel->ox, old_state->oy + rel->oy, &nox, &noy);
+		enesim_renderer_origin_set(r, nox, noy);
+#else
+		enesim_renderer_origin_set(r, old_state->ox - rel->ox, old_state->oy - rel->oy);
+#endif
+		enesim_renderer_scale_set(r, old_state->sx * rel->sx, old_state->sy * rel->sy);
+	}
+	else
+	{
+		enesim_renderer_origin_set(r, old_state->ox + rel->ox, old_state->oy + rel->oy);
+		enesim_renderer_scale_set(r, old_state->sx * rel->sx, old_state->sy * rel->sy);
+	}
 	/* TODO calculate the new color */
+	enesim_renderer_color_set(r, argb8888_mul4_sym(old_state->color, rel->color));
 }
 
- we should or either use this or the 
-void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer *rel,
-		Enesim_Matrix *old_matrix, double *old_ox, double *old_oy,
-		double *old_sx, double *old_sy)
-but instead of passing the old values as pointers, just pass a whole Enesim_Renderer_State *;
-or even better something like this:
-
-EAPI void enesim_renderer_relative_set(Enesim_Renderer *r, Enesim_Renderer_State *rel, Enesim_Renderer_State *old_state)
-
-and we need some kind of flags to use to know what to calculate, like the flags themselves? another
-flags like booleans?
-
-#endif
+EAPI void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer_State *state)
+{
+	/* restore origin */
+	enesim_renderer_origin_set(r, state->ox, state->oy);
+	/* restore the scale */
+	enesim_renderer_scale_set(r, state->sx, state->sy);
+	/* restore original matrix */
+	enesim_renderer_transformation_set(r, &state->transformation);
+	/* restore the color */
+	enesim_renderer_color_set(r, state->color);
+}

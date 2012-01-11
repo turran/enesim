@@ -35,12 +35,8 @@ typedef struct _Enesim_Renderer_Shape
 	/* private */
 	Eina_Bool changed : 1;
 	/* needed for the state */
-	Enesim_Matrix stroke_transformation;
-	Enesim_Matrix fill_transformation;
-	double fill_ox, fill_oy;
-	double fill_sx, fill_sy;
-	double stroke_ox, stroke_oy;
-	double stroke_sx, stroke_sy;
+	Enesim_Renderer_State old_fill;
+	Enesim_Renderer_State old_stroke;
 	/* interface */
 	Enesim_Renderer_Shape_Sw_Setup sw_setup;
 	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
@@ -221,19 +217,13 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	if (thiz->current.fill.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
-		enesim_renderer_relative_unset(r, thiz->current.fill.r,
-				&thiz->fill_transformation,
-				thiz->fill_ox, thiz->fill_oy,
-				thiz->fill_sx, thiz->fill_sy);
+		enesim_renderer_relative_unset(thiz->current.fill.r, &thiz->old_fill);
 		enesim_renderer_cleanup(thiz->current.fill.r, s);
 	}
 	if (thiz->current.stroke.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 	{
-		enesim_renderer_relative_unset(r, thiz->current.stroke.r,
-				&thiz->stroke_transformation,
-				thiz->stroke_ox, thiz->stroke_oy,
-				thiz->stroke_sx, thiz->stroke_sy);
+		enesim_renderer_relative_unset(thiz->current.stroke.r, &thiz->old_stroke);
 		enesim_renderer_cleanup(thiz->current.stroke.r, s);
 	}
 	thiz->past = thiz->current;
@@ -252,10 +242,7 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
 		fill_renderer = EINA_TRUE;
-		enesim_renderer_relative_set(r, thiz->current.fill.r,
-				&thiz->fill_transformation,
-				&thiz->fill_ox, &thiz->fill_oy,
-				&thiz->fill_sx, &thiz->fill_sy);
+		enesim_renderer_relative_set(thiz->current.fill.r, state, &thiz->old_fill);
 		if (!enesim_renderer_setup(thiz->current.fill.r, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Fill renderer failed");
@@ -265,20 +252,14 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 	if (thiz->current.stroke.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 	{
-		enesim_renderer_relative_set(r, thiz->current.stroke.r,
-				&thiz->stroke_transformation,
-				&thiz->stroke_ox, &thiz->stroke_oy,
-				&thiz->stroke_sx, &thiz->stroke_sy);
+		enesim_renderer_relative_set(thiz->current.stroke.r, state, &thiz->old_stroke);
 		if (!enesim_renderer_setup(thiz->current.stroke.r, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Stroke renderer failed");
 			/* clean up the fill renderer setup */
 			if (fill_renderer)
 			{
-				enesim_renderer_relative_unset(r, thiz->current.fill.r,
-						&thiz->fill_transformation,
-						thiz->fill_ox, thiz->fill_oy,
-						thiz->fill_sx, thiz->fill_sy);
+				enesim_renderer_relative_unset(thiz->current.fill.r, &thiz->old_fill);
 				enesim_renderer_cleanup(thiz->current.fill.r, s);
 
 			}

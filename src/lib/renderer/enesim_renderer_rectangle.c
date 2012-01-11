@@ -51,11 +51,15 @@ typedef struct _Enesim_Renderer_Rectangle
 	Enesim_Renderer_Rectangle_State current;
 	Enesim_Renderer_Rectangle_State past;
 	/* internal state */
+	Eina_Bool changed : 1;
+	/* for the case we use the path renderer */
+	Enesim_Renderer *path;
+	Enesim_Renderer_Sw_Fill fill;
+	/* for our own case */
 	Eina_F16p16 ww;
 	Eina_F16p16 hh;
 	Eina_F16p16 xx;
 	Eina_F16p16 yy;
-	Eina_Bool changed : 1;
 	Enesim_F16p16_Matrix matrix;
 	/* the inner rectangle in case of rounded corners */
 	int lxx0, rxx0;
@@ -260,7 +264,6 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 
 	return thiz;
 }
-
 #if NEW_RENDERER
 static uint32_t _rectangle_get_color(Eina_F16p16 xx, Eina_F16p16 yy, Eina_F16p16 ww0, Eina_F16p16 hh0,
 			Enesim_Color ocolor, Enesim_Color icolor)
@@ -437,6 +440,19 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 }
 
 #else
+/*----------------------------------------------------------------------------*
+ *                               Span functions                               *
+ *----------------------------------------------------------------------------*/
+/* Use the internal path for drawing */
+static void _rectangle_path_span(Enesim_Renderer *r, int x, int y,
+		unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Rectangle *thiz;
+
+	thiz = _rectangle_get(r);
+	thiz->fill(thiz->path, x, y, len, ddata);
+}
+
 /* stroke and/or fill with possibly a fill renderer */
 static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *ddata)
@@ -1617,11 +1633,57 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	if (rad > (scaled_height / 2.0))
 		rad = scaled_height / 2.0;
 
+	scaled_x = thiz->current.x * state->sx;
+	scaled_y = thiz->current.y * state->sy;
+
+	/* check if we should use the path approach */
+	/* FIXME later */
+#if 0
+	if (state->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		if (!thiz->path)
+			thiz->path = enesim_renderer_path_new();
+		/* FIXME the best approach would be to know *what* has changed
+		 * because we only need to generate the vertices for x,y,w,h
+		 * change
+		 */
+		if (1) //thiz->changed)
+		{
+			enesim_renderer_path_command_clear(thiz->path);
+			/* FIXME handle the corners too */
+			enesim_renderer_path_move_to(thiz->path, scaled_x, scaled_y);
+			enesim_renderer_path_line_to(thiz->path, scaled_x + scaled_width, scaled_y);
+			enesim_renderer_path_line_to(thiz->path, scaled_x + scaled_width, scaled_y + scaled_height);
+			enesim_renderer_path_line_to(thiz->path, scaled_x, scaled_y + scaled_height);
+			enesim_renderer_path_close(thiz->path, EINA_TRUE);
+		}
+
+		enesim_renderer_color_set(thiz->path, state->color);
+		enesim_renderer_origin_set(thiz->path, state->ox, state->oy);
+		enesim_renderer_geometry_transformation_set(thiz->path, &state->geometry_transformation);
+
+		enesim_renderer_shape_fill_renderer_set(thiz->path, sstate->fill.r);
+		enesim_renderer_shape_fill_color_set(thiz->path, sstate->fill.color);
+		enesim_renderer_shape_stroke_renderer_set(thiz->path, sstate->stroke.r);
+		enesim_renderer_shape_stroke_weight_set(thiz->path, sstate->stroke.weight);
+		enesim_renderer_shape_stroke_color_set(thiz->path, sstate->stroke.color);
+		enesim_renderer_shape_draw_mode_set(thiz->path, sstate->draw_mode);
+
+		if (!enesim_renderer_setup(thiz->path, s, error))
+		{
+			return EINA_FALSE;
+		}
+		thiz->fill = enesim_renderer_sw_fill_get(thiz->path);
+		*fill = _rectangle_path_span;
+
+		return EINA_TRUE;
+	}
+#endif
+
+	/* the code from here is only meaningful for our own span functions */
 	thiz->ww = eina_f16p16_double_from(scaled_width);
 	thiz->hh = eina_f16p16_double_from(scaled_height);
 
-	scaled_x = thiz->current.x * state->sx;
-	scaled_y = thiz->current.y * state->sy;
 	thiz->xx = eina_f16p16_double_from(scaled_x);
 	thiz->yy = eina_f16p16_double_from(scaled_y);
 
@@ -1725,6 +1787,12 @@ static void _rectangle_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 static void _rectangle_free(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Rectangle *thiz;
+
+	thiz = _rectangle_get(r);
+	if (thiz->path)
+		enesim_renderer_unref(thiz->path);
+	free(thiz);
 }
 
 static void _rectangle_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)

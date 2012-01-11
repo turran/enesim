@@ -62,8 +62,10 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name);
 EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name);
-EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, Enesim_Matrix *m);
+EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m);
 EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m);
+EAPI void enesim_renderer_geometry_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m);
+EAPI void enesim_renderer_geometry_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y);
 EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y);
 EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x);
@@ -122,6 +124,8 @@ typedef struct _Enesim_Renderer_State
 	Enesim_Renderer *mask;
 	Enesim_Matrix transformation;
 	Enesim_Matrix_Type transformation_type;
+	Enesim_Matrix geometry_transformation;
+	Enesim_Matrix_Type geometry_transformation_type;
 } Enesim_Renderer_State;
 
 /* common descriptor functions */
@@ -205,6 +209,9 @@ struct _Enesim_Renderer_Descriptor {
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data);
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
+
+EAPI void enesim_renderer_relative_set(Enesim_Renderer *r, const Enesim_Renderer_State *rel, Enesim_Renderer_State *old_state);
+EAPI void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer_State *state);
 
 /* TODO remove this one */
 EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);

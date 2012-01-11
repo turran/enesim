@@ -34,9 +34,7 @@ typedef struct _Enesim_Renderer_Transition {
 	} offset;
 
 	struct {
-		Enesim_Matrix original;
-		double ox, oy;
-		double sx, sy;
+		Enesim_Renderer_State old;
 		Enesim_Renderer *r;
 	} r0, r1;
 } Enesim_Renderer_Transition;
@@ -110,10 +108,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	if (!t || !t->r0.r || !t->r1.r)
 		return EINA_FALSE;
 
-	enesim_renderer_relative_set(r, t->r0.r, &t->r0.original, &t->r0.ox, &t->r0.oy, &t->r0.sx, &t->r0.sy);
+	enesim_renderer_relative_set(t->r0.r, state, &t->r0.old);
 	if (!enesim_renderer_setup(t->r0.r, s, error))
 		goto r0_end;
-	enesim_renderer_relative_set(r, t->r1.r, &t->r1.original, &t->r1.ox, &t->r1.oy, &t->r1.sx, &t->r1.sy);
+	enesim_renderer_relative_set(t->r1.r, state, &t->r1.old);
 	if (!enesim_renderer_setup(t->r1.r, s, error))
 		goto r1_end;
 
@@ -121,10 +119,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 
 	return EINA_TRUE;
 r1_end:
-	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy, t->r1.sx, t->r1.sy);
+	enesim_renderer_relative_unset(t->r1.r, &t->r1.old);
 	enesim_renderer_cleanup(t->r0.r, s);
 r0_end:
-	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy, t->r0.sx, t->r0.sy);
+	enesim_renderer_relative_unset(t->r0.r, &t->r0.old);
 	return EINA_FALSE;
 }
 
@@ -134,9 +132,9 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	t = _transition_get(r);
 	enesim_renderer_cleanup(t->r0.r, s);
-	enesim_renderer_relative_unset(r, t->r0.r, &t->r0.original, t->r0.ox, t->r0.oy, t->r0.sx, t->r0.sy);
+	enesim_renderer_relative_unset(t->r0.r, &t->r0.old);
 	enesim_renderer_cleanup(t->r1.r, s);
-	enesim_renderer_relative_unset(r, t->r1.r, &t->r1.original, t->r1.ox, t->r1.oy, t->r1.sx, t->r1.sy);
+	enesim_renderer_relative_unset(t->r1.r, &t->r1.old);
 }
 
 static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)

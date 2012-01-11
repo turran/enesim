@@ -37,7 +37,7 @@ typedef struct _Enesim_Rasterizer_Descriptor
 
 Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *data);
 void * enesim_rasterizer_data_get(Enesim_Renderer *r);
-void enesim_rasterizier_figure_set(Enesim_Renderer *r, const Enesim_Figure *f);
+void enesim_rasterizer_figure_set(Enesim_Renderer *r, const Enesim_Figure *f);
 
 Enesim_Renderer * enesim_rasterizer_basic_new(void);
 void enesim_rasterizer_basic_vectors_get(Enesim_Renderer *r, int *nvectors,
