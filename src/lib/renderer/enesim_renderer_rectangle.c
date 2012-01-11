@@ -1638,7 +1638,7 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 
 	/* check if we should use the path approach */
 	/* FIXME later */
-#if 0
+#if 1
 	if (state->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		if (!thiz->path)
@@ -1943,7 +1943,7 @@ static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 #if NEW_RENDERER
 	/* .boundings = 		*/ NULL, //_rectangle_boundings,
 #else
-	/* .boundings = 		*/ _rectangle_boundings,
+	/* .boundings = 		*/ NULL, //_rectangle_boundings,
 #endif
 	/* .destination_transform = 	*/ NULL,
 	/* .flags = 			*/ _rectangle_flags,

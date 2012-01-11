@@ -231,6 +231,24 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 #if 0
 		Enesim_Curve_State st;
 		Enesim_Point *p;
+
+		p = eina_list_data_get(inset->points);
+		st.vertex_add = _stroke_curve_prepend;
+		st.last_x = p->x;
+		st.last_y = p->y;
+		st.last_ctrl_x = p->x;
+		st.last_ctrl_y = p->y;
+		st.data = inset;
+		enesim_curve_arc_to(&st, thiz->r, thiz->r, 180 - (c * M_PI / 180.0), EINA_FALSE, EINA_FALSE, i0.x, i0.y);
+		printf("inset quadratic origin at %g %g to %g %g\n", p->x, p->y, i0.x, i0.y);
+#endif
+		enesim_polygon_point_prepend_from_coords(inset, thiz->p1.x, thiz->p1.y);
+	}
+	else
+	{
+#if 0
+		Enesim_Curve_State st;
+		Enesim_Point *p;
 		Eina_List *l;
 
 		l = eina_list_last(offset->points);
@@ -243,28 +261,8 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		st.data = offset;
 
 		printf("offset quadratic origin at %g %g to %g %g\n", p->x, p->y, o0.x, o0.y);
-		enesim_curve_squadratic_to(&st, o0.x, o0.y);
+		enesim_curve_arc_to(&st, thiz->r, thiz->r, 180 - (c * M_PI / 180.0), EINA_FALSE, EINA_FALSE, o0.x, o0.y);
 #endif
-		/* TODO do the curve on the offset_polygon */
-		enesim_polygon_point_prepend_from_coords(inset, thiz->p1.x, thiz->p1.y);
-	}
-	else
-	{
-#if 0
-		Enesim_Curve_State st;
-		Enesim_Point *p;
-
-		p = eina_list_data_get(inset->points);
-		st.vertex_add = _stroke_curve_prepend;
-		st.last_x = p->x;
-		st.last_y = p->y;
-		st.last_ctrl_x = p->x;
-		st.last_ctrl_y = p->y;
-		st.data = inset;
-		enesim_curve_squadratic_to(&st, i0.x, i0.y);
-		printf("inset quadratic origin at %g %g to %g %g\n", p->x, p->y, i0.x, i0.y);
-#endif
-		/* TODO do the curve on the inset_polygon */
 		enesim_polygon_point_append_from_coords(offset, thiz->p1.x, thiz->p1.y);
 	}
 	enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
@@ -543,7 +541,7 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
 			enesim_curve_arc_to(&state.st,
-					rx, ry, 
+					rx, ry,
 					cmd->definition.arc_to.angle,
 					cmd->definition.arc_to.large,
 					cmd->definition.arc_to.sweep,
@@ -578,7 +576,7 @@ static const char * _enesim_path_name(Enesim_Renderer *r)
 	return "path";
 }
 
-static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
+static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
@@ -688,7 +686,7 @@ static Eina_Bool _enesim_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _enesim_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -819,7 +817,6 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Path *thiz;
 
  	thiz = _enesim_path_get(r);
-	_path_state_cleanup(thiz);
 }
 #endif
 
@@ -832,8 +829,8 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .sw_setup = 			*/ _enesim_state_setup,
-	/* .sw_cleanup = 		*/ _enesim_state_cleanup,
+	/* .sw_setup = 			*/ _path_sw_setup,
+	/* .sw_cleanup = 		*/ _path_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
