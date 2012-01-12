@@ -53,7 +53,7 @@ typedef struct _Enesim_Renderer_OpenCL_Data
 } Enesim_Renderer_OpenCL_Data;
 
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error);
 void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
@@ -66,7 +66,7 @@ void enesim_renderer_opencl_shutdown(void);
 
 #if BUILD_OPENGL
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error);
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
@@ -122,7 +122,6 @@ typedef Eina_Bool (*Enesim_Renderer_Shape_OpenGL_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error);
 
-/* FIXME use this descriptor */
 typedef struct _Enesim_Renderer_Shape_Descriptor {
 	/* common */
 	Enesim_Renderer_Name name;
@@ -206,7 +205,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r,
 		Enesim_Surface *s, Eina_Rectangle *area,
 		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags);
 
-Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, const Enesim_Renderer_State *state, Enesim_Surface *s, Enesim_Error **error);
+Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES], Enesim_Surface *s, Enesim_Error **error);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 
 #endif

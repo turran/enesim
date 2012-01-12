@@ -488,15 +488,18 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
  */
 EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
 {
+	const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES];
 	Enesim_Backend b;
 	Eina_Bool ret = EINA_TRUE;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	states[ENESIM_STATE_CURRENT] = &r->current;
+	states[ENESIM_STATE_PAST] = &r->past;
 	b = enesim_surface_backend_get(s);
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
-		if (!enesim_renderer_sw_setup(r, &r->current, s, error))
+		if (!enesim_renderer_sw_setup(r, states, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Software setup failed");
 			ret = EINA_FALSE;
@@ -506,7 +509,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 
 		case ENESIM_BACKEND_OPENCL:
 #if BUILD_OPENCL
-		if (!enesim_renderer_opencl_setup(r, &r->current, s, error))
+		if (!enesim_renderer_opencl_setup(r, states, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "OpenCL setup failed");
 			ret = EINA_FALSE;
@@ -516,7 +519,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 
 		case ENESIM_BACKEND_OPENGL:
 #if BUILD_OPENGL
-		if (!enesim_renderer_opengl_setup(r, &r->current, s, error))
+		if (!enesim_renderer_opengl_setup(r, states, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "OpenGL setup failed");
 			ret = EINA_FALSE;

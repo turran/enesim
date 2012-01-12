@@ -130,7 +130,7 @@ static Eina_Bool _shader_compile(GLenum program, Enesim_Renderer_OpenGL_Shader *
  *                                 Global                                     *
  *============================================================================*/
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {
@@ -153,7 +153,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
 	}
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
-	ret = r->descriptor.opengl_setup(r, state, s, &num, &shaders, error);
+	ret = r->descriptor.opengl_setup(r, state[ENESIM_STATE_CURRENT], s, &num, &shaders, error);
 	if (rdata->num_shaders != num)
 	{
 		rdata->num_shaders = num;

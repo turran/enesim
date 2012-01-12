@@ -114,6 +114,13 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 
 typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
 
+typedef enum _Enesim_Renderer_States
+{
+	ENESIM_STATE_CURRENT,
+	ENESIM_STATE_PAST,
+	ENESIM_RENDERER_STATES,
+} Enesim_Renderer_States;
+
 typedef struct _Enesim_Renderer_State
 {
 	Enesim_Rop rop;

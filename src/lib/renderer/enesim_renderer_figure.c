@@ -32,7 +32,7 @@ typedef struct _Enesim_Renderer_Figure
 	Enesim_Figure *figure;
 	Enesim_Polygon *last_polygon;
 	Enesim_Point *last_point;
-	Enesim_Renderer *bifigure;
+	Enesim_Renderer *path;
 	Enesim_Renderer_Sw_Fill final_fill;
 	Eina_Bool changed :1;
 } Enesim_Renderer_Figure;
@@ -53,28 +53,35 @@ static void _span(Enesim_Renderer *r, int x, int y,
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = _figure_get(r);
-	thiz->final_fill(thiz->bifigure, x, y, len, ddata);
+	thiz->final_fill(thiz->path, x, y, len, ddata);
 }
 
-static void _generate_stroke(Enesim_Figure *f, Enesim_Figure *offset, Enesim_Figure *inset, double r)
+static void _figure_generate_commands(Enesim_Renderer_Figure *thiz)
 {
+	Enesim_Figure *f;
 	Enesim_Polygon *p;
 	Eina_List *l1;
 
+	f = thiz->figure;
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
 		Enesim_Point *pt;
 		Eina_List *l2;
 		Eina_List *l3;
 
-		/* generate the edges */
 		l2 = p->points;
+
+		if (!l2) continue;
+		pt = eina_list_data_get(l2);
+		l2 = eina_list_next(l2);
+
+		enesim_renderer_path_move_to(thiz->path, pt->x, pt->y);
 		EINA_LIST_FOREACH(l2, l3, pt)
 		{
-			/* from the previous edge to the new one generate the
-			 * outer/inner edges
-			 */
+			enesim_renderer_path_line_to(thiz->path, pt->x, pt->y);
 		}
+		if (p->closed)
+			enesim_renderer_path_close(thiz->path, EINA_TRUE);
 	}
 }
 /*----------------------------------------------------------------------------*
@@ -100,11 +107,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
-	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Renderer *sr;
-	Enesim_Renderer *fr;
 	Enesim_Renderer_Sw_Data *sdata;
-	double sw;
 
 	thiz = _figure_get(r);
 	if (!enesim_figure_polygon_count(thiz->figure))
@@ -113,32 +116,31 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		ENESIM_RENDERER_ERROR(r, error, "No points on the polygon, nothing to draw");
 		return EINA_FALSE;
 	}
-	if (!enesim_renderer_shape_setup(r, state, s, error))
-	{
-		return EINA_FALSE;
-	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	/* pick up the correct renderer */
-	if ((draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && sw >= 1.0)
-	{
-		/* FIXME not yet */
-		/* TODO generate the stroke */
-	}
-	enesim_rasterizer_figure_set(thiz->bifigure, thiz->figure);
+	if (thiz->changed)
+		_figure_generate_commands(thiz);
 
-	enesim_renderer_shape_stroke_renderer_get(r, &sr);
-	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, sr);
-	enesim_renderer_shape_fill_renderer_get(r, &fr);
-	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, fr);
+	/* pass all the properties to the path */
+	enesim_renderer_shape_stroke_color_set(thiz->path, sstate->stroke.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->path, sstate->stroke.r);
+	enesim_renderer_shape_stroke_weight_set(thiz->path, sstate->stroke.weight);
+	enesim_renderer_shape_fill_color_set(thiz->path, sstate->fill.color);
+	enesim_renderer_shape_fill_renderer_set(thiz->path, sstate->fill.r);
+	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->draw_mode);
+	/* base properties */
+	enesim_renderer_origin_set(thiz->path, state->ox, state->oy);
+	enesim_renderer_geometry_transformation_set(thiz->path, &state->geometry_transformation);
+	enesim_renderer_transformation_set(thiz->path, &state->transformation);
+	enesim_renderer_color_set(thiz->path, state->color);
+	enesim_renderer_rop_set(thiz->path, state->rop);
+	enesim_renderer_scale_set(thiz->path, state->sx, state->sy);
 
-	if (!enesim_renderer_setup(thiz->bifigure, s, error))
+	if (!enesim_renderer_setup(thiz->path, s, error))
 		return EINA_FALSE;
 
 	*fill = _span;
 
-	sdata = enesim_renderer_backend_data_get(thiz->bifigure, ENESIM_BACKEND_SOFTWARE);
+	sdata = enesim_renderer_backend_data_get(thiz->path, ENESIM_BACKEND_SOFTWARE);
 	thiz->final_fill = sdata->fill;
 
 	return EINA_TRUE;
@@ -146,12 +148,17 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 
 static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	enesim_renderer_shape_cleanup(r, s);
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	enesim_renderer_cleanup(thiz->path, s);
+	thiz->changed = EINA_FALSE;
 }
 
 static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	*flags = ENESIM_RENDERER_FLAG_AFFINE |
+	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
 			ENESIM_SHAPE_FLAG_FILL_RENDERER;
@@ -194,7 +201,7 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_FIGURE_MAGIC);
 	thiz->figure = enesim_figure_new();
-	thiz->bifigure = enesim_rasterizer_bifigure_new();
+	thiz->path = enesim_renderer_path_new();
 
 	r = enesim_renderer_shape_new(&_figure_descriptor, thiz);
 	return r;

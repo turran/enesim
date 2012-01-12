@@ -134,7 +134,6 @@ static void _stroke_curve_append(double x, double y, void *data)
 {
 	Enesim_Polygon *p = data;
 
-	printf("adding vertex %g %g\n", x, y);
 	enesim_polygon_point_append_from_coords(p, x, y);
 }
 
@@ -142,7 +141,6 @@ static void _stroke_curve_prepend(double x, double y, void *data)
 {
 	Enesim_Polygon *p = data;
 
-	printf("prepending vertex %g %g\n", x, y);
 	enesim_polygon_point_prepend_from_coords(p, x, y);
 }
 
@@ -153,9 +151,11 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	Enesim_Polygon *offset = thiz->offset_polygon;
 	Enesim_Point o0, o1;
 	Enesim_Point i0, i1;
+	Eina_Bool large;
 	double ox;
 	double oy;
-	int c;
+	int c1;
+	int c2;
 
 	enesim_polygon_point_append_from_coords(thiz->original_polygon, x, y);
 
@@ -215,6 +215,9 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	i0.x = thiz->p1.x - ox;
 	i0.y = thiz->p1.y - oy;
 
+
+	c1 = ((thiz->p2.x - thiz->p1.x) * thiz->n01.x) + ((thiz->p2.y - thiz->p1.y) * thiz->n01.y);
+	c2 = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
 	/* add the vertices of the new edge */
 	/* check if the previous edge and this one to see the concave/convex thing */
 	/* dot product
@@ -224,14 +227,20 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	 * < 0 convex
 	 * = -1 pointing opposite direction
 	 */
+	if (c2 > 0)
+		large = EINA_TRUE;
+	else
+		large = EINA_FALSE;
 
-	c = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
-	if (c <= 0)
+	/* right side */
+	if (c1 >= 0)
 	{
-#if 0
 		Enesim_Curve_State st;
 		Enesim_Point *p;
+		double rad = acos(c2);
 
+		enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
+		/* add an arc to the inset */
 		p = eina_list_data_get(inset->points);
 		st.vertex_add = _stroke_curve_prepend;
 		st.last_x = p->x;
@@ -239,18 +248,18 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		st.last_ctrl_x = p->x;
 		st.last_ctrl_y = p->y;
 		st.data = inset;
-		enesim_curve_arc_to(&st, thiz->r, thiz->r, 180 - (c * M_PI / 180.0), EINA_FALSE, EINA_FALSE, i0.x, i0.y);
-		printf("inset quadratic origin at %g %g to %g %g\n", p->x, p->y, i0.x, i0.y);
-#endif
-		enesim_polygon_point_prepend_from_coords(inset, thiz->p1.x, thiz->p1.y);
+		enesim_curve_arc_to(&st, thiz->r, thiz->r, rad, large, EINA_FALSE, i0.x, i0.y);
 	}
+	/* left side */
 	else
 	{
-#if 0
 		Enesim_Curve_State st;
 		Enesim_Point *p;
 		Eina_List *l;
+		double rad = acos(c2);
 
+		enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
+		/* add an arc to the offset */
 		l = eina_list_last(offset->points);
 		p = eina_list_data_get(l);
 		st.vertex_add = _stroke_curve_append;
@@ -260,13 +269,8 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		st.last_ctrl_y = p->y;
 		st.data = offset;
 
-		printf("offset quadratic origin at %g %g to %g %g\n", p->x, p->y, o0.x, o0.y);
-		enesim_curve_arc_to(&st, thiz->r, thiz->r, 180 - (c * M_PI / 180.0), EINA_FALSE, EINA_FALSE, o0.x, o0.y);
-#endif
-		enesim_polygon_point_append_from_coords(offset, thiz->p1.x, thiz->p1.y);
+		enesim_curve_arc_to(&st, thiz->r, thiz->r, rad, large, EINA_TRUE, o0.x, o0.y);
 	}
-	enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
-	enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
 
 	o1.x = thiz->p2.x + ox;
 	o1.y = thiz->p2.y + oy;
@@ -571,7 +575,7 @@ static void _enesim_span(Enesim_Renderer *r, int x, int y, unsigned int len, voi
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _enesim_path_name(Enesim_Renderer *r)
+static const char * _path_name(Enesim_Renderer *r)
 {
 	return "path";
 }
@@ -695,7 +699,7 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _enesim_path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
@@ -821,11 +825,11 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 #endif
 
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
-	/* .name = 			*/ _enesim_path_name,
+	/* .name = 			*/ _path_name,
 	/* .free = 			*/ NULL,
 	/* .boundings = 		*/ NULL, // _boundings,
 	/* .destination_transform = 	*/ NULL,
-	/* .flags = 			*/ NULL,
+	/* .flags = 			*/ _path_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,

@@ -1685,6 +1685,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		ENESIM_RENDERER_ERROR(r, error, "No figure to rasterize");
 		return EINA_FALSE;
 	}
+
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (thiz->changed)
 	{
