@@ -1708,7 +1708,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			int npts;
 
 			npts = enesim_polygon_point_count(p);
-			if ((npts < 2) || 
+			if ((npts < 2) ||
 					((npts < 3) && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE)))
 			{
 				ENESIM_RENDERER_ERROR(r, error, "Not enough points %d", npts);
@@ -1819,7 +1819,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				n++;
 				l2 = eina_list_next(l2);
 				pt = npt;
-				
+
 				vec++;
 			}
 		}

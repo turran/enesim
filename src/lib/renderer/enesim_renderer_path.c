@@ -237,7 +237,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	{
 		Enesim_Curve_State st;
 		Enesim_Point *p;
-		double rad = acos(c2);
+		double rad = acos(c2) * 180 / M_PI;
 
 		enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
 		/* add an arc to the inset */
@@ -256,7 +256,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		Enesim_Curve_State st;
 		Enesim_Point *p;
 		Eina_List *l;
-		double rad = acos(c2);
+		double rad = acos(c2) * 180 / M_PI;
 
 		enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
 		/* add an arc to the offset */
