@@ -267,7 +267,6 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 
 static Eina_Bool _rectangle_use_path(Enesim_Matrix_Type geometry_type)
 {
-		return EINA_TRUE;
 	if (geometry_type != ENESIM_MATRIX_IDENTITY)
 		return EINA_TRUE;
 	return EINA_FALSE;

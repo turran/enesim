@@ -1791,8 +1791,11 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				y1 = ((int) (y1 * 256)) / 256.0;
 				x01 = x1 - x0;
 				y01 = y1 - y0;
-				if ((len = hypot(x01, y01)) < (1 / 256.0))
+				len = hypot(x01, y01);
+				if (len < (1 / 256.0))
 				{
+					/* FIXME what to do here?
+					 * skip this point, pick the next? */
 					ENESIM_RENDERER_ERROR(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/256.0, x0, y0, x1, y1);
 					return EINA_FALSE;
 				}
@@ -1816,11 +1819,11 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				if (vec->xx0 > thiz->rxx)
 					thiz->rxx = vec->xx0;
 
+				pt = npt;
+				vec++;
 				n++;
 				l2 = eina_list_next(l2);
-				pt = npt;
 
-				vec++;
 			}
 		}
 		thiz->changed = EINA_FALSE;
