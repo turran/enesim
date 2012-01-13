@@ -55,7 +55,7 @@ typedef struct _Enesim_Rasterizer_Basic
 	/* private */
 	Enesim_F16p16_Vector *vectors;
 	int nvectors;
-	Enesim_Figure *figure;
+	const Enesim_Figure *figure;
 	Eina_Bool changed : 1;
 
 	/* FIXME this are the boundings calculated at the setup
@@ -1669,12 +1669,13 @@ static void _basic_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
 }
 
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error)
 {
 	Enesim_Rasterizer_Basic *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint;
 	double sw;
@@ -1829,29 +1830,29 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->changed = EINA_FALSE;
 	}
 
-	enesim_matrix_f16p16_matrix_to(&state->transformation,
+	enesim_matrix_f16p16_matrix_to(&cs->transformation,
 			&thiz->matrix);
 
 	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	if (state->transformation_type != ENESIM_MATRIX_PROJECTIVE)
+	if (cs->transformation_type != ENESIM_MATRIX_PROJECTIVE)
 	{
 		*fill = _stroke_fill_paint_affine;
-		if (&state->transformation.yx == 0)
+		if (&cs->transformation.yx == 0)
 			*fill = _stroke_fill_paint_affine_simple;
 		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			Enesim_Renderer *fpaint;
 
 			*fill = _stroke_paint_fill_affine;
-			if (&state->transformation.yx == 0)
+			if (&cs->transformation.yx == 0)
 				*fill = _stroke_paint_fill_affine_simple;
 
 			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 			{
 				*fill = _stroke_paint_fill_paint_affine;
-				if (&state->transformation.yx == 0)
+				if (&cs->transformation.yx == 0)
 					*fill = _stroke_paint_fill_paint_affine_simple;
 			}
 		}
@@ -1873,7 +1874,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _basic_sw_cleanup(Enesim_Renderer *r)
+static void _basic_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 }
 

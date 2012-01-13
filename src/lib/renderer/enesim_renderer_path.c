@@ -427,7 +427,7 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 		Enesim_Renderer_Path_Polygon_Close polygon_close,
 		Enesim_Renderer_Path_Done path_done,
 		double scale_x, double scale_y,
-		Enesim_Matrix *gm,
+		const Enesim_Matrix *gm,
 		void *data)
 {
 	Eina_List *l;
@@ -581,18 +581,15 @@ static const char * _path_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
-
-	Enesim_Color color;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	Enesim_Color stroke_color;
-	Enesim_Renderer *stroke_renderer;
-	Enesim_Color fill_color;
-	Enesim_Renderer *fill_renderer;
 	Enesim_Shape_Draw_Mode draw_mode;
 	double stroke_weight;
 
@@ -627,8 +624,8 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 					_stroke_path_polygon_add,
 					_stroke_path_polygon_close,
 					_stroke_path_done,
-					state->sx, state->sy,
-					&state->geometry_transformation,
+					cs->sx, cs->sy,
+					&cs->geometry_transformation,
 					&st);
 			enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 			enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, thiz->stroke_figure);
@@ -643,8 +640,8 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 					_strokeless_path_polygon_add,
 					_strokeless_path_polygon_close,
 					NULL,
-					state->sx, state->sy,
-					&state->geometry_transformation,
+					cs->sx, cs->sy,
+					&cs->geometry_transformation,
 					&st);
 			enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 		}
@@ -658,22 +655,15 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_shape_draw_mode_set(thiz->bifigure, draw_mode);
 	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, stroke_weight);
 
-	enesim_renderer_shape_stroke_color_get(r, &stroke_color);
-	enesim_renderer_shape_stroke_color_set(thiz->bifigure, stroke_color);
+	enesim_renderer_shape_stroke_color_set(thiz->bifigure, css->stroke.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, css->stroke.r);
 
-	enesim_renderer_shape_stroke_renderer_get(r, &stroke_renderer);
-	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, stroke_renderer);
+	enesim_renderer_shape_fill_color_set(thiz->bifigure, css->fill.color);
+	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, css->fill.r);
 
-	enesim_renderer_shape_fill_color_get(r, &fill_color);
-	enesim_renderer_shape_fill_color_set(thiz->bifigure, fill_color);
-
-	enesim_renderer_shape_fill_renderer_get(r, &fill_renderer);
-	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, fill_renderer);
-
-	enesim_renderer_color_get(r, &color);
-	enesim_renderer_color_set(thiz->bifigure, color);
-	enesim_renderer_origin_set(thiz->bifigure, state->ox, state->oy);
-	enesim_renderer_transformation_set(thiz->bifigure, &state->transformation);
+	enesim_renderer_color_set(thiz->bifigure, cs->color);
+	enesim_renderer_origin_set(thiz->bifigure, cs->ox, cs->oy);
+	enesim_renderer_transformation_set(thiz->bifigure, &cs->transformation);
 
 	if (!enesim_renderer_setup(thiz->bifigure, s, error))
 	{
@@ -704,7 +694,9 @@ static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER;
+			ENESIM_RENDERER_FLAG_GEOMETRY |
+			ENESIM_SHAPE_FLAG_FILL_RENDERER |
+			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _enesim_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
@@ -720,7 +712,8 @@ static void _enesim_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 
 #if BUILD_OPENGL
 static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
@@ -803,6 +796,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	 * pass to the geometry shader through uniforms
 	 * the shader should only emit primitives and vertices
 	 */
+	return EINA_TRUE;
 }
 
 static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)

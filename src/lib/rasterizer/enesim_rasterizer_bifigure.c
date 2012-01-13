@@ -57,7 +57,7 @@ typedef struct _Enesim_Rasterizer_BiFigure
 	Enesim_Renderer *over;
 	Enesim_Renderer *under;
 	Enesim_Figure *over_figure;
-	Enesim_Figure *under_figure;
+	const Enesim_Figure *under_figure;
 
 	int tyy, byy;
 
@@ -645,12 +645,13 @@ static void _bifigure_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure
 }
 
 static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	Enesim_Rectangle boundings;
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint, *fpaint;
@@ -705,8 +706,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	/* setup the figures and get span funcs */
 	if (!thiz->under)
 	{
-		enesim_renderer_origin_set(thiz->over, state->ox, state->oy);
-		enesim_renderer_transformation_set(thiz->over, &state->transformation);
+		enesim_renderer_origin_set(thiz->over, cs->ox, cs->oy);
+		enesim_renderer_transformation_set(thiz->over, &cs->transformation);
 		enesim_renderer_color_set(thiz->over, color);
 		enesim_renderer_shape_fill_color_set(thiz->over, scolor);
 		enesim_renderer_shape_fill_renderer_set(thiz->over, spaint);
@@ -719,8 +720,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	{
 		if ( (sw <= 1) || (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) )
 		{
-			enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
-			enesim_renderer_transformation_set(thiz->under, &state->transformation);
+			enesim_renderer_origin_set(thiz->under, cs->ox, cs->oy);
+			enesim_renderer_transformation_set(thiz->under, &cs->transformation);
 			enesim_renderer_color_set(thiz->under, color);
 			enesim_renderer_shape_draw_mode_set(thiz->under, draw_mode);
 			enesim_renderer_shape_stroke_weight_set(thiz->under, 1);
@@ -736,16 +737,16 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		{
 			if (thiz->over)
 			{
-				enesim_renderer_origin_set(thiz->over, state->ox, state->oy);
-				enesim_renderer_transformation_set(thiz->over, &state->transformation);
+				enesim_renderer_origin_set(thiz->over, cs->ox, cs->oy);
+				enesim_renderer_transformation_set(thiz->over, &cs->transformation);
 				enesim_renderer_color_set(thiz->over, color);
 				enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
 				enesim_renderer_shape_fill_color_set(thiz->over, scolor);
 				enesim_renderer_shape_fill_renderer_set(thiz->over, spaint);
 				if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 				{
-					enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
-					enesim_renderer_transformation_set(thiz->under, &state->transformation);
+					enesim_renderer_origin_set(thiz->under, cs->ox, cs->oy);
+					enesim_renderer_transformation_set(thiz->under, &cs->transformation);
 					enesim_renderer_color_set(thiz->under, color);
 					enesim_renderer_shape_draw_mode_set(thiz->under, ENESIM_SHAPE_DRAW_MODE_STROKE_FILL);
 					enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
@@ -758,7 +759,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 
 				if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 				{
-					enesim_matrix_f16p16_matrix_to(&state->transformation,
+					enesim_matrix_f16p16_matrix_to(&cs->transformation,
 									&thiz->matrix);
 					// need to define more cases, but for now...
 					*fill = _bifig_stroke_paint_fill_paint_affine_simple;
@@ -772,8 +773,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			}
 			else
 			{
-				enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
-				enesim_renderer_transformation_set(thiz->under, &state->transformation);
+				enesim_renderer_origin_set(thiz->under, cs->ox, cs->oy);
+				enesim_renderer_transformation_set(thiz->under, &cs->transformation);
 				enesim_renderer_color_set(thiz->under, color);
 				enesim_renderer_shape_draw_mode_set(thiz->under, draw_mode);
 				enesim_renderer_shape_stroke_weight_set(thiz->under, 1);

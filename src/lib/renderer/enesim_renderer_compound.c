@@ -192,11 +192,12 @@ static const char * _compound_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Compound *thiz;
+	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
 	Eina_List *ll;
 	Eina_Bool only_fill = EINA_TRUE;
 
@@ -392,7 +393,7 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 		{
 			if ((ret = enesim_renderer_has_changed(l->r)))
 			{
-				char *child_name;
+				const char *child_name;
 
 				enesim_renderer_name_get(l->r, &child_name);
 				DBG("The child %s has changed", child_name);

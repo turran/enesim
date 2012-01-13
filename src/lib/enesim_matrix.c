@@ -163,7 +163,7 @@ EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_point_transform(Enesim_Matrix *m, double x, double y, double *xr, double *yr)
+EAPI void enesim_matrix_point_transform(const Enesim_Matrix *m, double x, double y, double *xr, double *yr)
 {
 	double xrr, yrr;
 
@@ -276,7 +276,7 @@ EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_inverse(Enesim_Matrix *m, Enesim_Matrix *m2)
+EAPI void enesim_matrix_inverse(const Enesim_Matrix *m, Enesim_Matrix *m2)
 {
 	double scalar;
 
@@ -291,7 +291,7 @@ EAPI void enesim_matrix_inverse(Enesim_Matrix *m, Enesim_Matrix *m2)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_compose(Enesim_Matrix *m1, Enesim_Matrix *m2, Enesim_Matrix *dst)
+EAPI void enesim_matrix_compose(const Enesim_Matrix *m1, const Enesim_Matrix *m2, Enesim_Matrix *dst)
 {
 	double a11, a12, a13, a21, a22, a23, a31, a32, a33;
 

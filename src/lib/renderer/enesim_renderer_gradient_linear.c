@@ -121,11 +121,12 @@ static void _linear_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	Eina_F16p16 x0, x1, y0, y1;
 	Eina_F16p16 f;
 
@@ -172,7 +173,7 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	 */
 	thiz->length = eina_f16p16_int_to(f);
 	/* just override the identity case */
-	if (state->transformation_type == ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
 		*fill = _argb8888_pad_span_identity;
 
 	return EINA_TRUE;

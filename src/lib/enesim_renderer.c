@@ -85,6 +85,17 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 	}
 	else
 	{
+		/* first the geometry transformation */
+		if (flags & ENESIM_RENDERER_FLAG_GEOMETRY)
+		{
+			if (state->geometry_transformation_type != ENESIM_MATRIX_IDENTITY && boundings->w != INT_MAX && boundings->h != INT_MAX)
+			{
+				Enesim_Quad q;
+
+				enesim_matrix_rectangle_transform(&state->geometry_transformation, boundings, &q);
+				enesim_quad_rectangle_to(&q, boundings);
+			}
+		}
 		/* translate */
 		if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
 		{
@@ -93,6 +104,7 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 			if (boundings->y != INT_MIN / 2)
 				boundings->y += state->oy;
 		}
+		/* transform */
 		if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
 		{
 			if (state->transformation_type != ENESIM_MATRIX_IDENTITY && boundings->w != INT_MAX && boundings->h != INT_MAX)
@@ -531,6 +543,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		break;
 	}
 	enesim_renderer_boundings(r, &r->current_boundings);
+	enesim_renderer_destination_boundings(r, &r->current_destination_boundings, 0, 0);
 
 	return ret;
 }
@@ -558,6 +571,7 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	/* first stuff that needs to be freed */
 	r->past = r->current;
 	r->past_boundings = r->current_boundings;
+	r->past_destination_boundings = r->current_destination_boundings;
 	DBG("Cleaning up the renderer %s", r->name);
 }
 
@@ -828,12 +842,30 @@ EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
  * @param[in] r The renderer to get the boundings from
  * @param[out] rect The rectangle to store the boundings
  */
+//EAPI void enesim_renderer_boundings_extended(Enesim_Renderer *r, Enesim_Rectangle *rect)
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!rect) return;
 
 	_enesim_renderer_boundings(r, rect);
+}
+
+/**
+ * Gets the bounding box of the renderer on its own coordinate space without
+ * adding the origin translation
+ * @param[in] r The renderer to get the boundings from
+ * @param[out] prev The rectangle to store the previous boundings
+ * @param[out] curr The rectangle to store the current boundings
+ */
+EAPI void enesim_renderer_boundings_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	if (curr)
+		_enesim_renderer_boundings(r, curr);
+	if (prev)
+		*prev = r->past_boundings;
 }
 
 /**
@@ -853,6 +885,33 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 	enesim_renderer_flags(r, &flags);
 	_enesim_renderer_boundings(r, &boundings);
 	_enesim_renderer_destination_boundings(r, flags, &r->current, &boundings, x, y, rect);
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_destination_boundings_extended(Enesim_Renderer *r,
+		Eina_Rectangle *prev, Eina_Rectangle *curr,
+		int x, int y)
+{
+	Enesim_Rectangle boundings;
+	Enesim_Renderer_Flag flags;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	if (curr)
+	{
+		enesim_renderer_flags(r, &flags);
+		_enesim_renderer_boundings(r, &boundings);
+		_enesim_renderer_destination_boundings(r, flags, &r->current, &boundings, x, y, curr);
+	}
+	if (prev)
+	{
+		*prev = r->past_destination_boundings;
+		prev->x -= x;
+		prev->y -= y;
+	}
 }
 
 /**
@@ -946,7 +1005,6 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *clip, int x, int y, Enesim_Error **error)
 {
 	Enesim_Renderer_Flag flags;
-	Eina_Rectangle boundings;
 	Eina_Rectangle final;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -974,8 +1032,7 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		}
 	}
 	/* clip against the destination rectangle */
-	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
-	if (!eina_rectangle_intersection(&final, &boundings))
+	if (!eina_rectangle_intersection(&final, &r->current_destination_boundings))
 	{
 		WRN("The renderer %p boundings does not intersect on the destination rectangle", r);
 		goto end;
@@ -1001,7 +1058,6 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_List *clips, int x, int y, Enesim_Error **error)
 {
 	Enesim_Renderer_Flag flags;
-	Eina_Rectangle boundings;
 	Eina_Rectangle surface_size;
 
 	if (!clips)
@@ -1018,14 +1074,13 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 
 	_surface_boundings(s, &surface_size);
 	/* clip against the destination rectangle */
-	enesim_renderer_destination_boundings(r, &boundings, 0, 0);
-	if (!eina_rectangle_intersection(&boundings, &surface_size))
+	if (!eina_rectangle_intersection(&r->current_destination_boundings, &surface_size))
 	{
 		WRN("The renderer %p boundings does not intersect on the destination rectangle", r);
 		goto end;
 	}
 	enesim_renderer_flags(r, &flags);
-	_draw_list_internal(r, s, &boundings, clips, x, y, flags);
+	_draw_list_internal(r, s, &r->current_destination_boundings, clips, x, y, flags);
 
 	/* TODO set the format again */
 end:

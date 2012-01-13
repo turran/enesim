@@ -98,20 +98,21 @@ static const char * _transition_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Transition *t;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	t = _transition_get(r);
 	if (!t || !t->r0.r || !t->r1.r)
 		return EINA_FALSE;
 
-	enesim_renderer_relative_set(t->r0.r, state, &t->r0.old);
+	enesim_renderer_relative_set(t->r0.r, cs, &t->r0.old);
 	if (!enesim_renderer_setup(t->r0.r, s, error))
 		goto r0_end;
-	enesim_renderer_relative_set(t->r1.r, state, &t->r1.old);
+	enesim_renderer_relative_set(t->r1.r, cs, &t->r1.old);
 	if (!enesim_renderer_setup(t->r1.r, s, error))
 		goto r1_end;
 

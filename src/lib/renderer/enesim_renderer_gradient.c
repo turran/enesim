@@ -265,11 +265,12 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	Stop *curr, *next, *last;
 	Eina_F16p16 xx, inc;
 	Eina_List *tmp;
@@ -287,7 +288,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	}
 	/* setup the implementation */
 	*fill = NULL;
-	if (!thiz->descriptor->sw_setup(r, state, s, fill, error))
+	if (!thiz->descriptor->sw_setup(r, states, s, fill, error))
 	{
 		ENESIM_RENDERER_ERROR(r, error, "Gradient implementation failed");
 
@@ -297,9 +298,9 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	}
 	if (!*fill)
 	{
-		enesim_matrix_f16p16_matrix_to(&state->transformation,
+		enesim_matrix_f16p16_matrix_to(&cs->transformation,
 				&thiz->matrix);
-		*fill = _spans[thiz->mode][state->transformation_type];
+		*fill = _spans[thiz->mode][cs->transformation_type];
 	}
 	/* get the length */
 	thiz->slen = thiz->descriptor->length(r);

@@ -500,7 +500,7 @@ end:
 }
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {
@@ -518,7 +518,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		}
 	}
 	if (!r->descriptor.sw_setup) return EINA_TRUE;
-	if (!r->descriptor.sw_setup(r, state[ENESIM_STATE_CURRENT], s, &fill, error))
+	if (!r->descriptor.sw_setup(r, states, s, &fill, error))
 	{
 		WRN("Setup callback on %s failed", r->name);
 		return EINA_FALSE;

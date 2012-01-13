@@ -40,8 +40,7 @@ enesim_renderer_background.h \
 enesim_renderer_perlin.h \
 enesim_renderer_clipper.h \
 enesim_renderer_pattern.h \
-enesim_renderer_transition.h \
-enesim_renderer_hswitch.h
+enesim_renderer_transition.h
 
 installed_headersdir = $(prefix)/include/enesim
 installed_headers_DATA = $(ENESIM_UTILHEADERS)

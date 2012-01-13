@@ -68,11 +68,17 @@ static Eina_Bool _circle_use_path(Enesim_Matrix_Type geometry_type)
 
 static void _circle_path_setup(Enesim_Renderer_Circle *thiz,
 		double x, double y, double r,
-		const Enesim_Renderer_State *state, const Enesim_Renderer_Shape_State *sstate)
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES])
 {
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	//const Enesim_Renderer_State *ps = states[ENESIM_STATE_PAST];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+
 	if (!thiz->path)
 		thiz->path = enesim_renderer_path_new();
 	/* generate the four arcs */
+	/* FIXME also check that the prev geometry and curr geometry transformations are diff */
 	if (thiz->changed)
 	{
 		enesim_renderer_path_command_clear(thiz->path);
@@ -83,16 +89,17 @@ static void _circle_path_setup(Enesim_Renderer_Circle *thiz,
 		enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x, y - r);
 	}
 
-	enesim_renderer_color_set(thiz->path, state->color);
-	enesim_renderer_origin_set(thiz->path, state->ox, state->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &state->geometry_transformation);
-
-	enesim_renderer_shape_fill_renderer_set(thiz->path, sstate->fill.r);
-	enesim_renderer_shape_fill_color_set(thiz->path, sstate->fill.color);
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, sstate->stroke.r);
-	enesim_renderer_shape_stroke_weight_set(thiz->path, sstate->stroke.weight);
-	enesim_renderer_shape_stroke_color_set(thiz->path, sstate->stroke.color);
-	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->draw_mode);
+	/* pass all the properties to the path */
+	enesim_renderer_color_set(thiz->path, cs->color);
+	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
+	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	/* base properties */
+	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
+	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
+	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
+	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
+	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 }
 /*----------------------------------------------------------------------------*
  *                               Span functions                               *
@@ -126,7 +133,7 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	unsigned int icolor;
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
 	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
-	int rr2 = rr1 * 1.41421357, irr2 = irr1 * 1.41421357; // sqrt(2)
+	int rr2 = rr1 * M_SQRT2, irr2 = irr1 * M_SQRT2;
 	int xx0 = thiz->xx0, yy0 = thiz->yy0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -266,7 +273,7 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 	unsigned int icolor;
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
 	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
-	int rr2 = rr1 * 1.41421357, irr2 = irr1 * 1.41421357; // sqrt(2)
+	int rr2 = rr1 * M_SQRT2, irr2 = irr1 * M_SQRT2;
 	int xx0 = thiz->xx0, yy0 = thiz->yy0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -369,7 +376,7 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	unsigned int icolor;
 	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
 	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
-	int rr2 = rr1 * 1.41421357, irr2 = irr1 * 1.41421357; // sqrt(2)
+	int rr2 = rr1 * M_SQRT2, irr2 = irr1 * M_SQRT2;
 	int xx0 = thiz->xx0, yy0 = thiz->yy0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -467,25 +474,45 @@ static const char * _circle_name(Enesim_Renderer *r)
 	return "circle";
 }
 
-static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _circle_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Circle *thiz;
+	Enesim_Shape_Stroke_Location location;
+	Enesim_Shape_Draw_Mode dm;
+	double sw = 0;
 
 	thiz = _circle_get(r);
-	rect->x = thiz->current.x - thiz->current.r;
-	rect->y = thiz->current.y - thiz->current.r;
-	rect->w = rect->h = thiz->current.r * 2;
+	enesim_renderer_shape_stroke_location_get(r, &location);
+	enesim_renderer_shape_draw_mode_get(r, &dm);
+	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		enesim_renderer_shape_stroke_weight_get(r, &sw);
+	switch (location)
+	{
+		case ENESIM_SHAPE_STROKE_CENTER:
+		sw /= 2.0;
+		break;
+
+		case ENESIM_SHAPE_STROKE_INSIDE:
+		sw = 0.0;
+		break;
+
+		case ENESIM_SHAPE_STROKE_OUTSIDE:
+		break;
+	}
+	rect->x = thiz->current.x - thiz->current.r - sw;
+	rect->y = thiz->current.y - thiz->current.r - sw;
+	rect->w = rect->h = (thiz->current.r + sw) * 2;
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Circle *thiz;
-	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Renderer *spaint;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	double rad;
 	double sw;
 
@@ -493,9 +520,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	if (!thiz || (thiz->current.r < 1))
 		return EINA_FALSE;
 
-	if (_circle_use_path(state->geometry_transformation_type))
+	if (_circle_use_path(cs->geometry_transformation_type))
 	{
-		_circle_path_setup(thiz, thiz->current.x, thiz->current.y, thiz->current.r, state, sstate);
+		_circle_path_setup(thiz, thiz->current.x, thiz->current.y, thiz->current.r, states, sstates);
 		if (!enesim_renderer_setup(thiz->path, s, error))
 		{
 			return EINA_FALSE;
@@ -507,10 +534,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	}
 	else
 	{
-
-		thiz->rr0 = 65536 * (thiz->current.r - 1);
-		thiz->xx0 = 65536 * (thiz->current.x - 0.5);
-		thiz->yy0 = 65536 * (thiz->current.y - 0.5);
+		Enesim_Shape_Draw_Mode draw_mode;
+		Enesim_Renderer *spaint;
 
 		enesim_renderer_shape_stroke_weight_get(r, &sw);
 		thiz->do_inner = 1;
@@ -519,16 +544,36 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 			sw = 0;
 			thiz->do_inner = 0;
 		}
+
+		/* handle the different stroke locations */
+		switch (css->stroke.location)
+		{
+			case ENESIM_SHAPE_STROKE_CENTER:
+			sw /= 2.0;
+			break;
+
+			case ENESIM_SHAPE_STROKE_INSIDE:
+			sw = 0.0;
+			break;
+
+			case ENESIM_SHAPE_STROKE_OUTSIDE:
+			break;
+		}
+
+		thiz->rr0 = 65536 * (thiz->current.r + sw - 1);
+		thiz->xx0 = 65536 * (thiz->current.x - 0.5);
+		thiz->yy0 = 65536 * (thiz->current.y - 0.5);
+
 		rad = thiz->current.r - 1 - sw;
 		if (rad < 0.0039)
 			rad = 0;
 
 		thiz->irr0 = rad * 65536;
 
-		if (!enesim_renderer_shape_setup(r, state, s, error))
+		if (!enesim_renderer_shape_setup(r, states, s, error))
 			return EINA_FALSE;
 
-		enesim_matrix_f16p16_matrix_to(&state->transformation,
+		enesim_matrix_f16p16_matrix_to(&cs->transformation,
 				&thiz->matrix);
 
 		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
@@ -550,7 +595,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	}
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _circle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Circle *thiz;
 
@@ -560,7 +605,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _circle_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Circle *thiz;
 
@@ -574,7 +619,9 @@ static void _flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER;
+			ENESIM_RENDERER_FLAG_GEOMETRY |
+			ENESIM_SHAPE_FLAG_FILL_RENDERER |
+			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
@@ -595,7 +642,7 @@ static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _circle_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Circle *thiz;
 
@@ -607,15 +654,15 @@ static void _free(Enesim_Renderer *r)
 
 static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .name = 			*/ _circle_name,
-	/* .free = 			*/ _free,
-	/* .boundings = 		*/ _boundings,
+	/* .free = 			*/ _circle_free,
+	/* .boundings = 		*/ _circle_boundings,
 	/* .destination_transform = 	*/ NULL,
-	/* .flags = 			*/ _flags,
+	/* .flags = 			*/ _circle_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _circle_has_changed,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .sw_setup = 			*/ _circle_sw_setup,
+	/* .sw_cleanup = 		*/ _circle_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
@@ -642,6 +689,8 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_CIRCLE_MAGIC);
 	r = enesim_renderer_shape_new(&_circle_descriptor, thiz);
+	/* to maintain compatibility */
+	enesim_renderer_shape_stroke_location_set(r, ENESIM_SHAPE_STROKE_INSIDE);
 	return r;
 }
 

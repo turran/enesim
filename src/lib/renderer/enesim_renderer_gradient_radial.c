@@ -116,7 +116,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {

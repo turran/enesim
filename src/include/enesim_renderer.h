@@ -38,9 +38,10 @@ typedef enum Enesim_Renderer_Flag
 	ENESIM_RENDERER_FLAG_ROP 		= (1 << 7), /**< Can draw directly using the raster operation */
 	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 8), /**< Supports the quality property */
 	ENESIM_RENDERER_FLAG_MASK 		= (1 << 9), /**< The renderer can use the mask directly */
+	ENESIM_RENDERER_FLAG_GEOMETRY 		= (1 << 10), /**< Geometry transformation */
 } Enesim_Renderer_Flag;
 
-#define ENESIM_RENDERER_FLAGS 10
+#define ENESIM_RENDERER_FLAGS 11
 
 /**
  * Callback function of the Enesim_Renderer_Damage descriptor function
@@ -86,7 +87,11 @@ EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask);
 
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
+EAPI void enesim_renderer_boundings_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);
+
 EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
+EAPI void enesim_renderer_destination_boundings_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
+
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
@@ -150,14 +155,15 @@ typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
 		unsigned int len, void *dst);
 
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error);
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 /* opencl backend descriptor functions */
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state, Enesim_Surface *s,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Error **error);
@@ -182,7 +188,8 @@ typedef struct _Enesim_Renerer_OpenGL_Shader
 } Enesim_Renderer_OpenGL_Shader;
 
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state, Enesim_Surface *s,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error);
@@ -247,7 +254,6 @@ EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
 #include "enesim_renderer_perlin.h"
 #include "enesim_renderer_clipper.h"
 #include "enesim_renderer_transition.h"
-#include "enesim_renderer_hswitch.h"
 
 /**
  * @}

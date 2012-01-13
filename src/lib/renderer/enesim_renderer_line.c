@@ -296,12 +296,13 @@ static const char * _line_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _line_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Line *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	Enesim_Point p0, p1;
 	double vx, vy;
 	double x0, x1, y0, y1;
@@ -316,10 +317,10 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	y0 = thiz->current.y0;
 	y1 = thiz->current.y1;
 
-	if (state->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
-		enesim_matrix_point_transform(&state->geometry_transformation, x0, y0, &x0, &y0);
-		enesim_matrix_point_transform(&state->geometry_transformation, x1, y1, &x1, &y1);
+		enesim_matrix_point_transform(&cs->geometry_transformation, x0, y0, &x0, &y0);
+		enesim_matrix_point_transform(&cs->geometry_transformation, x1, y1, &x1, &y1);
 	}
 
 	if (y1 < y0)
@@ -365,7 +366,7 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	/* the perpendicular line on the last point */
 	_line_setup(&thiz->nm, &p1, vy, -vx, len);
 
-	if (!enesim_renderer_shape_setup(r, state, s, error))
+	if (!enesim_renderer_shape_setup(r, states, s, error))
 	{
 		ENESIM_RENDERER_ERROR(r, error, "Shape cannot setup");
 		return EINA_FALSE;
@@ -375,7 +376,7 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	thiz->rr = EINA_F16P16_HALF * (stroke + 1);
 	if (thiz->rr < EINA_F16P16_HALF) thiz->rr = EINA_F16P16_HALF;
 
-	enesim_matrix_f16p16_matrix_to(&state->transformation,
+	enesim_matrix_f16p16_matrix_to(&cs->transformation,
 			&thiz->matrix);
 
 	*fill = _spans[thiz->current.cap];
@@ -399,6 +400,7 @@ static void _line_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
+			ENESIM_RENDERER_FLAG_GEOMETRY |
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 

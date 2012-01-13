@@ -23,7 +23,6 @@ enesim_renderer_gradient.c \
 enesim_renderer_gradient_linear.c \
 enesim_renderer_gradient_radial.c \
 enesim_renderer_grid.c \
-enesim_renderer_hswitch.c \
 enesim_renderer_image.c \
 enesim_renderer_importer.c \
 enesim_renderer_line.c \

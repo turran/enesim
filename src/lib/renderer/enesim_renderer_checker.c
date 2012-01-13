@@ -64,6 +64,35 @@ Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static Eina_Bool _checker_state_setup(Enesim_Renderer_Checker *thiz,
+		const Enesim_Renderer_State *state)
+{
+	Enesim_Color final_color1;
+	Enesim_Color final_color2;
+	Enesim_Color rend_color;
+
+	final_color1 = thiz->current.color1;
+	final_color2 = thiz->current.color2;
+
+	rend_color = state->color;
+	if (rend_color != ENESIM_COLOR_FULL)
+	{
+		final_color1 = argb8888_mul4_sym(rend_color, final_color1);
+		final_color2 = argb8888_mul4_sym(rend_color, final_color2);
+	}
+	thiz->final_color1 = final_color1;
+	thiz->final_color2 = final_color2;
+	return EINA_TRUE;
+}
+
+static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
+{
+	thiz->past = thiz->current;
+	thiz->changed = EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
+ *                               Span functions                               *
+ *----------------------------------------------------------------------------*/
 static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -293,32 +322,6 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 	}
 }
 
-static Eina_Bool _checker_state_setup(Enesim_Renderer_Checker *thiz, Enesim_Renderer *r)
-{
-	Enesim_Color final_color1;
-	Enesim_Color final_color2;
-	Enesim_Color rend_color;
-
-	final_color1 = thiz->current.color1;
-	final_color2 = thiz->current.color2;
-
-	enesim_renderer_color_get(r, &rend_color);
-	if (rend_color != ENESIM_COLOR_FULL)
-	{
-		final_color1 = argb8888_mul4_sym(rend_color, final_color1);
-		final_color2 = argb8888_mul4_sym(rend_color, final_color2);
-	}
-	thiz->final_color1 = final_color1;
-	thiz->final_color2 = final_color2;
-	return EINA_TRUE;
-}
-
-static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
-{
-	thiz->past = thiz->current;
-	thiz->changed = EINA_FALSE;
-}
-
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -336,14 +339,15 @@ static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Checker *thiz;
+	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
 
 	thiz = _checker_get(r);
-	_checker_state_setup(thiz, r);
+	_checker_state_setup(thiz, state);
 
 	thiz->ww = eina_f16p16_int_from(thiz->current.sw);
 	thiz->ww2 = thiz->ww * 2;
@@ -422,7 +426,7 @@ static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 
 #if BUILD_OPENGL
 static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
@@ -430,9 +434,10 @@ static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Checker *thiz;
 	Enesim_Renderer_OpenGL_Shader *shader;
+	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
 
  	thiz = _checker_get(r);
-	if (!_checker_state_setup(thiz, r)) return EINA_FALSE;
+	if (!_checker_state_setup(thiz, state)) return EINA_FALSE;
 
 	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
 	shader->type = ENESIM_SHADER_FRAGMENT;

@@ -56,43 +56,59 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 }
 
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
+	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->sw_setup) return EINA_FALSE;
-	return thiz->sw_setup(r, state, &thiz->current, s, fill, error);
+
+	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	sstates[ENESIM_STATE_PAST] = &thiz->past;
+
+	return thiz->sw_setup(r, states, sstates, s, fill, error);
 }
 
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
+	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->opengl_setup) return EINA_FALSE;
-	return thiz->opengl_setup(r, state, &thiz->current, s, num_shaders,
+
+	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	sstates[ENESIM_STATE_PAST] = &thiz->past;
+
+	return thiz->opengl_setup(r, states, sstates, s, num_shaders,
 		shaders, error);
 }
 
 static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state, Enesim_Surface *s,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
+	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->opengl_setup) return EINA_FALSE;
-	return thiz->opencl_setup(r, state, &thiz->current, s,
+
+	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	sstates[ENESIM_STATE_PAST] = &thiz->past;
+
+	return thiz->opencl_setup(r, states, sstates, s,
 		program_name, program_source, program_length, error);
 }
 
@@ -107,7 +123,7 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 	{
 		if (enesim_renderer_has_changed(thiz->current.fill.r))
 		{
-			char *fill_name;
+			const char *fill_name;
 
 			enesim_renderer_name_get(thiz->current.fill.r, &fill_name);
 			DBG("The fill renderer %s has changed", fill_name);
@@ -119,7 +135,7 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 	{
 		if (enesim_renderer_has_changed(thiz->current.stroke.r))
 		{
-			char *stroke_name;
+			const char *stroke_name;
 
 			enesim_renderer_name_get(thiz->current.stroke.r, &stroke_name);
 			DBG("The stroke renderer %s has changed", stroke_name);
@@ -181,6 +197,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	/* set default properties */
 	thiz->current.fill.color = thiz->past.fill.color = 0xffffffff;
 	thiz->current.stroke.color = thiz->past.stroke.color = 0xffffffff;
+	thiz->current.stroke.location = ENESIM_SHAPE_STROKE_CENTER;
 	thiz->has_changed = descriptor->has_changed;
 	thiz->sw_setup = descriptor->sw_setup;
 	thiz->opengl_setup = descriptor->opengl_setup;
@@ -230,11 +247,12 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
+	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
 	Eina_Bool fill_renderer = EINA_FALSE;
 
 	thiz = _shape_get(r);
@@ -303,6 +321,32 @@ EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *we
 	thiz = _shape_get(r);
 	if (weight) *weight = thiz->current.stroke.weight;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Location location)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	thiz->current.stroke.location = location;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_location_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Location *location)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	if (location) *location = thiz->current.stroke.location;
+}
+
 
 /**
  * To be documented

@@ -349,11 +349,12 @@ static const char * _stripes_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	if (!thiz)
 		return EINA_FALSE;
@@ -363,20 +364,20 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 
 	if (thiz->current.even.paint)
 	{
-		enesim_renderer_relative_set(thiz->current.even.paint, state, &thiz->old_even);
+		enesim_renderer_relative_set(thiz->current.even.paint, cs, &thiz->old_even);
 		if (!enesim_renderer_setup(thiz->current.even.paint, s, error))
 			return EINA_FALSE;
 	}
 	if (thiz->current.odd.paint)
 	{
-		enesim_renderer_relative_set(thiz->current.odd.paint, state, &thiz->old_odd);
+		enesim_renderer_relative_set(thiz->current.odd.paint, cs, &thiz->old_odd);
 		if (!enesim_renderer_setup(thiz->current.odd.paint, s, error))
 			return EINA_FALSE;
 	}
 
-	enesim_matrix_f16p16_matrix_to(&state->transformation,
+	enesim_matrix_f16p16_matrix_to(&cs->transformation,
 			&thiz->matrix);
-	switch (state->transformation_type)
+	switch (cs->transformation_type)
 	{
 		case ENESIM_MATRIX_IDENTITY:
 		case ENESIM_MATRIX_AFFINE:
@@ -488,7 +489,7 @@ static void _free(Enesim_Renderer *r)
 
 #if BUILD_OPENGL
 static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,

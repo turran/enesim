@@ -101,13 +101,15 @@ static void _free(Enesim_Renderer *r)
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Renderer_Sw_Data *sdata;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
 	thiz = _figure_get(r);
 	if (!enesim_figure_polygon_count(thiz->figure))
@@ -121,19 +123,19 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		_figure_generate_commands(thiz);
 
 	/* pass all the properties to the path */
-	enesim_renderer_shape_stroke_color_set(thiz->path, sstate->stroke.color);
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, sstate->stroke.r);
-	enesim_renderer_shape_stroke_weight_set(thiz->path, sstate->stroke.weight);
-	enesim_renderer_shape_fill_color_set(thiz->path, sstate->fill.color);
-	enesim_renderer_shape_fill_renderer_set(thiz->path, sstate->fill.r);
-	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->draw_mode);
+	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
+	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
+	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
+	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
+	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 	/* base properties */
-	enesim_renderer_origin_set(thiz->path, state->ox, state->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &state->geometry_transformation);
-	enesim_renderer_transformation_set(thiz->path, &state->transformation);
-	enesim_renderer_color_set(thiz->path, state->color);
-	enesim_renderer_rop_set(thiz->path, state->rop);
-	enesim_renderer_scale_set(thiz->path, state->sx, state->sy);
+	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
+	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
+	enesim_renderer_color_set(thiz->path, cs->color);
+	enesim_renderer_rop_set(thiz->path, cs->rop);
+	enesim_renderer_scale_set(thiz->path, cs->sx, cs->sy);
 
 	if (!enesim_renderer_setup(thiz->path, s, error))
 		return EINA_FALSE;
@@ -157,11 +159,10 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER;
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	enesim_renderer_flags(thiz->path, flags);
 }
 
 static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {

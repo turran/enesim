@@ -274,8 +274,12 @@ static Eina_Bool _rectangle_use_path(Enesim_Matrix_Type geometry_type)
 
 static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 		double x, double y, double w, double h, double r,
-		const Enesim_Renderer_State *state, const Enesim_Renderer_Shape_State *sstate)
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES])
 {
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+
 	if (!thiz->path)
 		thiz->path = enesim_renderer_path_new();
 	/* FIXME the best approach would be to know *what* has changed
@@ -326,16 +330,17 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 		enesim_renderer_path_close(thiz->path, EINA_TRUE);
 	}
 
-	enesim_renderer_color_set(thiz->path, state->color);
-	enesim_renderer_origin_set(thiz->path, state->ox, state->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &state->geometry_transformation);
-
-	enesim_renderer_shape_fill_renderer_set(thiz->path, sstate->fill.r);
-	enesim_renderer_shape_fill_color_set(thiz->path, sstate->fill.color);
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, sstate->stroke.r);
-	enesim_renderer_shape_stroke_weight_set(thiz->path, sstate->stroke.weight);
-	enesim_renderer_shape_stroke_color_set(thiz->path, sstate->stroke.color);
-	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->draw_mode);
+	/* pass all the properties to the path */
+	enesim_renderer_color_set(thiz->path, cs->color);
+	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
+	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	/* base properties */
+	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
+	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
+	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
+	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
+	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 }
 
 #if NEW_RENDERER
@@ -1671,14 +1676,15 @@ static const char * _rectangle_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	double rad;
 	double sw;
 	double scaled_width;
@@ -1692,8 +1698,8 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		ENESIM_RENDERER_ERROR(r, error, "Invalid size %d %d", thiz->current.width, thiz->current.height);
 		return EINA_FALSE;
 	}
-	scaled_width = thiz->current.width * state->sx;
-	scaled_height = thiz->current.height * state->sy;
+	scaled_width = thiz->current.width * cs->sx;
+	scaled_height = thiz->current.height * cs->sy;
 
 	if ((scaled_width < 1) || (scaled_height < 1))
 	{
@@ -1707,14 +1713,14 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	if (rad > (scaled_height / 2.0))
 		rad = scaled_height / 2.0;
 
-	scaled_x = thiz->current.x * state->sx;
-	scaled_y = thiz->current.y * state->sy;
+	scaled_x = thiz->current.x * cs->sx;
+	scaled_y = thiz->current.y * cs->sy;
 
 	/* check if we should use the path approach */
 	/* FIXME later */
-	if (_rectangle_use_path(state->geometry_transformation_type))
+	if (_rectangle_use_path(cs->geometry_transformation_type))
 	{
-		_rectangle_path_setup(thiz, scaled_x, scaled_y, scaled_width, scaled_height, rad, state, sstate);
+		_rectangle_path_setup(thiz, scaled_x, scaled_y, scaled_width, scaled_height, rad, states, sstates);
 		if (!enesim_renderer_setup(thiz->path, s, error))
 		{
 			return EINA_FALSE;
@@ -1754,13 +1760,13 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		thiz->irr0 = eina_f16p16_double_from(rad);
 		thiz->sw = sw;
 
-		if (!enesim_renderer_shape_setup(r, state, s, error))
+		if (!enesim_renderer_shape_setup(r, states, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Shape cannot setup");
 			return EINA_FALSE;
 		}
 
-		enesim_matrix_f16p16_matrix_to(&state->transformation,
+		enesim_matrix_f16p16_matrix_to(&cs->transformation,
 				&thiz->matrix);
 		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 		enesim_renderer_shape_stroke_renderer_get(r, &spaint);
@@ -1768,8 +1774,8 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 #if NEW_RENDERER
 		*fill = _test_affine;
 #else
-		if (state->transformation_type == ENESIM_MATRIX_AFFINE ||
-			 state->transformation_type == ENESIM_MATRIX_IDENTITY)
+		if (cs->transformation_type == ENESIM_MATRIX_AFFINE ||
+			 cs->transformation_type == ENESIM_MATRIX_IDENTITY)
 		{
 			*fill = _rounded_stroke_fill_paint_affine;
 			if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
@@ -1828,8 +1834,10 @@ static void _rectangle_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
+			ENESIM_RENDERER_FLAG_GEOMETRY |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER;
+			ENESIM_SHAPE_FLAG_FILL_RENDERER |
+			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _rectangle_free(Enesim_Renderer *r)
@@ -1893,8 +1901,8 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
  * given that at the end we'll generate vertices too
  */
 static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
@@ -2031,6 +2039,8 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_RECTANGLE_MAGIC);
 	r = enesim_renderer_shape_new(&_rectangle_descriptor, thiz);
+	/* to maintain compatibility */
+	enesim_renderer_shape_stroke_location_set(r, ENESIM_SHAPE_STROKE_INSIDE);
 	return r;
 }
 /**

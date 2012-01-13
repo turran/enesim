@@ -245,11 +245,12 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Grid *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	thiz = _grid_get(r);
 	if (!thiz->inside.w || !thiz->inside.h || !thiz->outside.w || !thiz->outside.h)
@@ -260,20 +261,20 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	thiz->hht = eina_f16p16_int_from(thiz->ht);
 	thiz->wwt = eina_f16p16_int_from(thiz->wt);
 
-	switch (state->transformation_type)
+	switch (cs->transformation_type)
 	{
 		case ENESIM_MATRIX_IDENTITY:
 		*fill = _span_identity;
 		break;
 
 		case ENESIM_MATRIX_AFFINE:
-		enesim_matrix_f16p16_matrix_to(&state->transformation,
+		enesim_matrix_f16p16_matrix_to(&cs->transformation,
 				&thiz->matrix);
 		*fill = _span_affine;
 		break;
 
 		case ENESIM_MATRIX_PROJECTIVE:
-		enesim_matrix_f16p16_matrix_to(&state->transformation,
+		enesim_matrix_f16p16_matrix_to(&cs->transformation,
 				&thiz->matrix);
 		*fill = _span_projective;
 		break;

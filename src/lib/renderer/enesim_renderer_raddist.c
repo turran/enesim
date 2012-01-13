@@ -101,17 +101,18 @@ static const char * _raddist_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Raddist *rd;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	rd = _raddist_get(r);
 	if (!rd->src) return EINA_FALSE;
 
 	*fill = _span_identity;
-	if (state->transformation_type == ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_identity;
 	else
 		return EINA_FALSE;

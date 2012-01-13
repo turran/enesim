@@ -282,10 +282,11 @@ static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _image_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state, Enesim_Surface *s,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES], Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Image *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	Enesim_Format fmt;
 	int sw, sh;
 
@@ -311,12 +312,12 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	if (sw != thiz->w || sh != thiz->h)
 	{
 		/* as we need to scale we can only use the point compositor */
-		thiz->point = enesim_compositor_point_get(state->rop, &fmt,
-				ENESIM_FORMAT_ARGB8888, state->color, ENESIM_FORMAT_NONE);
+		thiz->point = enesim_compositor_point_get(cs->rop, &fmt,
+				ENESIM_FORMAT_ARGB8888, cs->color, ENESIM_FORMAT_NONE);
 		if (!thiz->point)
 		{
 			WRN("Not suitable point compositor for sfmt %d and color %08x",
-					fmt, state->color);
+					fmt, cs->color);
 			return EINA_FALSE;
 		}
 
@@ -325,11 +326,11 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 		_offsets(thiz->x, thiz->w, sw, thiz->xoff);
 		_offsets(thiz->y, thiz->h, sh, thiz->yoff);
 
-		if (state->transformation_type == ENESIM_MATRIX_IDENTITY)
+		if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
 			*fill = _scale_fast_identity;
-		else if (state->transformation_type == ENESIM_MATRIX_AFFINE)
+		else if (cs->transformation_type == ENESIM_MATRIX_AFFINE)
 		{
-			enesim_matrix_f16p16_matrix_to(&state->transformation,
+			enesim_matrix_f16p16_matrix_to(&cs->transformation,
 					&thiz->matrix);
 			*fill = _scale_fast_affine;
 		}
@@ -337,12 +338,12 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	else
 	{
 		/* we can use directly a span compositor */
-		thiz->span = enesim_compositor_span_get(state->rop, &fmt,
-				ENESIM_FORMAT_ARGB8888, state->color, ENESIM_FORMAT_NONE);
+		thiz->span = enesim_compositor_span_get(cs->rop, &fmt,
+				ENESIM_FORMAT_ARGB8888, cs->color, ENESIM_FORMAT_NONE);
 		if (!thiz->span)
 		{
 			WRN("Not suitable span compositor for sfmt %d and color %08x",
-					fmt, state->color);
+					fmt, cs->color);
 			return EINA_FALSE;
 		}
 		*fill = _argb8888_to_argb8888_noscale;

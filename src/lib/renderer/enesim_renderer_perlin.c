@@ -115,10 +115,12 @@ static const char * _perlin_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state, Enesim_Surface *s,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Perlin *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	thiz = _perlin_get(r);
 	if (thiz->xfreq.coeff)
@@ -134,7 +136,7 @@ static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
 		thiz->yfreq.val, thiz->ampl.val, thiz->xfreq.coeff, thiz->yfreq.coeff,
 		thiz->ampl.coeff);
 
-	if (state->transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 		return EINA_FALSE;
 
 	*fill = _argb8888_span_identity;

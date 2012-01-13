@@ -33,6 +33,8 @@ struct _Enesim_Renderer
 	Eina_Hash *prv_data;
 	Enesim_Rectangle current_boundings;
 	Enesim_Rectangle past_boundings;
+	Eina_Rectangle current_destination_boundings;
+	Eina_Rectangle past_destination_boundings;
 	/* the descriptor */
 	Enesim_Renderer_Descriptor descriptor;
 	void *data;
@@ -91,6 +93,7 @@ typedef struct _Enesim_Renderer_Shape_State
 		Enesim_Color color;
 		Enesim_Renderer *r;
 		double weight;
+		Enesim_Shape_Stroke_Location location;
 	} stroke;
 
 	struct {
@@ -102,21 +105,21 @@ typedef struct _Enesim_Renderer_Shape_State
 
 
 typedef Eina_Bool (*Enesim_Renderer_Shape_Sw_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error);
 typedef Eina_Bool (*Enesim_Renderer_Shape_OpenCL_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Error **error);
 typedef Eina_Bool (*Enesim_Renderer_Shape_OpenGL_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
@@ -166,7 +169,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
 void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error);
 

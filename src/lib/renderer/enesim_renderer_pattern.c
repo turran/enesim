@@ -89,7 +89,7 @@ static const char * _pattern_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {

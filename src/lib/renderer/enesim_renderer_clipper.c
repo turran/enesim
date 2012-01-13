@@ -93,7 +93,7 @@ static const char * _clipper_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
