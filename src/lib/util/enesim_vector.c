@@ -153,6 +153,24 @@ void enesim_figure_clear(Enesim_Figure *thiz)
 		enesim_polygon_delete(p);
 	}
 }
+
+void enesim_figure_dump(Enesim_Figure *f)
+{
+	Enesim_Polygon *p;
+	Eina_List *l1;
+
+	EINA_LIST_FOREACH(f->polygons, l1, p)
+	{
+		Enesim_Point *pt;
+		Eina_List *l2;
+
+		printf("New %s polygon\n", p->closed ? "closed": "");
+		EINA_LIST_FOREACH(p->points, l2, pt)
+		{
+			printf("%g %g\n", pt->x, pt->y);
+		}
+	}
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

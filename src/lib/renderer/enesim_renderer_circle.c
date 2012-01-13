@@ -61,7 +61,6 @@ static inline Enesim_Renderer_Circle * _circle_get(Enesim_Renderer *r)
 
 static Eina_Bool _circle_use_path(Enesim_Matrix_Type geometry_type)
 {
-		return EINA_TRUE;
 	if (geometry_type != ENESIM_MATRIX_IDENTITY)
 		return EINA_TRUE;
 	return EINA_FALSE;
@@ -598,6 +597,12 @@ static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
 
 static void _free(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Circle *thiz;
+
+	thiz = _circle_get(r);
+	if (thiz->path)
+		enesim_renderer_unref(thiz->path);
+	free(thiz);
 }
 
 static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
