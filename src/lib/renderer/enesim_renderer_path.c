@@ -382,9 +382,40 @@ static void _stroke_path_done(void *data)
 	if (!thiz->original_polygon->closed)
 	{
 		Enesim_Polygon *to_merge;
+		Enesim_Point *first;
+		Enesim_Point *last;
 
 		enesim_polygon_close(thiz->original_polygon, EINA_TRUE);
+		/* FIXME is not complete yet */
 		/* TODO use the stroke cap to close the offset and the inset */
+		if (thiz->cap != ENESIM_CAP_BUTT)
+		{
+			Eina_List *l;
+
+			/* FIXME we should decide if we use the offset of the inset, but for now ... */
+			last = eina_list_data_get(thiz->inset_polygon->points);
+			l = eina_list_last(thiz->inset_polygon->points);
+			first = eina_list_data_get(l);
+			/* do an arc from last offet to first inset */
+			if (thiz->cap == ENESIM_CAP_ROUND)
+			{
+				Enesim_Curve_State st;
+
+				st.vertex_add = _stroke_curve_prepend;
+				st.last_x = first->x;
+				st.last_y = first->y;
+				st.last_ctrl_x = first->x;
+				st.last_ctrl_y = first->y;
+				st.data = thiz->inset_polygon;
+				/* FIXME what about the sweep and the large? */
+				enesim_curve_arc_to(&st, thiz->rx, thiz->ry, 0, EINA_TRUE, EINA_TRUE, last->x, last->y);
+			}
+			/* square case extend the last offset r length and the first inset r length, join them */
+			else
+			{
+				/* TODO */
+			}
+		}
 		to_merge = thiz->inset_polygon;
 		enesim_figure_polygon_remove(thiz->stroke_figure, to_merge);
 		enesim_polygon_merge(thiz->offset_polygon, thiz->inset_polygon);

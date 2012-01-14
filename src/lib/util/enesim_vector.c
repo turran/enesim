@@ -116,7 +116,6 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 	Eina_List *l;
 
 	l = eina_list_merge(thiz->points, to_merge->points);
-	printf("%p %p %p\n", l, thiz->points, to_merge->points);
 }
 
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
