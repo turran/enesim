@@ -43,6 +43,7 @@
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>
+#include <float.h>
 /* TODO remove all assert statements */
 #include <assert.h>
 

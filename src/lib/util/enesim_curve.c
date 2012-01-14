@@ -50,6 +50,7 @@ void enesim_curve_quadratic_to(Enesim_Curve_State *state,
 	double x0, y0, x1, y1, x01, y01;
 	double sm = 1 / 92.0;
 
+	/* TODO should we check here that the x,y == ctrl_x, ctrl_y? or on the caller */
 	x0 = state->last_x;
 	y0 = state->last_y;
 	x01 = (x0 + x) / 2;

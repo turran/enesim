@@ -1718,13 +1718,39 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			nvectors += npts;
 			first_point = eina_list_data_get(p->points);
 			last_point = eina_list_data_get(eina_list_last(p->points));
+			{
+				double x0, x1,y0, y1;
+				double x01, y01;
+				double len;
 
+				x0 = ((int) (first_point->x * 256)) / 256.0;
+				x1 = ((int) (last_point->x * 256)) / 256.0;
+				y0 = ((int) (first_point->y * 256)) / 256.0;
+				y1 = ((int) (last_point->y * 256)) / 256.0;
+				//printf("%g %g -> %g %g\n", x0, y0, x1, y1);
+				x01 = x1 - x0;
+				y01 = y1 - y0;
+				len = hypot(x01, y01);
+				//printf("len = %g\n", len);
+				if (len < (1 / 256.0))
+				{
+					//printf("last == first\n");
+					nvectors--;
+					pclosed = 1;
+				}
+			}
+			/* FIXME for some reason this == comparision is not working on
+			 * the linecap.svg example (26.5X23.5 -> 26.5X23.5)
+			 */
+#if 0
 			if ((last_point->x == first_point->x) &&
 					(last_point->y == first_point->y))
 			{
+				printf("last == first\n");
 				nvectors--;
 				pclosed = 1;
 			}
+#endif
 
 			if (!p->closed && (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) && !pclosed)
 				nvectors--;
@@ -1761,12 +1787,36 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			first_point = eina_list_data_get(p->points);
 			last_point = eina_list_data_get(eina_list_last(p->points));
 
+			{
+				double x0, x1,y0, y1;
+				double x01, y01;
+				double len;
+
+				x0 = ((int) (first_point->x * 256)) / 256.0;
+				x1 = ((int) (last_point->x * 256)) / 256.0;
+				y0 = ((int) (first_point->y * 256)) / 256.0;
+				y1 = ((int) (last_point->y * 256)) / 256.0;
+				//printf("%g %g -> %g %g\n", x0, y0, x1, y1);
+				x01 = x1 - x0;
+				y01 = y1 - y0;
+				len = hypot(x01, y01);
+				//printf("len = %g\n", len);
+				if (len < (1 / 256.0))
+				{
+					//printf("last == first\n");
+					nverts--;
+					pclosed = 1;
+				}
+			}
+			/* FIXME same bug as above */
+#if 0
 			if ((last_point->x == first_point->x) &&
 					(last_point->y == first_point->y))
 			{
 				nverts--;
 				pclosed = 1;
 			}
+#endif
 			if (sopen && !pclosed)
 				nverts--;
 

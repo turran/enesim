@@ -291,7 +291,7 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 	{
 		enesim_renderer_path_command_clear(thiz->path);
 		/* FIXME for now handle the corners like this */
-		if (thiz->current.corner.tl)
+		if (thiz->current.corner.tl && r > 0.0)
 		{
 			enesim_renderer_path_move_to(thiz->path, x, y + r);
 			enesim_renderer_path_quadratic_to(thiz->path, x, y, x + r, y);
@@ -300,7 +300,7 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 		{
 			enesim_renderer_path_move_to(thiz->path, x, y);
 		}
-		if (thiz->current.corner.tr)
+		if (thiz->current.corner.tr && r > 0.0)
 		{
 			enesim_renderer_path_line_to(thiz->path, x + w - r, y);
 			enesim_renderer_path_quadratic_to(thiz->path, x + w, y, x + w, y + r);
@@ -309,7 +309,7 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 		{
 			enesim_renderer_path_line_to(thiz->path, x + w, y);
 		}
-		if (thiz->current.corner.br)
+		if (thiz->current.corner.br && r > 0.0)
 		{
 			enesim_renderer_path_line_to(thiz->path, x + w, y + h - r);
 			enesim_renderer_path_quadratic_to(thiz->path, x + w, y + h, x + w - r, y + h);
@@ -318,7 +318,7 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 		{
 			enesim_renderer_path_line_to(thiz->path, x + w, y + h);
 		}
-		if (thiz->current.corner.bl)
+		if (thiz->current.corner.bl && r > 0.0)
 		{
 			enesim_renderer_path_line_to(thiz->path, x + r, y + h);
 			enesim_renderer_path_quadratic_to(thiz->path, x, y + h, x, y + h - r);

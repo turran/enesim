@@ -85,7 +85,8 @@ typedef struct _Enesim_Renderer_Path_Stroke_State
 	Enesim_Point first;
         Enesim_Point p0, p1, p2;
         Enesim_Point n01, n12;
-        double r;
+        double rx;
+        double ry;
         int count;
 } Enesim_Renderer_Path_Stroke_State;
 
@@ -157,6 +158,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	int c1;
 	int c2;
 
+	/* FIXME check that the vertex is actually far enough */
 	enesim_polygon_point_append_from_coords(thiz->original_polygon, x, y);
 
 	/* just store the first point */
@@ -175,8 +177,8 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 			thiz->p1.y = y;
 			_do_normal(&thiz->n01, &thiz->p0, &thiz->p1);
 
-			ox = thiz->r * thiz->n01.x;
-			oy = thiz->r * thiz->n01.y;
+			ox = thiz->rx  * thiz->n01.x;
+			oy = thiz->ry * thiz->n01.y;
 
 			o0.x = thiz->p0.x + ox;
 			o0.y = thiz->p0.y + oy;
@@ -206,8 +208,8 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	thiz->p2.x = x;
 	thiz->p2.y = y;
 	_do_normal(&thiz->n12, &thiz->p1, &thiz->p2);
-	ox = thiz->r * thiz->n12.x;
-	oy = thiz->r * thiz->n12.y;
+	ox = thiz->rx * thiz->n12.x;
+	oy = thiz->ry * thiz->n12.y;
 
 	o0.x = thiz->p1.x + ox;
 	o0.y = thiz->p1.y + oy;
@@ -248,7 +250,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		st.last_ctrl_x = p->x;
 		st.last_ctrl_y = p->y;
 		st.data = inset;
-		enesim_curve_arc_to(&st, thiz->r, thiz->r, rad, large, EINA_FALSE, i0.x, i0.y);
+		enesim_curve_arc_to(&st, thiz->rx, thiz->ry, rad, large, EINA_FALSE, i0.x, i0.y);
 	}
 	/* left side */
 	else
@@ -269,7 +271,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		st.last_ctrl_y = p->y;
 		st.data = offset;
 
-		enesim_curve_arc_to(&st, thiz->r, thiz->r, rad, large, EINA_TRUE, o0.x, o0.y);
+		enesim_curve_arc_to(&st, thiz->rx, thiz->ry, rad, large, EINA_TRUE, o0.x, o0.y);
 	}
 
 	o1.x = thiz->p2.x + ox;
@@ -336,8 +338,8 @@ static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 		/* TODO do the curve on the inset_polygon */
 		enesim_polygon_point_append_from_coords(offset, thiz->p1.x, thiz->p1.y);
 	}
-	ox = thiz->r * thiz->n12.x;
-	oy = thiz->r * thiz->n12.y;
+	ox = thiz->rx * thiz->n12.x;
+	oy = thiz->ry * thiz->n12.y;
 
 	o0.x = thiz->p1.x + ox;
 	o0.y = thiz->p1.y + oy;
@@ -433,12 +435,6 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 	Eina_List *l;
 	Enesim_Renderer_Command_State state;
 	Enesim_Renderer_Path_Command *cmd;
-	double rx;
-	double ry;
-	double ctrl_x0;
-	double ctrl_y0;
-	double ctrl_x1;
-	double ctrl_y1;
 
 	state.vertex_add = vertex_add;
 	state.polygon_add = polygon_add;
@@ -456,6 +452,12 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 	EINA_LIST_FOREACH(commands, l, cmd)
 	{
 		double x, y;
+		double rx;
+		double ry;
+		double ctrl_x0;
+		double ctrl_y0;
+		double ctrl_x1;
+		double ctrl_y1;
 		/* send the new vertex to the figure renderer */
 		switch (cmd->type)
 		{
@@ -618,7 +620,8 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 			st.fill_figure = thiz->fill_figure;
 			st.stroke_figure = thiz->stroke_figure;
 			st.count = 0;
-			st.r = stroke_weight / 2.0;
+			st.rx = stroke_weight * cs->geometry_transformation.xx / 2.0;
+			st.ry = stroke_weight * cs->geometry_transformation.yy / 2.0;
 
 			_enesim_path_generate_vertices(thiz->commands, _stroke_path_vertex_add,
 					_stroke_path_polygon_add,
