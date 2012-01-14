@@ -151,6 +151,15 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 	/* weight */
 	if (thiz->current.stroke.weight != thiz->past.stroke.weight)
 		return EINA_TRUE;
+	/* location */
+	if (thiz->current.stroke.location != thiz->past.stroke.location)
+		return EINA_TRUE;
+	/* join */
+	if (thiz->current.stroke.join != thiz->past.stroke.join)
+		return EINA_TRUE;
+	/* cap */
+	if (thiz->current.stroke.cap != thiz->past.stroke.cap)
+		return EINA_TRUE;
 	/* color */
 	if (thiz->current.fill.color != thiz->past.fill.color)
 		return EINA_TRUE;
@@ -371,6 +380,56 @@ EAPI void enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r, Enesim_Colo
 
 	thiz = _shape_get(r);
 	*color = thiz->current.stroke.color;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap cap)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	thiz->current.stroke.cap = cap;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap *cap)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*cap = thiz->current.stroke.cap;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Join join)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	thiz->current.stroke.join = join;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Join *join)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*join = thiz->current.stroke.join;
 }
 
 /**

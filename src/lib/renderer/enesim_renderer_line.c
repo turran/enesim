@@ -44,7 +44,6 @@ typedef struct _Enesim_Renderer_Line_State
 	double y0;
 	double x1;
 	double y1;
-	Enesim_Shape_Stroke_Cap cap;
 } Enesim_Renderer_Line_State;
 
 typedef struct _Enesim_Renderer_Line
@@ -297,12 +296,13 @@ static const char * _line_name(Enesim_Renderer *r)
 
 static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Line *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	Enesim_Point p0, p1;
 	double vx, vy;
 	double x0, x1, y0, y1;
@@ -379,7 +379,7 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	enesim_matrix_f16p16_matrix_to(&cs->transformation,
 			&thiz->matrix);
 
-	*fill = _spans[thiz->current.cap];
+	*fill = _spans[css->stroke.cap];
 
 	return EINA_TRUE;
 }
@@ -440,9 +440,6 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 	/* y1 */
 	if (thiz->current.y1 != thiz->past.y1)
 		return EINA_TRUE;
-	/* cap */
-	if (thiz->current.cap != thiz->past.cap)
-		return EINA_TRUE;
 
 	return EINA_FALSE;
 }
@@ -485,9 +482,9 @@ EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 	if (!spans_initialized)
 	{
 		spans_initialized = EINA_TRUE;
-		_spans[ENESIM_BUTT] = _span_butt;
-		_spans[ENESIM_ROUND] = _span_round;
-		_spans[ENESIM_SQUARE] = _span_square;
+		_spans[ENESIM_CAP_BUTT] = _span_butt;
+		_spans[ENESIM_CAP_ROUND] = _span_round;
+		_spans[ENESIM_CAP_SQUARE] = _span_square;
 	}
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Line));
@@ -565,20 +562,3 @@ EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
 	thiz = _line_get(r);
 	*y1 = thiz->current.y1;
 }
-
-EAPI void enesim_renderer_line_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap cap)
-{
-	Enesim_Renderer_Line *thiz;
-
-	thiz = _line_get(r);
-	thiz->current.cap = cap;
-}
-
-EAPI void enesim_renderer_line_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap *cap)
-{
-	Enesim_Renderer_Line *thiz;
-
-	thiz = _line_get(r);
-	*cap = thiz->current.cap;
-}
-

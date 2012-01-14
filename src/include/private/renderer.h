@@ -94,6 +94,8 @@ typedef struct _Enesim_Renderer_Shape_State
 		Enesim_Renderer *r;
 		double weight;
 		Enesim_Shape_Stroke_Location location;
+		Enesim_Shape_Stroke_Cap cap;
+		Enesim_Shape_Stroke_Join join;
 	} stroke;
 
 	struct {
