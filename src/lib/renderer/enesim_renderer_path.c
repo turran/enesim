@@ -85,6 +85,8 @@ typedef struct _Enesim_Renderer_Path_Stroke_State
 	Enesim_Point first;
         Enesim_Point p0, p1, p2;
         Enesim_Point n01, n12;
+	Enesim_Shape_Stroke_Join join;
+	Enesim_Shape_Stroke_Cap cap;
         double rx;
         double ry;
         int count;
@@ -116,6 +118,52 @@ static inline Enesim_Renderer_Path * _enesim_path_get(Enesim_Renderer *r)
 /*----------------------------------------------------------------------------*
  *                                With stroke                                 *
  *----------------------------------------------------------------------------*/
+typedef struct _Enesim_Path_Edge
+{
+	double x0;
+	double y0;
+	double x1;
+	double y1;
+} Enesim_Path_Edge;
+
+static void _edge_join(Enesim_Path_Edge *e1,
+		Enesim_Path_Edge *e2,
+		Enesim_Shape_Stroke_Join join,
+		double rx,
+		double ry,
+		Eina_Bool large,
+		Eina_Bool sweep,
+		Enesim_Curve_Vertex_Add vertex_add,
+		void *data)
+{
+	Enesim_Curve_State st;
+	switch (join)
+	{
+		case ENESIM_JOIN_MITER:
+		/* TODO */
+		break;
+
+		/* join theme with an arc */
+		case ENESIM_JOIN_ROUND:
+		st.vertex_add = vertex_add;
+		st.last_x = e1->x1;
+		st.last_y = e1->y1;
+		st.last_ctrl_x = e1->x1;
+		st.last_ctrl_y = e1->y1;
+		st.data = data;
+		enesim_curve_arc_to(&st, rx, ry, 0, large, sweep, e2->x0, e2->y0);
+		break;
+
+		case ENESIM_JOIN_BEVEL:
+		/* just join theme with a line */
+		vertex_add(e2->x0, e2->y0, data);
+		break;
+
+		default:
+		break;
+	}
+}
+
 static void _do_normal(Enesim_Point *n, Enesim_Point *p0, Enesim_Point *p1)
 {
 	double dx;
@@ -153,6 +201,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	Enesim_Point o0, o1;
 	Enesim_Point i0, i1;
 	Eina_Bool large;
+	Enesim_Path_Edge e1, e2;
 	double ox;
 	double oy;
 	int c1;
@@ -217,6 +266,11 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	i0.x = thiz->p1.x - ox;
 	i0.y = thiz->p1.y - oy;
 
+	o1.x = thiz->p2.x + ox;
+	o1.y = thiz->p2.y + oy;
+
+	i1.x = thiz->p2.x - ox;
+	i1.y = thiz->p2.y - oy;
 
 	c1 = ((thiz->p2.x - thiz->p1.x) * thiz->n01.x) + ((thiz->p2.y - thiz->p1.y) * thiz->n01.y);
 	c2 = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
@@ -237,50 +291,53 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	/* right side */
 	if (c1 >= 0)
 	{
-		Enesim_Curve_State st;
 		Enesim_Point *p;
-		double rad = acos(c2) * 180 / M_PI;
+		Eina_List *l2;
 
 		enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
-		/* add an arc to the inset */
+		/* join the inset */
 		p = eina_list_data_get(inset->points);
-		st.vertex_add = _stroke_curve_prepend;
-		st.last_x = p->x;
-		st.last_y = p->y;
-		st.last_ctrl_x = p->x;
-		st.last_ctrl_y = p->y;
-		st.data = inset;
-		enesim_curve_arc_to(&st, thiz->rx, thiz->ry, rad, large, EINA_FALSE, i0.x, i0.y);
+		e1.x1 = p->x;
+		e1.y1 = p->y; 
+		l2 = eina_list_next(inset->points);
+		p = eina_list_data_get(l2);
+		e1.x0 = p->x;
+		e1.y0 = p->y;
+
+		e2.x0 = i0.x;
+		e2.y0 = i0.y;
+		e2.x1 = i1.x;
+		e2.y1 = i1.y;
+
+		_edge_join(&e1, &e2, thiz->join, thiz->rx, thiz->ry, large, EINA_FALSE,
+				_stroke_curve_prepend, inset);
 	}
 	/* left side */
 	else
 	{
-		Enesim_Curve_State st;
 		Enesim_Point *p;
-		Eina_List *l;
-		double rad = acos(c2) * 180 / M_PI;
+		Eina_List *l2;
 
 		enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
-		/* add an arc to the offset */
-		l = eina_list_last(offset->points);
-		p = eina_list_data_get(l);
-		st.vertex_add = _stroke_curve_append;
-		st.last_x = p->x;
-		st.last_y = p->y;
-		st.last_ctrl_x = p->x;
-		st.last_ctrl_y = p->y;
-		st.data = offset;
+		/* join the offset */
+		l2 = eina_list_last(offset->points);
+		p = eina_list_data_get(l2);
+		e1.x1 = p->x;
+		e1.y1 = p->y; 
+		l2 = eina_list_prev(l2);
+		p = eina_list_data_get(l2);
+		e1.x0 = p->x;
+		e1.y0 = p->y;
 
-		enesim_curve_arc_to(&st, thiz->rx, thiz->ry, rad, large, EINA_TRUE, o0.x, o0.y);
+		e2.x0 = o0.x;
+		e2.y0 = o0.y;
+		e2.x1 = o1.x;
+		e2.y1 = o1.y;
+		_edge_join(&e1, &e2, thiz->join, thiz->rx, thiz->ry, large, EINA_TRUE,
+				_stroke_curve_append, offset);
 	}
 
-	o1.x = thiz->p2.x + ox;
-	o1.y = thiz->p2.y + oy;
 	enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
-
-
-	i1.x = thiz->p2.x - ox;
-	i1.y = thiz->p2.y - oy;
 	enesim_polygon_point_prepend_from_coords(inset, i1.x, i1.y);
 
 	thiz->p0 = thiz->p1;
@@ -619,6 +676,8 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 
 			st.fill_figure = thiz->fill_figure;
 			st.stroke_figure = thiz->stroke_figure;
+			st.join = css->stroke.join;
+			st.cap = css->stroke.cap;
 			st.count = 0;
 			st.rx = stroke_weight * cs->geometry_transformation.xx / 2.0;
 			st.ry = stroke_weight * cs->geometry_transformation.yy / 2.0;
