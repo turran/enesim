@@ -83,13 +83,13 @@ typedef struct _Enesim_Renderer_Path_Stroke_State
 	Enesim_Figure *fill_figure;
 	Enesim_Figure *stroke_figure;
 	Enesim_Point first;
-        Enesim_Point p0, p1, p2;
-        Enesim_Point n01, n12;
+	Enesim_Point p0, p1, p2;
+	Enesim_Point n01, n12;
 	Enesim_Shape_Stroke_Join join;
 	Enesim_Shape_Stroke_Cap cap;
-        double rx;
-        double ry;
-        int count;
+	double rx;
+	double ry;
+	int count;
 } Enesim_Renderer_Path_Stroke_State;
 
 typedef struct _Enesim_Renderer_Path
@@ -193,7 +193,7 @@ static void _stroke_curve_prepend(double x, double y, void *data)
 	enesim_polygon_point_prepend_from_coords(p, x, y);
 }
 
-static void _stroke_path_vertex_add(double x, double y, void *data)
+static void _stroke_path_vertex_process(double x, double y, void *data)
 {
 	Enesim_Renderer_Path_Stroke_State *thiz = data;
 	Enesim_Polygon *inset = thiz->inset_polygon;
@@ -208,7 +208,6 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	int c2;
 
 	/* FIXME check that the vertex is actually far enough */
-	enesim_polygon_point_append_from_coords(thiz->original_polygon, x, y);
 
 	/* just store the first point */
 	if (thiz->count < 2)
@@ -298,7 +297,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		/* join the inset */
 		p = eina_list_data_get(inset->points);
 		e1.x1 = p->x;
-		e1.y1 = p->y; 
+		e1.y1 = p->y;
 		l2 = eina_list_next(inset->points);
 		p = eina_list_data_get(l2);
 		e1.x0 = p->x;
@@ -323,7 +322,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 		l2 = eina_list_last(offset->points);
 		p = eina_list_data_get(l2);
 		e1.x1 = p->x;
-		e1.y1 = p->y; 
+		e1.y1 = p->y;
 		l2 = eina_list_prev(l2);
 		p = eina_list_data_get(l2);
 		e1.x0 = p->x;
@@ -344,7 +343,14 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	thiz->p1 = thiz->p2;
 	thiz->n01 = thiz->n12;
 	thiz->count++;
-	return;
+}
+
+static void _stroke_path_vertex_add(double x, double y, void *data)
+{
+	Enesim_Renderer_Path_Stroke_State *thiz = data;
+
+	enesim_polygon_point_append_from_coords(thiz->original_polygon, x, y);
+	_stroke_path_vertex_process(x, y, data);
 }
 
 static void _stroke_path_polygon_add(void *data)
@@ -368,63 +374,47 @@ static void _stroke_path_polygon_add(void *data)
 	thiz->inset_polygon = p;
 }
 
-static void _stroke_path_polygon_close(Eina_Bool close, void *data)
-{
-        Enesim_Renderer_Path_Stroke_State *thiz = data;
-	Enesim_Polygon *inset = thiz->inset_polygon;
-	Enesim_Polygon *offset = thiz->offset_polygon;
-	Enesim_Point o0, o1;
-	Enesim_Point i0, i1;
-	double ox;
-	double oy;
-	double c;
-
-	enesim_polygon_close(thiz->original_polygon, close);
-
-	/* add the missing edge */
-	_do_normal(&thiz->n12, &thiz->p1, &thiz->first);
-
-	c = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
-	if (c <= 0)
-	{
-		/* TODO do the curve on the offset_polygon */
-		enesim_polygon_point_prepend_from_coords(inset, thiz->p1.x, thiz->p1.y);
-	}
-	else
-	{
-		/* TODO do the curve on the inset_polygon */
-		enesim_polygon_point_append_from_coords(offset, thiz->p1.x, thiz->p1.y);
-	}
-	ox = thiz->rx * thiz->n12.x;
-	oy = thiz->ry * thiz->n12.y;
-
-	o0.x = thiz->p1.x + ox;
-	o0.y = thiz->p1.y + oy;
-	enesim_polygon_point_append_from_coords(offset, o0.x, o0.y);
-
-	o1.x = thiz->first.x + ox;
-	o1.y = thiz->first.y + oy;
-	enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
-
-	i0.x = thiz->p1.x - ox;
-	i0.y = thiz->p1.y - oy;
-	enesim_polygon_point_prepend_from_coords(inset, i0.x, i0.y);
-
-	i1.x = thiz->first.x - ox;
-	i1.y = thiz->first.y - oy;
-	enesim_polygon_point_prepend_from_coords(inset, i1.x, i1.y);
-}
-
 static void _stroke_path_done(void *data)
 {
         Enesim_Renderer_Path_Stroke_State *thiz = data;
 
-	/* TODO check that we are not closed */
-	/* FIXME for now, is not the same to close a polygon through a close
-	 * command that closing it like this
-	 */
-	enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
-	enesim_polygon_close(thiz->inset_polygon, EINA_TRUE);
+	/* check that we are not closed */
+	if (!thiz->original_polygon->closed)
+	{
+		Enesim_Polygon *to_merge;
+
+		enesim_polygon_close(thiz->original_polygon, EINA_TRUE);
+		/* TODO use the stroke cap to close the offset and the inset */
+		to_merge = thiz->inset_polygon;
+		enesim_figure_polygon_remove(thiz->stroke_figure, to_merge);
+		enesim_polygon_merge(thiz->offset_polygon, thiz->inset_polygon);
+	}
+	else
+	{
+		/* FIXME for now, is not the same to close a polygon through a close
+		 * command that closing it like this
+		 */
+		enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
+		enesim_polygon_close(thiz->inset_polygon, EINA_TRUE);
+	}
+}
+
+static void _stroke_path_polygon_close(Eina_Bool close, void *data)
+{
+        Enesim_Renderer_Path_Stroke_State *thiz = data;
+
+	if (close)
+	{
+		Enesim_Point *p;
+		Eina_List *l;
+		/* also close the figure itself */
+		_stroke_path_vertex_process(thiz->first.x, thiz->first.y, thiz);
+		enesim_polygon_close(thiz->original_polygon, EINA_TRUE);
+		/* close the inset/off with the join cap */
+		l = eina_list_next(thiz->original_polygon->points);
+		p = eina_list_data_get(l);
+		_stroke_path_vertex_process(p->x, p->y, thiz);
+	}
 }
 /*----------------------------------------------------------------------------*
  *                              Without stroke                                *
@@ -928,6 +918,8 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 	thiz->bifigure = r;
 
 	r = enesim_renderer_shape_new(&_path_descriptor, thiz);
+	/* FIXME for now */
+	enesim_renderer_shape_stroke_join_set(r, ENESIM_JOIN_ROUND);
 	return r;
 
 err_figure:

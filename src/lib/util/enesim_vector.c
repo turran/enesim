@@ -111,6 +111,14 @@ void enesim_polygon_delete(Enesim_Polygon *thiz)
 	free(thiz);
 }
 
+void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
+{
+	Eina_List *l;
+
+	l = eina_list_merge(thiz->points, to_merge->points);
+	printf("%p %p %p\n", l, thiz->points, to_merge->points);
+}
+
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
 {
 	thiz->closed = close;
@@ -138,6 +146,11 @@ void enesim_figure_delete(Enesim_Figure *thiz)
 void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p)
 {
 	thiz->polygons = eina_list_append(thiz->polygons, p);
+}
+
+void enesim_figure_polygon_remove(Enesim_Figure *thiz, Enesim_Polygon *p)
+{
+	thiz->polygons = eina_list_remove(thiz->polygons, p);
 }
 
 int enesim_figure_polygon_count(Enesim_Figure *thiz)
