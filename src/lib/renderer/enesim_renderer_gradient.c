@@ -317,7 +317,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	start = curr->pos * thiz->slen;
 	end = last->pos * thiz->slen;
 
-	thiz->src = dst = alloca(sizeof(uint32_t) * thiz->slen);
+	thiz->src = dst = malloc(sizeof(uint32_t) * thiz->slen);
 
 	/* in case we dont start at 0.0 */
 	for (i = 0; i < start; i++)
