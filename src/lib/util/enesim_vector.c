@@ -41,6 +41,18 @@ static Eina_Bool _points_equal(Enesim_Point *p0, Enesim_Point *p1, double thresh
 		return EINA_TRUE;
 	return EINA_FALSE;
 }
+
+void _polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p)
+{
+	thiz->points = eina_list_append(thiz->points, p);
+	_polygon_update_bounds(thiz, p);
+}
+
+void _polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p)
+{
+	thiz->points = eina_list_prepend(thiz->points, p);
+	_polygon_update_bounds(thiz, p);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -82,31 +94,39 @@ void enesim_polygon_threshold_set(Enesim_Polygon *p, double threshold)
 void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, double y)
 {
 	Enesim_Point *p;
+	Eina_List *l;
 
+	l = eina_list_last(thiz->points);
+	if (l)
+	{
+		Enesim_Point tmp;
+
+		p = eina_list_data_get(l);
+		tmp.x = x;
+		tmp.y = y;
+		if (_points_equal(&tmp, p, thiz->threshold))
+			return;
+	}
 	p = enesim_point_new_from_coords(x, y);
-	enesim_polygon_point_append(thiz, p);
-}
-
-void enesim_polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p)
-{
-	/* FIXME check the threshold */
-	thiz->points = eina_list_append(thiz->points, p);
-	_polygon_update_bounds(thiz, p);
+	_polygon_point_append(thiz, p);
 }
 
 void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, double y)
 {
 	Enesim_Point *p;
 
-	p = enesim_point_new_from_coords(x, y);
-	enesim_polygon_point_prepend(thiz, p);
-}
+	if (thiz->points)
+	{
+		Enesim_Point tmp;
 
-void enesim_polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p)
-{
-	/* FIXME check the threshold */
-	thiz->points = eina_list_prepend(thiz->points, p);
-	_polygon_update_bounds(thiz, p);
+		p = eina_list_data_get(thiz->points);
+		tmp.x = x;
+		tmp.y = y;
+		if (_points_equal(&tmp, p, thiz->threshold))
+			return;
+	}
+	p = enesim_point_new_from_coords(x, y);
+	_polygon_point_prepend(thiz, p);
 }
 
 int enesim_polygon_point_count(Enesim_Polygon *thiz)

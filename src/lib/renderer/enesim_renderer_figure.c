@@ -31,7 +31,6 @@ typedef struct _Enesim_Renderer_Figure
 	EINA_MAGIC
 	Enesim_Figure *figure;
 	Enesim_Polygon *last_polygon;
-	Enesim_Point *last_point;
 	Enesim_Renderer *path;
 	Enesim_Renderer_Sw_Fill final_fill;
 	Eina_Bool changed :1;
@@ -233,25 +232,12 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Polygon *p;
-	Enesim_Point *pt;
 
 	thiz = _figure_get(r);
 
 	p = thiz->last_polygon;
 	if (!p) return;
-
-	pt = thiz->last_point;
-	if (pt)
-	{
-		
-		if ((fabs(pt->x - x) < (1 / 256.0)) &&
-				(fabs(pt->y - y) < (1 / 256.0)))
-			return;
-	}
-
-	pt = enesim_point_new_from_coords(x, y);
-	enesim_polygon_point_append(p, pt);
-	thiz->last_point = pt;
+	enesim_polygon_point_append_from_coords(p, x, y);
 	thiz->changed = 1;
 }
 
