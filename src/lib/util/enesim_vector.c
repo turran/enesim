@@ -163,7 +163,7 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 	if (_points_equal(first, last, thiz->threshold))
 	{
 		to_merge->points = eina_list_remove(to_merge->points, first);
-		free(free);
+		free(first);
 	}
 	thiz->points = eina_list_merge(thiz->points, to_merge->points);
 }
