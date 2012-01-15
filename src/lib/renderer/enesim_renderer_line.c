@@ -317,10 +317,13 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	y0 = thiz->current.y0;
 	y1 = thiz->current.y1;
 
+	enesim_renderer_shape_stroke_weight_get(r, &stroke);
 	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		enesim_matrix_point_transform(&cs->geometry_transformation, x0, y0, &x0, &y0);
 		enesim_matrix_point_transform(&cs->geometry_transformation, x1, y1, &x1, &y1);
+		/* TODO handle the scale of the stroke on both directions, x and y */
+		stroke = stroke * cs->geometry_transformation.xx; 
 	}
 
 	if (y1 < y0)
@@ -372,7 +375,6 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &stroke);
 	thiz->rr = EINA_F16P16_HALF * (stroke + 1);
 	if (thiz->rr < EINA_F16P16_HALF) thiz->rr = EINA_F16P16_HALF;
 
