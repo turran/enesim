@@ -35,6 +35,7 @@ typedef struct _Enesim_Polygon
 {
 	Eina_List *points;
 	Eina_Bool closed : 1;
+	double threshold;
 	double xmax;
 	double xmin;
 	double ymax;
@@ -114,6 +115,7 @@ void enesim_polygon_clear(Enesim_Polygon *thiz);
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close);
 void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge);
 void enesim_polygon_boundings(Enesim_Polygon *ep, Enesim_Rectangle *bounds);
+void enesim_polygon_threshold_set(Enesim_Polygon *p, double threshold);
 
 Enesim_Figure * enesim_figure_new(void);
 void enesim_figure_delete(Enesim_Figure *thiz);

@@ -29,6 +29,18 @@ static inline void _polygon_update_bounds(Enesim_Polygon *ep, Enesim_Point *p)
 	if (p->x < ep->xmin) ep->xmin = p->x;
 	if (p->y < ep->ymin) ep->ymin = p->y;
 }
+
+static Eina_Bool _points_equal(Enesim_Point *p0, Enesim_Point *p1, double threshold)
+{
+	double x01;
+	double y01;
+
+	x01 = fabs(p0->x - p1->x);
+	y01 = fabs(p0->y - p1->y);
+	if (x01 < threshold && y01 < threshold)
+		return EINA_TRUE;
+	return EINA_FALSE;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -58,7 +70,13 @@ Enesim_Polygon * enesim_polygon_new(void)
 	p = calloc(1, sizeof(Enesim_Polygon));
 	p->xmax = p->ymax = -DBL_MAX;
 	p->xmin = p->ymin = DBL_MAX;
+	p->threshold = DBL_EPSILON;
 	return p;
+}
+
+void enesim_polygon_threshold_set(Enesim_Polygon *p, double threshold)
+{
+	p->threshold = threshold;
 }
 
 void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, double y)
@@ -71,6 +89,7 @@ void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, dou
 
 void enesim_polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p)
 {
+	/* FIXME check the threshold */
 	thiz->points = eina_list_append(thiz->points, p);
 	_polygon_update_bounds(thiz, p);
 }
@@ -85,6 +104,7 @@ void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, do
 
 void enesim_polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p)
 {
+	/* FIXME check the threshold */
 	thiz->points = eina_list_prepend(thiz->points, p);
 	_polygon_update_bounds(thiz, p);
 }
@@ -113,9 +133,19 @@ void enesim_polygon_delete(Enesim_Polygon *thiz)
 
 void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 {
+	Enesim_Point *last, *first;
 	Eina_List *l;
-
-	l = eina_list_merge(thiz->points, to_merge->points);
+	
+	/* check that the last point at thiz is not equal to the first point to merge */
+	l = eina_list_last(thiz->points);
+	last = eina_list_data_get(l);
+	first = eina_list_data_get(to_merge->points);
+	if (_points_equal(first, last, thiz->threshold))
+	{
+		to_merge->points = eina_list_remove(to_merge->points, first);
+		free(free);
+	}
+	thiz->points = eina_list_merge(thiz->points, to_merge->points);
 }
 
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)

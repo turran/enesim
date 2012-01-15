@@ -362,14 +362,17 @@ static void _stroke_path_polygon_add(void *data)
         thiz->count = 0;
 
 	p = enesim_polygon_new();
+	enesim_polygon_threshold_set(p, 1/256.0); // FIXME make 1/256.0 a constant */
 	enesim_figure_polygon_append(thiz->fill_figure, p);
 	thiz->original_polygon = p;
 
 	p = enesim_polygon_new();
+	enesim_polygon_threshold_set(p, 1/256.0);
 	enesim_figure_polygon_append(thiz->stroke_figure, p);
 	thiz->offset_polygon = p;
 
 	p = enesim_polygon_new();
+	enesim_polygon_threshold_set(p, 1/256.0);
 	enesim_figure_polygon_append(thiz->stroke_figure, p);
 	thiz->inset_polygon = p;
 }
@@ -382,8 +385,8 @@ static void _stroke_path_done(void *data)
 	if (!thiz->original_polygon->closed)
 	{
 		Enesim_Polygon *to_merge;
-		Enesim_Point *first;
-		Enesim_Point *last;
+		Enesim_Point *off, *ofl;
+		Enesim_Point *inf, *inl;
 
 		enesim_polygon_close(thiz->original_polygon, EINA_TRUE);
 		/* FIXME is not complete yet */
@@ -392,23 +395,34 @@ static void _stroke_path_done(void *data)
 		{
 			Eina_List *l;
 
-			/* FIXME we should decide if we use the offset of the inset, but for now ... */
-			last = eina_list_data_get(thiz->inset_polygon->points);
+			inf = eina_list_data_get(thiz->inset_polygon->points);
 			l = eina_list_last(thiz->inset_polygon->points);
-			first = eina_list_data_get(l);
+			inl = eina_list_data_get(l);
+
+			off = eina_list_data_get(thiz->offset_polygon->points);
+			l = eina_list_last(thiz->offset_polygon->points);
+			ofl = eina_list_data_get(l);
 			/* do an arc from last offet to first inset */
 			if (thiz->cap == ENESIM_CAP_ROUND)
 			{
 				Enesim_Curve_State st;
 
 				st.vertex_add = _stroke_curve_prepend;
-				st.last_x = first->x;
-				st.last_y = first->y;
-				st.last_ctrl_x = first->x;
-				st.last_ctrl_y = first->y;
-				st.data = thiz->inset_polygon;
+				st.data = thiz->offset_polygon;
+				st.last_x = off->x;
+				st.last_y = off->y;
+				st.last_ctrl_x = off->x;
+				st.last_ctrl_y = off->y;
 				/* FIXME what about the sweep and the large? */
-				enesim_curve_arc_to(&st, thiz->rx, thiz->ry, 0, EINA_TRUE, EINA_TRUE, last->x, last->y);
+				enesim_curve_arc_to(&st, thiz->rx, thiz->ry, 0, EINA_TRUE, EINA_FALSE, inl->x, inl->y);
+
+				st.vertex_add = _stroke_curve_append;
+				st.data = thiz->offset_polygon;
+				st.last_x = ofl->x;
+				st.last_y = ofl->y;
+				st.last_ctrl_x = ofl->x;
+				st.last_ctrl_y = ofl->y;
+				enesim_curve_arc_to(&st, thiz->rx, thiz->ry, 0, EINA_FALSE, EINA_TRUE, inf->x, inf->y);
 			}
 			/* square case extend the last offset r length and the first inset r length, join them */
 			else
@@ -420,14 +434,8 @@ static void _stroke_path_done(void *data)
 		enesim_figure_polygon_remove(thiz->stroke_figure, to_merge);
 		enesim_polygon_merge(thiz->offset_polygon, thiz->inset_polygon);
 	}
-	else
-	{
-		/* FIXME for now, is not the same to close a polygon through a close
-		 * command that closing it like this
-		 */
-		enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
-		enesim_polygon_close(thiz->inset_polygon, EINA_TRUE);
-	}
+	enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
+	enesim_polygon_close(thiz->inset_polygon, EINA_TRUE);
 }
 
 static void _stroke_path_polygon_close(Eina_Bool close, void *data)
@@ -467,6 +475,7 @@ static void _strokeless_path_polygon_add(void *data)
 	Enesim_Polygon *p;
 
 	p = enesim_polygon_new();
+	enesim_polygon_threshold_set(p, 1/256.0); // FIXME make 1/256.0 a constant */
 	enesim_figure_polygon_append(thiz->fill_figure, p);
 }
 
