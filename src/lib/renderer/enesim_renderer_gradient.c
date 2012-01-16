@@ -251,11 +251,6 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Gradient *thiz;
 
 	thiz = _gradient_get(r);
-	if (thiz->src)
-	{
-		free(thiz->src);
-		thiz->src = NULL;
-	}
 	thiz->slen = 0;
 	thiz->changed = EINA_FALSE;
 	if (thiz->descriptor->sw_cleanup)
@@ -274,6 +269,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	Stop *curr, *next, *last;
 	Eina_F16p16 xx, inc;
 	Eina_List *tmp;
+	int slen;
 	int start;
 	int end;
 	int i;
@@ -291,9 +287,6 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	if (!thiz->descriptor->sw_setup(r, states, s, fill, error))
 	{
 		ENESIM_RENDERER_ERROR(r, error, "Gradient implementation failed");
-
-		free(thiz->src);
-		thiz->src = NULL;
 		return EINA_FALSE;
 	}
 	if (!*fill)
@@ -303,7 +296,12 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		*fill = _spans[thiz->mode][cs->transformation_type];
 	}
 	/* get the length */
-	thiz->slen = thiz->descriptor->length(r);
+	slen = thiz->descriptor->length(r);
+	if (slen < 0)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "Gradient length %d < 0", slen);
+		return EINA_FALSE;
+	}
 
 	curr = eina_list_data_get(thiz->stops);
 	tmp = eina_list_next(thiz->stops);
@@ -311,13 +309,20 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	last = eina_list_data_get(eina_list_last(thiz->stops));
 	/* TODO check that next->pos - curr->pos != 0 */
 	/* Check that we dont divide by 0 */
-	inc = eina_f16p16_double_from(1.0 / ((next->pos - curr->pos) * thiz->slen));
+	inc = eina_f16p16_double_from(1.0 / ((next->pos - curr->pos) * slen));
 	xx = 0;
 
-	start = curr->pos * thiz->slen;
-	end = last->pos * thiz->slen;
+	start = curr->pos * slen;
+	end = last->pos * slen;
 
-	thiz->src = dst = malloc(sizeof(uint32_t) * thiz->slen);
+	dst = thiz->src;
+	if (!thiz->src || slen != thiz->slen)
+	{
+		thiz->slen = slen;
+		if (thiz->src)
+			free(thiz->src);
+		thiz->src = dst = malloc(sizeof(uint32_t) * thiz->slen);
+	}
 
 	/* in case we dont start at 0.0 */
 	for (i = 0; i < start; i++)

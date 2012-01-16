@@ -29,83 +29,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-void enesim_curve_line_to(Enesim_Curve_State *state,
-		double x, double y)
-{
-	state->vertex_add(x, y, state->data);
-	state->last_ctrl_x = state->last_x;
-	state->last_ctrl_y = state->last_y;
-	state->last_x = x;
-	state->last_y = y;
-}
-
-/* these subdiv approximations need to be done more carefully */
-void enesim_curve_quadratic_to(Enesim_Curve_State *state,
-		double ctrl_x, double ctrl_y,
-		double x, double y)
-{
-	double x0, y0, x1, y1, x01, y01;
-	double sm = 1 / 92.0;
-
-	/* TODO should we check here that the x,y == ctrl_x, ctrl_y? or on the caller */
-	x0 = state->last_x;
-	y0 = state->last_y;
-	x01 = (x0 + x) / 2;
-	y01 = (y0 + y) / 2;
-	if ((((x01 - ctrl_x) * (x01 - ctrl_x)) + ((y01 - ctrl_y) * (y01
-			- ctrl_y))) <= sm)
-	{
-		state->vertex_add(x, y, state->data);
-		state->last_x = x;
-		state->last_y = y;
-		state->last_ctrl_x = ctrl_x;
-		state->last_ctrl_y = ctrl_y;
-		return;
-	}
-
-	x0 = (ctrl_x + x0) / 2;
-	y0 = (ctrl_y + y0) / 2;
-	x1 = (ctrl_x + x) / 2;
-	y1 = (ctrl_y + y) / 2;
-	x01 = (x0 + x1) / 2;
-	y01 = (y0 + y1) / 2;
-
-	enesim_curve_quadratic_to(state, x0, y0, x01, y01);
-	state->last_x = x01;
-	state->last_y = y01;
-	state->last_ctrl_x = x0;
-	state->last_ctrl_y = y0;
-
-	enesim_curve_quadratic_to(state, x1, y1, x, y);
-	state->last_x = x;
-	state->last_y = y;
-	state->last_ctrl_x = x1;
-	state->last_ctrl_y = y1;
-}
-
-void enesim_curve_squadratic_to(Enesim_Curve_State *state,
-		double x, double y)
-{
-	double x0, y0, cx0, cy0;
-
-	x0 = state->last_x;
-	y0 = state->last_y;
-	cx0 = state->last_ctrl_x;
-	cy0 = state->last_ctrl_y;
-	cx0 = (2 * x0) - cx0;
-	cy0 = (2 * y0) - cy0;
-
-	enesim_curve_quadratic_to(state, cx0, cy0, x, y);
-	state->last_x = x;
-	state->last_y = y;
-	state->last_ctrl_x = cx0;
-	state->last_ctrl_y = cy0;
-}
-
-void enesim_curve_cubic_to(Enesim_Curve_State *state,
+static void _curve_cubic_to(Enesim_Curve_State *state,
 		double ctrl_x0, double ctrl_y0,
 		double ctrl_x, double ctrl_y,
 		double x, double y)
@@ -144,17 +68,116 @@ void enesim_curve_cubic_to(Enesim_Curve_State *state,
 	xc = (xa + xb) / 2;
 	yc = (ya + yb) / 2;
 
-	enesim_curve_cubic_to(state, x01, y01, xa, ya, xc, yc);
+	_curve_cubic_to(state, x01, y01, xa, ya, xc, yc);
 	state->last_x = xc;
 	state->last_y = yc;
 	state->last_ctrl_x = xa;
 	state->last_ctrl_y = ya;
 
-	enesim_curve_cubic_to(state, xb, yb, x23, y23, x, y);
+	_curve_cubic_to(state, xb, yb, x23, y23, x, y);
 	state->last_x = x;
 	state->last_y = y;
 	state->last_ctrl_x = x23;
 	state->last_ctrl_y = y23;
+}
+
+static void _curve_quadratic_to(Enesim_Curve_State *state,
+		double ctrl_x, double ctrl_y,
+		double x, double y)
+{
+	double x0, y0, x1, y1, x01, y01;
+	double sm = 1 / 92.0;
+
+	/* TODO should we check here that the x,y == ctrl_x, ctrl_y? or on the caller */
+	x0 = state->last_x;
+	y0 = state->last_y;
+	x01 = (x0 + x) / 2;
+	y01 = (y0 + y) / 2;
+	if ((((x01 - ctrl_x) * (x01 - ctrl_x)) + ((y01 - ctrl_y) * (y01
+			- ctrl_y))) <= sm)
+	{
+		state->vertex_add(x, y, state->data);
+		state->last_x = x;
+		state->last_y = y;
+		state->last_ctrl_x = ctrl_x;
+		state->last_ctrl_y = ctrl_y;
+		return;
+	}
+
+	x0 = (ctrl_x + x0) / 2;
+	y0 = (ctrl_y + y0) / 2;
+	x1 = (ctrl_x + x) / 2;
+	y1 = (ctrl_y + y) / 2;
+	x01 = (x0 + x1) / 2;
+	y01 = (y0 + y1) / 2;
+
+	_curve_quadratic_to(state, x0, y0, x01, y01);
+	state->last_x = x01;
+	state->last_y = y01;
+	state->last_ctrl_x = x0;
+	state->last_ctrl_y = y0;
+
+	_curve_quadratic_to(state, x1, y1, x, y);
+	state->last_x = x;
+	state->last_y = y;
+	state->last_ctrl_x = x1;
+	state->last_ctrl_y = y1;
+}
+
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+void enesim_curve_line_to(Enesim_Curve_State *state,
+		double x, double y)
+{
+	state->vertex_add(x, y, state->data);
+	state->last_ctrl_x = state->last_x;
+	state->last_ctrl_y = state->last_y;
+	state->last_x = x;
+	state->last_y = y;
+}
+
+/* these subdiv approximations need to be done more carefully */
+void enesim_curve_quadratic_to(Enesim_Curve_State *state,
+		double ctrl_x, double ctrl_y,
+		double x, double y)
+{
+	_curve_quadratic_to(state, ctrl_x, ctrl_y, x, y);
+	state->last_x = x;
+	state->last_y = y;
+	state->last_ctrl_x = ctrl_x;
+	state->last_ctrl_y = ctrl_y;
+}
+	
+void enesim_curve_squadratic_to(Enesim_Curve_State *state,
+		double x, double y)
+{
+	double x0, y0, cx0, cy0;
+
+	x0 = state->last_x;
+	y0 = state->last_y;
+	cx0 = state->last_ctrl_x;
+	cy0 = state->last_ctrl_y;
+	cx0 = (2 * x0) - cx0;
+	cy0 = (2 * y0) - cy0;
+
+	enesim_curve_quadratic_to(state, cx0, cy0, x, y);
+	state->last_x = x;
+	state->last_y = y;
+	state->last_ctrl_x = cx0;
+	state->last_ctrl_y = cy0;
+}
+
+void enesim_curve_cubic_to(Enesim_Curve_State *state,
+		double ctrl_x0, double ctrl_y0,
+		double ctrl_x, double ctrl_y,
+		double x, double y)
+{
+	_curve_cubic_to(state, ctrl_x0, ctrl_y0, ctrl_x, ctrl_y, x, y);
+	state->last_x = x;
+	state->last_y = y;
+	state->last_ctrl_x = ctrl_x;
+	state->last_ctrl_y = ctrl_y;
 }
 
 void enesim_curve_scubic_to(Enesim_Curve_State *state,
