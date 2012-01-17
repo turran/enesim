@@ -513,8 +513,6 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Circle *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	double rad;
-	double sw;
 
 	thiz = _circle_get(r);
 	if (!thiz || (thiz->current.r < 1))
@@ -522,7 +520,27 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 
 	if (_circle_use_path(cs->geometry_transformation_type))
 	{
-		_circle_path_setup(thiz, thiz->current.x, thiz->current.y, thiz->current.r, states, sstates);
+		double rad;
+
+		rad = thiz->current.r;
+		if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		{
+			switch (css->stroke.location)
+			{
+				case ENESIM_SHAPE_STROKE_OUTSIDE:
+				rad += css->stroke.weight / 2.0;
+				break;
+
+				case ENESIM_SHAPE_STROKE_INSIDE:
+				rad -= css->stroke.weight / 2.0;
+				break;
+
+				case ENESIM_SHAPE_STROKE_CENTER:
+				break;
+			}
+		}
+
+		_circle_path_setup(thiz, thiz->current.x, thiz->current.y, rad, states, sstates);
 		if (!enesim_renderer_setup(thiz->path, s, error))
 		{
 			return EINA_FALSE;
@@ -536,35 +554,41 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 	{
 		Enesim_Shape_Draw_Mode draw_mode;
 		Enesim_Renderer *spaint;
+		double rad;
+		double sw;
 
-		enesim_renderer_shape_stroke_weight_get(r, &sw);
 		thiz->do_inner = 1;
-		if (sw >= (thiz->current.r - 1))
+
+		sw = css->stroke.weight;
+		rad = thiz->current.r;
+		if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 		{
-			sw = 0;
-			thiz->do_inner = 0;
+			/* handle the different stroke locations */
+			switch (css->stroke.location)
+			{
+				case ENESIM_SHAPE_STROKE_CENTER:
+				rad += sw / 2.0;
+				break;
+
+				case ENESIM_SHAPE_STROKE_INSIDE:
+				if (sw >= (thiz->current.r - 1))
+				{
+					sw = 0;
+					thiz->do_inner = 0;
+				}
+				break;
+
+				case ENESIM_SHAPE_STROKE_OUTSIDE:
+				rad += sw;
+				break;
+			}
 		}
 
-		/* handle the different stroke locations */
-		switch (css->stroke.location)
-		{
-			case ENESIM_SHAPE_STROKE_CENTER:
-			sw /= 2.0;
-			break;
-
-			case ENESIM_SHAPE_STROKE_INSIDE:
-			sw = 0.0;
-			break;
-
-			case ENESIM_SHAPE_STROKE_OUTSIDE:
-			break;
-		}
-
-		thiz->rr0 = 65536 * (thiz->current.r + sw - 1);
+		thiz->rr0 = 65536 * (rad - 1);
 		thiz->xx0 = 65536 * (thiz->current.x - 0.5);
 		thiz->yy0 = 65536 * (thiz->current.y - 0.5);
 
-		rad = thiz->current.r - 1 - sw;
+		rad = rad - 1 - sw;
 		if (rad < 0.0039)
 			rad = 0;
 

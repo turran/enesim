@@ -94,6 +94,7 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 
 				enesim_matrix_rectangle_transform(&state->geometry_transformation, boundings, &q);
 				enesim_quad_rectangle_to(&q, boundings);
+				//printf("transformed boundings %" ENESIM_RECTANGLE_FORMAT "\n", ENESIM_RECTANGLE_ARGS(boundings));
 			}
 		}
 		/* translate */
@@ -122,10 +123,11 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 				boundings->h += m.yy;
 			}
 		}
-		destination->x = lround(boundings->x);
-		destination->y = lround(boundings->y);
-		destination->w = lround(boundings->w);
-		destination->h = lround(boundings->h);
+		destination->x = floor(boundings->x);
+		destination->y = floor(boundings->y);
+		destination->w = ceil(boundings->w);
+		destination->h = ceil(boundings->h);
+		//printf("final boundings %" ENESIM_RECTANGLE_FORMAT "\n", ENESIM_RECTANGLE_ARGS(boundings));
 	}
 	destination->x -= x;
 	destination->y -= y;
