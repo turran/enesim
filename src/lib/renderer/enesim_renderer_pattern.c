@@ -139,15 +139,17 @@ static void _pattern_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _pattern_boundings(Enesim_Renderer *r, Enesim_Rectangle *bounds)
+static void _pattern_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = _pattern_get(r);
-	bounds->x = thiz->current.x;
-	bounds->y = thiz->current.y;
-	bounds->w = thiz->current.width;
-	bounds->h = thiz->current.height;
+	boundings->x = thiz->current.x;
+	boundings->y = thiz->current.y;
+	boundings->w = thiz->current.width;
+	boundings->h = thiz->current.height;
 }
 
 static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
@@ -165,7 +167,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _pattern_name,
 	/* .free = 			*/ _pattern_free,
 	/* .boundings = 		*/ _pattern_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _pattern_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

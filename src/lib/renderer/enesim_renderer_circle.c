@@ -474,7 +474,10 @@ static const char * _circle_name(Enesim_Renderer *r)
 	return "circle";
 }
 
-static void _circle_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _circle_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Circle *thiz;
 	Enesim_Shape_Stroke_Location location;
@@ -680,7 +683,7 @@ static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .name = 			*/ _circle_name,
 	/* .free = 			*/ _circle_free,
 	/* .boundings = 		*/ _circle_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _circle_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

@@ -242,9 +242,12 @@ static const char * _image_name(Enesim_Renderer *r)
 	return "image";
 }
 
-static void _image_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _image_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Image *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	thiz = _image_get(r);
 	if (!thiz->s)
@@ -261,6 +264,38 @@ static void _image_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 		rect->w = thiz->w;
 		rect->h = thiz->h;
 	}
+	/* the translate */
+	rect->x += cs->ox;
+	rect->y += cs->oy;
+}
+
+static void _image_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
+{
+	Enesim_Rectangle oboundings;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+
+	_image_boundings(r, states, &oboundings);
+	/* apply the inverse matrix */
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+		Enesim_Matrix m;
+
+		enesim_matrix_inverse(&cs->transformation, &m);
+		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
+		enesim_quad_rectangle_to(&q, &oboundings);
+		/* fix the antialias scaling */
+		boundings->x -= m.xx;
+		boundings->y -= m.yy;
+		boundings->w += m.xx;
+		boundings->h += m.yy;
+	}
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.w);
+	boundings->h = ceil(oboundings.h);
 }
 
 static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
@@ -382,7 +417,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _image_name,
 	/* .free = 			*/ _image_free,
 	/* .boundings = 		*/ _image_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ _image_destination_boundings,
 	/* .flags = 			*/ _image_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

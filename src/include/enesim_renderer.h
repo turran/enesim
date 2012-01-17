@@ -50,9 +50,7 @@ typedef enum Enesim_Renderer_Flag
  * @param past
  * @param data
  */
-typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, Enesim_Rectangle *area, Eina_Bool past, void *data);
-
-typedef Eina_Bool (*Enesim_Renderer_Destination_Damage_Cb)(Enesim_Renderer *r, Eina_Rectangle *area, Eina_Bool past, void *data);
+typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, Eina_Rectangle *area, Eina_Bool past, void *data);
 
 
 EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data);
@@ -95,7 +93,6 @@ EAPI void enesim_renderer_destination_boundings_extended(Enesim_Renderer *r, Ein
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
-EAPI void enesim_renderer_destination_damages_get(Enesim_Renderer *r, Enesim_Renderer_Destination_Damage_Cb cb, void *data);
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error);
@@ -144,8 +141,12 @@ typedef struct _Enesim_Renderer_State
 typedef const char * (*Enesim_Renderer_Name)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
-typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r, Enesim_Rectangle *rect);
-typedef void (*Enesim_Renderer_Destination_Transform)(Enesim_Renderer *r, Enesim_Rectangle *area, Eina_Rectangle *dest);
+typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect);
+typedef void (*Enesim_Renderer_Destination_Boundings)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *dboundings);
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
@@ -202,7 +203,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
-	Enesim_Renderer_Destination_Transform destination_transform;
+	Enesim_Renderer_Destination_Boundings destination_boundings;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Damage damage;

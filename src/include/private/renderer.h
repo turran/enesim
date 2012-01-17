@@ -105,6 +105,14 @@ typedef struct _Enesim_Renderer_Shape_State
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape_State;
 
+typedef void (*Enesim_Renderer_Shape_Boundings)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings);
+typedef void (*Enesim_Renderer_Shape_Destination_Boundings)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings);
 
 typedef Eina_Bool (*Enesim_Renderer_Shape_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
@@ -131,8 +139,8 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	/* common */
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Boundings boundings;
-	Enesim_Renderer_Destination_Transform destination_transform;
+	Enesim_Renderer_Shape_Boundings boundings;
+	Enesim_Renderer_Shape_Destination_Boundings destination_boundings;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Damage damage;
@@ -188,7 +196,7 @@ typedef struct _Enesim_Renderer_Gradient_Descriptor
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
-	Enesim_Renderer_Destination_Transform destination_transform;
+	Enesim_Renderer_Destination_Boundings destination_boundings;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Has_Changed has_changed;
 } Enesim_Renderer_Gradient_Descriptor;

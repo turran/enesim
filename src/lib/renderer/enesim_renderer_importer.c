@@ -159,7 +159,9 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _importer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _importer_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Importer *thiz;
 
@@ -181,6 +183,19 @@ static void _importer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 		rect->w = 0;
 		rect->h = 0;
 	}
+}
+
+static void _importer_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *rect)
+{
+	Enesim_Rectangle oboundings;
+
+	_importer_boundings(r, states, &oboundings);
+	rect->x = oboundings.x;
+	rect->y = oboundings.x;
+	rect->w = oboundings.w;
+	rect->h = oboundings.h;
 }
 
 static void _importer_free(Enesim_Renderer *r)
@@ -209,7 +224,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _importer_name,
 	/* .free =			*/ _importer_free,
 	/* .boundings = 		*/ _importer_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ _importer_destination_boundings,
  	/* .flags = 			*/ _importer_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

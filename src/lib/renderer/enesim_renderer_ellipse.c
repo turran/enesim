@@ -1027,7 +1027,10 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _ellipse_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Ellipse *thiz;
 
@@ -1093,8 +1096,8 @@ static void _ellipse_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .name = 			*/ _ellipse_name,
 	/* .free = 			*/ _free,
-	/* .boundings =  		*/ NULL, //_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .boundings =  		*/ _ellipse_boundings,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _ellipse_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

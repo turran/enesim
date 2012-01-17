@@ -1850,7 +1850,10 @@ static void _rectangle_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _rectangle_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+static void _rectangle_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	double sx, sy;
@@ -2000,7 +2003,7 @@ static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 #else
 	/* .boundings = 		*/ NULL, //_rectangle_boundings,
 #endif
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _rectangle_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

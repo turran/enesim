@@ -172,15 +172,58 @@ static void _clipper_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	enesim_renderer_flags(thiz->content, flags);
 }
 
-static void _clipper_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _clipper_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Clipper *thiz;
+	Enesim_Renderer_Flag flags;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	thiz = _clipper_get(r);
 	rect->x = 0;
 	rect->y = 0;
 	rect->w = thiz->width;
 	rect->h = thiz->height;
+	_clipper_flags(r, &flags);
+	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
+	{
+		rect->x += cs->ox;
+		rect->y += cs->oy;
+	}
+}
+
+static void _clipper_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings)
+{
+	Enesim_Rectangle oboundings;
+	Enesim_Renderer_Flag flags;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+
+	_clipper_boundings(r, states, &oboundings);
+	_clipper_flags(r, &flags);
+	if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
+	{
+		if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+		{
+			Enesim_Quad q;
+			Enesim_Matrix m;
+
+			enesim_matrix_inverse(&cs->transformation, &m);
+			enesim_matrix_rectangle_transform(&m, &oboundings, &q);
+			enesim_quad_rectangle_to(&q, &oboundings);
+			/* fix the antialias scaling */
+			boundings->x -= m.xx;
+			boundings->y -= m.yy;
+			boundings->w += m.xx;
+			boundings->h += m.yy;
+		}
+	}
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.w);
+	boundings->h = ceil(oboundings.h);
 }
 
 static Eina_Bool _clipper_has_changed(Enesim_Renderer *r)
@@ -214,7 +257,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _clipper_name,
 	/* .free = 			*/ _clipper_free,
 	/* .boundings = 		*/ _clipper_boundings,
-	/* .destination_transform =	*/ NULL,
+	/* .destination_boundings =	*/ _clipper_destination_boundings,
 	/* .flags = 			*/ _clipper_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

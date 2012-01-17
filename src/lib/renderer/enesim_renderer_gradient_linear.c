@@ -214,7 +214,7 @@ static Enesim_Renderer_Gradient_Descriptor _linear_descriptor = {
 	/* .sw_cleanup = 		*/ _linear_state_cleanup,
 	/* .free = 			*/ NULL,
 	/* .boundings = 		*/ NULL,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .has_changed = 		*/ _linear_has_changed,
 };

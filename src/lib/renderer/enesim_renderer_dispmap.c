@@ -238,7 +238,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
@@ -293,7 +295,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _dispmap_name,
 	/* .free = 			*/ _free,
 	/* .boundings = 		*/ _boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _dispmap_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

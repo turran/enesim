@@ -38,6 +38,8 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_State old_fill;
 	Enesim_Renderer_State old_stroke;
 	/* interface */
+	Enesim_Renderer_Shape_Boundings boundings;
+	Enesim_Renderer_Shape_Destination_Boundings destination_boundings;
 	Enesim_Renderer_Shape_Sw_Setup sw_setup;
 	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
 	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
@@ -54,6 +56,54 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 
 	return thiz;
 }
+
+static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings)
+{
+	Enesim_Renderer_Shape *thiz;
+	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
+
+	thiz = enesim_renderer_data_get(r);
+	if (!thiz->destination_boundings)
+	{
+		boundings->x = INT_MIN / 2;
+		boundings->y = INT_MIN / 2;
+		boundings->w = INT_MAX;
+		boundings->h = INT_MAX;
+
+		return;
+	}
+
+	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	sstates[ENESIM_STATE_PAST] = &thiz->past;
+	thiz->destination_boundings(r, states, sstates, boundings);
+
+}
+
+static void _enesim_renderer_shape_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
+{
+	Enesim_Renderer_Shape *thiz;
+	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
+
+	thiz = enesim_renderer_data_get(r);
+	if (!thiz->boundings)
+	{
+		boundings->x = INT_MIN / 2;
+		boundings->y = INT_MIN / 2;
+		boundings->w = INT_MAX;
+		boundings->h = INT_MAX;
+
+		return;
+	}
+
+	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	sstates[ENESIM_STATE_PAST] = &thiz->past;
+	thiz->boundings(r, states, sstates, boundings);
+}
+
 
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
@@ -211,12 +261,14 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	thiz->sw_setup = descriptor->sw_setup;
 	thiz->opengl_setup = descriptor->opengl_setup;
 	thiz->opencl_setup = descriptor->opencl_setup;
+	thiz->destination_boundings = descriptor->destination_boundings;
+	thiz->boundings = descriptor->boundings;
 	/* set the parent descriptor */
 	pdescriptor.version = ENESIM_RENDERER_API;
 	pdescriptor.name = descriptor->name;
 	pdescriptor.free = descriptor->free;
-	pdescriptor.boundings = descriptor->boundings;
-	pdescriptor.destination_transform = descriptor->destination_transform;
+	pdescriptor.boundings = _enesim_renderer_shape_boundings;
+	pdescriptor.destination_boundings = _enesim_renderer_shape_destination_boundings;
 	pdescriptor.flags = descriptor->flags;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damage = descriptor->damage;

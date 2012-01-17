@@ -35,6 +35,11 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list);
 
+EAPI void enesim_renderer_compound_pre_setup_set(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Setup cb, void *data);
+EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Setup cb, void *data);
+
 /**
  * @}
  */

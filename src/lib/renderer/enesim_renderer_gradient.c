@@ -357,14 +357,16 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _gradient_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+static void _gradient_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Gradient *thiz;
 
 	thiz = _gradient_get(r);
 	if (thiz->mode == ENESIM_RESTRICT && thiz->descriptor->boundings)
 	{
-		thiz->descriptor->boundings(r, boundings);
+		thiz->descriptor->boundings(r, states, boundings);
 	}
 	else
 	{
@@ -427,7 +429,7 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .name = 			*/ _gradient_name,
 	/* .free = 			*/ _gradient_free,
 	/* .boundings = 		*/ _gradient_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _gradient_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

@@ -410,7 +410,10 @@ static void _line_free(Enesim_Renderer *r)
 {
 }
 
-static void _line_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+static void _line_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Line *thiz;
 
@@ -451,7 +454,7 @@ static Enesim_Renderer_Shape_Descriptor _line_descriptor = {
 	/* .name = 			*/ _line_name,
 	/* .free = 			*/ _line_free,
 	/* .boundings = 		*/ NULL,// _line_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _line_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

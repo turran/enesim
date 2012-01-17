@@ -60,14 +60,6 @@ typedef struct _Layer
 	Enesim_Renderer_State old;
 } Layer;
 
-typedef struct _Enesim_Renderer_Compound_Damage_Data
-{
-	Enesim_Renderer *real_r;
-	Enesim_Renderer_Flag flags;
-	Enesim_Renderer_Damage_Cb real_cb;
-	void *real_data;
-} Enesim_Renderer_Compound_Damage_Data;
-
 static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -76,38 +68,6 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	ENESIM_RENDERER_COMPOUND_MAGIC_CHECK(thiz);
 
 	return thiz;
-}
-
-static Eina_Bool _compound_destination_boundings_cb(Enesim_Renderer *r,
-		Enesim_Rectangle *area, Eina_Bool past, void *data)
-{
-	Enesim_Renderer_Compound_Damage_Data *ddata = data;
-	Eina_Rectangle dst_area;
-	Enesim_Rectangle real_area;
-
-	/* FIXME we should send the past and the current boundings */
-#if 0
-	/* translate, scale, transform, whatever, and send the area back */
-	if (past)
-	{
-		enesim_renderer_destination_boundings(r, ddata->flags,
-				&r->past, area, 0, 0, &real_area);
-	}
-	else
-	{
-		enesim_renderer_destination_boundings(r, ddata->flags,
-				&r->current, area, 0, 0, &real_area);
-	}
-#endif
-	enesim_renderer_destination_boundings(r, &dst_area, 0, 0);
-	real_area.x = dst_area.x;
-	real_area.y = dst_area.y;
-	real_area.w = dst_area.w;
-	real_area.h = dst_area.h;
-
-	//printf("compound returning %g %g %g %g\n", real_area.x, real_area.y, real_area.w, real_area.h);
-
-	return ddata->real_cb(ddata->real_r, &real_area, past, ddata->real_data);
 }
 
 static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
@@ -282,7 +242,13 @@ static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+/* FIXME this both boundings are wrong
+ * because they dont have the setup done when calculating the
+ * boundings
+ */
+static void _compound_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
@@ -302,8 +268,8 @@ static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 		enesim_renderer_destination_boundings(lr, &tmp, 0, 0);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
-		nx2 = tmp.x + tmp.w - 1;
-		ny2 = tmp.y + tmp.h - 1;
+		nx2 = tmp.x + tmp.w;
+		ny2 = tmp.y + tmp.h;
 
 		/* pick the bigger area */
 		if (nx1 < x1) x1 = nx1;
@@ -313,14 +279,21 @@ static void _compound_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	}
 	rect->x = x1;
 	rect->y = y1;
-	rect->w = x2 - x1 + 1;
-	rect->h = y2 - y1 + 1;
+	rect->w = x2 - x1;
+	rect->h = y2 - y1;
 }
 
-/* TODO later */
-static void _compound_destination_boundings(Enesim_Renderer *r, Eina_Rectangle *rect)
+static void _compound_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *rect)
 {
+	Enesim_Rectangle boundings;
 
+	_compound_boundings(r, states, &boundings);
+	rect->x = floor(boundings.x);
+	rect->y = floor(boundings.y);
+	rect->w = ceil(boundings.w);
+	rect->h = ceil(boundings.h);
 }
 
 static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -407,19 +380,14 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 static void _compound_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
-	Enesim_Renderer_Compound_Damage_Data ddata;
 	Eina_List *ll;
 	Layer *l;
 
 	thiz = _compound_get(r);
 
-	ddata.real_r = r;
-	ddata.real_cb = cb;
-	ddata.real_data = data;
 	EINA_LIST_FOREACH(thiz->layers, ll, l)
 	{
-		enesim_renderer_flags(l->r, &ddata.flags);
-		enesim_renderer_damages_get(l->r, _compound_destination_boundings_cb, &ddata);
+		enesim_renderer_damages_get(l->r, cb, data);
 	}
 }
 
@@ -428,7 +396,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _compound_name,
 	/* .free = 			*/ _compound_free,
 	/* .boundings =  		*/ _compound_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ _compound_destination_boundings,
 	/* .flags = 			*/ _compound_flags,
 	/* .is_inside = 		*/ _compound_is_inside,
 	/* .damage = 			*/ _compound_damage,

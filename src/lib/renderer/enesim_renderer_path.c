@@ -760,7 +760,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
 				&cs->geometry_transformation, cs->sx, cs->sy,
 				css->stroke.join, css->stroke.cap);
-		thiz->changed = 0;
+		thiz->changed = EINA_FALSE;
 	}
 
 	enesim_renderer_shape_draw_mode_set(thiz->bifigure, css->draw_mode);
@@ -813,39 +813,26 @@ static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
  * not the source boundings which should be calculated without the geometry
  * transformation
  */
-static void _path_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+static void _path_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Path *thiz;
-	Enesim_Shape_Draw_Mode draw_mode;
-	double stroke_weight;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_State *ps = states[ENESIM_STATE_PAST];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	double xmin;
 	double ymin;
 	double xmax;
 	double ymax;
 
 	thiz = _enesim_path_get(r);
-
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	enesim_renderer_shape_stroke_weight_get(r, &stroke_weight);
-	/* FIXME for now: we should also pass the old and current states */
-	if (thiz->changed)
+	if (_path_needs_generate(thiz, &cs->geometry_transformation, &ps->geometry_transformation))
 	{
-		Enesim_Matrix gm;
-		Enesim_Shape_Stroke_Join stroke_join;
-		Enesim_Shape_Stroke_Cap stroke_cap;
-		double sx;
-		double sy;
-
-		/* FIXME for now: we should also pass the old and current states */
-		enesim_renderer_shape_stroke_join_get(r, &stroke_join);
-		enesim_renderer_shape_stroke_cap_get(r, &stroke_cap);
-
-		enesim_renderer_geometry_transformation_get(r, &gm);
-		enesim_renderer_scale_get(r, &sx, &sy);
-
-		_path_generate_figures(thiz, draw_mode, stroke_weight,
-				&gm, sx, sy,
-				stroke_join, stroke_cap);
+		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
+				&cs->geometry_transformation, cs->sx, cs->sy,
+				css->stroke.join, css->stroke.cap);
 		thiz->changed = EINA_FALSE;
 	}
 
@@ -858,7 +845,7 @@ static void _path_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 		return;
 	}
 
-	if ((draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && (stroke_weight > 1.0))
+	if ((css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && (css->stroke.weight > 1.0))
 	{
 		enesim_figure_boundings(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax);
 	}
@@ -871,6 +858,54 @@ static void _path_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 	boundings->w = xmax - xmin;
 	boundings->y = ymin;
 	boundings->h = ymax - ymin;
+
+	/* translate by the origin */
+	boundings->x += cs->ox;
+	boundings->y += cs->oy;
+}
+
+static void _path_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings)
+{
+	Enesim_Renderer_Path *thiz;
+	Enesim_Rectangle oboundings;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+
+	thiz = _enesim_path_get(r);
+
+	_path_boundings(r, states, sstates, &oboundings);
+	if (oboundings.w == 0 && oboundings.h == 0)
+	{
+		boundings->x = 0;
+		boundings->y = 0;
+		boundings->w = 0;
+		boundings->h = 0;
+
+		return;
+	}
+
+	/* apply the inverse matrix */
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY
+			&& boundings->w != INT_MAX && boundings->h != INT_MAX)
+	{
+		Enesim_Quad q;
+		Enesim_Matrix m;
+
+		enesim_matrix_inverse(&cs->transformation, &m);
+		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
+		enesim_quad_rectangle_to(&q, &oboundings);
+		/* fix the antialias scaling */
+		boundings->x -= m.xx;
+		boundings->y -= m.yy;
+		boundings->w += m.xx;
+		boundings->h += m.yy;
+	}
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.w);
+	boundings->h = ceil(oboundings.h);
 }
 
 #if BUILD_OPENGL
@@ -984,8 +1019,8 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .name = 			*/ _path_name,
 	/* .free = 			*/ NULL,
-	/* .boundings = 		*/ NULL, //_path_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .boundings = 		*/ _path_boundings,
+	/* .destination_boundings = 	*/ _path_destination_boundings,
 	/* .flags = 			*/ _path_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

@@ -138,7 +138,9 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_relative_unset(t->r1.r, &t->r1.old);
 }
 
-static void _boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
+static void _boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Transition *trans;
 	Enesim_Rectangle r0_rect;
@@ -191,7 +193,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _transition_name,
 	/* .free = 			*/ _free,
 	/* .boundings = 		*/ _boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _transition_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

@@ -140,7 +140,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _radial_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+static void _radial_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
@@ -160,7 +162,7 @@ static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
 	/* .sw_cleanup = 		*/ _state_cleanup,
 	/* .free = 			*/ NULL,
 	/* .boundings = 		*/ _radial_boundings,
-	/* .destination_transform = 	*/ NULL,
+	/* .destination_boundings = 	*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
 };
