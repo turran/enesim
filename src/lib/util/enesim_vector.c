@@ -173,9 +173,12 @@ void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
 	thiz->closed = close;
 }
 
-void enesim_polygon_boundings(Enesim_Polygon *ep, Enesim_Rectangle *bounds)
+void enesim_polygon_boundings(Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
 {
-
+	*xmin = thiz->xmin;
+	*ymin = thiz->ymin;
+	*ymax = thiz->ymax;
+	*xmax = thiz->xmax;
 }
 
 Enesim_Figure * enesim_figure_new(void)
@@ -190,6 +193,30 @@ void enesim_figure_delete(Enesim_Figure *thiz)
 {
 	enesim_figure_clear(thiz);
 	free(thiz);
+}
+
+void enesim_figure_boundings(Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
+{
+	Enesim_Polygon *p;
+	Eina_List *l;
+	double fxmax;
+	double fxmin;
+	double fymax;
+	double fymin;
+
+	fxmax = fymax = -DBL_MAX;
+	fxmin = fymin = DBL_MAX;
+	EINA_LIST_FOREACH(thiz->polygons, l, p)
+	{
+		if (p->xmax > fxmax) fxmax = p->xmax;
+		if (p->ymax > fymax) fymax = p->ymax;
+		if (p->xmin < fxmin) fxmin = p->xmin;
+		if (p->ymin < fymin) fymin = p->ymin;
+	}
+	*xmax = fxmax;
+	*xmin = fxmin;
+	*ymax = fymax;
+	*ymin = fymin;
 }
 
 void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p)

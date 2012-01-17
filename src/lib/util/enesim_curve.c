@@ -18,14 +18,6 @@
 
 #include "Enesim.h"
 #include "enesim_private.h"
-/* FIXME
- * the state last_ctrl_pt/last_pt is broken on the cubic and quadratic
- * we should have an indirection to keep track correctly of the state
- * If we fix it, looks like a new vertex is created that is on almost
- * the same place as the one before, and the path renderer (the basic
- * rasterizer really) complains at line 796:
- * _basic_sw_setup basic2 Length 0 < 0.00390625
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

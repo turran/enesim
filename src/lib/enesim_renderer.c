@@ -249,33 +249,18 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 		return EINA_TRUE;
 	}
 
-	if (r->current.transformation.xx != r->past.transformation.xx ||
-			r->current.transformation.xy != r->past.transformation.xy ||
-			r->current.transformation.xz != r->past.transformation.xz ||
-			r->current.transformation.yx != r->past.transformation.yx ||
-			r->current.transformation.yy != r->past.transformation.yy ||
-			r->current.transformation.yz != r->past.transformation.yz ||
-			r->current.transformation.zx != r->past.transformation.zx ||
-			r->current.transformation.zy != r->past.transformation.zy ||
-			r->current.transformation.zz != r->past.transformation.zz)
+	if (!enesim_matrix_is_equal(&r->current.transformation, &r->past.transformation))
 	{
 		return EINA_TRUE;
 	}
+
 	/* the geometry_transformation */
 	if (r->current.geometry_transformation_type != r->past.geometry_transformation_type)
 	{
 		return EINA_TRUE;
 	}
 
-	if (r->current.geometry_transformation.xx != r->past.geometry_transformation.xx ||
-			r->current.geometry_transformation.xy != r->past.geometry_transformation.xy ||
-			r->current.geometry_transformation.xz != r->past.geometry_transformation.xz ||
-			r->current.geometry_transformation.yx != r->past.geometry_transformation.yx ||
-			r->current.geometry_transformation.yy != r->past.geometry_transformation.yy ||
-			r->current.geometry_transformation.yz != r->past.geometry_transformation.yz ||
-			r->current.geometry_transformation.zx != r->past.geometry_transformation.zx ||
-			r->current.geometry_transformation.zy != r->past.geometry_transformation.zy ||
-			r->current.geometry_transformation.zz != r->past.geometry_transformation.zz)
+	if (!enesim_matrix_is_equal(&r->current.geometry_transformation, &r->past.geometry_transformation))
 	{
 		return EINA_TRUE;
 	}

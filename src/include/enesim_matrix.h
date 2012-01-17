@@ -71,6 +71,7 @@ EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
 		Enesim_F16p16_Matrix *fm);
 
+EAPI Eina_Bool enesim_matrix_is_equal(const Enesim_Matrix *m1, const Enesim_Matrix *m2);
 EAPI void enesim_matrix_compose(const Enesim_Matrix *m1, const Enesim_Matrix *m2,
 		Enesim_Matrix *dst);
 EAPI void enesim_matrix_translate(Enesim_Matrix *t, double tx, double ty);

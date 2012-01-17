@@ -661,6 +661,77 @@ static void _enesim_span(Enesim_Renderer *r, int x, int y, unsigned int len, voi
 	thiz = _enesim_path_get(r);
 	thiz->fill(thiz->bifigure, x, y, len, ddata);
 }
+
+static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
+		const Enesim_Matrix *cgm,
+		const Enesim_Matrix *pgm)
+{
+	/* some command has been added */
+	if (thiz->changed)
+		return EINA_TRUE;
+	/* the geometry transformation is different */
+	if (!enesim_matrix_is_equal(cgm, pgm))
+		return EINA_TRUE;
+	return EINA_FALSE;
+}
+
+static void _path_generate_figures(Enesim_Renderer_Path *thiz,
+		Enesim_Shape_Draw_Mode dm,
+		double sw,
+		const Enesim_Matrix *geometry_transformation,
+		double sx,
+		double sy,
+		Enesim_Shape_Stroke_Join join,
+		Enesim_Shape_Stroke_Cap cap)
+{
+	if (thiz->fill_figure)
+		enesim_figure_clear(thiz->fill_figure);
+	else
+		thiz->fill_figure = enesim_figure_new();
+
+	if (thiz->stroke_figure)
+		enesim_figure_clear(thiz->stroke_figure);
+	else
+		thiz->stroke_figure = enesim_figure_new();
+	if ((dm & ENESIM_SHAPE_DRAW_MODE_STROKE) && (sw > 1.0))
+	{
+		Enesim_Renderer_Path_Stroke_State st;
+
+		st.fill_figure = thiz->fill_figure;
+		st.stroke_figure = thiz->stroke_figure;
+		st.join = join;
+		st.cap = cap;
+		st.count = 0;
+		st.rx = sw * geometry_transformation->xx / 2.0;
+		st.ry = sw * geometry_transformation->yy / 2.0;
+
+		_enesim_path_generate_vertices(thiz->commands, _stroke_path_vertex_add,
+				_stroke_path_polygon_add,
+				_stroke_path_polygon_close,
+				_stroke_path_done,
+				sx, sy,
+				geometry_transformation,
+				&st);
+		enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
+		enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, thiz->stroke_figure);
+	}
+	else
+	{
+		Enesim_Renderer_Path_Strokeless_State st;
+
+		st.fill_figure = thiz->fill_figure;
+
+		_enesim_path_generate_vertices(thiz->commands, _strokeless_path_vertex_add,
+				_strokeless_path_polygon_add,
+				_strokeless_path_polygon_close,
+				NULL,
+				sx, sy,
+				geometry_transformation,
+				&st);
+		/* set the fill figure on the bifigure as its under polys */
+		enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
+	}
+}
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -677,79 +748,25 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_State *ps = states[ENESIM_STATE_PAST];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	Enesim_Color stroke_color;
-	Enesim_Shape_Draw_Mode draw_mode;
-	double stroke_weight;
 
 	thiz = _enesim_path_get(r);
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	enesim_renderer_shape_stroke_weight_get(r, &stroke_weight);
-
 	/* TODO in the future the generation of polygons might depend also on the geometric matrix used */
 	/* generate the list of points/polygons */
-	if (thiz->changed)
+	if (_path_needs_generate(thiz, &cs->geometry_transformation, &ps->geometry_transformation))
 	{
-		if (thiz->fill_figure)
-			enesim_figure_clear(thiz->fill_figure);
-		else
-			thiz->fill_figure = enesim_figure_new();
-
-		if (thiz->stroke_figure)
-			enesim_figure_clear(thiz->stroke_figure);
-		else
-			thiz->stroke_figure = enesim_figure_new();
-		if ((draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && (stroke_weight > 1.0))
-		{
-			Enesim_Renderer_Path_Stroke_State st;
-
-			st.fill_figure = thiz->fill_figure;
-			st.stroke_figure = thiz->stroke_figure;
-			st.join = css->stroke.join;
-			st.cap = css->stroke.cap;
-			st.count = 0;
-			st.rx = stroke_weight * cs->geometry_transformation.xx / 2.0;
-			st.ry = stroke_weight * cs->geometry_transformation.yy / 2.0;
-
-			_enesim_path_generate_vertices(thiz->commands, _stroke_path_vertex_add,
-					_stroke_path_polygon_add,
-					_stroke_path_polygon_close,
-					_stroke_path_done,
-					cs->sx, cs->sy,
-					&cs->geometry_transformation,
-					&st);
-			enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
-			enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, thiz->stroke_figure);
-		}
-		else
-		{
-			Enesim_Renderer_Path_Strokeless_State st;
-
-			st.fill_figure = thiz->fill_figure;
-
-			_enesim_path_generate_vertices(thiz->commands, _strokeless_path_vertex_add,
-					_strokeless_path_polygon_add,
-					_strokeless_path_polygon_close,
-					NULL,
-					cs->sx, cs->sy,
-					&cs->geometry_transformation,
-					&st);
-			enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
-		}
-		/* set the fill figure on the bifigure as its under polys */
+		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
+				&cs->geometry_transformation, cs->sx, cs->sy,
+				css->stroke.join, css->stroke.cap);
 		thiz->changed = 0;
 	}
 
-	/* FIXME given that we now pass the state, there's no need to gt/set every property
-	 * just pass the state or set the values
-	 */
-	enesim_renderer_shape_draw_mode_set(thiz->bifigure, draw_mode);
-	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, stroke_weight);
-
+	enesim_renderer_shape_draw_mode_set(thiz->bifigure, css->draw_mode);
+	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, css->stroke.weight);
 	enesim_renderer_shape_stroke_color_set(thiz->bifigure, css->stroke.color);
 	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, css->stroke.r);
-
 	enesim_renderer_shape_fill_color_set(thiz->bifigure, css->fill.color);
 	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, css->fill.r);
 
@@ -791,15 +808,69 @@ static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
-static void _enesim_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+/* FIXME still WIP
+ * note that we are calculating the destination boundings here
+ * not the source boundings which should be calculated without the geometry
+ * transformation
+ */
+static void _path_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Path *thiz;
+	Enesim_Shape_Draw_Mode draw_mode;
+	double stroke_weight;
+	double xmin;
+	double ymin;
+	double xmax;
+	double ymax;
 
 	thiz = _enesim_path_get(r);
 
-	/* FIXME fix this */
-	if (!thiz->bifigure) return;
-	enesim_renderer_boundings(thiz->bifigure, boundings);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_shape_stroke_weight_get(r, &stroke_weight);
+	/* FIXME for now: we should also pass the old and current states */
+	if (thiz->changed)
+	{
+		Enesim_Matrix gm;
+		Enesim_Shape_Stroke_Join stroke_join;
+		Enesim_Shape_Stroke_Cap stroke_cap;
+		double sx;
+		double sy;
+
+		/* FIXME for now: we should also pass the old and current states */
+		enesim_renderer_shape_stroke_join_get(r, &stroke_join);
+		enesim_renderer_shape_stroke_cap_get(r, &stroke_cap);
+
+		enesim_renderer_geometry_transformation_get(r, &gm);
+		enesim_renderer_scale_get(r, &sx, &sy);
+
+		_path_generate_figures(thiz, draw_mode, stroke_weight,
+				&gm, sx, sy,
+				stroke_join, stroke_cap);
+		thiz->changed = EINA_FALSE;
+	}
+
+	if (!thiz->fill_figure)
+	{
+		boundings->x = 0;
+		boundings->y = 0;
+		boundings->w = 0;
+		boundings->h = 0;
+		return;
+	}
+
+	if ((draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && (stroke_weight > 1.0))
+	{
+		enesim_figure_boundings(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax);
+	}
+	else
+	{
+		enesim_figure_boundings(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax);
+	}
+
+	boundings->x = xmin;
+	boundings->w = xmax - xmin;
+	boundings->y = ymin;
+	boundings->h = ymax - ymin;
 }
 
 #if BUILD_OPENGL
@@ -913,7 +984,7 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .name = 			*/ _path_name,
 	/* .free = 			*/ NULL,
-	/* .boundings = 		*/ NULL, // _boundings,
+	/* .boundings = 		*/ NULL, //_path_boundings,
 	/* .destination_transform = 	*/ NULL,
 	/* .flags = 			*/ _path_flags,
 	/* .is_inside = 		*/ NULL,

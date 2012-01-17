@@ -240,6 +240,7 @@ EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a)
 	MATRIX_ZZ(a) = a33;
 
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -317,6 +318,26 @@ EAPI void enesim_matrix_compose(const Enesim_Matrix *m1, const Enesim_Matrix *m2
 	MATRIX_ZY(dst) = a32;
 	MATRIX_ZZ(dst) = a33;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool enesim_matrix_is_equal(const Enesim_Matrix *m1, const Enesim_Matrix *m2)
+{
+	if (m1->xx != m2->xx ||
+			m1->xy != m2->xy ||
+			m1->xz != m2->xz ||
+			m1->yx != m2->yx ||
+			m1->yy != m2->yy ||
+			m1->yz != m2->yz ||
+			m1->zx != m2->zx ||
+			m1->zy != m2->zy ||
+			m1->zz != m2->zz)
+		return EINA_FALSE;
+	return EINA_TRUE;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed
