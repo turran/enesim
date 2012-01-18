@@ -474,22 +474,23 @@ static const char * _circle_name(Enesim_Renderer *r)
 	return "circle";
 }
 
+/* FIXME we still need to decide what to do with the stroke
+ * transformation
+ */
 static void _circle_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Circle *thiz;
-	Enesim_Shape_Stroke_Location location;
-	Enesim_Shape_Draw_Mode dm;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	double sw = 0;
 
 	thiz = _circle_get(r);
-	enesim_renderer_shape_stroke_location_get(r, &location);
-	enesim_renderer_shape_draw_mode_get(r, &dm);
-	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 		enesim_renderer_shape_stroke_weight_get(r, &sw);
-	switch (location)
+	switch (css->stroke.location)
 	{
 		case ENESIM_SHAPE_STROKE_CENTER:
 		sw /= 2.0;
@@ -505,6 +506,48 @@ static void _circle_boundings(Enesim_Renderer *r,
 	rect->x = thiz->current.x - thiz->current.r - sw;
 	rect->y = thiz->current.y - thiz->current.r - sw;
 	rect->w = rect->h = (thiz->current.r + sw) * 2;
+
+	/* translate by the origin */
+	rect->x += cs->ox;
+	rect->y += cs->oy;
+	/* apply the geometry transformation */
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+
+		enesim_matrix_rectangle_transform(&cs->geometry_transformation, rect, &q);
+		enesim_quad_rectangle_to(&q, rect);
+	}
+}
+
+static void _circle_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *boundings)
+{
+	Enesim_Rectangle oboundings;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+
+	_circle_boundings(r, states, sstates, &oboundings);
+	/* apply the inverse matrix */
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+		Enesim_Matrix m;
+
+		enesim_matrix_inverse(&cs->transformation, &m);
+		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
+		enesim_quad_rectangle_to(&q, &oboundings);
+		/* fix the antialias scaling */
+		boundings->x -= m.xx;
+		boundings->y -= m.yy;
+		boundings->w += m.xx;
+		boundings->h += m.yy;
+	}
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.w);
+	boundings->h = ceil(oboundings.h);
 }
 
 static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
@@ -683,7 +726,7 @@ static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .name = 			*/ _circle_name,
 	/* .free = 			*/ _circle_free,
 	/* .boundings = 		*/ _circle_boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .destination_boundings = 	*/ _circle_destination_boundings,
 	/* .flags = 			*/ _circle_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

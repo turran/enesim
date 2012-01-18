@@ -808,11 +808,6 @@ static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
-/* FIXME still WIP
- * note that we are calculating the destination boundings here
- * not the source boundings which should be calculated without the geometry
- * transformation
- */
 static void _path_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],

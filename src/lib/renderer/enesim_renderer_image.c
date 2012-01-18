@@ -242,6 +242,9 @@ static const char * _image_name(Enesim_Renderer *r)
 	return "image";
 }
 
+/* FIXME we still need to decide what to do with the stroke
+ * transformation
+ */
 static void _image_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)

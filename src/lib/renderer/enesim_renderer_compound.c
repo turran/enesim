@@ -166,6 +166,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
+		Enesim_Renderer_Flag flags;
 		Enesim_Color color;
 		Enesim_Rop rop;
 		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
@@ -205,7 +206,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		/* FIXME fix the simplest case (fill) */
 		enesim_renderer_rop_get(l->r, &rop);
 		enesim_renderer_color_get(l->r, &color);
-		if (rop != ENESIM_FILL || color != ENESIM_COLOR_FULL)
+		enesim_renderer_flags(l->r, &flags);
+		if ((rop != ENESIM_FILL || color != ENESIM_COLOR_FULL) && !(flags & ENESIM_RENDERER_FLAG_ROP))
 		{
 			l->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_ARGB8888,
 					color, ENESIM_FORMAT_NONE);
@@ -243,7 +245,7 @@ static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 /* FIXME this both boundings are wrong
- * because they dont have the setup done when calculating the
+ * because they dont have the relativeness done when calculating the
  * boundings
  */
 static void _compound_boundings(Enesim_Renderer *r,
@@ -294,6 +296,13 @@ static void _compound_destination_boundings(Enesim_Renderer *r,
 	rect->y = floor(boundings.y);
 	rect->w = ceil(boundings.w);
 	rect->h = ceil(boundings.h);
+#if 0
+	{
+		const char *name;
+		enesim_renderer_name_get(r, &name);
+		printf("%s destination bounds %d %d %d %d\n", name, rect->x, rect->y, rect->w, rect->h);
+	}
+#endif
 }
 
 static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -305,7 +314,7 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	thiz = _compound_get(r);
 	if (!thiz->layers)
 	{
-		*flags = 0;
+		*flags = ENESIM_RENDERER_FLAG_ROP;
 		return;
 	}
 
@@ -319,6 +328,8 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		enesim_renderer_flags(lr, &tmp);
 		f &= tmp;
 	}
+	/* we do support the rop flag always */
+	f |= ENESIM_RENDERER_FLAG_ROP;
 	*flags = f;
 }
 

@@ -1717,9 +1717,27 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	scaled_y = thiz->current.y * cs->sy;
 
 	/* check if we should use the path approach */
-	/* FIXME later */
 	if (_rectangle_use_path(cs->geometry_transformation_type))
 	{
+		/* FIXME in case of a stroked rectangle we need to convert the location of the stroke to center */
+#if 0
+		if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		{
+			switch (css->stroke.location)
+			{
+				case ENESIM_SHAPE_STROKE_OUTSIDE:
+				rad += css->stroke.weight / 2.0;
+				break;
+
+				case ENESIM_SHAPE_STROKE_INSIDE:
+				rad -= css->stroke.weight / 2.0;
+				break;
+
+				case ENESIM_SHAPE_STROKE_CENTER:
+				break;
+			}
+		}
+#endif
 		_rectangle_path_setup(thiz, scaled_x, scaled_y, scaled_width, scaled_height, rad, states, sstates);
 		if (!enesim_renderer_setup(thiz->path, s, error))
 		{
@@ -1856,15 +1874,76 @@ static void _rectangle_boundings(Enesim_Renderer *r,
 		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Rectangle *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+	double sw = 0;
 	double sx, sy;
 
 	thiz = _rectangle_get(r);
 
+	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		enesim_renderer_shape_stroke_weight_get(r, &sw);
+	switch (css->stroke.location)
+	{
+		case ENESIM_SHAPE_STROKE_CENTER:
+		sw /= 2.0;
+		break;
+
+		case ENESIM_SHAPE_STROKE_INSIDE:
+		sw = 0.0;
+		break;
+
+		case ENESIM_SHAPE_STROKE_OUTSIDE:
+		break;
+	}
+
 	enesim_renderer_scale_get(r, &sx, &sy);
-	boundings->x = thiz->current.x * sx;
-	boundings->y = thiz->current.y * sy;
-	boundings->w = thiz->current.width * sx;
-	boundings->h = thiz->current.height * sy;
+	boundings->x = (thiz->current.x * cs->sx) - sw;
+	boundings->y = (thiz->current.y * cs->sy) - sw;
+	boundings->w = (thiz->current.width * cs->sx) + sw;;
+	boundings->h = (thiz->current.height * cs->sy) + sw;
+
+	/* translate by the origin */
+	boundings->x += cs->ox;
+	boundings->y += cs->oy;
+	/* apply the geometry transformation */
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+
+		enesim_matrix_rectangle_transform(&cs->geometry_transformation, boundings, &q);
+		enesim_quad_rectangle_to(&q, boundings);
+	}
+}
+
+static void _rectangle_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings)
+{
+	Enesim_Rectangle oboundings;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+
+	_rectangle_boundings(r, states, sstates, &oboundings);
+	/* apply the inverse matrix */
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+		Enesim_Matrix m;
+
+		enesim_matrix_inverse(&cs->transformation, &m);
+		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
+		enesim_quad_rectangle_to(&q, &oboundings);
+		/* fix the antialias scaling */
+		boundings->x -= m.xx;
+		boundings->y -= m.yy;
+		boundings->w += m.xx;
+		boundings->h += m.yy;
+	}
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.w);
+	boundings->h = ceil(oboundings.h);
 }
 
 static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
@@ -2001,9 +2080,9 @@ static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 #if NEW_RENDERER
 	/* .boundings = 		*/ NULL, //_rectangle_boundings,
 #else
-	/* .boundings = 		*/ NULL, //_rectangle_boundings,
+	/* .boundings = 		*/ _rectangle_boundings,
 #endif
-	/* .destination_boundings = 	*/ NULL,
+	/* .destination_boundings = 	*/ _rectangle_destination_boundings,
 	/* .flags = 			*/ _rectangle_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
