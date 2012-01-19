@@ -279,30 +279,6 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 
 	return EINA_FALSE;
 }
-
-#if 0
-static Eina_Bool _enesim_renderer_destination_boundings_cb(Enesim_Renderer *r,
-		Enesim_Rectangle *area, Eina_Bool past, void *data)
-{
-	Enesim_Renderer_Destination_Damage_Data *ddata = data;
-	Eina_Rectangle real_area;
-
-	/* translate, scale, transform, whatever, and send the area back */
-	if (past)
-	{
-		_enesim_renderer_destination_boundings(r, ddata->flags,
-				&r->past, area, 0, 0, &real_area);
-	}
-	else
-	{
-		_enesim_renderer_destination_boundings(r, ddata->flags,
-				&r->current, area, 0, 0, &real_area);
-	}
-
-	return ddata->real_cb(r, &real_area, past, ddata->real_data);
-}
-#endif
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/

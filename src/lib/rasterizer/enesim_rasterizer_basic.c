@@ -89,12 +89,15 @@ static void _stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
 	int stroke = 0;
+	double sw;
+	int sww;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Enesim_F16p16_Edge *edges, *edge;
 	Enesim_F16p16_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	double ox, oy;
+	int lx = 1<<30, rx = -lx;
 
 	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
 			thiz->matrix.xz;
@@ -141,6 +144,8 @@ get_out:
 			edge->e = ((v->a * (long long int) xx) >> 16) +
 					((v->b * (long long int) yy) >> 16) +
 					v->c;
+			if (lx > xx0)  lx = xx0;
+			if (rx < xx1)  rx = xx1;
 			edge++;
 			nedges++;
 		}
@@ -149,6 +154,32 @@ get_out:
 	}
 	if (!nedges)
 		goto get_out;
+
+	lx = (lx >> 16) - 2 - x;
+	if (lx > 0)
+	{
+		memset(dst, 0, sizeof(unsigned int) * lx);
+		xx += lx * axx;
+		d += lx;
+		n = 0;  edge = edges;
+		while (n < nedges)
+		{
+			edge->e += lx * edge->de;
+			edge++;
+			n++;
+		}
+
+	}
+	else lx = 0;
+
+	rx = (rx >> 16) + 2 - x;
+	if (len > rx)
+	{
+		len -= rx;
+		memset(dst + rx, 0, sizeof(unsigned int) * len);
+		e -= len;
+	}
+	else rx = len;
 
 	enesim_renderer_shape_stroke_color_get(r, &scolor);
 	enesim_renderer_shape_fill_color_get(r, &fcolor);
@@ -161,9 +192,11 @@ get_out:
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
+		sww = 65536;
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
@@ -171,22 +204,35 @@ get_out:
 			Enesim_Renderer_Sw_Data *sdata;
 
 			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(fpaint, x, y, len, dst);
+			sdata->fill(fpaint, x + lx, y, rx - lx, dst + lx);
 		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
+		if (sw <= 0)
+		{
+			sww = 65536;
+			stroke = 0;
+		}
+		else
+			sww = sqrt(sw) * 65536;
 		if (fpaint)
 		{
 			Enesim_Renderer_Sw_Data *sdata;
 
 			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(fpaint, x, y, len, dst);
+			sdata->fill(fpaint, x + lx, y, rx - lx, dst + lx);
 		}
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
+		if (sw <= 0)
+		{
+			memset(d, 0, sizeof(unsigned int) * len);
+			return;
+		}
+		sww = sqrt(sw) * 65536;
 		fcolor = 0;
 		fpaint = NULL;
 		stroke = 1;
@@ -213,13 +259,13 @@ get_out:
 			if (ee < 0)
 				ee = -ee;
 
-			if ((ee < 65536) && ((xx + 0xffff) >= edge->xx0) && (xx
+			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) && (xx
 					<= (0xffff + edge->xx1)))
 			{
-				if (a < 16384)
-					a = 65536 - ee;
+				if (a < sww/4)
+					a = sww - ee;
 				else
-					a = (a + (65536 - ee)) / 2;
+					a = (a + (sww - ee)) / 2;
 			}
 
 			edge->e += edge->de;
@@ -246,7 +292,7 @@ get_out:
 					p0 = INTERP_65536(a, p0, q0);
 			}
 		}
-		else if (a)
+		if (a && !count)
 		{
 			p0 = scolor;
 			if (fpaint && !stroke)
@@ -275,12 +321,15 @@ static void _stroke_paint_fill_affine_simple(Enesim_Renderer *r, int x,
 	Enesim_Color scolor;
 	Enesim_Renderer *spaint;
 	Enesim_Renderer_Sw_Data *sdata;
+	double sw;
+	int sww;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Enesim_F16p16_Edge *edges, *edge;
 	Enesim_F16p16_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	double ox, oy;
+	int lx = 1<<30, rx = -lx;
 
 	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
 			thiz->matrix.xz;
@@ -327,6 +376,8 @@ get_out:
 			edge->e = ((v->a * (long long int) xx) >> 16) +
 					((v->b * (long long int) yy) >> 16) +
 					v->c;
+			if (lx > xx0)  lx = xx0;
+			if (rx < xx1)  rx = xx1;
 			edge++;
 			nedges++;
 		}
@@ -335,6 +386,32 @@ get_out:
 	}
 	if (!nedges)
 		goto get_out;
+
+	lx = (lx >> 16) - 2 - x;
+	if (lx > 0)
+	{
+		memset(dst, 0, sizeof(unsigned int) * lx);
+		xx += lx * axx;
+		d += lx;
+		n = 0;  edge = edges;
+		while (n < nedges)
+		{
+			edge->e += lx * edge->de;
+			edge++;
+			n++;
+		}
+
+	}
+	else lx = 0;
+
+	rx = (rx >> 16) + 2 - x;
+	if (len > rx)
+	{
+		len -= rx;
+		memset(dst + rx, 0, sizeof(unsigned int) * len);
+		e -= len;
+	}
+	else rx = len;
 
 	enesim_renderer_shape_stroke_color_get(r, &scolor);
 	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
@@ -347,12 +424,15 @@ get_out:
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sww = sqrt(sw) * 65536;
+
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		fcolor = 0;
 
 	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x, y, len, dst);
+	sdata->fill(spaint, x + lx, y, rx - lx, dst + lx);
 
 	while (d < e)
 	{
@@ -375,13 +455,13 @@ get_out:
 			if (ee < 0)
 				ee = -ee;
 
-			if ((ee < 65536) && ((xx + 0xffff) >= edge->xx0) && (xx
+			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) && (xx
 					<= (0xffff + edge->xx1)))
 			{
-				if (a < 16384)
-					a = 65536 - ee;
+				if (a < sww/4)
+					a = sww - ee;
 				else
-					a = (a + (65536 - ee)) / 2;
+					a = (a + (sww - ee)) / 2;
 			}
 
 			edge->e += edge->de;
@@ -404,7 +484,7 @@ get_out:
 					p0 = INTERP_65536(a, p0, q0);
 			}
 		}
-		else if (a)
+		if (a && !count)
 		{
 			p0 = *d;
 			if (scolor != 0xffffffff)
@@ -428,6 +508,8 @@ static void _stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint, *spaint;
+	double sw;
+	int sww;
 	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -435,6 +517,7 @@ static void _stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int x,
 	Enesim_F16p16_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	double ox, oy;
+	int lx = 1<<30, rx = -lx;
 
 	int axx = thiz->matrix.xx, axy = thiz->matrix.xy, axz =
 			thiz->matrix.xz;
@@ -482,6 +565,8 @@ get_out:
 			edge->e = ((v->a * (long long int) xx) >> 16) +
 					((v->b * (long long int) yy) >> 16) +
 					v->c;
+			if (lx > xx0)  lx = xx0;
+			if (rx < xx1)  rx = xx1;
 			edge++;
 			nedges++;
 		}
@@ -490,6 +575,32 @@ get_out:
 	}
 	if (!nedges)
 		goto get_out;
+
+	lx = (lx >> 16) - 2 - x;
+	if (lx > 0)
+	{
+		memset(dst, 0, sizeof(unsigned int) * lx);
+		xx += lx * axx;
+		d += lx;
+		n = 0;  edge = edges;
+		while (n < nedges)
+		{
+			edge->e += lx * edge->de;
+			edge++;
+			n++;
+		}
+
+	}
+	else lx = 0;
+
+	rx = (rx >> 16) + 2 - x;
+	if (len > rx)
+	{
+		len -= rx;
+		memset(dst + rx, 0, sizeof(unsigned int) * len);
+		e -= len;
+	}
+	else rx = len;
 
 	enesim_renderer_shape_stroke_color_get(r, &scolor);
 	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
@@ -503,13 +614,16 @@ get_out:
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sww = sqrt(sw) * 65536;
+
 	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(fpaint, x, y, len, dst);
+	sdata->fill(fpaint, x + lx, y, rx - lx, dst + lx);
 
 	sbuf = alloca(len * sizeof(unsigned int));
 	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x, y, len, sbuf);
-	s = sbuf;
+	sdata->fill(spaint, x + lx, y, rx - lx, sbuf + lx);
+	s = sbuf + lx;
 
 	while (d < e)
 	{
@@ -532,13 +646,13 @@ get_out:
 			if (ee < 0)
 				ee = -ee;
 
-			if ((ee < 65536) && ((xx + 0xffff) >= edge->xx0) && (xx
+			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) && (xx
 					<= (0xffff + edge->xx1)))
 			{
-				if (a < 16384)
-					a = 65536 - ee;
+				if (a < sww/4)
+					a = sww - ee;
 				else
-					a = (a + (65536 - ee)) / 2;
+					a = (a + (sww - ee)) / 2;
 			}
 
 			edge->e += edge->de;
@@ -564,7 +678,7 @@ get_out:
 					p0 = INTERP_65536(a, p0, q0);
 			}
 		}
-		else if (a)
+		if (a && !count)
 		{
 			p0 = *s;
 			if (scolor != 0xffffffff)
@@ -592,6 +706,8 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
 	int stroke = 0;
+	double sw;
+	int sww;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Enesim_F16p16_Edge *edges, *edge;
@@ -677,9 +793,11 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
+		sww = 65536;
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
@@ -693,6 +811,13 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
+		if (sw <= 0)
+		{
+			sww = 65536;
+			stroke = 0;
+		}
+		else
+			sww = sqrt(sw) * 65536;
 		if (fpaint)
 		{
 			Enesim_Renderer_Sw_Data *sdata;
@@ -703,6 +828,13 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
+		if (sw <= 0)
+		{
+			memset(d, 0, sizeof (unsigned int) * len);
+			return;
+		}
+
+		sww = sqrt(sw) * 65536;
 		fcolor = 0;
 		fpaint = NULL;
 		stroke = 1;
@@ -731,14 +863,14 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 				}
 				if (ee < 0)
 					ee = -ee;
-				if ((ee < 65536) &&
+				if ((ee < sww) &&
 						((xx + 0xffff) >= edge->xx0) &&
 						(xx <= (0xffff + edge->xx1)))
 				{
-					if (a < 16384)
-						a = 65536 - ee;
+					if (a < sww/4)
+						a = sww - ee;
 					else
-						a = (a + (65536 - ee)) / 2;
+						a = (a + (sww - ee)) / 2;
 				}
 			}
 
@@ -795,6 +927,8 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *spaint;
+	double sw;
+	int sww;
 	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -881,6 +1015,9 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sww = sqrt(sw) * 65536;
+
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		fcolor = 0;
@@ -911,14 +1048,14 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 				}
 				if (ee < 0)
 					ee = -ee;
-				if ((ee < 65536) &&
+				if ((ee < sww) &&
 						((xx + 0xffff) >= edge->xx0) &&
 						(xx <= (0xffff + edge->xx1)))
 				{
-					if (a < 16384)
-						a = 65536 - ee;
+					if (a < sww/4)
+						a = sww - ee;
 					else
-						a = (a + (65536 - ee)) / 2;
+						a = (a + (sww - ee)) / 2;
 				}
 			}
 
@@ -967,6 +1104,8 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint, *spaint;
+	double sw;
+	int sww;
 	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -1055,6 +1194,9 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sww = sqrt(sw) * 65536;
+
 	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 	sdata->fill(fpaint, x, y, len, dst);
 
@@ -1086,14 +1228,14 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 				}
 				if (ee < 0)
 					ee = -ee;
-				if ((ee < 65536) &&
+				if ((ee < sww) &&
 						((xx + 0xffff) >= edge->xx0) &&
 						(xx <= (0xffff + edge->xx1)))
 				{
-					if (a < 16384)
-						a = 65536 - ee;
+					if (a < sww/4)
+						a = sww - ee;
 					else
-						a = (a + (65536 - ee)) / 2;
+						a = (a + (sww - ee)) / 2;
 				}
 			}
 
@@ -1148,6 +1290,8 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint;
 	int stroke = 0;
+	double sw;
+	int sww;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	Enesim_F16p16_Edge *edges, *edge;
@@ -1209,9 +1353,12 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
+		sww = 65536;
 		scolor = fcolor;
 		stroke = 0;
 		if (fpaint)
@@ -1225,6 +1372,13 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		stroke = 1;
+		if (sw <= 0)
+		{
+			sww = 65536;
+			stroke = 0;
+		}
+		else
+			sww = sqrt(sw) * 65536;
 		if (fpaint)
 		{
 			Enesim_Renderer_Sw_Data *sdata;
@@ -1235,6 +1389,12 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	}
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
+		if (sw <= 0)
+		{
+			memset(d, 0, sizeof (unsigned int) * len);
+			return;
+		}
+		sww = sqrt(sw) * 65536;
 		fcolor = 0;
 		fpaint = NULL;
 		stroke = 1;
@@ -1270,14 +1430,14 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 					}
 					if (ee < 0)
 						ee = -ee;
-					if ((ee < 65536) &&
+					if ((ee < sww) &&
 							((sxx + 0xffff) >= edge->xx0) &&
 							(sxx <= (0xffff + edge->xx1)))
 					{
-						if (a < 16384)
-							a = 65536 - ee;
+						if (a < sww/4)
+							a = sww - ee;
 						else
-							a = (a + (65536 - ee)) / 2;
+							a = (a + (sww - ee)) / 2;
 					}
 				}
 				edge->e += edge->de;
@@ -1333,6 +1493,8 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *spaint;
+	double sw;
+	int sww;
 	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -1396,6 +1558,9 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sww = sqrt(sw) * 65536;
+
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		fcolor = 0;
@@ -1433,14 +1598,14 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 					}
 					if (ee < 0)
 						ee = -ee;
-					if ((ee < 65536) &&
+					if ((ee < sww) &&
 							((sxx + 0xffff) >= edge->xx0) &&
 							(sxx <= (0xffff + edge->xx1)))
 					{
-						if (a < 16384)
-							a = 65536 - ee;
+						if (a < sww/4)
+							a = sww - ee;
 						else
-							a = (a + (65536 - ee)) / 2;
+							a = (a + (sww - ee)) / 2;
 					}
 				}
 				edge->e += edge->de;
@@ -1489,6 +1654,8 @@ static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint, *spaint;
+	double sw;
+	int sww;
 	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
@@ -1554,6 +1721,9 @@ static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sww = sqrt(sw) * 65536;
+
 	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 	sdata->fill(fpaint, x, y, len, dst);
 
@@ -1592,14 +1762,14 @@ static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 					}
 					if (ee < 0)
 						ee = -ee;
-					if ((ee < 65536) &&
+					if ((ee < sww) &&
 							((sxx + 0xffff) >= edge->xx0) &&
 							(sxx <= (0xffff + edge->xx1)))
 					{
-						if (a < 16384)
-							a = 65536 - ee;
+						if (a < sww/4)
+							a = sww - ee;
 						else
-							a = (a + (65536 - ee)) / 2;
+							a = (a + (sww - ee)) / 2;
 					}
 				}
 				edge->e += edge->de;
@@ -1890,7 +2060,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		*fill = _stroke_fill_paint_affine;
 		if (&cs->transformation.yx == 0)
 			*fill = _stroke_fill_paint_affine_simple;
-		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		if ((sw > 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			Enesim_Renderer *fpaint;
 
@@ -1910,7 +2080,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	else
 	{
 		*fill = _stroke_fill_paint_proj;
-		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		if ((sw > 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			Enesim_Renderer *fpaint;
 

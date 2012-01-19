@@ -1685,60 +1685,66 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	double rad;
-	double sw;
-	double scaled_width;
-	double scaled_height;
-	double scaled_x;
-	double scaled_y;
+	double x;
+	double y;
+	double w;
+	double h;
 
 	thiz = _rectangle_get(r);
-	if (!thiz || (thiz->current.width < 1) || (thiz->current.height < 1))
+	if (!thiz)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "Invalid size %d %d", thiz->current.width, thiz->current.height);
 		return EINA_FALSE;
 	}
-	scaled_width = thiz->current.width * cs->sx;
-	scaled_height = thiz->current.height * cs->sy;
 
-	if ((scaled_width < 1) || (scaled_height < 1))
+	w = thiz->current.width * cs->sx;
+	h = thiz->current.height * cs->sy;
+	if ((w < 1) || (h < 1))
 	{
-		ENESIM_RENDERER_ERROR(r, error, "Invalid scaled size %d %d", scaled_width, scaled_height);
+		ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g", w, h);
 		return EINA_FALSE;
 	}
+
+	x = thiz->current.x * cs->sx;
+	y = thiz->current.y * cs->sy;
 
 	rad = thiz->current.corner.radius;
-	if (rad > (scaled_width / 2.0))
-		rad = scaled_width / 2.0;
-	if (rad > (scaled_height / 2.0))
-		rad = scaled_height / 2.0;
-
-	scaled_x = thiz->current.x * cs->sx;
-	scaled_y = thiz->current.y * cs->sy;
+	if (rad > (w / 2.0))
+		rad = w / 2.0;
+	if (rad > (h / 2.0))
+		rad = h / 2.0;
 
 	/* check if we should use the path approach */
 	if (_rectangle_use_path(cs->geometry_transformation_type))
 	{
-		/* FIXME in case of a stroked rectangle we need to convert the location of the stroke to center */
-#if 0
+		double sw;
+
+		sw = css->stroke.weight;
+		/* in case of a stroked rectangle we need to convert the location of the stroke to center */
 		if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 		{
 			switch (css->stroke.location)
 			{
 				case ENESIM_SHAPE_STROKE_OUTSIDE:
-				rad += css->stroke.weight / 2.0;
+				x -= sw / 2.0;
+				y -= sw / 2.0;
+				w += sw;
+				h += sw;
 				break;
 
 				case ENESIM_SHAPE_STROKE_INSIDE:
-				rad -= css->stroke.weight / 2.0;
+				x += sw / 2.0;
+				y += sw / 2.0;
+				w -= sw;
+				h -= sw;
 				break;
 
-				case ENESIM_SHAPE_STROKE_CENTER:
+				default:
 				break;
 			}
 		}
-#endif
-		_rectangle_path_setup(thiz, scaled_x, scaled_y, scaled_width, scaled_height, rad, states, sstates);
+		_rectangle_path_setup(thiz, x, y, w, h, rad, states, sstates);
 		if (!enesim_renderer_setup(thiz->path, s, error))
 		{
 			return EINA_FALSE;
@@ -1751,22 +1757,47 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	/* do our own setup */
 	else
 	{
-		/* the code from here is only meaningful for our own span functions */
-		thiz->ww = eina_f16p16_double_from(scaled_width);
-		thiz->hh = eina_f16p16_double_from(scaled_height);
+		double sw = css->stroke.weight;
 
-		thiz->xx = eina_f16p16_double_from(scaled_x);
-		thiz->yy = eina_f16p16_double_from(scaled_y);
+		if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		{
+			/* handle the different stroke locations */
+			switch (css->stroke.location)
+			{
+				case ENESIM_SHAPE_STROKE_CENTER:
+				x -= sw / 2.0;
+				y -= sw / 2.0;
+				w += sw;
+				h += sw;
+				break;
+
+				case ENESIM_SHAPE_STROKE_OUTSIDE:
+				x -= sw;
+				y -= sw;
+				w += sw * 2.0;
+				h += sw * 2.0;
+				break;
+
+				default:
+				break;
+			}
+		}
+
+		/* the code from here is only meaningful for our own span functions */
+		thiz->ww = eina_f16p16_double_from(w);
+		thiz->hh = eina_f16p16_double_from(h);
+
+		thiz->xx = eina_f16p16_double_from(x);
+		thiz->yy = eina_f16p16_double_from(y);
 
 		thiz->rr0 = eina_f16p16_double_from(rad);
 		thiz->lxx0 = thiz->rr0;
 		thiz->tyy0 = thiz->rr0;
-		thiz->rxx0 = eina_f16p16_double_from(scaled_width - rad - 1);
-		thiz->byy0 = eina_f16p16_double_from(scaled_height - rad - 1);
+		thiz->rxx0 = eina_f16p16_double_from(w - rad - 1);
+		thiz->byy0 = eina_f16p16_double_from(h - rad - 1);
 
-		enesim_renderer_shape_stroke_weight_get(r, &sw);
 		thiz->do_inner = 1;
-		if ((sw >= scaled_width / 2.0) || (sw >= scaled_height / 2.0))
+		if ((sw >= w / 2.0) || (sw >= h / 2.0))
 		{
 			sw = 0;
 			thiz->do_inner = 0;
@@ -1876,32 +1907,44 @@ static void _rectangle_boundings(Enesim_Renderer *r,
 	Enesim_Renderer_Rectangle *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	double sw = 0;
-	double sx, sy;
+	double x, y, w, h;
 
 	thiz = _rectangle_get(r);
 
+	/* first scale */
+	x = thiz->current.x * cs->sx;
+	y = thiz->current.y * cs->sy;
+	w = thiz->current.width * cs->sx;
+	h = thiz->current.height * cs->sy;
+	/* for the stroke location get the real width */
 	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
-		enesim_renderer_shape_stroke_weight_get(r, &sw);
-	switch (css->stroke.location)
 	{
-		case ENESIM_SHAPE_STROKE_CENTER:
-		sw /= 2.0;
-		break;
+		double sw = css->stroke.weight;
+		switch (css->stroke.location)
+		{
+			case ENESIM_SHAPE_STROKE_CENTER:
+			x -= sw / 2.0;
+			y -= sw / 2.0;
+			w += sw;
+			h += sw;
+			break;
 
-		case ENESIM_SHAPE_STROKE_INSIDE:
-		sw = 0.0;
-		break;
+			case ENESIM_SHAPE_STROKE_OUTSIDE:
+			x -= sw;
+			y -= sw;
+			w += sw * 2.0;
+			h += sw * 2.0;
+			break;
 
-		case ENESIM_SHAPE_STROKE_OUTSIDE:
-		break;
+			default:
+			break;
+		}
 	}
 
-	enesim_renderer_scale_get(r, &sx, &sy);
-	boundings->x = (thiz->current.x * cs->sx) - sw;
-	boundings->y = (thiz->current.y * cs->sy) - sw;
-	boundings->w = (thiz->current.width * cs->sx) + sw;;
-	boundings->h = (thiz->current.height * cs->sy) + sw;
+	boundings->x = x;
+	boundings->y = y;
+	boundings->w = w;
+	boundings->h = h;
 
 	/* translate by the origin */
 	boundings->x += cs->ox;

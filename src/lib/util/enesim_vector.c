@@ -18,7 +18,6 @@
 #include "Enesim.h"
 #include "enesim_private.h"
 #include "float.h"
-/* TODO whenever we append/prepend a new point, calculate the boundings */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -155,7 +154,7 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 {
 	Enesim_Point *last, *first;
 	Eina_List *l;
-	
+
 	/* check that the last point at thiz is not equal to the first point to merge */
 	l = eina_list_last(thiz->points);
 	last = eina_list_data_get(l);
@@ -166,6 +165,11 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 		free(first);
 	}
 	thiz->points = eina_list_merge(thiz->points, to_merge->points);
+	/* update the boundings */
+	if (to_merge->xmax > thiz->xmax) thiz->xmax = to_merge->xmax;
+	if (to_merge->ymax > thiz->ymax) thiz->ymax = to_merge->ymax;
+	if (to_merge->xmin < thiz->xmin) thiz->xmin = to_merge->xmin;
+	if (to_merge->ymin < thiz->ymin) thiz->ymin = to_merge->ymin;
 }
 
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
