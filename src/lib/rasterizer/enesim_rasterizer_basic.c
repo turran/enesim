@@ -2058,21 +2058,21 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	if (cs->transformation_type != ENESIM_MATRIX_PROJECTIVE)
 	{
 		*fill = _stroke_fill_paint_affine;
-		if (&cs->transformation.yx == 0)
+		if (cs->transformation.yx == 0)
 			*fill = _stroke_fill_paint_affine_simple;
 		if ((sw > 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			Enesim_Renderer *fpaint;
 
 			*fill = _stroke_paint_fill_affine;
-			if (&cs->transformation.yx == 0)
+			if (cs->transformation.yx == 0)
 				*fill = _stroke_paint_fill_affine_simple;
 
 			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 			{
 				*fill = _stroke_paint_fill_paint_affine;
-				if (&cs->transformation.yx == 0)
+				if (cs->transformation.yx == 0)
 					*fill = _stroke_paint_fill_paint_affine_simple;
 			}
 		}
