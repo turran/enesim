@@ -274,7 +274,7 @@ static void _image_boundings(Enesim_Renderer *r,
 
 static void _image_destination_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Eina_Rectangle *boundings)
 {
 	Enesim_Rectangle oboundings;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
