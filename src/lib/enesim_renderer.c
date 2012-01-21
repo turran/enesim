@@ -519,8 +519,6 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		default:
 		break;
 	}
-	enesim_renderer_boundings(r, &r->current_boundings);
-	enesim_renderer_destination_boundings(r, &r->current_destination_boundings, 0, 0);
 
 	return ret;
 }
@@ -547,8 +545,6 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	/* swap the states */
 	/* first stuff that needs to be freed */
 	r->past = r->current;
-	r->past_boundings = r->current_boundings;
-	r->past_destination_boundings = r->current_destination_boundings;
 	DBG("Cleaning up the renderer %s", r->name);
 }
 
@@ -997,6 +993,8 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 			goto end;
 		}
 	}
+	enesim_renderer_boundings(r, &r->current_boundings);
+	enesim_renderer_destination_boundings(r, &r->current_destination_boundings, 0, 0);
 	/* clip against the destination rectangle */
 	if (!eina_rectangle_intersection(&final, &r->current_destination_boundings))
 	{
@@ -1007,6 +1005,8 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	_draw_internal(r, s, &final, x, y, flags);
 
 	/* TODO set the format again */
+	r->past_boundings = r->current_boundings;
+	r->past_destination_boundings = r->current_destination_boundings;
 end:
 	enesim_renderer_cleanup(r, s);
 	return EINA_TRUE;
@@ -1039,6 +1039,8 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	if (!enesim_renderer_setup(r, s, error)) return EINA_FALSE;
 
 	_surface_boundings(s, &surface_size);
+	enesim_renderer_boundings(r, &r->current_boundings);
+	enesim_renderer_destination_boundings(r, &r->current_destination_boundings, 0, 0);
 	/* clip against the destination rectangle */
 	if (!eina_rectangle_intersection(&r->current_destination_boundings, &surface_size))
 	{
@@ -1049,6 +1051,8 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	_draw_list_internal(r, s, &r->current_destination_boundings, clips, x, y, flags);
 
 	/* TODO set the format again */
+	r->past_boundings = r->current_boundings;
+	r->past_destination_boundings = r->current_destination_boundings;
 end:
 	enesim_renderer_cleanup(r, s);
 	return EINA_TRUE;
