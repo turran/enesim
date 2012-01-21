@@ -83,7 +83,6 @@ static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned i
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
-	Eina_F16p16 *freq, *ampl, per;
 
 	thiz = _perlin_get(r);
 	/* end of state setup */
@@ -92,7 +91,6 @@ static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned i
 	while (dst < end)
 	{
 		Eina_F16p16 per;
-		uint32_t p0;
 		uint8_t c;
 
 		per = enesim_perlin_get(xx, yy, thiz->octaves, thiz->xfreq.coeff,

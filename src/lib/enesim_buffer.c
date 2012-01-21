@@ -186,8 +186,6 @@ EAPI void enesim_buffer_unref(Enesim_Buffer *b)
  */
 EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
 {
-	void *buffer_data;
-
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	return enesim_pool_data_get(b->pool, b->backend_data, b->format, b->w, b->h, data);
 }

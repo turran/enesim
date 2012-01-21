@@ -90,7 +90,7 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 
 	enesim_buffer_data_get(dst, &data);
 	/* FIXME check the stride too */
-	enesim_surface_data_get(s, &sdata, &stride);
+	enesim_surface_data_get(s, (void **)&sdata, &stride);
 	/* TODO check the clip and x, y */
 	converter(&data, clip->w, clip->h, sdata, clip->w, clip->h, stride);
 

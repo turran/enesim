@@ -186,7 +186,6 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, voi
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
-	int sy;
 	Eina_F16p16 yy, xx;
 
 	thiz = _grid_get(r);
@@ -209,7 +208,6 @@ static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len,
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
-	int sy;
 	Eina_F16p16 yy, xx, zz;
 
 	thiz = _grid_get(r);

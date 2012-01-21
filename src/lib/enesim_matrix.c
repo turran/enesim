@@ -120,7 +120,7 @@ EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double 
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_values_get(Enesim_Matrix *m, double *a, double *b, double *c,
+EAPI void enesim_matrix_values_get(const Enesim_Matrix *m, double *a, double *b, double *c,
 		double *d, double *e, double *f, double *g, double *h, double *i)
 {
 	if (a) *a = MATRIX_XX(m);
@@ -187,30 +187,30 @@ EAPI void enesim_matrix_point_transform(const Enesim_Matrix *m, double x, double
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_eina_rectangle_transform(Enesim_Matrix *m, Eina_Rectangle *r, Enesim_Quad *q)
+EAPI void enesim_matrix_eina_rectangle_transform(const Enesim_Matrix *m, const Eina_Rectangle *r, const Enesim_Quad *q)
 {
-	enesim_matrix_point_transform(m, r->x, r->y, &q->x0, &q->y0);
-	enesim_matrix_point_transform(m, r->x + r->w, r->y, &q->x1, &q->y1);
-	enesim_matrix_point_transform(m, r->x + r->w, r->y + r->h, &q->x2, &q->y2);
-	enesim_matrix_point_transform(m, r->x, r->y + r->h, &q->x3, &q->y3);
+	enesim_matrix_point_transform(m, r->x, r->y, &((Enesim_Quad *)q)->x0, &((Enesim_Quad *)q)->y0);
+	enesim_matrix_point_transform(m, r->x + r->w, r->y, &((Enesim_Quad *)q)->x1, &((Enesim_Quad *)q)->y1);
+	enesim_matrix_point_transform(m, r->x + r->w, r->y + r->h, &((Enesim_Quad *)q)->x2, &((Enesim_Quad *)q)->y2);
+	enesim_matrix_point_transform(m, r->x, r->y + r->h, &((Enesim_Quad *)q)->x3, &((Enesim_Quad *)q)->y3);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_rectangle_transform(Enesim_Matrix *m, Enesim_Rectangle *r, Enesim_Quad *q)
+EAPI void enesim_matrix_rectangle_transform(const Enesim_Matrix *m, const Enesim_Rectangle *r, const Enesim_Quad *q)
 {
-	enesim_matrix_point_transform(m, r->x, r->y, &q->x0, &q->y0);
-	enesim_matrix_point_transform(m, r->x + r->w, r->y, &q->x1, &q->y1);
-	enesim_matrix_point_transform(m, r->x + r->w, r->y + r->h, &q->x2, &q->y2);
-	enesim_matrix_point_transform(m, r->x, r->y + r->h, &q->x3, &q->y3);
+	enesim_matrix_point_transform(m, r->x, r->y, &((Enesim_Quad *)q)->x0, &((Enesim_Quad *)q)->y0);
+	enesim_matrix_point_transform(m, r->x + r->w, r->y, &((Enesim_Quad *)q)->x1, &((Enesim_Quad *)q)->y1);
+	enesim_matrix_point_transform(m, r->x + r->w, r->y + r->h, &((Enesim_Quad *)q)->x2, &((Enesim_Quad *)q)->y2);
+	enesim_matrix_point_transform(m, r->x, r->y + r->h, &((Enesim_Quad *)q)->x3, &((Enesim_Quad *)q)->y3);
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a)
+EAPI void enesim_matrix_adjoint(const Enesim_Matrix *m, Enesim_Matrix *a)
 {
 	double a11, a12, a13, a21, a22, a23, a31, a32, a33;
 
@@ -245,7 +245,7 @@ EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI double enesim_matrix_determinant(Enesim_Matrix *m)
+EAPI double enesim_matrix_determinant(const Enesim_Matrix *m)
 {
 	double det;
 
@@ -342,8 +342,8 @@ EAPI Eina_Bool enesim_matrix_is_equal(const Enesim_Matrix *m1, const Enesim_Matr
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_f16p16_matrix_compose(Enesim_F16p16_Matrix *m1,
-		Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst)
+EAPI void enesim_f16p16_matrix_compose(const Enesim_F16p16_Matrix *m1,
+		const Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst)
 {
 	Eina_F16p16 a11, a12, a13, a21, a22, a23, a31, a32, a33;
 
@@ -483,7 +483,7 @@ EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
+EAPI void enesim_quad_eina_rectangle_to(const Enesim_Quad *q,
 		Eina_Rectangle *r)
 {
 	double xmin, ymin, xmax, ymax;
@@ -515,7 +515,7 @@ EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
+EAPI void enesim_quad_rectangle_to(const Enesim_Quad *q,
 		Enesim_Rectangle *r)
 {
 	double xmin, ymin, xmax, ymax;
@@ -547,7 +547,7 @@ EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
  * FIXME: To be fixed
  */
 EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
-		Eina_Rectangle *r)
+		const Eina_Rectangle *r)
 {
 	QUAD_X0(q) = r->x;
 	QUAD_Y0(q) = r->y;
@@ -562,7 +562,7 @@ EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_coords_get(Enesim_Quad *q, double *x1, double *y1,
+EAPI void enesim_quad_coords_get(const Enesim_Quad *q, double *x1, double *y1,
 		double *x2, double *y2, double *x3, double *y3, double *x4,
 		double *y4)
 {
@@ -597,7 +597,7 @@ EAPI void enesim_quad_coords_set(Enesim_Quad *q, double x1,
  * FIXME: To be fixed
  */
 EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m,
-		Enesim_Quad *q)
+		const Enesim_Quad *q)
 {
 	double ex = QUAD_X0(q) - QUAD_X1(q) + QUAD_X2(q) - QUAD_X3(q); // x0 - x1 + x2 - x3
 	double ey = QUAD_Y0(q) - QUAD_Y1(q) + QUAD_Y2(q) - QUAD_Y3(q); // y0 - y1 + y2 - y3
@@ -649,7 +649,7 @@ EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m,
  * FIXME: To be fixed
  */
 EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m,
-		Enesim_Quad *q)
+		const Enesim_Quad *q)
 {
 	Enesim_Matrix tmp;
 
@@ -670,7 +670,7 @@ EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m,
  * Creates a projective matrix that maps a quadrangle to a quadrangle
  */
 EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m,
-		Enesim_Quad *src, Enesim_Quad *dst)
+		const Enesim_Quad *src, const Enesim_Quad *dst)
 {
 	Enesim_Matrix tmp;
 

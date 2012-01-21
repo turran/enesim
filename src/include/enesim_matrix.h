@@ -62,7 +62,7 @@ typedef struct _Enesim_Quad
 EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m);
 EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double c,
 		double d, double e, double f, double g, double h, double i);
-EAPI void enesim_matrix_values_get(Enesim_Matrix *m, double *a, double *b,
+EAPI void enesim_matrix_values_get(const Enesim_Matrix *m, double *a, double *b,
 		double *c, double *d, double *e, double *f, double *g, double *h,
 		double *i);
 EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
@@ -79,32 +79,32 @@ EAPI void enesim_matrix_scale(Enesim_Matrix *t, double sx, double sy);
 EAPI void enesim_matrix_rotate(Enesim_Matrix *t, double rad);
 EAPI void enesim_matrix_identity(Enesim_Matrix *t);
 
-EAPI double enesim_matrix_determinant(Enesim_Matrix *m);
+EAPI double enesim_matrix_determinant(const Enesim_Matrix *m);
 EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar);
 EAPI void enesim_matrix_inverse(const Enesim_Matrix *m, Enesim_Matrix *m2);
-EAPI void enesim_matrix_adjoint(Enesim_Matrix *m, Enesim_Matrix *a);
+EAPI void enesim_matrix_adjoint(const Enesim_Matrix *m, Enesim_Matrix *a);
 
 EAPI void enesim_matrix_point_transform(const Enesim_Matrix *m, double x, double y, double *xr, double *yr);
-EAPI void enesim_matrix_eina_rectangle_transform(Enesim_Matrix *m, Eina_Rectangle *r, Enesim_Quad *q);
-EAPI void enesim_matrix_rectangle_transform(Enesim_Matrix *m, Enesim_Rectangle *r, Enesim_Quad *q);
+EAPI void enesim_matrix_eina_rectangle_transform(const Enesim_Matrix *m, const Eina_Rectangle *r, const Enesim_Quad *q);
+EAPI void enesim_matrix_rectangle_transform(const Enesim_Matrix *m, const Enesim_Rectangle *r, const Enesim_Quad *q);
 
-EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m, Enesim_Quad *src, Enesim_Quad *dst);
-EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m, Enesim_Quad *q);
-EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m, Enesim_Quad *q);
+EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m, const Enesim_Quad *src, const Enesim_Quad *dst);
+EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m, const Enesim_Quad *q);
+EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m, const Enesim_Quad *q);
 
-EAPI void enesim_f16p16_matrix_compose(Enesim_F16p16_Matrix *m1,
-		Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
+EAPI void enesim_f16p16_matrix_compose(const Enesim_F16p16_Matrix *m1,
+		const Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
 EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix *m);
 
-EAPI void enesim_quad_rectangle_to(Enesim_Quad *q,
+EAPI void enesim_quad_rectangle_to(const Enesim_Quad *q,
 		Enesim_Rectangle *r);
-EAPI void enesim_quad_eina_rectangle_to(Enesim_Quad *q,
+EAPI void enesim_quad_eina_rectangle_to(const Enesim_Quad *q,
 		Eina_Rectangle *r);
 EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
-		Eina_Rectangle *r);
+		const Eina_Rectangle *r);
 EAPI void enesim_quad_coords_set(Enesim_Quad *q, double x1, double y1, double x2,
 		double y2, double x3, double y3, double x4, double y4);
-EAPI void enesim_quad_coords_get(Enesim_Quad *q, double *x1, double *y1,
+EAPI void enesim_quad_coords_get(const Enesim_Quad *q, double *x1, double *y1,
 		double *x2, double *y2, double *x3, double *y3, double *x4,
 		double *y4);
 /**

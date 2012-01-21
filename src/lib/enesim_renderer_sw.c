@@ -289,7 +289,7 @@ static void * _thread_run(void *data)
 }
 
 static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
-		uint32_t *ddata, size_t stride,
+		uint8_t *ddata, size_t stride,
 		Enesim_Format dfmt,
 		Enesim_Renderer_Flag flags)
 {

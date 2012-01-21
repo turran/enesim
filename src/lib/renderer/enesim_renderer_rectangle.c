@@ -1333,7 +1333,6 @@ static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy, zz;
-	int fill_only = 0;
 	char bl = thiz->current.corner.bl, br = thiz->current.corner.br, tl = thiz->current.corner.tl, tr = thiz->current.corner.tr;
 
 	enesim_renderer_shape_stroke_color_get(r, &ocolor);

@@ -209,8 +209,6 @@ static void _bifig_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x, in
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
-
-	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -306,7 +304,7 @@ get_out:
 						q0 = MUL4_SYM(fcolor, q0);
 				}
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);	
+					q0 = MUL_A_65536(ua, q0);
 			}
 
 			if (oa < 65536)
@@ -346,8 +344,6 @@ static void _bifig_stroke_paint_fill_affine_simple(Enesim_Renderer *r, int x, in
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
-
-	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -430,7 +426,7 @@ get_out:
 			{
 				q0 = fcolor;
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);	
+					q0 = MUL_A_65536(ua, q0);
 			}
 
 			if (oa < 65536)
@@ -461,8 +457,6 @@ static void _bifig_stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
-
-	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -558,7 +552,7 @@ get_out:
 				if (fcolor != 0xffffffff)
 					q0 = MUL4_SYM(fcolor, q0);
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);	
+					q0 = MUL_A_65536(ua, q0);
 			}
 
 			if (oa < 65536)
@@ -822,7 +816,6 @@ static void _bifigure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 static void _bifigure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
-	Enesim_Rectangle fboundings;
 
 	thiz = _bifigure_get(r);
 
@@ -871,7 +864,7 @@ void enesim_rasterizer_bifigure_over_figure_set(Enesim_Renderer *r, const Enesim
 	Enesim_Rasterizer_BiFigure *thiz;
 
 	thiz = _bifigure_get(r);
-	thiz->over_figure = figure;
+	thiz->over_figure = (Enesim_Figure *)figure;
 	if (figure && !thiz->over)
 		thiz->over = enesim_rasterizer_basic_new();
 	thiz->changed = EINA_TRUE;
