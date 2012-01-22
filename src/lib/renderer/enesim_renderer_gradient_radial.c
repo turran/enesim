@@ -121,21 +121,30 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	double cx, cy, rx, ry;
 
 	thiz = _radial_get(r);
+	cx = thiz->center.x;
+	cy = thiz->center.y;
+	rx = thiz->radius.x;
+	ry = thiz->radius.y;
+
+	/* TODO calculate the transformed coordinates */
 	/* TODO check that the radius are positive */
-	if (thiz->radius.x > thiz->radius.y)
+	if (rx > ry)
 	{
-		_get_focis(thiz->center.x, thiz->center.y, thiz->radius.x,
-				thiz->radius.y, &thiz->f1.x, &thiz->f1.y,
+		_get_focis(cx, cy, rx, ry,
+				&thiz->f1.x, &thiz->f1.y,
 				&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
 	}
 	else
 	{
-		_get_focis(thiz->center.y, thiz->center.x, thiz->radius.y,
-				thiz->radius.x, &thiz->f1.y, &thiz->f1.x,
+		_get_focis(cy, cx, ry, rx,
+				&thiz->f1.y, &thiz->f1.x,
 				&thiz->f2.y, &thiz->f2.x, &thiz->min, &thiz->max);
 	}
+
 	//printf("generating span for = %g (%g %g)\n", thiz->max - thiz->min, thiz->max, thiz->min);
 	return EINA_TRUE;
 }

@@ -127,47 +127,38 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	Eina_F16p16 x0, x1, y0, y1;
+	double x0, x1, y0, y1;
+	Eina_F16p16 xx0, xx1, yy0, yy1;
 	Eina_F16p16 f;
 
 	thiz = _linear_get(r);
-#define MATRIX 0
-	x0 = eina_f16p16_double_from(thiz->current.x0);
-	x1 = eina_f16p16_double_from(thiz->current.x1);
-	y0 = eina_f16p16_double_from(thiz->current.y0);
-	y1 = eina_f16p16_double_from(thiz->current.y1);
 
-#if MATRIX
-	f = eina_f16p16_mul(r->matrix.values.xx, r->matrix.values.yy) -
-			eina_f16p16_mul(r->matrix.values.xy, r->matrix.values.yx);
-	/* TODO check that (xx * yy) - (xy * yx) < epsilon */
-	f = ((int64_t)f << 16) / 65536;
-	/* apply the transformation on each point */
-	thiz->fx0 = eina_f16p16_mul(r->matrix.values.yy, x0) -
-			eina_f16p16_mul(eina_f16p16_mul(r->matrix.values.xy, y0), f) -
-			r->matrix.values.xz;
-	thiz->fx1 = eina_f16p16_mul(r->matrix.values.yy, x1) -
-			eina_f16p16_mul(eina_f16p16_mul(r->matrix.values.xy, y1), f) -
-			r->matrix.values.xz;
-	thiz->fy0 = eina_f16p16_mul(r->matrix.values.yx, x0) -
-			eina_f16p16_mul(eina_f16p16_mul(r->matrix.values.xx, y0), f) -
-			r->matrix.values.yz;
-	thiz->fy1 = eina_f16p16_mul(r->matrix.values.yx, x1) -
-			eina_f16p16_mul(eina_f16p16_mul(r->matrix.values.xx, y1), f) -
-			r->matrix.values.yz;
-	/* get the length of the transformed points */
-	x0 = thiz->fx1 - thiz->fx0;
-	y0 = thiz->fy1 - thiz->fy0;
-#else
-	x0 = x1 - x0;
-	y0 = y1 - y0;
+	x0 = thiz->current.x0;
+	x1 = thiz->current.x1;
+	y0 = thiz->current.y0;
+	y1 = thiz->current.y1;
+	/* TODO handle the geometry transformation */
+#if 0
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		const Enesim_Matrix *gm = &cs->geometry_transformation;
+		enesim_matrix_point_transform(gm, x0, y0, &x0, &y0);
+		enesim_matrix_point_transform(gm, x1, y1, &x1, &y1);
+	}
 #endif
+	xx0 = eina_f16p16_double_from(x0);
+	xx1 = eina_f16p16_double_from(x1);
+	yy0 = eina_f16p16_double_from(y0);
+	yy1 = eina_f16p16_double_from(y1);
+
+	xx0 = xx1 - xx0;
+	yy0 = yy1 - yy0;
 
 	/* we need to use floats because of the limitation of 16.16 values */
-	f = eina_f16p16_double_from(hypot(eina_f16p16_double_to(x0), eina_f16p16_double_to(y0)));
+	f = eina_f16p16_double_from(hypot(eina_f16p16_double_to(xx0), eina_f16p16_double_to(yy0)));
 	f += 32768;
-	thiz->ayx = ((int64_t)x0 << 16) / f;
-	thiz->ayy = ((int64_t)y0 << 16) / f;
+	thiz->ayx = ((int64_t)xx0 << 16) / f;
+	thiz->ayy = ((int64_t)yy0 << 16) / f;
 	/* TODO check that the difference between x0 - x1 and y0 - y1 is
 	 * < tolerance
 	 */
