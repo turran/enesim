@@ -70,7 +70,7 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _compound_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
@@ -116,7 +116,7 @@ static void _span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddat
 	}
 }
 
-static void _span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _compound_span_only_fill(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
@@ -217,11 +217,11 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	}
 	if (only_fill)
 	{
-		*fill = _span_only_fill;
+		*fill = _compound_span_only_fill;
 	}
 	else
 	{
-		*fill = _span;
+		*fill = _compound_span;
 	}
 
 	return EINA_TRUE;

@@ -646,7 +646,6 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	Enesim_Rectangle boundings;
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint, *fpaint;
 	Enesim_Color color, scolor, fcolor;
@@ -782,9 +781,34 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			}
 		}
 	}
-	enesim_renderer_boundings(r, &boundings);
-	thiz->tyy = boundings.y;
-	thiz->byy = boundings.y + boundings.h;
+	/* do our own internal boundings */
+	/* FIXME this tyy and byy in theory should be the same as the max/min of the under/over
+	 * bounds, why do we need a double check on the span function? rendering only on the bounding
+	 * box is something that is controlled on the path, i.e the renderer that *uses* this internal
+	 * renderer */
+	if (thiz->under && thiz->over)
+	{
+		double uxmin, xmin;
+		double uymin, ymin;
+		double uxmax, xmax;
+		double uymax, ymax;
+
+		enesim_figure_boundings(thiz->under_figure, &uxmin, &uymin, &uxmax, &uymax);
+		enesim_figure_boundings(thiz->over_figure, &xmin, &ymin, &xmax, &ymax);
+
+		if (uxmin < xmin)
+			xmin = uxmin;
+		if (uymin < ymin)
+			ymin = uymin;
+		if (uxmax > xmax)
+			xmax = uxmax;
+		if (uymax > ymax)
+			ymax = uymax;
+
+		thiz->tyy = eina_f16p16_double_from(ymin);
+		thiz->byy = eina_f16p16_double_from(ymax);
+	}
+	
 
 	return EINA_TRUE;
 }
@@ -808,31 +832,6 @@ static void _bifigure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
 			ENESIM_SHAPE_FLAG_FILL_RENDERER;
-}
-
-/* FIXME this is incomplete for now, but is easier to do the calcs with
- * l,t,r,b than x,y + w,h
- */
-static void _bifigure_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
-{
-	Enesim_Rasterizer_BiFigure *thiz;
-
-	thiz = _bifigure_get(r);
-
-	boundings->x = 0;
-	boundings->y = 0;
-	boundings->w = 0;
-	boundings->h = 0;
-	if (thiz->under)
-	{
-		enesim_renderer_boundings(thiz->under, boundings);
-	}
-	if (thiz->over)
-	{
-		Enesim_Rectangle oboundings;
-		enesim_renderer_boundings(thiz->under, &oboundings);
-		/* FIXME get the biggest */
-	}
 }
 
 static Enesim_Rasterizer_Descriptor _descriptor = {

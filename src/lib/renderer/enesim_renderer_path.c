@@ -106,7 +106,7 @@ typedef struct _Enesim_Renderer_Path
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Path;
 
-static inline Enesim_Renderer_Path * _enesim_path_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -492,7 +492,7 @@ static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 /*----------------------------------------------------------------------------*
  *                                 Commands                                   *
  *----------------------------------------------------------------------------*/
-static void _enesim_move_to(Enesim_Renderer_Command_State *state,
+static void _move_to(Enesim_Renderer_Command_State *state,
 		double x, double y)
 {
 	/* we have to reset the curve state too */
@@ -505,12 +505,12 @@ static void _enesim_move_to(Enesim_Renderer_Command_State *state,
 	state->vertex_add(x, y, state->data);
 }
 
-static void _enesim_close(Enesim_Renderer_Command_State *state, Eina_Bool close)
+static void _close(Enesim_Renderer_Command_State *state, Eina_Bool close)
 {
 	state->polygon_close(close, state->data);
 }
 
-static void _enesim_path_generate_vertices(Eina_List *commands,
+static void _path_generate_vertices(Eina_List *commands,
 		Enesim_Curve_Vertex_Add vertex_add,
 		Enesim_Renderer_Path_Polygon_Add polygon_add,
 		Enesim_Renderer_Path_Polygon_Close polygon_close,
@@ -555,7 +555,7 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			_enesim_move_to(&state, x, y);
+			_move_to(&state, x, y);
 			break;
 
 			case ENESIM_COMMAND_LINE_TO:
@@ -642,7 +642,7 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 			break;
 
 			case ENESIM_COMMAND_CLOSE:
-			_enesim_close(&state, cmd->definition.close.close);
+			_close(&state, cmd->definition.close.close);
 			break;
 
 			default:
@@ -654,11 +654,11 @@ static void _enesim_path_generate_vertices(Eina_List *commands,
 		state.path_done(state.data);
 }
 
-static void _enesim_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _path_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _enesim_path_get(r);
+	thiz = _path_get(r);
 	thiz->fill(thiz->bifigure, x, y, len, ddata);
 }
 
@@ -705,7 +705,7 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 		st.rx = sw * geometry_transformation->xx / 2.0;
 		st.ry = sw * geometry_transformation->yy / 2.0;
 
-		_enesim_path_generate_vertices(thiz->commands, _stroke_path_vertex_add,
+		_path_generate_vertices(thiz->commands, _stroke_path_vertex_add,
 				_stroke_path_polygon_add,
 				_stroke_path_polygon_close,
 				_stroke_path_done,
@@ -721,7 +721,7 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 
 		st.fill_figure = thiz->fill_figure;
 
-		_enesim_path_generate_vertices(thiz->commands, _strokeless_path_vertex_add,
+		_path_generate_vertices(thiz->commands, _strokeless_path_vertex_add,
 				_strokeless_path_polygon_add,
 				_strokeless_path_polygon_close,
 				NULL,
@@ -751,7 +751,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	const Enesim_Renderer_State *ps = states[ENESIM_STATE_PAST];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
-	thiz = _enesim_path_get(r);
+	thiz = _path_get(r);
 
 	/* TODO in the future the generation of polygons might depend also on the geometric matrix used */
 	/* generate the list of points/polygons */
@@ -784,7 +784,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	{
 		return EINA_FALSE;
 	}
-	*fill = _enesim_span;
+	*fill = _path_span;
 
 	return EINA_TRUE;
 }
@@ -793,7 +793,7 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _enesim_path_get(r);
+	thiz = _path_get(r);
 	enesim_renderer_cleanup(thiz->bifigure, s);
 	thiz->changed = EINA_FALSE;
 }
@@ -822,7 +822,7 @@ static void _path_boundings(Enesim_Renderer *r,
 	double xmax;
 	double ymax;
 
-	thiz = _enesim_path_get(r);
+	thiz = _path_get(r);
 	if (_path_needs_generate(thiz, &cs->geometry_transformation, &ps->geometry_transformation))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
@@ -868,7 +868,7 @@ static void _path_destination_boundings(Enesim_Renderer *r,
 	Enesim_Rectangle oboundings;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
-	thiz = _enesim_path_get(r);
+	thiz = _path_get(r);
 
 	_path_boundings(r, states, sstates, &oboundings);
 	if (oboundings.w == 0 && oboundings.h == 0)
@@ -892,10 +892,10 @@ static void _path_destination_boundings(Enesim_Renderer *r,
 		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
 		enesim_quad_rectangle_to(&q, &oboundings);
 		/* fix the antialias scaling */
-		boundings->x -= m.xx;
-		boundings->y -= m.yy;
-		boundings->w += m.xx;
-		boundings->h += m.yy;
+		oboundings.x -= m.xx;
+		oboundings.y -= m.yy;
+		oboundings.w += m.xx;
+		oboundings.h += m.yy;
 	}
 	boundings->x = floor(oboundings.x);
 	boundings->y = floor(oboundings.y);
@@ -913,7 +913,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
- 	thiz = _enesim_path_get(r);
+ 	thiz = _path_get(r);
 
 	/*
 	 * On the gl version use the tesselator to generate the triangles and pass them
@@ -998,7 +998,7 @@ static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s
 	Enesim_Renderer_OpenGL_Data *rdata;
 	int final_color;
 
- 	thiz = _enesim_path_get(r);
+ 	thiz = _path_get(r);
 
 	return EINA_TRUE;
 }
@@ -1007,7 +1007,7 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
 
- 	thiz = _enesim_path_get(r);
+ 	thiz = _path_get(r);
 }
 #endif
 
@@ -1077,7 +1077,7 @@ EAPI void enesim_renderer_path_command_clear(Enesim_Renderer *r)
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_Command *c;
 
-	thiz = _enesim_path_get(r);
+	thiz = _path_get(r);
 	EINA_LIST_FREE(thiz->commands, c)
 	{
 		free(c);
@@ -1093,7 +1093,7 @@ EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Renderer_P
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_Command *new_command;
 
-	thiz = _enesim_path_get(r);
+	thiz = _path_get(r);
 
 	new_command = malloc(sizeof(Enesim_Renderer_Path_Command));
 	*new_command = *cmd;

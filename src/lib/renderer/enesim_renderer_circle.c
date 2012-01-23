@@ -539,10 +539,10 @@ static void _circle_destination_boundings(Enesim_Renderer *r,
 		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
 		enesim_quad_rectangle_to(&q, &oboundings);
 		/* fix the antialias scaling */
-		boundings->x -= m.xx;
-		boundings->y -= m.yy;
-		boundings->w += m.xx;
-		boundings->h += m.yy;
+		oboundings.x -= m.xx;
+		oboundings.y -= m.yy;
+		oboundings.w += m.xx;
+		oboundings.h += m.yy;
 	}
 	boundings->x = floor(oboundings.x);
 	boundings->y = floor(oboundings.y);
