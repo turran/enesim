@@ -28,7 +28,7 @@ static void _curve_cubic_to(Enesim_Curve_State *state,
 {
 	double x0, y0, x01, y01, x23, y23;
 	double xa, ya, xb, yb, xc, yc;
-	double sm = 1 / 64.0;
+	double sm = 1 / 32.0;
 
 	x0 = state->last_x;
 	y0 = state->last_y;
@@ -78,7 +78,7 @@ static void _curve_quadratic_to(Enesim_Curve_State *state,
 		double x, double y)
 {
 	double x0, y0, x1, y1, x01, y01;
-	double sm = 1 / 92.0;
+	double sm = 1 / 64.0;
 
 	/* TODO should we check here that the x,y == ctrl_x, ctrl_y? or on the caller */
 	x0 = state->last_x;

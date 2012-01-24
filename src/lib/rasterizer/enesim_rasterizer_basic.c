@@ -121,21 +121,24 @@ get_out:
 	edge = edges;
 	while (n < nvectors)
 	{
-		int xx0 = v->xx0, xx1 = v->xx1;
 		int yy0 = v->yy0, yy1 = v->yy1;
 
-		if (xx1 < xx0)
-		{
-			xx0 = xx1;
-			xx1 = v->xx0;
-		}
 		if (yy1 < yy0)
 		{
 			yy0 = yy1;
 			yy1 = v->yy0;
 		}
-		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff))))
+		if (yy + 0xffff < yy0)
+			break;
+		if (((yy + 0xffff) >= yy0) & (yy <= (yy1 + 0xffff)))
 		{
+			int xx0 = v->xx0, xx1 = v->xx1;
+
+			if (xx1 < xx0)
+			{
+				xx0 = xx1;
+				xx1 = v->xx0;
+			}
 			edge->xx0 = xx0;
 			edge->xx1 = xx1;
 			edge->yy0 = yy0;
@@ -168,7 +171,6 @@ get_out:
 			edge++;
 			n++;
 		}
-
 	}
 	else lx = 0;
 
@@ -250,7 +252,7 @@ get_out:
 		{
 			int ee = edge->e;
 
-			if ((yy >= edge->yy0) && (yy < edge->yy1))
+			if ((yy >= edge->yy0) & (yy < edge->yy1))
 			{
 				count++;
 				if (ee < 0)
@@ -259,7 +261,7 @@ get_out:
 			if (ee < 0)
 				ee = -ee;
 
-			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) && (xx
+			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) & (xx
 					<= (0xffff + edge->xx1)))
 			{
 				if (a < sww/4)
@@ -353,21 +355,24 @@ get_out:
 	edge = edges;
 	while (n < nvectors)
 	{
-		int xx0 = v->xx0, xx1 = v->xx1;
 		int yy0 = v->yy0, yy1 = v->yy1;
 
-		if (xx1 < xx0)
-		{
-			xx0 = xx1;
-			xx1 = v->xx0;
-		}
 		if (yy1 < yy0)
 		{
 			yy0 = yy1;
 			yy1 = v->yy0;
 		}
-		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff))))
+		if (yy + 0xffff < yy0)
+			break;
+		if (((yy + 0xffff) >= yy0) & (yy <= (yy1 + 0xffff)))
 		{
+			int xx0 = v->xx0, xx1 = v->xx1;
+
+			if (xx1 < xx0)
+			{
+				xx0 = xx1;
+				xx1 = v->xx0;
+			}
 			edge->xx0 = xx0;
 			edge->xx1 = xx1;
 			edge->yy0 = yy0;
@@ -400,7 +405,6 @@ get_out:
 			edge++;
 			n++;
 		}
-
 	}
 	else lx = 0;
 
@@ -446,7 +450,7 @@ get_out:
 		{
 			int ee = edge->e;
 
-			if ((yy >= edge->yy0) && (yy < edge->yy1))
+			if ((yy >= edge->yy0) & (yy < edge->yy1))
 			{
 				count++;
 				if (ee < 0)
@@ -455,7 +459,7 @@ get_out:
 			if (ee < 0)
 				ee = -ee;
 
-			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) && (xx
+			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) & (xx
 					<= (0xffff + edge->xx1)))
 			{
 				if (a < sww/4)
@@ -542,21 +546,24 @@ get_out:
 	edge = edges;
 	while (n < nvectors)
 	{
-		int xx0 = v->xx0, xx1 = v->xx1;
 		int yy0 = v->yy0, yy1 = v->yy1;
 
-		if (xx1 < xx0)
-		{
-			xx0 = xx1;
-			xx1 = v->xx0;
-		}
 		if (yy1 < yy0)
 		{
 			yy0 = yy1;
 			yy1 = v->yy0;
 		}
-		if ((((yy + 0xffff)) >= (yy0)) && ((yy) <= ((yy1 + 0xffff))))
+		if (yy + 0xffff < yy0)
+			break;
+		if (((yy + 0xffff) >= yy0) & (yy <= (yy1 + 0xffff)))
 		{
+			int xx0 = v->xx0, xx1 = v->xx1;
+
+			if (xx1 < xx0)
+			{
+				xx0 = xx1;
+				xx1 = v->xx0;
+			}
 			edge->xx0 = xx0;
 			edge->xx1 = xx1;
 			edge->yy0 = yy0;
@@ -589,7 +596,6 @@ get_out:
 			edge++;
 			n++;
 		}
-
 	}
 	else lx = 0;
 
@@ -620,10 +626,10 @@ get_out:
 	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
 	sdata->fill(fpaint, x + lx, y, rx - lx, dst + lx);
 
-	sbuf = alloca(len * sizeof(unsigned int));
+	sbuf = alloca((rx - lx) * sizeof(unsigned int));
 	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x + lx, y, rx - lx, sbuf + lx);
-	s = sbuf + lx;
+	sdata->fill(spaint, x + lx, y, rx - lx, sbuf);
+	s = sbuf;
 
 	while (d < e)
 	{
@@ -637,7 +643,7 @@ get_out:
 		{
 			int ee = edge->e;
 
-			if ((yy >= edge->yy0) && (yy < edge->yy1))
+			if ((yy >= edge->yy0) & (yy < edge->yy1))
 			{
 				count++;
 				if (ee < 0)
@@ -646,7 +652,7 @@ get_out:
 			if (ee < 0)
 				ee = -ee;
 
-			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) && (xx
+			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) & (xx
 					<= (0xffff + edge->xx1)))
 			{
 				if (a < sww/4)
@@ -1838,6 +1844,24 @@ static void _basic_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
 	thiz->changed = EINA_TRUE;
 }
 
+static int _tysort(void *l, void *r)
+{
+	Enesim_F16p16_Vector *lv = (Enesim_F16p16_Vector *)l;
+	Enesim_F16p16_Vector *rv = (Enesim_F16p16_Vector *)r;
+	int lyy, ryy;
+
+	lyy = lv->yy0;
+	if (lyy > lv->yy1)
+		lyy = lv->yy1;
+	ryy = rv->yy0;
+	if (ryy > rv->yy1)
+		ryy = rv->yy1;
+	if (lyy <= ryy)
+		return -1;
+	return 1;
+}
+
+
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
@@ -2020,7 +2044,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 					ENESIM_RENDERER_ERROR(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/256.0, x0, y0, x1, y1);
 					return EINA_FALSE;
 				}
-				len *= 1 + (1 / 16.0);
+				len *= 1 + (1 / 32.0);
 				vec->a = -(y01 * 65536) / len;
 				vec->b = (x01 * 65536) / len;
 				vec->c = (65536 * ((y1 * x0) - (x1 * y0)))
@@ -2047,6 +2071,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 
 			}
 		}
+		qsort(thiz->vectors, thiz->nvectors, sizeof(Enesim_F16p16_Vector), _tysort);
 		thiz->changed = EINA_FALSE;
 	}
 
