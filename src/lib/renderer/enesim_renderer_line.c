@@ -84,7 +84,8 @@ static void _line_setup(Enesim_F16p16_Line *l, Enesim_Point *p0, double vx, doub
 	l->c = eina_f16p16_double_from(line.c /= len);
 }
 
-static uint32_t _butt_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
+static inline uint32_t _butt_line(Eina_F16p16 rr, Eina_F16p16 e01,
+		Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
 		Enesim_Renderer *srend, Enesim_Color scolor, uint32_t *d)
 {
 	uint32_t p0 = 0;
@@ -118,7 +119,8 @@ static uint32_t _butt_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, 
 	return p0;
 }
 
-static uint32_t _square_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
+static inline uint32_t _square_line(Eina_F16p16 rr, Eina_F16p16 e01,
+		Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
 		Enesim_Renderer *srend, Enesim_Color scolor, uint32_t *d)
 {
 	uint32_t p0 = 0;
@@ -152,7 +154,8 @@ static uint32_t _square_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np
 	return p0;
 }
 
-static uint32_t _round_line(Eina_F16p16 rr, Eina_F16p16 e01, Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
+static inline uint32_t _round_line(Eina_F16p16 rr, Eina_F16p16 e01,
+		Eina_F16p16 e01_np, Eina_F16p16 e01_nm,
 		Enesim_Renderer *srend, Enesim_Color scolor, uint32_t *d)
 {
 	Eina_F16p16 yy;
@@ -403,6 +406,7 @@ static void _line_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
 			ENESIM_RENDERER_FLAG_GEOMETRY |
+			ENESIM_RENDERER_FLAG_COLORIZE |
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 

@@ -253,11 +253,7 @@ get_out:
 			int ee = edge->e;
 
 			if ((yy >= edge->yy0) & (yy < edge->yy1))
-			{
-				count++;
-				if (ee < 0)
-					count -= 2;
-			}
+				count += (ee >= 0) - (ee <0);
 			if (ee < 0)
 				ee = -ee;
 
@@ -451,11 +447,7 @@ get_out:
 			int ee = edge->e;
 
 			if ((yy >= edge->yy0) & (yy < edge->yy1))
-			{
-				count++;
-				if (ee < 0)
-					count -= 2;
-			}
+				count += (ee >= 0) - (ee <0);
 			if (ee < 0)
 				ee = -ee;
 
@@ -644,11 +636,7 @@ get_out:
 			int ee = edge->e;
 
 			if ((yy >= edge->yy0) & (yy < edge->yy1))
-			{
-				count++;
-				if (ee < 0)
-					count -= 2;
-			}
+				count += (ee >= 0) - (ee <0);
 			if (ee < 0)
 				ee = -ee;
 
@@ -862,11 +850,7 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 					(yy <= (edge->yy1 + 0xffff)))
 			{
 				if ((yy >= edge->yy0) && (yy < edge->yy1))
-				{
-					count++;
-					if (ee < 0)
-						count -= 2;
-				}
+					count += (ee >= 0) - (ee <0);
 				if (ee < 0)
 					ee = -ee;
 				if ((ee < sww) &&
@@ -1047,11 +1031,7 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 					(yy <= (edge->yy1 + 0xffff)))
 			{
 				if ((yy >= edge->yy0) && (yy < edge->yy1))
-				{
-					count++;
-					if (ee < 0)
-						count -= 2;
-				}
+					count += (ee >= 0) - (ee <0);
 				if (ee < 0)
 					ee = -ee;
 				if ((ee < sww) &&
@@ -1227,11 +1207,7 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 					(yy <= (edge->yy1 + 0xffff)))
 			{
 				if ((yy >= edge->yy0) && (yy < edge->yy1))
-				{
-					count++;
-					if (ee < 0)
-						count -= 2;
-				}
+					count += (ee >= 0) - (ee <0);
 				if (ee < 0)
 					ee = -ee;
 				if ((ee < sww) &&
@@ -1429,11 +1405,7 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 				{
 					if ((syy >= edge->yy0) &&
 							(syy < edge->yy1))
-					{
-						count++;
-						if (ee < 0)
-							count -= 2;
-					}
+						count += (ee >= 0) - (ee <0);
 					if (ee < 0)
 						ee = -ee;
 					if ((ee < sww) &&
@@ -1597,11 +1569,7 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 				{
 					if ((syy >= edge->yy0) &&
 							(syy < edge->yy1))
-					{
-						count++;
-						if (ee < 0)
-							count -= 2;
-					}
+						count += (ee >= 0) - (ee <0);
 					if (ee < 0)
 						ee = -ee;
 					if ((ee < sww) &&
@@ -1761,11 +1729,7 @@ static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 				{
 					if ((syy >= edge->yy0) &&
 							(syy < edge->yy1))
-					{
-						count++;
-						if (ee < 0)
-							count -= 2;
-					}
+						count += (ee >= 0) - (ee <0);
 					if (ee < 0)
 						ee = -ee;
 					if ((ee < sww) &&

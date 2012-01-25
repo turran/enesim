@@ -109,6 +109,14 @@ static void _compound_span(Enesim_Renderer *r, int x, int y, unsigned int len, v
 			Enesim_Color color;
 
 			enesim_renderer_color_get(l->r, &color);
+			/* FIXME we need to remove this but right now it can't be removed or the drawings
+			 * will appear wrong, we need to split the compound draw functions also by the rop
+			 * it has, if filling we should always set the 0 the span because its what the
+			 * renderer that uses this one (for fill, stroke or whatever) expects. i.e the
+			 * compound *must* fill the whole destination boundings, that's a requirement
+			 * in case of blending there's no need to do so, the final dst buffer can be left
+			 * with the pixels it had for the areas the layers dont draw to
+			 */
 			memset(tmp, 0, lboundings.w * sizeof(uint32_t));
 			ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, tmp);
 			l->span(dst + offset, lboundings.w, tmp, color, NULL);
@@ -207,6 +215,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		enesim_renderer_rop_get(l->r, &rop);
 		enesim_renderer_color_get(l->r, &color);
 		enesim_renderer_flags(l->r, &flags);
+		if (flags & ENESIM_RENDERER_FLAG_COLORIZE)
+			color = ENESIM_COLOR_FULL;
 		if ((rop != ENESIM_FILL || color != ENESIM_COLOR_FULL) && !(flags & ENESIM_RENDERER_FLAG_ROP))
 		{
 			l->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_ARGB8888,

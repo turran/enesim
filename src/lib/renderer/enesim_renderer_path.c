@@ -801,9 +801,11 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
+			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
 			ENESIM_RENDERER_FLAG_GEOMETRY |
+			ENESIM_RENDERER_FLAG_COLORIZE |
 			ENESIM_SHAPE_FLAG_FILL_RENDERER |
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
