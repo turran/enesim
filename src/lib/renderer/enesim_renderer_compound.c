@@ -224,6 +224,14 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 			only_fill = EINA_FALSE;
 		}
 		enesim_renderer_destination_boundings(l->r, &l->destination_boundings, 0, 0);
+		if (thiz->post_cb)
+		{
+			if (!thiz->post_cb(r, l->r, thiz->post_data))
+			{
+				/* FIXME waht to do here */
+				break;
+			}
+		}
 	}
 	if (only_fill)
 	{
