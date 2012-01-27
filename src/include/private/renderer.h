@@ -101,6 +101,7 @@ typedef struct _Enesim_Renderer_Shape_State
 	struct {
 		Enesim_Color color;
 		Enesim_Renderer *r;
+		Enesim_Shape_Fill_Rule rule;
 	} fill;
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape_State;

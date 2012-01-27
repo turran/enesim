@@ -61,10 +61,20 @@ typedef enum _Enesim_Shape_Stroke_Join
 	ENESIM_SHAPE_STROKE_JOINS,
 } Enesim_Shape_Stroke_Join;
 
-EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight);
-EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *weight);
+typedef enum _Enesim_Shape_Fill_Rule
+{
+    ENESIM_SHAPE_FILL_RULE_NON_ZERO,
+    ENESIM_SHAPE_FILL_RULE_EVEN_ODD,
+} Enesim_Shape_Fill_Rule;
+
+
+/* stroke properties */
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
 EAPI void enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r, Enesim_Color *color);
+EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
+EAPI void enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r, Enesim_Renderer **o);
+EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight);
+EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *weight);
 EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Location location);
 EAPI void enesim_renderer_shape_stroke_location_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Location *location);
 EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap cap);
@@ -74,10 +84,15 @@ EAPI void enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r, Enesim_Shape
 EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
 EAPI void enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r, Enesim_Renderer **o);
 
+/* fill properties */
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color fill_color);
 EAPI void enesim_renderer_shape_fill_color_get(Enesim_Renderer *r, Enesim_Color *fill_color);
 EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *f);
 EAPI void enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r, Enesim_Renderer **fill);
+EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Shape_Fill_Rule rule);
+EAPI void enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r, Enesim_Shape_Fill_Rule *rule);
+
+/* stroke and/or fill */
 EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_Draw_Mode draw_mode);
 EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_Draw_Mode *draw_mode);
 /**

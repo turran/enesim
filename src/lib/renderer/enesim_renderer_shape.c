@@ -216,6 +216,9 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 	/* renderer */
 	if (thiz->current.fill.r != thiz->past.fill.r)
 		return EINA_TRUE;
+	/* fill rule */
+	if (thiz->current.fill.rule != thiz->past.fill.rule)
+		return EINA_TRUE;
 	/* draw mode */
 	if (thiz->current.draw_mode != thiz->past.draw_mode)
 		return EINA_TRUE;
@@ -367,6 +370,8 @@ EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double wei
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.stroke.weight == weight)
+		return;
 	thiz->current.stroke.weight = weight;
 	thiz->changed = EINA_TRUE;
 }
@@ -392,6 +397,8 @@ EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_S
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.stroke.location == location)
+		return;
 	thiz->current.stroke.location = location;
 	thiz->changed = EINA_TRUE;
 }
@@ -418,6 +425,8 @@ EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Colo
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.stroke.color == color)
+		return;
 	thiz->current.stroke.color = color;
 	thiz->changed = EINA_TRUE;
 }
@@ -431,7 +440,7 @@ EAPI void enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r, Enesim_Colo
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
-	*color = thiz->current.stroke.color;
+	if (color) *color = thiz->current.stroke.color;
 }
 
 /**
@@ -443,6 +452,8 @@ EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.stroke.cap == cap)
+		return;
 	thiz->current.stroke.cap = cap;
 	thiz->changed = EINA_TRUE;
 }
@@ -456,7 +467,7 @@ EAPI void enesim_renderer_shape_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
-	*cap = thiz->current.stroke.cap;
+	if (cap) *cap = thiz->current.stroke.cap;
 }
 
 /**
@@ -468,6 +479,8 @@ EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Shape
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.stroke.join == join)
+		return;
 	thiz->current.stroke.join = join;
 	thiz->changed = EINA_TRUE;
 }
@@ -481,7 +494,7 @@ EAPI void enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r, Enesim_Shape
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
-	*join = thiz->current.stroke.join;
+	if (join) *join = thiz->current.stroke.join;
 }
 
 /**
@@ -493,11 +506,14 @@ EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_R
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.stroke.r == stroke)
+		return;
+	
 	if (thiz->current.stroke.r)
 		enesim_renderer_unref(thiz->current.stroke.r);
 	thiz->current.stroke.r = stroke;
-	if (thiz->current.stroke.r)
-		thiz->current.stroke.r = enesim_renderer_ref(thiz->current.stroke.r);
+	if (stroke)
+		thiz->current.stroke.r = enesim_renderer_ref(stroke);
 	thiz->changed = EINA_TRUE;
 }
 
@@ -509,8 +525,11 @@ EAPI void enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r, Enesim_R
 {
 	Enesim_Renderer_Shape *thiz;
 
+	if (!stroke) return;
 	thiz = _shape_get(r);
 	*stroke = thiz->current.stroke.r;
+	if (thiz->current.stroke.r)
+		thiz->current.stroke.r = enesim_renderer_ref(thiz->current.stroke.r);
 }
 
 /**
@@ -522,6 +541,8 @@ EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color 
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.fill.color == color)
+		return;
 	thiz->current.fill.color = color;
 	thiz->changed = EINA_TRUE;
 }
@@ -535,7 +556,7 @@ EAPI void enesim_renderer_shape_fill_color_get(Enesim_Renderer *r, Enesim_Color 
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
-	*color = thiz->current.fill.color;
+	if (color) *color = thiz->current.fill.color;
 }
 
 /**
@@ -547,11 +568,13 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.fill.r == fill)
+		return;
 	if (thiz->current.fill.r)
 		enesim_renderer_unref(thiz->current.fill.r);
 	thiz->current.fill.r = fill;
-	if (thiz->current.fill.r)
-		thiz->current.fill.r = enesim_renderer_ref(thiz->current.fill.r);
+	if (fill)
+		thiz->current.fill.r = enesim_renderer_ref(fill);
 	thiz->changed = EINA_TRUE;
 }
 
@@ -574,11 +597,40 @@ EAPI void enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r, Enesim_Ren
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Shape_Fill_Rule rule)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	if (thiz->current.fill.rule == rule)
+		return;
+	thiz->current.fill.rule = rule;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r, Enesim_Shape_Fill_Rule *rule)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	if (rule) *rule = thiz->current.fill.rule;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_Draw_Mode draw_mode)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
+	if (thiz->current.draw_mode == draw_mode)
+		return;
 	thiz->current.draw_mode = draw_mode;
 	thiz->changed = EINA_TRUE;
 }
@@ -592,5 +644,5 @@ EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_D
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
-	*draw_mode = thiz->current.draw_mode;
+	if (draw_mode) *draw_mode = thiz->current.draw_mode;
 }
