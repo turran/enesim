@@ -31,6 +31,7 @@ struct _Enesim_Renderer
 	Enesim_Renderer_State past;
 	/* the private data */
 	Eina_Hash *prv_data;
+	Enesim_Renderer_Flag current_flags;
 	Enesim_Rectangle current_boundings;
 	Enesim_Rectangle past_boundings;
 	Eina_Rectangle current_destination_boundings;
@@ -43,6 +44,7 @@ struct _Enesim_Renderer
 	 * surface or opencl surface, we need an array to keep *ALL* the
 	 * possible data */
 	void *backend_data[ENESIM_BACKENDS];
+	Eina_Bool in_setup : 1;
 };
 
 void enesim_renderer_init(void);
@@ -60,7 +62,7 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 		Enesim_Error **error);
 void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		int x, int y, Enesim_Renderer_Flag flags);
+		int x, int y);
 void enesim_renderer_opencl_init(void);
 void enesim_renderer_opencl_shutdown(void);
 
@@ -73,7 +75,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error);
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		int x, int y, Enesim_Renderer_Flag flags);
+		int x, int y);
 
 void enesim_renderer_opengl_init(void);
 void enesim_renderer_opengl_shutdown(void);
@@ -84,6 +86,8 @@ void enesim_renderer_opengl_shutdown(void);
 typedef struct _Enesim_Renderer_Sw_Data
 {
 	Enesim_Renderer_Sw_Fill fill;
+	/* FIXME use this one, we'll need it in case the renderer does not support the current render operation */
+	Enesim_Compositor_Span span;
 } Enesim_Renderer_Sw_Data;
 
 
@@ -214,10 +218,10 @@ void enesim_renderer_sw_init(void);
 void enesim_renderer_sw_shutdown(void);
 void enesim_renderer_sw_draw(Enesim_Renderer *r,
 		Enesim_Surface *s, Eina_Rectangle *area,
-		int x, int y, Enesim_Renderer_Flag flags);
+		int x, int y);
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r,
 		Enesim_Surface *s, Eina_Rectangle *area,
-		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags);
+		Eina_List *clips, int x, int y);
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES], Enesim_Surface *s, Enesim_Error **error);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);

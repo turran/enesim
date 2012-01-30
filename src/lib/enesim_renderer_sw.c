@@ -42,42 +42,16 @@
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Flag flags)
 {
-#if 0
-	if (r->current.mask)
-	{
-		*has_mask = EINA_TRUE;
-		if (flags & ENESIM_RENDERER_FLAG_MASK)
-			*needs_mask = EINA_FALSE;
-		else
-			*needs_mask = EINA_TRUE;
-	}
-	else
-	{
-		*has_mask = EINA_FALSE;
-	}
+	Enesim_Color color = r->current.color;
+	Enesim_Rop rop = r->current.rop;
 
-	if (r->current.rop == ENESIM_FILL)
-	{
-		*has_rop = EINA_FALSE;
-		if (r->current.color == ENESIM_COLOR_FULL)
-		{
-
-		}
-	}
-	else
-	{
-		*has_rop = EINA_TRUE;
-	}
-#endif
+	if (flags & ENESIM_RENDERER_FLAG_COLORIZE)
+		color = ENESIM_COLOR_FULL;
+	if (flags & ENESIM_RENDERER_FLAG_ROP)
+		rop = ENESIM_FILL;
 
 	/* fill rop and color is full, we use the simple draw function */
-	if ((r->current.rop == ENESIM_FILL) && (r->current.color == ENESIM_COLOR_FULL))
-		return EINA_FALSE;
-	/* the renderer can handle different rops and the color is full, use simple draw function */
-	if ((flags & ENESIM_RENDERER_FLAG_ROP) && (r->current.color == ENESIM_COLOR_FULL))
-		return EINA_FALSE;
-	/* the renderer can handle different rops and also the color, use simple draw function */
-	if ((flags & ENESIM_RENDERER_FLAG_ROP) && (flags & ENESIM_RENDERER_FLAG_COLORIZE))
+	if ((rop == ENESIM_FILL) && (color == ENESIM_COLOR_FULL))
 		return EINA_FALSE;
 	return EINA_TRUE;
 }
@@ -290,8 +264,7 @@ static void * _thread_run(void *data)
 
 static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 		uint8_t *ddata, size_t stride,
-		Enesim_Format dfmt,
-		Enesim_Renderer_Flag flags)
+		Enesim_Format dfmt)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
@@ -303,27 +276,10 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 	_op.area = *area;
 	_op.fill = sw_data->fill;
 	_op.mask_fill = NULL;
-	_op.span = NULL;
-
-	if (_is_sw_draw_composed(r, flags))
-	{
-		Enesim_Compositor_Span span;
-
-		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				r->current.color, ENESIM_FORMAT_NONE);
-		if (!span)
-		{
-			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->current.rop, r->current.color);
-			goto end;
-		}
-		_op.span = span;
-	}
+	_op.span = sw_data->span;
 
 	pthread_barrier_wait(&_start);
 	pthread_barrier_wait(&_end);
-end:
-	return;
 }
 #else
 /*----------------------------------------------------------------------------*
@@ -331,26 +287,17 @@ end:
  *----------------------------------------------------------------------------*/
 static void _sw_draw_no_threaded(Enesim_Renderer *r,
 		Eina_Rectangle *area,
-		uint8_t *ddata, size_t stride, Enesim_Format dfmt,
-		Enesim_Renderer_Flag flags)
+		uint8_t *ddata, size_t stride,
+		Enesim_Format dfmt)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
-	if (_is_sw_draw_composed(r, flags))
+	if (sw_data->span)
 	{
-		Enesim_Compositor_Span span;
 		uint8_t *fdata;
 		size_t len;
 
-		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				r->current.color, ENESIM_FORMAT_NONE);
-		if (!span)
-		{
-			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->current.rop, r->current.color);
-			goto end;
-		}
 		len = area->w * sizeof(uint32_t);
 		fdata = alloca(len);
 		_sw_surface_draw_rop(r, sw_data->fill, span, ddata, stride, fdata, len, area);
@@ -359,8 +306,6 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r,
 	{
 		_sw_surface_draw_simple(r, sw_data->fill, ddata, stride, area);
 	}
-end:
-	return;
 }
 #endif
 /*============================================================================*
@@ -403,7 +348,7 @@ void enesim_renderer_sw_shutdown(void)
 }
 
 void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		int x, int y, Enesim_Renderer_Flag flags)
+		int x, int y)
 {
 	Enesim_Format dfmt;
 	uint8_t *ddata;
@@ -418,39 +363,33 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectang
 	area->y -= y;
 
 #ifdef BUILD_PTHREAD
-	_sw_draw_threaded(r, area, ddata, stride, dfmt, flags);
+	_sw_draw_threaded(r, area, ddata, stride, dfmt);
 #else
-	_sw_draw_no_threaded(r, area, ddata, stride, dfmt, flags);
+	_sw_draw_no_threaded(r, area, ddata, stride, dfmt);
 #endif
 }
 
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		Eina_List *clips, int x, int y, Enesim_Renderer_Flag flags)
+		Eina_List *clips, int x, int y)
 {
 	Enesim_Format dfmt;
 	Enesim_Renderer_Sw_Data *rswdata;
+	Enesim_Renderer_Flag flags;
 	uint8_t *ddata;
 	size_t stride;
 	size_t bpp;
 
 	_sw_surface_setup(s, &dfmt, (void *)&ddata, &stride, &bpp);
 	ddata = ddata + (area->y * stride) + (area->x * bpp);
+
+	enesim_renderer_flags(r, &flags);
 	rswdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 
-	if (_is_sw_draw_composed(r, flags))
+	if (rswdata->span)
 	{
-		Enesim_Compositor_Span span;
 		Eina_Rectangle *clip;
 		Eina_List *l;
 
-		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				r->current.color, ENESIM_FORMAT_NONE);
-		if (!span)
-		{
-			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->current.rop, r->current.color);
-			goto end;
-		}
 		/* iterate over the list of clips */
 		EINA_LIST_FOREACH(clips, l, clip)
 		{
@@ -469,7 +408,7 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			/* now render */
 			len = final.w * bpp;
 			fdata = alloca(len);
-			_sw_surface_draw_rop(r, rswdata->fill, span, rdata, stride,
+			_sw_surface_draw_rop(r, rswdata->fill, rswdata->span, rdata, stride,
 					fdata, len, &final);
 		}
 	}
@@ -495,8 +434,6 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			_sw_surface_draw_simple(r, rswdata->fill, rdata, stride, &final);
 		}
 	}
-end:
-	return;
 }
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
@@ -505,7 +442,9 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Sw_Fill fill = NULL;
+	Enesim_Compositor_Span span = NULL;
 	Enesim_Renderer_Sw_Data *sw_data;
+	Enesim_Renderer_Flag flags;
 
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
@@ -537,6 +476,25 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		sw_data = calloc(1, sizeof(Enesim_Renderer_Sw_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
 	}
+
+	enesim_renderer_flags(r, &flags);
+	if (_is_sw_draw_composed(r, flags))
+	{
+		Enesim_Compositor_Span span;
+		Enesim_Format dfmt;
+
+		dfmt = enesim_surface_format_get(s);
+		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+				r->current.color, ENESIM_FORMAT_NONE);
+		if (!span)
+		{
+			WRN("No suitable span compositor to render %p with rop "
+					"%d and color %08x", r, r->current.rop, r->current.color);
+			return EINA_FALSE;
+		}
+	}
+
+	sw_data->span = span;
 	sw_data->fill = fill;
 	return EINA_TRUE;
 }
@@ -566,3 +524,13 @@ EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
 	//ENESIM_MAGIC_CHECK_RENDERER(r);
 	return sw_data->fill;
 }
+
+/* TODO in theory the function to call on the API side to draw on sw should be
+ * something like:
+void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
+{
+	Enesim_Renderer_Sw_Data *sw_data;
+
+	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
+}
+ */

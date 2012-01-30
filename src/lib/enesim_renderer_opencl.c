@@ -110,7 +110,7 @@ void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		int x, int y, Enesim_Renderer_Flag flags)
+		int x, int y)
 {
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *sdata;
