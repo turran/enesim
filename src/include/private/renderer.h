@@ -216,7 +216,7 @@ void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void
 /* sw backend */
 void enesim_renderer_sw_init(void);
 void enesim_renderer_sw_shutdown(void);
-void enesim_renderer_sw_draw(Enesim_Renderer *r,
+void enesim_renderer_sw_draw_area(Enesim_Renderer *r,
 		Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y);
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r,

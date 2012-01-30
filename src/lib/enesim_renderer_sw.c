@@ -347,7 +347,7 @@ void enesim_renderer_sw_shutdown(void)
 #endif
 }
 
-void enesim_renderer_sw_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
+void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y)
 {
 	Enesim_Format dfmt;
@@ -494,6 +494,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		}
 	}
 
+	/* TODO add a real_draw function that will compose the two ... or not :) */
 	sw_data->span = span;
 	sw_data->fill = fill;
 	return EINA_TRUE;
@@ -525,12 +526,30 @@ EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
 	return sw_data->fill;
 }
 
-/* TODO in theory the function to call on the API side to draw on sw should be
- * something like:
-void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
+	if (sw_data->span)
+	{
+		uint32_t *tmp;
+		size_t bytes;
+
+		bytes = len * sizeof(uint32_t);
+		tmp = alloca(bytes);
+		/* FIXME for now */
+		memset(tmp, 0, bytes);
+		sw_data->fill(r, x, y, len, tmp);
+		/* compose the filled and the destination spans */
+		span(data, len, tmp, r->current.color, NULL);
+	}
+	else
+	{
+		sw_data->fill(r, x, y, len, data);
+	}
 }
- */

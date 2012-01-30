@@ -152,7 +152,7 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
-		enesim_renderer_sw_draw(r, s, area, x, y);
+		enesim_renderer_sw_draw_area(r, s, area, x, y);
 		break;
 
 		case ENESIM_BACKEND_OPENCL:

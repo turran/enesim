@@ -230,6 +230,9 @@ EAPI void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer_Sta
 
 /* TODO remove this one */
 EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
+
+EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
+
 #endif
 
 #include "enesim_renderer_shape.h"

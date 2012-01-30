@@ -28,6 +28,9 @@
  *   wrap in a way a compound renderer but we have to also store the list
  *   of children added, so basically we iterate twice, one the compound itself
  *   and one the compound-wrapper
+ * - Another way to optmize this is to make the setup() function of every
+ *   layer thread safe, that way given that each layer does not depend on the other
+ *   the setup can be done on parallel
  */
 /*============================================================================*
  *                                  Local                                     *
