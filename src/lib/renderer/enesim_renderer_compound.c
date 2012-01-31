@@ -278,6 +278,8 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Flag f = 0xffffffff;
+	Enesim_Rop rop;
+	Eina_Bool same_rop = EINA_TRUE;
 	Eina_List *ll;
 
 	thiz = _compound_get(r);
@@ -287,16 +289,31 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		return;
 	}
 
+	enesim_renderer_rop_get(r, &rop);
+	/* TODO we need to find an heuristic to set the colorize/rop flag
+	 * that reduces the number of raster operations we have to do
+	 * (i.e a passthrough)
+	 * - if every renderer has the same rop as the compund then
+	 * there is no need to do a post composition of the result. but how to
+	 * handle the colorize?
+	 */
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Renderer *lr = l->r;
 		Enesim_Renderer_Flag tmp;
+		Enesim_Rop lrop;
 
 		/* intersect with every flag */
 		enesim_renderer_flags(lr, &tmp);
+		enesim_renderer_rop_get(lr, &lrop);
+		if (lrop != rop)
+			same_rop = EINA_FALSE;
+
 		f &= tmp;
 	}
+	if (same_rop)
+		f |= ENESIM_RENDERER_FLAG_ROP;
 	*flags = f;
 }
 
