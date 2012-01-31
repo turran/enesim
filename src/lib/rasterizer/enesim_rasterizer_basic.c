@@ -107,7 +107,8 @@ static void _stroke_fill_paint_affine_simple(Enesim_Renderer *r,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -185,19 +186,19 @@ get_out:
 	}
 	else rx = len;
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	scolor = sstate->stroke.color;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	sw = sstate->stroke.weight;
+	draw_mode = sstate->draw_mode;
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		sww = 65536;
@@ -332,7 +333,8 @@ static void _stroke_paint_fill_affine_simple(Enesim_Renderer *r,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -410,21 +412,21 @@ get_out:
 	}
 	else rx = len;
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sw = sstate->stroke.weight;
 	sww = sqrt(sw) * 65536;
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	draw_mode = sstate->draw_mode;
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		fcolor = 0;
 
@@ -519,7 +521,8 @@ static void _stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r,
 	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 	unsigned int *sbuf, *s;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -597,19 +600,19 @@ get_out:
 	}
 	else rx = len;
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sw = sstate->stroke.weight;
 	sww = sqrt(sw) * 65536;
 
 	enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
@@ -713,7 +716,8 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -772,19 +776,19 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 		v++;
 	}
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	scolor = sstate->stroke.color;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	sw = sstate->stroke.weight;
+	draw_mode = sstate->draw_mode;
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		sww = 65536;
@@ -927,7 +931,8 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 	int xx = (axx * x) + (axx >> 1) + (axy * y) + (axy >> 1) + axz - 32768;
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -986,21 +991,21 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 		v++;
 	}
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sw = sstate->stroke.weight;
 	sww = sqrt(sw) * 65536;
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	draw_mode = sstate->draw_mode;
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		fcolor = 0;
 
@@ -1101,7 +1106,8 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	unsigned int *sbuf, *s;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -1160,19 +1166,19 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
 		v++;
 	}
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sw = sstate->stroke.weight;
 	sww = sqrt(sw) * 65536;
 
 	enesim_renderer_sw_draw(fpaint, x, y, len, dst);
@@ -1283,7 +1289,8 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r,
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx0 = eina_f16p16_double_from(ox);
 	yy0 = eina_f16p16_double_from(oy);
 
@@ -1316,19 +1323,20 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r,
 		edge++;
 	}
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
-	enesim_renderer_color_get(r, &color);
+	scolor = sstate->stroke.color;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
+
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sw = sstate->stroke.weight;
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	draw_mode = sstate->draw_mode;
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
 		sww = 65536;
@@ -1478,7 +1486,8 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r,
 	int yy = (ayx * x) + (ayx >> 1) + (ayy * y) + (ayy >> 1) + ayz - 32768;
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx0 = eina_f16p16_double_from(ox);
 	yy0 = eina_f16p16_double_from(oy);
 
@@ -1511,21 +1520,21 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r,
 		edge++;
 	}
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sw = sstate->stroke.weight;
 	sww = sqrt(sw) * 65536;
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	draw_mode = sstate->draw_mode;
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		fcolor = 0;
 
@@ -1636,7 +1645,8 @@ static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r,
 	int zz = (azx * x) + (azx >> 1) + (azy * y) + (azy >> 1) + azz;
 	unsigned int *sbuf, *s;
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx0 = eina_f16p16_double_from(ox);
 	yy0 = eina_f16p16_double_from(oy);
 
@@ -1669,19 +1679,20 @@ static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r,
 		edge++;
 	}
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
+
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	sw = sstate->stroke.weight;
 	sww = sqrt(sw) * 65536;
 
 	enesim_renderer_sw_draw(fpaint, x, y, len, dst);
@@ -1819,6 +1830,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Rasterizer_Basic *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint;
 	double sw;
@@ -1830,7 +1842,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	draw_mode = css->draw_mode;
 	if (thiz->changed)
 	{
 		Enesim_Polygon *p;
@@ -2027,8 +2039,8 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	enesim_matrix_f16p16_matrix_to(&cs->transformation,
 			&thiz->matrix);
 
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
+	sw = css->stroke.weight;
+	spaint = css->stroke.r;
 	if (cs->transformation_type != ENESIM_MATRIX_PROJECTIVE)
 	{
 		*draw = _stroke_fill_paint_affine;
@@ -2042,7 +2054,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			if (cs->transformation.yx == 0)
 				*draw = _stroke_paint_fill_affine_simple;
 
-			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			fpaint = css->fill.r;
 			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 			{
 				*draw = _stroke_paint_fill_paint_affine;
@@ -2059,7 +2071,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			Enesim_Renderer *fpaint;
 
 			*draw = _stroke_paint_fill_proj;
-			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+			fpaint = css->fill.r;
 			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 				*draw = _stroke_paint_fill_paint_proj;
 		}
