@@ -27,6 +27,7 @@ typedef struct _Enesim_Curve_State
 	double last_y;
 	double last_ctrl_x;
 	double last_ctrl_y;
+	double threshold;
 	void *data;
 } Enesim_Curve_State;
 

@@ -18,28 +18,10 @@
 #include "Enesim.h"
 #include "enesim_private.h"
 
-/*
- * The idea of the path/figure renderers is the following:
- * Basically both at the end need to rasterize the resulting polygon, right
- * now the path renderer is using the figure renderer so it is a good option
- * to split the rasterizer algorigthm on the figure and put it into another
- * abstraction (rasterizer maybe?) and then make both renderers use that
- * rasterizer which should operate on list of polygons
- * In order to do the path/figure stroking we should also share the same
- * algorithm to create such offset curves. The simplest approach is:
- * 1. create parallel edges to the original edges
- * 2. when doing the offset curve, if it is convex then do curves
- * (or squares or whatever join type) from the offset edge points to the other
- * offset edge points. if it is concave just intersect both offset edges or do
- * a line from one offset edge point to the original edge point and then another
- * from it to the other offset edge point. If we are doing an inset curve we do
- * the opposite approach.
- * 3. Once the above is done we end with two new polygons, one for the offset curve
- * and one for the inset curve. Then we should pass such polygons to the rasterizer
- * with some special winding algorithm. A positive winding for the offset and a negative
- * winding for the inset.
+/**
+ * TODO
+ * - Use the threshold on the curve state
  */
-
 /*
  * Some formulas found on the research process:
  * l1 = Ax + By + C
