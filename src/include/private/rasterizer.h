@@ -21,8 +21,9 @@
 typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Figure *figure);
 typedef Eina_Bool (*Enesim_Rasterizer_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill,
+		Enesim_Renderer_Shape_Sw_Draw *draw,
 		Enesim_Error **error);
 typedef void (*Enesim_Rasterizer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 

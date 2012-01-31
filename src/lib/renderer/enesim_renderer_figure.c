@@ -47,6 +47,7 @@ static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 
 static void _figure_span(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -104,7 +105,7 @@ static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -139,7 +140,7 @@ static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 	if (!enesim_renderer_setup(thiz->path, s, error))
 		return EINA_FALSE;
 
-	*fill = _figure_span;
+	*draw = _figure_span;
 
 	return EINA_TRUE;
 }

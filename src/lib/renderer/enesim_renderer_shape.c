@@ -58,7 +58,6 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-#if 0
 static void _enesim_renderer_shape_sw_draw(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		int x, int y,
@@ -68,9 +67,8 @@ static void _enesim_renderer_shape_sw_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = enesim_renderer_data_get(r);
-	thiz->sw_draw (r, state, &thiz->current, x, y, len, dst);
+	thiz->sw_draw(r, state, &thiz->current, x, y, len, dst);
 }
-#endif
 
 static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
@@ -123,7 +121,8 @@ static void _enesim_renderer_shape_boundings(Enesim_Renderer *r,
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill,
+		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
 	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
@@ -134,7 +133,13 @@ static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
 	sstates[ENESIM_STATE_PAST] = &thiz->past;
 
-	return thiz->sw_setup(r, states, sstates, s, fill, error);
+	if (!thiz->sw_setup(r, states, sstates, s, &thiz->sw_draw, error))
+		return EINA_FALSE;
+	if (!thiz->sw_draw)
+		return EINA_FALSE;
+	*fill = _enesim_renderer_shape_sw_draw;
+
+	return EINA_TRUE;
 }
 
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,

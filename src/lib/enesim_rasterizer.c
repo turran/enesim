@@ -65,7 +65,7 @@ static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
 {
 	Enesim_Rasterizer *thiz;
 	Eina_Bool ret;
@@ -75,7 +75,7 @@ static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 
 	if (!enesim_renderer_shape_setup(r, states, s, error))
 		return EINA_FALSE;
-	ret = thiz->sw_setup(r, states, s, fill, error);
+	ret = thiz->sw_setup(r, states, sstates, s, draw, error);
 	return ret;
 }
 

@@ -655,6 +655,7 @@ static void _path_generate_vertices(Eina_List *commands,
 
 static void _path_span(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Path *thiz;
@@ -745,7 +746,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -780,7 +781,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	*fill = _path_span;
+	*draw = _path_span;
 
 	return EINA_TRUE;
 }

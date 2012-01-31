@@ -106,6 +106,7 @@ static void _circle_path_setup(Enesim_Renderer_Circle *thiz,
 /* Use the internal path for drawing */
 static void _circle_path_span(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -122,6 +123,7 @@ static void _circle_path_span(Enesim_Renderer *r,
 /* stroke and/or fill with possibly a fill renderer */
 static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
  		unsigned int len, void *ddata)
 {
@@ -257,6 +259,7 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 /* stroke with a renderer and possibly fill with color */
 static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -362,6 +365,7 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 /* stroke and fill with renderers */
 static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -549,7 +553,7 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
 {
 	Enesim_Renderer_Circle *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -586,7 +590,7 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 		{
 			return EINA_FALSE;
 		}
-		*fill = _circle_path_span;
+		*draw = _circle_path_span;
 
 		return EINA_TRUE;
 	}
@@ -643,16 +647,16 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 		enesim_renderer_shape_stroke_renderer_get(r, &spaint);
 
-		*fill = _stroke_fill_paint_affine;
+		*draw = _stroke_fill_paint_affine;
 		if ((sw != 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			Enesim_Renderer *fpaint;
 
-			*fill = _stroke_paint_fill_affine;
+			*draw = _stroke_paint_fill_affine;
 			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 			if (fpaint && thiz->do_inner &&
 						(draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
-				*fill = _stroke_paint_fill_paint_affine;
+				*draw = _stroke_paint_fill_paint_affine;
 		}
 
 		return EINA_TRUE;

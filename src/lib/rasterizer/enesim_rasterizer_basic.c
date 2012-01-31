@@ -81,6 +81,7 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 /* stroke and/or fill with possibly a fill renderer */
 static void _stroke_fill_paint_affine_simple(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -306,6 +307,7 @@ get_out:
 /* stroke with a renderer and possibly fill with color */
 static void _stroke_paint_fill_affine_simple(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -492,6 +494,7 @@ get_out:
 /* stroke and fill with renderers */
 static void _stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -683,6 +686,7 @@ get_out:
 /* stroke and/or fill with possibly a fill renderer */
 static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -896,6 +900,7 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 /* stroke with a renderer and possibly fill with color */
 static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -1070,6 +1075,7 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 /* stroke and fill with renderers */
 static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -1247,6 +1253,7 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
 /* stroke and/or fill with possibly a fill renderer */
 static void _stroke_fill_paint_proj(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -1442,6 +1449,7 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r,
 /* stroke with a renderer and possibly fill with color */
 static void _stroke_paint_fill_proj(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -1599,6 +1607,7 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r,
 /* stroke and fill with renderers */
 static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -1803,8 +1812,9 @@ static int _tysort(void *l, void *r)
 
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill,
+		Enesim_Renderer_Shape_Sw_Draw *draw,
 		Enesim_Error **error)
 {
 	Enesim_Rasterizer_Basic *thiz;
@@ -2021,37 +2031,37 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
 	if (cs->transformation_type != ENESIM_MATRIX_PROJECTIVE)
 	{
-		*fill = _stroke_fill_paint_affine;
+		*draw = _stroke_fill_paint_affine;
 		if (cs->transformation.yx == 0)
-			*fill = _stroke_fill_paint_affine_simple;
+			*draw = _stroke_fill_paint_affine_simple;
 		if ((sw > 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			Enesim_Renderer *fpaint;
 
-			*fill = _stroke_paint_fill_affine;
+			*draw = _stroke_paint_fill_affine;
 			if (cs->transformation.yx == 0)
-				*fill = _stroke_paint_fill_affine_simple;
+				*draw = _stroke_paint_fill_affine_simple;
 
 			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 			{
-				*fill = _stroke_paint_fill_paint_affine;
+				*draw = _stroke_paint_fill_paint_affine;
 				if (cs->transformation.yx == 0)
-					*fill = _stroke_paint_fill_paint_affine_simple;
+					*draw = _stroke_paint_fill_paint_affine_simple;
 			}
 		}
 	}
 	else
 	{
-		*fill = _stroke_fill_paint_proj;
+		*draw = _stroke_fill_paint_proj;
 		if ((sw > 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			Enesim_Renderer *fpaint;
 
-			*fill = _stroke_paint_fill_proj;
+			*draw = _stroke_paint_fill_proj;
 			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
 			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
-				*fill = _stroke_paint_fill_paint_proj;
+				*draw = _stroke_paint_fill_paint_proj;
 		}
 	}
 
