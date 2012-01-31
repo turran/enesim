@@ -283,7 +283,8 @@ static void _bifig_stroke_fill_paint_affine_simple(Enesim_Renderer *r,
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -297,11 +298,11 @@ get_out:
 
 	SETUP_EDGES
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	scolor = sstate->stroke.color;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
@@ -416,7 +417,8 @@ static void _bifig_stroke_paint_fill_affine_simple(Enesim_Renderer *r,
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -430,11 +432,11 @@ get_out:
 
 	SETUP_EDGES
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
@@ -529,7 +531,8 @@ static void _bifig_stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r,
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
 
-	enesim_renderer_origin_get(r, &ox, &oy);
+	ox = state->ox;
+	oy = state->oy;
 	xx -= eina_f16p16_double_from(ox);
 	yy -= eina_f16p16_double_from(oy);
 
@@ -543,12 +546,12 @@ get_out:
 
 	SETUP_EDGES
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	scolor = sstate->stroke.color;
+	spaint = sstate->stroke.r;
+	fcolor = sstate->fill.color;
+	fpaint = sstate->fill.r;
 
-	enesim_renderer_color_get(r, &color);
+	color = state->color;
 	if (color != 0xffffffff)
 	{
 		scolor = argb8888_mul4_sym(color, scolor);
@@ -687,6 +690,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint, *fpaint;
 	Enesim_Color color, scolor, fcolor;
@@ -704,13 +708,13 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	enesim_renderer_color_get(r, &color);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, &spaint);
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	color = cs->color;
+	draw_mode = css->draw_mode;
+	sw = css->stroke.weight;
+	scolor = css->stroke.color;
+	spaint = css->stroke.r;
+	fcolor = css->fill.color;
+	fpaint = css->fill.r;
 
 	if (thiz->changed)
 	{
