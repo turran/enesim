@@ -60,7 +60,6 @@ typedef struct _Enesim_Rasterizer_BiFigure
 	const Enesim_Figure *under_figure;
 
 	int tyy, byy;
-	Enesim_Renderer_Sw_Fill fill;
 
 	Enesim_F16p16_Matrix matrix;
 	Eina_Bool changed :1;
@@ -307,10 +306,7 @@ get_out:
 	}
 	if (fpaint)
 	{
-		Enesim_Renderer_Sw_Data *sdata;
-
-		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-		sdata->fill(fpaint, x + lx, y, rx - lx, dst + lx);
+		enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
 	}
 
 	while (d < e)
@@ -391,7 +387,6 @@ static void _bifig_stroke_paint_fill_affine_simple(Enesim_Renderer *r, int x, in
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *spaint;
-	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 
@@ -440,8 +435,7 @@ get_out:
 		fcolor = argb8888_mul4_sym(color, fcolor);
 	}
 
-	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x + lx, y, rx - lx, dst + lx);
+	enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
 
 	while (d < e)
 	{
@@ -502,7 +496,6 @@ static void _bifig_stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
 	Enesim_Renderer *fpaint, *spaint;
-	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	unsigned int *sbuf, *s;
@@ -554,12 +547,10 @@ get_out:
 	}
 
 	sbuf = alloca((rx - lx) * sizeof(unsigned int));
-	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x + lx, y, rx - lx, sbuf);
+	enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, sbuf);
 	s = sbuf;
 
-	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(fpaint, x + lx, y, rx - lx, dst + lx);
+	enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
 
 	while (d < e)
 	{
@@ -631,7 +622,7 @@ static void _over_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len
 	Enesim_Rasterizer_BiFigure *thiz;
 
 	thiz = _bifigure_get(r);
-	thiz->fill(thiz->over, x, y, len, ddata);
+	enesim_renderer_sw_draw(thiz->over, x, y, len, ddata);
 }
 
 static void _under_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
@@ -639,9 +630,8 @@ static void _under_figure_span(Enesim_Renderer *r, int x, int y, unsigned int le
 	Enesim_Rasterizer_BiFigure *thiz;
 
 	thiz = _bifigure_get(r);
-	thiz->fill(thiz->under, x, y, len, ddata);
+	enesim_renderer_sw_draw(thiz->under, x, y, len, ddata);
 }
-
 /*----------------------------------------------------------------------------*
  *                    The Enesim's rasterizer interface                       *
  *----------------------------------------------------------------------------*/
@@ -742,7 +732,6 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
 		if (!enesim_renderer_setup(thiz->over, s, error))
 			return EINA_FALSE;
-		thiz->fill = enesim_renderer_sw_fill_get(thiz->over);
 		*fill = _over_figure_span;
 	}
 	else
@@ -760,7 +749,6 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 			if (!enesim_renderer_setup(thiz->under, s, error))
 				return EINA_FALSE;
-			thiz->fill = enesim_renderer_sw_fill_get(thiz->under);
 			*fill = _under_figure_span;
 		}
 		else  // stroke_weight > 1 and draw_mode != FILL
@@ -780,7 +768,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 					enesim_renderer_color_set(thiz->under, color);
 					enesim_renderer_shape_draw_mode_set(thiz->under, ENESIM_SHAPE_DRAW_MODE_STROKE_FILL);
 					enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
-					enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);	
+					enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 					if (!enesim_renderer_setup(thiz->under, s, error))
 						return EINA_FALSE;
 				}
@@ -800,7 +788,6 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 				}
 				else
 				{
-					thiz->fill = enesim_renderer_sw_fill_get(thiz->over);
 					*fill = _over_figure_span;
 				}
 			}
@@ -817,7 +804,6 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 				enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 				if (!enesim_renderer_setup(thiz->under, s, error))
 					return EINA_FALSE;
-				thiz->fill = enesim_renderer_sw_fill_get(thiz->under);
 				*fill = _under_figure_span;
 			}
 		}
@@ -849,7 +835,6 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		thiz->tyy = eina_f16p16_double_from(ymin);
 		thiz->byy = eina_f16p16_double_from(ymax);
 	}
-	
 
 	return EINA_TRUE;
 }
