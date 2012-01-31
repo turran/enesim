@@ -73,7 +73,7 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, int x, int y, unsigned int len, void *ddata, uint32_t *tmp)
+static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, int x, int y, unsigned int len, void *ddata)
 {
 	Eina_List *ll;
 	Eina_Rectangle span;
@@ -83,7 +83,6 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
-		Enesim_Renderer_Sw_Data *ldata;
 		Eina_Rectangle lboundings;
 		unsigned int offset;
 
@@ -94,108 +93,38 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 		{
 			continue;
 		}
-		ldata = enesim_renderer_backend_data_get(l->r, ENESIM_BACKEND_SOFTWARE);
+
 		offset = lboundings.x - span.x;
-
-		if (!l->span)
-		{
-			ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + offset);
-		}
-		else
-		{
-			Enesim_Color color;
-
-			enesim_renderer_color_get(l->r, &color);
-			/* FIXME this is the memset that should go away, in theory the
-			 * layer should fill the whole span we pass in
-			 */
-			memset(tmp, 0, lboundings.w * sizeof(uint32_t));
-			ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, tmp);
-			l->span(dst + offset, lboundings.w, tmp, color, NULL);
-		}
+		enesim_renderer_sw_draw(l->r, lboundings.x, lboundings.y, lboundings.w, dst + offset);
 	}
 
-}
-
-static inline void _compound_span_layer_fill(Enesim_Renderer_Compound *thiz, int x, int y, unsigned int len, void *ddata)
-{
-	Eina_List *ll;
-	Eina_Rectangle span;
-	uint32_t *dst = ddata;
-
-	eina_rectangle_coords_from(&span, x, y, len, 1);
-	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
-	{
-		Layer *l;
-		Enesim_Renderer_Sw_Data *ldata;
-		Eina_Rectangle lboundings;
-
-		l = eina_list_data_get(ll);
-
-		ldata = enesim_renderer_backend_data_get(l->r, ENESIM_BACKEND_SOFTWARE);
-		lboundings = l->destination_boundings;
-		if (!eina_rectangle_intersection(&lboundings, &span))
-		{
-			continue;
-		}
-		ldata->fill(l->r, lboundings.x, lboundings.y, lboundings.w, dst + (lboundings.x - span.x));
-	}
-}
-
-
-/* our rop is blend and every layer has to fill */
-static void _compound_blend_span_fill_layer(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
-{
-	Enesim_Renderer_Compound *thiz;
-
-	thiz = _compound_get(r);
-	_compound_span_layer_fill(thiz, x, y, len, ddata);
-}
-
-/* our rop is fill and every layer has to fill */
-static void _compound_fill_span_fill_layer(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
-{
-	Enesim_Renderer_Compound *thiz;
-
-	thiz = _compound_get(r);
-	/* FIXME this case can be further optimized in case we do know that the layers we are going
-	 * to draw will fill the whole area, which isnt known. one optmiziation could be to
-	 * avoid this memset whenever we know that we only have one layer */
-	memset(ddata, 0, len * sizeof(uint32_t));
-	_compound_span_layer_fill(thiz, x, y, len, ddata);
 }
 
 /* whenever the compound needs to fill, we need to zeros the whole destination buffer */
-static void _compound_fill_span_blend_layer(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
-	uint32_t *tmp;
-	size_t tmp_size;
 
 	thiz = _compound_get(r);
-	tmp_size = sizeof(uint32_t) * len;
-	tmp = alloca(tmp_size);
 
 	/* we might need to add this memset in case the layers for this span dont fill the whole area */
-	//memset(ddata, 0, len * sizeof(uint32_t));
-	memset(tmp, 0, tmp_size);
-	_compound_span_layer_blend(thiz, x, y, len, ddata, tmp);
+	memset(ddata, 0, len * sizeof(uint32_t));
+	_compound_span_layer_blend(thiz, x, y, len, ddata);
 }
 
 /* whenever the compound needs to blend, we only need to draw the area of each layer */
-static void _compound_blend_span_blend_layer(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
-	uint32_t *tmp;
-	size_t tmp_size;
 
 	thiz = _compound_get(r);
-	tmp_size = sizeof(uint32_t) * len;
-	tmp = alloca(tmp_size);
 
 	/* we should only do one memset, here instead of per each layer */
-	memset(tmp, 0, tmp_size);
-	_compound_span_layer_blend(thiz, x, y, len, ddata, tmp);
+	_compound_span_layer_blend(thiz, x, y, len, ddata);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -213,17 +142,12 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Compound *thiz;
 	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
 	Eina_List *ll;
-	Eina_Bool only_fill = EINA_TRUE;
 
 	thiz = _compound_get(r);
 	/* setup every layer */
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
-		Enesim_Renderer_Flag flags;
-		Enesim_Color color;
-		Enesim_Rop rop;
-		Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
 
 		/* TODO check the flags and only generate the relative properties
 		 * for those supported
@@ -257,18 +181,6 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		/* set the span given the color */
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
-		/* FIXME fix the simplest case (fill) */
-		enesim_renderer_rop_get(l->r, &rop);
-		enesim_renderer_color_get(l->r, &color);
-		enesim_renderer_flags(l->r, &flags);
-		if (flags & ENESIM_RENDERER_FLAG_COLORIZE)
-			color = ENESIM_COLOR_FULL;
-		if ((rop != ENESIM_FILL || color != ENESIM_COLOR_FULL) && !(flags & ENESIM_RENDERER_FLAG_ROP))
-		{
-			l->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_ARGB8888,
-					color, ENESIM_FORMAT_NONE);
-			only_fill = EINA_FALSE;
-		}
 		enesim_renderer_destination_boundings(l->r, &l->destination_boundings, 0, 0);
 		if (thiz->post_cb)
 		{
@@ -281,17 +193,11 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	}
 	if (state->rop == ENESIM_FILL)
 	{
-		if (only_fill)
-			*fill = _compound_fill_span_fill_layer;
-		else
-			*fill = _compound_fill_span_blend_layer;
+		*fill = _compound_fill_span_blend_layer;
 	}
 	else
 	{
-		if (only_fill)
-			*fill = _compound_blend_span_fill_layer;
-		else
-			*fill = _compound_blend_span_blend_layer;
+		*fill = _compound_blend_span_blend_layer;
 	}
 
 	return EINA_TRUE;
@@ -366,13 +272,6 @@ static void _compound_destination_boundings(Enesim_Renderer *r,
 	rect->y = floor(boundings.y);
 	rect->w = ceil(boundings.w);
 	rect->h = ceil(boundings.h);
-#if 0
-	{
-		const char *name;
-		enesim_renderer_name_get(r, &name);
-		printf("%s destination bounds %d %d %d %d\n", name, rect->x, rect->y, rect->w, rect->h);
-	}
-#endif
 }
 
 static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
@@ -384,7 +283,7 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	thiz = _compound_get(r);
 	if (!thiz->layers)
 	{
-		*flags = ENESIM_RENDERER_FLAG_ROP;
+		*flags = 0;
 		return;
 	}
 
@@ -398,8 +297,6 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		enesim_renderer_flags(lr, &tmp);
 		f &= tmp;
 	}
-	/* we do support the rop flag always */
-	f |= ENESIM_RENDERER_FLAG_ROP;
 	*flags = f;
 }
 

@@ -101,8 +101,8 @@ static inline void _sw_surface_draw_rop_mask(Enesim_Renderer *r,
 		memset(tmp_mask, 0, len);
 		memset(tmp, 0, len);
 
-		fill(r, area->x, area->y, area->w, tmp);
-		mask_fill(r->current.mask, area->x, area->y, area->w, tmp_mask);
+		fill(r, &r->current, area->x, area->y, area->w, tmp);
+		mask_fill(r->current.mask, &r->current.mask->current, area->x, area->y, area->w, tmp_mask);
 		area->y++;
 		/* compose the filled and the destination spans */
 		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, (uint32_t *)tmp_mask);
@@ -124,7 +124,7 @@ static inline void _sw_surface_draw_rop(Enesim_Renderer *r,
 	{
 		/* FIXME we should not memset this */
 		memset(tmp, 0, len);
-		fill(r, area->x, area->y, area->w, tmp);
+		fill(r, &r->current, area->x, area->y, area->w, tmp);
 		area->y++;
 		/* compose the filled and the destination spans */
 		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, NULL);
@@ -142,7 +142,7 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 {
 	while (area->h--)
 	{
-		fill(r, area->x, area->y, area->w, ddata);
+		fill(r, &r->current, area->x, area->y, area->w, ddata);
 		area->y++;
 		ddata += stride;
 	}
@@ -191,7 +191,7 @@ static inline void _sw_surface_draw_rop_threaded(Enesim_Renderer *r,
 
 		/* FIXME we should not memset this */
 		memset(tmp, 0, len);
-		fill(r, area->x, y, area->w, tmp);
+		fill(r, &r->current, area->x, y, area->w, tmp);
 		/* compose the filled and the destination spans */
 		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, NULL);
 end:
@@ -213,7 +213,7 @@ static inline void _sw_surface_draw_simple_threaded(Enesim_Renderer *r,
 	{
 		if (h % _num_cpus != thread) goto end;
 
-		fill(r, area->x, y, area->w, ddata);
+		fill(r, &r->current, area->x, y, area->w, ddata);
 end:
 		ddata += stride;
 		h--;
@@ -480,7 +480,6 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_flags(r, &flags);
 	if (_is_sw_draw_composed(r, flags))
 	{
-		Enesim_Compositor_Span span;
 		Enesim_Format dfmt;
 
 		dfmt = enesim_surface_format_get(s);
@@ -535,6 +534,7 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 	Enesim_Renderer_Sw_Data *sw_data;
 
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
+	/* TODO be sure that the renderer intersect with this coordinates */
 	if (sw_data->span)
 	{
 		uint32_t *tmp;
@@ -544,12 +544,12 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 		tmp = alloca(bytes);
 		/* FIXME for now */
 		memset(tmp, 0, bytes);
-		sw_data->fill(r, x, y, len, tmp);
+		sw_data->fill(r, &r->current, x, y, len, tmp);
 		/* compose the filled and the destination spans */
-		span(data, len, tmp, r->current.color, NULL);
+		sw_data->span(data, len, tmp, r->current.color, NULL);
 	}
 	else
 	{
-		sw_data->fill(r, x, y, len, data);
+		sw_data->fill(r, &r->current, x, y, len, data);
 	}
 }

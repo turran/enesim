@@ -85,8 +85,10 @@ void enesim_renderer_opengl_shutdown(void);
 
 typedef struct _Enesim_Renderer_Sw_Data
 {
+	/* TODO for later we might need a pointer to the function that calls the fill only
+	 * or both, to avoid the if
+	 */
 	Enesim_Renderer_Sw_Fill fill;
-	/* FIXME use this one, we'll need it in case the renderer does not support the current render operation */
 	Enesim_Compositor_Span span;
 } Enesim_Renderer_Sw_Data;
 
@@ -109,6 +111,13 @@ typedef struct _Enesim_Renderer_Shape_State
 	} fill;
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape_State;
+
+typedef void (*Enesim_Renderer_Shape_Sw_Draw)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_Shape_State *sstate,
+		int x, int y,
+		unsigned int len,
+		void *data);
 
 typedef void (*Enesim_Renderer_Shape_Boundings)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],

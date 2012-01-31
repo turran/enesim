@@ -93,7 +93,9 @@ static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
 /*----------------------------------------------------------------------------*
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
-static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_identity(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx;
@@ -148,7 +150,9 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, v
 	}
 }
 
-static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx, ww, hh, ww2, hh2;
@@ -233,7 +237,9 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, voi
 	}
 }
 
-static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_projective(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx, zz, ww, hh, ww2, hh2;

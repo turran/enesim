@@ -101,7 +101,6 @@ typedef struct _Enesim_Renderer_Path
 	Enesim_Figure *fill_figure;
 	Enesim_Figure *stroke_figure;
 
-	Enesim_Renderer_Sw_Fill fill;
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Path;
@@ -654,12 +653,14 @@ static void _path_generate_vertices(Eina_List *commands,
 		state.path_done(state.data);
 }
 
-static void _path_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _path_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Path *thiz;
 
 	thiz = _path_get(r);
-	thiz->fill(thiz->bifigure, x, y, len, ddata);
+	enesim_renderer_sw_draw(thiz->bifigure, x, y, len, ddata);
 }
 
 static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
@@ -779,11 +780,6 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	thiz->fill = enesim_renderer_sw_fill_get(thiz->bifigure);
-	if (!thiz->fill)
-	{
-		return EINA_FALSE;
-	}
 	*fill = _path_span;
 
 	return EINA_TRUE;

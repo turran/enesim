@@ -68,7 +68,9 @@ static Eina_F16p16 _linear_distance_internal(Enesim_Renderer_Gradient_Linear *th
 	return eina_f16p16_sub(eina_f16p16_add(a, b), 32768);
 }
 
-static void _argb8888_pad_span_identity(Enesim_Renderer *r, int x, int y,
+static void _argb8888_pad_span_identity(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;

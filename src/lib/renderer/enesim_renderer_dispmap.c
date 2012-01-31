@@ -85,8 +85,10 @@ static inline Eina_F16p16 _displace(Eina_F16p16 coord, uint8_t distance, Eina_F1
 }
 
 #define DISPMAP_IDENTITY(xch, ych, xfunction, yfunction) \
-static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r, int x,	\
-		int y, unsigned int len, void *ddata)				\
+static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
+		const Enesim_Renderer_State *state,				\
+		int x, int y, unsigned int len,					\
+		void *ddata)							\
 {										\
 	Enesim_Renderer_Dispmap *thiz;						\
 	uint32_t *dst = ddata;							\
@@ -140,8 +142,10 @@ next:										\
 }
 
 #define DISPMAP_AFFINE(xch, ych, xfunction, yfunction) \
-static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r, int x,	\
-		int y, unsigned int len, void *ddata)				\
+static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
+		const Enesim_Renderer_State *state,				\
+		int x, int y, unsigned int len,					\
+		void *ddata)							\
 {										\
 	Enesim_Renderer_Dispmap *thiz;						\
 	uint32_t *dst = ddata;							\

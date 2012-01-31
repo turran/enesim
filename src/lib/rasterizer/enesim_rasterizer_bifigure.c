@@ -249,7 +249,9 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 		}
 
 
-static void _bifig_stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x, int y,
+static void _bifig_stroke_fill_paint_affine_simple(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
@@ -379,7 +381,9 @@ get_out:
 	}
 }
 
-static void _bifig_stroke_paint_fill_affine_simple(Enesim_Renderer *r, int x, int y,
+static void _bifig_stroke_paint_fill_affine_simple(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
@@ -488,7 +492,9 @@ get_out:
 	}
 }
 
-static void _bifig_stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int x, int y,
+static void _bifig_stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
@@ -617,7 +623,9 @@ get_out:
 }
 
 
-static void _over_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _over_figure_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 
@@ -625,7 +633,9 @@ static void _over_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len
 	enesim_renderer_sw_draw(thiz->over, x, y, len, ddata);
 }
 
-static void _under_figure_span(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _under_figure_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 

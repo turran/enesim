@@ -41,6 +41,7 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_Shape_Boundings boundings;
 	Enesim_Renderer_Shape_Destination_Boundings destination_boundings;
 	Enesim_Renderer_Shape_Sw_Setup sw_setup;
+	Enesim_Renderer_Shape_Sw_Draw sw_draw;
 	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
 	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_Has_Changed has_changed;
@@ -56,6 +57,20 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 
 	return thiz;
 }
+
+#if 0
+static void _enesim_renderer_shape_sw_draw(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
+		unsigned int len,
+		void *dst)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	thiz->sw_draw (r, state, &thiz->current, x, y, len, dst);
+}
+#endif
 
 static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],

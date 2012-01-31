@@ -1056,6 +1056,10 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 
 	/* setup the common parameters */
 	if (!enesim_renderer_setup(r, s, error)) return EINA_FALSE;
+	/* FIXME the in_setup should be set on the setup and removed on the cleanup, the renderers
+	 * that have other renderers call the setup() function, not the draw :-/
+	 * we also need to get the bounds and destination on the setup as we had and cache it
+	 */
 
 	_surface_boundings(s, &surface_size);
 	enesim_renderer_boundings(r, &r->current_boundings);

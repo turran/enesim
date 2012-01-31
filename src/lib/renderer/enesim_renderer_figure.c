@@ -32,7 +32,6 @@ typedef struct _Enesim_Renderer_Figure
 	Enesim_Figure *figure;
 	Enesim_Polygon *last_polygon;
 	Enesim_Renderer *path;
-	Enesim_Renderer_Sw_Fill final_fill;
 	Eina_Bool changed :1;
 } Enesim_Renderer_Figure;
 
@@ -46,13 +45,15 @@ static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span(Enesim_Renderer *r, int x, int y,
+static void _figure_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = _figure_get(r);
-	thiz->final_fill(thiz->path, x, y, len, ddata);
+	enesim_renderer_sw_draw(thiz->path, x, y, len, ddata);
 }
 
 static void _figure_generate_commands(Enesim_Renderer_Figure *thiz)
@@ -99,14 +100,13 @@ static void _free(Enesim_Renderer *r)
 	enesim_figure_delete(thiz->figure);
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
+static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
-	Enesim_Renderer_Sw_Data *sdata;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
@@ -139,15 +139,12 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	if (!enesim_renderer_setup(thiz->path, s, error))
 		return EINA_FALSE;
 
-	*fill = _span;
-
-	sdata = enesim_renderer_backend_data_get(thiz->path, ENESIM_BACKEND_SOFTWARE);
-	thiz->final_fill = sdata->fill;
+	*fill = _figure_span;
 
 	return EINA_TRUE;
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _figure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Figure *thiz;
 
@@ -173,8 +170,8 @@ static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .sw_setup = 			*/ _figure_sw_setup,
+	/* .sw_cleanup = 		*/ _figure_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,

@@ -216,7 +216,9 @@ static inline uint32_t _round_line(Eina_F16p16 rr, Eina_F16p16 e01,
 }
 
 #define LINE(cap, capfunction) \
-static void _span_##cap(Enesim_Renderer *r, int x, int y,			\
+static void _span_##cap(Enesim_Renderer *r,					\
+		const Enesim_Renderer_State *state,				\
+		int x, int y,							\
 		unsigned int len, void *ddata)					\
 {										\
 	Enesim_Renderer_Line *thiz;						\
@@ -264,11 +266,7 @@ static void _span_##cap(Enesim_Renderer *r, int x, int y,			\
 										\
 	if (srend)								\
 	{									\
-			Enesim_Renderer_Sw_Data *sdata;				\
-										\
-			sdata = enesim_renderer_backend_data_get(srend,		\
-					ENESIM_BACKEND_SOFTWARE);		\
-			sdata->fill(srend, x, y, len, ddata);			\
+			enesim_renderer_sw_draw(srend, x, y, len, ddata); 	\
 	}									\
 										\
 	while (d < e)								\

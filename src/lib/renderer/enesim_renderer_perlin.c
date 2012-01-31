@@ -77,7 +77,9 @@ static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int
 }
 #endif
 
-static void _argb8888_span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _argb8888_span_identity(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Perlin *thiz;
 	uint32_t *dst = ddata;

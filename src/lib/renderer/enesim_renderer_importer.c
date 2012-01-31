@@ -45,7 +45,9 @@ static inline Enesim_Renderer_Importer * _importer_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_argb8888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_argb8888_none_argb8888(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -73,7 +75,9 @@ static void _span_argb8888_none_argb8888(Enesim_Renderer *r, int x, int y, unsig
 	}
 }
 
-static void _span_a8_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_a8_none_argb8888(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -93,7 +97,9 @@ static void _span_a8_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned in
 	}
 }
 
-static void _span_rgb888_none_argb8888(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;

@@ -150,7 +150,8 @@ static inline uint32_t _repeat_color_get(Enesim_Renderer_Gradient *thiz, Eina_F1
 
 #define GRADIENT_PROJECTIVE(mode) \
 static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
-		int x,	int y, 	unsigned int len, void *ddata)		\
+		const Enesim_Renderer_State *state,			\
+		int x, int y, unsigned int len, void *ddata)		\
 {									\
 	Enesim_Renderer_Gradient *thiz;					\
 	uint32_t *dst = ddata;						\
@@ -177,8 +178,9 @@ static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
 }
 
 #define GRADIENT_IDENTITY(mode) \
-static void _argb8888_##mode##_span_identity(Enesim_Renderer *r, int x,	\
-		int y, 	unsigned int len, void *ddata)			\
+static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
+		const Enesim_Renderer_State *state,			\
+		int x, int y, unsigned int len, void *ddata)		\
 {									\
 	Enesim_Renderer_Gradient *thiz;					\
 	uint32_t *dst = ddata;						\
@@ -200,8 +202,9 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r, int x,	\
 }
 
 #define GRADIENT_AFFINE(mode) \
-static void _argb8888_##mode##_span_affine(Enesim_Renderer *r, int x,	\
-		int y, 	unsigned int len, void *ddata)			\
+static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
+		const Enesim_Renderer_State *state,			\
+ 		int x, int y, unsigned int len, void *ddata)		\
 {									\
 	Enesim_Renderer_Gradient *thiz;					\
 	uint32_t *dst = ddata;						\

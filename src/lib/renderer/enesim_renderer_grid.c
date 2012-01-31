@@ -126,7 +126,9 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 }
 
 
-static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_identity(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;
@@ -181,7 +183,9 @@ static void _span_identity(Enesim_Renderer *r, int x, int y, unsigned int len, v
 #endif
 }
 
-static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;
@@ -203,7 +207,9 @@ static void _span_affine(Enesim_Renderer *r, int x, int y, unsigned int len, voi
 	}
 }
 
-static void _span_projective(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _span_projective(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;

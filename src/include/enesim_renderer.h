@@ -152,7 +152,9 @@ typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 /* software backend descriptor functions */
-typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r, int x, int y,
+typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *dst);
 
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,

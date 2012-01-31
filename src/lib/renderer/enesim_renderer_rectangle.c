@@ -54,7 +54,6 @@ typedef struct _Enesim_Renderer_Rectangle
 	Eina_Bool changed : 1;
 	/* for the case we use the path renderer */
 	Enesim_Renderer *path;
-	Enesim_Renderer_Sw_Fill fill;
 	/* for our own case */
 	Eina_F16p16 ww;
 	Eina_F16p16 hh;
@@ -440,18 +439,12 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
 		do_inner = 0;
 		if (fpaint)
 		{
-			Enesim_Renderer_Sw_Data *sdata;
-
-			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(fpaint, x, y, len, dst);
+			enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 		}
 	}
 	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
 	{
-		Enesim_Renderer_Sw_Data *sdata;
-
-		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-		sdata->fill(fpaint, x, y, len, dst);
+		enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 	}
 
         enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
@@ -523,17 +516,21 @@ static void _test_affine(Enesim_Renderer *r, int x, int y, unsigned int len,
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
 /* Use the internal path for drawing */
-static void _rectangle_path_span(Enesim_Renderer *r, int x, int y,
+static void _rectangle_path_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	thiz->fill(thiz->path, x, y, len, ddata);
+	enesim_renderer_sw_draw(thiz->path, x, y, len, ddata);
 }
 
 /* stroke and/or fill with possibly a fill renderer */
-static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
+static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -587,18 +584,12 @@ static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 		do_inner = 0;
 		if (fpaint)
 		{
-			Enesim_Renderer_Sw_Data *sdata;
-
-			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(fpaint, x, y, len, dst);
+			enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 		}
 	}
 	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
 	{
-		Enesim_Renderer_Sw_Data *sdata;
-
-		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-		sdata->fill(fpaint, x, y, len, dst);
+		enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 	}
 
         enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
@@ -737,7 +728,9 @@ static void _rounded_stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke with a renderer and possibly fill with color */
-static void _rounded_stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
+static void _rounded_stroke_paint_fill_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -761,7 +754,6 @@ static void _rounded_stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
 	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
 	Enesim_Renderer *spaint;
-	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy;
@@ -779,8 +771,7 @@ static void _rounded_stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 		icolor = argb8888_mul4_sym(color, icolor);
 	}
 
-	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x, y, len, dst);
+	enesim_renderer_sw_draw(spaint, x, y, len, dst);
 
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		icolor = 0;
@@ -911,7 +902,9 @@ static void _rounded_stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke and fill with renderers */
-static void _rounded_stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
+static void _rounded_stroke_paint_fill_paint_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -934,7 +927,6 @@ static void _rounded_stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, i
 	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
 	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
 	Enesim_Renderer *fpaint, *spaint;
-	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	unsigned int *sbuf, *s;
@@ -954,12 +946,9 @@ static void _rounded_stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, i
 		icolor = argb8888_mul4_sym(color, icolor);
 	}
 
-	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(fpaint, x, y, len, dst);
-
+	enesim_renderer_sw_draw(spaint, x, y, len, dst);
 	sbuf = alloca(len * sizeof(unsigned int));
-	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x, y, len, sbuf);
+	enesim_renderer_sw_draw(spaint, x, y, len, sbuf);
 	s = sbuf;
 
         enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
@@ -1092,7 +1081,9 @@ static void _rounded_stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, i
 }
 
 /* stroke and/or fill with possibly a fill renderer */
-static void _rounded_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+static void _rounded_stroke_fill_paint_proj(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -1147,18 +1138,12 @@ static void _rounded_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 		do_inner = 0;
 		if (fpaint)
 		{
-			Enesim_Renderer_Sw_Data *sdata;
-
-			sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-			sdata->fill(fpaint, x, y, len, dst);
+			enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 		}
 	}
 	if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL) && do_inner && fpaint)
 	{
-		Enesim_Renderer_Sw_Data *sdata;
-
-		sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-		sdata->fill(fpaint, x, y, len, dst);
+		enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 	}
 	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
 	xx = eina_f16p16_sub(xx, xx0);
@@ -1304,7 +1289,9 @@ static void _rounded_stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke with a renderer and possibly fill with color */
-static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
+static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -1329,7 +1316,6 @@ static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
 	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
 	Enesim_Renderer *spaint;
-	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy, zz;
@@ -1340,8 +1326,7 @@ static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 	enesim_renderer_shape_fill_color_get(r, &icolor);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 
-	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x, y, len, dst);
+	enesim_renderer_sw_draw(spaint, x, y, len, dst);
 
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		icolor = 0;
@@ -1479,7 +1464,9 @@ static void _rounded_stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke and fill with renderers */
-static void _rounded_stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
+static void _rounded_stroke_paint_fill_paint_proj(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Rectangle *thiz = _rectangle_get(r);
@@ -1503,7 +1490,6 @@ static void _rounded_stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int
 	int lxx0 = thiz->lxx0, rxx0 = thiz->rxx0;
 	int tyy0 = thiz->tyy0, byy0 = thiz->byy0;
 	Enesim_Renderer *fpaint, *spaint;
-	Enesim_Renderer_Sw_Data *sdata;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	unsigned int *sbuf, *s;
@@ -1522,12 +1508,9 @@ static void _rounded_stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int
 		icolor = argb8888_mul4_sym(color, icolor);
 	}
 
-	sdata = enesim_renderer_backend_data_get(fpaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(fpaint, x, y, len, dst);
-
+	enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 	sbuf = alloca(len * sizeof(unsigned int));
-	sdata = enesim_renderer_backend_data_get(spaint, ENESIM_BACKEND_SOFTWARE);
-	sdata->fill(spaint, x, y, len, sbuf);
+	enesim_renderer_sw_draw(spaint, x, y, len, sbuf);
 	s = sbuf;
 
 	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
@@ -1748,7 +1731,6 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		{
 			return EINA_FALSE;
 		}
-		thiz->fill = enesim_renderer_sw_fill_get(thiz->path);
 		*fill = _rectangle_path_span;
 
 		return EINA_TRUE;

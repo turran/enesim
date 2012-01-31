@@ -79,8 +79,9 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 
 /* affine simple */
 /* stroke and/or fill with possibly a fill renderer */
-static void _stroke_fill_paint_affine_simple(Enesim_Renderer *r, int x,
-		int y, unsigned int len, void *ddata)
+static void _stroke_fill_paint_affine_simple(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -303,8 +304,9 @@ get_out:
 }
 
 /* stroke with a renderer and possibly fill with color */
-static void _stroke_paint_fill_affine_simple(Enesim_Renderer *r, int x,
-		int y, unsigned int len, void *ddata)
+static void _stroke_paint_fill_affine_simple(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -488,8 +490,9 @@ get_out:
 }
 
 /* stroke and fill with renderers */
-static void _stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r, int x,
-		int y, unsigned int len, void *ddata)
+static void _stroke_paint_fill_paint_affine_simple(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Color color;
@@ -678,8 +681,9 @@ get_out:
 
 /* affine general */
 /* stroke and/or fill with possibly a fill renderer */
-static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
-		unsigned int len, void *ddata)
+static void _stroke_fill_paint_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -890,7 +894,9 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke with a renderer and possibly fill with color */
-static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
+static void _stroke_paint_fill_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
@@ -1062,8 +1068,9 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke and fill with renderers */
-static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
-		unsigned int len, void *ddata)
+static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Color color;
@@ -1238,8 +1245,9 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r, int x, int y,
 
 /* projective general */
 /* stroke and/or fill with possibly a fill renderer */
-static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
-		unsigned int len, void *ddata)
+static void _stroke_fill_paint_proj(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -1432,8 +1440,9 @@ static void _stroke_fill_paint_proj(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke with a renderer and possibly fill with color */
-static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
-		unsigned int len, void *ddata)
+static void _stroke_paint_fill_proj(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
@@ -1588,8 +1597,9 @@ static void _stroke_paint_fill_proj(Enesim_Renderer *r, int x, int y,
 }
 
 /* stroke and fill with renderers */
-static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r, int x, int y,
-		unsigned int len, void *ddata)
+static void _stroke_paint_fill_paint_proj(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
 	Enesim_Color color;

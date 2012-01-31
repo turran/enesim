@@ -47,10 +47,12 @@ static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span(Enesim_Renderer *p, int x, int y,
+static void _background_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Background *thiz = _background_get(p);
+	Enesim_Renderer_Background *thiz = _background_get(r);
 	uint32_t *dst = ddata;
 
 	thiz->span(dst, len, NULL, thiz->final_color, NULL);
@@ -95,7 +97,7 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_rop_get(r, &rop);
 	thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
 			thiz->final_color, ENESIM_FORMAT_NONE);
-	*fill = _span;
+	*fill = _background_span;
 
 	return EINA_TRUE;
 }

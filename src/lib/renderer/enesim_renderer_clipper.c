@@ -55,13 +55,15 @@ static inline Enesim_Renderer_Clipper * _clipper_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span(Enesim_Renderer *r, int x, int y,
+static void _clipper_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *dst)
 {
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = _clipper_get(r);
-	thiz->content_fill(thiz->content, x, y, len, dst);
+	enesim_renderer_sw_draw(thiz->content, x, y, len, dst);
 }
 
 static void _content_cleanup(Enesim_Renderer_Clipper *thiz, Enesim_Surface *s)
@@ -141,8 +143,7 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
 		_content_cleanup(thiz, s);
 		return EINA_FALSE;
 	}
-	*fill = _span;
-	thiz->content_fill = enesim_renderer_sw_fill_get(thiz->content);
+	*fill = _clipper_span;
 	return EINA_TRUE;
 }
 

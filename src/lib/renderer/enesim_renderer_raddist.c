@@ -47,7 +47,9 @@ static inline Enesim_Renderer_Raddist * _raddist_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _span_identity(Enesim_Renderer *r, int x, int y,
+static void _span_identity(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Raddist *rd;

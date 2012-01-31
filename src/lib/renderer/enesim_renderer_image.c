@@ -121,7 +121,9 @@ static void _scale_good(Surface *s, int x, int y, unsigned int len, uint32_t *ds
 }
 #endif
 
-static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _scale_fast_identity(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz;
 	size_t sstride;
@@ -150,7 +152,9 @@ static void _scale_fast_identity(Enesim_Renderer *r, int x, int y, unsigned int 
 	}
 }
 
-static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _scale_fast_affine(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz;
 	size_t sstride;
@@ -186,7 +190,9 @@ static void _scale_fast_affine(Enesim_Renderer *r, int x, int y, unsigned int le
 	}
 }
 
-static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *dst)
+static void _a8_to_argb8888_noscale(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Image *thiz;
 	size_t sstride;
@@ -215,7 +221,9 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned i
 	}
 }
 
-static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r, int x, int y, unsigned int len, void *ddata)
+static void _argb8888_to_argb8888_noscale(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz;
 	Enesim_Color color;
