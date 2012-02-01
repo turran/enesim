@@ -162,17 +162,9 @@ static void _boundings(Enesim_Renderer *r,
 	rect->h = r0_rect.h > r1_rect.h ? r0_rect.h : r1_rect.h;
 }
 
-static void _transition_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _transition_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Transition *thiz;
-
-	thiz = _transition_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;

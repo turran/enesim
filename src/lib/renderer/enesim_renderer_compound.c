@@ -274,11 +274,12 @@ static void _compound_destination_boundings(Enesim_Renderer *r,
 	rect->h = ceil(boundings.h);
 }
 
-static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _compound_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Flag f = 0xffffffff;
-	Enesim_Rop rop;
+	Enesim_Rop rop = state->rop;
 	Eina_Bool same_rop = EINA_TRUE;
 	Eina_List *ll;
 
@@ -289,7 +290,6 @@ static void _compound_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 		return;
 	}
 
-	enesim_renderer_rop_get(r, &rop);
 	/* TODO we need to find an heuristic to set the colorize/rop flag
 	 * that reduces the number of raster operations we have to do
 	 * (i.e a passthrough)

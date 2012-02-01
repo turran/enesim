@@ -154,7 +154,8 @@ static void _figure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _figure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _figure_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Figure *thiz;
 

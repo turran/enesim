@@ -159,7 +159,8 @@ static void _clipper_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 
-static void _clipper_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _clipper_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Clipper *thiz;
 
@@ -186,7 +187,7 @@ static void _clipper_boundings(Enesim_Renderer *r,
 	rect->y = 0;
 	rect->w = thiz->width;
 	rect->h = thiz->height;
-	_clipper_flags(r, &flags);
+	_clipper_flags(r, cs, &flags);
 	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
 	{
 		rect->x += cs->ox;
@@ -203,7 +204,7 @@ static void _clipper_destination_boundings(Enesim_Renderer *r,
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	_clipper_boundings(r, states, &oboundings);
-	_clipper_flags(r, &flags);
+	_clipper_flags(r, cs, &flags);
 	if (flags & (ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_PROJECTIVE))
 	{
 		if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)

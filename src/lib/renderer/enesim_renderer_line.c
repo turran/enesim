@@ -218,6 +218,7 @@ static inline uint32_t _round_line(Eina_F16p16 rr, Eina_F16p16 e01,
 #define LINE(cap, capfunction) \
 static void _span_##cap(Enesim_Renderer *r,					\
 		const Enesim_Renderer_State *state,				\
+		const Enesim_Renderer_Shape_State *sstate,			\
 		int x, int y,							\
 		unsigned int len, void *ddata)					\
 {										\
@@ -286,7 +287,7 @@ LINE(butt, _butt_line);
 LINE(round, _round_line);
 LINE(square, _square_line);
 
-static Enesim_Renderer_Sw_Fill _spans[ENESIM_SHAPE_STROKE_CAPS];
+static Enesim_Renderer_Shape_Sw_Draw _spans[ENESIM_SHAPE_STROKE_CAPS];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -299,7 +300,7 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
 {
 	Enesim_Renderer_Line *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -382,7 +383,7 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	enesim_matrix_f16p16_matrix_to(&cs->transformation,
 			&thiz->matrix);
 
-	*fill = _spans[css->stroke.cap];
+	*draw = _spans[css->stroke.cap];
 
 	return EINA_TRUE;
 }
@@ -398,7 +399,8 @@ static void _line_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _line_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _line_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |

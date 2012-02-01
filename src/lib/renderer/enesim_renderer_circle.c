@@ -673,17 +673,9 @@ static void _circle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _circle_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _circle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Circle *thiz;
-
-	thiz = _circle_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |

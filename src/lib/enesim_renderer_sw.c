@@ -532,9 +532,37 @@ EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
 EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
+	Eina_Rectangle span;
+	Eina_Rectangle rbounds;
 
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
+#if 0
 	/* TODO be sure that the renderer intersect with this coordinates */
+	eina_rectangle_coords_from(&span, x, y, len, 1);
+	rbounds = r->current_destination_boundings;
+	if (!eina_rectangle_intersection(&rbounds, &span))
+	{
+		return;
+	}
+
+	if (sw_data->span)
+	{
+		uint32_t *tmp;
+		size_t bytes;
+
+		bytes = rbounds.w * sizeof(uint32_t);
+		tmp = alloca(bytes);
+		/* FIXME for now */
+		memset(tmp, 0, bytes);
+		sw_data->fill(r, &r->current, rbounds.x, rbounds.y, rbounds.w, tmp);
+		/* compose the filled and the destination spans */
+		sw_data->span(data + rbounds.x, rbounds.w, tmp, r->current.color, NULL);
+	}
+	else
+	{
+		sw_data->fill(r, &r->current, rbounds.x, rbounds.y, rbounds.w, data);
+	}
+#else
 	if (sw_data->span)
 	{
 		uint32_t *tmp;
@@ -552,4 +580,5 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 	{
 		sw_data->fill(r, &r->current, x, y, len, data);
 	}
+#endif
 }

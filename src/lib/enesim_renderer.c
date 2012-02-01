@@ -567,7 +567,7 @@ EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 	}
 	if (r->descriptor.flags)
 	{
-		r->descriptor.flags(r, flags);
+		r->descriptor.flags(r, &r->current, flags);
 		return;
 	}
 }

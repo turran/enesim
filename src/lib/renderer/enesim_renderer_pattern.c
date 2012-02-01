@@ -47,31 +47,39 @@ static inline Enesim_Renderer_Pattern * _pattern_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _repeat_span(Enesim_Renderer *p, int x, int y,
+static void _repeat_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
+	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
-static void _pad_span(Enesim_Renderer *p, int x, int y,
+static void _pad_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
+	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
-static void _restrict_span(Enesim_Renderer *p, int x, int y,
+static void _restrict_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
+	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
-static void _reflect_span(Enesim_Renderer *p, int x, int y,
+static void _reflect_span(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(p);
+	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
@@ -112,17 +120,9 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _pattern_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _pattern_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Pattern *thiz;
-
-	thiz = _pattern_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |

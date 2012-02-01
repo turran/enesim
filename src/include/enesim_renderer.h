@@ -147,7 +147,9 @@ typedef void (*Enesim_Renderer_Boundings)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_Destination_Boundings)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Eina_Rectangle *dboundings);
-typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
+typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
@@ -229,9 +231,6 @@ EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_relative_set(Enesim_Renderer *r, const Enesim_Renderer_State *rel, Enesim_Renderer_State *old_state);
 EAPI void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer_State *state);
-
-/* TODO remove this one */
-EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
 

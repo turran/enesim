@@ -96,11 +96,9 @@ static void _rasterizer_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _rasterizer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _rasterizer_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Rasterizer *thiz;
-
-	thiz = _rasterizer_get(r);
 	/* FIXME we should use the rasterizer implementation flags */
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |

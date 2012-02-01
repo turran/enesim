@@ -292,15 +292,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 
 static void _grid_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Grid *thiz;
-
-	thiz = _grid_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |

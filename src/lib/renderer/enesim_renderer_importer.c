@@ -212,16 +212,9 @@ static void _importer_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _importer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _importer_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Importer *thiz;
-
-	thiz = _importer_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
 }
 

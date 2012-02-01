@@ -1856,17 +1856,9 @@ static void _rectangle_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _rectangle_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _rectangle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Rectangle *thiz;
-
-	thiz = _rectangle_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |

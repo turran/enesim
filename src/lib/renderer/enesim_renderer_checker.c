@@ -412,17 +412,9 @@ static Eina_Bool _checker_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
-static void _checker_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _checker_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Checker *thiz;
-
-	thiz = _checker_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |

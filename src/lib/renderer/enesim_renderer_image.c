@@ -397,17 +397,9 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _image_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _image_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Image *thiz;
-
-	thiz = _image_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888;

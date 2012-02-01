@@ -753,6 +753,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, css->stroke.r);
 	enesim_renderer_shape_fill_color_set(thiz->bifigure, css->fill.color);
 	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, css->fill.r);
+	enesim_renderer_shape_fill_rule_set(thiz->bifigure, css->fill.rule);
 
 	enesim_renderer_color_set(thiz->bifigure, cs->color);
 	enesim_renderer_origin_set(thiz->bifigure, cs->ox, cs->oy);
@@ -777,7 +778,8 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _path_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _path_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_SCALE |

@@ -270,17 +270,9 @@ static void _boundings(Enesim_Renderer *r,
 	}
 }
 
-static void _dispmap_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _dispmap_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Dispmap *thiz;
-
-	thiz = _dispmap_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888;

@@ -418,17 +418,9 @@ static void _stripes_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_stripes_state_cleanup(thiz, s);
 }
 
-static void _stripes_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _stripes_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Stripes *thiz;
-
-	thiz = _stripes_get(r);
-	if (!thiz)
-	{
-		*flags = 0;
-		return;
-	}
-
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |

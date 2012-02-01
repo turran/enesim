@@ -31,14 +31,15 @@ static inline void _polygon_update_bounds(Enesim_Polygon *ep, Enesim_Point *p)
 
 static Eina_Bool _points_equal(Enesim_Point *p0, Enesim_Point *p1, double threshold)
 {
+	Eina_Bool ret = EINA_FALSE;
 	double x01;
 	double y01;
 
 	x01 = fabs(p0->x - p1->x);
 	y01 = fabs(p0->y - p1->y);
 	if (x01 < threshold && y01 < threshold)
-		return EINA_TRUE;
-	return EINA_FALSE;
+		ret = EINA_TRUE;
+	return ret;
 }
 
 void _polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p)
