@@ -126,6 +126,7 @@ static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
 	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
 	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
+	enesim_renderer_shape_fill_rule_set(thiz->path, css->fill.rule);
 	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
 	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
 	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);

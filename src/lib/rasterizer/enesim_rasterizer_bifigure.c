@@ -88,12 +88,38 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 			oedge->xx1 = ov->xx1; \
 			oedge->yy0 = ov->yy0; \
 			oedge->yy1 = ov->yy1; \
-			oedge->de = ov->a; \
+			oedge->de = (ov->a * (long long int) axx) >> 16; \
 			oedge->e = ((ov->a * (long long int) xx) >> 16) + \
 					((ov->b * (long long int) yy) >> 16) + \
 					ov->c; \
-			if (lx > ov->xx0)  lx = ov->xx0; \
-			if (rx < ov->xx1)  rx = ov->xx1; \
+			if (ov->sgn && ((ov->xx1 - ov->xx0) > 2)) \
+			{ \
+				int dxx = (ov->xx1 - ov->xx0); \
+				double dd = dxx / (double)(ov->yy1 - ov->yy0); \
+				int lxxc, lyyc = yy - 0xffff; \
+				int rxxc, ryyc = yy + 0xffff; \
+ \
+				if (ov->sgn < 0) \
+				{ lyyc = yy + 0xffff;  ryyc = yy - 0xffff; } \
+ \
+				lxxc = (lyyc - ov->yy0) * dd; \
+				rxxc = (ryyc - ov->yy0) * dd; \
+ \
+				if (ov->sgn < 0) \
+				{ lxxc = dxx - lxxc;  rxxc = dxx - rxxc; } \
+ \
+				lxxc += ov->xx0;  rxxc += ov->xx0; \
+				if (lxxc < ov->xx0)  lxxc = ov->xx0; \
+				if (rxxc > ov->xx1)  rxxc = ov->xx1; \
+ \
+				if (lx > lxxc)  lx = lxxc; \
+				if (rx < rxxc)  rx = rxxc; \
+			} \
+			else \
+			{ \
+				if (lx > ov->xx0)  lx = ov->xx0; \
+				if (rx < ov->xx1)  rx = ov->xx1; \
+			} \
 			oedge++; \
 			noedges++; \
 		} \
@@ -113,12 +139,38 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 			uedge->xx1 = uv->xx1; \
 			uedge->yy0 = uv->yy0; \
 			uedge->yy1 = uv->yy1; \
-			uedge->de = uv->a; \
+			uedge->de = (uv->a * (long long int) axx) >> 16; \
 			uedge->e = ((uv->a * (long long int) xx) >> 16) + \
 					((uv->b * (long long int) yy) >> 16) + \
 					uv->c; \
-			if (lx > uv->xx0)  lx = uv->xx0; \
-			if (rx < uv->xx1)  rx = uv->xx1; \
+			if (uv->sgn && ((uv->xx1 - uv->xx0) > 2)) \
+			{ \
+				int dxx = (uv->xx1 - uv->xx0); \
+				double dd = dxx / (double)(uv->yy1 - uv->yy0); \
+				int lxxc, lyyc = yy - 0xffff; \
+				int rxxc, ryyc = yy + 0xffff; \
+ \
+				if (uv->sgn < 0) \
+				{ lyyc = yy + 0xffff;  ryyc = yy - 0xffff; } \
+ \
+				lxxc = (lyyc - uv->yy0) * dd; \
+				rxxc = (ryyc - uv->yy0) * dd; \
+ \
+				if (uv->sgn < 0) \
+				{ lxxc = dxx - lxxc;  rxxc = dxx - rxxc; } \
+ \
+				lxxc += uv->xx0;  rxxc += uv->xx0; \
+				if (lxxc < uv->xx0)  lxxc = uv->xx0; \
+				if (rxxc > uv->xx1)  rxxc = uv->xx1; \
+ \
+				if (lx > lxxc)  lx = lxxc; \
+				if (rx < rxxc)  rx = rxxc; \
+			} \
+			else \
+			{ \
+				if (lx > uv->xx0)  lx = uv->xx0; \
+				if (rx < uv->xx1)  rx = uv->xx1; \
+			} \
 			uedge++; \
 			nuedges++; \
 		} \
@@ -132,7 +184,7 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 	if (lx > 0) \
 	{ \
 		memset(dst, 0, sizeof(unsigned int) * lx); \
-		xx += lx * 65536; \
+		xx += lx * axx; \
 		d += lx; \
 		n = 0;  oedge = oedges; \
 		while (n < noedges) \
@@ -238,8 +290,10 @@ static void _bifig_stroke_fill_paint_nz(Enesim_Renderer *r,
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
-	int xx = x << 16;
-	int yy = y << 16;
+	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
@@ -340,7 +394,7 @@ get_out:
 			}
 		}
 		*d++ = p0;
-		xx += 65536;
+		xx += axx;
 	}
 }
 
@@ -369,8 +423,10 @@ static void _bifig_stroke_paint_fill_nz(Enesim_Renderer *r,
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
-	int xx = x << 16;
-	int yy = y << 16;
+	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
@@ -450,7 +506,7 @@ get_out:
 			}
 		}
 		*d++ = p0;
-		xx += 65536;
+		xx += axx;
 	}
 }
 
@@ -480,8 +536,10 @@ static void _bifig_stroke_paint_fill_paint_nz(Enesim_Renderer *r,
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
-	int xx = x << 16;
-	int yy = y << 16;
+	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
@@ -579,7 +637,7 @@ get_out:
 		}
 		*d++ = p0;
 		s++;
-		xx += 65536;
+		xx += axx;
 	}
 }
 
@@ -673,8 +731,10 @@ static void _bifig_stroke_fill_paint_eo_u(Enesim_Renderer *r,
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
-	int xx = x << 16;
-	int yy = y << 16;
+	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
@@ -775,7 +835,7 @@ get_out:
 			}
 		}
 		*d++ = p0;
-		xx += 65536;
+		xx += axx;
 	}
 }
 
@@ -803,8 +863,10 @@ static void _bifig_stroke_paint_fill_eo_u(Enesim_Renderer *r,
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
-	int xx = x << 16;
-	int yy = y << 16;
+	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
@@ -884,7 +946,7 @@ get_out:
 			}
 		}
 		*d++ = p0;
-		xx += 65536;
+		xx += axx;
 	}
 }
 
@@ -913,8 +975,10 @@ static void _bifig_stroke_paint_fill_paint_eo_u(Enesim_Renderer *r,
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
-	int xx = x << 16;
-	int yy = y << 16;
+	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
+	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
+	int xx = (axx * x) + (axx >> 1) + axz - 32768;
+	int yy = (ayy * y) + (ayy >> 1) + ayz - 32768;
 
 	enesim_rasterizer_basic_vectors_get(thiz->under, &nuvectors, &uv);
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
@@ -1012,7 +1076,7 @@ get_out:
 		}
 		*d++ = p0;
 		s++;
-		xx += 65536;
+		xx += axx;
 	}
 }
 
@@ -1132,6 +1196,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		thiz->changed = EINA_FALSE;
 	}
 
+	enesim_matrix_f16p16_matrix_to(&cs->transformation,
+			&thiz->matrix);
 	/* setup the figures and get span funcs */
 	if (!thiz->under)
 	{

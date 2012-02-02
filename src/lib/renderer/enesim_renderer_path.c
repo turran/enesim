@@ -145,7 +145,7 @@ static void _edge_join(Enesim_Path_Edge *e1,
 	}
 }
 
-static void _do_normal(Enesim_Point *n, Enesim_Point *p0, Enesim_Point *p1)
+static inline Eina_Bool _do_normal(Enesim_Point *n, Enesim_Point *p0, Enesim_Point *p1, double threshold)
 {
 	double dx;
 	double dy;
@@ -154,10 +154,13 @@ static void _do_normal(Enesim_Point *n, Enesim_Point *p0, Enesim_Point *p1)
 	dx = p1->x - p0->x;
 	dy = p1->y - p0->y;
 
-	/* FIXME check if the point is the same */
+	if (fabs(dx) < threshold && fabs(dy) < threshold)
+		return EINA_FALSE;
 	f = 1.0 / hypot(dx, dy);
 	n->x = dy * f;
 	n->y = -dx * f;
+
+	return EINA_TRUE;
 }
 
 static void _stroke_curve_append(double x, double y, void *data)
@@ -188,8 +191,6 @@ static void _stroke_path_vertex_process(double x, double y, void *data)
 	int c1;
 	int c2;
 
-	/* FIXME check that the vertex is actually far enough */
-
 	/* just store the first point */
 	if (thiz->count < 2)
 	{
@@ -204,7 +205,9 @@ static void _stroke_path_vertex_process(double x, double y, void *data)
 			case 1:
 			thiz->p1.x = x;
 			thiz->p1.y = y;
-			_do_normal(&thiz->n01, &thiz->p0, &thiz->p1);
+			/* FIXME use the threshold set by the quality prop or something like that */
+			if (!_do_normal(&thiz->n01, &thiz->p0, &thiz->p1, 1/256.0))
+				return;
 
 			ox = thiz->rx  * thiz->n01.x;
 			oy = thiz->ry * thiz->n01.y;
@@ -236,7 +239,9 @@ static void _stroke_path_vertex_process(double x, double y, void *data)
 	/* get the normals of the new edge */
 	thiz->p2.x = x;
 	thiz->p2.y = y;
-	_do_normal(&thiz->n12, &thiz->p1, &thiz->p2);
+	/* FIXME use the threshold set by the quality prop or something like that */
+	if (!_do_normal(&thiz->n12, &thiz->p1, &thiz->p2, 1/256.0))
+		return;
 	ox = thiz->rx * thiz->n12.x;
 	oy = thiz->ry * thiz->n12.y;
 
@@ -611,7 +616,9 @@ static void _path_generate_vertices(Eina_List *commands,
 			ry = scale_y * cmd->definition.arc_to.ry;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
-			enesim_matrix_point_transform(gm, rx, ry, &rx, &ry);
+			rx = rx * hypot(gm->xx, gm->yx);
+			ry = ry * hypot(gm->xy, gm->yy);
+			
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
 			enesim_curve_arc_to(&state.st,

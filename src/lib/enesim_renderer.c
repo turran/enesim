@@ -106,7 +106,7 @@ static Eina_Hash *_factories = NULL;
 /*----------------------------------------------------------------------------*
  *                   Functions to transform the boundings                     *
  *----------------------------------------------------------------------------*/
-static void _enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
+static inline void _enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *boundings)
 {
 	if (r->descriptor.boundings)
 	{
@@ -122,9 +122,8 @@ static void _enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *bou
 	}
 }
 
-static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
-		Eina_Rectangle *boundings,
-		int x, int y)
+static inline void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
+		Eina_Rectangle *boundings)
 {
 	if (r->descriptor.destination_boundings)
 	{
@@ -134,8 +133,6 @@ static void _enesim_renderer_destination_boundings(Enesim_Renderer *r,
 		states[ENESIM_STATE_PAST] = &r->past;
 
 		r->descriptor.destination_boundings(r, states, boundings);
-		boundings->x -= x;
-		boundings->y -= y;
 	}
 	else
 	{
@@ -521,6 +518,13 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		default:
 		break;
 	}
+	if (!r->in_setup)
+	{
+		enesim_renderer_boundings(r, &r->current_boundings);
+		enesim_renderer_destination_boundings(r, &r->current_destination_boundings, 0, 0);
+		enesim_renderer_flags(r, &r->current_flags);
+		r->in_setup = EINA_TRUE;
+	}
 
 	return ret;
 }
@@ -547,6 +551,12 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	/* swap the states */
 	/* first stuff that needs to be freed */
 	r->past = r->current;
+	if (r->in_setup)
+	{
+		r->past_boundings = r->current_boundings;
+		r->past_destination_boundings = r->current_destination_boundings;
+		r->in_setup = EINA_FALSE;
+	}
 	DBG("Cleaning up the renderer %s", r->name);
 }
 
@@ -832,10 +842,11 @@ EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	if (r->in_setup)
 	{
 		*rect = r->current_boundings;
-		return;
 	}
-
-	_enesim_renderer_boundings(r, rect);
+	else
+	{
+		_enesim_renderer_boundings(r, rect);
+	}
 }
 
 /**
@@ -870,7 +881,14 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 		*rect = r->current_destination_boundings;
 		return;
 	}
-	_enesim_renderer_destination_boundings(r, rect, x, y);
+	else
+	{
+		_enesim_renderer_destination_boundings(r, rect);
+	}
+	if (rect->x != INT_MIN / 2)
+		rect->x -= x;
+	if (rect->y != INT_MIN / 2)
+		rect->y -= y;
 }
 
 /**
@@ -885,13 +903,15 @@ EAPI void enesim_renderer_destination_boundings_extended(Enesim_Renderer *r,
 
 	if (curr)
 	{
-		_enesim_renderer_destination_boundings(r, curr, x, y);
+		enesim_renderer_destination_boundings(r, curr, x, y);
 	}
 	if (prev)
 	{
 		*prev = r->past_destination_boundings;
-		prev->x -= x;
-		prev->y -= y;
+		if (prev->x != INT_MIN / 2)
+			prev->x -= x;
+		if (prev->y != INT_MIN / 2)
+			prev->y -= y;
 	}
 }
 
@@ -1011,22 +1031,15 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 			goto end;
 		}
 	}
-	enesim_renderer_boundings(r, &r->current_boundings);
-	enesim_renderer_destination_boundings(r, &r->current_destination_boundings, 0, 0);
 	/* clip against the destination rectangle */
 	if (!eina_rectangle_intersection(&final, &r->current_destination_boundings))
 	{
 		WRN("The renderer %p boundings does not intersect on the destination rectangle", r);
 		goto end;
 	}
-	enesim_renderer_flags(r, &r->current_flags);
-	r->in_setup = EINA_TRUE;
 	_draw_internal(r, s, &final, x, y);
 
 	/* TODO set the format again */
-	r->past_boundings = r->current_boundings;
-	r->past_destination_boundings = r->current_destination_boundings;
-	r->in_setup = EINA_FALSE;
 end:
 	enesim_renderer_cleanup(r, s);
 	return EINA_TRUE;

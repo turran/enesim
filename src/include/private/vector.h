@@ -64,6 +64,7 @@ typedef struct _Enesim_F16p16_Vector
 {
 	int xx0, yy0, xx1, yy1;
 	int a, b, c;
+	int sgn;
 } Enesim_F16p16_Vector;
 
 typedef struct _Enesim_F16p16_Edge
