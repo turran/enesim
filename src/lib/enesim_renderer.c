@@ -966,6 +966,27 @@ EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
  * To  be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_hints_set(Enesim_Renderer *r, Enesim_Renderer_Hint hints)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->hints = hints;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hints)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (!hints) return;
+	*hints = r->hints;
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -1075,22 +1096,15 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	 */
 
 	_surface_boundings(s, &surface_size);
-	enesim_renderer_boundings(r, &r->current_boundings);
-	enesim_renderer_destination_boundings(r, &r->current_destination_boundings, 0, 0);
 	/* clip against the destination rectangle */
 	if (!eina_rectangle_intersection(&r->current_destination_boundings, &surface_size))
 	{
 		WRN("The renderer %p boundings does not intersect on the destination rectangle", r);
 		goto end;
 	}
-	enesim_renderer_flags(r, &r->current_flags);
-	r->in_setup = EINA_TRUE;
 	_draw_list_internal(r, s, &r->current_destination_boundings, clips, x, y);
 
 	/* TODO set the format again */
-	r->past_boundings = r->current_boundings;
-	r->past_destination_boundings = r->current_destination_boundings;
-	r->in_setup = EINA_FALSE;
 end:
 	enesim_renderer_cleanup(r, s);
 	return EINA_TRUE;

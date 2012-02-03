@@ -26,7 +26,7 @@
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
 
 /** Flags that specify what a renderer supports */
-typedef enum Enesim_Renderer_Flag
+typedef enum _Enesim_Renderer_Flag
 {
 	ENESIM_RENDERER_FLAG_TRANSLATE		= (1 << 0), /**< The renderer can be translated using the origin property */
 	ENESIM_RENDERER_FLAG_SCALE		= (1 << 1), /**< The renderer can be scaled using the scale property */
@@ -42,6 +42,11 @@ typedef enum Enesim_Renderer_Flag
 } Enesim_Renderer_Flag;
 
 #define ENESIM_RENDERER_FLAGS 11
+
+typedef enum _Enesim_Renderer_Hint
+{
+	ENESIM_RENDERER_HINT_CACHE		= (1 << 0), /**< Cache the resulting drawing */
+} Enesim_Renderer_Hint;
 
 /**
  * Callback function of the Enesim_Renderer_Damage descriptor function
@@ -83,6 +88,9 @@ EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask);
+
+EAPI void enesim_renderer_hint_set(Enesim_Renderer *r, Enesim_Renderer_Hint hints);
+EAPI void enesim_renderer_hint_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hints);
 
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_boundings_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);

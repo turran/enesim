@@ -159,6 +159,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
 			{
 				enesim_renderer_relative_unset(l->r, &l->old);
+				/* FIXME what to do here */
 				break;
 			}
 		}
@@ -186,7 +187,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		{
 			if (!thiz->post_cb(r, l->r, thiz->post_data))
 			{
-				/* FIXME waht to do here */
+				enesim_renderer_relative_unset(l->r, &l->old);
+				/* FIXME what to do here */
 				break;
 			}
 		}
