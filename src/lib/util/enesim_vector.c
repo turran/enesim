@@ -178,7 +178,7 @@ void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
 	thiz->closed = close;
 }
 
-void enesim_polygon_boundings(Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
+void enesim_polygon_boundings(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
 {
 	*xmin = thiz->xmin;
 	*ymin = thiz->ymin;
@@ -200,7 +200,7 @@ void enesim_figure_delete(Enesim_Figure *thiz)
 	free(thiz);
 }
 
-void enesim_figure_boundings(Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
+void enesim_figure_boundings(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
 {
 	Enesim_Polygon *p;
 	Eina_List *l;

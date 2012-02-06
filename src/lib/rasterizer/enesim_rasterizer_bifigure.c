@@ -1340,13 +1340,6 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _bifigure_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
-{
-	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER;
-}
-
 static Enesim_Rasterizer_Descriptor _descriptor = {
 	/* .name = 		*/ _bifigure_name,
 	/* .free = 		*/ _bifigure_free,
