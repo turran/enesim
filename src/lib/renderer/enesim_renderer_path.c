@@ -531,6 +531,7 @@ static void _path_generate_vertices(Eina_List *commands,
 		double ctrl_y0;
 		double ctrl_x1;
 		double ctrl_y1;
+		double ca, sa;
 		/* send the new vertex to the figure renderer */
 		switch (cmd->type)
 		{
@@ -614,16 +615,19 @@ static void _path_generate_vertices(Eina_List *commands,
 			y = scale_y * cmd->definition.arc_to.y;
 			rx = scale_x * cmd->definition.arc_to.rx;
 			ry = scale_y * cmd->definition.arc_to.ry;
+			ca = cos(cmd->definition.arc_to.angle * M_PI / 180.0);
+			sa = sin(cmd->definition.arc_to.angle * M_PI / 180.0);
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
-			rx = rx * hypot(gm->xx, gm->yx);
-			ry = ry * hypot(gm->xy, gm->yy);
+			rx = rx * hypot((ca * gm->xx) + (sa * gm->xy), (ca * gm->yx) + (sa * gm->yy));
+			ry = ry * hypot((ca * gm->xy) - (sa * gm->xx), (ca * gm->yy) - (sa * gm->yx));
+			ca = atan2((ca * gm->yx) + (sa * gm->yy), (ca * gm->xx) + (sa * gm->xy));
 			
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
 			enesim_curve_arc_to(&state.st,
 					rx, ry,
-					cmd->definition.arc_to.angle,
+					ca * 180.0 / M_PI,
 					cmd->definition.arc_to.large,
 					cmd->definition.arc_to.sweep,
 					x, y);
@@ -744,7 +748,6 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 
 	thiz = _path_get(r);
 
-	/* TODO in the future the generation of polygons might depend also on the geometric matrix used */
 	/* generate the list of points/polygons */
 	if (_path_needs_generate(thiz, &cs->geometry_transformation, &ps->geometry_transformation))
 	{
@@ -889,8 +892,8 @@ static void _path_destination_boundings(Enesim_Renderer *r,
 	}
 	boundings->x = floor(oboundings.x);
 	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.w);
-	boundings->h = ceil(oboundings.h);
+	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
+	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
 }
 
 #if BUILD_OPENGL

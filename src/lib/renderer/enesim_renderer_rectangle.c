@@ -1966,8 +1966,8 @@ static void _rectangle_destination_boundings(Enesim_Renderer *r,
 	}
 	boundings->x = floor(oboundings.x);
 	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.w);
-	boundings->h = ceil(oboundings.h);
+	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
+	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
 }
 
 static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)

@@ -46,6 +46,7 @@ typedef struct _Enesim_Renderer_Compound
 	EINA_MAGIC
 	/* properties */
 	Eina_List *layers;
+	Eina_List *visible_layers; /* FIXME maybe is time to change from lists to arrays */
 	Enesim_Renderer_Compound_Setup pre_cb;
 	void *pre_data;
 	Enesim_Renderer_Compound_Setup post_cb;
@@ -80,7 +81,7 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 	uint32_t *dst = ddata;
 
 	eina_rectangle_coords_from(&span, x, y, len, 1);
-	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
+	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
 		Eina_Rectangle lboundings;
@@ -97,7 +98,6 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 		offset = lboundings.x - span.x;
 		enesim_renderer_sw_draw(l->r, lboundings.x, lboundings.y, lboundings.w, dst + offset);
 	}
-
 }
 
 /* whenever the compound needs to fill, we need to zeros the whole destination buffer */
@@ -144,6 +144,12 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	Eina_List *ll;
 
 	thiz = _compound_get(r);
+
+	if (thiz->visible_layers)
+	{
+		eina_list_free(thiz->visible_layers);
+		thiz->visible_layers = NULL;
+	}
 	/* setup every layer */
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
@@ -159,8 +165,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
 			{
 				enesim_renderer_relative_unset(l->r, &l->old);
-				/* FIXME what to do here */
-				break;
+				continue;
 			}
 		}
 		if (!enesim_renderer_setup(l->r, s, error))
@@ -169,15 +174,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 
 			enesim_renderer_name_get(l->r, &name);
 			ENESIM_RENDERER_ERROR(r, error, "Child renderer %s can not setup", name);
-			for (; ll && ll != thiz->layers; ll = eina_list_prev(ll))
-			{
-				Layer *pl = eina_list_data_get(ll);
-				enesim_renderer_relative_unset(pl->r, &pl->old);
-				enesim_renderer_cleanup(pl->r, s);
-				ll = eina_list_prev(ll);
-			}
-
-			return EINA_FALSE;
+			continue;
 		}
 		/* set the span given the color */
 		/* FIXME fix the resulting format */
@@ -188,10 +185,11 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 			if (!thiz->post_cb(r, l->r, thiz->post_data))
 			{
 				enesim_renderer_relative_unset(l->r, &l->old);
-				/* FIXME what to do here */
-				break;
+				continue;
 			}
 		}
+		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
+		thiz->visible_layers = eina_list_append(thiz->visible_layers, l); 
 	}
 	if (state->rop == ENESIM_FILL)
 	{
@@ -208,16 +206,17 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Compound *thiz;
+	Layer *layer;
 	Eina_List *ll;
+	Eina_List *ll_next;
 
 	thiz = _compound_get(r);
 	/* cleanup every layer */
-	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
+	EINA_LIST_FOREACH_SAFE(thiz->visible_layers, ll, ll_next, layer)
 	{
-		Layer *l = eina_list_data_get(ll);
-
-		enesim_renderer_relative_unset(l->r, &l->old);
-		enesim_renderer_cleanup(l->r, s);
+		enesim_renderer_relative_unset(layer->r, &layer->old);
+		enesim_renderer_cleanup(layer->r, s);
+		thiz->visible_layers = eina_list_remove_list(thiz->visible_layers, ll);
 	}
 	thiz->changed = EINA_FALSE;
 }
@@ -265,15 +264,15 @@ static void _compound_boundings(Enesim_Renderer *r,
 
 static void _compound_destination_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *rect)
+		Eina_Rectangle *boundings)
 {
-	Enesim_Rectangle boundings;
+	Enesim_Rectangle oboundings;
 
-	_compound_boundings(r, states, &boundings);
-	rect->x = floor(boundings.x);
-	rect->y = floor(boundings.y);
-	rect->w = ceil(boundings.w);
-	rect->h = ceil(boundings.h);
+	_compound_boundings(r, states, &oboundings);
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w);
+	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h);
 }
 
 static void _compound_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -325,6 +324,11 @@ static void _compound_free(Enesim_Renderer *r)
 
 	thiz = _compound_get(r);
 	enesim_renderer_compound_layer_clear(r);
+	if (thiz->visible_layers)
+	{
+		eina_list_free(thiz->visible_layers);
+		thiz->visible_layers = NULL;
+	}
 	free(thiz);
 }
 
