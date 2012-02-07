@@ -697,8 +697,8 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 		st.join = join;
 		st.cap = cap;
 		st.count = 0;
-		st.rx = sw * geometry_transformation->xx / 2.0;
-		st.ry = sw * geometry_transformation->yy / 2.0;
+		st.rx = sw / 2 * hypot(geometry_transformation->xx, geometry_transformation->yx);
+		st.ry = sw / 2 * hypot(geometry_transformation->xy, geometry_transformation->yy);
 
 		_path_generate_vertices(thiz->commands, _stroke_path_vertex_add,
 				_stroke_path_polygon_add,
