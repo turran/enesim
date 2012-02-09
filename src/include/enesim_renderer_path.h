@@ -117,6 +117,7 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void);
 
 EAPI void enesim_renderer_path_command_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Renderer_Path_Command *cmd);
+EAPI void enesim_renderer_path_command_set(Enesim_Renderer *r, Eina_List *l);
 
 EAPI void enesim_renderer_path_move_to(Enesim_Renderer *r, double x, double y);
 EAPI void enesim_renderer_path_line_to(Enesim_Renderer *r, double x, double y);

@@ -120,8 +120,10 @@ static void _edge_join(Enesim_Path_Edge *e1,
 	Enesim_Curve_State st;
 	switch (join)
 	{
+		/* TODO here we should add the intersection of both edges */
+		/* we need a miter length variable too */
 		case ENESIM_JOIN_MITER:
-		/* TODO */
+		vertex_add(e2->x0, e2->y0, data);
 		break;
 
 		/* join theme with an arc */
@@ -1092,6 +1094,23 @@ EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Renderer_P
 	*new_command = *cmd;
 	thiz->commands = eina_list_append(thiz->commands, new_command);
 	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_path_command_set(Enesim_Renderer *r,
+		Eina_List *list)
+{
+	Enesim_Renderer_Path_Command *cmd;
+	Eina_List *l;
+
+	enesim_renderer_path_command_clear(r);
+	EINA_LIST_FOREACH(list, l, cmd)
+	{
+		enesim_renderer_path_command_add(r, cmd);
+	}
 }
 
 /**
