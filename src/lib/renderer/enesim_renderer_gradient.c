@@ -350,7 +350,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		}
 		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
 		p0 = argb8888_interp_256(off, next->argb, curr->argb);
-		*dst++ = p0;
+		*dst++ = enesim_color_argb_from(p0);
 		xx += inc;
 	}
 	/* in case we dont end at 1.0 */
