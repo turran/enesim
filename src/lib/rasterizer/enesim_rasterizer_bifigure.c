@@ -92,6 +92,7 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 			oedge->e = ((ov->a * (long long int) xx) >> 16) + \
 					((ov->b * (long long int) yy) >> 16) + \
 					ov->c; \
+			oedge->counted = ((yy >= oedge->yy0) & (yy < oedge->yy1)); \
 			if (ov->sgn && ((ov->xx1 - ov->xx0) > 2)) \
 			{ \
 				int dxx = (ov->xx1 - ov->xx0); \
@@ -143,6 +144,7 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 			uedge->e = ((uv->a * (long long int) xx) >> 16) + \
 					((uv->b * (long long int) yy) >> 16) + \
 					uv->c; \
+			uedge->counted = ((yy >= uedge->yy0) & (yy < uedge->yy1)); \
 			if (uv->sgn && ((uv->xx1 - uv->xx0) > 2)) \
 			{ \
 				int dxx = (uv->xx1 - uv->xx0); \
@@ -220,7 +222,7 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 		{ \
 			int ee = uedge->e; \
  \
-			if ((yy >= uedge->yy0) & (yy < uedge->yy1)) \
+			if (uedge->counted) \
 				ucount += (ee >= 0) - (ee < 0); \
 			if (ee < 0) \
 				ee = -ee; \
@@ -245,7 +247,7 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 		{ \
 			int ee = oedge->e; \
  \
-			if ((yy >= oedge->yy0) & (yy < oedge->yy1)) \
+			if (oedge->counted) \
 				ocount += (ee >= 0) - (ee < 0); \
 			if (ee < 0) \
 				ee = -ee; \
@@ -342,6 +344,7 @@ get_out:
 		{
 			unsigned int q0 = 0;
 
+			p0 = scolor;
 			if (ucount) // inside under figure
 			{
 				q0 = fcolor;
@@ -366,7 +369,7 @@ get_out:
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, scolor, q0);
+				p0 = INTERP_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -477,6 +480,10 @@ get_out:
 		{
 			unsigned int q0 = 0;
 
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
 			if (ucount) // inside under figure
 				q0 = fcolor;
 			else if (ua) // on the outside boundary of the under figure
@@ -487,12 +494,7 @@ get_out:
 			}
 
 			if (oa < 65536)
-			{
-				color = *d;
-				if (scolor != 0xffffffff)
-					color = MUL4_SYM(scolor, color);
-				p0 = INTERP_65536(oa, color, q0);
-			}
+				p0 = INTERP_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -595,6 +597,10 @@ get_out:
 		{
 			unsigned int q0 = 0;
 
+			p0 = *s;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
 			if (ucount) // inside under figure
 			{
 				q0 = *d;
@@ -611,12 +617,7 @@ get_out:
 			}
 
 			if (oa < 65536)
-			{
-				color = *s;
-				if (scolor != 0xffffffff)
-					color = MUL4_SYM(scolor, color);
-				p0 = INTERP_65536(oa, color, q0);
-			}
+				p0 = INTERP_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -649,7 +650,7 @@ get_out:
 		{ \
 			int ee = uedge->e; \
  \
-			if ((yy >= uedge->yy0) & (yy < uedge->yy1)) \
+			if (uedge->counted) \
 			{ \
 				unp += (ee >= 0); \
 				unn += (ee < 0); \
@@ -672,15 +673,9 @@ get_out:
 		} \
  \
 		if ((unp + unn) % 4) \
-		{ \
-			if (!(unp % 2)) \
-				uin = 1; \
-		} \
+			uin = !(unp % 2); \
 		else \
-		{ \
-			if (unp % 2) \
-				uin = 1; \
-		} \
+			uin = (unp % 2); \
  \
 		m = 0; \
 		oedge = oedges; \
@@ -688,7 +683,7 @@ get_out:
 		{ \
 			int ee = oedge->e; \
  \
-			if ((yy >= oedge->yy0) & (yy < oedge->yy1)) \
+			if (oedge->counted) \
 				ocount += (ee >= 0) - (ee < 0); \
 			if (ee < 0) \
 				ee = -ee; \
@@ -783,6 +778,7 @@ get_out:
 		{
 			unsigned int q0 = 0;
 
+			p0 = scolor;
 			if (uin) // inside under figure
 			{
 				q0 = fcolor;
@@ -807,7 +803,7 @@ get_out:
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, scolor, q0);
+				p0 = INTERP_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -917,6 +913,10 @@ get_out:
 		{
 			unsigned int q0 = 0;
 
+			p0 = *d;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
 			if (uin) // inside under figure
 				q0 = fcolor;
 			else if (ua) // on the outside boundary of the under figure
@@ -927,12 +927,7 @@ get_out:
 			}
 
 			if (oa < 65536)
-			{
-				color = *d;
-				if (scolor != 0xffffffff)
-					color = MUL4_SYM(scolor, color);
-				p0 = INTERP_65536(oa, color, q0);
-			}
+				p0 = INTERP_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -1034,6 +1029,10 @@ get_out:
 		{
 			unsigned int q0 = 0;
 
+			p0 = *s;
+			if (scolor != 0xffffffff)
+				p0 = MUL4_SYM(scolor, p0);
+
 			if (uin) // inside under figure
 			{
 				q0 = *d;
@@ -1050,12 +1049,7 @@ get_out:
 			}
 
 			if (oa < 65536)
-			{
-				color = *s;
-				if (scolor != 0xffffffff)
-					color = MUL4_SYM(scolor, color);
-				p0 = INTERP_65536(oa, color, q0);
-			}
+				p0 = INTERP_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{

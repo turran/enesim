@@ -94,6 +94,7 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 			edge->e = ((v->a * (long long int) xx) >> 16) + \
 					((v->b * (long long int) yy) >> 16) + \
 					v->c; \
+			edge->counted = ((yy >= edge->yy0) & (yy < edge->yy1)); \
 			if (v->sgn && ((v->xx1 - v->xx0) > 2)) \
 			{ \
 				int dxx = (v->xx1 - v->xx0); \
@@ -163,7 +164,7 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 		{ \
 			int ee = edge->e; \
  \
-			if ((yy >= edge->yy0) & (yy < edge->yy1)) \
+			if (edge->counted) \
 				count += (ee >= 0) - (ee <0); \
 			if (ee < 0) \
 				ee = -ee; \
@@ -533,7 +534,7 @@ get_out:
 		{ \
 			int ee = edge->e; \
  \
-			if ((yy >= edge->yy0) & (yy < edge->yy1)) \
+			if (edge->counted) \
 			{ \
 				np += (ee >= 0); \
 				nn += (ee < 0); \
@@ -556,15 +557,9 @@ get_out:
 		} \
  \
 		if ((np + nn) % 4) \
-		{ \
-			if (!(np % 2)) \
-				in = 1; \
-		} \
+			in = !(np % 2); \
 		else \
-		{ \
-			if (np % 2) \
-				in = 1; \
-		}
+			in = (np % 2);
 
 /* identity */
 /* stroke and/or fill with possibly a fill renderer even-odd rule */
