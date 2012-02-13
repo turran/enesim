@@ -139,15 +139,15 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	x1 = thiz->current.x1;
 	y0 = thiz->current.y0;
 	y1 = thiz->current.y1;
-	/* TODO handle the geometry transformation */
-#if 0
+
+	/* handle the geometry transformation */
 	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		const Enesim_Matrix *gm = &cs->geometry_transformation;
 		enesim_matrix_point_transform(gm, x0, y0, &x0, &y0);
 		enesim_matrix_point_transform(gm, x1, y1, &x1, &y1);
 	}
-#endif
+
 	xx0 = eina_f16p16_double_from(x0);
 	xx1 = eina_f16p16_double_from(x1);
 	yy0 = eina_f16p16_double_from(y0);

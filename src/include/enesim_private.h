@@ -130,6 +130,8 @@ extern int enesim_log_dom_global;
 #include "private/compositor.h"
 #include "private/matrix.h"
 #include "private/renderer.h"
+#include "private/gradient.h"
+#include "private/shape.h"
 #include "private/rasterizer.h"
 #include "private/buffer.h"
 #include "private/pool.h"

@@ -51,22 +51,49 @@ static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static inline void _get_focis(double cx, double cy, double a, double b,
-		double *f1x, double *f1y, double *f2x, double *f2y,
+/* given an ellipse at center cx, cy with the semi major axis at ax, ay
+ * and semi minor axis at bx, by, calculate the foci f1x, f1y, f2x, f2y
+ * and max, min lengths to be inside the ellipse
+ */
+static inline void _get_foci_transformed(double cx, double cy,
+		double a,
+		double ax, double ay,
+		double b,
+		double *f1x, double *f1y,
+		double *f2x, double *f2y,
 		double *min, double *max)
 {
-	double c;
+	double f;
+	double uax, uay;
 
-	//printf("a = %g, b = %g\n", a, b);
-	c = sqrt((a * a) - (b * b));
-	//printf("c = %g\n", c);
-	*f1x = cx - c;
+	uax = (ax - cx)/a;
+	uay = (ay - cy)/a;
+
+	f = sqrt((a * a) - (b * b));
+
+	*f1x = cx + (uax * f);
+	*f1y = cy + (uay * f);
+	*f2x = cx - (uax * f);
+	*f2y = cy - (uay * f);
+	*max = 2 * a;
+	*min = 2 * f;
+}
+
+static inline void _get_foci(double cx, double cy,
+		double a, double b,
+		double *f1x, double *f1y,
+		double *f2x, double *f2y,
+		double *min, double *max)
+{
+	double f;
+
+	f = sqrt((a * a) - (b * b));
+	*f1x = cx - f;
 	*f1y = cy;
-	*f2x = cx + c;
+	*f2x = cx + f;
 	*f2y = cy;
 	*max = 2 * a;
-	*min = 2 * c;
-	//printf("f1 %g %g, f2 %g %g min %g max %g\n", *f1x, *f1y, *f2x, *f2y, *min, *max);
+	*min = 2 * f;
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -122,7 +149,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	double cx, cy, rx, ry;
+	double cx, cy;
+	double rx, ry;
+	double hx, hy;
+	double vx, vy;
 
 	thiz = _radial_get(r);
 	cx = thiz->center.x;
@@ -130,19 +160,59 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	rx = thiz->radius.x;
 	ry = thiz->radius.y;
 
-	/* TODO calculate the transformed coordinates */
-	/* TODO check that the radius are positive */
-	if (rx > ry)
+	/* check that the radius are positive */
+	if (rx < 0 || ry < 0)
 	{
-		_get_focis(cx, cy, rx, ry,
-				&thiz->f1.x, &thiz->f1.y,
-				&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
+		return EINA_FALSE;
+	}
+	vx = cx;
+	vy = cy - ry;
+	hx = cx + rx;
+	hy = cy;
+
+	/* calculate the transformed coordinates */
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		const Enesim_Matrix *gm = &cs->geometry_transformation;
+		double h;
+		double v;
+
+		enesim_matrix_point_transform(gm, cx, cy, &cx, &cy);
+		enesim_matrix_point_transform(gm, hx, hy, &hx, &hy);
+		enesim_matrix_point_transform(gm, vx, vy, &vx, &vy);
+
+		h = hypot(hx - cx, hy - cy);
+		v = hypot(vx - cx, vy - cy);
+		if (h > v)
+		{
+			_get_foci_transformed(cx, cy,
+					h, hx, hy, v,
+					&thiz->f1.x, &thiz->f1.y,
+					&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
+
+		}
+		else
+		{
+			_get_foci_transformed(cx, cy,
+					v, vx, vy, h,
+					&thiz->f1.x, &thiz->f1.y,
+					&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
+		}
 	}
 	else
 	{
-		_get_focis(cy, cx, ry, rx,
+		if (rx > ry)
+		{
+			_get_foci(cx, cy, rx, ry,
+					&thiz->f1.x, &thiz->f1.y,
+					&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
+		}
+		else
+		{
+			_get_foci(cy, cx, ry, rx,
 				&thiz->f1.y, &thiz->f1.x,
 				&thiz->f2.y, &thiz->f2.x, &thiz->min, &thiz->max);
+		}
 	}
 
 	//printf("generating span for = %g (%g %g)\n", thiz->max - thiz->min, thiz->max, thiz->min);
