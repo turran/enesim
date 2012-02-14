@@ -26,6 +26,8 @@
 			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC);\
 	} while(0)
 
+static Enesim_Renderer_Gradient_Sw_Draw _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
+
 typedef struct _Enesim_Renderer_Gradient_Radial
 {
 	EINA_MAGIC
@@ -49,6 +51,31 @@ static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
 	ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC_CHECK(thiz);
 
 	return thiz;
+}
+
+static Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz,
+		Eina_F16p16 x, Eina_F16p16 y)
+{
+	double a, b;
+	double ret;
+	double d1, d2;
+
+	a = eina_f16p16_double_to(x);
+	b = eina_f16p16_double_to(y);
+
+	d1 = a - thiz->f1.x;
+	d2 = b - thiz->f1.y;
+
+	ret = hypot(d1, d2);
+
+	d1 = a - thiz->f2.x;
+	d2 = b - thiz->f2.y;
+
+	ret += hypot(d1, d2);
+	//printf("old distance = %g\n", r);
+	ret -= thiz->min;
+
+	return eina_f16p16_double_from(ret);
 }
 
 /* given an ellipse at center cx, cy with the semi major axis at ax, ay
@@ -95,8 +122,23 @@ static inline void _get_foci(double cx, double cy,
 	*max = 2 * a;
 	*min = 2 * f;
 }
+
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, restrict);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, repeat);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, pad);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, reflect);
+
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, restrict);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, repeat);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, pad);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, reflect);
+
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, restrict);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, repeat);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, pad);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, reflect);
 /*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
+ *                The Enesim's gradient renderer interface                    *
  *----------------------------------------------------------------------------*/
 static int _radial_length(Enesim_Renderer *r)
 {
@@ -104,33 +146,6 @@ static int _radial_length(Enesim_Renderer *r)
 
 	thiz = _radial_get(r);
 	return lrint(thiz->max - thiz->min);
-}
-
-static Eina_F16p16 _radial_distance(Enesim_Renderer *r, Eina_F16p16 x,
-		Eina_F16p16 y)
-{
-	Enesim_Renderer_Gradient_Radial *thiz;
-	double a, b;
-	double ret;
-	double d1, d2;
-
-	thiz = _radial_get(r);
-	a = eina_f16p16_double_to(x);
-	b = eina_f16p16_double_to(y);
-
-	d1 = a - thiz->f1.x;
-	d2 = b - thiz->f1.y;
-
-	ret = hypot(d1, d2);
-
-	d1 = a - thiz->f2.x;
-	d2 = b - thiz->f2.y;
-
-	ret += hypot(d1, d2);
-	//printf("old distance = %g\n", r);
-	ret -= thiz->min;
-
-	return eina_f16p16_double_from(ret);
 }
 
 static const char * _radial_name(Enesim_Renderer *r)
@@ -144,8 +159,9 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -215,6 +231,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		}
 	}
 
+	*draw = _spans[gstate->mode][cs->transformation_type];
 	//printf("generating span for = %g (%g %g)\n", thiz->max - thiz->min, thiz->max, thiz->min);
 	return EINA_TRUE;
 }
@@ -234,7 +251,6 @@ static void _radial_boundings(Enesim_Renderer *r,
 }
 
 static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
-	/* .distance = 			*/ _radial_distance,
 	/* .length = 			*/ _radial_length,
 	/* .name = 			*/ _radial_name,
 	/* .sw_setup = 			*/ _state_setup,
@@ -256,6 +272,25 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 	Enesim_Renderer *r;
+	static Eina_Bool spans_initialized = EINA_FALSE;
+
+	if (!spans_initialized)
+	{
+		spans_initialized = EINA_TRUE;
+		/* first the span functions */
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+	}
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient_Radial));
 	if (!thiz) return NULL;

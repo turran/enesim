@@ -26,6 +26,8 @@
 			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRADIENT_LINEAR_MAGIC);\
 	} while(0)
 
+static Enesim_Renderer_Gradient_Sw_Draw _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
+
 typedef struct _Enesim_Renderer_Gradient_Linear_State
 {
 	double x0;
@@ -58,7 +60,7 @@ static inline Enesim_Renderer_Gradient_Linear * _linear_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static Eina_F16p16 _linear_distance_internal(Enesim_Renderer_Gradient_Linear *thiz, Eina_F16p16 x,
+static Eina_F16p16 _linear_distance(Enesim_Renderer_Gradient_Linear *thiz, Eina_F16p16 x,
 		Eina_F16p16 y)
 {
 	Eina_F16p16 a, b;
@@ -68,6 +70,8 @@ static Eina_F16p16 _linear_distance_internal(Enesim_Renderer_Gradient_Linear *th
 	return eina_f16p16_sub(eina_f16p16_add(a, b), 32768);
 }
 
+#if 0
+/* This will be enabled later */
 static void _argb8888_pad_span_identity(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		int x, int y,
@@ -88,8 +92,24 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r,
 		d += thiz->ayx;
 	}
 }
+#endif
+
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, restrict);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, repeat);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, pad);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, reflect);
+
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, restrict);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, repeat);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, pad);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, reflect);
+
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, restrict);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, repeat);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, pad);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Linear, _linear_get, _linear_distance, reflect);
 /*----------------------------------------------------------------------------*
- *            The Enesim's gradient renderer interface                        *
+ *                The Enesim's gradient renderer interface                    *
  *----------------------------------------------------------------------------*/
 static const char * _linear_name(Enesim_Renderer *r)
 {
@@ -104,15 +124,6 @@ static int _linear_length(Enesim_Renderer *r)
 	return thiz->length;
 }
 
-static Eina_F16p16 _linear_distance(Enesim_Renderer *r, Eina_F16p16 x,
-		Eina_F16p16 y)
-{
-	Enesim_Renderer_Gradient_Linear *thiz;
-
-	thiz = _linear_get(r);
-	return _linear_distance_internal(thiz, x, y);
-}
-
 static void _linear_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -124,8 +135,9 @@ static void _linear_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -165,9 +177,12 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	 * < tolerance
 	 */
 	thiz->length = eina_f16p16_int_to(f);
+#if 0
 	/* just override the identity case */
 	if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
 		*fill = _argb8888_pad_span_identity;
+#endif
+	*draw = _spans[gstate->mode][cs->transformation_type];
 
 	return EINA_TRUE;
 }
@@ -200,7 +215,6 @@ Eina_Bool _linear_has_changed(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Gradient_Descriptor _linear_descriptor = {
-	/* .distance =  		*/ _linear_distance,
 	/* .length = 			*/ _linear_length,
 	/* .name = 			*/ _linear_name,
 	/* .sw_setup = 			*/ _linear_state_setup,
@@ -222,6 +236,25 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 	Enesim_Renderer *r;
+	static Eina_Bool spans_initialized = EINA_FALSE;
+
+	if (!spans_initialized)
+	{
+		spans_initialized = EINA_TRUE;
+		/* first the span functions */
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
+		_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
+		_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
+		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
+		_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+	}
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient_Linear));
 	if (!thiz) return NULL;

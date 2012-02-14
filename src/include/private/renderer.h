@@ -104,10 +104,10 @@ static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p
 void enesim_renderer_identity_setup(Enesim_Renderer *r, int x, int y,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy);
 void enesim_renderer_affine_setup(Enesim_Renderer *r, int x, int y,
-		Enesim_F16p16_Matrix *matrix,
+		const Enesim_F16p16_Matrix *matrix,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy);
 void enesim_renderer_projective_setup(Enesim_Renderer *r, int x, int y,
-		Enesim_F16p16_Matrix *matrix,
+		const Enesim_F16p16_Matrix *matrix,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy, Eina_F16p16 *fpz);
 
 void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);

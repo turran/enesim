@@ -316,7 +316,7 @@ void enesim_renderer_identity_setup(Enesim_Renderer *r, int x, int y,
  * y' = (yx * x) + (yy * y) + yz;
  */
 void enesim_renderer_affine_setup(Enesim_Renderer *r, int x, int y,
-		Enesim_F16p16_Matrix *matrix,
+		const Enesim_F16p16_Matrix *matrix,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
 {
 	Eina_F16p16 xx, yy;
@@ -343,7 +343,7 @@ void enesim_renderer_affine_setup(Enesim_Renderer *r, int x, int y,
  * z' = (zx * x) + (zy * y) + zz;
  */
 void enesim_renderer_projective_setup(Enesim_Renderer *r, int x, int y,
-		Enesim_F16p16_Matrix *matrix,
+		const Enesim_F16p16_Matrix *matrix,
 		Eina_F16p16 *fpx, Eina_F16p16 *fpy, Eina_F16p16 *fpz)
 {
 	Eina_F16p16 xx, yy;
