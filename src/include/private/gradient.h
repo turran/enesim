@@ -18,6 +18,7 @@
 #ifndef GRADIENT_H_
 #define GRADIENT_H_
 
+#include "libargb.h"
 /* helper functions for different spread modes */
 static inline uint32_t enesim_renderer_gradient_pad_color_get(Enesim_Color *src, size_t len, Eina_F16p16 p)
 {
@@ -87,7 +88,21 @@ static inline uint32_t enesim_renderer_gradient_restrict_color_get(Enesim_Color 
 
 static inline uint32_t enesim_renderer_gradient_reflect_color_get(Enesim_Color *src, size_t len, Eina_F16p16 p)
 {
-	return 0xff000000;
+	int fp;
+	int fp_next;
+	uint32_t v;
+	uint16_t a;
+
+	fp = eina_f16p16_int_to(p);
+	fp = fp % (2 * len);
+	if (fp < 0) fp += 2 * len;
+	if (fp >= len) fp = (2 * len) - fp - 1;
+	fp_next = (fp < (len - 1) ? (fp + 1) : len - 1);
+
+	a = eina_f16p16_fracc_get(p) >> 8;
+	v = argb8888_interp_256(1 + a, src[fp_next], src[fp]);
+
+	return v;
 }
 
 static inline uint32_t enesim_renderer_gradient_repeat_color_get(Enesim_Color *src, size_t len, Eina_F16p16 p)
@@ -98,8 +113,9 @@ static inline uint32_t enesim_renderer_gradient_repeat_color_get(Enesim_Color *s
 	uint16_t a;
 
 	fp = eina_f16p16_int_to(p);
-	fp = fp % len;
-	fp_next = (fp + 1) % len;
+	if (fp > len - 1)
+		fp = fp % len;
+	fp_next = (fp < (len - 1) ? fp + 1 : 0);
 
 	a = eina_f16p16_fracc_get(p) >> 8;
 	v = argb8888_interp_256(1 + a, src[fp_next], src[fp]);
@@ -164,9 +180,6 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
 				gstate->len, d);			\
 		xx += EINA_F16P16_ONE;					\
 	}								\
-	/* FIXME is there some mmx bug there? the interp_256 already calls this \
-	 * but the float support is fucked up				\
-	 */								\
 }
 
 #define GRADIENT_AFFINE(type, type_get, distance, mode) \

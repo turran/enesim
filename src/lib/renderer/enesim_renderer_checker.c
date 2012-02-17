@@ -17,6 +17,7 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+#include "libargb.h"
 /**
  * @todo
  * - Optimize the case where both colors are the same

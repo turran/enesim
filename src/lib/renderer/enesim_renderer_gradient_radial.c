@@ -17,6 +17,8 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+#include "private/gradient.h"
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -34,13 +36,12 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	/* properties */
 	struct {
 		double x, y;
-	} center, radius;
+	} center, focus;
+	double radius;
 	/* state generated */
-	struct {
-		double x, y;
-	} f1, f2;
-	double min;
-	double max;
+	double r, zf;
+	double fx, fy;
+	Enesim_Matrix m;
 } Enesim_Renderer_Gradient_Radial;
 
 static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
@@ -53,74 +54,23 @@ static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz,
+static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz,
 		Eina_F16p16 x, Eina_F16p16 y)
 {
+	Eina_F16p16 ret;
+	double r = thiz->r, fx = thiz->fx, fy = thiz->fy;
 	double a, b;
-	double ret;
 	double d1, d2;
 
-	a = eina_f16p16_double_to(x);
-	b = eina_f16p16_double_to(y);
+	a = eina_f16p16_double_to(x) - (fx + thiz->center.x);
+	b = eina_f16p16_double_to(y) - (fy + thiz->center.y);
 
-	d1 = a - thiz->f1.x;
-	d2 = b - thiz->f1.y;
+	d1 = (a * fy) - (b * fx);
+	d2 = fabs(((r * r) * ((a * a) + (b * b))) - (d1 * d1));
+	r = ((a * fx) + (b * fy) + sqrt(d2)) * thiz->zf;
 
-	ret = hypot(d1, d2);
-
-	d1 = a - thiz->f2.x;
-	d2 = b - thiz->f2.y;
-
-	ret += hypot(d1, d2);
-	//printf("old distance = %g\n", r);
-	ret -= thiz->min;
-
-	return eina_f16p16_double_from(ret);
-}
-
-/* given an ellipse at center cx, cy with the semi major axis at ax, ay
- * and semi minor axis at bx, by, calculate the foci f1x, f1y, f2x, f2y
- * and max, min lengths to be inside the ellipse
- */
-static inline void _get_foci_transformed(double cx, double cy,
-		double a,
-		double ax, double ay,
-		double b,
-		double *f1x, double *f1y,
-		double *f2x, double *f2y,
-		double *min, double *max)
-{
-	double f;
-	double uax, uay;
-
-	uax = (ax - cx)/a;
-	uay = (ay - cy)/a;
-
-	f = sqrt((a * a) - (b * b));
-
-	*f1x = cx + (uax * f);
-	*f1y = cy + (uay * f);
-	*f2x = cx - (uax * f);
-	*f2y = cy - (uay * f);
-	*max = 2 * a;
-	*min = 2 * f;
-}
-
-static inline void _get_foci(double cx, double cy,
-		double a, double b,
-		double *f1x, double *f1y,
-		double *f2x, double *f2y,
-		double *min, double *max)
-{
-	double f;
-
-	f = sqrt((a * a) - (b * b));
-	*f1x = cx - f;
-	*f1y = cy;
-	*f2x = cx + f;
-	*f2y = cy;
-	*max = 2 * a;
-	*min = 2 * f;
+	ret = eina_f16p16_double_from(r);
+	return ret;
 }
 
 GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, restrict);
@@ -145,7 +95,7 @@ static int _radial_length(Enesim_Renderer *r)
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = _radial_get(r);
-	return lrint(thiz->max - thiz->min);
+	return lrint(thiz->r) + 1;
 }
 
 static const char * _radial_name(Enesim_Renderer *r)
@@ -166,73 +116,46 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Gradient_Radial *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	double cx, cy;
-	double rx, ry;
-	double hx, hy;
-	double vx, vy;
+	double fx, fy;
+	double rad, ss;
 
 	thiz = _radial_get(r);
+
 	cx = thiz->center.x;
 	cy = thiz->center.y;
-	rx = thiz->radius.x;
-	ry = thiz->radius.y;
+	rad = fabs(thiz->radius);
 
-	/* check that the radius are positive */
-	if (rx < 0 || ry < 0)
-	{
+	/* check the radius size (also need consider the transf..) */
+	if (rad < 0.5)
 		return EINA_FALSE;
-	}
-	vx = cx;
-	vy = cy - ry;
-	hx = cx + rx;
-	hy = cy;
+	thiz->r = rad;
 
-	/* calculate the transformed coordinates */
+	fx = thiz->focus.x;
+	fy = thiz->focus.y;
+	ss = hypot(fx - cx, fy - cy);
+	if (ss + 0.5 >= rad)
+	{
+		double t = rad / (ss + 0.5);
+
+		fx = cx + t * (fx - cx);
+		fy = cy + t * (fy - cy); 
+	}
+
+	fx -= cx;  fy -= cy;
+	thiz->fx = fx;  thiz->fy = fy;
+	thiz->zf = rad / (rad*rad - (fx*fx + fy*fy));
+
+	enesim_matrix_identity(&thiz->m);
+	/* FIXME - do this better later */
 	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		const Enesim_Matrix *gm = &cs->geometry_transformation;
-		double h;
-		double v;
 
-		enesim_matrix_point_transform(gm, cx, cy, &cx, &cy);
-		enesim_matrix_point_transform(gm, hx, hy, &hx, &hy);
-		enesim_matrix_point_transform(gm, vx, vy, &vx, &vy);
-
-		h = hypot(hx - cx, hy - cy);
-		v = hypot(vx - cx, vy - cy);
-		if (h > v)
-		{
-			_get_foci_transformed(cx, cy,
-					h, hx, hy, v,
-					&thiz->f1.x, &thiz->f1.y,
-					&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
-
-		}
-		else
-		{
-			_get_foci_transformed(cx, cy,
-					v, vx, vy, h,
-					&thiz->f1.x, &thiz->f1.y,
-					&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
-		}
+		enesim_matrix_inverse(gm, &thiz->m);
 	}
-	else
-	{
-		if (rx > ry)
-		{
-			_get_foci(cx, cy, rx, ry,
-					&thiz->f1.x, &thiz->f1.y,
-					&thiz->f2.x, &thiz->f2.y, &thiz->min, &thiz->max);
-		}
-		else
-		{
-			_get_foci(cy, cx, ry, rx,
-				&thiz->f1.y, &thiz->f1.x,
-				&thiz->f2.y, &thiz->f2.x, &thiz->min, &thiz->max);
-		}
-	}
+	enesim_renderer_transformation_set(r, &thiz->m);
+	*draw = _spans[gstate->mode][enesim_matrix_type_get(&thiz->m)];
 
-	*draw = _spans[gstate->mode][cs->transformation_type];
-	//printf("generating span for = %g (%g %g)\n", thiz->max - thiz->min, thiz->max, thiz->min);
 	return EINA_TRUE;
 }
 
@@ -244,10 +167,10 @@ static void _radial_boundings(Enesim_Renderer *r,
 
 	thiz = _radial_get(r);
 
-	boundings->x = thiz->center.x - thiz->radius.x;
-	boundings->y = thiz->center.y - thiz->radius.y;
-	boundings->w = thiz->radius.x * 2;
-	boundings->h = thiz->radius.y * 2;
+	boundings->x = thiz->center.x - fabs(thiz->radius);
+	boundings->y = thiz->center.y - fabs(thiz->radius);
+	boundings->w = fabs(thiz->radius) * 2;
+	boundings->h = fabs(thiz->radius) * 2;
 }
 
 static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
@@ -303,44 +226,115 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, double v)
+EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, double center_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = _radial_get(r);
-	thiz->center.x = v;
+	thiz->center.x = center_x;
 }
 /**
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, double v)
+EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, double center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = _radial_get(r);
-	thiz->center.y = v;
+	thiz->center.y = center_y;
 }
 /**
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_radial_radius_y_set(Enesim_Renderer *r, double v)
+EAPI void enesim_renderer_gradient_radial_center_x_get(Enesim_Renderer *r, double *center_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = _radial_get(r);
-	thiz->radius.y = v;
+	if (center_x)
+		*center_x = thiz->center.x;
 }
 /**
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_radial_radius_x_set(Enesim_Renderer *r, double v)
+EAPI void enesim_renderer_gradient_radial_center_y_get(Enesim_Renderer *r, double *center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = _radial_get(r);
-	thiz->radius.x = v;
+	if (center_y)
+		*center_y = thiz->center.y;
+}
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_radial_focus_x_set(Enesim_Renderer *r, double focus_x)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = _radial_get(r);
+	thiz->focus.x = focus_x;
+}
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double focus_y)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = _radial_get(r);
+	thiz->focus.y = focus_y;
+}
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_radial_focus_x_get(Enesim_Renderer *r, double *focus_x)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = _radial_get(r);
+	if (focus_x)
+		*focus_x = thiz->focus.x;
+}
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_radial_focus_y_get(Enesim_Renderer *r, double *focus_y)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = _radial_get(r);
+	if (focus_y)
+		*focus_y = thiz->focus.y;
+}
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_radial_radius_set(Enesim_Renderer *r, double radius)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = _radial_get(r);
+	thiz->radius = radius;
+}
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_radial_radius_get(Enesim_Renderer *r, double *radius)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = _radial_get(r);
+	if (radius)
+		*radius = thiz->radius;
 }
 

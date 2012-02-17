@@ -32,6 +32,7 @@
 #include "Enesim.h"
 #include "enesim_private.h"
 
+
 /**
  * @todo
  * - In a near future we should move the API functions into global ones?

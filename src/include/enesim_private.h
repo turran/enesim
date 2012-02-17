@@ -44,6 +44,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <float.h>
+#include <fenv.h>
 /* TODO remove all assert statements */
 #include <assert.h>
 
@@ -88,9 +89,6 @@ extern int enesim_log_dom_global;
 
 #define LIBARGB_DEBUG 0
 
-#include "libargb.h"
-
-/* define every magic herer  to track them easily */
 /* define here every renderer magic */
 #define ENESIM_RENDERER_BACKGROUND_MAGIC 0xe7e51430
 #define ENESIM_RENDERER_CHECKER_MAGIC 0xe7e51431
@@ -126,13 +124,10 @@ extern int enesim_log_dom_global;
 #include "private/curve.h"
 /* now the surface format backends */
 #include "private/format.h"
-#include "private/format_argb8888_unpre.h"
+//#include "private/format_argb8888_unpre.h"
 #include "private/compositor.h"
 #include "private/matrix.h"
 #include "private/renderer.h"
-#include "private/gradient.h"
-#include "private/shape.h"
-#include "private/rasterizer.h"
 #include "private/buffer.h"
 #include "private/pool.h"
 #include "private/surface.h"

@@ -71,6 +71,10 @@ EAPI int enesim_init(void)
 #ifdef EFL_HAVE_SSE2
 	/* EINA_ERROR_PINFO("SSE2 Drawer available\n"); */
 #endif
+	/* FIXME for some reason we are having several fp exaceptions
+	 * better disable the inexact case always
+	 */
+	feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
 
 	return _enesim_init_count;
 

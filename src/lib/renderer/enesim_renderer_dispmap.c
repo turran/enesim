@@ -17,6 +17,7 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+#include "libargb.h"
 /*
  * P'(x,y) <- P(x + scale * (XC(x,y) - .5), y + scale * (YC(x,y) - .5))
  */

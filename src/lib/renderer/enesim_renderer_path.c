@@ -17,7 +17,8 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
-
+#include "private/shape.h"
+#include "private/rasterizer.h"
 /**
  * TODO
  * - Use the threshold on the curve state

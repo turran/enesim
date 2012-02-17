@@ -17,6 +17,8 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+#include "private/shape.h"
+#include "libargb.h"
 
 /* Until we fix the new renderer */
 #define NEW_RENDERER 0

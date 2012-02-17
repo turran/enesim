@@ -17,6 +17,7 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+#include "private/gradient.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -159,7 +160,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 
 	/* in case we dont start at 0.0 */
 	for (i = 0; i < start; i++)
-		*dst++ = 0x00ffffff;
+		*dst++ = 0;
 
 	/* FIXME Im not sure if we increment xx by the 1 / ((next - curr) * len) value
 	 * as it might not be too accurate
@@ -185,7 +186,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	}
 	/* in case we dont end at 1.0 */
 	for (i = end; i < thiz->sw.len; i++)
-		*dst++ = 0x00ffffff;
+		*dst++ = 0;
 
 	return EINA_TRUE;
 }
