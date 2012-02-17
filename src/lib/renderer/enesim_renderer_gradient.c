@@ -312,6 +312,37 @@ void * enesim_renderer_gradient_data_get(Enesim_Renderer *r)
 	thiz = _gradient_get(r);
 	return thiz->data;
 }
+
+int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Stop *curr_stop, *next_stop;
+	Eina_List *curr, *next, *last;
+	double dp = 1.0, small = 1.0 / 16384.0;
+
+	thiz = _gradient_get(r);
+
+	curr = thiz->current.stops;
+	curr_stop = eina_list_data_get(curr);
+	last = eina_list_last(thiz->current.stops);
+	while (curr != last)
+	{
+		double del;
+
+		next = eina_list_next(curr);
+		next_stop = eina_list_data_get(next);
+
+		del = next_stop->pos - curr_stop->pos;
+		if ((del > small) && (del < dp))
+			dp = del;
+
+		curr = next;
+		curr_stop = next_stop;
+	}
+
+	return 2 * ceil(1.0 / dp);
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

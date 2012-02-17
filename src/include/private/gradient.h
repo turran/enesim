@@ -260,5 +260,6 @@ typedef struct _Enesim_Renderer_Gradient_Descriptor
 
 Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descriptor *gdescriptor, void *data);
 void * enesim_renderer_gradient_data_get(Enesim_Renderer *r);
+int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r);
 
 #endif

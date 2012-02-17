@@ -41,7 +41,10 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	/* state generated */
 	double r, zf;
 	double fx, fy;
+	double scale;
+	int glen;
 	Enesim_Matrix m;
+	Eina_Bool simple : 1;
 } Enesim_Renderer_Gradient_Radial;
 
 static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
@@ -62,8 +65,12 @@ static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz
 	double a, b;
 	double d1, d2;
 
-	a = eina_f16p16_double_to(x) - (fx + thiz->center.x);
-	b = eina_f16p16_double_to(y) - (fy + thiz->center.y);
+	if (thiz->simple)
+		return hypot(thiz->scale * (x - 65536 * thiz->center.x),
+				thiz->scale * (y - 65536 * thiz->center.y));
+
+	a = thiz->scale * (eina_f16p16_double_to(x) - (fx + thiz->center.x));
+	b = thiz->scale * (eina_f16p16_double_to(y) - (fy + thiz->center.y));
 
 	d1 = (a * fy) - (b * fx);
 	d2 = fabs(((r * r) * ((a * a) + (b * b))) - (d1 * d1));
@@ -95,7 +102,7 @@ static int _radial_length(Enesim_Renderer *r)
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = _radial_get(r);
-	return lrint(thiz->r) + 1;
+	return thiz->glen;
 }
 
 static const char * _radial_name(Enesim_Renderer *r)
@@ -118,24 +125,33 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	double cx, cy;
 	double fx, fy;
 	double rad, ss;
+	int glen;
 
 	thiz = _radial_get(r);
-
 	cx = thiz->center.x;
 	cy = thiz->center.y;
 	rad = fabs(thiz->radius);
 
 	/* check the radius size (also need consider the transf..) */
-	if (rad < 0.5)
+	if (rad < (1 / 256.0))
 		return EINA_FALSE;
 	thiz->r = rad;
+
+	thiz->scale = 1;
+	thiz->glen = ceil(rad) + 2;
+	glen = enesim_renderer_gradient_natural_length_get(r);
+	if (thiz->glen < glen + 2)
+	{
+		thiz->scale = glen / rad;
+		thiz->glen = glen + 2;
+	}
 
 	fx = thiz->focus.x;
 	fy = thiz->focus.y;
 	ss = hypot(fx - cx, fy - cy);
-	if (ss + 0.5 >= rad)
+	if (ss + (1 / 256.0) >= rad)
 	{
-		double t = rad / (ss + 0.5);
+		double t = rad / (ss + (1 / 256.0));
 
 		fx = cx + t * (fx - cx);
 		fy = cy + t * (fy - cy); 
@@ -144,6 +160,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	fx -= cx;  fy -= cy;
 	thiz->fx = fx;  thiz->fy = fy;
 	thiz->zf = rad / (rad*rad - (fx*fx + fy*fy));
+
+	thiz->simple = 0;
+	if ((fabs(fx) < (1 / 256.0)) && (fabs(fy) < (1 / 256.0)))
+		thiz->simple = 1;
 
 	enesim_matrix_identity(&thiz->m);
 	/* FIXME - do this better later */

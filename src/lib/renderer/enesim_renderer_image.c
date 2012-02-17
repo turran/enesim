@@ -17,6 +17,7 @@
  */
 #include "Enesim.h"
 #include "enesim_private.h"
+#include "libargb.h"
 /**
  * @todo
  * - add support for sw and sh
