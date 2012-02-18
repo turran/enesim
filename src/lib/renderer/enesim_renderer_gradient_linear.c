@@ -285,6 +285,27 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
  * FIXME
  * To be documented
  */
+EAPI void enesim_renderer_gradient_linear_pos_get(Enesim_Renderer *r, double *x0,
+		double *y0, double *x1, double *y1)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+
+	if (x0)
+		*x0 = thiz->current.x0;
+	if (y0)
+		*y0 = thiz->current.y0;
+	if (x1)
+		*x1 = thiz->current.x1;
+	if (y1)
+		*y1 = thiz->current.y1;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
 EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -292,6 +313,19 @@ EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0)
 	thiz = _linear_get(r);
 	thiz->current.x0 = x0;
 	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_linear_x0_get(Enesim_Renderer *r, double *x0)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+	if (x0)
+		*x0 = thiz->current.x0;
 }
 
 /**
@@ -311,6 +345,18 @@ EAPI void enesim_renderer_gradient_linear_y0_set(Enesim_Renderer *r, double y0)
  * FIXME
  * To be documented
  */
+EAPI void enesim_renderer_gradient_linear_y0_get(Enesim_Renderer *r, double *y0)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+	if (y0)
+		*y0 = thiz->current.y0;
+}
+/**
+ * FIXME
+ * To be documented
+ */
 EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -324,6 +370,19 @@ EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1)
  * FIXME
  * To be documented
  */
+EAPI void enesim_renderer_gradient_linear_x1_get(Enesim_Renderer *r, double *x1)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+	if (x1)
+		*x1 = thiz->current.x1;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
 EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -331,5 +390,18 @@ EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1)
 	thiz = _linear_get(r);
 	thiz->current.y1 = y1;
 	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * FIXME
+ * To be documented
+ */
+EAPI void enesim_renderer_gradient_linear_y1_get(Enesim_Renderer *r, double *y1)
+{
+	Enesim_Renderer_Gradient_Linear *thiz;
+
+	thiz = _linear_get(r);
+	if (y1)
+		*y1 = thiz->current.y1;
 }
 

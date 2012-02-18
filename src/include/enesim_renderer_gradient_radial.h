@@ -29,10 +29,18 @@ EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, doubl
 EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, double center_y);
 EAPI void enesim_renderer_gradient_radial_center_x_get(Enesim_Renderer *r, double *center_x);
 EAPI void enesim_renderer_gradient_radial_center_y_get(Enesim_Renderer *r, double *center_y);
+EAPI void enesim_renderer_gradient_radial_center_set(Enesim_Renderer *r, double center_x, double center_y);
+EAPI void enesim_renderer_gradient_radial_center_get(Enesim_Renderer *r, 
+							double *center_x, double *center_y);
+
 EAPI void enesim_renderer_gradient_radial_focus_x_set(Enesim_Renderer *r, double focus_x);
 EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double focus_y);
 EAPI void enesim_renderer_gradient_radial_focus_x_get(Enesim_Renderer *r, double *focus_x);
 EAPI void enesim_renderer_gradient_radial_focus_y_get(Enesim_Renderer *r, double *focus_y);
+EAPI void enesim_renderer_gradient_radial_focus_set(Enesim_Renderer *r, double focus_x, double focus_y);
+EAPI void enesim_renderer_gradient_radial_focus_get(Enesim_Renderer *r, 
+							double *focus_x, double *focus_y);
+
 EAPI void enesim_renderer_gradient_radial_radius_set(Enesim_Renderer *r, double radius);
 EAPI void enesim_renderer_gradient_radial_radius_get(Enesim_Renderer *r, double *radius);
 
