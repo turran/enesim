@@ -61,14 +61,17 @@ static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
 static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz,
 		Eina_F16p16 x, Eina_F16p16 y)
 {
-	Eina_F16p16 ret;
 	double r = thiz->r, fx = thiz->fx, fy = thiz->fy;
+	Eina_F16p16 ret;
 	double a, b;
 	double d1, d2;
 
 	if (thiz->simple)
-		return hypot(thiz->scale * (x - 65536 * thiz->center.x),
-				thiz->scale * (y - 65536 * thiz->center.y));
+	{
+		a = x - 65536 * thiz->center.x;  b = y - 65536 * thiz->center.y;
+		ret = thiz->scale * sqrt(a*a + b*b);
+		return ret;
+	}
 
 	a = thiz->scale * (eina_f16p16_double_to(x) - (fx + thiz->center.x));
 	b = thiz->scale * (eina_f16p16_double_to(y) - (fy + thiz->center.y));
@@ -125,7 +128,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	double cx, cy;
 	double fx, fy;
-	double rad, ss;
+	double rad, scale, small = (1 / 8192.0);
 	int glen;
 
 	thiz = _radial_get(r);
@@ -133,26 +136,43 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	cy = thiz->center.y;
 	rad = fabs(thiz->radius);
 
-	/* check the radius size (also need consider the transf..) */
-	if (rad < (1 / 256.0))
+	if (rad < small)
 		return EINA_FALSE;
 	thiz->r = rad;
 
-	thiz->scale = 1;
-	thiz->glen = ceil(rad) + 2;
-	glen = enesim_renderer_gradient_natural_length_get(r);
-	if (thiz->glen < glen + 2)
+	scale = 1;
+	glen = ceil(rad) + 1;
+
+	enesim_matrix_identity(&thiz->m);
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
-		thiz->scale = glen / rad;
-		thiz->glen = glen + 2;
+		const Enesim_Matrix *gm = &cs->geometry_transformation;
+		double mx, my;
+
+		mx = hypot(gm->xx, gm->yx);
+		my = hypot(gm->xy, gm->yy);
+		scale = hypot(mx, my) / sqrt(2);
+		glen = ceil(rad * scale) + 1;
+
+		enesim_matrix_inverse(gm, &thiz->m);
 	}
+	enesim_renderer_transformation_set(r, &thiz->m);
+
+	if (glen < 4)
+	{
+		scale = 3 / rad;
+		glen = 4;
+	}
+
+	thiz->scale = scale;
+	thiz->glen = glen;
 
 	fx = thiz->focus.x;
 	fy = thiz->focus.y;
-	ss = hypot(fx - cx, fy - cy);
-	if (ss + (1 / 256.0) >= rad)
+	scale = hypot(fx - cx, fy - cy);
+	if (scale + small >= rad)
 	{
-		double t = rad / (ss + (1 / 256.0));
+		double t = rad / (scale + small);
 
 		fx = cx + t * (fx - cx);
 		fy = cy + t * (fy - cy); 
@@ -163,20 +183,10 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	thiz->zf = rad / (rad*rad - (fx*fx + fy*fy));
 
 	thiz->simple = 0;
-	if ((fabs(fx) < (1 / 256.0)) && (fabs(fy) < (1 / 256.0)))
+	if ((fabs(fx) < small) && (fabs(fy) < small))
 		thiz->simple = 1;
 
-	enesim_matrix_identity(&thiz->m);
-	/* FIXME - do this better later */
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
-	{
-		const Enesim_Matrix *gm = &cs->geometry_transformation;
-
-		enesim_matrix_inverse(gm, &thiz->m);
-	}
-	enesim_renderer_transformation_set(r, &thiz->m);
 	*draw = _spans[gstate->mode][enesim_matrix_type_get(&thiz->m)];
-
 	return EINA_TRUE;
 }
 
@@ -424,4 +434,3 @@ EAPI void enesim_renderer_gradient_radial_radius_get(Enesim_Renderer *r, double 
 	if (radius)
 		*radius = thiz->radius;
 }
-

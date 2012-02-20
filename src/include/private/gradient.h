@@ -113,8 +113,12 @@ static inline uint32_t enesim_renderer_gradient_repeat_color_get(Enesim_Color *s
 	uint16_t a;
 
 	fp = eina_f16p16_int_to(p);
-	if (fp > len - 1)
+	if ((fp > len - 1) || (fp < 0))
+	{
 		fp = fp % len;
+		if (fp < 0)
+			fp += len;
+	}
 	fp_next = (fp < (len - 1) ? fp + 1 : 0);
 
 	a = eina_f16p16_fracc_get(p) >> 8;
