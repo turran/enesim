@@ -35,6 +35,7 @@ typedef struct _Enesim_Renderer_Pattern {
 	Enesim_Renderer_Pattern_State current;
 	Enesim_Renderer_Pattern_State past;
 	/* generated at state setup */
+	Enesim_Surface *cache;
 	/* private */
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Pattern;
@@ -83,9 +84,72 @@ static void _reflect_span(Enesim_Renderer *r,
 
 }
 
-static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz, Enesim_Renderer *r)
+static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz, Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Error **error)
 {
- 	thiz = _pattern_get(r);
+	Eina_Rectangle source_bounds;
+	Eina_Rectangle dst_bounds;
+	Enesim_Backend backend;
+	Enesim_Format format;
+	Eina_Bool changed = EINA_FALSE;
+	int x;
+	int y;
+	int w;
+	int h;
+
+	/* setup the renderer */
+	if (!thiz->current.source)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "You need to set a source renderer");
+		return EINA_FALSE;
+	}
+
+	/* setup the surface */
+	enesim_renderer_destination_boundings(thiz->current.source,
+			&source_bounds, 0, 0);
+
+	format = enesim_surface_format_get(s);
+	/* TODO we need to define correctly the position and size */
+	w = thiz->current.width;
+	if (source_bounds.w < w)
+		w = source_bounds.w;
+
+	h = thiz->current.height;
+	if (source_bounds.h < h)
+		h = source_bounds.h;
+
+	if (thiz->cache)
+	{
+		Enesim_Format sf;
+		int sw;
+		int sh;
+
+		enesim_surface_size_get(thiz->cache, &sw, &sh);
+		sf = enesim_surface_format_get(thiz->cache);
+		if (sw != w || sh != h || format != sf)
+		{
+			enesim_surface_unref(thiz->cache);
+			thiz->cache = NULL;
+		}
+	}
+
+	if (!thiz->cache)
+	{
+		thiz->cache = enesim_surface_new(format, w, h);
+		changed = EINA_TRUE;
+	}
+
+	if (enesim_renderer_has_changed(thiz->current.source) && changed)
+	{
+		/* TODO The surface backend might be different, still there are some
+		 * issues with the API on the surface/pool side
+		 */
+		if (!enesim_renderer_setup(thiz->current.source, thiz->cache, error))
+			return EINA_FALSE;
+		enesim_renderer_draw(thiz->current.source, thiz->cache, NULL,
+				source_bounds.x, source_bounds.y, NULL);
+	}
+
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
@@ -105,7 +169,8 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 
  	thiz = _pattern_get(r);
 
-	if (!_pattern_state_setup(thiz, r)) return EINA_FALSE;
+	/* do the common setup */
+	if (!_pattern_state_setup(thiz, r, s, error)) return EINA_FALSE;
 	*fill = _repeat_span;
 
 	return EINA_TRUE;
@@ -152,6 +217,19 @@ static void _pattern_boundings(Enesim_Renderer *r,
 	boundings->h = thiz->current.height;
 }
 
+static void _pattern_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings)
+{
+	Enesim_Rectangle oboundings;
+
+	_pattern_boundings(r, states, &oboundings);
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w);
+	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h);
+}
+
 static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -167,7 +245,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name = 			*/ _pattern_name,
 	/* .free = 			*/ _pattern_free,
 	/* .boundings = 		*/ _pattern_boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .destination_boundings = 	*/ _pattern_destination_boundings,
 	/* .flags = 			*/ _pattern_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
