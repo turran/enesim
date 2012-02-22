@@ -1981,7 +1981,7 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 	if (!thiz->changed) return EINA_FALSE;
 
 	/* the width */
-	if (thiz->current.width != thiz->past.height)
+	if (thiz->current.width != thiz->past.width)
 		return EINA_TRUE;
 	/* the height */
 	if (thiz->current.height != thiz->past.height)
