@@ -462,7 +462,7 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x)
+EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
 {
 	Enesim_Renderer_Image *thiz;
 
@@ -474,7 +474,7 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, int x)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y)
+EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Image *thiz;
 
@@ -486,7 +486,7 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, int y)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w)
+EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
 {
 	Enesim_Renderer_Image *thiz;
 
@@ -498,7 +498,7 @@ EAPI void enesim_renderer_image_w_set(Enesim_Renderer *r, int w)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_h_set(Enesim_Renderer *r, int h)
+EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
 {
 	Enesim_Renderer_Image *thiz;
 

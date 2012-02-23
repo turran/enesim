@@ -404,6 +404,8 @@ static void _pattern_free(Enesim_Renderer *r)
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = _pattern_get(r);
+	if (thiz->cache)
+		enesim_surface_unref(thiz->cache);
 	free(thiz);
 }
 
