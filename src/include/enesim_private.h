@@ -22,6 +22,19 @@
 #include "config.h"
 #endif
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+#include <inttypes.h>
+#include <float.h>
+#include <fenv.h>
+/* TODO remove all assert statements */
+#include <assert.h>
+#include <stdarg.h>
+#include <limits.h>
+#include <math.h>
+
 #if BUILD_PTHREAD
 #include <pthread.h>
 #endif
@@ -40,14 +53,6 @@
 #include "GL/glext.h"
 #endif
 
-#include <string.h>
-#include <limits.h>
-#include <stdint.h>
-#include <float.h>
-#include <fenv.h>
-/* TODO remove all assert statements */
-#include <assert.h>
-
 #ifdef ENESIM_DEFAULT_LOG_COLOR
 # undef ENESIM_DEFAULT_LOG_COLOR
 #endif
@@ -58,16 +63,6 @@
 #define DBG(...) EINA_LOG_DOM_DBG(enesim_log_dom_global, __VA_ARGS__)
 extern int enesim_log_dom_global;
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <limits.h>
-
-#ifndef _ISOC99_SOURCE // truncf support
-#define _ISOC99_SOURCE
-#endif
-
-#include <math.h>
 /* SIMD intrinsics */
 #ifdef EFL_HAVE_MMX
 #define LIBARGB_MMX 1

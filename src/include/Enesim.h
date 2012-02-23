@@ -38,7 +38,7 @@
  * @brief Enesim API
  */
 
-#include <stdint.h>
+#include <inttypes.h>
 
 #include <Eina.h>
 
