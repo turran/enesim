@@ -48,4 +48,25 @@ static inline Eina_F16p16 eina_f16p16_hypot(Eina_F16p16 x, Eina_F16p16 y)
 	return eina_f16p16_sqrt(x);
 }
 
+/* round downn */
+static inline int eina_f16p16_floor(Eina_F16p16 v)
+{
+	return v >> 16;
+}
+
+/* round to nearest */
+static inline int eina_f16p16_round(Eina_F16p16 v)
+{
+	return eina_f16p16_floor(v + EINA_F16P16_HALF);
+}
+
+/* round towards zero */
+static inline int eina_f16p16_trunc(Eina_F16p16 v)
+{
+#if 0
+	if (v > 0) return eina_f16p16_floor(v);
+	else return eina_f16p16_ceil(v);
+#endif
+}
+
 #endif
