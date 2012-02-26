@@ -47,7 +47,7 @@ typedef struct _Enesim_Renderer_Image
 	/* private */
 	unsigned int *src;
 	int sw, sh;
-	int sstride;
+	size_t sstride;
 	int xx, yy;
 	double w, h;
 	int iw, ih;
@@ -130,7 +130,7 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
-	uint32_t *dst = ddata, end = dst + len;
+	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
 	Eina_F16p16 xx, yy;
@@ -208,7 +208,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
-	uint32_t *dst = ddata, end = dst + len;
+	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
 	int iw = thiz->iw, ih = thiz->ih;
@@ -276,11 +276,11 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
-	uint32_t *dst = ddata, end = dst + len;
+	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
 	int iw = thiz->iw, ih = thiz->ih;
-	int mxx = thiz->mxx, myy = thiz->myy;
+	long long int mxx = thiz->mxx, myy = thiz->myy;
 	int xx, yy;
 	Enesim_Color color = state->color;
 
@@ -360,7 +360,7 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r,
 		int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
-	uint8_t *src = thiz->src;
+	uint8_t *src = (uint8_t *)thiz->src;
 	int sw = thiz->sw;
 
 	x -= state->ox;
@@ -539,6 +539,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 				*fill = _argb8888_blend_span;
 		}
 	}
+
 	return EINA_TRUE;
 }
 
