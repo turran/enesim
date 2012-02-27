@@ -45,16 +45,15 @@ typedef struct _Enesim_Renderer_Image
 	Enesim_Renderer_Image_State current;
 	Enesim_Renderer_Image_State past;
 	/* private */
-	unsigned int *src;
+	uint32_t *src;
 	int sw, sh;
 	size_t sstride;
-	int xx, yy;
-	double w, h;
-	int iw, ih;
-	int mxx, myy;
+	Eina_F16p16 ixx, iyy;
+	Eina_F16p16 iww, ihh;
+	Eina_F16p16 mxx, myy;
 	Enesim_F16p16_Matrix matrix;
 	Enesim_Compositor_Span span;
-	Eina_Bool scaled : 1;
+	Eina_Bool simple : 1;
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Image;
 
@@ -78,8 +77,8 @@ static void _argb8888_blend_span(Enesim_Renderer *r,
 	uint32_t *src = thiz->src;
 	uint32_t *dst = ddata;
 
-	x -= (thiz->xx >> 16);
-	y -= (thiz->yy >> 16);
+	x -= eina_f16p16_int_to(thiz->ixx);
+	y -= eina_f16p16_int_to(thiz->iyy);
 
 	if ((y < 0) || (y >= thiz->sh) || (x >= thiz->sw) || (x + len < 0))
 		return;
@@ -102,8 +101,8 @@ static void _argb8888_image_no_scale_identity(Enesim_Renderer *r,
 	uint32_t *dst = ddata;
 
 
-	x -= (thiz->xx >> 16);
-	y -= (thiz->yy >> 16);
+	x -= eina_f16p16_int_to(thiz->ixx);
+	y -= eina_f16p16_int_to(thiz->iyy);
 
 	if ((y < 0) || (y >= thiz->sh) || (x >= thiz->sw) || (x + len < 0) || !state->color)
 	{
@@ -146,10 +145,10 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 
 	xx = (thiz->matrix.xx * x) + (thiz->matrix.xx >> 1) + 
 		(thiz->matrix.xy * y) + (thiz->matrix.xy >> 1) + 
-		thiz->matrix.xz - 32768 - thiz->xx;
+		thiz->matrix.xz - 32768 - thiz->ixx;
 	yy = (thiz->matrix.yx * x) + (thiz->matrix.yx >> 1) + 
 		(thiz->matrix.yy * y) + (thiz->matrix.yy >> 1) + 
-		thiz->matrix.yz - 32768 - thiz->yy;
+		thiz->matrix.yz - 32768 - thiz->iyy;
 
 	while (dst < end)
 	{
@@ -160,16 +159,13 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 
 		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
 		{
-			uint32_t *p, p1 = 0, p2 = 0, p3 = 0;
-
-			p = src + (y * sw) + x;
+			uint32_t *p = src + (y * sw) + x;
+			uint32_t p1 = 0, p2 = 0, p3 = 0;
 
 			if ((x > -1) && (y > - 1))
 				p0 = *p;
-
 			if ((y > -1) && ((x + 1) < sw))
 				p1 = *(p + 1);
-
 			if ((y + 1) < sh)
 			{
 				if (x > -1)
@@ -177,13 +173,10 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 				if ((x + 1) < sw)
 					p3 = *(p + sw + 1);
 			}
-
 			if (p0 | p1 | p2 | p3)
 			{
-				uint16_t ax, ay;
-
-				ax = 1 + ((xx & 0xffff) >> 8);
-				ay = 1 + ((yy & 0xffff) >> 8);
+				uint16_t ax = 1 + ((xx & 0xffff) >> 8);
+				uint16_t ay = 1 + ((yy & 0xffff) >> 8);
 
 				p0 = argb8888_interp_256(ax, p1, p0);
 				p2 = argb8888_interp_256(ax, p3, p2);
@@ -211,10 +204,11 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
-	int iw = thiz->iw, ih = thiz->ih;
-	int mxx = thiz->mxx, myy = thiz->myy;
-	int ixx, iyy, iy;
-	int ay;
+	Eina_F16p16 iww = thiz->iww, ihh = thiz->ihh;
+	Eina_F16p16 mxx = thiz->mxx, myy = thiz->myy;
+	Eina_F16p16 xx, yy, ixx, iyy;
+	int iy;
+	uint16_t ay;
 	Enesim_Color color = state->color;
 
 	if (!color)
@@ -225,41 +219,54 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 	if (color == 0xffffffff)
 		color = 0;
 
-	x -= (thiz->xx >> 16);
-	y -= (thiz->yy >> 16);
-	if ((y < 0) || (y >= ih))
+	xx = eina_f16p16_int_from(x) - thiz->ixx;
+	yy = eina_f16p16_int_from(y) - thiz->iyy;
+
+	if ((yy <= -EINA_F16P16_ONE) || (yy >= ihh))
 	{
 		memset(dst, 0, sizeof(unsigned int) * len);
 		return;
 	}
 
-	iyy = myy * y;
-	iy = iyy >> 16;
+	iyy = (myy * (long long int)yy) >> 16;
+	iy = eina_f16p16_int_to(iyy);
 	src += (iy * sw);
 	ay = 1 + ((iyy & 0xffff) >> 8);
-	ixx = mxx * x;
+	if (yy < 0)
+		ay = 1 + ((yy & 0xffff) >> 8);
+	if ((ihh - yy) < EINA_F16P16_ONE)
+		ay = 256 - ((ihh - yy) >> 8);
+	ixx = (mxx * (long long int)xx) >> 16;
 
 	while (dst < end)
 	{
-		unsigned int  p0 = 0;
+		uint32_t p0 = 0;
 
-		if (((unsigned) x) < iw)
+		if ((xx > -EINA_F16P16_ONE) & (xx < iww))
 		{
-			int  ix = ixx >> 16;
-			int  ax = 1 + ((ixx & 0xffff) >> 8);
-			unsigned int *p = src + ix, p3, p2, p1;
+			int ix = eina_f16p16_int_to(ixx);
+			uint32_t *p = src + ix;
+			uint32_t p1 = 0, p2 = 0, p3 = 0;
 
-			p0 = p1 = p2 = p3 = *p;
-			if ((ix + 1) < sw)
+			if ((iy > -1) & (ix > -1))
+				p0 = *p;
+			if ((iy > -1) & ((ix + 1) < sw))
 				p1 = *(p + 1);
 			if ((iy + 1) < sh)
 			{
-				p2 = *(p + sw);
+				if (ix > -1)
+					p2 = *(p + sw);
 				if ((ix + 1) < sw)
-				p3 = *(p + sw + 1);
+					p3 = *(p + sw + 1);
 			}
 			if (p0 | p1 | p2 | p3)
 			{
+				uint16_t ax = 1 + ((ixx & 0xffff) >> 8);
+
+				if (xx < 0)
+					ax = 1 + ((xx & 0xffff) >> 8);
+				if ((iww - xx) < EINA_F16P16_ONE)
+					ax = 256 - ((iww - xx) >> 8);
 				p0 = argb8888_interp_256(ax, p1, p0);
 				p2 = argb8888_interp_256(ax, p3, p2);
 				p0 = argb8888_interp_256(ay, p2, p0);
@@ -267,7 +274,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 					p0 = argb8888_mul4_sym(p0, color);
 			}
         	}
-		*dst++ = p0;  x++;  ixx += mxx;
+		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
 }
 
@@ -279,9 +286,9 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
-	int iw = thiz->iw, ih = thiz->ih;
-	long long int mxx = thiz->mxx, myy = thiz->myy;
-	int xx, yy;
+	Eina_F16p16 iww = thiz->iww, ihh = thiz->ihh;
+	Eina_F16p16 mxx = thiz->mxx, myy = thiz->myy;
+	Eina_F16p16 xx, yy;
 	Enesim_Color color = state->color;
 
 	if (!color)
@@ -294,32 +301,26 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 
 	xx = (thiz->matrix.xx * x) + (thiz->matrix.xx >> 1) + 
 		(thiz->matrix.xy * y) + (thiz->matrix.xy >> 1) + 
-		thiz->matrix.xz - 32768 - thiz->xx;
+		thiz->matrix.xz - 32768 - thiz->ixx;
 	yy = (thiz->matrix.yx * x) + (thiz->matrix.yx >> 1) + 
 		(thiz->matrix.yy * y) + (thiz->matrix.yy >> 1) + 
-		thiz->matrix.yz - 32768 - thiz->yy;
+		thiz->matrix.yz - 32768 - thiz->iyy;
 
 	while (dst < end)
 	{
-		unsigned int  p0 = 0;
+		uint32_t p0 = 0;
 
-		x = (xx >> 16);
-		y = (yy >> 16);
-		if ( (((unsigned) (x + 1)) < (iw + 1)) & (((unsigned) (y + 1)) < (ih + 1)) )
+		if ( (((unsigned) (xx + EINA_F16P16_ONE)) < (iww + EINA_F16P16_ONE)) & 
+			(((unsigned) (yy + EINA_F16P16_ONE)) < (ihh + EINA_F16P16_ONE)) )
 		{
-			int  ixx, ix, iyy, iy;
-			int  ax, ay;
-			unsigned int *p, p3 = 0, p2 = 0, p1 = 0;
+			Eina_F16p16 ixx, iyy;
+			int ix, iy;
+			uint32_t *p, p3 = 0, p2 = 0, p1 = 0;
 
-			ixx = (mxx * xx) >> 16;  ix = ixx >> 16;
-			iyy = (myy * yy) >> 16;  iy = iyy >> 16;
-			ax = 1 + ((ixx >> 8) & 0xff);
-			ay = 1 + ((iyy >> 8) & 0xff);
-
-			if ((x < 0) || ((x + 2) > iw))
-				ax = 1 + ((xx >> 8) & 0xff);
-			if ((y < 0) || ((y + 2) > ih))
-				ay = 1 + ((yy >> 8) & 0xff);
+			ixx = (mxx * (long long int)xx) >> 16;
+			ix = eina_f16p16_int_to(ixx);
+			iyy = (myy * (long long int)yy) >> 16;
+			iy = eina_f16p16_int_to(iyy);
 
 			p = src + (iy * sw) + ix;
 
@@ -336,6 +337,19 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 			}
 			if (p0 | p1 | p2 | p3)
 			{
+				uint16_t ax, ay;
+
+				ax = 1 + ((ixx & 0xffff) >> 8);
+				ay = 1 + ((iyy & 0xffff) >> 8);
+				if (xx < 0)
+					ax = 1 + ((xx & 0xffff) >> 8);
+				if ((iww - xx) < EINA_F16P16_ONE)
+					ax = 256 - ((iww - xx) >> 8);
+				if (yy < 0)
+					ay = 1 + ((yy & 0xffff) >> 8);
+				if ((ihh - yy) < EINA_F16P16_ONE)
+					ay = 256 - ((ihh - yy) >> 8);
+
 				p0 = argb8888_interp_256(ax, p1, p0);
 				p2 = argb8888_interp_256(ax, p3, p2);
 				p0 = argb8888_interp_256(ay, p2, p0);
@@ -363,8 +377,8 @@ static void _a8_to_argb8888_noscale(Enesim_Renderer *r,
 	uint8_t *src = (uint8_t *)thiz->src;
 	int sw = thiz->sw;
 
-	x -= state->ox;
-	y -= state->oy;
+	x -= (thiz->ixx) >> 16;
+	y -= (thiz->iyy) >> 16;
 
 	src += (thiz->sstride * y) + x;
 	while (len--)
@@ -459,6 +473,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Image *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	Enesim_Format fmt;
+	Enesim_Matrix_Type mtype;
 	double x, y, w, h;
 
 	thiz = _image_get(r);
@@ -475,63 +490,53 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	x *= cs->sx;  y *= cs->sy;
 	w *= cs->sx;  h *= cs->sy;
 
-	thiz->iw = thiz->w = w;
-	thiz->ih = thiz->h = h;
-	if ((thiz->iw < 1) || (thiz->ih < 1) || (thiz->sw < 1) || (thiz->sh < 1))
+	if ((w < 1) || (h < 1) || (thiz->sw < 1) || (thiz->sh < 1))
 	{
 		WRN("Size too small");
 		return EINA_FALSE;
 	}
-	thiz->xx = 65536 * (x + cs->ox);
-	thiz->yy = 65536 * (y + cs->oy);
+	thiz->iww = (w * 65536);
+	thiz->ihh = (h * 65536);
+	thiz->ixx = 65536 * (x + cs->ox);
+	thiz->iyy = 65536 * (y + cs->oy);
 	thiz->mxx = 65536;  thiz->myy = 65536;
 
 	/* FIXME we need to use the format from the destination surface */
 	fmt = ENESIM_FORMAT_ARGB8888;
 	enesim_matrix_f16p16_matrix_to(&cs->transformation, &thiz->matrix);
+	mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
 
 	if ((fabs(thiz->sw - w) > 1/256.0) || (fabs(thiz->sh - h) > 1/256.0))
 	{
-		Enesim_Matrix_Type mtype;
-		double sx = thiz->iw / w;
-		double sy = thiz->ih / h;
+		double sx = thiz->sw - (1 - 1/(double)thiz->sw);
+		double isx = w - (1 - 1/w);
+		double sy = thiz->sh - (1 - 1/(double)thiz->sh);
+		double isy = h - (1 - 1/h);
 
-		thiz->scaled = 1;
-		thiz->matrix.xx *= sx;  thiz->matrix.xy *= sx;
-		thiz->matrix.yy *= sy;  thiz->matrix.yx *= sy;
-		
-		mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
-
-		if (thiz->sw != thiz->iw || thiz->sh != thiz->ih)
+		thiz->mxx = (sx * 65536) / isx;
+		thiz->myy = (sy * 65536) / isy;
+		thiz->simple = 0;
+		if (mtype == ENESIM_MATRIX_AFFINE)  // in case it's just a translation
 		{
-			if ((thiz->sw > 1) && (thiz->iw > 1))
-				thiz->mxx = ((thiz->sw - 1) << 16) / (thiz->iw - 1);
-			else
-				thiz->mxx = (thiz->sw << 16) / thiz->iw;
-			if ((thiz->sh > 1) && (thiz->ih > 1))
-				thiz->myy = ((thiz->sh - 1) << 16) / (thiz->ih - 1);
-			else
-				thiz->myy = (thiz->sh << 16) / thiz->ih;
-
-			*fill = _spans[1][mtype];
+			thiz->ixx -= thiz->matrix.xz;  thiz->matrix.xz = 0;
+			thiz->iyy -= thiz->matrix.yz;  thiz->matrix.yz = 0;
+			mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
 		}
-		else
-		{
-			*fill = _spans[0][mtype];
-			if (mtype == ENESIM_MATRIX_IDENTITY)
-			{
-				thiz->span = enesim_compositor_span_get(cs->rop, &fmt,
-						ENESIM_FORMAT_ARGB8888, cs->color, ENESIM_FORMAT_NONE);
-				if (cs->rop == ENESIM_BLEND)
-					*fill = _argb8888_blend_span;
-			}
-		}
+		*fill = _spans[1][mtype];
 	}
 	else
 	{
-		thiz->scaled = 0;
-		*fill = _spans[0][cs->transformation_type];
-		if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
+		thiz->simple = 1;
+		if ((thiz->ixx & 0xffff) || (thiz->iyy & 0xffff))  // non-int translation
+		{
+			thiz->matrix.xz -= thiz->ixx;  thiz->ixx = 0;
+			thiz->matrix.yz -= thiz->iyy;  thiz->iyy = 0;
+			mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
+			if (mtype != ENESIM_MATRIX_IDENTITY)
+				thiz->simple = 0;
+		}
+		*fill = _spans[0][mtype];
+		if (mtype == ENESIM_MATRIX_IDENTITY)
 		{
 			thiz->span = enesim_compositor_span_get(cs->rop, &fmt,
 				ENESIM_FORMAT_ARGB8888, cs->color, ENESIM_FORMAT_NONE);
@@ -554,11 +559,11 @@ static void _image_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 			//ENESIM_RENDERER_FLAG_QUALITY |
 			ENESIM_RENDERER_FLAG_COLORIZE;
 
-	if ((state->transformation_type == ENESIM_MATRIX_IDENTITY) && (state->rop != ENESIM_FILL))
+	if (state->rop != ENESIM_FILL)
 	{
 		Enesim_Renderer_Image *thiz = _image_get(r);
 
-		if (!thiz->scaled)
+		if (thiz->simple)
 			*flags |= ENESIM_RENDERER_FLAG_ROP;
 	}
 }
@@ -568,6 +573,8 @@ static void _image_free(Enesim_Renderer *r)
 	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
+	if (thiz->current.s)
+		enesim_surface_unref(thiz->current.s);
 	free(thiz);
 }
 

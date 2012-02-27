@@ -67,6 +67,7 @@ static inline int eina_f16p16_trunc(Eina_F16p16 v)
 	if (v > 0) return eina_f16p16_floor(v);
 	else return eina_f16p16_ceil(v);
 #endif
+	return 0;
 }
 
 #endif
