@@ -140,9 +140,12 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 		/* TODO The surface backend might be different, still there are some
 		 * issues with the API on the surface/pool side
 		 */
-		printf("thiz->cache %p\n", thiz->cache);
 		if (!enesim_renderer_setup(thiz->current.source, thiz->cache, error))
+		{
+			ENESIM_RENDERER_ERROR(r, error,
+					"Impossible to setup the source renderer");
 			return EINA_FALSE;
+		}
 		enesim_renderer_draw(thiz->current.source, thiz->cache, NULL,
 				0, 0, NULL);
 	}

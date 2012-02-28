@@ -48,8 +48,9 @@ typedef enum _Enesim_Rop
  */
 typedef enum _Enesim_Quality
 {
-	ENESIM_GOOD, /**< Good quality, slower */
-	ENESIM_FAST, /**< Normal quality, faster */
+	ENESIM_QUALITY_GOOD, /**< Good quality */
+	ENESIM_QUALITY_FAST, /**< Lower quality, fastest */
+	ENESIM_QUALITY_BEST, /**< Best quality */
 	ENESIM_QUALITIES
 } Enesim_Quality;
 

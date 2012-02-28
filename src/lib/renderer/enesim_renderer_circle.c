@@ -34,6 +34,22 @@ typedef struct _Enesim_Renderer_Circle_State {
 	double r;
 } Enesim_Renderer_Circle_State;
 
+typedef struct _Enesim_Renderer_Circle_Sw
+{
+	Eina_F16p16 rr0;
+	Eina_F16p16 rr1; /* rr0 + 1 */
+	Eina_F16p16 rr2; /* rr1 * sqrt2 */
+} Enesim_Renderer_Circle_Sw;
+
+typedef struct _Enesim_Renderer_Circle_Sw_State
+{
+	Enesim_Renderer_Circle_Sw outter;
+	Enesim_Renderer_Circle_Sw inner;
+	Eina_F16p16 xx0, yy0;
+	Enesim_F16p16_Matrix matrix;
+	Eina_Bool do_inner :1;
+} Enesim_Renderer_Circle_Sw_State;
+
 typedef struct _Enesim_Renderer_Circle {
 	EINA_MAGIC
 	/* public properties */
@@ -43,11 +59,7 @@ typedef struct _Enesim_Renderer_Circle {
 	Eina_Bool changed : 1;
 	/* for the case we use the path renderer */
 	Enesim_Renderer *path;
-	/* for our own case */
-	Enesim_F16p16_Matrix matrix;
-	int xx0, yy0;
-	int rr0, irr0;
-	unsigned char do_inner :1;
+	Enesim_Renderer_Circle_Sw_State sw_state;
 } Enesim_Renderer_Circle;
 
 static inline Enesim_Renderer_Circle * _circle_get(Enesim_Renderer *r)
@@ -102,6 +114,38 @@ static void _circle_path_setup(Enesim_Renderer_Circle *thiz,
 	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
 	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 }
+
+static inline Enesim_Color _circle_sample(Eina_F16p16 xx, Eina_F16p16 yy,
+		Enesim_Renderer_Circle_Sw *swc,
+		Enesim_Color ocolor, Enesim_Color icolor)
+{
+	Eina_F16p16 rr0 = swc->rr0;
+	Eina_F16p16 rr1 = swc->rr1;
+	Eina_F16p16 rr2 = swc->rr2;
+	Enesim_Color p0;
+	uint16_t a = 256;
+
+	p0 = icolor;
+	if (abs(xx) + abs(yy) >= rr0)
+	{
+		a = 0;
+		if (abs(xx) + abs(yy) <= rr2)
+		{
+			int rr = hypot(xx, yy);
+
+			if (rr < rr1)
+			{
+				a = 256;
+				if (rr > rr0)
+					a -= ((rr - rr0) >> 8);
+			}
+		}
+	}
+	if (a < 256)
+		p0 = argb8888_interp_256(a, icolor, ocolor);
+
+	return p0;
+}
 /*----------------------------------------------------------------------------*
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
@@ -132,16 +176,15 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 	Enesim_Renderer_Circle *thiz = _circle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *fpaint;
-	int axx = thiz->matrix.xx;
-	int ayx = thiz->matrix.yx;
-	int do_inner = thiz->do_inner;
+	int axx = thiz->sw_state.matrix.xx;
+	int ayx = thiz->sw_state.matrix.yx;
+	int do_inner = thiz->sw_state.do_inner;
 	Enesim_Color color;
 	unsigned int ocolor;
 	unsigned int icolor;
-	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
-	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
-	int rr2 = rr1 * M_SQRT2, irr2 = irr1 * M_SQRT2;
-	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	int rr0 = thiz->sw_state.outter.rr0, rr1 = thiz->sw_state.outter.rr1;
+	int irr0 = thiz->sw_state.inner.rr0, irr1 = thiz->sw_state.inner.rr1;
+	int xx0 = thiz->sw_state.xx0, yy0 = thiz->sw_state.yy0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy;
@@ -186,42 +229,26 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 		enesim_renderer_sw_draw(fpaint, x, y, len, dst);
 	}
 
-        enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+        enesim_renderer_affine_setup(r, x, y, &thiz->sw_state.matrix, &xx, &yy);
 	xx -= xx0;
 	yy -= yy0;
+
 	while (d < e)
 	{
+		Eina_F16p16 absxx = abs(xx);
+		Eina_F16p16 absyy = abs(yy);
 		unsigned int q0 = 0;
 
-		if ((abs(xx) <= rr1) && (abs(yy) <= rr1))
+		if ((absxx <= rr1) && (absyy <= rr1))
 		{
 			unsigned int op0 = ocolor, p0;
-			int a = 256;
 
 			if (fill_only && fpaint)
 				op0 = argb8888_mul4_sym(*d, op0);
 
-			if (abs(xx) + abs(yy) >= rr0)
-			{
-				a = 0;
-				if (abs(xx) + abs(yy) <= rr2)
-				{
-					int rr = hypot(xx, yy);
-
-					if (rr < rr1)
-					{
-						a = 256;
-						if (rr > rr0)
-							a -= ((rr - rr0) >> 8);
-					}
-				}
-			}
-
-			if (a < 256)
-				op0 = argb8888_mul_256(a, op0);
-
-			p0 = op0;
-			if (do_inner && (abs(xx) <= irr1) && (abs(yy) <= irr1))
+			p0 = _circle_sample(xx, yy, &thiz->sw_state.outter, 0, op0);
+			op0 = p0;
+			if (do_inner && (absxx <= irr1) && (absyy <= irr1))
 			{
 				p0 = icolor;
 				if (fpaint)
@@ -230,25 +257,7 @@ static void _stroke_fill_paint_affine(Enesim_Renderer *r,
 					if (icolor != 0xffffffff)
 						p0 = argb8888_mul4_sym(icolor, p0);
 				}
-				a = 256;
-				if (abs(xx) + abs(yy) >= irr0)
-				{
-					a = 0;
-					if (abs(xx) + abs(yy) <= irr2)
-					{
-						int rr = hypot(xx, yy);
-
-						if (rr < irr1)
-						{
-							a = 256;
-							if (rr > irr0)
-								a -= ((rr - irr0) >> 8);
-						}
-					}
-				}
-
-				if (a < 256)
-					p0 = argb8888_interp_256(a, p0, op0);
+				p0 = _circle_sample(xx, yy, &thiz->sw_state.inner, op0, p0);
 			}
 			q0 = p0;
 		}
@@ -268,16 +277,15 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 	Enesim_Renderer_Circle *thiz = _circle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *spaint;
-	int axx = thiz->matrix.xx;
-	int ayx = thiz->matrix.yx;
-	int do_inner = thiz->do_inner;
+	int axx = thiz->sw_state.matrix.xx;
+	int ayx = thiz->sw_state.matrix.yx;
+	int do_inner = thiz->sw_state.do_inner;
 	Enesim_Color color;
 	unsigned int ocolor;
 	unsigned int icolor;
-	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
-	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
-	int rr2 = rr1 * M_SQRT2, irr2 = irr1 * M_SQRT2;
-	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	int rr1 = thiz->sw_state.outter.rr1;
+	int irr1 = thiz->sw_state.inner.rr1;
+	int xx0 = thiz->sw_state.xx0, yy0 = thiz->sw_state.yy0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	int xx, yy;
@@ -299,62 +307,28 @@ static void _stroke_paint_fill_affine(Enesim_Renderer *r,
 	if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		icolor = 0;
 
-        enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+        enesim_renderer_affine_setup(r, x, y, &thiz->sw_state.matrix, &xx, &yy);
 	xx -= xx0;
 	yy -= yy0;
+
 	while (d < e)
 	{
+		Eina_F16p16 absxx = abs(xx);
+		Eina_F16p16 absyy = abs(yy);
 		unsigned int q0 = 0;
 
-		if ((abs(xx) <= rr1) && (abs(yy) <= rr1))
+		if ((absxx <= rr1) && (absyy <= rr1))
 		{
 			unsigned int op0 = *d, p0;
-			int a = 256;
 
 			if (ocolor != 0xffffffff)
 				op0 = argb8888_mul4_sym(ocolor, op0);
-			if (abs(xx) + abs(yy) >= rr0)
+
+			p0 = _circle_sample(xx, yy, &thiz->sw_state.outter, 0, op0);
+			op0 = p0;
+			if (do_inner && (absxx <= irr1) && (absyy <= irr1))
 			{
-				a = 0;
-				if (abs(xx) + abs(yy) <= rr2)
-				{
-					int rr = hypot(xx, yy);
-
-					if (rr < rr1)
-					{
-						a = 256;
-						if (rr > rr0)
-							a -= ((rr - rr0) >> 8);
-					}
-				}
-			}
-
-			if (a < 256)
-				op0 = argb8888_mul_256(a, op0);
-
-			p0 = op0;
-			if (do_inner && (abs(xx) <= irr1) && (abs(yy) <= irr1))
-			{
-				p0 = icolor;
-				a = 256;
-				if (abs(xx) + abs(yy) >= irr0)
-				{
-					a = 0;
-					if (abs(xx) + abs(yy) <= irr2)
-					{
-						int rr = hypot(xx, yy);
-
-						if (rr < irr1)
-						{
-							a = 256;
-							if (rr > irr0)
-								a -= ((rr - irr0) >> 8);
-						}
-					}
-				}
-
-				if (a < 256)
-					p0 = argb8888_interp_256(a, p0, op0);
+				p0 = _circle_sample(xx, yy, &thiz->sw_state.inner, op0, icolor);
 			}
 			q0 = p0;
 		}
@@ -374,14 +348,13 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
 	Enesim_Renderer_Circle *thiz = _circle_get(r);
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *fpaint, *spaint;
-	int axx = thiz->matrix.xx;
-	int ayx = thiz->matrix.yx;
+	int axx = thiz->sw_state.matrix.xx;
+	int ayx = thiz->sw_state.matrix.yx;
 	unsigned int ocolor;
 	unsigned int icolor;
-	int rr0 = thiz->rr0, rr1 = rr0 + 65536;
-	int irr0 = thiz->irr0, irr1 = irr0 + 65536;
-	int rr2 = rr1 * M_SQRT2, irr2 = irr1 * M_SQRT2;
-	int xx0 = thiz->xx0, yy0 = thiz->yy0;
+	int rr1 = thiz->sw_state.outter.rr1;
+	int irr1 = thiz->sw_state.inner.rr1;
+	int xx0 = thiz->sw_state.xx0, yy0 = thiz->sw_state.yy0;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
 	unsigned int *sbuf, *s;
@@ -398,65 +371,29 @@ static void _stroke_paint_fill_paint_affine(Enesim_Renderer *r,
 	enesim_renderer_sw_draw(spaint, x, y, len, sbuf);
 	s = sbuf;
 
-        enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+        enesim_renderer_affine_setup(r, x, y, &thiz->sw_state.matrix, &xx, &yy);
 	xx -= xx0;
 	yy -= yy0;
+
 	while (d < e)
 	{
+		Eina_F16p16 absxx = abs(xx);
+		Eina_F16p16 absyy = abs(yy);
 		unsigned int q0 = 0;
 
-		if ((abs(xx) <= rr1) && (abs(yy) <= rr1))
+		if ((absxx <= rr1) && (absyy <= rr1))
 		{
 			unsigned int op0 = *s, p0;
-			int a = 256;
 
-			if (ocolor != 0xffffffff)
-				op0 = argb8888_mul4_sym(ocolor, op0);
+			p0 = _circle_sample(xx, yy, &thiz->sw_state.outter, 0, op0);
+			op0 = p0;
 
-			if (abs(xx) + abs(yy) >= rr0)
-			{
-				a = 0;
-				if (abs(xx) + abs(yy) <= rr2)
-				{
-					int rr = hypot(xx, yy);
-
-					if (rr < rr1)
-					{
-						a = 256;
-						if (rr > rr0)
-							a -= ((rr - rr0) >> 8);
-					}
-				}
-			}
-
-			if (a < 256)
-				op0 = argb8888_mul_256(a, op0);
-
-			p0 = op0;
-			if ((abs(xx) <= irr1) && (abs(yy) <= irr1))
+			if ((absxx <= irr1) && (absyy <= irr1))
 			{
 				p0 = *d;
 				if (icolor != 0xffffffff)
 					p0 = argb8888_mul4_sym(icolor, p0);
-				a = 256;
-				if (abs(xx) + abs(yy) >= irr0)
-				{
-					a = 0;
-					if (abs(xx) + abs(yy) <= irr2)
-					{
-						int rr = hypot(xx, yy);
-
-						if (rr < irr1)
-						{
-							a = 256;
-							if (rr > irr0)
-								a -= ((rr - irr0) >> 8);
-						}
-					}
-				}
-
-				if (a < 256)
-					p0 = argb8888_interp_256(a, p0, op0);
+				p0 = _circle_sample(xx, yy, &thiz->sw_state.inner, op0, p0);
 			}
 			q0 = p0;
 		}
@@ -603,7 +540,7 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 		double rad;
 		double sw;
 
-		thiz->do_inner = 1;
+		thiz->sw_state.do_inner = 1;
 
 		sw = css->stroke.weight;
 		rad = thiz->current.r;
@@ -620,7 +557,7 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 				if (sw >= (thiz->current.r - 1))
 				{
 					sw = 0;
-					thiz->do_inner = 0;
+					thiz->sw_state.do_inner = 0;
 				}
 				break;
 
@@ -630,21 +567,25 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 			}
 		}
 
-		thiz->rr0 = 65536 * (rad - 1);
-		thiz->xx0 = 65536 * (thiz->current.x - 0.5);
-		thiz->yy0 = 65536 * (thiz->current.y - 0.5);
+		thiz->sw_state.outter.rr0 = 65536 * (rad - 1);
+		thiz->sw_state.outter.rr1 = thiz->sw_state.outter.rr0 + 65536;
+		thiz->sw_state.outter.rr2 = thiz->sw_state.outter.rr1 * M_SQRT2;
+		thiz->sw_state.xx0 = 65536 * (thiz->current.x - 0.5);
+		thiz->sw_state.yy0 = 65536 * (thiz->current.y - 0.5);
 
 		rad = rad - 1 - sw;
 		if (rad < 0.0039)
 			rad = 0;
 
-		thiz->irr0 = rad * 65536;
+		thiz->sw_state.inner.rr0 = rad * 65536;
+		thiz->sw_state.inner.rr1 = thiz->sw_state.inner.rr0 + 65536;
+		thiz->sw_state.inner.rr2 = thiz->sw_state.inner.rr1 * M_SQRT2;
 
 		if (!enesim_renderer_shape_setup(r, states, s, error))
 			return EINA_FALSE;
 
 		enesim_matrix_f16p16_matrix_to(&cs->transformation,
-				&thiz->matrix);
+				&thiz->sw_state.matrix);
 
 		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 		enesim_renderer_shape_stroke_renderer_get(r, &spaint);
@@ -656,7 +597,7 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 
 			*draw = _stroke_paint_fill_affine;
 			enesim_renderer_shape_fill_renderer_get(r, &fpaint);
-			if (fpaint && thiz->do_inner &&
+			if (fpaint && thiz->sw_state.do_inner &&
 						(draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 				*draw = _stroke_paint_fill_paint_affine;
 		}
