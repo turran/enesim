@@ -131,9 +131,9 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 			&thiz->sw.matrix);
 	/* get the length */
 	slen = thiz->descriptor->length(r);
-	if (slen < 0)
+	if (slen <= 0)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "Gradient length %d < 0", slen);
+		ENESIM_RENDERER_ERROR(r, error, "Gradient length %d <= 0", slen);
 		return EINA_FALSE;
 	}
 
