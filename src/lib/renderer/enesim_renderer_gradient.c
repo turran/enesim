@@ -100,6 +100,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Gradient_Stop *curr, *next, *last;
 	Eina_F16p16 xx, inc;
 	Eina_List *tmp;
+	double diff;
 	int slen;
 	int start;
 	int end;
@@ -141,9 +142,16 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	tmp = eina_list_next(thiz->current.stops);
 	next = eina_list_data_get(tmp);
 	last = eina_list_data_get(eina_list_last(thiz->current.stops));
-	/* TODO check that next->pos - curr->pos != 0 */
-	/* Check that we dont divide by 0 */
-	inc = eina_f16p16_double_from(1.0 / ((next->pos - curr->pos) * slen));
+	diff = next->pos - curr->pos;
+	/* get a valid start */
+	while (!diff)
+	{
+		tmp = eina_list_next(tmp);
+		curr = next;
+		next = eina_list_data_get(tmp);
+		diff = next->pos - curr->pos;
+	}
+	inc = eina_f16p16_double_from(1.0 / (diff * slen));
 	xx = 0;
 
 	start = curr->pos * slen;
@@ -176,7 +184,12 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 			tmp = eina_list_next(tmp);
 			curr = next;
 			next = eina_list_data_get(tmp);
-			inc = eina_f16p16_double_from(1.0 / ((next->pos - curr->pos) * thiz->sw.len));
+			diff = next->pos - curr->pos;
+			if (!diff)
+			{
+				continue;
+			}
+			inc = eina_f16p16_double_from(1.0 / (diff * slen));
 			xx = 0;
 		}
 		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
@@ -368,6 +381,7 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_
 	s = malloc(sizeof(Enesim_Renderer_Gradient_Stop));
 	s->argb = stop->argb;
 	s->pos = pos;
+
 	/* if pos == 0.0 set to first */
 	if (pos == 0.0)
 	{
