@@ -18,6 +18,14 @@
 #include "Enesim.h"
 #include "enesim_private.h"
 #include "private/shape.h"
+/* TODO
+ * - whenever we need the damage area of a shape, we need to check if
+ *   the renderer has a fill renderer, if so, we should call the damage
+ *   on the fill renderer in case the shape hasnt changed
+ * - when the bounds are requested, if we are using a fill renderer
+ *   and our draw mode is fill we should intersect our boundings
+ *   with the one of the fill renderer
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -529,7 +537,7 @@ EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_R
 	thiz = _shape_get(r);
 	if (thiz->current.stroke.r == stroke)
 		return;
-	
+
 	if (thiz->current.stroke.r)
 		enesim_renderer_unref(thiz->current.stroke.r);
 	thiz->current.stroke.r = stroke;
