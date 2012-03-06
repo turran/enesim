@@ -74,7 +74,7 @@ EAPI int enesim_init(void)
 	/* FIXME for some reason we are having several fp exaceptions
 	 * better disable the inexact case always
 	 */
-	feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
+	feenableexcept(FE_DIVBYZERO | FE_INVALID);
 
 	return _enesim_init_count;
 

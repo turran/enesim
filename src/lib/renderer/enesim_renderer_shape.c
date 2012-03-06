@@ -84,7 +84,6 @@ static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
 		Eina_Rectangle *boundings)
 {
 	Enesim_Renderer_Shape *thiz;
-	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->destination_boundings)
@@ -93,14 +92,26 @@ static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
 		boundings->y = INT_MIN / 2;
 		boundings->w = INT_MAX;
 		boundings->h = INT_MAX;
+	}
+	else
+	{
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
-		return;
+		sstates[ENESIM_STATE_CURRENT] = &thiz->current;
+		sstates[ENESIM_STATE_PAST] = &thiz->past;
+		thiz->destination_boundings(r, states, sstates, boundings);
 	}
 
-	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	sstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->destination_boundings(r, states, sstates, boundings);
+#if 0
+	if (thiz->current.fill.r &&
+			(thiz->current.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL))
+	{
+		Enesim_Rectangle fbounds;
 
+		enesim_renderer_destination_boundings(thiz->current.fill.r, &fbounds, 0, 0);
+		eina_rectangle_intersection(boundings, &fbounds);
+	}
+#endif
 }
 
 static void _enesim_renderer_shape_boundings(Enesim_Renderer *r,
@@ -124,6 +135,16 @@ static void _enesim_renderer_shape_boundings(Enesim_Renderer *r,
 	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
 	sstates[ENESIM_STATE_PAST] = &thiz->past;
 	thiz->boundings(r, states, sstates, boundings);
+#if 0
+	if (thiz->current.fill.r &&
+			(thiz->current.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL))
+	{
+		Enesim_Rectangle fbounds;
+
+		enesim_renderer_destination_boundings(thiz->current.fill.r, &fbounds, 0, 0);
+		enesim_rectangle_intersection(boundings, &fbounds);
+	}
+#endif
 }
 
 
