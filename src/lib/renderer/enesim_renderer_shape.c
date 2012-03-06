@@ -147,6 +147,16 @@ static void _enesim_renderer_shape_boundings(Enesim_Renderer *r,
 #endif
 }
 
+static void _enesim_renderer_shape_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = enesim_renderer_data_get(r);
+	/* TODO if the shape has changed then send the whole boundings */
+	/* TODO if not and we fill with a renderer which has changed then only
+	 * send the damages of that fill
+	 */
+}
 
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
