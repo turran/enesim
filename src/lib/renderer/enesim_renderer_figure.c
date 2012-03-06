@@ -86,6 +86,30 @@ static void _figure_generate_commands(Enesim_Renderer_Figure *thiz)
 			enesim_renderer_path_close(thiz->path, EINA_TRUE);
 	}
 }
+
+static void _figure_path_setup(Enesim_Renderer_Figure *thiz,
+		const Enesim_Renderer_State *cs,
+		const Enesim_Renderer_Shape_State *css)
+{
+	if (thiz->changed)
+		_figure_generate_commands(thiz);
+
+	/* pass all the properties to the path */
+	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
+	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
+	enesim_renderer_shape_fill_rule_set(thiz->path, css->fill.rule);
+	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
+	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
+	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
+	/* base properties */
+	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
+	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
+	enesim_renderer_color_set(thiz->path, cs->color);
+	enesim_renderer_rop_set(thiz->path, cs->rop);
+	enesim_renderer_scale_set(thiz->path, cs->sx, cs->sy);
+}
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -120,24 +144,7 @@ static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	if (thiz->changed)
-		_figure_generate_commands(thiz);
-
-	/* pass all the properties to the path */
-	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
-	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
-	enesim_renderer_shape_fill_rule_set(thiz->path, css->fill.rule);
-	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
-	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
-	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
-	/* base properties */
-	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
-	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
-	enesim_renderer_color_set(thiz->path, cs->color);
-	enesim_renderer_rop_set(thiz->path, cs->rop);
-	enesim_renderer_scale_set(thiz->path, cs->sx, cs->sy);
+	_figure_path_setup(thiz, cs, css);
 
 	if (!enesim_renderer_setup(thiz->path, s, error))
 		return EINA_FALSE;
@@ -165,11 +172,39 @@ static void _figure_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state
 	enesim_renderer_flags(thiz->path, flags);
 }
 
+static void _figure_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *rect)
+{
+	Enesim_Renderer_Figure *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+
+	thiz = _figure_get(r);
+	_figure_path_setup(thiz, cs, css);
+	enesim_renderer_boundings(thiz->path, rect);
+}
+
+static void _figure_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings)
+{
+	Enesim_Renderer_Figure *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+
+	thiz = _figure_get(r);
+	_figure_path_setup(thiz, cs, css);
+	enesim_renderer_destination_boundings(thiz->path, boundings, 0, 0);
+}
+
 static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {
 	/* .name = 			*/ _figure_name,
 	/* .free = 			*/ _free,
-	/* .boundings = 		*/ NULL,
-	/* .destination_boundings = 	*/ NULL,
+	/* .boundings = 		*/ _figure_boundings,
+	/* .destination_boundings = 	*/ _figure_destination_boundings,
 	/* .flags = 			*/ _figure_flags,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
@@ -222,7 +257,7 @@ EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *r)
 	enesim_figure_polygon_append(thiz->figure, p);
 
 	thiz->last_polygon = p;
-	thiz->changed = 1;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * To be documented
@@ -239,7 +274,7 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 	p = thiz->last_polygon;
 	if (!p) return;
 	enesim_polygon_point_append_from_coords(p, x, y);
-	thiz->changed = 1;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -257,7 +292,7 @@ EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r, Eina_Bool clo
 	if (!p) return;
 
 	enesim_polygon_close(p, close);
-	thiz->changed = 1;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -270,7 +305,7 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
 
 	thiz = _figure_get(r);
 	enesim_figure_clear(thiz->figure);
-	thiz->changed = 1;
+	thiz->changed = EINA_TRUE;
 }
 
 /**
