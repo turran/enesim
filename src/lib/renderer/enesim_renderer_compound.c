@@ -378,7 +378,10 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 	return ret;
 }
 
-static void _compound_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
+static void _compound_damage(Enesim_Renderer *r,
+		const Eina_Rectangle *old_boundings,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;

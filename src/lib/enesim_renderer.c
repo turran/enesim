@@ -1144,7 +1144,12 @@ EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage
 		return;
 	if (r->descriptor.damage)
 	{
-		r->descriptor.damage(r, cb, data);
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES];
+
+		states[ENESIM_STATE_CURRENT] = &r->current;
+		states[ENESIM_STATE_PAST] = &r->past;
+		r->descriptor.damage(r, &r->past_destination_boundings,
+				states, cb, data);
 	}
 	else
 	{

@@ -35,6 +35,13 @@
 			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_SHAPE_MAGIC);\
 	} while(0)
 
+typedef struct _Enesim_Renderer_Shape_Damage_Data
+{
+	Eina_Rectangle *boundings;
+	Enesim_Renderer_Damage_Cb real_cb;
+	void *real_data;
+} Enesim_Renderer_Shape_Damage_Data;
+
 typedef struct _Enesim_Renderer_Shape
 {
 	EINA_MAGIC
@@ -65,6 +72,78 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 	ENESIM_RENDERER_SHAPE_MAGIC_CHECK(thiz);
 
 	return thiz;
+}
+
+/* FIXME this might be useful to be shared */
+static inline Eina_Bool _common_changed(const Enesim_Renderer_State *current,
+		const Enesim_Renderer_State *past)
+{
+	/* the rop */
+	if (current->rop != past->rop)
+	{
+		return EINA_TRUE;
+	}
+	/* the color */
+	if (current->color != past->color)
+	{
+		return EINA_TRUE;
+	}
+	/* the mask */
+	if (current->mask != past->mask)
+		return EINA_TRUE;
+	if (current->mask)
+	{
+		if (enesim_renderer_has_changed(current->mask))
+		{
+			return EINA_TRUE;
+		}
+	}
+	/* the origin */
+	if (current->ox != past->ox || current->oy != past->oy)
+	{
+		return EINA_TRUE;
+	}
+	/* the scale */
+	if (current->sx != past->sx || current->sy != past->sy)
+	{
+		return EINA_TRUE;
+	}
+	/* the transformation */
+	if (current->transformation_type != past->transformation_type)
+	{
+		return EINA_TRUE;
+	}
+
+	if (!enesim_matrix_is_equal(&current->transformation, &past->transformation))
+	{
+		return EINA_TRUE;
+	}
+
+	/* the geometry_transformation */
+	if (current->geometry_transformation_type != past->geometry_transformation_type)
+	{
+		return EINA_TRUE;
+	}
+
+	if (!enesim_matrix_is_equal(&current->geometry_transformation, &past->geometry_transformation))
+	{
+		return EINA_TRUE;
+	}
+	return EINA_FALSE;
+}
+
+/* called from the optimized case of the damages to just clip the damages
+ * to our own bounds
+ */
+static Eina_Bool _shape_damage_cb(Enesim_Renderer *r,
+		Eina_Rectangle *area, Eina_Bool past, void *data)
+{
+	Enesim_Renderer_Shape_Damage_Data *ddata = data;
+
+	/* here we just intersect the damages with our bounds */
+	eina_rectangle_intersection(ddata->boundings, area);
+	ddata->real_cb(r, ddata->boundings, past, ddata->real_data);
+	return EINA_TRUE;
 }
 
 static void _enesim_renderer_shape_sw_draw(Enesim_Renderer *r,
@@ -147,17 +226,6 @@ static void _enesim_renderer_shape_boundings(Enesim_Renderer *r,
 #endif
 }
 
-static void _enesim_renderer_shape_damage(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
-{
-	Enesim_Renderer_Shape *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	/* TODO if the shape has changed then send the whole boundings */
-	/* TODO if not and we fill with a renderer which has changed then only
-	 * send the damages of that fill
-	 */
-}
-
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
@@ -222,36 +290,8 @@ static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
 		program_name, program_source, program_length, error);
 }
 
-static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
+static Eina_Bool _enesim_renderer_shape_changed_basic(Enesim_Renderer_Shape *thiz)
 {
-	/* FIXME handle the case where it had a stroke/fill and not now
-	 * or the opposite
-	 */
-	/* we should first check if the fill renderer has changed */
-	if (thiz->current.fill.r &&
-			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
-	{
-		if (enesim_renderer_has_changed(thiz->current.fill.r))
-		{
-			const char *fill_name;
-
-			enesim_renderer_name_get(thiz->current.fill.r, &fill_name);
-			DBG("The fill renderer %s has changed", fill_name);
-			return EINA_TRUE;
-		}
-	}
-	if (thiz->current.stroke.r &&
-			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
-	{
-		if (enesim_renderer_has_changed(thiz->current.stroke.r))
-		{
-			const char *stroke_name;
-
-			enesim_renderer_name_get(thiz->current.stroke.r, &stroke_name);
-			DBG("The stroke renderer %s has changed", stroke_name);
-			return EINA_TRUE;
-		}
-	}
 	if (!thiz->changed)
 		return EINA_FALSE;
 	/* the stroke */
@@ -285,6 +325,44 @@ static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
 	return EINA_FALSE;
 }
 
+static Eina_Bool _enesim_renderer_shape_changed(Enesim_Renderer_Shape *thiz)
+{
+	Eina_Bool ret;
+	/* FIXME handle the case where it had a stroke/fill and not now
+	 * or the opposite
+	 */
+	/* we should first check if the fill renderer has changed */
+	if (thiz->current.fill.r &&
+			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+	{
+		if (enesim_renderer_has_changed(thiz->current.fill.r))
+		{
+			const char *fill_name;
+
+			enesim_renderer_name_get(thiz->current.fill.r, &fill_name);
+			DBG("The fill renderer %s has changed", fill_name);
+			ret = EINA_TRUE;
+			goto done;
+		}
+	}
+	if (thiz->current.stroke.r &&
+			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+	{
+		if (enesim_renderer_has_changed(thiz->current.stroke.r))
+		{
+			const char *stroke_name;
+
+			enesim_renderer_name_get(thiz->current.stroke.r, &stroke_name);
+			DBG("The stroke renderer %s has changed", stroke_name);
+			ret = EINA_TRUE;
+			goto done;
+		}
+	}
+	ret = _enesim_renderer_shape_changed_basic(thiz);
+done:
+	return ret;
+}
+
 static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -301,6 +379,74 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 		ret = thiz->has_changed(r);
 
 	return ret;
+}
+
+static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
+		const Eina_Rectangle *old_boundings,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Renderer_Damage_Cb cb, void *data)
+{
+	Enesim_Renderer_Shape *thiz;
+	Eina_Rectangle current_boundings;
+	Eina_Bool do_send_old = EINA_FALSE;
+
+	thiz = enesim_renderer_data_get(r);
+
+	/* get the current boundings */
+	enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
+
+	/* first check if the common properties have changed */
+	do_send_old = _common_changed(states[ENESIM_STATE_CURRENT],
+			states[ENESIM_STATE_PAST]);
+	if (do_send_old) goto send_old;
+
+	/* check if the common shape properties have changed */
+	do_send_old = _enesim_renderer_shape_changed_basic(thiz);
+	if (do_send_old) goto send_old;
+
+	/* check if the shape implementation has changed */
+	if (thiz->has_changed)
+		do_send_old = thiz->has_changed(r);
+
+send_old:
+	if (do_send_old)
+	{
+		cb(r, old_boundings, EINA_TRUE, data);
+		cb(r, &current_boundings, EINA_FALSE, data);
+	}
+	else
+	{
+		/* optimized case */
+		Enesim_Shape_Draw_Mode dm = thiz->current.draw_mode;
+		Eina_Bool stroke_changed = EINA_FALSE;
+
+		if (thiz->current.stroke.r &&
+					(dm & ENESIM_SHAPE_DRAW_MODE_STROKE))
+			stroke_changed = enesim_renderer_has_changed(thiz->current.stroke.r);
+
+		/* if we fill with a renderer which has changed then only
+		 * send the damages of that fill
+		 */
+		if (thiz->current.fill.r &&
+				(dm & ENESIM_SHAPE_DRAW_MODE_FILL) &&
+				!stroke_changed)
+		{
+			Enesim_Renderer_Shape_Damage_Data ddata;
+			ddata.real_cb = cb;
+			ddata.real_data = data;
+			ddata.boundings = &current_boundings;
+
+			enesim_renderer_damages_get(thiz->current.fill.r, _shape_damage_cb, &ddata);
+		}
+		/* otherwise send the current boundings only */
+		else
+		{
+			if (stroke_changed)
+			{
+				cb(r, &current_boundings, EINA_FALSE, data);
+			}
+		}
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -334,7 +480,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	pdescriptor.destination_boundings = _enesim_renderer_shape_destination_boundings;
 	pdescriptor.flags = descriptor->flags;
 	pdescriptor.is_inside = descriptor->is_inside;
-	pdescriptor.damage = descriptor->damage;
+	pdescriptor.damage = _enesim_renderer_shape_damage;
 	pdescriptor.has_changed = _enesim_renderer_shape_has_changed;
 	pdescriptor.sw_setup = _enesim_renderer_shape_sw_setup;
 	pdescriptor.sw_cleanup = descriptor->sw_cleanup;
