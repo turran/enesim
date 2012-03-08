@@ -240,9 +240,6 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data);
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
 
-EAPI void enesim_renderer_relative_set(Enesim_Renderer *r, const Enesim_Renderer_State *rel, Enesim_Renderer_State *old_state);
-EAPI void enesim_renderer_relative_unset(Enesim_Renderer *r, Enesim_Renderer_State *state);
-
 EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
 
 #endif

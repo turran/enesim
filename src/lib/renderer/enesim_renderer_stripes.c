@@ -41,8 +41,6 @@ typedef struct _Enesim_Renderer_Stripes {
 	Enesim_Renderer_Stripes_State current;
 	Enesim_Renderer_Stripes_State past;
 	/* private */
-	Enesim_Renderer_State old_odd;
-	Enesim_Renderer_State old_even;
 	Eina_Bool changed : 1;
 	Enesim_Color final_color1;
 	Enesim_Color final_color2;
@@ -266,7 +264,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 		enesim_renderer_sw_draw(opaint, x, y, len, sbuf);
 		s = sbuf;
 	}
-	
+
 	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 	while (d < e)
 	{
@@ -341,12 +339,10 @@ static void _stripes_state_cleanup(Enesim_Renderer_Stripes *thiz, Enesim_Surface
 {
 	if (thiz->current.even.paint)
 	{
-		enesim_renderer_relative_unset(thiz->current.even.paint, &thiz->old_even);
 		enesim_renderer_cleanup(thiz->current.even.paint, s);
 	}
 	if (thiz->current.odd.paint)
 	{
-		enesim_renderer_relative_unset(thiz->current.odd.paint, &thiz->old_odd);
 		enesim_renderer_cleanup(thiz->current.odd.paint, s);
 	}
 	thiz->past = thiz->current;
@@ -377,13 +373,11 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 
 	if (thiz->current.even.paint)
 	{
-		enesim_renderer_relative_set(thiz->current.even.paint, cs, &thiz->old_even);
 		if (!enesim_renderer_setup(thiz->current.even.paint, s, error))
 			return EINA_FALSE;
 	}
 	if (thiz->current.odd.paint)
 	{
-		enesim_renderer_relative_set(thiz->current.odd.paint, cs, &thiz->old_odd);
 		if (!enesim_renderer_setup(thiz->current.odd.paint, s, error))
 			return EINA_FALSE;
 	}

@@ -61,7 +61,6 @@ typedef struct _Layer
 	/* generated at state setup */
 	Eina_Rectangle destination_boundings;
 	Enesim_Compositor_Span span;
-	Enesim_Renderer_State old;
 } Layer;
 
 static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
@@ -155,16 +154,11 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	{
 		Layer *l = eina_list_data_get(ll);
 
-		/* TODO check the flags and only generate the relative properties
-		 * for those supported
-		 */
 		/* the position and the matrix */
-		enesim_renderer_relative_set(l->r, state, &l->old);
 		if (thiz->pre_cb)
 		{
 			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
 			{
-				enesim_renderer_relative_unset(l->r, &l->old);
 				continue;
 			}
 		}
@@ -184,12 +178,11 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 		{
 			if (!thiz->post_cb(r, l->r, thiz->post_data))
 			{
-				enesim_renderer_relative_unset(l->r, &l->old);
 				continue;
 			}
 		}
 		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
-		thiz->visible_layers = eina_list_append(thiz->visible_layers, l); 
+		thiz->visible_layers = eina_list_append(thiz->visible_layers, l);
 	}
 	if (state->rop == ENESIM_FILL)
 	{
@@ -214,17 +207,12 @@ static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	/* cleanup every layer */
 	EINA_LIST_FOREACH_SAFE(thiz->visible_layers, ll, ll_next, layer)
 	{
-		enesim_renderer_relative_unset(layer->r, &layer->old);
 		enesim_renderer_cleanup(layer->r, s);
 		thiz->visible_layers = eina_list_remove_list(thiz->visible_layers, ll);
 	}
 	thiz->changed = EINA_FALSE;
 }
 
-/* FIXME this both boundings are wrong
- * because they dont have the relativeness done when calculating the
- * boundings
- */
 static void _compound_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)

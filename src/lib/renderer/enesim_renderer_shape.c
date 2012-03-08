@@ -50,9 +50,6 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_Shape_State past;
 	/* private */
 	Eina_Bool changed : 1;
-	/* needed for the state */
-	Enesim_Renderer_State old_fill;
-	Enesim_Renderer_State old_stroke;
 	/* interface */
 	Enesim_Renderer_Shape_Boundings boundings;
 	Enesim_Renderer_Shape_Destination_Boundings destination_boundings;
@@ -504,13 +501,11 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	if (thiz->current.fill.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
-		enesim_renderer_relative_unset(thiz->current.fill.r, &thiz->old_fill);
 		enesim_renderer_cleanup(thiz->current.fill.r, s);
 	}
 	if (thiz->current.stroke.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 	{
-		enesim_renderer_relative_unset(thiz->current.stroke.r, &thiz->old_stroke);
 		enesim_renderer_cleanup(thiz->current.stroke.r, s);
 	}
 	thiz->past = thiz->current;
@@ -530,7 +525,6 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
 		fill_renderer = EINA_TRUE;
-		enesim_renderer_relative_set(thiz->current.fill.r, state, &thiz->old_fill);
 		if (!enesim_renderer_setup(thiz->current.fill.r, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Fill renderer failed");
@@ -540,14 +534,12 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 	if (thiz->current.stroke.r &&
 			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 	{
-		enesim_renderer_relative_set(thiz->current.stroke.r, state, &thiz->old_stroke);
 		if (!enesim_renderer_setup(thiz->current.stroke.r, s, error))
 		{
 			ENESIM_RENDERER_ERROR(r, error, "Stroke renderer failed");
 			/* clean up the fill renderer setup */
 			if (fill_renderer)
 			{
-				enesim_renderer_relative_unset(thiz->current.fill.r, &thiz->old_fill);
 				enesim_renderer_cleanup(thiz->current.fill.r, s);
 
 			}
