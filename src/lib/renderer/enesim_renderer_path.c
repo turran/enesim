@@ -798,10 +798,17 @@ static void _path_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY |
-			ENESIM_RENDERER_FLAG_COLORIZE |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+			ENESIM_RENDERER_FLAG_GEOMETRY; 
+}
+static void _path_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static void _path_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _path_boundings(Enesim_Renderer *r,
@@ -1013,9 +1020,11 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .boundings = 		*/ _path_boundings,
 	/* .destination_boundings = 	*/ _path_destination_boundings,
 	/* .flags = 			*/ _path_flags,
+	/* .hints_get = 			*/ _path_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,
+	/* .feature_get =		*/ _path_feature_get,
 	/* .sw_setup = 			*/ _path_sw_setup,
 	/* .sw_cleanup = 		*/ _path_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

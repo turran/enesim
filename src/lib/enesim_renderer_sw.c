@@ -41,14 +41,14 @@
  *                                  Local                                     *
  *============================================================================*/
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
-		Enesim_Renderer_Flag flags)
+		Enesim_Renderer_Hint hints)
 {
 	Enesim_Color color = r->current.color;
 	Enesim_Rop rop = r->current.rop;
 
-	if (flags & ENESIM_RENDERER_FLAG_COLORIZE)
+	if (hints & ENESIM_RENDERER_HINT_COLORIZE)
 		color = ENESIM_COLOR_FULL;
-	if (flags & ENESIM_RENDERER_FLAG_ROP)
+	if (hints & ENESIM_RENDERER_HINT_ROP)
 		rop = ENESIM_FILL;
 
 	/* fill rop and color is full, we use the simple draw function */
@@ -445,7 +445,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Sw_Fill fill = NULL;
 	Enesim_Compositor_Span span = NULL;
 	Enesim_Renderer_Sw_Data *sw_data;
-	Enesim_Renderer_Flag flags;
+	Enesim_Renderer_Hint hints;
 
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
@@ -478,8 +478,8 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
 	}
 
-	enesim_renderer_flags(r, &flags);
-	if (_is_sw_draw_composed(r, flags))
+	enesim_renderer_hints_get(r, &hints);
+	if (_is_sw_draw_composed(r, hints))
 	{
 		Enesim_Format dfmt;
 

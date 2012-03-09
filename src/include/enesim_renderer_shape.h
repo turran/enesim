@@ -24,11 +24,11 @@
  * @{
  */
 
-typedef enum _Enesim_Shape_Flag
+typedef enum _Enesim_Shape_Feature
 {
-	ENESIM_SHAPE_FLAG_FILL_RENDERER 	= (1 << (ENESIM_RENDERER_FLAGS + 0)),
-	ENESIM_SHAPE_FLAG_STROKE_RENDERER	= (1 << (ENESIM_RENDERER_FLAGS + 1)),
-} Enesim_Shape_Flag;
+	ENESIM_SHAPE_FLAG_FILL_RENDERER 	= (1 << 0),
+	ENESIM_SHAPE_FLAG_STROKE_RENDERER	= (1 << 1),
+} Enesim_Shape_Feature;
 
 typedef enum _Enesim_Shape_Draw_Mode
 {
@@ -67,6 +67,7 @@ typedef enum _Enesim_Shape_Fill_Rule
     ENESIM_SHAPE_FILL_RULE_EVEN_ODD,
 } Enesim_Shape_Fill_Rule;
 
+EAPI void enesim_renderer_shape_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features);
 
 /* stroke properties */
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);

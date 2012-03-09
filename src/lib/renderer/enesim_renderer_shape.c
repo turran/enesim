@@ -57,6 +57,7 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_Shape_Sw_Draw sw_draw;
 	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
 	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
+	Enesim_Renderer_Shape_Feature_Get feature_get;
 	Enesim_Renderer_Has_Changed has_changed;
 	void *data;
 } Enesim_Renderer_Shape;
@@ -138,8 +139,8 @@ static Eina_Bool _shape_damage_cb(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Damage_Data *ddata = data;
 
 	/* here we just intersect the damages with our bounds */
-	eina_rectangle_intersection(ddata->boundings, area);
-	ddata->real_cb(r, ddata->boundings, past, ddata->real_data);
+	if (eina_rectangle_intersection(ddata->boundings, area))
+		ddata->real_cb(r, ddata->boundings, past, ddata->real_data);
 	return EINA_TRUE;
 }
 
@@ -360,7 +361,8 @@ done:
 	return ret;
 }
 
-static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
+static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Shape *thiz;
 	Eina_Bool ret = EINA_TRUE;
@@ -373,7 +375,7 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 	}
 	/* call the has_changed on the descriptor */
 	if (thiz->has_changed)
-		ret = thiz->has_changed(r);
+		ret = thiz->has_changed(r, states);
 
 	return ret;
 }
@@ -403,7 +405,7 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 
 	/* check if the shape implementation has changed */
 	if (thiz->has_changed)
-		do_send_old = thiz->has_changed(r);
+		do_send_old = thiz->has_changed(r, states);
 
 send_old:
 	if (do_send_old)
@@ -469,6 +471,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	thiz->opencl_setup = descriptor->opencl_setup;
 	thiz->destination_boundings = descriptor->destination_boundings;
 	thiz->boundings = descriptor->boundings;
+	thiz->feature_get = descriptor->feature_get;
 	/* set the parent descriptor */
 	pdescriptor.version = ENESIM_RENDERER_API;
 	pdescriptor.name = descriptor->name;
@@ -476,6 +479,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	pdescriptor.boundings = _enesim_renderer_shape_boundings;
 	pdescriptor.destination_boundings = _enesim_renderer_shape_destination_boundings;
 	pdescriptor.flags = descriptor->flags;
+	pdescriptor.hints_get = descriptor->hints_get;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damage = _enesim_renderer_shape_damage;
 	pdescriptor.has_changed = _enesim_renderer_shape_has_changed;
@@ -843,4 +847,18 @@ EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_D
 
 	thiz = _shape_get(r);
 	if (draw_mode) *draw_mode = thiz->current.draw_mode;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	*features = 0;
+	if (thiz->feature_get)
+		thiz->feature_get(r, features);
 }

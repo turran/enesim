@@ -728,16 +728,22 @@ static void _image_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_QUALITY |
-			ENESIM_RENDERER_FLAG_COLORIZE;
+			ENESIM_RENDERER_FLAG_QUALITY; 
 
+}
+
+static void _image_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 	if (state->rop != ENESIM_FILL)
 	{
 		Enesim_Renderer_Image *thiz = _image_get(r);
 
 		if (thiz->simple)
-			*flags |= ENESIM_RENDERER_FLAG_ROP;
+			*hints |= ENESIM_RENDERER_HINT_ROP;
 	}
+
 }
 
 static void _image_free(Enesim_Renderer *r)
@@ -757,6 +763,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings = 		*/ _image_boundings,
 	/* .destination_boundings = 	*/ _image_destination_boundings,
 	/* .flags = 			*/ _image_flags,
+	/* .hints_get = 			*/ _image_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,

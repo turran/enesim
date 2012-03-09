@@ -5,7 +5,7 @@
   want to get the backend data and manage that data directly
 + Add a pattern renderer. Basically it should just draw another renderer inifinitely, of course
  if we want to restrict it to a specific area, then we should use a clipper? or maybe make the
- pattern clip also? 
+ pattern clip also?
 + Make use of the flags on the surface draw function
 + We need to optimize and avoid the need to always call
   enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
@@ -31,3 +31,10 @@
 + Initialize every renderer to some sane vales
 + We need to use whenever possible functions for fixed point operations. This way later we can just
   create some #defines for them and we can easily change from 16.16 to 32.32 or stuff like that
++ The renderers should implement or even the change interface or the damage, there's no need to iterate
+  the rendernig tree twice, one for the change callback and another for the damage callback
++ If we do the above then we should remove the enesim_renderer_has_changed API function, it should just
+  request the damages. If no damages, then no change, etc. Or implement the changed as a call to damages
+  with a simple callback that whenever a some damage area is returned then we should just abort and return
+  true
++ Later we'll need some kind of locking on the surface

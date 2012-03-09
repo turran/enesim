@@ -32,20 +32,17 @@ typedef enum _Enesim_Renderer_Flag
 	ENESIM_RENDERER_FLAG_SCALE		= (1 << 1), /**< The renderer can be scaled using the scale property */
 	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 2), /**< Affine transformation */
 	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 3), /**< Perspective transformations */
-	ENESIM_RENDERER_FLAG_COLORIZE 		= (1 << 4), /**< Use the renderer color directly */
-	ENESIM_RENDERER_FLAG_A8 		= (1 << 5), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 6), /**< Supports ARGB8888 surfaces */
-	ENESIM_RENDERER_FLAG_ROP 		= (1 << 7), /**< Can draw directly using the raster operation */
-	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 8), /**< Supports the quality property */
-	ENESIM_RENDERER_FLAG_MASK 		= (1 << 9), /**< The renderer can use the mask directly */
-	ENESIM_RENDERER_FLAG_GEOMETRY 		= (1 << 10), /**< Geometry transformation */
+	ENESIM_RENDERER_FLAG_A8 		= (1 << 4), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 5), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 6), /**< Supports the quality property */
+	ENESIM_RENDERER_FLAG_GEOMETRY 		= (1 << 7), /**< Geometry transformation */
 } Enesim_Renderer_Flag;
-
-#define ENESIM_RENDERER_FLAGS 11
 
 typedef enum _Enesim_Renderer_Hint
 {
-	ENESIM_RENDERER_HINT_CACHE		= (1 << 0), /**< Cache the resulting drawing */
+	ENESIM_RENDERER_HINT_COLORIZE 		= (1 << 0), /**< Can draw directly using the color property */
+	ENESIM_RENDERER_HINT_ROP 		= (1 << 1), /**< Can draw directly using the raster operation */
+	ENESIM_RENDERER_HINT_MASK 		= (1 << 2), /**< Can draw directly using the mask renderer */
 } Enesim_Renderer_Hint;
 
 /**
@@ -89,9 +86,6 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask);
 
-EAPI void enesim_renderer_hint_set(Enesim_Renderer *r, Enesim_Renderer_Hint hints);
-EAPI void enesim_renderer_hint_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hints);
-
 EAPI void enesim_renderer_boundings(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_boundings_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);
 
@@ -99,6 +93,7 @@ EAPI void enesim_renderer_destination_boundings(Enesim_Renderer *r, Eina_Rectang
 EAPI void enesim_renderer_destination_boundings_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
 
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
+EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hints);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
@@ -158,7 +153,11 @@ typedef void (*Enesim_Renderer_Destination_Boundings)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		Enesim_Renderer_Flag *flags);
-typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r);
+typedef void (*Enesim_Renderer_Hints_Get)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints);
+typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES]);
 typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_boundings,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
@@ -220,6 +219,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Boundings boundings;
 	Enesim_Renderer_Destination_Boundings destination_boundings;
 	Enesim_Renderer_Flags flags;
+	Enesim_Renderer_Hints_Get hints_get;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Damage damage;
 	Enesim_Renderer_Has_Changed has_changed;
@@ -234,6 +234,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Shader_Setup opengl_shader_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
+	/* we should expand from here */
 };
 
 EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor

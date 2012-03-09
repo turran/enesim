@@ -407,8 +407,13 @@ static void _pattern_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_COLORIZE;
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static void _pattern_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
 static void _pattern_free(Enesim_Renderer *r)
@@ -462,7 +467,8 @@ static void _pattern_destination_boundings(Enesim_Renderer *r,
 
 }
 
-static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
+static Eina_Bool _pattern_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Pattern *thiz;
 
@@ -510,6 +516,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings = 		*/ _pattern_boundings,
 	/* .destination_boundings = 	*/ _pattern_destination_boundings,
 	/* .flags = 			*/ _pattern_flags,
+	/* .hints_get = 			*/ _pattern_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _pattern_has_changed,

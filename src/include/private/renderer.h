@@ -26,7 +26,6 @@ struct _Enesim_Renderer
 {
 	EINA_MAGIC
 	char *name;
-	Enesim_Renderer_Hint hints;
 	int ref;
 	Enesim_Renderer_State current;
 	Enesim_Renderer_State past;

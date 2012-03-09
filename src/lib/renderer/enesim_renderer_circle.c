@@ -622,13 +622,17 @@ static void _circle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY |
-			ENESIM_RENDERER_FLAG_COLORIZE |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+			ENESIM_RENDERER_FLAG_GEOMETRY;
 }
 
-static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
+static void _circle_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static Eina_Bool _circle_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Circle *thiz;
 
@@ -644,6 +648,11 @@ static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
 	if (thiz->current.y != thiz->past.y)
 		return EINA_TRUE;
 	return EINA_FALSE;
+}
+
+static void _circle_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _circle_free(Enesim_Renderer *r)
@@ -662,9 +671,11 @@ static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .boundings = 		*/ _circle_boundings,
 	/* .destination_boundings = 	*/ _circle_destination_boundings,
 	/* .flags = 			*/ _circle_flags,
+	/* .hints_get = 		*/ _circle_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _circle_has_changed,
+	/* .feature_get =		*/ _circle_feature_get,
 	/* .sw_setup = 			*/ _circle_sw_setup,
 	/* .sw_cleanup = 		*/ _circle_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

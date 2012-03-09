@@ -163,6 +163,15 @@ static void _figure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
+static Eina_Bool _figure_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	return thiz->changed;
+}
+
 static void _figure_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 		Enesim_Renderer_Flag *flags)
 {
@@ -170,6 +179,15 @@ static void _figure_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state
 
 	thiz = _figure_get(r);
 	enesim_renderer_flags(thiz->path, flags);
+}
+
+static void _figure_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	enesim_renderer_hints_get(thiz->path, hints);
 }
 
 static void _figure_boundings(Enesim_Renderer *r,
@@ -200,15 +218,25 @@ static void _figure_destination_boundings(Enesim_Renderer *r,
 	enesim_renderer_destination_boundings(thiz->path, boundings, 0, 0);
 }
 
+static void _figure_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	enesim_renderer_shape_feature_get(thiz->path, features);
+}
+
 static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {
 	/* .name = 			*/ _figure_name,
 	/* .free = 			*/ _free,
 	/* .boundings = 		*/ _figure_boundings,
 	/* .destination_boundings = 	*/ _figure_destination_boundings,
 	/* .flags = 			*/ _figure_flags,
+	/* .hints_get = 			*/ _figure_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
-	/* .has_changed = 		*/ NULL,
+	/* .has_changed = 		*/ _figure_has_changed,
+	/* .feature_get =		*/ _figure_feature_get,
 	/* .sw_setup = 			*/ _figure_sw_setup,
 	/* .sw_cleanup = 		*/ _figure_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

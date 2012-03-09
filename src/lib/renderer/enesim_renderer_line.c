@@ -406,9 +406,18 @@ static void _line_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY |
-			ENESIM_RENDERER_FLAG_COLORIZE |
-			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+			ENESIM_RENDERER_FLAG_GEOMETRY;
+}
+
+static void _line_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static void _line_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _line_free(Enesim_Renderer *r)
@@ -430,7 +439,8 @@ static void _line_boundings(Enesim_Renderer *r,
 	boundings->h = fabs(thiz->current.y1 - thiz->current.y0);
 }
 
-static Eina_Bool _line_has_changed(Enesim_Renderer *r)
+static Eina_Bool _line_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Line *thiz;
 
@@ -461,9 +471,11 @@ static Enesim_Renderer_Shape_Descriptor _line_descriptor = {
 	/* .boundings = 		*/ NULL,// _line_boundings,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _line_flags,
+	/* .hints_get = 			*/ _line_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _line_has_changed,
+	/* .feature_get =		*/ _line_feature_get,
 	/* .sw_setup = 			*/ _line_state_setup,
 	/* .sw_cleanup = 		*/ _line_state_cleanup,
 	/* .opencl_setup =		*/ NULL,

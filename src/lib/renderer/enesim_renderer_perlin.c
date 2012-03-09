@@ -177,6 +177,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings =  		*/ NULL,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _perlin_flags,
+	/* .hints_get = 			*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,

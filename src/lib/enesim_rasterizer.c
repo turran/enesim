@@ -104,8 +104,18 @@ static void _rasterizer_flags(Enesim_Renderer *r, const Enesim_Renderer_State *s
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_COLORIZE;
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static void _rasterizer_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static void _rasterizer_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _rasterizer_boundings(Enesim_Renderer *r, Enesim_Renderer *boundings)
@@ -128,9 +138,11 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 		/* .boundings = 		*/ NULL,
 		/* .destination_transform = 	*/ NULL,
 		/* .flags = 			*/ _rasterizer_flags,
+		/* .hint_get = 			*/ _rasterizer_hints,
 		/* .is_inside = 		*/ NULL,
 		/* .damage = 			*/ NULL,
 		/* .has_changed = 		*/ NULL,
+		/* .feature_get =		*/ _rasterizer_feature_get,
 		/* .sw_setup = 			*/ _rasterizer_sw_setup,
 		/* .sw_cleanup = 		*/ _rasterizer_sw_cleanup,
 		/* .opencl_setup =		*/ NULL,

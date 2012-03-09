@@ -188,11 +188,14 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-Eina_Bool _linear_has_changed(Enesim_Renderer *r)
+Eina_Bool _linear_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 
 	thiz = _linear_get(r);
+
+	printf("linear changed\n");
 	if (!thiz->changed)
 		return EINA_FALSE;
 

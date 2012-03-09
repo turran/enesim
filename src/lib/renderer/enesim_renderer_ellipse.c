@@ -1034,7 +1034,8 @@ static void _ellipse_boundings(Enesim_Renderer *r,
 	rect->h = thiz->current.ry * 2;
 }
 
-static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r)
+static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Ellipse *thiz;
 
@@ -1073,10 +1074,18 @@ static void _ellipse_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY |
-			ENESIM_RENDERER_FLAG_COLORIZE |
-			ENESIM_SHAPE_FLAG_FILL_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+			ENESIM_RENDERER_FLAG_GEOMETRY;
+}
+
+static void _ellipse_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static void _ellipse_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
@@ -1085,9 +1094,11 @@ static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .boundings =  		*/ _ellipse_boundings,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _ellipse_flags,
+	/* .hints_get = 			*/ _ellipse_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _ellipse_has_changed,
+	/* .feature_get =		*/ _ellipse_feature_get,
 	/* .sw_setup = 			*/ _state_setup,
 	/* .sw_cleanup = 		*/ _state_cleanup,
 	/* .opencl_setup =		*/ NULL,

@@ -212,9 +212,14 @@ static void _background_flags(Enesim_Renderer *r, const Enesim_Renderer_State *s
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_ROP |
-			ENESIM_RENDERER_FLAG_COLORIZE;
+			ENESIM_RENDERER_FLAG_ARGB8888;
+
+}
+
+static void _background_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_COLORIZE;
 
 }
 
@@ -226,7 +231,8 @@ static void _background_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Eina_Bool _background_has_changed(Enesim_Renderer *r)
+static Eina_Bool _background_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Background *thiz;
 
@@ -243,6 +249,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings =             */ NULL,
 	/* .destination_boundings = */ NULL,
 	/* .flags =                 */ _background_flags,
+	/* .hints_get =                 */ _background_hints,
 	/* .is_inside =             */ NULL,
 	/* .damage =                */ NULL,
 	/* .has_changed =           */ _background_has_changed,

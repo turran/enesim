@@ -257,7 +257,8 @@ static const char * _gradient_name(Enesim_Renderer *r)
 		return "gradient";
 }
 
-static Eina_Bool _gradient_has_changed(Enesim_Renderer *r)
+static Eina_Bool _gradient_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Gradient *thiz;
 	Eina_Bool ret = EINA_TRUE;
@@ -269,7 +270,7 @@ static Eina_Bool _gradient_has_changed(Enesim_Renderer *r)
 		return ret;
 	}
 	if (thiz->descriptor->has_changed)
-		ret = thiz->descriptor->has_changed(r);
+		ret = thiz->descriptor->has_changed(r, states);
 	return ret;
 }
 
@@ -280,6 +281,7 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .boundings = 		*/ _gradient_boundings,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _gradient_flags,
+	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _gradient_has_changed,

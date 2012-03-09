@@ -291,7 +291,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _grid_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _grid_flags(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
@@ -314,6 +316,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings = 		*/ NULL,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _grid_flags,
+	/* .hints_get = 			*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,

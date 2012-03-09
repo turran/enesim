@@ -169,6 +169,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings =  		*/ _boundings,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _raddist_flags,
+	/* .hints_get = 			*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,

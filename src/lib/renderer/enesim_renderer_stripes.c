@@ -419,11 +419,17 @@ static void _stripes_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_COLORIZE;
+			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static Eina_Bool _stripes_has_changed(Enesim_Renderer *r)
+static void _stripes_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static Eina_Bool _stripes_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Stripes *thiz;
 
@@ -550,6 +556,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings = 		*/ NULL,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _stripes_flags,
+	/* .hints_get = 			*/ _stripes_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed = 		*/ _stripes_has_changed,

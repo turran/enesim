@@ -394,7 +394,8 @@ static void _checker_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Eina_Bool _checker_has_changed(Enesim_Renderer *r)
+static Eina_Bool _checker_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Checker *thiz;
 
@@ -419,8 +420,13 @@ static void _checker_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_COLORIZE;
+			ENESIM_RENDERER_FLAG_ARGB8888;
+}
+
+static void _checker_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
 #if BUILD_OPENGL
@@ -499,6 +505,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings = 		*/ NULL,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _checker_flags,
+	/* .hints = 			*/ _checker_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _checker_has_changed,

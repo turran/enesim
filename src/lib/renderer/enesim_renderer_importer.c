@@ -225,6 +225,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings = 		*/ _importer_boundings,
 	/* .destination_boundings = 	*/ _importer_destination_boundings,
  	/* .flags = 			*/ _importer_flags,
+ 	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,

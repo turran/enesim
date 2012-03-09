@@ -266,6 +266,13 @@ static void _compound_destination_boundings(Enesim_Renderer *r,
 static void _compound_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 		Enesim_Renderer_Flag *flags)
 {
+	/* TODO here we should only support the destination formats of the surfaces */
+	*flags = 0;
+}
+
+static void _compound_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Hint *hints)
+{
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Flag f = 0xffffffff;
 	Enesim_Rop rop = state->rop;
@@ -275,7 +282,7 @@ static void _compound_flags(Enesim_Renderer *r, const Enesim_Renderer_State *sta
 	thiz = _compound_get(r);
 	if (!thiz->layers)
 	{
-		*flags = 0;
+		*hints = 0;
 		return;
 	}
 
@@ -290,11 +297,11 @@ static void _compound_flags(Enesim_Renderer *r, const Enesim_Renderer_State *sta
 	{
 		Layer *l = eina_list_data_get(ll);
 		Enesim_Renderer *lr = l->r;
-		Enesim_Renderer_Flag tmp;
+		Enesim_Renderer_Hint tmp;
 		Enesim_Rop lrop;
 
 		/* intersect with every flag */
-		enesim_renderer_flags(lr, &tmp);
+		enesim_renderer_hints_get(lr, &tmp);
 		enesim_renderer_rop_get(lr, &lrop);
 		if (lrop != rop)
 			same_rop = EINA_FALSE;
@@ -302,8 +309,8 @@ static void _compound_flags(Enesim_Renderer *r, const Enesim_Renderer_State *sta
 		f &= tmp;
 	}
 	if (same_rop)
-		f |= ENESIM_RENDERER_FLAG_ROP;
-	*flags = f;
+		f |= ENESIM_RENDERER_HINT_ROP;
+	*hints = f;
 }
 
 static void _compound_free(Enesim_Renderer *r)
@@ -339,7 +346,8 @@ static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
 	return is_inside;
 }
 
-static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
+static Eina_Bool _compound_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_Bool ret;
@@ -390,6 +398,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .boundings =  		*/ _compound_boundings,
 	/* .destination_boundings = 	*/ _compound_destination_boundings,
 	/* .flags = 			*/ _compound_flags,
+	/* .hints_get = 			*/ _compound_hints,
 	/* .is_inside = 		*/ _compound_is_inside,
 	/* .damage = 			*/ _compound_damage,
 	/* .has_changed = 		*/ _compound_has_changed,

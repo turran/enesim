@@ -882,21 +882,12 @@ EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_hints_set(Enesim_Renderer *r, Enesim_Renderer_Hint hints)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->hints = hints;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hints)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!hints) return;
-	*hints = r->hints;
+	if (r->descriptor.hints_get)
+		r->descriptor.hints_get(r, &r->current, hints);
 }
 
 /**
@@ -1061,12 +1052,22 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 	 * function we assume it is always true */
 	if (r->descriptor.has_changed)
 	{
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES];
+
+		states[ENESIM_STATE_CURRENT] = &r->current;
+		states[ENESIM_STATE_PAST] = &r->past;
+
 		/* first check if the common properties have changed */
 		if (!_enesim_renderer_common_changed(r))
 		{
-			ret = r->descriptor.has_changed(r);
+			ret = r->descriptor.has_changed(r, states);
 		}
 	}
+	else
+	{
+		WRN("The renderer %s does not implement the change callback", r->name);
+	}
+
 	if (ret)
 	{
 		DBG("The renderer %s has changed", r->name);
@@ -1084,8 +1085,6 @@ EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage
 
 	if (!cb) return;
 
-	if (!enesim_renderer_has_changed(r))
-		return;
 	if (r->descriptor.damage)
 	{
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES];
@@ -1098,6 +1097,10 @@ EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage
 	else
 	{
 		Eina_Rectangle current_boundings;
+
+		if (!enesim_renderer_has_changed(r))
+			return;
+
 		/* send the old bounds and the new one */
 		enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
 		cb(r, &current_boundings, EINA_FALSE, data);
