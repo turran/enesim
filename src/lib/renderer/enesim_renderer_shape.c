@@ -137,10 +137,11 @@ static Eina_Bool _shape_damage_cb(Enesim_Renderer *r,
 		Eina_Rectangle *area, Eina_Bool past, void *data)
 {
 	Enesim_Renderer_Shape_Damage_Data *ddata = data;
+	Eina_Rectangle new_area = *area;
 
 	/* here we just intersect the damages with our bounds */
-	if (eina_rectangle_intersection(ddata->boundings, area))
-		ddata->real_cb(r, ddata->boundings, past, ddata->real_data);
+	if (eina_rectangle_intersection(&new_area, ddata->boundings))
+		ddata->real_cb(r, &new_area, past, ddata->real_data);
 	return EINA_TRUE;
 }
 

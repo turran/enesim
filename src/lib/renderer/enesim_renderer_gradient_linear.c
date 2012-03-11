@@ -195,7 +195,6 @@ Eina_Bool _linear_has_changed(Enesim_Renderer *r,
 
 	thiz = _linear_get(r);
 
-	printf("linear changed\n");
 	if (!thiz->changed)
 		return EINA_FALSE;
 

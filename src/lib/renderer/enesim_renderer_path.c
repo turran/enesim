@@ -86,6 +86,7 @@ typedef struct _Enesim_Renderer_Path
 
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
+	Eina_Bool needs_setup : 1; /* FIXME the changed is not enough */
 } Enesim_Renderer_Path;
 
 static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
@@ -800,10 +801,20 @@ static void _path_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 			ENESIM_RENDERER_FLAG_ARGB8888 |
 			ENESIM_RENDERER_FLAG_GEOMETRY; 
 }
+
 static void _path_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static Eina_Bool _path_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+{
+	Enesim_Renderer_Path *thiz;
+
+	thiz = _path_get(r);
+	return thiz->changed;
 }
 
 static void _path_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
@@ -1020,10 +1031,10 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .boundings = 		*/ _path_boundings,
 	/* .destination_boundings = 	*/ _path_destination_boundings,
 	/* .flags = 			*/ _path_flags,
-	/* .hints_get = 			*/ _path_hints,
+	/* .hints_get = 		*/ _path_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
-	/* .has_changed = 		*/ NULL,
+	/* .has_changed = 		*/ _path_has_changed,
 	/* .feature_get =		*/ _path_feature_get,
 	/* .sw_setup = 			*/ _path_sw_setup,
 	/* .sw_cleanup = 		*/ _path_sw_cleanup,
