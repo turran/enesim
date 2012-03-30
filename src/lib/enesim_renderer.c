@@ -888,6 +888,8 @@ EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hi
 	if (!hints) return;
 	if (r->descriptor.hints_get)
 		r->descriptor.hints_get(r, &r->current, hints);
+	else
+		*hints = 0;
 }
 
 /**
