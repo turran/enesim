@@ -29,6 +29,7 @@ enesim_renderer_line.c \
 enesim_renderer_path.c \
 enesim_renderer_pattern.c \
 enesim_renderer_perlin.c \
+enesim_renderer_proxy.c \
 enesim_renderer_rectangle.c \
 enesim_renderer_raddist.c \
 enesim_renderer_shape.c \
