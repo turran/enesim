@@ -266,6 +266,7 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 #include "enesim_renderer_background.h"
 #include "enesim_renderer_pattern.h"
 #include "enesim_renderer_perlin.h"
+#include "enesim_renderer_proxy.h"
 #include "enesim_renderer_clipper.h"
 #include "enesim_renderer_transition.h"
 

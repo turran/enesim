@@ -24,10 +24,10 @@
  * @{
  */
 
-EAPI Enesim_Renderer * esvg_renderer_proxy_new(void);
-EAPI void esvg_renderer_proxy_proxied_set(Enesim_Renderer *r,
+EAPI Enesim_Renderer * enesim_renderer_proxy_new(void);
+EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 		Enesim_Renderer *proxied);
-EAPI void esvg_renderer_proxy_proxied_get(Enesim_Renderer *r,
+EAPI void enesim_renderer_proxy_proxied_get(Enesim_Renderer *r,
 		Enesim_Renderer **proxied);
 
 /**

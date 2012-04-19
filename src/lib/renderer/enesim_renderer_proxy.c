@@ -213,10 +213,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
  *                                   API                                      *
  *============================================================================*/
 /**
- * Creates a clipper renderer
+ * Creates a proxy renderer
  * @return The new renderer
  */
-EAPI Enesim_Renderer * esvg_renderer_proxy_new(void)
+EAPI Enesim_Renderer * enesim_renderer_proxy_new(void)
 {
 	Enesim_Renderer *r;
 	Enesim_Renderer_Proxy *thiz;
@@ -232,7 +232,7 @@ EAPI Enesim_Renderer * esvg_renderer_proxy_new(void)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void esvg_renderer_proxy_proxied_set(Enesim_Renderer *r,
+EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 		Enesim_Renderer *proxied)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -249,7 +249,7 @@ EAPI void esvg_renderer_proxy_proxied_set(Enesim_Renderer *r,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void esvg_renderer_proxy_proxied_get(Enesim_Renderer *r,
+EAPI void enesim_renderer_proxy_proxied_get(Enesim_Renderer *r,
 		Enesim_Renderer **proxied)
 {
 	Enesim_Renderer_Proxy *thiz;
