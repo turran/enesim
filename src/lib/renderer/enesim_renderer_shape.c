@@ -466,6 +466,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	thiz->current.fill.color = thiz->past.fill.color = 0xffffffff;
 	thiz->current.stroke.color = thiz->past.stroke.color = 0xffffffff;
 	thiz->current.stroke.location = ENESIM_SHAPE_STROKE_CENTER;
+	thiz->current.draw_mode = ENESIM_SHAPE_DRAW_MODE_FILL;
 	thiz->has_changed = descriptor->has_changed;
 	thiz->sw_setup = descriptor->sw_setup;
 	thiz->opengl_setup = descriptor->opengl_setup;

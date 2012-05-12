@@ -77,6 +77,7 @@ typedef struct _Enesim_Renderer_Rectangle
 	Enesim_Renderer_Rectangle_State past;
 	/* internal state */
 	Eina_Bool changed : 1;
+	Eina_Bool use_path : 1;
 	/* for the case we use the path renderer */
 	Enesim_Renderer *path;
 	Enesim_Renderer_Rectangle_Sw_State sw_state;
@@ -293,6 +294,7 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 	if (thiz->changed)
 	{
 		int count = 0;
+
 		enesim_renderer_path_command_clear(thiz->path);
 		/* FIXME for now handle the corners like this */
 		if (thiz->current.corner.tl && r > 0.0)
@@ -1054,7 +1056,8 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		rad = h / 2.0;
 
 	/* check if we should use the path approach */
-	if (_rectangle_use_path(cs->geometry_transformation_type))
+	thiz->use_path = _rectangle_use_path(cs->geometry_transformation_type);
+	if (thiz->use_path)
 	{
 		double sw;
 
@@ -1207,8 +1210,14 @@ static void _rectangle_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = _rectangle_get(r);
 
 	enesim_renderer_shape_cleanup(r, s);
+	/* check if we should use the path approach */
+	if (thiz->use_path)
+	{
+		enesim_renderer_cleanup(thiz->path, s);
+	}
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
+	thiz->use_path = EINA_FALSE;
 }
 
 static void _rectangle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,

@@ -57,6 +57,7 @@ typedef struct _Enesim_Renderer_Circle {
 	Enesim_Renderer_Circle_State past;
 	/* private */
 	Eina_Bool changed : 1;
+	Eina_Bool use_path : 1;
 	/* for the case we use the path renderer */
 	Enesim_Renderer *path;
 	Enesim_Renderer_Circle_Sw_State sw_state;
@@ -502,7 +503,8 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 	if (!thiz || (thiz->current.r < 1))
 		return EINA_FALSE;
 
-	if (_circle_use_path(cs->geometry_transformation_type))
+	thiz->use_path = _circle_use_path(cs->geometry_transformation_type);
+	if (thiz->use_path)
 	{
 		double rad;
 
@@ -612,8 +614,11 @@ static void _circle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _circle_get(r);
 	enesim_renderer_shape_cleanup(r, s);
+	if (thiz->use_path)
+		enesim_renderer_cleanup(thiz->path, s);
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
+	thiz->use_path = EINA_FALSE;
 }
 
 static void _circle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,

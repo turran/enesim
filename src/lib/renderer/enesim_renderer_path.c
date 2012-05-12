@@ -665,13 +665,14 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 		const Enesim_Matrix *cgm,
 		const Enesim_Matrix *pgm)
 {
+	Eina_Bool ret = EINA_FALSE;
 	/* some command has been added */
 	if (thiz->changed)
-		return EINA_TRUE;
+		ret = EINA_TRUE;
 	/* the geometry transformation is different */
-	if (!enesim_matrix_is_equal(cgm, pgm))
-		return EINA_TRUE;
-	return EINA_FALSE;
+	else if (!enesim_matrix_is_equal(cgm, pgm))
+		ret = EINA_TRUE;
+	return ret;
 }
 
 static void _path_generate_figures(Enesim_Renderer_Path *thiz,

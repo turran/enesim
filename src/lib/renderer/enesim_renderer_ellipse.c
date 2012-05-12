@@ -43,6 +43,7 @@ typedef struct _Enesim_Renderer_Ellipse
 	Enesim_Renderer_Ellipse_State past;
 	/* private */
 	Eina_Bool changed : 1;
+	Eina_Bool use_path : 1;
 	/* for the case we use the path renderer */
 	Enesim_Renderer *path;
 	/* for our own case */
@@ -906,7 +907,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	if (!thiz || (thiz->current.rx < 1) || (thiz->current.ry < 1))
 		return EINA_FALSE;
 
-	if (_ellipse_use_path(cs->geometry_transformation_type))
+	thiz->use_path = _ellipse_use_path(cs->geometry_transformation_type);
+	if (thiz->use_path)
 	{
 		_ellipse_path_setup(thiz, thiz->current.x, thiz->current.y, thiz->current.rx, thiz->current.ry, states, sstates);
 		if (!enesim_renderer_setup(thiz->path, s, error))
@@ -1016,8 +1018,11 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _ellipse_get(r);
 	enesim_renderer_shape_cleanup(r, s);
+	if (thiz->use_path)
+		enesim_renderer_cleanup(thiz->path, s);
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
+	thiz->use_path = EINA_FALSE;
 }
 
 static void _ellipse_boundings(Enesim_Renderer *r,
