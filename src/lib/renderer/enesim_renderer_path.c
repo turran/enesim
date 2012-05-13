@@ -789,6 +789,7 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Path *thiz;
 
 	thiz = _path_get(r);
+	enesim_renderer_shape_cleanup(r, s);
 	enesim_renderer_cleanup(thiz->bifigure, s);
 	thiz->changed = EINA_FALSE;
 }
