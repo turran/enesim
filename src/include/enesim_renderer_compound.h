@@ -24,7 +24,7 @@
  * @{
  */
 
-typedef Eina_Bool (*Enesim_Renderer_Compound_Setup)(Enesim_Renderer *r, Enesim_Renderer *layer, void *data);
+typedef Eina_Bool (*Enesim_Renderer_Compound_Cb)(Enesim_Renderer *r, Enesim_Renderer *layer, void *data);
 
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
@@ -36,9 +36,14 @@ EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 		Eina_List *list);
 
 EAPI void enesim_renderer_compound_pre_setup_set(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Setup cb, void *data);
+		Enesim_Renderer_Compound_Cb cb, void *data);
 EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Setup cb, void *data);
+		Enesim_Renderer_Compound_Cb cb, void *data);
+
+EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Cb cb, void *data);
+EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Cb cb, void *data);
 
 /**
  * @}

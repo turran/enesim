@@ -47,9 +47,9 @@ typedef struct _Enesim_Renderer_Compound
 	/* properties */
 	Eina_List *layers;
 	Eina_List *visible_layers; /* FIXME maybe is time to change from lists to arrays */
-	Enesim_Renderer_Compound_Setup pre_cb;
+	Enesim_Renderer_Compound_Cb pre_cb;
 	void *pre_data;
-	Enesim_Renderer_Compound_Setup post_cb;
+	Enesim_Renderer_Compound_Cb post_cb;
 	void *post_data;
 	/* private */
 	Eina_Bool changed : 1;
@@ -517,9 +517,47 @@ EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
 	}
 }
 
+/**
+ *
+ */
+EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Cb cb, void *data)
+{
+	Enesim_Renderer_Compound *thiz;
+	Layer *layer;
+	Eina_List *l;
 
+	thiz = _compound_get(r);
+	EINA_LIST_FOREACH(thiz->layers, l, layer)
+	{
+		if (!cb(r, layer->r, data))
+			break;
+	}
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Cb cb, void *data)
+{
+	Enesim_Renderer_Compound *thiz;
+	Layer *layer;
+	Eina_List *l;
+
+	thiz = _compound_get(r);
+	EINA_LIST_REVERSE_FOREACH(thiz->layers, l, layer)
+	{
+		if (!cb(r, layer->r, data))
+			break;
+	}
+}
+
+/**
+ *
+ */
 EAPI void enesim_renderer_compound_pre_setup_set(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Setup cb, void *data)
+		Enesim_Renderer_Compound_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
 
@@ -528,8 +566,11 @@ EAPI void enesim_renderer_compound_pre_setup_set(Enesim_Renderer *r,
 	thiz->pre_data = data;
 }
 
+/**
+ *
+ */
 EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Setup cb, void *data)
+		Enesim_Renderer_Compound_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
 
