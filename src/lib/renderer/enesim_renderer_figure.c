@@ -144,6 +144,12 @@ static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
+	if (!enesim_renderer_shape_setup(r, states, s, error))
+	{
+		ENESIM_RENDERER_ERROR(r, error, "Shape cannot setup");
+		return EINA_FALSE;
+	}
+
 	_figure_path_setup(thiz, cs, css);
 
 	if (!enesim_renderer_setup(thiz->path, s, error))
@@ -159,6 +165,7 @@ static void _figure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = _figure_get(r);
+	enesim_renderer_shape_cleanup(r, s);
 	enesim_renderer_cleanup(thiz->path, s);
 	thiz->changed = EINA_FALSE;
 }

@@ -283,6 +283,11 @@ EAPI void enesim_matrix_inverse(const Enesim_Matrix *m, Enesim_Matrix *m2)
 
 	/* determinant */
 	scalar = enesim_matrix_determinant(m);
+	if (!scalar)
+	{
+		enesim_matrix_identity(m2);
+		return;
+	}
 	/* do its adjoint */
 	enesim_matrix_adjoint(m, m2);
 	/* divide */
