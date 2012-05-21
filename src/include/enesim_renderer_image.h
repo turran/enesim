@@ -37,6 +37,8 @@ EAPI void enesim_renderer_image_height_get(Enesim_Renderer *r, double *h);
 EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI void enesim_renderer_image_src_get(Enesim_Renderer *r, Enesim_Surface **src);
 
+EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, Eina_Rectangle *area);
+
 /**
  * @}
  */

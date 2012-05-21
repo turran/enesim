@@ -54,6 +54,7 @@ typedef struct _Enesim_Renderer_Image
 	Eina_F16p16 nxx, nyy;
 	Enesim_F16p16_Matrix matrix;
 	Enesim_Compositor_Span span;
+	Eina_List *surface_damages; 
 	Eina_Bool simple : 1;
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Image;
@@ -67,6 +68,34 @@ static inline Enesim_Renderer_Image * _image_get(Enesim_Renderer *r)
 	ENESIM_RENDERER_IMAGE_MAGIC_CHECK(thiz);
 
 	return thiz;
+}
+
+static void _image_transform_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Rectangle *oboundings,
+		Eina_Rectangle *boundings)
+{
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+
+	/* apply the inverse matrix */
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+		Enesim_Matrix m;
+
+		enesim_matrix_inverse(&cs->transformation, &m);
+		enesim_matrix_rectangle_transform(&m, oboundings, &q);
+		enesim_quad_rectangle_to(&q, oboundings);
+		/* fix the antialias scaling */
+		oboundings->x -= m.xx;
+		oboundings->y -= m.yy;
+		oboundings->w += m.xx;
+		oboundings->h += m.yy;
+	}
+	boundings->x = floor(oboundings->x);
+	boundings->y = floor(oboundings->y);
+	boundings->w = ceil(oboundings->w);
+	boundings->h = ceil(oboundings->h);
 }
 
 /* blend simple */
@@ -1342,28 +1371,9 @@ static void _image_destination_boundings(Enesim_Renderer *r,
 		Eina_Rectangle *boundings)
 {
 	Enesim_Rectangle oboundings;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	_image_boundings(r, states, &oboundings);
-	/* apply the inverse matrix */
-	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
-	{
-		Enesim_Quad q;
-		Enesim_Matrix m;
-
-		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
-		enesim_quad_rectangle_to(&q, &oboundings);
-		/* fix the antialias scaling */
-		oboundings.x -= m.xx;
-		oboundings.y -= m.yy;
-		oboundings.w += m.xx;
-		oboundings.h += m.yy;
-	}
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.w);
-	boundings->h = ceil(oboundings.h);
+	_image_transform_boundings(r, states, &oboundings, boundings);
 }
 
 static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
@@ -1547,6 +1557,44 @@ static Eina_Bool _image_has_changed(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
+static void _image_damages(Enesim_Renderer *r,
+		const Eina_Rectangle *old_boundings,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Renderer_Damage_Cb cb, void *data)
+{
+	Enesim_Renderer_Image *thiz;
+	Eina_Rectangle *sd;
+	Eina_Rectangle bounds;
+
+
+	thiz = _image_get(r);
+	/* if we have changed just send the previous bounds
+	 * and the current one
+	 */
+	if (enesim_renderer_has_changed(r))
+	{
+		cb(r, old_boundings, EINA_TRUE, data);
+		_image_destination_boundings(r, states, &bounds);
+		cb(r, &bounds, EINA_FALSE, data);
+		EINA_LIST_FREE(thiz->surface_damages, sd)
+			free(sd);
+	}
+	/* in other case, send the surface damages tansformed
+	 * to destination coorindates
+	 */
+	else
+	{
+		EINA_LIST_FREE(thiz->surface_damages, sd)
+		{
+			Enesim_Rectangle sdd;
+
+			enesim_rectangle_coords_from(&sdd, sd->x, sd->y, sd->w, sd->h);
+			_image_transform_boundings(r, states, &sdd, &bounds);
+			cb(r, &bounds, EINA_FALSE, data);
+		}
+	}
+}
+
 static void _image_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1566,7 +1614,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .flags = 			*/ _image_flags,
 	/* .hints_get =			*/ _image_hints,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damage = 			*/ _image_damages,
 	/* .has_changed = 		*/ _image_has_changed,
 	/* .sw_setup = 			*/ _image_state_setup,
 	/* .sw_cleanup = 		*/ _image_state_cleanup,
@@ -1830,4 +1878,19 @@ EAPI void enesim_renderer_image_src_get(Enesim_Renderer *r, Enesim_Surface **src
 	if (!thiz) return;
 	if (*src)
 		*src = thiz->current.s;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, Eina_Rectangle *area)
+{
+	Enesim_Renderer_Image *thiz;
+	Eina_Rectangle *d;
+
+	thiz = _image_get(r);
+
+	d = calloc(1, sizeof(Eina_Rectangle));
+	thiz->surface_damages = eina_list_append(thiz->surface_damages, d);
 }
