@@ -149,7 +149,14 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		tmp = eina_list_next(tmp);
 		curr = next;
 		next = eina_list_data_get(tmp);
+		if (!next)
+			break;
 		diff = next->pos - curr->pos;
+	}
+	if (!diff)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "No valid offset between stops");
+		return EINA_FALSE;
 	}
 	inc = eina_f16p16_double_from(1.0 / (diff * slen));
 	xx = 0;
