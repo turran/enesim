@@ -22,6 +22,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define MIN(a, b) a > b ? b : a
+
 /* TODO merge this with the bifigure */
 #define MUL4_SYM(x, y) \
  ( ((((((x) >> 16) & 0xff00) * (((y) >> 16) & 0xff00)) + 0xff0000) & 0xff000000) + \
@@ -137,6 +139,8 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 	lx = (lx >> 16) - 1 - x; \
 	if (lx > 0) \
 	{ \
+		/* printf("lx > 0 %d\n", lx); */ \
+		lx = MIN (lx, len); \
 		memset(dst, 0, sizeof(unsigned int) * lx); \
 		xx += lx * axx; \
 		d += lx; \
@@ -154,6 +158,7 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 	if (len > rx) \
 	{ \
 		len -= rx; \
+		/* printf("len > rx %d\n", len); */ \
 		memset(dst + rx, 0, sizeof(unsigned int) * len); \
 		e -= len; \
 	} \
@@ -227,6 +232,7 @@ get_out:
 		return;
 	}
 
+	/* BUG HERE!!!! */
 	SETUP_EDGES
 
 	scolor = sstate->stroke.color;

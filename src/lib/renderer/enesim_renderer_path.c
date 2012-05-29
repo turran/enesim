@@ -1113,6 +1113,20 @@ EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Renderer_P
 
 	thiz = _path_get(r);
 
+	/* do not allow a move to command after another move to, just simplfiy them */
+	if (cmd->type == ENESIM_COMMAND_MOVE_TO)
+	{
+		Enesim_Renderer_Path_Command *last_command;
+
+		last_command = eina_list_data_get(thiz->commands);
+		if (last_command && last_command->type == ENESIM_COMMAND_MOVE_TO)
+		{
+			last_command->definition.move_to.x = cmd->definition.move_to.x;
+			last_command->definition.move_to.y = cmd->definition.move_to.y;
+			return;
+		}
+	}
+
 	new_command = malloc(sizeof(Enesim_Renderer_Path_Command));
 	*new_command = *cmd;
 	thiz->commands = eina_list_append(thiz->commands, new_command);
