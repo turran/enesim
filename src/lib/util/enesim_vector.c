@@ -156,6 +156,9 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 	Enesim_Point *last, *first;
 	Eina_List *l;
 
+	if (!thiz->points) return;
+	if (!to_merge->points) return;
+
 	/* check that the last point at thiz is not equal to the first point to merge */
 	l = eina_list_last(thiz->points);
 	last = eina_list_data_get(l);
@@ -178,12 +181,14 @@ void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
 	thiz->closed = close;
 }
 
-void enesim_polygon_boundings(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
+Eina_Bool enesim_polygon_boundings(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
 {
+	if (!thiz->points) return EINA_FALSE;
 	*xmin = thiz->xmin;
 	*ymin = thiz->ymin;
 	*ymax = thiz->ymax;
 	*xmax = thiz->xmax;
+	return EINA_TRUE;
 }
 
 Enesim_Figure * enesim_figure_new(void)
@@ -200,28 +205,43 @@ void enesim_figure_delete(Enesim_Figure *thiz)
 	free(thiz);
 }
 
-void enesim_figure_boundings(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
+Eina_Bool enesim_figure_boundings(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
 {
 	Enesim_Polygon *p;
+	Eina_Bool valid = EINA_FALSE;
 	Eina_List *l;
 	double fxmax;
 	double fxmin;
 	double fymax;
 	double fymin;
 
+	if (!thiz->polygons) return EINA_FALSE;
+
 	fxmax = fymax = -DBL_MAX;
 	fxmin = fymin = DBL_MAX;
 	EINA_LIST_FOREACH(thiz->polygons, l, p)
 	{
-		if (p->xmax > fxmax) fxmax = p->xmax;
-		if (p->ymax > fymax) fymax = p->ymax;
-		if (p->xmin < fxmin) fxmin = p->xmin;
-		if (p->ymin < fymin) fymin = p->ymin;
+		double pxmin;
+		double pxmax;
+		double pymin;
+		double pymax;
+
+		if (!enesim_polygon_boundings(p, &pxmin, &pymin, &pxmax, &pymax))
+			continue;
+
+		if (pxmax > fxmax) fxmax = pxmax;
+		if (pymax > fymax) fymax = pymax;
+		if (pxmin < fxmin) fxmin = pxmin;
+		if (pymin < fymin) fymin = pymin;
+		valid = EINA_TRUE;
 	}
+	if (!valid) return EINA_FALSE;
+
 	*xmax = fxmax;
 	*xmin = fxmin;
 	*ymax = fymax;
 	*ymin = fymin;
+	return EINA_TRUE;
 }
 
 void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p)

@@ -189,9 +189,13 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		if (xx >= 65536)
 		{
 			tmp = eina_list_next(tmp);
+			/* we advanced but there's no other stop? */
+			if (!tmp)
+				break;
 			curr = next;
 			next = eina_list_data_get(tmp);
 			diff = next->pos - curr->pos;
+			/* the stop position is the same as the previous position, just skip it */
 			if (!diff)
 			{
 				continue;

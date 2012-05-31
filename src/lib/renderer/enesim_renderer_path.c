@@ -858,11 +858,13 @@ static void _path_boundings(Enesim_Renderer *r,
 
 	if ((css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && (css->stroke.weight > 1.0))
 	{
-		enesim_figure_boundings(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax);
+		if (!enesim_figure_boundings(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax))
+			goto failed;
 	}
 	else
 	{
-		enesim_figure_boundings(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax);
+		if (!enesim_figure_boundings(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax))
+			goto failed;
 	}
 
 	boundings->x = xmin;
@@ -873,6 +875,13 @@ static void _path_boundings(Enesim_Renderer *r,
 	/* translate by the origin */
 	boundings->x += cs->ox;
 	boundings->y += cs->oy;
+	return;
+
+failed:
+	boundings->x = 0;
+	boundings->y = 0;
+	boundings->w = 0;
+	boundings->h = 0;
 }
 
 static void _path_destination_boundings(Enesim_Renderer *r,
