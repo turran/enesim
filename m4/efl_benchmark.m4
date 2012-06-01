@@ -12,7 +12,7 @@ AC_DEFUN([EFL_CHECK_BENCHMARK],
 dnl configure option
 
 AC_ARG_ENABLE([benchmark],
-   [AC_HELP_STRING([--enable-benchmark], [enable tests @<:@default=no@:>@])],
+   [AS_HELP_STRING([--enable-benchmark], [enable tests @<:@default=no@:>@])],
    [
     if test "x${enableval}" = "xyes" ; then
        _efl_enable_benchmark="yes"

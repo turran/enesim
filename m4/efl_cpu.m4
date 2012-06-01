@@ -13,7 +13,7 @@ AC_DEFUN([EFL_CHECK_CPU_MMX],
 dnl configure option
 
 AC_ARG_ENABLE([cpu-mmx],
-   [AC_HELP_STRING([--enable-cpu-mmx], [enable mmx code @<:@default=yes@:>@])],
+   [AS_HELP_STRING([--enable-cpu-mmx], [enable mmx code @<:@default=yes@:>@])],
    [
     if test "x${enableval}" = "xyes" ; then
        _efl_enable_cpu_mmx="yes"
@@ -79,7 +79,7 @@ AC_DEFUN([EFL_CHECK_CPU_SSE],
 dnl configure option
 
 AC_ARG_ENABLE([cpu-sse],
-   [AC_HELP_STRING([--enable-cpu-sse], [enable sse code @<:@default=yes@:>@])],
+   [AS_HELP_STRING([--enable-cpu-sse], [enable sse code @<:@default=yes@:>@])],
    [
     if test "x${enableval}" = "xyes" ; then
        _efl_enable_cpu_sse="yes"
@@ -145,7 +145,7 @@ AC_DEFUN([EFL_CHECK_CPU_SSE2],
 dnl configure option
 
 AC_ARG_ENABLE([cpu-sse2],
-   [AC_HELP_STRING([--enable-cpu-sse2], [enable sse2 code @<:@default=yes@:>@])],
+   [AS_HELP_STRING([--enable-cpu-sse2], [enable sse2 code @<:@default=yes@:>@])],
    [
     if test "x${enableval}" = "xyes" ; then
        _efl_enable_cpu_sse2="yes"
@@ -212,7 +212,7 @@ AC_DEFUN([EFL_CHECK_CPU_ALTIVEC],
 dnl configure option
 
 AC_ARG_ENABLE([cpu-altivec],
-   [AC_HELP_STRING([--enable-cpu-altivec], [enable altivec code @<:@default=yes@:>@])],
+   [AS_HELP_STRING([--enable-cpu-altivec], [enable altivec code @<:@default=yes@:>@])],
    [
     if test "x${enableval}" = "xyes" ; then
        _efl_enable_cpu_altivec="yes"

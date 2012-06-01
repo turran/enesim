@@ -9,7 +9,7 @@ format_[]DOWN="no"
 ifelse("x$2", "xno",
 [
   AC_ARG_ENABLE(format-[]DOWN,
-    AC_HELP_STRING(
+    AS_HELP_STRING(
       [--enable-format-[]DOWN],
       [enable the $1 surface format]
     ),
@@ -18,7 +18,7 @@ ifelse("x$2", "xno",
   )
 ], [
   AC_ARG_ENABLE(format-[]DOWN,
-    AC_HELP_STRING(
+    AS_HELP_STRING(
       [--disable-format-[]DOWN],
       [disable the $1 surface format]
     ),

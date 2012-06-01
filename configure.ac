@@ -57,7 +57,7 @@ PKG_PROG_PKG_CONFIG
 
 PKG_CHECK_MODULES([EINA], [eina >= 1.0.0])
 AC_ARG_WITH([equanime],
-   [AC_HELP_STRING([--with-equanime], [enable Equanime pool support])],
+   [AS_HELP_STRING([--with-equanime], [enable Equanime pool support])],
    [want_equanime="yes"],
    [want_equanime="no"])
 
@@ -72,9 +72,7 @@ AC_ARG_WITH([equanime],
 
 ### Checks for compiler characteristics
 
-AM_PROG_CC_STDC
 AC_HEADER_STDC
-AC_C_CONST
 AC_C_BIGENDIAN
 EFL_ATTRIBUTE_UNUSED
 EFL_COMPILER_FLAG([-Wall])
@@ -119,7 +117,7 @@ AC_CHECK_HEADERS(pthread.h sched.h,
 
 AC_MSG_CHECKING(whether to build pthread code)
 AC_ARG_ENABLE(pthreads,
-  AC_HELP_STRING([--enable-pthreads], [enable threaded rendering]),
+  AS_HELP_STRING([--enable-pthreads], [enable threaded rendering]),
   [
       if test "x$enableval" = "xyes" ; then
         if test "x$build_pthreads" = "xyes"; then
@@ -276,7 +274,7 @@ AC_SUBST([ENESIM_LIBS])
 
 ## Make the debug preprocessor configurable
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 enesim.pc
 enesim_opencl.pc
@@ -293,6 +291,8 @@ src/lib/util/Makefile
 src/tests/Makefile
 ],[
 ])
+
+AC_OUTPUT
 
 #####################################################################
 ## Info
@@ -332,9 +332,11 @@ echo "  Eina......................................: yes"
 echo "  OpenCL....................................: ${build_opencl}"
 echo "  OpenGL....................................: ${build_opengl}"
 echo
-echo "Installation Path...........................: ${prefix}"
+echo "Compilation.................................: make (or gmake)"
+echo "  CPPFLAGS..................................: $CPPFLAGS"
+echo "  CFLAGS....................................: $CFLAGS"
+echo "  LDFLAGS...................................: $LDFLAGS"
 echo
-echo "Now type 'make' ('gmake' on some systems) to compile $PACKAGE,"
-echo "and then afterwards as root (or the user who will install this), type"
-echo "'make install'. Change users with 'su' or 'sudo' appropriately."
+echo "Installation................................: make install (as root if needed, with 'su' or 'sudo')"
+echo "  prefix....................................: $prefix"
 echo

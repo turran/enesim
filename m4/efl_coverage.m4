@@ -16,7 +16,7 @@ AC_DEFUN([EFL_CHECK_COVERAGE],
 dnl configure option
 
 AC_ARG_ENABLE([coverage],
-   [AC_HELP_STRING([--enable-coverage], [compile with coverage profiling instrumentation @<:@default=no@:>@])],
+   [AS_HELP_STRING([--enable-coverage], [compile with coverage profiling instrumentation @<:@default=no@:>@])],
    [
     if test "x${enableval}" = "xyes" ; then
        _efl_enable_coverage="yes"
