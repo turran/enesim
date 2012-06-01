@@ -1126,8 +1126,10 @@ EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Renderer_P
 	if (cmd->type == ENESIM_COMMAND_MOVE_TO)
 	{
 		Enesim_Renderer_Path_Command *last_command;
+		Eina_List *last;
 
-		last_command = eina_list_data_get(thiz->commands);
+		last = eina_list_last(thiz->commands);
+		last_command = eina_list_data_get(last);
 		if (last_command && last_command->type == ENESIM_COMMAND_MOVE_TO)
 		{
 			last_command->definition.move_to.x = cmd->definition.move_to.x;
