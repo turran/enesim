@@ -87,33 +87,36 @@ EFL_COMPILER_FLAG([-Wall])
 pthread_cflags=""
 pthread_libs=""
 build_pthreads="no"
-has_pthreads="no"
 need_pthreads="no"
-# basic pthread support
-AC_CHECK_HEADER(pthread.h,
-  [
-   has_pthreads="yes"
-  ],
-  [
-   has_pthreads="no"
-  ]
-)
 
 # sched_getaffinity pthread_attr_setaffinity_np
-AC_CHECK_HEADERS(pthread.h sched.h,
-      [
-        AC_CHECK_LIB(pthread, pthread_attr_setaffinity_np,
-          [
-            AC_CHECK_LIB(pthread, pthread_barrier_wait,
-              [ build_pthreads="yes" ],
-              [ build_pthreads="no" ]
-            )
-          ],
-          [ build_pthreads="no" ]
-        )
-      ],
-      [ build_pthreads="no" ]
-)
+AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])
+
+AC_CHECK_LIB([pthread], [pthread_attr_setaffinity_np],
+   [
+    AC_CHECK_LIB(pthread, pthread_barrier_wait,
+       [build_pthreads="yes"],
+       [build_pthreads="no"])
+   ],
+   [build_pthreads="no"])
+
+if test "x${build_pthreads}" = "xyes" ; then
+   AC_CHECK_TYPE([cpu_set_t],
+      [AC_DEFINE([enesim_cpu_set_t], [cpu_set_t], [cpu_set_t type])],
+      [],
+      [[
+#include <sched.h>
+      ]])
+   if test "x${ac_cv_type_cpu_set_t}" = "xno" ; then
+      AC_CHECK_TYPE([cpuset_t],
+         [AC_DEFINE([enesim_cpu_set_t], [cpuset_t], [cpu_set_t type])],
+         [],
+         [[
+#include <sys/param.h>
+#include <sys/cpuset.h>
+         ]])
+   fi
+fi
 
 AC_MSG_CHECKING(whether to build pthread code)
 AC_ARG_ENABLE(pthreads,

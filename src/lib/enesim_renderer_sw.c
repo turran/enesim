@@ -25,8 +25,21 @@
 #endif
 
 #ifdef BUILD_PTHREAD
-#include <sched.h>
-#include <pthread.h>
+# ifdef HAVE_SCHED_H
+#  include <sched.h>
+# endif
+# ifdef HAVE_PTHREAD_H
+#  include <pthread.h>
+# endif
+# ifdef HAVE_PTHREAD_NP_H
+#  include <pthread_np.h>
+# endif
+# ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+# endif
+# ifdef HAVE_SYS_CPUSET_H
+#  include <sys/cpuset.h>
+# endif
 #endif
 
 #include "Enesim.h"
@@ -326,13 +339,13 @@ void enesim_renderer_sw_init(void)
 	pthread_attr_init(&attr);
 	for (i = 0; i < _num_cpus; i++)
 	{
-		cpu_set_t cpu;
+		enesim_cpu_set_t cpu;
 
 		CPU_ZERO(&cpu);
 		CPU_SET(i, &cpu);
 		_threads[i].cpuidx = i;
 		pthread_create(&_threads[i].tid, &attr, _thread_run, (void *)&_threads[i]);
-		pthread_setaffinity_np(_threads[i].tid, sizeof(cpu_set_t), &cpu);
+		pthread_setaffinity_np(_threads[i].tid, sizeof(enesim_cpu_set_t), &cpu);
 
 	}
 #endif
