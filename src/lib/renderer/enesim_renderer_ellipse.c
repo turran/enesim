@@ -67,6 +67,24 @@ static inline Enesim_Renderer_Ellipse * _ellipse_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static Eina_Bool _ellipse_properties_have_changed(Enesim_Renderer_Ellipse *thiz)
+{
+	if (!thiz->changed) return EINA_FALSE;
+	/* the rx */
+	if (thiz->current.rx != thiz->past.rx)
+		return EINA_TRUE;
+	/* the ry */
+	if (thiz->current.ry != thiz->past.ry)
+		return EINA_TRUE;
+	/* the x */
+	if (thiz->current.x != thiz->past.x)
+		return EINA_TRUE;
+	/* the y */
+	if (thiz->current.y != thiz->past.y)
+		return EINA_TRUE;
+	return EINA_FALSE;
+}
+
 static Eina_Bool _ellipse_use_path(Enesim_Matrix_Type geometry_type)
 {
 	if (geometry_type != ENESIM_MATRIX_IDENTITY)
@@ -87,16 +105,17 @@ static void _ellipse_path_setup(Enesim_Renderer_Ellipse *thiz,
 		thiz->path = enesim_renderer_path_new();
 	/* generate the four arcs */
 	/* FIXME also check that the prev geometry and curr geometry transformations are diff */
-	if (thiz->changed)
-	{
-		enesim_renderer_path_command_clear(thiz->path);
-		enesim_renderer_path_move_to(thiz->path, x, y - ry);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + ry);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x - rx, y);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y - ry);
-	}
+	if (!_ellipse_properties_have_changed(thiz))
+		goto pass;
 
+	enesim_renderer_path_command_clear(thiz->path);
+	enesim_renderer_path_move_to(thiz->path, x, y - ry);
+	enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
+	enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + ry);
+	enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x - rx, y);
+	enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y - ry);
+
+pass:
 	enesim_renderer_color_set(thiz->path, cs->color);
 	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
 	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
@@ -1045,21 +1064,7 @@ static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r,
 	Enesim_Renderer_Ellipse *thiz;
 
 	thiz = _ellipse_get(r);
-	if (!thiz->changed) return EINA_FALSE;
-	/* the rx */
-	if (thiz->current.rx != thiz->past.rx)
-		return EINA_TRUE;
-	/* the ry */
-	if (thiz->current.ry != thiz->past.ry)
-		return EINA_TRUE;
-	/* the x */
-	if (thiz->current.x != thiz->past.x)
-		return EINA_TRUE;
-	/* the y */
-	if (thiz->current.y != thiz->past.y)
-		return EINA_TRUE;
-	return EINA_FALSE;
-
+	return _ellipse_properties_have_changed(thiz);
 }
 
 static void _free(Enesim_Renderer *r)

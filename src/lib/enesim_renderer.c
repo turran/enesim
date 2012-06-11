@@ -466,6 +466,12 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		default:
 		break;
 	}
+	if (!ret)
+	{
+		enesim_renderer_cleanup(r, s);
+		return ret;
+	}
+
 	if (!r->in_setup)
 	{
 		/* given that we already did the setup, the current and previous should be equal

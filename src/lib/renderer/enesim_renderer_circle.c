@@ -80,6 +80,21 @@ static Eina_Bool _circle_use_path(Enesim_Matrix_Type geometry_type)
 	return EINA_FALSE;
 }
 
+static Eina_Bool _circle_properties_have_changed(Enesim_Renderer_Circle *thiz)
+{
+	if (!thiz->changed) return EINA_FALSE;
+	/* the radius */
+	if (thiz->current.r != thiz->past.r)
+		return EINA_TRUE;
+	/* the x */
+	if (thiz->current.x != thiz->past.x)
+		return EINA_TRUE;
+	/* the y */
+	if (thiz->current.y != thiz->past.y)
+		return EINA_TRUE;
+	return EINA_FALSE;
+}
+
 static void _circle_path_setup(Enesim_Renderer_Circle *thiz,
 		double x, double y, double r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
@@ -93,16 +108,17 @@ static void _circle_path_setup(Enesim_Renderer_Circle *thiz,
 		thiz->path = enesim_renderer_path_new();
 	/* generate the four arcs */
 	/* FIXME also check that the prev geometry and curr geometry transformations are diff */
-	if (thiz->changed)
-	{
-		enesim_renderer_path_command_clear(thiz->path);
-		enesim_renderer_path_move_to(thiz->path, x, y -r);
-		enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x + r, y);
-		enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x, y + r);
-		enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x - r, y);
-		enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x, y - r);
-	}
+	if (!_circle_properties_have_changed(thiz))
+		goto pass;
 
+	enesim_renderer_path_command_clear(thiz->path);
+	enesim_renderer_path_move_to(thiz->path, x, y -r);
+	enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x + r, y);
+	enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x, y + r);
+	enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x - r, y);
+	enesim_renderer_path_arc_to(thiz->path, r, r, 0, EINA_FALSE, EINA_TRUE, x, y - r);
+
+pass:
 	/* pass all the properties to the path */
 	enesim_renderer_color_set(thiz->path, cs->color);
 	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
@@ -642,17 +658,7 @@ static Eina_Bool _circle_has_changed(Enesim_Renderer *r,
 	Enesim_Renderer_Circle *thiz;
 
 	thiz = _circle_get(r);
-	if (!thiz->changed) return EINA_FALSE;
-	/* the radius */
-	if (thiz->current.r != thiz->past.r)
-		return EINA_TRUE;
-	/* the x */
-	if (thiz->current.x != thiz->past.x)
-		return EINA_TRUE;
-	/* the y */
-	if (thiz->current.y != thiz->past.y)
-		return EINA_TRUE;
-	return EINA_FALSE;
+	return _circle_properties_have_changed(thiz);
 }
 
 static void _circle_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)

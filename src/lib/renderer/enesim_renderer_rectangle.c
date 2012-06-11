@@ -269,6 +269,34 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static Eina_Bool _rectangle_properties_have_changed(Enesim_Renderer_Rectangle *thiz)
+{
+	if (!thiz->changed) return EINA_FALSE;
+
+	/* the width */
+	if (thiz->current.width != thiz->past.width)
+		return EINA_TRUE;
+	/* the height */
+	if (thiz->current.height != thiz->past.height)
+		return EINA_TRUE;
+	/* the x */
+	if (thiz->current.x != thiz->past.x)
+		return EINA_TRUE;
+	/* the y */
+	if (thiz->current.y != thiz->past.y)
+		return EINA_TRUE;
+	/* the corners */
+	if ((thiz->current.corner.tl != thiz->past.corner.tl) || (thiz->current.corner.tr != thiz->past.corner.tr) ||
+	     (thiz->current.corner.bl != thiz->past.corner.bl) || (thiz->current.corner.br != thiz->past.corner.br))
+		return EINA_TRUE;
+	/* the corner radius */
+	if (thiz->current.corner.radius != thiz->past.corner.radius)
+		return EINA_TRUE;
+
+	return EINA_FALSE;
+}
+
+
 static Eina_Bool _rectangle_use_path(Enesim_Matrix_Type geometry_type)
 {
 	if (geometry_type != ENESIM_MATRIX_IDENTITY)
@@ -283,6 +311,7 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 {
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+	int count = 0;
 
 	if (!thiz->path)
 		thiz->path = enesim_renderer_path_new();
@@ -291,59 +320,58 @@ static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
 	 * change
 	 */
 	/* FIXME or prev->geometry_transformation_type == IDENTITY && curr->geometry_transformation_type != IDENTITY */
-	if (thiz->changed)
+	if (!_rectangle_properties_have_changed(thiz))
+		goto pass;
+
+	enesim_renderer_path_command_clear(thiz->path);
+	/* FIXME for now handle the corners like this */
+	if (thiz->current.corner.tl && r > 0.0)
 	{
-		int count = 0;
-
-		enesim_renderer_path_command_clear(thiz->path);
-		/* FIXME for now handle the corners like this */
-		if (thiz->current.corner.tl && r > 0.0)
-		{
-			enesim_renderer_path_move_to(thiz->path, x, y + r);
-			enesim_renderer_path_quadratic_to(thiz->path, x, y, x + r, y);
-			count++;
-		}
-		else
-		{
-			enesim_renderer_path_move_to(thiz->path, x, y);
-			count++;
-		}
-		if (thiz->current.corner.tr && r > 0.0)
-		{
-			enesim_renderer_path_line_to(thiz->path, x + w - r, y);
-			enesim_renderer_path_quadratic_to(thiz->path, x + w, y, x + w, y + r);
-			count++;
-		}
-		else
-		{
-			enesim_renderer_path_line_to(thiz->path, x + w, y);
-			count++;
-		}
-		if (thiz->current.corner.br && r > 0.0)
-		{
-			enesim_renderer_path_line_to(thiz->path, x + w, y + h - r);
-			enesim_renderer_path_quadratic_to(thiz->path, x + w, y + h, x + w - r, y + h);
-			count++;
-		}
-		else
-		{
-			enesim_renderer_path_line_to(thiz->path, x + w, y + h);
-			count++;
-		}
-		if (thiz->current.corner.bl && r > 0.0)
-		{
-			enesim_renderer_path_line_to(thiz->path, x + r, y + h);
-			enesim_renderer_path_quadratic_to(thiz->path, x, y + h, x, y + h - r);
-			count++;
-		}
-		else
-		{
-			enesim_renderer_path_line_to(thiz->path, x, y + h);
-			count++;
-		}
-		enesim_renderer_path_close(thiz->path, EINA_TRUE);
+		enesim_renderer_path_move_to(thiz->path, x, y + r);
+		enesim_renderer_path_quadratic_to(thiz->path, x, y, x + r, y);
+		count++;
 	}
+	else
+	{
+		enesim_renderer_path_move_to(thiz->path, x, y);
+		count++;
+	}
+	if (thiz->current.corner.tr && r > 0.0)
+	{
+		enesim_renderer_path_line_to(thiz->path, x + w - r, y);
+		enesim_renderer_path_quadratic_to(thiz->path, x + w, y, x + w, y + r);
+		count++;
+	}
+	else
+	{
+		enesim_renderer_path_line_to(thiz->path, x + w, y);
+		count++;
+	}
+	if (thiz->current.corner.br && r > 0.0)
+	{
+		enesim_renderer_path_line_to(thiz->path, x + w, y + h - r);
+		enesim_renderer_path_quadratic_to(thiz->path, x + w, y + h, x + w - r, y + h);
+		count++;
+	}
+	else
+	{
+		enesim_renderer_path_line_to(thiz->path, x + w, y + h);
+		count++;
+	}
+	if (thiz->current.corner.bl && r > 0.0)
+	{
+		enesim_renderer_path_line_to(thiz->path, x + r, y + h);
+		enesim_renderer_path_quadratic_to(thiz->path, x, y + h, x, y + h - r);
+		count++;
+	}
+	else
+	{
+		enesim_renderer_path_line_to(thiz->path, x, y + h);
+		count++;
+	}
+	enesim_renderer_path_close(thiz->path, EINA_TRUE);
 
+pass:
 	/* pass all the properties to the path */
 	enesim_renderer_color_set(thiz->path, cs->color);
 	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
@@ -1348,30 +1376,7 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r,
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-
-	if (!thiz->changed) return EINA_FALSE;
-
-	/* the width */
-	if (thiz->current.width != thiz->past.width)
-		return EINA_TRUE;
-	/* the height */
-	if (thiz->current.height != thiz->past.height)
-		return EINA_TRUE;
-	/* the x */
-	if (thiz->current.x != thiz->past.x)
-		return EINA_TRUE;
-	/* the y */
-	if (thiz->current.y != thiz->past.y)
-		return EINA_TRUE;
-	/* the corners */
-	if ((thiz->current.corner.tl != thiz->past.corner.tl) || (thiz->current.corner.tr != thiz->past.corner.tr) ||
-	     (thiz->current.corner.bl != thiz->past.corner.bl) || (thiz->current.corner.br != thiz->past.corner.br))
-		return EINA_TRUE;
-	/* the corner radius */
-	if (thiz->current.corner.radius != thiz->past.corner.radius)
-		return EINA_TRUE;
-
-	return EINA_FALSE;
+	return _rectangle_properties_have_changed(thiz);
 }
 
 #if BUILD_OPENGL

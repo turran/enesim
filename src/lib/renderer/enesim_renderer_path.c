@@ -83,7 +83,11 @@ typedef struct _Enesim_Renderer_Path
 	/* private */
 	Enesim_Figure *fill_figure;
 	Enesim_Figure *stroke_figure;
-
+	/* external properties that require a path generation */
+	Enesim_Matrix last_matrix;
+	Enesim_Shape_Stroke_Join last_join;
+	Enesim_Shape_Stroke_Cap last_cap;
+	/* internal stuff */
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
 	Eina_Bool needs_setup : 1; /* FIXME the changed is not enough */
@@ -663,14 +667,21 @@ static void _path_span(Enesim_Renderer *r,
 
 static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 		const Enesim_Matrix *cgm,
-		const Enesim_Matrix *pgm)
+		Enesim_Shape_Stroke_Join join,
+		Enesim_Shape_Stroke_Cap cap)
 {
 	Eina_Bool ret = EINA_FALSE;
 	/* some command has been added */
 	if (thiz->changed)
 		ret = EINA_TRUE;
+	/* the stroke cap is different */
+	else if (thiz->last_join != join)
+		ret = EINA_TRUE;
+	else if (thiz->last_cap != cap)
+		ret = EINA_TRUE;
+	/* the stroke join is different */
 	/* the geometry transformation is different */
-	else if (!enesim_matrix_is_equal(cgm, pgm))
+	else if (!enesim_matrix_is_equal(cgm, &thiz->last_matrix))
 		ret = EINA_TRUE;
 	return ret;
 }
@@ -731,6 +742,10 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 		/* set the fill figure on the bifigure as its under polys */
 		enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 	}
+	/* update the last values */
+	thiz->last_join = join;
+	thiz->last_cap = cap;
+	thiz->last_matrix = *geometry_transformation;
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -748,13 +763,13 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_State *ps = states[ENESIM_STATE_PAST];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
 	thiz = _path_get(r);
 
 	/* generate the list of points/polygons */
-	if (_path_needs_generate(thiz, &cs->geometry_transformation, &ps->geometry_transformation))
+	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
 				&cs->geometry_transformation, cs->sx, cs->sy,
@@ -831,7 +846,6 @@ static void _path_boundings(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_State *ps = states[ENESIM_STATE_PAST];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 	double xmin;
 	double ymin;
@@ -839,7 +853,8 @@ static void _path_boundings(Enesim_Renderer *r,
 	double ymax;
 
 	thiz = _path_get(r);
-	if (_path_needs_generate(thiz, &cs->geometry_transformation, &ps->geometry_transformation))
+	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
 				&cs->geometry_transformation, cs->sx, cs->sy,
