@@ -52,6 +52,7 @@ static void _proxy_span(Enesim_Renderer *r,
 	Enesim_Renderer_Proxy *thiz;
 
  	thiz = _proxy_get(r);
+	/* FIXME isnt enough to call the proxied fill */
 	enesim_renderer_sw_draw(thiz->proxied, x, y, len, dst);
 }
 /*----------------------------------------------------------------------------*

@@ -103,7 +103,9 @@ static void _opengl_vertex_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
 }
 #endif
 
-static Eina_Bool _opengl_shader_compile(GLenum program, Enesim_Renderer_OpenGL_Shader *shader, GLenum *sh_id)
+static Eina_Bool _opengl_shader_compile(GLenum pid,
+		Enesim_Renderer_OpenGL_Shader *shader,
+		GLenum *sid)
 {
 	GLenum st;
 	GLenum sh;
@@ -128,64 +130,102 @@ static Eina_Bool _opengl_shader_compile(GLenum program, Enesim_Renderer_OpenGL_S
 		return EINA_FALSE;
 	}
 	/* attach the shader to the program */
-	glAttachObjectARB(program, sh);
-	*sh_id = sh;
+	glAttachObjectARB(pid, sh);
+	*sid = sh;
 
 	return EINA_TRUE;
 }
 
-static Eina_Bool _opengl_shaders_compile(Enesim_Renderer *r,
+static Eina_Bool _opengl_compiled_program_link(Enesim_Renderer_OpenGL_Compiled_Program *cp)
+{
+	int ok = 0;
+
+	/* link it */
+	glLinkProgramARB(cp->id);
+	glGetObjectParameterivARB(cp->id, GL_OBJECT_LINK_STATUS_ARB, &ok);
+	if (!ok)
+	{
+		char log[PATH_MAX];
+		glGetInfoLogARB(cp->id, sizeof(log), NULL, log);
+		printf("Failed to Link %s\n", log);
+		/* FIXME destroy all the shaders */
+
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static Eina_Bool _opengl_compiled_program_new(
+		Enesim_Renderer_OpenGL_Compiled_Program *cp,
+		Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Data *rdata,
-		Eina_Bool *has_geometry,
-		Eina_Bool *has_vertex)
+		Enesim_Renderer_OpenGL_Program *p)
 {
 	int i;
 
-	/* by default to false */
-	*has_vertex = EINA_FALSE;
-	*has_geometry = EINA_FALSE;
+	cp->num_shaders = p->num_shaders;
+	cp->shaders = calloc(cp->num_shaders, sizeof(GLenum));
+	cp->id = glCreateProgramObjectARB();
 	/* compile every shader */
-	for (i = 0; i < rdata->num_shaders; i++)
+	for (i = 0; i < p->num_shaders; i++)
 	{
 		Enesim_Renderer_OpenGL_Shader *shader;
 		GLenum sh;
 
-		shader = &rdata->shaders[i];
+		shader = &p->shaders[i];
 
-		if (!_opengl_shader_compile(rdata->program, shader, &sh))
-			return EINA_FALSE;
+		if (!_opengl_shader_compile(cp->id, shader, &sh))
+		{
+			i++;
+			goto error;
+		}
 
-		rdata->sids[i] = sh;
-		if (shader->type == ENESIM_SHADER_GEOMETRY)
-			*has_geometry = EINA_TRUE;
-		if (shader->type == ENESIM_SHADER_VERTEX)
-			*has_vertex = EINA_TRUE;
+		cp->shaders[i] = sh;
 	}
-	return EINA_TRUE;
-}
-
-static Eina_Bool _shaders_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Data *rdata)
-{
-	int i;
-
-	/* setup every shader */
-	for (i = 0; i < rdata->num_shaders; i++)
+	/* now link */
+	if (!_opengl_compiled_program_link(cp))
+		goto error;
+	/* use this program and setup each shader */
+	glUseProgramObjectARB(cp->id);
+	for (i = 0; i < p->num_shaders; i++)
 	{
 		Enesim_Renderer_OpenGL_Shader *shader;
 
-		shader = &rdata->shaders[i];
-		if (!rdata->shader_setup(r, s, shader))
+		shader = &p->shaders[i];
+		if (!rdata->shader_setup(r, s, p, shader))
 		{
 			printf("Cannot setup the shader\n");
-			return EINA_FALSE;
+			i = p->num_shaders;
+			goto error;
 		}
 	}
+
 	return EINA_TRUE;
+
+error:
+	for (i--; i >= 0; i--)
+	{
+		/* TODO destroy each shader */
+	}
+	free(cp->shaders);
+
+	return EINA_FALSE;
 }
 
+static void _opengl_compiled_program_free(
+		Enesim_Renderer_OpenGL_Compiled_Program *cp)
+{
+	int i;
+
+	for (i = 0; i < cp->num_shaders; i++)
+	{
+		/* TODO destroy each shader */
+	}
+	free(cp->shaders);
+}
+
+#if 0
 static void _opengl_draw_own_geometry(Enesim_Renderer_OpenGL_Data *rdata,
 		const Eina_Rectangle *area,
 		int width, int height)
@@ -236,6 +276,8 @@ static void _opengl_draw_own_geometry(Enesim_Renderer_OpenGL_Data *rdata,
 		glEnd();
 	}
 }
+#endif
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -245,15 +287,13 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Renderer_OpenGL_Shader *shaders;
+	Enesim_Renderer_OpenGL_Program *programs;
 	Enesim_Renderer_OpenGL_Define_Geometry define_geometry;
 	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
 	Enesim_Buffer_OpenGL_Data *sdata;
-	Eina_Bool has_vertex = EINA_FALSE;
-	Eina_Bool has_geometry = EINA_FALSE;
 	GLenum status;
-	int ok = 0;
 	int num;
+	int i;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -268,60 +308,39 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	if (!r->descriptor.opengl_setup(r, states, s,
 			&define_geometry,
 			&shader_setup,
-			&num, &shaders, error))
+			&programs, &num, error))
 		return EINA_FALSE;
+
+	/* FIXME we need to know if we should create, compile and link the programs
+	 * again or not .... */
 
 	/* store the data returned by the setup */
 	rdata->define_geometry = define_geometry;
 	rdata->shader_setup = shader_setup;
-	rdata->shaders = shaders;
+	rdata->programs = programs;
 
-	/* FIXME we need to know if we should create, compile and link the shaders
-	 * again or not .... */
-	if (rdata->num_shaders != num)
+	/* FIXME for now we just free them */
+	for (i = 0; i < rdata->num_programs; i++)
 	{
-		rdata->num_shaders = num;
-		if (rdata->sids)
-			free(rdata->sids);
-		rdata->sids = calloc(num, sizeof(GLenum));
+		Enesim_Renderer_OpenGL_Compiled_Program *cp;
+
+		cp = &rdata->c_programs[i];
+		_opengl_compiled_program_free(cp);
 	}
-	rdata->num_shaders = num;
-
-	if (!rdata->program)
+	rdata->num_programs = num;
+	rdata->c_programs = calloc(rdata->num_programs, sizeof(GLenum));
+	for (i = 0; i < rdata->num_programs; i++)
 	{
-		rdata->program = glCreateProgramObjectARB();
-	}
+		Enesim_Renderer_OpenGL_Program *p;
+		Enesim_Renderer_OpenGL_Compiled_Program *cp;
 
-	/* compile every shader */
-	_opengl_shaders_compile(r, s, rdata, &has_geometry, &has_vertex);
-	/* FIXME by now we always unset the geometry and vertex */
-	has_geometry = EINA_FALSE;
-	has_vertex = EINA_FALSE;
-
-	if (has_geometry)
-	{
-		rdata->has_geometry = EINA_TRUE;
-		if (!has_vertex)
-		{
-			GLenum sh;
-			/* FIXME we could have this already compiled */
-			_opengl_shader_compile(rdata->program, &_vertex_shader, &sh);
-		}
+		p = &rdata->programs[i];
+		cp = &rdata->c_programs[i];
+		/* TODO check return value */
+		_opengl_compiled_program_new(cp, r, s, rdata, p);
 	}
 
-	/* link it */
-	glLinkProgramARB(rdata->program);
-	glGetObjectParameterivARB(rdata->program, GL_OBJECT_LINK_STATUS_ARB, &ok);
-	if (!ok)
-	{
-		char log[PATH_MAX];
-		glGetInfoLogARB(rdata->program, sizeof(log), NULL, log);
-		printf("Failed to Link %s\n", log);
-		/* FIXME destroy all the shaders */
-
-		return EINA_FALSE;
-	}
-
+	/* create the fbos */
 	if (!rdata->fbo)
 	{
 		glGenFramebuffersEXT(1, &rdata->fbo);
@@ -336,9 +355,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
         {
 		ENESIM_RENDERER_ERROR(r, error, "Impossible too setup the framebuffer %d", status);
         }
-	/* setup every shader */
-	glUseProgramObjectARB(rdata->program);
-	_shaders_setup(r, s, rdata);
 
 	return EINA_TRUE;
 }
@@ -382,10 +398,12 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 		glOrtho(0, width, 0, height, -1, 1);
 		rdata->define_geometry(r, area);
 	}
+#if 0
 	else
 	{
 		_opengl_draw_own_geometry(rdata, area, width, height);
 	}
+#endif
 	/* FIXME we should define a post_render function
 	 * to put the state as it was before */
 	glUseProgramObjectARB(0);
