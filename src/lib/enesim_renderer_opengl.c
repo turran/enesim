@@ -88,7 +88,7 @@ static void _opengl_rop_set(Enesim_Renderer *r)
 }
 
 #if 0
-Disabled for now until we find a solution with the unresolved symbol
+/* Disabled for now until we find a solution with the unresolved symbol */
 static void _opengl_geometry_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
 {
 	st = GL_GEOMETRY_SHADER_EXT;
