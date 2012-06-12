@@ -1044,6 +1044,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	shader->name = "background";
 	shader->source =
 	#include "enesim_renderer_background.glsl"
+	;
 	shader->size = strlen(shader->source);
 
 	*shaders = shader;

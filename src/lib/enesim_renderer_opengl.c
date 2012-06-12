@@ -168,12 +168,13 @@ static Eina_Bool _opengl_compiled_program_new(
 	cp->shaders = calloc(cp->num_shaders, sizeof(GLenum));
 	cp->id = glCreateProgramObjectARB();
 	/* compile every shader */
+	
 	for (i = 0; i < p->num_shaders; i++)
 	{
 		Enesim_Renderer_OpenGL_Shader *shader;
 		GLenum sh;
 
-		shader = &p->shaders[i];
+		shader = p->shaders[i];
 
 		if (!_opengl_shader_compile(cp->id, shader, &sh))
 		{
@@ -192,7 +193,7 @@ static Eina_Bool _opengl_compiled_program_new(
 	{
 		Enesim_Renderer_OpenGL_Shader *shader;
 
-		shader = &p->shaders[i];
+		shader = p->shaders[i];
 		if (!rdata->shader_setup(r, s, p, shader))
 		{
 			printf("Cannot setup the shader\n");

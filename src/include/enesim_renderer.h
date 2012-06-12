@@ -204,8 +204,8 @@ typedef struct _Enesim_Renderer_OpenGL_Shader
 
 typedef struct _Enesim_Renderer_OpenGL_Program
 {
-	Enesim_Renderer_OpenGL_Shader *shaders;
 	const char *name;
+	Enesim_Renderer_OpenGL_Shader **shaders;
 	int num_shaders;
 } Enesim_Renderer_OpenGL_Program;
 

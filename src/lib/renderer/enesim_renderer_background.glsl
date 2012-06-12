@@ -5,4 +5,4 @@ void main()
 {
     gl_FragColor = background_final_color;
 }
-);
+)

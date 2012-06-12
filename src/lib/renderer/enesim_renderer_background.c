@@ -61,6 +61,7 @@ static void _background_span(Enesim_Renderer *r,
 
 #if BUILD_OPENGL
 static Eina_Bool _background_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Program *program,
 		Enesim_Renderer_OpenGL_Shader *shader)
 {
 	Enesim_Renderer_Background *thiz;
@@ -177,6 +178,32 @@ static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 #endif
 
 #if BUILD_OPENGL
+
+/* the only shader */
+static Enesim_Renderer_OpenGL_Shader _background_shader = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "background",
+	/* .source	= */
+#include "enesim_renderer_background.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_background_shaders[] = {
+	&_background_shader,
+	NULL,
+};
+
+/* the only program */
+static Enesim_Renderer_OpenGL_Program _background_program = {
+	/* .name 	= */ "background",
+	/* .shaders 	= */ _background_shaders,
+	/* .num_shaders	= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program *_background_programs[] = {
+	&_background_program,
+	NULL,
+};
+
 static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
@@ -200,6 +227,7 @@ static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 	shader->name = "background";
 	shader->source =
 	#include "enesim_renderer_background.glsl"
+	;
 	shader->size = strlen(shader->source);
 
 	*shaders = shader;
