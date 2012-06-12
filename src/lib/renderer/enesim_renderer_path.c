@@ -19,6 +19,7 @@
 #include "enesim_private.h"
 #include "private/shape.h"
 #include "private/rasterizer.h"
+#include "libargb.h"
 /**
  * TODO
  * - Use the threshold on the curve state
@@ -75,12 +76,30 @@ typedef struct _Enesim_Renderer_Path_Stroke_State
 	int count;
 } Enesim_Renderer_Path_Stroke_State;
 
+typedef struct _Enesim_Renderer_Path_OpenGL_Figure
+{
+	Eina_List *vertices;
+	Enesim_Surface *tmp;
+	Enesim_Surface *renderer_s;
+} Enesim_Renderer_Path_OpenGL_Figure;
+
+typedef struct _Enesim_Renderer_Path_OpenGL
+{
+	/* FIXME just a test */
+	Enesim_Color final_color;
+
+	Enesim_Renderer_Path_OpenGL_Figure stroke;
+	Enesim_Renderer_Path_OpenGL_Figure fill;
+} Enesim_Renderer_Path_OpenGL;
+
 typedef struct _Enesim_Renderer_Path
 {
 	EINA_MAGIC
 	/* properties */
 	Eina_List *commands;
 	/* private */
+	Enesim_Renderer_Path_OpenGL gl;
+	/* TODO put the below data into a path_sw struct */
 	Enesim_Figure *fill_figure;
 	Enesim_Figure *stroke_figure;
 	/* external properties that require a path generation */
@@ -665,6 +684,54 @@ static void _path_span(Enesim_Renderer *r,
 	enesim_renderer_sw_draw(thiz->bifigure, x, y, len, ddata);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Renderer_OpenGL_Shader *shader)
+{
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer_Path_OpenGL *gl;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int final_color;
+
+ 	thiz = _path_get(r);
+	gl = &thiz->gl;
+
+	printf("shader setup\n");
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
+	glUniform4fARB(final_color,
+			argb8888_red_get(gl->final_color) / 255.0,
+			argb8888_green_get(gl->final_color) / 255.0,
+			argb8888_blue_get(gl->final_color) / 255.0,
+			argb8888_alpha_get(gl->final_color) / 255.0);
+
+	return EINA_TRUE;
+}
+
+static void _path_opengl_define_geometry(Enesim_Renderer *r,
+		const Eina_Rectangle *area)
+{
+	/* TODO
+	 * check if we are doing fill + stroke
+	 * in that case the geometry is only the bounding box
+	 * in case of only fill or only stroke then the geometry
+	 * is the matching figure
+	 * in case of fill/stroke renderers, those must be rendered previously
+	 * into another texture and use a fragment shader that reads from
+	 * that texture, else, use the classic color fragment
+	 */
+	
+	/* FIXME for now */
+	printf("define geometry! %d %d %d %d\n", area->x, area->y, area->w, area->h);
+	glBegin(GL_QUADS);
+		glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
+		glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
+		glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
+		glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
+	glEnd();
+}
+#endif
+
 static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 		const Enesim_Matrix *cgm,
 		Enesim_Shape_Stroke_Join join,
@@ -948,13 +1015,43 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
- 	thiz = _path_get(r);
+	Enesim_Renderer_Path_OpenGL *gl;
+	Enesim_Renderer_OpenGL_Shader *shader;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
+ 	thiz = _path_get(r);
+	gl = &thiz->gl;
+
+	/* TODO the rendering of a stroke+fill shape is a two step, we need to
+	 * change how the opengl backend works to instead of expecting
+	 * a list of shaders, expect a list of programs. so the common
+	 * part knows how to render in multiple step a renderer
+	 */
+	*shader_setup = _path_opengl_shader_setup;
+	*define_geometry = _path_opengl_define_geometry;
+
+	/* FIXME for now, we only do the fill */
+	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
+	shader->type = ENESIM_SHADER_FRAGMENT;
+	shader->name = "background";
+	shader->source =
+	#include "enesim_renderer_background.glsl"
+	shader->size = strlen(shader->source);
+
+	*shaders = shader;
+	*num_shaders = 1;
+
+	gl->final_color = css->fill.color;
+
+	/* TODO generate the figures, but use the tesselator directly and store the vertices */
 	/*
 	 * On the gl version use the tesselator to generate the triangles and pass them
 	 * to the goemetry shader. Only tesselate again whenever something has changed
@@ -1032,17 +1129,6 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	Enesim_Renderer_Path *thiz;
-	Enesim_Renderer_OpenGL_Data *rdata;
-	int final_color;
-
- 	thiz = _path_get(r);
-
-	return EINA_TRUE;
-}
-
 static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
@@ -1069,11 +1155,9 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .opencl_cleanup =		*/ NULL,
 #if BUILD_OPENGL
 	/* .opengl_setup = 		*/ _path_opengl_setup,
-	/* .opengl_shader_setup =	*/ _path_opengl_shader_setup,
-	/* .opengl_cleanup =		*/ _path_opengl_cleanup
+	/* .opengl_cleanup =		*/ _path_opengl_cleanup,
 #else
 	/* .opengl_setup = 		*/ NULL,
-	/* .opengl_shader_setup =	*/ NULL,
 	/* .opengl_cleanup = 		*/ NULL
 #endif
 };

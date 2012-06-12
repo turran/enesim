@@ -59,6 +59,30 @@ static void _background_span(Enesim_Renderer *r,
 	thiz->span(dst, len, NULL, thiz->final_color, NULL);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _background_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Shader *shader)
+{
+	Enesim_Renderer_Background *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int final_color;
+
+ 	thiz = _background_get(r);
+	if (strcmp(shader->name, "background"))
+		return EINA_FALSE;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
+	glUniform4fARB(final_color,
+			argb8888_red_get(thiz->final_color) / 255.0,
+			argb8888_green_get(thiz->final_color) / 255.0,
+			argb8888_blue_get(thiz->final_color) / 255.0,
+			argb8888_alpha_get(thiz->final_color) / 255.0);
+
+	return EINA_TRUE;
+}
+#endif
+
 static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesim_Renderer *r)
 {
 	Enesim_Color final_color, rend_color;
@@ -156,6 +180,8 @@ static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error)
@@ -166,6 +192,9 @@ static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
  	thiz = _background_get(r);
 	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
 
+	*shader_setup = _background_opengl_shader_setup;
+	*define_geometry = NULL;
+
 	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
 	shader->type = ENESIM_SHADER_FRAGMENT;
 	shader->name = "background";
@@ -175,24 +204,6 @@ static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 
 	*shaders = shader;
 	*num_shaders = 1;
-
-	return EINA_TRUE;
-}
-
-static Eina_Bool _background_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	Enesim_Renderer_Background *thiz;
-	Enesim_Renderer_OpenGL_Data *rdata;
-	int final_color;
-
- 	thiz = _background_get(r);
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
-	glUniform4fARB(final_color,
-			argb8888_red_get(thiz->final_color) / 255.0,
-			argb8888_green_get(thiz->final_color) / 255.0,
-			argb8888_blue_get(thiz->final_color) / 255.0,
-			argb8888_alpha_get(thiz->final_color) / 255.0);
 
 	return EINA_TRUE;
 }
@@ -243,35 +254,33 @@ static Eina_Bool _background_has_changed(Enesim_Renderer *r,
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =               */ ENESIM_RENDERER_API,
-	/* .name =                  */ _background_name,
-	/* .free =                  */ _background_free,
-	/* .boundings =             */ NULL,
-	/* .destination_boundings = */ NULL,
-	/* .flags =                 */ _background_flags,
-	/* .hints_get =                 */ _background_hints,
-	/* .is_inside =             */ NULL,
-	/* .damage =                */ NULL,
-	/* .has_changed =           */ _background_has_changed,
-	/* .sw_setup =              */ _background_sw_setup,
-	/* .sw_cleanup =            */ _background_sw_cleanup,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ _background_name,
+	/* .free = 			*/ _background_free,
+	/* .boundings = 		*/ NULL,
+	/* .destination_boundings =	*/ NULL,
+	/* .flags = 			*/ _background_flags,
+	/* .hints_get = 		*/ _background_hints,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _background_has_changed,
+	/* .sw_setup = 			*/ _background_sw_setup,
+	/* .sw_cleanup = 		*/ _background_sw_cleanup,
 #if BUILD_OPENCL
-	/* .opencl_setup =          */ _background_opencl_setup,
-	/* .opencl_kernel_setup =   */ _background_opencl_kernel_setup,
-	/* .opencl_cleanup =        */ _background_opencl_cleanup,
+	/* .opencl_setup = 		*/ _background_opencl_setup,
+	/* .opencl_kernel_setup =   	*/ _background_opencl_kernel_setup,
+	/* .opencl_cleanup = 		*/ _background_opencl_cleanup,
 #else
-	/* .opencl_setup =          */ NULL,
-	/* .opencl_kernel_setup =   */ NULL,
-	/* .opencl_cleanup =        */ NULL,
+	/* .opencl_setup = 		*/ NULL,
+	/* .opencl_kernel_setup = 	*/ NULL,
+	/* .opencl_cleanup = 		*/ NULL,
 #endif
 #if BUILD_OPENGL
-	/* .opengl_setup =          */ _background_opengl_setup,
-	/* .opengl_shader_setup =   */ _background_opengl_shader_setup,
-	/* .opengl_cleanup =        */ _background_opengl_cleanup
+	/* .opengl_setup = 		*/ _background_opengl_setup,
+	/* .opengl_cleanup = 		*/ _background_opengl_cleanup,
 #else
-	/* .opengl_setup =          */ NULL,
-	/* .opengl_shader_setup =   */ NULL,
-	/* .opengl_cleanup =        */ NULL
+	/* .opengl_setup = 		*/ NULL,
+	/* .opengl_cleanup = 		*/ NULL
 #endif
 };
 /*============================================================================*

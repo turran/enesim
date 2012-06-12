@@ -1115,7 +1115,6 @@ static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup = 	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 };
 /*============================================================================*

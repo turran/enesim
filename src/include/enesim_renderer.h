@@ -194,7 +194,7 @@ typedef enum _Enesim_Renderer_OpenGL_Shader_Type
 	ENESIM_SHADERS,
 } Enesim_Renderer_OpenGL_Shader_Type;
 
-typedef struct _Enesim_Renerer_OpenGL_Shader
+typedef struct _Enesim_Renderer_OpenGL_Shader
 {
 	Enesim_Renderer_OpenGL_Shader_Type type;
 	const char *name;
@@ -202,14 +202,25 @@ typedef struct _Enesim_Renerer_OpenGL_Shader
 	size_t size;
 } Enesim_Renderer_OpenGL_Shader;
 
+typedef struct _Enesim_Renderer_OpenGL_Program
+{
+	Enesim_Renderer_OpenGL_Shader *shaders;
+	int num_shaders;
+} Enesim_Renderer_OpenGL_Program;
+
+typedef Eina_Bool (*Enesim_Renderer_OpenGL_Shader_Setup)(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Shader *shader);
+typedef void (*Enesim_Renderer_OpenGL_Define_Geometry)(Enesim_Renderer *r, const Eina_Rectangle *area);
+
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error);
 typedef void (*Enesim_Renderer_OpenGL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
-typedef Eina_Bool (*Enesim_Renderer_OpenGL_Shader_Setup)(Enesim_Renderer *r, Enesim_Surface *s);
 
 struct _Enesim_Renderer_Descriptor {
 	/* common */
@@ -232,7 +243,6 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
 	/* opengl based functions */
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
-	Enesim_Renderer_OpenGL_Shader_Setup opengl_shader_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* we should expand from here */
 };

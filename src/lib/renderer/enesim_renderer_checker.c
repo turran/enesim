@@ -65,6 +65,44 @@ Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _checker_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Shader *shader)
+{
+	Enesim_Renderer_Checker *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int odd_color;
+	int even_color;
+	int sw;
+	int sh;
+
+ 	thiz = _checker_get(r);
+	if (strcmp(shader->name, "checker"))
+		return EINA_FALSE;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	even_color = glGetUniformLocationARB(rdata->program, "checker_even_color");
+	odd_color = glGetUniformLocationARB(rdata->program, "checker_odd_color");
+	sw = glGetUniformLocationARB(rdata->program, "checker_sw");
+	sh = glGetUniformLocationARB(rdata->program, "checker_sh");
+
+	glUniform4fARB(even_color,
+			argb8888_red_get(thiz->final_color1) / 255.0,
+			argb8888_green_get(thiz->final_color1) / 255.0,
+			argb8888_blue_get(thiz->final_color1) / 255.0,
+			argb8888_alpha_get(thiz->final_color1) / 255.0);
+	glUniform4fARB(odd_color,
+			argb8888_red_get(thiz->final_color2) / 255.0,
+			argb8888_green_get(thiz->final_color2) / 255.0,
+			argb8888_blue_get(thiz->final_color2) / 255.0,
+			argb8888_alpha_get(thiz->final_color2) / 255.0);
+	glUniform1i(sw, thiz->current.sw);
+	glUniform1i(sh, thiz->current.sh);
+
+	return EINA_TRUE;
+}
+#endif
+
 static Eina_Bool _checker_state_setup(Enesim_Renderer_Checker *thiz,
 		const Enesim_Renderer_State *state)
 {
@@ -433,6 +471,8 @@ static void _checker_hints(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error)
@@ -444,6 +484,9 @@ static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
  	thiz = _checker_get(r);
 	if (!_checker_state_setup(thiz, state)) return EINA_FALSE;
 
+	*shader_setup = _checker_opengl_shader_setup;
+	*define_geometry = NULL;
+
 	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
 	shader->type = ENESIM_SHADER_FRAGMENT;
 	shader->name = "checker";
@@ -453,38 +496,6 @@ static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 
 	*shaders = shader;
 	*num_shaders = 1;
-
-	return EINA_TRUE;
-}
-
-static Eina_Bool _checker_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	Enesim_Renderer_Checker *thiz;
-	Enesim_Renderer_OpenGL_Data *rdata;
-	int odd_color;
-	int even_color;
-	int sw;
-	int sh;
-
- 	thiz = _checker_get(r);
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	even_color = glGetUniformLocationARB(rdata->program, "checker_even_color");
-	odd_color = glGetUniformLocationARB(rdata->program, "checker_odd_color");
-	sw = glGetUniformLocationARB(rdata->program, "checker_sw");
-	sh = glGetUniformLocationARB(rdata->program, "checker_sh");
-
-	glUniform4fARB(even_color,
-			argb8888_red_get(thiz->final_color1) / 255.0,
-			argb8888_green_get(thiz->final_color1) / 255.0,
-			argb8888_blue_get(thiz->final_color1) / 255.0,
-			argb8888_alpha_get(thiz->final_color1) / 255.0);
-	glUniform4fARB(odd_color,
-			argb8888_red_get(thiz->final_color2) / 255.0,
-			argb8888_green_get(thiz->final_color2) / 255.0,
-			argb8888_blue_get(thiz->final_color2) / 255.0,
-			argb8888_alpha_get(thiz->final_color2) / 255.0);
-	glUniform1i(sw, thiz->current.sw);
-	glUniform1i(sh, thiz->current.sh);
 
 	return EINA_TRUE;
 }
@@ -516,11 +527,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .opencl_cleanup =		*/ NULL,
 #if BUILD_OPENGL
 	/* .opengl_setup =          	*/ _checker_opengl_setup,
-	/* .opengl_shader_setup =   	*/ _checker_opengl_shader_setup,
 	/* .opengl_cleanup =        	*/ _checker_opengl_cleanup
 #else
 	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup =   	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 #endif
 };

@@ -302,7 +302,6 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup = 	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 };
 /*============================================================================*

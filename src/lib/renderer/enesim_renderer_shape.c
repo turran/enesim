@@ -252,6 +252,8 @@ static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error)
@@ -265,8 +267,9 @@ static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
 	sstates[ENESIM_STATE_PAST] = &thiz->past;
 
-	return thiz->opengl_setup(r, states, sstates, s, num_shaders,
-		shaders, error);
+	return thiz->opengl_setup(r, states, sstates, s, 
+			define_geometry, shader_setup, num_shaders,
+			shaders, error);
 }
 
 static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
@@ -280,7 +283,7 @@ static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
 	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
-	if (!thiz->opengl_setup) return EINA_FALSE;
+	if (!thiz->opencl_setup) return EINA_FALSE;
 
 	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
 	sstates[ENESIM_STATE_PAST] = &thiz->past;
@@ -491,7 +494,6 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
 	pdescriptor.opencl_cleanup = descriptor->opencl_cleanup;
 	pdescriptor.opengl_setup = _enesim_renderer_shape_opengl_setup;
-	pdescriptor.opengl_shader_setup = descriptor->opengl_shader_setup;
 	pdescriptor.opengl_cleanup = descriptor->opengl_cleanup;
 
 	r = enesim_renderer_new(&pdescriptor, thiz);
@@ -523,7 +525,6 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
-	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
 	Eina_Bool fill_renderer = EINA_FALSE;
 
 	thiz = _shape_get(r);

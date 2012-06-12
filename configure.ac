@@ -177,7 +177,6 @@ AC_LINK_IFELSE(
      ]],
      [[
 glGenFramebuffersEXT(0, NULL);
-glProgramParameteriEXT(0, 0, 0);
      ]])
   ],
   [
@@ -187,7 +186,7 @@ glProgramParameteriEXT(0, 0, 0);
   [build_opengl="no"])
 LIBS=${LIBS_save}
 
-AC_MSG_CHECKING([whether glGenTextures is in libGL.a])
+AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
 AC_MSG_RESULT([${build_opengl}])
 
 if test "x${build_opengl}" = "xno" ; then
@@ -202,7 +201,6 @@ if test "x${build_opengl}" = "xno" ; then
        ]],
        [[
 glGenFramebuffersEXT(0, NULL);
-glProgramParameteriEXT(0, 0, 0);
        ]])
     ],
     [
@@ -212,7 +210,7 @@ glProgramParameteriEXT(0, 0, 0);
     [build_opengl="no"])
   LIBS=${LIBS_save}
 
-  AC_MSG_CHECKING([whether glGenTextures is in libopengl32.a])
+  AC_MSG_CHECKING([whether glGenFramebffersEXT is in libopengl32.a])
   AC_MSG_RESULT([${build_opengl}])
 fi
 

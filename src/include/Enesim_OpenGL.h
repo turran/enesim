@@ -26,14 +26,26 @@
 EAPI Enesim_Pool * enesim_pool_opengl_new(void);
 
 #ifdef ENESIM_EXTENSION
+typedef struct _Enesim_Renderer_OpenGL_Compiled_Program
+{
+	GLenum id;
+	GLenum *shaders;
+} Enesim_Renderer_Compiled_Program;
+
 typedef struct _Enesim_Renderer_OpenGL_Data
 {
+	/* data fetch on the setup */
+	Enesim_Renderer_OpenGL_Define_Geometry define_geometry;
+	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
+	Enesim_Renderer_OpenGL_Shader *shaders;
+	int num_shaders;
+	/* generated */
 	GLuint fbo;
 	GLenum program;
-	GLenum *shaders;
-	Enesim_Renderer_OpenGL_Shader_Type *shader_types;
-	int num_shaders;
-	Eina_Bool has_geometry;
+	GLenum *sids;
+	Eina_Bool has_geometry; /* has a geometry shader */
+	Eina_Bool has_vertex; /* has a vertex shader */
+	Eina_Bool does_geometry; /* the renderer defines the geometry */
 } Enesim_Renderer_OpenGL_Data;
 
 typedef struct _Enesim_Buffer_OpenGL_Data

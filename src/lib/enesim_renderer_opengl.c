@@ -87,27 +87,33 @@ static void _opengl_rop_set(Enesim_Renderer *r)
 	}
 }
 
-static Eina_Bool _shader_compile(GLenum program, Enesim_Renderer_OpenGL_Shader *shader, GLenum *sh_id)
+#if 0
+Disabled for now until we find a solution with the unresolved symbol
+static void _opengl_geometry_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
+{
+	st = GL_GEOMETRY_SHADER_EXT;
+	glProgramParameteriEXT(program, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
+	glProgramParameteriEXT(program, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
+	glProgramParameteriEXT(program, GL_GEOMETRY_VERTICES_OUT_EXT, 10);
+}
+
+static void _opengl_vertex_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
+{
+	st = GL_VERTEX_SHADER_ARB;
+}
+#endif
+
+static Eina_Bool _opengl_shader_compile(GLenum program, Enesim_Renderer_OpenGL_Shader *shader, GLenum *sh_id)
 {
 	GLenum st;
 	GLenum sh;
 	int ok = 0;
 
-	if (shader->type == ENESIM_SHADER_GEOMETRY)
-	{
-		st = GL_GEOMETRY_SHADER_EXT;
-		glProgramParameteriEXT(program, GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
-		glProgramParameteriEXT(program, GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
-		glProgramParameteriEXT(program, GL_GEOMETRY_VERTICES_OUT_EXT, 10);
-	}
-	else if (shader->type == ENESIM_SHADER_FRAGMENT)
-		st = GL_FRAGMENT_SHADER_ARB;
-	else if (shader->type == ENESIM_SHADER_VERTEX)
-		st = GL_VERTEX_SHADER_ARB;
-	else
-	{
+	/* FIXME for now we only support fragment shaders */
+	if (shader->type != ENESIM_SHADER_FRAGMENT)
 		return EINA_FALSE;
-	}
+
+	st = GL_FRAGMENT_SHADER_ARB;
 	/* setup the shaders */
 	sh = glCreateShaderObjectARB(st);
 	glShaderSourceARB(sh, 1, (const GLcharARB **)&shader->source, (const GLint *)&shader->size);
@@ -124,7 +130,111 @@ static Eina_Bool _shader_compile(GLenum program, Enesim_Renderer_OpenGL_Shader *
 	/* attach the shader to the program */
 	glAttachObjectARB(program, sh);
 	*sh_id = sh;
+
 	return EINA_TRUE;
+}
+
+static Eina_Bool _opengl_shaders_compile(Enesim_Renderer *r,
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Data *rdata,
+		Eina_Bool *has_geometry,
+		Eina_Bool *has_vertex)
+{
+	int i;
+
+	/* by default to false */
+	*has_vertex = EINA_FALSE;
+	*has_geometry = EINA_FALSE;
+	/* compile every shader */
+	for (i = 0; i < rdata->num_shaders; i++)
+	{
+		Enesim_Renderer_OpenGL_Shader *shader;
+		GLenum sh;
+
+		shader = &rdata->shaders[i];
+
+		if (!_opengl_shader_compile(rdata->program, shader, &sh))
+			return EINA_FALSE;
+
+		rdata->sids[i] = sh;
+		if (shader->type == ENESIM_SHADER_GEOMETRY)
+			*has_geometry = EINA_TRUE;
+		if (shader->type == ENESIM_SHADER_VERTEX)
+			*has_vertex = EINA_TRUE;
+	}
+	return EINA_TRUE;
+}
+
+static Eina_Bool _shaders_setup(Enesim_Renderer *r,
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Data *rdata)
+{
+	int i;
+
+	/* setup every shader */
+	for (i = 0; i < rdata->num_shaders; i++)
+	{
+		Enesim_Renderer_OpenGL_Shader *shader;
+
+		shader = &rdata->shaders[i];
+		if (!rdata->shader_setup(r, s, shader))
+		{
+			printf("Cannot setup the shader\n");
+			return EINA_FALSE;
+		}
+	}
+	return EINA_TRUE;
+}
+
+static void _opengl_draw_own_geometry(Enesim_Renderer_OpenGL_Data *rdata,
+		const Eina_Rectangle *area,
+		int width, int height)
+{
+	/* check the types of shaders
+	 * if only geometry then we need the common vertex
+	 */
+	if (rdata->has_geometry)
+	{
+		int pixel_transform;
+
+		pixel_transform = glGetUniformLocationARB(rdata->program, "pixel_transform");
+		printf("pixel_transform = %d\n", pixel_transform);
+		if (pixel_transform >= 0)
+		{
+			double sx = 2.0/width;
+			double sy = 2.0/height;
+
+			//const GLfloat values[] = {-sx, 0, 0, 0, -sy, 0, 0, 0, 1};
+			const GLfloat values[] = {sx, 0, -1, 0, -sy, 1, 0, 0, 1};
+			glUniformMatrix3fv(pixel_transform, 1, GL_FALSE, values);
+		}
+		/* in this case we need to setup some common uniforms
+		 * like the pixel transformation, etc
+		 */
+		glBegin(GL_POINTS);
+			glVertex2d(area->x, area->y);
+		glEnd();
+	}
+	/* simplest case */
+	else
+	{
+		glMatrixMode(GL_TEXTURE);
+		glLoadIdentity();
+		/* FIXME for now */
+		//glScalef(0.02, 0.02, 1.0);
+		glRotatef(30, 0.0, 0.0, 1.0);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, width, 0, height, -1, 1);
+
+		glBegin(GL_QUADS);
+			glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
+			glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
+			glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
+			glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
+		glEnd();
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -136,59 +246,58 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Shader *shaders;
+	Enesim_Renderer_OpenGL_Define_Geometry define_geometry;
+	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Eina_Bool has_vertex = EINA_FALSE;
 	Eina_Bool has_geometry = EINA_FALSE;
-	Eina_Bool ret;
 	GLenum status;
 	int ok = 0;
-	int i;
 	int num;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	/* create the data in case does not exist */
 	if (!rdata)
 	{
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
 	}
+	/* do the setup */
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
-	ret = r->descriptor.opengl_setup(r, states, s, &num, &shaders, error);
+	if (!r->descriptor.opengl_setup(r, states, s,
+			&define_geometry,
+			&shader_setup,
+			&num, &shaders, error))
+		return EINA_FALSE;
+
+	/* store the data returned by the setup */
+	rdata->define_geometry = define_geometry;
+	rdata->shader_setup = shader_setup;
+	rdata->shaders = shaders;
+
+	/* FIXME we need to know if we should create, compile and link the shaders
+	 * again or not .... */
 	if (rdata->num_shaders != num)
 	{
 		rdata->num_shaders = num;
-		if (rdata->shaders)
-			free(rdata->shaders);
-		if (rdata->shader_types)
-			free(rdata->shader_types);
-		rdata->shaders = calloc(num, sizeof(GLenum));
-		rdata->shader_types = calloc(num, sizeof(Enesim_Renderer_OpenGL_Shader_Type));
+		if (rdata->sids)
+			free(rdata->sids);
+		rdata->sids = calloc(num, sizeof(GLenum));
 	}
-
-	if (!ret) return EINA_FALSE;
+	rdata->num_shaders = num;
 
 	if (!rdata->program)
 	{
 		rdata->program = glCreateProgramObjectARB();
 	}
 
-	for (i = 0; i < num; i++)
-	{
-		Enesim_Renderer_OpenGL_Shader *shader;
-		GLenum sh;
+	/* compile every shader */
+	_opengl_shaders_compile(r, s, rdata, &has_geometry, &has_vertex);
+	/* FIXME by now we always unset the geometry and vertex */
+	has_geometry = EINA_FALSE;
+	has_vertex = EINA_FALSE;
 
-		shader = &shaders[i];
-
-		if (!_shader_compile(rdata->program, shader, &sh))
-			return EINA_FALSE;
-
-		rdata->shaders[i] = sh;
-		rdata->shader_types[i] = shader->type;;
-		if (rdata->shader_types[i] == ENESIM_SHADER_GEOMETRY)
-			has_geometry = EINA_TRUE;
-		if (rdata->shader_types[i] == ENESIM_SHADER_VERTEX)
-			has_vertex = EINA_TRUE;
-	}
 	if (has_geometry)
 	{
 		rdata->has_geometry = EINA_TRUE;
@@ -196,7 +305,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		{
 			GLenum sh;
 			/* FIXME we could have this already compiled */
-			_shader_compile(rdata->program, &_vertex_shader, &sh);
+			_opengl_shader_compile(rdata->program, &_vertex_shader, &sh);
 		}
 	}
 
@@ -227,16 +336,9 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
         {
 		ENESIM_RENDERER_ERROR(r, error, "Impossible too setup the framebuffer %d", status);
         }
-
+	/* setup every shader */
 	glUseProgramObjectARB(rdata->program);
-	if (r->descriptor.opengl_shader_setup)
-	{
-		if (!r->descriptor.opengl_shader_setup(r, s))
-		{
-			printf("Cannot setup the shader\n");
-			return EINA_FALSE;
-		}
-	}
+	_shaders_setup(r, s, rdata);
 
 	return EINA_TRUE;
 }
@@ -266,54 +368,26 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	glEnable(GL_BLEND);
 
 	enesim_surface_size_get(s, &width, &height);
-
-	_opengl_rop_set(r);
-	/* check the types of shaders
-	 * if only geometry then we need the common vertex
+	/* FIXME we should define a pre_render function
+	 * to for example set/store some attributes
 	 */
-	if (rdata->has_geometry)
+	_opengl_rop_set(r);
+	/* now draw */
+	if (rdata->define_geometry)
 	{
-		int pixel_transform;
-
-		pixel_transform = glGetUniformLocationARB(rdata->program, "pixel_transform");
-		printf("pixel_transform = %d\n", pixel_transform);
-		if (pixel_transform >= 0)
-		{
-			double sx = 2.0/width;
-			double sy = 2.0/height;
-
-			//const GLfloat values[] = {-sx, 0, 0, 0, -sy, 0, 0, 0, 1};
-			const GLfloat values[] = {sx, 0, -1, 0, -sy, 1, 0, 0, 1};
-			glUniformMatrix3fv(pixel_transform, 1, GL_FALSE, values);
-			GLERR;
-		}
-		/* in this case we need to setup some common uniforms
-		 * like the pixel transformation, etc
-		 */
-		glBegin(GL_POINTS);
-			glVertex2d(area->x, area->y);
-		glEnd();
-	}
-	/* simplest case */
-	else
-	{
-		glMatrixMode(GL_TEXTURE);
-		glLoadIdentity();
 		/* FIXME for now */
-		//glScalef(0.02, 0.02, 1.0);
-		glRotatef(30, 0.0, 0.0, 1.0);
-
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, width, 0, height, -1, 1);
 
-		glBegin(GL_QUADS);
-			glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
-			glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
-			glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
-			glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
-		glEnd();
+		glOrtho(0, width, 0, height, -1, 1);
+		rdata->define_geometry(r, area);
 	}
+	else
+	{
+		_opengl_draw_own_geometry(rdata, area, width, height);
+	}
+	/* FIXME we should define a post_render function
+	 * to put the state as it was before */
 	glUseProgramObjectARB(0);
 }
 

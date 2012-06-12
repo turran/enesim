@@ -385,6 +385,51 @@ pass:
 	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Rectangle *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	int width;
+	int height;
+	int x;
+	int y;
+
+ 	thiz = _rectangle_get(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+
+	x = glGetUniformLocationARB(rdata->program, "rectangle_x");
+	y = glGetUniformLocationARB(rdata->program, "rectangle_y");
+	width = glGetUniformLocationARB(rdata->program, "rectangle_width");
+	height = glGetUniformLocationARB(rdata->program, "rectangle_height");
+
+	glUniform1f(x, thiz->current.x);
+	glUniform1f(y, thiz->current.y);
+	glUniform1f(width, thiz->current.width);
+	glUniform1f(height, thiz->current.height);
+
+	/* FIXME set the background like this for now */
+	{
+		int odd_color;
+		int even_color;
+		int odd_thickness;
+		int even_thickness;
+
+		even_color = glGetUniformLocationARB(rdata->program, "stripes_even_color");
+		odd_color = glGetUniformLocationARB(rdata->program, "stripes_odd_color");
+		even_thickness = glGetUniformLocationARB(rdata->program, "stripes_even_thickness");
+		odd_thickness = glGetUniformLocationARB(rdata->program, "stripes_odd_thickness");
+
+		glUniform4fARB(even_color, 1.0, 0.0, 0.0, 1.0);
+		glUniform4fARB(odd_color, 0.0, 0.0, 1.0, 1.0);
+		glUniform1i(even_thickness, 2.0);
+		glUniform1i(odd_thickness, 5.0);
+	}
+
+	return EINA_TRUE;
+}
+#endif
+
 static inline Enesim_Color _rectangle_sample(Eina_F16p16 xx, Eina_F16p16 yy,
 			Enesim_Renderer_Rectangle_Sw *sws,
 			Enesim_Renderer_Rectangle *thiz,
@@ -1388,6 +1433,8 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Define_Geometry *define_geomery,
+		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
 		Enesim_Error **error)
@@ -1425,49 +1472,6 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	Enesim_Renderer_Rectangle *thiz;
-	Enesim_Renderer_OpenGL_Data *rdata;
-	int width;
-	int height;
-	int x;
-	int y;
-
- 	thiz = _rectangle_get(r);
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-
-	x = glGetUniformLocationARB(rdata->program, "rectangle_x");
-	y = glGetUniformLocationARB(rdata->program, "rectangle_y");
-	width = glGetUniformLocationARB(rdata->program, "rectangle_width");
-	height = glGetUniformLocationARB(rdata->program, "rectangle_height");
-
-	glUniform1f(x, thiz->current.x);
-	glUniform1f(y, thiz->current.y);
-	glUniform1f(width, thiz->current.width);
-	glUniform1f(height, thiz->current.height);
-
-	/* FIXME set the background like this for now */
-	{
-		int odd_color;
-		int even_color;
-		int odd_thickness;
-		int even_thickness;
-
-		even_color = glGetUniformLocationARB(rdata->program, "stripes_even_color");
-		odd_color = glGetUniformLocationARB(rdata->program, "stripes_odd_color");
-		even_thickness = glGetUniformLocationARB(rdata->program, "stripes_even_thickness");
-		odd_thickness = glGetUniformLocationARB(rdata->program, "stripes_odd_thickness");
-
-		glUniform4fARB(even_color, 1.0, 0.0, 0.0, 1.0);
-		glUniform4fARB(odd_color, 0.0, 0.0, 1.0, 1.0);
-		glUniform1i(even_thickness, 2.0);
-		glUniform1i(odd_thickness, 5.0);
-	}
-
-	return EINA_TRUE;
-}
-
 static void _rectangle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Rectangle *thiz;
@@ -1494,11 +1498,9 @@ static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 	/* .opencl_cleanup =		*/ NULL,
 #if BUILD_OPENGL
 	/* .opengl_setup =          	*/ _rectangle_opengl_setup,
-	/* .opengl_shader_setup =   	*/ _rectangle_opengl_shader_setup,
-	/* .opengl_cleanup =        	*/ _rectangle_opengl_cleanup
+	/* .opengl_cleanup =        	*/ _rectangle_opengl_cleanup,
 #else
 	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup =   	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 #endif
 };
