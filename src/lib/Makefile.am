@@ -35,7 +35,8 @@ compositor/libenesim_compositor.la \
 converter/libenesim_converter.la \
 pool/libenesim_pool.la \
 @ENESIM_LIBS@ \
-@pthread_libs@
+@pthread_libs@ \
+-lm
 
 libenesim_la_LDFLAGS = -no-undefined -version-info @version_info@
 
