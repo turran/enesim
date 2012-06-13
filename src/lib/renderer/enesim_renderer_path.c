@@ -765,7 +765,6 @@ static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
 	if (!p) return;
 
 	/* add another vertex */
-	printf("adding vertex at %g %g %g\n", pt->x, pt->y, pt->z);
 	enesim_polygon_point_append_from_coords(p->polygon, pt->x, pt->y);
 	glVertex3f(pt->x, pt->y, 0.0);
 }
@@ -775,21 +774,14 @@ static void _path_opengl_combine_cb(GLdouble coords[3],
 		GLfloat weight[4], GLdouble **dataOut,
 		void *data)
 {
-	printf("TODO combine!\n");
-#if 0
-	GLdouble *vertex;
-	int i;
-	vertex = (GLdouble *) malloc(6 * sizeof(GLdouble));
-	vertex[0] = coords[0];
-	vertex[1] = coords[1];
-	vertex[2] = coords[2];
-	for (i = 3; i < 7; i++)
-	vertex[i] = weight[0] * vertex_data[0][i] 
-		  + weight[1] * vertex_data[1][i]
-		  + weight[2] * vertex_data[2][i] 
-		  + weight[3] * vertex_data[3][i];
-	*dataOut = vertex;
-#endif
+	Enesim_Point *pt;
+
+	pt = enesim_point_new();
+	pt->x = coords[0];
+	pt->y = coords[1];
+	pt->z = coords[2];
+	/* we dont have any information to interpolate with the weight */
+	*dataOut = (GLdouble *)pt;
 }
 
 static void _path_opengl_begin_cb(GLenum which, void *data)
@@ -827,6 +819,7 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_OpenGL_Figure *glf,
 	/* generate the figures */
 	/* TODO we could use the tesselator directly on our own vertex generator? */
 	t = gluNewTess();
+	gluTessProperty(t, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);
 	gluTessCallback(t, GLU_TESS_VERTEX_DATA, &_path_opengl_vertex_cb);
 	gluTessCallback(t, GLU_TESS_BEGIN_DATA, &_path_opengl_begin_cb);
 	gluTessCallback(t, GLU_TESS_END_DATA, &_path_opengl_end_cb);
@@ -880,13 +873,16 @@ static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _path_opengl_draw(Enesim_Renderer *r,
+static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_OpenGL *gl;
+	Enesim_Renderer_Path_OpenGL_Figure *gf;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_Shape_Draw_Mode dm;
+	Enesim_Figure *f;
 
 	thiz = _path_get(r);
 	gl = &thiz->gl;
@@ -904,20 +900,43 @@ static void _path_opengl_draw(Enesim_Renderer *r,
 	 * that texture, else, use the classic color fragment
 	 */
 
+	enesim_renderer_shape_draw_mode_get(r, &dm);
+	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	{
+		gf = &gl->stroke;
+		f = thiz->stroke_figure;
+	}
+	else
+	{
+		gf = &gl->fill;
+		f = thiz->fill_figure;
+	}
+
 	glEnable(GL_POLYGON_SMOOTH);
 	glColor3f(1.0, 0.0, 0.0);
 	/* check if we need to tesselate again */
-	if (gl->fill.needs_tesselate)
+	if (gf->needs_tesselate)
 	{
-		_path_opengl_tesselate(&gl->fill, thiz->fill_figure);
+		_path_opengl_tesselate(gf, f);
 	}
 	/* if not, just use the cached vertices */
 	else
 	{
 		
 	}
-#if 0	
-	/* FIXME for now */
+}
+
+#if 0
+static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
+		const Eina_Rectangle *area, int w, int h)
+{
+	/* for fill and stroke we need to draw the stroke first on a
+	 * temporary fbo, then the fill into a temporary fbo too
+	 * finally draw again into the destination using the temporary
+	 * fbos as a source. If the pixel is different than transparent
+	 * then multiply that color with the current color
+	 */
+	/* use the area to render boths paths */
 	printf("define geometry! %d %d %d %d\n", area->x, area->y, area->w, area->h);
 	glBegin(GL_QUADS);
 		glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
@@ -925,21 +944,8 @@ static void _path_opengl_draw(Enesim_Renderer *r,
 		glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
 		glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
 	glEnd();
-#endif
 }
 
-#if 0
-static void _path_opengl_stroke_direct_draw(Enesim_Renderer *r,
-		const Eina_Rectangle *area, int w, int h)
-{
-
-}
-
-static void _path_opengl_fill_stroke_direct_draw(Enesim_Renderer *r,
-		const Eina_Rectangle *area, int w, int h)
-{
-
-}
 #endif
 
 #endif
@@ -1240,6 +1246,8 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_OpenGL *gl;
 	Enesim_Renderer_OpenGL_Shader *shader;
+	Enesim_Shape_Draw_Mode dm;
+	double sw;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
@@ -1256,13 +1264,29 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		thiz->changed = EINA_FALSE;
 	}
 
+	/* check what to draw, stroke, fill or stroke + fill */
+	dm = css->draw_mode;
+	sw = css->stroke.weight;
+	/* fill + stroke */
+	if (dm == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL && (sw > 1.0))
+	{
+
+	}
+	else if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE && (sw > 1.0))
+	{
+	}
+	else if (dm & ENESIM_SHAPE_DRAW_MODE_FILL)
+	{
+
+	}
+
 	/* TODO the rendering of a stroke+fill shape is a two step, we need to
 	 * change how the opengl backend works to instead of expecting
 	 * a list of shaders, expect a list of programs. so the common
 	 * part knows how to render in multiple step a renderer
 	 */
 	*shader_setup = _path_opengl_shader_setup;
-	*draw = _path_opengl_draw;
+	*draw = _path_opengl_fill_or_stroke_draw;
 	*programs = _path_programs;
 	*num_programs = 1;
 
