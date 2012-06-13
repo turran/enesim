@@ -71,10 +71,10 @@ typedef Eina_Bool (*Enesim_Renderer_Shape_OpenGL_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Define_Geometry *define_geomery,
+		Enesim_Renderer_OpenGL_Draw *define_geomery,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_shaders,
-		Enesim_Renderer_OpenGL_Shader **shaders,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***shaders,
 		Enesim_Error **error);
 
 typedef void (*Enesim_Renderer_Shape_Feature_Get)(Enesim_Renderer *r, Enesim_Shape_Feature *features);

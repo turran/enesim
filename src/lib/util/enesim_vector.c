@@ -71,6 +71,7 @@ Enesim_Point * enesim_point_new_from_coords(double x, double y)
 	thiz = enesim_point_new();
 	thiz->x = x;
 	thiz->y = y;
+	thiz->z = 0;
 
 	return thiz;
 }
@@ -104,6 +105,7 @@ void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, dou
 		p = eina_list_data_get(l);
 		tmp.x = x;
 		tmp.y = y;
+		tmp.z = 0;
 		if (_points_equal(&tmp, p, thiz->threshold))
 			return;
 	}
@@ -122,6 +124,7 @@ void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, do
 		p = eina_list_data_get(thiz->points);
 		tmp.x = x;
 		tmp.y = y;
+		tmp.z = 0;
 		if (_points_equal(&tmp, p, thiz->threshold))
 			return;
 	}

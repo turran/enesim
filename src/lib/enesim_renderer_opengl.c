@@ -19,6 +19,7 @@
 #include "enesim_private.h"
 /*
  * Shall we use only one framebuffer? One framebuffer per renderer?
+ * Add a program cache
  */
 /*============================================================================*
  *                                  Local                                     *
@@ -75,7 +76,7 @@ static void _opengl_rop_set(Enesim_Renderer *r)
 	switch (rop)
 	{
 		case ENESIM_BLEND:
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		break;
 
 		case ENESIM_FILL:
@@ -109,6 +110,7 @@ static Eina_Bool _opengl_shader_compile(GLenum pid,
 {
 	GLenum st;
 	GLenum sh;
+	size_t size;
 	int ok = 0;
 
 	/* FIXME for now we only support fragment shaders */
@@ -118,7 +120,8 @@ static Eina_Bool _opengl_shader_compile(GLenum pid,
 	st = GL_FRAGMENT_SHADER_ARB;
 	/* setup the shaders */
 	sh = glCreateShaderObjectARB(st);
-	glShaderSourceARB(sh, 1, (const GLcharARB **)&shader->source, (const GLint *)&shader->size);
+	size = strlen(shader->source);
+	glShaderSourceARB(sh, 1, (const GLcharARB **)&shader->source, (const GLint *)&size);
 	/* compile it */
 	glCompileShaderARB(sh);
 	glGetObjectParameterivARB(sh, GL_OBJECT_COMPILE_STATUS_ARB, &ok);
@@ -167,8 +170,8 @@ static Eina_Bool _opengl_compiled_program_new(
 	cp->num_shaders = p->num_shaders;
 	cp->shaders = calloc(cp->num_shaders, sizeof(GLenum));
 	cp->id = glCreateProgramObjectARB();
+
 	/* compile every shader */
-	
 	for (i = 0; i < p->num_shaders; i++)
 	{
 		Enesim_Renderer_OpenGL_Shader *shader;
@@ -202,6 +205,7 @@ static Eina_Bool _opengl_compiled_program_new(
 		}
 	}
 
+	glUseProgramObjectARB(0);
 	return EINA_TRUE;
 
 error:
@@ -288,8 +292,8 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Renderer_OpenGL_Program *programs;
-	Enesim_Renderer_OpenGL_Define_Geometry define_geometry;
+	Enesim_Renderer_OpenGL_Program **programs;
+	Enesim_Renderer_OpenGL_Draw draw;
 	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	GLenum status;
@@ -307,16 +311,21 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	/* do the setup */
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
 	if (!r->descriptor.opengl_setup(r, states, s,
-			&define_geometry,
+			&draw,
 			&shader_setup,
-			&programs, &num, error))
+			&num, &programs, error))
 		return EINA_FALSE;
+
+	if (!draw)
+	{
+		return EINA_FALSE;
+	}
 
 	/* FIXME we need to know if we should create, compile and link the programs
 	 * again or not .... */
 
 	/* store the data returned by the setup */
-	rdata->define_geometry = define_geometry;
+	rdata->draw = draw;
 	rdata->shader_setup = shader_setup;
 	rdata->programs = programs;
 
@@ -335,7 +344,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Renderer_OpenGL_Program *p;
 		Enesim_Renderer_OpenGL_Compiled_Program *cp;
 
-		p = &rdata->programs[i];
+		p = rdata->programs[i];
 		cp = &rdata->c_programs[i];
 		/* TODO check return value */
 		_opengl_compiled_program_new(cp, r, s, rdata, p);
@@ -390,21 +399,15 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	 */
 	_opengl_rop_set(r);
 	/* now draw */
-	if (rdata->define_geometry)
+	if (rdata->draw)
 	{
 		/* FIXME for now */
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
 		glOrtho(0, width, 0, height, -1, 1);
-		rdata->define_geometry(r, area);
+		rdata->draw(r, area, width, height);
 	}
-#if 0
-	else
-	{
-		_opengl_draw_own_geometry(rdata, area, width, height);
-	}
-#endif
 	/* FIXME we should define a post_render function
 	 * to put the state as it was before */
 	glUseProgramObjectARB(0);
@@ -433,4 +436,19 @@ void enesim_renderer_opengl_delete(Enesim_Renderer *r)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+#if 0
+EAPI void enesim_renderer_opengl_target_set(Enesim_Renderer *r, Enesim_Surface *s)
+{
 
+}
+
+EAPI void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s)
+{
+
+}
+
+EAPI void enesim_renderer_opengl_compile_program(Enesim_Renderer *r ...)
+{
+
+}
+#endif

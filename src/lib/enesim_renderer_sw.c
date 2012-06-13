@@ -534,8 +534,8 @@ EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
-	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 	//ENESIM_MAGIC_CHECK_RENDERER(r);
+	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 	return sw_data->fill;
 }
 

@@ -167,7 +167,7 @@ AM_CONDITIONAL(HAVE_OPENCL, [test "x$build_opencl" = "xyes"])
 
 dnl Check for opengl
 LIBS_save=${LIBS}
-LIBS="${LIBS} -lGL"
+LIBS="${LIBS} -lGL -lGLU"
 AC_LINK_IFELSE(
   [
    AC_LANG_PROGRAM(
@@ -181,7 +181,7 @@ glGenFramebuffersEXT(0, NULL);
   ],
   [
    build_opengl="yes"
-   opengl_libs="-lGL"
+   opengl_libs="-lGL -lGLU"
   ],
   [build_opengl="no"])
 LIBS=${LIBS_save}
@@ -205,7 +205,7 @@ glGenFramebuffersEXT(0, NULL);
     ],
     [
      build_opengl="yes"
-     opengl_libs="-lopengl32"
+     opengl_libs="-lopengl32 -lGLU"
     ],
     [build_opengl="no"])
   LIBS=${LIBS_save}

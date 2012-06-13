@@ -36,9 +36,9 @@ typedef struct _Enesim_Renderer_OpenGL_Compiled_Program
 typedef struct _Enesim_Renderer_OpenGL_Data
 {
 	/* data fetch on the setup */
-	Enesim_Renderer_OpenGL_Define_Geometry define_geometry;
+	Enesim_Renderer_OpenGL_Draw draw;
 	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
-	Enesim_Renderer_OpenGL_Program *programs;
+	Enesim_Renderer_OpenGL_Program **programs;
 	int num_programs;
 	/* generated */
 	Enesim_Renderer_OpenGL_Compiled_Program *c_programs;

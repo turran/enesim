@@ -59,25 +59,58 @@ static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
 }
 
 #if BUILD_OPENGL
+
+/* the only shader */
+static Enesim_Renderer_OpenGL_Shader _stripes_shader = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "stripes",
+	/* .source	= */
+#include "enesim_renderer_stripes.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_stripes_shaders[] = {
+	&_stripes_shader,
+	NULL,
+};
+
+/* the only program */
+static Enesim_Renderer_OpenGL_Program _stripes_program = {
+	/* .name 	= */ "stripes",
+	/* .shaders 	= */ _stripes_shaders,
+	/* .num_shaders	= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program *_stripes_programs[] = {
+	&_stripes_program,
+	NULL,
+};
+
 static Eina_Bool _stripes_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Program *program,
 		Enesim_Renderer_OpenGL_Shader *shader)
 {
 	Enesim_Renderer_Stripes *thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer_OpenGL_Compiled_Program *cp;
 	int odd_color;
 	int even_color;
 	int odd_thickness;
 	int even_thickness;
 
  	thiz = _stripes_get(r);
+
+	if (strcmp(program->name, "stripes"))
+		return EINA_FALSE;
 	if (strcmp(shader->name, "stripes"))
 		return EINA_FALSE;
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	even_color = glGetUniformLocationARB(rdata->program, "stripes_even_color");
-	odd_color = glGetUniformLocationARB(rdata->program, "stripes_odd_color");
-	even_thickness = glGetUniformLocationARB(rdata->program, "stripes_even_thickness");
-	odd_thickness = glGetUniformLocationARB(rdata->program, "stripes_odd_thickness");
+	cp = &rdata->c_programs[0];
+	
+	even_color = glGetUniformLocationARB(cp->id, "stripes_even_color");
+	odd_color = glGetUniformLocationARB(cp->id, "stripes_odd_color");
+	even_thickness = glGetUniformLocationARB(cp->id, "stripes_even_thickness");
+	odd_thickness = glGetUniformLocationARB(cp->id, "stripes_odd_thickness");
 
 	glUniform4fARB(even_color,
 			argb8888_red_get(thiz->final_color1) / 255.0,
@@ -93,6 +126,37 @@ static Eina_Bool _stripes_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface
 	glUniform1i(odd_thickness, thiz->current.odd.thickness);
 
 	return EINA_TRUE;
+}
+
+static void _stripes_opengl_draw(Enesim_Renderer *r, const Eina_Rectangle *area, int w, int h)
+{
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	cp = &rdata->c_programs[0];
+	glUseProgramObjectARB(cp->id);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, 0, h, -1, 1);
+
+	glBegin(GL_QUADS);
+		glTexCoord2d(area->x, area->y);
+		glVertex2d(area->x, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y);
+		glVertex2d(area->x + area->w, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y + area->h);
+		glVertex2d(area->x + area->w, area->y + area->h);
+
+		glTexCoord2d(area->x, area->y + area->h);
+		glVertex2d(area->x, area->y + area->h);
+	glEnd();
 }
 #endif
 
@@ -520,32 +584,25 @@ static void _free(Enesim_Renderer *r)
 }
 
 #if BUILD_OPENGL
+
 static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
-		Enesim_Renderer_OpenGL_Shader **shaders,
+		Enesim_Renderer_OpenGL_Program ***programs,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Stripes *thiz;
-	Enesim_Renderer_OpenGL_Shader *shader;
 
  	thiz = _stripes_get(r);
 	if (!_stripes_state_setup(thiz, r)) return EINA_FALSE;
 
 	*shader_setup = _stripes_opengl_shader_setup;
-	*define_geometry = NULL;
+	*draw = _stripes_opengl_draw;
 
-	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
-	shader->type = ENESIM_SHADER_FRAGMENT;
-	shader->name = "stripes";
-	shader->source =
-	#include "enesim_renderer_stripes.glsl"
-	shader->size = strlen(shader->source);
-
-	*shaders = shader;
+	*programs = _stripes_programs;
 	*num_shaders = 1;
 
 	return EINA_TRUE;

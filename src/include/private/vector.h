@@ -18,10 +18,14 @@
 #ifndef VECTOR_H_
 #define VECTOR_H_
 
+/* The z is required for the gl backend
+ * to avoid allocating a new GLdouble[3]
+ */
 typedef struct _Enesim_Point
 {
 	double x;
 	double y;
+	double z;
 } Enesim_Point;
 
 typedef struct _Enesim_Line

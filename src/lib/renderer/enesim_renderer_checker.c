@@ -471,7 +471,7 @@ static void _checker_hints(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
@@ -485,14 +485,13 @@ static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 	if (!_checker_state_setup(thiz, state)) return EINA_FALSE;
 
 	*shader_setup = _checker_opengl_shader_setup;
-	*define_geometry = NULL;
+	*draw = NULL;
 
 	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
 	shader->type = ENESIM_SHADER_FRAGMENT;
 	shader->name = "checker";
 	shader->source =
 	#include "enesim_renderer_checker.glsl"
-	shader->size = strlen(shader->source);
 
 	*shaders = shader;
 	*num_shaders = 1;

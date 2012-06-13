@@ -252,10 +252,10 @@ static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_shaders,
-		Enesim_Renderer_OpenGL_Shader **shaders,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Shader ***programs,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -268,8 +268,8 @@ static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 	sstates[ENESIM_STATE_PAST] = &thiz->past;
 
 	return thiz->opengl_setup(r, states, sstates, s, 
-			define_geometry, shader_setup, num_shaders,
-			shaders, error);
+			draw, shader_setup, num_programs,
+			programs, error);
 }
 
 static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,

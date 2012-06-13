@@ -1433,7 +1433,7 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Define_Geometry *define_geomery,
+		Enesim_Renderer_OpenGL_Draw *define_geomery,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Shader **shaders,
@@ -1456,7 +1456,6 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 		"#version 120\n"
 		"#extension GL_EXT_geometry_shader4 : enable\n"
 	#include "enesim_renderer_rectangle.glsl"
-	shader->size = strlen(shader->source);
 
 	/* FIXME for now we should use the background renderer for the color */
 	/* if we have a renderer set use that one but render into another texture
@@ -1467,7 +1466,7 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 	shader->name = "stripes";
 	shader->source = 
 	#include "enesim_renderer_stripes.glsl"
-	shader->size = strlen(shader->source);
+	;
 
 	return EINA_TRUE;
 }

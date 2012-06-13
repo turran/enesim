@@ -20,6 +20,10 @@
 #include "private/shape.h"
 #include "private/rasterizer.h"
 #include "libargb.h"
+
+#if BUILD_OPENGL
+#include "GL/glut.h"
+#endif
 /**
  * TODO
  * - Use the threshold on the curve state
@@ -76,11 +80,28 @@ typedef struct _Enesim_Renderer_Path_Stroke_State
 	int count;
 } Enesim_Renderer_Path_Stroke_State;
 
+#if 0
+typedef enum _Enesim_Renderer_Path_OpenGL_Type
+{
+	ENESIM_PATH_FILL_DIRECT,
+	ENESIM_PATH_STROKE_DIRECT,
+	ENESIM_PATH_STROKE_DIRECT,
+} Enesim_Renderer_Path_OpenGL_Type;
+#endif
+
+#if BUILD_OPENGL
+typedef struct _Enesim_Renderer_Path_OpenGL_Polygon
+{
+	GLenum type;
+	Enesim_Polygon *polygon;
+} Enesim_Renderer_Path_OpenGL_Polygon;
+
 typedef struct _Enesim_Renderer_Path_OpenGL_Figure
 {
-	Eina_List *vertices;
+	Eina_List *polygons;
 	Enesim_Surface *tmp;
 	Enesim_Surface *renderer_s;
+	Eina_Bool needs_tesselate : 1;
 } Enesim_Renderer_Path_OpenGL_Figure;
 
 typedef struct _Enesim_Renderer_Path_OpenGL
@@ -91,6 +112,7 @@ typedef struct _Enesim_Renderer_Path_OpenGL
 	Enesim_Renderer_Path_OpenGL_Figure stroke;
 	Enesim_Renderer_Path_OpenGL_Figure fill;
 } Enesim_Renderer_Path_OpenGL;
+#endif
 
 typedef struct _Enesim_Renderer_Path
 {
@@ -98,7 +120,9 @@ typedef struct _Enesim_Renderer_Path
 	/* properties */
 	Eina_List *commands;
 	/* private */
+#if BUILD_OPENGL
 	Enesim_Renderer_Path_OpenGL gl;
+#endif
 	/* TODO put the below data into a path_sw struct */
 	Enesim_Figure *fill_figure;
 	Enesim_Figure *stroke_figure;
@@ -109,7 +133,6 @@ typedef struct _Enesim_Renderer_Path
 	/* internal stuff */
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
-	Eina_Bool needs_setup : 1; /* FIXME the changed is not enough */
 } Enesim_Renderer_Path;
 
 static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
@@ -685,8 +708,157 @@ static void _path_span(Enesim_Renderer *r,
 }
 
 #if BUILD_OPENGL
+
+/* the only shader */
+static Enesim_Renderer_OpenGL_Shader _path_shader = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "path",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_ambient.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_path_shaders[] = {
+	&_path_shader,
+	NULL,
+};
+
+/* the only program */
+static Enesim_Renderer_OpenGL_Program _path_program = {
+	/* .name 	= */ "path",
+	/* .shaders 	= */ _path_shaders,
+	/* .num_shaders	= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program *_path_programs[] = {
+	&_path_program,
+	NULL,
+};
+
+static void _path_opengl_figure_clear(Enesim_Renderer_Path_OpenGL_Figure *f)
+{
+	if (f->polygons)
+	{
+		Enesim_Renderer_Path_OpenGL_Polygon *p;
+
+		EINA_LIST_FREE(f->polygons, p)
+		{
+			enesim_polygon_delete(p->polygon);
+			free(p);
+		}
+		f->polygons = NULL;
+	}
+}
+/*----------------------------------------------------------------------------*
+ *                            Tesselator callbacks                            *
+ *----------------------------------------------------------------------------*/
+static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
+{
+	Enesim_Renderer_Path_OpenGL_Figure *f = data;
+	Enesim_Renderer_Path_OpenGL_Polygon *p;
+	Enesim_Point *pt = vertex;
+	Eina_List *l;
+
+	/* get the last polygon */
+	l = eina_list_last(f->polygons);
+	p = eina_list_data_get(l);
+
+	if (!p) return;
+
+	/* add another vertex */
+	printf("adding vertex at %g %g %g\n", pt->x, pt->y, pt->z);
+	enesim_polygon_point_append_from_coords(p->polygon, pt->x, pt->y);
+	glVertex3f(pt->x, pt->y, 0.0);
+}
+
+static void _path_opengl_combine_cb(GLdouble coords[3], 
+		GLdouble *vertex_data[4],
+		GLfloat weight[4], GLdouble **dataOut,
+		void *data)
+{
+	printf("TODO combine!\n");
+#if 0
+	GLdouble *vertex;
+	int i;
+	vertex = (GLdouble *) malloc(6 * sizeof(GLdouble));
+	vertex[0] = coords[0];
+	vertex[1] = coords[1];
+	vertex[2] = coords[2];
+	for (i = 3; i < 7; i++)
+	vertex[i] = weight[0] * vertex_data[0][i] 
+		  + weight[1] * vertex_data[1][i]
+		  + weight[2] * vertex_data[2][i] 
+		  + weight[3] * vertex_data[3][i];
+	*dataOut = vertex;
+#endif
+}
+
+static void _path_opengl_begin_cb(GLenum which, void *data)
+{
+	Enesim_Renderer_Path_OpenGL_Polygon *p;
+	Enesim_Renderer_Path_OpenGL_Figure *f = data;
+
+	/* add another polygon */
+	p = calloc(1, sizeof(Enesim_Renderer_Path_OpenGL_Polygon));
+	p->type = which;
+	p->polygon = enesim_polygon_new();
+	f->polygons = eina_list_append(f->polygons, p);
+
+	glBegin(which);
+}
+
+static void _path_opengl_end_cb(void *data)
+{
+	glEnd();
+}
+
+static void _path_opengl_error_cb(GLenum errno, void *data)
+{
+}
+
+static void _path_opengl_tesselate(Enesim_Renderer_Path_OpenGL_Figure *glf,
+		Enesim_Figure *f)
+{
+	Enesim_Polygon *p;
+	Eina_List *l1;
+	GLUtesselator *t;
+
+	_path_opengl_figure_clear(glf);
+
+	/* generate the figures */
+	/* TODO we could use the tesselator directly on our own vertex generator? */
+	t = gluNewTess();
+	gluTessCallback(t, GLU_TESS_VERTEX_DATA, &_path_opengl_vertex_cb);
+	gluTessCallback(t, GLU_TESS_BEGIN_DATA, &_path_opengl_begin_cb);
+	gluTessCallback(t, GLU_TESS_END_DATA, &_path_opengl_end_cb);
+	gluTessCallback(t, GLU_TESS_COMBINE_DATA, &_path_opengl_combine_cb); 
+	gluTessCallback(t, GLU_TESS_ERROR_DATA, &_path_opengl_error_cb); 
+
+	gluTessBeginPolygon(t, glf);
+	EINA_LIST_FOREACH (f->polygons, l1, p)
+	{
+		Enesim_Point *pt;
+		Eina_List *l2;
+		Eina_List *last;
+
+		last = eina_list_last(p->points);
+		gluTessBeginContour(t);
+		EINA_LIST_FOREACH(p->points, l2, pt)
+		{
+			//if (last == l2)
+			//	break;
+			gluTessVertex(t, (GLdouble *)pt, pt);
+		}
+		gluTessEndContour(t);
+	}
+	gluTessEndPolygon(t);
+	glf->needs_tesselate = EINA_FALSE;
+	gluDeleteTess(t);
+}
+
 static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Renderer_OpenGL_Shader *shader)
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Program *program,
+		Enesim_Renderer_OpenGL_Shader *shader)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_OpenGL *gl;
@@ -708,9 +880,20 @@ static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _path_opengl_define_geometry(Enesim_Renderer *r,
-		const Eina_Rectangle *area)
+static void _path_opengl_draw(Enesim_Renderer *r,
+		const Eina_Rectangle *area, int w, int h)
 {
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer_Path_OpenGL *gl;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+
+	thiz = _path_get(r);
+	gl = &thiz->gl;
+	/* Just define the geometry from the fill figure */
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	cp = &rdata->c_programs[0];
+	//glUseProgramObjectARB(cp->id);
 	/* TODO
 	 * check if we are doing fill + stroke
 	 * in that case the geometry is only the bounding box
@@ -720,7 +903,20 @@ static void _path_opengl_define_geometry(Enesim_Renderer *r,
 	 * into another texture and use a fragment shader that reads from
 	 * that texture, else, use the classic color fragment
 	 */
-	
+
+	glEnable(GL_POLYGON_SMOOTH);
+	glColor3f(1.0, 0.0, 0.0);
+	/* check if we need to tesselate again */
+	if (gl->fill.needs_tesselate)
+	{
+		_path_opengl_tesselate(&gl->fill, thiz->fill_figure);
+	}
+	/* if not, just use the cached vertices */
+	else
+	{
+		
+	}
+#if 0	
 	/* FIXME for now */
 	printf("define geometry! %d %d %d %d\n", area->x, area->y, area->w, area->h);
 	glBegin(GL_QUADS);
@@ -729,7 +925,23 @@ static void _path_opengl_define_geometry(Enesim_Renderer *r,
 		glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
 		glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
 	glEnd();
+#endif
 }
+
+#if 0
+static void _path_opengl_stroke_direct_draw(Enesim_Renderer *r,
+		const Eina_Rectangle *area, int w, int h)
+{
+
+}
+
+static void _path_opengl_fill_stroke_direct_draw(Enesim_Renderer *r,
+		const Eina_Rectangle *area, int w, int h)
+{
+
+}
+#endif
+
 #endif
 
 static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
@@ -813,6 +1025,10 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 	thiz->last_join = join;
 	thiz->last_cap = cap;
 	thiz->last_matrix = *geometry_transformation;
+#if BUILD_OPENGL
+	thiz->gl.fill.needs_tesselate = EINA_TRUE;
+	thiz->gl.stroke.needs_tesselate = EINA_TRUE;
+#endif
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -1015,10 +1231,10 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_shaders,
-		Enesim_Renderer_OpenGL_Shader **shaders,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
@@ -1030,103 +1246,28 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
  	thiz = _path_get(r);
 	gl = &thiz->gl;
 
+	/* generate the figures */
+	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+			css->stroke.join, css->stroke.cap))
+	{
+		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
+				&cs->geometry_transformation, cs->sx, cs->sy,
+				css->stroke.join, css->stroke.cap);
+		thiz->changed = EINA_FALSE;
+	}
+
 	/* TODO the rendering of a stroke+fill shape is a two step, we need to
 	 * change how the opengl backend works to instead of expecting
 	 * a list of shaders, expect a list of programs. so the common
 	 * part knows how to render in multiple step a renderer
 	 */
 	*shader_setup = _path_opengl_shader_setup;
-	*define_geometry = _path_opengl_define_geometry;
-
-	/* FIXME for now, we only do the fill */
-	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
-	shader->type = ENESIM_SHADER_FRAGMENT;
-	shader->name = "background";
-	shader->source =
-	#include "enesim_renderer_background.glsl"
-	;
-	shader->size = strlen(shader->source);
-
-	*shaders = shader;
-	*num_shaders = 1;
+	*draw = _path_opengl_draw;
+	*programs = _path_programs;
+	*num_programs = 1;
 
 	gl->final_color = css->fill.color;
 
-	/* TODO generate the figures, but use the tesselator directly and store the vertices */
-	/*
-	 * On the gl version use the tesselator to generate the triangles and pass them
-	 * to the goemetry shader. Only tesselate again whenever something has changed
-	 */
-#if 0
-	tobj = gluNewTess();
-	gluTessCallback(tobj, GLU_TESS_VERTEX,
-			   (GLvoid (*) ()) &glVertex3dv);
-	gluTessCallback(tobj, GLU_TESS_BEGIN,
-			   (GLvoid (*) ()) &beginCallback);
-	gluTessCallback(tobj, GLU_TESS_END,
-			   (GLvoid (*) ()) &endCallback);
-	gluTessCallback(tobj, GLU_TESS_ERROR,
-			   (GLvoid (*) ()) &errorCallback);
-
-	/*  new callback routines registered by these calls */
-	void vertexCallback(GLvoid *vertex)
-	{
-		const GLdouble *pointer;
-
-		pointer = (GLdouble *) vertex;
-		glColor3dv(pointer+3);
-		glVertex3dv(vertex);
-	}
-
-	void combineCallback(GLdouble coords[3], 
-			     GLdouble *vertex_data[4],
-			     GLfloat weight[4], GLdouble **dataOut )
-	{
-		GLdouble *vertex;
-		int i;
-
-		vertex = (GLdouble *) malloc(6 * sizeof(GLdouble));
-		vertex[0] = coords[0];
-		vertex[1] = coords[1];
-		vertex[2] = coords[2];
-		for (i = 3; i < 7; i++)
-		vertex[i] = weight[0] * vertex_data[0][i] 
-			  + weight[1] * vertex_data[1][i]
-			  + weight[2] * vertex_data[2][i] 
-			  + weight[3] * vertex_data[3][i];
-		*dataOut = vertex;
-	}
-
-	/*  the callback routines registered by gluTessCallback() */
-
-	void beginCallback(GLenum which)
-	{
-	}
-
-	void endCallback(void)
-	{
-	}
-	// describe non-convex polygon
-	gluTessBeginPolygon(tess, user_data);
-		// first contour
-		gluTessBeginContour(tess);
-		gluTessVertex(tess, coords[0], vertex_data);
-		...
-		gluTessEndContour(tess);
-
-		// second contour
-		gluTessBeginContour(tess);
-		gluTessVertex(tess, coords[5], vertex_data);
-		...
-		gluTessEndContour(tess);
-		...
-	gluTessEndPolygon(tess);
-
-#endif
-	/* after tesselating we should have a structure with our triangles that we should
-	 * pass to the geometry shader through uniforms
-	 * the shader should only emit primitives and vertices
-	 */
 	return EINA_TRUE;
 }
 

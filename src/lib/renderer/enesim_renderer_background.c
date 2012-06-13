@@ -60,20 +60,50 @@ static void _background_span(Enesim_Renderer *r,
 }
 
 #if BUILD_OPENGL
+
+/* the only shader */
+static Enesim_Renderer_OpenGL_Shader _background_shader = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "background",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_ambient.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_background_shaders[] = {
+	&_background_shader,
+	NULL,
+};
+
+/* the only program */
+static Enesim_Renderer_OpenGL_Program _background_program = {
+	/* .name 	= */ "background",
+	/* .shaders 	= */ _background_shaders,
+	/* .num_shaders	= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program *_background_programs[] = {
+	&_background_program,
+	NULL,
+};
+
 static Eina_Bool _background_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Program *program,
 		Enesim_Renderer_OpenGL_Shader *shader)
 {
 	Enesim_Renderer_Background *thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer_OpenGL_Compiled_Program *cp;
 	int final_color;
 
  	thiz = _background_get(r);
+	if (strcmp(program->name, "background"))
+		return EINA_FALSE;
 	if (strcmp(shader->name, "background"))
 		return EINA_FALSE;
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
+	cp = &rdata->c_programs[0];
+	final_color = glGetUniformLocationARB(cp->id, "ambient_final_color");
 	glUniform4fARB(final_color,
 			argb8888_red_get(thiz->final_color) / 255.0,
 			argb8888_green_get(thiz->final_color) / 255.0,
@@ -81,6 +111,37 @@ static Eina_Bool _background_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surf
 			argb8888_alpha_get(thiz->final_color) / 255.0);
 
 	return EINA_TRUE;
+}
+
+static void _background_opengl_draw(Enesim_Renderer *r, const Eina_Rectangle *area, int w, int h)
+{
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	cp = &rdata->c_programs[0];
+	glUseProgramObjectARB(cp->id);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, 0, h, -1, 1);
+
+	glBegin(GL_QUADS);
+		glTexCoord2d(area->x, area->y);
+		glVertex2d(area->x, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y);
+		glVertex2d(area->x + area->w, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y + area->h);
+		glVertex2d(area->x + area->w, area->y + area->h);
+
+		glTexCoord2d(area->x, area->y + area->h);
+		glVertex2d(area->x, area->y + area->h);
+	glEnd();
 }
 #endif
 
@@ -179,59 +240,24 @@ static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 #if BUILD_OPENGL
 
-/* the only shader */
-static Enesim_Renderer_OpenGL_Shader _background_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
-	/* .name 	= */ "background",
-	/* .source	= */
-#include "enesim_renderer_background.glsl"
-};
-
-static Enesim_Renderer_OpenGL_Shader *_background_shaders[] = {
-	&_background_shader,
-	NULL,
-};
-
-/* the only program */
-static Enesim_Renderer_OpenGL_Program _background_program = {
-	/* .name 	= */ "background",
-	/* .shaders 	= */ _background_shaders,
-	/* .num_shaders	= */ 1,
-};
-
-static Enesim_Renderer_OpenGL_Program *_background_programs[] = {
-	&_background_program,
-	NULL,
-};
-
 static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Define_Geometry *define_geometry,
+		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_shaders,
-		Enesim_Renderer_OpenGL_Shader **shaders,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Background *thiz;
-	Enesim_Renderer_OpenGL_Shader *shader;
 
  	thiz = _background_get(r);
 	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
 
 	*shader_setup = _background_opengl_shader_setup;
-	*define_geometry = NULL;
-
-	shader = calloc(1, sizeof(Enesim_Renderer_OpenGL_Shader));
-	shader->type = ENESIM_SHADER_FRAGMENT;
-	shader->name = "background";
-	shader->source =
-	#include "enesim_renderer_background.glsl"
-	;
-	shader->size = strlen(shader->source);
-
-	*shaders = shader;
-	*num_shaders = 1;
+	*draw = _background_opengl_draw;
+	*num_programs = 1;
+	*programs = _background_programs;
 
 	return EINA_TRUE;
 }
@@ -252,14 +278,12 @@ static void _background_flags(Enesim_Renderer *r, const Enesim_Renderer_State *s
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
-
 }
 
 static void _background_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_COLORIZE;
-
 }
 
 static void _background_free(Enesim_Renderer *r)
