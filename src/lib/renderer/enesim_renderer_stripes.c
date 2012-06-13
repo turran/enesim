@@ -128,7 +128,8 @@ static Eina_Bool _stripes_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface
 	return EINA_TRUE;
 }
 
-static void _stripes_opengl_draw(Enesim_Renderer *r, const Eina_Rectangle *area, int w, int h)
+static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;

@@ -211,7 +211,8 @@ typedef struct _Enesim_Renderer_OpenGL_Program
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Shader_Setup)(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Program *program,
 		Enesim_Renderer_OpenGL_Shader *shader);
-typedef void (*Enesim_Renderer_OpenGL_Draw)(Enesim_Renderer *r, const Eina_Rectangle *area, int dw, int dh);
+typedef void (*Enesim_Renderer_OpenGL_Draw)(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int dw, int dh);
 
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],

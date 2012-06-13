@@ -873,32 +873,53 @@ static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
+
+static void _path_opengl_figure_draw(Enesim_Renderer *r,
+		Enesim_Renderer_Path_OpenGL_Figure *gf,
+		Enesim_Figure *f,
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Compiled_Program *cp)
+{
+	Enesim_Buffer_OpenGL_Data *sdata;
+	Enesim_Renderer_OpenGL_Data *rdata;
+
+	sdata = enesim_surface_backend_data_get(s);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+
+	/* run it on the renderer fbo */
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, sdata->texture, 0);
+	if (cp)
+	{
+		/* get the compiled shader from the renderer backend data */
+		glUseProgramObjectARB(cp->id);
+	}
+	/* check if we need to tesselate again */
+	if (gf->needs_tesselate)
+	{
+		_path_opengl_tesselate(gf, f);
+	}
+	/* if not, just use the cached vertices */
+	else
+	{
+		
+	}
+}
+
 static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
+		Enesim_Surface *s,
 		const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_OpenGL *gl;
 	Enesim_Renderer_Path_OpenGL_Figure *gf;
-	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;
 	Enesim_Shape_Draw_Mode dm;
 	Enesim_Figure *f;
 
 	thiz = _path_get(r);
 	gl = &thiz->gl;
-	/* Just define the geometry from the fill figure */
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	cp = &rdata->c_programs[0];
-	//glUseProgramObjectARB(cp->id);
-	/* TODO
-	 * check if we are doing fill + stroke
-	 * in that case the geometry is only the bounding box
-	 * in case of only fill or only stroke then the geometry
-	 * is the matching figure
-	 * in case of fill/stroke renderers, those must be rendered previously
-	 * into another texture and use a fragment shader that reads from
-	 * that texture, else, use the classic color fragment
-	 */
 
 	enesim_renderer_shape_draw_mode_get(r, &dm);
 	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
@@ -914,21 +935,13 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 
 	glEnable(GL_POLYGON_SMOOTH);
 	glColor3f(1.0, 0.0, 0.0);
-	/* check if we need to tesselate again */
-	if (gf->needs_tesselate)
-	{
-		_path_opengl_tesselate(gf, f);
-	}
-	/* if not, just use the cached vertices */
-	else
-	{
-		
-	}
+	/* TODO later we might need to use a compiled program */
+	_path_opengl_figure_draw(r, gf, f, s, NULL);
 }
 
 #if 0
 static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
-		const Eina_Rectangle *area, int w, int h)
+		Enesim_Surface *s, const Eina_Rectangle *area, int w, int h)
 {
 	/* for fill and stroke we need to draw the stroke first on a
 	 * temporary fbo, then the fill into a temporary fbo too
@@ -936,6 +949,10 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	 * fbos as a source. If the pixel is different than transparent
 	 * then multiply that color with the current color
 	 */
+	/* check if we have a temporary buffer for stroking */
+	/* check if we have a temporary buffer for filling */
+	/* use glUniformli and glActiveTexute/glBindTexture to set the samplers */
+	/* make the shader use both samplers to render the final result to */
 	/* use the area to render boths paths */
 	printf("define geometry! %d %d %d %d\n", area->x, area->y, area->w, area->h);
 	glBegin(GL_QUADS);

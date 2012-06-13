@@ -406,7 +406,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 		glLoadIdentity();
 
 		glOrtho(0, width, 0, height, -1, 1);
-		rdata->draw(r, area, width, height);
+		rdata->draw(r, s, area, width, height);
 	}
 	/* FIXME we should define a post_render function
 	 * to put the state as it was before */
