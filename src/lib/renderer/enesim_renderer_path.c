@@ -22,7 +22,7 @@
 #include "libargb.h"
 
 #if BUILD_OPENGL
-#include "GL/glut.h"
+#include "GL/glu.h"
 #endif
 /**
  * TODO
