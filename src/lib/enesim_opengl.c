@@ -15,38 +15,45 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "enesim_private.h"
-
-#include "enesim_main.h"
-#include "enesim_pool.h"
-#include "enesim_buffer.h"
-
-#include "private/converter.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static void _1d_a8_none_argb8888(Enesim_Buffer_Sw_Data *data,
-		uint32_t len, void *sdata)
-{
-	uint8_t *dst = data->a8.plane0;
-	uint8_t *src = sdata;
-
-	while (len--)
-	{
-		*dst = *src >> 24;
-
-		dst++;
-		src++;
-	}
-}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void enesim_converter_a8_init(void)
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+#if 0
+EAPI void enesim_renderer_opengl_compile_program(Enesim_Renderer *r ...)
 {
-	enesim_converter_span_register(
-			ENESIM_CONVERTER_1D(_1d_a8_none_argb8888),
-			ENESIM_BUFFER_FORMAT_A8,
-			ENESIM_ANGLE_0,
-			ENESIM_FORMAT_ARGB8888);
+
+}
+#endif
+
+EAPI void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww, int wh)
+{
+	GLint x;
+	GLint y;
+	GLsizei w;
+	GLsizei h;
+
+	if (!area)
+	{
+		enesim_opengl_clip_unset();
+		return;
+	}
+
+	x = ww - area->x;
+	y = hh - area->y;
+	w = area->w;
+	h = area->h;
+
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(x, y, w, h);
+}
+
+EAPI void enesim_opengl_clip_unset(void)
+{
+	glDisable(GL_SCISSOR_TEST);
 }

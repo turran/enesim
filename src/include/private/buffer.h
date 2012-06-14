@@ -25,16 +25,6 @@
 			EINA_MAGIC_FAIL(d, ENESIM_MAGIC_BUFFER);\
 	} while(0)
 
-#if BUILD_OPENCL
-typedef struct _Enesim_Buffer_OpenCL_Data
-{
-	cl_mem mem;
-	cl_context context;
-	cl_device_id device;
-	cl_command_queue queue;
-} Enesim_Buffer_OpenCL_Data;
-#endif
-
 struct _Enesim_Buffer
 {
 	EINA_MAGIC

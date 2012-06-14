@@ -15,9 +15,15 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
 
+#include "enesim_main.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_converter.h"
+
+#include "private/converter.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

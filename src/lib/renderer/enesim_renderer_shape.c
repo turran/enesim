@@ -15,8 +15,20 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "enesim_main.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+
+#include "private/renderer.h"
 #include "private/shape.h"
 /* TODO
  * - whenever we need the damage area of a shape, we need to check if
@@ -134,7 +146,7 @@ static inline Eina_Bool _common_changed(const Enesim_Renderer_State *current,
  * to our own bounds
  */
 static Eina_Bool _shape_damage_cb(Enesim_Renderer *r,
-		Eina_Rectangle *area, Eina_Bool past, void *data)
+		const Eina_Rectangle *area, Eina_Bool past, void *data)
 {
 	Enesim_Renderer_Shape_Damage_Data *ddata = data;
 	Eina_Rectangle new_area = *area;
@@ -254,8 +266,6 @@ static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_programs,
-		Enesim_Renderer_OpenGL_Shader ***programs,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -268,8 +278,7 @@ static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 	sstates[ENESIM_STATE_PAST] = &thiz->past;
 
 	return thiz->opengl_setup(r, states, sstates, s, 
-			draw, shader_setup, num_programs,
-			programs, error);
+			draw, shader_setup, error);
 }
 
 static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
@@ -493,6 +502,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	pdescriptor.opencl_setup = _enesim_renderer_shape_opencl_setup;
 	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
 	pdescriptor.opencl_cleanup = descriptor->opencl_cleanup;
+	pdescriptor.opengl_initialize = descriptor->opengl_initialize;
 	pdescriptor.opengl_setup = _enesim_renderer_shape_opengl_setup;
 	pdescriptor.opengl_cleanup = descriptor->opengl_cleanup;
 

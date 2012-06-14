@@ -15,9 +15,24 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+#include "libargb.h"
+
+#include "enesim_main.h"
+#include "enesim_eina.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+
+#include "private/renderer.h"
 #include "private/shape.h"
+#include "private/vector.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

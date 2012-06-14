@@ -15,8 +15,13 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "enesim_main.h"
+#include "enesim_color.h"
+#include "enesim_compositor.h"
+
+#include "private/compositor.h"
 /*
  * TODO add a surface compositor too, like point (0D), span (1D) but a 2D one :)
  */

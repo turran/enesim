@@ -18,10 +18,22 @@
 #ifndef ENESIM_OPENCL_H_
 #define ENESIM_OPENCL_H_
 
-#include "Enesim.h"
 #include "CL/cl.h"
 
 #define ENESIM_OPENCL_KERNEL(k) #k
+
+typedef struct _Enesim_Renderer_OpenCL_Data
+{
+	cl_kernel kernel;
+} Enesim_Renderer_OpenCL_Data;
+
+typedef struct _Enesim_Buffer_OpenCL_Data
+{
+	cl_mem mem;
+	cl_context context;
+	cl_device_id device;
+	cl_command_queue queue;
+} Enesim_Buffer_OpenCL_Data;
 
 EAPI Enesim_Pool * enesim_pool_opencl_new(void);
 

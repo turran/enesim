@@ -16,8 +16,23 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "enesim_main.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_surface.h"
+#include "enesim_renderer.h"
+
+#include "Enesim_OpenGL.h"
+
+#include "private/pool.h"
+#include "private/buffer.h"
 
 /**
  * @todo

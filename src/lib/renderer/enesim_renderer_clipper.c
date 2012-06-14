@@ -15,8 +15,20 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "enesim_main.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+
+#include "private/renderer.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -76,7 +88,7 @@ static void _clipper_span(Enesim_Renderer *r,
  * to our own bounds
  */
 static Eina_Bool _clipper_damage_cb(Enesim_Renderer *r,
-		Eina_Rectangle *area, Eina_Bool past, void *data)
+		const Eina_Rectangle *area, Eina_Bool past, void *data)
 {
 	Enesim_Renderer_Clipper_Damage_Data *ddata = data;
 	Eina_Rectangle new_area = *area;

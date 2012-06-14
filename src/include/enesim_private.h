@@ -22,47 +22,26 @@
 #include "config.h"
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
-#include <inttypes.h>
-#include <float.h>
-#include <fenv.h>
-/* TODO remove all assert statements */
-#include <assert.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <math.h>
-
-#if BUILD_PTHREAD
-#include <pthread.h>
+/* we need to include this pthreads headers before eina */
+#ifdef BUILD_PTHREAD
+# ifdef HAVE_SCHED_H
+#  include <sched.h>
+# endif
+# ifdef HAVE_PTHREAD_H
+#  include <pthread.h>
+# endif
+# ifdef HAVE_PTHREAD_NP_H
+#  include <pthread_np.h>
+# endif
+# ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+# endif
+# ifdef HAVE_SYS_CPUSET_H
+#  include <sys/cpuset.h>
+# endif
 #endif
 
-#if HAVE_SCHED_H
-#include <sched.h>
-#endif
-
-#if BUILD_OPENCL
-#include "Enesim_OpenCL.h"
-#endif
-
-#if BUILD_OPENGL
-#define GL_GLEXT_PROTOTYPES
-#include "Enesim_OpenGL.h"
-#include "GL/glext.h"
-#endif
-
-#ifdef ENESIM_DEFAULT_LOG_COLOR
-# undef ENESIM_DEFAULT_LOG_COLOR
-#endif
-#define ENESIM_DEFAULT_LOG_COLOR EINA_COLOR_LIGHTRED
-
-#define ERR(...) EINA_LOG_DOM_ERR(enesim_log_dom_global, __VA_ARGS__)
-#define WRN(...) EINA_LOG_DOM_WARN(enesim_log_dom_global, __VA_ARGS__)
-#define DBG(...) EINA_LOG_DOM_DBG(enesim_log_dom_global, __VA_ARGS__)
-extern int enesim_log_dom_global;
-
+/* the libargb needed macros */
 /* SIMD intrinsics */
 #ifdef EFL_HAVE_MMX
 #define LIBARGB_MMX 1
@@ -83,6 +62,22 @@ extern int enesim_log_dom_global;
 #endif
 
 #define LIBARGB_DEBUG 0
+
+/* dependencies */
+#include "Eina.h"
+
+#include <math.h>
+
+/* the log domains */
+#ifdef ENESIM_DEFAULT_LOG_COLOR
+# undef ENESIM_DEFAULT_LOG_COLOR
+#endif
+#define ENESIM_DEFAULT_LOG_COLOR EINA_COLOR_LIGHTRED
+
+#define ERR(...) EINA_LOG_DOM_ERR(enesim_log_dom_global, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(enesim_log_dom_global, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(enesim_log_dom_global, __VA_ARGS__)
+extern int enesim_log_dom_global;
 
 /* define here every renderer magic */
 #define ENESIM_RENDERER_BACKGROUND_MAGIC 0xe7e51430
@@ -116,18 +111,5 @@ extern int enesim_log_dom_global;
 #define ENESIM_RASTERIZER_BIFIGURE_MAGIC 0xe7e51462
 
 #define ENESIM_RENDERER_PROXY_MAGIC 0xe7e51463
-
-#include "private/vector.h"
-#include "private/curve.h"
-/* now the surface format backends */
-#include "private/format.h"
-//#include "private/format_argb8888_unpre.h"
-#include "private/compositor.h"
-#include "private/matrix.h"
-#include "private/renderer.h"
-#include "private/buffer.h"
-#include "private/pool.h"
-#include "private/surface.h"
-#include "private/converter.h"
 
 #endif

@@ -15,8 +15,13 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "enesim_eina.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+
+#include "private/matrix.h"
 /* TODO add a fixed point matrix too, to speed up the matrix_rotate sin/cos */
 /*============================================================================*
  *                                  Local                                     *

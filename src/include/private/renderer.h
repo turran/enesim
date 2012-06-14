@@ -51,11 +51,6 @@ void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
 
 #if BUILD_OPENCL
-typedef struct _Enesim_Renderer_OpenCL_Data
-{
-	cl_kernel kernel;
-} Enesim_Renderer_OpenCL_Data;
-
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,

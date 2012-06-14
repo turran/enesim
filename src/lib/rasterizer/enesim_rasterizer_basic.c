@@ -15,15 +15,27 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
-#include "private/rasterizer.h"
 #include "libargb.h"
+
+#include <math.h>
+
+#include "enesim_main.h"
+#include "enesim_eina.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_renderer.h"
+
+#include "private/vector.h"
+#include "private/rasterizer.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define MIN(a, b) a > b ? b : a
-
 /* TODO merge this with the bifigure */
 #define MUL4_SYM(x, y) \
  ( ((((((x) >> 16) & 0xff00) * (((y) >> 16) & 0xff00)) + 0xff0000) & 0xff000000) + \

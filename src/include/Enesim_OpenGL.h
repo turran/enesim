@@ -20,8 +20,10 @@
 
 #define ENESIM_OPENGL_SHADER(k) #k
 
-#include "Enesim.h"
+#define GL_GLEXT_PROTOTYPES
 #include "GL/gl.h"
+#include "GL/glu.h"
+#include "GL/glext.h"
 
 EAPI Enesim_Pool * enesim_pool_opengl_new(void);
 

@@ -52,7 +52,7 @@ typedef enum _Enesim_Renderer_Hint
  * @param past
  * @param data
  */
-typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, Eina_Rectangle *area, Eina_Bool past, void *data);
+typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, const Eina_Rectangle *area, Eina_Bool past, void *data);
 
 
 EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data);
@@ -206,6 +206,7 @@ typedef struct _Enesim_Renderer_OpenGL_Program
 	const char *name;
 	Enesim_Renderer_OpenGL_Shader **shaders;
 	int num_shaders;
+	/* FIXME the shader_setup should be placed here instead of the setup */
 } Enesim_Renderer_OpenGL_Program;
 
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Shader_Setup)(Enesim_Renderer *r, Enesim_Surface *s,
@@ -214,13 +215,14 @@ typedef Eina_Bool (*Enesim_Renderer_OpenGL_Shader_Setup)(Enesim_Renderer *r, Ene
 typedef void (*Enesim_Renderer_OpenGL_Draw)(Enesim_Renderer *r, Enesim_Surface *s,
 		const Eina_Rectangle *area, int dw, int dh);
 
+typedef Eina_Bool (*Enesim_Renderer_OpenGL_Initialize)(Enesim_Renderer *r,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs);
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_programs,
-		Enesim_Renderer_OpenGL_Program ***programs,
 		Enesim_Error **error);
 typedef void (*Enesim_Renderer_OpenGL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 
@@ -244,6 +246,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
 	/* opengl based functions */
+	Enesim_Renderer_OpenGL_Initialize opengl_initialize;
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* we should expand from here */

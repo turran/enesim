@@ -20,31 +20,21 @@
  * flag, so basically we cant use CPU_ZERO, CPU_SET, etc
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#ifdef BUILD_PTHREAD
-# ifdef HAVE_SCHED_H
-#  include <sched.h>
-# endif
-# ifdef HAVE_PTHREAD_H
-#  include <pthread.h>
-# endif
-# ifdef HAVE_PTHREAD_NP_H
-#  include <pthread_np.h>
-# endif
-# ifdef HAVE_SYS_PARAM_H
-#  include <sys/param.h>
-# endif
-# ifdef HAVE_SYS_CPUSET_H
-#  include <sys/cpuset.h>
-# endif
-#endif
-
-#include "Enesim.h"
 #include "enesim_private.h"
 
+#include "enesim_main.h"
+#include "enesim_eina.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+
+#include "private/renderer.h"
 
 /**
  * @todo

@@ -16,8 +16,14 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "enesim_main.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+
+#include "private/pool.h"
+#include "private/buffer.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

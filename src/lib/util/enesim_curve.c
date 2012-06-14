@@ -15,9 +15,9 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "private/curve.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

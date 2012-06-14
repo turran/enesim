@@ -15,8 +15,25 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+
+#include "enesim_main.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+
+#if BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#endif
+
+#include "private/buffer.h"
+#include "private/renderer.h"
 /*
  * Shall we use only one framebuffer? One framebuffer per renderer?
  * Add a program cache
@@ -24,6 +41,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Eina_Hash *_program_lut = NULL;
+
 static Eina_Bool _fragment_shader_support = EINA_FALSE;
 static Eina_Bool _geometry_shader_support = EINA_FALSE;
 
@@ -41,7 +60,6 @@ static Enesim_Renderer_OpenGL_Shader _vertex_shader = {
 	/* .type = 	*/ ENESIM_SHADER_VERTEX,
 	/* .name = 	*/ "vertex_passthrough",
 	/* .source =	*/ _vertex_passthrough,
-	/* .size =	*/ sizeof(_vertex_passthrough),
 };
 
 /* FIXME for debugging purposes */
@@ -190,22 +208,6 @@ static Eina_Bool _opengl_compiled_program_new(
 	/* now link */
 	if (!_opengl_compiled_program_link(cp))
 		goto error;
-	/* use this program and setup each shader */
-	glUseProgramObjectARB(cp->id);
-	for (i = 0; i < p->num_shaders; i++)
-	{
-		Enesim_Renderer_OpenGL_Shader *shader;
-
-		shader = p->shaders[i];
-		if (!rdata->shader_setup(r, s, p, shader))
-		{
-			printf("Cannot setup the shader\n");
-			i = p->num_shaders;
-			goto error;
-		}
-	}
-
-	glUseProgramObjectARB(0);
 	return EINA_TRUE;
 
 error:
@@ -292,13 +294,12 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Renderer_OpenGL_Program **programs;
 	Enesim_Renderer_OpenGL_Draw draw;
 	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	GLenum status;
-	int num;
 	int i;
+	int j;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -307,13 +308,38 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	{
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
+		if (r->descriptor.opengl_initialize)
+		{
+			Enesim_Renderer_OpenGL_Program **programs;
+			Enesim_Renderer_OpenGL_Compiled_Program *cp;
+			int num;
+
+			if (!r->descriptor.opengl_initialize(r, &num, &programs))
+				return EINA_FALSE;
+			rdata->programs = programs;
+			rdata->num_programs = num;
+
+			rdata->c_programs = calloc(rdata->num_programs, sizeof(GLenum));
+			for (i = 0; i < rdata->num_programs; i++)
+			{
+				Enesim_Renderer_OpenGL_Program *p;
+				Enesim_Renderer_OpenGL_Compiled_Program *cp;
+
+				p = rdata->programs[i];
+				cp = &rdata->c_programs[i];
+
+				/* TODO try to find the program */
+				/* TODO check return value */
+				_opengl_compiled_program_new(cp, r, s, rdata, p);
+			}
+		}
 	}
 	/* do the setup */
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
 	if (!r->descriptor.opengl_setup(r, states, s,
 			&draw,
 			&shader_setup,
-			&num, &programs, error))
+			error))
 		return EINA_FALSE;
 
 	if (!draw)
@@ -327,27 +353,28 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	/* store the data returned by the setup */
 	rdata->draw = draw;
 	rdata->shader_setup = shader_setup;
-	rdata->programs = programs;
 
-	/* FIXME for now we just free them */
-	for (i = 0; i < rdata->num_programs; i++)
-	{
-		Enesim_Renderer_OpenGL_Compiled_Program *cp;
-
-		cp = &rdata->c_programs[i];
-		_opengl_compiled_program_free(cp);
-	}
-	rdata->num_programs = num;
-	rdata->c_programs = calloc(rdata->num_programs, sizeof(GLenum));
-	for (i = 0; i < rdata->num_programs; i++)
+	/* use this program and setup each shader */
+	for (j = 0; j < rdata->num_programs; j++)
 	{
 		Enesim_Renderer_OpenGL_Program *p;
 		Enesim_Renderer_OpenGL_Compiled_Program *cp;
 
-		p = rdata->programs[i];
-		cp = &rdata->c_programs[i];
-		/* TODO check return value */
-		_opengl_compiled_program_new(cp, r, s, rdata, p);
+		p = rdata->programs[j];
+		cp = &rdata->c_programs[j];
+
+		glUseProgramObjectARB(cp->id);
+		for (i = 0; i < p->num_shaders; i++)
+		{
+			Enesim_Renderer_OpenGL_Shader *shader;
+
+			shader = p->shaders[i];
+			if (!rdata->shader_setup(r, s, p, shader))
+			{
+				printf("Cannot setup the shader\n");
+			}
+		}
+		glUseProgramObjectARB(0);
 	}
 
 	/* create the fbos */
@@ -415,6 +442,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 
 void enesim_renderer_opengl_init(void)
 {
+	_program_lut = eina_hash_string_superfast_new(NULL);
 	/* maybe we should add a hash to match between kernel name and program */
 	_opengl_extensions_setup();
 	printf("Fragment shader %d Geometry shader %d\n", _fragment_shader_support, _geometry_shader_support);
@@ -422,7 +450,7 @@ void enesim_renderer_opengl_init(void)
 
 void enesim_renderer_opengl_shutdown(void)
 {
-
+	/* TODO destroy the lut */
 }
 
 /* we need a way to destroy the renderer data
@@ -447,8 +475,4 @@ EAPI void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s)
 
 }
 
-EAPI void enesim_renderer_opengl_compile_program(Enesim_Renderer *r ...)
-{
-
-}
 #endif

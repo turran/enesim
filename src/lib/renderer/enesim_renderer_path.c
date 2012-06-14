@@ -15,15 +15,30 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
-#include "private/shape.h"
-#include "private/rasterizer.h"
 #include "libargb.h"
 
-#if BUILD_OPENGL
-#include "GL/glu.h"
+#include "enesim_main.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+
+#ifdef BUILD_OPENGL
+#include "Enesim_OpenGL.h"
 #endif
+
+#include "private/renderer.h"
+#include "private/shape.h"
+#include "private/vector.h"
+#include "private/rasterizer.h"
+#include "private/curve.h"
+
 /**
  * TODO
  * - Use the threshold on the curve state
@@ -877,19 +892,17 @@ static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r,
 static void _path_opengl_figure_draw(Enesim_Renderer *r,
 		Enesim_Renderer_Path_OpenGL_Figure *gf,
 		Enesim_Figure *f,
-		Enesim_Surface *s,
+		GLenum texture,
 		Enesim_Renderer_OpenGL_Compiled_Program *cp)
 {
-	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Renderer_OpenGL_Data *rdata;
 
-	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
 	/* run it on the renderer fbo */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, sdata->texture, 0);
+			GL_TEXTURE_2D, texture, 0);
 	if (cp)
 	{
 		/* get the compiled shader from the renderer backend data */
@@ -915,12 +928,14 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Path_OpenGL *gl;
 	Enesim_Renderer_Path_OpenGL_Figure *gf;
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Shape_Draw_Mode dm;
 	Enesim_Figure *f;
 
 	thiz = _path_get(r);
 	gl = &thiz->gl;
 
+	sdata = enesim_surface_backend_data_get(s);
 	enesim_renderer_shape_draw_mode_get(r, &dm);
 	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -936,7 +951,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glEnable(GL_POLYGON_SMOOTH);
 	glColor3f(1.0, 0.0, 0.0);
 	/* TODO later we might need to use a compiled program */
-	_path_opengl_figure_draw(r, gf, f, s, NULL);
+	_path_opengl_figure_draw(r, gf, f, sdata->texture, NULL);
 }
 
 #if 0
@@ -1250,14 +1265,21 @@ static void _path_destination_boundings(Enesim_Renderer *r,
 }
 
 #if BUILD_OPENGL
+static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs)
+{
+	*programs = _path_programs;
+	*num_programs = 1;
+	return EINA_TRUE;
+}
+
 static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_programs,
-		Enesim_Renderer_OpenGL_Program ***programs,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
@@ -1304,8 +1326,6 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	 */
 	*shader_setup = _path_opengl_shader_setup;
 	*draw = _path_opengl_fill_or_stroke_draw;
-	*programs = _path_programs;
-	*num_programs = 1;
 
 	gl->final_color = css->fill.color;
 
@@ -1337,6 +1357,7 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
 #if BUILD_OPENGL
+	/* .opengl_initialize = 	*/ _path_opengl_initialize,
 	/* .opengl_setup = 		*/ _path_opengl_setup,
 	/* .opengl_cleanup =		*/ _path_opengl_cleanup,
 #else
