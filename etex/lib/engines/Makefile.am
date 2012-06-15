@@ -1,0 +1,7 @@
+MAINTAINERCLEANFILES = Makefile.in
+
+SUBDIRS =
+
+if HAVE_FREETYPE
+SUBDIRS += freetype
+endif

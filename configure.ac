@@ -14,7 +14,7 @@ AC_INIT([enesim], [v_ver], [enesim-devel@googlegroups.com])
 AC_PREREQ([2.60])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADERS([src/include/config.h])
+AC_CONFIG_HEADERS([enesim/include/config.h])
 AC_USE_SYSTEM_EXTENSIONS
 
 AM_INIT_AUTOMAKE([1.6 dist-bzip2])
@@ -41,25 +41,110 @@ ENESIM_BUILD=""
 case "$host_os" in
    mingw*)
       ENESIM_BUILD="-DENESIM_BUILD"
+      EMAGE_BUILD="-DEMAGE_BUILD"
+      ETEX_BUILD="-DETEX_BUILD"
    ;;
 esac
 AC_SUBST([ENESIM_BUILD])
+AC_SUBST([EMAGE_BUILD])
+AC_SUBST([ETEX_BUILD])
 
 
 ### Additional options to configure
 
 
 ### Checks for programs
+
 AC_PROG_CC
+
+# pkg-config
 PKG_PROG_PKG_CONFIG
+
+# Check whether pkg-config supports Requires.private
+if $PKG_CONFIG --atleast-pkgconfig-version 0.22; then
+   pkgconfig_requires_private="Requires.private"
+else
+   pkgconfig_requires_private="Requires"
+fi
+AC_SUBST([pkgconfig_requires_private])
+
+# doxygen program for documentation building
+EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
+
 
 ### Checks for libraries
 
-PKG_CHECK_MODULES([EINA], [eina >= 1.0.0])
+## Enesim
+AC_SUBST([requirements_enesim])
+requirements_enesim="eina >= 1.0.0"
+PKG_CHECK_MODULES([EINA], [${requirements_enesim}])
 AC_ARG_WITH([equanime],
    [AS_HELP_STRING([--with-equanime], [enable Equanime pool support])],
    [want_equanime="yes"],
    [want_equanime="no"])
+
+## Emage
+AC_SUBST([requirements_emage])
+requirements_emage="enesim >= ${VERSION} eina >= 1.0.0"
+PKG_CHECK_MODULES(EMAGE, [${requirements_emage}],
+   [have_emage="yes"],
+   [have_emage="no"])
+
+if test "x${have_emage}" = "xyes" ; then
+# libpng
+   PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
+      [enable_png="yes"],
+      [enable_png="no"])
+   EMAGE_MODULE([Png], [${enable_png}], [yes])
+
+# libjpeg
+   AC_CHECK_HEADER([jpeglib.h], [enable_jpg="yes"], [enable_jpg="no"])
+   EMAGE_MODULE([Jpg], [${enable_jpg}], [no])
+fi
+
+AM_CONDITIONAL([HAVE_EMAGE], [test "x${have_emage}" = "xyes"])
+
+## Etex
+AC_SUBST([requirements_etex])
+requirements_etex="enesim >= ${VERSION} eina >= 1.0.0"
+
+# Emage
+if test "x${have_emage}" = "xyes" ; then
+   requirements_etex="${requirements_etex} emage"
+   AC_DEFINE([HAVE_EMAGE], [1], [Have support for emage])
+fi
+
+# Freetype
+PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
+   [have_freetype="yes"],
+   [have_freetype="no"])
+if test "x${have_freetype}" = "xyes" ; then
+   requirements_etex="${requirements_etex} freetype2 >= 9.3.0"
+   AC_DEFINE(HAVE_FREETYPE, 1, [Have support for freetype])
+   PKG_CHECK_MODULES([FREETYPE], [freetype2 >= 9.3.0],
+      [have_freetype="yes"],
+      [have_freetype="no"])
+fi
+AM_CONDITIONAL(HAVE_FREETYPE, test "x${have_freetype}" = "xyes")
+
+PKG_CHECK_MODULES(ETEX, [${requirements_etex}],
+   [have_etex="yes"],
+   [have_etex="no"])
+
+have_ender="no"
+if test "x${have_etex}" = "xyes" ; then
+   ETEX_CFLAGS="$ETEX_CFLAGS -DENESIM_EXTENSION"
+
+#ender
+   PKG_CHECK_EXISTS([ender], [have_ender="yes"], [have_ender="no"])
+   if test "x${have_ender}" = "xyes" ; then
+      ENDER_DATADIR=$($PKG_CONFIG --variable=datadir ender)
+      AC_SUBST([ENDER_DATADIR])
+   fi
+fi
+
+AM_CONDITIONAL([HAVE_ETEX], [test "x${have_etex}" = "xyes"])
+AM_CONDITIONAL([HAVE_ENDER], [test "x${have_ender}" = "xyes"])
 
 ### Checks for header files
 
@@ -74,6 +159,7 @@ AC_ARG_WITH([equanime],
 
 AC_HEADER_STDC
 AC_C_BIGENDIAN
+AM_PROG_CC_C_O
 EFL_ATTRIBUTE_UNUSED
 EFL_COMPILER_FLAG([-Wall])
 
@@ -280,16 +366,30 @@ Makefile
 enesim.pc
 enesim_opencl.pc
 enesim_opengl.pc
-src/Makefile
-src/include/Makefile
-src/lib/Makefile
-src/lib/compositor/Makefile
-src/lib/converter/Makefile
-src/lib/pool/Makefile
-src/lib/renderer/Makefile
-src/lib/rasterizer/Makefile
-src/lib/util/Makefile
-src/tests/Makefile
+emage.pc
+etex.pc
+enesim/Makefile
+enesim/include/Makefile
+enesim/lib/Makefile
+enesim/lib/compositor/Makefile
+enesim/lib/converter/Makefile
+enesim/lib/pool/Makefile
+enesim/lib/renderer/Makefile
+enesim/lib/rasterizer/Makefile
+enesim/lib/util/Makefile
+enesim/tests/Makefile
+emage/Makefile
+emage/include/Makefile
+emage/lib/Makefile
+emage/modules/Makefile
+emage/examples/Makefile
+etex/Makefile
+etex/include/Makefile
+etex/lib/Makefile
+etex/lib/engines/Makefile
+etex/lib/engines/freetype/Makefile
+etex/data/Makefile
+etex/tests/Makefile
 ],[
 ])
 
@@ -332,6 +432,19 @@ echo "Buffer Pools:"
 echo "  Eina......................................: yes"
 echo "  OpenCL....................................: ${build_opencl}"
 echo "  OpenGL....................................: ${build_opengl}"
+echo
+echo "  Emage.....................................: ${have_emage}"
+if test "x${have_emage}" = "xyes" ; then
+   echo "    PNG.....................................: ${have_module_png}"
+   echo "    JPG.....................................: ${have_module_jpg}"
+fi
+echo
+echo "  Etex......................................: ${have_etex}"
+if test "x${have_etex}" = "xyes" ; then
+   echo "    Freetype................................: ${have_freetype}"
+   echo "    Emage...................................: ${have_emage}"
+   echo "    Ender...................................: ${have_ender}"
+fi
 echo
 echo "Compilation.................................: make (or gmake)"
 echo "  CPPFLAGS..................................: $CPPFLAGS"

@@ -1,0 +1,6 @@
++ Add fontconfig support
++ Add a path-follow-span, i.e a text span that can receive
+  a shape and use that as the path to follow. We need more
+  code on enesim to know whenever a renderer is of a specific
+  type, similar to what we are doing on eon
++ Add rich text element

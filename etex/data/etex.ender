@@ -1,0 +1,12 @@
+using "enesim";
+
+namespace "etex" {
+	abstract "base" : "renderer" {
+		string "font_name";
+		uint "size";
+	};
+	class "span" : "base" {
+		string "text";
+		uint "direction";
+	};
+};
