@@ -131,20 +131,11 @@ PKG_CHECK_MODULES(ETEX, [${requirements_etex}],
    [have_etex="yes"],
    [have_etex="no"])
 
-have_ender="no"
 if test "x${have_etex}" = "xyes" ; then
    ETEX_CFLAGS="$ETEX_CFLAGS -DENESIM_EXTENSION"
-
-#ender
-   PKG_CHECK_EXISTS([ender], [have_ender="yes"], [have_ender="no"])
-   if test "x${have_ender}" = "xyes" ; then
-      ENDER_DATADIR=$($PKG_CONFIG --variable=datadir ender)
-      AC_SUBST([ENDER_DATADIR])
-   fi
 fi
 
 AM_CONDITIONAL([HAVE_ETEX], [test "x${have_etex}" = "xyes"])
-AM_CONDITIONAL([HAVE_ENDER], [test "x${have_ender}" = "xyes"])
 
 ### Checks for header files
 
@@ -388,7 +379,6 @@ etex/include/Makefile
 etex/lib/Makefile
 etex/lib/engines/Makefile
 etex/lib/engines/freetype/Makefile
-etex/data/Makefile
 etex/tests/Makefile
 ],[
 ])
@@ -443,7 +433,6 @@ echo "Etex........................................: ${have_etex}"
 if test "x${have_etex}" = "xyes" ; then
    echo "  Freetype..................................: ${have_freetype}"
    echo "  Emage.....................................: ${have_emage}"
-   echo "  Ender.....................................: ${have_ender}"
 fi
 echo
 echo "Compilation.................................: make (or gmake)"
