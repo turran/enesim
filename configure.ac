@@ -433,17 +433,17 @@ echo "  Eina......................................: yes"
 echo "  OpenCL....................................: ${build_opencl}"
 echo "  OpenGL....................................: ${build_opengl}"
 echo
-echo "  Emage.....................................: ${have_emage}"
+echo "Emage.......................................: ${have_emage}"
 if test "x${have_emage}" = "xyes" ; then
-   echo "    PNG.....................................: ${have_module_png}"
-   echo "    JPG.....................................: ${have_module_jpg}"
+   echo "  PNG.......................................: ${have_module_png}"
+   echo "  JPG.......................................: ${have_module_jpg}"
 fi
 echo
-echo "  Etex......................................: ${have_etex}"
+echo "Etex........................................: ${have_etex}"
 if test "x${have_etex}" = "xyes" ; then
-   echo "    Freetype................................: ${have_freetype}"
-   echo "    Emage...................................: ${have_emage}"
-   echo "    Ender...................................: ${have_ender}"
+   echo "  Freetype..................................: ${have_freetype}"
+   echo "  Emage.....................................: ${have_emage}"
+   echo "  Ender.....................................: ${have_ender}"
 fi
 echo
 echo "Compilation.................................: make (or gmake)"
