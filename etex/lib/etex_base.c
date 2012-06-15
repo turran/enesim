@@ -178,7 +178,6 @@ static Eina_Bool _etex_base_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		Enesim_Error **error)
 {
 	Etex_Base *thiz;
@@ -192,7 +191,7 @@ static Eina_Bool _etex_base_opengl_setup(Enesim_Renderer *r,
 
 	_etex_base_common_setup(thiz);
 	return thiz->opengl_setup(r, states, sstates, s,
-		draw, shader_setup, error);
+		draw, error);
 }
 
 static void _etex_base_opengl_cleanup(Enesim_Renderer *r,

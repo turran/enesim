@@ -132,7 +132,6 @@ typedef Eina_Bool (*Etex_Base_OpenGL_Setup)(Enesim_Renderer *r,
 		const Etex_Base_State *sstate[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		Enesim_Error **error);
 
 typedef struct _Etex_Base_Descriptor
