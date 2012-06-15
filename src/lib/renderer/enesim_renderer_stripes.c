@@ -601,14 +601,20 @@ static void _free(Enesim_Renderer *r)
 }
 
 #if BUILD_OPENGL
+static Eina_Bool _stripes_opengl_initialize(Enesim_Renderer *r,
+		int *num_shaders,
+		Enesim_Renderer_OpenGL_Program ***programs)
+{
+	*programs = _stripes_programs;
+	*num_shaders = 1;
+	return EINA_TRUE;
+}
 
 static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
-		int *num_shaders,
-		Enesim_Renderer_OpenGL_Program ***programs,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Stripes *thiz;
@@ -618,9 +624,6 @@ static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 
 	*shader_setup = _stripes_opengl_shader_setup;
 	*draw = _stripes_opengl_draw;
-
-	*programs = _stripes_programs;
-	*num_shaders = 1;
 
 	return EINA_TRUE;
 }
@@ -651,6 +654,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
 #if BUILD_OPENGL
+	/* .opengl_initialize =        	*/ _stripes_opengl_initialize,
 	/* .opengl_setup =          	*/ _stripes_opengl_setup,
 	/* .opengl_cleanup =        	*/ _stripes_opengl_cleanup
 #else

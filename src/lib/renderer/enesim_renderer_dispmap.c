@@ -29,6 +29,7 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_dispmap.h"
 
 #include "private/renderer.h"
 /*

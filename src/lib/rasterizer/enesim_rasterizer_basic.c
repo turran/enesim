@@ -30,6 +30,7 @@
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_shape.h"
 
 #include "private/vector.h"
 #include "private/rasterizer.h"

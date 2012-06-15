@@ -260,31 +260,6 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 
 #endif
 
-#include "enesim_renderer_shape.h"
-#include "enesim_renderer_rectangle.h"
-#include "enesim_renderer_circle.h"
-#include "enesim_renderer_ellipse.h"
-#include "enesim_renderer_figure.h"
-#include "enesim_renderer_path.h"
-#include "enesim_renderer_checker.h"
-#include "enesim_renderer_dispmap.h"
-#include "enesim_renderer_raddist.h"
-#include "enesim_renderer_grid.h"
-#include "enesim_renderer_stripes.h"
-#include "enesim_renderer_image.h"
-#include "enesim_renderer_gradient.h"
-#include "enesim_renderer_gradient_linear.h"
-#include "enesim_renderer_gradient_radial.h"
-#include "enesim_renderer_compound.h"
-#include "enesim_renderer_importer.h"
-#include "enesim_renderer_line.h"
-#include "enesim_renderer_background.h"
-#include "enesim_renderer_pattern.h"
-#include "enesim_renderer_perlin.h"
-#include "enesim_renderer_proxy.h"
-#include "enesim_renderer_clipper.h"
-#include "enesim_renderer_transition.h"
-
 /**
  * @}
  */

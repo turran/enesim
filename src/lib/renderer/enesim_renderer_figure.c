@@ -27,6 +27,9 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_shape.h"
+#include "enesim_renderer_path.h"
+#include "enesim_renderer_figure.h"
 
 #include "private/renderer.h"
 #include "private/shape.h"
