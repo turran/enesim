@@ -91,9 +91,9 @@ static Enesim_Renderer_OpenGL_Shader *_stripes_shaders[] = {
 
 /* the only program */
 static Enesim_Renderer_OpenGL_Program _stripes_program = {
-	/* .name 	= */ "stripes",
-	/* .shaders 	= */ _stripes_shaders,
-	/* .num_shaders	= */ 1,
+	/* .name 		= */ "stripes",
+	/* .shaders 		= */ _stripes_shaders,
+	/* .num_shaders		= */ 1,
 };
 
 static Enesim_Renderer_OpenGL_Program *_stripes_programs[] = {
@@ -101,58 +101,53 @@ static Enesim_Renderer_OpenGL_Program *_stripes_programs[] = {
 	NULL,
 };
 
-static Eina_Bool _stripes_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Program *program,
-		Enesim_Renderer_OpenGL_Shader *shader)
+/* odd = final2 */
+static Eina_Bool _stripes_opengl_shader_setup(GLenum pid,
+		Enesim_Color even_color, Enesim_Color odd_color,
+		double even_thickness, double odd_thickness)
 {
-	Enesim_Renderer_Stripes *thiz;
-	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Renderer_OpenGL_Compiled_Program *cp;
-	int odd_color;
-	int even_color;
-	int odd_thickness;
-	int even_thickness;
+	int odd_color_u;
+	int even_color_u;
+	int odd_thickness_u;
+	int even_thickness_u;
 
- 	thiz = _stripes_get(r);
+	glUseProgramObjectARB(pid);
+	even_color_u = glGetUniformLocationARB(pid, "stripes_even_color");
+	odd_color_u = glGetUniformLocationARB(pid, "stripes_odd_color");
+	even_thickness_u = glGetUniformLocationARB(pid, "stripes_even_thickness");
+	odd_thickness_u = glGetUniformLocationARB(pid, "stripes_odd_thickness");
 
-	if (strcmp(program->name, "stripes"))
-		return EINA_FALSE;
-	if (strcmp(shader->name, "stripes"))
-		return EINA_FALSE;
-
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	cp = &rdata->c_programs[0];
-	
-	even_color = glGetUniformLocationARB(cp->id, "stripes_even_color");
-	odd_color = glGetUniformLocationARB(cp->id, "stripes_odd_color");
-	even_thickness = glGetUniformLocationARB(cp->id, "stripes_even_thickness");
-	odd_thickness = glGetUniformLocationARB(cp->id, "stripes_odd_thickness");
-
-	glUniform4fARB(even_color,
-			argb8888_red_get(thiz->final_color1) / 255.0,
-			argb8888_green_get(thiz->final_color1) / 255.0,
-			argb8888_blue_get(thiz->final_color1) / 255.0,
-			argb8888_alpha_get(thiz->final_color1) / 255.0);
-	glUniform4fARB(odd_color,
-			argb8888_red_get(thiz->final_color2) / 255.0,
-			argb8888_green_get(thiz->final_color2) / 255.0,
-			argb8888_blue_get(thiz->final_color2) / 255.0,
-			argb8888_alpha_get(thiz->final_color2) / 255.0);
-	glUniform1i(even_thickness, thiz->current.even.thickness);
-	glUniform1i(odd_thickness, thiz->current.odd.thickness);
+	glUniform4fARB(even_color_u,
+			argb8888_red_get(even_color) / 255.0,
+			argb8888_green_get(even_color) / 255.0,
+			argb8888_blue_get(even_color) / 255.0,
+			argb8888_alpha_get(even_color) / 255.0);
+	glUniform4fARB(odd_color_u,
+			argb8888_red_get(odd_color) / 255.0,
+			argb8888_green_get(odd_color) / 255.0,
+			argb8888_blue_get(odd_color) / 255.0,
+			argb8888_alpha_get(odd_color) / 255.0);
+	glUniform1i(even_thickness_u, even_thickness);
+	glUniform1i(odd_thickness_u, odd_thickness);
 
 	return EINA_TRUE;
 }
 
+
 static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		const Eina_Rectangle *area, int w, int h)
 {
+	Enesim_Renderer_Stripes *thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;
 
+	thiz = _stripes_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	cp = &rdata->c_programs[0];
-	glUseProgramObjectARB(cp->id);
+	_stripes_opengl_shader_setup(cp->id,
+			thiz->final_color1, thiz->final_color2,
+			thiz->current.even.thickness,
+			thiz->current.odd.thickness);
 
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
@@ -174,6 +169,8 @@ static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		glTexCoord2d(area->x, area->y + area->h);
 		glVertex2d(area->x, area->y + area->h);
 	glEnd();
+	/* don't use any program */
+	glUseProgramObjectARB(0);
 }
 #endif
 
@@ -614,7 +611,6 @@ static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Stripes *thiz;
@@ -622,7 +618,6 @@ static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
  	thiz = _stripes_get(r);
 	if (!_stripes_state_setup(thiz, r)) return EINA_FALSE;
 
-	*shader_setup = _stripes_opengl_shader_setup;
 	*draw = _stripes_opengl_draw;
 
 	return EINA_TRUE;

@@ -60,5 +60,5 @@ void main()
 
 	gl_FragColor = p0;
 }
-);
+)
 

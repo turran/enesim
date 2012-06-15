@@ -39,7 +39,6 @@ typedef struct _Enesim_Renderer_OpenGL_Data
 {
 	/* data fetch on the setup */
 	Enesim_Renderer_OpenGL_Draw draw;
-	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
 	Enesim_Renderer_OpenGL_Program **programs;
 	int num_programs;
 	/* generated */
@@ -57,6 +56,14 @@ typedef struct _Enesim_Buffer_OpenGL_Data
 	GLuint texture;
 	unsigned int num_textures;
 } Enesim_Buffer_OpenGL_Data;
+
+EAPI GLenum enesim_opengl_texture_new(int width, int height);
+EAPI void enesim_opengl_texture_free(GLenum id);
+EAPI void enesim_opengl_compiled_program_set(Enesim_Renderer_OpenGL_Compiled_Program *cp);
+EAPI void enesim_opengl_rop_set(Enesim_Rop rop);
+EAPI void enesim_opengl_clip_unset(void);
+EAPI void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww, int hh);
+
 #endif
 
 #endif

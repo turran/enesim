@@ -1480,8 +1480,7 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Draw *define_geomery,
-		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
+		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Rectangle *thiz;

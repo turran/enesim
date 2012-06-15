@@ -47,7 +47,9 @@ libenesim_la_LIBADD += -lOpenCL
 endif
 
 if HAVE_OPENGL
-libenesim_la_SOURCES += enesim_renderer_opengl.c
+libenesim_la_SOURCES += \
+enesim_renderer_opengl.c \
+enesim_opengl.c
 libenesim_la_LIBADD += -lGL -lGLU
 endif
 

@@ -123,9 +123,6 @@ typedef struct _Enesim_Renderer_Path_OpenGL_Figure
 
 typedef struct _Enesim_Renderer_Path_OpenGL
 {
-	/* FIXME just a test */
-	Enesim_Color final_color;
-
 	Enesim_Renderer_Path_OpenGL_Figure stroke;
 	Enesim_Renderer_Path_OpenGL_Figure fill;
 } Enesim_Renderer_Path_OpenGL;
@@ -725,29 +722,97 @@ static void _path_span(Enesim_Renderer *r,
 }
 
 #if BUILD_OPENGL
+static Eina_Bool _path_opengl_ambient_shader_setup(GLenum pid,
+		Enesim_Color color)
+{
+	int final_color_u;
 
-/* the only shader */
-static Enesim_Renderer_OpenGL_Shader _path_shader = {
+	glUseProgramObjectARB(pid);
+	final_color_u = glGetUniformLocationARB(pid, "ambient_final_color");
+	glUniform4fARB(final_color_u,
+			argb8888_red_get(color) / 255.0,
+			argb8888_green_get(color) / 255.0,
+			argb8888_blue_get(color) / 255.0,
+			argb8888_alpha_get(color) / 255.0);
+
+	return EINA_TRUE;
+}
+
+#define GLERR {\
+        GLenum err; \
+        err = glGetError(); \
+        printf("Error %x\n", err); \
+        }
+
+static Eina_Bool _path_opengl_merge_shader_setup(GLenum pid,
+		GLenum texture0, GLenum texture1)
+{
+	int t;
+
+	glUseProgramObjectARB(pid);
+	t = glGetUniformLocationARB(pid, "merge_texture_0");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture0);
+	glUniform1i(t, 0);
+
+	t = glGetUniformLocationARB(pid, "merge_texture_1");
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glUniform1i(t, 1);
+
+	glActiveTexture(GL_TEXTURE0);
+
+	return EINA_TRUE;
+}
+
+static Enesim_Renderer_OpenGL_Shader _path_shader_ambient = {
 	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
-	/* .name 	= */ "path",
+	/* .name 	= */ "ambient",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_ambient.glsl"
 };
 
-static Enesim_Renderer_OpenGL_Shader *_path_shaders[] = {
-	&_path_shader,
+static Enesim_Renderer_OpenGL_Shader _path_shader_coordinates = {
+	/* .type 	= */ ENESIM_SHADER_VERTEX,
+	/* .name 	= */ "coordinates",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_vertex.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader _path_shader_merge = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "merge",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_merge.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_path_simple_shaders[] = {
+	&_path_shader_ambient,
 	NULL,
 };
 
-/* the only program */
-static Enesim_Renderer_OpenGL_Program _path_program = {
-	/* .name 	= */ "path",
-	/* .shaders 	= */ _path_shaders,
-	/* .num_shaders	= */ 1,
+static Enesim_Renderer_OpenGL_Shader *_path_complex_shaders[] = {
+	&_path_shader_merge,
+	&_path_shader_coordinates,
+	NULL,
+};
+
+static Enesim_Renderer_OpenGL_Program _path_simple_program = {
+	/* .name 		= */ "path_simple",
+	/* .shaders 		= */ _path_simple_shaders,
+	/* .num_shaders		= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program _path_complex_program = {
+	/* .name 		= */ "path_complex",
+	/* .shaders 		= */ _path_complex_shaders,
+	/* .num_shaders		= */ 2,
 };
 
 static Enesim_Renderer_OpenGL_Program *_path_programs[] = {
-	&_path_program,
+	&_path_simple_program,
+	&_path_complex_program,
 	NULL,
 };
 
@@ -865,44 +930,14 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_OpenGL_Figure *glf,
 	gluDeleteTess(t);
 }
 
-static Eina_Bool _path_opengl_shader_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Program *program,
-		Enesim_Renderer_OpenGL_Shader *shader)
-{
-	Enesim_Renderer_Path *thiz;
-	Enesim_Renderer_Path_OpenGL *gl;
-	Enesim_Renderer_OpenGL_Data *rdata;
-	int final_color;
-
- 	thiz = _path_get(r);
-	gl = &thiz->gl;
-
-	printf("shader setup\n");
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	final_color = glGetUniformLocationARB(rdata->program, "background_final_color");
-	glUniform4fARB(final_color,
-			argb8888_red_get(gl->final_color) / 255.0,
-			argb8888_green_get(gl->final_color) / 255.0,
-			argb8888_blue_get(gl->final_color) / 255.0,
-			argb8888_alpha_get(gl->final_color) / 255.0);
-
-	return EINA_TRUE;
-}
-
-
-static void _path_opengl_figure_draw(Enesim_Renderer *r,
+static void _path_opengl_figure_draw(GLenum fbo,
+		GLenum texture,
 		Enesim_Renderer_Path_OpenGL_Figure *gf,
 		Enesim_Figure *f,
-		GLenum texture,
 		Enesim_Renderer_OpenGL_Compiled_Program *cp)
 {
-	Enesim_Renderer_OpenGL_Data *rdata;
-
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-
 	/* run it on the renderer fbo */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, texture, 0);
 	if (cp)
@@ -918,7 +953,7 @@ static void _path_opengl_figure_draw(Enesim_Renderer *r,
 	/* if not, just use the cached vertices */
 	else
 	{
-		
+		printf("no tesselate!\n");
 	}
 }
 
@@ -930,57 +965,113 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Path_OpenGL *gl;
 	Enesim_Renderer_Path_OpenGL_Figure *gf;
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Shape_Draw_Mode dm;
 	Enesim_Figure *f;
+	Enesim_Color color;
 
 	thiz = _path_get(r);
 	gl = &thiz->gl;
 
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 	enesim_renderer_shape_draw_mode_get(r, &dm);
 	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		gf = &gl->stroke;
 		f = thiz->stroke_figure;
+		/* TODO multiply the color */
+		enesim_renderer_shape_stroke_color_get(r, &color);
 	}
+
 	else
 	{
 		gf = &gl->fill;
 		f = thiz->fill_figure;
+		/* TODO multiply the color */
+		enesim_renderer_shape_fill_color_get(r, &color);
 	}
 
 	glEnable(GL_POLYGON_SMOOTH);
-	glColor3f(1.0, 0.0, 0.0);
-	/* TODO later we might need to use a compiled program */
-	_path_opengl_figure_draw(r, gf, f, sdata->texture, NULL);
+
+	cp = &rdata->c_programs[0];
+	_path_opengl_ambient_shader_setup(cp->id, color);
+	_path_opengl_figure_draw(rdata->fbo, sdata->texture, gf, f, cp);
 }
 
-#if 0
+/* for fill and stroke we need to draw the stroke first on a
+ * temporary fbo, then the fill into a temporary fbo too
+ * finally draw again into the destination using the temporary
+ * fbos as a source. If the pixel is different than transparent
+ * then multiply that color with the current color
+ */
 static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 		Enesim_Surface *s, const Eina_Rectangle *area, int w, int h)
 {
-	/* for fill and stroke we need to draw the stroke first on a
-	 * temporary fbo, then the fill into a temporary fbo too
-	 * finally draw again into the destination using the temporary
-	 * fbos as a source. If the pixel is different than transparent
-	 * then multiply that color with the current color
-	 */
-	/* check if we have a temporary buffer for stroking */
-	/* check if we have a temporary buffer for filling */
-	/* use glUniformli and glActiveTexute/glBindTexture to set the samplers */
-	/* make the shader use both samplers to render the final result to */
-	/* use the area to render boths paths */
-	printf("define geometry! %d %d %d %d\n", area->x, area->y, area->w, area->h);
-	glBegin(GL_QUADS);
-		glTexCoord2d(area->x, area->y); glVertex2d(area->x, area->y);
-		glTexCoord2d(area->x + area->w, area->y); glVertex2d(area->x + area->w, area->y);
-		glTexCoord2d(area->x + area->w, area->y + area->h); glVertex2d(area->x + area->w, area->y + area->h);
-		glTexCoord2d(area->x, area->y + area->h); glVertex2d(area->x, area->y + area->h);
-	glEnd();
-}
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer_Path_OpenGL *gl;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Buffer_OpenGL_Data *sdata;
+	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_Color color;
+	GLenum textures[2];
 
-#endif
+	thiz = _path_get(r);
+	gl = &thiz->gl;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	sdata = enesim_surface_backend_data_get(s);
+
+	cp = &rdata->c_programs[0];
+
+	/* create the fill texture */
+	textures[0] = enesim_opengl_texture_new(w, h);
+	/* create the stroke texture */
+	textures[1] = enesim_opengl_texture_new(w, h);
+	/* draw the fill into the newly created buffer */
+	/* TODO multiply the color */
+	enesim_renderer_shape_fill_color_get(r, &color);
+	_path_opengl_ambient_shader_setup(cp->id, color);
+	_path_opengl_figure_draw(rdata->fbo, textures[0], &gl->fill, thiz->fill_figure, cp);
+	/* draw the stroke into the newly created buffer */
+	/* TODO multiply the color */
+	enesim_renderer_shape_stroke_color_get(r, &color);
+	_path_opengl_ambient_shader_setup(cp->id, color);
+	_path_opengl_figure_draw(rdata->fbo, textures[1], &gl->stroke, thiz->stroke_figure, cp);
+
+	/* now use the real destination surface to draw the merge fragment */
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, sdata->texture, 0);
+	cp = &rdata->c_programs[1];
+	_path_opengl_merge_shader_setup(cp->id, textures[0], textures[1]);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glOrtho(-w, w, -h, h, -1, 1);
+
+	/* use the area to render boths paths */
+	glBegin(GL_QUADS);
+		glTexCoord2d(area->x, area->y);
+		glVertex2d(area->x, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y);
+		glVertex2d(area->x + area->w, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y + area->h);
+		glVertex2d(area->x + area->w, area->y + area->h);
+
+		glTexCoord2d(area->x, area->y + area->h);
+		glVertex2d(area->x, area->y + area->h);
+	glEnd();
+	GLERR
+	/* destroy the textures */
+	enesim_opengl_texture_free(textures[0]);
+	enesim_opengl_texture_free(textures[1]);
+	/* don't use any program */
+	glUseProgramObjectARB(0);
+}
 
 #endif
 
@@ -1272,7 +1363,7 @@ static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
 	*programs = _path_programs;
-	*num_programs = 1;
+	*num_programs = 2;
 	return EINA_TRUE;
 }
 
@@ -1281,12 +1372,10 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Renderer_OpenGL_Shader_Setup *shader_setup,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_OpenGL *gl;
-	Enesim_Renderer_OpenGL_Shader *shader;
 	Enesim_Shape_Draw_Mode dm;
 	double sw;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -1311,14 +1400,11 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	/* fill + stroke */
 	if (dm == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL && (sw > 1.0))
 	{
-
+		*draw = _path_opengl_fill_and_stroke_draw;
 	}
-	else if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE && (sw > 1.0))
+	else
 	{
-	}
-	else if (dm & ENESIM_SHAPE_DRAW_MODE_FILL)
-	{
-
+		*draw = _path_opengl_fill_or_stroke_draw;
 	}
 
 	/* TODO the rendering of a stroke+fill shape is a two step, we need to
@@ -1326,10 +1412,6 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	 * a list of shaders, expect a list of programs. so the common
 	 * part knows how to render in multiple step a renderer
 	 */
-	*shader_setup = _path_opengl_shader_setup;
-	*draw = _path_opengl_fill_or_stroke_draw;
-
-	gl->final_color = css->fill.color;
 
 	return EINA_TRUE;
 }

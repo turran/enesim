@@ -46,22 +46,6 @@ static Eina_Hash *_program_lut = NULL;
 static Eina_Bool _fragment_shader_support = EINA_FALSE;
 static Eina_Bool _geometry_shader_support = EINA_FALSE;
 
-/* FIXME this should be ported to the new glsl 3.1 standard */
-static const char _vertex_passthrough[] = "					\
-void main(void)									\
-{										\
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 		\
-	gl_TexCoord[0]  = gl_TextureMatrix[0] * gl_MultiTexCoord0;		\
-}";
-
-/* gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; */
-
-static Enesim_Renderer_OpenGL_Shader _vertex_shader = {
-	/* .type = 	*/ ENESIM_SHADER_VERTEX,
-	/* .name = 	*/ "vertex_passthrough",
-	/* .source =	*/ _vertex_passthrough,
-};
-
 /* FIXME for debugging purposes */
 #define GLERR {\
         GLenum err; \
@@ -116,10 +100,6 @@ static void _opengl_geometry_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
 	glProgramParameteriEXT(program, GL_GEOMETRY_VERTICES_OUT_EXT, 10);
 }
 
-static void _opengl_vertex_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
-{
-	st = GL_VERTEX_SHADER_ARB;
-}
 #endif
 
 static Eina_Bool _opengl_shader_compile(GLenum pid,
@@ -132,10 +112,20 @@ static Eina_Bool _opengl_shader_compile(GLenum pid,
 	int ok = 0;
 
 	/* FIXME for now we only support fragment shaders */
-	if (shader->type != ENESIM_SHADER_FRAGMENT)
-		return EINA_FALSE;
+	switch (shader->type)
+	{
+		case ENESIM_SHADER_FRAGMENT:
+		st = GL_FRAGMENT_SHADER_ARB;
+		break;
 
-	st = GL_FRAGMENT_SHADER_ARB;
+		case ENESIM_SHADER_VERTEX:
+		st = GL_VERTEX_SHADER_ARB;
+		break;
+
+		default:
+		return EINA_FALSE;
+	}
+
 	/* setup the shaders */
 	sh = glCreateShaderObjectARB(st);
 	size = strlen(shader->source);
@@ -295,7 +285,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Draw draw;
-	Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	GLenum status;
 	int i;
@@ -311,7 +300,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		if (r->descriptor.opengl_initialize)
 		{
 			Enesim_Renderer_OpenGL_Program **programs;
-			Enesim_Renderer_OpenGL_Compiled_Program *cp;
 			int num;
 
 			if (!r->descriptor.opengl_initialize(r, &num, &programs))
@@ -338,7 +326,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
 	if (!r->descriptor.opengl_setup(r, states, s,
 			&draw,
-			&shader_setup,
 			error))
 		return EINA_FALSE;
 
@@ -352,16 +339,21 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 
 	/* store the data returned by the setup */
 	rdata->draw = draw;
-	rdata->shader_setup = shader_setup;
 
+#if 0
 	/* use this program and setup each shader */
 	for (j = 0; j < rdata->num_programs; j++)
 	{
 		Enesim_Renderer_OpenGL_Program *p;
 		Enesim_Renderer_OpenGL_Compiled_Program *cp;
+		Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
 
 		p = rdata->programs[j];
 		cp = &rdata->c_programs[j];
+		shader_setup = p->shader_setup;
+
+		if (!shader_setup)
+			continue;
 
 		glUseProgramObjectARB(cp->id);
 		for (i = 0; i < p->num_shaders; i++)
@@ -369,14 +361,14 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 			Enesim_Renderer_OpenGL_Shader *shader;
 
 			shader = p->shaders[i];
-			if (!rdata->shader_setup(r, s, p, shader))
+			if (!shader_setup(r, s, p, shader))
 			{
 				printf("Cannot setup the shader\n");
 			}
 		}
 		glUseProgramObjectARB(0);
 	}
-
+#endif
 	/* create the fbos */
 	if (!rdata->fbo)
 	{
