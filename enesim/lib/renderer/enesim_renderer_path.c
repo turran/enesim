@@ -993,8 +993,6 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		enesim_renderer_shape_fill_color_get(r, &color);
 	}
 
-	glEnable(GL_POLYGON_SMOOTH);
-
 	cp = &rdata->c_programs[0];
 	_path_opengl_ambient_shader_setup(cp->id, color);
 	_path_opengl_figure_draw(rdata->fbo, sdata->texture, gf, f, cp);
@@ -1065,7 +1063,6 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 		glTexCoord2d(area->x, area->y + area->h);
 		glVertex2d(area->x, area->y + area->h);
 	glEnd();
-	GLERR
 	/* destroy the textures */
 	enesim_opengl_texture_free(textures[0]);
 	enesim_opengl_texture_free(textures[1]);

@@ -435,9 +435,6 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 void enesim_renderer_opengl_init(void)
 {
 	_program_lut = eina_hash_string_superfast_new(NULL);
-	/* maybe we should add a hash to match between kernel name and program */
-	_opengl_extensions_setup();
-	printf("Fragment shader %d Geometry shader %d\n", _fragment_shader_support, _geometry_shader_support);
 }
 
 void enesim_renderer_opengl_shutdown(void)
