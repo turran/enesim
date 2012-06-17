@@ -163,19 +163,31 @@ EFL_COMPILER_FLAG([-Wall])
 ## PTHREADS
 pthread_cflags=""
 pthread_libs=""
-build_pthreads="no"
 need_pthreads="no"
+
+AC_ARG_ENABLE([pthreads],
+   [AS_HELP_STRING([--enable-pthreads], [enable threaded rendering])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       build_pthreads="yes"
+    else
+       build_pthreads="no"
+    fi
+   ],
+   [build_pthreads="yes"])
 
 # sched_getaffinity pthread_attr_setaffinity_np
 AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])
 
-AC_CHECK_LIB([pthread], [pthread_attr_setaffinity_np],
-   [
-    AC_CHECK_LIB(pthread, pthread_barrier_wait,
-       [build_pthreads="yes"],
-       [build_pthreads="no"])
-   ],
-   [build_pthreads="no"])
+if test "x${build_pthreads}" = "xyes" ; then
+   AC_CHECK_LIB([pthread], [pthread_attr_setaffinity_np],
+      [
+       AC_CHECK_LIB(pthread, pthread_barrier_wait,
+          [build_pthreads="yes"],
+          [build_pthreads="no"])
+      ],
+      [build_pthreads="no"])
+fi
 
 if test "x${build_pthreads}" = "xyes" ; then
    AC_CHECK_TYPE([cpu_set_t],
@@ -195,36 +207,17 @@ if test "x${build_pthreads}" = "xyes" ; then
    fi
 fi
 
-AC_MSG_CHECKING(whether to build pthread code)
-AC_ARG_ENABLE(pthreads,
-  AS_HELP_STRING([--enable-pthreads], [enable threaded rendering]),
-  [
-      if test "x$enableval" = "xyes" ; then
-        if test "x$build_pthreads" = "xyes"; then
-          AC_MSG_RESULT(yes)
-          AC_DEFINE(BUILD_PTHREAD, 1, [Build Threaded Rendering])
-          build_pthreads="yes"
-	  need_pthreads="yes"
-        else
-          if "x$use_strict" = "xyes"; then
-            AC_MSG_ERROR(pthreads headers or functions not found (strict dependencies checking))
-          else
-            AC_MSG_RESULT(no: pthread headers or functions not found)
-          fi
-        fi
-      else
-        AC_MSG_RESULT(no)
-        build_pthreads="no"
-      fi
-  ],
-  [
-    AC_MSG_RESULT($build_pthreads)
-    if test "x$build_pthreads" = "xyes" ; then
-      AC_DEFINE(BUILD_PTHREAD, 1, [Build Threaded Rendering])
-      need_pthreads="yes"
-    fi
-  ]
-)
+AC_MSG_CHECKING([whether to build pthread code])
+AC_MSG_RESULT([${build_pthreads}])
+
+if test "x${build_pthreads}" = "xyes" ; then
+   AC_DEFINE(BUILD_PTHREAD, 1, [Build Threaded Rendering])
+   pthread_cflags="-pthread"
+   pthread_libs="-pthread"
+fi
+
+AC_SUBST([pthread_cflags])
+AC_SUBST([pthread_libs])
 
 ################################################################################
 ##                                  Backends                                  ##
@@ -297,20 +290,6 @@ if test "x${build_opengl}" = "xyes"; then
   AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
 fi
 AM_CONDITIONAL([HAVE_OPENGL], [test "x${build_opengl}" = "xyes"])
-#######################################
-## Link with pthread if needed
-AC_MSG_CHECKING(whether we should link with pthread)
-if test "x${need_pthreads}" = "xyes"; then
-  AC_MSG_RESULT(yes)
-  pthread_cflags=""
-  pthread_libs="-lpthread"
-else
-  AC_MSG_RESULT(no)
-fi
-
-
-AC_SUBST([pthread_cflags])
-AC_SUBST([pthread_libs])
 
 
 ### Needed information
