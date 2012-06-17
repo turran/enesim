@@ -90,17 +90,20 @@ PKG_CHECK_MODULES(EMAGE, [${requirements_emage}],
    [have_emage="yes"],
    [have_emage="no"])
 
+enable_png="no"
+enable_jpg="no"
 if test "x${have_emage}" = "xyes" ; then
 # libpng
    PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
       [enable_png="yes"],
       [enable_png="no"])
-   EMAGE_MODULE([Png], [${enable_png}], [yes])
 
 # libjpeg
    AC_CHECK_HEADER([jpeglib.h], [enable_jpg="yes"], [enable_jpg="no"])
-   EMAGE_MODULE([Jpg], [${enable_jpg}], [no])
 fi
+
+EMAGE_MODULE([Png], [${enable_png}], [yes])
+EMAGE_MODULE([Jpg], [${enable_jpg}], [no])
 
 AM_CONDITIONAL([HAVE_EMAGE], [test "x${have_emage}" = "xyes"])
 

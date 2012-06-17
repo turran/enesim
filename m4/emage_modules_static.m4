@@ -29,8 +29,8 @@ AC_ARG_ENABLE([module-[]DOWN],
 AC_MSG_CHECKING([whether to enable $1 module])
 AC_MSG_RESULT([${want_module}])
 
-if test "x${have_module}" = "xno" -a "x${want_module}" = "xyes" -a "x${use_strict}" = "xyes" ; then
-   AC_MSG_ERROR([$1 dependencies not found (strict dependencies checking)])
+if test "x${want_module}" = "xno" ; then
+   have_module="no"
 fi
 
 AC_MSG_CHECKING([whether $1 module will be built])
