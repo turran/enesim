@@ -86,10 +86,12 @@ AC_ARG_WITH([equanime],
 ## Emage
 AC_SUBST([requirements_emage])
 requirements_emage="enesim >= ${VERSION} eina >= 1.0.0"
-PKG_CHECK_MODULES(EMAGE, [${requirements_emage}],
+PKG_CHECK_MODULES(EMAGE, [eina >= 1.0.0],
    [have_emage="yes"],
    [have_emage="no"])
 
+
+have_emage="yes"
 enable_png="no"
 enable_jpg="no"
 if test "x${have_emage}" = "xyes" ; then
@@ -110,6 +112,7 @@ AM_CONDITIONAL([HAVE_EMAGE], [test "x${have_emage}" = "xyes"])
 ## Etex
 AC_SUBST([requirements_etex])
 requirements_etex="enesim >= ${VERSION} eina >= 1.0.0"
+requirements_build_etex="eina >= 1.0.0"
 
 # Emage
 if test "x${have_emage}" = "xyes" ; then
@@ -123,6 +126,7 @@ PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
    [have_freetype="no"])
 if test "x${have_freetype}" = "xyes" ; then
    requirements_etex="${requirements_etex} freetype2 >= 9.3.0"
+   requirements_build_etex="${requirements_build_etex} freetype2 >= 9.3.0"
    AC_DEFINE(HAVE_FREETYPE, 1, [Have support for freetype])
    PKG_CHECK_MODULES([FREETYPE], [freetype2 >= 9.3.0],
       [have_freetype="yes"],
@@ -130,7 +134,7 @@ if test "x${have_freetype}" = "xyes" ; then
 fi
 AM_CONDITIONAL(HAVE_FREETYPE, test "x${have_freetype}" = "xyes")
 
-PKG_CHECK_MODULES(ETEX, [${requirements_etex}],
+PKG_CHECK_MODULES(ETEX, [${requirements_build_etex}],
    [have_etex="yes"],
    [have_etex="no"])
 
