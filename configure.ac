@@ -359,7 +359,6 @@ etex/lib/Makefile
 etex/lib/engines/Makefile
 etex/lib/engines/freetype/Makefile
 etex/tests/Makefile
-],[
 ])
 
 AC_OUTPUT
