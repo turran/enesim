@@ -8,8 +8,7 @@ AM_CPPFLAGS = \
 -I$(top_srcdir)/src/include \
 -I$(top_srcdir)/external/libargb \
 @ENESIM_BUILD@ \
-@ENESIM_CFLAGS@ \
-@pthread_libs@
+@ENESIM_CFLAGS@
 
 lib_LTLIBRARIES = libenesim.la
 
@@ -35,7 +34,6 @@ compositor/libenesim_compositor.la \
 converter/libenesim_converter.la \
 pool/libenesim_pool.la \
 @ENESIM_LIBS@ \
-@pthread_libs@ \
 -lm
 
 libenesim_la_LDFLAGS = -no-undefined -version-info @version_info@
