@@ -29,6 +29,10 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_compound.h"
 
+#ifdef BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#endif
+
 #include "private/renderer.h"
 /**
  * @todo
@@ -73,7 +77,6 @@ typedef struct _Layer
 	Enesim_Renderer *r;
 	/* generated at state setup */
 	Eina_Rectangle destination_boundings;
-	Enesim_Compositor_Span span;
 } Layer;
 
 static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
@@ -85,6 +88,82 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 
 	return thiz;
 }
+
+static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
+		Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Error **error)
+{
+	Eina_List *ll;
+
+	if (thiz->visible_layers)
+	{
+		eina_list_free(thiz->visible_layers);
+		thiz->visible_layers = NULL;
+	}
+	/* setup every layer */
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
+	{
+		Layer *l = eina_list_data_get(ll);
+
+		/* the position and the matrix */
+		if (thiz->pre_cb)
+		{
+			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
+			{
+				continue;
+			}
+		}
+		if (!enesim_renderer_setup(l->r, s, error))
+		{
+			const char *name;
+
+			enesim_renderer_name_get(l->r, &name);
+			ENESIM_RENDERER_ERROR(r, error, "Child renderer %s can not setup", name);
+			continue;
+		}
+		/* set the span given the color */
+		/* FIXME fix the resulting format */
+		/* FIXME what about the surface formats here? */
+		enesim_renderer_destination_boundings(l->r, &l->destination_boundings, 0, 0);
+		if (thiz->post_cb)
+		{
+			if (!thiz->post_cb(r, l->r, thiz->post_data))
+			{
+				continue;
+			}
+		}
+		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
+		thiz->visible_layers = eina_list_append(thiz->visible_layers, l);
+	}
+	return EINA_TRUE;
+}
+
+static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surface *s)
+{
+	Layer *layer;
+	Eina_List *ll;
+	Eina_List *ll_next;
+
+	/* cleanup every layer */
+	EINA_LIST_FOREACH_SAFE(thiz->visible_layers, ll, ll_next, layer)
+	{
+		enesim_renderer_cleanup(layer->r, s);
+		thiz->visible_layers = eina_list_remove_list(thiz->visible_layers, ll);
+	}
+	thiz->changed = EINA_FALSE;
+}
+
+#if BUILD_OPENGL
+static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int w, int h)
+{
+	/* create a temporary texture */
+	/* render each layer there with the requested rop */
+	// enesim_opengl_rop_set(l->r, l->rop);
+	// enesim_renderer_opengl_draw(l->r, s, area, w, h);
+	/* finally just rop the resulting texture into the real texture */
+}
+#endif
 
 static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, int x, int y, unsigned int len, void *ddata)
 {
@@ -146,57 +225,18 @@ static const char * _compound_name(Enesim_Renderer *r)
 	return "compound";
 }
 
-static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
+static Eina_Bool _compound_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Compound *thiz;
 	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
-	Eina_List *ll;
 
 	thiz = _compound_get(r);
+	if (!_compound_state_setup(thiz, r, s, error))
+		return EINA_FALSE;
 
-	if (thiz->visible_layers)
-	{
-		eina_list_free(thiz->visible_layers);
-		thiz->visible_layers = NULL;
-	}
-	/* setup every layer */
-	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
-	{
-		Layer *l = eina_list_data_get(ll);
-
-		/* the position and the matrix */
-		if (thiz->pre_cb)
-		{
-			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
-			{
-				continue;
-			}
-		}
-		if (!enesim_renderer_setup(l->r, s, error))
-		{
-			const char *name;
-
-			enesim_renderer_name_get(l->r, &name);
-			ENESIM_RENDERER_ERROR(r, error, "Child renderer %s can not setup", name);
-			continue;
-		}
-		/* set the span given the color */
-		/* FIXME fix the resulting format */
-		/* FIXME what about the surface formats here? */
-		enesim_renderer_destination_boundings(l->r, &l->destination_boundings, 0, 0);
-		if (thiz->post_cb)
-		{
-			if (!thiz->post_cb(r, l->r, thiz->post_data))
-			{
-				continue;
-			}
-		}
-		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
-		thiz->visible_layers = eina_list_append(thiz->visible_layers, l);
-	}
 	if (state->rop == ENESIM_FILL)
 	{
 		*fill = _compound_fill_span_blend_layer;
@@ -209,21 +249,12 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _compound_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _compound_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Compound *thiz;
-	Layer *layer;
-	Eina_List *ll;
-	Eina_List *ll_next;
 
 	thiz = _compound_get(r);
-	/* cleanup every layer */
-	EINA_LIST_FOREACH_SAFE(thiz->visible_layers, ll, ll_next, layer)
-	{
-		enesim_renderer_cleanup(layer->r, s);
-		thiz->visible_layers = eina_list_remove_list(thiz->visible_layers, ll);
-	}
-	thiz->changed = EINA_FALSE;
+	_compound_state_cleanup(thiz, s);
 }
 
 static void _compound_boundings(Enesim_Renderer *r,
@@ -404,6 +435,42 @@ static void _compound_damage(Enesim_Renderer *r,
 	}
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs)
+{
+#if 0
+	*num_programs = 1;
+	*programs = _compound_programs;
+#endif
+	return EINA_TRUE;
+}
+
+static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Compound *thiz;
+
+ 	thiz = _compound_get(r);
+	if (!_compound_state_setup(thiz, r, s, error)) return EINA_FALSE;
+
+	*draw = _compound_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _compound_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Compound *thiz;
+
+ 	thiz = _compound_get(r);
+	_compound_state_cleanup(thiz, s);
+}
+#endif
+
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _compound_name,
@@ -415,13 +482,20 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ _compound_is_inside,
 	/* .damage = 			*/ _compound_damage,
 	/* .has_changed = 		*/ _compound_has_changed,
-	/* .sw_setup = 			*/ _compound_state_setup,
-	/* .sw_cleanup = 		*/ _compound_state_cleanup,
+	/* .sw_setup = 			*/ _compound_sw_setup,
+	/* .sw_cleanup = 		*/ _compound_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+#if BUILD_OPENGL
+	/* .opengl_initialize = 	*/ _compound_opengl_initialize,
+	/* .opengl_setup = 		*/ _compound_opengl_setup,
+	/* .opengl_cleanup = 		*/ _compound_opengl_cleanup,
+#else
+	/* .opengl_initialize = 	*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
+#endif
 };
 /*============================================================================*
  *                                   API                                      *

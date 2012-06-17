@@ -69,27 +69,6 @@ static void _opengl_extensions_setup(void)
 		_geometry_shader_support = EINA_TRUE;
 }
 
-static void _opengl_rop_set(Enesim_Renderer *r)
-{
-	Enesim_Rop rop;
-
-	enesim_renderer_rop_get(r, &rop);
-	glBlendEquation(GL_FUNC_ADD);
-	switch (rop)
-	{
-		case ENESIM_BLEND:
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		break;
-
-		case ENESIM_FILL:
-		glBlendFunc(GL_ONE, GL_ZERO);
-		break;
-
-		default:
-		break;
-	}
-}
-
 #if 0
 /* Disabled for now until we find a solution with the unresolved symbol */
 static void _opengl_geometry_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
@@ -416,7 +395,6 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	/* FIXME we should define a pre_render function
 	 * to for example set/store some attributes
 	 */
-	_opengl_rop_set(r);
 	/* now draw */
 	if (rdata->draw)
 	{

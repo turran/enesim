@@ -257,7 +257,6 @@ static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 #endif
 
 #if BUILD_OPENGL
-
 static Eina_Bool _background_opengl_initialize(Enesim_Renderer *r,
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs)
