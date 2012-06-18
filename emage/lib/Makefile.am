@@ -16,5 +16,7 @@ libemage_la_SOURCES = \
 emage.c
 ## add every .c module that is going to be built-in
 
-libemage_la_LIBADD = @EMAGE_LIBS@
+libemage_la_LIBADD = \
+$(top_builddir)/enesim/lib/libenesim.la \
+@EMAGE_LIBS@
 libemage_la_LDFLAGS = -no-undefined -version-info @version_info@
