@@ -27,6 +27,7 @@ etex_span.c
 
 libetex_la_LIBADD = \
 $(top_builddir)/enesim/lib/libenesim.la \
+$(top_builddir)/emage/lib/libemage.la \
 @ETEX_LIBS@
 
 if HAVE_FREETYPE

@@ -43,8 +43,8 @@ enesim_renderer_clipper.h \
 enesim_renderer_pattern.h \
 enesim_renderer_transition.h
 
-installed_headersdir = $(prefix)/include/enesim
-installed_headers_DATA = $(ENESIM_UTILHEADERS)
+installed_headersdir = $(includedir)/enesim
+dist_installed_headers_DATA = $(ENESIM_UTILHEADERS)
 include_HEADERS = Enesim.h
 
 if HAVE_OPENCL
@@ -55,3 +55,6 @@ if HAVE_OPENGL
 include_HEADERS += Enesim_OpenGL.h
 endif
 
+EXTRA_DIST = \
+enesim_private.h \
+private

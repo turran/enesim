@@ -38,7 +38,10 @@ enesim_renderer_shape.c \
 enesim_renderer_stripes.c \
 enesim_renderer_transition.c
 
-libenesim_renderer_la_LIBADD =
-
-libenesim_renderer_la_DEPENDENCIES =
-
+EXTRA_DIST = \
+enesim_renderer_checker.glsl \
+enesim_renderer_opengl_common_ambient.glsl \
+enesim_renderer_opengl_common_merge.glsl \
+enesim_renderer_opengl_common_vertex.glsl \
+enesim_renderer_rectangle.glsl \
+enesim_renderer_stripes.glsl

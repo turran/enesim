@@ -5,8 +5,10 @@ Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/src/include \
+-I$(top_srcdir)/enesim/include \
+-I$(top_builddir)/enesim/include \
 -I$(top_srcdir)/external/libargb \
+-I$(top_builddir)/external/libargb \
 @ENESIM_BUILD@ \
 @ENESIM_CFLAGS@
 
