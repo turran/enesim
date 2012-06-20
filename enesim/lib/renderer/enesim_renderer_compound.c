@@ -135,6 +135,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
 		thiz->visible_layers = eina_list_append(thiz->visible_layers, l);
 	}
+
 	return EINA_TRUE;
 }
 

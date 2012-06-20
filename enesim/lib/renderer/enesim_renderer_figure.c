@@ -81,6 +81,7 @@ static void _figure_generate_commands(Enesim_Renderer_Figure *thiz)
 	Eina_List *l1;
 
 	f = thiz->figure;
+	enesim_renderer_path_command_clear(thiz->path);
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
 		Enesim_Point *pt;
@@ -108,7 +109,10 @@ static void _figure_path_setup(Enesim_Renderer_Figure *thiz,
 		const Enesim_Renderer_Shape_State *css)
 {
 	if (thiz->changed)
+	{
 		_figure_generate_commands(thiz);
+		thiz->changed = EINA_FALSE;
+	}
 
 	/* pass all the properties to the path */
 	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
@@ -183,7 +187,6 @@ static void _figure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = _figure_get(r);
 	enesim_renderer_shape_cleanup(r, s);
 	enesim_renderer_cleanup(thiz->path, s);
-	thiz->changed = EINA_FALSE;
 }
 
 static Eina_Bool _figure_has_changed(Enesim_Renderer *r,

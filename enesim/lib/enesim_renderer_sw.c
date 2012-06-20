@@ -376,6 +376,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		Eina_List *clips, int x, int y)
 {
+#if 0
 	Enesim_Format dfmt;
 	Enesim_Renderer_Sw_Data *rswdata;
 	Enesim_Renderer_Flag flags;
@@ -388,7 +389,6 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 
 	enesim_renderer_flags(r, &flags);
 	rswdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
-
 	if (rswdata->span)
 	{
 		Eina_Rectangle *clip;
@@ -438,6 +438,16 @@ void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 			_sw_surface_draw_simple(r, rswdata->fill, rdata, stride, &final);
 		}
 	}
+#else
+	Eina_Rectangle *clip;
+	Eina_List *l;
+
+	/* iterate over the list of clips */
+	EINA_LIST_FOREACH(clips, l, clip)
+	{
+		enesim_renderer_sw_draw_area(r, s, clip, x, y);
+	}
+#endif
 }
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
