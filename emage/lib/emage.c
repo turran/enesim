@@ -259,7 +259,7 @@ static void * _thread_load(void *data)
 {
 	Emage_Provider *prov;
 	Emage_Job *j = data;
-	void *options;
+	void *options = NULL;
 
 	prov = _load_provider_get(j->file);
 	if (!prov)
@@ -444,7 +444,7 @@ EAPI Eina_Bool emage_load(const char *file, Enesim_Surface **s,
 	Emage_Provider *prov;
 	Eina_Error err = 0;
 	Eina_Bool ret = EINA_TRUE;
-	void *op;
+	void *op = NULL;
 
 	prov = _load_provider_get(file);
 	if (!prov)
