@@ -123,5 +123,6 @@ int main(int argc, char **argv)
 		emage_dispatch();
 	}
 	emage_shutdown();
+	return 0;
 }
 

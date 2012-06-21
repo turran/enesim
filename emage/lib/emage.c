@@ -680,5 +680,5 @@ EAPI void emage_pool_size_set(int num)
  */
 EAPI int emage_pool_size_get(void)
 {
-
+	return 0;
 }

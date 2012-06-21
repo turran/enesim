@@ -685,4 +685,5 @@ EAPI int etex_span_index_at(Enesim_Renderer *r, int x, int y)
 {
 	/* check that x, y is inside the bounding box */
 	/* get the glyph at that position */
+	return 0;
 }
