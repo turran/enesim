@@ -111,8 +111,10 @@ EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_D
 
 EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
 
-EAPI Enesim_Buffer_Format enesim_buffer_format_rgb_get(uint8_t aoffset, uint8_t alen,
-		uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen,
+EAPI Eina_Bool enesim_buffer_format_rgb_get(Enesim_Buffer_Format *fmt,
+		uint8_t aoffset, uint8_t alen,
+		uint8_t roffset, uint8_t rlen,
+		uint8_t goffset, uint8_t glen,
 		uint8_t boffset, uint8_t blen, Eina_Bool premul);
 EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt);
 

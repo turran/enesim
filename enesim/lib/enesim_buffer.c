@@ -247,26 +247,39 @@ EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, 
  * FIXME: To be fixed
  * FIXME how to handle the gray?
  */
-EAPI Enesim_Buffer_Format enesim_buffer_format_rgb_get(uint8_t aoffset, uint8_t alen,
-		uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen,
+EAPI Eina_Bool enesim_buffer_format_rgb_get(Enesim_Buffer_Format *fmt,
+		uint8_t aoffset, uint8_t alen,
+		uint8_t roffset, uint8_t rlen,
+		uint8_t goffset, uint8_t glen,
 		uint8_t boffset, uint8_t blen, Eina_Bool premul)
 {
+	Eina_Bool ret = EINA_FALSE;
+
 	if ((boffset == 0) && (blen == 5) && (goffset == 5) && (glen == 6) &&
 			(roffset == 11) && (rlen == 5) && (aoffset == 0) && (alen == 0))
-		return ENESIM_BUFFER_FORMAT_RGB565;
+	{
+		ret = EINA_TRUE;
+		*fmt = ENESIM_BUFFER_FORMAT_RGB565;
+	}
 
 	if ((boffset == 0) && (blen == 8) && (goffset == 8) && (glen == 8) &&
 			(roffset == 16) && (rlen == 8) && (aoffset == 24) && (alen == 8))
 	{
+		ret = EINA_TRUE;
 		if (premul)
-			return ENESIM_BUFFER_FORMAT_ARGB8888_PRE;
+			*fmt = ENESIM_BUFFER_FORMAT_ARGB8888_PRE;
 		else
-			return ENESIM_BUFFER_FORMAT_ARGB8888;
+			*fmt = ENESIM_BUFFER_FORMAT_ARGB8888;
 	}
 
 	if ((boffset == 0) && (blen == 0) && (goffset == 0) && (glen == 0) &&
 			(roffset == 0) && (rlen == 0) && (aoffset == 0) && (alen == 8))
-		return ENESIM_BUFFER_FORMAT_A8;
+	{
+		ret = EINA_TRUE;
+		*fmt = ENESIM_BUFFER_FORMAT_A8;
+	}
+
+	return ret;
 }
 
 /**
