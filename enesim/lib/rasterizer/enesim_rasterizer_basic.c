@@ -94,6 +94,161 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static inline int _basic_edges_nz_process(Enesim_F16p16_Edge *edges, int edges_count,
+		Eina_F16p16 xx, Eina_F16p16 sww,
+		int *counted)
+{
+	Enesim_F16p16_Edge *edge = edges;
+	int a = 0;
+	int n = 0;
+	int count = 0;
+
+	while (n < edges_count)
+	{
+		int ee = edge->e;
+		if (edge->counted)
+			count += (ee >= 0) - (ee <0);
+		if (ee < 0)
+			ee = -ee;
+		if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) &
+				(xx <= (0xffff + edge->xx1)))
+		{
+			if (a < sww/4)
+				a = sww - ee;
+			else
+				a = (a + (sww - ee)) / 2;
+		}
+		edge->e += edge->de;
+		edge++;
+		n++;
+	}
+	*counted = count;
+	return a;
+}
+
+static inline Eina_Bool _basic_edges_setup(Enesim_F16p16_Edge *edges, int *edges_count,
+		Enesim_F16p16_Vector *v, int nvectors,
+		Eina_F16p16 xx, Eina_F16p16 yy,
+		Eina_F16p16 axx,
+		Eina_F16p16 *ll, Eina_F16p16 *rr)
+{		
+	Enesim_F16p16_Edge *edge = edges;
+	Eina_F16p16 lx = INT_MAX / 2;
+	Eina_F16p16 rx = -lx;
+	int nedges = 0;
+	int n = 0;
+
+	while (n < nvectors)
+	{
+		if (yy + 0xffff < v->yy0)
+			break;
+		if (((yy + 0xffff) >= v->yy0) & (yy <= (v->yy1 + 0xffff)))
+		{
+			edge->xx0 = v->xx0;
+			edge->xx1 = v->xx1;
+			edge->yy0 = v->yy0;
+			edge->yy1 = v->yy1;
+			edge->de = (v->a * (long long int) axx) >> 16;
+			edge->e = ((v->a * (long long int) xx) >> 16) +
+					((v->b * (long long int) yy) >> 16) +
+					v->c;
+			edge->counted = ((yy >= edge->yy0) & (yy < edge->yy1));
+			if (v->sgn && ((v->xx1 - v->xx0) > 2))
+			{
+				int dxx = (v->xx1 - v->xx0);
+				double dd = dxx / (double)(v->yy1 - v->yy0);
+				int lxxc, lyyc = yy - 0xffff;
+				int rxxc, ryyc = yy + 0xffff;
+
+				if (v->sgn < 0)
+				{ lyyc = yy + 0xffff;  ryyc = yy - 0xffff; }
+
+				lxxc = (lyyc - v->yy0) * dd;
+				rxxc = (ryyc - v->yy0) * dd;
+
+				if (v->sgn < 0)
+				{ lxxc = dxx - lxxc;  rxxc = dxx - rxxc; }
+
+				lxxc += v->xx0;  rxxc += v->xx0;
+				if (lxxc < v->xx0) lxxc = v->xx0;
+				if (rxxc > v->xx1) rxxc = v->xx1;
+
+				if (lx > lxxc)  lx = lxxc;
+				if (rx < rxxc)  rx = rxxc;
+			}
+			else
+			{
+				if (lx > v->xx0)  lx = v->xx0;
+				if (rx < v->xx1)  rx = v->xx1;
+			}
+			edge++;
+			nedges++;
+		}
+		n++;
+		v++;
+	}
+
+	if (!nedges)
+		return EINA_FALSE;
+
+	*ll = lx;
+	*rr = rx;
+	*edges_count = nedges;
+	return EINA_TRUE;
+}
+
+static inline void _basic_edges_clip(Enesim_F16p16_Edge *edges, int nedges,
+		Eina_F16p16 axx, Eina_F16p16 *pxx,
+		Eina_F16p16 *lxx, Eina_F16p16 *rxx,
+		int *px, unsigned int *plen, uint32_t **pd)
+{
+	Eina_F16p16 xx = *pxx;
+	Eina_F16p16 lx = *lxx;
+	Eina_F16p16 rx = *rxx;
+	int x = *px;
+	unsigned int len = *plen;
+	uint32_t *d = *pd;
+	uint32_t *dd = d;
+
+	/* clip on the left side */
+	lx = (lx >> 16) - 1 - x;
+	if (lx > 0)
+	{
+		Enesim_F16p16_Edge *edge;
+		int n = 0;
+
+		lx = MIN(lx, len);
+		memset(dd, 0, sizeof(uint32_t) * lx);
+		xx += lx * axx;
+		d += lx;
+
+		edge = edges;
+		while (n < nedges)
+		{
+			edge->e += lx * edge->de;
+			edge++;
+			n++;
+		}
+	}
+	else lx = 0;
+
+	/* clip on the right side */
+	rx = (rx >> 16) + 2 - x;
+	if (len > rx)
+	{
+		len -= rx;
+		memset(dd + rx, 0, sizeof(uint32_t) * len);
+	}
+	else rx = len;
+
+	*pxx = xx;
+	*px = x;
+	*plen = len;
+	*pd = d;
+	*rxx = rx;
+	*lxx = lx;
+}
+
 #define SETUP_EDGES \
 	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
 	edge = edges; \
