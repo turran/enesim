@@ -542,7 +542,7 @@ static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 /*----------------------------------------------------------------------------*
  *                                 Commands                                   *
  *----------------------------------------------------------------------------*/
-static void _move_to(Enesim_Renderer_Command_State *state,
+static void _p_move_to(Enesim_Renderer_Command_State *state,
 		double x, double y)
 {
 	/* we have to reset the curve state too */
@@ -555,7 +555,7 @@ static void _move_to(Enesim_Renderer_Command_State *state,
 	state->vertex_add(x, y, state->data);
 }
 
-static void _close(Enesim_Renderer_Command_State *state, Eina_Bool close)
+static void _p_close(Enesim_Renderer_Command_State *state, Eina_Bool close)
 {
 	state->polygon_close(close, state->data);
 }
@@ -606,7 +606,7 @@ static void _path_generate_vertices(Eina_List *commands,
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			_move_to(&state, x, y);
+			_p_move_to(&state, x, y);
 			break;
 
 			case ENESIM_COMMAND_LINE_TO:
@@ -686,7 +686,7 @@ static void _path_generate_vertices(Eina_List *commands,
 			rx = rx * hypot((ca * gm->xx) + (sa * gm->xy), (ca * gm->yx) + (sa * gm->yy));
 			ry = ry * hypot((ca * gm->xy) - (sa * gm->xx), (ca * gm->yy) - (sa * gm->yx));
 			ca = atan2((ca * gm->yx) + (sa * gm->yy), (ca * gm->xx) + (sa * gm->xy));
-			
+
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
 			enesim_curve_arc_to(&state.st,
@@ -698,7 +698,7 @@ static void _path_generate_vertices(Eina_List *commands,
 			break;
 
 			case ENESIM_COMMAND_CLOSE:
-			_close(&state, cmd->definition.close.close);
+			_p_close(&state, cmd->definition.close.close);
 			break;
 
 			default:
@@ -767,22 +767,22 @@ static Eina_Bool _path_opengl_merge_shader_setup(GLenum pid,
 }
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_ambient = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
-	/* .name 	= */ "ambient",
+	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name	= */ "ambient",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_ambient.glsl"
 };
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_coordinates = {
-	/* .type 	= */ ENESIM_SHADER_VERTEX,
-	/* .name 	= */ "coordinates",
+	/* .type	= */ ENESIM_SHADER_VERTEX,
+	/* .name	= */ "coordinates",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_vertex.glsl"
 };
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_merge = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
-	/* .name 	= */ "merge",
+	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name	= */ "merge",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_merge.glsl"
 };
@@ -799,14 +799,14 @@ static Enesim_Renderer_OpenGL_Shader *_path_complex_shaders[] = {
 };
 
 static Enesim_Renderer_OpenGL_Program _path_simple_program = {
-	/* .name 		= */ "path_simple",
-	/* .shaders 		= */ _path_simple_shaders,
+	/* .name		= */ "path_simple",
+	/* .shaders		= */ _path_simple_shaders,
 	/* .num_shaders		= */ 1,
 };
 
 static Enesim_Renderer_OpenGL_Program _path_complex_program = {
-	/* .name 		= */ "path_complex",
-	/* .shaders 		= */ _path_complex_shaders,
+	/* .name		= */ "path_complex",
+	/* .shaders		= */ _path_complex_shaders,
 	/* .num_shaders		= */ 2,
 };
 
@@ -851,7 +851,7 @@ static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
 	glVertex3f(pt->x, pt->y, 0.0);
 }
 
-static void _path_opengl_combine_cb(GLdouble coords[3], 
+static void _path_opengl_combine_cb(GLdouble coords[3],
 		GLdouble *vertex_data[4],
 		GLfloat weight[4], GLdouble **dataOut,
 		void *data)
@@ -905,8 +905,8 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_OpenGL_Figure *glf,
 	gluTessCallback(t, GLU_TESS_VERTEX_DATA, &_path_opengl_vertex_cb);
 	gluTessCallback(t, GLU_TESS_BEGIN_DATA, &_path_opengl_begin_cb);
 	gluTessCallback(t, GLU_TESS_END_DATA, &_path_opengl_end_cb);
-	gluTessCallback(t, GLU_TESS_COMBINE_DATA, &_path_opengl_combine_cb); 
-	gluTessCallback(t, GLU_TESS_ERROR_DATA, &_path_opengl_error_cb); 
+	gluTessCallback(t, GLU_TESS_COMBINE_DATA, &_path_opengl_combine_cb);
+	gluTessCallback(t, GLU_TESS_ERROR_DATA, &_path_opengl_error_cb);
 
 	gluTessBeginPolygon(t, glf);
 	EINA_LIST_FOREACH (f->polygons, l1, p)
@@ -1227,7 +1227,7 @@ static void _path_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY; 
+			ENESIM_RENDERER_FLAG_GEOMETRY;
 }
 
 static void _path_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -1378,7 +1378,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
- 	thiz = _path_get(r);
+	thiz = _path_get(r);
 	gl = &thiz->gl;
 
 	/* generate the figures */
@@ -1417,33 +1417,33 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
 
- 	thiz = _path_get(r);
+	thiz = _path_get(r);
 }
 #endif
 
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
-	/* .name = 			*/ _path_name,
-	/* .free = 			*/ NULL,
-	/* .boundings = 		*/ _path_boundings,
-	/* .destination_boundings = 	*/ _path_destination_boundings,
-	/* .flags = 			*/ _path_flags,
-	/* .hints_get = 		*/ _path_hints,
-	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
-	/* .has_changed = 		*/ _path_has_changed,
+	/* .name =			*/ _path_name,
+	/* .free =			*/ NULL,
+	/* .boundings =		*/ _path_boundings,
+	/* .destination_boundings =	*/ _path_destination_boundings,
+	/* .flags =			*/ _path_flags,
+	/* .hints_get =		*/ _path_hints,
+	/* .is_inside =		*/ NULL,
+	/* .damage =			*/ NULL,
+	/* .has_changed =		*/ _path_has_changed,
 	/* .feature_get =		*/ _path_feature_get,
-	/* .sw_setup = 			*/ _path_sw_setup,
-	/* .sw_cleanup = 		*/ _path_sw_cleanup,
+	/* .sw_setup =			*/ _path_sw_setup,
+	/* .sw_cleanup =		*/ _path_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
 #if BUILD_OPENGL
-	/* .opengl_initialize = 	*/ _path_opengl_initialize,
-	/* .opengl_setup = 		*/ _path_opengl_setup,
+	/* .opengl_initialize =	*/ _path_opengl_initialize,
+	/* .opengl_setup =		*/ _path_opengl_setup,
 	/* .opengl_cleanup =		*/ _path_opengl_cleanup,
 #else
-	/* .opengl_setup = 		*/ NULL,
-	/* .opengl_cleanup = 		*/ NULL
+	/* .opengl_setup =		*/ NULL,
+	/* .opengl_cleanup =		*/ NULL
 #endif
 };
 /*============================================================================*
