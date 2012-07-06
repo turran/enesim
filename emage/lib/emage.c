@@ -451,11 +451,11 @@ EAPI void emage_options_parse(const char *options, Emage_Option_Cb cb, void *dat
 
 	orig = v = strdup(options);
 	/* split the value by ';' */
-	while ((sc = index(v, ';')))
+	while ((sc = strchr(v, ';')))
 	{
 		*sc = '\0';
 		/* split it by ':' */
-		c = index(v, '=');
+		c = strchr(v, '=');
 		if (c)
 		{
 			char *vv;
@@ -467,7 +467,7 @@ EAPI void emage_options_parse(const char *options, Emage_Option_Cb cb, void *dat
 		v = sc + 1;
 	}
 	/* do the last one */
-	c = index(v, '=');
+	c = strchr(v, '=');
 	if (c)
 	{
 		char *vv;
