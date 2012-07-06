@@ -39,6 +39,4 @@ struct _Enesim_Buffer
 	void *user; /* user provided data */
 };
 
-void * enesim_buffer_backend_data_get(Enesim_Buffer *b);
-
 #endif

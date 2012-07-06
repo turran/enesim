@@ -17,7 +17,11 @@
  */
 #include "enesim_private.h"
 
+#define CHECK_FE 0
+
+#if CHECK_FE
 #include <fenv.h>
+#endif
 
 #include "enesim_main.h"
 #include "enesim_error.h"
@@ -88,11 +92,12 @@ EAPI int enesim_init(void)
 #ifdef EFL_HAVE_SSE2
 	/* EINA_ERROR_PINFO("SSE2 Drawer available\n"); */
 #endif
+#if CHECK_FE
 	/* FIXME for some reason we are having several fp exaceptions
 	 * better disable the inexact case always
 	 */
 	feenableexcept(FE_DIVBYZERO | FE_INVALID);
-
+#endif
 	return _enesim_init_count;
 
   shutdown_eina:

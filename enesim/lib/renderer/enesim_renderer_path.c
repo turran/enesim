@@ -542,7 +542,7 @@ static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 /*----------------------------------------------------------------------------*
  *                                 Commands                                   *
  *----------------------------------------------------------------------------*/
-static void _p_move_to(Enesim_Renderer_Command_State *state,
+static void _path_move_to(Enesim_Renderer_Command_State *state,
 		double x, double y)
 {
 	/* we have to reset the curve state too */
@@ -555,7 +555,7 @@ static void _p_move_to(Enesim_Renderer_Command_State *state,
 	state->vertex_add(x, y, state->data);
 }
 
-static void _p_close(Enesim_Renderer_Command_State *state, Eina_Bool close)
+static void _path_close(Enesim_Renderer_Command_State *state, Eina_Bool close)
 {
 	state->polygon_close(close, state->data);
 }
@@ -606,7 +606,7 @@ static void _path_generate_vertices(Eina_List *commands,
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			_p_move_to(&state, x, y);
+			_path_move_to(&state, x, y);
 			break;
 
 			case ENESIM_COMMAND_LINE_TO:
@@ -698,7 +698,7 @@ static void _path_generate_vertices(Eina_List *commands,
 			break;
 
 			case ENESIM_COMMAND_CLOSE:
-			_p_close(&state, cmd->definition.close.close);
+			_path_close(&state, cmd->definition.close.close);
 			break;
 
 			default:

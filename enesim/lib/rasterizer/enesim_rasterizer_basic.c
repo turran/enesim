@@ -130,7 +130,7 @@ static inline int _basic_edges_nz_process(Enesim_F16p16_Edge *edges, int edges_c
 	return a;
 }
 
-static inline Eina_Bool _basic_edges_setup(Enesim_F16p16_Edge *edges, int *edges_count,
+static inline Eina_Bool _basic_edges_generate(Enesim_F16p16_Edge *edges, int *edges_count,
 		Enesim_F16p16_Vector *v, int nvectors,
 		Eina_F16p16 xx, Eina_F16p16 yy,
 		Eina_F16p16 axx,
@@ -253,6 +253,29 @@ static inline void _basic_edges_clip(Enesim_F16p16_Edge *edges, int nedges,
 	*lxx = lx;
 }
 
+static inline Eina_Bool _basic_edges_setup(Enesim_F16p16_Edge *edges, int *edges_count,
+		Enesim_F16p16_Vector *v, int nvectors,
+		Eina_F16p16 yy,
+		Eina_F16p16 *ll, Eina_F16p16 *rr,
+		Eina_F16p16 axx, Eina_F16p16 *pxx,
+		int *px, unsigned int *plen, uint32_t **pd)
+{
+	if (!_basic_edges_generate(edges, edges_count,
+		v, nvectors, *pxx, yy, axx, ll, rr))
+		return EINA_FALSE;
+
+	_basic_edges_clip(edges, *edges_count,
+		axx, pxx, ll, rr, px, plen, pd);
+
+	return EINA_TRUE;
+}
+
+#define SETUP_EDGES \
+	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
+	if (!_basic_edges_setup(edges, &nedges, v, nvectors, yy, &lx, &rx, axx, &xx, &x, &len, &d)) \
+		goto get_out;
+
+#if 0
 #define SETUP_EDGES \
 	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
 	edge = edges; \
@@ -335,6 +358,7 @@ static inline void _basic_edges_clip(Enesim_F16p16_Edge *edges, int nedges,
 		e -= len; \
 	} \
 	else rx = len;
+#endif
 
 #define EVAL_EDGES_NZ \
 		n = 0; \
