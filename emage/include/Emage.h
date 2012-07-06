@@ -107,6 +107,15 @@ typedef struct _Emage_Provider
 EAPI Eina_Bool emage_provider_register(Emage_Provider *);
 EAPI void emage_provider_unregister(Emage_Provider *);
 
+EAPI Eina_Bool emage_provider_info_load(Emage_Provider *thiz,
+	const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt);
+EAPI Eina_Bool emage_provider_load(Emage_Provider *thiz,
+		const char *file, Enesim_Surface **s,
+		Enesim_Format f, Enesim_Pool *mpool, const char *options);
+EAPI Eina_Bool emage_provider_save(Emage_Provider *thiz,
+		const char *file, Enesim_Surface *s,
+		const char *options);
+
 /**
  * @}
  * @defgroup Emage_Misc_Group Misc

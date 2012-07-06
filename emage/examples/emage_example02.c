@@ -1,11 +1,21 @@
 #include "Emage.h"
 
+void help(void)
+{
+	printf("emage_example02 INFILE OUTFILE\n");
+}
 
 int main(int argc, char **argv)
 {
 	Enesim_Surface *s = NULL;
 	char *fload;
 	char *fsave;
+
+	if (argc < 3)
+	{
+		help();
+		return -1;
+	}
 
 	fload = argv[1];
 	fsave = argv[2];

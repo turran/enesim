@@ -43,6 +43,7 @@ Enesim
 
 Emage
 =====
++ Make the load/save functions receive the Emage_Data (the data abstraction: file, buffer, whatever)
 + Right now we support loading/saving files by doing
   emage_load(file, surface, options)
   and the providers have this interface:

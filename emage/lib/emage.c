@@ -6,21 +6,6 @@
 
 #define EMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
 
-#ifdef ERR
-# undef ERR
-#endif
-#define ERR(...) EINA_LOG_DOM_ERR(emage_log_dom_global, __VA_ARGS__)
-
-#ifdef WRN
-# undef WRN
-#endif
-#define WRN(...) EINA_LOG_DOM_WARN(emage_log_dom_global, __VA_ARGS__)
-
-#ifdef DBG
-# undef DBG
-#endif
-#define DBG(...) EINA_LOG_DOM_DBG(emage_log_dom_global, __VA_ARGS__)
-
 static int _emage_init_count = 0;
 static Eina_Array *_modules = NULL;
 static Eina_List *_providers = NULL;
@@ -71,124 +56,6 @@ typedef struct _Emage_Job
 	} op;
 } Emage_Job;
 
-
-static void _provider_data_convert(Enesim_Buffer *buffer,
-		uint32_t w, uint32_t h, Enesim_Surface *s)
-{
-	Enesim_Renderer *importer;
-
-	importer = enesim_renderer_importer_new();
-	enesim_renderer_importer_buffer_set(importer, buffer);
-	enesim_renderer_draw(importer, s, NULL, 0, 0, NULL);
-	enesim_renderer_unref(importer);
-}
-
-static Eina_Bool _provider_info_load(Emage_Provider *p, const char *file,
-		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
-{
-	Eina_Bool ret;
-	int pw, ph;
-	Enesim_Buffer_Format pfmt;
-
-	/* get the info from the image */
-	ret = p->info_get(file, &pw, &ph, &pfmt, options);
-	if (w) *w = pw;
-	if (h) *h = ph;
-	if (sfmt) *sfmt = pfmt;
-
-	return ret;
-}
-
-static Eina_Bool _provider_options_parse(Emage_Provider *p, const char *options,
-		void **options_data)
-{
-	if (!options)
-		return EINA_TRUE;
-
-	if (!p->options_parse)
-		return EINA_TRUE;
-
-	*options_data = p->options_parse(options);
-	return EINA_TRUE;
-}
-
-static void _provider_options_free(Emage_Provider *p, void *options)
-{
-	if (p->options_free)
-		p->options_free(options);
-}
-
-static Eina_Bool _provider_data_load(Emage_Provider *p, const char *file,
-		Enesim_Surface **s, Enesim_Format f, Enesim_Pool *mpool,
-		void *options,
-		Eina_Error *err)
-{
-	Enesim_Buffer_Format cfmt;
-	Enesim_Buffer *buffer;
-	Enesim_Surface *ss = *s;
-	Eina_Error error;
-	Eina_Bool owned = EINA_FALSE;
-	Eina_Bool import = EINA_FALSE;
-	int w, h;
-
-	error = _provider_info_load(p, file, &w, &h, &cfmt, options);
-	if (error)
-	{
-		goto info_err;
-	}
-	if (!ss)
-	{
-		ss = enesim_surface_new_pool_from(f, w, h, mpool);
-		if (!ss)
-		{
-			error = EMAGE_ERROR_ALLOCATOR;
-			goto surface_err;
-		}
-		owned = EINA_TRUE;
-	}
-
-	if (cfmt == ENESIM_BUFFER_FORMAT_ARGB8888_PRE || cfmt == ENESIM_BUFFER_FORMAT_A8)
-	{
-		buffer = enesim_surface_buffer_get(ss);
-	}
-	else
-	{
-		/* create a buffer of format cfmt where the provider will fill */
-		buffer = enesim_buffer_new_pool_from(cfmt, w, h, mpool);
-		if (!buffer)
-		{
-			error = EMAGE_ERROR_ALLOCATOR;
-			goto buffer_err;
-		}
-		import = EINA_TRUE;
-	}
-
-	/* load the file */
-	error = p->load(file, buffer, options);
-	if (error)
-	{
-		goto load_err;
-	}
-	if (import)
-	{
-		/* convert */
-		_provider_data_convert(buffer, w, h, ss);
-	}
-
-	*s = ss;
-	return EINA_TRUE;
-
-load_err:
-	enesim_buffer_unref(buffer);
-buffer_err:
-	if (owned)
-		enesim_surface_unref(ss);
-surface_err:
-info_err:
-	*err = error;
-	return EINA_FALSE;
-}
-
 static Emage_Provider * _load_provider_get(const char *file)
 {
 	Eina_List *tmp;
@@ -209,19 +76,6 @@ static Emage_Provider * _load_provider_get(const char *file)
 			return p;
 	}
 	return NULL;
-}
-
-static Eina_Bool _provider_data_save(Emage_Provider *p, const char *file,
-		Enesim_Surface *s, Eina_Error *err)
-{
-	/* save the file */
-	if (p->save(file, s, NULL) == EINA_FALSE)
-	{
-		*err = EMAGE_ERROR_SAVING;
-		return EINA_FALSE;
-	}
-
-	return EINA_TRUE;
 }
 
 static Emage_Provider * _save_provider_get(const char *file)
@@ -259,7 +113,6 @@ static void * _thread_load(void *data)
 {
 	Emage_Provider *prov;
 	Emage_Job *j = data;
-	void *options = NULL;
 
 	prov = _load_provider_get(j->file);
 	if (!prov)
@@ -272,10 +125,9 @@ static void * _thread_load(void *data)
 		return NULL;
 #endif
 	}
-	_provider_options_parse(prov, j->options, &options);
-	_provider_data_load(prov, j->file, &j->op.load.s, j->op.load.f,
-			j->op.load.pool, options, &j->err);
-	_provider_options_free(prov, options);
+	if (!emage_provider_load(prov, j->file, &j->op.load.s,
+		j->op.load.f, j->op.load.pool, j->options))
+		j->err = eina_error_get();
 	_thread_finish(j);
 
 #ifdef _WIN32
@@ -305,7 +157,8 @@ static void * _thread_save(void *data)
 		return NULL;
 #endif
 	}
-	_provider_data_save(prov, j->file, j->op.save.s, &j->err);
+	if (!emage_provider_save(prov, j->file, j->op.save.s, j->options))
+		j->err = eina_error_get();
 	_thread_finish(j);
 
 #ifdef _WIN32
@@ -419,13 +272,7 @@ EAPI Eina_Bool emage_info_load(const char *file, int *w, int *h, Enesim_Buffer_F
 	Emage_Provider *prov;
 
 	prov = _load_provider_get(file);
-	if (!prov)
-	{
-		eina_error_set(EMAGE_ERROR_PROVIDER);
-		return EINA_FALSE;
-	}
-	_provider_info_load(prov, file, w, h, sfmt, NULL);
-	return EINA_TRUE;
+	return emage_provider_info_load(prov, file, w, h, sfmt);
 }
 /**
  * Load an image synchronously
@@ -442,24 +289,9 @@ EAPI Eina_Bool emage_load(const char *file, Enesim_Surface **s,
 		Enesim_Format f, Enesim_Pool *mpool, const char *options)
 {
 	Emage_Provider *prov;
-	Eina_Error err = 0;
-	Eina_Bool ret = EINA_TRUE;
-	void *op = NULL;
 
 	prov = _load_provider_get(file);
-	if (!prov)
-	{
-		eina_error_set(EMAGE_ERROR_PROVIDER);
-		return EINA_FALSE;
-	}
-	_provider_options_parse(prov, options, &op);
-	if (!_provider_data_load(prov, file, s, f, mpool, op, &err))
-	{
-		eina_error_set(err);
-		ret = EINA_FALSE;
-	}
-	_provider_options_free(prov, op);
-	return ret;
+	return emage_provider_load(prov, file, s, f, mpool, options);
 }
 /**
  * Load an image asynchronously
@@ -505,20 +337,9 @@ EAPI void emage_load_async(const char *file, Enesim_Surface *s,
 EAPI Eina_Bool emage_save(const char *file, Enesim_Surface *s, const char *options)
 {
 	Emage_Provider *prov;
-	Eina_Error err = 0;
 
 	prov = _save_provider_get(file);
-	if (!prov)
-	{
-		eina_error_set(EMAGE_ERROR_PROVIDER);
-		return EINA_FALSE;
-	}
-	if (!_provider_data_save(prov, file, s, &err))
-	{
-		eina_error_set(err);
-		return EINA_FALSE;
-	}
-	return EINA_TRUE;
+	return emage_provider_save(prov, file, s, options);
 }
 /**
  * Save an image asynchronously
