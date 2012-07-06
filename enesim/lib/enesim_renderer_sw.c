@@ -304,7 +304,7 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r,
 
 		len = area->w * sizeof(uint32_t);
 		fdata = alloca(len);
-		_sw_surface_draw_rop(r, sw_data->fill, span, ddata, stride, fdata, len, area);
+		_sw_surface_draw_rop(r, sw_data->fill, sw_data->span, ddata, stride, fdata, len, area);
 	}
 	else
 	{
