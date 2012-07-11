@@ -238,6 +238,11 @@ static void * _thread_run(void *data)
 			size_t len;
 
 			len = op->area.w * sizeof(uint32_t);
+			/* FIXME remove this malloc. or we either
+			 * make the tmp buffer part of the renderer
+			 * and make it grow until we reach the span len
+			 * or alloca everytime
+			 */
 			tmp = malloc(len);
 			_sw_surface_draw_rop_threaded(op->renderer,
 					thiz->cpuidx,
@@ -258,7 +263,6 @@ static void * _thread_run(void *data)
 					op->dst,
 					op->stride,
 					&op->area);
-
 		}
 		pthread_barrier_wait(&_end);
 	} while (1);
@@ -376,78 +380,19 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		Eina_List *clips, int x, int y)
 {
-#if 0
-	Enesim_Format dfmt;
-	Enesim_Renderer_Sw_Data *rswdata;
-	Enesim_Renderer_Flag flags;
-	uint8_t *ddata;
-	size_t stride;
-	size_t bpp;
-
-	_sw_surface_setup(s, &dfmt, (void *)&ddata, &stride, &bpp);
-	ddata = ddata + (area->y * stride) + (area->x * bpp);
-
-	enesim_renderer_flags(r, &flags);
-	rswdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
-	if (rswdata->span)
-	{
-		Eina_Rectangle *clip;
-		Eina_List *l;
-
-		/* iterate over the list of clips */
-		EINA_LIST_FOREACH(clips, l, clip)
-		{
-			Eina_Rectangle final;
-			size_t len;
-			uint8_t *fdata;
-			uint8_t *rdata;
-
-			final = *clip;
-			if (!eina_rectangle_intersection(&final, area))
-				continue;
-			rdata = ddata + (final.y * stride) + (final.x * bpp);
-			/* translate the origin */
-			final.x -= x;
-			final.y -= y;
-			/* now render */
-			len = final.w * bpp;
-			fdata = alloca(len);
-			_sw_surface_draw_rop(r, rswdata->fill, rswdata->span, rdata, stride,
-					fdata, len, &final);
-		}
-	}
-	else
-	{
-		Eina_Rectangle *clip;
-		Eina_List *l;
-
-		/* iterate over the list of clips */
-		EINA_LIST_FOREACH(clips, l, clip)
-		{
-			Eina_Rectangle final;
-			uint8_t *rdata;
-
-			final = *clip;
-			if (!eina_rectangle_intersection(&final, area))
-				continue;
-			rdata = ddata + (final.y * stride) + (final.x * bpp);
-			/* translate the origin */
-			final.x -= x;
-			final.y -= y;
-			/* now render */
-			_sw_surface_draw_simple(r, rswdata->fill, rdata, stride, &final);
-		}
-	}
-#else
 	Eina_Rectangle *clip;
 	Eina_List *l;
 
 	/* iterate over the list of clips */
 	EINA_LIST_FOREACH(clips, l, clip)
 	{
-		enesim_renderer_sw_draw_area(r, s, clip, x, y);
+		Eina_Rectangle final; 
+		
+		final = *clip;
+		if (!eina_rectangle_intersection(&final, area))
+			continue;
+		enesim_renderer_sw_draw_area(r, s, &final, x, y);
 	}
-#endif
 }
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
