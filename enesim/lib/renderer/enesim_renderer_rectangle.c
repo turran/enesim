@@ -322,7 +322,7 @@ static Eina_Bool _rectangle_use_path(Enesim_Matrix_Type geometry_type)
 	return EINA_FALSE;
 }
 
-static void _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
+static void _rectangle_path_propagate(Enesim_Renderer_Rectangle *thiz,
 		double x, double y, double w, double h, double r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES])
@@ -403,48 +403,70 @@ pass:
 	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 }
 
+static Eina_Bool _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
+		double x, double y, double w, double h, double rad,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Error **error)
+{
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+	double sw;
+
+	sw = css->stroke.weight;
+	/* in case of a stroked rectangle we need to convert the location of the stroke to center */
+	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	{
+		switch (css->stroke.location)
+		{
+			case ENESIM_SHAPE_STROKE_OUTSIDE:
+			x -= sw / 2.0;
+			y -= sw / 2.0;
+			w += sw;
+			h += sw;
+			break;
+
+			case ENESIM_SHAPE_STROKE_INSIDE:
+			x += sw / 2.0;
+			y += sw / 2.0;
+			w -= sw;
+			h -= sw;
+			break;
+
+			default:
+			break;
+		}
+	}
+	_rectangle_path_propagate(thiz, x, y, w, h, rad, states, sstates);
+	if (!enesim_renderer_setup(thiz->path, s, error))
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static void _rectangle_state_cleanup(Enesim_Renderer_Rectangle *thiz,
+		Enesim_Renderer *r, Enesim_Surface *s)
+{
+	enesim_renderer_shape_cleanup(r, s);
+	/* check if we should use the path approach */
+	if (thiz->use_path)
+	{
+		enesim_renderer_cleanup(thiz->path, s);
+	}
+	thiz->past = thiz->current;
+	thiz->changed = EINA_FALSE;
+	thiz->use_path = EINA_FALSE;
+}
+
 #if BUILD_OPENGL
-static Eina_Bool _rectangle_opengl_shader_setup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _rectangle_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_Rectangle *thiz;
-	Enesim_Renderer_OpenGL_Data *rdata;
-	int width;
-	int height;
-	int x;
-	int y;
 
- 	thiz = _rectangle_get(r);
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-
-	x = glGetUniformLocationARB(rdata->program, "rectangle_x");
-	y = glGetUniformLocationARB(rdata->program, "rectangle_y");
-	width = glGetUniformLocationARB(rdata->program, "rectangle_width");
-	height = glGetUniformLocationARB(rdata->program, "rectangle_height");
-
-	glUniform1f(x, thiz->current.x);
-	glUniform1f(y, thiz->current.y);
-	glUniform1f(width, thiz->current.width);
-	glUniform1f(height, thiz->current.height);
-
-	/* FIXME set the background like this for now */
-	{
-		int odd_color;
-		int even_color;
-		int odd_thickness;
-		int even_thickness;
-
-		even_color = glGetUniformLocationARB(rdata->program, "stripes_even_color");
-		odd_color = glGetUniformLocationARB(rdata->program, "stripes_odd_color");
-		even_thickness = glGetUniformLocationARB(rdata->program, "stripes_even_thickness");
-		odd_thickness = glGetUniformLocationARB(rdata->program, "stripes_odd_thickness");
-
-		glUniform4fARB(even_color, 1.0, 0.0, 0.0, 1.0);
-		glUniform4fARB(odd_color, 0.0, 0.0, 1.0, 1.0);
-		glUniform1i(even_thickness, 2.0);
-		glUniform1i(odd_thickness, 5.0);
-	}
-
-	return EINA_TRUE;
+	thiz = _rectangle_get(r);
+	enesim_renderer_opengl_draw(thiz->path, s, area, w, h);
 }
 #endif
 
@@ -1106,7 +1128,44 @@ static const char * _rectangle_name(Enesim_Renderer *r)
 	return "rectangle";
 }
 
-static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
+static inline Eina_Bool _rectangle_generate_geometry(Enesim_Renderer_Rectangle *thiz,
+		Enesim_Renderer *r,
+		const Enesim_Renderer_State *cs,
+		double *dx, double *dy, double *dw, double *dh, double *drad,
+		Enesim_Error **error)
+{
+	double rad;
+	double x;
+	double y;
+	double w;
+	double h;
+
+	w = thiz->current.width * cs->sx;
+	h = thiz->current.height * cs->sy;
+	if ((w < 1) || (h < 1))
+	{
+		ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g", w, h);
+		return EINA_FALSE;
+	}
+
+	x = thiz->current.x * cs->sx;
+	y = thiz->current.y * cs->sy;
+
+	rad = thiz->current.corner.radius;
+	if (rad > (w / 2.0))
+		rad = w / 2.0;
+	if (rad > (h / 2.0))
+		rad = h / 2.0;
+
+	*dx = x;
+	*dy = y;
+	*dw = w;
+	*dh = h;
+	*drad = rad;
+	return EINA_TRUE;
+}
+
+static Eina_Bool _rectangle_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
@@ -1129,58 +1188,14 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	w = thiz->current.width * cs->sx;
-	h = thiz->current.height * cs->sy;
-	if ((w < 1) || (h < 1))
-	{
-		ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g", w, h);
+	if (!_rectangle_generate_geometry(thiz, r, cs, &x, &y, &w, &h, &rad, error))
 		return EINA_FALSE;
-	}
-
-	x = thiz->current.x * cs->sx;
-	y = thiz->current.y * cs->sy;
-
-	rad = thiz->current.corner.radius;
-	if (rad > (w / 2.0))
-		rad = w / 2.0;
-	if (rad > (h / 2.0))
-		rad = h / 2.0;
 
 	/* check if we should use the path approach */
 	thiz->use_path = _rectangle_use_path(cs->geometry_transformation_type);
 	if (thiz->use_path)
 	{
-		double sw;
-
-		sw = css->stroke.weight;
-		/* in case of a stroked rectangle we need to convert the location of the stroke to center */
-		if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
-		{
-			switch (css->stroke.location)
-			{
-				case ENESIM_SHAPE_STROKE_OUTSIDE:
-				x -= sw / 2.0;
-				y -= sw / 2.0;
-				w += sw;
-				h += sw;
-				break;
-
-				case ENESIM_SHAPE_STROKE_INSIDE:
-				x += sw / 2.0;
-				y += sw / 2.0;
-				w -= sw;
-				h -= sw;
-				break;
-
-				default:
-				break;
-			}
-		}
-		_rectangle_path_setup(thiz, x, y, w, h, rad, states, sstates);
-		if (!enesim_renderer_setup(thiz->path, s, error))
-		{
-			return EINA_FALSE;
-		}
+		_rectangle_path_setup(thiz, x, y, w, h, rad, states, sstates, s, error);
 		*draw = _rectangle_path_span;
 
 		return EINA_TRUE;
@@ -1294,21 +1309,12 @@ static Eina_Bool _rectangle_state_setup(Enesim_Renderer *r,
 	}
 }
 
-static void _rectangle_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _rectangle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-
-	enesim_renderer_shape_cleanup(r, s);
-	/* check if we should use the path approach */
-	if (thiz->use_path)
-	{
-		enesim_renderer_cleanup(thiz->path, s);
-	}
-	thiz->past = thiz->current;
-	thiz->changed = EINA_FALSE;
-	thiz->use_path = EINA_FALSE;
+	_rectangle_state_cleanup(thiz, r, s);
 }
 
 static void _rectangle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -1484,13 +1490,20 @@ static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Rectangle *thiz;
-	Enesim_Renderer_OpenGL_Shader *shader;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	double rad;
+	double x;
+	double y;
+	double w;
+	double h;
 
  	thiz = _rectangle_get(r);
 
-	/* FIXME in order to generate the stroke we might need to call this twice
-	 * one for the outter rectangle and one for the inner
-	 */
+	thiz->use_path = EINA_TRUE;
+	if (!_rectangle_generate_geometry(thiz, r, cs, &x, &y, &w, &h, &rad, error))
+		return EINA_FALSE;
+	_rectangle_path_setup(thiz, x, y, w, h, rad, states, sstates, s, error);
+	*draw = _rectangle_opengl_draw;
 	return EINA_TRUE;
 }
 
@@ -1499,6 +1512,7 @@ static void _rectangle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Rectangle *thiz;
 
  	thiz = _rectangle_get(r);
+	_rectangle_state_cleanup(thiz, r, s);
 }
 #endif
 
@@ -1513,8 +1527,8 @@ static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _rectangle_has_changed,
 	/* .feature_get =		*/ _rectangle_feature_get,
-	/* .sw_setup = 			*/ _rectangle_state_setup,
-	/* .sw_cleanup = 		*/ _rectangle_state_cleanup,
+	/* .sw_setup = 			*/ _rectangle_sw_setup,
+	/* .sw_cleanup = 		*/ _rectangle_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,

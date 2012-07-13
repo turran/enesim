@@ -377,24 +377,6 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 #endif
 }
 
-void enesim_renderer_sw_draw_list(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		Eina_List *clips, int x, int y)
-{
-	Eina_Rectangle *clip;
-	Eina_List *l;
-
-	/* iterate over the list of clips */
-	EINA_LIST_FOREACH(clips, l, clip)
-	{
-		Eina_Rectangle final; 
-		
-		final = *clip;
-		if (!eina_rectangle_intersection(&final, area))
-			continue;
-		enesim_renderer_sw_draw_area(r, s, &final, x, y);
-	}
-}
-
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,

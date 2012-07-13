@@ -34,6 +34,14 @@ typedef struct _Enesim_Rectangle
 	double h;
 } Enesim_Rectangle;
 
+static inline void enesim_rectangle_normalize(Enesim_Rectangle *r, Eina_Rectangle *dst)
+{
+	dst->x = floor(r->x);
+	dst->y = floor(r->y);
+	dst->w = ceil(r->x - dst->x + r->w);
+	dst->h = ceil(r->y - dst->y + r->h);
+}
+
 static inline Eina_Bool enesim_rectangle_is_inside(Enesim_Rectangle *r, double x, double y)
 {
 	if ((x - r->x >= 0) && (y - r->y >= 0) && (r->x + r->w - x >= 0) && (r->y + r->h - y >= 0))

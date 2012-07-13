@@ -159,6 +159,16 @@ EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b)
 	return b->backend;
 }
 
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Pool * enesim_buffer_pool_get(Enesim_Buffer *b)
+{
+	return b->pool;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed

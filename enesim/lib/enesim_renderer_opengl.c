@@ -53,6 +53,7 @@ static Eina_Bool _geometry_shader_support = EINA_FALSE;
         printf("Error %d\n", err); \
         }
 
+#if 0
 static void _opengl_extensions_setup(void)
 {
 	char *extensions;
@@ -69,7 +70,6 @@ static void _opengl_extensions_setup(void)
 		_geometry_shader_support = EINA_TRUE;
 }
 
-#if 0
 /* Disabled for now until we find a solution with the unresolved symbol */
 static void _opengl_geometry_shader_setup(Enesim_Renderer_OpenGL_Shader *shader)
 {
@@ -267,7 +267,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	Enesim_Buffer_OpenGL_Data *sdata;
 	GLenum status;
 	int i;
-	int j;
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -278,29 +277,48 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
 		if (r->descriptor.opengl_initialize)
 		{
-			Enesim_Renderer_OpenGL_Program **programs;
-			int num;
+			Enesim_Renderer_OpenGL_Program **programs = NULL;
+			Enesim_Renderer_OpenGL_Program_Data *pdata;
+			const char *name;
+			int num = 0;
 
+			name = r->descriptor.name(r);
+			if (!name) return EINA_FALSE;
+
+			pdata = eina_hash_find(_program_lut, name);
+			if (pdata)
+			{
+				rdata->program = pdata;
+				goto setup;
+			}
+			pdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Program_Data));
 			if (!r->descriptor.opengl_initialize(r, &num, &programs))
 				return EINA_FALSE;
-			rdata->programs = programs;
-			rdata->num_programs = num;
+			pdata->programs = programs;
+			pdata->num_programs = num;
 
-			rdata->c_programs = calloc(rdata->num_programs, sizeof(GLenum));
-			for (i = 0; i < rdata->num_programs; i++)
+			eina_hash_add(_program_lut, name, pdata);
+
+			if (!programs)
+				goto setup;
+
+			pdata->compiled = calloc(pdata->num_programs, sizeof(Enesim_Renderer_OpenGL_Compiled_Program));
+			for (i = 0; i < pdata->num_programs; i++)
 			{
 				Enesim_Renderer_OpenGL_Program *p;
 				Enesim_Renderer_OpenGL_Compiled_Program *cp;
 
-				p = rdata->programs[i];
-				cp = &rdata->c_programs[i];
+				p = pdata->programs[i];
+				cp = &pdata->compiled[i];
 
 				/* TODO try to find the program */
 				/* TODO check return value */
 				_opengl_compiled_program_new(cp, r, s, rdata, p);
 			}
+			rdata->program = pdata;
 		}
 	}
+setup:
 	/* do the setup */
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
 	if (!r->descriptor.opengl_setup(r, states, s,
@@ -369,10 +387,13 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	if (!r->descriptor.opengl_cleanup) return;
+	r->descriptor.opengl_cleanup(r, s);
 }
 
-void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
+/* FIXME this should be exported and normalize in the same way as the one on the enesim_renderer_sw.c
+ */
+void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Eina_Rectangle *area,
 		int x, int y)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
@@ -386,8 +407,8 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	/* run it on the renderer fbo */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	/* get the compiled shader from the renderer backend data */
-	glUseProgramObjectARB(rdata->program);
+	///* get the compiled shader from the renderer backend data */
+	//glUseProgramObjectARB(rdata->program);
 	/* create the geometry to render to */
 	glEnable(GL_BLEND);
 

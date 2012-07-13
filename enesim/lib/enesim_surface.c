@@ -197,6 +197,15 @@ EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI Enesim_Pool * enesim_surface_pool_get(Enesim_Surface *s)
+{
+	return enesim_buffer_pool_get(s->buffer);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);

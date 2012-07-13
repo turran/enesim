@@ -15,9 +15,11 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
 #include "libargb.h"
+
+#include "enesim_color.h"
+
 #include "private/format_argb8888_unpre.h" // FIXME for now until we fix this
 /*============================================================================*
  *                                  Local                                     *

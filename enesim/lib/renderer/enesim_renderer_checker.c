@@ -153,7 +153,7 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	thiz = _checker_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	cp = &rdata->c_programs[0];
+	cp = &rdata->program->compiled[0];
 	glUseProgramObjectARB(cp->id);
 	_checker_opengl_shader_setup(cp->id,
 			thiz->final_color2, thiz->final_color1,

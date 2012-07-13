@@ -28,6 +28,14 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 
+#ifdef BUILD_OPENCL
+#include "Enesim_OpenCL.h"
+#endif
+
+#ifdef BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#endif
+
 #include "private/renderer.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -84,6 +92,18 @@ static void _clipper_span(Enesim_Renderer *r,
 	enesim_renderer_sw_draw(thiz->current.content, x, y, len, dst);
 }
 
+#if BUILD_OPENGL
+static void _clipper_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int w, int h)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+ 	thiz = _clipper_get(r);
+	enesim_renderer_opengl_draw(thiz->current.content, s, area, w, h);
+}
+#endif
+
+
 /* called from the optimized case of the damages to just clip the damages
  * to our own bounds
  */
@@ -113,22 +133,10 @@ static Eina_Bool _clipper_changed_basic(Enesim_Renderer_Clipper *thiz)
 		return EINA_TRUE;
 	return EINA_FALSE;
 }
-/*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
- *----------------------------------------------------------------------------*/
-static const char * _clipper_name(Enesim_Renderer *r)
-{
-	return "clipper";
-}
 
-static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+static Eina_Bool _clipper_state_setup(Enesim_Renderer_Clipper *thiz,
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
 {
-	Enesim_Renderer_Clipper *thiz;
-
- 	thiz = _clipper_get(r);
 	if (!thiz->current.content)
 	{
 		ENESIM_RENDERER_ERROR(r, error, "No content");
@@ -142,20 +150,47 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer *r,
 		ENESIM_RENDERER_ERROR(r, error, "Content renderer %s can not setup", name);
 		return EINA_FALSE;
 	}
-	*fill = _clipper_span;
+
 	return EINA_TRUE;
 }
 
-static void _clipper_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _clipper_state_cleanup(Enesim_Renderer_Clipper *thiz,
+		Enesim_Surface *s)
 {
-	Enesim_Renderer_Clipper *thiz;
-
- 	thiz = _clipper_get(r);
 	thiz->changed = EINA_FALSE;
 	thiz->past = thiz->current;
 
 	if (!thiz->current.content) return;
 	enesim_renderer_cleanup(thiz->current.content, s);
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _clipper_name(Enesim_Renderer *r)
+{
+	return "clipper";
+}
+
+static Eina_Bool _clipper_sw_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+ 	thiz = _clipper_get(r);
+	if (!_clipper_state_setup(thiz, r, s, error))
+		return EINA_FALSE;
+	*fill = _clipper_span;
+	return EINA_TRUE;
+}
+
+static void _clipper_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+ 	thiz = _clipper_get(r);
+	_clipper_state_cleanup(thiz, s);
 }
 
 static void _clipper_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -278,6 +313,32 @@ static void _clipper_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _clipper_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+ 	thiz = _clipper_get(r);
+	if (!_clipper_state_setup(thiz, r, s, error))
+		return EINA_FALSE;
+
+	*draw = _clipper_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _clipper_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+ 	thiz = _clipper_get(r);
+	_clipper_state_cleanup(thiz, s);
+}
+#endif
+
 static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _clipper_name,
@@ -289,13 +350,20 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ _clipper_damage,
 	/* .has_changed = 		*/ _clipper_has_changed,
-	/* .sw_setup = 			*/ _clipper_state_setup,
-	/* .sw_cleanup = 		*/ _clipper_state_cleanup,
+	/* .sw_setup = 			*/ _clipper_sw_setup,
+	/* .sw_cleanup = 		*/ _clipper_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
+#if BUILD_OPENGL
+	/* .opengl_initialize = 	*/ NULL,
+	/* .opengl_setup = 		*/ _clipper_opengl_setup,
+	/* .opengl_cleanup = 		*/ _clipper_opengl_cleanup,
+#else
+	/* .opengl_initialize = 	*/ NULL,
+	/* .opengl_setup = 		*/ NULL,
+	/* .opengl_cleanup = 		*/ NULL
+#endif
 };
 /*============================================================================*
  *                                   API                                      *

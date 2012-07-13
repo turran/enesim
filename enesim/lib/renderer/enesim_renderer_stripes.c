@@ -143,7 +143,7 @@ static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	thiz = _stripes_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	cp = &rdata->c_programs[0];
+	cp = &rdata->program->compiled[0];
 	_stripes_opengl_shader_setup(cp->id,
 			thiz->final_color1, thiz->final_color2,
 			thiz->current.even.thickness,

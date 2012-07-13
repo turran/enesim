@@ -35,17 +35,22 @@ typedef struct _Enesim_Renderer_OpenGL_Compiled_Program
 	int num_shaders;
 } Enesim_Renderer_OpenGL_Compiled_Program;
 
-typedef struct _Enesim_Renderer_OpenGL_Data
+typedef struct _Enesim_Renderer_OpenGL_Program_Data
 {
-	/* data fetch on the setup */
-	Enesim_Renderer_OpenGL_Draw draw;
 	Enesim_Renderer_OpenGL_Program **programs;
 	int num_programs;
 	/* generated */
-	Enesim_Renderer_OpenGL_Compiled_Program *c_programs;
+	Enesim_Renderer_OpenGL_Compiled_Program *compiled;
+} Enesim_Renderer_OpenGL_Program_Data;
+
+typedef struct _Enesim_Renderer_OpenGL_Data
+{
+	/* data fetch on the initialize */
+	Enesim_Renderer_OpenGL_Program_Data *program;
+	/* data fetch on the setup */
+	Enesim_Renderer_OpenGL_Draw draw;
 	GLuint fbo;
 	/* FIXME remove this */
-	GLenum program;
 	Eina_Bool has_geometry; /* has a geometry shader */
 	Eina_Bool has_vertex; /* has a vertex shader */
 	Eina_Bool does_geometry; /* the renderer defines the geometry */

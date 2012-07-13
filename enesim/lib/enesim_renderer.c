@@ -137,12 +137,34 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_List *clips, int x, int y)
 {
 	Enesim_Backend b;
+	Eina_Rectangle *clip;
+	Eina_List *l;
 
 	b = enesim_surface_backend_get(s);
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
-		enesim_renderer_sw_draw_list(r, s, area, clips, x, y);
+		EINA_LIST_FOREACH(clips, l, clip)
+		{
+			Eina_Rectangle final; 
+		
+			final = *clip;
+			if (!eina_rectangle_intersection(&final, area))
+				continue;
+			enesim_renderer_sw_draw_area(r, s, &final, x, y);
+		}
+		break;
+
+		case ENESIM_BACKEND_OPENGL:
+		EINA_LIST_FOREACH(clips, l, clip)
+		{
+			Eina_Rectangle final; 
+		
+			final = *clip;
+			if (!eina_rectangle_intersection(&final, area))
+				continue;
+			enesim_renderer_opengl_draw(r, s, &final, x, y);
+		}
 		break;
 
 		default:
@@ -446,6 +468,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 	states[ENESIM_STATE_CURRENT] = &r->current;
 	states[ENESIM_STATE_PAST] = &r->past;
 	b = enesim_surface_backend_get(s);
+	DBG("Setting up the renderer %s", r->name);
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
@@ -514,6 +537,10 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
 		enesim_renderer_sw_cleanup(r, s);
+		break;
+
+		case ENESIM_BACKEND_OPENGL:
+		enesim_renderer_opengl_cleanup(r, s);
 		break;
 
 		default:

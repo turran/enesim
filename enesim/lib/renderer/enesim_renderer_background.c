@@ -133,7 +133,7 @@ static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz = _background_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
-	cp = &rdata->c_programs[0];
+	cp = &rdata->program->compiled[0];
 	_background_opengl_shader_setup(cp->id, thiz->final_color);
 
 	glMatrixMode(GL_TEXTURE);
@@ -351,6 +351,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .opengl_setup = 		*/ _background_opengl_setup,
 	/* .opengl_cleanup = 		*/ _background_opengl_cleanup,
 #else
+	/* .opengl_initialize = 	*/ NULL,
 	/* .opengl_setup = 		*/ NULL,
 	/* .opengl_cleanup = 		*/ NULL
 #endif

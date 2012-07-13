@@ -53,6 +53,7 @@ EAPI Enesim_Buffer * enesim_surface_buffer_get(Enesim_Surface *s);
 EAPI void enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h);
 EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s);
 EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s);
+EAPI Enesim_Pool * enesim_surface_pool_get(Enesim_Surface *s);
 
 EAPI void enesim_surface_private_set(Enesim_Surface *s, void *data);
 EAPI void * enesim_surface_private_get(Enesim_Surface *s);

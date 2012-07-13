@@ -993,7 +993,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		enesim_renderer_shape_fill_color_get(r, &color);
 	}
 
-	cp = &rdata->c_programs[0];
+	cp = &rdata->program->compiled[0];
 	_path_opengl_ambient_shader_setup(cp->id, color);
 	_path_opengl_figure_draw(rdata->fbo, sdata->texture, gf, f, cp);
 }
@@ -1021,7 +1021,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 
-	cp = &rdata->c_programs[0];
+	cp = &rdata->program->compiled[0];
 
 	/* create the fill texture */
 	textures[0] = enesim_opengl_texture_new(w, h);
@@ -1042,7 +1042,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, sdata->texture, 0);
-	cp = &rdata->c_programs[1];
+	cp = &rdata->program->compiled[1];
 	_path_opengl_merge_shader_setup(cp->id, textures[0], textures[1]);
 
 	glMatrixMode(GL_TEXTURE);

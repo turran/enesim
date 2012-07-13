@@ -158,11 +158,34 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		const Eina_Rectangle *area, int w, int h)
 {
+	Enesim_Renderer_Compound *thiz;
+	Enesim_Pool *pool;
+	Enesim_Format format;
+	Enesim_Surface *tmp;
+	Eina_List *l;
+	Layer *layer;
+	int sw;
+	int sh;
+
+	thiz = _compound_get(r);
+
 	/* create a temporary texture */
-	/* render each layer there with the requested rop */
-	// enesim_opengl_rop_set(l->r, l->rop);
-	// enesim_renderer_opengl_draw(l->r, s, area, w, h);
+	enesim_surface_size_get(s, &sw, &sh);
+	pool = enesim_surface_pool_get(s);
+	format = enesim_surface_format_get(s);
+	tmp = enesim_surface_new_pool_from(format, sw, sh, pool);
+
+	/* render each layer */
+	EINA_LIST_FOREACH(thiz->layers, l, layer)
+	{
+		//enesim_renderer_opengl_draw(l->r, tmp, area, w, h);
+		enesim_renderer_opengl_draw(layer->r, s, area, w, h);
+	}
 	/* finally just rop the resulting texture into the real texture */
+	// enesim_renderer_rop_get(r, &rop);
+	// enesim_opengl_rop_set(l->r, l->rop);
+
+	enesim_surface_unref(tmp);
 }
 #endif
 

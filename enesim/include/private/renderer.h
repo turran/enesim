@@ -69,7 +69,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Error **error);
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
-void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
+void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Eina_Rectangle *area,
 		int x, int y);
 
 void enesim_renderer_opengl_init(void);
@@ -113,9 +113,6 @@ void enesim_renderer_sw_shutdown(void);
 void enesim_renderer_sw_draw_area(Enesim_Renderer *r,
 		Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y);
-void enesim_renderer_sw_draw_list(Enesim_Renderer *r,
-		Enesim_Surface *s, Eina_Rectangle *area,
-		Eina_List *clips, int x, int y);
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES], Enesim_Surface *s, Enesim_Error **error);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
