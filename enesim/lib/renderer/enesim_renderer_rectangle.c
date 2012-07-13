@@ -1537,6 +1537,7 @@ static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 	/* .opengl_setup =          	*/ _rectangle_opengl_setup,
 	/* .opengl_cleanup =        	*/ _rectangle_opengl_cleanup,
 #else
+	/* .opengl_initialize =         */ NULL,,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 #endif

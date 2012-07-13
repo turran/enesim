@@ -17,6 +17,9 @@
  */
 #ifndef ENESIM_RECTANGLE_H_
 #define ENESIM_RECTANGLE_H_
+
+#include <math.h>
+
 /**
  * @defgroup Enesim_Rectangle_Group Rectangle
  * @{

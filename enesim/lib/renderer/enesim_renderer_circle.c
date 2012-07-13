@@ -109,7 +109,7 @@ static Eina_Bool _circle_properties_have_changed(Enesim_Renderer_Circle *thiz)
 	return EINA_FALSE;
 }
 
-static void _circle_path_setup(Enesim_Renderer_Circle *thiz,
+static void _circle_path_propagate(Enesim_Renderer_Circle *thiz,
 		double x, double y, double r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES])
@@ -145,6 +145,62 @@ pass:
 	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
 	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 }
+
+static Eina_Bool _circle_path_setup(Enesim_Renderer_Circle *thiz,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Error **error)
+{
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+	double rad;
+
+	rad = thiz->current.r;
+	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	{
+		switch (css->stroke.location)
+		{
+			case ENESIM_SHAPE_STROKE_OUTSIDE:
+			rad += css->stroke.weight / 2.0;
+			break;
+
+			case ENESIM_SHAPE_STROKE_INSIDE:
+			rad -= css->stroke.weight / 2.0;
+			break;
+
+			case ENESIM_SHAPE_STROKE_CENTER:
+			break;
+		}
+	}
+
+	_circle_path_propagate(thiz, thiz->current.x, thiz->current.y, rad, states, sstates);
+	if (!enesim_renderer_setup(thiz->path, s, error))
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static void _circle_state_cleanup(Enesim_Renderer_Circle *thiz, Enesim_Renderer *r, Enesim_Surface *s)
+{
+	enesim_renderer_shape_cleanup(r, s);
+	if (thiz->use_path)
+		enesim_renderer_cleanup(thiz->path, s);
+	thiz->past = thiz->current;
+	thiz->changed = EINA_FALSE;
+	thiz->use_path = EINA_FALSE;
+}
+
+#if BUILD_OPENGL
+static void _circle_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int w, int h)
+{
+	Enesim_Renderer_Circle *thiz;
+
+	thiz = _circle_get(r);
+	enesim_renderer_opengl_draw(thiz->path, s, area, w, h);
+}
+#endif
 
 static inline Enesim_Color _circle_sample(Eina_F16p16 xx, Eina_F16p16 yy,
 		Enesim_Renderer_Circle_Sw *swc,
@@ -536,31 +592,8 @@ static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
 	thiz->use_path = _circle_use_path(cs->geometry_transformation_type);
 	if (thiz->use_path)
 	{
-		double rad;
-
-		rad = thiz->current.r;
-		if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
-		{
-			switch (css->stroke.location)
-			{
-				case ENESIM_SHAPE_STROKE_OUTSIDE:
-				rad += css->stroke.weight / 2.0;
-				break;
-
-				case ENESIM_SHAPE_STROKE_INSIDE:
-				rad -= css->stroke.weight / 2.0;
-				break;
-
-				case ENESIM_SHAPE_STROKE_CENTER:
-				break;
-			}
-		}
-
-		_circle_path_setup(thiz, thiz->current.x, thiz->current.y, rad, states, sstates);
-		if (!enesim_renderer_setup(thiz->path, s, error))
-		{
+		if (!_circle_path_setup(thiz, states, sstates, s,error))
 			return EINA_FALSE;
-		}
 		*draw = _circle_path_span;
 
 		return EINA_TRUE;
@@ -643,12 +676,7 @@ static void _circle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Circle *thiz;
 
 	thiz = _circle_get(r);
-	enesim_renderer_shape_cleanup(r, s);
-	if (thiz->use_path)
-		enesim_renderer_cleanup(thiz->path, s);
-	thiz->past = thiz->current;
-	thiz->changed = EINA_FALSE;
-	thiz->use_path = EINA_FALSE;
+	_circle_state_cleanup(thiz, r, s);
 }
 
 static void _circle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -690,6 +718,33 @@ static void _circle_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _circle_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Circle *thiz;
+
+ 	thiz = _circle_get(r);
+	thiz->use_path = EINA_TRUE;
+	if (!_circle_path_setup(thiz, states, sstates, s, error))
+		return EINA_FALSE;
+	*draw = _circle_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _circle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Circle *thiz;
+
+ 	thiz = _circle_get(r);
+	_circle_state_cleanup(thiz, r, s);
+}
+#endif
+
 static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .name = 			*/ _circle_name,
 	/* .free = 			*/ _circle_free,
@@ -706,8 +761,15 @@ static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+#if BUILD_OPENGL
+	/* .opengl_initialize =         */ NULL,
+	/* .opengl_setup =          	*/ _circle_opengl_setup,
+	/* .opengl_cleanup =        	*/ _circle_opengl_cleanup,
+#else
+	/* .opengl_initialize =         */ NULL,,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
+#endif
 };
 /*============================================================================*
  *                                 Global                                     *
