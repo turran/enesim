@@ -156,6 +156,7 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		break;
 
 		case ENESIM_BACKEND_OPENGL:
+#if BUILD_OPENGL
 		EINA_LIST_FOREACH(clips, l, clip)
 		{
 			Eina_Rectangle final; 
@@ -165,6 +166,7 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 				continue;
 			enesim_renderer_opengl_draw(r, s, &final, x, y);
 		}
+#endif
 		break;
 
 		default:
@@ -540,7 +542,9 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		break;
 
 		case ENESIM_BACKEND_OPENGL:
+#if BUILD_OPENGL
 		enesim_renderer_opengl_cleanup(r, s);
+#endif
 		break;
 
 		default:
