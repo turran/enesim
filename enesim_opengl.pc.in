@@ -7,6 +7,6 @@ Name: enesim
 Description: Enesim
 Requires: eina enesim
 Version: @VERSION@
-Libs: -L${libdir} -lenesim_opengl -lGL -lGLU
+Libs: -L${libdir} -lGL -lGLU
 Cflags: -I${includedir}
 
