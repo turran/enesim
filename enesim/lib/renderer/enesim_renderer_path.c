@@ -930,6 +930,25 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_OpenGL_Figure *glf,
 	gluDeleteTess(t);
 }
 
+static void _path_opengl_notesselate(Enesim_Renderer_Path_OpenGL_Figure *glf)
+{
+	Eina_List *l1;
+	Enesim_Renderer_Path_OpenGL_Polygon *p;
+
+	EINA_LIST_FOREACH(glf->polygons, l1, p)
+	{
+		Enesim_Point *pt;
+		Eina_List *l2;
+
+		glBegin(p->type);
+		EINA_LIST_FOREACH(p->polygon->points, l2, pt)
+		{
+			glVertex3f(pt->x, pt->y, 0.0);
+		}
+		glEnd();
+	}
+}
+
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
 		Enesim_Renderer_Path_OpenGL_Figure *gf,
@@ -953,7 +972,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	/* if not, just use the cached vertices */
 	else
 	{
-		printf("no tesselate!\n");
+		_path_opengl_notesselate(gf);
 	}
 }
 
