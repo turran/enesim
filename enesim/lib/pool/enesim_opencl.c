@@ -51,7 +51,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 			&format, w, h, 0, NULL, &ret);
 	if (ret != CL_SUCCESS)
 	{
-		printf("impossible to create the image %d\n", ret);
+		DBG("impossible to create the image %d", ret);
 		return EINA_FALSE;
 	}
 	*backend = ENESIM_BACKEND_OPENCL;
@@ -62,7 +62,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	data->device = thiz->device;
 	data->queue = thiz->queue;
 
-	printf("Image created correctly\n");
+	DBG("Image created correctly");
 	return EINA_TRUE;
 }
 
@@ -95,12 +95,12 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 	region[2] = 1;
 
 	clGetImageInfo(data->mem, CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
-	printf("row pitch %d\n", size);
+	DBG("row pitch %d", size);
 	dst->argb8888_pre.plane0 = calloc(size * h, sizeof(uint8_t));
 	ret = clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, 0, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
 	if (ret != CL_SUCCESS)
 	{
-		printf("Failed getting the surface\n");
+		DBG("Failed getting the surface");
 		return EINA_FALSE;
 	}
 	dst->argb8888_pre.plane0_stride = size;
@@ -145,23 +145,23 @@ EAPI Enesim_Pool * enesim_pool_opencl_new(void)
             &device_id, &ret_num_devices);
 	if (ret != CL_SUCCESS)
 	{
-		printf("impossible to get the devices\n");
+		DBG("impossible to get the devices");
  		goto end;
 	}
 	context = clCreateContext(0, 1, &device_id, NULL, NULL, &ret);
 	if (ret != CL_SUCCESS)
 	{
-		printf("impossible to get the context\n");
+		DBG("impossible to get the context");
 		goto end;
 	}
 	queue = clCreateCommandQueue(context, device_id, 0, &ret);
 	if (ret != CL_SUCCESS)
 	{
-		printf("impossible to get the command queue\n");
+		DBG("impossible to get the command queue");
 		goto end;
 	}
 
-	printf("Everything went ok\n");
+	DBG("Everything went ok");
 	thiz = calloc(1, sizeof(Enesim_OpenCL_Pool));
 	thiz->context = context;
 	thiz->device = device_id;
