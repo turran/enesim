@@ -74,6 +74,17 @@ static void _figure_span(Enesim_Renderer *r,
 	enesim_renderer_sw_draw(thiz->path, x, y, len, ddata);
 }
 
+#if BUILD_OPENGL
+static void _figure_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int w, int h)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	enesim_renderer_opengl_draw(thiz->path, s, area, w, h);
+}
+#endif
+
 static void _figure_generate_commands(Enesim_Renderer_Figure *thiz)
 {
 	Enesim_Figure *f;
@@ -130,27 +141,12 @@ static void _figure_path_setup(Enesim_Renderer_Figure *thiz,
 	enesim_renderer_rop_set(thiz->path, cs->rop);
 	enesim_renderer_scale_set(thiz->path, cs->sx, cs->sy);
 }
-/*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
- *----------------------------------------------------------------------------*/
-static const char * _figure_name(Enesim_Renderer *r)
-{
-	return "figure";
-}
 
-static void _free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Figure *thiz;
-
-	thiz = _figure_get(r);
-	enesim_figure_delete(thiz->figure);
-}
-
-static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
+static Eina_Bool _figure_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
+		Enesim_Error **error)
 {
 	Enesim_Renderer_Figure *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -175,6 +171,42 @@ static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 	if (!enesim_renderer_setup(thiz->path, s, error))
 		return EINA_FALSE;
 
+	return EINA_TRUE;
+}
+
+static void _figure_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	enesim_renderer_shape_cleanup(r, s);
+	enesim_renderer_cleanup(thiz->path, s);
+}
+
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _figure_name(Enesim_Renderer *r)
+{
+	return "figure";
+}
+
+static void _free(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = _figure_get(r);
+	enesim_figure_delete(thiz->figure);
+}
+
+static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
+{
+	if (!_figure_state_setup(r, states, sstates, s, error))
+		return EINA_FALSE;
 	*draw = _figure_span;
 
 	return EINA_TRUE;
@@ -182,11 +214,7 @@ static Eina_Bool _figure_sw_setup(Enesim_Renderer *r,
 
 static void _figure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Figure *thiz;
-
-	thiz = _figure_get(r);
-	enesim_renderer_shape_cleanup(r, s);
-	enesim_renderer_cleanup(thiz->path, s);
+	_figure_state_cleanup(r, s);
 }
 
 static Eina_Bool _figure_has_changed(Enesim_Renderer *r,
@@ -252,6 +280,27 @@ static void _figure_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *featur
 	enesim_renderer_shape_feature_get(thiz->path, features);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _figure_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Error **error)
+{
+	if (!_figure_state_setup(r, states, sstates, s, error))
+		return EINA_FALSE;
+	*draw = _figure_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _figure_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	_figure_state_cleanup(r, s);
+}
+#endif
+
+
 static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {
 	/* .name = 			*/ _figure_name,
 	/* .free = 			*/ _free,
@@ -268,8 +317,15 @@ static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+#if BUILD_OPENGL
+	/* .opengl_initialize =         */ NULL,
+	/* .opengl_setup =          	*/ _figure_opengl_setup,
+	/* .opengl_cleanup =        	*/ _figure_opengl_cleanup,
+#else
+	/* .opengl_initialize =         */ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
+#endif
 };
 /*============================================================================*
  *                                 Global                                     *
