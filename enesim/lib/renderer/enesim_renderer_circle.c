@@ -766,7 +766,7 @@ static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .opengl_setup =          	*/ _circle_opengl_setup,
 	/* .opengl_cleanup =        	*/ _circle_opengl_cleanup,
 #else
-	/* .opengl_initialize =         */ NULL,,
+	/* .opengl_initialize =         */ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 #endif
