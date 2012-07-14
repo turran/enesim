@@ -7,6 +7,6 @@ Name: enesim
 Description: Enesim
 Requires: eina enesim
 Version: @VERSION@
-Libs: -L${libdir} -lenesim_opencl
+Libs: -L${libdir} -lOpenCL
 Cflags: -I${includedir}
 
