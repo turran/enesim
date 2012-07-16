@@ -283,7 +283,11 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 			int num = 0;
 
 			name = r->descriptor.name(r);
-			if (!name) return EINA_FALSE;
+			if (!name)
+			{
+				ENESIM_RENDERER_ERROR(r, error, "Renderer with no name?");
+				return EINA_FALSE;
+			}
 
 			pdata = eina_hash_find(_program_lut, name);
 			if (pdata)
@@ -334,38 +338,6 @@ setup:
 	/* FIXME we need to know if we should create, compile and link the programs
 	 * again or not .... */
 
-	/* store the data returned by the setup */
-	rdata->draw = draw;
-
-#if 0
-	/* use this program and setup each shader */
-	for (j = 0; j < rdata->num_programs; j++)
-	{
-		Enesim_Renderer_OpenGL_Program *p;
-		Enesim_Renderer_OpenGL_Compiled_Program *cp;
-		Enesim_Renderer_OpenGL_Shader_Setup shader_setup;
-
-		p = rdata->programs[j];
-		cp = &rdata->c_programs[j];
-		shader_setup = p->shader_setup;
-
-		if (!shader_setup)
-			continue;
-
-		glUseProgramObjectARB(cp->id);
-		for (i = 0; i < p->num_shaders; i++)
-		{
-			Enesim_Renderer_OpenGL_Shader *shader;
-
-			shader = p->shaders[i];
-			if (!shader_setup(r, s, p, shader))
-			{
-				printf("Cannot setup the shader\n");
-			}
-		}
-		glUseProgramObjectARB(0);
-	}
-#endif
 	/* create the fbos */
 	if (!rdata->fbo)
 	{
@@ -381,6 +353,9 @@ setup:
         {
 		ENESIM_RENDERER_ERROR(r, error, "Impossible too setup the framebuffer %d", status);
         }
+
+	/* store the data returned by the setup */
+	rdata->draw = draw;
 
 	return EINA_TRUE;
 }
@@ -407,27 +382,15 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Ei
 	/* run it on the renderer fbo */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	///* get the compiled shader from the renderer backend data */
-	//glUseProgramObjectARB(rdata->program);
-	/* create the geometry to render to */
 	glEnable(GL_BLEND);
 
+	/* create the geometry to render to */
 	enesim_surface_size_get(s, &width, &height);
-	/* FIXME we should define a pre_render function
-	 * to for example set/store some attributes
-	 */
 	/* now draw */
 	if (rdata->draw)
 	{
-		/* FIXME for now */
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-
-		glOrtho(0, width, 0, height, -1, 1);
 		rdata->draw(r, s, area, width, height);
 	}
-	/* FIXME we should define a post_render function
-	 * to put the state as it was before */
 	glUseProgramObjectARB(0);
 }
 

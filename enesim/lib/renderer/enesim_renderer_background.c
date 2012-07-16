@@ -141,7 +141,7 @@ static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, w, 0, h, -1, 1);
+	glOrtho(0, w, h, 0, -1, 1);
 
 	glBegin(GL_QUADS);
 		glTexCoord2d(area->x, area->y);

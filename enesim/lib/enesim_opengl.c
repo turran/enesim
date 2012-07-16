@@ -107,8 +107,8 @@ EAPI void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww, int hh)
 		return;
 	}
 
-	x = ww - area->x;
-	y = hh - area->y;
+	x = area->x;
+	y = hh - (area->y + area->h);
 	w = area->w;
 	h = area->h;
 
@@ -116,4 +116,35 @@ EAPI void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww, int hh)
 	glScissor(x, y, w, h);
 }
 
+/* area is the destination of area of a viewport of size WxH */
+EAPI void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
+		int w, int h, int tx, int ty)
+{
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, t, 0);
 
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, 0, h, -1, 1);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glOrtho(-w, w, -h, h, -1, 1);
+
+	/* trigger the area */
+	glBegin(GL_QUADS);
+		glTexCoord2d(area->x, area->y);
+		glVertex2d(area->x, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y);
+		glVertex2d(area->x + area->w, area->y);
+
+		glTexCoord2d(area->x + area->w, area->y + area->h);
+		glVertex2d(area->x + area->w, area->y + area->h);
+
+		glTexCoord2d(area->x, area->y + area->h);
+		glVertex2d(area->x, area->y + area->h);
+	glEnd();
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+}

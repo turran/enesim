@@ -97,15 +97,6 @@ typedef struct _Enesim_Renderer_Path_Stroke_State
 	int count;
 } Enesim_Renderer_Path_Stroke_State;
 
-#if 0
-typedef enum _Enesim_Renderer_Path_OpenGL_Type
-{
-	ENESIM_PATH_FILL_DIRECT,
-	ENESIM_PATH_STROKE_DIRECT,
-	ENESIM_PATH_STROKE_DIRECT,
-} Enesim_Renderer_Path_OpenGL_Type;
-#endif
-
 #if BUILD_OPENGL
 typedef struct _Enesim_Renderer_Path_OpenGL_Polygon
 {
@@ -953,17 +944,37 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
 		Enesim_Renderer_Path_OpenGL_Figure *gf,
 		Enesim_Figure *f,
-		Enesim_Renderer_OpenGL_Compiled_Program *cp)
+		Enesim_Color color,
+		Enesim_Renderer *rel,
+		Enesim_Renderer_OpenGL_Data *rdata)
 {
+	
+	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+
+	/* get the compiled shader from the renderer backend data */
+	cp = &rdata->program->compiled[0];
+	_path_opengl_ambient_shader_setup(cp->id, color);
+
+	/* render the inner renderer first into a temporary texture */
+	if (rel != NULL)
+	{
+		printf("relative renderer\n");
+		/* TODO use the texture shader plus a color to multiply */
+	}
+	/* TODO use the ambient shader */
+	else
+	{
+
+	}
+
+	//if (color != ENESIM_COLOR_FULL)
+
 	/* run it on the renderer fbo */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, texture, 0);
-	if (cp)
-	{
-		/* get the compiled shader from the renderer backend data */
-		glUseProgramObjectARB(cp->id);
-	}
+	/* use the compiled shader */
+	glUseProgramObjectARB(cp->id);
 	/* check if we need to tesselate again */
 	if (gf->needs_tesselate)
 	{
@@ -976,6 +987,38 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	}
 }
 
+static void _path_opengl_stroke_renderer_setup(Enesim_Renderer *r,
+	Enesim_Color color,
+	Enesim_Color *final_color,
+	Enesim_Renderer **orend)
+{
+	Enesim_Color scolor;
+
+	enesim_renderer_shape_stroke_color_get(r, &scolor);
+	enesim_renderer_shape_stroke_renderer_get(r, orend);
+	/* multiply the color */
+	if (scolor != ENESIM_COLOR_FULL)
+		*final_color = argb8888_mul4_sym(color, scolor);
+	else
+		*final_color = color;
+}
+
+static void _path_opengl_fill_renderer_setup(Enesim_Renderer *r,
+	Enesim_Color color,
+	Enesim_Color *final_color,
+	Enesim_Renderer **orend)
+{
+	Enesim_Color fcolor;
+
+	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	enesim_renderer_shape_fill_renderer_get(r, orend);
+	/* multiply the color */
+	if (fcolor != ENESIM_COLOR_FULL)
+		*final_color = argb8888_mul4_sym(color, fcolor);
+	else
+		*final_color = color;
+}
+
 static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		const Eina_Rectangle *area, int w, int h)
@@ -983,12 +1026,13 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_OpenGL *gl;
 	Enesim_Renderer_Path_OpenGL_Figure *gf;
-	Enesim_Renderer_OpenGL_Compiled_Program *cp;
 	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer *rel;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Shape_Draw_Mode dm;
 	Enesim_Figure *f;
 	Enesim_Color color;
+	Enesim_Color final_color;
 
 	thiz = _path_get(r);
 	gl = &thiz->gl;
@@ -996,25 +1040,30 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 	enesim_renderer_shape_draw_mode_get(r, &dm);
+	enesim_renderer_color_get(r, &color);
 	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		gf = &gl->stroke;
 		f = thiz->stroke_figure;
-		/* TODO multiply the color */
-		enesim_renderer_shape_stroke_color_get(r, &color);
+		_path_opengl_stroke_renderer_setup(r, color, &final_color, &rel);
 	}
-
 	else
 	{
 		gf = &gl->fill;
 		f = thiz->fill_figure;
-		/* TODO multiply the color */
-		enesim_renderer_shape_fill_color_get(r, &color);
+		_path_opengl_fill_renderer_setup(r, color, &final_color, &rel);
 	}
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, h, 0, -1, 1);
 
-	cp = &rdata->program->compiled[0];
-	_path_opengl_ambient_shader_setup(cp->id, color);
-	_path_opengl_figure_draw(rdata->fbo, sdata->texture, gf, f, cp);
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glOrtho(-w, w, -h, h, -1, 1);
+
+	enesim_opengl_clip_set(area, w, h);
+	_path_opengl_figure_draw(rdata->fbo, sdata->texture, gf, f, final_color, rel, rdata);
+	enesim_opengl_clip_unset();
 }
 
 /* for fill and stroke we need to draw the stroke first on a
@@ -1031,7 +1080,9 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_Renderer *rel;
 	Enesim_Color color;
+	Enesim_Color final_color;
 	GLenum textures[2];
 
 	thiz = _path_get(r);
@@ -1040,33 +1091,59 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 
-	cp = &rdata->program->compiled[0];
+	printf("%d %d %d %d -> %d %d\n", area->x, area->y, area->w, area->h, w, h);
 
 	/* create the fill texture */
-	textures[0] = enesim_opengl_texture_new(w, h);
+	textures[0] = enesim_opengl_texture_new(area->w, area->h);
 	/* create the stroke texture */
-	textures[1] = enesim_opengl_texture_new(w, h);
+	textures[1] = enesim_opengl_texture_new(area->w, area->h);
+
+	enesim_renderer_color_get(r, &color);
+	glViewport(0, 0, area->w, area->h);
+
 	/* draw the fill into the newly created buffer */
-	/* TODO multiply the color */
-	enesim_renderer_shape_fill_color_get(r, &color);
-	_path_opengl_ambient_shader_setup(cp->id, color);
-	_path_opengl_figure_draw(rdata->fbo, textures[0], &gl->fill, thiz->fill_figure, cp);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(area->x, area->x + area->w, area->y, area->y + area->h, -1, 1);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	//glOrtho(area->x - area->w, area->x + area->w, area->y - area->h, area->y + area->h, -1, 1);
+
+	_path_opengl_fill_renderer_setup(r, color, &final_color, &rel);
+	_path_opengl_figure_draw(rdata->fbo, textures[0], &gl->fill,
+			thiz->fill_figure, final_color, rel, rdata);
 	/* draw the stroke into the newly created buffer */
-	/* TODO multiply the color */
-	enesim_renderer_shape_stroke_color_get(r, &color);
-	_path_opengl_ambient_shader_setup(cp->id, color);
-	_path_opengl_figure_draw(rdata->fbo, textures[1], &gl->stroke, thiz->stroke_figure, cp);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(area->x, area->x + area->w, area->y, area->y + area->h, -1, 1);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	//glOrtho(area->x - area->w, area->x + area->w, area->y - area->h, area->y + area->h, -1, 1);
+
+	_path_opengl_stroke_renderer_setup(r, color, &final_color, &rel);
+	_path_opengl_figure_draw(rdata->fbo, textures[1], &gl->stroke,
+			thiz->stroke_figure, final_color, rel, rdata);
 
 	/* now use the real destination surface to draw the merge fragment */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, sdata->texture, 0);
 	cp = &rdata->program->compiled[1];
-	_path_opengl_merge_shader_setup(cp->id, textures[0], textures[1]);
+	_path_opengl_merge_shader_setup(cp->id, textures[1], textures[0]);
+
+	printf("drawing!\n");
+
+	glViewport(0, 0, w, h);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, h, 0, -1, 1);
 
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
-	glOrtho(-w, w, -h, h, -1, 1);
+	glOrtho(area->x - area->w, area->x + area->w, area->y - area->h, area->y + area->h, -1, 1);
 
 	/* use the area to render boths paths */
 	glBegin(GL_QUADS);

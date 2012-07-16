@@ -2,6 +2,9 @@ ENESIM_OPENGL_SHADER(
 uniform sampler2D merge_texture_0;
 uniform sampler2D merge_texture_1;
 
+/* given two textures: merge_texture_0 and merge_texture_1 generate a
+ * fragment which is the mix of of both texture using the merge_texture_0 alpha
+ */
 void main()
 {
 	vec4 texel0 = texture2D(merge_texture_0, gl_TexCoord[0].xy);
