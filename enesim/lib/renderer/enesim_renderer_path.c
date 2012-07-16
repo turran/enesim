@@ -914,6 +914,11 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_OpenGL_Figure *glf,
 			//	break;
 			gluTessVertex(t, (GLdouble *)pt, pt);
 		}
+		if (p->closed)
+		{
+			pt = eina_list_data_get(p->points);
+			gluTessVertex(t, (GLdouble *)pt, pt);
+		}
 		gluTessEndContour(t);
 	}
 	gluTessEndPolygon(t);
@@ -940,6 +945,31 @@ static void _path_opengl_notesselate(Enesim_Renderer_Path_OpenGL_Figure *glf)
 	}
 }
 
+static void _path_opengl_silhoutte_draw(Enesim_Figure *f)
+{
+	Eina_List *l;
+	Enesim_Polygon *p;
+
+	glLineWidth(2);
+	EINA_LIST_FOREACH(f->polygons, l, p)
+	{
+		Enesim_Point *pt;
+		Eina_List *l2;
+
+		glBegin(GL_LINE_STRIP);
+		EINA_LIST_FOREACH(p->points, l2, pt)
+		{
+			glVertex3f(pt->x, pt->y, 0.0);
+		}
+		if (p->closed)
+		{
+			pt = eina_list_data_get(p->points);
+			glVertex3f(pt->x, pt->y, 0.0);
+		}
+		glEnd();
+	}
+}
+
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
 		Enesim_Renderer_Path_OpenGL_Figure *gf,
@@ -958,7 +988,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	/* render the inner renderer first into a temporary texture */
 	if (rel != NULL)
 	{
-		printf("relative renderer\n");
+		//printf("relative renderer\n");
 		/* TODO use the texture shader plus a color to multiply */
 	}
 	/* TODO use the ambient shader */
@@ -969,12 +999,16 @@ static void _path_opengl_figure_draw(GLenum fbo,
 
 	//if (color != ENESIM_COLOR_FULL)
 
+	/* render the silhouttes */
+	
+
 	/* run it on the renderer fbo */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, texture, 0);
 	/* use the compiled shader */
 	glUseProgramObjectARB(cp->id);
+#if 1
 	/* check if we need to tesselate again */
 	if (gf->needs_tesselate)
 	{
@@ -985,6 +1019,10 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	{
 		_path_opengl_notesselate(gf);
 	}
+#else
+	_path_opengl_silhoutte_draw(f);
+	GLERR
+#endif
 }
 
 static void _path_opengl_stroke_renderer_setup(Enesim_Renderer *r,
@@ -1058,6 +1096,11 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
 	glViewport(0, 0, w, h);
+
+	/* try rendering the figure into a 2x texture, then downscale */
+	/* the problem of this supersampling is what about the fill/stroke
+	 * renderers? do they need to be supersampled too?
+	 */
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -1141,8 +1184,6 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 			GL_TEXTURE_2D, sdata->texture, 0);
 	cp = &rdata->program->compiled[1];
 	_path_opengl_merge_shader_setup(cp->id, textures[1], textures[0]);
-
-	printf("drawing!\n");
 
 	glViewport(0, 0, w, h);
 
