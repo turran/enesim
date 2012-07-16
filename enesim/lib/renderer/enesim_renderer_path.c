@@ -1254,6 +1254,17 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 	thiz->gl.stroke.needs_tesselate = EINA_TRUE;
 #endif
 }
+
+
+static void _path_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Path *thiz;
+
+	thiz = _path_get(r);
+	enesim_renderer_shape_cleanup(r, s);
+	enesim_renderer_cleanup(thiz->bifigure, s);
+	thiz->changed = EINA_FALSE;
+}
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -1308,12 +1319,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 
 static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Path *thiz;
-
-	thiz = _path_get(r);
-	enesim_renderer_shape_cleanup(r, s);
-	enesim_renderer_cleanup(thiz->bifigure, s);
-	thiz->changed = EINA_FALSE;
+	_path_state_cleanup(r, s);
 }
 
 static void _path_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -1511,9 +1517,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 
 static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Path *thiz;
-
-	thiz = _path_get(r);
+	_path_state_cleanup(r, s);
 }
 #endif
 
