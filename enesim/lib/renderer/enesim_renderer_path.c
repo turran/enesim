@@ -1033,6 +1033,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Figure *f;
 	Enesim_Color color;
 	Enesim_Color final_color;
+	GLint viewport[4];
 
 	thiz = _path_get(r);
 	gl = &thiz->gl;
@@ -1053,6 +1054,11 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		f = thiz->fill_figure;
 		_path_opengl_fill_renderer_setup(r, color, &final_color, &rel);
 	}
+
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	glViewport(0, 0, w, h);
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, w, h, 0, -1, 1);
@@ -1064,6 +1070,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	enesim_opengl_clip_set(area, w, h);
 	_path_opengl_figure_draw(rdata->fbo, sdata->texture, gf, f, final_color, rel, rdata);
 	enesim_opengl_clip_unset();
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 /* for fill and stroke we need to draw the stroke first on a
@@ -1084,6 +1091,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	Enesim_Color color;
 	Enesim_Color final_color;
 	GLenum textures[2];
+	GLint viewport[4];
 
 	thiz = _path_get(r);
 	gl = &thiz->gl;
@@ -1099,6 +1107,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	textures[1] = enesim_opengl_texture_new(area->w, area->h);
 
 	enesim_renderer_color_get(r, &color);
+	glGetIntegerv(GL_VIEWPORT, viewport);
 	glViewport(0, 0, area->w, area->h);
 
 	/* draw the fill into the newly created buffer */
@@ -1164,6 +1173,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	enesim_opengl_texture_free(textures[1]);
 	/* don't use any program */
 	glUseProgramObjectARB(0);
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 #endif
