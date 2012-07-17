@@ -973,7 +973,7 @@ static void _path_opengl_notesselate(Enesim_Renderer_Path_OpenGL_Figure *glf)
 	}
 }
 
-static void _path_opengl_silhoutte_draw(Enesim_Figure *f, int w, int h)
+static void _path_opengl_silhoutte_draw(Enesim_Figure *f, const Eina_Rectangle *area)
 {
 	Eina_List *l;
 	Enesim_Polygon *p;
@@ -994,14 +994,15 @@ static void _path_opengl_silhoutte_draw(Enesim_Figure *f, int w, int h)
 		glVertex3f(last->x, last->y, 0.0);
 		EINA_LIST_FOREACH(l2, l2, pt)
 		{
-			glTexCoord4f(last->x, h - last->y, pt->x, h - pt->y);
+			glTexCoord4f(last->x - area->x, area->h - (last->y - area->y),
+					pt->x - area->x, area->h - (pt->y - area->y));
 			glVertex3f(pt->x, pt->y, 0.0);
 			last = pt;
 		}
 		if (p->closed)
 		{
 			pt = eina_list_data_get(p->points);
-			glTexCoord4f(last->x, h - last->y, pt->x, h - pt->y);
+			glTexCoord4f(last->x - area->x, area->h - last->y - area->y, pt->x - area->x, area->h - pt->y - area->y);
 			glVertex3f(pt->x, pt->y, 0.0);
 		}
 		glEnd();
@@ -1017,33 +1018,97 @@ static void _path_opengl_figure_draw2(GLenum fbo,
 		Enesim_Color color,
 		Enesim_Renderer *rel,
 		Enesim_Renderer_OpenGL_Data *rdata,
-		int x,
-		int y,
-		int w,
-		int h)
+		const Eina_Rectangle *area)
 {
 	Enesim_Renderer_OpenGL_Compiled_Program *cp;
 	GLenum textures[2];
 
-	glViewport(0, 0, w, h);
+	textures[0] = enesim_opengl_texture_new(area->w, area->h);
+	textures[1] = enesim_opengl_texture_new(area->w, area->h);
+
+	glViewport(0, 0, area->w, area->h);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, w, h, 0, -1, 1);
+	glOrtho(area->x, area->x + area->w, area->y + area->h, area->y, -1, 1);
 
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
-	glOrtho(-w, w, -h, h, -1, 1);
+	//glOrtho(area->x - area->w, area->x + area->w, area->y - area->h, area->y + area->h, -1, 1);
 
 	cp = &rdata->program->compiled[2];
 	_path_opengl_ambient_shader_setup(cp->id, color);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, texture, 0);
+			GL_TEXTURE_2D, textures[0], 0);
 	glUseProgramObjectARB(cp->id);
-	_path_opengl_silhoutte_draw(f, w, h);
+	_path_opengl_silhoutte_draw(f, area);
 	glUseProgramObjectARB(0);
+
+	/* now draw the figure in texture[1] */
+	cp = &rdata->program->compiled[0];
+	_path_opengl_ambient_shader_setup(cp->id, color);
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, textures[1], 0);
+	glUseProgramObjectARB(cp->id);
+	/* check if we need to tesselate again */
+	if (gf->needs_tesselate)
+	{
+		_path_opengl_tesselate(gf, f);
+	}
+	/* if not, just use the cached vertices */
+	else
+	{
+		_path_opengl_notesselate(gf);
+	}
+	glUseProgramObjectARB(0);
+
+	/* merge the two */
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, textures[1], 0);
+
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+	enesim_opengl_rop_set(ENESIM_BLEND);
+	glBegin(GL_QUADS);
+		glTexCoord2d(0, 1);
+		glVertex2d(area->x, area->y);
+
+		glTexCoord2d(1, 1);
+		glVertex2d(area->x + area->w, area->y);
+
+		glTexCoord2d(1, 0);
+		glVertex2d(area->x + area->w, area->y + area->h);
+
+		glTexCoord2d(0, 0);
+		glVertex2d(area->x, area->y + area->h);
+	glEnd();
+
+	/* blit the resulting texture into the final texture */
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, texture, 0);
+
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+	enesim_opengl_rop_set(ENESIM_FILL);
+	glBegin(GL_QUADS);
+		glTexCoord2d(0, 1);
+		glVertex2d(area->x, area->y);
+
+		glTexCoord2d(1, 1);
+		glVertex2d(area->x + area->w, area->y);
+
+		glTexCoord2d(1, 0);
+		glVertex2d(area->x + area->w, area->y + area->h);
+
+		glTexCoord2d(0, 0);
+		glVertex2d(area->x, area->y + area->h);
+	glEnd();
+	enesim_opengl_texture_free(textures[0]);
+	enesim_opengl_texture_free(textures[1]);
 }
 
 static void _path_opengl_figure_draw(GLenum fbo,
@@ -1145,7 +1210,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, texture, 0);
 	glUseProgramObjectARB(cp->id);
-	_path_opengl_silhoutte_draw(f, w, h);
+	//_path_opengl_silhoutte_draw(f, area);
 #endif
 }
 
@@ -1241,7 +1306,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	texture = enesim_opengl_texture_new(area->w, area->h);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	/* render there */
-	_path_opengl_figure_draw2(rdata->fbo, texture, gf, f, final_color, rel, rdata, area->x, area->y, area->w, area->h);
+	_path_opengl_figure_draw2(rdata->fbo, texture, gf, f, final_color, rel, rdata, area);
 
 	/* finally compose such texture with the destination texture */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
@@ -1257,7 +1322,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glLoadIdentity();
 
 	glBindTexture(GL_TEXTURE_2D, texture);
-	//enesim_opengl_rop_set(ENESIM_BLEND);
+	enesim_opengl_rop_set(ENESIM_BLEND);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);
 		glVertex2d(area->x, area->y);
@@ -1274,6 +1339,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	enesim_opengl_texture_free(texture);
+	enesim_opengl_rop_set(ENESIM_FILL);
 #endif
 }
 

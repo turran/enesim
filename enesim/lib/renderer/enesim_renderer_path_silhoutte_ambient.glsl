@@ -23,6 +23,7 @@ void main()
 	if (distance.x < 0.0 || distance.y < 0.0)
 		discard;
 	float d = min(distance.x, distance.y);
-	gl_FragColor = ambient_final_color * d;
+	gl_FragColor = ambient_final_color;
+	gl_FragColor.a = d;
 }
 )
