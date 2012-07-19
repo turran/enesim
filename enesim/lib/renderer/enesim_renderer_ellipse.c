@@ -106,10 +106,12 @@ static Eina_Bool _ellipse_use_path(Enesim_Matrix_Type geometry_type)
 	return EINA_FALSE;
 }
 
-static void _ellipse_path_setup(Enesim_Renderer_Ellipse *thiz,
+static Eina_Bool _ellipse_path_setup(Enesim_Renderer_Ellipse *thiz,
 		double x, double y, double rx, double ry,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Error **error)
 {
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	//const Enesim_Renderer_State *ps = states[ENESIM_STATE_PAST];
@@ -140,7 +142,37 @@ pass:
 	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
 	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
 	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
+
+	if (!enesim_renderer_setup(thiz->path, s, error))
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
 }
+
+static void _ellipse_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Ellipse *thiz;
+
+	thiz = _ellipse_get(r);
+	enesim_renderer_shape_cleanup(r, s);
+	if (thiz->use_path)
+		enesim_renderer_cleanup(thiz->path, s);
+	thiz->past = thiz->current;
+	thiz->changed = EINA_FALSE;
+	thiz->use_path = EINA_FALSE;
+}
+
+#if BUILD_OPENGL
+static void _ellipse_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		const Eina_Rectangle *area, int w, int h)
+{
+	Enesim_Renderer_Ellipse *thiz;
+
+	thiz = _ellipse_get(r);
+	enesim_renderer_opengl_draw(thiz->path, s, area, w, h);
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
@@ -922,7 +954,7 @@ static const char * _ellipse_name(Enesim_Renderer *r)
 	return "ellipse";
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
+static Eina_Bool _ellipse_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
@@ -943,11 +975,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	thiz->use_path = _ellipse_use_path(cs->geometry_transformation_type);
 	if (thiz->use_path)
 	{
-		_ellipse_path_setup(thiz, thiz->current.x, thiz->current.y, thiz->current.rx, thiz->current.ry, states, sstates);
-		if (!enesim_renderer_setup(thiz->path, s, error))
-		{
+		if (!_ellipse_path_setup(thiz, thiz->current.x, thiz->current.y, thiz->current.rx, thiz->current.ry, states, sstates, s, error))
 			return EINA_FALSE;
-		}
 		*draw = _ellipse_path_span;
 
 		return EINA_TRUE;
@@ -1045,17 +1074,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	}
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _ellipse_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Ellipse *thiz;
-
-	thiz = _ellipse_get(r);
-	enesim_renderer_shape_cleanup(r, s);
-	if (thiz->use_path)
-		enesim_renderer_cleanup(thiz->path, s);
-	thiz->past = thiz->current;
-	thiz->changed = EINA_FALSE;
-	thiz->use_path = EINA_FALSE;
+	_ellipse_state_cleanup(r, s);
 }
 
 static void _ellipse_boundings(Enesim_Renderer *r,
@@ -1112,6 +1133,31 @@ static void _ellipse_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *featu
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _ellipse_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Ellipse *thiz;
+
+ 	thiz = _ellipse_get(r);
+	thiz->use_path = EINA_TRUE;
+	if (!_ellipse_path_setup(thiz, thiz->current.x, thiz->current.y, thiz->current.rx, thiz->current.ry, states, sstates, s, error))
+		return EINA_FALSE;
+	*draw = _ellipse_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _ellipse_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	_ellipse_state_cleanup(r, s);
+}
+#endif
+
+
 static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .name = 			*/ _ellipse_name,
 	/* .free = 			*/ _free,
@@ -1123,13 +1169,20 @@ static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _ellipse_has_changed,
 	/* .feature_get =		*/ _ellipse_feature_get,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .sw_setup = 			*/ _ellipse_sw_setup,
+	/* .sw_cleanup = 		*/ _ellipse_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+#if BUILD_OPENGL
+	/* .opengl_initialize =         */ NULL,
+	/* .opengl_setup =          	*/ _ellipse_opengl_setup,
+	/* .opengl_cleanup =        	*/ _ellipse_opengl_cleanup,
+#else
+	/* .opengl_initialize =         */ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
+#endif
 };
 /*============================================================================*
  *                                 Global                                     *
