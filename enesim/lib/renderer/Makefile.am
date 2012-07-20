@@ -41,7 +41,10 @@ enesim_renderer_transition.c
 EXTRA_DIST = \
 enesim_renderer_checker.glsl \
 enesim_renderer_opengl_common_ambient.glsl \
+enesim_renderer_opengl_common_blit.glsl \
 enesim_renderer_opengl_common_merge.glsl \
 enesim_renderer_opengl_common_vertex.glsl \
+enesim_renderer_path_silhoutte_ambient.glsl \
+enesim_renderer_path_silhoutte_vertex.glsl \
 enesim_renderer_rectangle.glsl \
 enesim_renderer_stripes.glsl
