@@ -162,13 +162,20 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Pool *pool;
 	Enesim_Format format;
 	Enesim_Surface *tmp;
+	Enesim_Buffer_OpenGL_Data *sdata;
+	Enesim_Buffer_OpenGL_Data *tmp_sdata;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Rop rop;
 	Eina_List *l;
+	GLint viewport[4];
 	Layer *layer;
 	int sw;
 	int sh;
 
 	thiz = _compound_get(r);
 
+	sdata = enesim_surface_backend_data_get(s);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	/* create a temporary texture */
 	enesim_surface_size_get(s, &sw, &sh);
 	pool = enesim_surface_pool_get(s);
@@ -178,14 +185,50 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* render each layer */
 	EINA_LIST_FOREACH(thiz->layers, l, layer)
 	{
-		//enesim_renderer_opengl_draw(l->r, tmp, area, w, h);
 		enesim_renderer_opengl_draw(layer->r, s, area, w, h);
 	}
+#if 0
+	EINA_LIST_FOREACH(thiz->layers, l, layer)
+	{
+		enesim_renderer_opengl_draw(layer->r, tmp, area, w, h);
+	}
+	tmp_sdata = enesim_surface_backend_data_get(tmp);
 	/* finally just rop the resulting texture into the real texture */
-	// enesim_renderer_rop_get(r, &rop);
-	// enesim_opengl_rop_set(l->r, l->rop);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	enesim_renderer_rop_get(r, &rop);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, sdata->texture, 0);
+	glViewport(0, 0, w, h);
 
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, w, h, 0, -1, 1);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+
+	glBindTexture(GL_TEXTURE_2D, tmp_sdata->texture);
+	enesim_opengl_rop_set(rop);
+	glBegin(GL_QUADS);
+		glTexCoord2d(0, 1);
+		glVertex2d(area->x, area->y);
+
+		glTexCoord2d(1, 1);
+		glVertex2d(area->x + area->w, area->y);
+
+		glTexCoord2d(1, 0);
+		glVertex2d(area->x + area->w, area->y + area->h);
+
+		glTexCoord2d(0, 0);
+		glVertex2d(area->x, area->y + area->h);
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+	enesim_opengl_rop_set(ENESIM_FILL);
+#endif
 	enesim_surface_unref(tmp);
+
 }
 #endif
 
