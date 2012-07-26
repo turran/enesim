@@ -90,6 +90,12 @@ PKG_CHECK_MODULES(EMAGE, [eina >= 1.0.0],
    [have_emage="yes"],
    [have_emage="no"])
 
+case "$host_os" in
+   mingw*)
+      EMAGE_LIBS="${EMAGE_LIBS} -lws2_32"
+   ;;
+esac
+
 
 have_emage="yes"
 enable_png="no"

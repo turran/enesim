@@ -1,5 +1,16 @@
 #include "Emage.h"
 #include "emage_private.h"
+
+#ifdef _WIN32
+# define pipe_write(fd, buffer, size) send((fd), (char *)(buffer), size, 0)
+# define pipe_read(fd, buffer, size)  recv((fd), (char *)(buffer), size, 0)
+# define pipe_close(fd)               closesocket(fd)
+#else
+# define pipe_write(fd, buffer, size) write((fd), buffer, size)
+# define pipe_read(fd, buffer, size)  read((fd), buffer, size)
+# define pipe_close(fd)               close(fd)
+#endif /* ! _WIN32 */
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -102,7 +113,7 @@ static Emage_Provider * _save_provider_get(const char *file)
 static void _thread_finish(Emage_Job *j)
 {
 	int ret;
-	ret = write(_fifo[1], &j, sizeof(j));
+	ret = pipe_write(_fifo[1], &j, sizeof(j));
 }
 
 #ifdef _WIN32
@@ -250,8 +261,8 @@ EAPI int emage_shutdown(void)
 	/* shutdown every provider */
 	/* TODO what if we shutdown while some thread is active? */
 	/* the fifo */
-	close(_fifo[0]);
-	close(_fifo[1]);
+	pipe_close(_fifo[0]);
+	pipe_close(_fifo[1]);
 	enesim_shutdown();
 	eina_log_domain_unregister(emage_log_dom_global);
 	emage_log_dom_global = -1;
@@ -390,7 +401,7 @@ EAPI void emage_dispatch(void)
 	if (select(_fifo[0] + 1, &readset, NULL, NULL, &t) <= 0)
 		return;
 	/* read from the fifo fd and call the needed callbacks */
-	while (read(_fifo[0], &j, sizeof(j)) > 0)
+	while (pipe_read(_fifo[0], &j, sizeof(j)) > 0)
 	{
 		if (j->type == EMAGE_LOAD)
 			j->cb(j->op.load.s, j->data, j->err);

@@ -5,6 +5,10 @@
 # include "config.h"
 #endif
 
+#ifdef _WIN32
+# include <winsock2.h>
+#endif
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
