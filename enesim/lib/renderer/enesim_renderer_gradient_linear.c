@@ -59,7 +59,7 @@ typedef struct _Enesim_Renderer_Gradient_Linear
 	/* private */
 	Eina_Bool changed : 1;
 	/* generated at state setup */
-	Eina_F16p16 fx0, fx1, fy0, fy1;
+	Eina_F16p16 xx, yy;
 	Eina_F16p16 ayx, ayy;
 	int length;
 } Enesim_Renderer_Gradient_Linear;
@@ -78,10 +78,15 @@ static Eina_F16p16 _linear_distance(Enesim_Renderer_Gradient_Linear *thiz, Eina_
 		Eina_F16p16 y)
 {
 	Eina_F16p16 a, b;
+	Eina_F16p16 d;
 
-	a = eina_f16p16_mul(thiz->ayx, (x - thiz->fx0 + 32768));
-	b = eina_f16p16_mul(thiz->ayy, (y - thiz->fy0 + 32768));
-	return eina_f16p16_sub(eina_f16p16_add(a, b), 32768);
+	x = x - thiz->xx;
+	y = y - thiz->yy;
+	a = eina_f16p16_mul(thiz->ayx, x + 32768);
+	b = eina_f16p16_mul(thiz->ayy, y + 32768);
+	d = eina_f16p16_sub(eina_f16p16_add(a, b), 32768);
+
+	return d;
 }
 
 #if 0
@@ -174,9 +179,9 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 		enesim_matrix_point_transform(gm, x1, y1, &x1, &y1);
 	}
 
-	xx0 = eina_f16p16_double_from(x0);
+	thiz->xx = xx0 = eina_f16p16_double_from(x0);
 	xx1 = eina_f16p16_double_from(x1);
-	yy0 = eina_f16p16_double_from(y0);
+	thiz->yy = yy0 = eina_f16p16_double_from(y0);
 	yy1 = eina_f16p16_double_from(y1);
 
 	xx0 = xx1 - xx0;
@@ -187,6 +192,7 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	f += 32768;
 	thiz->ayx = ((int64_t)xx0 << 16) / f;
 	thiz->ayy = ((int64_t)yy0 << 16) / f;
+
 	/* TODO check that the difference between x0 - x1 and y0 - y1 is
 	 * < tolerance
 	 */
