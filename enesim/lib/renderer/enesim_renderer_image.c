@@ -1400,10 +1400,13 @@ static void _image_destination_boundings(Enesim_Renderer *r,
 static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Image *thiz;
+	Eina_Rectangle *sd;
 
 	thiz = _image_get(r);
 	thiz->changed = EINA_FALSE;
 	thiz->past = thiz->current;
+	EINA_LIST_FREE(thiz->surface_damages, sd)
+		free(sd);
 }
 
 static Eina_Bool _image_state_setup(Enesim_Renderer *r,
@@ -1597,15 +1600,15 @@ static void _image_damages(Enesim_Renderer *r,
 		cb(r, old_boundings, EINA_TRUE, data);
 		_image_destination_boundings(r, states, &bounds);
 		cb(r, &bounds, EINA_FALSE, data);
-		EINA_LIST_FREE(thiz->surface_damages, sd)
-			free(sd);
 	}
 	/* in other case, send the surface damages tansformed
 	 * to destination coorindates
 	 */
 	else
 	{
-		EINA_LIST_FREE(thiz->surface_damages, sd)
+		Eina_List *l;
+
+		EINA_LIST_FOREACH(thiz->surface_damages, l, sd)
 		{
 			Enesim_Rectangle sdd;
 
@@ -1912,5 +1915,6 @@ EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, Eina_Rectangle *a
 	thiz = _image_get(r);
 
 	d = calloc(1, sizeof(Eina_Rectangle));
+	*d = *area;
 	thiz->surface_damages = eina_list_append(thiz->surface_damages, d);
 }
