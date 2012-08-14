@@ -63,12 +63,16 @@ typedef struct _Enesim_Renderer_Compound
 	EINA_MAGIC
 	/* properties */
 	Eina_List *layers;
+	/* private */
 	Eina_List *visible_layers; /* FIXME maybe is time to change from lists to arrays */
+	Eina_List *added;
+	Eina_List *removed;
+
 	Enesim_Renderer_Compound_Cb pre_cb;
 	void *pre_data;
 	Enesim_Renderer_Compound_Cb post_cb;
 	void *post_data;
-	/* private */
+
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Compound;
 
@@ -89,22 +93,35 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
+		Layer *l)
+{
+	thiz->removed = eina_list_append(thiz->removed, l);
+	thiz->layers = eina_list_remove(thiz->layers, l);
+	thiz->changed = EINA_TRUE;
+}
+
 static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Error **error)
 {
 	Eina_List *ll;
+	Layer *l;
 
 	if (thiz->visible_layers)
 	{
 		eina_list_free(thiz->visible_layers);
 		thiz->visible_layers = NULL;
 	}
-	/* setup every layer */
-	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
+	EINA_LIST_FREE(thiz->added, l)
 	{
-		Layer *l = eina_list_data_get(ll);
-
+		/* add the recently added layers to the layers to calculate */
+		thiz->layers = eina_list_append(thiz->layers, l);
+		printf("adding layer '%s' to layers\n", l->r->name);
+	}
+	/* setup every layer */
+	EINA_LIST_FOREACH(thiz->layers, ll, l)
+	{
 		/* the position and the matrix */
 		if (thiz->pre_cb)
 		{
@@ -150,6 +167,13 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 	{
 		enesim_renderer_cleanup(layer->r, s);
 		thiz->visible_layers = eina_list_remove_list(thiz->visible_layers, ll);
+	}
+	/* remove the removed layers */
+	EINA_LIST_FREE(thiz->removed, layer)
+	{
+		/* now is safe to destroy the layer */
+		enesim_renderer_unref(layer->r);
+		free(layer);
 	}
 	thiz->changed = EINA_FALSE;
 }
@@ -329,6 +353,7 @@ static void _compound_boundings(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Compound *thiz;
+	Layer *l;
 	Eina_List *ll;
 	int x1 = 0;
 	int y1 = 0;
@@ -336,9 +361,22 @@ static void _compound_boundings(Enesim_Renderer *r,
 	int y2 = 0;
 
 	thiz = _compound_get(r);
-	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
+	/* first the just added layers */
+	EINA_LIST_FOREACH (thiz->added, ll, l)
 	{
-		Layer *l = eina_list_data_get(ll);
+		Enesim_Renderer *lr = l->r;
+		double nx1, ny1, nx2, ny2;
+		Eina_Rectangle tmp;
+
+		enesim_renderer_destination_boundings(lr, &tmp, 0, 0);
+		nx1 = tmp.x;
+		ny1 = tmp.y;
+		nx2 = tmp.x + tmp.w;
+		ny2 = tmp.y + tmp.h;
+	}
+	/* now the already there layers */	
+	EINA_LIST_FOREACH (thiz->layers, ll, l)
+	{
 		Enesim_Renderer *lr = l->r;
 		double nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
@@ -495,7 +533,26 @@ static void _compound_damage(Enesim_Renderer *r,
 	Layer *l;
 
 	thiz = _compound_get(r);
+	/* if some layer has been added or removed after the last draw
+	 * we need to inform of those areas even if those have damages
+	 * or not
+	 */
+	if (thiz->changed)
+	{
+		EINA_LIST_FOREACH(thiz->removed, ll, l)
+		{
+			cb(l->r, &l->destination_boundings, EINA_FALSE, data);
+		}
+		EINA_LIST_FOREACH(thiz->added, ll, l)
+		{
+			Eina_Rectangle db;
 
+			enesim_renderer_destination_boundings(l->r, &db, 0, 0);
+			cb(l->r, &db, EINA_FALSE, data);
+		}
+	}
+
+	/* now for every layer send the damage */
 	EINA_LIST_FOREACH(thiz->layers, ll, l)
 	{
 		enesim_renderer_damages_get(l->r, cb, data);
@@ -601,10 +658,9 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 	l = calloc(1, sizeof(Layer));
 	l->r = enesim_renderer_ref(rend);
 
-	thiz->layers = eina_list_append(thiz->layers, l);
+	thiz->added = eina_list_append(thiz->added, l);
 	thiz->changed = EINA_TRUE;
 }
-
 
 /**
  *
@@ -624,13 +680,10 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 	{
 		if (layer->r == rend)
 		{
-			enesim_renderer_unref(layer->r);
-			thiz->layers = eina_list_remove_list(thiz->layers, l);
-			free(layer);
+			_compound_layer_remove(thiz, layer);
 			break;
 		}
 	}
-	thiz->changed = EINA_TRUE;
 }
 
 /**
@@ -647,9 +700,7 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
 	thiz = _compound_get(r);
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
-		enesim_renderer_unref(layer->r);
-		thiz->layers = eina_list_remove_list(thiz->layers, l);
-		free(layer);
+		_compound_layer_remove(thiz, layer);
 	}
 	thiz->changed = EINA_TRUE;
 }
