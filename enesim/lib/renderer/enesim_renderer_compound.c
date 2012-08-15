@@ -117,7 +117,6 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 	{
 		/* add the recently added layers to the layers to calculate */
 		thiz->layers = eina_list_append(thiz->layers, l);
-		printf("adding layer '%s' to layers\n", l->r->name);
 	}
 	/* setup every layer */
 	EINA_LIST_FOREACH(thiz->layers, ll, l)
