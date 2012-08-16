@@ -1613,6 +1613,10 @@ static void _image_damages(Enesim_Renderer *r,
 			Enesim_Rectangle sdd;
 
 			enesim_rectangle_coords_from(&sdd, sd->x, sd->y, sd->w, sd->h);
+			/* the coordinates are relative to the image */
+			sdd.x += thiz->current.x;
+			sdd.y += thiz->current.y;
+			/* TODO clip it to the source boundings */
 			_image_transform_boundings(r, states, &sdd, &bounds);
 			cb(r, &bounds, EINA_FALSE, data);
 		}
