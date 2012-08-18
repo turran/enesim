@@ -235,9 +235,21 @@ AC_SUBST([pthread_libs])
 ################################################################################
 ##                                  Backends                                  ##
 ################################################################################
+dnl Check for opencl
+AC_ARG_ENABLE([opencl],
+   [AS_HELP_STRING([--enable-opencl], [enable OpenCL backend])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_opencl="yes"
+    else
+       want_opencl="no"
+    fi
+   ],
+   [want_opencl="no"])
+
 AC_CHECK_HEADERS(CL/cl.h, [have_cl_h="yes"], [have_cl_h="no"])
 AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [have_cl_l="yes"],[have_cl_l="no"])
-if test "x$have_cl_h" = "xyes" && test "x$have_cl_l" = "xyes"; then
+if test "x$have_cl_h" = "xyes" && test "x$have_cl_l" = "xyes" && test "x$want_opencl" = "xyes"; then
   build_opencl="yes"
 else
   build_opencl="no"
@@ -249,6 +261,17 @@ fi
 AM_CONDITIONAL(HAVE_OPENCL, [test "x$build_opencl" = "xyes"])
 
 dnl Check for opengl
+AC_ARG_ENABLE([opengl],
+   [AS_HELP_STRING([--enable-opengl], [enable OpenGL backend])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_opengl="yes"
+    else
+       want_opengl="no"
+    fi
+   ],
+   [want_opengl="no"])
+
 LIBS_save=${LIBS}
 LIBS="${LIBS} -lGL -lGLU"
 AC_LINK_IFELSE(
@@ -263,16 +286,16 @@ glGenFramebuffersEXT(0, NULL);
      ]])
   ],
   [
-   build_opengl="yes"
+   have_opengl="yes"
    opengl_libs="-lGL -lGLU"
   ],
-  [build_opengl="no"])
+  [have_opengl="no"])
 LIBS=${LIBS_save}
 
 AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
 AC_MSG_RESULT([${build_opengl}])
 
-if test "x${build_opengl}" = "xno" ; then
+if test "x${have_opengl}" = "xno" ; then
   LIBS_save=${LIBS}
   LIBS="${LIBS} -lopengl32"
   AC_LINK_IFELSE(
@@ -287,17 +310,23 @@ glGenFramebuffersEXT(0, NULL);
        ]])
     ],
     [
-     build_opengl="yes"
+     have_opengl="yes"
      opengl_libs="-lopengl32 -lGLU"
     ],
-    [build_opengl="no"])
+    [have_opengl="no"])
   LIBS=${LIBS_save}
 
   AC_MSG_CHECKING([whether glGenFramebffersEXT is in libopengl32.a])
-  AC_MSG_RESULT([${build_opengl}])
+  AC_MSG_RESULT([${have_opengl}])
 fi
 
 AC_SUBST([opengl_libs])
+
+if test "x$have_opengl" = "xyes" && test "x$want_opengl" = "xyes"; then
+  build_opengl="yes"
+else
+  build_opengl="no"
+fi
 
 if test "x${build_opengl}" = "xyes"; then
   AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
