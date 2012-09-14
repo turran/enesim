@@ -270,9 +270,13 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+
 	/* create the data in case does not exist */
 	if (!rdata)
 	{
+		/* initialize the opengl system */
+		enesim_opengl_init();
+
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
 		if (r->descriptor.opengl_initialize)

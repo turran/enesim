@@ -50,6 +50,6 @@ if HAVE_OPENGL
 libenesim_la_SOURCES += \
 enesim_renderer_opengl.c \
 enesim_opengl.c
-libenesim_la_LIBADD += -lGL -lGLU
+libenesim_la_LIBADD += @opengl_libs@ @GLEW_LIBS@
 endif
 

@@ -185,6 +185,8 @@ EAPI Enesim_Pool * enesim_pool_opengl_new(void)
 	Enesim_OpenGL_Pool *thiz;
 	Enesim_Pool *p;
 
+	/* initialize the opengl system */
+	enesim_opengl_init();
 	thiz = calloc(1, sizeof(Enesim_OpenGL_Pool));
 
 	p = enesim_pool_new(&_descriptor, thiz);

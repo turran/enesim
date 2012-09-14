@@ -21,7 +21,7 @@
 #define ENESIM_OPENGL_SHADER(k) #k
 
 #define GL_GLEXT_PROTOTYPES
-#include "GL/gl.h"
+#include "GL/glew.h"
 #include "GL/glu.h"
 #include "GL/glext.h"
 
@@ -62,6 +62,7 @@ typedef struct _Enesim_Buffer_OpenGL_Data
 	unsigned int num_textures;
 } Enesim_Buffer_OpenGL_Data;
 
+EAPI void enesim_opengl_init(void);
 EAPI GLenum enesim_opengl_texture_new(int width, int height);
 EAPI void enesim_opengl_texture_free(GLenum id);
 EAPI void enesim_opengl_compiled_program_set(Enesim_Renderer_OpenGL_Compiled_Program *cp);

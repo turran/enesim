@@ -23,6 +23,6 @@ endif
 
 if HAVE_OPENGL
 libenesim_pool_la_SOURCES += enesim_opengl.c
-libenesim_pool_la_LIBADD += @opengl_libs@
+libenesim_pool_la_LIBADD += @opengl_libs@ @GLEW_LIBS@
 endif
 

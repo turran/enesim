@@ -322,7 +322,11 @@ fi
 
 AC_SUBST([opengl_libs])
 
-if test "x$have_opengl" = "xyes" && test "x$want_opengl" = "xyes"; then
+PKG_CHECK_MODULES(GLEW, [glew],
+   [have_glew="yes"],
+   [have_glew="no"])
+
+if test "x$have_opengl" = "xyes" && test "x$have_glew" = "xyes" && test "x$want_opengl" = "xyes"; then
   build_opengl="yes"
 else
   build_opengl="no"
@@ -365,8 +369,8 @@ EXAMPLE_LIBS="$PNG_LIBS"
 AC_SUBST([EXAMPLE_CFLAGS])
 AC_SUBST([EXAMPLE_LIBS])
 
-ENESIM_CFLAGS="-DENESIM_EXTENSION $EINA_CFLAGS $EFL_SIMD_FLAGS $EFL_COVERAGE_CFLAGS $pthread_cflags"
-ENESIM_LIBS="$EINA_LIBS $EFL_COVERAGE_LIBS $pthread_libs $opengl_libs"
+ENESIM_CFLAGS="-DENESIM_EXTENSION $EINA_CFLAGS $EFL_SIMD_FLAGS $EFL_COVERAGE_CFLAGS $GLEW_CFLAGS $pthread_cflags"
+ENESIM_LIBS="$EINA_LIBS $EFL_COVERAGE_LIBS $GLEW_LIBS $pthread_libs $opengl_libs"
 AC_SUBST([ENESIM_CFLAGS])
 AC_SUBST([ENESIM_LIBS])
 

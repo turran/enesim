@@ -148,3 +148,11 @@ EAPI void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
 	glEnd();
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
+
+EAPI void enesim_opengl_init(void)
+{
+	static int _init = 0;
+
+	if (++_init != 1) return;
+	glewInit();
+}
