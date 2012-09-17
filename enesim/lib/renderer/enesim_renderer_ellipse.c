@@ -1085,12 +1085,25 @@ static void _ellipse_boundings(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Ellipse *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
 	thiz = _ellipse_get(r);
 	rect->x = thiz->current.x - thiz->current.rx;
 	rect->y = thiz->current.y - thiz->current.ry;
 	rect->w = thiz->current.rx * 2;
 	rect->h = thiz->current.ry * 2;
+	/* translate by the origin */
+	rect->x += cs->ox;
+	rect->y += cs->oy;
+	/* apply the geometry transformation */
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+
+		enesim_matrix_rectangle_transform(&cs->geometry_transformation, rect, &q);
+		enesim_quad_rectangle_to(&q, rect);
+	}
 }
 
 static void _ellipse_destination_boundings(Enesim_Renderer *r,
@@ -1194,7 +1207,7 @@ static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .boundings =  		*/ _ellipse_boundings,
 	/* .destination_boundings = 	*/ _ellipse_destination_boundings,
 	/* .flags = 			*/ _ellipse_flags,
-	/* .hints_get = 			*/ _ellipse_hints,
+	/* .hints_get = 		*/ _ellipse_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _ellipse_has_changed,
