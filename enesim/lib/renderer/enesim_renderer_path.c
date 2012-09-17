@@ -1625,12 +1625,6 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		*draw = _path_opengl_fill_or_stroke_draw;
 	}
 
-	/* TODO the rendering of a stroke+fill shape is a two step, we need to
-	 * change how the opengl backend works to instead of expecting
-	 * a list of shaders, expect a list of programs. so the common
-	 * part knows how to render in multiple step a renderer
-	 */
-
 	return EINA_TRUE;
 }
 
@@ -1643,11 +1637,11 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .name =			*/ _path_name,
 	/* .free =			*/ NULL,
-	/* .boundings =		*/ _path_boundings,
+	/* .boundings =			*/ _path_boundings,
 	/* .destination_boundings =	*/ _path_destination_boundings,
 	/* .flags =			*/ _path_flags,
-	/* .hints_get =		*/ _path_hints,
-	/* .is_inside =		*/ NULL,
+	/* .hints_get =			*/ _path_hints,
+	/* .is_inside =			*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed =		*/ _path_has_changed,
 	/* .feature_get =		*/ _path_feature_get,
@@ -1657,7 +1651,7 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
 #if BUILD_OPENGL
-	/* .opengl_initialize =	*/ _path_opengl_initialize,
+	/* .opengl_initialize =		*/ _path_opengl_initialize,
 	/* .opengl_setup =		*/ _path_opengl_setup,
 	/* .opengl_cleanup =		*/ _path_opengl_cleanup,
 #else

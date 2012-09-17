@@ -1093,6 +1093,36 @@ static void _ellipse_boundings(Enesim_Renderer *r,
 	rect->h = thiz->current.ry * 2;
 }
 
+static void _ellipse_destination_boundings(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Eina_Rectangle *boundings)
+{
+	Enesim_Rectangle oboundings;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+
+	_ellipse_boundings(r, states, sstates, &oboundings);
+	/* apply the inverse matrix */
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+		Enesim_Matrix m;
+
+		enesim_matrix_inverse(&cs->transformation, &m);
+		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
+		enesim_quad_rectangle_to(&q, &oboundings);
+		/* fix the antialias scaling */
+		boundings->x -= m.xx;
+		boundings->y -= m.yy;
+		boundings->w += m.xx;
+		boundings->h += m.yy;
+	}
+	boundings->x = floor(oboundings.x);
+	boundings->y = floor(oboundings.y);
+	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
+	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
+}
+
 static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
@@ -1162,7 +1192,7 @@ static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .name = 			*/ _ellipse_name,
 	/* .free = 			*/ _free,
 	/* .boundings =  		*/ _ellipse_boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .destination_boundings = 	*/ _ellipse_destination_boundings,
 	/* .flags = 			*/ _ellipse_flags,
 	/* .hints_get = 			*/ _ellipse_hints,
 	/* .is_inside = 		*/ NULL,
