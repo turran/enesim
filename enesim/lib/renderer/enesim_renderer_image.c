@@ -78,6 +78,7 @@ typedef struct _Enesim_Renderer_Image
 	Eina_List *surface_damages; 
 	Eina_Bool simple : 1;
 	Eina_Bool changed : 1;
+	Eina_Bool src_changed : 1;
 } Enesim_Renderer_Image;
 
 
@@ -1404,6 +1405,7 @@ static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _image_get(r);
 	thiz->changed = EINA_FALSE;
+	thiz->src_changed = EINA_FALSE;
 	thiz->past = thiz->current;
 	EINA_LIST_FREE(thiz->surface_damages, sd)
 		free(sd);
@@ -1568,6 +1570,7 @@ static Eina_Bool _image_has_changed(Enesim_Renderer *r,
 	Enesim_Renderer_Image *thiz;
 
 	thiz = _image_get(r);
+	if (thiz->src_changed) return EINA_TRUE;
 	if (!thiz->changed) return EINA_FALSE;
 
 	if (thiz->current.x != thiz->past.x)
@@ -1890,7 +1893,7 @@ EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 	thiz->current.s = src;
 	if (thiz->current.s)
 		thiz->current.s = enesim_surface_ref(thiz->current.s);
-	thiz->changed = EINA_TRUE;
+	thiz->src_changed = EINA_TRUE;
 }
 
 /**
