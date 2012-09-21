@@ -129,6 +129,9 @@ static const char * _radial_name(Enesim_Renderer *r)
 
 static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer_Gradient_Radial *thiz;
+	thiz = _radial_get(r);
+	thiz->changed = EINA_FALSE;
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
@@ -408,7 +411,7 @@ EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double
 
 	thiz = _radial_get(r);
 	thiz->focus.y = focus_y;
-//	thiz->changed = EINA_TRUE;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * FIXME
