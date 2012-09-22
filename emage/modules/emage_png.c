@@ -390,7 +390,7 @@ Eina_Bool png_provider_init(void)
 		return EINA_FALSE;
 	}
 	/* @todo
-	 * - Register png spepcific errors
+	 * - Register png specific errors
 	 */
 	return emage_provider_register(&_provider);
 }
