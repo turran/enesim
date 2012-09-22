@@ -385,8 +385,8 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	if (!descriptor->boundings) WRN("No bounding() function available");
 	if (!descriptor->flags) WRN("No flags() function available");
 	if (!descriptor->sw_setup) WRN("No sw_setup() function available");
-	if (!descriptor->sw_cleanup) WRN("No sw_setup() function available");
-	if (!descriptor->free) WRN("No sw_setup() function available");
+	if (!descriptor->sw_cleanup) WRN("No sw_cleanup() function available");
+	if (!descriptor->free) WRN("No free() function available");
 	r->descriptor = *descriptor;
 	r->data = data;
 	/* now initialize the renderer common properties */
