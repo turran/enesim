@@ -82,8 +82,8 @@ evas_image_load_file_head_jpeg_internal(Image_Entry *ie, FILE *f)
    w = cinfo.output_width;
    h = cinfo.output_height;
    if ((w < 1) || (h < 1) || (w > 8192) || (h > 8192))
-     {  
-        jpeg_destroy_decompress(&cinfo);
+     {
+	jpeg_destroy_decompress(&cinfo);
 	return 0;
      }
    if (ie->load_opts.scale_down_by > 1)
@@ -100,7 +100,7 @@ evas_image_load_file_head_jpeg_internal(Image_Entry *ie, FILE *f)
 	    (ie->load_opts.h > 0))
      {
 	int w2, h2;
-	
+
 	w2 = ie->load_opts.w;
 	h2 = (ie->load_opts.w * h) / w;
 	if (h2 > ie->load_opts.h)
@@ -113,18 +113,18 @@ evas_image_load_file_head_jpeg_internal(Image_Entry *ie, FILE *f)
      }
    if (w < 1) w = 1;
    if (h < 1) h = 1;
-   
+
    if ((w != cinfo.output_width) || (h != cinfo.output_height))
      {
 	scalew = cinfo.output_width / w;
 	scaleh = cinfo.output_height / h;
-	
+
 	ie->scale = scalew;
 	if (scaleh < scalew) ie->scale = scaleh;
-	
+
 	if      (ie->scale > 8) ie->scale = 8;
 	else if (ie->scale < 1) ie->scale = 1;
-	
+
 	if      (ie->scale == 3) ie->scale = 2;
 	else if (ie->scale == 5) ie->scale = 4;
 	else if (ie->scale == 6) ie->scale = 4;
@@ -134,7 +134,7 @@ evas_image_load_file_head_jpeg_internal(Image_Entry *ie, FILE *f)
    if (ie->scale > 1)
      {
 	jpeg_destroy_decompress(&cinfo);
-   
+
 	rewind(f);
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, f);
@@ -146,7 +146,7 @@ evas_image_load_file_head_jpeg_internal(Image_Entry *ie, FILE *f)
 	jpeg_calc_output_dimensions(&(cinfo));
 	jpeg_start_decompress(&cinfo);
      }
-   
+
    ie->w = cinfo.output_width;
    ie->h = cinfo.output_height;
 /* end head decoding */
@@ -188,20 +188,20 @@ evas_image_load_file_data_jpeg_internal(Image_Entry *ie, FILE *f)
 	cinfo.scale_num = 1;
 	cinfo.scale_denom = ie->scale;
      }
-   
+
 /* head decoding */
    jpeg_calc_output_dimensions(&(cinfo));
    jpeg_start_decompress(&cinfo);
-   
+
    w = cinfo.output_width;
    h = cinfo.output_height;
-   
+
    if ((w != ie->w) || (h != ie->h))
      {
 	jpeg_destroy_decompress(&cinfo);
 	return 0;
      }
-   
+
 /* end head decoding */
 /* data decoding */
    if (cinfo.rec_outbuf_height > 16)
@@ -409,15 +409,15 @@ Eina_Bool _jpg_load(const char *file, Enesim_Surface *s, void *options)
 }
 
 static Emage_Provider _provider = {
-	/* .name = 		*/ "jpg",
-	/* .type = 		*/ EMAGE_PROVIDER_SW,
-	/* .options_parse = 	*/ NULL,
-	/* .options_free = 	*/ NULL,
-	/* .loadable = 		*/ _jpg_loadable,
-	/* .saveable = 		*/ NULL,
-	/* .info_get = 		*/ _jpg_info_load,
-	/* .load = 		*/ _jpg_load,
-	/* .save = 		*/ NULL,
+	/* .name =		*/ "jpg",
+	/* .type =		*/ EMAGE_PROVIDER_SW,
+	/* .options_parse =	*/ NULL,
+	/* .options_free =	*/ NULL,
+	/* .loadable =		*/ _jpg_loadable,
+	/* .saveable =		*/ NULL,
+	/* .info_get =		*/ _jpg_info_load,
+	/* .load =		*/ _jpg_load,
+	/* .save =		*/ NULL,
 };
 /*============================================================================*
  *                             Module API                                     *
