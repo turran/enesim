@@ -34,6 +34,7 @@
 #endif
 
 #include "private/renderer.h"
+
 /**
  * @todo
  * - Handle the case whenever the renderer supports the ROP itself
@@ -354,17 +355,17 @@ static void _compound_boundings(Enesim_Renderer *r,
 	Enesim_Renderer_Compound *thiz;
 	Layer *l;
 	Eina_List *ll;
-	int x1 = 0;
-	int y1 = 0;
-	int x2 = 0;
-	int y2 = 0;
+	int x1 = INT_MAX;
+	int y1 = INT_MAX;
+	int x2 = -INT_MAX;
+	int y2 = -INT_MAX;
 
 	thiz = _compound_get(r);
 	/* first the just added layers */
 	EINA_LIST_FOREACH (thiz->added, ll, l)
 	{
 		Enesim_Renderer *lr = l->r;
-		double nx1, ny1, nx2, ny2;
+		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
 		enesim_renderer_destination_boundings(lr, &tmp, 0, 0);
@@ -372,12 +373,18 @@ static void _compound_boundings(Enesim_Renderer *r,
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w;
 		ny2 = tmp.y + tmp.h;
+
+		/* pick the bigger area */
+		if (nx1 < x1) x1 = nx1;
+		if (ny1 < y1) y1 = ny1;
+		if (nx2 > x2) x2 = nx2;
+		if (ny2 > y2) y2 = ny2;
 	}
 	/* now the already there layers */	
 	EINA_LIST_FOREACH (thiz->layers, ll, l)
 	{
 		Enesim_Renderer *lr = l->r;
-		double nx1, ny1, nx2, ny2;
+		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
 		enesim_renderer_destination_boundings(lr, &tmp, 0, 0);
