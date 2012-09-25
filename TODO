@@ -1,5 +1,6 @@
 Enesim
 ======
++ Add an eina allocator that uses posix_memalign
 + We should add a way to get the backend data from a renderer or surface. This is useful for
   cases like the glx example where we need a way to render the texture inside a surface into
   the final framebuffer. Another useful case might be on the future for a new way to define
