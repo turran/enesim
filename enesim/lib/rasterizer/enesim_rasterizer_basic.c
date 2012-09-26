@@ -360,6 +360,44 @@ static inline Eina_Bool _basic_edges_setup(Enesim_F16p16_Edge *edges, int *edges
 	else rx = len;
 #endif
 
+static void _eval_edges_nz(Enesim_F16p16_Edge *edges, int nedges, int xx, int sww, int *pa, int *pcount)
+{
+	Enesim_F16p16_Edge *edge;
+	int a = 0;
+	int count = 0;
+	int n = 0;
+
+	edge = edges;
+	while (n < nedges)
+	{ 
+		int ee = edge->e;
+
+		/* alternative */
+		//count += (ee >> 31) | ((~ee >> 31) & 1);
+		if (edge->counted)
+			count += (ee >= 0) - (ee <0);
+		if (ee < 0)
+			ee = -ee;
+
+		if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) & 
+				(xx <= (0xffff + edge->xx1))) 
+		{
+			if (a < sww/4)
+				a = sww - ee;
+			else
+				a = (a + (sww - ee)) / 2;
+		}
+
+		edge->e += edge->de;
+		edge++;
+		n++;
+	}
+	*pa = a;
+	*pcount = count;
+}
+
+#define EVAL_EDGES_NZ _eval_edges_nz(edges, nedges, xx, sww, &a, &count);
+#if 0
 #define EVAL_EDGES_NZ \
 		n = 0; \
 		edge = edges; \
@@ -385,7 +423,7 @@ static inline Eina_Bool _basic_edges_setup(Enesim_F16p16_Edge *edges, int *edges
 			edge++; \
 			n++; \
 		}
-
+#endif
 
 /* identity */
 /* stroke and/or fill with possibly a fill renderer non-zero rule */
