@@ -138,6 +138,7 @@ typedef struct _Enesim_Renderer_Path
 	/* internal stuff */
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
+	Eina_Bool generated : 1;
 } Enesim_Renderer_Path;
 
 static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
@@ -1294,7 +1295,7 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 {
 	Eina_Bool ret = EINA_FALSE;
 	/* some command has been added */
-	if (thiz->changed)
+	if (thiz->changed && !thiz->generated)
 		ret = EINA_TRUE;
 	/* the stroke cap is different */
 	else if (thiz->last_join != join)
@@ -1364,6 +1365,8 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 		/* set the fill figure on the bifigure as its under polys */
 		enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 	}
+
+	thiz->generated = EINA_TRUE;
 	/* update the last values */
 	thiz->last_join = join;
 	thiz->last_cap = cap;
@@ -1411,7 +1414,6 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
 				&cs->geometry_transformation, cs->sx, cs->sy,
 				css->stroke.join, css->stroke.cap);
-		thiz->changed = EINA_FALSE;
 	}
 
 	enesim_renderer_shape_draw_mode_set(thiz->bifigure, css->draw_mode);
@@ -1491,7 +1493,6 @@ static void _path_boundings(Enesim_Renderer *r,
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
 				&cs->geometry_transformation, cs->sx, cs->sy,
 				css->stroke.join, css->stroke.cap);
-		thiz->changed = EINA_FALSE;
 	}
 
 	if (!thiz->fill_figure)
@@ -1609,7 +1610,6 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
 				&cs->geometry_transformation, cs->sx, cs->sy,
 				css->stroke.join, css->stroke.cap);
-		thiz->changed = EINA_FALSE;
 	}
 
 	/* check what to draw, stroke, fill or stroke + fill */
@@ -1739,6 +1739,7 @@ EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Renderer_P
 	*new_command = *cmd;
 	thiz->commands = eina_list_append(thiz->commands, new_command);
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
