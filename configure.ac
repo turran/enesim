@@ -111,7 +111,7 @@ if test "x${have_emage}" = "xyes" ; then
 fi
 
 EMAGE_MODULE([Png], [${enable_png}], [yes])
-EMAGE_MODULE([Jpg], [${enable_jpg}], [no])
+EMAGE_MODULE([Jpg], [${enable_jpg}], [yes])
 
 AM_CONDITIONAL([HAVE_EMAGE], [test "x${have_emage}" = "xyes"])
 

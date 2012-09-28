@@ -1,411 +1,249 @@
 #include <stdio.h>
-#include <jpeglib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <setjmp.h>
+
+#include <jpeglib.h>
 
 #include "Emage.h"
 
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _JPEG_error_mgr *emptr;
-struct _JPEG_error_mgr
+
+#define EMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
+
+#ifdef ERR
+# undef ERR
+#endif
+#define ERR(...) EINA_LOG_DOM_ERR(emage_log_dom_jpg, __VA_ARGS__)
+
+#ifdef WRN
+# undef WRN
+#endif
+#define WRN(...) EINA_LOG_DOM_WARN(emage_log_dom_jpg, __VA_ARGS__)
+
+#ifdef DBG
+# undef DBG
+#endif
+#define DBG(...) EINA_LOG_DOM_DBG(emage_log_dom_jpg, __VA_ARGS__)
+
+static int emage_log_dom_jpg = -1;
+
+typedef struct _Jpg_Error_Mgr Jpg_Error_Mgr;
+struct _Jpg_Error_Mgr
 {
-   struct     jpeg_error_mgr pub;
-   jmp_buf    setjmp_buffer;
+	struct jpeg_error_mgr pub;
+	jmp_buf setjmp_buffer;
 };
 
-static void _JPEGFatalErrorHandler(j_common_ptr cinfo);
-static void _JPEGErrorHandler(j_common_ptr cinfo);
-static void _JPEGErrorHandler2(j_common_ptr cinfo, int msg_level);
-
-static void
-_JPEGFatalErrorHandler(j_common_ptr cinfo)
+static void _jpg_error_exit_cb(j_common_ptr cinfo)
 {
-   emptr errmgr;
+	Jpg_Error_Mgr *err;
 
-   errmgr = (emptr) cinfo->err;
-   /*   cinfo->err->output_message(cinfo);*/
-   longjmp(errmgr->setjmp_buffer, 1);
-   return;
+	err = (Jpg_Error_Mgr *)cinfo->err;
+	(*cinfo->err->output_message)(cinfo);
+	longjmp(err->setjmp_buffer, 1);
 }
 
-static void
-_JPEGErrorHandler(j_common_ptr cinfo)
+/*============================================================================*
+ *                          Emage Provider API                                *
+ *============================================================================*/
+Eina_Bool _jpg_loadable(const char *file)
 {
-   emptr errmgr;
+	struct stat s;
+	FILE *f;
+	unsigned char *buf;
+	int ret;
+	printf("%s\n", __FUNCTION__);
 
-   errmgr = (emptr) cinfo->err;
-   /*   cinfo->err->output_message(cinfo);*/
-   /*   longjmp(errmgr->setjmp_buffer, 1);*/
-   return;
+	if (!file)
+		return EINA_FALSE;
+
+	if (stat(file, &s) < 0)
+		return EINA_FALSE;
+
+	buf = malloc(s.st_size);
+	if (!buf)
+		return EINA_FALSE;
+
+	f = fopen(file, "rb");
+	if (!f)
+		goto free_buf;
+
+	ret = fread(buf, s.st_size, 1, f);
+	if (ret < 0)
+		goto close_f;
+
+	/*
+	 * Header "format"
+	 *
+	 * offset 0, size 2 : JPEG SOI (Start Of Image) marker (FFD8 hex)
+	 * offset 2, size 2 : JFIF marker (FFE0 hex) but only the first byte is sure, see [1]
+	 * 2 last bytes : JPEG EOI (End Of Image) marker (FFD9 hex), see [2]
+	 *
+	 * References:
+	 * [1] http://www.faqs.org/faqs/jpeg-faq/part1/section-15.html
+	 * [2] http://en.wikipedia.org/wiki/Magic_number_%28programming%29#Magic_numbers_in_files
+	 */
+	if ((buf[0] != 0xff) || (buf[1] != 0xd8) || (buf[2] != 0xff))
+		goto close_f;
+	if ((buf[s.st_size - 2] != 0xff) || (buf[s.st_size - 1] != 0xd9))
+		goto close_f;
+
+	fclose(f);
+	free(buf);
+
+	return EINA_TRUE;
+
+  close_f:
+	fclose(f);
+  free_buf:
+	free(buf);
+	printf("%s\n", __FUNCTION__);
+	return EINA_FALSE;
 }
 
-static void
-_JPEGErrorHandler2(j_common_ptr cinfo, int msg_level)
+Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
-   emptr errmgr;
+	struct jpeg_decompress_struct cinfo;
+	Jpg_Error_Mgr err;
+	FILE *f;
+	int ww = 0;
+	int hh = 0;
+	int fmt = -1;
+	printf("%s\n", __FUNCTION__);
 
-   errmgr = (emptr) cinfo->err;
-   /*   cinfo->err->output_message(cinfo);*/
-   /*   longjmp(errmgr->setjmp_buffer, 1);*/
-   return;
-   msg_level = 0;
-}
+	if (!file)
+		return EMAGE_ERROR_EXIST;
+	f = fopen(file, "rb");
 
-static int
-evas_image_load_file_head_jpeg_internal(Image_Entry *ie, FILE *f)
-{
-   int w, h, scalew, scaleh;
-   struct jpeg_decompress_struct cinfo;
-   struct _JPEG_error_mgr jerr;
+	if (!f)
+		return EMAGE_ERROR_EXIST;
 
-   if (!f) return 0;
-   cinfo.err = jpeg_std_error(&(jerr.pub));
-   jerr.pub.error_exit = _JPEGFatalErrorHandler;
-   jerr.pub.emit_message = _JPEGErrorHandler2;
-   jerr.pub.output_message = _JPEGErrorHandler;
-   if (setjmp(jerr.setjmp_buffer))
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   jpeg_create_decompress(&cinfo);
-   jpeg_stdio_src(&cinfo, f);
-   jpeg_read_header(&cinfo, TRUE);
-   cinfo.do_fancy_upsampling = FALSE;
-   cinfo.do_block_smoothing = FALSE;
-   cinfo.dct_method = JDCT_IFAST;
-   cinfo.dither_mode = JDITHER_ORDERED;
-   jpeg_start_decompress(&cinfo);
+	memset(&cinfo, 0, sizeof(cinfo));
+	cinfo.err = jpeg_std_error(&(err.pub));
+	err.pub.error_exit = _jpg_error_exit_cb;
+	if (setjmp(err.setjmp_buffer))
+	{
+		jpeg_destroy_decompress(&cinfo);
+		fclose(f);
+		return EMAGE_ERROR_ALLOCATOR;
+	}
 
-/* head decoding */
-   w = cinfo.output_width;
-   h = cinfo.output_height;
-   if ((w < 1) || (h < 1) || (w > 8192) || (h > 8192))
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   if (ie->load_opts.scale_down_by > 1)
-     {
-	w /= ie->load_opts.scale_down_by;
-	h /= ie->load_opts.scale_down_by;
-     }
-   else if (ie->load_opts.dpi > 0.0)
-     {
-	w = (w * ie->load_opts.dpi) / 90.0;
-	h = (h * ie->load_opts.dpi) / 90.0;
-     }
-   else if ((ie->load_opts.w > 0) &&
-	    (ie->load_opts.h > 0))
-     {
-	int w2, h2;
-
-	w2 = ie->load_opts.w;
-	h2 = (ie->load_opts.w * h) / w;
-	if (h2 > ie->load_opts.h)
-	  {
-	     h2 = ie->load_opts.h;
-	     w2 = (ie->load_opts.h * w) / h;
-	  }
-	w = w2;
-	h = h2;
-     }
-   if (w < 1) w = 1;
-   if (h < 1) h = 1;
-
-   if ((w != cinfo.output_width) || (h != cinfo.output_height))
-     {
-	scalew = cinfo.output_width / w;
-	scaleh = cinfo.output_height / h;
-
-	ie->scale = scalew;
-	if (scaleh < scalew) ie->scale = scaleh;
-
-	if      (ie->scale > 8) ie->scale = 8;
-	else if (ie->scale < 1) ie->scale = 1;
-
-	if      (ie->scale == 3) ie->scale = 2;
-	else if (ie->scale == 5) ie->scale = 4;
-	else if (ie->scale == 6) ie->scale = 4;
-	else if (ie->scale == 7) ie->scale = 4;
-     }
-
-   if (ie->scale > 1)
-     {
-	jpeg_destroy_decompress(&cinfo);
-
-	rewind(f);
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, f);
 	jpeg_read_header(&cinfo, TRUE);
 	cinfo.do_fancy_upsampling = FALSE;
 	cinfo.do_block_smoothing = FALSE;
-	cinfo.scale_num = 1;
-	cinfo.scale_denom = ie->scale;
+	cinfo.dct_method = JDCT_ISLOW; // JDCT_FLOAT JDCT_IFAST(quality loss)
+	cinfo.dither_mode = JDITHER_ORDERED;
+
+	/* Colorspace conversion options */
+	/* libjpeg can do the following conversions: */
+	/* GRAYSCALE => RGB YCbCr => RGB and YCCK => CMYK */
+	switch (cinfo.jpeg_color_space)
+	{
+	 case JCS_RGB:
+	 case JCS_YCbCr:
+		 cinfo.out_color_space = JCS_RGB;
+		 break;
+	 case JCS_CMYK:
+	 case JCS_YCCK:
+		 cinfo.out_color_space = JCS_CMYK;
+		 break;
+	 case JCS_GRAYSCALE:
+	 case JCS_UNKNOWN:
+	 default:
+		 break;
+	}
+
 	jpeg_calc_output_dimensions(&(cinfo));
 	jpeg_start_decompress(&cinfo);
-     }
 
-   ie->w = cinfo.output_width;
-   ie->h = cinfo.output_height;
-/* end head decoding */
+	ww = cinfo.output_width;
+	hh = cinfo.output_height;
 
-   jpeg_destroy_decompress(&cinfo);
-   return 1;
+	if (cinfo.output_components == 4)
+		if (cinfo.saw_Adobe_marker)
+			fmt = ENESIM_BUFFER_FORMAT_CMYK_ADOBE;
+		else
+			fmt = ENESIM_BUFFER_FORMAT_CMYK;
+	else if (cinfo.output_components == 3)
+		fmt = ENESIM_BUFFER_FORMAT_BGR888;
+	else if (cinfo.output_components == 1)
+		fmt = ENESIM_BUFFER_FORMAT_GRAY;
+	else
+	{
+		jpeg_destroy_decompress(&cinfo);
+		fclose(f);
+		return EMAGE_ERROR_FORMAT;
+	}
+
+	if (w) *w = ww;
+	if (h) *h = hh;
+	if (sfmt) *sfmt = fmt;
+
+	jpeg_destroy_decompress(&cinfo);
+	fclose(f);
+	return 0;
 }
 
-static int
-evas_image_load_file_data_jpeg_internal(Image_Entry *ie, FILE *f)
+Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *options)
 {
-   int w, h;
-   struct jpeg_decompress_struct cinfo;
-   struct _JPEG_error_mgr jerr;
-   DATA8 *ptr, *line[16], *data;
-   DATA32 *ptr2;
-   int x, y, l, i, scans, count, prevy;
-
-   if (!f) return 0;
-   cinfo.err = jpeg_std_error(&(jerr.pub));
-   jerr.pub.error_exit = _JPEGFatalErrorHandler;
-   jerr.pub.emit_message = _JPEGErrorHandler2;
-   jerr.pub.output_message = _JPEGErrorHandler;
-   if (setjmp(jerr.setjmp_buffer))
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   jpeg_create_decompress(&cinfo);
-   jpeg_stdio_src(&cinfo, f);
-   jpeg_read_header(&cinfo, TRUE);
-   cinfo.do_fancy_upsampling = FALSE;
-   cinfo.do_block_smoothing = FALSE;
-   cinfo.dct_method = JDCT_IFAST;
-   cinfo.dither_mode = JDITHER_ORDERED;
-
-   if (ie->scale > 1)
-     {
-	cinfo.scale_num = 1;
-	cinfo.scale_denom = ie->scale;
-     }
-
-/* head decoding */
-   jpeg_calc_output_dimensions(&(cinfo));
-   jpeg_start_decompress(&cinfo);
-
-   w = cinfo.output_width;
-   h = cinfo.output_height;
-
-   if ((w != ie->w) || (h != ie->h))
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-
-/* end head decoding */
-/* data decoding */
-   if (cinfo.rec_outbuf_height > 16)
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   data = alloca(w * 16 * 3);
-   evas_cache_image_surface_alloc(ie, w, h);
-   if (ie->flags.loaded)
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   ptr2 = evas_cache_image_pixels(ie);
-   count = 0;
-   prevy = 0;
-   if (cinfo.output_components == 3)
-     {
-	for (i = 0; i < cinfo.rec_outbuf_height; i++)
-	  line[i] = data + (i * w * 3);
-	for (l = 0; l < h; l += cinfo.rec_outbuf_height)
-	  {
-	     jpeg_read_scanlines(&cinfo, line, cinfo.rec_outbuf_height);
-	     scans = cinfo.rec_outbuf_height;
-	     if ((h - l) < scans) scans = h - l;
-	     ptr = data;
-	     for (y = 0; y < scans; y++)
-	       {
-		  for (x = 0; x < w; x++)
-		    {
-		       *ptr2 =
-			 (0xff000000) | ((ptr[0]) << 16) | ((ptr[1]) << 8) | (ptr[2]);
-		       ptr += 3;
-		       ptr2++;
-		    }
-	       }
-	  }
-     }
-   else if (cinfo.output_components == 1)
-     {
-	for (i = 0; i < cinfo.rec_outbuf_height; i++)
-	  line[i] = data + (i * w);
-	for (l = 0; l < h; l += cinfo.rec_outbuf_height)
-	  {
-	     jpeg_read_scanlines(&cinfo, line, cinfo.rec_outbuf_height);
-	     scans = cinfo.rec_outbuf_height;
-	     if ((h - l) < scans) scans = h - l;
-	     ptr = data;
-	     for (y = 0; y < scans; y++)
-	       {
-		  for (x = 0; x < w; x++)
-		    {
-		       *ptr2 =
-			 (0xff000000) | ((ptr[0]) << 16) | ((ptr[0]) << 8) | (ptr[0]);
-		       ptr++;
-		       ptr2++;
-		    }
-	       }
-	  }
-     }
-/* end data decoding */
-   jpeg_finish_decompress(&cinfo);
-   jpeg_destroy_decompress(&cinfo);
-   return 1;
-}
-
-#if 0 /* not used at the moment */
-static int
-evas_image_load_file_data_jpeg_alpha_internal(Image_Entry *ie, FILE *f)
-{
-   int w, h;
-   struct jpeg_decompress_struct cinfo;
-   struct _JPEG_error_mgr jerr;
-   DATA8 *ptr, *line[16], *data;
-   DATA32 *ptr2;
-   int x, y, l, i, scans, count, prevy;
-
-   if (!f) return 0;
-   cinfo.err = jpeg_std_error(&(jerr.pub));
-   jerr.pub.error_exit = _JPEGFatalErrorHandler;
-   jerr.pub.emit_message = _JPEGErrorHandler2;
-   jerr.pub.output_message = _JPEGErrorHandler;
-   if (setjmp(jerr.setjmp_buffer))
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   jpeg_create_decompress(&cinfo);
-   jpeg_stdio_src(&cinfo, f);
-   jpeg_read_header(&cinfo, TRUE);
-   cinfo.do_fancy_upsampling = FALSE;
-   cinfo.do_block_smoothing = FALSE;
-   jpeg_start_decompress(&cinfo);
-
-/* head decoding */
-   ie->w = w = cinfo.output_width;
-   ie->h = h = cinfo.output_height;
-/* end head decoding */
-/* data decoding */
-   if (cinfo.rec_outbuf_height > 16)
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   data = alloca(w * 16 * 3);
-   if (!ie->flags.loaded)
-     {
-	jpeg_destroy_decompress(&cinfo);
-	return 0;
-     }
-   ptr2 = evas_cache_image_pixels(ie);
-   count = 0;
-   prevy = 0;
-   if (cinfo.output_components == 3)
-     {
-	for (i = 0; i < cinfo.rec_outbuf_height; i++)
-	  line[i] = data + (i * w * 3);
-	for (l = 0; l < h; l += cinfo.rec_outbuf_height)
-	  {
-	     jpeg_read_scanlines(&cinfo, line, cinfo.rec_outbuf_height);
-	     scans = cinfo.rec_outbuf_height;
-	     if ((h - l) < scans) scans = h - l;
-	     ptr = data;
-	     for (y = 0; y < scans; y++)
-	       {
-		  for (x = 0; x < w; x++)
-		    {
-		       *ptr2 =
-			 ((*ptr2) & 0x00ffffff) |
-			 (((ptr[0] + ptr[1] + ptr[2]) / 3) << 24);
-		       ptr += 3;
-		       ptr2++;
-		    }
-	       }
-	  }
-     }
-   else if (cinfo.output_components == 1)
-     {
-	for (i = 0; i < cinfo.rec_outbuf_height; i++)
-	  line[i] = data + (i * w);
-	for (l = 0; l < h; l += cinfo.rec_outbuf_height)
-	  {
-	     jpeg_read_scanlines(&cinfo, line, cinfo.rec_outbuf_height);
-	     scans = cinfo.rec_outbuf_height;
-	     if ((h - l) < scans) scans = h - l;
-	     ptr = data;
-	     for (y = 0; y < scans; y++)
-	       {
-		  for (x = 0; x < w; x++)
-		    {
-		       *ptr2 =
-			 ((*ptr2) & 0x00ffffff) |
-			 ((ptr[0]) << 24);
-		       ptr++;
-		       ptr2++;
-		    }
-	       }
-	  }
-     }
-/* end data decoding */
-   jpeg_finish_decompress(&cinfo);
-   jpeg_destroy_decompress(&cinfo);
-   return 1;
-}
-#endif
-/*============================================================================*
- *                          Emage Provider API                                *
- *============================================================================*/
-Eina_Bool _jpg_loadable(const char *file, void *options)
-{
-
-}
-
-Eina_Bool _jpg_info_load(const char *file, int *w, int *h, Enesim_Surface_Format *sfmt, void *options)
-{
-	int val;
+	Enesim_Buffer_Sw_Data data;
+	struct jpeg_decompress_struct cinfo;
+	Jpg_Error_Mgr err;
 	FILE *f;
+	uint32_t *sdata;
+	uint8_t *line;
+	int stride;
+	JSAMPARRAY row;
 
-	if ((!file))
-		return 0;
+	if (!file)
+		return EMAGE_ERROR_EXIST;
 	f = fopen(file, "rb");
 	if (!f)
-		return 0;
-	val = evas_image_load_file_head_jpeg_internal(ie, f);
-	fclose(f);
-	return val;
-	key = 0;
-}
+		return EMAGE_ERROR_EXIST;
 
-Eina_Bool _jpg_load(const char *file, Enesim_Surface *s, void *options)
-{
-	int val;
-	FILE *f;
+	memset(&cinfo, 0, sizeof(cinfo));
+	cinfo.err = jpeg_std_error(&(err.pub));
+	err.pub.error_exit = _jpg_error_exit_cb;
+	if (setjmp(err.setjmp_buffer))
+	{
+		jpeg_destroy_decompress(&cinfo);
+		fclose(f);
+		return EMAGE_ERROR_ALLOCATOR;
+	}
 
-	if ((!file))
-		return 0;
-	f = fopen(file, "rb");
-	if (!f)
-		return 0;
-	val = evas_image_load_file_data_jpeg_internal(ie, f);
+	jpeg_create_decompress(&cinfo);
+	jpeg_stdio_src(&cinfo, f);
+	jpeg_read_header(&cinfo, TRUE);
+	cinfo.do_fancy_upsampling = FALSE;
+	cinfo.do_block_smoothing = FALSE;
+	cinfo.dct_method = JDCT_ISLOW; // JDCT_FLOAT JDCT_IFAST(quality loss)
+	cinfo.dither_mode = JDITHER_ORDERED;
+
+	jpeg_calc_output_dimensions(&(cinfo));
+	jpeg_start_decompress(&cinfo);
+
+	enesim_buffer_data_get(buffer, &data);
+	sdata = data.argb8888.plane0;
+
+	stride = cinfo.output_width * cinfo.output_components;
+	row = (*cinfo.mem->alloc_sarray)
+		((j_common_ptr) &cinfo, JPOOL_IMAGE, stride, 1);
+	line = (uint8_t *)sdata;
+	printf(" %d %d\n", stride, data.argb8888.plane0_stride);
+	while (cinfo.output_scanline < cinfo.output_height)
+	{
+		row[0] = line;
+		jpeg_read_scanlines(&cinfo, row, 1);
+		line += data.argb8888.plane0_stride;
+	}
+	jpeg_destroy_decompress(&cinfo);
 	fclose(f);
-	return val;
-	key = 0;
+	return 0;
 }
 
 static Emage_Provider _provider = {
@@ -424,12 +262,24 @@ static Emage_Provider _provider = {
  *============================================================================*/
 Eina_Bool jpg_provider_init(void)
 {
+	printf("%s\n", __FUNCTION__);
+	emage_log_dom_jpg = eina_log_domain_register("emage_jpg", EMAGE_LOG_COLOR_DEFAULT);
+	if (emage_log_dom_jpg < 0)
+	{
+		EINA_LOG_ERR("Emage: Can not create a general log domain.");
+		return EINA_FALSE;
+	}
+	/* @todo
+	 * - Register jpg specific errors
+	 */
 	return emage_provider_register(&_provider);
 }
 
 void jpg_provider_shutdown(void)
 {
 	emage_provider_unregister(&_provider);
+	eina_log_domain_unregister(emage_log_dom_jpg);
+	emage_log_dom_jpg = -1;
 }
 
 EINA_MODULE_INIT(jpg_provider_init);

@@ -132,6 +132,78 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
 		dst++;
 	}
 }
+
+/* Conversion from CMYK to RGB is done in 2 steps: */
+/* CMYK => CMY => RGB (see http://www.easyrgb.com/index.php?X=MATH) */
+/* after computation, if C, M, Y and K are between 0 and 1, we have: */
+/* R = (1 - C) * (1 - K) * 255 */
+/* G = (1 - M) * (1 - K) * 255 */
+/* B = (1 - Y) * (1 - K) * 255 */
+/* libjpeg stores CMYK values between 0 and 255, */
+/* so we replace C by C * 255 / 255, etc... and we obtain: */
+/* R = (255 - C) * (255 - K) / 255 */
+/* G = (255 - M) * (255 - K) / 255 */
+/* B = (255 - Y) * (255 - K) / 255 */
+/* with C, M, Y and K between 0 and 255. */
+/*
+ * Note: a / 255 is well approximated by (a + 255) / 256
+ */
+static void _span_cmyk_none_argb8888(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Importer *thiz;
+	uint32_t *dst = ddata;
+	uint8_t *ssrc;
+	size_t stride;
+
+	thiz = _importer_get(r);
+ 	ssrc = thiz->cdata.cmyk.plane0;
+	stride = thiz->cdata.cmyk.plane0_stride;
+	ssrc = ssrc + (stride * y) + x;
+	while (len--)
+	{
+		uint8_t r, g, b;
+
+		r = ((255 - ssrc[0]) * (255 - ssrc[3]) + 255) >> 8;
+		g = ((255 - ssrc[1]) * (255 - ssrc[3]) + 255) >> 8;
+		b = ((255 - ssrc[2]) * (255 - ssrc[3]) + 255) >> 8;
+		*dst = 0xff000000 | r << 16 | g << 8 | b;
+
+		dst++;
+		ssrc += 4;
+	}
+}
+
+/* According to libjpeg doc, Photoshop inverse the values of C, M, Y and K, */
+/* that is C is replaces by 255 - C, etc...*/
+/* See the comment above for the computation of RGB values from CMYK ones. */
+static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Importer *thiz;
+	uint32_t *dst = ddata;
+	uint8_t *ssrc;
+	size_t stride;
+
+	thiz = _importer_get(r);
+ 	ssrc = thiz->cdata.cmyk.plane0;
+	stride = thiz->cdata.cmyk.plane0_stride;
+	ssrc = ssrc + (stride * y) + x;
+	while (len--)
+	{
+		uint8_t r, g, b;
+
+		r = (ssrc[0] * ssrc[3] + 255) >> 8;
+		g = (ssrc[1] * ssrc[3] + 255) >> 8;
+		b = (ssrc[2] * ssrc[3] + 255) >> 8;
+		*dst = 0xff000000 | r << 16 | g << 8 | b;
+
+		dst++;
+		ssrc += 4;
+	}
+}
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -165,6 +237,14 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 
 		case ENESIM_BUFFER_FORMAT_RGB888:
 		*fill = _span_rgb888_none_argb8888;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		*fill = _span_cmyk_none_argb8888;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		*fill = _span_cmyk_adobe_none_argb8888;
 		break;
 
 		default:

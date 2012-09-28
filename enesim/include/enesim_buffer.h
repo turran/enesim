@@ -51,6 +51,8 @@ typedef enum _Enesim_Buffer_Format
 	ENESIM_BUFFER_FORMAT_BGR888,
 	ENESIM_BUFFER_FORMAT_A8,
 	ENESIM_BUFFER_FORMAT_GRAY,
+	ENESIM_BUFFER_FORMAT_CMYK,
+	ENESIM_BUFFER_FORMAT_CMYK_ADOBE,
 	ENESIM_BUFFER_FORMATS
 } Enesim_Buffer_Format;
 
@@ -80,6 +82,7 @@ struct _Enesim_Buffer_24bpp
 
 typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Rgb888;
 typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Bgr888;
+typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Cmyk;
 
 typedef union _Enesim_Buffer_Sw_Data
 {
@@ -89,6 +92,7 @@ typedef union _Enesim_Buffer_Sw_Data
 	Enesim_Buffer_A8 a8;
 	Enesim_Buffer_Rgb888 rgb888;
 	Enesim_Buffer_Bgr888 bgr888;
+	Enesim_Buffer_Cmyk cmyk;
 } Enesim_Buffer_Sw_Data;
 
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f, uint32_t w, uint32_t h);

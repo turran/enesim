@@ -74,6 +74,12 @@ static Eina_Bool _data_alloc(void *prv,
 		data->a8.plane0_stride = w;
 		break;
 
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		data->cmyk.plane0 = alloc_data;
+		data->cmyk.plane0_stride = w * 4;
+		break;
+
 		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		ERR("Unsupported format %d", fmt);
