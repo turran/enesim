@@ -224,22 +224,38 @@ Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *options)
 	cinfo.dct_method = JDCT_ISLOW; // JDCT_FLOAT JDCT_IFAST(quality loss)
 	cinfo.dither_mode = JDITHER_ORDERED;
 
+	switch (cinfo.jpeg_color_space)
+	{
+	 case JCS_RGB:
+	 case JCS_YCbCr:
+		 cinfo.out_color_space = JCS_RGB;
+		 break;
+	 case JCS_CMYK:
+	 case JCS_YCCK:
+		 cinfo.out_color_space = JCS_CMYK;
+		 break;
+	 case JCS_GRAYSCALE:
+	 case JCS_UNKNOWN:
+	 default:
+		 break;
+	}
+
 	jpeg_calc_output_dimensions(&(cinfo));
 	jpeg_start_decompress(&cinfo);
 
 	enesim_buffer_data_get(buffer, &data);
-	sdata = data.argb8888.plane0;
+	sdata = data.bgr888.plane0;
 
 	stride = cinfo.output_width * cinfo.output_components;
 	row = (*cinfo.mem->alloc_sarray)
 		((j_common_ptr) &cinfo, JPOOL_IMAGE, stride, 1);
 	line = (uint8_t *)sdata;
-	printf(" %d %d\n", stride, data.argb8888.plane0_stride);
+	printf(" %d %d\n", stride, data.bgr888.plane0_stride);
 	while (cinfo.output_scanline < cinfo.output_height)
 	{
 		row[0] = line;
 		jpeg_read_scanlines(&cinfo, row, 1);
-		line += data.argb8888.plane0_stride;
+		line += data.bgr888.plane0_stride;
 	}
 	jpeg_destroy_decompress(&cinfo);
 	fclose(f);
