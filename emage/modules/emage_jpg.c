@@ -169,7 +169,7 @@ Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format
 		else
 			fmt = ENESIM_BUFFER_FORMAT_CMYK;
 	else if (cinfo.output_components == 3)
-		fmt = ENESIM_BUFFER_FORMAT_BGR888;
+		fmt = ENESIM_BUFFER_FORMAT_RGB888;
 	else if (cinfo.output_components == 1)
 		fmt = ENESIM_BUFFER_FORMAT_GRAY;
 	else
