@@ -165,17 +165,27 @@ static inline Eina_Bool _basic_edges_generate(Enesim_F16p16_Edge *edges, int *ed
 				int rxxc, ryyc = yy + 0xffff;
 
 				if (v->sgn < 0)
-				{ lyyc = yy + 0xffff;  ryyc = yy - 0xffff; }
+				{
+					lyyc = yy + 0xffff;
+					ryyc = yy - 0xffff;
+				}
 
 				lxxc = (lyyc - v->yy0) * dd;
 				rxxc = (ryyc - v->yy0) * dd;
 
 				if (v->sgn < 0)
-				{ lxxc = dxx - lxxc;  rxxc = dxx - rxxc; }
+				{
+					lxxc = dxx - lxxc;
+					rxxc = dxx - rxxc;
+				}
 
-				lxxc += v->xx0;  rxxc += v->xx0;
-				if (lxxc < v->xx0) lxxc = v->xx0;
-				if (rxxc > v->xx1) rxxc = v->xx1;
+				lxxc += v->xx0;
+				rxxc += v->xx0;
+
+				if (lxxc < v->xx0)
+					lxxc = v->xx0;
+				if (rxxc > v->xx1)
+					rxxc = v->xx1;
 
 				if (lx > lxxc)  lx = lxxc;
 				if (rx < rxxc)  rx = rxxc;
@@ -275,92 +285,10 @@ static inline Eina_Bool _basic_edges_setup(Enesim_F16p16_Edge *edges, int *edges
 	if (!_basic_edges_setup(edges, &nedges, v, nvectors, yy, &lx, &rx, axx, &xx, &x, &len, &d)) \
 		goto get_out;
 
-#if 0
-#define SETUP_EDGES \
-	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
-	edge = edges; \
-	while (n < nvectors) \
-	{ \
-		if (yy + 0xffff < v->yy0) \
-			break; \
-		if (((yy + 0xffff) >= v->yy0) & (yy <= (v->yy1 + 0xffff))) \
-		{ \
-			edge->xx0 = v->xx0; \
-			edge->xx1 = v->xx1; \
-			edge->yy0 = v->yy0; \
-			edge->yy1 = v->yy1; \
-			edge->de = (v->a * (long long int) axx) >> 16; \
-			edge->e = ((v->a * (long long int) xx) >> 16) + \
-					((v->b * (long long int) yy) >> 16) + \
-					v->c; \
-			edge->counted = ((yy >= edge->yy0) & (yy < edge->yy1)); \
-			if (v->sgn && ((v->xx1 - v->xx0) > 2)) \
-			{ \
-				int dxx = (v->xx1 - v->xx0); \
-				double dd = dxx / (double)(v->yy1 - v->yy0); \
-				int lxxc, lyyc = yy - 0xffff; \
-				int rxxc, ryyc = yy + 0xffff; \
- \
-				if (v->sgn < 0) \
-				{ lyyc = yy + 0xffff;  ryyc = yy - 0xffff; } \
- \
-				lxxc = (lyyc - v->yy0) * dd; \
-				rxxc = (ryyc - v->yy0) * dd; \
- \
-				if (v->sgn < 0) \
-				{ lxxc = dxx - lxxc;  rxxc = dxx - rxxc; } \
- \
-				lxxc += v->xx0;  rxxc += v->xx0; \
-				if (lxxc < v->xx0) lxxc = v->xx0; \
-				if (rxxc > v->xx1) rxxc = v->xx1; \
- \
-				if (lx > lxxc)  lx = lxxc; \
-				if (rx < rxxc)  rx = rxxc; \
-			} \
-			else \
-			{ \
-				if (lx > v->xx0)  lx = v->xx0; \
-				if (rx < v->xx1)  rx = v->xx1; \
-			} \
-			edge++; \
-			nedges++; \
-		} \
-		n++; \
-		v++; \
-	} \
-	if (!nedges) \
-		goto get_out; \
- \
-	lx = (lx >> 16) - 1 - x; \
-	if (lx > 0) \
-	{ \
-		/* printf("lx > 0 %d\n", lx); */ \
-		lx = MIN (lx, len); \
-		memset(dst, 0, sizeof(unsigned int) * lx); \
-		xx += lx * axx; \
-		d += lx; \
-		n = 0;  edge = edges; \
-		while (n < nedges) \
-		{ \
-			edge->e += lx * edge->de; \
-			edge++; \
-			n++; \
-		} \
-	} \
-	else lx = 0; \
- \
-	rx = (rx >> 16) + 2 - x; \
-	if (len > rx) \
-	{ \
-		len -= rx; \
-		/* printf("len > rx %d\n", len); */ \
-		memset(dst + rx, 0, sizeof(unsigned int) * len); \
-		e -= len; \
-	} \
-	else rx = len;
-#endif
-
-static void _eval_edges_nz(Enesim_F16p16_Edge *edges, int nedges, int xx, int sww, int *pa, int *pcount)
+/* evaluate the list of edges at position xx with stroke width sww
+ * it writes the number of edges that intersect at x and the resulting alpha value
+ */
+static inline void _eval_edges_nz(Enesim_F16p16_Edge *edges, int nedges, int xx, int sww, int *pa, int *pcount)
 {
 	Enesim_F16p16_Edge *edge;
 	int a = 0;
@@ -397,33 +325,6 @@ static void _eval_edges_nz(Enesim_F16p16_Edge *edges, int nedges, int xx, int sw
 }
 
 #define EVAL_EDGES_NZ _eval_edges_nz(edges, nedges, xx, sww, &a, &count);
-#if 0
-#define EVAL_EDGES_NZ \
-		n = 0; \
-		edge = edges; \
-		while (n < nedges) \
-		{ \
-			int ee = edge->e; \
- \
-			if (edge->counted) \
-				count += (ee >= 0) - (ee <0); \
-			if (ee < 0) \
-				ee = -ee; \
- \
-			if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) & \
-					(xx <= (0xffff + edge->xx1))) \
-			{ \
-				if (a < sww/4) \
-					a = sww - ee; \
-				else \
-					a = (a + (sww - ee)) / 2; \
-			} \
- \
-			edge->e += edge->de; \
-			edge++; \
-			n++; \
-		}
-#endif
 
 /* identity */
 /* stroke and/or fill with possibly a fill renderer non-zero rule */
@@ -442,9 +343,9 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 	int sww;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
-	Enesim_F16p16_Edge *edges, *edge;
+	Enesim_F16p16_Edge *edges;
 	Enesim_F16p16_Vector *v = thiz->vectors;
-	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	int nvectors = thiz->nvectors, nedges = 0;
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
@@ -579,9 +480,9 @@ static void _stroke_paint_fill_nz(Enesim_Renderer *r,
 	int sww;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
-	Enesim_F16p16_Edge *edges, *edge;
+	Enesim_F16p16_Edge *edges;
 	Enesim_F16p16_Vector *v = thiz->vectors;
-	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	int nvectors = thiz->nvectors, nedges = 0;
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
@@ -677,9 +578,9 @@ static void _stroke_paint_fill_paint_nz(Enesim_Renderer *r,
 	int sww;
 	uint32_t *dst = ddata;
 	unsigned int *d = dst, *e = d + len;
-	Enesim_F16p16_Edge *edges, *edge;
+	Enesim_F16p16_Edge *edges;
 	Enesim_F16p16_Vector *v = thiz->vectors;
-	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	int nvectors = thiz->nvectors, nedges = 0;
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
 
