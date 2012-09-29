@@ -133,6 +133,32 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
 	}
 }
 
+static void _span_bgr888_none_argb8888(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state,
+		int x, int y, unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Importer *thiz;
+	uint32_t *dst = ddata;
+	uint8_t *ssrc;
+	size_t stride;
+
+	thiz = _importer_get(r);
+ 	ssrc = thiz->cdata.bgr888.plane0;
+	stride = thiz->cdata.bgr888.plane0_stride;
+	ssrc = ssrc + (stride * y) + x;
+	while (len--)
+	{
+		uint8_t r, g, b;
+
+		b = *ssrc++;
+		g = *ssrc++;
+		r = *ssrc++;
+		*dst = 0xff000000 | r << 16 | g << 8 | b;
+
+		dst++;
+	}
+}
+
 /* Conversion from CMYK to RGB is done in 2 steps: */
 /* CMYK => CMY => RGB (see http://www.easyrgb.com/index.php?X=MATH) */
 /* after computation, if C, M, Y and K are between 0 and 1, we have: */
@@ -237,6 +263,10 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 
 		case ENESIM_BUFFER_FORMAT_RGB888:
 		*fill = _span_rgb888_none_argb8888;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		*fill = _span_bgr888_none_argb8888;
 		break;
 
 		case ENESIM_BUFFER_FORMAT_CMYK:
