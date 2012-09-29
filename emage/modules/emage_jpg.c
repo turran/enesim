@@ -55,7 +55,6 @@ Eina_Bool _jpg_loadable(const char *file)
 	FILE *f;
 	unsigned char *buf;
 	int ret;
-	printf("%s\n", __FUNCTION__);
 
 	if (!file)
 		return EINA_FALSE;
@@ -100,7 +99,6 @@ Eina_Bool _jpg_loadable(const char *file)
 	fclose(f);
   free_buf:
 	free(buf);
-	printf("%s\n", __FUNCTION__);
 	return EINA_FALSE;
 }
 
@@ -112,7 +110,6 @@ Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format
 	int ww = 0;
 	int hh = 0;
 	int fmt = -1;
-	printf("%s\n", __FUNCTION__);
 
 	if (!file)
 		return EMAGE_ERROR_EXIST;
@@ -144,18 +141,20 @@ Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format
 	/* GRAYSCALE => RGB YCbCr => RGB and YCCK => CMYK */
 	switch (cinfo.jpeg_color_space)
 	{
-	 case JCS_RGB:
-	 case JCS_YCbCr:
-		 cinfo.out_color_space = JCS_RGB;
-		 break;
-	 case JCS_CMYK:
-	 case JCS_YCCK:
-		 cinfo.out_color_space = JCS_CMYK;
-		 break;
-	 case JCS_GRAYSCALE:
-	 case JCS_UNKNOWN:
-	 default:
-		 break;
+		case JCS_RGB:
+		case JCS_YCbCr:
+		cinfo.out_color_space = JCS_RGB;
+		break;
+
+		case JCS_CMYK:
+		case JCS_YCCK:
+		cinfo.out_color_space = JCS_CMYK;
+		break;
+
+		case JCS_GRAYSCALE:
+		case JCS_UNKNOWN:
+		default:
+		break;
 	}
 
 	jpeg_calc_output_dimensions(&(cinfo));
@@ -195,10 +194,10 @@ Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *options)
 	struct jpeg_decompress_struct cinfo;
 	Jpg_Error_Mgr err;
 	FILE *f;
-	uint32_t *sdata;
+	uint8_t *sdata;
 	uint8_t *line;
 	int stride;
-	JSAMPARRAY row;
+	JSAMPROW row;
 
 	if (!file)
 		return EMAGE_ERROR_EXIST;
@@ -226,36 +225,55 @@ Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *options)
 
 	switch (cinfo.jpeg_color_space)
 	{
-	 case JCS_RGB:
-	 case JCS_YCbCr:
-		 cinfo.out_color_space = JCS_RGB;
-		 break;
-	 case JCS_CMYK:
-	 case JCS_YCCK:
-		 cinfo.out_color_space = JCS_CMYK;
-		 break;
-	 case JCS_GRAYSCALE:
-	 case JCS_UNKNOWN:
-	 default:
-		 break;
+		case JCS_RGB:
+		case JCS_YCbCr:
+		cinfo.out_color_space = JCS_RGB;
+		break;
+
+		case JCS_CMYK:
+		case JCS_YCCK:
+		cinfo.out_color_space = JCS_CMYK;
+		break;
+
+		case JCS_GRAYSCALE:
+		case JCS_UNKNOWN:
+		default:
+		break;
 	}
 
 	jpeg_calc_output_dimensions(&(cinfo));
 	jpeg_start_decompress(&cinfo);
 
 	enesim_buffer_data_get(buffer, &data);
-	sdata = data.bgr888.plane0;
+	switch (cinfo.output_components)
+	{
+		case 4:
+		sdata = data.cmyk.plane0;
+		stride = data.cmyk.plane0_stride;
+		break;
 
-	stride = cinfo.output_width * cinfo.output_components;
-	row = (*cinfo.mem->alloc_sarray)
-		((j_common_ptr) &cinfo, JPOOL_IMAGE, stride, 1);
-	line = (uint8_t *)sdata;
-	printf(" %d %d\n", stride, data.bgr888.plane0_stride);
+		case 3:
+		sdata = data.bgr888.plane0;
+		stride = data.bgr888.plane0_stride;
+		break;
+
+		case 1:
+		sdata = data.a8.plane0;
+		stride = data.a8.plane0_stride;
+		break;
+
+		default:
+		jpeg_destroy_decompress(&cinfo);
+		fclose(f);
+		return EMAGE_ERROR_FORMAT;
+	}
+
+	line = sdata;
 	while (cinfo.output_scanline < cinfo.output_height)
 	{
-		row[0] = line;
-		jpeg_read_scanlines(&cinfo, row, 1);
-		line += data.bgr888.plane0_stride;
+		row = line;
+		jpeg_read_scanlines(&cinfo, &row, 1);
+		line += stride;
 	}
 	jpeg_destroy_decompress(&cinfo);
 	fclose(f);
@@ -278,7 +296,6 @@ static Emage_Provider _provider = {
  *============================================================================*/
 Eina_Bool jpg_provider_init(void)
 {
-	printf("%s\n", __FUNCTION__);
 	emage_log_dom_jpg = eina_log_domain_register("emage_jpg", EMAGE_LOG_COLOR_DEFAULT);
 	if (emage_log_dom_jpg < 0)
 	{

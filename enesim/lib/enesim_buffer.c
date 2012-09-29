@@ -229,6 +229,8 @@ EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, 
 	{
 		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
 		return w * h * 4;
 		break;
 
