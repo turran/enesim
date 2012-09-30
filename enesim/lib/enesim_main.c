@@ -38,6 +38,7 @@
 #include "private/compositor.h"
 #include "private/renderer.h"
 #include "private/converter.h"
+#include "private/mempool_aligned.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -83,6 +84,7 @@ EAPI int enesim_init(void)
 	/* TODO Dump the information about SIMD extensions
 	 * get the cpuid for this
 	 */
+	enesim_mempool_aligned_init();
 	enesim_compositor_init();
 	enesim_renderer_init();
 	enesim_converter_init();
@@ -126,6 +128,7 @@ EAPI int enesim_shutdown(void)
 	enesim_converter_shutdown();
 	enesim_renderer_shutdown();
 	enesim_compositor_shutdown();
+	enesim_mempool_aligned_shutdown();
 	eina_log_domain_unregister(enesim_log_dom_global);
 	enesim_log_dom_global = -1;
 	eina_shutdown();

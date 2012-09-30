@@ -250,7 +250,14 @@ EAPI Enesim_Pool * enesim_pool_default_get(void)
 
 	if (!p)
 	{
+		/* FIXME for later */
+#if 0
+		Eina_Mempool *m;
+		m = enesim_mempool_aligned_get();
+		p = enesim_pool_eina_new(m);
+#else
 		p = enesim_pool_new(&_default_descriptor, NULL);
+#endif
 	}
 	return p;
 }
