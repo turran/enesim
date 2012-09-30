@@ -3,7 +3,7 @@
 
 int end = 0;
 
-void help(void)
+static void help(void)
 {
 	printf("emage_example [load | save] [async | sync ] FILE\n");
 }

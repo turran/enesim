@@ -26,6 +26,7 @@
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void);
 EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int octaves);
 EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, double persistence);
+EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, double ampl);
 EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq);
 EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, double freq);
 

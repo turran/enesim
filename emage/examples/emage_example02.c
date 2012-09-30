@@ -1,6 +1,6 @@
 #include "Emage.h"
 
-void help(void)
+static void help(void)
 {
 	printf("emage_example02 INFILE OUTFILE\n");
 }

@@ -129,4 +129,11 @@ EAPI void emage_options_parse(const char *options, Emage_Option_Cb cb, void *dat
  * @}
  */
 
+typedef struct _Emage_Data Emage_Data;
+EAPI Eina_Bool emage_data_file_from(Emage_Data *thiz, const char *file);
+EAPI void emage_data_file_free(Emage_Data *thiz);
+
+EAPI void emage_pool_size_set(int num);
+EAPI int emage_pool_size_get(void);
+
 #endif

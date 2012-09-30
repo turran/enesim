@@ -128,5 +128,6 @@ void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p);
 void enesim_figure_polygon_remove(Enesim_Figure *thiz, Enesim_Polygon *p);
 Eina_Bool enesim_figure_boundings(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
 void enesim_figure_clear(Enesim_Figure *thiz);
+void enesim_figure_dump(Enesim_Figure *f);
 
 #endif

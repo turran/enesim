@@ -28,6 +28,7 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_stripes.h"
 
 #ifdef BUILD_OPENGL
 #include "Enesim_OpenGL.h"

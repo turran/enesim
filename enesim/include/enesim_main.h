@@ -99,7 +99,8 @@ EAPI int enesim_shutdown(void);
 EAPI void enesim_version_get(unsigned int *major, unsigned int *minor, unsigned int *micro);
 
 EAPI const char * enesim_format_name_get(Enesim_Format f);
-EAPI size_t enesim_format_bytes_calc(Enesim_Format f, uint32_t w, uint32_t h);
+EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h);
+EAPI size_t enesim_format_pitch_get(Enesim_Format fmt, uint32_t w);
 
 /** @} */
 

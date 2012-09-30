@@ -28,6 +28,7 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_gradient_linear.h"
 
 #include "private/renderer.h"
 #include "private/gradient.h"
@@ -207,7 +208,7 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-Eina_Bool _linear_has_changed(Enesim_Renderer *r,
+static Eina_Bool _linear_has_changed(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
 	Enesim_Renderer_Gradient_Linear *thiz;

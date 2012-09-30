@@ -679,7 +679,7 @@ EAPI void etex_span_buffer_get(Enesim_Renderer *r, Etex_Buffer **b)
 
 /**
  * TODO
- * add this to the header and implement it
+ * implement it
  */
 EAPI int etex_span_index_at(Enesim_Renderer *r, int x, int y)
 {

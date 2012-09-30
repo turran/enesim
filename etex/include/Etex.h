@@ -64,9 +64,9 @@ EAPI int etex_init(void);
 EAPI int etex_shutdown(void);
 
 typedef struct _Etex Etex;
-Etex * etex_default_get(void);
-Etex * etex_freetype_get(void);
-void etex_delete(Etex *e);
+EAPI Etex * etex_default_get(void);
+EAPI Etex * etex_freetype_get(void);
+EAPI void etex_freetype_delete(Etex *e);
 
 typedef enum _Etex_Direction
 {
@@ -140,7 +140,10 @@ EAPI Enesim_Renderer * etex_span_new(void);
 EAPI Enesim_Renderer * etex_span_new_from_etex(Etex *e);
 EAPI void etex_span_text_set(Enesim_Renderer *r, const char *str);
 EAPI void etex_span_text_get(Enesim_Renderer *r, const char **str);
+EAPI void etex_span_direction_get(Enesim_Renderer *r, Etex_Direction *direction);
+EAPI void etex_span_direction_set(Enesim_Renderer *r, Etex_Direction direction);
 EAPI void etex_span_buffer_get(Enesim_Renderer *r, Etex_Buffer **b);
+EAPI int etex_span_index_at(Enesim_Renderer *r, int x, int y);
 
 /**
  * @}

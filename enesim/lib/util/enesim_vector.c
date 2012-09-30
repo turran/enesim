@@ -44,13 +44,13 @@ static Eina_Bool _points_equal(Enesim_Point *p0, Enesim_Point *p1, double thresh
 	return ret;
 }
 
-void _polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p)
+static void _polygon_point_append(Enesim_Polygon *thiz, Enesim_Point *p)
 {
 	thiz->points = eina_list_append(thiz->points, p);
 	_polygon_update_bounds(thiz, p);
 }
 
-void _polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p)
+static void _polygon_point_prepend(Enesim_Polygon *thiz, Enesim_Point *p)
 {
 	thiz->points = eina_list_prepend(thiz->points, p);
 	_polygon_update_bounds(thiz, p);

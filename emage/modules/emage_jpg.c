@@ -49,7 +49,7 @@ static void _jpg_error_exit_cb(j_common_ptr cinfo)
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-Eina_Bool _jpg_loadable(const char *file)
+static Eina_Bool _jpg_loadable(const char *file)
 {
 	struct stat s;
 	FILE *f;
@@ -102,7 +102,7 @@ Eina_Bool _jpg_loadable(const char *file)
 	return EINA_FALSE;
 }
 
-Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
 	struct jpeg_decompress_struct cinfo;
 	Jpg_Error_Mgr err;
@@ -188,7 +188,7 @@ Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format
 	return 0;
 }
 
-Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *options)
+static Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *options)
 {
 	Enesim_Buffer_Sw_Data data;
 	struct jpeg_decompress_struct cinfo;
@@ -294,7 +294,7 @@ static Emage_Provider _provider = {
 /*============================================================================*
  *                             Module API                                     *
  *============================================================================*/
-Eina_Bool jpg_provider_init(void)
+static Eina_Bool jpg_provider_init(void)
 {
 	emage_log_dom_jpg = eina_log_domain_register("emage_jpg", EMAGE_LOG_COLOR_DEFAULT);
 	if (emage_log_dom_jpg < 0)
@@ -308,7 +308,7 @@ Eina_Bool jpg_provider_init(void)
 	return emage_provider_register(&_provider);
 }
 
-void jpg_provider_shutdown(void)
+static void jpg_provider_shutdown(void)
 {
 	emage_provider_unregister(&_provider);
 	eina_log_domain_unregister(emage_log_dom_jpg);

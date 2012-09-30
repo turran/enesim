@@ -39,6 +39,8 @@ EAPI void enesim_renderer_dispmap_map_get(Enesim_Renderer *r, Enesim_Surface **m
 EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI void enesim_renderer_dispmap_src_get(Enesim_Renderer *r, Enesim_Surface **src);
 EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor);
+
+EAPI double enesim_renderer_dispmap_factor_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
 EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
 

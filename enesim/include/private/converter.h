@@ -33,6 +33,7 @@ void enesim_converter_argb8888_init(void);
 void enesim_converter_rgb888_init(void);
 void enesim_converter_bgr888_init(void);
 void enesim_converter_rgb565_init(void);
+void enesim_converter_a8_init(void);
 
 EAPI void enesim_converter_span_register(Enesim_Converter_1D cnv,
 		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt);

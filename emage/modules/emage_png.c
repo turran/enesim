@@ -65,7 +65,7 @@ static Eina_Bool _png_format_get(int color_type, Enesim_Buffer_Format *fmt)
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-Eina_Bool _png_loadable(const char *file)
+static Eina_Bool _png_loadable(const char *file)
 {
 	FILE *f;
 	unsigned char buf[PNG_BYTES_TO_CHECK];
@@ -84,7 +84,7 @@ Eina_Bool _png_loadable(const char *file)
 	return EINA_TRUE;
 }
 
-Eina_Bool _png_saveable(const char *file)
+static Eina_Bool _png_saveable(const char *file)
 {
 	char *d;
 
@@ -98,7 +98,7 @@ Eina_Bool _png_saveable(const char *file)
 	return EINA_FALSE;
 }
 
-Eina_Error _png_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _png_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
 	FILE *f;
 	int bit_depth, color_type, interlace_type;
@@ -157,7 +157,7 @@ Eina_Error _png_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format
 	return EMAGE_ERROR_LOADING;
 }
 
-Eina_Error _png_load(const char *file, Enesim_Buffer *buffer, void *options)
+static Eina_Error _png_load(const char *file, Enesim_Buffer *buffer, void *options)
 {
 	Enesim_Buffer_Sw_Data data;
 	FILE *f;
@@ -278,7 +278,7 @@ Eina_Error _png_load(const char *file, Enesim_Buffer *buffer, void *options)
 	return EMAGE_ERROR_LOADING;
 }
 
-Eina_Bool _png_save(const char *file, Enesim_Surface *s, void *options)
+static Eina_Bool _png_save(const char *file, Enesim_Surface *s, void *options)
 {
 	FILE *f;
 	int y;
@@ -381,7 +381,7 @@ static Emage_Provider _provider = {
 /*============================================================================*
  *                             Module API                                     *
  *============================================================================*/
-Eina_Bool png_provider_init(void)
+static Eina_Bool png_provider_init(void)
 {
 	emage_log_dom_png = eina_log_domain_register("emage_png", EMAGE_LOG_COLOR_DEFAULT);
 	if (emage_log_dom_png < 0)
@@ -395,7 +395,7 @@ Eina_Bool png_provider_init(void)
 	return emage_provider_register(&_provider);
 }
 
-void png_provider_shutdown(void)
+static void png_provider_shutdown(void)
 {
 	emage_provider_unregister(&_provider);
 	eina_log_domain_unregister(emage_log_dom_png);

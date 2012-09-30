@@ -26,6 +26,7 @@
 EAPI Enesim_Renderer * enesim_renderer_raddist_new(void);
 EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius);
 EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor);
+EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI void enesim_renderer_raddist_src_get(Enesim_Renderer *r, Enesim_Surface **src);
 EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox);

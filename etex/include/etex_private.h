@@ -95,8 +95,11 @@ void etex_font_unref(Etex_Font *f);
 int etex_font_max_ascent_get(Etex_Font *f);
 int etex_font_max_descent_get(Etex_Font *f);
 
+Etex_Glyph * etex_font_glyph_get(Etex_Font *f, char c);
 Etex_Glyph * etex_font_glyph_load(Etex_Font *f, char c);
 void etex_font_glyph_unload(Etex_Font *f, char c);
+
+void etex_font_dump(Etex_Font *f, const char *path);
 
 typedef struct _Etex_Base_State
 {

@@ -29,6 +29,7 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_checker.h"
 
 #ifdef BUILD_OPENCL
 #include "Enesim_OpenCL.h"
@@ -76,7 +77,7 @@ typedef struct _Enesim_Renderer_Checker
 	Eina_F16p16 ww2, hh2;
 } Enesim_Renderer_Checker;
 
-Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
+static Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Checker *thiz;
 
@@ -726,7 +727,7 @@ EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
  * Gets the height of the checker rectangles
  * @returns The height
  */
-EAPI void enesim_renderer_checker_heigth_get(Enesim_Renderer *r, int *height)
+EAPI void enesim_renderer_checker_height_get(Enesim_Renderer *r, int *height)
 {
 	Enesim_Renderer_Checker *thiz;
 

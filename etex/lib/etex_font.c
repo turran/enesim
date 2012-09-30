@@ -67,7 +67,7 @@ static void _font_unref(Etex_Font *f)
 }
 
 #if HAVE_EMAGE
-Eina_Bool _dump(const Eina_Hash *hash, const void *key, void *data, void *fdata)
+static Eina_Bool _dump(const Eina_Hash *hash, const void *key, void *data, void *fdata)
 {
 	Etex_Glyph *g = (Etex_Glyph *)data;
 	char c = *(int *)key;

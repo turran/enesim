@@ -78,6 +78,7 @@ EAPI void enesim_matrix_translate(Enesim_Matrix *t, double tx, double ty);
 EAPI void enesim_matrix_scale(Enesim_Matrix *t, double sx, double sy);
 EAPI void enesim_matrix_rotate(Enesim_Matrix *t, double rad);
 EAPI void enesim_matrix_identity(Enesim_Matrix *t);
+EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m);
 
 EAPI double enesim_matrix_determinant(const Enesim_Matrix *m);
 EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar);

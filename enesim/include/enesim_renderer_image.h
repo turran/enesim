@@ -34,6 +34,8 @@ EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w);
 EAPI void enesim_renderer_image_width_get(Enesim_Renderer *r, double *w);
 EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h);
 EAPI void enesim_renderer_image_height_get(Enesim_Renderer *r, double *h);
+EAPI void enesim_renderer_image_size_set(Enesim_Renderer *r, double w, double h);
+EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *h);
 EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI void enesim_renderer_image_src_get(Enesim_Renderer *r, Enesim_Surface **src);
 

@@ -30,6 +30,7 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_path.h"
+#include "enesim_renderer_ellipse.h"
 
 #include "private/renderer.h"
 #include "private/shape.h"
