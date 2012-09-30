@@ -17,6 +17,20 @@
  */
 #include "enesim_private.h"
 
+#ifdef _WIN32
+# ifndef WIN32_LEAN_AND_MEAN
+#  define WIN32_LEAN_AND_MEAN
+# endif
+# include <windows.h>
+# undef WIN32_LEAN_AND_MEAN
+#elif defined(__MACH__) && defined (__APPLE__)
+#include <sys/sysctl.h>
+#elif defined (__linux__)
+# include <stdio.h>
+#else
+# error "Platform not supported"
+#endif
+
 #include "private/mempool_aligned.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -25,6 +39,7 @@ typedef struct _Enesim_Mempool_Aligned
 {
 	size_t alignment;
 } Enesim_Mempool_Aligned;
+
 static int _init = 0;
 
 /* TODO parse the options */
@@ -34,7 +49,76 @@ static void * _aligned_init(const char *context, const char *options, va_list ar
 
 	thiz = calloc(1, sizeof(Enesim_Mempool_Aligned));
 	/* TODO try to get the cache line size automatically */
+	/* Remains Solaris and BSD* */
+	/* TODO: Merge in Eina later */
+#ifdef _WIN32
+	{
+		DWORD buffer_size = 0;
+		DWORD i;
+		SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buffer = NULL;
+
+		if (!GetLogicalProcessorInformation(NULL, &buffer_size))
+		{
+			free(thiz);
+			return NULL;
+		}
+		buffer = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION *)malloc(buffer_size);
+		if (!buffer)
+		{
+			free(thiz);
+			return NULL;
+		}
+		if (!GetLogicalProcessorInformation(&buffer[0], &buffer_size))
+		{
+			free(buffer);
+			free(thiz);
+			return NULL;
+		}
+		for (i = 0; i != buffer_size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); ++i)
+		{
+			if ((buffer[i].Relationship == RelationCache) && (buffer[i].Cache.Level == 1))
+			{
+				thiz->alignment = buffer[i].Cache.LineSize;
+				break;
+			}
+		}
+		free(buffer);
+		if (thiz->alignment == 0)
+		{
+			free(thiz);
+			return NULL;
+		}
+	}
+#elif defined(__MACH__) && defined (__APPLE__)
+	{
+		size_t sizeof_line_size = sizeof(line_size);
+
+		sysctlbyname("hw.cachelinesize", &thiz->alignment, &sizeof_line_size, 0, 0);
+		if (thiz->alignment == 0)
+		{
+			free(thiz);
+			return NULL;
+		}
+	}
+#elif defined (__linux__)
+	{
+		FILE *p = NULL;
+
+		p = fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "rb");
+		if (p)
+		{
+			fscanf(p, "%d", &thiz->alignment);
+			fclose(p);
+		}
+		if (thiz->alignment == 0)
+		{
+			free(thiz);
+			return NULL;
+		}
+	}
+#else
 	thiz->alignment = 64;
+#endif
 	return thiz;
 }
 
@@ -45,7 +129,7 @@ static void _aligned_free(void *data, void *element)
 
 static void * _aligned_alloc(void *data, unsigned int size)
 {
-	Enesim_Mempool_Aligned *thiz = data;
+	Enesim_Mempool_Aligned *thiz = (Enesim_Mempool_Aligned *)data;
 	int ret;
 	void *element = NULL;
 
