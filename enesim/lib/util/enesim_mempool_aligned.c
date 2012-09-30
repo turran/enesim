@@ -49,10 +49,15 @@ static void * _aligned_alloc(void *data, unsigned int size)
 	int ret;
 	void *element = NULL;
 
-	/* FIXME use the correct version in windows */
+#ifdef _WIN32
+	element = _aligned_malloc(size, thiz->alignment);
+	if (!element)
+		return NULL;
+#else
 	ret = posix_memalign(&element, thiz->alignment, size);
 	if (ret)
 		return NULL;
+#endif
 	return element;
 }
 
