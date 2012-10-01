@@ -23,12 +23,11 @@
 # endif
 # include <windows.h>
 # undef WIN32_LEAN_AND_MEAN
-#elif defined(__MACH__) && defined (__APPLE__)
-#include <sys/sysctl.h>
+#elif (defined (__MACH__) && defined (__APPLE__)) || defined (__FreeBSD__)
+# include <sys/sysctl.h>
 #elif defined (__linux__)
 # include <stdio.h>
-#else
-# error "Platform not supported"
+# include <unistd.h>
 #endif
 
 #include "private/mempool_aligned.h"
@@ -89,7 +88,7 @@ static void * _aligned_init(const char *context, const char *options, va_list ar
 			return NULL;
 		}
 	}
-#elif defined(__MACH__) && defined (__APPLE__)
+#elif (defined (__MACH__) && defined (__APPLE__)) || defined (__FreeBSD__)
 	{
 		size_t sizeof_line_size = sizeof(line_size);
 
@@ -102,6 +101,9 @@ static void * _aligned_init(const char *context, const char *options, va_list ar
 	}
 #elif defined (__linux__)
 	{
+# ifdef _SC_LEVEL1_DCACHE_LINESIZE
+		thiz->alignment = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+# else
 		FILE *p = NULL;
 
 		p = fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "rb");
@@ -115,6 +117,7 @@ static void * _aligned_init(const char *context, const char *options, va_list ar
 			free(thiz);
 			return NULL;
 		}
+# endif
 	}
 #else
 	thiz->alignment = 64;
