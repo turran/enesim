@@ -135,6 +135,7 @@ typedef struct _Enesim_Renderer_Path
 	Enesim_Matrix last_matrix;
 	Enesim_Shape_Stroke_Join last_join;
 	Enesim_Shape_Stroke_Cap last_cap;
+	double last_stroke_weight;
 	/* internal stuff */
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
@@ -1290,6 +1291,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 
 static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 		const Enesim_Matrix *cgm,
+		double stroke_width,
 		Enesim_Shape_Stroke_Join join,
 		Enesim_Shape_Stroke_Cap cap)
 {
@@ -1297,12 +1299,14 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 	/* some command has been added */
 	if (thiz->changed && !thiz->generated)
 		ret = EINA_TRUE;
-	/* the stroke cap is different */
+	/* the stroke join is different */
 	else if (thiz->last_join != join)
 		ret = EINA_TRUE;
+	/* the stroke cap is different */
 	else if (thiz->last_cap != cap)
 		ret = EINA_TRUE;
-	/* the stroke join is different */
+	else if (thiz->last_stroke_weight != stroke_width)
+		ret = EINA_TRUE; 
 	/* the geometry transformation is different */
 	else if (!enesim_matrix_is_equal(cgm, &thiz->last_matrix))
 		ret = EINA_TRUE;
@@ -1371,6 +1375,7 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 	thiz->last_join = join;
 	thiz->last_cap = cap;
 	thiz->last_matrix = *geometry_transformation;
+	thiz->last_stroke_weight = sw;
 #if BUILD_OPENGL
 	thiz->gl.fill.needs_tesselate = EINA_TRUE;
 	thiz->gl.stroke.needs_tesselate = EINA_TRUE;
@@ -1409,6 +1414,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 
 	/* generate the list of points/polygons */
 	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+			css->stroke.weight,
 			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
@@ -1488,6 +1494,7 @@ static void _path_boundings(Enesim_Renderer *r,
 
 	thiz = _path_get(r);
 	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+			css->stroke.weight,
 			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
@@ -1605,6 +1612,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 
 	/* generate the figures */
 	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+			css->stroke.weight,
 			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
