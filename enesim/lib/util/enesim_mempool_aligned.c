@@ -90,7 +90,7 @@ static void * _aligned_init(const char *context, const char *options, va_list ar
 	}
 #elif (defined (__MACH__) && defined (__APPLE__)) || defined (__FreeBSD__)
 	{
-		size_t sizeof_line_size = sizeof(line_size);
+		size_t sizeof_line_size = sizeof(thiz->alignment);
 
 		sysctlbyname("hw.cachelinesize", &thiz->alignment, &sizeof_line_size, 0, 0);
 		if (thiz->alignment == 0)
