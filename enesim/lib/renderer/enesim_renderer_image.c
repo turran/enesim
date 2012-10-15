@@ -1429,6 +1429,10 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
+#if LOCK
+	enesim_surface_lock(thiz->current.s, EINA_FALSE);
+#endif
+
 	enesim_surface_size_get(thiz->current.s, &thiz->sw, &thiz->sh);
 	enesim_surface_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
 	x = thiz->current.x;  y = thiz->current.y;
@@ -1460,6 +1464,9 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	if ((w < 1) || (h < 1) || (thiz->sw < 1) || (thiz->sh < 1))
 	{
 		WRN("Size too small");
+#if LOCK
+	enesim_surface_unlock(thiz->current.s);
+#endif
 		return EINA_FALSE;
 	}
 

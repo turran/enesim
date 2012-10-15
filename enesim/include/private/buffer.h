@@ -36,6 +36,8 @@ struct _Enesim_Buffer
 	void *backend_data;
 	Enesim_Pool *pool;
 	Eina_Bool external_allocated; /* whenever the user wants a buffer by not copying a sw buffer pointer this is true otherwise false */
+	/* FIXME make this conditional for windows */
+	Eina_RWLock lock;
 	void *user; /* user provided data */
 };
 

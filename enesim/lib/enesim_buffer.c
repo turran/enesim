@@ -26,6 +26,37 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
+		void *backend_data, Enesim_Format f, Enesim_Pool *p,
+		Eina_Bool external)
+{
+	Enesim_Buffer *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Buffer));
+	EINA_MAGIC_SET(thiz, ENESIM_MAGIC_BUFFER);
+	thiz->w = w;
+	thiz->h = h;
+	thiz->backend = backend;
+	thiz->backend_data = backend_data;
+	thiz->format = f;
+	thiz->pool = p;
+	thiz->external_allocated = external;
+	thiz = enesim_buffer_ref(thiz);
+	/* now create the needed locks */
+#if LOCK
+	eina_rwlock_new(&thiz->lock);
+#endif
+	return thiz;
+}
+
+static void _buffer_free(Enesim_Buffer *b)
+{
+	enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
+#if LOCK
+	eina_rwlock_free(&b->lock);
+#endif
+	free(b);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -53,16 +84,7 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 	if (!enesim_pool_data_from(p, &backend, &backend_data, f, w, h, copy, data))
 		return NULL;
 
-	buf = calloc(1, sizeof(Enesim_Buffer));
-	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
-	buf->w = w;
-	buf->h = h;
-	buf->backend = backend;
-	buf->backend_data = backend_data;
-	buf->format = f;
-	buf->pool = p;
-	buf->external_allocated = !copy;
-	buf = enesim_buffer_ref(buf);
+	buf = _buffer_new(w, h, backend, backend_data, f, p, !copy);
 
 	return buf;
 }
@@ -102,16 +124,7 @@ enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w,
 	if (!enesim_pool_data_alloc(p, &backend, &backend_data, f, w, h))
 		return NULL;
 
-	buf = calloc(1, sizeof(Enesim_Buffer));
-	EINA_MAGIC_SET(buf, ENESIM_MAGIC_BUFFER);
-	buf->w = w;
-	buf->h = h;
-	buf->backend = backend;
-	buf->backend_data = backend_data;
-	buf->format = f;
-	buf->pool = p;
-	buf->external_allocated = EINA_FALSE;
-	buf = enesim_buffer_ref(buf);
+	buf = _buffer_new(w, h, backend, backend_data, f, p, EINA_FALSE);
 
 	return buf;
 }
@@ -191,8 +204,7 @@ EAPI void enesim_buffer_unref(Enesim_Buffer *b)
 	b->ref--;
 	if (!b->ref)
 	{
-		enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
-		free(b);
+		_buffer_free(b);
 	}
 }
 
@@ -332,3 +344,27 @@ EAPI void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
 	return b->backend_data;
 }
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write)
+{
+#if LOCK
+	if (write)
+		eina_rwlock_take_write(&b->lock);
+	else
+		eina_rwlock_take_read(&b->lock);
+#endif
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_buffer_unlock(Enesim_Buffer *b)
+{
+#if LOCK
+	eina_rwlock_release(&b->lock);
+#endif
+}

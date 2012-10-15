@@ -107,6 +107,9 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Backend b;
 
+#if LOCK
+	enesim_surface_lock(s, EINA_TRUE);
+#endif
 	b = enesim_surface_backend_get(s);
 	switch (b)
 	{
@@ -130,6 +133,9 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		WRN("Backend not supported %d", b);
 		break;
 	}
+#if LOCK
+	enesim_surface_unlock(s);
+#endif
 }
 
 static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
@@ -140,6 +146,9 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 	Eina_Rectangle *clip;
 	Eina_List *l;
 
+#if LOCK
+	enesim_surface_lock(s, EINA_TRUE);
+#endif
 	b = enesim_surface_backend_get(s);
 	switch (b)
 	{
@@ -173,6 +182,9 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		WRN("Backend not supported %d", b);
 		break;
 	}
+#if LOCK
+	enesim_surface_unlock(s);
+#endif
 }
 
 static inline void _surface_boundings(Enesim_Surface *s, Eina_Rectangle *boundings)

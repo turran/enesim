@@ -294,3 +294,21 @@ EAPI void * enesim_surface_backend_data_get(Enesim_Surface *s)
 {
 	return enesim_buffer_backend_data_get(s->buffer);
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_surface_lock(Enesim_Surface *s, Eina_Bool write)
+{
+	enesim_buffer_lock(s->buffer, write);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_surface_unlock(Enesim_Surface *s)
+{
+	enesim_buffer_unlock(s->buffer);
+}
