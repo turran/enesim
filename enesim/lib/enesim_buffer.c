@@ -204,6 +204,7 @@ EAPI void enesim_buffer_unref(Enesim_Buffer *b)
 	b->ref--;
 	if (!b->ref)
 	{
+		DBG("Unreffing buffer %p", b);
 		_buffer_free(b);
 	}
 }

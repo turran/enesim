@@ -223,6 +223,7 @@ EAPI void enesim_surface_unref(Enesim_Surface *s)
 	s->ref--;
 	if (!s->ref)
 	{
+		DBG("Unreffing surface %p with buffer %p", s, s->buffer);
 		enesim_buffer_unref(s->buffer);
 		free(s);
 	}
