@@ -266,12 +266,66 @@ EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, 
 	return 0;
 }
 
+EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
+		uint8_t *aoffset, uint8_t *alen,
+		uint8_t *roffset, uint8_t *rlen,
+		uint8_t *goffset, uint8_t *glen,
+		uint8_t *boffset, uint8_t *blen, Eina_Bool *premul)
+{
+	Eina_Bool ret = EINA_TRUE;
+
+	*aoffset = 0; *alen = 0;
+	*roffset = 0; *rlen = 0;
+	*goffset = 0; *glen = 0;
+	*boffset = 0; *blen = 0;
+	*premul = EINA_FALSE;
+
+	switch (fmt)
+	{
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		*aoffset = 24; *alen = 8;
+		*roffset = 16; *rlen = 8;
+		*goffset = 8; *glen = 8;
+		*boffset = 0; *blen = 8;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		*aoffset = 24; *alen = 8;
+		*roffset = 16; *rlen = 8;
+		*goffset = 8; *glen = 8;
+		*boffset = 0; *blen = 8;
+		*premul = EINA_TRUE;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		*roffset = 16; *rlen = 8;
+		*goffset = 8; *glen = 8;
+		*boffset = 0; *blen = 8;
+
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		*aoffset = 0; *alen = 0;
+		*roffset = 0; *rlen = 8;
+		*goffset = 8; *glen = 8;
+		*boffset = 16; *blen = 8;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_A8:
+		*aoffset = 0; *alen = 8;
+		break;
+
+		default:
+		ret = EINA_FALSE;
+		break;
+	}
+	return ret;
+}
+
 /**
  * To be documented
  * FIXME: To be fixed
  * FIXME how to handle the gray?
  */
-EAPI Eina_Bool enesim_buffer_format_rgb_get(Enesim_Buffer_Format *fmt,
+EAPI Eina_Bool enesim_buffer_format_rgb_components_from(Enesim_Buffer_Format *fmt,
 		uint8_t aoffset, uint8_t alen,
 		uint8_t roffset, uint8_t rlen,
 		uint8_t goffset, uint8_t glen,
