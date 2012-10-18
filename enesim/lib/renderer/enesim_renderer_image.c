@@ -737,6 +737,7 @@ static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 	ixx = (mxx * (long long int)xx) >> 16;
 	iyy0 = (myy * (long long int)yy) >> 16;
 	iy0 = iyy0 >> 16;
+	tyy0 = yy - (yy & 0xffff);  ty0 = tyy0 >> 16;
 	ntyy0 = tyy0 + nyy;  nty0 = ntyy0 >> 16;
 	q = src + (iy0 * sw);
 	y = yy >> 16;
