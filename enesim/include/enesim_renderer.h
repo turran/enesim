@@ -61,6 +61,9 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name);
 EAPI Enesim_Renderer * enesim_renderer_ref(Enesim_Renderer *r);
 EAPI void enesim_renderer_unref(Enesim_Renderer *r);
 
+EAPI void enesim_renderer_lock(Enesim_Renderer *r);
+EAPI void enesim_renderer_unlock(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name);
 EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name);
 EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m);

@@ -88,6 +88,8 @@ extern "C" {
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 /* renderers */
+#include "enesim_renderer_background.h"
+#include "enesim_renderer_blur.h"
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_rectangle.h"
 #include "enesim_renderer_circle.h"
@@ -106,7 +108,6 @@ extern "C" {
 #include "enesim_renderer_compound.h"
 #include "enesim_renderer_importer.h"
 #include "enesim_renderer_line.h"
-#include "enesim_renderer_background.h"
 #include "enesim_renderer_pattern.h"
 #include "enesim_renderer_perlin.h"
 #include "enesim_renderer_proxy.h"

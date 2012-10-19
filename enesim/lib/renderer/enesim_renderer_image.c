@@ -1406,8 +1406,11 @@ static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Eina_Rectangle *sd;
 
 	thiz = _image_get(r);
+	thiz->span = NULL;
 	thiz->changed = EINA_FALSE;
 	thiz->src_changed = EINA_FALSE;
+	if (thiz->current.s)
+		enesim_surface_unlock(thiz->current.s);
 	thiz->past = thiz->current;
 	EINA_LIST_FREE(thiz->surface_damages, sd)
 		free(sd);
@@ -1430,9 +1433,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-#if LOCK
 	enesim_surface_lock(thiz->current.s, EINA_FALSE);
-#endif
 
 	enesim_surface_size_get(thiz->current.s, &thiz->sw, &thiz->sh);
 	enesim_surface_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
@@ -1465,9 +1466,6 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	if ((w < 1) || (h < 1) || (thiz->sw < 1) || (thiz->sh < 1))
 	{
 		WRN("Size too small");
-#if LOCK
-	enesim_surface_unlock(thiz->current.s);
-#endif
 		return EINA_FALSE;
 	}
 
@@ -1504,7 +1502,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 		thiz->nxx = (isx * 65536) / sx;
 		thiz->nyy = (isy * 65536) / sy;
 
-		thiz->simple = 0;
+		thiz->simple = EINA_FALSE;
 		if (mtype == ENESIM_MATRIX_AFFINE)  // in case it's just a translation
 		{
 			thiz->ixx -= thiz->matrix.xz;  thiz->matrix.xz = 0;
@@ -1521,14 +1519,14 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	}
 	else
 	{
-		thiz->simple = 1;
+		thiz->simple = EINA_TRUE;
 		if ((thiz->ixx & 0xffff) || (thiz->iyy & 0xffff))  // non-int translation
 		{
 			thiz->matrix.xz -= thiz->ixx;  thiz->ixx = 0;
 			thiz->matrix.yz -= thiz->iyy;  thiz->iyy = 0;
 			mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
 			if (mtype != ENESIM_MATRIX_IDENTITY)
-				thiz->simple = 0;
+				thiz->simple = EINA_FALSE;
 		}
 
 		if (cs->quality == ENESIM_QUALITY_FAST)
@@ -1567,7 +1565,7 @@ static void _image_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 	{
 		Enesim_Renderer_Image *thiz = _image_get(r);
 
-		if (thiz->simple)
+		if (thiz->span)
 			*hints |= ENESIM_RENDERER_HINT_ROP;
 	}
 

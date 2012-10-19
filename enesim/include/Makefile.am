@@ -18,29 +18,30 @@ enesim_perlin.h \
 enesim_compositor.h \
 enesim_pool.h \
 enesim_renderer.h \
-enesim_renderer_shape.h \
-enesim_renderer_rectangle.h \
+enesim_renderer_background.h \
+enesim_renderer_blur.h \
+enesim_renderer_checker.h \
 enesim_renderer_circle.h \
+enesim_renderer_clipper.h \
+enesim_renderer_compound.h \
+enesim_renderer_dispmap.h \
 enesim_renderer_ellipse.h \
 enesim_renderer_figure.h \
-enesim_renderer_path.h \
-enesim_renderer_checker.h \
-enesim_renderer_dispmap.h \
-enesim_renderer_raddist.h \
-enesim_renderer_grid.h \
-enesim_renderer_stripes.h \
-enesim_renderer_image.h \
 enesim_renderer_gradient.h \
 enesim_renderer_gradient_linear.h \
 enesim_renderer_gradient_radial.h \
-enesim_renderer_compound.h \
-enesim_renderer_importer.h \
+enesim_renderer_grid.h \
+enesim_renderer_image.h \
 enesim_renderer_line.h \
-enesim_renderer_background.h \
+enesim_renderer_importer.h \
+enesim_renderer_path.h \
 enesim_renderer_perlin.h \
 enesim_renderer_proxy.h \
-enesim_renderer_clipper.h \
 enesim_renderer_pattern.h \
+enesim_renderer_raddist.h \
+enesim_renderer_rectangle.h \
+enesim_renderer_shape.h \
+enesim_renderer_stripes.h \
 enesim_renderer_transition.h
 
 installed_headersdir = $(includedir)/enesim

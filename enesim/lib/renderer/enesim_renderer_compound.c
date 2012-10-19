@@ -160,13 +160,16 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 {
 	Layer *layer;
 	Eina_List *ll;
-	Eina_List *ll_next;
 
 	/* cleanup every layer */
-	EINA_LIST_FOREACH_SAFE(thiz->visible_layers, ll, ll_next, layer)
+	EINA_LIST_FOREACH(thiz->layers, ll, layer)
 	{
 		enesim_renderer_cleanup(layer->r, s);
-		thiz->visible_layers = eina_list_remove_list(thiz->visible_layers, ll);
+	}
+	/* free the visible layers list */
+	EINA_LIST_FREE(thiz->visible_layers, layer)
+	{
+
 	}
 	/* remove the removed layers */
 	EINA_LIST_FREE(thiz->removed, layer)

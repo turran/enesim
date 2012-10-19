@@ -107,9 +107,7 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Backend b;
 
-#if LOCK
 	enesim_surface_lock(s, EINA_TRUE);
-#endif
 	b = enesim_surface_backend_get(s);
 	switch (b)
 	{
@@ -133,9 +131,7 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		WRN("Backend not supported %d", b);
 		break;
 	}
-#if LOCK
 	enesim_surface_unlock(s);
-#endif
 }
 
 static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
@@ -146,9 +142,7 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 	Eina_Rectangle *clip;
 	Eina_List *l;
 
-#if LOCK
 	enesim_surface_lock(s, EINA_TRUE);
-#endif
 	b = enesim_surface_backend_get(s);
 	switch (b)
 	{
@@ -182,9 +176,7 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		WRN("Backend not supported %d", b);
 		break;
 	}
-#if LOCK
 	enesim_surface_unlock(s);
-#endif
 }
 
 static inline void _surface_boundings(Enesim_Surface *s, Eina_Rectangle *boundings)
@@ -423,6 +415,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	enesim_rectangle_coords_from(&r->past_boundings, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	eina_rectangle_coords_from(&r->past_destination_boundings, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	r->prv_data = eina_hash_string_superfast_new(NULL);
+	eina_lock_new(&r->lock);
 	/* always set the first reference */
 	r = enesim_renderer_ref(r);
 	_enesim_renderer_factory_setup(r);
@@ -464,8 +457,30 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 	{
 		if (r->descriptor.free)
 			r->descriptor.free(r);
+		eina_lock_free(&r->lock);
+		/* TODO remove all the private data */
 		free(r);
 	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_lock(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	eina_lock_take(&r->lock);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_unlock(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	eina_lock_release(&r->lock);
 }
 
 /**
@@ -479,10 +494,17 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 	Eina_Bool ret = EINA_TRUE;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	DBG("Setting up the renderer %s", r->name);
+	if (r->in_setup)
+	{
+		WRN("Renderer '%s' already in the setup process", r->name);
+		return EINA_TRUE;
+	}
+	enesim_renderer_lock(r);
+
 	states[ENESIM_STATE_CURRENT] = &r->current;
 	states[ENESIM_STATE_PAST] = &r->past;
 	b = enesim_surface_backend_get(s);
-	DBG("Setting up the renderer %s", r->name);
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
@@ -517,13 +539,8 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		default:
 		break;
 	}
-	if (!ret)
-	{
-		enesim_renderer_cleanup(r, s);
-		return ret;
-	}
-
-	if (!r->in_setup)
+	r->in_setup = EINA_TRUE;
+	if (ret)
 	{
 		/* given that we already did the setup, the current and previous should be equal
 		 * when calculating the boundings
@@ -531,7 +548,6 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		_enesim_renderer_boundings(r, &r->current_boundings, &r->current, &r->current);
 		_enesim_renderer_destination_boundings(r, &r->current_destination_boundings, &r->current, &r->current);
 		enesim_renderer_flags(r, &r->current_flags);
-		r->in_setup = EINA_TRUE;
 	}
 
 	return ret;
@@ -546,6 +562,13 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Backend b;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	DBG("Cleaning up the renderer '%s'", r->name);
+	if (!r->in_setup)
+	{
+		WRN("Renderer '%s' has not done the setup first", r->name);
+		return;
+	}
+
 	b = enesim_surface_backend_get(s);
 	switch (b)
 	{
@@ -565,13 +588,12 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	/* swap the states */
 	/* first stuff that needs to be freed */
 	r->past = r->current;
-	if (r->in_setup)
-	{
-		r->past_boundings = r->current_boundings;
-		r->past_destination_boundings = r->current_destination_boundings;
-		r->in_setup = EINA_FALSE;
-	}
-	DBG("Cleaning up the renderer %s", r->name);
+
+	r->past_boundings = r->current_boundings;
+	r->past_destination_boundings = r->current_destination_boundings;
+	r->in_setup = EINA_FALSE;
+
+	enesim_renderer_unlock(r);
 }
 
 /**
@@ -999,11 +1021,13 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *clip, int x, int y, Enesim_Error **error)
 {
 	Eina_Rectangle final;
+	Eina_Bool ret = EINA_FALSE;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	if (!enesim_renderer_setup(r, s, error)) return EINA_FALSE;
+	if (!enesim_renderer_setup(r, s, error))
+		goto end;
 
 	if (!clip)
 	{
@@ -1031,11 +1055,13 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		goto end;
 	}
 	_draw_internal(r, s, &final, x, y);
+	ret = EINA_TRUE;
 
 	/* TODO set the format again */
 end:
 	enesim_renderer_cleanup(r, s);
-	return EINA_TRUE;
+
+	return ret;
 }
 
 /**
@@ -1050,6 +1076,7 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_List *clips, int x, int y, Enesim_Error **error)
 {
 	Eina_Rectangle surface_size;
+	Eina_Bool ret = EINA_FALSE;
 
 	if (!clips)
 	{
@@ -1061,7 +1088,8 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
 	/* setup the common parameters */
-	if (!enesim_renderer_setup(r, s, error)) return EINA_FALSE;
+	if (!enesim_renderer_setup(r, s, error))
+		goto end;
 
 	_surface_boundings(s, &surface_size);
 	/* clip against the destination rectangle */
@@ -1071,11 +1099,12 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		goto end;
 	}
 	_draw_list_internal(r, s, &r->current_destination_boundings, clips, x, y);
-
+	ret = EINA_TRUE;
 	/* TODO set the format again */
 end:
 	enesim_renderer_cleanup(r, s);
-	return EINA_TRUE;
+
+	return ret;
 }
 
 /**

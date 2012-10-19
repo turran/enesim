@@ -43,18 +43,15 @@ static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backen
 	thiz->external_allocated = external;
 	thiz = enesim_buffer_ref(thiz);
 	/* now create the needed locks */
-#if LOCK
 	eina_rwlock_new(&thiz->lock);
-#endif
+
 	return thiz;
 }
 
 static void _buffer_free(Enesim_Buffer *b)
 {
 	enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
-#if LOCK
 	eina_rwlock_free(&b->lock);
-#endif
 	free(b);
 }
 /*============================================================================*
@@ -405,12 +402,10 @@ EAPI void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
  */
 EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write)
 {
-#if LOCK
 	if (write)
 		eina_rwlock_take_write(&b->lock);
 	else
 		eina_rwlock_take_read(&b->lock);
-#endif
 }
 
 /**
@@ -419,7 +414,5 @@ EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write)
  */
 EAPI void enesim_buffer_unlock(Enesim_Buffer *b)
 {
-#if LOCK
 	eina_rwlock_release(&b->lock);
-#endif
 }

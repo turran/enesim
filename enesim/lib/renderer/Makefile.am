@@ -14,6 +14,7 @@ noinst_LTLIBRARIES = libenesim_renderer.la
 
 libenesim_renderer_la_SOURCES = \
 enesim_renderer_background.c \
+enesim_renderer_blur.c \
 enesim_renderer_checker.c \
 enesim_renderer_circle.c \
 enesim_renderer_clipper.c \

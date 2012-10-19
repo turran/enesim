@@ -100,6 +100,8 @@ static void _rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _rasterizer_get(r);
 	enesim_renderer_shape_cleanup(r, s);
+	if (thiz->sw_cleanup)
+		thiz->sw_cleanup(r, s);
 }
 
 static void _rasterizer_free(Enesim_Renderer *r)
@@ -174,6 +176,7 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 	thiz->free = d->free;
 	thiz->figure_set = d->figure_set;
 	thiz->sw_setup = d->sw_setup;
+	thiz->sw_cleanup = d->sw_cleanup;
 	thiz->data = data;
 
 	r = enesim_renderer_shape_new(&pdescriptor, thiz);

@@ -79,6 +79,8 @@ typedef struct _Enesim_Rasterizer_BiFigure
 	int tyy, byy;
 
 	Enesim_F16p16_Matrix matrix;
+	Eina_Bool over_used;
+	Eina_Bool under_used;
 	Eina_Bool changed :1;
 } Enesim_Rasterizer_BiFigure;
 
@@ -1218,6 +1220,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_shape_fill_color_set(thiz->over, scolor);
 		enesim_renderer_shape_fill_renderer_set(thiz->over, spaint);
 		enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
+
+		thiz->over_used = EINA_TRUE;
 		if (!enesim_renderer_setup(thiz->over, s, error))
 			return EINA_FALSE;
 		*draw = _over_figure_span;
@@ -1236,6 +1240,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
 			enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 			enesim_renderer_shape_fill_rule_set(thiz->under, rule);
+
+			thiz->under_used = EINA_TRUE;
 			if (!enesim_renderer_setup(thiz->under, s, error))
 				return EINA_FALSE;
 			*draw = _under_figure_span;
@@ -1259,9 +1265,12 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 					enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
 					enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 					enesim_renderer_shape_fill_rule_set(thiz->under, rule);
+
+					thiz->under_used = EINA_TRUE;
 					if (!enesim_renderer_setup(thiz->under, s, error))
 						return EINA_FALSE;
 				}
+				thiz->over_used = EINA_TRUE;
 				if (!enesim_renderer_setup(thiz->over, s, error))
 					return EINA_FALSE;
 
@@ -1301,6 +1310,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 				enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
 				enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
 				enesim_renderer_shape_fill_rule_set(thiz->under, rule);
+
+				thiz->under_used = EINA_TRUE;
 				if (!enesim_renderer_setup(thiz->under, s, error))
 					return EINA_FALSE;
 				*draw = _under_figure_span;
@@ -1344,10 +1355,16 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _bifigure_get(r);
 	/* FIXME We need to check that the over or under renderers were actually setup */
-	if (thiz->over)
+	if (thiz->over && thiz->over_used)
+	{
 		enesim_renderer_cleanup(thiz->over, s);
-	if (thiz->under)
+		thiz->over_used = EINA_FALSE;
+	}
+	if (thiz->under && thiz->under_used)
+	{
 		enesim_renderer_cleanup(thiz->under, s);
+		thiz->under_used = EINA_FALSE;
+	}
 	thiz->changed = EINA_FALSE;
 }
 
