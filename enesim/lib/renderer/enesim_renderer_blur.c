@@ -429,6 +429,8 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 	rx = thiz->rx;
 	if (rx < 0.5) rx = 0.5;
 	if (rx > 16) rx = 16;
+	rx += 0.5;
+
 	thiz->iaxx = rx * 65536;
 	thiz->ibxx = 65536 / rx;
 	thiz->irx = ceil(rx);
@@ -436,6 +438,8 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 	ry = thiz->ry;
 	if (ry < 0.5) ry = 0.5;
 	if (ry > 16) ry = 16;
+	ry += 0.5;
+
 	thiz->iayy = ry * 65536;
 	thiz->ibyy = 65536 / ry;
 	thiz->iry = ceil(ry);
