@@ -15,4 +15,5 @@ libenesim_util_la_SOURCES = \
 enesim_perlin.c \
 enesim_vector.c \
 enesim_curve.c \
-enesim_mempool_aligned.c
+enesim_mempool_aligned.c \
+enesim_mempool_buddy.c
