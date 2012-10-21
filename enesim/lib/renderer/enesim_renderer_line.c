@@ -71,6 +71,10 @@ typedef struct _Enesim_Renderer_Line
 	Enesim_Renderer_Line_State current;
 	/* private */
 	Enesim_Renderer_Line_State past;
+	/* the last variables used to generate the lines */
+	Enesim_Matrix last_geometric_transformation;
+	double last_stroke_weight;
+
 	Eina_Bool changed : 1;
 	Enesim_F16p16_Matrix matrix;
 
@@ -100,6 +104,30 @@ static void _line_setup(Enesim_F16p16_Line *l, Enesim_Point *p0, double vx, doub
 	l->a = eina_f16p16_double_from(line.a /= len);
 	l->b = eina_f16p16_double_from(line.b /= len);
 	l->c = eina_f16p16_double_from(line.c /= len);
+}
+
+static Eina_Bool _line_needs_generate(Enesim_Renderer_Line *thiz,
+	const Enesim_Renderer_State *cs,
+	const Enesim_Renderer_Shape_State *css)
+{
+	if (thiz->last_stroke_weight != css->stroke.weight)
+		return EINA_TRUE;
+	if (!enesim_matrix_is_equal(&thiz->last_geometric_transformation,
+			&cs->geometry_transformation))
+		return EINA_TRUE;
+	return EINA_FALSE;
+}
+
+static void _line_generate(Enesim_Renderer_Line *thiz,
+	const Enesim_Renderer_State *cs,
+	const Enesim_Renderer_Shape_State *css)
+{
+
+	if (!_line_needs_generate(thiz, cs, css))
+		return;
+	/* TODO generate the needed lines */
+	thiz->last_stroke_weight = css->stroke.weight;
+	thiz->last_geometric_transformation = cs->geometry_transformation;
 }
 
 static inline uint32_t _butt_line(Eina_F16p16 rr, Eina_F16p16 e01,
@@ -488,7 +516,7 @@ static Enesim_Renderer_Shape_Descriptor _line_descriptor = {
 	/* .boundings = 		*/ NULL,// _line_boundings,
 	/* .destination_boundings = 	*/ NULL,
 	/* .flags = 			*/ _line_flags,
-	/* .hints_get = 			*/ _line_hints,
+	/* .hints_get = 		*/ _line_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _line_has_changed,
