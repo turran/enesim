@@ -76,6 +76,7 @@ typedef struct _Enesim_Renderer_Line
 	double last_stroke_weight;
 
 	Eina_Bool changed : 1;
+	Eina_Bool generated : 1;
 	Enesim_F16p16_Matrix matrix;
 
 	Enesim_F16p16_Line line;
@@ -107,27 +108,98 @@ static void _line_setup(Enesim_F16p16_Line *l, Enesim_Point *p0, double vx, doub
 }
 
 static Eina_Bool _line_needs_generate(Enesim_Renderer_Line *thiz,
-	const Enesim_Renderer_State *cs,
-	const Enesim_Renderer_Shape_State *css)
+	const Enesim_Matrix *cgm,
+	double stroke_weight)
 {
-	if (thiz->last_stroke_weight != css->stroke.weight)
+	if (thiz->changed && !thiz->generated)
+		return EINA_TRUE;
+	if (thiz->last_stroke_weight != stroke_weight)
 		return EINA_TRUE;
 	if (!enesim_matrix_is_equal(&thiz->last_geometric_transformation,
-			&cs->geometry_transformation))
+			cgm))
 		return EINA_TRUE;
 	return EINA_FALSE;
 }
 
-static void _line_generate(Enesim_Renderer_Line *thiz,
+static Eina_Bool _line_generate(Enesim_Renderer_Line *thiz,
 	const Enesim_Renderer_State *cs,
 	const Enesim_Renderer_Shape_State *css)
 {
+	Enesim_Point p0, p1;
+	const Enesim_Matrix *cgm = &cs->geometry_transformation;
+	double vx, vy;
+	double x0, x1, y0, y1;
+	double x01, y01;
+	double len;
+	double stroke = css->stroke.weight;
 
-	if (!_line_needs_generate(thiz, cs, css))
-		return;
-	/* TODO generate the needed lines */
-	thiz->last_stroke_weight = css->stroke.weight;
-	thiz->last_geometric_transformation = cs->geometry_transformation;
+	if (!_line_needs_generate(thiz, cgm, stroke))
+		return EINA_TRUE;
+
+	x0 = thiz->current.x0;
+	x1 = thiz->current.x1;
+	y0 = thiz->current.y0;
+	y1 = thiz->current.y1;
+
+	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	{
+		enesim_matrix_point_transform(&cs->geometry_transformation, x0, y0, &x0, &y0);
+		enesim_matrix_point_transform(&cs->geometry_transformation, x1, y1, &x1, &y1);
+		/* TODO handle the scale of the stroke on both directions, x and y */
+		stroke = stroke * cs->geometry_transformation.xx; 
+	}
+
+	if (y1 < y0)
+	{
+		thiz->byy = eina_f16p16_double_from(y0);
+		thiz->tyy = eina_f16p16_double_from(y1);
+	}
+	else
+	{
+		thiz->byy = eina_f16p16_double_from(y1);
+		thiz->tyy = eina_f16p16_double_from(y0);
+	}
+
+	if (x1 < x0)
+	{
+		thiz->rxx = eina_f16p16_double_from(x0);
+		thiz->lxx = eina_f16p16_double_from(x1);
+	}
+	else
+	{
+		thiz->rxx = eina_f16p16_double_from(x1);
+		thiz->lxx = eina_f16p16_double_from(x0);
+	}
+
+	x01 = x1 - x0;
+	y01 = y1 - y0;
+
+	if ((len = hypot(x01, y01)) < 1)
+		return EINA_FALSE;
+
+	vx = x01;
+	vy = y01;
+	p0.x = x0;
+	p0.y = y0;
+	p1.x = x1;
+	p1.y = y1;
+
+	/* normalize to line length so that aa works well */
+	/* the original line */
+	_line_setup(&thiz->line, &p0, vx, vy, len);
+	/* the perpendicular line on the initial point */
+	_line_setup(&thiz->np, &p0, -vy, vx, len);
+	/* the perpendicular line on the last point */
+	_line_setup(&thiz->nm, &p1, vy, -vx, len);
+
+	thiz->rr = EINA_F16P16_HALF * (stroke + 1);
+	if (thiz->rr < EINA_F16P16_HALF) thiz->rr = EINA_F16P16_HALF;
+
+	thiz->last_stroke_weight = stroke;
+	thiz->last_geometric_transformation = *cgm;
+	thiz->generated = EINA_TRUE;
+
+	return EINA_TRUE;
 }
 
 static inline uint32_t _butt_line(Eina_F16p16 rr, Eina_F16p16 e01,
@@ -351,83 +423,23 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Line *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	Enesim_Point p0, p1;
-	double vx, vy;
-	double x0, x1, y0, y1;
-	double x01, y01;
-	double len;
-	double stroke;
 
 	thiz = _line_get(r);
 
-	x0 = thiz->current.x0;
-	x1 = thiz->current.x1;
-	y0 = thiz->current.y0;
-	y1 = thiz->current.y1;
-
-	enesim_renderer_shape_stroke_weight_get(r, &stroke);
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (!_line_generate(thiz, cs, css))
 	{
-		enesim_matrix_point_transform(&cs->geometry_transformation, x0, y0, &x0, &y0);
-		enesim_matrix_point_transform(&cs->geometry_transformation, x1, y1, &x1, &y1);
-		/* TODO handle the scale of the stroke on both directions, x and y */
-		stroke = stroke * cs->geometry_transformation.xx; 
-	}
-
-	if (y1 < y0)
-	{
-		thiz->byy = eina_f16p16_double_from(y0);
-		thiz->tyy = eina_f16p16_double_from(y1);
-	}
-	else
-	{
-		thiz->byy = eina_f16p16_double_from(y1);
-		thiz->tyy = eina_f16p16_double_from(y0);
-	}
-
-	if (x1 < x0)
-	{
-		thiz->rxx = eina_f16p16_double_from(x0);
-		thiz->lxx = eina_f16p16_double_from(x1);
-	}
-	else
-	{
-		thiz->rxx = eina_f16p16_double_from(x1);
-		thiz->lxx = eina_f16p16_double_from(x0);
-	}
-
-	x01 = x1 - x0;
-	y01 = y1 - y0;
-
-	if ((len = hypot(x01, y01)) < 1)
+		ENESIM_RENDERER_ERROR(r, error, "Invalid size");
 		return EINA_FALSE;
+	}
 
-	vx = x01;
-	vy = y01;
-	p0.x = x0;
-	p0.y = y0;
-	p1.x = x1;
-	p1.y = y1;
-
-	/* normalize to line length so that aa works well */
-	/* the original line */
-	_line_setup(&thiz->line, &p0, vx, vy, len);
-	/* the perpendicular line on the initial point */
-	_line_setup(&thiz->np, &p0, -vy, vx, len);
-	/* the perpendicular line on the last point */
-	_line_setup(&thiz->nm, &p1, vy, -vx, len);
+	enesim_matrix_f16p16_matrix_to(&cs->transformation,
+			&thiz->matrix);
 
 	if (!enesim_renderer_shape_setup(r, states, s, error))
 	{
 		ENESIM_RENDERER_ERROR(r, error, "Shape cannot setup");
 		return EINA_FALSE;
 	}
-
-	thiz->rr = EINA_F16P16_HALF * (stroke + 1);
-	if (thiz->rr < EINA_F16P16_HALF) thiz->rr = EINA_F16P16_HALF;
-
-	enesim_matrix_f16p16_matrix_to(&cs->transformation,
-			&thiz->matrix);
 
 	*draw = _spans[css->stroke.cap];
 
@@ -467,6 +479,10 @@ static void _line_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features
 
 static void _line_free(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Line *thiz;
+
+	thiz = _line_get(r);
+	free(thiz);
 }
 
 static void _line_boundings(Enesim_Renderer *r,
@@ -475,8 +491,30 @@ static void _line_boundings(Enesim_Renderer *r,
 		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Line *thiz;
+	Enesim_Quad q;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
 
 	thiz = _line_get(r);
+	if (!_line_generate(thiz, cs, css))
+		return;
+
+	/* TODO generate the quad based on the radius and the cap type
+	 * use the generated line equations for that
+	 */
+	switch (css->stroke.cap)
+	{
+		case ENESIM_CAP_BUTT:
+		
+		break;
+
+		case ENESIM_CAP_ROUND:
+		case ENESIM_CAP_SQUARE:
+		break;
+
+		default:
+		return;
+	}
 
 	boundings->x = thiz->current.x0;
 	boundings->y = thiz->current.y0;
@@ -567,6 +605,7 @@ EAPI void enesim_renderer_line_x0_set(Enesim_Renderer *r, double x0)
 	thiz = _line_get(r);
 	thiz->current.x0 = x0;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_line_x0_get(Enesim_Renderer *r, double *x0)
@@ -585,6 +624,7 @@ EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0)
 	thiz = _line_get(r);
 	thiz->current.y0 = y0;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_line_y0_get(Enesim_Renderer *r, double *y0)
@@ -602,6 +642,7 @@ EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1)
 	thiz = _line_get(r);
 	thiz->current.x1 = x1;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1)
@@ -619,6 +660,7 @@ EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
 	thiz = _line_get(r);
 	thiz->current.y1 = y1;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
