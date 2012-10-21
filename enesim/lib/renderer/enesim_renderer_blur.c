@@ -73,9 +73,9 @@ typedef struct _Enesim_Renderer_Blur
 	double rx, ry;
 	/* The state variables */
 	Enesim_F16p16_Matrix matrix;
-	int irx, iry;
-	int iaxx, ibxx;
-	int iayy, ibyy;
+//	int irx, iry;
+//	int iaxx, iayy;
+	int ibxx, ibyy;
 } Enesim_Renderer_Blur;
 
 static inline Enesim_Renderer_Blur * _blur_get(Enesim_Renderer *r)
@@ -126,26 +126,20 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	int sw, sh;
 	Enesim_Color color = state->color;
 	Eina_F16p16 xx, yy;
-	int iaxx, iayy;
 	int ibyy, ibxx;
-	int ixx, iyy, ix, ix0, iy, iy0;
+	int ix, ix0, iy, iy0;
 	int txx0, ntxx0, tx0, ntx0;
 	int tyy0, ntyy0, ty0, nty0;
 
 	thiz = _blur_get(r);
-	iaxx = thiz->iaxx, iayy = thiz->iayy;
 	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
 	/* setup the parameters */
 
+	ix = ix0 = x;  iy = iy0 = y;
 	xx = (ibxx * x) + (ibxx >> 1) - 32768;
 	yy = (ibyy * y) + (ibyy >> 1) - 32768;
-	x = eina_f16p16_int_to(xx);
-	y = eina_f16p16_int_to(yy);
-
-	ixx = (iaxx * (long long int)xx) >> 16;
-	ix = ix0 = (ixx >> 16);
-	iyy = (iayy * (long long int)yy) >> 16;
-	iy = iy0 = (iyy >> 16);
+	x = xx >> 16;
+	y = yy >> 16;
 
 	enesim_surface_size_get(thiz->src, &sw, &sh);
 	if ((iy < 0) || (iy >= sh))
@@ -156,29 +150,28 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
 	src = argb8888_at(src, sstride, ix, iy);
 
-	tyy0 = yy - (yy & 0xffff);  ty0 = (tyy0 >> 16);
+	tyy0 = yy & 0xffff0000;  ty0 = (tyy0 >> 16);
 	ntyy0 = tyy0 + ibyy;  nty0 = (ntyy0 >> 16);
 
-	txx0 = xx - (xx & 0xffff);  tx0 = (txx0 >> 16);
+	txx0 = xx & 0xffff0000;  tx0 = (txx0 >> 16);
 	ntxx0 = txx0 + ibxx;  ntx0 = (ntxx0 >> 16);
 
 	while (dst < end)
 	{
 		unsigned int p0 = 0;
 
-		if ( (ix > 0) & (ix < sw) )
+		if ( ((unsigned)ix < sw) )
 		{
 			unsigned int ag0 = 0, rb0 = 0, ag3 = 0, rb3 = 0, dag = 0, drb = 0;
 			int tyy = tyy0, ty = ty0, ntyy = ntyy0, nty = nty0;
 
-			pbuf = src + (ix - ix0);
+			pbuf = src + (ix - ix0);  iy = iy0;
 
-			while (1)
+			while (iy < sh)
 			{
 				unsigned int ag2 = 0, rb2 = 0, pag2 = 0, prb2 = 0, pp3 = 0;
 				unsigned int *p = pbuf;
 				int txx = txx0, tx = tx0, ntxx = ntxx0, ntx = ntx0;
-				int da;
 				int a;
 
 				while (1)
@@ -216,7 +209,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 						ag2 += pag2;   rb2 += prb2;
 					}
 
-					p++; txx = ntxx;  ntxx += ibxx;  ntx = (ntxx >> 16);
+					p++;  txx = ntxx;  ntxx += ibxx;  ntx = (ntxx >> 16);
 				}
 
 				if (nty != ty)
@@ -250,22 +243,21 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 					ag0 += dag;   rb0 += drb;
 				}
 
-				pbuf += sw;  tyy = ntyy;  ntyy += ibyy;  nty = (ntyy >> 16);
+				pbuf += sw;  tyy = ntyy;  ntyy += ibyy;  nty = (ntyy >> 16);  iy++;
 
 				p0 = ((ag0 + 0xff00ff) & 0xff00ff00) +
 					(((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 				// apply an alpha modifier to dampen alphas more smoothly
-				if ((da = (p0 >> 24)) && (da < 234))
-				{ da = _atable[da];  p0 = MUL_A_256(da, p0); }
+				if ((a = (p0 >> 24)) && (a < 234))
+				{ a = _atable[a];  p0 = MUL_A_256(a, p0); }
 
 				if (color != 0xffffffff)
 					p0 = argb8888_mul4_sym(p0, color);
 			}
 		}
 
-		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);
-		ixx += 65536;  ix = (ixx >> 16);
-		txx0 = xx - (xx & 0xffff);  tx0 = (txx0 >> 16);
+		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);  ix++;
+		txx0 = xx & 0xffff0000;  tx0 = (txx0 >> 16);
 		ntxx0 = (txx0 + ibxx);  ntx0 = (ntxx0 >> 16);
 	}
 }
@@ -283,27 +275,21 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	int sw, sh;
 	Enesim_Color color = state->color;
 	Eina_F16p16 xx, yy;
-	int iaxx, iayy;
 	int ibyy, ibxx;
-	int ixx, iyy, ix, ix0, iy, iy0;
+	int ix, ix0, iy, iy0;
 	int txx0, ntxx0, tx0, ntx0;
 	int tyy0, ntyy0, ty0, nty0;
 
 	thiz = _blur_get(r);
 
-	iaxx = thiz->iaxx, iayy = thiz->iayy;
 	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
 	/* setup the parameters */
 
+	ix = ix0 = x;  iy = iy0 = y;
 	xx = (ibxx * x) + (ibxx >> 1) - 32768;
 	yy = (ibyy * y) + (ibyy >> 1) - 32768;
-	x = eina_f16p16_int_to(xx);
-	y = eina_f16p16_int_to(yy);
-
-	ixx = (iaxx * (long long int)xx) >> 16;
-	ix = ix0 = (ixx >> 16);
-	iyy = (iayy * (long long int)yy) >> 16;
-	iy = iy0 = (iyy >> 16);
+	x = xx >> 16;
+	y = yy >> 16;
 
 	enesim_surface_size_get(thiz->src, &sw, &sh);
 	if ((iy < 0) || (iy >= sh))
@@ -314,24 +300,24 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
 	src = argb8888_at(src, sstride, ix, iy);
 
-	tyy0 = yy - (yy & 0xffff);  ty0 = (tyy0 >> 16);
+	tyy0 = yy & 0xffff0000;  ty0 = (tyy0 >> 16);
 	ntyy0 = tyy0 + ibyy;  nty0 = (ntyy0 >> 16);
 
-	txx0 = xx - (xx & 0xffff);  tx0 = (txx0 >> 16);
+	txx0 = xx & 0xffff0000;  tx0 = (txx0 >> 16);
 	ntxx0 = txx0 + ibxx;  ntx0 = (ntxx0 >> 16);
 
 	while (dst < end)
 	{
 		unsigned int p0 = 0;
 
-		if ( (ix > 0) & (ix < sw) )
+		if ( ((unsigned)ix < sw) )
 		{
 			unsigned int a0 = 0, a3 = 0, da = 0;
 			int tyy = tyy0, ty = ty0, ntyy = ntyy0, nty = nty0;
 
 			pbuf = src + (ix - ix0);
-
-			while (1)
+			iy = iy0;
+			while (iy < sh)
 			{
 				unsigned int a2 = 0, pa2 = 0, pp3 = 0;
 				int txx = txx0, tx = tx0, ntxx = ntxx0, ntx = ntx0;
@@ -359,8 +345,10 @@ static void _a8_span_identity(Enesim_Renderer *r,
 					else if (p3)
 					{
 						if (p3 != pp3)
+						{
 							pa2 = ((((p3 >> 16) & 0xff00) * ibxx) & 0xffff0000);
 							pp3 = p3;
+						}
 						a2 += pa2;
 					}
 
@@ -374,7 +362,6 @@ static void _a8_span_identity(Enesim_Renderer *r,
 						a0 += (((a2 >> 16) * (65536 - (tyy & 0xffff))) & 0xffff0000);
 						break;
 					}
-					da = (1 + (ntyy & 0xffff));
 					a0 = (((a2 >> 16) * (1 + (ntyy & 0xffff))) & 0xffff0000);
 					ty = nty;
 				}
@@ -388,7 +375,7 @@ static void _a8_span_identity(Enesim_Renderer *r,
 					a0 += da;
 				}
 
-				pbuf += sw;  tyy = ntyy;  ntyy += ibyy;  nty = (ntyy >> 16);
+				pbuf += sw;  tyy = ntyy;  ntyy += ibyy;  nty = (ntyy >> 16);  iy++;
 				p0 = ((a0 + 0xff0000) & 0xff000000);
 				// apply an alpha modifier to dampen alphas more smoothly
 				if ((da = (p0 >> 24)) && (da < 234))
@@ -399,9 +386,8 @@ static void _a8_span_identity(Enesim_Renderer *r,
 			}
 		}
 
-		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);
-		ixx += 65536;  ix = (ixx >> 16);
-		txx0 = xx - (xx & 0xffff);  tx0 = (txx0 >> 16);
+		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);  ix++;
+		txx0 = xx & 0xffff0000;  tx0 = (txx0 >> 16);
 		ntxx0 = (txx0 + ibxx);  ntx0 = (ntxx0 >> 16);
 	}
 }
@@ -426,23 +412,17 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 	if (!_blur_state_setup(thiz, r, s, error))
 		return EINA_FALSE;
 
-	rx = thiz->rx;
-	if (rx < 0.5) rx = 0.5;
+	rx = ((2 * thiz->rx) + 1.01) / 2.0;
+	if (rx <= 1) rx = 1.005;
 	if (rx > 16) rx = 16;
-	rx += 0.5;
 
-	thiz->iaxx = rx * 65536;
 	thiz->ibxx = 65536 / rx;
-	thiz->irx = ceil(rx);
 
-	ry = thiz->ry;
-	if (ry < 0.5) ry = 0.5;
+	ry = ((2 * thiz->ry) + 1.01) / 2.0;
+	if (ry <= 1) ry = 1.005;
 	if (ry > 16) ry = 16;
-	ry += 0.5;
 
-	thiz->iayy = ry * 65536;
 	thiz->ibyy = 65536 / ry;
-	thiz->iry = ceil(ry);
 
 	*fill = _spans[thiz->channel];
 	if (!*fill) return EINA_FALSE;
@@ -656,7 +636,7 @@ EAPI void enesim_renderer_blur_radius_y_set(Enesim_Renderer *r, double ry)
 
 	thiz = _blur_get(r);
 
-	thiz->rx = ry;
+	thiz->ry = ry;
 }
 /**
  * Gets the blur radius used in the y direction
