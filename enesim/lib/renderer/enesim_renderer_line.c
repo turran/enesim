@@ -146,7 +146,7 @@ static Eina_Bool _line_generate(Enesim_Renderer_Line *thiz,
 		enesim_matrix_point_transform(&cs->geometry_transformation, x0, y0, &x0, &y0);
 		enesim_matrix_point_transform(&cs->geometry_transformation, x1, y1, &x1, &y1);
 		/* TODO handle the scale of the stroke on both directions, x and y */
-		stroke = stroke * cs->geometry_transformation.xx; 
+		stroke = stroke * cs->geometry_transformation.xx;
 	}
 
 	if (y1 < y0)
@@ -505,7 +505,6 @@ static void _line_boundings(Enesim_Renderer *r,
 	switch (css->stroke.cap)
 	{
 		case ENESIM_CAP_BUTT:
-		
 		break;
 
 		case ENESIM_CAP_ROUND:
@@ -681,6 +680,7 @@ EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double 
 	thiz->current.x1 = x1;
 	thiz->current.y1 = y1;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_line_coords_get(Enesim_Renderer *r, double *x0, double *y0, double *x1, double *y1)
