@@ -130,36 +130,6 @@ static void _jpg_emage_src(struct jpeg_decompress_struct *cinfo, Emage_Data *dat
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-static Eina_Bool _jpg_loadable(Emage_Data *data)
-{
-	unsigned char buf[3];
-	int ret;
-
-	ret = emage_data_read(data, buf, 3);
-	if (ret < 0)
-		return EINA_FALSE;
-	/*
-	 * Header "format"
-	 *
-	 * offset 0, size 2 : JPEG SOI (Start Of Image) marker (FFD8 hex)
-	 * offset 2, size 2 : JFIF marker (FFE0 hex) but only the first byte is sure, see [1]
-	 * 2 last bytes : JPEG EOI (End Of Image) marker (FFD9 hex), see [2]
-	 *
-	 * References:
-	 * [1] http://www.faqs.org/faqs/jpeg-faq/part1/section-15.html
-	 * [2] http://en.wikipedia.org/wiki/Magic_number_%28programming%29#Magic_numbers_in_files
-	 */
-	if ((buf[0] != 0xff) || (buf[1] != 0xd8) || (buf[2] != 0xff))
-		return EINA_FALSE;
-#if 0
-	/* FIXME for later, we wont check the last bytes, that imply to read the whole file ... */
-	if ((buf[s.st_size - 2] != 0xff) || (buf[s.st_size - 1] != 0xd9))
-		goto close_f;
-#endif
-
-	return EINA_TRUE;
-}
-
 static Eina_Error _jpg_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
 	Jpg_Error_Mgr err;
@@ -322,17 +292,52 @@ static Emage_Provider _provider = {
 	/* .type =		*/ EMAGE_PROVIDER_SW,
 	/* .options_parse =	*/ NULL,
 	/* .options_free =	*/ NULL,
-	/* .loadable =		*/ _jpg_loadable,
+	/* .loadable =		*/ NULL,
 	/* .saveable =		*/ NULL,
 	/* .info_get =		*/ _jpg_info_load,
 	/* .load =		*/ _jpg_load,
 	/* .save =		*/ NULL,
 };
+
+static const char * _jpg_find(Emage_Data *data)
+{
+	unsigned char buf[3];
+	int ret;
+
+	ret = emage_data_read(data, buf, 3);
+	if (ret < 0) return NULL;
+	/*
+	 * Header "format"
+	 *
+	 * offset 0, size 2 : JPEG SOI (Start Of Image) marker (FFD8 hex)
+	 * offset 2, size 2 : JFIF marker (FFE0 hex) but only the first byte is sure, see [1]
+	 * 2 last bytes : JPEG EOI (End Of Image) marker (FFD9 hex), see [2]
+	 *
+	 * References:
+	 * [1] http://www.faqs.org/faqs/jpeg-faq/part1/section-15.html
+	 * [2] http://en.wikipedia.org/wiki/Magic_number_%28programming%29#Magic_numbers_in_files
+	 */
+	if ((buf[0] != 0xff) || (buf[1] != 0xd8) || (buf[2] != 0xff))
+		return NULL;
+#if 0
+	/* FIXME for later, we wont check the last bytes, that imply to read the whole file ... */
+	if ((buf[s.st_size - 2] != 0xff) || (buf[s.st_size - 1] != 0xd9))
+		goto close_f;
+#endif
+
+	return "image/jpg";
+}
+
+static Emage_Finder _finder = {
+	/* .find = 		*/ _jpg_find,
+};
+
 /*============================================================================*
  *                             Module API                                     *
  *============================================================================*/
 static Eina_Bool jpg_provider_init(void)
 {
+
 	emage_log_dom_jpg = eina_log_domain_register("emage_jpg", EMAGE_LOG_COLOR_DEFAULT);
 	if (emage_log_dom_jpg < 0)
 	{
@@ -342,11 +347,19 @@ static Eina_Bool jpg_provider_init(void)
 	/* @todo
 	 * - Register jpg specific errors
 	 */
-	return emage_provider_register(&_provider, "image/jpg");
+	if (!emage_provider_register(&_provider, "image/jpg"))
+		return EINA_FALSE;
+	if (!emage_finder_register(&_finder))
+	{
+		emage_provider_unregister(&_provider, "image/jpg");
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
 }
 
 static void jpg_provider_shutdown(void)
 {
+	emage_finder_unregister(&_finder);
 	emage_provider_unregister(&_provider, "image/jpg");
 	eina_log_domain_unregister(emage_log_dom_jpg);
 	emage_log_dom_jpg = -1;

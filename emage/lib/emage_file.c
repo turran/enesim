@@ -10,29 +10,6 @@ typedef struct _Emage_File_Data
 	Emage_Data *data;
 } Emage_File_Data;
 
-/* TODO later we need to add an object (type finder?) that translates
- * filename/filedata -> mimetype
- */
-static Eina_Bool  _file_mime(const char *file, const char **mime)
-{
-	Eina_Bool ret = EINA_TRUE;
-	char *end;
-
-	/* get the extension */
-	end = strrchr(file, '.');
-	if (!end) return EINA_FALSE;
-
-	end++;
-	if (!strcmp(end, "png"))
-		*mime = "image/png";
-	else if (!strcmp(end, "jpg"))
-		*mime = "image/jpg";
-	else
-		ret = EINA_FALSE;
-
-	return ret;
-}
-
 static void _emage_file_cb(Enesim_Surface *s, void *user_data, int error)
 {
 	Emage_File_Data *fdata = user_data;
@@ -41,32 +18,35 @@ static void _emage_file_cb(Enesim_Surface *s, void *user_data, int error)
 	emage_data_free(fdata->data);
 }
 
+static Eina_Bool _file_data_get(const char *file, const char *mode,
+		Emage_Data **data, const char **mime)
+{
+	Emage_Data *d;
+	const char *m;
+
+	d = emage_data_file_new(file, "wb");
+	if (!d) return EINA_FALSE;
+
+	m = emage_mime_get(d);
+	if (!m)
+	{
+		emage_data_free(d);
+		return EINA_FALSE;
+	}
+	*mime = m;
+	*data = d;
+	return EINA_TRUE;
+}
+
 static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const char **mime)
 {
-	if (!_file_mime(file, mime))
-		return EINA_FALSE;
-	*data = emage_data_file_new(file, "wb");
-	if (!*data) return EINA_FALSE;
-	return EINA_TRUE;
+	return _file_data_get(file, "rw", data, mime);
 }
 
 static Eina_Bool _file_load_data_get(const char *file, Emage_Data **data, const char **mime)
 {
-	if (!_file_mime(file, mime))
-		return EINA_FALSE;
-	*data = emage_data_file_new(file, "rb");
-	if (!*data) return EINA_FALSE;
-	return EINA_TRUE;
+	return _file_data_get(file, "rb", data, mime);
 }
-
-#if 0
-static Eina_Bool _file_load_mime(const char *file, const char **mime)
-{
-	struct stat stmp;
-	if ((!file) || (stat(file, &stmp) < 0))
-		return EINA_FALSE;
-}
-#endif
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -137,7 +117,6 @@ EAPI void emage_file_load_async(const char *file, Enesim_Surface *s,
 	if (!_file_load_data_get(file, &data, &mime))
 	{
 		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
-		emage_data_free(data);
 		return;
 	}
 	fdata.cb = cb;
@@ -186,7 +165,6 @@ EAPI void emage_file_save_async(const char *file, Enesim_Surface *s, Emage_Callb
 	if (!_file_save_data_get(file, &data, &mime))
 	{
 		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
-		emage_data_free(data);
 		return;
 	}
 	fdata.cb = cb;

@@ -20,6 +20,7 @@
 static int _emage_init_count = 0;
 static Eina_Array *_modules = NULL;
 static Eina_Hash *_providers = NULL;
+static Eina_List *_finders = NULL;
 static int _fifo[2]; /* the communication between the main thread and the async ones */
 static int emage_log_dom_global = -1;
 
@@ -82,6 +83,8 @@ static Emage_Provider * _load_provider_get(Emage_Data *data, const char *mime)
 		/* check if the provider can load the image */
 		if (!p->loadable)
 			continue;
+
+		emage_data_reset(data);
 		if (p->loadable(data) == EINA_TRUE)
 		{
 			emage_data_reset(data);
@@ -238,6 +241,8 @@ EAPI int emage_shutdown(void)
 #if BUILD_STATIC_MODULE_PNG
 	png_provider_shutdown();
 #endif
+	/* remove the finders */
+	eina_list_free(_finders);
 	/* remove the providers */
 	eina_hash_free(_providers);
 	/* shutdown every provider */
@@ -434,11 +439,6 @@ EAPI Eina_Bool emage_provider_register(Emage_Provider *p, const char *mime)
 	if (!p)
 		return EINA_FALSE;
 	/* check for mandatory functions */
-	if (!p->loadable)
-	{
-		WRN("Provider %s doesn't provide the loadable() function", p->name);
-		goto err;
-	}
 	if (!p->info_get)
 	{
 		WRN("Provider %s doesn't provide the info_get() function", p->name);
@@ -459,6 +459,48 @@ EAPI Eina_Bool emage_provider_register(Emage_Provider *p, const char *mime)
 err:
 	return EINA_FALSE;
 }
+
+/**
+ *
+ */
+EAPI const char * emage_mime_get(Emage_Data *data)
+{
+	Emage_Finder *f;
+	Eina_List *l;
+	const char *ret = NULL;
+
+	EINA_LIST_FOREACH(_finders, l, f)
+	{
+		emage_data_reset(data);
+		ret = f->find(data);
+		if (ret) break;
+	}
+	return ret;
+}
+
+/**
+ *
+ */
+EAPI Eina_Bool emage_finder_register(Emage_Finder *f)
+{
+	if (!f) return EINA_FALSE;
+
+	if (!f->find)
+	{
+		WRN("Finder %p doesn't provide the 'find()' function", f);
+		return EINA_FALSE;
+	}
+	_finders = eina_list_append(_finders, f);
+
+	return EINA_TRUE;
+}
+
+EAPI void emage_finder_unregister(Emage_Finder *f)
+{
+	if (!f) return;
+	_finders = eina_list_remove(_finders, f);
+}
+
 /**
  *
  */

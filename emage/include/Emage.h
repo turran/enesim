@@ -164,12 +164,28 @@ EAPI Eina_Bool emage_provider_save(Emage_Provider *thiz,
 
 /**
  * @}
+ * @defgroup Emage_Finder_Group Finder
+ * @{
+ */
+
+typedef struct _Emage_Finder
+{
+	const char *(*find)(Emage_Data *data);
+} Emage_Finder;
+
+EAPI Eina_Bool emage_finder_register(Emage_Finder *f);
+EAPI void emage_finder_unregister(Emage_Finder *f);
+
+/**
+ * @}
  * @defgroup Emage_Misc_Group Misc
  * @{
  */
 
 typedef void (*Emage_Option_Cb)(void *data, const char *key, const char *value);
 EAPI void emage_options_parse(const char *options, Emage_Option_Cb cb, void *data);
+
+EAPI const char * emage_mime_get(Emage_Data *data);
 
 /**
  * @}

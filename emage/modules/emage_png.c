@@ -87,19 +87,6 @@ static void _png_flush(png_structp png_ptr)
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-static Eina_Bool _png_loadable(Emage_Data *data)
-{
-	unsigned char buf[PNG_BYTES_TO_CHECK];
-	int ret;
-
-	ret = emage_data_read(data, buf, PNG_BYTES_TO_CHECK);
-	if (ret < 0)
-		return EINA_FALSE;
-	if (!png_check_sig(buf, PNG_BYTES_TO_CHECK))
-		return EINA_FALSE;
-	return EINA_TRUE;
-}
-
 static Eina_Bool _png_saveable(const char *file)
 {
 	char *d;
@@ -346,11 +333,27 @@ static Emage_Provider _provider = {
 	/* .type = 		*/ EMAGE_PROVIDER_SW,
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
-	/* .loadable = 		*/ _png_loadable,
+	/* .loadable = 		*/ NULL,
 	/* .saveable = 		*/ _png_saveable,
 	/* .info_get = 		*/ _png_info_load,
 	/* .load = 		*/ _png_load,
 	/* .save = 		*/ _png_save,
+};
+
+static const char * _png_find(Emage_Data *data)
+{
+	unsigned char buf[PNG_BYTES_TO_CHECK];
+	int ret;
+
+	ret = emage_data_read(data, buf, PNG_BYTES_TO_CHECK);
+	if (ret < 0) return NULL;
+	if (!png_check_sig(buf, PNG_BYTES_TO_CHECK))
+		return NULL;
+	return "image/png";
+}
+
+static Emage_Finder _finder = {
+	/* .find = 		*/ _png_find,
 };
 /*============================================================================*
  *                             Module API                                     *
@@ -366,11 +369,20 @@ static Eina_Bool png_provider_init(void)
 	/* @todo
 	 * - Register png specific errors
 	 */
-	return emage_provider_register(&_provider, "image/png");
+	if (!emage_provider_register(&_provider, "image/png"))
+		return EINA_FALSE;
+
+	if (!emage_finder_register(&_finder))
+	{
+		emage_provider_unregister(&_provider, "image/png");
+		return EINA_FALSE;		
+	}
+	return EINA_TRUE;
 }
 
 static void png_provider_shutdown(void)
 {
+	emage_finder_unregister(&_finder);
 	emage_provider_unregister(&_provider, "image/png");
 	eina_log_domain_unregister(emage_log_dom_png);
 	emage_log_dom_png = -1;
