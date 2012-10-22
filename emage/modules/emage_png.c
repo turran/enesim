@@ -392,12 +392,12 @@ static Eina_Bool png_provider_init(void)
 	/* @todo
 	 * - Register png specific errors
 	 */
-	return emage_provider_register(&_provider);
+	return emage_provider_register(&_provider, "image/png");
 }
 
 static void png_provider_shutdown(void)
 {
-	emage_provider_unregister(&_provider);
+	emage_provider_unregister(&_provider, "image/png");
 	eina_log_domain_unregister(emage_log_dom_png);
 	emage_log_dom_png = -1;
 }

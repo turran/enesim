@@ -73,6 +73,35 @@ EAPI Eina_Bool emage_save(const char *file, Enesim_Surface *s,
 		const char *options);
 EAPI void emage_save_async(const char *file, Enesim_Surface *s,
 		Emage_Callback cb, void *data, const char *options);
+
+/**
+ * @}
+ * @defgroup Emage_Data_Group Data
+ * @{
+ */
+typedef ssize_t (*Emage_Data_Read)(void *data, void *buffer, size_t len);
+typedef ssize_t (*Emage_Data_Write)(void *data, void *buffer, size_t len);
+typedef void * (*Emage_Data_Mmap)(void *data);
+typedef void (*Emage_Data_Free)(void *data);
+
+typedef struct _Emage_Data_Descriptor
+{
+	Emage_Data_Read read;
+	Emage_Data_Write write;
+	Emage_Data_Mmap mmap;
+	Emage_Data_Free free;
+} Emage_Data_Descriptor;
+
+typedef struct _Emage_Data Emage_Data;
+EAPI Emage_Data * emage_data_new(Emage_Data_Descriptor *d, void *data);
+EAPI ssize_t emage_data_read(Emage_Data *thiz, void *buffer, size_t len);
+EAPI ssize_t emage_data_write(Emage_Data *thiz, void *buffer, size_t len);
+EAPI void * emage_data_mmap(Emage_Data *thiz);
+EAPI void emage_data_free(Emage_Data *thiz);
+
+EAPI Eina_Bool emage_data_file_from(Emage_Data *thiz, const char *file);
+EAPI Eina_Bool emage_data_buffer_from(Emage_Data *thiz, void *buffer, size_t len);
+
 /**
  * @}
  * @defgroup Emage_Provider_Group Providers
@@ -104,8 +133,8 @@ typedef struct _Emage_Provider
 } Emage_Provider;
 
 
-EAPI Eina_Bool emage_provider_register(Emage_Provider *);
-EAPI void emage_provider_unregister(Emage_Provider *);
+EAPI Eina_Bool emage_provider_register(Emage_Provider *p, const char *mime);
+EAPI void emage_provider_unregister(Emage_Provider *p, const char *mime);
 
 EAPI Eina_Bool emage_provider_info_load(Emage_Provider *thiz,
 	const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt);
@@ -128,10 +157,6 @@ EAPI void emage_options_parse(const char *options, Emage_Option_Cb cb, void *dat
 /**
  * @}
  */
-
-typedef struct _Emage_Data Emage_Data;
-EAPI Eina_Bool emage_data_file_from(Emage_Data *thiz, const char *file);
-EAPI void emage_data_file_free(Emage_Data *thiz);
 
 EAPI void emage_pool_size_set(int num);
 EAPI int emage_pool_size_get(void);

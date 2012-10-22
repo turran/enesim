@@ -305,12 +305,12 @@ static Eina_Bool jpg_provider_init(void)
 	/* @todo
 	 * - Register jpg specific errors
 	 */
-	return emage_provider_register(&_provider);
+	return emage_provider_register(&_provider, "image/jpg");
 }
 
 static void jpg_provider_shutdown(void)
 {
-	emage_provider_unregister(&_provider);
+	emage_provider_unregister(&_provider, "image/jpg");
 	eina_log_domain_unregister(emage_log_dom_jpg);
 	emage_log_dom_jpg = -1;
 }

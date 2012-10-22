@@ -19,7 +19,7 @@
 
 static int _emage_init_count = 0;
 static Eina_Array *_modules = NULL;
-static Eina_List *_providers = NULL;
+static Eina_Hash *_providers = NULL;
 static int _fifo[2]; /* the communication between the main thread and the async ones */
 static int emage_log_dom_global = -1;
 
@@ -67,18 +67,49 @@ typedef struct _Emage_Job
 	} op;
 } Emage_Job;
 
+static void _provider_free(void *data)
+{
+	Eina_List *providers = data;
+	eina_list_free(providers);
+}
+
+/* TODO later we need to add an object (type finder?) that translates
+ * filename/filedata -> mimetype
+ */
+static const char * _file_mime(const char *file)
+{
+	char *end;
+	/* get the extension */
+	end = strrchr(file, '.');
+	if (!end) return "unknown";
+
+	end++;
+	if (!strcmp(end, "png"))
+		return "image/png";
+	else if (!strcmp(end, "jpg"))
+		return "image/jpg";
+	else
+		return "unknown";
+	
+}
+
 static Emage_Provider * _load_provider_get(const char *file)
 {
-	Eina_List *tmp;
 	Emage_Provider *p;
+	Eina_List *providers;
+	Eina_List *l;
 	struct stat stmp;
+	const char *mime;
 
 	if ((!file) || (stat(file, &stmp) < 0))
 		return NULL;
+
+	mime = _file_mime(file);
+	providers = eina_hash_find(_providers, mime);
+
 	/* iterate over the list of providers and check for a compatible loader */
-	for (tmp = _providers; tmp; tmp = eina_list_next(tmp))
+	EINA_LIST_FOREACH (providers, l, p)
 	{
-		p = eina_list_data_get(tmp);
 		/* TODO priority loaders */
 		/* check if the provider can load the image */
 		if (!p->loadable)
@@ -91,15 +122,19 @@ static Emage_Provider * _load_provider_get(const char *file)
 
 static Emage_Provider * _save_provider_get(const char *file)
 {
-	Eina_List *tmp;
 	Emage_Provider *p;
+	Eina_List *providers;
+	Eina_List *l;
+	const char *mime;
 
-	if (!file)
-		return NULL;
+	if (!file) return NULL;
+
+	mime = _file_mime(file);
+	providers = eina_hash_find(_providers, mime);
+
 	/* iterate over the list of providers and check for a compatible saver */
-	for (tmp = _providers; tmp; tmp = eina_list_next(tmp))
+	EINA_LIST_FOREACH (providers, l, p)
 	{
-		p = eina_list_data_get(tmp);
 		/* TODO priority savers */
 		/* check if the provider can save the image */
 		if (!p->saveable)
@@ -225,7 +260,8 @@ EAPI int emage_init(void)
 	EMAGE_ERROR_ALLOCATOR = eina_error_msg_static_register("Error allocating the surface data");
 	EMAGE_ERROR_LOADING = eina_error_msg_static_register("Error loading the image");
 	EMAGE_ERROR_SAVING = eina_error_msg_static_register("Error saving the image");
-
+	/* the providers */
+	_providers = eina_hash_string_superfast_new(_provider_free);
 	/* the modules */
 	_modules = eina_module_list_get(_modules, PACKAGE_LIB_DIR"/emage/", 1, NULL, NULL);
 	eina_module_list_load(_modules);
@@ -258,6 +294,8 @@ EAPI int emage_shutdown(void)
 #if BUILD_STATIC_MODULE_PNG
 	png_provider_shutdown();
 #endif
+	/* remove the providers */
+	eina_hash_free(_providers);
 	/* shutdown every provider */
 	/* TODO what if we shutdown while some thread is active? */
 	/* the fifo */
@@ -415,27 +453,35 @@ EAPI void emage_dispatch(void)
 /**
  *
  */
-EAPI Eina_Bool emage_provider_register(Emage_Provider *p)
+EAPI Eina_Bool emage_provider_register(Emage_Provider *p, const char *mime)
 {
+	Eina_List *providers;
+	Eina_List *tmp;
+
 	if (!p)
 		return EINA_FALSE;
 	/* check for mandatory functions */
 	if (!p->loadable)
 	{
-		WRN("Provider %s doesn't provide the loadable() function\n", p->name);
+		WRN("Provider %s doesn't provide the loadable() function", p->name);
 		goto err;
 	}
 	if (!p->info_get)
 	{
-		WRN("Provider %s doesn't provide the info_get() function\n", p->name);
+		WRN("Provider %s doesn't provide the info_get() function", p->name);
 		goto err;
 	}
 	if (!p->load)
 	{
-		WRN("Provider %s doesn't provide the load() function\n", p->name);
+		WRN("Provider %s doesn't provide the load() function", p->name);
 		goto err;
 	}
-	_providers = eina_list_append(_providers, p);
+	providers = tmp = eina_hash_find(_providers, mime);
+	providers = eina_list_append(providers, p);
+	if (!tmp)
+	{
+		eina_hash_add(_providers, mime, providers);
+	}
 	return EINA_TRUE;
 err:
 	return EINA_FALSE;
@@ -443,10 +489,24 @@ err:
 /**
  *
  */
-EAPI void emage_provider_unregister(Emage_Provider *p)
+EAPI void emage_provider_unregister(Emage_Provider *p, const char *mime)
 {
+	Eina_List *providers;
+	Eina_List *tmp;
+
+	providers = tmp = eina_hash_find(_providers, mime);
+	if (!providers)
+	{
+		WRN("Impossible to unregister the provider %p on mime '%s'", p, mime);
+		return;
+	}
+
 	/* remove from the list of providers */
-	_providers = eina_list_remove(_providers, p);
+	providers = eina_list_remove(providers, p);
+	if (!providers)
+	{
+		eina_hash_del(_providers, mime, tmp);
+	}
 }
 
 /**

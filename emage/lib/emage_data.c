@@ -5,32 +5,50 @@
  *============================================================================*/
 struct _Emage_Data
 {
-	char *raw;
-	size_t len;
-	void *private;
+	Emage_Data_Descriptor *descriptor;
+	void *data;
 };
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Eina_Bool emage_data_file_from(Emage_Data *thiz, const char *file)
+EAPI Emage_Data * emage_data_new(Emage_Data_Descriptor *descriptor, void *data)
 {
-	Eina_File *f;
+	Emage_Data *thiz;
 
-	f = eina_file_open(file, EINA_FALSE);
-	if (!f) return EINA_FALSE;
+	if (!descriptor)
+		return NULL;
 
-	thiz->private = f;
-	thiz->raw = eina_file_map_all(f, EINA_FILE_WILLNEED);
-	return EINA_TRUE;
+	thiz = calloc(1, sizeof(Emage_Data));
+	thiz->descriptor = descriptor;
+	thiz->data = data;
+
+	return thiz;
 }
 
-EAPI void emage_data_file_free(Emage_Data *thiz)
+EAPI ssize_t emage_data_read(Emage_Data *thiz, void *buffer, size_t len)
 {
-	Eina_File *f;
+	if (thiz->descriptor->read)
+		return thiz->descriptor->read(thiz->data, buffer, len);
+	return 0;
+}
 
-	f = thiz->private;
-	if (!f) return;
 
-	eina_file_map_free(f, thiz->raw);
-	eina_file_close(f);
+EAPI ssize_t emage_data_write(Emage_Data *thiz, void *buffer, size_t len)
+{
+	if (thiz->descriptor->write)
+		return thiz->descriptor->write(thiz->data, buffer, len);
+	return 0;
+}
+
+EAPI void * emage_data_mmap(Emage_Data *thiz)
+{
+	if (thiz->descriptor->mmap)
+		return thiz->descriptor->mmap(thiz->data);
+	return NULL;
+}
+
+EAPI void emage_data_free(Emage_Data *thiz)
+{
+	if (thiz->descriptor->free)
+		thiz->descriptor->free(thiz->data);
 }
