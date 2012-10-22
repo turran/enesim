@@ -24,7 +24,7 @@ static Eina_Bool _file_data_get(const char *file, const char *mode,
 	Emage_Data *d;
 	const char *m;
 
-	d = emage_data_file_new(file, "wb");
+	d = emage_data_file_new(file, mode);
 	if (!d) return EINA_FALSE;
 
 	m = emage_mime_get(d);
@@ -33,14 +33,16 @@ static Eina_Bool _file_data_get(const char *file, const char *mode,
 		emage_data_free(d);
 		return EINA_FALSE;
 	}
+	emage_data_reset(d);
 	*mime = m;
 	*data = d;
+
 	return EINA_TRUE;
 }
 
 static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const char **mime)
 {
-	return _file_data_get(file, "rw", data, mime);
+	return _file_data_get(file, "wb", data, mime);
 }
 
 static Eina_Bool _file_load_data_get(const char *file, Emage_Data **data, const char **mime)

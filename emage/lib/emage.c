@@ -82,7 +82,7 @@ static Emage_Provider * _load_provider_get(Emage_Data *data, const char *mime)
 		/* TODO priority loaders */
 		/* check if the provider can load the image */
 		if (!p->loadable)
-			continue;
+			return p;
 
 		emage_data_reset(data);
 		if (p->loadable(data) == EINA_TRUE)
