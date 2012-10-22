@@ -33,6 +33,8 @@ EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1);
 EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1);
 EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1);
 EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1);
+EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double y0, double x1, double y1);
+EAPI void enesim_renderer_line_coords_get(Enesim_Renderer *r, double *x0, double *y0, double *x1, double *y1);
 
 /**
  * @}

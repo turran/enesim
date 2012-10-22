@@ -670,3 +670,27 @@ EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
 	thiz = _line_get(r);
 	*y1 = thiz->current.y1;
 }
+
+EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double y0, double x1, double y1)
+{
+	Enesim_Renderer_Line *thiz;
+
+	thiz = _line_get(r);
+	thiz->current.x0 = x0;
+	thiz->current.y0 = y0;
+	thiz->current.x1 = x1;
+	thiz->current.y1 = y1;
+	thiz->changed = EINA_TRUE;
+}
+
+EAPI void enesim_renderer_line_coords_get(Enesim_Renderer *r, double *x0, double *y0, double *x1, double *y1)
+{
+	Enesim_Renderer_Line *thiz;
+
+	thiz = _line_get(r);
+	if (x0) *x0 = thiz->current.x0;
+	if (y0) *y0 = thiz->current.y0;
+	if (x1) *x1 = thiz->current.x1;
+	if (y1) *y1 = thiz->current.y1;
+	thiz->changed = EINA_TRUE;
+}
