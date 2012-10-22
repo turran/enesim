@@ -3,6 +3,13 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Emage_File_Data
+{
+	Emage_Callback cb;
+	void *user_data;
+	Emage_Data *data;
+} Emage_File_Data;
+
 /* TODO later we need to add an object (type finder?) that translates
  * filename/filedata -> mimetype
  */
@@ -24,6 +31,14 @@ static Eina_Bool  _file_mime(const char *file, const char **mime)
 		ret = EINA_FALSE;
 
 	return ret;
+}
+
+static void _emage_file_cb(Enesim_Surface *s, void *user_data, int error)
+{
+	Emage_File_Data *fdata = user_data;
+
+	fdata->cb(s, fdata->user_data, error);
+	emage_data_free(fdata->data);
 }
 
 static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const char **mime)
@@ -66,11 +81,14 @@ static Eina_Bool _file_load_mime(const char *file, const char **mime)
 EAPI Eina_Bool emage_file_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
 	Emage_Data *data;
+	Eina_Bool ret;
 	const char *mime;
 	
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	return emage_info_load(data, mime, w, h, sfmt);
+	ret = emage_info_load(data, mime, w, h, sfmt);
+	emage_data_free(data);
+	return ret;
 }
 /**
  * Load an image synchronously
@@ -87,11 +105,14 @@ EAPI Eina_Bool emage_file_load(const char *file, Enesim_Surface **s,
 		Enesim_Format f, Enesim_Pool *mpool, const char *options)
 {
 	Emage_Data *data;
+	Eina_Bool ret;
 	const char *mime;
 	
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	return emage_load(data, mime, s, f, mpool, options);
+	ret = emage_load(data, mime, s, f, mpool, options);
+	emage_data_free(data);
+	return ret;
 }
 /**
  * Load an image file asynchronously
@@ -110,14 +131,20 @@ EAPI void emage_file_load_async(const char *file, Enesim_Surface *s,
 		Emage_Callback cb, void *user_data, const char *options)
 {
 	Emage_Data *data;
+	Emage_File_Data fdata;
 	const char *mime;
-	
+
 	if (!_file_load_data_get(file, &data, &mime))
 	{
 		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
+		emage_data_free(data);
 		return;
 	}
-	emage_load_async(data, mime, s, f, mpool, cb, user_data, options);
+	fdata.cb = cb;
+	fdata.user_data = user_data;
+	fdata.data = data;
+
+	emage_load_async(data, mime, s, f, mpool, _emage_file_cb, &fdata, options);
 }
 /**
  * Save an image file synchronously
@@ -130,11 +157,14 @@ EAPI void emage_file_load_async(const char *file, Enesim_Surface *s,
 EAPI Eina_Bool emage_file_save(const char *file, Enesim_Surface *s, const char *options)
 {
 	Emage_Data *data;
+	Eina_Bool ret;
 	const char *mime;
 	
 	if (!_file_save_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	return emage_save(data, mime, s, options);
+	ret = emage_save(data, mime, s, options);
+	emage_data_free(data);
+	return ret;
 }
 /**
  * Save an image file asynchronously
@@ -150,12 +180,18 @@ EAPI void emage_file_save_async(const char *file, Enesim_Surface *s, Emage_Callb
 		void *user_data, const char *options)
 {
 	Emage_Data *data;
+	Emage_File_Data fdata;
 	const char *mime;
 	
 	if (!_file_save_data_get(file, &data, &mime))
 	{
 		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
+		emage_data_free(data);
 		return;
 	}
-	emage_save_async(data, mime, s, cb, user_data, options);
+	fdata.cb = cb;
+	fdata.user_data = user_data;
+	fdata.data = data;
+
+	emage_save_async(data, mime, s, _emage_file_cb, &fdata, options);
 }
