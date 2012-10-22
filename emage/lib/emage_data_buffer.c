@@ -73,6 +73,7 @@ static Emage_Data_Descriptor _emage_data_buffer_descriptor = {
 	/* .read	= */ _emage_data_buffer_read,
 	/* .write	= */ _emage_data_buffer_write,
 	/* .mmap	= */ _emage_data_buffer_mmap,
+	/* .munmap	= */ NULL,
 	/* .reset	= */ _emage_data_buffer_reset,
 	/* .length	= */ _emage_data_buffer_length,
 	/* .location 	= */ NULL,

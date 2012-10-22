@@ -47,6 +47,12 @@ EAPI void * emage_data_mmap(Emage_Data *thiz, size_t *size)
 	return NULL;
 }
 
+EAPI void emage_data_munmap(Emage_Data *thiz, void *ptr)
+{
+	if (thiz->descriptor->munmap)
+		return thiz->descriptor->munmap(thiz->data, ptr);
+}
+
 EAPI void emage_data_reset(Emage_Data *thiz)
 {
 	if (thiz->descriptor->reset)
