@@ -38,6 +38,12 @@ static void * _emage_data_file_mmap(void *data)
 }
 #endif
 
+static void _emage_data_file_reset(void *data)
+{
+	Emage_Data_File *thiz = data;
+	rewind(thiz->f);
+}
+
 static void _emage_data_file_free(void *data)
 {
 	Emage_Data_File *thiz = data;
@@ -50,17 +56,18 @@ static Emage_Data_Descriptor _emage_data_file_descriptor = {
 	/* .read	= */ _emage_data_file_read,
 	/* .write	= */ _emage_data_file_write,
 	/* .mmap	= */ NULL,
+	/* .reset	= */ _emage_data_file_reset,
 	/* .free	= */ _emage_data_file_free,
 };
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Emage_Data * emage_data_file_new(const char *file)
+EAPI Emage_Data * emage_data_file_new(const char *file, const char *mode)
 {
 	Emage_Data_File *thiz;
 	FILE *f;
 
-	f = fopen(file, "r");
+	f = fopen(file, mode);
 	if (!f) return EINA_FALSE;
 
 	thiz = calloc(1, sizeof(Emage_Data_File));

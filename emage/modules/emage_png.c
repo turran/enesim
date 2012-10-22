@@ -62,25 +62,41 @@ static Eina_Bool _png_format_get(int color_type, Enesim_Buffer_Format *fmt)
 
 	return EINA_TRUE;
 }
+
+/* our own io functions */
+static void _png_read(png_structp png_ptr, png_bytep buf, png_size_t length)
+{
+	Emage_Data *data;
+
+	data = png_get_io_ptr(png_ptr);
+	emage_data_read(data, buf, length);
+}
+
+static void _png_write(png_structp png_ptr, png_bytep buf, png_size_t length)
+{
+	Emage_Data *data;
+
+	data = png_get_io_ptr(png_ptr);
+	emage_data_write(data, buf, length);
+}
+
+static void _png_flush(png_structp png_ptr)
+{
+	/* nothing to do here */
+}
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-static Eina_Bool _png_loadable(const char *file)
+static Eina_Bool _png_loadable(Emage_Data *data)
 {
-	FILE *f;
 	unsigned char buf[PNG_BYTES_TO_CHECK];
 	int ret;
 
-	f = fopen(file, "rb");
-	ret = fread(buf, 1, PNG_BYTES_TO_CHECK, f);
+	ret = emage_data_read(data, buf, PNG_BYTES_TO_CHECK);
 	if (ret < 0)
 		return EINA_FALSE;
 	if (!png_check_sig(buf, PNG_BYTES_TO_CHECK))
-	{
-		fclose(f);
 		return EINA_FALSE;
-	}
-	fclose(f);
 	return EINA_TRUE;
 }
 
@@ -98,9 +114,8 @@ static Eina_Bool _png_saveable(const char *file)
 	return EINA_FALSE;
 }
 
-static Eina_Error _png_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _png_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
-	FILE *f;
 	int bit_depth, color_type, interlace_type;
 	char hasa, hasg;
 
@@ -110,26 +125,20 @@ static Eina_Error _png_info_load(const char *file, int *w, int *h, Enesim_Buffer
 
 	hasa = 0;
 	hasg = 0;
-	f = fopen(file, "rb");
-	if (!f)
-	{
-		return EMAGE_ERROR_EXIST;
-	}
 
-	rewind(f);
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
 	_png_msg_error_cb, _png_msg_warning_cb);
 	if (!png_ptr)
-		goto close_f;
+		goto error_read_struct;
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
-		goto destroy_read_struct;
+		goto error_info_struct;
 
 	if (setjmp(png_jmpbuf(png_ptr)))
-		goto destroy_info_struct;
+		goto error_jmp;
 
-	png_init_io(png_ptr, f);
+	png_set_read_fn(png_ptr,(png_voidp)data, _png_read);
 	png_read_info(png_ptr, info_ptr);
 	png_get_IHDR(png_ptr, info_ptr, (png_uint_32 *) (&w32),
 			(png_uint_32 *) (&h32), &bit_depth, &color_type,
@@ -137,84 +146,62 @@ static Eina_Error _png_info_load(const char *file, int *w, int *h, Enesim_Buffer
 	if (w) *w = w32;
 	if (h) *h = h32;
 	if (!sfmt)
-		goto destroy_info_struct;
+		goto error_jmp;
 
 	if (!_png_format_get(color_type, sfmt))
-		goto destroy_info_struct;
+		goto error_jmp;
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-	fclose(f);
-
 	return 0;
 
-  destroy_read_struct:
+error_jmp:
+	png_destroy_info_struct(png_ptr, (png_infopp)&info_ptr);
+error_info_struct:
 	png_destroy_read_struct(&png_ptr, NULL, NULL);
-	goto close_f;
-  destroy_info_struct:
-	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-  close_f:
-	fclose(f);
+error_read_struct:
 	return EMAGE_ERROR_LOADING;
 }
 
-static Eina_Error _png_load(const char *file, Enesim_Buffer *buffer, void *options)
+static Eina_Error _png_load(Emage_Data *data, Enesim_Buffer *buffer, void *options)
 {
-	Enesim_Buffer_Sw_Data data;
-	FILE *f;
-	int bit_depth, color_type, interlace_type;
-	unsigned char buf[PNG_BYTES_TO_CHECK];
-	unsigned char **lines;
-	char hasa, hasg;
-	int i;
+	Enesim_Buffer_Sw_Data sw_data;
 	Enesim_Buffer_Format fmt;
-	int pixel_inc;
-	size_t ret;
-
 	png_uint_32 w32, h32;
 	png_structp png_ptr = NULL;
 	png_infop info_ptr = NULL;
-
 	uint32_t *sdata;
+	int bit_depth, color_type, interlace_type;
+	unsigned char **lines;
+	char hasa, hasg;
+	int i;
+	int pixel_inc;
 
-	enesim_buffer_data_get(buffer, &data);
-	sdata = data.argb8888.plane0;
+	enesim_buffer_data_get(buffer, &sw_data);
+	sdata = sw_data.argb8888.plane0;
 
 	hasa = 0;
 	hasg = 0;
-	f = fopen(file, "rb");
-	if (!f)
-	{
-		return EMAGE_ERROR_EXIST;
-	}
-	/* if we havent read the header before, set the header data */
-	ret = fread(buf, 1, PNG_BYTES_TO_CHECK, f);
-	if (ret < PNG_BYTES_TO_CHECK)
-		goto close_f;
 
-	if (!png_check_sig(buf, PNG_BYTES_TO_CHECK))
-		goto close_f;
-
-	rewind(f);
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL,
 			NULL);
 	if (!png_ptr)
-		goto close_f;
+		goto error_read_struct;
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
-		goto destroy_read_struct;
+		goto error_info_struct;
 
 	if (setjmp(png_jmpbuf(png_ptr)))
-		goto destroy_info_struct;
+		goto error_jmp;
 
-	png_init_io(png_ptr, f);
+	png_set_read_fn(png_ptr,(png_voidp)data, _png_read);
 	png_read_info(png_ptr, info_ptr);
 	png_get_IHDR(png_ptr, info_ptr, (png_uint_32 *) (&w32),
 			(png_uint_32 *) (&h32), &bit_depth, &color_type,
 			&interlace_type, NULL, NULL);
 
 	if (!_png_format_get(color_type, &fmt))
-		goto destroy_info_struct;
+		goto error_jmp;
 
 	if (color_type == PNG_COLOR_TYPE_PALETTE)
 		png_set_expand(png_ptr);
@@ -236,10 +223,15 @@ static Eina_Error _png_load(const char *file, Enesim_Buffer *buffer, void *optio
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
 		png_set_expand(png_ptr);
 
-	//png_set_bgr(png_ptr);
+#ifdef WORDS_BIGENDIAN
+	png_set_swap_alpha(png_ptr);
+#else
+	png_set_bgr(png_ptr);
+#endif
+
 	pixel_inc = enesim_buffer_format_rgb_depth_get(fmt) / 8;
 	if (!pixel_inc)
-		goto destroy_info_struct;
+		goto error_jmp;
 
 	lines = (unsigned char **) alloca(h32 * sizeof(unsigned char *));
 
@@ -264,49 +256,38 @@ static Eina_Error _png_load(const char *file, Enesim_Buffer *buffer, void *optio
 	png_read_end(png_ptr, info_ptr);
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-	fclose(f);
 
 	return 0;
 
-  destroy_read_struct:
+error_jmp:
+	png_destroy_info_struct(png_ptr, (png_infopp)&info_ptr);
+error_info_struct:
 	png_destroy_read_struct(&png_ptr, NULL, NULL);
-	goto close_f;
-  destroy_info_struct:
-	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-  close_f:
-	fclose(f);
+error_read_struct:
 	return EMAGE_ERROR_LOADING;
 }
 
-static Eina_Bool _png_save(const char *file, Enesim_Surface *s, void *options)
+static Eina_Bool _png_save(Emage_Data *data, Enesim_Surface *s, void *options)
 {
-	FILE *f;
+	Enesim_Buffer *buffer;
+	Enesim_Buffer_Sw_Data cdata;
+	Eina_Rectangle rect;
+	png_structp png_ptr;
+	png_infop info_ptr;
+	png_bytep row_ptr;
+	png_color_8 sig_bit;
 	int y;
 	int w, h;
 	/* FIXME fix this, it should be part of the options */
 	const int compress = 0;
 
-	png_structp png_ptr;
-	png_infop info_ptr;
-	png_bytep row_ptr;
-	png_color_8 sig_bit;
-
-	Enesim_Buffer *buffer;
-	Enesim_Buffer_Sw_Data cdata;
-
-	Eina_Rectangle rect;
-
-	f = fopen(file, "wb");
-	if (!f)
-		return EINA_FALSE;
-
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL,NULL);
 	if (!png_ptr)
-		goto error_ptr;
+		goto error_write_struct;
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
-		goto error_info;
+		goto error_info_struct;
 
 	if (setjmp(png_jmpbuf(png_ptr)))
 		goto error_jmp;
@@ -314,13 +295,9 @@ static Eina_Bool _png_save(const char *file, Enesim_Surface *s, void *options)
 	enesim_surface_size_get(s, &w, &h);
 	buffer = enesim_buffer_new(ENESIM_BUFFER_FORMAT_ARGB8888, w, h);
 	if (!buffer)
-	{
-		fclose(f);
-		png_destroy_write_struct(&png_ptr, (png_infopp) & info_ptr);
-		png_destroy_info_struct(png_ptr, (png_infopp) & info_ptr);
-		return EINA_FALSE;
-	}
-	png_init_io(png_ptr, f);
+		goto error_jmp;
+
+	png_set_write_fn(png_ptr,(png_voidp)data, _png_write, _png_flush);
 	png_set_IHDR(png_ptr, info_ptr, w, h, 8,
                      PNG_COLOR_TYPE_RGB_ALPHA, png_get_interlace_type(png_ptr, info_ptr),
 			PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
@@ -353,17 +330,14 @@ static Eina_Bool _png_save(const char *file, Enesim_Surface *s, void *options)
 	png_destroy_write_struct(&png_ptr, (png_infopp) & info_ptr);
 	png_destroy_info_struct(png_ptr, (png_infopp) & info_ptr);
 	enesim_buffer_unref(buffer);
-	fclose(f);
 
 	return EINA_TRUE;
 
 error_jmp:
 	png_destroy_info_struct(png_ptr, (png_infopp)&info_ptr);
-error_info:
-	png_destroy_write_struct(&png_ptr, (png_infopp)&info_ptr);
-error_ptr:
-	fclose(f);
-
+error_info_struct:
+	png_destroy_write_struct(&png_ptr, NULL);
+error_write_struct:
 	return EINA_FALSE;
 }
 

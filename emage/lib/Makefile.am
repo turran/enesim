@@ -14,10 +14,12 @@ lib_LTLIBRARIES = libemage.la
 
 libemage_la_SOURCES = \
 emage.c \
-emage_provider.c \
 emage_data.c \
 emage_data_file.c \
-emage_data_buffer.c
+emage_data_buffer.c \
+emage_data_base64.c \
+emage_file.c \
+emage_provider.c
 ## add every .c module that is going to be built-in
 
 libemage_la_LIBADD = \

@@ -3,7 +3,7 @@ rm -f config.cache
 
 m4_define([v_maj], [0])
 m4_define([v_min], [0])
-m4_define([v_mic], [15])
+m4_define([v_mic], [16])
 m4_define([v_ver], [v_maj.v_min.v_mic])
 
 m4_define([lt_cur], m4_eval(v_maj + v_min))

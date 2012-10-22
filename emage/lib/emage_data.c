@@ -47,8 +47,16 @@ EAPI void * emage_data_mmap(Emage_Data *thiz)
 	return NULL;
 }
 
+EAPI void emage_data_reset(Emage_Data *thiz)
+{
+	if (thiz->descriptor->reset)
+		thiz->descriptor->reset(thiz->data);
+}
+
 EAPI void emage_data_free(Emage_Data *thiz)
 {
 	if (thiz->descriptor->free)
 		thiz->descriptor->free(thiz->data);
 }
+
+

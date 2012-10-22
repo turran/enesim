@@ -83,11 +83,11 @@ int main(int argc, char **argv)
 
 		if (async)
 		{
-			emage_save_async(file, s, async_save_cb, file, NULL);
+			emage_file_save_async(file, s, async_save_cb, file, NULL);
 		}
 		else
 		{
-			if (emage_save(file, s, NULL))
+			if (emage_file_save(file, s, NULL))
 				printf("Image %s saved sync successfully\n", file);
 			else
 			{
@@ -103,11 +103,11 @@ int main(int argc, char **argv)
 	{
 		if (async)
 		{
-			emage_load_async(file, s, ENESIM_FORMAT_ARGB8888, NULL, async_load_cb, file, NULL);
+			emage_file_load_async(file, s, ENESIM_FORMAT_ARGB8888, NULL, async_load_cb, file, NULL);
 		}
 		else
 		{
-			if (emage_load(file, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL))
+			if (emage_file_load(file, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL))
 				printf("Image %s loaded sync successfully\n", file);
 			else
 			{

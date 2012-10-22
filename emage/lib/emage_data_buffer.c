@@ -49,6 +49,13 @@ static void * _emage_data_buffer_mmap(void *data)
 	return thiz->buffer;
 }
 
+static void _emage_data_buffer_reset(void *data)
+{
+	Emage_Data_Buffer *thiz = data;
+	thiz->off = 0;
+	thiz->curr = thiz->buffer;
+}
+
 static void _emage_data_buffer_free(void *data)
 {
 	Emage_Data_Buffer *thiz = data;
@@ -59,6 +66,7 @@ static Emage_Data_Descriptor _emage_data_buffer_descriptor = {
 	/* .read	= */ _emage_data_buffer_read,
 	/* .write	= */ _emage_data_buffer_write,
 	/* .mmap	= */ _emage_data_buffer_mmap,
+	/* .reset	= */ _emage_data_buffer_reset,
 	/* .free	= */ _emage_data_buffer_free,
 };
 /*============================================================================*

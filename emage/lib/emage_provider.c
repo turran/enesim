@@ -14,7 +14,7 @@ static void _provider_data_convert(Enesim_Buffer *buffer,
 	enesim_renderer_unref(importer);
 }
 
-static Eina_Bool _provider_info_load(Emage_Provider *p, const char *file,
+static Eina_Bool _provider_info_load(Emage_Provider *p, Emage_Data *data,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
 	Eina_Bool ret;
@@ -22,7 +22,7 @@ static Eina_Bool _provider_info_load(Emage_Provider *p, const char *file,
 	Enesim_Buffer_Format pfmt;
 
 	/* get the info from the image */
-	ret = p->info_get(file, &pw, &ph, &pfmt, options);
+	ret = p->info_get(data, &pw, &ph, &pfmt, options);
 	if (w) *w = pw;
 	if (h) *h = ph;
 	if (sfmt) *sfmt = pfmt;
@@ -49,7 +49,7 @@ static void _provider_options_free(Emage_Provider *p, void *options)
 		p->options_free(options);
 }
 
-static Eina_Bool _provider_data_load(Emage_Provider *p, const char *file,
+static Eina_Bool _provider_data_load(Emage_Provider *p, Emage_Data *data,
 		Enesim_Surface **s, Enesim_Format f, Enesim_Pool *mpool,
 		void *options,
 		Eina_Error *err)
@@ -62,7 +62,7 @@ static Eina_Bool _provider_data_load(Emage_Provider *p, const char *file,
 	Eina_Bool import = EINA_FALSE;
 	int w, h;
 
-	error = _provider_info_load(p, file, &w, &h, &cfmt, options);
+	error = _provider_info_load(p, data, &w, &h, &cfmt, options);
 	if (error)
 	{
 		goto info_err;
@@ -94,8 +94,9 @@ static Eina_Bool _provider_data_load(Emage_Provider *p, const char *file,
 		import = EINA_TRUE;
 	}
 
-	/* load the file */
-	error = p->load(file, buffer, options);
+	/* load the data */
+	emage_data_reset(data);
+	error = p->load(data, buffer, options);
 	if (error)
 	{
 		goto load_err;
@@ -120,11 +121,11 @@ info_err:
 	return EINA_FALSE;
 }
 
-static Eina_Bool _provider_data_save(Emage_Provider *p, const char *file,
+static Eina_Bool _provider_data_save(Emage_Provider *p, Emage_Data *data,
 		Enesim_Surface *s, Eina_Error *err)
 {
-	/* save the file */
-	if (p->save(file, s, NULL) == EINA_FALSE)
+	/* save the data */
+	if (p->save(data, s, NULL) == EINA_FALSE)
 	{
 		*err = EMAGE_ERROR_SAVING;
 		return EINA_FALSE;
@@ -136,19 +137,19 @@ static Eina_Bool _provider_data_save(Emage_Provider *p, const char *file,
  *                                   API                                      *
  *============================================================================*/
 EAPI Eina_Bool emage_provider_info_load(Emage_Provider *thiz,
-	const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt)
+	Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
 	if (!thiz)
 	{
 		eina_error_set(EMAGE_ERROR_PROVIDER);
 		return EINA_FALSE;
 	}
-	_provider_info_load(thiz, file, w, h, sfmt, NULL);
+	_provider_info_load(thiz, data, w, h, sfmt, NULL);
 	return EINA_TRUE;
 }
 
 EAPI Eina_Bool emage_provider_load(Emage_Provider *thiz,
-		const char *file, Enesim_Surface **s,
+		Emage_Data *data, Enesim_Surface **s,
 		Enesim_Format f, Enesim_Pool *mpool, const char *options)
 {
 	Eina_Error err = 0;
@@ -161,7 +162,7 @@ EAPI Eina_Bool emage_provider_load(Emage_Provider *thiz,
 		return EINA_FALSE;
 	}
 	_provider_options_parse(thiz, options, &op);
-	if (!_provider_data_load(thiz, file, s, f, mpool, op, &err))
+	if (!_provider_data_load(thiz, data, s, f, mpool, op, &err))
 	{
 		eina_error_set(err);
 		ret = EINA_FALSE;
@@ -171,7 +172,7 @@ EAPI Eina_Bool emage_provider_load(Emage_Provider *thiz,
 }
 
 EAPI Eina_Bool emage_provider_save(Emage_Provider *thiz,
-		const char *file, Enesim_Surface *s,
+		Emage_Data *data, Enesim_Surface *s,
 		const char *options)
 {
 	Eina_Error err = 0;
@@ -181,7 +182,7 @@ EAPI Eina_Bool emage_provider_save(Emage_Provider *thiz,
 		eina_error_set(EMAGE_ERROR_PROVIDER);
 		return EINA_FALSE;
 	}
-	if (!_provider_data_save(thiz, file, s, &err))
+	if (!_provider_data_save(thiz, data, s, &err))
 	{
 		eina_error_set(err);
 		return EINA_FALSE;

@@ -28,14 +28,27 @@
 #endif
 #define DBG(...) EINA_LOG_DOM_DBG(emage_log_dom_jpg, __VA_ARGS__)
 
-static int emage_log_dom_jpg = -1;
+#define JPG_BLOCK_SIZE 4096
 
 typedef struct _Jpg_Error_Mgr Jpg_Error_Mgr;
+typedef struct _Jpg_Source Jpg_Source;
+
+/* our own jpeg source manager */
+struct _Jpg_Source
+{
+	struct jpeg_source_mgr pub;
+	JOCTET buffer[JPG_BLOCK_SIZE];
+	Eina_Bool mmaped;
+	Emage_Data *data;
+};
+
 struct _Jpg_Error_Mgr
 {
 	struct jpeg_error_mgr pub;
 	jmp_buf setjmp_buffer;
 };
+
+static int emage_log_dom_jpg = -1;
 
 static void _jpg_error_exit_cb(j_common_ptr cinfo)
 {
@@ -46,34 +59,85 @@ static void _jpg_error_exit_cb(j_common_ptr cinfo)
 	longjmp(err->setjmp_buffer, 1);
 }
 
+/*----------------------------------------------------------------------------*
+ *                         The jpeg source interface                          *
+ *----------------------------------------------------------------------------*/
+static void _jpg_emage_src_init(j_decompress_ptr cinfo)
+{
+	/* TODO check if we can mmap the buffer, if so map it and use
+	 * directly the whole bytes and pointer
+	 */
+	cinfo->src->bytes_in_buffer = 0;
+}
+
+static boolean _jpg_emage_src_fill(j_decompress_ptr cinfo)
+{
+	Jpg_Source *thiz = (Jpg_Source *)cinfo->src;
+	ssize_t ret;
+
+	ret = emage_data_read(thiz->data, thiz->buffer, JPG_BLOCK_SIZE);
+	if (ret < 0)
+	{
+		ERR("Reading failed");
+		ret = 0;
+	}
+
+	thiz->pub.bytes_in_buffer = ret;
+	thiz->pub.next_input_byte = thiz->buffer;
+	return TRUE;
+}
+
+void _jpg_emage_src_skip(j_decompress_ptr cinfo, long num_bytes)
+{
+	Jpg_Source *thiz = (Jpg_Source *)cinfo->src;
+
+	if (num_bytes > 0)
+	{
+		while (num_bytes > (long) thiz->pub.bytes_in_buffer)
+		{
+			num_bytes -= (long) thiz->pub.bytes_in_buffer;
+			(void) _jpg_emage_src_fill(cinfo);
+			/* note we assume that fill_input_buffer will never return FALSE,
+			* so suspension need not be handled.
+			*/
+		}
+		thiz->pub.next_input_byte += (size_t) num_bytes;
+		thiz->pub.bytes_in_buffer -= (size_t) num_bytes;
+	}
+}
+
+void _jpg_emage_src_term(j_decompress_ptr cinfo)
+{
+}
+
+static void _jpg_emage_src(struct jpeg_decompress_struct *cinfo, Emage_Data *data)
+{
+	Jpg_Source *thiz;
+
+	thiz = calloc(1, sizeof(Jpg_Source));
+	thiz->data = data;
+	/* override the methods */
+	thiz->pub.init_source = _jpg_emage_src_init;
+	thiz->pub.fill_input_buffer = _jpg_emage_src_fill;
+	thiz->pub.skip_input_data = _jpg_emage_src_skip;
+	thiz->pub.resync_to_restart = jpeg_resync_to_restart; /* use default method */
+	thiz->pub.term_source = _jpg_emage_src_term;
+	thiz->pub.bytes_in_buffer = 0;
+	thiz->pub.next_input_byte = NULL;
+
+	cinfo->src = (struct jpeg_source_mgr *)thiz;
+}
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-static Eina_Bool _jpg_loadable(const char *file)
+static Eina_Bool _jpg_loadable(Emage_Data *data)
 {
-	struct stat s;
-	FILE *f;
-	unsigned char *buf;
+	unsigned char buf[3];
 	int ret;
 
-	if (!file)
-		return EINA_FALSE;
-
-	if (stat(file, &s) < 0)
-		return EINA_FALSE;
-
-	buf = malloc(s.st_size);
-	if (!buf)
-		return EINA_FALSE;
-
-	f = fopen(file, "rb");
-	if (!f)
-		goto free_buf;
-
-	ret = fread(buf, s.st_size, 1, f);
+	ret = emage_data_read(data, buf, 3);
 	if (ret < 0)
-		goto close_f;
-
+		return EINA_FALSE;
 	/*
 	 * Header "format"
 	 *
@@ -86,37 +150,23 @@ static Eina_Bool _jpg_loadable(const char *file)
 	 * [2] http://en.wikipedia.org/wiki/Magic_number_%28programming%29#Magic_numbers_in_files
 	 */
 	if ((buf[0] != 0xff) || (buf[1] != 0xd8) || (buf[2] != 0xff))
-		goto close_f;
+		return EINA_FALSE;
+#if 0
+	/* FIXME for later, we wont check the last bytes, that imply to read the whole file ... */
 	if ((buf[s.st_size - 2] != 0xff) || (buf[s.st_size - 1] != 0xd9))
 		goto close_f;
-
-	fclose(f);
-	free(buf);
+#endif
 
 	return EINA_TRUE;
-
-  close_f:
-	fclose(f);
-  free_buf:
-	free(buf);
-	return EINA_FALSE;
 }
 
-static Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _jpg_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
-	struct jpeg_decompress_struct cinfo;
 	Jpg_Error_Mgr err;
-	FILE *f;
+	struct jpeg_decompress_struct cinfo;
 	int ww = 0;
 	int hh = 0;
 	int fmt = -1;
-
-	if (!file)
-		return EMAGE_ERROR_EXIST;
-	f = fopen(file, "rb");
-
-	if (!f)
-		return EMAGE_ERROR_EXIST;
 
 	memset(&cinfo, 0, sizeof(cinfo));
 	cinfo.err = jpeg_std_error(&(err.pub));
@@ -124,12 +174,11 @@ static Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer
 	if (setjmp(err.setjmp_buffer))
 	{
 		jpeg_destroy_decompress(&cinfo);
-		fclose(f);
 		return EMAGE_ERROR_ALLOCATOR;
 	}
 
 	jpeg_create_decompress(&cinfo);
-	jpeg_stdio_src(&cinfo, f);
+	_jpg_emage_src(&cinfo, data);
 	jpeg_read_header(&cinfo, TRUE);
 	cinfo.do_fancy_upsampling = FALSE;
 	cinfo.do_block_smoothing = FALSE;
@@ -175,7 +224,6 @@ static Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer
 	else
 	{
 		jpeg_destroy_decompress(&cinfo);
-		fclose(f);
 		return EMAGE_ERROR_FORMAT;
 	}
 
@@ -184,26 +232,18 @@ static Eina_Error _jpg_info_load(const char *file, int *w, int *h, Enesim_Buffer
 	if (sfmt) *sfmt = fmt;
 
 	jpeg_destroy_decompress(&cinfo);
-	fclose(f);
 	return 0;
 }
 
-static Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *options)
+static Eina_Error _jpg_load(Emage_Data *data, Enesim_Buffer *buffer, void *options)
 {
-	Enesim_Buffer_Sw_Data data;
-	struct jpeg_decompress_struct cinfo;
 	Jpg_Error_Mgr err;
-	FILE *f;
+	Enesim_Buffer_Sw_Data sw_data;
+	struct jpeg_decompress_struct cinfo;
+	JSAMPROW row;
 	uint8_t *sdata;
 	uint8_t *line;
 	int stride;
-	JSAMPROW row;
-
-	if (!file)
-		return EMAGE_ERROR_EXIST;
-	f = fopen(file, "rb");
-	if (!f)
-		return EMAGE_ERROR_EXIST;
 
 	memset(&cinfo, 0, sizeof(cinfo));
 	cinfo.err = jpeg_std_error(&(err.pub));
@@ -211,12 +251,11 @@ static Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *optio
 	if (setjmp(err.setjmp_buffer))
 	{
 		jpeg_destroy_decompress(&cinfo);
-		fclose(f);
 		return EMAGE_ERROR_ALLOCATOR;
 	}
 
 	jpeg_create_decompress(&cinfo);
-	jpeg_stdio_src(&cinfo, f);
+	_jpg_emage_src(&cinfo, data);
 	jpeg_read_header(&cinfo, TRUE);
 	cinfo.do_fancy_upsampling = FALSE;
 	cinfo.do_block_smoothing = FALSE;
@@ -244,27 +283,26 @@ static Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *optio
 	jpeg_calc_output_dimensions(&(cinfo));
 	jpeg_start_decompress(&cinfo);
 
-	enesim_buffer_data_get(buffer, &data);
+	enesim_buffer_data_get(buffer, &sw_data);
 	switch (cinfo.output_components)
 	{
 		case 4:
-		sdata = data.cmyk.plane0;
-		stride = data.cmyk.plane0_stride;
+		sdata = sw_data.cmyk.plane0;
+		stride = sw_data.cmyk.plane0_stride;
 		break;
 
 		case 3:
-		sdata = data.bgr888.plane0;
-		stride = data.bgr888.plane0_stride;
+		sdata = sw_data.bgr888.plane0;
+		stride = sw_data.bgr888.plane0_stride;
 		break;
 
 		case 1:
-		sdata = data.a8.plane0;
-		stride = data.a8.plane0_stride;
+		sdata = sw_data.a8.plane0;
+		stride = sw_data.a8.plane0_stride;
 		break;
 
 		default:
 		jpeg_destroy_decompress(&cinfo);
-		fclose(f);
 		return EMAGE_ERROR_FORMAT;
 	}
 
@@ -276,7 +314,6 @@ static Eina_Error _jpg_load(const char *file, Enesim_Buffer *buffer, void *optio
 		line += stride;
 	}
 	jpeg_destroy_decompress(&cinfo);
-	fclose(f);
 	return 0;
 }
 

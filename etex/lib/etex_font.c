@@ -75,7 +75,7 @@ static Eina_Bool _dump(const Eina_Hash *hash, const void *key, void *data, void 
 	char *path = fdata;
 
 	snprintf(fout, PATH_MAX, "%s/%c.png", path, c);
-	emage_save(fout, g->surface, NULL);
+	emage_file_save(fout, g->surface, NULL);
 	return EINA_TRUE;
 }
 #endif
