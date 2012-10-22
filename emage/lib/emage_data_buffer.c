@@ -43,9 +43,10 @@ static ssize_t _emage_data_buffer_write(void *data, void *buffer, size_t len)
 	return len;
 }
 
-static void * _emage_data_buffer_mmap(void *data)
+static void * _emage_data_buffer_mmap(void *data, size_t *size)
 {
 	Emage_Data_Buffer *thiz = data;
+	*size = thiz->len;
 	return thiz->buffer;
 }
 
@@ -67,6 +68,7 @@ static Emage_Data_Descriptor _emage_data_buffer_descriptor = {
 	/* .write	= */ _emage_data_buffer_write,
 	/* .mmap	= */ _emage_data_buffer_mmap,
 	/* .reset	= */ _emage_data_buffer_reset,
+	/* .location 	= */ NULL,
 	/* .free	= */ _emage_data_buffer_free,
 };
 /*============================================================================*

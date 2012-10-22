@@ -40,10 +40,10 @@ EAPI ssize_t emage_data_write(Emage_Data *thiz, void *buffer, size_t len)
 	return 0;
 }
 
-EAPI void * emage_data_mmap(Emage_Data *thiz)
+EAPI void * emage_data_mmap(Emage_Data *thiz, size_t *size)
 {
 	if (thiz->descriptor->mmap)
-		return thiz->descriptor->mmap(thiz->data);
+		return thiz->descriptor->mmap(thiz->data, size);
 	return NULL;
 }
 
@@ -51,6 +51,13 @@ EAPI void emage_data_reset(Emage_Data *thiz)
 {
 	if (thiz->descriptor->reset)
 		thiz->descriptor->reset(thiz->data);
+}
+
+EAPI char * emage_data_location(Emage_Data *thiz)
+{
+	if (thiz->descriptor->location)
+		return thiz->descriptor->location(thiz->data);
+	return NULL;
 }
 
 EAPI void emage_data_free(Emage_Data *thiz)

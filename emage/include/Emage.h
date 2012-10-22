@@ -63,8 +63,9 @@ EAPI void emage_dispatch(void);
  */
 typedef ssize_t (*Emage_Data_Read)(void *data, void *buffer, size_t len);
 typedef ssize_t (*Emage_Data_Write)(void *data, void *buffer, size_t len);
-typedef void * (*Emage_Data_Mmap)(void *data);
+typedef void * (*Emage_Data_Mmap)(void *data, size_t *size);
 typedef void (*Emage_Data_Reset)(void *data);
+typedef char * (*Emage_Data_Location)(void *data);
 typedef void (*Emage_Data_Free)(void *data);
 
 typedef struct _Emage_Data_Descriptor
@@ -73,6 +74,7 @@ typedef struct _Emage_Data_Descriptor
 	Emage_Data_Write write;
 	Emage_Data_Mmap mmap;
 	Emage_Data_Reset reset;
+	Emage_Data_Location location;
 	Emage_Data_Free free;
 } Emage_Data_Descriptor;
 
@@ -80,8 +82,9 @@ typedef struct _Emage_Data Emage_Data;
 EAPI Emage_Data * emage_data_new(Emage_Data_Descriptor *d, void *data);
 EAPI ssize_t emage_data_read(Emage_Data *thiz, void *buffer, size_t len);
 EAPI ssize_t emage_data_write(Emage_Data *thiz, void *buffer, size_t len);
-EAPI void * emage_data_mmap(Emage_Data *thiz);
+EAPI void * emage_data_mmap(Emage_Data *thiz, size_t *size);
 EAPI void emage_data_reset(Emage_Data *thiz);
+EAPI char * emage_data_location(Emage_Data *thiz);
 EAPI void emage_data_free(Emage_Data *thiz);
 
 EAPI Emage_Data * emage_data_file_new(const char *file, const char *mode);
