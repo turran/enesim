@@ -52,6 +52,7 @@ static Emage_Data_Descriptor _emage_data_base64_descriptor = {
 	/* .write	= */ NULL, /* not implemented yet */
 	/* .mmap	= */ NULL, /* impossible to do */
 	/* .reset	= */ _emage_data_base64_reset,
+	/* .length	= */ NULL, /* impossible to do */
 	/* .location	= */ _emage_data_base64_location,
 	/* .free	= */ _emage_data_base64_free,
 };

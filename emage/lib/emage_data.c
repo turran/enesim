@@ -53,6 +53,13 @@ EAPI void emage_data_reset(Emage_Data *thiz)
 		thiz->descriptor->reset(thiz->data);
 }
 
+EAPI size_t emage_data_length(Emage_Data *thiz)
+{
+	if (thiz->descriptor->length)
+		return thiz->descriptor->length(thiz->data);
+	return 0;
+}
+
 EAPI char * emage_data_location(Emage_Data *thiz)
 {
 	if (thiz->descriptor->location)

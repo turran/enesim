@@ -45,6 +45,15 @@ static void _emage_data_file_reset(void *data)
 	rewind(thiz->f);
 }
 
+static size_t _emage_data_file_length(void *data)
+{
+	Emage_Data_File *thiz = data;
+	struct stat st;
+
+	stat(thiz->location, &st);
+	return st.st_size;
+}
+
 static char * _emage_data_file_location(void *data)
 {
 	Emage_Data_File *thiz = data;
@@ -64,6 +73,7 @@ static Emage_Data_Descriptor _emage_data_file_descriptor = {
 	/* .write	= */ _emage_data_file_write,
 	/* .mmap	= */ NULL,
 	/* .reset	= */ _emage_data_file_reset,
+	/* .length	= */ _emage_data_file_length,
 	/* .location	= */ _emage_data_file_location,
 	/* .free	= */ _emage_data_file_free,
 };
