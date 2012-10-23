@@ -1,5 +1,6 @@
 #include "Emage.h"
 #include "emage_private.h"
+#include <ctype.h>
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -13,6 +14,26 @@ typedef struct _Emage_Data_Base64
 	char *curr;
 	char *end;
 } Emage_Data_Base64;
+
+static Eina_Bool _base64_decode_digit(unsigned char c, unsigned char *v)
+{
+	switch (c)
+	{
+		case '+': *v = 62;
+		break;
+
+		case '/': *v = 63;
+		break;
+
+		default:
+		if (isdigit(c)) *v = c - '0';
+		else if (islower(c)) *v = c - 'a' + 10;
+		else if (isupper(c)) *v = c - 'A' + 10 + 26;
+		else return EINA_FALSE;
+		break;
+	}
+	return EINA_TRUE;
+}
 
 static void _base64_decode_with_padding(int padding, unsigned char *in, unsigned char *out)
 {
