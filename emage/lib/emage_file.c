@@ -36,7 +36,7 @@ static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const 
 	ext = _emage_file_get_extension(file);
 	if (!ext) return EINA_FALSE;
 
-	d = emage_data_file_new(file, "rb");
+	d = emage_data_file_new(file, "w");
 	if (!d) return EINA_FALSE;
 
 	m = emage_mime_extension_from(ext);

@@ -105,13 +105,17 @@ static Emage_Provider * _save_provider_get(Emage_Data *data, const char *mime)
 	EINA_LIST_FOREACH (providers, l, p)
 	{
 		/* TODO priority savers */
+		return p;
+#if 0
 		/* check if the provider can save the image */
 		if (!p->saveable)
-			continue;
-#if 0
-		if (p->saveable(data) == EINA_TRUE)
-#endif
 			return p;
+		if (p->saveable(data) == EINA_TRUE)
+		{
+			emage_data_reset(data);
+			return p;
+		}
+#endif
 	}
 	return NULL;
 }
