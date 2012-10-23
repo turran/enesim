@@ -18,16 +18,48 @@ static void _emage_file_cb(Enesim_Surface *s, void *user_data, int error)
 	emage_data_free(fdata->data);
 }
 
-static Eina_Bool _file_data_get(const char *file, const char *mode,
-		Emage_Data **data, const char **mime)
+static const char * _emage_file_get_extension(const char *file)
+{
+	char *tmp;
+
+	tmp = strrchr(file, '.');
+	if (!tmp) return NULL;
+	return tmp + 1;
+}
+
+static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const char **mime)
+{
+	Emage_Data *d;
+	const char *m;
+	const char *ext;
+
+	ext = _emage_file_get_extension(file);
+	if (!ext) return EINA_FALSE;
+
+	d = emage_data_file_new(file, "rb");
+	if (!d) return EINA_FALSE;
+
+	m = emage_mime_extension_from(ext);
+	if (!m)
+	{
+		emage_data_free(d);
+		return EINA_FALSE;
+	}
+	*mime = m;
+	*data = d;
+
+	return EINA_TRUE;
+}
+
+static Eina_Bool _file_load_data_get(const char *file, Emage_Data **data, const char **mime)
 {
 	Emage_Data *d;
 	const char *m;
 
-	d = emage_data_file_new(file, mode);
+	d = emage_data_file_new(file, "rb");
 	if (!d) return EINA_FALSE;
 
-	m = emage_mime_get(d);
+	m = emage_mime_data_from(d);
 	if (!m)
 	{
 		emage_data_free(d);
@@ -38,16 +70,6 @@ static Eina_Bool _file_data_get(const char *file, const char *mode,
 	*data = d;
 
 	return EINA_TRUE;
-}
-
-static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const char **mime)
-{
-	return _file_data_get(file, "wb", data, mime);
-}
-
-static Eina_Bool _file_load_data_get(const char *file, Emage_Data **data, const char **mime)
-{
-	return _file_data_get(file, "rb", data, mime);
 }
 /*============================================================================*
  *                                   API                                      *

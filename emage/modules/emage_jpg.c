@@ -299,7 +299,7 @@ static Emage_Provider _provider = {
 	/* .save =		*/ NULL,
 };
 
-static const char * _jpg_find(Emage_Data *data)
+static const char * _jpg_data_from(Emage_Data *data)
 {
 	unsigned char buf[3];
 	int ret;
@@ -328,8 +328,16 @@ static const char * _jpg_find(Emage_Data *data)
 	return "image/jpg";
 }
 
+static const char * _jpg_extension_from(const char *ext)
+{
+	if (!strcmp(ext, "jpg"))
+		return "image/jpg";
+	return NULL;
+}
+
 static Emage_Finder _finder = {
-	/* .find = 		*/ _jpg_find,
+	/* .data_from 		= */ _jpg_data_from,
+	/* .extension_from 	= */ _jpg_extension_from,
 };
 
 /*============================================================================*

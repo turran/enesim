@@ -179,7 +179,8 @@ EAPI Eina_Bool emage_provider_save(Emage_Provider *thiz,
 
 typedef struct _Emage_Finder
 {
-	const char *(*find)(Emage_Data *data);
+	const char *(*data_from)(Emage_Data *data);
+	const char *(*extension_from)(const char *ext);
 } Emage_Finder;
 
 EAPI Eina_Bool emage_finder_register(Emage_Finder *f);
@@ -194,7 +195,8 @@ EAPI void emage_finder_unregister(Emage_Finder *f);
 typedef void (*Emage_Option_Cb)(void *data, const char *key, const char *value);
 EAPI void emage_options_parse(const char *options, Emage_Option_Cb cb, void *data);
 
-EAPI const char * emage_mime_get(Emage_Data *data);
+EAPI const char * emage_mime_data_from(Emage_Data *data);
+EAPI const char * emage_mime_extension_from(const char *ext);
 
 /**
  * @}

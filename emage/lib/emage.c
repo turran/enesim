@@ -463,7 +463,7 @@ err:
 /**
  *
  */
-EAPI const char * emage_mime_get(Emage_Data *data)
+EAPI const char * emage_mime_data_from(Emage_Data *data)
 {
 	Emage_Finder *f;
 	Eina_List *l;
@@ -472,7 +472,24 @@ EAPI const char * emage_mime_get(Emage_Data *data)
 	EINA_LIST_FOREACH(_finders, l, f)
 	{
 		emage_data_reset(data);
-		ret = f->find(data);
+		ret = f->data_from(data);
+		if (ret) break;
+	}
+	return ret;
+}
+
+/**
+ *
+ */
+EAPI const char * emage_mime_extension_from(const char *ext)
+{
+	Emage_Finder *f;
+	Eina_List *l;
+	const char *ret = NULL;
+
+	EINA_LIST_FOREACH(_finders, l, f)
+	{
+		ret = f->extension_from(ext);
 		if (ret) break;
 	}
 	return ret;
@@ -485,9 +502,14 @@ EAPI Eina_Bool emage_finder_register(Emage_Finder *f)
 {
 	if (!f) return EINA_FALSE;
 
-	if (!f->find)
+	if (!f->data_from)
 	{
-		WRN("Finder %p doesn't provide the 'find()' function", f);
+		WRN("Finder %p doesn't provide the 'data_from()' function", f);
+		return EINA_FALSE;
+	}
+	if (!f->extension_from)
+	{
+		WRN("Finder %p doesn't provide the 'extension_from()' function", f);
 		return EINA_FALSE;
 	}
 	_finders = eina_list_append(_finders, f);

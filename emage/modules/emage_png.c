@@ -340,7 +340,7 @@ static Emage_Provider _provider = {
 	/* .save = 		*/ _png_save,
 };
 
-static const char * _png_find(Emage_Data *data)
+static const char * _png_data_from(Emage_Data *data)
 {
 	unsigned char buf[PNG_BYTES_TO_CHECK];
 	int ret;
@@ -352,8 +352,16 @@ static const char * _png_find(Emage_Data *data)
 	return "image/png";
 }
 
+static const char * _png_extension_from(const char *ext)
+{
+	if (!strcmp(ext, "png"))
+		return "image/png";
+	return NULL;
+}
+
 static Emage_Finder _finder = {
-	/* .find = 		*/ _png_find,
+	/* .data_from 		= */ _png_data_from,
+	/* .extension_from	= */ _png_extension_from,
 };
 /*============================================================================*
  *                             Module API                                     *
