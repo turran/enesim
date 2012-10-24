@@ -30,6 +30,9 @@ static Eina_Bool _base64_decode_digit(unsigned char c, unsigned char *v)
 		case '/': *v = 63;
 		break;
 
+		case '=': *v = 0;
+		break;
+
 		default:
 		if (isdigit(c)) *v = c - '0' + 52;
 		else if (islower(c)) *v = c - 'a' + 26;
@@ -153,7 +156,6 @@ static ssize_t _emage_data_base64_read(void *data, void *buffer, size_t len)
 static void _emage_data_base64_reset(void *data)
 {
 	Emage_Data_Base64 *thiz = data;
-	printf("reset\n");
 	thiz->curr = thiz->buf;
 	thiz->last_offset = 0;
 }
@@ -195,7 +197,6 @@ EAPI Emage_Data * emage_data_base64_new(Emage_Data *d)
 	buf = emage_data_mmap(d, &size);
 	if (!buf) return NULL;
 
-	printf("size = %d\n", size);
 	thiz = calloc(1, sizeof(Emage_Data_Base64));
 	thiz->data = d;
 	thiz->buf = thiz->curr = buf;
