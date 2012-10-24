@@ -83,6 +83,7 @@ static void _png_write(png_structp png_ptr, png_bytep buf, png_size_t length)
 static void _png_flush(png_structp png_ptr)
 {
 	/* nothing to do here */
+	printf("flushing\n");
 }
 /*============================================================================*
  *                          Emage Provider API                                *
