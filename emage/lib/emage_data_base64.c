@@ -47,6 +47,10 @@ static void _base64_decode(unsigned char *in, unsigned char *out)
 	out[2] = (unsigned char)(((in[2] << 6) & 0xc0) | in[3]);
 }
 
+/* 4 bytes in base64 give 3 decoded bytes
+ * so the input must be multiple of 4
+ * and the output multiple of 3
+ */
 static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t len)
 {
 	int l = 0;
@@ -60,17 +64,12 @@ static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t 
 		{
 			if (!_base64_decode_digit(in[i], &dec[i]))
 				printf("error %c\n", in[i]);
-#if 1 
+#if 0 
 			printf("read %c %d\n", in[i], dec[i]);
 #endif
 		}
 
 		_base64_decode(dec, out);
-#if 0
-		printf("decoding %d %d %d %d -> %d %d %d\n",
-			in[0], in[1], in[2], in[3],
-			((char *)buffer)[0], ((char *)buffer)[1], ((char *)buffer)[2]);
-#endif
 		/* increment the source */
 		in += 4;
 		l += 4;
@@ -87,15 +86,12 @@ static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t 
 static ssize_t _emage_data_base64_read(void *data, void *buffer, size_t len)
 {
 	Emage_Data_Base64 *thiz = data;
-	/* 4 bytes in base64 give 3 decoded bytes */
-	unsigned char in[4];
 	int extra = 0;
 	int enclen;
 	int declen;
 	int rest;
-	char *b = buffer;
+	unsigned char *b = buffer;
 
-	printf("reading %ld decoded bytes\n", len);
 	/* first read the missing bytes from the previous read */
 	if (thiz->last_offset)
 	{
@@ -104,38 +100,39 @@ static ssize_t _emage_data_base64_read(void *data, void *buffer, size_t len)
 
 		offset = thiz->last_offset;
 		extra = 3 - offset;
- 		printf("with %d offset %d extra\n", offset, extra);
 		if (len < extra)
 		{
 			extra = len;
 		}
 		for (i = offset; i < offset + extra; i++)
 		{
-			printf("prev\n");
 			*b++ = thiz->last[i];
 			len--;
 		}
 		thiz->last_offset += extra;
 	}
-	printf("len = %d\n", len);
 	/* how many encoded blocks we need to read */
  	enclen = ((len + 2) / 3) * 4;
 	if (thiz->curr + enclen > thiz->end)
 	{
-		printf("clamping\n");
+		/* if we pass the inner data, we need to adapt
+		 * to the new sizes
+		 */
 		enclen = thiz->end - thiz->curr;
 		len = (enclen / 4) * 3;
 	}
 	declen = len;
 	rest = (declen % 3);
-	printf("real len %d %d\n", enclen, len);
+	/* check if we need to not read complete, if so
+	 * only read all the data that fits on the buffer
+	 * padded to 3 bytes
+	 */
 	if (rest)
 	{
 		declen -= rest;
 		enclen -= 4;
 	}
-	printf("declen = %d\n", declen);
-	_base64_decode_stream(thiz->curr, b, enclen);
+	_base64_decode_stream((unsigned char *)thiz->curr, b, enclen);
 	b += declen;
 	thiz->curr += enclen;
 
@@ -143,17 +140,13 @@ static ssize_t _emage_data_base64_read(void *data, void *buffer, size_t len)
 	{
 		int i;
 
-		printf("rest %d\n", rest);
-		_base64_decode_stream(thiz->curr, thiz->last, 4);
+		_base64_decode_stream((unsigned char *)thiz->curr, thiz->last, 4);
 		for (i = 0; i < rest; i++)
 			*b++ = thiz->last[i];
 		thiz->last_offset = rest;
 		thiz->curr += 4;
 		declen += rest;
 	}
-	printf("read %d (%d) of %d\n", declen + extra, declen, len);
-	printf("%08x %08x\n", *(uint32_t *)buffer, *((uint32_t *)buffer + 1));
-done:
 	return declen + extra;
 }
 

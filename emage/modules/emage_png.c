@@ -56,6 +56,14 @@ static Eina_Bool _png_format_get(int color_type, Enesim_Buffer_Format *fmt)
 		*fmt = ENESIM_BUFFER_FORMAT_A8;
 		break;
 
+		case PNG_COLOR_TYPE_PALETTE:
+		ERR("PNG_COLOR_TYPE_PALETTE not supported");
+		return EINA_FALSE;
+
+		case PNG_COLOR_TYPE_GRAY_ALPHA:
+		ERR("PNG_COLOR_TYPE_GRAY_ALPHA not supported");
+		return EINA_FALSE;
+
 		default:
 		return EINA_FALSE;
 	}
@@ -83,7 +91,6 @@ static void _png_write(png_structp png_ptr, png_bytep buf, png_size_t length)
 static void _png_flush(png_structp png_ptr)
 {
 	/* nothing to do here */
-	printf("flushing\n");
 }
 /*============================================================================*
  *                          Emage Provider API                                *
@@ -104,12 +111,11 @@ static Eina_Bool _png_saveable(const char *file)
 
 static Eina_Error _png_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
-	int bit_depth, color_type, interlace_type;
-	char hasa, hasg;
-
 	png_uint_32 w32, h32;
 	png_structp png_ptr = NULL;
 	png_infop info_ptr = NULL;
+	int bit_depth, color_type, interlace_type;
+	char hasa, hasg;
 
 	hasa = 0;
 	hasg = 0;
@@ -137,7 +143,10 @@ static Eina_Error _png_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer
 		goto error_jmp;
 
 	if (!_png_format_get(color_type, sfmt))
+	{
+		ERR("_png_format_get() failed for color %d", color_type);
 		goto error_jmp;
+	}
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 	return 0;
@@ -189,7 +198,10 @@ static Eina_Error _png_load(Emage_Data *data, Enesim_Buffer *buffer, void *optio
 			&interlace_type, NULL, NULL);
 
 	if (!_png_format_get(color_type, &fmt))
+	{
+		ERR("_png_format_get() failed for color %d", color_type);
 		goto error_jmp;
+	}
 
 	if (color_type == PNG_COLOR_TYPE_PALETTE)
 		png_set_expand(png_ptr);
@@ -244,7 +256,6 @@ static Eina_Error _png_load(Emage_Data *data, Enesim_Buffer *buffer, void *optio
 	png_read_end(png_ptr, info_ptr);
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-
 	return 0;
 
 error_jmp:
