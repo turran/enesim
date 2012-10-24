@@ -139,12 +139,12 @@ EAPI int enesim_shutdown(void)
 /**
  * @brief Retrieve the Enesim version.
  *
- * @param major The major version number.
- * @param minor The minor version number.
- * @param micro The micro version number.
+ * @param[out] major The major version number.
+ * @param[out] minor The minor version number.
+ * @param[out] micro The micro version number.
  *
  * This function returns the Enesim version in @p major, @p minor and
- * @p micro. These pointers can be NULL.
+ * @p micro. These buffers can be NULL.
  */
 EAPI void enesim_version_get(unsigned int *major, unsigned int *minor, unsigned int *micro)
 {
@@ -156,10 +156,10 @@ EAPI void enesim_version_get(unsigned int *major, unsigned int *minor, unsigned 
 /**
  * @brief Get the string based name of a format.
  *
- * @param f The format to get the name from.
+ * @param[in] f The format to get the name from.
  * @return The name of the format.
  *
- * This function returns a string associated to the format @f, for
+ * This function returns a string associated to the format @p f, for
  * convenience display of the format. If @p f is not a valid format or
  * an unsupported one, @c NULL is returned.
  */
@@ -188,9 +188,9 @@ EAPI const char * enesim_format_name_get(Enesim_Format f)
 /**
  * @brief Get the total size of bytes for a given a format and a size.
  *
- * @param f The format.
- * @param w The width.
- * @param h The height.
+ * @param[in] f The format.
+ * @param[in] w The width.
+ * @param[in] h The height.
  * @return The size in byte of a bitmap.
  *
  * This function returns the size in byte of a bitmap of format @p f,
@@ -218,12 +218,12 @@ EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h)
 /**
  * @brief Return the pitch for a given format and width.
  *
- * @param f The format.
- * @param w The width.
+ * @param[in] fmt The format.
+ * @param[in] w The width.
  * @return The pitch in byte.
  *
- * This function returns the pitch in byte of a bitmap of format @p f and
- * width @p w. If the format is not valid or is not supported, 0 is
+ * This function returns the pitch in byte of a bitmap of format @p fmt
+ * and width @p w. If the format is not valid or is not supported, 0 is
  * returned.
  *
  * @note This function calls enesim_format_size_get() with 1 as height.

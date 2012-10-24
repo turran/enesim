@@ -1550,8 +1550,12 @@ static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
  *                                   API                                      *
  *============================================================================*/
 /**
- * Creates a new rectangle renderer
- * @return The new renderer
+ * @brief Create a new rectangle renderer.
+ *
+ * @return A new rectangle renderer.
+ *
+ * This function returns a newly allocated rectangle renderer. On memory
+ * error, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 {
@@ -1566,10 +1570,15 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 	enesim_renderer_shape_stroke_location_set(r, ENESIM_SHAPE_STROKE_INSIDE);
 	return r;
 }
+
 /**
- * Sets the width of the rectangle
- * @param[in] r The rectangle renderer
- * @param[in] width The rectangle width
+ * @brief Set the width of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] width The rectangle width.
+ *
+ * This function sets the width of the rectangle renderer @p r to the
+ * value @p width.
  */
 EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double width)
 {
@@ -1579,22 +1588,32 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double width)
 	thiz->current.width = width;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the width of the rectangle
- * @param[in] r The rectangle renderer
- * @param[out] w The rectangle width
+ * @brief Retrieve the width of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[out] width The rectangle width.
+ *
+ * This function stores the width of the rectangle renderer @p r in
+ * the buffer @p width.
  */
 EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *width)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (width) *width = thiz->current.width;
+	*width = thiz->current.width;
 }
+
 /**
- * Sets the height of the rectangle
- * @param[in] r The rectangle renderer
- * @param[in] height The rectangle height
+ * @brief Set the height of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] height The rectangle height.
+ *
+ * This function sets the height of the rectangle renderer @p r to the
+ * value @p height.
  */
 EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double height)
 {
@@ -1604,23 +1623,32 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double height
 	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the height of the rectangle
- * @param[in] r The rectangle renderer
- * @param[out] height The rectangle height
+ * @brief Retrieve the height of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[out] height The rectangle height.
+ *
+ * This function stores the height of the rectangle renderer @p r in
+ * the buffer @p height.
  */
 EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, double *height)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (height) *height = thiz->current.height;
+	*height = thiz->current.height;
 }
 
 /**
- * Sets the x of the rectangle
- * @param[in] r The rectangle renderer
- * @param[in] x The rectangle x coordinate
+ * @brief Set the top left X coordinate of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] x The top left X coordinate.
+ *
+ * This function sets the top left X coordinate of the rectangle
+ * renderer @p r to the value @p x.
  */
 EAPI void enesim_renderer_rectangle_x_set(Enesim_Renderer *r, double x)
 {
@@ -1630,22 +1658,32 @@ EAPI void enesim_renderer_rectangle_x_set(Enesim_Renderer *r, double x)
 	thiz->current.x = x;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the x of the rectangle
- * @param[in] r The rectangle renderer
- * @param[out] w The rectangle x coordinate
+ * @brief Retrieve the top left X coordinate of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[out] x The top left X coordinate.
+ *
+ * This function stores the top left X coordinate of the rectangle
+ * renderer @p r in the buffer @p x.
  */
 EAPI void enesim_renderer_rectangle_x_get(Enesim_Renderer *r, double *x)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (x) *x = thiz->current.x;
+	*x = thiz->current.x;
 }
+
 /**
- * Sets the y of the rectangle
- * @param[in] r The rectangle renderer
- * @param[in] y The rectangle y coordinate
+ * @brief Set the top left Y coordinate of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left Y coordinate of the rectangle
+ * renderer @p r to the value @p y.
  */
 EAPI void enesim_renderer_rectangle_y_set(Enesim_Renderer *r, double y)
 {
@@ -1655,22 +1693,33 @@ EAPI void enesim_renderer_rectangle_y_set(Enesim_Renderer *r, double y)
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the y of the rectangle
- * @param[in] r The rectangle renderer
- * @param[out] y The rectangle y coordinate
+ * @brief Retrieve the top left Y coordinate of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[out] y The top left Y coordinate.
+ *
+ * This function stores the top left Y coordinate of the rectangle
+ * renderer @p r in the buffer @p y.
  */
 EAPI void enesim_renderer_rectangle_y_get(Enesim_Renderer *r, double *y)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (y) *y = thiz->current.y;
+	*y = thiz->current.y;
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the top left coordinates of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] x The top left X coordinate.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left coordinates of the rectangle
+ * renderer @p r to the values @p x and @p y.
  */
 EAPI void enesim_renderer_rectangle_position_set(Enesim_Renderer *r, double x, double y)
 {
@@ -1680,9 +1729,17 @@ EAPI void enesim_renderer_rectangle_position_set(Enesim_Renderer *r, double x, d
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Retrieve the top left coordinates of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[out] x The top left X coordinate.
+ * @param[out] y The top left Y coordinate.
+ *
+ * This function stores the top left coordinates value of the
+ * rectangle renderer @p r in the buffers @p x and @p y. These buffers
+ * can be @c NULL.
  */
 EAPI void enesim_renderer_rectangle_position_get(Enesim_Renderer *r, double *x, double *y)
 {
@@ -1694,8 +1751,14 @@ EAPI void enesim_renderer_rectangle_position_get(Enesim_Renderer *r, double *x, 
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the size of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] width The width.
+ * @param[in] height The height.
+ *
+ * This function sets the size of the rectangle renderer @p r to the
+ * values @p width and @p height.
  */
 EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double width, double height)
 {
@@ -1705,9 +1768,16 @@ EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double width, d
 	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Retrieve the size of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[out] width The width.
+ * @param[out] height The height.
+ *
+ * This function stores the size of the rectangle renderer @p r in the
+ * buffers @p width and @p height. These buffers can be @c NULL.
  */
 EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *width, double *height)
 {
@@ -1717,9 +1787,15 @@ EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *width, 
 	if (width) *width = thiz->current.width;
 	if (height) *height = thiz->current.height;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the radius of the corners of a rectangle renderer.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] radius The corners radius.
+ *
+ * This function sets the radius of the corners of the rectangle
+ * renderer @p r to the value @p radius.
  */
 EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *r, double radius)
 {
@@ -1735,8 +1811,14 @@ EAPI void enesim_renderer_rectangle_corner_radius_set(Enesim_Renderer *r, double
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set whether the top left corner of a rectangle renderer is rounded.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] rounded Whether the top left corner is rounded.
+ *
+ * This function sets the top left corner of the rectangle renderer
+ * @p r to rounded if @p rounded is EINA_TRUE, not rounded if it is
+ * EINA_FALSE.
  */
 EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
@@ -1748,8 +1830,14 @@ EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set whether the top right corner of a rectangle renderer is rounded.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] rounded Whether the top right corner is rounded.
+ *
+ * This function sets the top right corner of the rectangle renderer
+ * @p r to rounded if @p rounded is EINA_TRUE, not rounded if it is
+ * EINA_FALSE.
  */
 EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
@@ -1761,8 +1849,14 @@ EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Ein
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set whether the bottom left corner of a rectangle renderer is rounded.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] rounded Whether the bottom left corner is rounded.
+ *
+ * This function sets the bottom left corner of the rectangle renderer
+ * @p r to rounded if @p rounded is EINA_TRUE, not rounded if it is
+ * EINA_FALSE.
  */
 EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
@@ -1774,8 +1868,14 @@ EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, E
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set whether the bottom right corner of a rectangle renderer is rounded.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] rounded Whether the bottom right corner is rounded.
+ *
+ * This function sets the bottom right corner of the rectangle renderer
+ * @p r to rounded if @p rounded is EINA_TRUE, not rounded if it is
+ * EINA_FALSE.
  */
 EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, Eina_Bool rounded)
 {
@@ -1787,8 +1887,18 @@ EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, 
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set whether the corners of a rectangle renderer are rounded.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[in] tl Whether the top left corner is rounded.
+ * @param[in] tr Whether the top right corner is rounded.
+ * @param[in] bl Whether the bottom left corner is rounded.
+ * @param[in] br Whether the bottom right corner is rounded.
+ *
+ * This function sets the corners of the rectangle renderer
+ * @p r to rounded if @p rounded is EINA_TRUE, not rounded if it is
+ * EINA_FALSE. @p tl, @p tr, @p bl, @p br are respectively for top
+ * left, top right, bottom left and bottom right corners.
  */
 EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *r,
 		Eina_Bool tl, Eina_Bool tr, Eina_Bool bl, Eina_Bool br)

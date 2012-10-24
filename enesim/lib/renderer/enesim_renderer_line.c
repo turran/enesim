@@ -573,8 +573,12 @@ static Enesim_Renderer_Shape_Descriptor _line_descriptor = {
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Create a new line renderer.
+ *
+ * @return A new line renderer.
+ *
+ * This function returns a newly allocated line renderer. On memory
+ * error, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 {
@@ -597,6 +601,15 @@ EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 	return r;
 }
 
+/**
+ * @brief Set the X coordinate of the first point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[in] x0 The X coordinate.
+ *
+ * This function sets the X coordinate of the first point of the line
+ * renderer @p r to the value @p x0.
+ */
 EAPI void enesim_renderer_line_x0_set(Enesim_Renderer *r, double x0)
 {
 	Enesim_Renderer_Line *thiz;
@@ -607,6 +620,15 @@ EAPI void enesim_renderer_line_x0_set(Enesim_Renderer *r, double x0)
 	thiz->generated = EINA_FALSE;
 }
 
+/**
+ * @brief Retrieve the X coordinate of the first point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[out] x0 The X coordinate.
+ *
+ * This function stores the X coordinate value of the first point of
+ * the line renderer @p r in the buffer @p x0.
+ */
 EAPI void enesim_renderer_line_x0_get(Enesim_Renderer *r, double *x0)
 {
 	Enesim_Renderer_Line *thiz;
@@ -615,7 +637,15 @@ EAPI void enesim_renderer_line_x0_get(Enesim_Renderer *r, double *x0)
 	*x0 = thiz->current.x0;
 }
 
-
+/**
+ * @brief Set the Y coordinate of the first point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[in] y0 The Y coordinate.
+ *
+ * This function sets the Y coordinate of the first point of the line
+ * renderer @p r to the value @p y0.
+ */
 EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0)
 {
 	Enesim_Renderer_Line *thiz;
@@ -626,6 +656,15 @@ EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0)
 	thiz->generated = EINA_FALSE;
 }
 
+/**
+ * @brief Retrieve the Y coordinate of the first point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[out] y0 The Y coordinate.
+ *
+ * This function stores the Y coordinate value of the first point of
+ * the line renderer @p r in the buffer @p y0.
+ */
 EAPI void enesim_renderer_line_y0_get(Enesim_Renderer *r, double *y0)
 {
 	Enesim_Renderer_Line *thiz;
@@ -634,6 +673,15 @@ EAPI void enesim_renderer_line_y0_get(Enesim_Renderer *r, double *y0)
 	*y0 = thiz->current.y0;
 }
 
+/**
+ * @brief Set the X coordinate of the second point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[in] x1 The X coordinate.
+ *
+ * This function sets the X coordinate of the second point of the line
+ * renderer @p r to the value @p x1.
+ */
 EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1)
 {
 	Enesim_Renderer_Line *thiz;
@@ -644,6 +692,15 @@ EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1)
 	thiz->generated = EINA_FALSE;
 }
 
+/**
+ * @brief Retrieve the X coordinate of the second point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[out] x1 The X coordinate.
+ *
+ * This function stores the X coordinate value of the second point of
+ * the line renderer @p r in the buffer @p x1.
+ */
 EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1)
 {
 	Enesim_Renderer_Line *thiz;
@@ -652,6 +709,15 @@ EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1)
 	*x1 = thiz->current.x1;
 }
 
+/**
+ * @brief Set the Y coordinate of the second point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[in] y1 The Y coordinate.
+ *
+ * This function sets the Y coordinate of the second point of the line
+ * renderer @p r to the value @p y1.
+ */
 EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
 {
 	Enesim_Renderer_Line *thiz;
@@ -662,6 +728,15 @@ EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
 	thiz->generated = EINA_FALSE;
 }
 
+/**
+ * @brief Retrieve the Y coordinate of the second point of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[out] y1 The Y coordinate.
+ *
+ * This function stores the Y coordinate value of the second point of
+ * the line renderer @p r in the buffer @p y1.
+ */
 EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
 {
 	Enesim_Renderer_Line *thiz;
@@ -670,6 +745,18 @@ EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
 	*y1 = thiz->current.y1;
 }
 
+/**
+ * @brief Set the coordinates of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[in] x0 The X coordinate of the first point.
+ * @param[in] y0 The Y coordinate of the first point.
+ * @param[in] x1 The X coordinate of the second point.
+ * @param[in] y1 The Y coordinate of the second point.
+ *
+ * This function sets the coordinates of the points of the line
+ * renderer @p r to the values @p x0, @p y0, @p x1 and @p y1.
+ */
 EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double y0, double x1, double y1)
 {
 	Enesim_Renderer_Line *thiz;
@@ -683,6 +770,19 @@ EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double 
 	thiz->generated = EINA_FALSE;
 }
 
+/**
+ * @brief Retrieve the coordinates of a line renderer.
+ *
+ * @param[in] r The line renderer.
+ * @param[out] x0 The X coordinate of the first point.
+ * @param[out] y0 The Y coordinate of the first point.
+ * @param[out] x1 The X coordinate of the second point.
+ * @param[out] y1 The Y coordinate of the second point.
+ *
+ * This function stores the coordinates value of the points of
+ * the line renderer @p r in the buffers @p x0, @p y0, @p x1 and @p
+ * y1. These buffers can be @c NULL.
+ */
 EAPI void enesim_renderer_line_coords_get(Enesim_Renderer *r, double *x0, double *y0, double *x1, double *y1)
 {
 	Enesim_Renderer_Line *thiz;

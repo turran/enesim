@@ -1235,8 +1235,12 @@ static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Create a new ellipse renderer.
+ *
+ * @return A new ellipse renderer.
+ *
+ * This function returns a newly allocated ellipse renderer. On memory
+ * error, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 {
@@ -1252,8 +1256,14 @@ EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 	return r;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the coordinates of the center of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] x The X coordinate of the center.
+ * @param[in] y The Y coordinate of the center.
+ *
+ * This function sets the coordinates of the center of the ellipse
+ * renderer @p r to the values @p x and @p y.
  */
 EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *r, double x, double y)
 {
@@ -1268,8 +1278,15 @@ EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *r, double x, doubl
 	thiz->changed = EINA_TRUE;
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Retrieve the coordinates of the center of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[out] x The X coordinate of the center.
+ * @param[out] y The Y coordinate of the center.
+ *
+ * This function stores the coordinates value of the center of
+ * the ellipse renderer @p r in the buffers @p x and @p y. These buffers
+ * can be @c NULL.
  */
 EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *r, double *x, double *y)
 {
@@ -1281,8 +1298,14 @@ EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *r, double *x, doub
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the radii of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] radius_x The radius along the X axis.
+ * @param[in] radius_y The radius along the Y axis.
+ *
+ * This function sets the radii of the ellipse renderer @p r to the
+ * values @p radius_x along the X axis and @p radius_y along the Y axis.
  */
 EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *r, double radius_x, double radius_y)
 {
@@ -1302,8 +1325,15 @@ EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *r, double radius_x,
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Retrieve the radii of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[out] radius_x The radius along the X axis.
+ * @param[out] radius_y The radius along the Y axis.
+ *
+ * This function stores the radiis of the ellipse renderer @p r in the
+ * buffers @p radius_x for the radius along the X axis and @p radius_y
+ * for the radius along the Y axis. These buffers can be @c NULL.
  */
 EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *r, double *radius_x, double *radius_y)
 {
@@ -1315,8 +1345,13 @@ EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *r, double *radius_x
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the X coordinate of the center of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] x The X coordinate.
+ *
+ * This function sets the X coordinate of the center of the ellipse
+ * renderer @p r to the value @p x.
  */
 EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
 {
@@ -1327,8 +1362,13 @@ EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the Y coordinate of the center of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] y The Y coordinate.
+ *
+ * This function sets the Y coordinate of the center of the ellipse
+ * renderer @p r to the value @p y.
  */
 EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
 {
@@ -1339,8 +1379,13 @@ EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the radius along the X axis of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] rx The radius along the X axis.
+ *
+ * This function sets the radius along the X axis of the ellipse
+ * renderer @p r to the value @p rx.
  */
 EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *r, double rx)
 {
@@ -1351,8 +1396,13 @@ EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *r, double rx)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the radius along the Y axis of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] ry The radius along the Y axis.
+ *
+ * This function sets the radius along the Y axis of the ellipse
+ * renderer @p r to the value @p ry.
  */
 EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *r, double ry)
 {
@@ -1361,4 +1411,3 @@ EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *r, double ry)
 	thiz->current.ry = ry;
 	thiz->changed = EINA_TRUE;
 }
-

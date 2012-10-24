@@ -779,8 +779,12 @@ static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Create a new circle renderer.
+ *
+ * @return A new circle renderer.
+ *
+ * This function returns a newly allocated circle renderer. On memory
+ * error, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 {
@@ -797,8 +801,13 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the X coordinate of the center of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @param[in] x The X coordinate.
+ *
+ * This function sets the X coordinate of the center of the circle
+ * renderer @p r to the value @p x.
  */
 EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
 {
@@ -810,8 +819,13 @@ EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the Y coordinate of the center of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @param[in] y The Y coordinate.
+ *
+ * This function sets the Y coordinate of the center of the circle
+ * renderer @p r to the value @p y.
  */
 EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
 {
@@ -823,8 +837,14 @@ EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the coordinates of the center of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @param[in] x The X coordinate of the center.
+ * @param[in] y The Y coordinate of the center.
+ *
+ * This function sets the coordinates of the center of the circle
+ * renderer @p r to the values @p x and @p y.
  */
 EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double y)
 {
@@ -835,9 +855,17 @@ EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Retrieve the coordinates of the center of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @param[out] x The X coordinate of the center.
+ * @param[out] y The Y coordinate of the center.
+ *
+ * This function stores the coordinates value of the center of
+ * the circle renderer @p r in the buffers @p x and @p y. These buffers
+ * can be @c NULL.
  */
 EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, double *y)
 {
@@ -847,9 +875,15 @@ EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, doubl
 	if (x) *x = thiz->current.x;
 	if (y) *y = thiz->current.y;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the radius of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @param[in] radius The radius.
+ *
+ * This function sets the radius of the circle renderer @p r to the
+ * value @p radius.
  */
 EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
 {
@@ -863,13 +897,18 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Retrieve the radius of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @param[out] radius The radius.
+ *
+ * This function stores the radius of the circle renderer @p r in the
+ * buffer @p radius.
  */
 EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius)
 {
 	Enesim_Renderer_Circle *thiz;
 
 	thiz = _circle_get(r);
-	if (radius) *radius = thiz->current.r;
+	*radius = thiz->current.r;
 }
