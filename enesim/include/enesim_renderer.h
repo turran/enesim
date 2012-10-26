@@ -131,6 +131,7 @@ typedef enum _Enesim_Renderer_States
 
 typedef struct _Enesim_Renderer_State
 {
+	Eina_Bool visibility;
 	Enesim_Rop rop;
 	Enesim_Color color;
 	Enesim_Quality quality;

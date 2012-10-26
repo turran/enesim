@@ -1,7 +1,6 @@
 Enesim
 ======
 + Add log levels on every subsystem
-+ Add an eina allocator that uses posix_memalign
 + We should add a way to get the backend data from a renderer or surface. This is useful for
   cases like the glx example where we need a way to render the texture inside a surface into
   the final framebuffer. Another useful case might be on the future for a new way to define
@@ -41,44 +40,10 @@ Enesim
   request the damages. If no damages, then no change, etc. Or implement the changed as a call to damages
   with a simple callback that whenever a some damage area is returned then we should just abort and return
   true
-+ Later we'll need some kind of locking on the surface
 
 Emage
 =====
 + Make the load/save functions receive the Emage_Data (the data abstraction: file, buffer, whatever)
-+ Right now we support loading/saving files by doing
-  emage_load(file, surface, options)
-  and the providers have this interface:
-
-typedef struct _Emage_Provider
-{
-	const char *name;
-	Emage_Provider_Type type;
-	void * (*options_parse)(const char *options);
-	void (*options_free)(void *options);
-	/* TODO also pass the backend, pool and desired format? */
-	Eina_Bool (*loadable)(const char *file);
-	Eina_Bool (*saveable)(const char *file);
-	Eina_Error (*info_get)(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options);
-	Eina_Error (*load)(const char *file, Enesim_Buffer *b, void *options);
-	Eina_Bool (*save)(const char *file, Enesim_Surface *s, void *options);
-} Emage_Provider;
-
-That means that when we load a file, the path is actually passed to the providers as is and it decides
-if the file is loadable (usually by getting the extension of the path and returning TRUE/FALSE)
-Then the info is loaded and finally the real load. What we need to do is to abstract all the IO and just
-normalize the way providers fetch the data. Currently it means three fopen, fread, etc. What we can do is
-that the IO is abstracted on emage itself i.e:
-
-emage_load(file, surface, options)
-emage_load_data_from(data, data_length, mimetype, surface, options)
-emage_load_base64_from(base64_data, data_length, mimetype, surface, options)
-emage_load_foo_from(foo ....)
-
-Then the providers api should actually be as a first parameter pass the data instead of the file path
-Then the emage core lib should have a way to match a extension to a mime type and also change the loadable to receive
-the mimetype instead of the file. Maybe later add more specific api functions on the provider to detect the file
-i.e a type finder based on some data, like the magic number on the raw data
 
 Etex
 ====

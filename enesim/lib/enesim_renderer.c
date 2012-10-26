@@ -210,6 +210,11 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 
 static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 {
+	/* the visibility */
+	if (r->current.visibility != r->past.visibility)
+	{
+		return EINA_TRUE;
+	}
 	/* the rop */
 	if (r->current.rop != r->past.rop)
 	{
@@ -396,6 +401,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	/* now initialize the renderer common properties */
 	EINA_MAGIC_SET(r, ENESIM_MAGIC_RENDERER);
 	/* common properties */
+	r->current.visibility = r->past.visibility = EINA_TRUE;
 	r->current.ox = r->past.ox = 0;
 	r->current.oy = r->past.oy = 0;
 	r->current.sx = r->past.sx = 1;
@@ -828,6 +834,24 @@ EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (color) *color = r->current.color;
+}
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->current.visibility = visible;
+}
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visible)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (visible) *visible = r->current.visibility;
 }
 
 /**
