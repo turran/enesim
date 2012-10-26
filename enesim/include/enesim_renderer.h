@@ -82,6 +82,8 @@ EAPI void enesim_renderer_x_scale_set(Enesim_Renderer *r, double x);
 EAPI void enesim_renderer_x_scale_get(Enesim_Renderer *r, double *x);
 EAPI void enesim_renderer_y_scale_set(Enesim_Renderer *r, double y);
 EAPI void enesim_renderer_y_scale_get(Enesim_Renderer *r, double *y);
+EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visibility);
+EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visibility);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
 EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
