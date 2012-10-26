@@ -124,9 +124,6 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 	{
 		Eina_Bool visible;
 
-		enesim_renderer_visibility_get(l->r, &visible);
-		if (!visible) continue;
-
 		/* the position and the matrix */
 		if (thiz->pre_cb)
 		{
@@ -154,6 +151,10 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 				continue;
 			}
 		}
+
+		enesim_renderer_visibility_get(l->r, &visible);
+		if (!visible) continue;
+
 		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
 		thiz->visible_layers = eina_list_append(thiz->visible_layers, l);
 	}
@@ -169,10 +170,6 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 	/* cleanup every layer */
 	EINA_LIST_FOREACH(thiz->layers, ll, layer)
 	{
-		Eina_Bool visible;
-
-		enesim_renderer_visibility_get(layer->r, &visible);
-		if (!visible) continue;
 		enesim_renderer_cleanup(layer->r, s);
 	}
 	/* free the visible layers list */
