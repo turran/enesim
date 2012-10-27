@@ -94,6 +94,28 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static Eina_Bool _compound_common_changed(Enesim_Renderer_Compound *thiz,
+		const Enesim_Renderer_State *current,
+		const Enesim_Renderer_State *past)
+{
+	/* the visibility */
+	if (current->visibility != past->visibility)
+	{
+		return EINA_TRUE;
+	}
+	/* the rop */
+	if (current->rop != past->rop)
+	{
+		return EINA_TRUE;
+	}
+	/* the color */
+	if (current->color != past->color)
+	{
+		return EINA_TRUE;
+	}
+	return EINA_FALSE;
+}
+
 static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 		Layer *l)
 {
@@ -545,14 +567,29 @@ static void _compound_damage(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
+	Eina_Bool common_changed;
 	Layer *l;
 
 	thiz = _compound_get(r);
+	common_changed = _compound_common_changed(thiz, states[ENESIM_STATE_CURRENT],
+		states[ENESIM_STATE_PAST]);
+	/* given that we do support the visibility, color, rop, we need to take into
+	 * account such change
+	 */
+	if (common_changed)
+	{
+		Eina_Rectangle current_boundings;
+
+		enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
+		cb(r, old_boundings, EINA_TRUE, data);
+		cb(r, &current_boundings, EINA_FALSE, data);
+		return;
+	}
 	/* if some layer has been added or removed after the last draw
 	 * we need to inform of those areas even if those have damages
 	 * or not
 	 */
-	if (thiz->changed)
+	else if (thiz->changed)
 	{
 		EINA_LIST_FOREACH(thiz->removed, ll, l)
 		{
@@ -566,7 +603,6 @@ static void _compound_damage(Enesim_Renderer *r,
 			cb(l->r, &db, EINA_FALSE, data);
 		}
 	}
-
 	/* now for every layer send the damage */
 	EINA_LIST_FOREACH(thiz->layers, ll, l)
 	{

@@ -218,8 +218,20 @@ static void _proxy_damage(Enesim_Renderer *r,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Proxy *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_State *ps = states[ENESIM_STATE_CURRENT];
 
 	thiz = _proxy_get(r);
+	/* we need to take care of the visibility */
+	if (cs->visibility != ps->visibility)
+	{
+		Eina_Rectangle current_boundings;
+
+		enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
+		cb(r, old_boundings, EINA_TRUE, data);
+		cb(r, &current_boundings, EINA_FALSE, data);
+		return;
+	}
 	if (!thiz->proxied)
 		return;
 	enesim_renderer_damages_get(thiz->proxied,
