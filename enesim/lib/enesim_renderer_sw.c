@@ -363,6 +363,8 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	size_t stride;
 	size_t bpp;
 
+	if (!r->current.visibility) return;
+
 	_sw_surface_setup(s, &dfmt, (void **)&ddata, &stride, &bpp);
 	ddata = ddata + (area->y * stride) + (area->x * bpp);
 
@@ -478,6 +480,7 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 	unsigned int left;
 	unsigned int right;
 
+	if (!r->current.visibility) return;
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
 	eina_rectangle_coords_from(&span, x, y, len, 1);

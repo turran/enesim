@@ -89,6 +89,11 @@ static inline Enesim_Renderer_Shape * _shape_get(Enesim_Renderer *r)
 static inline Eina_Bool _common_changed(const Enesim_Renderer_State *current,
 		const Enesim_Renderer_State *past)
 {
+	/* the visibility */
+	if (current->visibility != past->visibility)
+	{
+		return EINA_TRUE;
+	}
 	/* the rop */
 	if (current->rop != past->rop)
 	{

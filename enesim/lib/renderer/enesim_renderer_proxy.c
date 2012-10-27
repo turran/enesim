@@ -148,9 +148,7 @@ static void _proxy_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static void _proxy_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Proxy *thiz;
-
-	thiz = _proxy_get(r);
+	/* we dont support anything */
 	*flags = 0;
 }
 

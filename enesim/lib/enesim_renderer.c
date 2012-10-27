@@ -213,6 +213,7 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 	/* the visibility */
 	if (r->current.visibility != r->past.visibility)
 	{
+		printf("visibility changed!\n");
 		return EINA_TRUE;
 	}
 	/* the rop */
