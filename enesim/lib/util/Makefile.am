@@ -12,6 +12,7 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_util.la
 
 libenesim_util_la_SOURCES = \
+enesim_path.c \
 enesim_perlin.c \
 enesim_vector.c \
 enesim_curve.c \
