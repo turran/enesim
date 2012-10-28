@@ -165,11 +165,31 @@ void enesim_curve_cubic_to(Enesim_Curve_State *state,
 		double ctrl_x, double ctrl_y,
 		double x, double y)
 {
-	_curve_cubic_to(state, ctrl_x0, ctrl_y0, ctrl_x, ctrl_y, x, y);
+	/* force one initial subdivision */
+	double x01 = (state->last_x + ctrl_x0) / 2;
+	double y01 = (state->last_y + ctrl_y0) / 2;
+	double xc = (ctrl_x0 + ctrl_x) / 2;
+	double yc = (ctrl_y0 + ctrl_y) / 2;
+	double x23 = (x + ctrl_x) / 2;
+	double y23 = (y + ctrl_y) / 2;
+	double xa = (x01 + xc) / 2;
+	double ya = (y01 + yc) / 2;
+	double xb = (x23 + xc) / 2;
+	double yb = (y23 + yc) / 2;
+
+	xc = (xa + xb) / 2;
+	yc = (ya + yb) / 2;
+	_curve_cubic_to(state, x01, y01, xa, ya, xc, yc);
+	state->last_x = xc;
+	state->last_y = yc;
+	state->last_ctrl_x = xa;
+	state->last_ctrl_y = ya;
+
+	_curve_cubic_to(state, xb, yb, x23, y23, x, y);
 	state->last_x = x;
 	state->last_y = y;
-	state->last_ctrl_x = ctrl_x;
-	state->last_ctrl_y = ctrl_y;
+	state->last_ctrl_x = x23;
+	state->last_ctrl_y = y23;
 }
 
 void enesim_curve_scubic_to(Enesim_Curve_State *state,
