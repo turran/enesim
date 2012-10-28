@@ -42,7 +42,7 @@ typedef struct _Enesim_Mempool_Aligned
 static int _init = 0;
 
 /* TODO parse the options */
-static void * _aligned_init(const char *context, const char *options, va_list args)
+static void * _enesim_mempool_aligned_init(const char *context, const char *options, va_list args)
 {
 	Enesim_Mempool_Aligned *thiz;
 
@@ -125,12 +125,12 @@ static void * _aligned_init(const char *context, const char *options, va_list ar
 	return thiz;
 }
 
-static void _aligned_free(void *data, void *element)
+static void _enesim_mempool_aligned_free(void *data, void *element)
 {
 	free(element);
 }
 
-static void * _aligned_alloc(void *data, unsigned int size)
+static void * _enesim_mempool_aligned_alloc(void *data, unsigned int size)
 {
 	Enesim_Mempool_Aligned *thiz = (Enesim_Mempool_Aligned *)data;
 	int ret;
@@ -148,7 +148,7 @@ static void * _aligned_alloc(void *data, unsigned int size)
 	return element;
 }
 
-static void _aligned_shutdown(void *data)
+static void _enesim_mempool_aligned_shutdown(void *data)
 {
 	Enesim_Mempool_Aligned *thiz = data;
 	free(thiz);
@@ -156,13 +156,13 @@ static void _aligned_shutdown(void *data)
 
 static Eina_Mempool_Backend _mempool_aligned = {
 	/* .name 		= */ "aligned",
-	/* .init 		= */ _aligned_init,
-	/* .free 		= */ _aligned_free,
-	/* .alloc		= */ _aligned_alloc,
+	/* .init 		= */ _enesim_mempool_aligned_init,
+	/* .free 		= */ _enesim_mempool_aligned_free,
+	/* .alloc		= */ _enesim_mempool_aligned_alloc,
 	/* .realloc		= */ NULL,
 	/* .garbage_collect 	= */ NULL,
 	/* .statistics		= */ NULL,
-	/* .shutdown		= */ _aligned_shutdown,
+	/* .shutdown		= */ _enesim_mempool_aligned_shutdown,
 	/* .repack		= */ NULL,
 };
 /*============================================================================*
