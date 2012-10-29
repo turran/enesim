@@ -42,41 +42,57 @@ static Eina_Bool _raw_saveable(const char *file)
 
 static Eina_Bool _raw_save(Emage_Data *data, Enesim_Surface *s, void *options)
 {
-	uint32_t *start;
-	uint32_t *end;
+	uint32_t *sdata;
 	size_t stride;
 	int32_t w;
 	int32_t h;
 	int i = 0;
+	int j = 0;
+	int cols = 0;
+	const char str_data[] = "static char _data[] = {";
+	const char str_function[] = "static Enesim_Surface * _surface(void)\n"
+			"{\n"
+			"\tEnesim_Buffer_Sw_Data sw_data;\n"
+			"\tEnesim_Surface *s;\n"
+			"\tsw_data.argb88888.plane0 = _data;\n"
+			"\tsw_data.argb88888.plane0_stride = %d;\n"
+			"\ts = enesim_surface_new_data_from(ENESIM_FORMAT_ARGB8888,\n"
+			"\t\t\t%d,%d,EINA_FALSE, &sw_data);\n"
+			"\treturn s;\n"
+			"}\n";
+	char function[PATH_MAX];
+	size_t len;
 
 	/* dump a c byte array with the data of the surface and also
 	 * a static function to get such surface
 	 */
-	ERR("Saving raw!");
-
-	enesim_surface_data_get(s, (void **)&start, &stride);
-	end = (uint32_t *)((char *)start + stride);
-
+	enesim_surface_data_get(s, (void **)&sdata, &stride);
 	enesim_surface_size_get(s, &w, &h);
-	emage_data_write(data, "static char _data[] = {", 23);
-	while (start < end)
+	emage_data_write(data, str_data, strlen(str_data));
+	for (i = 0; i < h; i++)
 	{
-		char str[255];
-		uint8_t a, r, g, b;
+		for (j = 0; j < w; j++)
+		{
+			char str[255];
+			uint8_t a, r, g, b;
 
-		if (i % 4 == 0)
-			emage_data_write(data, "\n\t", 2);
-		enesim_color_components_to(*start, &a, &r, &g, &b);
-		if (start == end - 1)
-			sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x ", a, r, g, b);
-		else
-			sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x, ", a, r, g, b);
-		emage_data_write(data, str, strlen(str));
-		start++;
-		i++;
+			if (cols % 4 == 0)
+				emage_data_write(data, "\n\t", 2);
+			enesim_color_components_to(*sdata, &a, &r, &g, &b);
+			if (i == h -1 &&  j == w - 1)
+				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x ", a, r, g, b);
+			else
+				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x, ", a, r, g, b);
+			emage_data_write(data, str, strlen(str));
+			cols++;
+			sdata++;
+		}
+		sdata = (uint32_t *)((uint8_t *)sdata + stride);
 	}
-	/* always write in blocks of 40 hex */
-	emage_data_write(data, "\n};", 3);
+	emage_data_write(data, "\n};\n", 4);
+	/* now the function to get such surface */
+	len = snprintf(function, PATH_MAX, str_function, w * 4, w, h);
+	emage_data_write(data, function, len);
 	return EINA_TRUE;
 }
 
