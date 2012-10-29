@@ -34,3 +34,13 @@ emage_jpg.c
 emage_jpg_la_LIBADD = $(top_builddir)/emage/lib/libemage.la @EMAGE_LIBS@ -ljpeg
 emage_jpg_la_LDFLAGS = -no-undefined -module -avoid-version
 endif
+
+emage_raw_LTLIBRARIES = emage_raw.la
+emage_rawdir = $(libdir)/emage
+
+emage_raw_la_SOURCES = \
+emage_raw.c
+
+emage_raw_la_LIBADD = $(top_builddir)/emage/lib/libemage.la @EMAGE_LIBS@
+emage_raw_la_LDFLAGS = -no-undefined -module -avoid-version
+

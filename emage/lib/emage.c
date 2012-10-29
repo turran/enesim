@@ -446,12 +446,10 @@ EAPI Eina_Bool emage_provider_register(Emage_Provider *p, const char *mime)
 	if (!p->info_get)
 	{
 		WRN("Provider %s doesn't provide the info_get() function", p->name);
-		goto err;
 	}
 	if (!p->load)
 	{
 		WRN("Provider %s doesn't provide the load() function", p->name);
-		goto err;
 	}
 	providers = tmp = eina_hash_find(_providers, mime);
 	providers = eina_list_append(providers, p);
@@ -460,8 +458,6 @@ EAPI Eina_Bool emage_provider_register(Emage_Provider *p, const char *mime)
 		eina_hash_add(_providers, mime, providers);
 	}
 	return EINA_TRUE;
-err:
-	return EINA_FALSE;
 }
 
 /**
@@ -475,10 +471,14 @@ EAPI const char * emage_mime_data_from(Emage_Data *data)
 
 	EINA_LIST_FOREACH(_finders, l, f)
 	{
+		if (!f->data_from)
+			continue;
+
 		emage_data_reset(data);
 		ret = f->data_from(data);
 		if (ret) break;
 	}
+	ERR("Using mime %s", ret);
 	return ret;
 }
 
@@ -509,12 +509,10 @@ EAPI Eina_Bool emage_finder_register(Emage_Finder *f)
 	if (!f->data_from)
 	{
 		WRN("Finder %p doesn't provide the 'data_from()' function", f);
-		return EINA_FALSE;
 	}
 	if (!f->extension_from)
 	{
 		WRN("Finder %p doesn't provide the 'extension_from()' function", f);
-		return EINA_FALSE;
 	}
 	_finders = eina_list_append(_finders, f);
 

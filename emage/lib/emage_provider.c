@@ -14,14 +14,16 @@ static void _provider_data_convert(Enesim_Buffer *buffer,
 	enesim_renderer_unref(importer);
 }
 
-static Eina_Bool _provider_info_load(Emage_Provider *p, Emage_Data *data,
+static Eina_Error _provider_info_load(Emage_Provider *p, Emage_Data *data,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
-	Eina_Bool ret;
+	Eina_Error ret = EMAGE_ERROR_PROVIDER;
 	int pw, ph;
 	Enesim_Buffer_Format pfmt;
 
 	/* get the info from the image */
+	if (!p->info_get) return ret;
+
 	ret = p->info_get(data, &pw, &ph, &pfmt, options);
 	if (w) *w = pw;
 	if (h) *h = ph;
@@ -125,6 +127,8 @@ static Eina_Bool _provider_data_save(Emage_Provider *p, Emage_Data *data,
 		Enesim_Surface *s, Eina_Error *err)
 {
 	/* save the data */
+	if (!p->save) return EINA_FALSE;
+
 	if (p->save(data, s, NULL) == EINA_FALSE)
 	{
 		*err = EMAGE_ERROR_SAVING;
@@ -139,12 +143,17 @@ static Eina_Bool _provider_data_save(Emage_Provider *p, Emage_Data *data,
 EAPI Eina_Bool emage_provider_info_load(Emage_Provider *thiz,
 	Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
+	Eina_Error err;
 	if (!thiz)
 	{
 		eina_error_set(EMAGE_ERROR_PROVIDER);
 		return EINA_FALSE;
 	}
-	_provider_info_load(thiz, data, w, h, sfmt, NULL);
+	err = _provider_info_load(thiz, data, w, h, sfmt, NULL);
+	if (err)
+	{
+		return EINA_FALSE;
+	}
 	return EINA_TRUE;
 }
 
