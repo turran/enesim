@@ -43,10 +43,66 @@
  *                                  Local                                     *
  *============================================================================*/
 static int _enesim_init_count = 0;
+
+/* simple struct to initialize all the domains easily */
+struct log
+{
+	int *d;
+	const char *name;
+} logs[] = {
+	{ &enesim_log_dom_global,	"enesim" },
+	{ &enesim_log_dom_surface,	"enesim_surface" },
+	{ &enesim_log_dom_renderer,	"enesim_renderer" },
+};
+
+static Eina_Bool _register_domains(void)
+{
+	int count;
+	int i;
+
+	/* register every domain here */
+	count = sizeof(logs)/sizeof(struct log);
+	for (i = 0; i < count; i++)
+	{
+		struct log *l = &logs[i];
+		/* FIXME something is wrong, is not using the correct the pointer ...? */
+		*l->d = eina_log_domain_register(l->name, ENESIM_DEFAULT_LOG_COLOR);
+		if (*l->d < 0)
+		{
+			fprintf(stderr, "Enesim: Can not create domaing log '%s'", l->name);
+			goto log_error;
+		}
+	}
+	return EINA_TRUE;
+log_error:
+	for (; i >= 0; i--)
+	{
+		struct log *l = &logs[i];
+		eina_log_domain_unregister(*l->d);
+	}
+	return EINA_FALSE;
+}
+
+static void _unregister_domains(void)
+{
+	int count;
+	int i;
+
+	/* remove every log */
+	count = sizeof(logs)/sizeof(struct log);
+	for (i = 0; i < count; i++)
+	{
+		struct log *l = &logs[i];
+		eina_log_domain_unregister(*l->d);
+	}
+
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 int enesim_log_dom_global = -1;
+int enesim_log_dom_surface = -1;
+int enesim_log_dom_renderer = -1;
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -73,13 +129,13 @@ EAPI int enesim_init(void)
 		fprintf(stderr, "Enesim: Eina init failed");
 		return --_enesim_init_count;
 	}
-
-	enesim_log_dom_global = eina_log_domain_register("enesim", ENESIM_DEFAULT_LOG_COLOR);
-	if (enesim_log_dom_global < 0)
+	if (!_register_domains())
 	{
-		EINA_LOG_ERR("Enesim Can not create a general log domain.");
+		EINA_LOG_ERR("Enesim Can not create the log domains.");
 		goto shutdown_eina;
 	}
+	/* FIXME something is wrong with the log registration */
+	enesim_log_dom_global = eina_log_domain_register("enesim", ENESIM_DEFAULT_LOG_COLOR);
 
 	/* TODO Dump the information about SIMD extensions
 	 * get the cpuid for this
@@ -129,8 +185,7 @@ EAPI int enesim_shutdown(void)
 	enesim_renderer_shutdown();
 	enesim_compositor_shutdown();
 	enesim_mempool_aligned_shutdown();
-	eina_log_domain_unregister(enesim_log_dom_global);
-	enesim_log_dom_global = -1;
+	_unregister_domains();
 	eina_shutdown();
 
 	return _enesim_init_count;

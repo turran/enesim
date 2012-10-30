@@ -69,6 +69,10 @@
 #include <math.h>
 
 /* the log domains */
+extern int enesim_log_dom_global;
+extern int enesim_log_dom_surface;
+extern int enesim_log_dom_renderer;
+
 #ifdef ENESIM_DEFAULT_LOG_COLOR
 # undef ENESIM_DEFAULT_LOG_COLOR
 #endif
@@ -77,7 +81,6 @@
 #define ERR(...) EINA_LOG_DOM_ERR(enesim_log_dom_global, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(enesim_log_dom_global, __VA_ARGS__)
 #define DBG(...) EINA_LOG_DOM_DBG(enesim_log_dom_global, __VA_ARGS__)
-extern int enesim_log_dom_global;
 
 /* define here every renderer magic */
 #define ENESIM_RENDERER_BACKGROUND_MAGIC 0xe7e51430
