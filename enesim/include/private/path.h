@@ -33,6 +33,8 @@ typedef struct _Enesim_Path_Descriptor
 typedef struct _Enesim_Path
 {
 	Enesim_Path_Descriptor *descriptor;
+	Enesim_Curve_State st;
+	Enesim_Figure *figure;
 	const Enesim_Matrix *gm;
 	double scale_x;
 	double scale_y;
@@ -40,9 +42,15 @@ typedef struct _Enesim_Path
 } Enesim_Path;
 
 Enesim_Path * enesim_path_new(Enesim_Path_Descriptor *descriptor, void *data);
-Enesim_Path * enesim_path_strokeless_new(void);
-Enesim_Path * enesim_path_full_new(void);
+void enesim_path_figure_set(Enesim_Path *thiz, Enesim_Figure *figure);
+void enesim_path_transformation_set(Enesim_Path *thiz, Enesim_Matrix *matrix);
+void enesim_path_scale_set(Enesim_Path *thiz, double scale_x, double scale_y);
 void * enesim_path_data_get(Enesim_Path *thiz);
 void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands);
+
+Enesim_Path * enesim_path_strokeless_new(void);
+
+Enesim_Path * enesim_path_full_new(void);
+void enesim_path_full_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke);
 
 #endif

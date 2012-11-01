@@ -17,52 +17,117 @@
  */
 #include "enesim_private.h"
 
+#include "enesim_main.h"
+#include "enesim_eina.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+#include "enesim_renderer_shape.h"
+#include "enesim_renderer_path.h"
 
 #include "private/curve.h"
+#include "private/vector.h"
 #include "private/path.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#if 0
+typedef struct _Enesim_Path_Stroke
+{
+	/* keep the original path */
+	Enesim_Path *p;
+	/* our own private data */
+	Enesim_Polygon *original_polygon;
+	Enesim_Polygon *offset_polygon;
+	Enesim_Polygon *inset_polygon;
+	Enesim_Figure *stroke_figure;
+	Enesim_Point first;
+	Enesim_Point p0, p1, p2;
+	Enesim_Point n01, n12;
+	Enesim_Shape_Stroke_Join join;
+	Enesim_Shape_Stroke_Cap cap;
+	double rx;
+	double ry;
+	int count;
+} Enesim_Path_Stroke;
+
+typedef struct _Enesim_Path_Strokeless
+{
+	Enesim_Path *p;
+} Enesim_Path_Strokeless;
+
+typedef struct _Enesim_Path_Edge
+{
+	double x0;
+	double y0;
+	double x1;
+	double y1;
+} Enesim_Path_Edge;
+/*----------------------------------------------------------------------------*
+ *                                 Commands                                   *
+ *----------------------------------------------------------------------------*/
+static void _path_move_to(Enesim_Path *thiz,
+		double x, double y)
+{
+	/* we have to reset the curve state too */
+	thiz->st.last_x = x;
+	thiz->st.last_y = y;
+	thiz->st.last_ctrl_x = x;
+	thiz->st.last_ctrl_y = y;
+	/* now call the interface */
+	thiz->descriptor->polygon_add(thiz->data);
+	thiz->descriptor->vertex_add(x, y, thiz->data);
+}
+
+static void _path_close(Enesim_Path *thiz, Eina_Bool close)
+{
+	thiz->descriptor->polygon_close(close, thiz->data);
+}
 /*----------------------------------------------------------------------------*
  *                              Without stroke                                *
  *----------------------------------------------------------------------------*/
 static void _strokeless_path_vertex_add(double x, double y, void *data)
 {
-	Enesim_Renderer_Path_Strokeless_State *thiz = data;
+	Enesim_Path_Strokeless *thiz = data;
+	Enesim_Path *path = thiz->p;
 	Enesim_Polygon *p;
 	Eina_List *last;
 
-	last = eina_list_last(thiz->fill_figure->polygons);
+	last = eina_list_last(path->figure->polygons);
 	p = eina_list_data_get(last);
 	enesim_polygon_point_append_from_coords(p, x, y);
 }
 
 static void _strokeless_path_polygon_add(void *data)
 {
-	Enesim_Renderer_Path_Strokeless_State *thiz = data;
+	Enesim_Path_Strokeless *thiz = data;
+	Enesim_Path *path = thiz->p;
 	Enesim_Polygon *p;
 
 	p = enesim_polygon_new();
 	enesim_polygon_threshold_set(p, 1/256.0); // FIXME make 1/256.0 a constant */
-	enesim_figure_polygon_append(thiz->fill_figure, p);
+	enesim_figure_polygon_append(path->figure, p);
 }
 
 static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 {
-	Enesim_Renderer_Path_Strokeless_State *thiz = data;
+	Enesim_Path_Strokeless *thiz = data;
+	Enesim_Path *path = thiz->p;
 	Enesim_Polygon *p;
 	Eina_List *last;
 
-	last = eina_list_last(thiz->fill_figure->polygons);
+	last = eina_list_last(path->figure->polygons);
 	p = eina_list_data_get(last);
 	p->closed = close;
 }
 
 /* the strokeless path generator */
-static Enesim_Path_Descriptor *_strokeless_descriptor = {
+static Enesim_Path_Descriptor _strokeless_descriptor = {
 	/* .vertex_add		= */ _strokeless_path_vertex_add, 
 	/* .polygon_add 	= */ _strokeless_path_polygon_add,
 	/* .polygon_close 	= */ _strokeless_path_polygon_close,
@@ -73,14 +138,6 @@ static Enesim_Path_Descriptor *_strokeless_descriptor = {
 /*----------------------------------------------------------------------------*
  *                                With stroke                                 *
  *----------------------------------------------------------------------------*/
-typedef struct _Enesim_Path_Edge
-{
-	double x0;
-	double y0;
-	double x1;
-	double y1;
-} Enesim_Path_Edge;
-
 static void _edge_join(Enesim_Path_Edge *e1,
 		Enesim_Path_Edge *e2,
 		Enesim_Shape_Stroke_Join join,
@@ -155,7 +212,7 @@ static void _stroke_curve_prepend(double x, double y, void *data)
 
 static void _stroke_path_merge(void *data)
 {
-	Enesim_Renderer_Path_Stroke_State *thiz = data;
+	Enesim_Path_Stroke *thiz = data;
 	Enesim_Polygon *to_merge;
 	Enesim_Point *off, *ofl;
 	Enesim_Point *inf, *inl;
@@ -208,7 +265,7 @@ static void _stroke_path_merge(void *data)
 
 static void _stroke_path_vertex_process(double x, double y, void *data)
 {
-	Enesim_Renderer_Path_Stroke_State *thiz = data;
+	Enesim_Path_Stroke *thiz = data;
 	Enesim_Polygon *inset = thiz->inset_polygon;
 	Enesim_Polygon *offset = thiz->offset_polygon;
 	Enesim_Point o0, o1;
@@ -362,7 +419,7 @@ static void _stroke_path_vertex_process(double x, double y, void *data)
 
 static void _stroke_path_vertex_add(double x, double y, void *data)
 {
-	Enesim_Renderer_Path_Stroke_State *thiz = data;
+	Enesim_Path_Stroke *thiz = data;
 
 	enesim_polygon_point_append_from_coords(thiz->original_polygon, x, y);
 	_stroke_path_vertex_process(x, y, data);
@@ -370,7 +427,8 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 
 static void _stroke_path_polygon_add(void *data)
 {
-        Enesim_Renderer_Path_Stroke_State *thiz = data;
+        Enesim_Path_Stroke *thiz = data;
+	Enesim_Path *path = thiz->p;
         Enesim_Polygon *p;
 
         /* just reset */
@@ -384,7 +442,7 @@ static void _stroke_path_polygon_add(void *data)
 
 	p = enesim_polygon_new();
 	enesim_polygon_threshold_set(p, 1/256.0); // FIXME make 1/256.0 a constant */
-	enesim_figure_polygon_append(thiz->fill_figure, p);
+	enesim_figure_polygon_append(path->figure, p);
 	thiz->original_polygon = p;
 
 	p = enesim_polygon_new();
@@ -400,7 +458,7 @@ static void _stroke_path_polygon_add(void *data)
 
 static void _stroke_path_done(void *data)
 {
-        Enesim_Renderer_Path_Stroke_State *thiz = data;
+        Enesim_Path_Stroke *thiz = data;
 
 	/* check that we are not closed */
 	if (!thiz->original_polygon->closed)
@@ -416,7 +474,7 @@ static void _stroke_path_done(void *data)
 
 static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 {
-        Enesim_Renderer_Path_Stroke_State *thiz = data;
+        Enesim_Path_Stroke *thiz = data;
 
 	if (close)
 	{
@@ -436,17 +494,17 @@ static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 	}
 }
 
-static Enesim_Path_Descriptor *_full_descriptor = {
+static Enesim_Path_Descriptor _full_descriptor = {
 	/* .vertex_add		= */ _stroke_path_vertex_add, 
 	/* .polygon_add 	= */ _stroke_path_polygon_add,
 	/* .polygon_close 	= */ _stroke_path_polygon_close,
 	/* .path_done 		= */ _stroke_path_done,
 };
-#endif
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Path * enesim_path_new(Enesim_Path_Descriptor *descriptor, void *data)
+Enesim_Path * enesim_path_new(Enesim_Path_Descriptor *descriptor,
+		void *data)
 {
 	Enesim_Path *thiz;
 
@@ -456,22 +514,50 @@ Enesim_Path * enesim_path_new(Enesim_Path_Descriptor *descriptor, void *data)
 	return thiz;
 }
 
+void enesim_path_figure_set(Enesim_Path *thiz, Enesim_Figure *figure)
+{
+	thiz->figure = figure;
+}
+
+void enesim_path_transformation_set(Enesim_Path *thiz, Enesim_Matrix *matrix)
+{
+	thiz->gm = matrix;
+}
+
+void enesim_path_scale_set(Enesim_Path *thiz, double scale_x, double scale_y)
+{
+	thiz->scale_x = scale_x;
+	thiz->scale_y = scale_y;
+}
+
 Enesim_Path * enesim_path_strokeless_new(void)
 {
-#if 0
 	Enesim_Path_Strokeless *s;
-	enesim_path_new(&_full_descriptor, s);
-#endif
-	return NULL;
+	Enesim_Path *thiz;
+
+	s = calloc(1, sizeof(Enesim_Path_Strokeless));
+	thiz = enesim_path_new(&_strokeless_descriptor, s);
+	s->p = thiz;
+
+	return thiz;
 }
 
 Enesim_Path * enesim_path_full_new(void)
 {
-#if 0
 	Enesim_Path_Stroke *s;
-	enesim_path_new(&_full_descriptor, s);
-#endif
-	return NULL;
+	Enesim_Path *thiz;
+
+	s = calloc(1, sizeof(Enesim_Path_Stroke));
+	thiz = enesim_path_new(&_full_descriptor, s);
+	s->p = thiz;
+
+	return thiz;
+}
+
+void enesim_path_full_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke)
+{
+	Enesim_Path_Stroke *s = thiz->data;
+	s->stroke_figure = stroke;
 }
 
 void * enesim_path_data_get(Enesim_Path *thiz)
@@ -481,23 +567,24 @@ void * enesim_path_data_get(Enesim_Path *thiz)
 
 void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 {
-#if 0
 	Eina_List *l;
-	Enesim_Renderer_Command_State state;
 	Enesim_Renderer_Path_Command *cmd;
+	const Enesim_Matrix *gm;
+	double scale_x;
+	double scale_y;
 
-	state.vertex_add = vertex_add;
-	state.polygon_add = polygon_add;
-	state.polygon_close = polygon_close;
-	state.path_done = path_done;
-	state.data = data;
+	/* reset our curve state */
+	thiz->st.vertex_add = thiz->descriptor->vertex_add;
+	thiz->st.last_x = 0;
+	thiz->st.last_y = 0;
+	thiz->st.last_ctrl_x = 0;
+	thiz->st.last_ctrl_y = 0;
+	thiz->st.data = thiz->data;
 
-	state.st.vertex_add = vertex_add;
-	state.st.last_x = 0;
-	state.st.last_y = 0;
-	state.st.last_ctrl_x = 0;
-	state.st.last_ctrl_y = 0;
-	state.st.data = data;
+	/* set the needed variables */
+	scale_x = thiz->scale_x;
+	scale_y = thiz->scale_y;
+	gm = thiz->gm;
 
 	EINA_LIST_FOREACH(commands, l, cmd)
 	{
@@ -519,7 +606,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			_path_move_to(&state, x, y);
+			_path_move_to(thiz, x, y);
 			break;
 
 			case ENESIM_COMMAND_LINE_TO:
@@ -529,7 +616,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_line_to(&state.st, x, y);
+			enesim_curve_line_to(&thiz->st, x, y);
 			break;
 
 			case ENESIM_COMMAND_QUADRATIC_TO:
@@ -542,7 +629,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_quadratic_to(&state.st, ctrl_x0, ctrl_y0, x, y);
+			enesim_curve_quadratic_to(&thiz->st, ctrl_x0, ctrl_y0, x, y);
 			break;
 
 			case ENESIM_COMMAND_SQUADRATIC_TO:
@@ -552,7 +639,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_squadratic_to(&state.st, x, y);
+			enesim_curve_squadratic_to(&thiz->st, x, y);
 			break;
 
 			case ENESIM_COMMAND_CUBIC_TO:
@@ -568,7 +655,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 			enesim_matrix_point_transform(gm, ctrl_x1, ctrl_y1, &ctrl_x1, &ctrl_y1);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_cubic_to(&state.st,
+			enesim_curve_cubic_to(&thiz->st,
 					ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1,
 					x, y);
 			break;
@@ -583,7 +670,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_scubic_to(&state.st, ctrl_x0, ctrl_y0,
+			enesim_curve_scubic_to(&thiz->st, ctrl_x0, ctrl_y0,
 					x, y);
 			break;
 
@@ -602,7 +689,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_arc_to(&state.st,
+			enesim_curve_arc_to(&thiz->st,
 					rx, ry,
 					ca * 180.0 / M_PI,
 					cmd->definition.arc_to.large,
@@ -611,7 +698,7 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 			break;
 
 			case ENESIM_COMMAND_CLOSE:
-			_path_close(&state, cmd->definition.close.close);
+			_path_close(thiz, cmd->definition.close.close);
 			break;
 
 			default:
@@ -619,7 +706,6 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 		}
 	}
 	/* in case we delay the creation of the vertices this triggers that */
-	if (state.path_done)
-		state.path_done(state.data);
-#endif
+	if (thiz->descriptor->path_done)
+		thiz->descriptor->path_done(thiz->data);
 }
