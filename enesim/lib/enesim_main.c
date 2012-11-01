@@ -129,10 +129,15 @@ EAPI int enesim_init(void)
 		fprintf(stderr, "Enesim: Eina init failed");
 		return --_enesim_init_count;
 	}
+	if (!eina_threads_init())
+	{
+		fprintf(stderr, "Enesim: Eina Threads init failed");
+		goto shutdown_eina;
+	}
 	if (!_register_domains())
 	{
 		EINA_LOG_ERR("Enesim Can not create the log domains.");
-		goto shutdown_eina;
+		goto shutdown_eina_threads;
 	}
 	/* FIXME something is wrong with the log registration */
 	enesim_log_dom_global = eina_log_domain_register("enesim", ENESIM_DEFAULT_LOG_COLOR);
@@ -158,7 +163,9 @@ EAPI int enesim_init(void)
 #endif
 	return _enesim_init_count;
 
-  shutdown_eina:
+shutdown_eina_threads:
+	eina_threads_shutdown();
+shutdown_eina:
 	eina_shutdown();
 	return --_enesim_init_count;
 }
