@@ -64,12 +64,12 @@ static Eina_Bool _register_domains(void)
 	count = sizeof(logs)/sizeof(struct log);
 	for (i = 0; i < count; i++)
 	{
-		struct log *l = &logs[i];
 		/* FIXME something is wrong, is not using the correct the pointer ...? */
-		*l->d = eina_log_domain_register(l->name, ENESIM_DEFAULT_LOG_COLOR);
-		if (*l->d < 0)
+		*logs[i].d = eina_log_domain_register(logs[i].name, ENESIM_DEFAULT_LOG_COLOR);
+		printf("domain = %d %d %p %p\n", *logs[i].d, enesim_log_dom_global, logs[i].d, &enesim_log_dom_global);
+		if (*logs[i].d < 0)
 		{
-			fprintf(stderr, "Enesim: Can not create domaing log '%s'", l->name);
+			fprintf(stderr, "Enesim: Can not create domaing log '%s'", logs[i].name);
 			goto log_error;
 		}
 	}
