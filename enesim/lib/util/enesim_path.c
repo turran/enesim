@@ -51,6 +51,7 @@ typedef struct _Enesim_Path_Stroke
 	Enesim_Point n01, n12;
 	Enesim_Shape_Stroke_Join join;
 	Enesim_Shape_Stroke_Cap cap;
+	double sw;
 	double rx;
 	double ry;
 	int count;
@@ -131,6 +132,7 @@ static Enesim_Path_Descriptor _strokeless_descriptor = {
 	/* .vertex_add		= */ _strokeless_path_vertex_add, 
 	/* .polygon_add 	= */ _strokeless_path_polygon_add,
 	/* .polygon_close 	= */ _strokeless_path_polygon_close,
+	/* .path_begin 		= */ NULL,
 	/* .path_done 		= */ NULL,
 };
 
@@ -456,6 +458,19 @@ static void _stroke_path_polygon_add(void *data)
 	thiz->inset_polygon = p;
 }
 
+static void _stroke_path_begin(void *data)
+{
+	Enesim_Path_Stroke *thiz = data;
+	Enesim_Path *path = thiz->p;
+
+	/* initialize our state */
+	thiz->count = 0;
+	thiz->rx = thiz->sw / 2 * hypot(path->gm->xx, path->gm->yx);
+	thiz->ry = thiz->sw / 2 * hypot(path->gm->xy, path->gm->yy);
+	thiz->inset_polygon = NULL;
+	thiz->offset_polygon = NULL;
+}
+
 static void _stroke_path_done(void *data)
 {
         Enesim_Path_Stroke *thiz = data;
@@ -498,6 +513,7 @@ static Enesim_Path_Descriptor _full_descriptor = {
 	/* .vertex_add		= */ _stroke_path_vertex_add, 
 	/* .polygon_add 	= */ _stroke_path_polygon_add,
 	/* .polygon_close 	= */ _stroke_path_polygon_close,
+	/* .path_begin 		= */ _stroke_path_begin,
 	/* .path_done 		= */ _stroke_path_done,
 };
 /*============================================================================*
@@ -514,12 +530,20 @@ Enesim_Path * enesim_path_new(Enesim_Path_Descriptor *descriptor,
 	return thiz;
 }
 
+void enesim_path_free(Enesim_Path *thiz)
+{
+	/* TODO call the interface to free the path implementation
+	 * data
+	 */
+	free(thiz);
+}
+
 void enesim_path_figure_set(Enesim_Path *thiz, Enesim_Figure *figure)
 {
 	thiz->figure = figure;
 }
 
-void enesim_path_transformation_set(Enesim_Path *thiz, Enesim_Matrix *matrix)
+void enesim_path_transformation_set(Enesim_Path *thiz, const Enesim_Matrix *matrix)
 {
 	thiz->gm = matrix;
 }
@@ -560,6 +584,24 @@ void enesim_path_full_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke
 	s->stroke_figure = stroke;
 }
 
+void enesim_path_full_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap)
+{
+	Enesim_Path_Stroke *s = thiz->data;
+	s->cap = cap;
+}
+
+void enesim_path_full_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join)
+{
+	Enesim_Path_Stroke *s = thiz->data;
+	s->join = join;
+}
+
+void enesim_path_full_stroke_weight_set(Enesim_Path *thiz, double sw)
+{
+	Enesim_Path_Stroke *s = thiz->data;
+	s->sw = sw;
+}
+
 void * enesim_path_data_get(Enesim_Path *thiz)
 {
 	return thiz->data;
@@ -585,6 +627,9 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 	scale_x = thiz->scale_x;
 	scale_y = thiz->scale_y;
 	gm = thiz->gm;
+
+	if (thiz->descriptor->path_begin)
+		thiz->descriptor->path_begin(thiz->data);
 
 	EINA_LIST_FOREACH(commands, l, cmd)
 	{
