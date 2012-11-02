@@ -35,6 +35,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_renderer_gradient
+
 #define ENESIM_RENDERER_GRADIENT_MAGIC_CHECK(d) \
 	do {\
 		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRADIENT_MAGIC))\

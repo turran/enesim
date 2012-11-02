@@ -49,10 +49,20 @@ struct log
 {
 	int *d;
 	const char *name;
-} logs[] = {
-	{ &enesim_log_dom_global,	"enesim" },
-	{ &enesim_log_dom_surface,	"enesim_surface" },
-	{ &enesim_log_dom_renderer,	"enesim_renderer" },
+};
+
+static struct log logs[] = {
+	{ &enesim_log_global,			"enesim" },
+	{ &enesim_log_pool,			"enesim_pool" },
+	{ &enesim_log_buffer,			"enesim_buffer" },
+	{ &enesim_log_surface,			"enesim_surface" },
+	{ &enesim_log_renderer,			"enesim_renderer" },
+	{ &enesim_log_renderer_image,		"enesim_renderer_image" },
+	{ &enesim_log_renderer_compound, 	"enesim_renderer_compound" },
+	{ &enesim_log_renderer_pattern, 	"enesim_renderer_pattern" },
+	{ &enesim_log_renderer_shape, 		"enesim_renderer_shape" },
+	{ &enesim_log_renderer_gradient, 	"enesim_renderer_gradient" },
+	{ &enesim_log_renderer_gradient_radial,	"enesim_renderer_gradient_radial" },
 };
 
 static Eina_Bool _register_domains(void)
@@ -66,7 +76,6 @@ static Eina_Bool _register_domains(void)
 	{
 		/* FIXME something is wrong, is not using the correct the pointer ...? */
 		*logs[i].d = eina_log_domain_register(logs[i].name, ENESIM_DEFAULT_LOG_COLOR);
-		printf("domain = %d %d %p %p\n", *logs[i].d, enesim_log_dom_global, logs[i].d, &enesim_log_dom_global);
 		if (*logs[i].d < 0)
 		{
 			fprintf(stderr, "Enesim: Can not create domaing log '%s'", logs[i].name);
@@ -100,9 +109,17 @@ static void _unregister_domains(void)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-int enesim_log_dom_global = -1;
-int enesim_log_dom_surface = -1;
-int enesim_log_dom_renderer = -1;
+int enesim_log_global = -1;
+int enesim_log_pool = -1;
+int enesim_log_surface = -1;
+int enesim_log_buffer = -1;
+int enesim_log_renderer = -1;
+int enesim_log_renderer_image = -1;
+int enesim_log_renderer_compound = -1;
+int enesim_log_renderer_pattern = -1;
+int enesim_log_renderer_shape = -1;
+int enesim_log_renderer_gradient = -1;
+int enesim_log_renderer_gradient_radial = -1;
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -139,9 +156,6 @@ EAPI int enesim_init(void)
 		EINA_LOG_ERR("Enesim Can not create the log domains.");
 		goto shutdown_eina_threads;
 	}
-	/* FIXME something is wrong with the log registration */
-	enesim_log_dom_global = eina_log_domain_register("enesim", ENESIM_DEFAULT_LOG_COLOR);
-
 	/* TODO Dump the information about SIMD extensions
 	 * get the cpuid for this
 	 */

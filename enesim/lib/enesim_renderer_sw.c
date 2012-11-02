@@ -43,6 +43,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_renderer
+
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Hint hints)
 {

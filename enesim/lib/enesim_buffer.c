@@ -26,6 +26,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_buffer
+
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
 		void *backend_data, Enesim_Format f, Enesim_Pool *p,
 		Eina_Bool external)

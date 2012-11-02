@@ -28,6 +28,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_surface
+
 static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 		Enesim_Buffer_Format *buf_fmt)
 {

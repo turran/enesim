@@ -48,6 +48,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_renderer
+
 #define ENESIM_MAGIC_RENDERER 0xe7e51420
 #define ENESIM_MAGIC_CHECK_RENDERER(d)\
 	do {\

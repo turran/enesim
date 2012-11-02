@@ -42,6 +42,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_renderer_pattern
+
 typedef struct _Enesim_Renderer_Pattern_State
 {
 	double x;

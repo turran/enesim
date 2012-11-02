@@ -48,6 +48,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_renderer_image
+
 #define ENESIM_RENDERER_IMAGE_MAGIC_CHECK(d)\
 	do {\
 		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_IMAGE_MAGIC))\

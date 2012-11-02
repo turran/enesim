@@ -36,6 +36,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_renderer_gradient_radial
+
 #define ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC_CHECK(d) \
 	do {\
 		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC))\
@@ -174,6 +176,8 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		enesim_matrix_inverse(gm, &thiz->m);
 	}
 	enesim_renderer_transformation_set(r, &thiz->m);
+	DBG("Using a transformation matrix of %" ENESIM_MATRIX_FORMAT,
+			ENESIM_MATRIX_ARGS (&thiz->m));
 
 	if (glen < 4)
 	{
