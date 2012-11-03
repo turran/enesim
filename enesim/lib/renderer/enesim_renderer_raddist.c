@@ -49,14 +49,23 @@
 			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_RADDIST_MAGIC);\
 	} while(0)
 
+typedef struct _Enesim_Renderer_Raddist_State
+{
+	double scale;
+	double radius;
+	/* the x and y origin of the circle */
+	int orx;
+	int ory;
+} Enesim_Renderer_Raddist_State;
+
 typedef struct _Enesim_Renderer_Raddist
 {
 	EINA_MAGIC
 	Enesim_Surface *src;
-	double scale;
-	double radius;
-	/* the x and y origin of the circle */
-	int orx, ory;
+	Enesim_Renderer_Raddist_State current;
+	Enesim_Renderer_Raddist_State past;
+	Eina_Bool changed : 1;
+	Eina_Bool src_changed : 1;
 } Enesim_Renderer_Raddist;
 
 static inline Enesim_Renderer_Raddist * _raddist_get(Enesim_Renderer *r)
@@ -74,7 +83,7 @@ static void _span_identity(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	double r_inv;
@@ -83,19 +92,19 @@ static void _span_identity(Enesim_Renderer *r,
 	size_t sstride;
 	double ox, oy;
 
-	rd = _raddist_get(r);
+	thiz = _raddist_get(r);
 	/* setup the parameters */
-	enesim_surface_size_get(rd->src, &sw, &sh);
-	enesim_surface_data_get(rd->src, (void **)&src, &sstride);
+	enesim_surface_size_get(thiz->src, &sw, &sh);
+	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
 	/* FIXME move this to the setup */
-	r_inv = 1.0f / rd->radius;
+	r_inv = 1.0f / thiz->current.radius;
 
 	enesim_renderer_origin_get(r, &ox, &oy);
 	x -= (int)ox;
 	y -= (int)oy;
 
-	x -= rd->orx;
-	y -= rd->ory;
+	x -= thiz->current.orx;
+	y -= thiz->current.ory;
 
 	while (dst < end)
 	{
@@ -104,9 +113,9 @@ static void _span_identity(Enesim_Renderer *r,
 		int sx, sy;
 		double r = hypot(x, y);
 
-		r = (((rd->scale * (rd->radius - r)) + r) * r_inv);
-		sxx = eina_f16p16_double_from((r * x) + rd->orx);
-		syy = eina_f16p16_double_from((r * y) + rd->ory);
+		r = (((thiz->current.scale * (thiz->current.radius - r)) + r) * r_inv);
+		sxx = eina_f16p16_double_from((r * x) + thiz->current.orx);
+		syy = eina_f16p16_double_from((r * y) + thiz->current.ory);
 
 		sy = (syy >> 16);
 		sx = (sxx >> 16);
@@ -129,11 +138,11 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
-	rd = _raddist_get(r);
-	if (!rd->src) return EINA_FALSE;
+	thiz = _raddist_get(r);
+	if (!thiz->src) return EINA_FALSE;
 
 	*fill = _span_identity;
 	if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
@@ -143,14 +152,24 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Raddist *thiz;
+
+	thiz = _raddist_get(r);
+	thiz->changed = EINA_FALSE;
+	thiz->src_changed = EINA_FALSE;
+	thiz->past = thiz->current;
+}
+
 static void _boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 
-	rd = _raddist_get(r);
-	if (!rd->src)
+	thiz = _raddist_get(r);
+	if (!thiz->src)
 	{
 		rect->x = 0;
 		rect->y = 0;
@@ -161,12 +180,33 @@ static void _boundings(Enesim_Renderer *r,
 	{
 		int sw, sh;
 
-		enesim_surface_size_get(rd->src, &sw, &sh);
+		enesim_surface_size_get(thiz->src, &sw, &sh);
 		rect->x = 0;
 		rect->y = 0;
 		rect->w = sw;
 		rect->h = sh;
 	}
+}
+
+static Eina_Bool _raddist_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+{
+	Enesim_Renderer_Raddist *thiz;
+
+	thiz = _raddist_get(r);
+	if (thiz->src_changed) return EINA_TRUE;
+	if (!thiz->changed) return EINA_FALSE;
+
+	if (thiz->current.orx != thiz->past.orx)
+		return EINA_TRUE;
+	if (thiz->current.ory != thiz->past.ory)
+		return EINA_TRUE;
+	if (thiz->current.scale != thiz->past.scale)
+		return EINA_TRUE;
+	if (thiz->current.radius != thiz->past.radius)
+		return EINA_TRUE;
+	return EINA_FALSE;
+	
 }
 
 static void _raddist_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -194,9 +234,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .hints_get = 			*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
-	/* .has_changed = 		*/ NULL,
+	/* .has_changed = 		*/ _raddist_has_changed,
 	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ NULL,
+	/* .sw_cleanup = 		*/ _state_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
@@ -221,30 +261,32 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 
 EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 
 	if (!radius)
 		radius = 1;
-	rd = _raddist_get(r);
-	rd->radius = radius;
+	thiz = _raddist_get(r);
+	thiz->current.radius = radius;
+	thiz->changed = EINA_TRUE;
 }
 
 EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 
-	rd = _raddist_get(r);
+	thiz = _raddist_get(r);
 	if (factor > 1.0)
 		factor = 1.0;
-	rd->scale = factor;
+	thiz->current.scale = factor;
+	thiz->changed = EINA_TRUE;
 }
 
 EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 
-	rd = _raddist_get(r);
-	return rd->scale;
+	thiz = _raddist_get(r);
+	return thiz->current.scale;
 }
 
 EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src)
@@ -257,6 +299,7 @@ EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	thiz->src = src;
 	if (thiz->src)
 		thiz->src = enesim_surface_ref(thiz->src);
+	thiz->src_changed = EINA_TRUE;
 }
 
 EAPI void enesim_renderer_raddist_src_get(Enesim_Renderer *r, Enesim_Surface **src)
@@ -272,16 +315,18 @@ EAPI void enesim_renderer_raddist_src_get(Enesim_Renderer *r, Enesim_Surface **s
 
 EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 
-	rd = _raddist_get(r);
-	rd->orx = ox;
+	thiz = _raddist_get(r);
+	thiz->current.orx = ox;
+	thiz->changed = EINA_TRUE;
 }
 
 EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy)
 {
-	Enesim_Renderer_Raddist *rd;
+	Enesim_Renderer_Raddist *thiz;
 
-	rd = _raddist_get(r);
-	rd->ory = oy;
+	thiz = _raddist_get(r);
+	thiz->current.ory = oy;
+	thiz->changed = EINA_TRUE;
 }
