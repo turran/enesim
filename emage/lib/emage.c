@@ -478,7 +478,7 @@ EAPI const char * emage_mime_data_from(Emage_Data *data)
 		ret = f->data_from(data);
 		if (ret) break;
 	}
-	ERR("Using mime %s", ret);
+	DBG("Using mime '%s'", ret);
 	return ret;
 }
 
