@@ -66,6 +66,10 @@
 /* dependencies */
 #include "Eina.h"
 
+#ifdef BUILD_OPENGL
+#include "GL/glew.h"
+#endif
+
 #include <math.h>
 
 /* the log domains */
