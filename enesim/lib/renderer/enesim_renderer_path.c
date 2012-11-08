@@ -487,7 +487,6 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	if (silhoutte)
 	{
 		/* first fill the silhoutte (the anti alias border) */
-
 		cp = &rdata->program->compiled[2];
 		_path_opengl_ambient_shader_setup(cp->id, color);
 		glUseProgramObjectARB(cp->id);
@@ -499,6 +498,9 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	_path_opengl_ambient_shader_setup(cp->id, color);
 	glUseProgramObjectARB(cp->id);
 
+#if DEBUG
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
 	/* check if we need to tesselate again */
 	if (gf->needs_tesselate)
 	{
@@ -510,6 +512,9 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		_path_opengl_notesselate(gf);
 	}
 	glUseProgramObjectARB(0);
+#if DEBUG
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
 }
 
 static void _path_opengl_stroke_renderer_setup(Enesim_Renderer *r,
@@ -661,9 +666,9 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 			thiz->fill_figure, final_color, rel, rdata, EINA_FALSE, area);
 	/* draw the stroke into the newly created buffer */
 	_path_opengl_stroke_renderer_setup(r, color, &final_color, &rel);
+	/* FIXME this one is slow but only after the other */
 	_path_opengl_figure_draw(rdata->fbo, textures[1], &gl->stroke,
 			thiz->stroke_figure, final_color, rel, rdata, EINA_TRUE, area);
-
 	/* now use the real destination surface to draw the merge fragment */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
@@ -1067,6 +1072,7 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .opengl_setup =		*/ _path_opengl_setup,
 	/* .opengl_cleanup =		*/ _path_opengl_cleanup,
 #else
+	/* .opengl_initialize =		*/ NULL,
 	/* .opengl_setup =		*/ NULL,
 	/* .opengl_cleanup =		*/ NULL
 #endif

@@ -26,6 +26,10 @@
 #include "GL/glext.h"
 
 EAPI Enesim_Pool * enesim_pool_opengl_new(void);
+EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h,
+		GLuint *texture, unsigned int num_textures);
+EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format f, uint32_t w, uint32_t h,
+		GLuint texture);
 
 #ifdef ENESIM_EXTENSION
 typedef struct _Enesim_Renderer_OpenGL_Compiled_Program

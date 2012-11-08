@@ -239,14 +239,16 @@ static Eina_Bool _radial_has_changed(Enesim_Renderer *r,
 
 static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
 	/* .length = 			*/ _radial_length,
-	/* .name = 			*/ _radial_name,
 	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .name = 			*/ _radial_name,
 	/* .free = 			*/ NULL,
 	/* .boundings = 		*/ _radial_boundings,
 	/* .destination_boundings = 	*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .has_changed = 		*/ _radial_has_changed,
+	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .opengl_initialize = 	*/ NULL,
+	/* .opengl_setup = 		*/ NULL,
 };
 /*============================================================================*
  *                                   API                                      *

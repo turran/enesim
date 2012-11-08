@@ -23,6 +23,16 @@
 
 #include "private/pool.h"
 #include "private/buffer.h"
+
+#if BUILD_OPENGL
+#include "enesim_surface.h"
+#include "enesim_error.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_color.h"
+#include "enesim_renderer.h"
+#include "Enesim_OpenGL.h"
+#endif
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -52,7 +62,8 @@ static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backen
 
 static void _buffer_free(Enesim_Buffer *b)
 {
-	enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
+	if (b->pool)
+		enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
 	eina_rwlock_free(&b->lock);
 	free(b);
 }
@@ -141,6 +152,30 @@ EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f,
 
 	return buf;
 }
+
+#if BUILD_OPENGL
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,
+		uint32_t w, uint32_t h,
+		GLuint *textures, unsigned int num_textures)
+{
+	Enesim_Buffer *b;
+	Enesim_Buffer_OpenGL_Data *backend_data;
+
+	if (!w || !h) return NULL;
+	backend_data = calloc(1, sizeof(Enesim_Buffer_OpenGL_Data));
+	/* FIXME for now */
+	backend_data->texture = textures[0];
+	backend_data->num_textures = num_textures;
+
+	b = _buffer_new(w, h, ENESIM_BACKEND_OPENGL, backend_data, f, NULL, EINA_TRUE);
+	return b;
+}
+#endif
+
 /**
  * To be documented
  * FIXME: To be fixed

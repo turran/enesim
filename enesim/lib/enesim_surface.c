@@ -25,6 +25,15 @@
 #include "private/pool.h"
 #include "private/buffer.h"
 #include "private/surface.h"
+
+#if BUILD_OPENGL
+#include "enesim_error.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_color.h"
+#include "enesim_renderer.h"
+#include "Enesim_OpenGL.h"
+#endif
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -164,6 +173,39 @@ EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h
 
 	return s;
 }
+
+#if BUILD_OPENGL
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format fmt,
+		uint32_t w, uint32_t h,
+		GLuint texture)
+{
+	Enesim_Surface *s;
+	Enesim_Buffer *b;
+	Enesim_Buffer_Format buf_fmt;
+	GLuint textures[1];
+
+	if ((!w) || (!h)) return NULL;
+	if (!_format_to_buffer_format(fmt, &buf_fmt))
+		return NULL;
+
+	textures[0] = texture;
+	b = enesim_buffer_new_opengl_data_from(buf_fmt, w, h, textures, 1);
+	if (!b) return NULL;
+
+	s = calloc(1, sizeof(Enesim_Surface));
+	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
+	s->format = fmt;
+	s->buffer = b;
+	s = enesim_surface_ref(s);
+
+	return s;
+}
+#endif
+
 /**
  * To be documented
  * FIXME: To be fixed

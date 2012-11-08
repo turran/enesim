@@ -251,15 +251,21 @@ typedef Eina_Bool (*Enesim_Renderer_Gradient_Sw_Setup)(Enesim_Renderer *r,
 
 typedef struct _Enesim_Renderer_Gradient_Descriptor
 {
+	/* gradient based functions */
 	Enesim_Renderer_Gradient_Length length;
-	Enesim_Renderer_Name name;
 	Enesim_Renderer_Gradient_Sw_Setup sw_setup;
-	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* common renderer functions */
+	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Boundings boundings;
 	Enesim_Renderer_Destination_Boundings destination_boundings;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Has_Changed has_changed;
+	/* software based functions */
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* opengl based functions */
+	Enesim_Renderer_OpenGL_Initialize opengl_initialize;
+	Enesim_Renderer_OpenGL_Setup opengl_setup;
 } Enesim_Renderer_Gradient_Descriptor;
 
 Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descriptor *gdescriptor, void *data);

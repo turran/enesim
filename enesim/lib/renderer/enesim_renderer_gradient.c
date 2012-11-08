@@ -71,6 +71,91 @@ static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
 	return thiz;
 }
 
+static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enesim_Renderer *r,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Gradient_Stop *curr, *next, *last;
+	Eina_F16p16 xx, inc;
+	Eina_List *tmp;
+	double diff;
+	int slen;
+	int start;
+	int end;
+	int i;
+	uint32_t *dst;
+
+	dst = thiz->sw.src;
+	slen = thiz->sw.len;
+
+	curr = eina_list_data_get(thiz->current.stops);
+	tmp = eina_list_next(thiz->current.stops);
+	next = eina_list_data_get(tmp);
+	last = eina_list_data_get(eina_list_last(thiz->current.stops));
+	diff = next->pos - curr->pos;
+	/* get a valid start */
+	while (!diff)
+	{
+		tmp = eina_list_next(tmp);
+		curr = next;
+		next = eina_list_data_get(tmp);
+		if (!next)
+			break;
+		diff = next->pos - curr->pos;
+	}
+	if (!diff)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "No valid offset between stops");
+		return EINA_FALSE;
+	}
+	inc = eina_f16p16_double_from(1.0 / (diff * slen));
+	xx = 0;
+
+	start = curr->pos * slen;
+	end = last->pos * slen;
+
+	dst = thiz->sw.src;
+
+	/* in case we dont start at 0.0 */
+	for (i = 0; i < start; i++)
+		*dst++ = curr->argb;
+
+	/* FIXME Im not sure if we increment xx by the 1 / ((next - curr) * len) value
+	 * as it might not be too accurate
+	 */
+	for (i = start; i < end; i++)
+	{
+		uint16_t off;
+		uint32_t p0;
+
+		/* advance the curr and next */
+		if (xx >= 65536)
+		{
+			tmp = eina_list_next(tmp);
+			/* we advanced but there's no other stop? */
+			if (!tmp)
+				break;
+			curr = next;
+			next = eina_list_data_get(tmp);
+			diff = next->pos - curr->pos;
+			/* the stop position is the same as the previous position, just skip it */
+			if (!diff)
+			{
+				continue;
+			}
+			inc = eina_f16p16_double_from(1.0 / (diff * slen));
+			xx = 0;
+		}
+		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
+		p0 = argb8888_interp_256(off, next->argb, curr->argb);
+		*dst++ = enesim_color_argb_from(p0);
+		xx += inc;
+	}
+	/* in case we dont end at 1.0 */
+	for (i = end; i < thiz->sw.len; i++)
+		*dst++ = curr->argb;
+	return EINA_TRUE;
+}
+
 static Eina_Bool _gradient_changed(Enesim_Renderer_Gradient *thiz)
 {
 	if (thiz->stops_changed)
@@ -125,15 +210,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Gradient *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	Enesim_Renderer_Gradient_Stop *curr, *next, *last;
-	Eina_F16p16 xx, inc;
-	Eina_List *tmp;
-	double diff;
 	int slen;
-	int start;
-	int end;
-	int i;
-	uint32_t *dst;
 
 	thiz = _gradient_get(r);
 	/* check that we have at least two stops */
@@ -165,80 +242,17 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		ENESIM_RENDERER_ERROR(r, error, "Gradient length %d <= 0", slen);
 		return EINA_FALSE;
 	}
-
-	curr = eina_list_data_get(thiz->current.stops);
-	tmp = eina_list_next(thiz->current.stops);
-	next = eina_list_data_get(tmp);
-	last = eina_list_data_get(eina_list_last(thiz->current.stops));
-	diff = next->pos - curr->pos;
-	/* get a valid start */
-	while (!diff)
-	{
-		tmp = eina_list_next(tmp);
-		curr = next;
-		next = eina_list_data_get(tmp);
-		if (!next)
-			break;
-		diff = next->pos - curr->pos;
-	}
-	if (!diff)
-	{
-		ENESIM_RENDERER_ERROR(r, error, "No valid offset between stops");
-		return EINA_FALSE;
-	}
-	inc = eina_f16p16_double_from(1.0 / (diff * slen));
-	xx = 0;
-
-	start = curr->pos * slen;
-	end = last->pos * slen;
-
-	dst = thiz->sw.src;
 	if (!thiz->sw.src || slen != thiz->sw.len)
 	{
 		thiz->sw.len = slen;
 		if (thiz->sw.src)
 			free(thiz->sw.src);
-		thiz->sw.src = dst = malloc(sizeof(uint32_t) * thiz->sw.len);
+		thiz->sw.src = malloc(sizeof(uint32_t) * thiz->sw.len);
 	}
-
-	/* in case we dont start at 0.0 */
-	for (i = 0; i < start; i++)
-		*dst++ = curr->argb;
-
-	/* FIXME Im not sure if we increment xx by the 1 / ((next - curr) * len) value
-	 * as it might not be too accurate
-	 */
-	for (i = start; i < end; i++)
+	if (!_gradient_generate_1d_span(thiz, r, error))
 	{
-		uint16_t off;
-		uint32_t p0;
-
-		/* advance the curr and next */
-		if (xx >= 65536)
-		{
-			tmp = eina_list_next(tmp);
-			/* we advanced but there's no other stop? */
-			if (!tmp)
-				break;
-			curr = next;
-			next = eina_list_data_get(tmp);
-			diff = next->pos - curr->pos;
-			/* the stop position is the same as the previous position, just skip it */
-			if (!diff)
-			{
-				continue;
-			}
-			inc = eina_f16p16_double_from(1.0 / (diff * slen));
-			xx = 0;
-		}
-		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
-		p0 = argb8888_interp_256(off, next->argb, curr->argb);
-		*dst++ = enesim_color_argb_from(p0);
-		xx += inc;
+		return EINA_FALSE;
 	}
-	/* in case we dont end at 1.0 */
-	for (i = end; i < thiz->sw.len; i++)
-		*dst++ = curr->argb;
 
 	return EINA_TRUE;
 }
@@ -312,6 +326,38 @@ done:
 	return ret;
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _gradient_opengl_initialize(Enesim_Renderer *r,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	if (!thiz->descriptor->opengl_initialize)
+	{
+		return EINA_TRUE;
+	}
+	return thiz->descriptor->opengl_initialize(r, num_programs, programs);
+}
+
+static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		Enesim_Surface *s,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = _gradient_get(r);
+	if (!thiz->descriptor->opengl_setup)
+	{
+		return EINA_FALSE;
+	}
+	return thiz->descriptor->opengl_setup(r, states, s, draw, error);
+}
+#endif
+
 static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _gradient_name,
@@ -328,8 +374,15 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
+#if BUILD_OPENGL
+	/* .opengl_initialize = 	*/ _gradient_opengl_initialize,
+	/* .opengl_setup =          	*/ _gradient_opengl_setup,
 	/* .opengl_cleanup =        	*/ NULL
+#else
+	/* .opengl_initialize = 	*/ NULL,
+	/* .opengl_setup = 		*/ NULL,
+	/* .opengl_cleanup = 		*/ NULL
+#endif
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -475,11 +528,9 @@ EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
 		Eina_List *list)
 {
-	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Stop *stop;
 	Eina_List *l;
 
-	thiz = _gradient_get(r);
 	EINA_LIST_FOREACH(list, l, stop)
 	{
 		enesim_renderer_gradient_stop_add(r, stop);
