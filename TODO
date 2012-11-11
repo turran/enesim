@@ -43,7 +43,7 @@ Enesim
 
 Emage
 =====
-+ Make the load/save functions receive the Emage_Data (the data abstraction: file, buffer, whatever)
++ Instead of having a single implicit context, we should be able to create different context
 
 Etex
 ====
