@@ -40,4 +40,8 @@
 # include <pthread.h>
 #endif
 
+extern int emage_log_dom_global;
+Emage_Provider * emage_load_provider_get(Emage_Data *data, const char *mime);
+Emage_Provider * emage_save_provider_get(Emage_Data *data, const char *mime);
+
 #endif /*EMAGE_PRIVATE_H_*/

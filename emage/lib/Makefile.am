@@ -14,6 +14,7 @@ lib_LTLIBRARIES = libemage.la
 
 libemage_la_SOURCES = \
 emage.c \
+emage_context.c \
 emage_data.c \
 emage_data_file.c \
 emage_data_buffer.c \

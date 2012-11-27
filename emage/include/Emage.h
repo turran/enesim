@@ -99,10 +99,30 @@ EAPI Emage_Data * emage_data_base64_new(Emage_Data *d);
 
 /**
  * @}
+ * @defgroup Emage_Context Context
+ * @{
+ */
+typedef struct _Emage_Context Emage_Context;
+typedef void (*Emage_Callback)(Enesim_Surface *s, void *data, int error); /**< Function prototype called whenever an image is loaded or saved */
+
+EAPI Emage_Context * emage_context_new(void);
+EAPI void emage_context_free(Emage_Context *thiz);
+EAPI void emage_context_load_async(Emage_Context *thiz,
+		Emage_Data *data, const char *mime, Enesim_Surface *s,
+		Enesim_Format f, Enesim_Pool *mpool, Emage_Callback cb,
+		void *user_data, const char *options);
+EAPI void emage_context_save_async(Emage_Context *thiz, Emage_Data *data,
+		const char *mime, Enesim_Surface *s, Emage_Callback cb,
+		void *user_data, const char *options);
+EAPI void emage_context_dispatch(Emage_Context *thiz);
+EAPI void emage_context_pool_size_set(Emage_Context *thiz, int num);
+EAPI int emage_context_pool_size_get(Emage_Context *thiz);
+
+/**
+ * @}
  * @defgroup Emage_Load_Save_Group Image Loading and Saving
  * @{
  */
-typedef void (*Emage_Callback)(Enesim_Surface *s, void *data, int error); /**< Function prototype called whenever an image is loaded or saved */
 
 EAPI Eina_Bool emage_info_load(Emage_Data *data, const char *mime,
 		int *w, int *h, Enesim_Buffer_Format *sfmt);
@@ -201,8 +221,5 @@ EAPI const char * emage_mime_extension_from(const char *ext);
 /**
  * @}
  */
-
-EAPI void emage_pool_size_set(int num);
-EAPI int emage_pool_size_get(void);
 
 #endif

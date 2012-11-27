@@ -1,16 +1,6 @@
 #include "Emage.h"
 #include "emage_private.h"
 
-#ifdef _WIN32
-# define pipe_write(fd, buffer, size) send((fd), (char *)(buffer), size, 0)
-# define pipe_read(fd, buffer, size)  recv((fd), (char *)(buffer), size, 0)
-# define pipe_close(fd)               closesocket(fd)
-#else
-# define pipe_write(fd, buffer, size) write((fd), buffer, size)
-# define pipe_read(fd, buffer, size)  read((fd), buffer, size)
-# define pipe_close(fd)               close(fd)
-#endif /* ! _WIN32 */
-
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -21,8 +11,7 @@ static int _emage_init_count = 0;
 static Eina_Array *_modules = NULL;
 static Eina_Hash *_providers = NULL;
 static Eina_List *_finders = NULL;
-static int _fifo[2]; /* the communication between the main thread and the async ones */
-static int emage_log_dom_global = -1;
+static Emage_Context *_main_context = NULL;
 
 Eina_Error EMAGE_ERROR_EXIST;
 Eina_Error EMAGE_ERROR_PROVIDER;
@@ -32,44 +21,12 @@ Eina_Error EMAGE_ERROR_ALLOCATOR;
 Eina_Error EMAGE_ERROR_LOADING;
 Eina_Error EMAGE_ERROR_SAVING;
 
-#ifdef _WIN32
-static HANDLE tid;
-# define EMAGE_THREAD_CREATE(x, f, d) x = CreateThread(NULL, 0, f, d, 0, NULL);
-#else
-static pthread_t tid;
-# define EMAGE_THREAD_CREATE(x, f, d) pthread_create(&(x), NULL, (void *)f, d)
-#endif
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+int emage_log_dom_global = -1;
 
-typedef enum _Emage_Job_Type
-{
-	EMAGE_LOAD,
-	EMAGE_SAVE,
-	EMAGE_JOB_TYPES,
-} Emage_Job_Type;
-
-typedef struct _Emage_Job
-{
-	Emage_Provider *prov;
-	Emage_Data *data;
-	Emage_Callback cb;
-	void *user_data;
-	Eina_Error err;
-	Emage_Job_Type type;
-	char *options;
-
-	union {
-		struct {
-			Enesim_Surface *s;
-			Enesim_Format f;
-			Enesim_Pool *pool;
-		} load;
-		struct {
-			Enesim_Surface *s;
-		} save;
-	} op;
-} Emage_Job;
-
-static Emage_Provider * _load_provider_get(Emage_Data *data, const char *mime)
+Emage_Provider * emage_load_provider_get(Emage_Data *data, const char *mime)
 {
 	Emage_Provider *p;
 	Eina_List *providers;
@@ -94,7 +51,7 @@ static Emage_Provider * _load_provider_get(Emage_Data *data, const char *mime)
 	return NULL;
 }
 
-static Emage_Provider * _save_provider_get(Emage_Data *data, const char *mime)
+Emage_Provider * emage_save_provider_get(Emage_Data *data, const char *mime)
 {
 	Emage_Provider *p;
 	Eina_List *providers;
@@ -118,51 +75,6 @@ static Emage_Provider * _save_provider_get(Emage_Data *data, const char *mime)
 #endif
 	}
 	return NULL;
-}
-
-static void _thread_finish(Emage_Job *j)
-{
-	int ret;
-	ret = pipe_write(_fifo[1], &j, sizeof(j));
-}
-
-#ifdef _WIN32
-static DWORD WINAPI _thread_load(LPVOID data)
-#else
-static void * _thread_load(void *data)
-#endif
-{
-	Emage_Job *j = data;
-
-	if (!emage_provider_load(j->prov, j->data, &j->op.load.s,
-		j->op.load.f, j->op.load.pool, j->options))
-		j->err = eina_error_get();
-	_thread_finish(j);
-
-#ifdef _WIN32
-	return 1;
-#else
-	return NULL;
-#endif
-}
-
-#ifdef _WIN32
-static DWORD WINAPI _thread_save(LPVOID data)
-#else
-static void * _thread_save(void *data)
-#endif
-{
-	Emage_Job *j = data;
-
-	if (!emage_provider_save(j->prov, j->data, j->op.save.s, j->options))
-		j->err = eina_error_get();
-	_thread_finish(j);
-
-#ifdef _WIN32
-	return 1;
-#else
-	return NULL;
-#endif
 }
 /*============================================================================*
  *                                   API                                      *
@@ -195,14 +107,6 @@ EAPI int emage_init(void)
 		goto unregister_log_domain;
 	}
 
-	/* the fifo */
-	if (pipe(_fifo) < 0)
-	{
-		ERR("can not create pipe");
-		goto shutdown_enesim;
-	}
-
-	fcntl(_fifo[0], F_SETFL, O_NONBLOCK);
 	/* the errors */
 	EMAGE_ERROR_EXIST = eina_error_msg_static_register("Files does not exist");
 	EMAGE_ERROR_PROVIDER = eina_error_msg_static_register("No provider for such file");
@@ -219,16 +123,15 @@ EAPI int emage_init(void)
 #if BUILD_STATIC_MODULE_PNG
 	png_provider_init();
 #endif
-	/* TODO the pool of threads */
+	/* create our main context */
+	_main_context = emage_context_new();
 
 	return _emage_init_count;
 
-  shutdown_enesim:
-	enesim_shutdown();
-  unregister_log_domain:
+unregister_log_domain:
 	eina_log_domain_unregister(emage_log_dom_global);
 	emage_log_dom_global = -1;
-  shutdown_eina:
+shutdown_eina:
 	eina_shutdown();
 	return --_emage_init_count;
 }
@@ -240,6 +143,10 @@ EAPI int emage_shutdown(void)
 	if (--_emage_init_count != 0)
 		return _emage_init_count;
 
+	/* destroy our main context */
+	emage_context_free(_main_context);
+	_main_context = NULL;
+
 	/* unload every module */
 	eina_module_list_free(_modules);
 #if BUILD_STATIC_MODULE_PNG
@@ -250,10 +157,6 @@ EAPI int emage_shutdown(void)
 	/* remove the providers */
 	eina_hash_free(_providers);
 	/* shutdown every provider */
-	/* TODO what if we shutdown while some thread is active? */
-	/* the fifo */
-	pipe_close(_fifo[0]);
-	pipe_close(_fifo[1]);
 	enesim_shutdown();
 	eina_log_domain_unregister(emage_log_dom_global);
 	emage_log_dom_global = -1;
@@ -275,7 +178,7 @@ EAPI Eina_Bool emage_info_load(Emage_Data *data, const char *mime,
 {
 	Emage_Provider *prov;
 
-	prov = _load_provider_get(data, mime);
+	prov = emage_load_provider_get(data, mime);
 	return emage_provider_info_load(prov, data, w, h, sfmt);
 }
 /**
@@ -296,7 +199,7 @@ EAPI Eina_Bool emage_load(Emage_Data *data, const char *mime,
 {
 	Emage_Provider *prov;
 
-	prov = _load_provider_get(data, mime);
+	prov = emage_load_provider_get(data, mime);
 	return emage_provider_load(prov, data, s, f, mpool, options);
 }
 /**
@@ -316,31 +219,8 @@ EAPI void emage_load_async(Emage_Data *data, const char *mime,
 		Enesim_Surface *s, Enesim_Format f, Enesim_Pool *mpool,
 		Emage_Callback cb, void *user_data, const char *options)
 {
-	Emage_Job *j;
-	Emage_Provider *prov;
-
-	prov = _load_provider_get(data, mime);
-	if (!prov)
-	{
-		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
-		return;
-	}
-
-	j = calloc(1, sizeof(Emage_Job));
-	j->prov = prov;
-	j->data = data;
-	j->cb = cb;
-	j->user_data = user_data;
-	if (options)
-		j->options = strdup(options);
-	j->err = 0;
-	j->type = EMAGE_LOAD;
-	j->op.load.s = s;
-	j->op.load.pool = mpool;
-	j->op.load.f = f;
-	/* create a thread that loads the image on background and sends
-	 * a command into the fifo fd */
-	EMAGE_THREAD_CREATE(tid, _thread_load, j);
+	emage_context_load_async(_main_context, data, mime, s, f, mpool, cb,
+			user_data, options);
 }
 /**
  * Save an image synchronously
@@ -356,9 +236,10 @@ EAPI Eina_Bool emage_save(Emage_Data *data, const char *mime,
 {
 	Emage_Provider *prov;
 
-	prov = _save_provider_get(data, mime);
+	prov = emage_save_provider_get(data, mime);
 	return emage_provider_save(prov, data, s, options);
 }
+
 /**
  * Save an image asynchronously
  *
@@ -374,29 +255,8 @@ EAPI void emage_save_async(Emage_Data *data, const char *mime,
 		Enesim_Surface *s, Emage_Callback cb,
 		void *user_data, const char *options)
 {
-	Emage_Job *j;
-	Emage_Provider *prov;
-
-	prov = _save_provider_get(data, mime);
-	if (!prov)
-	{
-		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
-		return;
-	}
-
-	j = malloc(sizeof(Emage_Job));
-	j->prov = prov;
-	j->data = data;
-	j->cb = cb;
-	j->user_data = user_data;
-	if (options)
-		j->options = strdup(options);
-	j->err = 0;
-	j->type = EMAGE_SAVE;
-	j->op.save.s = s;
-	/* create a thread that saves the image on background and sends
-	 * a command into the fifo fd */
-	EMAGE_THREAD_CREATE(tid, _thread_save, j);
+	emage_context_save_async(_main_context, data, mime, s, cb, user_data,
+			options);
 }
 
 /**
@@ -407,29 +267,7 @@ EAPI void emage_save_async(Emage_Data *data, const char *mime,
  */
 EAPI void emage_dispatch(void)
 {
-	fd_set readset;
-	struct timeval t;
-	Emage_Job *j;
-
-	/* check if there's data to read */
-	FD_ZERO(&readset);
-	FD_SET(_fifo[0], &readset);
-	t.tv_sec = 0;
-	t.tv_usec = 0;
-
-	if (select(_fifo[0] + 1, &readset, NULL, NULL, &t) <= 0)
-		return;
-	/* read from the fifo fd and call the needed callbacks */
-	while (pipe_read(_fifo[0], &j, sizeof(j)) > 0)
-	{
-		if (j->type == EMAGE_LOAD)
-			j->cb(j->op.load.s, j->user_data, j->err);
-		else
-			j->cb(j->op.save.s, j->user_data, j->err);
-		if (j->options)
-			free(j->options);
-		free(j);
-	}
+	emage_context_dispatch(_main_context);
 }
 
 /**
@@ -588,28 +426,4 @@ EAPI void emage_options_parse(const char *options, Emage_Option_Cb cb, void *dat
 	}
 	/* and call the attr_cb */
 	free(orig);
-}
-
-
-/**
- * @brief Sets the size of the thread's pool
- * @param num The number of threads
- *
- * Sets the maximum number of threads Emage will create to dispatch asynchronous
- * calls.
- */
-EAPI void emage_pool_size_set(int num)
-{
-
-}
-/**
- * @brief Gets the size of the thread's pool
- *
- * @return The number of threads
- * Returns the maximum number threads of number Emage will create the dispatch
- * asynchronous calls.
- */
-EAPI int emage_pool_size_get(void)
-{
-	return 0;
 }
