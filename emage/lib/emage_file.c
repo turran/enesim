@@ -87,7 +87,7 @@ EAPI Eina_Bool emage_file_info_load(const char *file, int *w, int *h, Enesim_Buf
 	Emage_Data *data;
 	Eina_Bool ret;
 	const char *mime;
-	
+
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = emage_info_load(data, mime, w, h, sfmt);
@@ -111,7 +111,7 @@ EAPI Eina_Bool emage_file_load(const char *file, Enesim_Surface **s,
 	Emage_Data *data;
 	Eina_Bool ret;
 	const char *mime;
-	
+
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = emage_load(data, mime, s, f, mpool, options);
@@ -162,7 +162,7 @@ EAPI Eina_Bool emage_file_save(const char *file, Enesim_Surface *s, const char *
 	Emage_Data *data;
 	Eina_Bool ret;
 	const char *mime;
-	
+
 	if (!_file_save_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = emage_save(data, mime, s, options);
@@ -185,7 +185,7 @@ EAPI void emage_file_save_async(const char *file, Enesim_Surface *s, Emage_Callb
 	Emage_Data *data;
 	Emage_File_Data fdata;
 	const char *mime;
-	
+
 	if (!_file_save_data_get(file, &data, &mime))
 	{
 		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
