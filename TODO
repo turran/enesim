@@ -1,6 +1,21 @@
 Enesim
 ======
-+ Add log levels on every subsystem
++ We have a performance problem when some renderer has changed. Basically on the practice
+  we end having a full tree of renderers, several levels, proxies, whatever. When we need
+  to know what area to draw we basically iterate over all the tree. That means that we start
+  from the topmost renderer and then going down, even if no children has actually changed
+  we still need to call a function on each child to see if it has changed or not. In case
+  of damages it is the same.
+
+  So we need a way to inform somehow whenever a renderer has changed "upstream" to avoid
+  iterating over all the children Here upstream refers that if a renderer is for example
+  added on a compound renderer, when the children have a _set() function it should call a
+  function in the form of:
+  enesim_renderer_notify_change().
+  This function should call a list of "listeners" of such
+  "event" so for example the compund renderer can listen to that and again inform "upstream"
+  of a change.
++ Add log levels on every subsystem/renderer
 + We should add a way to get the backend data from a renderer or surface. This is useful for
   cases like the glx example where we need a way to render the texture inside a surface into
   the final framebuffer. Another useful case might be on the future for a new way to define
