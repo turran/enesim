@@ -151,8 +151,8 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		case ENESIM_BACKEND_SOFTWARE:
 		EINA_LIST_FOREACH(clips, l, clip)
 		{
-			Eina_Rectangle final; 
-		
+			Eina_Rectangle final;
+
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
 				continue;
@@ -164,8 +164,8 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 #if BUILD_OPENGL
 		EINA_LIST_FOREACH(clips, l, clip)
 		{
-			Eina_Rectangle final; 
-		
+			Eina_Rectangle final;
+
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
 				continue;
@@ -1158,6 +1158,44 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 	*error = enesim_error_add(*error, str);
 }
 
+#if 0
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_change_notify(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	/* if we have notified a changed already dont do it again */
+	if (r->notified_change) return;
+
+	r->notified_change = TRUE;
+	/* inform about the change */
+}
+
+EAPI Enesim_Renderer_Listener * enesim_renderer_change_listen(Enesim_Renderer *r,
+		Enesim_Renderer_Change_Cb cb, void *data)
+{
+	/* register on the list of listener */
+}
+
+EAPI void enesim_renderer_change_mute(Enesim_Renderer *r,
+		Enesim_Renderer_Listener *listener)
+{
+	/* unregister from the list of listener */
+
+}
+
+EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
+		Enesim_Renderer_Change_Cb cb, void *data)
+{
+	/* unregister from the list of listener */
+	/* call the other function */
+}
+
+
+#endif
+
 /**
  * To  be documented
  * FIXME: To be fixed
@@ -1167,6 +1205,14 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 	Eina_Bool ret = EINA_TRUE;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+#if 0
+	/* in case the renderer has not notified about a change just return
+	 * false
+	 */
+	if (!r->notifed_change) return EINA_FALSE;
+	/* TODO split the below code into an internal version */
+	/* TODO modify the logic a bit */
+#endif
 
 	/* if the renderer does not has the descriptor
 	 * function we assume it is always true */
@@ -1204,6 +1250,12 @@ EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
 	if (!cb) return;
+#if 0
+	/* TODO change the API to return TRUE/FALSE whenever there are damages or not */
+	/* in case the renderer has not notified about a change just return */
+	if (!r->notifed_change) return;
+	/* use the internal has changed function */
+#endif
 
 	if (r->descriptor.damage)
 	{
