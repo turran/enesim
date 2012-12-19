@@ -33,8 +33,10 @@ m4/ltsugar.m4 \
 m4/libtool.m4 \
 m4/ltversion.m4 \
 m4/lt~obsolete.m4 \
-m4/ltoptions.m4
-
+m4/ltoptions.m4 \
+config.h.in~ \
+config.h.in \
+config.h
 
 EXTRA_DIST = \
 AUTHORS \
