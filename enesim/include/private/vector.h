@@ -75,6 +75,7 @@ typedef struct _Enesim_F16p16_Edge
 {
 	int xx0, yy0, xx1, yy1;
 	int e, de;
+	int lx;
 	int counted : 1;
 } Enesim_F16p16_Edge;
 
