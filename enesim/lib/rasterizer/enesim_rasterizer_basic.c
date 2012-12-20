@@ -41,13 +41,6 @@
 # define MIN(a,b) ((a) < (b)) ? (a) : (b)
 #endif
 
-/* TODO merge this with the bifigure */
-#define MUL4_SYM(x, y) \
- ( ((((((x) >> 16) & 0xff00) * (((y) >> 16) & 0xff00)) + 0xff0000) & 0xff000000) + \
-   ((((((x) >> 8) & 0xff00) * (((y) >> 16) & 0xff)) + 0xff00) & 0xff0000) + \
-   ((((((x) & 0xff00) * ((y) & 0xff00)) + 0xff00) >> 16) & 0xff00) + \
-   (((((x) & 0xff) * ((y) & 0xff)) + 0xff) >> 8) )
-
 #define INTERP_65536(a, c0, c1) \
 	( ((((((c0 >> 16) & 0xff00) - ((c1 >> 16) & 0xff00)) * a) + \
 	  (c1 & 0xff000000)) & 0xff000000) + \
@@ -405,13 +398,8 @@ get_out:
 			}
 			else if (fcolor != 0xffffffff)
 			{
-				while(dst < ne)
-				{
-					uint32_t tmp;
-
-					tmp = argb8888_mul4_sym(fcolor, *dst);
-					*dst++ = tmp;
-				}
+				argb8888_none_color_none_mul4_sym(dst, ne - dst, NULL, fcolor, NULL);
+				dst = ne;
 			}
 		}
 	}
@@ -651,10 +639,8 @@ get_out:
 			memset(dst, 0, sizeof(unsigned int) * dx);
 		else
 		{
-			uint32_t *ne = dst + dx;
-
-			while (dst < ne)
-				*dst++ = argb8888_mul4_sym(fcolor, *dst);
+			argb8888_none_color_none_mul4_sym(dst, dx, NULL, fcolor, NULL);
+			dst += dx;
 		}
 	}
 
@@ -860,8 +846,8 @@ get_out:
 			}
 			else if (fcolor != 0xffffffff)
 			{
-				while(dst < ne)
-					*dst++ = argb8888_mul4_sym(fcolor, *dst);
+				argb8888_none_color_none_mul4_sym(dst, ne - dst, NULL, fcolor, NULL);
+				dst = ne;
 			}
 		}
 	}
@@ -1104,10 +1090,8 @@ get_out:
 			memset(dst, 0, sizeof(unsigned int) * dx);
 		else
 		{
-			uint32_t *ne = dst + dx;
-
-			while (dst < ne)
-				*dst++ = argb8888_mul4_sym(fcolor, *dst);
+			argb8888_none_color_none_mul4_sym(dst, dx, NULL, fcolor, NULL);
+			dst += dx;
 		}
 	}
 
