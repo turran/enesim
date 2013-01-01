@@ -1,5 +1,4 @@
-MAINTAINERCLEANFILES = \
-Makefile.in
+MAINTAINERCLEANFILES = Makefile.in
 
 if BUILD_SURFACE_ARGB8888_UNPRE
 ARGB8888_UNPRE_REQ=argb8888_unpre.c
@@ -28,10 +27,8 @@ endif
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/enesim/include \
--I$(top_builddir)/enesim/include \
 -I$(top_srcdir)/external/libargb \
--I$(top_builddir)/external/libargb \
-@ENESIM_BUILD@ \
+-DENESIM_BUILD \
 @ENESIM_CFLAGS@
 
 noinst_LTLIBRARIES = libenesim_converter.la

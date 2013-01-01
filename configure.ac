@@ -34,20 +34,7 @@ AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 
 ### Needed information
 
-AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
-
-ENESIM_BUILD=""
-case "$host_os" in
-   mingw*)
-      ENESIM_BUILD="-DENESIM_BUILD"
-      EMAGE_BUILD="-DEMAGE_BUILD"
-      ETEX_BUILD="-DETEX_BUILD"
-   ;;
-esac
-AC_SUBST([ENESIM_BUILD])
-AC_SUBST([EMAGE_BUILD])
-AC_SUBST([ETEX_BUILD])
 
 
 ### Additional options to configure

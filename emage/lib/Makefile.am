@@ -2,13 +2,10 @@ MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_builddir) \
 -I$(top_srcdir)/enesim/include \
--I$(top_builddir)/enesim/include \
 -I$(top_srcdir)/emage/include \
--I$(top_builddir)/emage/include \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
-@EMAGE_BUILD@ \
+-DEMAGE_BUILD \
 @EMAGE_CFLAGS@
 
 lib_LTLIBRARIES = libemage.la
