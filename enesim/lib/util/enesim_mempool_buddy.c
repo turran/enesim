@@ -27,6 +27,8 @@
  * memory pool divided by the block size.
  */
 #include "enesim_private.h"
+
+#include "private/mempool_buddy.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
