@@ -1,11 +1,15 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <setjmp.h>
 
-#include <jpeglib.h>
-
 #include "Emage.h"
+
+#include <jpeglib.h>
 
 /*============================================================================*
  *                                  Local                                     *
