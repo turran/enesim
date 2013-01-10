@@ -10,4 +10,4 @@ AM_CPPFLAGS = \
 noinst_LTLIBRARIES = libenesim_compositor.la
 
 libenesim_compositor_la_SOURCES = \
-argb8888.c
+enesim_compositor_argb8888.c
