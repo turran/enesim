@@ -160,6 +160,7 @@ EAPI int enesim_init(void)
 	 * get the cpuid for this
 	 */
 	enesim_mempool_aligned_init();
+	enesim_mempool_buddy_init();
 	enesim_compositor_init();
 	enesim_renderer_init();
 	enesim_converter_init();
@@ -206,6 +207,7 @@ EAPI int enesim_shutdown(void)
 	enesim_renderer_shutdown();
 	enesim_compositor_shutdown();
 	enesim_mempool_aligned_shutdown();
+	enesim_mempool_buddy_shutdown();
 	_unregister_domains();
 	eina_shutdown();
 
