@@ -142,7 +142,7 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 		case ENESIM_FORMAT_ARGB8888_SPARSE:
 		case ENESIM_FORMAT_XRGB8888:
 		sw_data.argb8888_pre.plane0 = data;
-		sw_data.argb8888_pre.plane0_stride = stride ? stride : w;
+		sw_data.argb8888_pre.plane0_stride = stride ? stride : w * 4;
 		break;
 
 		case ENESIM_FORMAT_A8:

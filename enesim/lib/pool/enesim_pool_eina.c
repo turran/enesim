@@ -53,22 +53,22 @@ static Eina_Bool _data_alloc(void *prv,
 	{
 		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		data->argb8888.plane0 = alloc_data;
-		data->argb8888.plane0_stride = w;
+		data->argb8888.plane0_stride = w * 4;
 		break;
 
 		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		data->argb8888_pre.plane0 = alloc_data;
-		data->argb8888_pre.plane0_stride = w;
+		data->argb8888_pre.plane0_stride = w * 4;
 		break;
 
 		case ENESIM_BUFFER_FORMAT_RGB565:
 		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w;
+		data->rgb565.plane0_stride = w * 2;
 		break;
 
 		case ENESIM_BUFFER_FORMAT_RGB888:
 		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w;
+		data->rgb565.plane0_stride = w * 2;
 		break;
 
 		case ENESIM_BUFFER_FORMAT_A8:
