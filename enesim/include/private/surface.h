@@ -30,6 +30,8 @@ struct _Enesim_Surface
 	EINA_MAGIC
 	int ref;
 	Enesim_Buffer *buffer;
+	Enesim_Buffer_Free free_func;
+	void *free_func_data;
 	Enesim_Format format;
 	void *user; /* user provided data */
 };

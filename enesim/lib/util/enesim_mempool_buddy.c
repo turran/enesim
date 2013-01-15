@@ -32,6 +32,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT _buddy_log
+
 typedef struct _Block
 {
 	EINA_INLIST;
@@ -51,6 +53,7 @@ typedef struct _Buddy
 } Buddy;
 
 static int _init = 0;
+static int _buddy_log;
 
 /* get the minimum order greater or equal to size */
 static inline unsigned int _get_order(Buddy *b, size_t size)
@@ -63,7 +66,7 @@ static inline unsigned int _get_order(Buddy *b, size_t size)
 	{
 		bytes += bytes;
 	}
-	//printf("order for size %d is %d\n", size, i + b->min_order);
+	DBG("Order for size %zu is %u (%u)", size, i + b->min_order, i);
 	return i;
 }
 
@@ -89,6 +92,8 @@ static void *_buddy_init(__UNUSED__ const char *context,
 	heap = va_arg(args, void *);
 	size = va_arg(args, size_t);
 	min_order = va_arg(args, int);
+	DBG("Creating a buddy allocator with heap %p, size %zu, min_order %d",
+			heap, size, min_order);
 	/* the minimum order we support is 15 (32K) */
 	min_order = min_order < 15 ? 15 : min_order;
 	bytes = 1 << min_order;
@@ -96,7 +101,11 @@ static void *_buddy_init(__UNUSED__ const char *context,
 	{
 		bytes += bytes;
 	}
-	if (!i) return NULL;
+	if (!i)
+	{
+		ERR("Impossible to find a 2^k bytes less than size");
+		return NULL;
+	}
 
 	b = malloc(sizeof(Buddy));
 	b->heap = heap;
@@ -129,6 +138,7 @@ static void _buddy_free(void *data, void *element)
 	size_t offset;
 	size_t idx;
 
+	DBG("Freeing block at %p", element);
 	offset = (unsigned char *)element - (unsigned char *)b->heap;
 	if (offset > b->size)
 		return;
@@ -186,16 +196,21 @@ static void *_buddy_alloc(void *data, unsigned int size)
 	Block *block, *buddy;
 	unsigned int k, j;
 
+	DBG("Allocing %u bytes", size);
 	k = j = _get_order(b, size);
 	/* get a free list of order k where k <= j <= max_order */
 	while ((j < b->num_order) && !b->areas[j])
 		j++;
 	/* check that the order is on our range */
 	if (j + b->min_order > b->max_order)
+	{
+		WRN("Order %d out of range [%d - %d]", j, b->min_order,
+				b->max_order);
 		return NULL;
+	}
 
 	/* get a free element on this order, if not, go splitting until we find one */
-	//printf("getting order %d (%d) for size %d\n", j, k, size);
+	DBG("Getting order %u (%u) for size %u", j, k, size);
 found:
 	if (j == k)
 	{
@@ -208,6 +223,7 @@ found:
 		b->areas[j] = eina_inlist_remove(b->areas[j], EINA_INLIST_GET(block));
 		ret = _get_offset(b, block);
 
+		DBG("Found a block of order %u at %p", j, ret);
 		return ret;
 	}
 
@@ -231,7 +247,7 @@ static void _buddy_statistics(void *data)
 
 	printf("Information:\n");
 	printf("size = %zu, min_order = %d, max_order = %d, num_order = %d, "
-			"num_blocks = %d (%uKB)\n",
+			"num_blocks = %d (%luKB)\n",
 			b->size,
 			b->min_order,
 			b->max_order,
@@ -273,6 +289,7 @@ int enesim_mempool_buddy_init(void)
 	if (!_init++)
 	{
 		eina_mempool_register(&_backend);
+		_buddy_log = eina_log_domain_register("buddy", ENESIM_DEFAULT_LOG_COLOR);
 	}
 	return _init;
 }
@@ -282,5 +299,7 @@ int enesim_mempool_buddy_shutdown(void)
 	if (--_init != 0)
 		return _init;
 	eina_mempool_unregister(&_backend);
+	eina_log_domain_unregister(_buddy_log);
+
 	return _init;
 }

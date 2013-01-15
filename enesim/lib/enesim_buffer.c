@@ -40,7 +40,7 @@
 
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
 		void *backend_data, Enesim_Format f, Enesim_Pool *p,
-		Eina_Bool external)
+		Eina_Bool external, Enesim_Buffer_Free free_func, void *free_func_data)
 {
 	Enesim_Buffer *thiz;
 
@@ -53,6 +53,11 @@ static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backen
 	thiz->format = f;
 	thiz->pool = p;
 	thiz->external_allocated = external;
+	if (thiz->external_allocated)
+	{
+		thiz->free_func = free_func;
+		thiz->free_func_data = free_func_data;
+	}
 	thiz = enesim_buffer_ref(thiz);
 	/* now create the needed locks */
 	eina_rwlock_new(&thiz->lock);
@@ -62,8 +67,16 @@ static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backen
 
 static void _buffer_free(Enesim_Buffer *b)
 {
+	if (b->external_allocated)
+	{
+		if (b->free_func)
+			b->free_func(b->backend_data, b->free_func_data);
+	}
 	if (b->pool)
-		enesim_pool_data_free(b->pool, b->backend_data, b->format, b->external_allocated);
+	{
+		enesim_pool_data_free(b->pool, b->backend_data, b->format,
+				b->external_allocated);
+	}
 	eina_rwlock_free(&b->lock);
 	free(b);
 }
@@ -79,7 +92,8 @@ static void _buffer_free(Enesim_Buffer *b)
  */
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
-		Enesim_Buffer_Sw_Data *data)
+		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		void *free_func_data)
 {
 	Enesim_Buffer *buf;
 	Enesim_Backend backend;
@@ -91,10 +105,12 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 		if (!p) return NULL;
 	}
 
-	if (!enesim_pool_data_from(p, &backend, &backend_data, f, w, h, copy, data))
+	if (!enesim_pool_data_from(p, &backend, &backend_data, f, w, h, copy,
+			data))
 		return NULL;
 
-	buf = _buffer_new(w, h, backend, backend_data, f, p, !copy);
+	buf = _buffer_new(w, h, backend, backend_data, f, p, !copy, free_func,
+			free_func_data);
 
 	return buf;
 }
@@ -105,11 +121,13 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
  */
 EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Eina_Bool copy,
-		Enesim_Buffer_Sw_Data *data)
+		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		void *user_data)
 {
 	Enesim_Buffer *buf;
 
-	buf = enesim_buffer_new_pool_and_data_from(f, w, h, NULL, copy, data);
+	buf = enesim_buffer_new_pool_and_data_from(f, w, h, NULL, copy, data,
+			free_func, user_data);
 
 	return buf;
 }
@@ -134,7 +152,8 @@ enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w,
 	if (!enesim_pool_data_alloc(p, &backend, &backend_data, f, w, h))
 		return NULL;
 
-	buf = _buffer_new(w, h, backend, backend_data, f, p, EINA_FALSE);
+	buf = _buffer_new(w, h, backend, backend_data, f, p, EINA_FALSE, NULL,
+			NULL);
 
 	return buf;
 }
@@ -171,7 +190,8 @@ EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,
 	backend_data->texture = textures[0];
 	backend_data->num_textures = num_textures;
 
-	b = _buffer_new(w, h, ENESIM_BACKEND_OPENGL, backend_data, f, NULL, EINA_TRUE);
+	b = _buffer_new(w, h, ENESIM_BACKEND_OPENGL, backend_data, f, NULL,
+			EINA_TRUE, NULL, NULL);
 	return b;
 }
 #endif

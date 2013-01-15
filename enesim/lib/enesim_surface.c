@@ -76,6 +76,18 @@ static inline Eina_Bool _buffer_format_to_format(Enesim_Buffer_Format buf_fmt,
 	}
 
 }
+
+static void _surface_sw_free_func(void *data, void *user_data)
+{
+	Enesim_Surface *thiz = user_data;
+	Enesim_Buffer_Sw_Data *sw_data = data;
+
+	if (thiz->free_func)
+	{
+		/* given that is an union it does not matter, i suppose ... */
+		thiz->free_func(sw_data->argb8888_pre.plane0, thiz->free_func_data);
+	}
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -112,25 +124,54 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
  * FIXME: To be fixed
  */
 EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
-		uint32_t w, uint32_t h, Eina_Bool copy,
-		Enesim_Buffer_Sw_Data *data)
+		uint32_t w, uint32_t h, Eina_Bool copy, void *data,
+		size_t stride, Enesim_Buffer_Free free_func, void *user_data)
 {
 	Enesim_Surface *s;
 	Enesim_Buffer *b;
 	Enesim_Buffer_Format buf_fmt;
+	Enesim_Buffer_Sw_Data sw_data;
 
 	if ((!w) || (!h)) return NULL;
 	if (!_format_to_buffer_format(fmt, &buf_fmt))
 		return NULL;
 
-	b = enesim_buffer_new_data_from(buf_fmt, w, h, copy, data);
-	if (!b) return NULL;
+	switch (fmt)
+	{
+		case ENESIM_FORMAT_ARGB8888:
+		case ENESIM_FORMAT_ARGB8888_SPARSE:
+		case ENESIM_FORMAT_XRGB8888:
+		sw_data.argb8888_pre.plane0 = data;
+		sw_data.argb8888_pre.plane0_stride = stride;
+		if (!stride)
+			sw_data.a8.plane0_stride = enesim_format_pitch_get(fmt, w);
+
+		case ENESIM_FORMAT_A8:
+		sw_data.a8.plane0 = data;
+		sw_data.a8.plane0_stride = stride;
+		if (!stride)
+			sw_data.a8.plane0_stride = enesim_format_pitch_get(fmt, w);
+		break;
+
+		default:
+		WRN("Unsupported format %d", s->format);
+		return EINA_FALSE;
+	}
 
 	s = calloc(1, sizeof(Enesim_Surface));
 	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
 	s->format = fmt;
-	s->buffer = b;
+	s->free_func = free_func;
+	s->free_func_data = user_data;
 	s = enesim_surface_ref(s);
+
+	b = enesim_buffer_new_data_from(buf_fmt, w, h, copy, &sw_data, _surface_sw_free_func, s);
+	if (!b)
+	{
+		free(s);
+		return NULL;
+	}
+	s->buffer = b;
 
 	return s;
 }

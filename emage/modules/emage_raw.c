@@ -52,12 +52,9 @@ static Eina_Bool _raw_save(Emage_Data *data, Enesim_Surface *s, void *options)
 	const char str_data[] = "static char _data[] = {";
 	const char str_function[] = "static Enesim_Surface * _surface(void)\n"
 			"{\n"
-			"\tEnesim_Buffer_Sw_Data sw_data;\n"
 			"\tEnesim_Surface *s;\n"
-			"\tsw_data.argb88888.plane0 = _data;\n"
-			"\tsw_data.argb88888.plane0_stride = %d;\n"
 			"\ts = enesim_surface_new_data_from(ENESIM_FORMAT_ARGB8888,\n"
-			"\t\t\t%d,%d,EINA_FALSE, &sw_data);\n"
+			"\t\t\t%d,%d,EINA_FALSE, data, %d, NULL, NULL);\n"
 			"\treturn s;\n"
 			"}\n";
 	char function[PATH_MAX];
@@ -91,7 +88,7 @@ static Eina_Bool _raw_save(Emage_Data *data, Enesim_Surface *s, void *options)
 	}
 	emage_data_write(data, "\n};\n", 4);
 	/* now the function to get such surface */
-	len = snprintf(function, PATH_MAX, str_function, w * 4, w, h);
+	len = snprintf(function, PATH_MAX, str_function, w, h, w * 4);
 	emage_data_write(data, function, len);
 	return EINA_TRUE;
 }

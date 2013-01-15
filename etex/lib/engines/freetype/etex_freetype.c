@@ -151,13 +151,12 @@ static void _etex_freetype_glyph_get(Etex_Engine_Data data, Etex_Engine_Font_Dat
 			Etex_Freetype_Glyph efg;
 			FT_Raster_Params params;
 			unsigned int width, height;
-			Enesim_Buffer_Sw_Data data;
+			void *data;
 
 			width = face->glyph->metrics.width >> 6;
 			height = face->glyph->metrics.height >> 6;
 			if (!width || !height) goto no_surface;
-			data.argb8888_pre.plane0 = calloc(width * height, sizeof(uint32_t));
-			data.argb8888_pre.plane0_stride = width * 4;
+			data = calloc(width * height, sizeof(uint32_t));
 
 			efg.data = &data;
 			efg.glyph = face->glyph;
@@ -168,7 +167,10 @@ static void _etex_freetype_glyph_get(Etex_Engine_Data data, Etex_Engine_Font_Dat
 			params.user = &efg;
 			//printf("getting glyph %c of size %d %d\n", c, width, height);
 			FT_Outline_Render(library, &face->glyph->outline, &params);
-			g->surface = enesim_surface_new_data_from(ENESIM_FORMAT_ARGB8888, width, height, EINA_FALSE, &data);
+			g->surface = enesim_surface_new_data_from(
+					ENESIM_FORMAT_ARGB8888, width, height,
+					EINA_FALSE, data, width * 4, NULL,
+					NULL);
 no_surface:
 			g->origin = (face->glyph->metrics.horiBearingY >> 6);
 			g->x_advance = (face->glyph->metrics.horiAdvance >> 6);

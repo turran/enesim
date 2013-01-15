@@ -95,11 +95,18 @@ typedef union _Enesim_Buffer_Sw_Data
 	Enesim_Buffer_Cmyk cmyk;
 } Enesim_Buffer_Sw_Data;
 
+typedef void (*Enesim_Buffer_Free)(void *data, void *user_data);
+
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f, uint32_t w, uint32_t h);
-EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Eina_Bool copy, Enesim_Buffer_Sw_Data *data);
+EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
+		uint32_t w, uint32_t h, Eina_Bool copy,
+		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		void *free_func_data);
 EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
-		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy, Enesim_Buffer_Sw_Data *data);
+		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
+		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		void *free_func_data);
 
 EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b);
 EAPI void enesim_buffer_unref(Enesim_Buffer *b);

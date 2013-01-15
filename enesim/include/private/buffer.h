@@ -35,7 +35,16 @@ struct _Enesim_Buffer
 	Enesim_Backend backend;
 	void *backend_data;
 	Enesim_Pool *pool;
-	Eina_Bool external_allocated; /* whenever the user wants a buffer by not copying a sw buffer pointer this is true otherwise false */
+	/* callback to use whenever the data is provided
+	 * by the user. This is only used whenever the
+	 * external_allocated flag is set
+	 */
+	Enesim_Buffer_Free free_func;
+	void *free_func_data;
+	/* whenever the user wants a buffer by not copying
+	 * a sw buffer pointer this is true otherwise false
+	 */
+	Eina_Bool external_allocated;
 	/* FIXME make this conditional for windows */
 	Eina_RWLock lock;
 	void *user; /* user provided data */
