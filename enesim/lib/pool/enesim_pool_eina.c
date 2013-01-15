@@ -67,8 +67,8 @@ static Eina_Bool _data_alloc(void *prv,
 		break;
 
 		case ENESIM_BUFFER_FORMAT_RGB888:
-		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w * 2;
+		data->rgb888.plane0 = alloc_data;
+		data->rgb888.plane0_stride = w * 3;
 		break;
 
 		case ENESIM_BUFFER_FORMAT_A8:
