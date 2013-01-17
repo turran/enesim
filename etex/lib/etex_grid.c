@@ -20,7 +20,7 @@
 # include <config.h>
 #endif
 
-#include "Etex.h"
+#include "Enesim_Text.h"
 #include "enesim_text_private.h"
 /* for now we are using only chars, until we need utf8 */
 /*============================================================================*

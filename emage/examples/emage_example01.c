@@ -1,4 +1,4 @@
-#include "Emage.h"
+#include "Enesim_Image.h"
 #include <stdio.h>
 
 int end = 0;

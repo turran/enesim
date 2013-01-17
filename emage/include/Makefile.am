@@ -1,5 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in
 
-include_HEADERS = Emage.h
+include_HEADERS = Enesim_Image.h
 
-EXTRA_DIST = emage_private.h
+EXTRA_DIST = enesim_image_private.h

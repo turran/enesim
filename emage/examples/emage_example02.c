@@ -1,4 +1,4 @@
-#include "Emage.h"
+#include "Enesim_Image.h"
 
 static void help(void)
 {

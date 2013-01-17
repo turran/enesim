@@ -1,5 +1,5 @@
 MAINTAINERCLEANFILES = Makefile.in config.h.in~ config.h.in
 
-include_HEADERS = Etex.h
+include_HEADERS = Enesim_Text.h
 
-EXTRA_DIST = etex_private.h
+EXTRA_DIST = enesim_text_private.h
