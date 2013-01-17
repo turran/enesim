@@ -112,7 +112,7 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 					((ov->b * (long long int) yy) >> 16) + \
 					ov->c; \
 			oedge->counted = ((yy >= oedge->yy0) & (yy < oedge->yy1)); \
-			if (ov->sgn && ((ov->xx1 - ov->xx0) > 2)) \
+			if (ov->sgn) \
 			{ \
 				int dxx = (ov->xx1 - ov->xx0); \
 				double dd = dxx / (double)(ov->yy1 - ov->yy0); \
@@ -134,11 +134,13 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
  \
 				if (lx > lxxc)  lx = lxxc; \
 				if (rx < rxxc)  rx = rxxc; \
+				oedge->lx = (lxxc >> 16); \
 			} \
 			else \
 			{ \
 				if (lx > ov->xx0)  lx = ov->xx0; \
 				if (rx < ov->xx1)  rx = ov->xx1; \
+				oedge->lx = (ov->xx0 >> 16); \
 			} \
 			oedge++; \
 			noedges++; \
@@ -164,7 +166,7 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 					((uv->b * (long long int) yy) >> 16) + \
 					uv->c; \
 			uedge->counted = ((yy >= uedge->yy0) & (yy < uedge->yy1)); \
-			if (uv->sgn && ((uv->xx1 - uv->xx0) > 2)) \
+			if (uv->sgn) \
 			{ \
 				int dxx = (uv->xx1 - uv->xx0); \
 				double dd = dxx / (double)(uv->yy1 - uv->yy0); \
@@ -186,11 +188,13 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
  \
 				if (lx > lxxc)  lx = lxxc; \
 				if (rx < rxxc)  rx = rxxc; \
+				uedge->lx = (lxxc >> 16); \
 			} \
 			else \
 			{ \
 				if (lx > uv->xx0)  lx = uv->xx0; \
 				if (rx < uv->xx1)  rx = uv->xx1; \
+				uedge->lx = (uv->xx0 >> 16); \
 			} \
 			uedge++; \
 			nuedges++; \
@@ -201,10 +205,23 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 	if (!noedges && !nuedges) \
 		goto get_out; \
  \
+	rx = (rx >> 16) + 2 - x; \
+	if (len > rx) \
+	{ \
+		len -= rx; \
+		memset(dst + rx, 0, sizeof(unsigned int) * len); \
+		e -= len; \
+	} \
+	else rx = len; \
+ \
 	lx = (lx >> 16) - 1 - x; \
+repeat: \
+	if (lx > (int)len) \
+		lx = len; \
 	if (lx > 0) \
 	{ \
-		memset(dst, 0, sizeof(unsigned int) * lx); \
+		if (first) \
+			memset(dst, 0, sizeof(unsigned int) * lx); \
 		xx += lx * axx; \
 		d += lx; \
 		n = 0;  oedge = oedges; \
@@ -223,18 +240,55 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 		} \
 	} \
 	else lx = 0; \
- \
-	rx = (rx >> 16) + 2 - x; \
-	if (len > rx) \
-	{ \
-		len -= rx; \
-		memset(dst + rx, 0, sizeof(unsigned int) * len); \
-		e -= len; \
-	} \
-	else rx = len;
+
 
 
 #define EVAL_BI_EDGES_NZ \
+		m = 0; \
+		oedge = oedges; \
+		while (m < noedges) \
+		{ \
+			int ee = oedge->e; \
+ \
+			if (oedge->counted) \
+				ocount += (ee >= 0) - (ee < 0); \
+			if (ee < 0) \
+				ee = -ee; \
+ \
+			if ((ee < 65536) && ((xx + 0xffff) >= oedge->xx0) & \
+					(xx <= (0xffff + oedge->xx1))) \
+			{ \
+				if (oa < 16384) \
+					oa = 65536 - ee; \
+				else \
+					oa = (oa + (65536 - ee)) / 2; \
+			} \
+ \
+			oedge->e += oedge->de; \
+			oedge++; \
+			m++; \
+		} \
+		if (!oa && ocount) \
+		{ \
+			int mx = rx; \
+ \
+			oedge = oedges; \
+			m = 0; \
+			while (m < noedges) \
+			{ \
+				if ((x <= oedge->lx) & (mx > oedge->lx)) \
+					mx = oedge->lx; \
+				oedge->e -= oedge->de; \
+				oedge++; \
+				m++; \
+			} \
+			lx = mx - x; \
+			if (lx < 1) \
+				lx = 1; \
+			ooutside = 0; \
+			goto repeat; \
+		} \
+ \
 		n = 0; \
 		uedge = uedges; \
 		while (n < nuedges) \
@@ -259,31 +313,42 @@ static inline Enesim_Rasterizer_BiFigure * _bifigure_get(Enesim_Renderer *r)
 			uedge++; \
 			n++; \
 		} \
- \
-		m = 0; \
-		oedge = oedges; \
-		while (m < noedges) \
+		if (!oa && !ua) \
 		{ \
-			int ee = oedge->e; \
+			int mx = rx, nx = rx; \
  \
-			if (oedge->counted) \
-				ocount += (ee >= 0) - (ee < 0); \
-			if (ee < 0) \
-				ee = -ee; \
- \
-			if ((ee < 65536) && ((xx + 0xffff) >= oedge->xx0) & \
-					(xx <= (0xffff + oedge->xx1))) \
+			uedge = uedges; \
+			n = 0; \
+			while (n < nuedges) \
 			{ \
-				if (oa < 16384) \
-					oa = 65536 - ee; \
-				else \
-					oa = (oa + (65536 - ee)) / 2; \
+				if ((x <= uedge->lx) & (nx > uedge->lx)) \
+					nx = uedge->lx; \
+				uedge->e -= uedge->de; \
+				uedge++; \
+				n++; \
 			} \
+			lx = nx - x; \
+			uoutside = !ucount; \
  \
-			oedge->e += oedge->de; \
-			oedge++; \
-			m++; \
-		}
+			oedge = oedges; \
+			m = 0; \
+			while (m < noedges) \
+			{ \
+				if ((x <= oedge->lx) & (mx > oedge->lx)) \
+					mx = oedge->lx; \
+				oedge->e -= oedge->de; \
+				oedge++; \
+				m++; \
+			} \
+			if (lx > (mx - x)) \
+				lx = mx - x; \
+			if (lx < 1) \
+				lx = 1; \
+			ooutside = 1; \
+			goto repeat; \
+		} \
+ \
+
 
 
 static void _bifig_stroke_fill_paint_nz(Enesim_Renderer *r,
@@ -310,6 +375,7 @@ static void _bifig_stroke_fill_paint_nz(Enesim_Renderer *r,
 
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
+	int first = 1, ooutside = 0, uoutside = 0;
 
 	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
 	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
@@ -334,21 +400,64 @@ get_out:
 
 	SETUP_BI_EDGES
 
-	scolor = sstate->stroke.color;
-	fcolor = sstate->fill.color;
-	fpaint = sstate->fill.r;
-
-	color = state->color;
-	if (color != 0xffffffff)
+	if (first)
 	{
-		scolor = argb8888_mul4_sym(color, scolor);
-		fcolor = argb8888_mul4_sym(color, fcolor);
+		first = 0;
+		scolor = sstate->stroke.color;
+		fcolor = sstate->fill.color;
+		fpaint = sstate->fill.r;
+		color = state->color;
+		if (color != 0xffffffff)
+		{
+			scolor = argb8888_mul4_sym(color, scolor);
+			fcolor = argb8888_mul4_sym(color, fcolor);
+		}
+		if (fpaint)
+			enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
+		rx += x;
 	}
-	if (fpaint)
+	else
 	{
-		enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
+		int dx = lx;
+
+		dst = d - lx;
+		if (dx > (e - dst))
+			dx = (e - dst);
+		if (!ooutside)
+		{
+			uint32_t *ne = dst + dx;
+
+			while(dst < ne)
+				*dst++ = scolor;
+		}
+		else
+		{
+			if (!uoutside)
+			{
+				uint32_t *ne = dst + dx;
+
+				if (!fpaint)
+				{
+					while(dst < ne)
+						*dst++ = fcolor;
+				}
+				else if (fcolor != 0xffffffff)
+				{
+					while(dst < ne)
+					{
+						uint32_t tmp;
+
+						tmp = argb8888_mul4_sym(fcolor, *dst);
+						*dst++ = tmp;
+					}
+				}
+			}
+			else
+				memset(dst, 0, sizeof(unsigned int) * dx);
+		}
 	}
 
+	x += lx;
 	while (d < e)
 	{
 		unsigned int p0 = 0;
@@ -417,6 +526,7 @@ get_out:
 		}
 		*d++ = p0;
 		xx += axx;
+		x++;
 	}
 }
 
@@ -444,6 +554,7 @@ static void _bifig_stroke_paint_fill_nz(Enesim_Renderer *r,
 
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
+	int first = 1, ooutside = 0, uoutside = 0;
 
 	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
 	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
@@ -468,19 +579,59 @@ get_out:
 
 	SETUP_BI_EDGES
 
-	scolor = sstate->stroke.color;
-	spaint = sstate->stroke.r;
-	fcolor = sstate->fill.color;
-
-	color = state->color;
-	if (color != 0xffffffff)
+	if (first)
 	{
-		scolor = argb8888_mul4_sym(color, scolor);
-		fcolor = argb8888_mul4_sym(color, fcolor);
+		first = 0;
+		scolor = sstate->stroke.color;
+		spaint = sstate->stroke.r;
+		fcolor = sstate->fill.color;
+		color = state->color;
+		if (color != 0xffffffff)
+		{
+			scolor = argb8888_mul4_sym(color, scolor);
+			fcolor = argb8888_mul4_sym(color, fcolor);
+		}
+
+		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
+		rx += x;
+	}
+	else
+	{
+		int dx = lx;
+
+		dst = d - lx;
+		if (dx > (e - dst))
+			dx = (e - dst);
+		if (!ooutside)
+		{
+			if (scolor != 0xffffffff)
+			{
+				uint32_t *ne = dst + dx;
+
+				while(dst < ne)
+				{
+					uint32_t tmp;
+
+					tmp = argb8888_mul4_sym(scolor, *dst);
+					*dst++ = tmp;
+				}
+			}
+		}
+		else
+		{
+			if (!uoutside)
+			{
+				uint32_t *ne = dst + dx;
+
+				while(dst < ne)
+					*dst++ = fcolor;
+			}
+			else
+				memset(dst, 0, sizeof(unsigned int) * dx);
+		}
 	}
 
-	enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
-
+	x += lx;
 	while (d < e)
 	{
 		unsigned int p0 = 0;
@@ -528,6 +679,7 @@ get_out:
 		}
 		*d++ = p0;
 		xx += axx;
+		x++;
 	}
 }
 
@@ -556,6 +708,7 @@ static void _bifig_stroke_paint_fill_paint_nz(Enesim_Renderer *r,
 
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
+	int first = 1, ooutside = 0, uoutside = 0;
 
 	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
 	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
@@ -580,24 +733,73 @@ get_out:
 
 	SETUP_BI_EDGES
 
-	scolor = sstate->stroke.color;
-	spaint = sstate->stroke.r;
-	fcolor = sstate->fill.color;
-	fpaint = sstate->fill.r;
-
-	color = state->color;
-	if (color != 0xffffffff)
+	if (first)
 	{
-		scolor = argb8888_mul4_sym(color, scolor);
-		fcolor = argb8888_mul4_sym(color, fcolor);
+		first = 0;
+		scolor = sstate->stroke.color;
+		spaint = sstate->stroke.r;
+		fcolor = sstate->fill.color;
+		fpaint = sstate->fill.r;
+		color = state->color;
+		if (color != 0xffffffff)
+		{
+			scolor = argb8888_mul4_sym(color, scolor);
+			fcolor = argb8888_mul4_sym(color, fcolor);
+		}
+
+		sbuf = alloca((rx - lx) * sizeof(unsigned int));
+		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, sbuf);
+		s = sbuf;
+
+		enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
+		rx += x;
+	}
+	else
+	{
+		int dx = lx;
+
+		dst = d - lx;
+		if (dx > (e - dst))
+			dx = (e - dst);
+
+		if (!ooutside)
+		{
+			uint32_t *sb = s, *ne = dst + dx;
+
+			while(dst < ne)
+			{
+				uint32_t tmp = *sb;
+
+				if (scolor != 0xffffffff)
+					tmp = argb8888_mul4_sym(scolor, tmp);
+				*dst++ = tmp;
+				sb++;
+			}
+		}
+		else
+		{
+			if (!uoutside)
+			{
+				uint32_t *ne = dst + dx;
+
+				if (fcolor != 0xffffffff)
+				{
+					while(dst < ne)
+					{
+						uint32_t tmp;
+
+						tmp = argb8888_mul4_sym(fcolor, *dst);
+						*dst++ = tmp;
+					}
+				}
+			}
+			else
+				memset(dst, 0, sizeof(unsigned int) * dx);
+		}
+		s += lx;
 	}
 
-	sbuf = alloca((rx - lx) * sizeof(unsigned int));
-	enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, sbuf);
-	s = sbuf;
-
-	enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
-
+	x += lx;
 	while (d < e)
 	{
 		unsigned int p0 = 0;
@@ -658,11 +860,57 @@ get_out:
 		*d++ = p0;
 		s++;
 		xx += axx;
+		x++;
 	}
 }
 
 
 #define EVAL_BI_EDGES_EO_U \
+		m = 0; \
+		oedge = oedges; \
+		while (m < noedges) \
+		{ \
+			int ee = oedge->e; \
+ \
+			if (oedge->counted) \
+				ocount += (ee >= 0) - (ee < 0); \
+			if (ee < 0) \
+				ee = -ee; \
+ \
+			if ((ee < 65536) && ((xx + 0xffff) >= oedge->xx0) & \
+					(xx <= (0xffff + oedge->xx1))) \
+			{ \
+				if (oa < 16384) \
+					oa = 65536 - ee; \
+				else \
+					oa = (oa + (65536 - ee)) / 2; \
+			} \
+ \
+			oedge->e += oedge->de; \
+			oedge++; \
+			m++; \
+		} \
+		if (!oa && ocount) \
+		{ \
+			int mx = rx; \
+ \
+			oedge = oedges; \
+			m = 0; \
+			while (m < noedges) \
+			{ \
+				if ((x <= oedge->lx) & (mx > oedge->lx)) \
+					mx = oedge->lx; \
+				oedge->e -= oedge->de; \
+				oedge++; \
+				m++; \
+			} \
+			lx = mx - x; \
+			if (lx < 1) \
+				lx = 1; \
+			ooutside = 0; \
+			goto repeat; \
+		} \
+ \
 		n = 0; \
 		uedge = uedges; \
 		while (n < nuedges) \
@@ -696,30 +944,41 @@ get_out:
 		else \
 			uin = (unp % 2); \
  \
-		m = 0; \
-		oedge = oedges; \
-		while (m < noedges) \
+		if (!oa && !ua) \
 		{ \
-			int ee = oedge->e; \
+			int mx = rx, nx = rx; \
  \
-			if (oedge->counted) \
-				ocount += (ee >= 0) - (ee < 0); \
-			if (ee < 0) \
-				ee = -ee; \
- \
-			if ((ee < 65536) && ((xx + 0xffff) >= oedge->xx0) & \
-					(xx <= (0xffff + oedge->xx1))) \
+			uedge = uedges; \
+			n = 0; \
+			while (n < nuedges) \
 			{ \
-				if (oa < 16384) \
-					oa = 65536 - ee; \
-				else \
-					oa = (oa + (65536 - ee)) / 2; \
+				if ((x <= uedge->lx) & (nx > uedge->lx)) \
+					nx = uedge->lx; \
+				uedge->e -= uedge->de; \
+				uedge++; \
+				n++; \
 			} \
+			lx = nx - x; \
+			uoutside = !uin; \
  \
-			oedge->e += oedge->de; \
-			oedge++; \
-			m++; \
-		}
+			oedge = oedges; \
+			m = 0; \
+			while (m < noedges) \
+			{ \
+				if ((x <= oedge->lx) & (mx > oedge->lx)) \
+					mx = oedge->lx; \
+				oedge->e -= oedge->de; \
+				oedge++; \
+				m++; \
+			} \
+			if (lx > (mx - x)) \
+				lx = mx - x; \
+			if (lx < 1) \
+				lx = 1; \
+			ooutside = 1; \
+			goto repeat; \
+		} \
+
 
 static void _bifig_stroke_fill_paint_eo_u(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
@@ -744,6 +1003,7 @@ static void _bifig_stroke_fill_paint_eo_u(Enesim_Renderer *r,
 
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
+	int first = 1, ooutside = 0, uoutside = 0;
 
 	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
 	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
@@ -767,21 +1027,64 @@ get_out:
 
 	SETUP_BI_EDGES
 
-	scolor = sstate->stroke.color;
-	fcolor = sstate->fill.color;
-	fpaint = sstate->fill.r;
-
-	enesim_renderer_color_get(r, &color);
-	if (color != 0xffffffff)
+	if (first)
 	{
-		scolor = argb8888_mul4_sym(color, scolor);
-		fcolor = argb8888_mul4_sym(color, fcolor);
+		first = 0;
+		scolor = sstate->stroke.color;
+		fcolor = sstate->fill.color;
+		fpaint = sstate->fill.r;
+		color = state->color;
+		if (color != 0xffffffff)
+		{
+			scolor = argb8888_mul4_sym(color, scolor);
+			fcolor = argb8888_mul4_sym(color, fcolor);
+		}
+		if (fpaint)
+			enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
+		rx += x;
 	}
-	if (fpaint)
+	else
 	{
-		enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
+		int dx = lx;
+
+		dst = d - lx;
+		if (dx > (e - dst))
+			dx = (e - dst);
+		if (!ooutside)
+		{
+			uint32_t *ne = dst + dx;
+
+			while(dst < ne)
+				*dst++ = scolor;
+		}
+		else
+		{
+			if (!uoutside)
+			{
+				uint32_t *ne = dst + dx;
+
+				if (!fpaint)
+				{
+					while(dst < ne)
+						*dst++ = fcolor;
+				}
+				else if (fcolor != 0xffffffff)
+				{
+					while(dst < ne)
+					{
+						uint32_t tmp;
+
+						tmp = argb8888_mul4_sym(fcolor, *dst);
+						*dst++ = tmp;
+					}
+				}
+			}
+			else
+				memset(dst, 0, sizeof(unsigned int) * dx);
+		}
 	}
 
+	x += lx;
 	while (d < e)
 	{
 		unsigned int p0 = 0;
@@ -851,6 +1154,7 @@ get_out:
 		}
 		*d++ = p0;
 		xx += axx;
+		x++;
 	}
 }
 
@@ -877,6 +1181,7 @@ static void _bifig_stroke_paint_fill_eo_u(Enesim_Renderer *r,
 
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
+	int first = 1, ooutside = 0, uoutside = 0;
 
 	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
 	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
@@ -900,19 +1205,59 @@ get_out:
 
 	SETUP_BI_EDGES
 
-	scolor = sstate->stroke.color;
-	spaint = sstate->stroke.r;
-	fcolor = sstate->fill.color;
-
-	enesim_renderer_color_get(r, &color);
-	if (color != 0xffffffff)
+	if (first)
 	{
-		scolor = argb8888_mul4_sym(color, scolor);
-		fcolor = argb8888_mul4_sym(color, fcolor);
+		first = 0;
+		scolor = sstate->stroke.color;
+		spaint = sstate->stroke.r;
+		fcolor = sstate->fill.color;
+		color = state->color;
+		if (color != 0xffffffff)
+		{
+			scolor = argb8888_mul4_sym(color, scolor);
+			fcolor = argb8888_mul4_sym(color, fcolor);
+		}
+
+		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
+		rx += x;
+	}
+	else
+	{
+		int dx = lx;
+
+		dst = d - lx;
+		if (dx > (e - dst))
+			dx = (e - dst);
+		if (!ooutside)
+		{
+			if (scolor != 0xffffffff)
+			{
+				uint32_t *ne = dst + dx;
+
+				while(dst < ne)
+				{
+					uint32_t tmp;
+
+					tmp = argb8888_mul4_sym(scolor, *dst);
+					*dst++ = tmp;
+				}
+			}
+		}
+		else
+		{
+			if (!uoutside)
+			{
+				uint32_t *ne = dst + dx;
+
+				while(dst < ne)
+					*dst++ = fcolor;
+			}
+			else
+				memset(dst, 0, sizeof(unsigned int) * dx);
+		}
 	}
 
-	enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
-
+	x += lx;
 	while (d < e)
 	{
 		unsigned int p0 = 0;
@@ -961,6 +1306,7 @@ get_out:
 		}
 		*d++ = p0;
 		xx += axx;
+		x++;
 	}
 }
 
@@ -988,6 +1334,7 @@ static void _bifig_stroke_paint_fill_paint_eo_u(Enesim_Renderer *r,
 
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
+	int first = 1, ooutside = 0, uoutside = 0;
 
 	int axx = thiz->matrix.xx, axz = thiz->matrix.xz;
 	int ayy = thiz->matrix.yy, ayz = thiz->matrix.yz;
@@ -1011,24 +1358,73 @@ get_out:
 
 	SETUP_BI_EDGES
 
-	scolor = sstate->stroke.color;
-	spaint = sstate->stroke.r;
-	fcolor = sstate->fill.color;
-	fpaint = sstate->fill.r;
-
-	enesim_renderer_color_get(r, &color);
-	if (color != 0xffffffff)
+	if (first)
 	{
-		scolor = argb8888_mul4_sym(color, scolor);
-		fcolor = argb8888_mul4_sym(color, fcolor);
+		first = 0;
+		scolor = sstate->stroke.color;
+		spaint = sstate->stroke.r;
+		fcolor = sstate->fill.color;
+		fpaint = sstate->fill.r;
+		color = state->color;
+		if (color != 0xffffffff)
+		{
+			scolor = argb8888_mul4_sym(color, scolor);
+			fcolor = argb8888_mul4_sym(color, fcolor);
+		}
+
+		sbuf = alloca((rx - lx) * sizeof(unsigned int));
+		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, sbuf);
+		s = sbuf;
+
+		enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
+		rx += x;
+	}
+	else
+	{
+		int dx = lx;
+
+		dst = d - lx;
+		if (dx > (e - dst))
+			dx = (e - dst);
+
+		if (!ooutside)
+		{
+			uint32_t *sb = s, *ne = dst + dx;
+
+			while(dst < ne)
+			{
+				uint32_t tmp = *sb;
+
+				if (scolor != 0xffffffff)
+					tmp = argb8888_mul4_sym(scolor, tmp);
+				*dst++ = tmp;
+				sb++;
+			}
+		}
+		else
+		{
+			if (!uoutside)
+			{
+				if (fcolor != 0xffffffff)
+				{
+					uint32_t *ne = dst + dx;
+
+					while(dst < ne)
+					{
+						uint32_t tmp;
+
+						tmp = argb8888_mul4_sym(fcolor, *dst);
+						*dst++ = tmp;
+					}
+				}
+			}
+			else
+				memset(dst, 0, sizeof(unsigned int) * dx);
+		}
+		s += lx;
 	}
 
-	sbuf = alloca((rx - lx) * sizeof(unsigned int));
-	enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, sbuf);
-	s = sbuf;
-
-	enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
-
+	x += lx;
 	while (d < e)
 	{
 		unsigned int p0 = 0;
@@ -1090,6 +1486,7 @@ get_out:
 		*d++ = p0;
 		s++;
 		xx += axx;
+		x++;
 	}
 }
 
