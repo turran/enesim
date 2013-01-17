@@ -21,26 +21,26 @@
 #endif
 
 #include "Etex.h"
-#include "etex_private.h"
+#include "enesim_text_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-struct _Etex_Buffer
+struct _Enesim_Text_Buffer
 {
 	void *data;
-	Etex_Buffer_Descriptor *descriptor;
+	Enesim_Text_Buffer_Descriptor *descriptor;
 };
 
-typedef struct _Etex_Buffer_Default
+typedef struct _Enesim_Text_Buffer_Default
 {
 	char *string;
 	size_t length; /* string length */
 	size_t bytes; /* alloced length */
-} Etex_Buffer_Default;
+} Enesim_Text_Buffer_Default;
 
 static void _default_string_set(void *data, const char *string, int length)
 {
-	Etex_Buffer_Default *thiz = data;
+	Enesim_Text_Buffer_Default *thiz = data;
 
 	/* first create the needed space */
 	if (length < 0)
@@ -58,7 +58,7 @@ static void _default_string_set(void *data, const char *string, int length)
 
 static int _default_string_insert(void *data, const char *string, int length, ssize_t offset)
 {
-	Etex_Buffer_Default *thiz = data;
+	Enesim_Text_Buffer_Default *thiz = data;
 	int new_length;
 	int to_move;
 	int i;
@@ -94,33 +94,33 @@ static int _default_string_insert(void *data, const char *string, int length, ss
 
 static int _default_string_delete(void *data, int length, ssize_t offset)
 {
-	Etex_Buffer_Default *thiz = data;
+	Enesim_Text_Buffer_Default *thiz = data;
 
 	return 0;
 }
 
 static const char * _default_string_get(void *data)
 {
-	Etex_Buffer_Default *thiz = data;
+	Enesim_Text_Buffer_Default *thiz = data;
 	return thiz->string;
 }
 
 static int _default_string_length(void *data)
 {
-	Etex_Buffer_Default *thiz = data;
+	Enesim_Text_Buffer_Default *thiz = data;
 	return thiz->length;
 }
 
 static void _default_free(void *data)
 {
-	Etex_Buffer_Default *thiz = data;
+	Enesim_Text_Buffer_Default *thiz = data;
 
 	free(thiz->string);
 	free(thiz);
 }
 
 /* the default buffer */
-Etex_Buffer_Descriptor _etex_buffer_default = {
+Enesim_Text_Buffer_Descriptor _enesim_text_buffer_default = {
 	/* .string_get = */ _default_string_get,
 	/* .string_set = */ _default_string_set,
 	/* .string_insert = */ _default_string_insert,
@@ -138,31 +138,31 @@ Etex_Buffer_Descriptor _etex_buffer_default = {
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Etex_Buffer * etex_buffer_new(int initial_length)
+EAPI Enesim_Text_Buffer * enesim_text_buffer_new(int initial_length)
 {
-	Etex_Buffer_Default *bd;
+	Enesim_Text_Buffer_Default *bd;
 
-	bd = calloc(1, sizeof(Etex_Buffer_Default));
+	bd = calloc(1, sizeof(Enesim_Text_Buffer_Default));
 	if (initial_length <= 0)
 		initial_length = PATH_MAX;
 	bd->string = calloc(initial_length, sizeof(char));
 	bd->bytes = initial_length;
 	bd->length = 0;
 
-	return etex_buffer_new_from_descriptor(&_etex_buffer_default, bd);
+	return enesim_text_buffer_new_from_descriptor(&_enesim_text_buffer_default, bd);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Etex_Buffer * etex_buffer_new_from_descriptor(Etex_Buffer_Descriptor *descriptor, void *data)
+EAPI Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_Descriptor *descriptor, void *data)
 {
-	Etex_Buffer *b;
+	Enesim_Text_Buffer *b;
 
 	if (!descriptor) return NULL;
 
-	b = calloc(1, sizeof(Etex_Buffer));
+	b = calloc(1, sizeof(Enesim_Text_Buffer));
 	b->descriptor = descriptor;
 	b->data = data;
 
@@ -173,7 +173,7 @@ EAPI Etex_Buffer * etex_buffer_new_from_descriptor(Etex_Buffer_Descriptor *descr
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void etex_buffer_delete(Etex_Buffer *b)
+EAPI void enesim_text_buffer_delete(Enesim_Text_Buffer *b)
 {
 	if (!b) return;
 
@@ -186,7 +186,7 @@ EAPI void etex_buffer_delete(Etex_Buffer *b)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void etex_buffer_string_set(Etex_Buffer *b, const char *string, int length)
+EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *b, const char *string, int length)
 {
 	if (!length) return;
 	if (!b) return;
@@ -199,7 +199,7 @@ EAPI void etex_buffer_string_set(Etex_Buffer *b, const char *string, int length)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int etex_buffer_string_insert(Etex_Buffer *b, const char *string, int length, ssize_t offset)
+EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *b, const char *string, int length, ssize_t offset)
 {
 	if (!length) return length;
 
@@ -212,7 +212,7 @@ EAPI int etex_buffer_string_insert(Etex_Buffer *b, const char *string, int lengt
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * etex_buffer_string_get(Etex_Buffer *b)
+EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *b)
 {
 	if (b->descriptor->string_get)
 		return b->descriptor->string_get(b->data);
@@ -223,7 +223,7 @@ EAPI const char * etex_buffer_string_get(Etex_Buffer *b)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int etex_buffer_string_delete(Etex_Buffer *b, int length, ssize_t offset)
+EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *b, int length, ssize_t offset)
 {
 	if (!length) return length;
 
@@ -236,7 +236,7 @@ EAPI int etex_buffer_string_delete(Etex_Buffer *b, int length, ssize_t offset)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int etex_buffer_string_length(Etex_Buffer *b)
+EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *b)
 {
 	if (!b) return 0;
 	if (b->descriptor->string_length)

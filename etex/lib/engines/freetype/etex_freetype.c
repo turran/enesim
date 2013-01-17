@@ -20,7 +20,7 @@
 #endif
 
 #include "Etex.h"
-#include "etex_private.h"
+#include "enesim_text_private.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -29,14 +29,14 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Etex_Freetype_Glyph
+typedef struct _Enesim_Text_Freetype_Glyph
 {
 	FT_GlyphSlot glyph;
 	Enesim_Buffer_Sw_Data *data;
-} Etex_Freetype_Glyph;
+} Enesim_Text_Freetype_Glyph;
 
 
-static void * _etex_freetype_init(void)
+static void * _enesim_text_freetype_init(void)
 {
 	static FT_Library library = NULL;
 
@@ -45,14 +45,14 @@ static void * _etex_freetype_init(void)
 	return library;
 }
 
-static void _etex_freetype_shutdown(void *data)
+static void _enesim_text_freetype_shutdown(void *data)
 {
 	FT_Library library = data;
 
 	FT_Done_FreeType(library);
 }
 
-static Etex_Engine_Font_Data _etex_freetype_font_load(Etex_Engine_Data data, const char *name, int size)
+static Enesim_Text_Engine_Font_Data _enesim_text_freetype_font_load(Enesim_Text_Engine_Data data, const char *name, int size)
 {
 	FT_Library library = data;
 	FT_Face face;
@@ -65,12 +65,12 @@ static Etex_Engine_Font_Data _etex_freetype_font_load(Etex_Engine_Data data, con
 	return face;
 }
 
-static void _etex_freetype_font_delete(Etex_Engine_Data data, Etex_Engine_Font_Data fdata)
+static void _enesim_text_freetype_font_delete(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
 {
 
 }
 
-static int _etex_freetype_font_max_ascent_get(Etex_Engine_Data data, Etex_Engine_Font_Data fdata)
+static int _enesim_text_freetype_font_max_ascent_get(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
 {
 	FT_Face face = fdata;
 	int asc;
@@ -85,7 +85,7 @@ static int _etex_freetype_font_max_ascent_get(Etex_Engine_Data data, Etex_Engine
 	return asc;
 }
 
-static int _etex_freetype_font_max_descent_get(Etex_Engine_Data data, Etex_Engine_Font_Data fdata)
+static int _enesim_text_freetype_font_max_descent_get(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
 {
 	FT_Face face = fdata;
 	int desc;
@@ -105,7 +105,7 @@ static void _raster_callback(const int y,
                const FT_Span * const spans,
                void * const user)
 {
-	Etex_Freetype_Glyph *efg = (Etex_Freetype_Glyph *)user;
+	Enesim_Text_Freetype_Glyph *efg = (Enesim_Text_Freetype_Glyph *)user;
 	int width;
 	int height;
 	int i;
@@ -137,7 +137,7 @@ static void _raster_callback(const int y,
 	}
 }
 
-static void _etex_freetype_glyph_get(Etex_Engine_Data data, Etex_Engine_Font_Data fdata, char c, Etex_Glyph *g)
+static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g)
 {
 	FT_UInt gindex;
 	FT_Face face = fdata;
@@ -148,7 +148,7 @@ static void _etex_freetype_glyph_get(Etex_Engine_Data data, Etex_Engine_Font_Dat
 	{
 		if (face->glyph->format == FT_GLYPH_FORMAT_OUTLINE)
 		{
-			Etex_Freetype_Glyph efg;
+			Enesim_Text_Freetype_Glyph efg;
 			FT_Raster_Params params;
 			unsigned int width, height;
 			void *data;
@@ -180,14 +180,14 @@ no_surface:
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Etex_Engine etex_freetype  = {
-	.init = _etex_freetype_init,
-	.shutdown = _etex_freetype_shutdown,
-	.font_load = _etex_freetype_font_load,
-	.font_delete = _etex_freetype_font_delete,
-	.font_max_ascent_get = _etex_freetype_font_max_ascent_get,
-	.font_max_descent_get = _etex_freetype_font_max_descent_get,
-	.font_glyph_get = _etex_freetype_glyph_get,
+Enesim_Text_Engine enesim_text_freetype  = {
+	.init = _enesim_text_freetype_init,
+	.shutdown = _enesim_text_freetype_shutdown,
+	.font_load = _enesim_text_freetype_font_load,
+	.font_delete = _enesim_text_freetype_font_delete,
+	.font_max_ascent_get = _enesim_text_freetype_font_max_ascent_get,
+	.font_max_descent_get = _enesim_text_freetype_font_max_descent_get,
+	.font_glyph_get = _enesim_text_freetype_glyph_get,
 };
 /*============================================================================*
  *                                   API                                      *

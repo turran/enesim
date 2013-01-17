@@ -2,14 +2,14 @@
 
 int main(void)
 {
-	Etex_Buffer *b;
-	etex_init();
+	Enesim_Text_Buffer *b;
+	enesim_text_init();
 
-	b = etex_buffer_new(0);
-	etex_buffer_string_set(b, "ABCDE", -1);
-	printf("current string = %s\n", etex_buffer_string_get(b));
-	etex_buffer_string_insert(b, "1234", -1, 3);
-	printf("current string = %s\n", etex_buffer_string_get(b));
-	etex_shutdown();
+	b = enesim_text_buffer_new(0);
+	enesim_text_buffer_string_set(b, "ABCDE", -1);
+	printf("current string = %s\n", enesim_text_buffer_string_get(b));
+	enesim_text_buffer_string_insert(b, "1234", -1, 3);
+	printf("current string = %s\n", enesim_text_buffer_string_get(b));
+	enesim_text_shutdown();
 	return 0;
 }

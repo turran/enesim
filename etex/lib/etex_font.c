@@ -25,31 +25,31 @@
 #endif
 
 #include "Etex.h"
-#include "etex_private.h"
+#include "enesim_text_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-struct _Etex_Font
+struct _Enesim_Text_Font
 {
 	Etex *etex;
-	Etex_Engine_Font_Data data;
+	Enesim_Text_Engine_Font_Data data;
 	Eina_Hash *glyphs;
 	char *key;
 	int ref;
 };
 
-static void _font_ref(Etex_Font *f)
+static void _font_ref(Enesim_Text_Font *f)
 {
 	f->ref++;
 }
 
-static void _font_unload(Etex_Font *f)
+static void _font_unload(Enesim_Text_Font *f)
 {
 	f->etex->engine->font_delete(f->etex->data, f->data);
 	eina_hash_del(f->etex->fonts, f->key, f);
 }
 
-static void _font_unref(Etex_Font *f)
+static void _font_unref(Enesim_Text_Font *f)
 {
 	if (f->ref <= 0)
 	{
@@ -69,7 +69,7 @@ static void _font_unref(Etex_Font *f)
 #if HAVE_EMAGE
 static Eina_Bool _dump(const Eina_Hash *hash, const void *key, void *data, void *fdata)
 {
-	Etex_Glyph *g = (Etex_Glyph *)data;
+	Enesim_Text_Glyph *g = (Enesim_Text_Glyph *)data;
 	char c = *(int *)key;
 	char fout[PATH_MAX];
 	char *path = fdata;
@@ -82,10 +82,10 @@ static Eina_Bool _dump(const Eina_Hash *hash, const void *key, void *data, void 
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Etex_Font * etex_font_load(Etex *e, const char *name, int size)
+Enesim_Text_Font * enesim_text_font_load(Etex *e, const char *name, int size)
 {
-	Etex_Font *f;
-	Etex_Engine_Font_Data data;
+	Enesim_Text_Font *f;
+	Enesim_Text_Engine_Font_Data data;
 	char *key;
 	size_t len;
 
@@ -108,7 +108,7 @@ Etex_Font * etex_font_load(Etex *e, const char *name, int size)
 		return NULL;
 	}
 
-	f = calloc(1, sizeof(Etex_Font));
+	f = calloc(1, sizeof(Enesim_Text_Font));
 	f->etex = e;
 	f->data = data;
 	f->key = key;
@@ -119,52 +119,52 @@ Etex_Font * etex_font_load(Etex *e, const char *name, int size)
 	return f;
 }
 
-void etex_font_unref(Etex_Font *f)
+void enesim_text_font_unref(Enesim_Text_Font *f)
 {
 	if (!f) return;
 	_font_unref(f);
 }
 
-Etex_Font * etex_font_ref(Etex_Font *f)
+Enesim_Text_Font * enesim_text_font_ref(Enesim_Text_Font *f)
 {
 	if (!f) return NULL;
 	_font_ref(f);
 	return f;
 }
 
-int etex_font_max_ascent_get(Etex_Font *f)
+int enesim_text_font_max_ascent_get(Enesim_Text_Font *f)
 {
 	if (!f) return 0;
 	return f->etex->engine->font_max_ascent_get(f->etex->data, f->data);
 }
 
-int etex_font_max_descent_get(Etex_Font *f)
+int enesim_text_font_max_descent_get(Enesim_Text_Font *f)
 {
 	if (!f) return 0;
 	return f->etex->engine->font_max_descent_get(f->etex->data, f->data);
 }
 
-Etex_Glyph * etex_font_glyph_get(Etex_Font *f, char c)
+Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *f, char c)
 {
-	Etex_Glyph *g;
+	Enesim_Text_Glyph *g;
 
 	if (!f) return NULL;
-	g = calloc(1, sizeof(Etex_Glyph));
+	g = calloc(1, sizeof(Enesim_Text_Glyph));
 	f->etex->engine->font_glyph_get(f->etex->data, f->data, c, g);
 
 	return g;
 }
 
-Etex_Glyph * etex_font_glyph_load(Etex_Font *f, char c)
+Enesim_Text_Glyph * enesim_text_font_glyph_load(Enesim_Text_Font *f, char c)
 {
-	Etex_Glyph *g;
+	Enesim_Text_Glyph *g;
 	int key;
 
 	key = c;
 	g = eina_hash_find(f->glyphs, &key);
 	if (!g)
 	{
-		g = etex_font_glyph_get(f, c);
+		g = enesim_text_font_glyph_get(f, c);
 		if (!g) goto end;
 		eina_hash_add(f->glyphs, &key, g);
 	}
@@ -173,9 +173,9 @@ end:
 	return g;
 }
 
-void etex_font_glyph_unload(Etex_Font *f, char c)
+void enesim_text_font_glyph_unload(Enesim_Text_Font *f, char c)
 {
-	Etex_Glyph *g;
+	Enesim_Text_Glyph *g;
 	int key;
 
 	key = c;
@@ -191,7 +191,7 @@ void etex_font_glyph_unload(Etex_Font *f, char c)
 	}
 }
 
-void etex_font_dump(Etex_Font *f, const char *path)
+void enesim_text_font_dump(Enesim_Text_Font *f, const char *path)
 {
 #if HAVE_EMAGE
 	eina_hash_foreach(f->glyphs, _dump, path);

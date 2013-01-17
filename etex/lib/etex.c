@@ -21,13 +21,13 @@
 #endif
 
 #include "Etex.h"
-#include "etex_private.h"
+#include "enesim_text_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static int _etex_init_count = 0;
+static int _enesim_text_init_count = 0;
 
-static void _etex_setup(Etex *e)
+static void _enesim_text_setup(Etex *e)
 {
 	e->data = e->engine->init();
 	e->fonts = eina_hash_string_superfast_new(NULL);
@@ -36,10 +36,10 @@ static void _etex_setup(Etex *e)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-int etex_log_dom_global = -1;
+int enesim_text_log_dom_global = -1;
 
 #if HAVE_FREETYPE
-extern Etex_Engine etex_freetype;
+extern Enesim_Text_Engine enesim_text_freetype;
 #endif
 /*============================================================================*
  *                                   API                                      *
@@ -48,19 +48,19 @@ extern Etex_Engine etex_freetype;
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int etex_init(void)
+EAPI int enesim_text_init(void)
 {
-	if (++_etex_init_count != 1)
-		return _etex_init_count;
+	if (++_enesim_text_init_count != 1)
+		return _enesim_text_init_count;
 
 	if (!eina_init())
 	{
 		fprintf(stderr, "Etex: Eina init failed");
-		return --_etex_init_count;
+		return --_enesim_text_init_count;
 	}
 
-	etex_log_dom_global = eina_log_domain_register("etex", ETEX_LOG_COLOR_DEFAULT);
-	if (etex_log_dom_global < 0)
+	enesim_text_log_dom_global = eina_log_domain_register("etex", ENESIM_TEXT_LOG_COLOR_DEFAULT);
+	if (enesim_text_log_dom_global < 0)
 	{
 		EINA_LOG_ERR("Etex: Can not create a general log domain.");
 		goto shutdown_eina;
@@ -72,30 +72,30 @@ EAPI int etex_init(void)
 		goto unregister_log_domain;
 	}
 
-	return _etex_init_count;
+	return _enesim_text_init_count;
 
   unregister_log_domain:
-	eina_log_domain_unregister(etex_log_dom_global);
-	etex_log_dom_global = -1;
+	eina_log_domain_unregister(enesim_text_log_dom_global);
+	enesim_text_log_dom_global = -1;
   shutdown_eina:
 	eina_shutdown();
-	return --_etex_init_count;
+	return --_enesim_text_init_count;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int etex_shutdown(void)
+EAPI int enesim_text_shutdown(void)
 {
-	if (--_etex_init_count != 0)
-		return _etex_init_count;
+	if (--_enesim_text_init_count != 0)
+		return _enesim_text_init_count;
 
 	enesim_shutdown();
-	eina_log_domain_unregister(etex_log_dom_global);
-	etex_log_dom_global = -1;
+	eina_log_domain_unregister(enesim_text_log_dom_global);
+	enesim_text_log_dom_global = -1;
 	eina_shutdown();
 
-	return _etex_init_count;
+	return _enesim_text_init_count;
 }
 /**
  * To be documented
@@ -103,7 +103,7 @@ EAPI int etex_shutdown(void)
  * TODO change this to _get()
  * add a refcount and on deletion check that
  */
-EAPI Etex * etex_freetype_get(void)
+EAPI Etex * enesim_text_freetype_get(void)
 {
 #if HAVE_FREETYPE
 	static Etex *e = NULL;
@@ -111,8 +111,8 @@ EAPI Etex * etex_freetype_get(void)
 	if (!e)
 	{
 		e = calloc(1, sizeof(Etex));
-		e->engine = &etex_freetype;
-		_etex_setup(e);
+		e->engine = &enesim_text_freetype;
+		_enesim_text_setup(e);
 	}
 	return e;
 #else
@@ -125,7 +125,7 @@ EAPI Etex * etex_freetype_get(void)
  * FIXME: To be fixed
  * FIXME: remove this!
  */
-EAPI void etex_freetype_delete(Etex *e)
+EAPI void enesim_text_freetype_delete(Etex *e)
 {
 #if HAVE_FREETYPE
 	e->engine->shutdown(e->data);
@@ -135,10 +135,10 @@ EAPI void etex_freetype_delete(Etex *e)
 /**
  *
  */
-Etex * etex_default_get(void)
+Etex * enesim_text_default_get(void)
 {
 #if HAVE_FREETYPE
-	return etex_freetype_get();
+	return enesim_text_freetype_get();
 #endif
 	return NULL;
 }
