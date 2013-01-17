@@ -5,7 +5,7 @@ int end = 0;
 
 static void help(void)
 {
-	printf("emage_example [load | save] [async | sync ] FILE\n");
+	printf("enesim_image_example [load | save] [async | sync ] FILE\n");
 }
 
 static void async_load_cb(Enesim_Surface *s, void *data, int error)
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 	}
 	file = argv[3];
 
-	emage_init();
+	enesim_image_init();
 	if (!async)
 		end = 1;
 
@@ -83,11 +83,11 @@ int main(int argc, char **argv)
 
 		if (async)
 		{
-			emage_file_save_async(file, s, async_save_cb, file, NULL);
+			enesim_image_file_save_async(file, s, async_save_cb, file, NULL);
 		}
 		else
 		{
-			if (emage_file_save(file, s, NULL))
+			if (enesim_image_file_save(file, s, NULL))
 				printf("Image %s saved sync successfully\n", file);
 			else
 			{
@@ -103,11 +103,11 @@ int main(int argc, char **argv)
 	{
 		if (async)
 		{
-			emage_file_load_async(file, s, ENESIM_FORMAT_ARGB8888, NULL, async_load_cb, file, NULL);
+			enesim_image_file_load_async(file, s, ENESIM_FORMAT_ARGB8888, NULL, async_load_cb, file, NULL);
 		}
 		else
 		{
-			if (emage_file_load(file, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL))
+			if (enesim_image_file_load(file, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL))
 				printf("Image %s loaded sync successfully\n", file);
 			else
 			{
@@ -120,9 +120,9 @@ int main(int argc, char **argv)
 	}
 	while (!end)
 	{
-		emage_dispatch();
+		enesim_image_dispatch();
 	}
-	emage_shutdown();
+	enesim_image_shutdown();
 	return 0;
 }
 

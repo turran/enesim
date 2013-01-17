@@ -1,13 +1,13 @@
 #include "Emage.h"
-#include "emage_private.h"
+#include "enesim_image_private.h"
 #include <ctype.h>
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Emage_Data_Base64
+typedef struct _Enesim_Image_Data_Base64
 {
 	/* passed in */
-	Emage_Data *data;
+	Enesim_Image_Data *data;
 	/* last decoded data */
 	unsigned char last[3];
 	/* the next value to read */
@@ -18,7 +18,7 @@ typedef struct _Emage_Data_Base64
 	char *curr;
 	char *end;
 	ssize_t offset;
-} Emage_Data_Base64;
+} Enesim_Image_Data_Base64;
 
 static Eina_Bool _base64_decode_digit(unsigned char c, unsigned char *v)
 {
@@ -86,9 +86,9 @@ static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t 
 /* when the user requests 3 bytes of base64 decoded data we need to read 4 bytes
  * so we always read more from the real source
  */
-static ssize_t _emage_data_base64_read(void *data, void *buffer, size_t len)
+static ssize_t _enesim_image_data_base64_read(void *data, void *buffer, size_t len)
 {
-	Emage_Data_Base64 *thiz = data;
+	Enesim_Image_Data_Base64 *thiz = data;
 	int extra = 0;
 	int enclen;
 	int declen;
@@ -153,51 +153,51 @@ static ssize_t _emage_data_base64_read(void *data, void *buffer, size_t len)
 	return declen + extra;
 }
 
-static void _emage_data_base64_reset(void *data)
+static void _enesim_image_data_base64_reset(void *data)
 {
-	Emage_Data_Base64 *thiz = data;
+	Enesim_Image_Data_Base64 *thiz = data;
 	thiz->curr = thiz->buf;
 	thiz->last_offset = 0;
 }
 
-static char * _emage_data_base64_location(void *data)
+static char * _enesim_image_data_base64_location(void *data)
 {
-	Emage_Data_Base64 *thiz = data;
-	return emage_data_location(thiz->data);
+	Enesim_Image_Data_Base64 *thiz = data;
+	return enesim_image_data_location(thiz->data);
 }
 
-static void _emage_data_base64_free(void *data)
+static void _enesim_image_data_base64_free(void *data)
 {
-	Emage_Data_Base64 *thiz = data;
+	Enesim_Image_Data_Base64 *thiz = data;
 
-	emage_data_munmap(thiz->data, thiz->buf);
-	emage_data_free(thiz->data);
+	enesim_image_data_munmap(thiz->data, thiz->buf);
+	enesim_image_data_free(thiz->data);
 	free(thiz);
 }
 
-static Emage_Data_Descriptor _emage_data_base64_descriptor = {
-	/* .read	= */ _emage_data_base64_read,
+static Enesim_Image_Data_Descriptor _enesim_image_data_base64_descriptor = {
+	/* .read	= */ _enesim_image_data_base64_read,
 	/* .write	= */ NULL, /* not implemented yet */
 	/* .mmap	= */ NULL, /* impossible to do */
 	/* .munmap	= */ NULL,
-	/* .reset	= */ _emage_data_base64_reset,
+	/* .reset	= */ _enesim_image_data_base64_reset,
 	/* .length	= */ NULL, /* impossible to do */
-	/* .location	= */ _emage_data_base64_location,
-	/* .free	= */ _emage_data_base64_free,
+	/* .location	= */ _enesim_image_data_base64_location,
+	/* .free	= */ _enesim_image_data_base64_free,
 };
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Emage_Data * emage_data_base64_new(Emage_Data *d)
+EAPI Enesim_Image_Data * enesim_image_data_base64_new(Enesim_Image_Data *d)
 {
-	Emage_Data_Base64 *thiz;
+	Enesim_Image_Data_Base64 *thiz;
 	char *buf;
 	size_t size;
 
-	buf = emage_data_mmap(d, &size);
+	buf = enesim_image_data_mmap(d, &size);
 	if (!buf) return NULL;
 
-	thiz = calloc(1, sizeof(Emage_Data_Base64));
+	thiz = calloc(1, sizeof(Enesim_Image_Data_Base64));
 	thiz->data = d;
 	thiz->buf = thiz->curr = buf;
 	thiz->end = thiz->buf + size;
@@ -205,5 +205,5 @@ EAPI Emage_Data * emage_data_base64_new(Emage_Data *d)
 	thiz->declen = (size / 3) * 4;
 	thiz->offset = 0;
 
-	return emage_data_new(&_emage_data_base64_descriptor, thiz);
+	return enesim_image_data_new(&_enesim_image_data_base64_descriptor, thiz);
 }

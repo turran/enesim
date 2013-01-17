@@ -1,5 +1,5 @@
-#ifndef EMAGE_PRIVATE_H_
-#define EMAGE_PRIVATE_H_
+#ifndef ENESIM_IMAGE_PRIVATE_H_
+#define ENESIM_IMAGE_PRIVATE_H_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -18,17 +18,17 @@
 #ifdef ERR
 # undef ERR
 #endif
-#define ERR(...) EINA_LOG_DOM_ERR(emage_log_dom_global, __VA_ARGS__)
+#define ERR(...) EINA_LOG_DOM_ERR(enesim_image_log_dom_global, __VA_ARGS__)
 
 #ifdef WRN
 # undef WRN
 #endif
-#define WRN(...) EINA_LOG_DOM_WARN(emage_log_dom_global, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(enesim_image_log_dom_global, __VA_ARGS__)
 
 #ifdef DBG
 # undef DBG
 #endif
-#define DBG(...) EINA_LOG_DOM_DBG(emage_log_dom_global, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(enesim_image_log_dom_global, __VA_ARGS__)
 
 #ifdef WIN32
 # ifndef WIN32_LEAN_AND_MEAN
@@ -40,8 +40,8 @@
 # include <pthread.h>
 #endif
 
-extern int emage_log_dom_global;
-Emage_Provider * emage_load_provider_get(Emage_Data *data, const char *mime);
-Emage_Provider * emage_save_provider_get(Emage_Data *data, const char *mime);
+extern int enesim_image_log_dom_global;
+Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, const char *mime);
+Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Image_Data *data, const char *mime);
 
-#endif /*EMAGE_PRIVATE_H_*/
+#endif /*ENESIM_IMAGE_PRIVATE_H_*/

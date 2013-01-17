@@ -15,24 +15,24 @@
 /* number to checks for magic png info */
 #define PNG_BYTES_TO_CHECK 4
 
-#define EMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
+#define ENESIM_IMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
 
 #ifdef ERR
 # undef ERR
 #endif
-#define ERR(...) EINA_LOG_DOM_ERR(emage_log_dom_png, __VA_ARGS__)
+#define ERR(...) EINA_LOG_DOM_ERR(enesim_image_log_dom_png, __VA_ARGS__)
 
 #ifdef WRN
 # undef WRN
 #endif
-#define WRN(...) EINA_LOG_DOM_WARN(emage_log_dom_png, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(enesim_image_log_dom_png, __VA_ARGS__)
 
 #ifdef DBG
 # undef DBG
 #endif
-#define DBG(...) EINA_LOG_DOM_DBG(emage_log_dom_png, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(enesim_image_log_dom_png, __VA_ARGS__)
 
-static int emage_log_dom_png = -1;
+static int enesim_image_log_dom_png = -1;
 
 static void _png_msg_error_cb(png_structp png_ptr, png_const_charp error_msg)
 {
@@ -78,18 +78,18 @@ static Eina_Bool _png_format_get(int color_type, Enesim_Buffer_Format *fmt)
 /* our own io functions */
 static void _png_read(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
-	Emage_Data *data;
+	Enesim_Image_Data *data;
 
 	data = png_get_io_ptr(png_ptr);
-	emage_data_read(data, buf, length);
+	enesim_image_data_read(data, buf, length);
 }
 
 static void _png_write(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
-	Emage_Data *data;
+	Enesim_Image_Data *data;
 
 	data = png_get_io_ptr(png_ptr);
-	emage_data_write(data, buf, length);
+	enesim_image_data_write(data, buf, length);
 }
 
 static void _png_flush(png_structp png_ptr)
@@ -113,7 +113,7 @@ static Eina_Bool _png_saveable(const char *file)
 	return EINA_FALSE;
 }
 
-static Eina_Error _png_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _png_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
 	png_uint_32 w32, h32;
 	png_structp png_ptr = NULL;
@@ -160,10 +160,10 @@ error_jmp:
 error_info_struct:
 	png_destroy_read_struct(&png_ptr, NULL, NULL);
 error_read_struct:
-	return EMAGE_ERROR_LOADING;
+	return ENESIM_IMAGE_ERROR_LOADING;
 }
 
-static Eina_Error _png_load(Emage_Data *data, Enesim_Buffer *buffer, void *options)
+static Eina_Error _png_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options)
 {
 	Enesim_Buffer_Sw_Data sw_data;
 	Enesim_Buffer_Format fmt;
@@ -267,10 +267,10 @@ error_jmp:
 error_info_struct:
 	png_destroy_read_struct(&png_ptr, NULL, NULL);
 error_read_struct:
-	return EMAGE_ERROR_LOADING;
+	return ENESIM_IMAGE_ERROR_LOADING;
 }
 
-static Eina_Bool _png_save(Emage_Data *data, Enesim_Surface *s, void *options)
+static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options)
 {
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
@@ -344,9 +344,9 @@ error_write_struct:
 	return EINA_FALSE;
 }
 
-static Emage_Provider _provider = {
+static Enesim_Image_Provider _provider = {
 	/* .name = 		*/ "png",
-	/* .type = 		*/ EMAGE_PROVIDER_SW,
+	/* .type = 		*/ ENESIM_IMAGE_PROVIDER_SW,
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,
@@ -356,12 +356,12 @@ static Emage_Provider _provider = {
 	/* .save = 		*/ _png_save,
 };
 
-static const char * _png_data_from(Emage_Data *data)
+static const char * _png_data_from(Enesim_Image_Data *data)
 {
 	unsigned char buf[PNG_BYTES_TO_CHECK];
 	int ret;
 
-	ret = emage_data_read(data, buf, PNG_BYTES_TO_CHECK);
+	ret = enesim_image_data_read(data, buf, PNG_BYTES_TO_CHECK);
 	if (ret < 0) return NULL;
 	if (!png_check_sig(buf, PNG_BYTES_TO_CHECK))
 		return NULL;
@@ -375,7 +375,7 @@ static const char * _png_extension_from(const char *ext)
 	return NULL;
 }
 
-static Emage_Finder _finder = {
+static Enesim_Image_Finder _finder = {
 	/* .data_from 		= */ _png_data_from,
 	/* .extension_from	= */ _png_extension_from,
 };
@@ -384,8 +384,8 @@ static Emage_Finder _finder = {
  *============================================================================*/
 static Eina_Bool png_provider_init(void)
 {
-	emage_log_dom_png = eina_log_domain_register("emage_png", EMAGE_LOG_COLOR_DEFAULT);
-	if (emage_log_dom_png < 0)
+	enesim_image_log_dom_png = eina_log_domain_register("enesim_image_png", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
+	if (enesim_image_log_dom_png < 0)
 	{
 		EINA_LOG_ERR("Emage: Can not create a general log domain.");
 		return EINA_FALSE;
@@ -393,12 +393,12 @@ static Eina_Bool png_provider_init(void)
 	/* @todo
 	 * - Register png specific errors
 	 */
-	if (!emage_provider_register(&_provider, "image/png"))
+	if (!enesim_image_provider_register(&_provider, "image/png"))
 		return EINA_FALSE;
 
-	if (!emage_finder_register(&_finder))
+	if (!enesim_image_finder_register(&_finder))
 	{
-		emage_provider_unregister(&_provider, "image/png");
+		enesim_image_provider_unregister(&_provider, "image/png");
 		return EINA_FALSE;		
 	}
 	return EINA_TRUE;
@@ -406,10 +406,10 @@ static Eina_Bool png_provider_init(void)
 
 static void png_provider_shutdown(void)
 {
-	emage_finder_unregister(&_finder);
-	emage_provider_unregister(&_provider, "image/png");
-	eina_log_domain_unregister(emage_log_dom_png);
-	emage_log_dom_png = -1;
+	enesim_image_finder_unregister(&_finder);
+	enesim_image_provider_unregister(&_provider, "image/png");
+	eina_log_domain_unregister(enesim_image_log_dom_png);
+	enesim_image_log_dom_png = -1;
 }
 
 EINA_MODULE_INIT(png_provider_init);

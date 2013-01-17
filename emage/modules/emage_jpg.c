@@ -15,22 +15,22 @@
  *                                  Local                                     *
  *============================================================================*/
 
-#define EMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
+#define ENESIM_IMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
 
 #ifdef ERR
 # undef ERR
 #endif
-#define ERR(...) EINA_LOG_DOM_ERR(emage_log_dom_jpg, __VA_ARGS__)
+#define ERR(...) EINA_LOG_DOM_ERR(enesim_image_log_dom_jpg, __VA_ARGS__)
 
 #ifdef WRN
 # undef WRN
 #endif
-#define WRN(...) EINA_LOG_DOM_WARN(emage_log_dom_jpg, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(enesim_image_log_dom_jpg, __VA_ARGS__)
 
 #ifdef DBG
 # undef DBG
 #endif
-#define DBG(...) EINA_LOG_DOM_DBG(emage_log_dom_jpg, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(enesim_image_log_dom_jpg, __VA_ARGS__)
 
 #define JPG_BLOCK_SIZE 4096
 
@@ -43,7 +43,7 @@ struct _Jpg_Source
 	struct jpeg_source_mgr pub;
 	JOCTET buffer[JPG_BLOCK_SIZE];
 	Eina_Bool mmaped;
-	Emage_Data *data;
+	Enesim_Image_Data *data;
 };
 
 struct _Jpg_Error_Mgr
@@ -52,7 +52,7 @@ struct _Jpg_Error_Mgr
 	jmp_buf setjmp_buffer;
 };
 
-static int emage_log_dom_jpg = -1;
+static int enesim_image_log_dom_jpg = -1;
 
 static void _jpg_error_exit_cb(j_common_ptr cinfo)
 {
@@ -66,7 +66,7 @@ static void _jpg_error_exit_cb(j_common_ptr cinfo)
 /*----------------------------------------------------------------------------*
  *                         The jpeg source interface                          *
  *----------------------------------------------------------------------------*/
-static void _jpg_emage_src_init(j_decompress_ptr cinfo)
+static void _jpg_enesim_image_src_init(j_decompress_ptr cinfo)
 {
 	/* TODO check if we can mmap the buffer, if so map it and use
 	 * directly the whole bytes and pointer
@@ -74,12 +74,12 @@ static void _jpg_emage_src_init(j_decompress_ptr cinfo)
 	cinfo->src->bytes_in_buffer = 0;
 }
 
-static boolean _jpg_emage_src_fill(j_decompress_ptr cinfo)
+static boolean _jpg_enesim_image_src_fill(j_decompress_ptr cinfo)
 {
 	Jpg_Source *thiz = (Jpg_Source *)cinfo->src;
 	ssize_t ret;
 
-	ret = emage_data_read(thiz->data, thiz->buffer, JPG_BLOCK_SIZE);
+	ret = enesim_image_data_read(thiz->data, thiz->buffer, JPG_BLOCK_SIZE);
 	if (ret < 0)
 	{
 		ERR("Reading failed");
@@ -91,7 +91,7 @@ static boolean _jpg_emage_src_fill(j_decompress_ptr cinfo)
 	return TRUE;
 }
 
-void _jpg_emage_src_skip(j_decompress_ptr cinfo, long num_bytes)
+void _jpg_enesim_image_src_skip(j_decompress_ptr cinfo, long num_bytes)
 {
 	Jpg_Source *thiz = (Jpg_Source *)cinfo->src;
 
@@ -100,7 +100,7 @@ void _jpg_emage_src_skip(j_decompress_ptr cinfo, long num_bytes)
 		while (num_bytes > (long) thiz->pub.bytes_in_buffer)
 		{
 			num_bytes -= (long) thiz->pub.bytes_in_buffer;
-			(void) _jpg_emage_src_fill(cinfo);
+			(void) _jpg_enesim_image_src_fill(cinfo);
 			/* note we assume that fill_input_buffer will never return FALSE,
 			* so suspension need not be handled.
 			*/
@@ -110,22 +110,22 @@ void _jpg_emage_src_skip(j_decompress_ptr cinfo, long num_bytes)
 	}
 }
 
-void _jpg_emage_src_term(j_decompress_ptr cinfo)
+void _jpg_enesim_image_src_term(j_decompress_ptr cinfo)
 {
 }
 
-static void _jpg_emage_src(struct jpeg_decompress_struct *cinfo, Emage_Data *data)
+static void _jpg_enesim_image_src(struct jpeg_decompress_struct *cinfo, Enesim_Image_Data *data)
 {
 	Jpg_Source *thiz;
 
 	thiz = calloc(1, sizeof(Jpg_Source));
 	thiz->data = data;
 	/* override the methods */
-	thiz->pub.init_source = _jpg_emage_src_init;
-	thiz->pub.fill_input_buffer = _jpg_emage_src_fill;
-	thiz->pub.skip_input_data = _jpg_emage_src_skip;
+	thiz->pub.init_source = _jpg_enesim_image_src_init;
+	thiz->pub.fill_input_buffer = _jpg_enesim_image_src_fill;
+	thiz->pub.skip_input_data = _jpg_enesim_image_src_skip;
 	thiz->pub.resync_to_restart = jpeg_resync_to_restart; /* use default method */
-	thiz->pub.term_source = _jpg_emage_src_term;
+	thiz->pub.term_source = _jpg_enesim_image_src_term;
 	thiz->pub.bytes_in_buffer = 0;
 	thiz->pub.next_input_byte = NULL;
 
@@ -134,7 +134,7 @@ static void _jpg_emage_src(struct jpeg_decompress_struct *cinfo, Emage_Data *dat
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-static Eina_Error _jpg_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _jpg_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
 	Jpg_Error_Mgr err;
 	struct jpeg_decompress_struct cinfo;
@@ -148,11 +148,11 @@ static Eina_Error _jpg_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer
 	if (setjmp(err.setjmp_buffer))
 	{
 		jpeg_destroy_decompress(&cinfo);
-		return EMAGE_ERROR_ALLOCATOR;
+		return ENESIM_IMAGE_ERROR_ALLOCATOR;
 	}
 
 	jpeg_create_decompress(&cinfo);
-	_jpg_emage_src(&cinfo, data);
+	_jpg_enesim_image_src(&cinfo, data);
 	jpeg_read_header(&cinfo, TRUE);
 	cinfo.do_fancy_upsampling = FALSE;
 	cinfo.do_block_smoothing = FALSE;
@@ -198,7 +198,7 @@ static Eina_Error _jpg_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer
 	else
 	{
 		jpeg_destroy_decompress(&cinfo);
-		return EMAGE_ERROR_FORMAT;
+		return ENESIM_IMAGE_ERROR_FORMAT;
 	}
 
 	if (w) *w = ww;
@@ -209,7 +209,7 @@ static Eina_Error _jpg_info_load(Emage_Data *data, int *w, int *h, Enesim_Buffer
 	return 0;
 }
 
-static Eina_Error _jpg_load(Emage_Data *data, Enesim_Buffer *buffer, void *options)
+static Eina_Error _jpg_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options)
 {
 	Jpg_Error_Mgr err;
 	Enesim_Buffer_Sw_Data sw_data;
@@ -225,11 +225,11 @@ static Eina_Error _jpg_load(Emage_Data *data, Enesim_Buffer *buffer, void *optio
 	if (setjmp(err.setjmp_buffer))
 	{
 		jpeg_destroy_decompress(&cinfo);
-		return EMAGE_ERROR_ALLOCATOR;
+		return ENESIM_IMAGE_ERROR_ALLOCATOR;
 	}
 
 	jpeg_create_decompress(&cinfo);
-	_jpg_emage_src(&cinfo, data);
+	_jpg_enesim_image_src(&cinfo, data);
 	jpeg_read_header(&cinfo, TRUE);
 	cinfo.do_fancy_upsampling = FALSE;
 	cinfo.do_block_smoothing = FALSE;
@@ -277,7 +277,7 @@ static Eina_Error _jpg_load(Emage_Data *data, Enesim_Buffer *buffer, void *optio
 
 		default:
 		jpeg_destroy_decompress(&cinfo);
-		return EMAGE_ERROR_FORMAT;
+		return ENESIM_IMAGE_ERROR_FORMAT;
 	}
 
 	line = sdata;
@@ -291,9 +291,9 @@ static Eina_Error _jpg_load(Emage_Data *data, Enesim_Buffer *buffer, void *optio
 	return 0;
 }
 
-static Emage_Provider _provider = {
+static Enesim_Image_Provider _provider = {
 	/* .name =		*/ "jpg",
-	/* .type =		*/ EMAGE_PROVIDER_SW,
+	/* .type =		*/ ENESIM_IMAGE_PROVIDER_SW,
 	/* .options_parse =	*/ NULL,
 	/* .options_free =	*/ NULL,
 	/* .loadable =		*/ NULL,
@@ -303,12 +303,12 @@ static Emage_Provider _provider = {
 	/* .save =		*/ NULL,
 };
 
-static const char * _jpg_data_from(Emage_Data *data)
+static const char * _jpg_data_from(Enesim_Image_Data *data)
 {
 	unsigned char buf[3];
 	int ret;
 
-	ret = emage_data_read(data, buf, 3);
+	ret = enesim_image_data_read(data, buf, 3);
 	if (ret < 0) return NULL;
 	/*
 	 * Header "format"
@@ -339,7 +339,7 @@ static const char * _jpg_extension_from(const char *ext)
 	return NULL;
 }
 
-static Emage_Finder _finder = {
+static Enesim_Image_Finder _finder = {
 	/* .data_from 		= */ _jpg_data_from,
 	/* .extension_from 	= */ _jpg_extension_from,
 };
@@ -350,8 +350,8 @@ static Emage_Finder _finder = {
 static Eina_Bool jpg_provider_init(void)
 {
 
-	emage_log_dom_jpg = eina_log_domain_register("emage_jpg", EMAGE_LOG_COLOR_DEFAULT);
-	if (emage_log_dom_jpg < 0)
+	enesim_image_log_dom_jpg = eina_log_domain_register("enesim_image_jpg", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
+	if (enesim_image_log_dom_jpg < 0)
 	{
 		EINA_LOG_ERR("Emage: Can not create a general log domain.");
 		return EINA_FALSE;
@@ -359,15 +359,15 @@ static Eina_Bool jpg_provider_init(void)
 	/* @todo
 	 * - Register jpg specific errors
 	 */
-	if (!emage_provider_register(&_provider, "image/jpg"))
+	if (!enesim_image_provider_register(&_provider, "image/jpg"))
 		return EINA_FALSE;
 	/* some define the mime type for jpg as jpeg, or is the other
 	 * the wrong one ? */
-	if (!emage_provider_register(&_provider, "image/jpeg"))
+	if (!enesim_image_provider_register(&_provider, "image/jpeg"))
 		return EINA_FALSE;
-	if (!emage_finder_register(&_finder))
+	if (!enesim_image_finder_register(&_finder))
 	{
-		emage_provider_unregister(&_provider, "image/jpg");
+		enesim_image_provider_unregister(&_provider, "image/jpg");
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
@@ -375,10 +375,10 @@ static Eina_Bool jpg_provider_init(void)
 
 static void jpg_provider_shutdown(void)
 {
-	emage_finder_unregister(&_finder);
-	emage_provider_unregister(&_provider, "image/jpg");
-	eina_log_domain_unregister(emage_log_dom_jpg);
-	emage_log_dom_jpg = -1;
+	enesim_image_finder_unregister(&_finder);
+	enesim_image_provider_unregister(&_provider, "image/jpg");
+	eina_log_domain_unregister(enesim_image_log_dom_jpg);
+	enesim_image_log_dom_jpg = -1;
 }
 
 EINA_MODULE_INIT(jpg_provider_init);

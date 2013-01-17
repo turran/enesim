@@ -1,5 +1,5 @@
 #include "Emage.h"
-#include "emage_private.h"
+#include "enesim_image_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -14,10 +14,10 @@ static void _provider_data_convert(Enesim_Buffer *buffer,
 	enesim_renderer_unref(importer);
 }
 
-static Eina_Error _provider_info_load(Emage_Provider *p, Emage_Data *data,
+static Eina_Error _provider_info_load(Enesim_Image_Provider *p, Enesim_Image_Data *data,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
-	Eina_Error ret = EMAGE_ERROR_PROVIDER;
+	Eina_Error ret = ENESIM_IMAGE_ERROR_PROVIDER;
 	int pw, ph;
 	Enesim_Buffer_Format pfmt;
 
@@ -36,7 +36,7 @@ static Eina_Error _provider_info_load(Emage_Provider *p, Emage_Data *data,
 	return ret;
 }
 
-static Eina_Bool _provider_options_parse(Emage_Provider *p, const char *options,
+static Eina_Bool _provider_options_parse(Enesim_Image_Provider *p, const char *options,
 		void **options_data)
 {
 	if (!options)
@@ -49,13 +49,13 @@ static Eina_Bool _provider_options_parse(Emage_Provider *p, const char *options,
 	return EINA_TRUE;
 }
 
-static void _provider_options_free(Emage_Provider *p, void *options)
+static void _provider_options_free(Enesim_Image_Provider *p, void *options)
 {
 	if (p->options_free)
 		p->options_free(options);
 }
 
-static Eina_Bool _provider_data_load(Emage_Provider *p, Emage_Data *data,
+static Eina_Bool _provider_data_load(Enesim_Image_Provider *p, Enesim_Image_Data *data,
 		Enesim_Surface **s, Enesim_Format f, Enesim_Pool *mpool,
 		void *options,
 		Eina_Error *err)
@@ -78,7 +78,7 @@ static Eina_Bool _provider_data_load(Emage_Provider *p, Emage_Data *data,
 		ss = enesim_surface_new_pool_from(f, w, h, mpool);
 		if (!ss)
 		{
-			error = EMAGE_ERROR_ALLOCATOR;
+			error = ENESIM_IMAGE_ERROR_ALLOCATOR;
 			goto surface_err;
 		}
 		owned = EINA_TRUE;
@@ -94,14 +94,14 @@ static Eina_Bool _provider_data_load(Emage_Provider *p, Emage_Data *data,
 		buffer = enesim_buffer_new_pool_from(cfmt, w, h, mpool);
 		if (!buffer)
 		{
-			error = EMAGE_ERROR_ALLOCATOR;
+			error = ENESIM_IMAGE_ERROR_ALLOCATOR;
 			goto buffer_err;
 		}
 		import = EINA_TRUE;
 	}
 
 	/* load the data */
-	emage_data_reset(data);
+	enesim_image_data_reset(data);
 	error = p->load(data, buffer, options);
 	if (error)
 	{
@@ -127,7 +127,7 @@ info_err:
 	return EINA_FALSE;
 }
 
-static Eina_Bool _provider_data_save(Emage_Provider *p, Emage_Data *data,
+static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Image_Data *data,
 		Enesim_Surface *s, Eina_Error *err)
 {
 	/* save the data */
@@ -135,7 +135,7 @@ static Eina_Bool _provider_data_save(Emage_Provider *p, Emage_Data *data,
 
 	if (p->save(data, s, NULL) == EINA_FALSE)
 	{
-		*err = EMAGE_ERROR_SAVING;
+		*err = ENESIM_IMAGE_ERROR_SAVING;
 		return EINA_FALSE;
 	}
 
@@ -144,13 +144,13 @@ static Eina_Bool _provider_data_save(Emage_Provider *p, Emage_Data *data,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Eina_Bool emage_provider_info_load(Emage_Provider *thiz,
-	Emage_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt)
+EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
+	Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
 	Eina_Error err;
 	if (!thiz)
 	{
-		eina_error_set(EMAGE_ERROR_PROVIDER);
+		eina_error_set(ENESIM_IMAGE_ERROR_PROVIDER);
 		return EINA_FALSE;
 	}
 	err = _provider_info_load(thiz, data, w, h, sfmt, NULL);
@@ -161,8 +161,8 @@ EAPI Eina_Bool emage_provider_info_load(Emage_Provider *thiz,
 	return EINA_TRUE;
 }
 
-EAPI Eina_Bool emage_provider_load(Emage_Provider *thiz,
-		Emage_Data *data, Enesim_Surface **s,
+EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
+		Enesim_Image_Data *data, Enesim_Surface **s,
 		Enesim_Format f, Enesim_Pool *mpool, const char *options)
 {
 	Eina_Error err = 0;
@@ -171,7 +171,7 @@ EAPI Eina_Bool emage_provider_load(Emage_Provider *thiz,
 
 	if (!thiz)
 	{
-		eina_error_set(EMAGE_ERROR_PROVIDER);
+		eina_error_set(ENESIM_IMAGE_ERROR_PROVIDER);
 		return EINA_FALSE;
 	}
 	_provider_options_parse(thiz, options, &op);
@@ -184,15 +184,15 @@ EAPI Eina_Bool emage_provider_load(Emage_Provider *thiz,
 	return ret;
 }
 
-EAPI Eina_Bool emage_provider_save(Emage_Provider *thiz,
-		Emage_Data *data, Enesim_Surface *s,
+EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
+		Enesim_Image_Data *data, Enesim_Surface *s,
 		const char *options)
 {
 	Eina_Error err = 0;
 
 	if (!thiz)
 	{
-		eina_error_set(EMAGE_ERROR_PROVIDER);
+		eina_error_set(ENESIM_IMAGE_ERROR_PROVIDER);
 		return EINA_FALSE;
 	}
 	if (!_provider_data_save(thiz, data, s, &err))

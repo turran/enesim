@@ -5,24 +5,24 @@
  *                                  Local                                     *
  *============================================================================*/
 #define MIME "image/embedded-raw"
-#define EMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
+#define ENESIM_IMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
 
 #ifdef ERR
 # undef ERR
 #endif
-#define ERR(...) EINA_LOG_DOM_ERR(emage_log_dom_raw, __VA_ARGS__)
+#define ERR(...) EINA_LOG_DOM_ERR(enesim_image_log_dom_raw, __VA_ARGS__)
 
 #ifdef WRN
 # undef WRN
 #endif
-#define WRN(...) EINA_LOG_DOM_WARN(emage_log_dom_raw, __VA_ARGS__)
+#define WRN(...) EINA_LOG_DOM_WARN(enesim_image_log_dom_raw, __VA_ARGS__)
 
 #ifdef DBG
 # undef DBG
 #endif
-#define DBG(...) EINA_LOG_DOM_DBG(emage_log_dom_raw, __VA_ARGS__)
+#define DBG(...) EINA_LOG_DOM_DBG(enesim_image_log_dom_raw, __VA_ARGS__)
 
-static int emage_log_dom_raw = -1;
+static int enesim_image_log_dom_raw = -1;
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
@@ -40,7 +40,7 @@ static Eina_Bool _raw_saveable(const char *file)
 	return EINA_FALSE;
 }
 
-static Eina_Bool _raw_save(Emage_Data *data, Enesim_Surface *s, void *options)
+static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options)
 {
 	uint32_t *sdata;
 	size_t stride;
@@ -65,7 +65,7 @@ static Eina_Bool _raw_save(Emage_Data *data, Enesim_Surface *s, void *options)
 	 */
 	enesim_surface_data_get(s, (void **)&sdata, &stride);
 	enesim_surface_size_get(s, &w, &h);
-	emage_data_write(data, str_data, strlen(str_data));
+	enesim_image_data_write(data, str_data, strlen(str_data));
 	for (i = 0; i < h; i++)
 	{
 		for (j = 0; j < w; j++)
@@ -74,28 +74,28 @@ static Eina_Bool _raw_save(Emage_Data *data, Enesim_Surface *s, void *options)
 			uint8_t a, r, g, b;
 
 			if (cols % 4 == 0)
-				emage_data_write(data, "\n\t", 2);
+				enesim_image_data_write(data, "\n\t", 2);
 			enesim_color_components_to(*sdata, &a, &r, &g, &b);
 			if (i == h -1 &&  j == w - 1)
 				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x ", a, r, g, b);
 			else
 				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x, ", a, r, g, b);
-			emage_data_write(data, str, strlen(str));
+			enesim_image_data_write(data, str, strlen(str));
 			cols++;
 			sdata++;
 		}
 		sdata = (uint32_t *)((uint8_t *)sdata + stride);
 	}
-	emage_data_write(data, "\n};\n", 4);
+	enesim_image_data_write(data, "\n};\n", 4);
 	/* now the function to get such surface */
 	len = snprintf(function, PATH_MAX, str_function, w, h, w * 4);
-	emage_data_write(data, function, len);
+	enesim_image_data_write(data, function, len);
 	return EINA_TRUE;
 }
 
-static Emage_Provider _provider = {
+static Enesim_Image_Provider _provider = {
 	/* .name = 		*/ "raw",
-	/* .type = 		*/ EMAGE_PROVIDER_SW,
+	/* .type = 		*/ ENESIM_IMAGE_PROVIDER_SW,
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,
@@ -114,7 +114,7 @@ static const char * _raw_extension_from(const char *ext)
 	return NULL;
 }
 
-static Emage_Finder _finder = {
+static Enesim_Image_Finder _finder = {
 	/* .data_from 		= */ NULL,
 	/* .extension_from	= */ _raw_extension_from,
 };
@@ -123,18 +123,18 @@ static Emage_Finder _finder = {
  *============================================================================*/
 static Eina_Bool raw_provider_init(void)
 {
-	emage_log_dom_raw = eina_log_domain_register("emage_raw", EMAGE_LOG_COLOR_DEFAULT);
-	if (emage_log_dom_raw < 0)
+	enesim_image_log_dom_raw = eina_log_domain_register("enesim_image_raw", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
+	if (enesim_image_log_dom_raw < 0)
 	{
 		EINA_LOG_ERR("Emage: Can not create a general log domain.");
 		return EINA_FALSE;
 	}
-	if (!emage_provider_register(&_provider, MIME))
+	if (!enesim_image_provider_register(&_provider, MIME))
 		return EINA_FALSE;
 
-	if (!emage_finder_register(&_finder))
+	if (!enesim_image_finder_register(&_finder))
 	{
-		emage_provider_unregister(&_provider, MIME);
+		enesim_image_provider_unregister(&_provider, MIME);
 		return EINA_FALSE;		
 	}
 	return EINA_TRUE;
@@ -142,10 +142,10 @@ static Eina_Bool raw_provider_init(void)
 
 static void raw_provider_shutdown(void)
 {
-	emage_finder_unregister(&_finder);
-	emage_provider_unregister(&_provider, MIME);
-	eina_log_domain_unregister(emage_log_dom_raw);
-	emage_log_dom_raw = -1;
+	enesim_image_finder_unregister(&_finder);
+	enesim_image_provider_unregister(&_provider, MIME);
+	eina_log_domain_unregister(enesim_image_log_dom_raw);
+	enesim_image_log_dom_raw = -1;
 }
 
 EINA_MODULE_INIT(raw_provider_init);

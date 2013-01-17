@@ -1,30 +1,30 @@
 #include "Emage.h"
-#include "emage_private.h"
+#include "enesim_image_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Emage_Data_File
+typedef struct _Enesim_Image_Data_File
 {
 	FILE *f;
 	int fd;
 	Eina_Bool mmapped;
 	const char *location;
-} Emage_Data_File;
+} Enesim_Image_Data_File;
 /*----------------------------------------------------------------------------*
  *                        The Emage Data interface                            *
  *----------------------------------------------------------------------------*/
-static ssize_t _emage_data_file_read(void *data, void *buffer, size_t len)
+static ssize_t _enesim_image_data_file_read(void *data, void *buffer, size_t len)
 {
-	Emage_Data_File *thiz = data;
+	Enesim_Image_Data_File *thiz = data;
 	ssize_t ret;
 
 	ret = fread(buffer, 1, len, thiz->f);
 	return ret;
 }
 
-static ssize_t _emage_data_file_write(void *data, void *buffer, size_t len)
+static ssize_t _enesim_image_data_file_write(void *data, void *buffer, size_t len)
 {
-	Emage_Data_File *thiz = data;
+	Enesim_Image_Data_File *thiz = data;
 	ssize_t ret;
 
 	ret = fwrite(buffer, 1, len, thiz->f);
@@ -33,65 +33,65 @@ static ssize_t _emage_data_file_write(void *data, void *buffer, size_t len)
 
 #if 0
 /* FIXME for later */
-static void * _emage_data_file_mmap(void *data, size_t *size)
+static void * _enesim_image_data_file_mmap(void *data, size_t *size)
 {
 
 }
 #endif
 
-static void _emage_data_file_reset(void *data)
+static void _enesim_image_data_file_reset(void *data)
 {
-	Emage_Data_File *thiz = data;
+	Enesim_Image_Data_File *thiz = data;
 	rewind(thiz->f);
 }
 
-static size_t _emage_data_file_length(void *data)
+static size_t _enesim_image_data_file_length(void *data)
 {
-	Emage_Data_File *thiz = data;
+	Enesim_Image_Data_File *thiz = data;
 	struct stat st;
 
 	stat(thiz->location, &st);
 	return st.st_size;
 }
 
-static char * _emage_data_file_location(void *data)
+static char * _enesim_image_data_file_location(void *data)
 {
-	Emage_Data_File *thiz = data;
+	Enesim_Image_Data_File *thiz = data;
 	return strdup(thiz->location);
 }
 
-static void _emage_data_file_free(void *data)
+static void _enesim_image_data_file_free(void *data)
 {
-	Emage_Data_File *thiz = data;
+	Enesim_Image_Data_File *thiz = data;
 
 	fclose(thiz->f);
 	free(thiz);
 }
 
-static Emage_Data_Descriptor _emage_data_file_descriptor = {
-	/* .read	= */ _emage_data_file_read,
-	/* .write	= */ _emage_data_file_write,
+static Enesim_Image_Data_Descriptor _enesim_image_data_file_descriptor = {
+	/* .read	= */ _enesim_image_data_file_read,
+	/* .write	= */ _enesim_image_data_file_write,
 	/* .mmap	= */ NULL,
 	/* .munmap	= */ NULL,
-	/* .reset	= */ _emage_data_file_reset,
-	/* .length	= */ _emage_data_file_length,
-	/* .location	= */ _emage_data_file_location,
-	/* .free	= */ _emage_data_file_free,
+	/* .reset	= */ _enesim_image_data_file_reset,
+	/* .length	= */ _enesim_image_data_file_length,
+	/* .location	= */ _enesim_image_data_file_location,
+	/* .free	= */ _enesim_image_data_file_free,
 };
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Emage_Data * emage_data_file_new(const char *file, const char *mode)
+EAPI Enesim_Image_Data * enesim_image_data_file_new(const char *file, const char *mode)
 {
-	Emage_Data_File *thiz;
+	Enesim_Image_Data_File *thiz;
 	FILE *f;
 
 	f = fopen(file, mode);
 	if (!f) return EINA_FALSE;
 
-	thiz = calloc(1, sizeof(Emage_Data_File));
+	thiz = calloc(1, sizeof(Enesim_Image_Data_File));
 	thiz->f = f;
 	thiz->location = file;
 
-	return emage_data_new(&_emage_data_file_descriptor, thiz);
+	return enesim_image_data_new(&_enesim_image_data_file_descriptor, thiz);
 }

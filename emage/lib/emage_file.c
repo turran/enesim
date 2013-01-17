@@ -1,24 +1,24 @@
 #include "Emage.h"
-#include "emage_private.h"
+#include "enesim_image_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Emage_File_Data
+typedef struct _Enesim_Image_File_Data
 {
-	Emage_Callback cb;
+	Enesim_Image_Callback cb;
 	void *user_data;
-	Emage_Data *data;
-} Emage_File_Data;
+	Enesim_Image_Data *data;
+} Enesim_Image_File_Data;
 
-static void _emage_file_cb(Enesim_Surface *s, void *user_data, int error)
+static void _enesim_image_file_cb(Enesim_Surface *s, void *user_data, int error)
 {
-	Emage_File_Data *fdata = user_data;
+	Enesim_Image_File_Data *fdata = user_data;
 
 	fdata->cb(s, fdata->user_data, error);
-	emage_data_free(fdata->data);
+	enesim_image_data_free(fdata->data);
 }
 
-static const char * _emage_file_get_extension(const char *file)
+static const char * _enesim_image_file_get_extension(const char *file)
 {
 	char *tmp;
 
@@ -27,22 +27,22 @@ static const char * _emage_file_get_extension(const char *file)
 	return tmp + 1;
 }
 
-static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const char **mime)
+static Eina_Bool _file_save_data_get(const char *file, Enesim_Image_Data **data, const char **mime)
 {
-	Emage_Data *d;
+	Enesim_Image_Data *d;
 	const char *m;
 	const char *ext;
 
-	ext = _emage_file_get_extension(file);
+	ext = _enesim_image_file_get_extension(file);
 	if (!ext) return EINA_FALSE;
 
-	d = emage_data_file_new(file, "wb");
+	d = enesim_image_data_file_new(file, "wb");
 	if (!d) return EINA_FALSE;
 
-	m = emage_mime_extension_from(ext);
+	m = enesim_image_mime_extension_from(ext);
 	if (!m)
 	{
-		emage_data_free(d);
+		enesim_image_data_free(d);
 		return EINA_FALSE;
 	}
 	*mime = m;
@@ -51,21 +51,21 @@ static Eina_Bool _file_save_data_get(const char *file, Emage_Data **data, const 
 	return EINA_TRUE;
 }
 
-static Eina_Bool _file_load_data_get(const char *file, Emage_Data **data, const char **mime)
+static Eina_Bool _file_load_data_get(const char *file, Enesim_Image_Data **data, const char **mime)
 {
-	Emage_Data *d;
+	Enesim_Image_Data *d;
 	const char *m;
 
-	d = emage_data_file_new(file, "rb");
+	d = enesim_image_data_file_new(file, "rb");
 	if (!d) return EINA_FALSE;
 
-	m = emage_mime_data_from(d);
+	m = enesim_image_mime_data_from(d);
 	if (!m)
 	{
-		emage_data_free(d);
+		enesim_image_data_free(d);
 		return EINA_FALSE;
 	}
-	emage_data_reset(d);
+	enesim_image_data_reset(d);
 	*mime = m;
 	*data = d;
 
@@ -82,16 +82,16 @@ static Eina_Bool _file_load_data_get(const char *file, Emage_Data **data, const 
  * @param h The image height
  * @param sfmt The image original format
  */
-EAPI Eina_Bool emage_file_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt)
+EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
-	Emage_Data *data;
+	Enesim_Image_Data *data;
 	Eina_Bool ret;
 	const char *mime;
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = emage_info_load(data, mime, w, h, sfmt);
-	emage_data_free(data);
+	ret = enesim_image_info_load(data, mime, w, h, sfmt);
+	enesim_image_data_free(data);
 	return ret;
 }
 /**
@@ -105,17 +105,17 @@ EAPI Eina_Bool emage_file_info_load(const char *file, int *w, int *h, Enesim_Buf
  * @param options Any option the emage provider might require
  * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool emage_file_load(const char *file, Enesim_Surface **s,
+EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Surface **s,
 		Enesim_Format f, Enesim_Pool *mpool, const char *options)
 {
-	Emage_Data *data;
+	Enesim_Image_Data *data;
 	Eina_Bool ret;
 	const char *mime;
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = emage_load(data, mime, s, f, mpool, options);
-	emage_data_free(data);
+	ret = enesim_image_load(data, mime, s, f, mpool, options);
+	enesim_image_data_free(data);
 	return ret;
 }
 /**
@@ -130,24 +130,24 @@ EAPI Eina_Bool emage_file_load(const char *file, Enesim_Surface **s,
  * @param data User provided data
  * @param options Any option the emage provider might require
  */
-EAPI void emage_file_load_async(const char *file, Enesim_Surface *s,
+EAPI void enesim_image_file_load_async(const char *file, Enesim_Surface *s,
 		Enesim_Format f, Enesim_Pool *mpool,
-		Emage_Callback cb, void *user_data, const char *options)
+		Enesim_Image_Callback cb, void *user_data, const char *options)
 {
-	Emage_Data *data;
-	Emage_File_Data fdata;
+	Enesim_Image_Data *data;
+	Enesim_Image_File_Data fdata;
 	const char *mime;
 
 	if (!_file_load_data_get(file, &data, &mime))
 	{
-		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
+		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 	fdata.cb = cb;
 	fdata.user_data = user_data;
 	fdata.data = data;
 
-	emage_load_async(data, mime, s, f, mpool, _emage_file_cb, &fdata, options);
+	enesim_image_load_async(data, mime, s, f, mpool, _enesim_image_file_cb, &fdata, options);
 }
 /**
  * Save an image file synchronously
@@ -157,16 +157,16 @@ EAPI void emage_file_load_async(const char *file, Enesim_Surface *s,
  * @param options Any option the emage provider might require
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool emage_file_save(const char *file, Enesim_Surface *s, const char *options)
+EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Surface *s, const char *options)
 {
-	Emage_Data *data;
+	Enesim_Image_Data *data;
 	Eina_Bool ret;
 	const char *mime;
 
 	if (!_file_save_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = emage_save(data, mime, s, options);
-	emage_data_free(data);
+	ret = enesim_image_save(data, mime, s, options);
+	enesim_image_data_free(data);
 	return ret;
 }
 /**
@@ -179,21 +179,21 @@ EAPI Eina_Bool emage_file_save(const char *file, Enesim_Surface *s, const char *
  * @param options Any option the emage provider might require
  *
  */
-EAPI void emage_file_save_async(const char *file, Enesim_Surface *s, Emage_Callback cb,
+EAPI void enesim_image_file_save_async(const char *file, Enesim_Surface *s, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
-	Emage_Data *data;
-	Emage_File_Data fdata;
+	Enesim_Image_Data *data;
+	Enesim_Image_File_Data fdata;
 	const char *mime;
 
 	if (!_file_save_data_get(file, &data, &mime))
 	{
-		cb(NULL, user_data, EMAGE_ERROR_PROVIDER);
+		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 	fdata.cb = cb;
 	fdata.user_data = user_data;
 	fdata.data = data;
 
-	emage_save_async(data, mime, s, _emage_file_cb, &fdata, options);
+	enesim_image_save_async(data, mime, s, _enesim_image_file_cb, &fdata, options);
 }
