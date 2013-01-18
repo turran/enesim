@@ -3,25 +3,22 @@ MAINTAINERCLEANFILES = Makefile.in
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
--I$(top_srcdir)/emage/include \
+-I$(top_srcdir)/src/lib \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
--DEMAGE_BUILD \
-@EMAGE_CFLAGS@
+-DEnesim_BUILD \
+@ENESIM_CFLAGS@
 
-lib_LTLIBRARIES = libemage.la
+noinst_LTLIBRARIES = libenesim_image.la
 
-libemage_la_SOURCES = \
-emage.c \
-emage_context.c \
-emage_data.c \
-emage_data_file.c \
-emage_data_buffer.c \
-emage_data_base64.c \
-emage_file.c \
-emage_provider.c
+libenesim_image_la_SOURCES = \
+enesim_image_context.c \
+enesim_image_data.c \
+enesim_image_data_file.c \
+enesim_image_data_buffer.c \
+enesim_image_data_base64.c \
+enesim_image_file.c \
+enesim_image_provider.c
 ## add every .c module that is going to be built-in
 
-libemage_la_LIBADD = \
-$(top_builddir)/enesim/lib/libenesim.la \
-@EMAGE_LIBS@
-libemage_la_LDFLAGS = -no-undefined -version-info @version_info@
+libenesim_image_la_LIBADD = \
+@ENESIM_LIBS@

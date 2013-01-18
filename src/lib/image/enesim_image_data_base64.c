@@ -1,4 +1,4 @@
-#include "Enesim_Image.h"
+#include "enesim_image.h"
 #include "enesim_image_private.h"
 #include <ctype.h>
 /*============================================================================*

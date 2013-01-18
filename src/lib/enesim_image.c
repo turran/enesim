@@ -1,4 +1,6 @@
-#include "Enesim_Image.h"
+/* Horrible hack to make it compile */
+#define PACKAGE_LIB_DIR "/"
+#include "enesim_image.h"
 #include "enesim_image_private.h"
 
 /*============================================================================*
