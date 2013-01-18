@@ -12,19 +12,21 @@ AM_CPPFLAGS = \
 @ENESIM_CFLAGS@
 
 ENESIM_UTILHEADERS = \
+enesim_buffer.h \
+enesim_color.h \
+enesim_compositor.h \
+enesim_converter.h \
 enesim_eina.h \
 enesim_error.h \
+enesim_image.h \
 enesim_main.h \
-enesim_color.h \
-enesim_rectangle.h \
-enesim_buffer.h \
-enesim_surface.h \
-enesim_converter.h \
 enesim_matrix.h \
 enesim_perlin.h \
-enesim_compositor.h \
 enesim_pool.h \
-enesim_renderer.h
+enesim_rectangle.h \
+enesim_renderer.h \
+enesim_surface.h \
+enesim_text.h
 
 installed_headersdir = $(includedir)/enesim
 dist_installed_headers_DATA = $(ENESIM_UTILHEADERS)
