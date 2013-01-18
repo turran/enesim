@@ -866,6 +866,51 @@ EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *width, 
 	if (height) *height = thiz->current.height;
 }
 
+
+EAPI void enesim_renderer_rectangle_corner_radius_x_set(Enesim_Renderer *r, double rx)
+{
+	Enesim_Renderer_Rectangle *thiz;
+	thiz = _rectangle_get(r);
+	if (!thiz) return;
+	if (rx < 0)
+		rx = 0;
+	if (thiz->current.corner.rx == rx)
+		return;
+	thiz->current.corner.rx = rx;
+	thiz->changed = EINA_TRUE;
+}
+
+EAPI void enesim_renderer_rectangle_corner_radius_y_set(Enesim_Renderer *r, double ry)
+{
+	Enesim_Renderer_Rectangle *thiz;
+	thiz = _rectangle_get(r);
+	if (!thiz) return;
+	if (ry < 0)
+		ry = 0;
+	if (thiz->current.corner.ry == ry)
+		return;
+	thiz->current.corner.ry = ry;
+	thiz->changed = EINA_TRUE;
+}
+
+EAPI void enesim_renderer_rectangle_corner_radius_x_get(Enesim_Renderer *r, double *rx)
+{
+	Enesim_Renderer_Rectangle *thiz;
+	thiz = _rectangle_get(r);
+	if (!thiz) return;
+	if (rx)
+		*rx = thiz->current.corner.rx;
+}
+
+EAPI void enesim_renderer_rectangle_corner_radius_y_get(Enesim_Renderer *r, double *ry)
+{
+	Enesim_Renderer_Rectangle *thiz;
+	thiz = _rectangle_get(r);
+	if (!thiz) return;
+	if (ry)
+		*ry = thiz->current.corner.ry;
+}
+
 /**
  * @brief Set the radii of the corners of a rectangle renderer.
  *

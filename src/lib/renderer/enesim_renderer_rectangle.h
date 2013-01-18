@@ -39,6 +39,12 @@ EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *p, double *h);
 EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *p, double w, double h);
 EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *p, double *w, double *h);
 
+EAPI void enesim_renderer_rectangle_corner_radius_x_set(Enesim_Renderer *p, double rx);
+EAPI void enesim_renderer_rectangle_corner_radius_y_set(Enesim_Renderer *p, double ry);
+
+EAPI void enesim_renderer_rectangle_corner_radius_x_get(Enesim_Renderer *p, double *rx);
+EAPI void enesim_renderer_rectangle_corner_radius_y_get(Enesim_Renderer *p, double *ry);
+
 EAPI void enesim_renderer_rectangle_corner_radii_set(Enesim_Renderer *p, double rx, double ry);
 EAPI void enesim_renderer_rectangle_corner_radii_get(Enesim_Renderer *p, double *rx, double *ry);
 
