@@ -13,7 +13,7 @@ AM_CPPFLAGS = \
 # PNG
 if BUILD_MODULE_PNG
 enesim_image_png_LTLIBRARIES = enesim_image_png.la
-enesim_image_pngdir = $(libdir)/enesim_image
+enesim_image_pngdir = $(libdir)/enesim/image
 
 enesim_image_png_la_SOURCES = \
 enesim_image_png.c
@@ -25,7 +25,7 @@ endif
 # JPG
 if BUILD_MODULE_JPG
 enesim_image_jpg_LTLIBRARIES = enesim_image_jpg.la
-enesim_image_jpgdir = $(libdir)/enesim_image
+enesim_image_jpgdir = $(libdir)/enesim/image
 
 enesim_image_jpg_la_SOURCES = \
 enesim_image_jpg.c
@@ -35,7 +35,7 @@ enesim_image_jpg_la_LDFLAGS = -no-undefined -module -avoid-version
 endif
 
 enesim_image_raw_LTLIBRARIES = enesim_image_raw.la
-enesim_image_rawdir = $(libdir)/enesim_image
+enesim_image_rawdir = $(libdir)/enesim/image
 
 enesim_image_raw_la_SOURCES = \
 enesim_image_raw.c
