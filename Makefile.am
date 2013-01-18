@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = enesim
+SUBDIRS = src
 
 if HAVE_EMAGE
 SUBDIRS += emage
