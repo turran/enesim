@@ -26,7 +26,7 @@ endif
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/enesim/include \
+-I$(top_srcdir)/src/include \
 -I$(top_srcdir)/external/libargb \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@

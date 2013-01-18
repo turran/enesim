@@ -3,8 +3,8 @@ MAINTAINERCLEANFILES = Makefile.in
 AM_CPPFLAGS = \
 -I. \
 -I$(top_builddir) \
--I$(top_srcdir)/enesim/include \
--I$(top_builddir)/enesim/include \
+-I$(top_srcdir)/src/include \
+-I$(top_builddir)/src/include \
 -I$(top_srcdir)/emage/include \
 -I$(top_builddir)/emage/include \
 -DPACKAGE_DATA_DIR=\"$(datadir)/$(PACKAGE)\" \

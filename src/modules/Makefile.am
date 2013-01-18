@@ -3,7 +3,7 @@ Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/enesim/include \
+-I$(top_srcdir)/src/include \
 -I$(top_srcdir)/emage/include \
 -DEMAGE_BUILD \
 @EMAGE_CFLAGS@ \

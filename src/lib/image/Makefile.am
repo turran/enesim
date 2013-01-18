@@ -2,7 +2,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/enesim/include \
+-I$(top_srcdir)/src/include \
 -I$(top_srcdir)/emage/include \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DEMAGE_BUILD \

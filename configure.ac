@@ -70,48 +70,24 @@ AC_ARG_WITH([equanime],
    [want_equanime="yes"],
    [want_equanime="no"])
 
-## Emage
-AC_SUBST([requirements_emage])
-requirements_emage="enesim >= ${VERSION} eina >= 1.0.0"
-PKG_CHECK_MODULES(EMAGE, [eina >= 1.0.0],
-   [have_emage="yes"],
-   [have_emage="no"])
-
 case "$host_os" in
    mingw*)
-      EMAGE_LIBS="${EMAGE_LIBS} -lws2_32"
+      ENESIM_LIBS="${ENESIM_LIBS} -lws2_32"
    ;;
 esac
 
-
-have_emage="yes"
 enable_png="no"
 enable_jpg="no"
-if test "x${have_emage}" = "xyes" ; then
 # libpng
-   PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
-      [enable_png="yes"],
-      [enable_png="no"])
+PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
+   [enable_png="yes"],
+   [enable_png="no"])
 
 # libjpeg
-   AC_CHECK_HEADER([jpeglib.h], [enable_jpg="yes"], [enable_jpg="no"])
-fi
+AC_CHECK_HEADER([jpeglib.h], [enable_jpg="yes"], [enable_jpg="no"])
 
 EMAGE_MODULE([Png], [${enable_png}], [yes])
 EMAGE_MODULE([Jpg], [${enable_jpg}], [yes])
-
-AM_CONDITIONAL([HAVE_EMAGE], [test "x${have_emage}" = "xyes"])
-
-## Etex
-AC_SUBST([requirements_etex])
-requirements_etex="enesim >= ${VERSION} eina >= 1.0.0"
-requirements_build_etex="eina >= 1.0.0"
-
-# Emage
-if test "x${have_emage}" = "xyes" ; then
-   requirements_etex="${requirements_etex} emage"
-   AC_DEFINE([HAVE_EMAGE], [1], [Have support for emage])
-fi
 
 # Freetype
 PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
@@ -126,16 +102,6 @@ if test "x${have_freetype}" = "xyes" ; then
       [have_freetype="no"])
 fi
 AM_CONDITIONAL(HAVE_FREETYPE, test "x${have_freetype}" = "xyes")
-
-PKG_CHECK_MODULES(ETEX, [${requirements_build_etex}],
-   [have_etex="yes"],
-   [have_etex="no"])
-
-if test "x${have_etex}" = "xyes" ; then
-   ETEX_CFLAGS="$ETEX_CFLAGS -DENESIM_EXTENSION"
-fi
-
-AM_CONDITIONAL([HAVE_ETEX], [test "x${have_etex}" = "xyes"])
 
 ### Checks for header files
 
@@ -369,29 +335,21 @@ Makefile
 enesim.pc
 enesim_opencl.pc
 enesim_opengl.pc
-emage.pc
-etex.pc
-enesim/Makefile
-enesim/include/Makefile
-enesim/lib/Makefile
-enesim/lib/compositor/Makefile
-enesim/lib/converter/Makefile
-enesim/lib/pool/Makefile
-enesim/lib/renderer/Makefile
-enesim/lib/rasterizer/Makefile
-enesim/lib/util/Makefile
-enesim/tests/Makefile
-emage/Makefile
-emage/include/Makefile
-emage/lib/Makefile
-emage/modules/Makefile
-emage/examples/Makefile
-etex/Makefile
-etex/include/Makefile
-etex/lib/Makefile
-etex/lib/engines/Makefile
-etex/lib/engines/freetype/Makefile
-etex/tests/Makefile
+src/Makefile
+src/include/Makefile
+src/lib/Makefile
+src/lib/compositor/Makefile
+src/lib/converter/Makefile
+src/lib/image/Makefile
+src/lib/pool/Makefile
+src/lib/renderer/Makefile
+src/lib/rasterizer/Makefile
+src/lib/util/Makefile
+src/lib/text/engines/Makefile
+src/lib/text/engines/freetype/Makefile
+src/tests/Makefile
+src/modules/Makefile
+src/examples/Makefile
 ])
 
 AC_OUTPUT
@@ -434,17 +392,12 @@ echo "  Eina......................................: yes"
 echo "  OpenCL....................................: ${build_opencl}"
 echo "  OpenGL....................................: ${build_opengl}"
 echo
-echo "Emage.......................................: ${have_emage}"
-if test "x${have_emage}" = "xyes" ; then
-   echo "  PNG.......................................: ${have_module_png}"
-   echo "  JPG.......................................: ${have_module_jpg}"
-fi
+echo "Image Providers:"
+echo "  PNG.......................................: ${have_module_png}"
+echo "  JPG.......................................: ${have_module_jpg}"
 echo
-echo "Etex........................................: ${have_etex}"
-if test "x${have_etex}" = "xyes" ; then
-   echo "  Freetype..................................: ${have_freetype}"
-   echo "  Emage.....................................: ${have_emage}"
-fi
+echo "Font Engines:"
+echo "  Freetype..................................: ${have_freetype}"
 echo
 echo "Compilation.................................: make (or gmake)"
 echo "  CPPFLAGS..................................: $CPPFLAGS"

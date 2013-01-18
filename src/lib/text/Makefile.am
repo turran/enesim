@@ -4,7 +4,7 @@ SUBDIRS = engines
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/enesim/include \
+-I$(top_srcdir)/src/include \
 -I$(top_srcdir)/emage/include \
 -I$(top_srcdir)/etex/include \
 -I$(top_srcdir)/external/libargb \

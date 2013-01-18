@@ -4,7 +4,7 @@ noinst_LTLIBRARIES = libetex_freetype.la
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/enesim/include \
+-I$(top_srcdir)/src/include \
 -I$(top_srcdir)/etex/include \
 -I$(top_srcdir)/external/libargb \
 -DETEX_BUILD \

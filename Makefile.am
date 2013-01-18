@@ -2,14 +2,6 @@
 
 SUBDIRS = src
 
-if HAVE_EMAGE
-SUBDIRS += emage
-endif
-
-if HAVE_ETEX
-SUBDIRS += etex
-endif
-
 MAINTAINERCLEANFILES = \
 Makefile.in \
 aclocal.m4 \
@@ -26,8 +18,6 @@ configure-stamp \
 depcomp \
 enesim.pc \
 enesim_opencl.pc \
-emage.pc \
-etex.pc \
 enesim_docs.tar.gz \
 m4/ltsugar.m4 \
 m4/libtool.m4 \
@@ -46,8 +36,6 @@ Doxyfile \
 README \
 enesim.pc.in \
 enesim_opencl.pc.in \
-emage.pc.in \
-etex.pc.in \
 m4/efl_attribute.m4 \
 m4/efl_benchmark.m4 \
 m4/efl_compiler_flag.m4 \
@@ -69,14 +57,6 @@ endif
 
 if HAVE_OPENGL
 pkgconfig_DATA += enesim_opengl.pc
-endif
-
-if HAVE_EMAGE
-pkgconfig_DATA += emage.pc
-endif
-
-if HAVE_ETEX
-pkgconfig_DATA += etex.pc
 endif
 
 .PHONY: coverage benchmark
