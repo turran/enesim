@@ -19,7 +19,7 @@
 # include <config.h>
 #endif
 
-#include "Enesim_Text.h"
+#include "enesim_text.h"
 #include "enesim_text_private.h"
 
 #include <ft2build.h>

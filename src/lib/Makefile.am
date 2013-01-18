@@ -1,4 +1,4 @@
-SUBDIRS = compositor converter image pool rasterizer renderer util
+SUBDIRS = compositor converter image text pool rasterizer renderer util
 
 MAINTAINERCLEANFILES = Makefile.in
 
@@ -28,6 +28,7 @@ enesim_pool.c
 
 libenesim_la_LIBADD = \
 image/libenesim_image.la \
+text/libenesim_text.la \
 util/libenesim_util.la \
 rasterizer/libenesim_rasterizer.la \
 renderer/libenesim_renderer.la \

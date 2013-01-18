@@ -345,6 +345,7 @@ src/lib/pool/Makefile
 src/lib/renderer/Makefile
 src/lib/rasterizer/Makefile
 src/lib/util/Makefile
+src/lib/text/Makefile
 src/lib/text/engines/Makefile
 src/lib/text/engines/freetype/Makefile
 src/tests/Makefile

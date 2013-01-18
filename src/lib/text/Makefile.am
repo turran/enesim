@@ -5,29 +5,21 @@ SUBDIRS = engines
 AM_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/include \
--I$(top_srcdir)/emage/include \
--I$(top_srcdir)/etex/include \
+-I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/external/libargb \
--DETEX_BUILD \
-@ETEX_CFLAGS@ \
+-DENESIM_BUILD \
+@ENESIM_CFLAGS@ \
 @EFL_SIMD_FLAGS@
 
-lib_LTLIBRARIES = libetex.la
+noinst_LTLIBRARIES = libenesim_text.la
 
-libetex_la_SOURCES = \
-etex.c \
-etex_buffer.c \
-etex_font.c \
-etex_base.c \
-etex_span.c
+libenesim_text_la_SOURCES = \
+enesim_text_buffer.c \
+enesim_text_font.c
 
-libetex_la_LIBADD = \
-$(top_builddir)/enesim/lib/libenesim.la \
-$(top_builddir)/emage/lib/libemage.la \
-@ETEX_LIBS@
+libenesim_text_la_LIBADD = \
+@ENESIM_LIBS@
 
 if HAVE_FREETYPE
-libetex_la_LIBADD += $(top_builddir)/etex/lib/engines/freetype/libetex_freetype.la
+libenesim_text_la_LIBADD += $(top_builddir)/src/lib/text/engines/freetype/libenesim_text_engine_freetype.la
 endif
-
-libetex_la_LDFLAGS = -no-undefined -version-info @version_info@

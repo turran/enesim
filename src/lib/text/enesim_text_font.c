@@ -24,7 +24,7 @@
 #include <Emage.h>
 #endif
 
-#include "Enesim_Text.h"
+#include "enesim_text.h"
 #include "enesim_text_private.h"
 /*============================================================================*
  *                                  Local                                     *
