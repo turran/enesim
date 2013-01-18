@@ -18,7 +18,7 @@
 #ifndef RASTERIZER_H_
 #define RASTERIZER_H_
 
-#include "private/shape.h"
+#include "enesim_renderer_shape_private.h"
 
 typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Figure *figure);
 typedef Eina_Bool (*Enesim_Rasterizer_Sw_Setup)(Enesim_Renderer *r,

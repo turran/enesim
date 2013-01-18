@@ -29,8 +29,8 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
 
-#include "private/renderer.h"
-#include "private/shape.h"
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_shape_private.h"
 /* TODO
  * - whenever we need the damage area of a shape, we need to check if
  *   the renderer has a fill renderer, if so, we should call the damage

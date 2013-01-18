@@ -2,7 +2,9 @@ MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/src/include \
+-I$(top_srcdir)/src/lib \
+-I$(top_srcdir)/src/lib/renderer \
+-I$(top_srcdir)/src/lib/util \
 -I$(top_srcdir)/external/libargb \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@

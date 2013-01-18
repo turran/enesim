@@ -35,12 +35,12 @@
 #include "Enesim_OpenGL.h"
 #endif
 
-#include "private/renderer.h"
-#include "private/shape.h"
-#include "private/vector.h"
-#include "private/rasterizer.h"
-#include "private/curve.h"
-#include "private/path.h"
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_shape_private.h"
+#include "enesim_vector_private.h"
+#include "enesim_rasterizer_private.h"
+#include "enesim_curve_private.h"
+#include "enesim_path_private.h"
 
 /**
  * TODO

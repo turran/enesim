@@ -30,8 +30,8 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_gradient_linear.h"
 
-#include "private/renderer.h"
-#include "private/gradient.h"
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_gradient_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

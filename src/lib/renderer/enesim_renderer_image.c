@@ -39,7 +39,7 @@
 #include "Enesim_OpenGL.h"
 #endif
 
-#include "private/renderer.h"
+#include "enesim_renderer_private.h"
 /**
  * @todo
  * - add support for sw and sh

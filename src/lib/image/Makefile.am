@@ -2,7 +2,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/src/include \
+-I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DEnesim_BUILD \

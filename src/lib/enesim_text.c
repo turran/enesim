@@ -1,5 +1,5 @@
-/* ETEX - Enesim's Text Renderer
- * Copyright (C) 2010 Jorge Luis Zapata
+/* ENESIM - Direct Rendering Library
+ * Copyright (C) 2007-2011 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,12 +15,9 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
+#include "enesim_private.h"
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-#include "Enesim_Text.h"
+#include "enesim_text.h"
 #include "enesim_text_private.h"
 /*============================================================================*
  *                                  Local                                     *

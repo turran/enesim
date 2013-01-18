@@ -31,7 +31,7 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_dispmap.h"
 
-#include "private/renderer.h"
+#include "enesim_renderer_private.h"
 /*
  * P'(x,y) <- P(x + scale * (XC(x,y) - .5), y + scale * (YC(x,y) - .5))
  */

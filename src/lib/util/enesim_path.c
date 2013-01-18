@@ -31,9 +31,9 @@
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_path.h"
 
-#include "private/curve.h"
-#include "private/vector.h"
-#include "private/path.h"
+#include "enesim_curve_private.h"
+#include "enesim_vector_private.h"
+#include "enesim_path_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -129,7 +129,7 @@ static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 
 /* the strokeless path generator */
 static Enesim_Path_Descriptor _strokeless_descriptor = {
-	/* .vertex_add		= */ _strokeless_path_vertex_add, 
+	/* .vertex_add		= */ _strokeless_path_vertex_add,
 	/* .polygon_add 	= */ _strokeless_path_polygon_add,
 	/* .polygon_close 	= */ _strokeless_path_polygon_close,
 	/* .path_begin 		= */ NULL,

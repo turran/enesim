@@ -21,7 +21,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 
-#include "private/converter.h"
+#include "enesim_converter_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

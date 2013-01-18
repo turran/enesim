@@ -37,7 +37,7 @@
 #include "Enesim_OpenGL.h"
 #endif
 
-#include "private/renderer.h"
+#include "enesim_renderer_private.h"
 /* TODO The idea of this renderer is to wrap an image renderer (and its methods)
  * and use another renderer as the src renderer. This renderer should keep
  * track of the damages and whenever the span function requires to render

@@ -30,8 +30,8 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 
-#include "private/surface.h"
-#include "private/renderer.h"
+#include "enesim_surface_private.h"
+#include "enesim_renderer_private.h"
 /**
  * @todo
  * - Add a way to get/set such description

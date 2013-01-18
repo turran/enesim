@@ -1,35 +1,6 @@
 #ifndef _ENESIM_TEXT_H
 #define _ENESIM_TEXT_H
 
-#include <Eina.h>
-#include <Enesim.h>
-
-#ifdef EAPI
-# undef EAPI
-#endif
-
-#ifdef _WIN32
-# ifdef ENESIM_TEXT_BUILD
-#  ifdef DLL_EXPORT
-#   define EAPI __declspec(dllexport)
-#  else
-#   define EAPI
-#  endif
-# else
-#  define EAPI __declspec(dllimport)
-# endif
-#else
-# ifdef __GNUC__
-#  if __GNUC__ >= 4
-#   define EAPI __attribute__ ((visibility("default")))
-#  else
-#   define EAPI
-#  endif
-# else
-#  define EAPI
-# endif
-#endif
-
 /**
  * @mainpage Etex
  * @section intro Introduction
@@ -116,63 +87,6 @@ EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *b, const char *str
 EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *b, int length, ssize_t offset);
 EAPI void enesim_text_buffer_delete(Enesim_Text_Buffer *b);
 EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *b);
-
-/**
- * @}
- * @defgroup Enesim_Text_Base_Renderer_Group Base Renderer
- * @{
- */
-
-EAPI void enesim_text_base_font_name_set(Enesim_Renderer *r, const char *font);
-EAPI void enesim_text_base_font_name_get(Enesim_Renderer *r, const char **font);
-EAPI void enesim_text_base_size_set(Enesim_Renderer *r, unsigned int size);
-EAPI void enesim_text_base_size_get(Enesim_Renderer *r, unsigned int *size);
-EAPI void enesim_text_base_max_ascent_get(Enesim_Renderer *r, int *masc);
-EAPI void enesim_text_base_max_descent_get(Enesim_Renderer *r, int *mdesc);
-EAPI Enesim_Text_Font * enesim_text_base_font_get(Enesim_Renderer *r);
-
-/**
- * @}
- * @defgroup Enesim_Text_Span_Renderer_Group Span Renderer
- * @{
- */
-EAPI Enesim_Renderer * enesim_text_span_new(void);
-EAPI Enesim_Renderer * enesim_text_span_new_from_etex(Etex *e);
-EAPI void enesim_text_span_text_set(Enesim_Renderer *r, const char *str);
-EAPI void enesim_text_span_text_get(Enesim_Renderer *r, const char **str);
-EAPI void enesim_text_span_direction_get(Enesim_Renderer *r, Enesim_Text_Direction *direction);
-EAPI void enesim_text_span_direction_set(Enesim_Renderer *r, Enesim_Text_Direction direction);
-EAPI void enesim_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b);
-EAPI int enesim_text_span_index_at(Enesim_Renderer *r, int x, int y);
-
-/**
- * @}
- * @defgroup Enesim_Text_Grid_Renderer_Group Grid Renderer
- * @{
- */
-
-typedef struct _Enesim_Text_Grid_Char
-{
-	char c;
-	unsigned int row;
-	unsigned int column;
-	Enesim_Color foreground;
-	Enesim_Color background;
-} Enesim_Text_Grid_Char;
-
-typedef struct _Enesim_Text_Grid_String
-{
-	const char *string;
-	unsigned int row;
-	unsigned int column;
-	Enesim_Color foreground;
-	Enesim_Color background;
-} Enesim_Text_Grid_String;
-
-EAPI Enesim_Renderer * enesim_text_grid_new(void);
-EAPI Enesim_Renderer * enesim_text_grid_new_from_etex(Etex *e);
-EAPI void enesim_text_grid_columns_set(Enesim_Renderer *r, unsigned int columns);
-EAPI void enesim_text_grid_rows_set(Enesim_Renderer *r, unsigned int rows);
 
 /**
  * @}

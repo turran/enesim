@@ -34,7 +34,7 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 
-#include "private/renderer.h"
+#include "enesim_renderer_private.h"
 
 /**
  * @todo

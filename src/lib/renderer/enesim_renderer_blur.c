@@ -31,7 +31,7 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_blur.h"
 
-#include "private/renderer.h"
+#include "enesim_renderer_private.h"
 /*
  * A box-like blur filter - initial slow version.
  */

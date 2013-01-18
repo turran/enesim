@@ -21,7 +21,7 @@
 #include "enesim_color.h"
 #include "enesim_compositor.h"
 
-#include "private/compositor.h"
+#include "enesim_compositor_private.h"
 /*
  * TODO add a surface compositor too, like point (0D), span (1D) but a 2D one :)
  */

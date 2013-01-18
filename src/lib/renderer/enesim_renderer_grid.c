@@ -30,7 +30,7 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_grid.h"
 
-#include "private/renderer.h"
+#include "enesim_renderer_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

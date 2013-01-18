@@ -21,7 +21,7 @@
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
 
-#include "private/matrix.h"
+#include "enesim_matrix_private.h"
 /* TODO add a fixed point matrix too, to speed up the matrix_rotate sin/cos */
 /*============================================================================*
  *                                  Local                                     *

@@ -28,7 +28,7 @@
  */
 #include "enesim_private.h"
 
-#include "private/mempool_buddy.h"
+#include "enesim_mempool_buddy_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

@@ -30,8 +30,8 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 
-#include "private/buffer.h"
-#include "private/renderer.h"
+#include "enesim_buffer_private.h"
+#include "enesim_renderer_private.h"
 
 #if BUILD_OPENCL
 #include "Enesim_OpenCL.h"

@@ -22,9 +22,9 @@
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
 
-#include "private/pool.h"
-#include "private/buffer.h"
-#include "private/surface.h"
+#include "enesim_pool_private.h"
+#include "enesim_buffer_private.h"
+#include "enesim_surface_private.h"
 
 #if BUILD_OPENGL
 #include "enesim_error.h"

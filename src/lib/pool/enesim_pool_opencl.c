@@ -23,8 +23,8 @@
 
 #include "Enesim_OpenCL.h"
 
-#include "private/pool.h"
-#include "private/buffer.h"
+#include "enesim_pool_private.h"
+#include "enesim_buffer_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

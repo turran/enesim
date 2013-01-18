@@ -21,8 +21,8 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 
-#include "private/pool.h"
-#include "private/buffer.h"
+#include "enesim_pool_private.h"
+#include "enesim_buffer_private.h"
 
 #if BUILD_OPENGL
 #include "enesim_surface.h"

@@ -29,9 +29,9 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
 
-#include "private/renderer.h"
-#include "private/vector.h"
-#include "private/rasterizer.h"
+#include "enesim_renderer_private.h"
+#include "enesim_vector_private.h"
+#include "enesim_rasterizer_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

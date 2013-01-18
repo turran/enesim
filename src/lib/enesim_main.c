@@ -35,10 +35,10 @@
 #include "enesim_renderer.h"
 #include "enesim_converter.h"
 
-#include "private/compositor.h"
-#include "private/renderer.h"
-#include "private/converter.h"
-#include "private/mempool_aligned.h"
+#include "enesim_compositor_private.h"
+#include "enesim_renderer_private.h"
+#include "enesim_converter_private.h"
+#include "enesim_mempool_aligned_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

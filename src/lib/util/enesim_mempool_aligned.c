@@ -30,7 +30,7 @@
 # include <unistd.h>
 #endif
 
-#include "private/mempool_aligned.h"
+#include "enesim_mempool_aligned_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

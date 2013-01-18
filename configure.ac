@@ -336,7 +336,6 @@ enesim.pc
 enesim_opencl.pc
 enesim_opengl.pc
 src/Makefile
-src/include/Makefile
 src/lib/Makefile
 src/lib/compositor/Makefile
 src/lib/converter/Makefile

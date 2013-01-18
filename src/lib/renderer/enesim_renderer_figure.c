@@ -31,9 +31,9 @@
 #include "enesim_renderer_path.h"
 #include "enesim_renderer_figure.h"
 
-#include "private/renderer.h"
-#include "private/shape.h"
-#include "private/vector.h"
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_shape_private.h"
+#include "enesim_vector_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

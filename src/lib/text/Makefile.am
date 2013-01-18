@@ -4,7 +4,7 @@ SUBDIRS = engines
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/src/include \
+-I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/external/libargb \
 -DENESIM_BUILD \

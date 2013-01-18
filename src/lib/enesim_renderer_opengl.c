@@ -32,8 +32,8 @@
 #include "Enesim_OpenGL.h"
 #endif
 
-#include "private/buffer.h"
-#include "private/renderer.h"
+#include "enesim_buffer_private.h"
+#include "enesim_renderer_private.h"
 /*
  * Shall we use only one framebuffer? One framebuffer per renderer?
  * Add a program cache
