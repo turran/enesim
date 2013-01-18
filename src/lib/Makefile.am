@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 -I$(top_srcdir)/src/lib/renderer \
 -I$(top_srcdir)/src/lib/util \
 -I$(top_srcdir)/external/libargb \
+-DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@
 

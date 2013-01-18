@@ -56,10 +56,6 @@ Enesim
   with a simple callback that whenever a some damage area is returned then we should just abort and return
   true
 
-Emage
-=====
-+ Instead of having a single implicit context, we should be able to create different context
-
 Etex
 ====
 + Add fontconfig support

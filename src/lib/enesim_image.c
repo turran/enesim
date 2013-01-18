@@ -21,11 +21,8 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
-/* FIXME Horrible hack to make it compile */
-#define PACKAGE_LIB_DIR "/"
 #include "enesim_image.h"
 #include "enesim_image_private.h"
-
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -143,7 +140,7 @@ EAPI int enesim_image_init(void)
 	/* the providers */
 	_providers = eina_hash_string_superfast_new(NULL);
 	/* the modules */
-	_modules = eina_module_list_get(_modules, PACKAGE_LIB_DIR"/emage/", 1, NULL, NULL);
+	_modules = eina_module_list_get(_modules, PACKAGE_LIB_DIR"/enesim/image/", 1, NULL, NULL);
 	eina_module_list_load(_modules);
 #if BUILD_STATIC_MODULE_PNG
 	png_provider_init();
