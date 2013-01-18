@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <setjmp.h>
 
-#include "Enesim_Image.h"
+#include "Enesim.h"
 
 #include <jpeglib.h>
 

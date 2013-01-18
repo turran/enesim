@@ -3,42 +3,43 @@ Makefile.in
 
 AM_CPPFLAGS = \
 -I. \
--I$(top_srcdir)/src/include \
--I$(top_srcdir)/emage/include \
--DEMAGE_BUILD \
-@EMAGE_CFLAGS@ \
+-I$(top_builddir)/ \
+-I$(top_srcdir)/src/lib \
+-I$(top_srcdir)/src/lib/renderer \
+-DENESIM_BUILD \
+@ENESIM_CFLAGS@ \
 @PNG_CFLAGS@
 
 # PNG
 if BUILD_MODULE_PNG
-emage_png_LTLIBRARIES = emage_png.la
-emage_pngdir = $(libdir)/emage
+enesim_image_png_LTLIBRARIES = enesim_image_png.la
+enesim_image_pngdir = $(libdir)/enesim_image
 
-emage_png_la_SOURCES = \
-emage_png.c
+enesim_image_png_la_SOURCES = \
+enesim_image_png.c
 
-emage_png_la_LIBADD = $(top_builddir)/emage/lib/libemage.la @EMAGE_LIBS@ @PNG_LIBS@
-emage_png_la_LDFLAGS = -no-undefined -module -avoid-version
+enesim_image_png_la_LIBADD = $(top_builddir)/src/lib/libenesim.la @ENESIM_LIBS@ @PNG_LIBS@
+enesim_image_png_la_LDFLAGS = -no-undefined -module -avoid-version
 endif
 
 # JPG
 if BUILD_MODULE_JPG
-emage_jpg_LTLIBRARIES = emage_jpg.la
-emage_jpgdir = $(libdir)/emage
+enesim_image_jpg_LTLIBRARIES = enesim_image_jpg.la
+enesim_image_jpgdir = $(libdir)/enesim_image
 
-emage_jpg_la_SOURCES = \
-emage_jpg.c
+enesim_image_jpg_la_SOURCES = \
+enesim_image_jpg.c
 
-emage_jpg_la_LIBADD = $(top_builddir)/emage/lib/libemage.la @EMAGE_LIBS@ -ljpeg
-emage_jpg_la_LDFLAGS = -no-undefined -module -avoid-version
+enesim_image_jpg_la_LIBADD = $(top_builddir)/src/lib/libenesim.la @ENESIM_LIBS@ -ljpeg
+enesim_image_jpg_la_LDFLAGS = -no-undefined -module -avoid-version
 endif
 
-emage_raw_LTLIBRARIES = emage_raw.la
-emage_rawdir = $(libdir)/emage
+enesim_image_raw_LTLIBRARIES = enesim_image_raw.la
+enesim_image_rawdir = $(libdir)/enesim_image
 
-emage_raw_la_SOURCES = \
-emage_raw.c
+enesim_image_raw_la_SOURCES = \
+enesim_image_raw.c
 
-emage_raw_la_LIBADD = $(top_builddir)/emage/lib/libemage.la @EMAGE_LIBS@
-emage_raw_la_LDFLAGS = -no-undefined -module -avoid-version
+enesim_image_raw_la_LIBADD = $(top_builddir)/src/lib/libenesim.la @ENESIM_LIBS@
+enesim_image_raw_la_LDFLAGS = -no-undefined -module -avoid-version
 

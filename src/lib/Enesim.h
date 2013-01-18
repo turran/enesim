@@ -87,6 +87,8 @@ extern "C" {
 #include "enesim_converter.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_image.h"
+#include "enesim_text.h"
 /* renderers */
 #include "enesim_renderer_background.h"
 #include "enesim_renderer_blur.h"

@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "Enesim_Image.h"
+#include "Enesim.h"
 #include "png.h"
 /*============================================================================*
  *                                  Local                                     *
