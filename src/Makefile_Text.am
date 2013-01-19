@@ -1,8 +1,0 @@
-
-lib_libenesim_la_SOURCES += \
-lib/text/enesim_text_buffer.c \
-lib/text/enesim_text_font.c
-
-if HAVE_FREETYPE
-lib_libenesim_la_SOURCES += lib/text/engines/freetype/enesim_text_engine_freetype.c
-endif

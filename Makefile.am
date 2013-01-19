@@ -1,6 +1,24 @@
-## Process this file with automake to produce Makefile.in
+AUTOMAKE_OPTIONS = subdir-objects
+ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src
+SUBDIRS = . src
+EXTRA_DIST =
+
+### Library
+
+include src/lib/Makefile_Core.mk
+include src/lib/compositor/Makefile_Compositor.mk
+include src/lib/converter/Makefile_Converter.mk
+include src/lib/image/Makefile_Image.mk
+include src/lib/pool/Makefile_Pool.mk
+include src/lib/rasterizer/Makefile_Rasterizer.mk
+include src/lib/renderer/Makefile_Renderer.mk
+include src/lib/text/Makefile_Text.mk
+include src/lib/util/Makefile_Util.mk
+
+### Modules
+
+include src/modules/Makefile_Modules.mk
 
 MAINTAINERCLEANFILES = \
 Makefile.in \
@@ -28,7 +46,7 @@ config.h.in~ \
 config.h.in \
 config.h
 
-EXTRA_DIST = \
+EXTRA_DIST += \
 AUTHORS \
 COPYING \
 gendoc \
@@ -44,9 +62,6 @@ m4/efl_cpu.m4 \
 m4/efl_tests.m4 \
 m4/enesim_format.m4 \
 external
-
-
-ACLOCAL_AMFLAGS = -I m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = enesim.pc
