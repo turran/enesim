@@ -70,8 +70,13 @@ static double _cos(double x)
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Return the type of the given floating point matrix.
+ *
+ * @param m The floating point matrix.
+ * @return The type of the matrix.
+ *
+ * This function returns the type of the matrix @p m. No check is done
+ * on @p m.
  */
 EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m)
 {
@@ -86,9 +91,15 @@ EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m)
 			return ENESIM_MATRIX_AFFINE;
 	}
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Return the type of the given fixed point matrix.
+ *
+ * @param m The fixed point matrix.
+ * @return The type of the matrix.
+ *
+ * This function returns the type of the matrix @p m. No check is done
+ * on @p m.
  */
 EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix *m)
 {
@@ -105,8 +116,24 @@ EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the values of the coefficients of the given floating
+ * point matrix.
+ *
+ * @param m The floating point matrix.
+ * @param a The first coefficient value.
+ * @param b The second coefficient value.
+ * @param c The third coefficient value.
+ * @param d The fourth coefficient value.
+ * @param e The fifth coefficient value.
+ * @param f The sixth coefficient value.
+ * @param g The seventh coefficient value.
+ * @param h The heighth coefficient value.
+ * @param i The nineth coefficient value.
+ *
+ * This function sets the values of the coefficients of the matrix
+ * @p m. No check is done on @p m.
+ *
+ * @see enesim_matrix_values_get()
  */
 EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double c,
 		double d, double e, double f, double g, double h, double i)
@@ -121,9 +148,26 @@ EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double 
 	MATRIX_ZY(m) = h;
 	MATRIX_ZZ(m) = i;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Get the values of the coefficients of the given floating
+ * point matrix.
+ *
+ * @param m The floating point matrix.
+ * @param a The first coefficient value.
+ * @param b The second coefficient value.
+ * @param c The third coefficient value.
+ * @param d The fourth coefficient value.
+ * @param e The fifth coefficient value.
+ * @param f The sixth coefficient value.
+ * @param g The seventh coefficient value.
+ * @param h The heighth coefficient value.
+ * @param i The nineth coefficient value.
+ *
+ * This function gets the values of the coefficients of the matrix
+ * @p m. No check is done on @p m.
+ *
+ * @see enesim_matrix_values_set()
  */
 EAPI void enesim_matrix_values_get(const Enesim_Matrix *m, double *a, double *b, double *c,
 		double *d, double *e, double *f, double *g, double *h, double *i)
@@ -138,8 +182,26 @@ EAPI void enesim_matrix_values_get(const Enesim_Matrix *m, double *a, double *b,
 	if (h) *h = MATRIX_ZY(m);
 	if (i) *i = MATRIX_ZZ(m);
 }
+
 /**
- * convert the transformation values to fixed point
+ * @brief Get the values of the coefficients of the given fixed
+ * point matrix.
+ *
+ * @param m The fixed point matrix.
+ * @param a The first coefficient value.
+ * @param b The second coefficient value.
+ * @param c The third coefficient value.
+ * @param d The fourth coefficient value.
+ * @param e The fifth coefficient value.
+ * @param f The sixth coefficient value.
+ * @param g The seventh coefficient value.
+ * @param h The heighth coefficient value.
+ * @param i The nineth coefficient value.
+ *
+ * This function gets the values of the coefficients of the matrix
+ * @p m. No check is done on @p m.
+ *
+ * @see enesim_matrix_values_set()
  */
 EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
@@ -156,6 +218,17 @@ EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 	if (i) *i = eina_f16p16_double_from(MATRIX_ZZ(m));
 }
 
+/**
+ * @brief Transform the given floating point matrix to the given fixed
+ * point matrix.
+ *
+ * @param m The floating point matrix.
+ * @param fm The fixed point matrix.
+ *
+ * This function transforms the floating point matrix @p m to a fixed
+ * point matrix and store the coefficients into the fixed point matrix
+ * @p fm.
+ */
 EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
 		Enesim_F16p16_Matrix *fm)
 {
@@ -247,8 +320,13 @@ EAPI void enesim_matrix_adjoint(const Enesim_Matrix *m, Enesim_Matrix *a)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Return the determinant of the given matrix.
+ *
+ * @param m The matrix.
+ * @return The determinant.
+ *
+ * This function returns the determinant of the matrix @p m. No check
+ * is done on @p m.
  */
 EAPI double enesim_matrix_determinant(const Enesim_Matrix *m)
 {
@@ -260,9 +338,15 @@ EAPI double enesim_matrix_determinant(const Enesim_Matrix *m)
 
 	return det;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Divide the given matrix by the given scalar.
+ *
+ * @param m The matrix.
+ * @param scalar The scalar number.
+ *
+ * This function divides the matrix @p m by @p scalar. No check
+ * is done on @p m.
  */
 EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar)
 {
@@ -278,9 +362,16 @@ EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar)
 	MATRIX_ZY(m) /= scalar;
 	MATRIX_ZZ(m) /= scalar;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Compute the inverse of the given matrix.
+ *
+ * @param m The matrix to inverse.
+ * @param m2 The inverse matrix.
+ *
+ * This function inverse the matrix @p m and stores the result in
+ * @p m2. No check is done on @p m or @p m2. If @p m can not be
+ * invertible, then @p m2 is set to the identity matrix.
  */
 EAPI void enesim_matrix_inverse(const Enesim_Matrix *m, Enesim_Matrix *m2)
 {
@@ -330,8 +421,14 @@ EAPI void enesim_matrix_compose(const Enesim_Matrix *m1, const Enesim_Matrix *m2
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Check whether the two given matrices are equal or not.
+ *
+ * @param m1 The first matrix.
+ * @param m2 The second matrix.
+ * @return EINA_TRUE if the two matrices are equal, 0 otherwise.
+ *
+ * This function return EINA_TRUE if thematrices @p m1 and @p m2 are
+ * equal, EINA_FALSE otherwise. No check is done on the matrices.
  */
 EAPI Eina_Bool enesim_matrix_is_equal(const Enesim_Matrix *m1, const Enesim_Matrix *m2)
 {
@@ -455,9 +552,14 @@ EAPI void enesim_matrix_rotate(Enesim_Matrix *m, double rad)
 	MATRIX_ZY(m) = 0;
 	MATRIX_ZZ(m) = 1;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the given floating point matrix to the identity matrix.
+ *
+ * @param m The floating point matrix to set
+ *
+ * This function sets @p m to the identity matrix. No check is done on
+ * @p m.
  */
 EAPI void enesim_matrix_identity(Enesim_Matrix *m)
 {
@@ -473,8 +575,12 @@ EAPI void enesim_matrix_identity(Enesim_Matrix *m)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the given fixed point matrix to the identity matrix.
+ *
+ * @param m The fixed point matrix to set
+ *
+ * This function sets @p m to the identity matrix. No check is done on
+ * @p m.
  */
 EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m)
 {
