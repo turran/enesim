@@ -74,6 +74,7 @@
 
 /* the log domains */
 extern int enesim_log_global;
+extern int enesim_log_image;
 extern int enesim_log_pool;
 extern int enesim_log_surface;
 extern int enesim_log_buffer;

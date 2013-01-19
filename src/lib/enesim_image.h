@@ -23,8 +23,6 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
  * @defgroup Enesim_Image_Main_Group Main
  * @{
  */
-EAPI int enesim_image_init(void);
-EAPI int enesim_image_shutdown(void);
 EAPI void enesim_image_dispatch(void);
 
 /**

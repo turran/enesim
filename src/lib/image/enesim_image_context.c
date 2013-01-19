@@ -39,6 +39,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_image
+
 struct _Enesim_Image_Context
 {
 	/* the communication between the main thread and the async ones */

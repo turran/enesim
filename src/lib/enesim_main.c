@@ -34,7 +34,9 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 #include "enesim_converter.h"
+#include "enesim_image.h"
 
+#include "enesim_image_private.h"
 #include "enesim_compositor_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_converter_private.h"
@@ -53,6 +55,7 @@ struct log
 
 static struct log logs[] = {
 	{ &enesim_log_global,			"enesim" },
+	{ &enesim_log_image,			"enesim_image" },
 	{ &enesim_log_pool,			"enesim_pool" },
 	{ &enesim_log_buffer,			"enesim_buffer" },
 	{ &enesim_log_surface,			"enesim_surface" },
@@ -110,6 +113,7 @@ static void _unregister_domains(void)
  *                                 Global                                     *
  *============================================================================*/
 int enesim_log_global = -1;
+int enesim_log_image = -1;
 int enesim_log_pool = -1;
 int enesim_log_surface = -1;
 int enesim_log_buffer = -1;
@@ -164,6 +168,7 @@ EAPI int enesim_init(void)
 	enesim_compositor_init();
 	enesim_renderer_init();
 	enesim_converter_init();
+	enesim_image_init();
 #ifdef EFL_HAVE_MMX
 	/* EINA_ERROR_PINFO("MMX Drawer available\n"); */
 #endif
@@ -203,6 +208,7 @@ EAPI int enesim_shutdown(void)
 	if (--_enesim_init_count != 0)
 		return _enesim_init_count;
 
+	enesim_image_shutdown();
 	enesim_converter_shutdown();
 	enesim_renderer_shutdown();
 	enesim_compositor_shutdown();

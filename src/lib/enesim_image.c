@@ -26,8 +26,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-
-#define ENESIM_IMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
+#define ENESIM_LOG_DEFAULT enesim_log_image
 
 static int _enesim_image_init_count = 0;
 static Eina_Array *_modules = NULL;
@@ -46,8 +45,6 @@ Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-int enesim_image_log_dom_global = -1;
-
 Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, const char *mime)
 {
 	Enesim_Image_Provider *p;
@@ -98,36 +95,15 @@ Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Image_Data *data, 
 	}
 	return NULL;
 }
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
+
 /**
  * Initialize emage. This function must be called before any other emage
  * function
  */
-EAPI int enesim_image_init(void)
+int enesim_image_init(void)
 {
 	if (++_enesim_image_init_count != 1)
 		return _enesim_image_init_count;
-
-	if (!eina_init())
-	{
-		fprintf(stderr, "Emage: Eina init failed");
-		return --_enesim_image_init_count;
-	}
-
-	enesim_image_log_dom_global = eina_log_domain_register("emage", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
-	if (enesim_image_log_dom_global < 0)
-	{
-		EINA_LOG_ERR("Emage: Can not create a general log domain.");
-		goto shutdown_eina;
-	}
-
-	if (!enesim_init())
-	{
-		ERR("Enesim init failed");
-		goto unregister_log_domain;
-	}
 
 	/* the errors */
 	ENESIM_IMAGE_ERROR_EXIST = eina_error_msg_static_register("Files does not exist");
@@ -149,18 +125,11 @@ EAPI int enesim_image_init(void)
 	_main_context = enesim_image_context_new();
 
 	return _enesim_image_init_count;
-
-unregister_log_domain:
-	eina_log_domain_unregister(enesim_image_log_dom_global);
-	enesim_image_log_dom_global = -1;
-shutdown_eina:
-	eina_shutdown();
-	return --_enesim_image_init_count;
 }
 /**
  * Shutdown emage library. Once you have finished using emage, shut it down.
  */
-EAPI int enesim_image_shutdown(void)
+int enesim_image_shutdown(void)
 {
 	if (--_enesim_image_init_count != 0)
 		return _enesim_image_init_count;
@@ -178,14 +147,13 @@ EAPI int enesim_image_shutdown(void)
 	eina_list_free(_finders);
 	/* remove the providers */
 	eina_hash_free(_providers);
-	/* shutdown every provider */
-	enesim_shutdown();
-	eina_log_domain_unregister(enesim_image_log_dom_global);
-	enesim_image_log_dom_global = -1;
-	eina_shutdown();
 
 	return _enesim_image_init_count;
 }
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+
 /**
  * Loads information about an image
  *
