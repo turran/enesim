@@ -140,7 +140,7 @@ void enesim_curve_quadratic_to(Enesim_Curve_State *state,
 	state->last_ctrl_x = ctrl_x;
 	state->last_ctrl_y = ctrl_y;
 }
-	
+
 void enesim_curve_squadratic_to(Enesim_Curve_State *state,
 		double x, double y)
 {

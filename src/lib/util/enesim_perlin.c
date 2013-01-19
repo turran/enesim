@@ -102,7 +102,7 @@ EAPI Eina_F16p16 enesim_perlin_get(Eina_F16p16 xx, Eina_F16p16 yy,
 	unsigned int octaves, Eina_F16p16 *xfreq, Eina_F16p16 *yfreq,
 	Eina_F16p16 *ampl)
 {
-	int i;
+	unsigned int i;
 	Eina_F16p16 total = 0;
 
 	for (i = 0; i < octaves; i++)
@@ -129,7 +129,7 @@ EAPI void enesim_perlin_coeff_set(unsigned int octaves, double persistence,
 	Eina_F16p16 *yfreqcoeff, Eina_F16p16 *amplcoeff)
 {
 	Eina_F16p16 per;
-	int i;
+	unsigned int i;
 
 	per = eina_f16p16_double_from(persistence);
 	xfreqcoeff[0] = eina_f16p16_mul(eina_f16p16_double_from(xfreq), 131072);

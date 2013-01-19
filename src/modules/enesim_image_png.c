@@ -34,12 +34,12 @@
 
 static int enesim_image_log_dom_png = -1;
 
-static void _png_msg_error_cb(png_structp png_ptr, png_const_charp error_msg)
+static void _png_msg_error_cb(png_structp png_ptr EINA_UNUSED, png_const_charp error_msg)
 {
 	ERR("%s", error_msg);
 }
 
-static void _png_msg_warning_cb(png_structp png_ptr, png_const_charp warning_msg)
+static void _png_msg_warning_cb(png_structp png_ptr EINA_UNUSED, png_const_charp warning_msg)
 {
 	WRN("%s", warning_msg);
 }
@@ -92,7 +92,7 @@ static void _png_write(png_structp png_ptr, png_bytep buf, png_size_t length)
 	enesim_image_data_write(data, buf, length);
 }
 
-static void _png_flush(png_structp png_ptr)
+static void _png_flush(png_structp png_ptr EINA_UNUSED)
 {
 	/* nothing to do here */
 }
@@ -113,7 +113,7 @@ static Eina_Bool _png_saveable(const char *file)
 	return EINA_FALSE;
 }
 
-static Eina_Error _png_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _png_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
 {
 	png_uint_32 w32, h32;
 	png_structp png_ptr = NULL;
@@ -163,7 +163,7 @@ error_read_struct:
 	return ENESIM_IMAGE_ERROR_LOADING;
 }
 
-static Eina_Error _png_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options)
+static Eina_Error _png_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
 {
 	Enesim_Buffer_Sw_Data sw_data;
 	Enesim_Buffer_Format fmt;
@@ -174,7 +174,7 @@ static Eina_Error _png_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void
 	int bit_depth, color_type, interlace_type;
 	unsigned char **lines;
 	char hasa, hasg;
-	int i;
+	unsigned int i;
 	int pixel_inc;
 
 	enesim_buffer_data_get(buffer, &sw_data);
@@ -270,7 +270,7 @@ error_read_struct:
 	return ENESIM_IMAGE_ERROR_LOADING;
 }
 
-static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options)
+static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options EINA_UNUSED)
 {
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
@@ -282,7 +282,7 @@ static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	int y;
 	int w, h;
 	/* FIXME fix this, it should be part of the options */
-	const int compress = 0;
+	const int compression = 0;
 
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL,NULL);
 	if (!png_ptr)
@@ -315,7 +315,7 @@ static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	sig_bit.alpha = 8;
 	png_set_sBIT(png_ptr, info_ptr, &sig_bit);
 
-	png_set_compression_level(png_ptr, compress);
+	png_set_compression_level(png_ptr, compression);
 	png_write_info(png_ptr, info_ptr);
 	png_set_shift(png_ptr, &sig_bit);
 	png_set_packing(png_ptr);

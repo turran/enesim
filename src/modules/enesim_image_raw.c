@@ -40,7 +40,7 @@ static Eina_Bool _raw_saveable(const char *file)
 	return EINA_FALSE;
 }
 
-static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options)
+static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options EINA_UNUSED)
 {
 	uint32_t *sdata;
 	size_t stride;
@@ -65,7 +65,7 @@ static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	 */
 	enesim_surface_data_get(s, (void **)&sdata, &stride);
 	enesim_surface_size_get(s, &w, &h);
-	enesim_image_data_write(data, str_data, strlen(str_data));
+	enesim_image_data_write(data, (void *)str_data, strlen(str_data));
 	for (i = 0; i < h; i++)
 	{
 		for (j = 0; j < w; j++)
@@ -150,5 +150,3 @@ static void raw_provider_shutdown(void)
 
 EINA_MODULE_INIT(raw_provider_init);
 EINA_MODULE_SHUTDOWN(raw_provider_shutdown);
-
-

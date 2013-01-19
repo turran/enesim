@@ -42,7 +42,7 @@ typedef struct _Enesim_Mempool_Aligned
 static int _init = 0;
 
 /* TODO parse the options */
-static void * _enesim_mempool_aligned_init(const char *context, const char *options, va_list args)
+static void * _enesim_mempool_aligned_init(const char *context EINA_UNUSED, const char *options EINA_UNUSED, va_list args EINA_UNUSED)
 {
 	Enesim_Mempool_Aligned *thiz;
 
@@ -125,7 +125,7 @@ static void * _enesim_mempool_aligned_init(const char *context, const char *opti
 	return thiz;
 }
 
-static void _enesim_mempool_aligned_free(void *data, void *element)
+static void _enesim_mempool_aligned_free(void *data EINA_UNUSED, void *element)
 {
 	free(element);
 }

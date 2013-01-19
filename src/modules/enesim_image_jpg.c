@@ -110,7 +110,7 @@ void _jpg_enesim_image_src_skip(j_decompress_ptr cinfo, long num_bytes)
 	}
 }
 
-void _jpg_enesim_image_src_term(j_decompress_ptr cinfo)
+void _jpg_enesim_image_src_term(j_decompress_ptr cinfo EINA_UNUSED)
 {
 }
 
@@ -134,7 +134,7 @@ static void _jpg_enesim_image_src(struct jpeg_decompress_struct *cinfo, Enesim_I
 /*============================================================================*
  *                          Emage Provider API                                *
  *============================================================================*/
-static Eina_Error _jpg_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
+static Eina_Error _jpg_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
 {
 	Jpg_Error_Mgr err;
 	struct jpeg_decompress_struct cinfo;
@@ -209,7 +209,7 @@ static Eina_Error _jpg_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim
 	return 0;
 }
 
-static Eina_Error _jpg_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options)
+static Eina_Error _jpg_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
 {
 	Jpg_Error_Mgr err;
 	Enesim_Buffer_Sw_Data sw_data;
