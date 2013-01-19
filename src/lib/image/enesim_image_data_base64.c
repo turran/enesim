@@ -79,7 +79,8 @@ static void _base64_decode(unsigned char *in, unsigned char *out)
  */
 static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t len)
 {
-	int l = 0;
+	size_t l = 0;
+
 	while (l < len)
 	{
 		unsigned char dec[4];
@@ -90,7 +91,7 @@ static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t 
 		{
 			if (!_base64_decode_digit(in[i], &dec[i]))
 				printf("error %c\n", in[i]);
-#if 0 
+#if 0
 			printf("read %c %d\n", in[i], dec[i]);
 #endif
 		}

@@ -83,7 +83,7 @@ static Eina_Bool _data_alloc(void *prv,
 static void _data_free(void *prv,
 		void *backend_data,
 		Enesim_Buffer_Format fmt,
-		Eina_Bool external_allocated)
+		Eina_Bool external_allocated EINA_UNUSED)
 {
 	Enesim_Eina_Pool *thiz = prv;
 	Enesim_Buffer_Sw_Data *data = backend_data;
@@ -109,10 +109,10 @@ static void _data_free(void *prv,
 	free(data);
 }
 
-static Eina_Bool _data_get(void *prv,
+static Eina_Bool _data_get(void *prv EINA_UNUSED,
 		void *backend_data,
-		Enesim_Buffer_Format fmt,
-		uint32_t w, uint32_t h,
+		Enesim_Buffer_Format fmt EINA_UNUSED,
+		uint32_t w EINA_UNUSED, uint32_t h EINA_UNUSED,
 		Enesim_Buffer_Sw_Data *dst)
 {
 	Enesim_Buffer_Sw_Data *data = backend_data;

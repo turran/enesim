@@ -27,7 +27,7 @@
  *                                  Local                                     *
  *============================================================================*/
 static void _2d_argb8888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		void *sdata, uint32_t sw, uint32_t sh,
+		void *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED,
 		size_t spitch)
 {
 	uint8_t *src = sdata;

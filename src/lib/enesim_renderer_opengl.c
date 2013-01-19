@@ -114,9 +114,9 @@ static Eina_Bool _opengl_shader_compile(GLenum pid,
 	glGetObjectParameterivARB(sh, GL_OBJECT_COMPILE_STATUS_ARB, &ok);
 	if (!ok)
 	{
-		char log[PATH_MAX];
-		glGetInfoLogARB(sh, sizeof(log), NULL, log);
-		printf("Failed to compile %s\n", log);
+		char info_log[PATH_MAX];
+		glGetInfoLogARB(sh, sizeof(info_log), NULL, info_log);
+		printf("Failed to compile %s\n", info_log);
 		return EINA_FALSE;
 	}
 	/* attach the shader to the program */
@@ -135,9 +135,9 @@ static Eina_Bool _opengl_compiled_program_link(Enesim_Renderer_OpenGL_Compiled_P
 	glGetObjectParameterivARB(cp->id, GL_OBJECT_LINK_STATUS_ARB, &ok);
 	if (!ok)
 	{
-		char log[PATH_MAX];
-		glGetInfoLogARB(cp->id, sizeof(log), NULL, log);
-		printf("Failed to Link %s\n", log);
+		char info_log[PATH_MAX];
+		glGetInfoLogARB(cp->id, sizeof(info_log), NULL, info_log);
+		printf("Failed to Link %s\n", info_log);
 		/* FIXME destroy all the shaders */
 
 		return EINA_FALSE;
@@ -147,9 +147,9 @@ static Eina_Bool _opengl_compiled_program_link(Enesim_Renderer_OpenGL_Compiled_P
 
 static Eina_Bool _opengl_compiled_program_new(
 		Enesim_Renderer_OpenGL_Compiled_Program *cp,
-		Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Data *rdata,
+		Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Data *rdata EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Program *p)
 {
 	int i;
@@ -373,7 +373,7 @@ void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 /* FIXME this should be exported and normalize in the same way as the one on the enesim_renderer_sw.c
  */
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Eina_Rectangle *area,
-		int x, int y)
+		int x EINA_UNUSED, int y EINA_UNUSED)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;

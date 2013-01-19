@@ -65,7 +65,7 @@ static Enesim_Compositor_Point _point_color_get(Enesim_Rop rop,
 }
 
 static Enesim_Compositor_Point _point_mask_color_get(Enesim_Rop rop,
-		Enesim_Format *dfmt, Enesim_Color color, Enesim_Format mfmt)
+		Enesim_Format *dfmt, Enesim_Color color EINA_UNUSED, Enesim_Format mfmt)
 {
 	return _comps.pt_mask_color[rop][*dfmt][mfmt];
 }
@@ -114,7 +114,7 @@ static Enesim_Compositor_Span _span_color_get(Enesim_Rop rop,
  * and multiplying with color color
  */
 static Enesim_Compositor_Span _span_mask_color_get(Enesim_Rop rop,
-		Enesim_Format *dfmt, Enesim_Format mfmt, Enesim_Color color)
+		Enesim_Format *dfmt, Enesim_Format mfmt, Enesim_Color color EINA_UNUSED)
 {
 	return _comps.sp_mask_color[rop][*dfmt][mfmt];
 }

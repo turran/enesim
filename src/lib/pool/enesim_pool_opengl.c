@@ -46,11 +46,10 @@ typedef struct _Enesim_OpenGL_Pool
 {
 } Enesim_OpenGL_Pool;
 
-static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
+static Eina_Bool _data_alloc(void *prv EINA_UNUSED, Enesim_Backend *backend,
 		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
-	Enesim_OpenGL_Pool *thiz = prv;
 	Enesim_Buffer_OpenGL_Data *data;
 
 	data = malloc(sizeof(Enesim_Buffer_OpenGL_Data));
@@ -83,7 +82,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _data_from(void *prv,
+static Eina_Bool _data_from(void *prv EINA_UNUSED,
 		Enesim_Backend *backend,
 		void **backend_data,
 		Enesim_Buffer_Format fmt,
@@ -91,7 +90,6 @@ static Eina_Bool _data_from(void *prv,
 		Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *src)
 {
-	Enesim_OpenGL_Pool *thiz = prv;
 	Enesim_Buffer_OpenGL_Data *data;
 
 	if (!copy) return EINA_FALSE;
@@ -122,18 +120,18 @@ static Eina_Bool _data_from(void *prv,
 	return EINA_TRUE;
 }
 
-static void _data_free(void *prv, void *backend_data,
-		Enesim_Buffer_Format fmt,
-		Eina_Bool external_allocated)
+static void _data_free(void *prv EINA_UNUSED, void *backend_data,
+		Enesim_Buffer_Format fmt EINA_UNUSED,
+		Eina_Bool external_allocated EINA_UNUSED)
 {
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
 
 	glDeleteTextures(1, &data->texture);
 }
 
-static Eina_Bool _data_get(void *prv, void *backend_data,
+static Eina_Bool _data_get(void *prv EINA_UNUSED, void *backend_data,
 		Enesim_Buffer_Format fmt,
-		uint32_t w, uint32_t h,
+		uint32_t w, uint32_t h EINA_UNUSED,
 		Enesim_Buffer_Sw_Data *dst)
 {
 	Enesim_Buffer_OpenGL_Data *data = backend_data;

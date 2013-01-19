@@ -27,7 +27,7 @@
  *                                  Local                                     *
  *============================================================================*/
 static void _2d_rgb565_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		void *sdata, uint32_t sw, uint32_t sh,
+		void *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED,
 		size_t spitch)
 {
 	uint16_t *dst = data->rgb565.plane0;

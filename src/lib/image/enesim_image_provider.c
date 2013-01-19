@@ -33,7 +33,7 @@
  *                                  Local                                     *
  *============================================================================*/
 static void _provider_data_convert(Enesim_Buffer *buffer,
-		uint32_t w, uint32_t h, Enesim_Surface *s)
+		uint32_t w EINA_UNUSED, uint32_t h EINA_UNUSED, Enesim_Surface *s)
 {
 	Enesim_Renderer *importer;
 
@@ -215,7 +215,7 @@ EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
 
 EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 		Enesim_Image_Data *data, Enesim_Surface *s,
-		const char *options)
+		const char *options EINA_UNUSED)
 {
 	Eina_Error err = 0;
 

@@ -113,7 +113,7 @@ static void _rasterizer_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _rasterizer_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _rasterizer_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	/* FIXME we should use the rasterizer implementation flags */
@@ -123,13 +123,13 @@ static void _rasterizer_flags(Enesim_Renderer *r, const Enesim_Renderer_State *s
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _rasterizer_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _rasterizer_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
-static void _rasterizer_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _rasterizer_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
