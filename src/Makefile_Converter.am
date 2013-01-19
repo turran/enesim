@@ -1,0 +1,7 @@
+
+lib_libenesim_la_SOURCES += \
+lib/converter/enesim_converter_rgb565.c \
+lib/converter/enesim_converter_argb8888.c \
+lib/converter/enesim_converter_a8.c \
+lib/converter/enesim_converter_rgb888.c \
+lib/converter/enesim_converter_bgr888.c

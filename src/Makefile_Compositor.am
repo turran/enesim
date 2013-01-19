@@ -1,0 +1,3 @@
+
+lib_libenesim_la_SOURCES += \
+lib/compositor/enesim_compositor_argb8888.c

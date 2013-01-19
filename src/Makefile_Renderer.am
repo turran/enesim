@@ -1,0 +1,68 @@
+
+dist_installed_headers_DATA += \
+lib/renderer/enesim_renderer_background.h \
+lib/renderer/enesim_renderer_blur.h \
+lib/renderer/enesim_renderer_checker.h \
+lib/renderer/enesim_renderer_circle.h \
+lib/renderer/enesim_renderer_clipper.h \
+lib/renderer/enesim_renderer_compound.h \
+lib/renderer/enesim_renderer_dispmap.h \
+lib/renderer/enesim_renderer_ellipse.h \
+lib/renderer/enesim_renderer_figure.h \
+lib/renderer/enesim_renderer_gradient.h \
+lib/renderer/enesim_renderer_gradient_linear.h \
+lib/renderer/enesim_renderer_gradient_radial.h \
+lib/renderer/enesim_renderer_grid.h \
+lib/renderer/enesim_renderer_image.h \
+lib/renderer/enesim_renderer_line.h \
+lib/renderer/enesim_renderer_importer.h \
+lib/renderer/enesim_renderer_path.h \
+lib/renderer/enesim_renderer_perlin.h \
+lib/renderer/enesim_renderer_proxy.h \
+lib/renderer/enesim_renderer_pattern.h \
+lib/renderer/enesim_renderer_raddist.h \
+lib/renderer/enesim_renderer_rectangle.h \
+lib/renderer/enesim_renderer_shape.h \
+lib/renderer/enesim_renderer_stripes.h \
+lib/renderer/enesim_renderer_transition.h
+
+lib_libenesim_la_SOURCES += \
+lib/renderer/enesim_renderer_background.c \
+lib/renderer/enesim_renderer_blur.c \
+lib/renderer/enesim_renderer_checker.c \
+lib/renderer/enesim_renderer_circle.c \
+lib/renderer/enesim_renderer_clipper.c \
+lib/renderer/enesim_renderer_compound.c \
+lib/renderer/enesim_renderer_dispmap.c \
+lib/renderer/enesim_renderer_ellipse.c \
+lib/renderer/enesim_renderer_figure.c \
+lib/renderer/enesim_renderer_gradient.c \
+lib/renderer/enesim_renderer_gradient_linear.c \
+lib/renderer/enesim_renderer_gradient_radial.c \
+lib/renderer/enesim_renderer_grid.c \
+lib/renderer/enesim_renderer_image.c \
+lib/renderer/enesim_renderer_importer.c \
+lib/renderer/enesim_renderer_line.c \
+lib/renderer/enesim_renderer_path.c \
+lib/renderer/enesim_renderer_pattern.c \
+lib/renderer/enesim_renderer_perlin.c \
+lib/renderer/enesim_renderer_proxy.c \
+lib/renderer/enesim_renderer_rectangle.c \
+lib/renderer/enesim_renderer_raddist.c \
+lib/renderer/enesim_renderer_shape.c \
+lib/renderer/enesim_renderer_stripes.c \
+lib/renderer/enesim_renderer_transition.c \
+lib/renderer/enesim_renderer_gradient_private.h \
+lib/renderer/enesim_renderer_shape_private.h \
+lib/renderer/enesim_renderer_text_base_private.h
+
+EXTRA_DIST = \
+lib/renderer/enesim_renderer_checker.glsl \
+lib/renderer/enesim_renderer_opengl_common_ambient.glsl \
+lib/renderer/enesim_renderer_opengl_common_blit.glsl \
+lib/renderer/enesim_renderer_opengl_common_merge.glsl \
+lib/renderer/enesim_renderer_opengl_common_vertex.glsl \
+lib/renderer/enesim_renderer_path_silhoutte_ambient.glsl \
+lib/renderer/enesim_renderer_path_silhoutte_vertex.glsl \
+lib/renderer/enesim_renderer_rectangle.glsl \
+lib/renderer/enesim_renderer_stripes.glsl

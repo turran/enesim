@@ -1,0 +1,4 @@
+
+lib_libenesim_la_SOURCES += \
+lib/rasterizer/enesim_rasterizer_basic.c \
+lib/rasterizer/enesim_rasterizer_bifigure.c

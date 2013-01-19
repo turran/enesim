@@ -336,20 +336,7 @@ enesim.pc
 enesim_opencl.pc
 enesim_opengl.pc
 src/Makefile
-src/lib/Makefile
-src/lib/compositor/Makefile
-src/lib/converter/Makefile
-src/lib/image/Makefile
-src/lib/pool/Makefile
-src/lib/renderer/Makefile
-src/lib/rasterizer/Makefile
-src/lib/util/Makefile
-src/lib/text/Makefile
-src/lib/text/engines/Makefile
-src/lib/text/engines/freetype/Makefile
 src/tests/Makefile
-src/modules/Makefile
-src/examples/Makefile
 ])
 
 AC_OUTPUT
