@@ -4,9 +4,10 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: enesim
-Description: Enesim
-Requires: eina enesim
 Version: @VERSION@
-Libs: -L${libdir} -lGLEW -lGL -lGLU
-Cflags: -I${includedir}
+Description: Enesim
+Requires.private: @requirements_pc@
+Libs.private: @requirements_libs@
+Libs: -L${libdir} -lenesim
+Cflags: -I${includedir}/enesim
 

@@ -92,26 +92,10 @@ lib_libenesim_la_CPPFLAGS = \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@
 
-if HAVE_FREETYPE
-lib_libenesim_la_CPPFLAGS += @FREETYPE_CFLAGS@
-endif
-
 lib_libenesim_la_LIBADD = \
 @ENESIM_LIBS@ \
 @EFL_SIMD_FLAGS@ \
 -lm
-
-if HAVE_OPENCL
-lib_libenesim_la_LIBADD += -lOpenCL
-endif
-
-if HAVE_OPENGL
-lib_libenesim_la_LIBADD += @opengl_libs@ @GLEW_LIBS@
-endif
-
-if HAVE_FREETYPE
-lib_libenesim_la_LIBADD += @FREETYPE_LIBS@
-endif
 
 lib_libenesim_la_LDFLAGS = -no-undefined -version-info @version_info@
 

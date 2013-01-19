@@ -32,12 +32,67 @@ AC_DEFINE_UNQUOTED([VERSION_MINOR], [v_min], [Minor version])
 AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 
 
+### Additional options to configure
+
+## Pthreads
+AC_ARG_ENABLE([pthreads],
+   [AS_HELP_STRING([--enable-pthreads], [enable threaded rendering])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_pthreads="yes"
+    else
+       want_pthreads="no"
+    fi
+   ],
+   [want_pthreads="yes"])
+
+## Equanime
+AC_ARG_WITH([equanime],
+   [AS_HELP_STRING([--with-equanime], [enable Equanime pool support])],
+   [want_equanime="yes"],
+   [want_equanime="no"])
+
+## OpenCL
+AC_ARG_ENABLE([opencl],
+   [AS_HELP_STRING([--enable-opencl], [enable OpenCL backend])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_opencl="yes"
+    else
+       want_opencl="no"
+    fi
+   ],
+   [want_opencl="no"])
+
+## OpenGL
+AC_ARG_ENABLE([opengl],
+   [AS_HELP_STRING([--enable-opengl], [enable OpenGL backend])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_opengl="yes"
+    else
+       want_opengl="no"
+    fi
+   ],
+   [want_opengl="no"])
+
+
 ### Needed information
 
 AC_CANONICAL_HOST
 
+EFL_CHECK_CPU_MMX([have_mmx="yes"], [have_mmx="no"])
+EFL_CHECK_CPU_SSE([have_sse="yes"], [have_sse="no"])
+EFL_CHECK_CPU_SSE2([have_sse2="yes"], [have_sse2="no"])
+EFL_CHECK_CPU_ALTIVEC([have_altivec="yes"], [have_altivec="no"])
 
-### Additional options to configure
+# Add conditionals for every surface format but the argb8888_pre, it is
+# the core format and cannot be optional
+ENESIM_SURFACE_FORMAT([argb8888_unpre], [yes])
+ENESIM_SURFACE_FORMAT([rgb888_a8], [no])
+ENESIM_SURFACE_FORMAT([rgb565_xa5], [no])
+ENESIM_SURFACE_FORMAT([rgb565_b1a3], [yes])
+ENESIM_SURFACE_FORMAT([rgb888], [yes])
 
 
 ### Checks for programs
@@ -47,64 +102,79 @@ AC_PROG_CC
 # pkg-config
 PKG_PROG_PKG_CONFIG
 
-# Check whether pkg-config supports Requires.private
-if $PKG_CONFIG --atleast-pkgconfig-version 0.22; then
-   pkgconfig_requires_private="Requires.private"
-else
-   pkgconfig_requires_private="Requires"
-fi
-AC_SUBST([pkgconfig_requires_private])
-
 # doxygen program for documentation building
 EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 
 ### Checks for libraries
 
-## Enesim
-AC_SUBST([requirements_enesim])
-requirements_enesim="eina >= 1.0.0"
-PKG_CHECK_MODULES([EINA], [${requirements_enesim}])
-AC_ARG_WITH([equanime],
-   [AS_HELP_STRING([--with-equanime], [enable Equanime pool support])],
-   [want_equanime="yes"],
-   [want_equanime="no"])
+requirements_cflags=""
+requirements_libs=""
+requirements_pc=""
+
+## Windows
 
 case "$host_os" in
    mingw*)
-      ENESIM_LIBS="${ENESIM_LIBS} -lws2_32"
+      requirements_libs="${requirements_libs} -lws2_32"
    ;;
 esac
 
-enable_png="no"
-enable_jpg="no"
+## Eina
+
+requirements_pc="${requirements_pc} eina >= 1.0.0"
+
+## Freetype
+
+PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
+   [
+    have_freetype="yes"
+    requirements_pc="${requirements_pc} freetype2 >= 9.3.0"
+    AC_DEFINE([HAVE_FREETYPE], [1], [Have support for freetype])
+   ],
+   [have_freetype="no"])
+
+AM_CONDITIONAL([HAVE_FREETYPE], [test "x${have_freetype}" = "xyes"])
+
+## Glew
+
+PKG_CHECK_EXISTS([glew],
+   [
+    have_glew="yes"
+    requirements_pc="${requirements_pc} glew"
+    AC_DEFINE([HAVE_FREETYPE], [1], [Have support for freetype])
+   ],
+   [have_glew="no"])
+
+PKG_CHECK_MODULES([ENESIM], [${requirements_pc}])
+
 # libpng
-PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
+PKG_CHECK_MODULES([ENESIM_MODULES], [libpng >= 0.22],
    [enable_png="yes"],
    [enable_png="no"])
 
-# libjpeg
-AC_CHECK_HEADER([jpeglib.h], [enable_jpg="yes"], [enable_jpg="no"])
-
-EMAGE_MODULE([Png], [${enable_png}], [yes])
-EMAGE_MODULE([Jpg], [${enable_jpg}], [yes])
-
-# Freetype
-PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
-   [have_freetype="yes"],
-   [have_freetype="no"])
-if test "x${have_freetype}" = "xyes" ; then
-   requirements_etex="${requirements_etex} freetype2 >= 9.3.0"
-   requirements_build_etex="${requirements_build_etex} freetype2 >= 9.3.0"
-   AC_DEFINE(HAVE_FREETYPE, 1, [Have support for freetype])
-   PKG_CHECK_MODULES([FREETYPE], [freetype2 >= 9.3.0],
-      [have_freetype="yes"],
-      [have_freetype="no"])
-fi
-AM_CONDITIONAL(HAVE_FREETYPE, test "x${have_freetype}" = "xyes")
 
 ### Checks for header files
 
+# Pthreads
+have_pthreads="no"
+if test "x${want_pthreads}" = "xyes" ; then
+   AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h], [have_pthreads="yes"], [have_pthreads="no"])
+fi
+
+## openCL
+have_opencl="no"
+if test "x${want_opencl}" = "xyes" ; then
+   AC_CHECK_HEADERS([CL/cl.h], [have_opencl="yes"], [have_opencl="no"])
+fi
+
+## libjpeg
+AC_CHECK_HEADER([jpeglib.h],
+   [
+    enable_jpg="yes"
+    ENESIM_MODULES_LIBS="${ENESIM_MODULES_LIBS} -ljpeg"
+   ],
+   [enable_jpg="no"])
 
 ### Checks for types
 
@@ -114,42 +184,30 @@ AM_CONDITIONAL(HAVE_FREETYPE, test "x${have_freetype}" = "xyes")
 
 ### Checks for compiler characteristics
 
-AC_HEADER_STDC
 AC_C_BIGENDIAN
 AM_PROG_CC_C_O
 EFL_ATTRIBUTE_UNUSED
-EFL_COMPILER_FLAG([-Wall])
+EFL_CHECK_COMPILER_FLAGS([ENESIM], [-Wall -Wextra -Wshadow -Wpointer-arith -Wno-missing-field-initializers -fvisibility=hidden -fdata-sections -ffunction-sections])
 
 ### Checks for linker characteristics
 
+EFL_CHECK_LINKER_FLAGS([ENESIM], [-fvisibility=hidden -Wl,--no-copy-dt-needed-entries])
+# FIXME: what about : -fdata-sections -ffunction-sections -Wl,--gc-sections -fno-strict-aliasing ?
 
 ### Checks for library functions
 
-#######################################
-## PTHREADS
-pthread_cflags=""
-pthread_libs=""
-need_pthreads="no"
-
-AC_ARG_ENABLE([pthreads],
-   [AS_HELP_STRING([--enable-pthreads], [enable threaded rendering])],
-   [
-    if test "x$enableval" = "xyes" ; then
-       build_pthreads="yes"
-    else
-       build_pthreads="no"
-    fi
-   ],
-   [build_pthreads="yes"])
-
-# sched_getaffinity pthread_attr_setaffinity_np
-AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])
-
-if test "x${build_pthreads}" = "xyes" ; then
+## Pthreads
+build_pthreads="no"
+if test "x${have_pthreads}" = "xyes" ; then
    AC_CHECK_LIB([pthread], [pthread_attr_setaffinity_np],
       [
-       AC_CHECK_LIB(pthread, pthread_barrier_wait,
-          [build_pthreads="yes"],
+       AC_CHECK_LIB([pthread], [pthread_barrier_wait],
+          [
+           build_pthreads="yes"
+           AC_DEFINE([BUILD_PTHREAD], [1], [Build Threaded Rendering])
+           requirements_cflags="${requirements_cflags} -pthread"
+           requirements_libs="${requirements_libs} -pthread"
+          ],
           [build_pthreads="no"])
       ],
       [build_pthreads="no"])
@@ -176,113 +234,72 @@ fi
 AC_MSG_CHECKING([whether to build pthread code])
 AC_MSG_RESULT([${build_pthreads}])
 
-if test "x${build_pthreads}" = "xyes" ; then
-   AC_DEFINE(BUILD_PTHREAD, 1, [Build Threaded Rendering])
-   pthread_cflags="-pthread"
-   pthread_libs="-pthread"
+## OpenCL
+build_opencl="no"
+if test "x${have_opencl}" = "xyes" ; then
+   AC_CHECK_LIB([OpenCL], [clGetPlatformIDs],
+      [
+       build_opencl="yes"
+       requirements_libs="-lOpenCL ${requirements_libs}"
+       AC_DEFINE([BUILD_OPENCL], [1], [Build OpenCL Backend])
+      ],
+      [build_opencl="no"])
 fi
 
-AC_SUBST([pthread_cflags])
-AC_SUBST([pthread_libs])
+AM_CONDITIONAL([HAVE_OPENCL], [test "x${build_opencl}" = "xyes"])
 
-################################################################################
-##                                  Backends                                  ##
-################################################################################
-dnl Check for opencl
-AC_ARG_ENABLE([opencl],
-   [AS_HELP_STRING([--enable-opencl], [enable OpenCL backend])],
-   [
-    if test "x$enableval" = "xyes" ; then
-       want_opencl="yes"
-    else
-       want_opencl="no"
-    fi
-   ],
-   [want_opencl="no"])
-
-AC_CHECK_HEADERS(CL/cl.h, [have_cl_h="yes"], [have_cl_h="no"])
-AC_CHECK_LIB(OpenCL, clGetPlatformIDs, [have_cl_l="yes"],[have_cl_l="no"])
-if test "x$have_cl_h" = "xyes" && test "x$have_cl_l" = "xyes" && test "x$want_opencl" = "xyes"; then
-  build_opencl="yes"
-else
-  build_opencl="no"
-fi
-
-if test "x$build_opencl" = "xyes"; then
-  AC_DEFINE(BUILD_OPENCL, 1, [Build OpenCL Backend])
-fi
-AM_CONDITIONAL(HAVE_OPENCL, [test "x$build_opencl" = "xyes"])
-
-dnl Check for opengl
-AC_ARG_ENABLE([opengl],
-   [AS_HELP_STRING([--enable-opengl], [enable OpenGL backend])],
-   [
-    if test "x$enableval" = "xyes" ; then
-       want_opengl="yes"
-    else
-       want_opengl="no"
-    fi
-   ],
-   [want_opengl="no"])
-
-LIBS_save=${LIBS}
-LIBS="${LIBS} -lGL -lGLU"
-AC_LINK_IFELSE(
-  [
-   AC_LANG_PROGRAM(
-     [[
+## OpenGL
+build_opengl="no"
+if test "x${have_glew}" = "xyes" ; then
+# in libGL ?
+   LIBS_save=${LIBS}
+   LIBS="${LIBS} -lGL -lGLU"
+   AC_LINK_IFELSE(
+      [
+       AC_LANG_PROGRAM(
+          [[
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
-     ]],
-     [[
+          ]],
+          [[
 glGenFramebuffersEXT(0, NULL);
-     ]])
-  ],
-  [
-   have_opengl="yes"
-   opengl_libs="-lGL -lGLU"
-  ],
-  [have_opengl="no"])
-LIBS=${LIBS_save}
+          ]])
+      ],
+      [
+       build_opengl="yes"
+       requirements_libs="-lGL -lGLU ${requirements_libs}"
+      ],
+      [build_opengl="no"])
+   LIBS=${LIBS_save}
 
-AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
-AC_MSG_RESULT([${build_opengl}])
+   AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
+   AC_MSG_RESULT([${build_opengl}])
 
-if test "x${have_opengl}" = "xno" ; then
-  LIBS_save=${LIBS}
-  LIBS="${LIBS} -lopengl32"
-  AC_LINK_IFELSE(
-    [
-     AC_LANG_PROGRAM(
-       [[
+# in libopengl32 ?
+   if test "x${build_opengl}" = "xno" ; then
+      LIBS_save=${LIBS}
+      LIBS="${LIBS} -lopengl32"
+      AC_LINK_IFELSE(
+         [
+          AC_LANG_PROGRAM(
+             [[
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
-       ]],
-       [[
+             ]],
+             [[
 glGenFramebuffersEXT(0, NULL);
-       ]])
-    ],
-    [
-     have_opengl="yes"
-     opengl_libs="-lopengl32 -lGLU"
-    ],
-    [have_opengl="no"])
-  LIBS=${LIBS_save}
+             ]])
+         ],
+         [
+          build_opengl="yes"
+          requirements_libs="-lopengl32 -lGLU ${requirements_libs}"
+         ],
+         [build_opengl="no"])
+      LIBS=${LIBS_save}
 
-  AC_MSG_CHECKING([whether glGenFramebffersEXT is in libopengl32.a])
-  AC_MSG_RESULT([${have_opengl}])
-fi
-
-AC_SUBST([opengl_libs])
-
-PKG_CHECK_MODULES(GLEW, [glew],
-   [have_glew="yes"],
-   [have_glew="no"])
-
-if test "x$have_opengl" = "xyes" && test "x$have_glew" = "xyes" && test "x$want_opengl" = "xyes"; then
-  build_opengl="yes"
-else
-  build_opengl="no"
+      AC_MSG_CHECKING([whether glGenFramebffersEXT is in libopengl32.a])
+      AC_MSG_RESULT([${build_opengl}])
+   fi
 fi
 
 if test "x${build_opengl}" = "xyes"; then
@@ -290,22 +307,14 @@ if test "x${build_opengl}" = "xyes"; then
 fi
 AM_CONDITIONAL([HAVE_OPENGL], [test "x${build_opengl}" = "xyes"])
 
+##  FIXME: no more 'emage'
+EMAGE_MODULE([Png], [${enable_png}], [yes])
+EMAGE_MODULE([Jpg], [${enable_jpg}], [yes])
 
-### Needed information
-
-EFL_CHECK_CPU_MMX([have_mmx="yes"], [have_mmx="no"])
-EFL_CHECK_CPU_SSE([have_sse="yes"], [have_sse="no"])
-EFL_CHECK_CPU_SSE2([have_sse2="yes"], [have_sse2="no"])
-EFL_CHECK_CPU_ALTIVEC([have_altivec="yes"], [have_altivec="no"])
+#######################################
+## PTHREADS
 
 
-# Add conditionals for every surface format but the argb8888_pre, it is
-# the core format and cannot be optional
-ENESIM_SURFACE_FORMAT([argb8888_unpre], [yes])
-ENESIM_SURFACE_FORMAT([rgb888_a8], [no])
-ENESIM_SURFACE_FORMAT([rgb565_xa5], [no])
-ENESIM_SURFACE_FORMAT([rgb565_b1a3], [yes])
-ENESIM_SURFACE_FORMAT([rgb888], [yes])
 
 # Unit tests, coverage and benchmarking
 
@@ -317,15 +326,11 @@ EFL_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
 
 ### Substitutions
 
-EXAMPLE_CFLAGS="$PNG_CFLAGS"
-EXAMPLE_LIBS="$PNG_LIBS"
-AC_SUBST([EXAMPLE_CFLAGS])
-AC_SUBST([EXAMPLE_LIBS])
-
-ENESIM_CFLAGS="-DENESIM_EXTENSION $EINA_CFLAGS $EFL_SIMD_FLAGS $EFL_COVERAGE_CFLAGS $GLEW_CFLAGS $pthread_cflags"
-ENESIM_LIBS="$EINA_LIBS $EFL_COVERAGE_LIBS $GLEW_LIBS $pthread_libs $opengl_libs"
-AC_SUBST([ENESIM_CFLAGS])
-AC_SUBST([ENESIM_LIBS])
+AC_SUBST([requirements_cflags])
+AC_SUBST([requirements_libs])
+AC_SUBST([requirements_pc])
+ENESIM_CFLAGS="${ENESIM_CFLAGS} ${requirements_cflags} -DENESIM_EXTENSION ${EFL_SIMD_FLAGS} ${EFL_COVERAGE_CFLAGS}"
+ENESIM_LIBS="${ENESIM_LIBS} ${requirements_libs} ${EFL_COVERAGE_LIBS}"
 
 
 ## Make the debug preprocessor configurable

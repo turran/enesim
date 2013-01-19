@@ -13,12 +13,12 @@ modules_enesim_image_png_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib/renderer \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@ \
-@PNG_CFLAGS@
+@ENESIM_MODULES_CFLAGS@
 
 modules_enesim_image_png_la_LIBADD = \
 lib/libenesim.la \
 @ENESIM_LIBS@ \
-@PNG_LIBS@
+@ENESIM_MODULES_LIBS@
 
 modules_enesim_image_png_la_LDFLAGS = -no-undefined -module -avoid-version
 
@@ -37,12 +37,13 @@ modules_enesim_image_jpg_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib/renderer \
 -DENESIM_BUILD \
-@ENESIM_CFLAGS@
+@ENESIM_CFLAGS@ \
+@ENESIM_MODULES_CFLAGS@
 
 modules_enesim_image_jpg_la_LIBADD = \
 lib/libenesim.la \
 @ENESIM_LIBS@ \
--ljpeg
+@ENESIM_MODULES_LIBS@
 
 modules_enesim_image_jpg_la_LDFLAGS = -no-undefined -module -avoid-version
 
