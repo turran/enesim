@@ -339,8 +339,6 @@ Makefile
 enesim.pc
 enesim_opencl.pc
 enesim_opengl.pc
-src/Makefile
-src/tests/Makefile
 ])
 
 AC_OUTPUT
