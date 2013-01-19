@@ -186,7 +186,6 @@ AC_CHECK_HEADER([jpeglib.h],
 
 AC_C_BIGENDIAN
 AM_PROG_CC_C_O
-EFL_ATTRIBUTE_UNUSED
 EFL_CHECK_COMPILER_FLAGS([ENESIM], [-Wall -Wextra -Wshadow -Wpointer-arith -Wno-missing-field-initializers -fvisibility=hidden -fdata-sections -ffunction-sections])
 
 ### Checks for linker characteristics

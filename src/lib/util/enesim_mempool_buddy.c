@@ -78,8 +78,8 @@ static inline void *_get_offset(Buddy *b, Block *block)
 	return ret;
 }
 
-static void *_buddy_init(__UNUSED__ const char *context,
-                   __UNUSED__ const char *options,
+static void *_buddy_init(EINA_UNUSED const char *context,
+                   EINA_UNUSED const char *options,
                    va_list args)
 {
 	Buddy *b;
