@@ -93,9 +93,8 @@ static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	return EINA_TRUE;
 }
 
-static Enesim_Image_Provider _provider = {
+static Enesim_Image_Provider_Descriptor _provider = {
 	/* .name = 		*/ "raw",
-	/* .type = 		*/ ENESIM_IMAGE_PROVIDER_SW,
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,
@@ -129,13 +128,14 @@ static Eina_Bool raw_provider_init(void)
 		EINA_LOG_ERR("Emage: Can not create a general log domain.");
 		return EINA_FALSE;
 	}
-	if (!enesim_image_provider_register(&_provider, MIME))
+	if (!enesim_image_provider_register(&_provider,
+			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, MIME))
 		return EINA_FALSE;
 
 	if (!enesim_image_finder_register(&_finder))
 	{
 		enesim_image_provider_unregister(&_provider, MIME);
-		return EINA_FALSE;		
+		return EINA_FALSE;
 	}
 	return EINA_TRUE;
 }

@@ -27,6 +27,7 @@
 #include "enesim_matrix.h"
 #include "enesim_renderer.h"
 #include "enesim_image.h"
+#include "enesim_renderer_importer.h"
 #include "enesim_image_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -54,9 +55,9 @@ static Eina_Error _provider_info_load(Enesim_Image_Provider *p, Enesim_Image_Dat
 	*h = 0;
 	*sfmt = ENESIM_BUFFER_FORMATS;
 	/* get the info from the image */
-	if (!p->info_get) return ret;
+	if (!p->d->info_get) return ret;
 
-	ret = p->info_get(data, &pw, &ph, &pfmt, options);
+	ret = p->d->info_get(data, &pw, &ph, &pfmt, options);
 	if (w) *w = pw;
 	if (h) *h = ph;
 	if (sfmt) *sfmt = pfmt;
@@ -70,17 +71,17 @@ static Eina_Bool _provider_options_parse(Enesim_Image_Provider *p, const char *o
 	if (!options)
 		return EINA_TRUE;
 
-	if (!p->options_parse)
+	if (!p->d->options_parse)
 		return EINA_TRUE;
 
-	*options_data = p->options_parse(options);
+	*options_data = p->d->options_parse(options);
 	return EINA_TRUE;
 }
 
 static void _provider_options_free(Enesim_Image_Provider *p, void *options)
 {
-	if (p->options_free)
-		p->options_free(options);
+	if (p->d->options_free)
+		p->d->options_free(options);
 }
 
 static Eina_Bool _provider_data_load(Enesim_Image_Provider *p, Enesim_Image_Data *data,
@@ -130,7 +131,7 @@ static Eina_Bool _provider_data_load(Enesim_Image_Provider *p, Enesim_Image_Data
 
 	/* load the data */
 	enesim_image_data_reset(data);
-	error = p->load(data, buffer, options);
+	error = p->d->load(data, buffer, options);
 	if (error)
 	{
 		goto load_err;
@@ -159,9 +160,9 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Image_Data
 		Enesim_Surface *s, Eina_Error *err)
 {
 	/* save the data */
-	if (!p->save) return EINA_FALSE;
+	if (!p->d->save) return EINA_FALSE;
 
-	if (p->save(data, s, NULL) == EINA_FALSE)
+	if (p->d->save(data, s, NULL) == EINA_FALSE)
 	{
 		*err = ENESIM_IMAGE_ERROR_SAVING;
 		return EINA_FALSE;
@@ -230,4 +231,3 @@ EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 	}
 	return EINA_TRUE;
 }
-

@@ -344,9 +344,8 @@ error_write_struct:
 	return EINA_FALSE;
 }
 
-static Enesim_Image_Provider _provider = {
+static Enesim_Image_Provider_Descriptor _provider = {
 	/* .name = 		*/ "png",
-	/* .type = 		*/ ENESIM_IMAGE_PROVIDER_SW,
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,
@@ -393,13 +392,14 @@ static Eina_Bool png_provider_init(void)
 	/* @todo
 	 * - Register png specific errors
 	 */
-	if (!enesim_image_provider_register(&_provider, "image/png"))
+	if (!enesim_image_provider_register(&_provider,
+			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, "image/png"))
 		return EINA_FALSE;
 
 	if (!enesim_image_finder_register(&_finder))
 	{
 		enesim_image_provider_unregister(&_provider, "image/png");
-		return EINA_FALSE;		
+		return EINA_FALSE;
 	}
 	return EINA_TRUE;
 }

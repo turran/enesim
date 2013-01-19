@@ -57,11 +57,11 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, 
 	{
 		/* TODO priority loaders */
 		/* check if the provider can load the image */
-		if (!p->loadable)
+		if (!p->d->loadable)
 			return p;
 
 		enesim_image_data_reset(data);
-		if (p->loadable(data) == EINA_TRUE)
+		if (p->d->loadable(data) == EINA_TRUE)
 		{
 			enesim_image_data_reset(data);
 			return p;
@@ -263,29 +263,80 @@ EAPI void enesim_image_dispatch(void)
 /**
  *
  */
-EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider *p, const char *mime)
+EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd,
+		Enesim_Image_Provider_Priority priority, const char *mime)
 {
+	Enesim_Image_Provider *p;
 	Eina_List *providers;
 	Eina_List *tmp;
 
-	if (!p)
+	if (!pd)
 		return EINA_FALSE;
 	/* check for mandatory functions */
-	if (!p->info_get)
+	if (!pd->info_get)
 	{
-		WRN("Provider %s doesn't provide the info_get() function", p->name);
+		WRN("Provider %s doesn't provide the info_get() function", pd->name);
 	}
-	if (!p->load)
+	if (!pd->load)
 	{
-		WRN("Provider %s doesn't provide the load() function", p->name);
+		WRN("Provider %s doesn't provide the load() function", pd->name);
 	}
+
+	p = calloc(1, sizeof(Enesim_Image_Provider));
+	p->priority = priority;
+	p->mime = mime;
+	p->d = pd;
+
 	providers = tmp = eina_hash_find(_providers, mime);
+	/* TODO add to the list in order */
 	providers = eina_list_append(providers, p);
 	if (!tmp)
 	{
 		eina_hash_add(_providers, mime, providers);
 	}
 	return EINA_TRUE;
+}
+
+/**
+ *
+ */
+EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
+		Enesim_Image_Provider_Priority priority)
+{
+	p->priority = priority;
+	/* reorder the list */
+}
+
+/**
+ *
+ */
+EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd, const char *mime)
+{
+	Enesim_Image_Provider *p;
+	Eina_List *providers;
+	Eina_List *tmp;
+	Eina_List *l;
+
+	providers = tmp = eina_hash_find(_providers, mime);
+	if (!providers)
+	{
+		WRN("Impossible to unregister the provider %p on mime '%s'", pd, mime);
+		return;
+	}
+	/* find the provider for this mime list */
+	EINA_LIST_FOREACH(providers, l, p)
+	{
+		if (p->d != pd)
+			continue;
+
+		/* remove from the list of providers */
+		providers = eina_list_remove(providers, p);
+		if (!providers)
+		{
+			eina_hash_del(_providers, mime, tmp);
+		}
+		break;
+	}
 }
 
 /**
@@ -351,29 +402,6 @@ EAPI void enesim_image_finder_unregister(Enesim_Image_Finder *f)
 {
 	if (!f) return;
 	_finders = eina_list_remove(_finders, f);
-}
-
-/**
- *
- */
-EAPI void enesim_image_provider_unregister(Enesim_Image_Provider *p, const char *mime)
-{
-	Eina_List *providers;
-	Eina_List *tmp;
-
-	providers = tmp = eina_hash_find(_providers, mime);
-	if (!providers)
-	{
-		WRN("Impossible to unregister the provider %p on mime '%s'", p, mime);
-		return;
-	}
-
-	/* remove from the list of providers */
-	providers = eina_list_remove(providers, p);
-	if (!providers)
-	{
-		eina_hash_del(_providers, mime, tmp);
-	}
 }
 
 /**

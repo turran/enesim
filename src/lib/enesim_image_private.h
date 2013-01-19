@@ -25,6 +25,13 @@
 # include <pthread.h>
 #endif
 
+struct _Enesim_Image_Provider
+{
+	const char *mime;
+	Enesim_Image_Provider_Priority priority;
+	Enesim_Image_Provider_Descriptor *d;
+};
+
 int enesim_image_init(void);
 int enesim_image_shutdown(void);
 Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, const char *mime);

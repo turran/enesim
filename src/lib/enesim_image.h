@@ -123,20 +123,22 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Surface *s, Enes
  * @{
  */
 
-/* TODO replace this with a priority system */
-typedef enum _Enesim_Image_Provider_Type
+typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
+
+typedef enum _Enesim_Image_Provider_Priority
 {
-	ENESIM_IMAGE_PROVIDER_SW,
-	ENESIM_IMAGE_PROVIDER_HW,
-} Enesim_Image_Provider_Type;
+	ENESIM_IMAGE_PROVIDER_PRIORITY_NONE = 0,
+	ENESIM_IMAGE_PROVIDER_PRIORITY_MARGINAL = 64,
+	ENESIM_IMAGE_PROVIDER_PRIORITY_SECONDARY = 128,
+	ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY = 128,
+} Enesim_Image_Provider_Priority;
 
 /**
  * TODO Add a way to parse options and receive options from caller
  */
-typedef struct _Enesim_Image_Provider
+typedef struct _Enesim_Image_Provider_Descriptor
 {
 	const char *name;
-	Enesim_Image_Provider_Type type;
 	void * (*options_parse)(const char *options);
 	void (*options_free)(void *options);
 	/* TODO also pass the backend, pool and desired format? */
@@ -145,12 +147,14 @@ typedef struct _Enesim_Image_Provider
 	Eina_Error (*info_get)(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options);
 	Eina_Error (*load)(Enesim_Image_Data *data, Enesim_Buffer *b, void *options);
 	Eina_Bool (*save)(Enesim_Image_Data *data, Enesim_Surface *s, void *options);
-} Enesim_Image_Provider;
+} Enesim_Image_Provider_Descriptor;
 
 
-EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider *p, const char *mime);
-EAPI void enesim_image_provider_unregister(Enesim_Image_Provider *p, const char *mime);
+EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd, Enesim_Image_Provider_Priority priority, const char *mime);
+EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd, const char *mime);
 
+EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
+		Enesim_Image_Provider_Priority priority);
 EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
 	Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt);
 EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,

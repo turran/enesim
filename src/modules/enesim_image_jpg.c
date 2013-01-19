@@ -291,9 +291,8 @@ static Eina_Error _jpg_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void
 	return 0;
 }
 
-static Enesim_Image_Provider _provider = {
+static Enesim_Image_Provider_Descriptor _provider = {
 	/* .name =		*/ "jpg",
-	/* .type =		*/ ENESIM_IMAGE_PROVIDER_SW,
 	/* .options_parse =	*/ NULL,
 	/* .options_free =	*/ NULL,
 	/* .loadable =		*/ NULL,
@@ -359,11 +358,13 @@ static Eina_Bool jpg_provider_init(void)
 	/* @todo
 	 * - Register jpg specific errors
 	 */
-	if (!enesim_image_provider_register(&_provider, "image/jpg"))
+	if (!enesim_image_provider_register(&_provider,
+			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, "image/jpg"))
 		return EINA_FALSE;
 	/* some define the mime type for jpg as jpeg, or is the other
 	 * the wrong one ? */
-	if (!enesim_image_provider_register(&_provider, "image/jpeg"))
+	if (!enesim_image_provider_register(&_provider,
+			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, "image/jpeg"))
 		return EINA_FALSE;
 	if (!enesim_image_finder_register(&_finder))
 	{
