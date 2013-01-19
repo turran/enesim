@@ -325,6 +325,8 @@ EFL_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
 
 ### Substitutions
 
+AC_SUBST([build_opencl])
+AC_SUBST([build_opengl])
 AC_SUBST([requirements_cflags])
 AC_SUBST([requirements_libs])
 AC_SUBST([requirements_pc])
