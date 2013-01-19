@@ -21,6 +21,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
+#include "enesim_image.h"
 
 #include "enesim_text.h"
 #include "enesim_text_private.h"
@@ -64,8 +65,7 @@ static void _font_unref(Enesim_Text_Font *f)
 	}
 }
 
-#if HAVE_EMAGE
-static Eina_Bool _dump(const Eina_Hash *hash, const void *key, void *data, void *fdata)
+static Eina_Bool _dump(const Eina_Hash *hash EINA_UNUSED, const void *key, void *data, void *fdata)
 {
 	Enesim_Text_Glyph *g = (Enesim_Text_Glyph *)data;
 	char c = *(int *)key;
@@ -76,7 +76,6 @@ static Eina_Bool _dump(const Eina_Hash *hash, const void *key, void *data, void 
 	enesim_image_file_save(fout, g->surface, NULL);
 	return EINA_TRUE;
 }
-#endif
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -191,11 +190,8 @@ void enesim_text_font_glyph_unload(Enesim_Text_Font *f, char c)
 
 void enesim_text_font_dump(Enesim_Text_Font *f, const char *path)
 {
-#if HAVE_EMAGE
 	eina_hash_foreach(f->glyphs, _dump, path);
-#endif
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-

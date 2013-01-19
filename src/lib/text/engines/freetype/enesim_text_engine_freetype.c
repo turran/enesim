@@ -68,12 +68,12 @@ static Enesim_Text_Engine_Font_Data _enesim_text_freetype_font_load(Enesim_Text_
 	return face;
 }
 
-static void _enesim_text_freetype_font_delete(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
+static void _enesim_text_freetype_font_delete(Enesim_Text_Engine_Data data EINA_UNUSED, Enesim_Text_Engine_Font_Data fdata EINA_UNUSED)
 {
 
 }
 
-static int _enesim_text_freetype_font_max_ascent_get(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
+static int _enesim_text_freetype_font_max_ascent_get(Enesim_Text_Engine_Data data EINA_UNUSED, Enesim_Text_Engine_Font_Data fdata)
 {
 	FT_Face face = fdata;
 	int asc;
@@ -88,7 +88,7 @@ static int _enesim_text_freetype_font_max_ascent_get(Enesim_Text_Engine_Data dat
 	return asc;
 }
 
-static int _enesim_text_freetype_font_max_descent_get(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
+static int _enesim_text_freetype_font_max_descent_get(Enesim_Text_Engine_Data data EINA_UNUSED, Enesim_Text_Engine_Font_Data fdata)
 {
 	FT_Face face = fdata;
 	int desc;
@@ -140,11 +140,11 @@ static void _raster_callback(const int y,
 	}
 }
 
-static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g)
+static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data edata, Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g)
 {
 	FT_UInt gindex;
 	FT_Face face = fdata;
-	FT_Library library = data;
+	FT_Library library = edata;
 
 	gindex = FT_Get_Char_Index(face, c);
 	if (FT_Load_Glyph(face, gindex, FT_LOAD_NO_BITMAP) == 0)
@@ -154,14 +154,14 @@ static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data data, Enesim
 			Enesim_Text_Freetype_Glyph efg;
 			FT_Raster_Params params;
 			unsigned int width, height;
-			void *data;
+			void *gdata;
 
 			width = face->glyph->metrics.width >> 6;
 			height = face->glyph->metrics.height >> 6;
 			if (!width || !height) goto no_surface;
-			data = calloc(width * height, sizeof(uint32_t));
+			gdata = calloc(width * height, sizeof(uint32_t));
 
-			efg.data = &data;
+			efg.data = (Enesim_Buffer_Sw_Data *)&gdata;
 			efg.glyph = face->glyph;
 
 			memset(&params, 0, sizeof(params));
@@ -172,7 +172,7 @@ static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data data, Enesim
 			FT_Outline_Render(library, &face->glyph->outline, &params);
 			g->surface = enesim_surface_new_data_from(
 					ENESIM_FORMAT_ARGB8888, width, height,
-					EINA_FALSE, data, width * 4, NULL,
+					EINA_FALSE, gdata, width * 4, NULL,
 					NULL);
 no_surface:
 			g->origin = (face->glyph->metrics.horiBearingY >> 6);

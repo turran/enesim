@@ -47,7 +47,7 @@ static void _default_string_set(void *data, const char *string, int length)
 	/* first create the needed space */
 	if (length < 0)
 		length = strlen(string);
-	if (length + 1 > thiz->bytes)
+	if ((unsigned int)length + 1 > thiz->bytes)
 	{
 		thiz->string = realloc(thiz->string, sizeof(char) * length + 1);
 		thiz->bytes = length + 1;
@@ -61,7 +61,7 @@ static void _default_string_set(void *data, const char *string, int length)
 static int _default_string_insert(void *data, const char *string, int length, ssize_t offset)
 {
 	Enesim_Text_Buffer_Default *thiz = data;
-	int new_length;
+	unsigned int new_length;
 	int to_move;
 	int i;
 
@@ -70,7 +70,7 @@ static int _default_string_insert(void *data, const char *string, int length, ss
 		length = strlen(string);
 	if (offset < 0)
 		offset = 0;
-	else if (offset > thiz->length)
+	else if ((unsigned int)offset > thiz->length)
 		offset = thiz->length;
 
 	new_length = length + thiz->length;
