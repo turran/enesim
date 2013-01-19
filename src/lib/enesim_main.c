@@ -41,6 +41,7 @@
 #include "enesim_renderer_private.h"
 #include "enesim_converter_private.h"
 #include "enesim_mempool_aligned_private.h"
+#include "enesim_mempool_buddy_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

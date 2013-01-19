@@ -253,7 +253,7 @@ static void _buddy_statistics(void *data)
 			b->max_order,
 			b->num_order,
 			1 << b->num_order,
-			((1 << (b->num_order)) * sizeof(Block)) / 1024);
+			(unsigned long)(((1 << (b->num_order)) * sizeof(Block)) / 1024));
 	printf("Area dumping:");
 	/* iterate over the free lists and dump the maps */
 	for (i = 0; i < b->num_order; i++)
