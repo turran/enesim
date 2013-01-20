@@ -304,7 +304,7 @@ EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz)
  * Sets the maximum number of threads the context will create to dispatch asynchronous
  * calls.
  */
-EAPI void enesim_image_context_pool_size_set(Enesim_Image_Context *thiz, int num)
+EAPI void enesim_image_context_pool_size_set(Enesim_Image_Context *thiz EINA_UNUSED, int num EINA_UNUSED)
 {
 
 }
@@ -316,7 +316,7 @@ EAPI void enesim_image_context_pool_size_set(Enesim_Image_Context *thiz, int num
  * Returns the maximum number threads the context will create the dispatch
  * asynchronous calls.
  */
-EAPI int enesim_image_context_pool_size_get(Enesim_Image_Context *thiz)
+EAPI int enesim_image_context_pool_size_get(Enesim_Image_Context *thiz EINA_UNUSED)
 {
 	return 0;
 }
