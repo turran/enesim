@@ -226,20 +226,20 @@ static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNELS][ENESIM_CHANNELS][ENESIM_M
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _dispmap_name(Enesim_Renderer *r)
+static const char * _dispmap_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "dispmap";
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _state_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
 
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Dispmap *thiz;
 	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
@@ -258,7 +258,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 }
 
 static void _boundings(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Dispmap *thiz;
@@ -285,7 +285,7 @@ static void _boundings(Enesim_Renderer *r,
 	}
 }
 
-static void _dispmap_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _dispmap_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |

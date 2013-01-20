@@ -409,7 +409,7 @@ static Enesim_Renderer_Shape_Sw_Draw _spans[ENESIM_SHAPE_STROKE_CAPS];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _line_name(Enesim_Renderer *r)
+static const char * _line_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "line";
 }
@@ -457,7 +457,7 @@ static void _line_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _line_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _line_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -466,13 +466,13 @@ static void _line_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 			ENESIM_RENDERER_FLAG_GEOMETRY;
 }
 
-static void _line_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _line_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
-static void _line_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _line_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
@@ -522,7 +522,7 @@ static void _line_boundings(Enesim_Renderer *r,
 }
 
 static Eina_Bool _line_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Line *thiz;
 

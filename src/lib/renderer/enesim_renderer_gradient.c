@@ -289,7 +289,7 @@ static void _gradient_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _gradient_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _gradient_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |

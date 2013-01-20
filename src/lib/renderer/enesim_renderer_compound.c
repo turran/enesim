@@ -96,7 +96,7 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static Eina_Bool _compound_common_changed(Enesim_Renderer_Compound *thiz,
+static Eina_Bool _compound_common_changed(Enesim_Renderer_Compound *thiz EINA_UNUSED,
 		const Enesim_Renderer_State *current,
 		const Enesim_Renderer_State *past)
 {
@@ -317,7 +317,7 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 
 /* whenever the compound needs to fill, we need to zeros the whole destination buffer */
 static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -331,7 +331,7 @@ static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
 
 /* whenever the compound needs to blend, we only need to draw the area of each layer */
 static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -344,7 +344,7 @@ static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _compound_name(Enesim_Renderer *r)
+static const char * _compound_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "compound";
 }
@@ -382,7 +382,7 @@ static void _compound_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _compound_boundings(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -451,7 +451,7 @@ static void _compound_destination_boundings(Enesim_Renderer *r,
 	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h);
 }
 
-static void _compound_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _compound_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	/* TODO here we should only support the destination formats of the surfaces */
@@ -535,7 +535,7 @@ static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
 }
 
 static Eina_Bool _compound_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_Bool ret;

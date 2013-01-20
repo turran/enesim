@@ -176,7 +176,7 @@ static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 static void _span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -226,7 +226,7 @@ static void _span_projective(Enesim_Renderer *r,
 }
 
 static void _span_projective_paints(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -310,7 +310,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -354,7 +354,7 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_affine_paints(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -469,7 +469,7 @@ static void _stripes_state_cleanup(Enesim_Renderer_Stripes *thiz, Enesim_Surface
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _stripes_name(Enesim_Renderer *r)
+static const char * _stripes_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "stripes";
 }
@@ -530,7 +530,7 @@ static void _stripes_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_stripes_state_cleanup(thiz, s);
 }
 
-static void _stripes_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _stripes_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -539,14 +539,14 @@ static void _stripes_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _stripes_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _stripes_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
 static Eina_Bool _stripes_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Stripes *thiz;
 

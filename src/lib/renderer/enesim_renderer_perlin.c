@@ -78,7 +78,7 @@ static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, unsigned int
 #endif
 
 static void _argb8888_span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Perlin *thiz;
@@ -109,15 +109,15 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _perlin_name(Enesim_Renderer *r)
+static const char * _perlin_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "perlin";
 }
 
 static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Perlin *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -143,7 +143,7 @@ static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _perlin_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _perlin_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Perlin *thiz;
 
@@ -156,7 +156,7 @@ static void _perlin_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		free(thiz->ampl.coeff);
 }
 
-static void _perlin_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _perlin_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;

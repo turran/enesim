@@ -70,8 +70,8 @@ static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
 }
 
 static void _background_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Background *thiz = _background_get(r);
@@ -183,15 +183,15 @@ static void _background_state_cleanup(Enesim_Renderer_Background *thiz)
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _background_name(Enesim_Renderer *r)
+static const char * _background_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "background";
 }
 
 static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
@@ -208,7 +208,7 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 
@@ -291,7 +291,7 @@ static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 #endif
 
-static void _background_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _background_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -300,7 +300,7 @@ static void _background_flags(Enesim_Renderer *r, const Enesim_Renderer_State *s
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _background_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _background_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_COLORIZE;
@@ -315,7 +315,7 @@ static void _background_free(Enesim_Renderer *r)
 }
 
 static Eina_Bool _background_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 

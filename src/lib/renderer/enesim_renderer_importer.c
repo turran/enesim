@@ -57,7 +57,7 @@ static inline Enesim_Renderer_Importer * _importer_get(Enesim_Renderer *r)
 }
 
 static void _span_argb8888_none_argb8888(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -87,7 +87,7 @@ static void _span_argb8888_none_argb8888(Enesim_Renderer *r,
 }
 
 static void _span_a8_none_argb8888(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -109,7 +109,7 @@ static void _span_a8_none_argb8888(Enesim_Renderer *r,
 }
 
 static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -135,7 +135,7 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
 }
 
 static void _span_bgr888_none_argb8888(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -176,7 +176,7 @@ static void _span_bgr888_none_argb8888(Enesim_Renderer *r,
  * Note: a / 255 is well approximated by (a + 255) / 256
  */
 static void _span_cmyk_none_argb8888(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -206,7 +206,7 @@ static void _span_cmyk_none_argb8888(Enesim_Renderer *r,
 /* that is C is replaces by 255 - C, etc...*/
 /* See the comment above for the computation of RGB values from CMYK ones. */
 static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -234,14 +234,14 @@ static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char *_importer_name(Enesim_Renderer *r)
+static const char *_importer_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "importer";
 }
 
 static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -287,7 +287,7 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 }
 
 static void _importer_boundings(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -333,7 +333,7 @@ static void _importer_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _importer_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _importer_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;

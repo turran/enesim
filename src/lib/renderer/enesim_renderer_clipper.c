@@ -83,7 +83,7 @@ static inline Enesim_Renderer_Clipper * _clipper_get(Enesim_Renderer *r)
 }
 
 static void _clipper_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *dst)
 {
@@ -167,13 +167,13 @@ static void _clipper_state_cleanup(Enesim_Renderer_Clipper *thiz,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _clipper_name(Enesim_Renderer *r)
+static const char * _clipper_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "clipper";
 }
 
 static Eina_Bool _clipper_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -194,7 +194,7 @@ static void _clipper_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_clipper_state_cleanup(thiz, s);
 }
 
-static void _clipper_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _clipper_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Clipper *thiz;
@@ -254,7 +254,7 @@ static void _clipper_destination_boundings(Enesim_Renderer *r,
 }
 
 static Eina_Bool _clipper_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Clipper *thiz;
 	Eina_Bool ret = EINA_FALSE;
@@ -273,7 +273,7 @@ end:
 
 static void _clipper_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_boundings,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Clipper *thiz;

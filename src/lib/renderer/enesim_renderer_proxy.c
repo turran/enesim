@@ -66,7 +66,7 @@ static inline Enesim_Renderer_Proxy * _proxy_get(Enesim_Renderer *r)
 }
 
 static void _proxy_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *dst)
 {
@@ -117,13 +117,13 @@ static void _proxy_state_cleanup(Enesim_Renderer_Proxy *thiz,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _proxy_name(Enesim_Renderer *r)
+static const char * _proxy_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "proxy";
 }
 
 static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -145,14 +145,14 @@ static void _proxy_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_proxy_state_cleanup(thiz, s);
 }
 
-static void _proxy_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _proxy_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	/* we dont support anything */
 	*flags = 0;
 }
 
-static void _proxy_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _proxy_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -183,7 +183,7 @@ static void _proxy_boundings(Enesim_Renderer *r,
 }
 
 static void _proxy_destination_boundings(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Eina_Rectangle *boundings)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -201,7 +201,7 @@ static void _proxy_destination_boundings(Enesim_Renderer *r,
 }
 
 static Eina_Bool _proxy_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Proxy *thiz;
 	Eina_Bool ret = EINA_FALSE;

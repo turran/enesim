@@ -78,7 +78,7 @@ typedef struct _Enesim_Renderer_Image
 	Eina_F16p16 nxx, nyy;
 	Enesim_F16p16_Matrix matrix;
 	Enesim_Compositor_Span span;
-	Eina_List *surface_damages; 
+	Eina_List *surface_damages;
 	Eina_Bool simple : 1;
 	Eina_Bool changed : 1;
 	Eina_Bool src_changed : 1;
@@ -95,7 +95,7 @@ static inline Enesim_Renderer_Image * _image_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _image_transform_boundings(Enesim_Renderer *r,
+static void _image_transform_boundings(Enesim_Renderer *r EINA_UNUSED,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *oboundings,
 		Eina_Rectangle *boundings)
@@ -193,8 +193,8 @@ static void _argb8888_image_no_scale_affine_fast(Enesim_Renderer *r,
 }
 
 static void _argb8888_image_no_scale_projective_fast(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y, unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
 }
@@ -305,8 +305,8 @@ static void _argb8888_image_scale_affine_fast(Enesim_Renderer *r,
 }
 
 static void _argb8888_image_scale_projective_fast(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y, unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
 
@@ -412,8 +412,8 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 }
 
 static void _argb8888_image_no_scale_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y, unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
 }
@@ -585,8 +585,8 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 }
 
 static void _argb8888_image_scale_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y, unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
 
@@ -1305,29 +1305,29 @@ static void _argb8888_image_scale_d_d_affine(Enesim_Renderer *r,
 }
 
 static void _argb8888_image_scale_d_u_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y, unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
 }
 
 static void _argb8888_image_scale_u_d_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y, unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
 }
 
 static void _argb8888_image_scale_d_d_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y, unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
 }
 
 
 static void _a8_to_argb8888_noscale(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, uint32_t *dst)
 {
 	Enesim_Renderer_Image *thiz = _image_get(r);
@@ -1360,7 +1360,7 @@ static Enesim_Renderer_Sw_Fill  _spans_fast[2][ENESIM_MATRIX_TYPES];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _image_name(Enesim_Renderer *r)
+static const char * _image_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "image";
 }
@@ -1402,7 +1402,7 @@ static void _image_destination_boundings(Enesim_Renderer *r,
 	_image_transform_boundings(r, states, &oboundings, boundings);
 }
 
-static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz;
 	Eina_Rectangle *sd;
@@ -1419,8 +1419,8 @@ static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _image_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES], Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES], Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -1547,7 +1547,7 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _image_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _image_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -1574,7 +1574,7 @@ static void _image_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 }
 
 static Eina_Bool _image_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz;
 

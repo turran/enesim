@@ -184,8 +184,8 @@ static void _circle_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
  *----------------------------------------------------------------------------*/
 /* Use the internal path for drawing */
 static void _circle_path_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -199,7 +199,7 @@ static void _circle_path_span(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _circle_name(Enesim_Renderer *r)
+static const char * _circle_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "circle";
 }
@@ -306,7 +306,7 @@ static void _circle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_circle_state_cleanup(thiz, r, s);
 }
 
-static void _circle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _circle_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -315,14 +315,14 @@ static void _circle_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state
 			ENESIM_RENDERER_FLAG_GEOMETRY;
 }
 
-static void _circle_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _circle_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
 static Eina_Bool _circle_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Circle *thiz;
 
@@ -330,7 +330,7 @@ static Eina_Bool _circle_has_changed(Enesim_Renderer *r,
 	return _circle_properties_have_changed(thiz);
 }
 
-static void _circle_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _circle_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }

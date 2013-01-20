@@ -89,7 +89,7 @@ static inline Enesim_Renderer_Blur * _blur_get(Enesim_Renderer *r)
 }
 
 static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
 		Enesim_Error **error)
 {
 	if (!thiz->src)
@@ -103,7 +103,7 @@ static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
 }
 
 static void _blur_state_cleanup(Enesim_Renderer_Blur *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s)
+		Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
 	if (thiz->src)
 		enesim_surface_unlock(thiz->src);
@@ -395,13 +395,13 @@ static void _a8_span_identity(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _blur_name(Enesim_Renderer *r)
+static const char * _blur_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "blur";
 }
 
 static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -440,7 +440,7 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _blur_boundings(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Blur *thiz;
@@ -465,14 +465,14 @@ static void _blur_boundings(Enesim_Renderer *r,
 	}
 }
 
-static void _blur_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _blur_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _blur_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _blur_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;

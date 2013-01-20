@@ -213,7 +213,7 @@ static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
 static void _span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -270,7 +270,7 @@ static void _span_identity(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -357,7 +357,7 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -450,12 +450,12 @@ static void _span_projective(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _checker_name(Enesim_Renderer *r)
+static const char * _checker_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "checker";
 }
 
-static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
 
@@ -465,8 +465,8 @@ static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
 	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
@@ -513,7 +513,7 @@ static void _checker_free(Enesim_Renderer *r)
 }
 
 static Eina_Bool _checker_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
 
@@ -532,7 +532,7 @@ static Eina_Bool _checker_has_changed(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
-static void _checker_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _checker_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -541,7 +541,7 @@ static void _checker_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _checker_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _checker_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;

@@ -192,8 +192,8 @@ static void _ellipse_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
  *----------------------------------------------------------------------------*/
 /* Use the internal path for drawing */
 static void _ellipse_path_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -207,7 +207,7 @@ static void _ellipse_path_span(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _ellipse_name(Enesim_Renderer *r)
+static const char * _ellipse_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "ellipse";
 }
@@ -309,7 +309,7 @@ static void _ellipse_destination_boundings(Enesim_Renderer *r,
 }
 
 static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Ellipse *thiz;
 
@@ -327,7 +327,7 @@ static void _free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _ellipse_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _ellipse_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -336,13 +336,13 @@ static void _ellipse_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 			ENESIM_RENDERER_FLAG_GEOMETRY;
 }
 
-static void _ellipse_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _ellipse_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
-static void _ellipse_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _ellipse_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }

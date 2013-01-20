@@ -125,12 +125,12 @@ static int _radial_length(Enesim_Renderer *r)
 	return thiz->glen;
 }
 
-static const char * _radial_name(Enesim_Renderer *r)
+static const char * _radial_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "gradient_radial";
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 	thiz = _radial_get(r);
@@ -140,8 +140,8 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Eina_Bool _state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Gradient_State *gstate,
-		Enesim_Surface *s,
-		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Error **error)
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -196,7 +196,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 		double t = rad / (scale + small);
 
 		fx = cx + t * (fx - cx);
-		fy = cy + t * (fy - cy); 
+		fy = cy + t * (fy - cy);
 	}
 
 	fx -= cx;  fy -= cy;
@@ -212,7 +212,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 }
 
 static void _radial_boundings(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *boundings)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -226,7 +226,7 @@ static void _radial_boundings(Enesim_Renderer *r,
 }
 
 static Eina_Bool _radial_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 

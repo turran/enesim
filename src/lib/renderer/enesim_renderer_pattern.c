@@ -180,7 +180,7 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
 static void _argb8888_repeat_span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -217,25 +217,25 @@ static void _argb8888_repeat_span_identity(Enesim_Renderer *r,
 }
 
 static void _argb8888_repeat_span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
 static void _argb8888_repeat_span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
 static void _argb8888_reflect_span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -266,25 +266,25 @@ static void _argb8888_reflect_span_identity(Enesim_Renderer *r,
 }
 
 static void _argb8888_reflect_span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
 static void _argb8888_reflect_span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
 static void _argb8888_restrict_span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -318,25 +318,25 @@ static void _argb8888_restrict_span_identity(Enesim_Renderer *r,
 }
 
 static void _argb8888_restrict_span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
 static void _argb8888_restrict_span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
 static void _argb8888_pad_span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -370,18 +370,18 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r,
 }
 
 static void _argb8888_pad_span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
 }
 
 static void _argb8888_pad_span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		int x, int y,
-		unsigned int len, void *ddata)
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED,
+		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
 
@@ -391,7 +391,7 @@ static Enesim_Renderer_Sw_Fill  _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES]
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _pattern_name(Enesim_Renderer *r)
+static const char * _pattern_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "pattern";
 }
@@ -414,7 +414,7 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz;
 
@@ -424,7 +424,7 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _pattern_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _pattern_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -433,7 +433,7 @@ static void _pattern_flags(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _pattern_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _pattern_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -491,7 +491,7 @@ static void _pattern_destination_boundings(Enesim_Renderer *r,
 }
 
 static Eina_Bool _pattern_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Pattern *thiz;
 

@@ -63,8 +63,8 @@ static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
 }
 
 static void _figure_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -186,7 +186,7 @@ static void _figure_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _figure_name(Enesim_Renderer *r)
+static const char * _figure_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "figure";
 }
@@ -218,7 +218,7 @@ static void _figure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _figure_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Figure *thiz;
 
@@ -226,7 +226,7 @@ static Eina_Bool _figure_has_changed(Enesim_Renderer *r,
 	return thiz->changed;
 }
 
-static void _figure_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _figure_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	Enesim_Renderer_Figure *thiz;
@@ -235,7 +235,7 @@ static void _figure_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state
 	enesim_renderer_flags(thiz->path, flags);
 }
 
-static void _figure_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _figure_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	Enesim_Renderer_Figure *thiz;
