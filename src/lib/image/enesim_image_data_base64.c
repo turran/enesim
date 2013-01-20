@@ -105,7 +105,7 @@ static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t 
 	}
 }
 /*----------------------------------------------------------------------------*
- *                        The Emage Data interface                            *
+ *                      The Enesim Image Data interface                       *
  *----------------------------------------------------------------------------*/
 /* when the user requests 3 bytes of base64 decoded data we need to read 4 bytes
  * so we always read more from the real source

@@ -23,9 +23,9 @@
 #define DBG(...) EINA_LOG_DOM_DBG(enesim_image_log_dom_raw, __VA_ARGS__)
 
 static int enesim_image_log_dom_raw = -1;
-/*============================================================================*
- *                          Emage Provider API                                *
- *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                         Enesim Image Provider API                          *
+ *----------------------------------------------------------------------------*/
 static Eina_Bool _raw_saveable(const char *file)
 {
 	char *d;
@@ -125,7 +125,7 @@ static Eina_Bool raw_provider_init(void)
 	enesim_image_log_dom_raw = eina_log_domain_register("enesim_image_raw", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
 	if (enesim_image_log_dom_raw < 0)
 	{
-		EINA_LOG_ERR("Emage: Can not create a general log domain.");
+		EINA_LOG_ERR("Enesim: Can not create a general log domain.");
 		return EINA_FALSE;
 	}
 	if (!enesim_image_provider_register(&_provider,

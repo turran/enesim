@@ -298,9 +298,10 @@ EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz)
 
 /**
  * @brief Sets the size of the thread's pool
+ * @param thiz The image context
  * @param num The number of threads
  *
- * Sets the maximum number of threads Emage will create to dispatch asynchronous
+ * Sets the maximum number of threads the context will create to dispatch asynchronous
  * calls.
  */
 EAPI void enesim_image_context_pool_size_set(Enesim_Image_Context *thiz, int num)
@@ -309,9 +310,10 @@ EAPI void enesim_image_context_pool_size_set(Enesim_Image_Context *thiz, int num
 }
 /**
  * @brief Gets the size of the thread's pool
+ * @param thiz The image context
  *
  * @return The number of threads
- * Returns the maximum number threads of number Emage will create the dispatch
+ * Returns the maximum number threads the context will create the dispatch
  * asynchronous calls.
  */
 EAPI int enesim_image_context_pool_size_get(Enesim_Image_Context *thiz)

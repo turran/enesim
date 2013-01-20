@@ -1,14 +1,26 @@
+/* ENESIM - Direct Rendering Library
+ * Copyright (C) 2007-2011 Jorge Luis Zapata
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef ENESIM_IMAGE_H
 #define ENESIM_IMAGE_H
 
-/**
- * @mainpage Emage
- * @section intro Introduction
- * Emage is a library that loads and saves several types of image formats
- * from and to Enesim Surfaces
- * @section dependencies Dependencies
- * - Enesim
- * - Eina
+/*
+ * @defgroup Enesim_Image_Main_Group Main
+ * @{
  */
 
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_EXIST;
@@ -19,10 +31,6 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_ALLOCATOR;
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_LOADING;
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 
-/*
- * @defgroup Enesim_Image_Main_Group Main
- * @{
- */
 EAPI void enesim_image_dispatch(void);
 
 /**

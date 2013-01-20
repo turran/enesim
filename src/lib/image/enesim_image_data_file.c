@@ -34,7 +34,7 @@ typedef struct _Enesim_Image_Data_File
 	const char *location;
 } Enesim_Image_Data_File;
 /*----------------------------------------------------------------------------*
- *                        The Emage Data interface                            *
+ *                      The Enesim Image Data interface                       *
  *----------------------------------------------------------------------------*/
 static ssize_t _enesim_image_data_file_read(void *data, void *buffer, size_t len)
 {

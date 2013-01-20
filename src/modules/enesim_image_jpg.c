@@ -131,9 +131,9 @@ static void _jpg_enesim_image_src(struct jpeg_decompress_struct *cinfo, Enesim_I
 
 	cinfo->src = (struct jpeg_source_mgr *)thiz;
 }
-/*============================================================================*
- *                          Emage Provider API                                *
- *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                         Enesim Image Provider API                          *
+ *----------------------------------------------------------------------------*/
 static Eina_Error _jpg_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
 {
 	Jpg_Error_Mgr err;
@@ -352,7 +352,7 @@ static Eina_Bool jpg_provider_init(void)
 	enesim_image_log_dom_jpg = eina_log_domain_register("enesim_image_jpg", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
 	if (enesim_image_log_dom_jpg < 0)
 	{
-		EINA_LOG_ERR("Emage: Can not create a general log domain.");
+		EINA_LOG_ERR("Enesim: Can not create a general log domain.");
 		return EINA_FALSE;
 	}
 	/* @todo

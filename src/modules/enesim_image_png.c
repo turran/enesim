@@ -96,9 +96,9 @@ static void _png_flush(png_structp png_ptr EINA_UNUSED)
 {
 	/* nothing to do here */
 }
-/*============================================================================*
- *                          Emage Provider API                                *
- *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                         Enesim Image Provider API                          *
+ *----------------------------------------------------------------------------*/
 static Eina_Bool _png_saveable(const char *file)
 {
 	char *d;
@@ -386,7 +386,7 @@ static Eina_Bool png_provider_init(void)
 	enesim_image_log_dom_png = eina_log_domain_register("enesim_image_png", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
 	if (enesim_image_log_dom_png < 0)
 	{
-		EINA_LOG_ERR("Emage: Can not create a general log domain.");
+		EINA_LOG_ERR("Enesim: Can not create a general log domain.");
 		return EINA_FALSE;
 	}
 	/* @todo
