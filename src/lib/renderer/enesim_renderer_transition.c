@@ -71,7 +71,7 @@ static inline Enesim_Renderer_Transition * _transition_get(Enesim_Renderer *r)
 }
 
 static void _transition_span_general(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Transition *t;
@@ -111,7 +111,7 @@ static void _transition_span_general(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _transition_name(Enesim_Renderer *r)
+static const char * _transition_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "transition";
 }
@@ -152,7 +152,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _boundings(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Transition *trans;
@@ -177,7 +177,7 @@ static void _boundings(Enesim_Renderer *r,
 	rect->h = r0_rect.h > r1_rect.h ? r0_rect.h : r1_rect.h;
 }
 
-static void _transition_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+static void _transition_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |

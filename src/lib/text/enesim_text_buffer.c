@@ -94,7 +94,7 @@ static int _default_string_insert(void *data, const char *string, int length, ss
 	return length;
 }
 
-static int _default_string_delete(void *data, int length, ssize_t offset)
+static int _default_string_delete(void *data, int length EINA_UNUSED, ssize_t offset EINA_UNUSED)
 {
 	Enesim_Text_Buffer_Default *thiz = data;
 
