@@ -28,8 +28,8 @@ endif
 
 if BUILD_MODULE_JPG
 
-emage_jpg_LTLIBRARIES = src/modules/enesim_image_jpg.la
-emage_jpgdir = $(pkglibdir)/image
+enesim_image_jpg_LTLIBRARIES = src/modules/enesim_image_jpg.la
+enesim_image_jpgdir = $(pkglibdir)/image
 
 src_modules_enesim_image_jpg_la_SOURCES = src/modules/enesim_image_jpg.c
 
@@ -51,8 +51,8 @@ endif
 
 ## Raw
 
-emage_raw_LTLIBRARIES = src/modules/enesim_image_raw.la
-emage_rawdir = $(pkglibdir)/image
+enesim_image_raw_LTLIBRARIES = src/modules/enesim_image_raw.la
+enesim_image_rawdir = $(pkglibdir)/image
 
 src_modules_enesim_image_raw_la_SOURCES = src/modules/enesim_image_raw.c
 
