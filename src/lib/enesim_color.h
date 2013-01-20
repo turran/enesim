@@ -47,7 +47,7 @@ typedef uint32_t Enesim_Color;
 /**
  * @typedef Enesim_Alpha
  *
- * Internal representation of an alpha componentof a color.
+ * Internal representation of an alpha component of a color.
  */
 typedef uint8_t Enesim_Alpha;
 
