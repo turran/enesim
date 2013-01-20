@@ -18,14 +18,25 @@
 #ifndef ENESIM_ERROR_H_
 #define ENESIM_ERROR_H_
 
+/**
+ * @def ENESIM_ERROR(err, fmt, ...)
+ *
+ * Calls enesim_error_add_parametric() with current file, function and line.
+ *
+ * @see enesim_error_add_parametric()
+ */
 #define ENESIM_ERROR(err, fmt, ...) (enesim_error_add_parametric(err, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__)
 
+/**
+ * @typedef Enesim_Error
+ * Abstract error type.
+ */
 typedef struct _Enesim_Error Enesim_Error;
 
 EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string);
 EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char *file, const char *function, int line, char *fmt, va_list args);
 EAPI void enesim_error_delete(Enesim_Error *error);
-EAPI void enesim_error_dump(Enesim_Error *error);
+EAPI void enesim_error_dump(const Enesim_Error *error);
 
 #endif
 

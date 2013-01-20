@@ -28,8 +28,14 @@
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+
 /**
- * FIXME
+ * @brief Transform the given premultiplied color to a ARGB one.
+ *
+ * @param argb The premultiplied color.
+ * @return the ARGB color.
+ *
+ * This function transforms the premultiplied color @p c to an ARGB one.
  */
 EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c)
 {
@@ -40,7 +46,12 @@ EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c)
 }
 
 /**
- * FIXME
+ * @brief Transform the given ARGB color to a premultiplied one.
+ *
+ * @param argb The ARGB color.
+ * @return the premultiplied color.
+ *
+ * This function transforms the @p argb color to a premultiplied one.
  */
 EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb)
 {
@@ -50,9 +61,19 @@ EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb)
 	return c;
 }
 
-
 /**
- * Create a pixel from the given unpremultiplied components
+ * @brief Set the given premultiplied color with the given components.
+ *
+ * @param argb The Enesim color to set.
+ * @param a The alpha component.
+ * @param r The red component.
+ * @param g The green component.
+ * @param b The blue component.
+ *
+ * This function sets the premultiplied color @p color with the
+ * components @p a,  @p r, @p g and @p b.
+ *
+ * @see enesim_color_components_to()
  */
 EAPI void enesim_color_components_from(Enesim_Color *color,
 		uint8_t a, uint8_t r, uint8_t g, uint8_t b)
@@ -64,7 +85,18 @@ EAPI void enesim_color_components_from(Enesim_Color *color,
 }
 
 /**
-  * Extract the components from a color
+ * @brief Retrieve the component of the given premultiplied color.
+ *
+ * @param argb The Enesim color to set.
+ * @param a The alpha component.
+ * @param r The red component.
+ * @param g The green component.
+ * @param b The blue component.
+ *
+ * This function retrieves the ARGB components of the premultiplied
+ * color @p color and stores them into @p a,  @p r, @p g and @p b.
+ *
+ * @see enesim_color_components_from()
  */
 EAPI void enesim_color_components_to(Enesim_Color color,
 		uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b)
@@ -89,7 +121,18 @@ EAPI void enesim_color_components_to(Enesim_Color color,
 }
 
 /**
+ * @brief Set the given ARGB color with the given components.
  *
+ * @param argb The ARGB color to set.
+ * @param a The alpha component.
+ * @param r The red component.
+ * @param g The green component.
+ * @param b The blue component.
+ *
+ * This function sets the @p argb color with the components @p a,
+ * @p r, @p g and @p b.
+ *
+ * @see enesim_argb_components_to()
  */
 EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, uint8_t g, uint8_t b)
 {
@@ -97,7 +140,18 @@ EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, u
 }
 
 /**
+ * @brief Retrieve the component of the given ARGB color.
  *
+ * @param argb The ARGB color to set.
+ * @param a The alpha component.
+ * @param r The red component.
+ * @param g The green component.
+ * @param b The blue component.
+ *
+ * This function stores the @p argb color components into @p a, @p r,
+ * @p g and @p b. @p a, @p r, @p g and @p b can each be @c NULL.
+ *
+ * @see enesim_argb_components_from()
  */
 EAPI void enesim_argb_components_to(Enesim_Argb argb, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b)
 {

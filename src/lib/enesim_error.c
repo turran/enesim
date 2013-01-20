@@ -32,8 +32,20 @@ struct _Enesim_Error
  *                                   API                                      *
  *============================================================================*/
 /**
- * To  be documented
- * FIXME: To be fixed
+ * @brief Add an error string to the list of defined errors.
+ *
+ * @param error The list of errors.
+ * @param string The error description.
+ * @return The new list of errors.
+ *
+ * This function add the description @p string to the list or errors
+ * @p error. If @p string is @c NULL, @c NULL is returned. if @p error
+ * is @c NULL, an #Enesim_Error is allocated. @p string is added to
+ * @p error. On memory allocation error, @C NULL is returned,
+ * otherwise @p error is returned.
+ *
+ * @see enesim_error_add_parametric()
+ * @see enesim_error_delete()
  */
 EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
 {
@@ -42,6 +54,8 @@ EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
 	if (!error)
 	{
 		error = malloc(sizeof(Enesim_Error));
+		if (!error)
+			return NULL;
 		error->trace = NULL;
 	}
 	error->trace = eina_list_append(error->trace, strdup(string));
@@ -49,8 +63,22 @@ EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
 }
 
 /**
- * To  be documented
- * FIXME: To be fixed
+ * @brief Add a error to the list of defined errors with a formatted
+ * description.
+ *
+ * @param error The list of errors.
+ * @param file The file where the error occurs.
+ * @param function The function where the error occurs.
+ * @param line The line of the file where the error occurs.
+ * @param fmt Formatted string passed to vsnprintf().
+ * @return The new list of errors.
+ *
+ * This function formats the description of the error with @p file,
+ * @p function and @p line and calls enesim_error_add() with the
+ * built string. User defined description can be appended with @p fmt.
+ *
+ * @see enesim_error_add()
+ * @see enesim_error_delete()
  */
 EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char *file, const char *function, int line, char *fmt, va_list args)
 {
@@ -65,8 +93,15 @@ EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char 
 }
 
 /**
- * To  be documented
- * FIXME: To be fixed
+ * @brief Free the given list of errors.
+ *
+ * @param error The list of errors to free.
+ *
+ * This function frees the list of errors @p error. If @p error is @c
+ * NULL, this function returns immediatly.
+ *
+ * @see enesim_error_add()
+ * @see enesim_error_add_parametric()
  */
 EAPI void enesim_error_delete(Enesim_Error *error)
 {
@@ -82,15 +117,21 @@ EAPI void enesim_error_delete(Enesim_Error *error)
 }
 
 /**
- * To  be documented
- * FIXME: To be fixed
+ * @brief Display in the standard output the given errors.
+ *
+ * @param error The list of errors to display.
+ *
+ * This function displays in the standard output the list of errors
+ * stored in @p error. if @p error is @c NULL, this function returns
+ * immediatly.
  */
-EAPI void enesim_error_dump(Enesim_Error *error)
+EAPI void enesim_error_dump(const Enesim_Error *error)
 {
 	Eina_List *l;
 	char *str;
 
 	if (!error) return;
+
 	EINA_LIST_FOREACH(error->trace, l, str)
 	{
 		printf("%s", str);
