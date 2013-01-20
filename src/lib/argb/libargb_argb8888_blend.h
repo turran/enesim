@@ -54,7 +54,7 @@ static inline void blend_sse2(uint64_t *d, sse2_t alpha, sse2_t color)
  *                             Point operations                               *
  *============================================================================*/
 static inline void argb8888_pt_none_color_none_blend(uint32_t *d,
-		uint32_t s __UNUSED__, uint32_t color, uint32_t m __UNUSED__)
+		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m EINA_UNUSED)
 {
 	uint16_t a16 = 256 - (color >> 24);
 #if LIBARGB_MMX
@@ -71,7 +71,7 @@ static inline void argb8888_pt_none_color_none_blend(uint32_t *d,
 }
 
 static inline void argb8888_pt_none_color_argb8888_blend(uint32_t *d,
-		uint32_t s __UNUSED__, uint32_t color, uint32_t m)
+		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m)
 {
 	uint16_t ca = 256 - (color >> 24);
 	uint16_t ma = m >> 24;
@@ -98,7 +98,7 @@ static inline void argb8888_pt_none_color_argb8888_blend(uint32_t *d,
 }
 
 static inline void argb8888_pt_argb8888_none_none_blend(uint32_t *d,
-		uint32_t s, uint32_t color __UNUSED__, uint32_t m __UNUSED__)
+		uint32_t s, uint32_t color EINA_UNUSED, uint32_t m EINA_UNUSED)
 {
 	uint16_t a;
 
@@ -109,8 +109,8 @@ static inline void argb8888_pt_argb8888_none_none_blend(uint32_t *d,
  *                              Span operations                               *
  *============================================================================*/
 static inline void argb8888_sp_none_color_none_blend(uint32_t *d,
-		unsigned int len, uint32_t *s __UNUSED__,
-		uint32_t color, uint32_t *m __UNUSED__)
+		unsigned int len, uint32_t *s EINA_UNUSED,
+		uint32_t color, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 	uint16_t a16 = 256 - (color >> 24);
@@ -135,7 +135,7 @@ static inline void argb8888_sp_none_color_none_blend(uint32_t *d,
 #if 0
 static inline void argb8888_sp_argb8888_none_none_blend(uint32_t *d,
 		unsigned int len, uint32_t *s,
-		uint32_t color __UNUSED__, uint32_t *m __UNUSED__)
+		uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 #if LIBARGB_MMX
@@ -164,7 +164,7 @@ static inline void argb8888_sp_argb8888_none_none_blend(uint32_t *d,
 
 static inline void argb8888_sp_argb8888_none_none_blend(uint32_t *d,
 		unsigned int len, uint32_t *s,
-		uint32_t color __UNUSED__, uint32_t *m __UNUSED__)
+		uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 #if LIBARGB_MMX
@@ -205,7 +205,7 @@ static inline void argb8888_sp_argb8888_none_none_blend(uint32_t *d,
 
 static inline void argb8888_sp_argb8888_color_none_blend(uint32_t *d,
 		unsigned int len, uint32_t *s,
-		uint32_t color, uint32_t *m __UNUSED__)
+		uint32_t color, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 #if LIBARGB_MMX
@@ -235,7 +235,7 @@ static inline void argb8888_sp_argb8888_color_none_blend(uint32_t *d,
 
 
 static inline void argb8888_sp_none_color_argb8888_blend(uint32_t *d, unsigned int len,
-		uint32_t *s __UNUSED__, uint32_t color,
+		uint32_t *s EINA_UNUSED, uint32_t color,
 		uint32_t *m)
 {
 	uint16_t ca = 256 - (color >> 24);
@@ -269,7 +269,7 @@ static inline void argb8888_sp_none_color_argb8888_blend(uint32_t *d, unsigned i
 }
 
 static inline void argb8888_sp_none_color_a8_blend(uint32_t *d, unsigned int len,
-		uint32_t *s __UNUSED__, uint32_t color,
+		uint32_t *s EINA_UNUSED, uint32_t color,
 		uint8_t *m)
 {
 	uint16_t ca = 256 - (color >> 24);
@@ -303,7 +303,7 @@ static inline void argb8888_sp_none_color_a8_blend(uint32_t *d, unsigned int len
 }
 
 static inline void argb8888_sp_argb8888_none_argb8888_blend(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color __UNUSED__,
+		uint32_t *s, uint32_t color EINA_UNUSED,
 		uint32_t *m)
 {
 	uint32_t *end = d + len;

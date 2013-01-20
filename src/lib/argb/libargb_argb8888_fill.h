@@ -20,13 +20,13 @@
 /*============================================================================*
  *                             Point operations                               *
  *============================================================================*/
-static inline void argb8888_pt_none_color_none_fill(uint32_t *d, uint32_t s __UNUSED__,
-		uint32_t color, uint32_t m __UNUSED__)
+static inline void argb8888_pt_none_color_none_fill(uint32_t *d, uint32_t s EINA_UNUSED,
+		uint32_t color, uint32_t m EINA_UNUSED)
 {
 	*d = color;
 }
 static inline void argb8888_pt_none_color_argb8888_fill(uint32_t *d,
-		uint32_t s __UNUSED__, uint32_t color, uint32_t m)
+		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m)
 {
 	uint16_t a = m >> 24;
 	switch (a)
@@ -45,7 +45,7 @@ static inline void argb8888_pt_none_color_argb8888_fill(uint32_t *d,
 }
 
 static inline void argb8888_pt_argb8888_none_argb8888_fill(uint32_t *d,
-		uint32_t s, uint32_t color __UNUSED__, uint32_t m)
+		uint32_t s, uint32_t color EINA_UNUSED, uint32_t m)
 {
 	uint16_t a = m >> 24;
 	switch (a)
@@ -64,13 +64,13 @@ static inline void argb8888_pt_argb8888_none_argb8888_fill(uint32_t *d,
 }
 
 static inline void argb8888_pt_argb8888_none_none_fill(uint32_t *d,
-		uint32_t s, uint32_t color __UNUSED__, uint32_t m __UNUSED__)
+		uint32_t s, uint32_t color EINA_UNUSED, uint32_t m EINA_UNUSED)
 {
 	*d = s;
 }
 
 static inline void argb8888_pt_argb8888_color_none_fill(uint32_t *d,
-		uint32_t s, uint32_t color, uint32_t m __UNUSED__)
+		uint32_t s, uint32_t color, uint32_t m EINA_UNUSED)
 {
 	*d = argb8888_mul4_sym(color, s);
 }
@@ -83,7 +83,7 @@ static inline void argb8888_pt_argb8888_color_none_fill(uint32_t *d,
 /** dst = src*color*ma + dst*(1 - ma) **/
 /** no mask or src is equivalent to them being 1 everywhere **/
 static inline void argb8888_sp_none_color_none_fill(uint32_t *d, uint32_t len,
-		uint32_t *s __UNUSED__, uint32_t color, uint32_t *m __UNUSED__)
+		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -93,7 +93,7 @@ static inline void argb8888_sp_none_color_none_fill(uint32_t *d, uint32_t len,
 	}
 }
 static inline void argb8888_sp_argb8888_none_none_fill(uint32_t *d, uint32_t len,
-		uint32_t *s, uint32_t color __UNUSED__, uint32_t *m __UNUSED__)
+		uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -105,7 +105,7 @@ static inline void argb8888_sp_argb8888_none_none_fill(uint32_t *d, uint32_t len
 }
 
 static inline void argb8888_sp_argb8888_color_none_fill(uint32_t *d, uint32_t len,
-		uint32_t *s, uint32_t color, uint32_t *m __UNUSED__)
+		uint32_t *s, uint32_t color, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -131,7 +131,7 @@ static inline void argb8888_sp_argb8888_color_none_fill(uint32_t *d, uint32_t le
 }
 
 static inline void argb8888_sp_none_color_argb8888_fill(uint32_t *d, uint32_t len,
-		uint32_t *s __UNUSED__, uint32_t color, uint32_t *m)
+		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -156,7 +156,7 @@ static inline void argb8888_sp_none_color_argb8888_fill(uint32_t *d, uint32_t le
 }
 
 static inline void argb8888_sp_none_none_argb8888_fill(uint32_t *d, uint32_t len,
-		uint32_t *s __UNUSED__, uint32_t color __UNUSED__, uint32_t *m)
+		uint32_t *s EINA_UNUSED, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -181,7 +181,7 @@ static inline void argb8888_sp_none_none_argb8888_fill(uint32_t *d, uint32_t len
 }
 
 static inline void argb8888_sp_argb8888_none_argb8888_fill(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color __UNUSED__,
+		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED,
 		uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -238,7 +238,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_fill(uint32_t *d,
 }
 
 static inline void argb8888_sp_none_color_a8_fill(uint32_t *d, uint32_t len,
-		uint32_t *s __UNUSED__, uint32_t color, uint8_t *m)
+		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -297,7 +297,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_copy(uint32_t *d,
 }
 
 static inline void argb8888_sp_argb8888_none_argb8888_copy(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color __UNUSED__, uint32_t *m)
+		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -325,7 +325,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_copy(uint32_t *d,
 }
 
 static inline void argb8888_sp_none_color_argb8888_copy(uint32_t *d, uint32_t len,
-		uint32_t *s __UNUSED__, uint32_t color, uint32_t *m)
+		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -351,7 +351,7 @@ static inline void argb8888_sp_none_color_argb8888_copy(uint32_t *d, uint32_t le
 }
 
 static inline void argb8888_sp_none_none_argb8888_copy(uint32_t *d, uint32_t len,
-		uint32_t *s __UNUSED__, uint32_t color __UNUSED__, uint32_t *m)
+		uint32_t *s EINA_UNUSED, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)

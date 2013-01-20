@@ -28,8 +28,8 @@
  * MASK: Mask pixel format, none for nothing
  */
 
-#ifndef __UNUSED__
-#define __UNUSED__
+#ifndef EINA_UNUSED
+#define EINA_UNUSED
 #endif
 
 #include "libargb_argb8888.h"

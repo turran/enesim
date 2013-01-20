@@ -36,8 +36,8 @@ static inline uint32_t argb8888_mul4_sym(uint32_t c1, uint32_t c2)
  *                              Span operations                               *
  *============================================================================*/
 static inline void argb8888_none_color_none_mul4_sym(uint32_t *d,
-		unsigned int len, uint32_t *s __UNUSED__,
-		uint32_t color, uint32_t *m __UNUSED__)
+		unsigned int len, uint32_t *s EINA_UNUSED,
+		uint32_t color, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
 	while (d < end)

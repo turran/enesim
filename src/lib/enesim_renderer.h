@@ -169,6 +169,21 @@ typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data);
 
+#if 0
+/* TODO properties callbacks */
+typedef void (*Enesim_Renderer_X_Set_Cb)(void *p, double x);
+typedef double (*Enesim_Renderer_X_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Y_Set_Cb)(void *p, double x);
+typedef double (*Enesim_Renderer_Y_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Transformation_Set_Cb)(void *p, Enesim_Matrix *m);
+typedef void (*Enesim_Renderer_Transformation_Get_Cb)(void *p, Enesim_Matrix *m);
+typedef void (*Enesim_Renderer_Quality_Set_Cb)(void *p, Enesim_Quality q);
+typedef Enesim_Quality (*Enesim_Renderer_Quality_Get_Cb)(void *p);
+
+EAPI Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_Flag flags, Enesim_Renderer_State *curr, Enesim_Renderer_State *prev);
+EAPI void enesim_renderer_state_update(Enesim_Renderer_Flag flags, Enesim_Renderer_State *curr, Enesim_Renderer_State *prev);
+#endif
+
 /* software backend descriptor functions */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,

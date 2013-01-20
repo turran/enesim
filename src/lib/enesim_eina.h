@@ -61,7 +61,7 @@ static inline int eina_f16p16_round(Eina_F16p16 v)
 }
 
 /* round towards zero */
-static inline int eina_f16p16_trunc(Eina_F16p16 v)
+static inline int eina_f16p16_trunc(Eina_F16p16 v EINA_UNUSED)
 {
 #if 0
 	if (v > 0) return eina_f16p16_floor(v);

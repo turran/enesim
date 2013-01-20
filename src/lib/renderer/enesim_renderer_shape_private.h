@@ -109,5 +109,34 @@ Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Error **error);
 
+#if 0
+/* TODO properties callbacks */
+typedef void (*Enesim_Renderer_Shape_Stroke_Color_Set_Cb)(void *p, Enesim_Color color);
+typedef Enesim_Color (*Enesim_Renderer_Shape_Stroke_Color_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Shape_Stroke_Renderer_Set_Cb)(void *p, Enesim_Renderer *r);
+typedef Enesim_Renderer *(*Enesim_Renderer_Shape_Stroke_Renderer_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Shape_Stroke_Weight_Set_Cb)(void *p, double weight);
+typedef double (*Enesim_Renderer_Shape_Stroke_Weight_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Shape_Stroke_Location_Set_Cb)(void *p, Enesim_Shape_Stroke_Location l);
+typedef Enesim_Shape_Stroke_Location (*Enesim_Renderer_Shape_Stroke_Location_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Shape_Stroke_Cap_Set_Cb)(void *p, Enesim_Shape_Stroke_Cap l);
+typedef Enesim_Shape_Stroke_Cap (*Enesim_Renderer_Shape_Stroke_Cap_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Shape_Stroke_Join_Set_Cb)(void *p, Enesim_Shape_Stroke_Join l);
+typedef Enesim_Shape_Stroke_Join (*Enesim_Renderer_Shape_Stroke_Join_Get_Cb)(void *p);
+
+typedef void (*Enesim_Renderer_Shape_Fill_Color_Set_Cb)(void *p, Enesim_Color color);
+typedef Enesim_Color (*Enesim_Renderer_Shape_Fill_Color_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Shape_Fill_Renderer_Set_Cb)(void *p, Enesim_Renderer *r);
+typedef Enesim_Renderer *(*Enesim_Renderer_Shape_Fill_Renderer_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Shape_Fill_Rule_Set_Cb)(void *p, Enesim_Shape_Fill_Rule rule);
+typedef Enesim_Shape_Fill_Rule (*Enesim_Renderer_Shape_Fill_Rule_Get_Cb)(void *p);
+
+typedef void (*Enesim_Renderer_Shape_Draw_Mode_Set_Cb)(void *p, Enesim_Shape_Draw_Mode mode);
+typedef Enesim_Shape_Draw_Mode (*Enesim_Renderer_Shape_Draw_Mode_Get_Cb)(void *p);
+
+EAPI Eina_Bool enesim_renderer_shape_state_changed(Enesim_Renderer_Flag flags, Enesim_Renderer_Shape_State *curr, Enesim_Renderer_Shape_State *prev);
+EAPI void enesim_renderer_shape_state_update(Enesim_Renderer_Flag flags, Enesim_Renderer_Shape_State *curr, Enesim_Renderer_Shape_State *prev);
+#endif
+
 #endif
 
