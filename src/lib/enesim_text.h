@@ -1,16 +1,25 @@
+/* ENESIM - Direct Rendering Library
+ * Copyright (C) 2007-2011 Jorge Luis Zapata
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _ENESIM_TEXT_H
 #define _ENESIM_TEXT_H
 
 /**
- * @mainpage Etex
- * @section intro Introduction
- *
- * @section dependencies Dependencies
- * - Eina
- * - Enesim
- *
- * @brief Etex API
- *
  * @todo
  * - Split the renderer into different types of renderers:
  *   - span renderer
@@ -34,10 +43,10 @@
 EAPI int enesim_text_init(void);
 EAPI int enesim_text_shutdown(void);
 
-typedef struct _Etex Etex;
-EAPI Etex * enesim_text_default_get(void);
-EAPI Etex * enesim_text_freetype_get(void);
-EAPI void enesim_text_freetype_delete(Etex *e);
+typedef struct _Enesim_Text_Engine Enesim_Text_Engine;
+EAPI Enesim_Text_Engine * enesim_text_default_get(void);
+EAPI Enesim_Text_Engine * enesim_text_freetype_get(void);
+EAPI void enesim_text_engine_delete(Enesim_Text_Engine *e);
 
 typedef enum _Enesim_Text_Direction
 {
@@ -47,7 +56,7 @@ typedef enum _Enesim_Text_Direction
 
 /**
  * @}
- * @defgroup Enesim_Text_Font_Group Etex Font
+ * @defgroup Enesim_Text_Font_Group Enesim Text Font
  * @{
  */
 
@@ -56,7 +65,7 @@ typedef struct _Enesim_Text_Font Enesim_Text_Font;
 
 /**
  * @}
- * @defgroup Enesim_Text_Buffer_Group Etex Buffer
+ * @defgroup Enesim_Text_Buffer_Group Enexim Text Buffer
  * @{
  */
 

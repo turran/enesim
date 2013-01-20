@@ -24,7 +24,7 @@
  *============================================================================*/
 static int _enesim_text_init_count = 0;
 
-static void _enesim_text_setup(Etex *e)
+static void _enesim_text_setup(Enesim_Text_Engine *e)
 {
 	e->data = e->engine->init();
 	e->fonts = eina_hash_string_superfast_new(NULL);
@@ -52,14 +52,14 @@ EAPI int enesim_text_init(void)
 
 	if (!eina_init())
 	{
-		fprintf(stderr, "Etex: Eina init failed");
+		fprintf(stderr, "Enesim_Text_Engine: Eina init failed");
 		return --_enesim_text_init_count;
 	}
 
 	enesim_text_log_dom_global = eina_log_domain_register("etex", ENESIM_TEXT_LOG_COLOR_DEFAULT);
 	if (enesim_text_log_dom_global < 0)
 	{
-		EINA_LOG_ERR("Etex: Can not create a general log domain.");
+		EINA_LOG_ERR("Enesim_Text_Engine: Can not create a general log domain.");
 		goto shutdown_eina;
 	}
 
@@ -100,14 +100,14 @@ EAPI int enesim_text_shutdown(void)
  * TODO change this to _get()
  * add a refcount and on deletion check that
  */
-EAPI Etex * enesim_text_freetype_get(void)
+EAPI Enesim_Text_Engine * enesim_text_freetype_get(void)
 {
 #if HAVE_FREETYPE
-	static Etex *e = NULL;
+	static Enesim_Text_Engine *e = NULL;
 
 	if (!e)
 	{
-		e = calloc(1, sizeof(Etex));
+		e = calloc(1, sizeof(Enesim_Text_Engine));
 		e->engine = &enesim_text_freetype;
 		_enesim_text_setup(e);
 	}
@@ -122,7 +122,7 @@ EAPI Etex * enesim_text_freetype_get(void)
  * FIXME: To be fixed
  * FIXME: remove this!
  */
-EAPI void enesim_text_freetype_delete(Etex *e)
+EAPI void enesim_text_engine_delete(Enesim_Text_Engine *e)
 {
 #if HAVE_FREETYPE
 	e->engine->shutdown(e->data);
@@ -132,7 +132,7 @@ EAPI void enesim_text_freetype_delete(Etex *e)
 /**
  *
  */
-Etex * enesim_text_default_get(void)
+Enesim_Text_Engine * enesim_text_engine_default_get(void)
 {
 #if HAVE_FREETYPE
 	return enesim_text_freetype_get();

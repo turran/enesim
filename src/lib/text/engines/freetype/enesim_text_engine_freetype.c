@@ -183,7 +183,7 @@ no_surface:
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Text_Engine enesim_text_freetype  = {
+Enesim_Text_Engine_Descriptor enesim_text_freetype  = {
 	.init = _enesim_text_freetype_init,
 	.shutdown = _enesim_text_freetype_shutdown,
 	.font_load = _enesim_text_freetype_font_load,

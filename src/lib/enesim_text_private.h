@@ -68,7 +68,7 @@ struct _Enesim_Text_Glyph_Position
 typedef void * Enesim_Text_Engine_Data;
 typedef void * Enesim_Text_Engine_Font_Data;
 
-typedef struct _Enesim_Text_Engine
+typedef struct _Enesim_Text_Engine_Descriptor
 {
 	/* main interface */
 	Enesim_Text_Engine_Data (*init)(void);
@@ -79,17 +79,17 @@ typedef struct _Enesim_Text_Engine
 	int (*font_max_ascent_get)(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata);
 	int (*font_max_descent_get)(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata);
 	void (*font_glyph_get)(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g);
-} Enesim_Text_Engine;
+} Enesim_Text_Engine_Descriptor;
 
 /* main interface */
-struct _Etex
+struct _Enesim_Text_Engine
 {
-	Enesim_Text_Engine *engine;
+	Enesim_Text_Engine_Descriptor *d;
 	Eina_Hash *fonts;
 	Enesim_Text_Engine_Data data;
 };
 
-Enesim_Text_Font * enesim_text_font_load(Etex *e, const char *name, int size);
+Enesim_Text_Font * enesim_text_font_load(Enesim_Text_Engine *e, const char *name, int size);
 Enesim_Text_Font * enesim_text_font_ref(Enesim_Text_Font *f);
 void enesim_text_font_unref(Enesim_Text_Font *f);
 int enesim_text_font_max_ascent_get(Enesim_Text_Font *f);

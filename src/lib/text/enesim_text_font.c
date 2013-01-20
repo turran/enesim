@@ -30,7 +30,7 @@
  *============================================================================*/
 struct _Enesim_Text_Font
 {
-	Etex *etex;
+	Enesim_Text_Engine *engine;
 	Enesim_Text_Engine_Font_Data data;
 	Eina_Hash *glyphs;
 	char *key;
@@ -44,8 +44,8 @@ static void _font_ref(Enesim_Text_Font *f)
 
 static void _font_unload(Enesim_Text_Font *f)
 {
-	f->etex->engine->font_delete(f->etex->data, f->data);
-	eina_hash_del(f->etex->fonts, f->key, f);
+	f->engine->d->font_delete(f->engine->data, f->data);
+	eina_hash_del(f->engine->fonts, f->key, f);
 }
 
 static void _font_unref(Enesim_Text_Font *f)
@@ -79,7 +79,7 @@ static Eina_Bool _dump(const Eina_Hash *hash EINA_UNUSED, const void *key, void 
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Text_Font * enesim_text_font_load(Etex *e, const char *name, int size)
+Enesim_Text_Font * enesim_text_font_load(Enesim_Text_Engine *e, const char *name, int size)
 {
 	Enesim_Text_Font *f;
 	Enesim_Text_Engine_Font_Data data;
@@ -98,7 +98,7 @@ Enesim_Text_Font * enesim_text_font_load(Etex *e, const char *name, int size)
 		free(key);
 		return f;
 	};
-	data = e->engine->font_load(e->data, name, size);
+	data = e->d->font_load(e->data, name, size);
 	if (!data)
 	{
 		free(key);
@@ -106,7 +106,7 @@ Enesim_Text_Font * enesim_text_font_load(Etex *e, const char *name, int size)
 	}
 
 	f = calloc(1, sizeof(Enesim_Text_Font));
-	f->etex = e;
+	f->engine = e;
 	f->data = data;
 	f->key = key;
 	f->glyphs = eina_hash_int32_new(NULL);
@@ -132,13 +132,13 @@ Enesim_Text_Font * enesim_text_font_ref(Enesim_Text_Font *f)
 int enesim_text_font_max_ascent_get(Enesim_Text_Font *f)
 {
 	if (!f) return 0;
-	return f->etex->engine->font_max_ascent_get(f->etex->data, f->data);
+	return f->engine->d->font_max_ascent_get(f->engine->data, f->data);
 }
 
 int enesim_text_font_max_descent_get(Enesim_Text_Font *f)
 {
 	if (!f) return 0;
-	return f->etex->engine->font_max_descent_get(f->etex->data, f->data);
+	return f->engine->d->font_max_descent_get(f->engine->data, f->data);
 }
 
 Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *f, char c)
@@ -147,7 +147,7 @@ Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *f, char c)
 
 	if (!f) return NULL;
 	g = calloc(1, sizeof(Enesim_Text_Glyph));
-	f->etex->engine->font_glyph_get(f->etex->data, f->data, c, g);
+	f->engine->d->font_glyph_get(f->engine->data, f->data, c, g);
 
 	return g;
 }
