@@ -25,36 +25,36 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Text_Base
+typedef struct _Enesim_Renderer_Text_Base
 {
 	Etex *etex;
-	Enesim_Text_Base_State past, current;
+	Enesim_Renderer_Text_Base_State past, current;
 	Enesim_Text_Font *font;
 	/* interface */
-	Enesim_Text_Base_Boundings boundings;
-	Enesim_Text_Base_Destination_Boundings destination_boundings;
-	Enesim_Text_Base_Sw_Setup sw_setup;
+	Enesim_Renderer_Text_Base_Boundings boundings;
+	Enesim_Renderer_Text_Base_Destination_Boundings destination_boundings;
+	Enesim_Renderer_Text_Base_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
-	Enesim_Text_Base_OpenCL_Setup opencl_setup;
+	Enesim_Renderer_Text_Base_OpenCL_Setup opencl_setup;
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
-	Enesim_Text_Base_OpenGL_Setup opengl_setup;
+	Enesim_Renderer_Text_Base_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	Enesim_Renderer_Has_Changed has_changed;
 	Enesim_Renderer_Delete free;
 	/* private */
 	void *data;
 	Eina_Bool changed : 1;
-} Enesim_Text_Base;
+} Enesim_Renderer_Text_Base;
 
-static inline Enesim_Text_Base * _enesim_text_base_get(Enesim_Renderer *r)
+static inline Enesim_Renderer_Text_Base * _enesim_renderer_text_base_get(Enesim_Renderer *r)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_shape_data_get(r);
 	return thiz;
 }
 
-static Eina_Bool _enesim_text_base_changed(Enesim_Text_Base *thiz)
+static Eina_Bool _enesim_renderer_text_base_changed(Enesim_Renderer_Text_Base *thiz)
 {
 	if (!thiz->has_changed)
 		return EINA_FALSE;
@@ -73,9 +73,9 @@ static Eina_Bool _enesim_text_base_changed(Enesim_Text_Base *thiz)
 	return EINA_FALSE;
 }
 
-static void _enesim_text_base_common_setup(Enesim_Text_Base *thiz)
+static void _enesim_renderer_text_base_common_setup(Enesim_Renderer_Text_Base *thiz)
 {
-	if (_enesim_text_base_changed(thiz))
+	if (_enesim_renderer_text_base_changed(thiz))
 	{
 		if (thiz->font)
 		{
@@ -88,7 +88,7 @@ static void _enesim_text_base_common_setup(Enesim_Text_Base *thiz)
 	}
 }
 
-static void _enesim_text_base_common_cleanup(Enesim_Text_Base *thiz)
+static void _enesim_renderer_text_base_common_cleanup(Enesim_Renderer_Text_Base *thiz)
 {
 	/* now update the past state */
 	thiz->past.size = thiz->current.size;
@@ -97,14 +97,15 @@ static void _enesim_text_base_common_cleanup(Enesim_Text_Base *thiz)
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static void _enesim_text_base_destination_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_text_base_destination_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Eina_Rectangle *boundings)
 {
-	Enesim_Text_Base *thiz;
-	const Enesim_Text_Base_State *sstates[ENESIM_RENDERER_STATES];
+	Enesim_Renderer_Text_Base *thiz;
+	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->destination_boundings)
 	{
 		boundings->x = INT_MIN / 2;
@@ -115,20 +116,21 @@ static void _enesim_text_base_destination_boundings(Enesim_Renderer *r,
 		return;
 	}
 
-	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	sstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->destination_boundings(r, states, sstates, boundings);
+	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	tstates[ENESIM_STATE_PAST] = &thiz->past;
+	thiz->destination_boundings(r, states, sstates, tstates, boundings);
 
 }
 
-static void _enesim_text_base_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_text_base_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *boundings)
 {
-	Enesim_Text_Base *thiz;
-	const Enesim_Text_Base_State *sstates[ENESIM_RENDERER_STATES];
+	Enesim_Renderer_Text_Base *thiz;
+	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->boundings)
 	{
 		boundings->x = INT_MIN / 2;
@@ -139,112 +141,115 @@ static void _enesim_text_base_boundings(Enesim_Renderer *r,
 		return;
 	}
 
-	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	sstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->boundings(r, states, sstates, boundings);
+	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	tstates[ENESIM_STATE_PAST] = &thiz->past;
+	thiz->boundings(r, states, sstates, tstates, boundings);
 }
 
 
-static Eina_Bool _enesim_text_base_sw_setup(Enesim_Renderer *r,
+static Eina_Bool _enesim_renderer_text_base_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Shape_Sw_Draw *fill, Enesim_Error **error)
 {
-	Enesim_Text_Base *thiz;
-	const Enesim_Text_Base_State *sstates[ENESIM_RENDERER_STATES];
+	Enesim_Renderer_Text_Base *thiz;
+	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->sw_setup) return EINA_FALSE;
 
-	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	sstates[ENESIM_STATE_PAST] = &thiz->past;
+	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	tstates[ENESIM_STATE_PAST] = &thiz->past;
 
-	_enesim_text_base_common_setup(thiz);
-	return thiz->sw_setup(r, states, sstates, s, fill, error);
+	_enesim_renderer_text_base_common_setup(thiz);
+	return thiz->sw_setup(r, states, sstates, tstates, s, fill, error);
 }
 
-static void _enesim_text_base_sw_cleanup(Enesim_Renderer *r,
+static void _enesim_renderer_text_base_sw_cleanup(Enesim_Renderer *r,
 		Enesim_Surface *s)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (thiz->sw_cleanup)
 		thiz->sw_cleanup(r, s);
-	_enesim_text_base_common_cleanup(thiz);
+	_enesim_renderer_text_base_common_cleanup(thiz);
 }
 
-static Eina_Bool _enesim_text_base_opengl_setup(Enesim_Renderer *r,
+static Eina_Bool _enesim_renderer_text_base_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
 {
-	Enesim_Text_Base *thiz;
-	const Enesim_Text_Base_State *sstates[ENESIM_RENDERER_STATES];
+	Enesim_Renderer_Text_Base *thiz;
+	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->opengl_setup) return EINA_FALSE;
 
-	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	sstates[ENESIM_STATE_PAST] = &thiz->past;
+	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	tstates[ENESIM_STATE_PAST] = &thiz->past;
 
-	_enesim_text_base_common_setup(thiz);
-	return thiz->opengl_setup(r, states, sstates, s,
+	_enesim_renderer_text_base_common_setup(thiz);
+	return thiz->opengl_setup(r, states, sstates, tstates, s,
 		draw, error);
 }
 
-static void _enesim_text_base_opengl_cleanup(Enesim_Renderer *r,
+static void _enesim_renderer_text_base_opengl_cleanup(Enesim_Renderer *r,
 		Enesim_Surface *s)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (thiz->opengl_cleanup)
 		thiz->opengl_cleanup(r, s);
-	_enesim_text_base_common_cleanup(thiz);
+	_enesim_renderer_text_base_common_cleanup(thiz);
 }
 
-static Eina_Bool _enesim_text_base_opencl_setup(Enesim_Renderer *r,
+static Eina_Bool _enesim_renderer_text_base_opencl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Error **error)
 {
-	Enesim_Text_Base *thiz;
-	const Enesim_Text_Base_State *sstates[ENESIM_RENDERER_STATES];
+	Enesim_Renderer_Text_Base *thiz;
+	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->opengl_setup) return EINA_FALSE;
 
-	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	sstates[ENESIM_STATE_PAST] = &thiz->past;
+	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
+	tstates[ENESIM_STATE_PAST] = &thiz->past;
 
-	_enesim_text_base_common_setup(thiz);
-	return thiz->opencl_setup(r, states, sstates, s,
+	_enesim_renderer_text_base_common_setup(thiz);
+	return thiz->opencl_setup(r, states, sstates, tstates, s,
 		program_name, program_source, program_length, error);
 }
 
-static void _enesim_text_base_opencl_cleanup(Enesim_Renderer *r,
+static void _enesim_renderer_text_base_opencl_cleanup(Enesim_Renderer *r,
 		Enesim_Surface *s)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (thiz->opencl_cleanup)
 		thiz->opencl_cleanup(r, s);
-	_enesim_text_base_common_cleanup(thiz);
+	_enesim_renderer_text_base_common_cleanup(thiz);
 }
 
-static Eina_Bool _enesim_text_base_has_changed(Enesim_Renderer *r,
+static Eina_Bool _enesim_renderer_text_base_has_changed(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 	Eina_Bool ret = EINA_TRUE;
 
-	thiz = _enesim_text_base_get(r);
-	ret = _enesim_text_base_changed(thiz);
+	thiz = _enesim_renderer_text_base_get(r);
+	ret = _enesim_renderer_text_base_changed(thiz);
 	if (ret)
 	{
 		return ret;
@@ -256,11 +261,11 @@ static Eina_Bool _enesim_text_base_has_changed(Enesim_Renderer *r,
 	return ret;
 }
 
-static void _enesim_text_base_free(Enesim_Renderer *r)
+static void _enesim_renderer_text_base_free(Enesim_Renderer *r)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (thiz->current.font_name)
 		free(thiz->current.font_name);
 	if (thiz->past.font_name)
@@ -271,19 +276,26 @@ static void _enesim_text_base_free(Enesim_Renderer *r)
 		thiz->free(r);
 	free(thiz);
 }
+
+static void _enesim_renderer_text_base_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER;
+}
+
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Renderer * enesim_text_base_new(Etex *etex,
-		Enesim_Text_Base_Descriptor *descriptor,
+Enesim_Renderer * enesim_renderer_text_base_new(Etex *etex,
+		Enesim_Renderer_Text_Base_Descriptor *descriptor,
 		void *data)
 
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 	Enesim_Renderer *r;
-	Enesim_Renderer_Descriptor pdescriptor;
+	Enesim_Renderer_Shape_Descriptor pdescriptor;
 
-	thiz = calloc(1, sizeof(Enesim_Text_Base));
+	thiz = calloc(1, sizeof(Enesim_Renderer_Text_Base));
 	if (!thiz)
 		return NULL;
 
@@ -301,27 +313,34 @@ Enesim_Renderer * enesim_text_base_new(Etex *etex,
 	thiz->destination_boundings = descriptor->destination_boundings;
 	thiz->boundings = descriptor->boundings;
 	/* set the parent descriptor */
-	pdescriptor.version = ENESIM_RENDERER_API;
+//	pdescriptor.version = ENESIM_RENDERER_API;
 	pdescriptor.name = descriptor->name;
-	pdescriptor.free = _enesim_text_base_free;
-	pdescriptor.boundings = _enesim_text_base_boundings;
-	pdescriptor.destination_boundings = _enesim_text_base_destination_boundings;
+	pdescriptor.free = _enesim_renderer_text_base_free;
+	pdescriptor.boundings = _enesim_renderer_text_base_boundings;
+	pdescriptor.destination_boundings = _enesim_renderer_text_base_destination_boundings;
 	pdescriptor.flags = descriptor->flags;
 	pdescriptor.hints_get = descriptor->hints_get;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damage = descriptor->damage;
-	pdescriptor.has_changed = _enesim_text_base_has_changed;
-	pdescriptor.sw_setup = _enesim_text_base_sw_setup;
-	pdescriptor.sw_cleanup = _enesim_text_base_sw_cleanup;
-	pdescriptor.opencl_setup = _enesim_text_base_opencl_setup;
+	pdescriptor.has_changed = _enesim_renderer_text_base_has_changed;
+	pdescriptor.feature_get = _enesim_renderer_text_base_feature_get,
+	pdescriptor.sw_setup = _enesim_renderer_text_base_sw_setup;
+	pdescriptor.sw_cleanup = _enesim_renderer_text_base_sw_cleanup;
+	pdescriptor.opencl_setup = _enesim_renderer_text_base_opencl_setup;
 	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
-	pdescriptor.opencl_cleanup = _enesim_text_base_opencl_cleanup;
+	pdescriptor.opencl_cleanup = _enesim_renderer_text_base_opencl_cleanup;
+#if BUILD_OPENGL
 	pdescriptor.opengl_initialize = descriptor->opengl_initialize;
-	pdescriptor.opengl_setup = _enesim_text_base_opengl_setup;
-	pdescriptor.opengl_cleanup = _enesim_text_base_opengl_cleanup;
+	pdescriptor.opengl_setup = _enesim_renderer_text_base_opengl_setup;
+	pdescriptor.opengl_cleanup = _enesim_renderer_text_base_opengl_cleanup;
+#else
+	pdescriptor.opengl_initialize = NULL,
+	pdescriptor.opengl_setup = NULL,
+	pdescriptor.opengl_cleanup = NULL
+#endif
 
-	r = enesim_renderer_new(&pdescriptor, thiz);
-	if (!thiz) goto renderer_err;
+	r = enesim_renderer_shape_new(&pdescriptor, thiz);
+	if (!r) goto renderer_err;
 
 	return r;
 
@@ -330,20 +349,20 @@ renderer_err:
 	return NULL;
 }
 
-void * enesim_text_base_data_get(Enesim_Renderer *r)
+void * enesim_renderer_text_base_data_get(Enesim_Renderer *r)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	return thiz->data;
 }
 
-void enesim_text_base_setup(Enesim_Renderer *r)
+void enesim_renderer_text_base_setup(Enesim_Renderer *r)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
-	_enesim_text_base_common_setup(thiz);
+	thiz = _enesim_renderer_text_base_get(r);
+	_enesim_renderer_text_base_common_setup(thiz);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -352,12 +371,12 @@ void enesim_text_base_setup(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_base_font_name_set(Enesim_Renderer *r, const char *font)
+EAPI void enesim_renderer_text_base_font_name_set(Enesim_Renderer *r, const char *font)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
 	if (!font) return;
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz) return;
 	if (thiz->current.font_name) free(thiz->current.font_name);
 	thiz->current.font_name = strdup(font);
@@ -368,12 +387,12 @@ EAPI void enesim_text_base_font_name_set(Enesim_Renderer *r, const char *font)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_base_font_name_get(Enesim_Renderer *r, const char **font)
+EAPI void enesim_renderer_text_base_font_name_get(Enesim_Renderer *r, const char **font)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
 	if (!font) return;
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz) return;
 	*font = thiz->current.font_name;
 }
@@ -382,11 +401,11 @@ EAPI void enesim_text_base_font_name_get(Enesim_Renderer *r, const char **font)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_base_size_set(Enesim_Renderer *r, unsigned int size)
+EAPI void enesim_renderer_text_base_size_set(Enesim_Renderer *r, unsigned int size)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz) return;
 
 	thiz->current.size = size;
@@ -397,11 +416,11 @@ EAPI void enesim_text_base_size_set(Enesim_Renderer *r, unsigned int size)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_base_size_get(Enesim_Renderer *r, unsigned int *size)
+EAPI void enesim_renderer_text_base_size_get(Enesim_Renderer *r, unsigned int *size)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz) return;
 
 	*size = thiz->current.size;
@@ -411,14 +430,14 @@ EAPI void enesim_text_base_size_get(Enesim_Renderer *r, unsigned int *size)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_base_max_ascent_get(Enesim_Renderer *r, int *masc)
+EAPI void enesim_renderer_text_base_max_ascent_get(Enesim_Renderer *r, int *masc)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
 	*masc = 0;
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz) return;
-	enesim_text_base_setup(r);
+	enesim_renderer_text_base_setup(r);
 	if (!thiz->font) return;
 	*masc = enesim_text_font_max_ascent_get(thiz->font);
 }
@@ -427,14 +446,14 @@ EAPI void enesim_text_base_max_ascent_get(Enesim_Renderer *r, int *masc)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_base_max_descent_get(Enesim_Renderer *r, int *mdesc)
+EAPI void enesim_renderer_text_base_max_descent_get(Enesim_Renderer *r, int *mdesc)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
 	*mdesc = 0;
-	thiz = _enesim_text_base_get(r);
+	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz) return;
-	enesim_text_base_setup(r);
+	enesim_renderer_text_base_setup(r);
 	if (!thiz->font) return;
 	*mdesc = enesim_text_font_max_descent_get(thiz->font);
 }
@@ -443,12 +462,12 @@ EAPI void enesim_text_base_max_descent_get(Enesim_Renderer *r, int *mdesc)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Text_Font * enesim_text_base_font_get(Enesim_Renderer *r)
+EAPI Enesim_Text_Font * enesim_renderer_text_base_font_get(Enesim_Renderer *r)
 {
-	Enesim_Text_Base *thiz;
+	Enesim_Renderer_Text_Base *thiz;
 
-	thiz = _enesim_text_base_get(r);
-	enesim_text_base_setup(r);
+	thiz = _enesim_renderer_text_base_get(r);
+	enesim_renderer_text_base_setup(r);
 
 	return enesim_text_font_ref(thiz->font);
 }

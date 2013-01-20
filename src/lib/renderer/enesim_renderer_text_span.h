@@ -20,17 +20,17 @@
 
 /**
  * @}
- * @defgroup Enesim_Text_Span_Renderer_Group Span Renderer
+ * @defgroup Enesim_Renderer_Text_Span_Renderer_Group Span Renderer
  * @{
  */
-EAPI Enesim_Renderer * enesim_text_span_new(void);
-EAPI Enesim_Renderer * enesim_text_span_new_from_etex(Etex *e);
-EAPI void enesim_text_span_text_set(Enesim_Renderer *r, const char *str);
-EAPI void enesim_text_span_text_get(Enesim_Renderer *r, const char **str);
-EAPI void enesim_text_span_direction_get(Enesim_Renderer *r, Enesim_Text_Direction *direction);
-EAPI void enesim_text_span_direction_set(Enesim_Renderer *r, Enesim_Text_Direction direction);
-EAPI void enesim_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b);
-EAPI int enesim_text_span_index_at(Enesim_Renderer *r, int x, int y);
+EAPI Enesim_Renderer * enesim_renderer_text_span_new(void);
+EAPI Enesim_Renderer * enesim_renderer_text_span_new_from_etex(Etex *e);
+EAPI void enesim_renderer_text_span_text_set(Enesim_Renderer *r, const char *str);
+EAPI void enesim_renderer_text_span_text_get(Enesim_Renderer *r, const char **str);
+EAPI void enesim_renderer_text_span_direction_get(Enesim_Renderer *r, Enesim_Text_Direction *direction);
+EAPI void enesim_renderer_text_span_direction_set(Enesim_Renderer *r, Enesim_Text_Direction direction);
+EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b);
+EAPI int enesim_renderer_text_span_index_at(Enesim_Renderer *r, int x, int y);
 
 /**
  * @}

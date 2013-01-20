@@ -19,17 +19,17 @@
 #define ENESIM_RENDERER_TEXT_BASE_H_
 
 /**
- * @defgroup Enesim_Text_Base_Renderer_Group Base Renderer
+ * @defgroup Enesim_Renderer_Text_Base_Renderer_Group Base Renderer
  * @{
  */
 
-EAPI void enesim_text_base_font_name_set(Enesim_Renderer *r, const char *font);
-EAPI void enesim_text_base_font_name_get(Enesim_Renderer *r, const char **font);
-EAPI void enesim_text_base_size_set(Enesim_Renderer *r, unsigned int size);
-EAPI void enesim_text_base_size_get(Enesim_Renderer *r, unsigned int *size);
-EAPI void enesim_text_base_max_ascent_get(Enesim_Renderer *r, int *masc);
-EAPI void enesim_text_base_max_descent_get(Enesim_Renderer *r, int *mdesc);
-EAPI Enesim_Text_Font * enesim_text_base_font_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_text_base_font_name_set(Enesim_Renderer *r, const char *font);
+EAPI void enesim_renderer_text_base_font_name_get(Enesim_Renderer *r, const char **font);
+EAPI void enesim_renderer_text_base_size_set(Enesim_Renderer *r, unsigned int size);
+EAPI void enesim_renderer_text_base_size_get(Enesim_Renderer *r, unsigned int *size);
+EAPI void enesim_renderer_text_base_max_ascent_get(Enesim_Renderer *r, int *masc);
+EAPI void enesim_renderer_text_base_max_descent_get(Enesim_Renderer *r, int *mdesc);
+EAPI Enesim_Text_Font * enesim_renderer_text_base_font_get(Enesim_Renderer *r);
 
 /**
  * @}
