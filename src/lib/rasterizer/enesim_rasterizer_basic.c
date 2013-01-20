@@ -126,8 +126,8 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 
 /* Generate the edges for the current span */
 static inline void _basic_span_state_generate_edges(
-		Enesim_Rasterizer_Basic_Span_State *s,
-		Enesim_F16p16_Vector *vectors, int nvectors)
+		Enesim_Rasterizer_Basic_Span_State *s EINA_UNUSED,
+		Enesim_F16p16_Vector *vectors EINA_UNUSED, int nvectors EINA_UNUSED)
 {
 
 }
@@ -1132,7 +1132,7 @@ get_out:
 /*----------------------------------------------------------------------------*
  *                    The Enesim's rasterizer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _basic_name(Enesim_Renderer *r)
+static const char * _basic_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "basic";
 }
@@ -1170,7 +1170,7 @@ static int _tysort(const void *l, const void *r)
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Shape_Sw_Draw *draw,
 		Enesim_Error **error)
 {
@@ -1437,7 +1437,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _basic_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
 }
 

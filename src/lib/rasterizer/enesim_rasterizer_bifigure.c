@@ -1493,8 +1493,8 @@ get_out:
 
 
 static void _over_figure_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
@@ -1504,8 +1504,8 @@ static void _over_figure_span(Enesim_Renderer *r,
 }
 
 static void _under_figure_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
@@ -1516,7 +1516,7 @@ static void _under_figure_span(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                    The Enesim's rasterizer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _bifigure_name(Enesim_Renderer *r)
+static const char * _bifigure_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "bifigure";
 }
