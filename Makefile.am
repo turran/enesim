@@ -21,19 +21,19 @@ EXTRA_DIST =
 
 ### Library
 
-include src/lib/Makefile_Core.mk
-include src/lib/compositor/Makefile_Compositor.mk
-include src/lib/converter/Makefile_Converter.mk
-include src/lib/image/Makefile_Image.mk
-include src/lib/pool/Makefile_Pool.mk
-include src/lib/rasterizer/Makefile_Rasterizer.mk
-include src/lib/renderer/Makefile_Renderer.mk
-include src/lib/text/Makefile_Text.mk
-include src/lib/util/Makefile_Util.mk
+include src/lib/Makefile.mk
+include src/lib/compositor/Makefile.mk
+include src/lib/converter/Makefile.mk
+include src/lib/image/Makefile.mk
+include src/lib/pool/Makefile.mk
+include src/lib/rasterizer/Makefile.mk
+include src/lib/renderer/Makefile.mk
+include src/lib/text/Makefile.mk
+include src/lib/util/Makefile.mk
 
 ### Modules
 
-include src/modules/Makefile_Modules.mk
+include src/modules/Makefile.mk
 
 ### Tests
 
