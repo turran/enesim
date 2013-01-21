@@ -91,7 +91,7 @@ static boolean _jpg_enesim_image_src_fill(j_decompress_ptr cinfo)
 	return TRUE;
 }
 
-void _jpg_enesim_image_src_skip(j_decompress_ptr cinfo, long num_bytes)
+static void _jpg_enesim_image_src_skip(j_decompress_ptr cinfo, long num_bytes)
 {
 	Jpg_Source *thiz = (Jpg_Source *)cinfo->src;
 
@@ -110,7 +110,7 @@ void _jpg_enesim_image_src_skip(j_decompress_ptr cinfo, long num_bytes)
 	}
 }
 
-void _jpg_enesim_image_src_term(j_decompress_ptr cinfo EINA_UNUSED)
+static void _jpg_enesim_image_src_term(j_decompress_ptr cinfo EINA_UNUSED)
 {
 }
 

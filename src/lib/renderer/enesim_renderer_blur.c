@@ -326,7 +326,7 @@ static void _a8_span_identity(Enesim_Renderer *r,
 				while (1)
 				{
 					unsigned int p3 = *p;
- 
+
 					if (ntx != tx)
 					{
 						if (ntx != x)

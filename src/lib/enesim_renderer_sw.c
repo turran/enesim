@@ -94,7 +94,7 @@ static inline void _sw_surface_draw_rop_mask(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill fill,
 		Enesim_Renderer_Sw_Fill mask_fill,
 		Enesim_Compositor_Span span,
-		Enesim_Compositor_Span mask_span,
+		Enesim_Compositor_Span mask_span EINA_UNUSED,
 		uint8_t *ddata, size_t stride,
 		uint8_t *tmp,
 		uint8_t *tmp_mask,
@@ -298,7 +298,7 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 static void _sw_draw_no_threaded(Enesim_Renderer *r,
 		Eina_Rectangle *area,
 		uint8_t *ddata, size_t stride,
-		Enesim_Format dfmt)
+		Enesim_Format dfmt EINA_UNUSED)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
