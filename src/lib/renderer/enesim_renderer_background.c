@@ -124,7 +124,7 @@ static Eina_Bool _background_opengl_shader_setup(GLenum pid,
 }
 
 
-static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
 		const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_Background * thiz;
@@ -258,7 +258,7 @@ static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 #endif
 
 #if BUILD_OPENGL
-static Eina_Bool _background_opengl_initialize(Enesim_Renderer *r,
+static Eina_Bool _background_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
@@ -268,10 +268,10 @@ static Eina_Bool _background_opengl_initialize(Enesim_Renderer *r,
 }
 
 static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 
@@ -282,7 +282,7 @@ static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 

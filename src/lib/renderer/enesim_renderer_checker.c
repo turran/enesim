@@ -145,7 +145,7 @@ static Eina_Bool _checker_opengl_shader_setup(GLenum pid,
 	return EINA_TRUE;
 }
 
-static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
 		const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -548,7 +548,7 @@ static void _checker_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer
 }
 
 #if BUILD_OPENGL
-static Eina_Bool _checker_opengl_initialize(Enesim_Renderer *r,
+static Eina_Bool _checker_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
@@ -559,9 +559,9 @@ static Eina_Bool _checker_opengl_initialize(Enesim_Renderer *r,
 
 static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
 	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
@@ -574,7 +574,7 @@ static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _checker_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _checker_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
 

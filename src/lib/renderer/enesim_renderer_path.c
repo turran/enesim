@@ -288,9 +288,9 @@ static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
 }
 
 static void _path_opengl_combine_cb(GLdouble coords[3],
-		GLdouble *vertex_data[4],
-		GLfloat weight[4], GLdouble **dataOut,
-		void *data)
+		GLdouble *vertex_data[4] EINA_UNUSED,
+		GLfloat weight[4] EINA_UNUSED, GLdouble **dataOut,
+		void *data EINA_UNUSED)
 {
 	Enesim_Point *pt;
 
@@ -316,12 +316,12 @@ static void _path_opengl_begin_cb(GLenum which, void *data)
 	glBegin(which);
 }
 
-static void _path_opengl_end_cb(void *data)
+static void _path_opengl_end_cb(void *data EINA_UNUSED)
 {
 	glEnd();
 }
 
-static void _path_opengl_error_cb(GLenum errno, void *data)
+static void _path_opengl_error_cb(GLenum err_no EINA_UNUSED, void *data EINA_UNUSED)
 {
 }
 
@@ -993,7 +993,7 @@ static void _path_destination_boundings(Enesim_Renderer *r,
 }
 
 #if BUILD_OPENGL
-static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r,
+static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
@@ -1005,9 +1005,9 @@ static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r,
 static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer_Path_OpenGL *gl;

@@ -135,7 +135,7 @@ static Eina_Bool _stripes_opengl_shader_setup(GLenum pid,
 }
 
 
-static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
 		const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_Stripes *thiz;
@@ -599,7 +599,7 @@ static void _free(Enesim_Renderer *r)
 }
 
 #if BUILD_OPENGL
-static Eina_Bool _stripes_opengl_initialize(Enesim_Renderer *r,
+static Eina_Bool _stripes_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_shaders,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
@@ -609,10 +609,10 @@ static Eina_Bool _stripes_opengl_initialize(Enesim_Renderer *r,
 }
 
 static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Stripes *thiz;
 

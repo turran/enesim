@@ -542,7 +542,7 @@ static Eina_Bool _rectangle_opengl_initialize(Enesim_Renderer *r,
 	shader->type = ENESIM_SHADER_GEOMETRY;
 	shader->name = "rectangle";
 		//"#version 150\n"
-	shader->source = 
+	shader->source =
 		"#version 120\n"
 		"#extension GL_EXT_geometry_shader4 : enable\n"
 	#include "enesim_renderer_rectangle.glsl"
@@ -554,7 +554,7 @@ static Eina_Bool _rectangle_opengl_initialize(Enesim_Renderer *r,
 	shader++;
 	shader->type = ENESIM_SHADER_FRAGMENT;
 	shader->name = "stripes";
-	shader->source = 
+	shader->source =
 	#include "enesim_renderer_stripes.glsl"
 	;
 #endif

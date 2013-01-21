@@ -613,7 +613,7 @@ static void _compound_damage(Enesim_Renderer *r,
 }
 
 #if BUILD_OPENGL
-static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r,
+static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
@@ -625,7 +625,7 @@ static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r,
 }
 
 static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
