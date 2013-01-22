@@ -305,9 +305,8 @@ if test "x${build_opengl}" = "xyes"; then
 fi
 AM_CONDITIONAL([HAVE_OPENGL], [test "x${build_opengl}" = "xyes"])
 
-##  FIXME: no more 'emage'
-EMAGE_MODULE([Png], [${enable_png}], [yes])
-EMAGE_MODULE([Jpg], [${enable_jpg}], [yes])
+ENESIM_MODULE([Png], [${enable_png}], [yes])
+ENESIM_MODULE([Jpg], [${enable_jpg}], [yes])
 
 #######################################
 ## PTHREADS

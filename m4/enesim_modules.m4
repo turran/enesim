@@ -1,6 +1,6 @@
-dnl use: EMAGE_MODULE(module, want_module, have_module)
+dnl use: ENESIM_MODULE(module, want_module, have_module)
 
-AC_DEFUN([EMAGE_MODULE],
+AC_DEFUN([ENESIM_MODULE],
 [
 
 m4_pushdef([UP], m4_toupper([$1]))
