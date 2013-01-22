@@ -157,9 +157,8 @@ PKG_CHECK_MODULES([ENESIM_MODULES], [libpng >= 0.22],
 ### Checks for header files
 
 # Pthreads
-have_pthreads="no"
 if test "x${want_pthreads}" = "xyes" ; then
-   AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h], [have_pthreads="yes"], [have_pthreads="no"])
+   AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])
 fi
 
 ## openCL
@@ -197,7 +196,7 @@ EFL_CHECK_LINKER_FLAGS([ENESIM], [-fvisibility=hidden -Wl,--no-copy-dt-needed-en
 
 ## Pthreads
 build_pthreads="no"
-if test "x${have_pthreads}" = "xyes" ; then
+if test "x${want_pthreads}" = "xyes" ; then
    AC_CHECK_LIB([pthread], [pthread_attr_setaffinity_np],
       [
        AC_CHECK_LIB([pthread], [pthread_barrier_wait],
@@ -341,6 +340,7 @@ Makefile
 enesim.pc
 enesim_opencl.pc
 enesim_opengl.pc
+doc/Doxyfile
 ])
 
 AC_OUTPUT
