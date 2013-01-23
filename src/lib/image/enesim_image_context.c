@@ -105,7 +105,7 @@ static void * _thread_load(void *data)
 	_thread_finish(j);
 
 #ifdef _WIN32
-	return 1;
+	return 0;
 #else
 	return NULL;
 #endif
