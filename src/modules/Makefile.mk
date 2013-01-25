@@ -21,6 +21,7 @@ src/lib/libenesim.la \
 @ENESIM_MODULES_LIBS@
 
 src_modules_enesim_image_png_la_LDFLAGS = -no-undefined -module -avoid-version
+src_modules_enesim_image_png_la_LIBTOOLFLAGS = --tag=disable-static
 
 endif
 
@@ -46,6 +47,7 @@ src/lib/libenesim.la \
 @ENESIM_MODULES_LIBS@
 
 src_modules_enesim_image_jpg_la_LDFLAGS = -no-undefined -module -avoid-version
+src_modules_enesim_image_jpg_la_LIBTOOLFLAGS = --tag=disable-static
 
 endif
 
@@ -67,3 +69,4 @@ src/lib/libenesim.la \
 @ENESIM_LIBS@
 
 src_modules_enesim_image_raw_la_LDFLAGS = -no-undefined -module -avoid-version
+src_modules_enesim_image_raw_la_LIBTOOLFLAGS = --tag=disable-static
