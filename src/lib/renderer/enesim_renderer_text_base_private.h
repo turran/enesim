@@ -25,16 +25,16 @@ typedef struct _Enesim_Renderer_Text_Base_State
 	char *str;
 } Enesim_Renderer_Text_Base_State;
 
-typedef void (*Enesim_Renderer_Text_Base_Boundings)(Enesim_Renderer *r,
+typedef void (*Enesim_Renderer_Text_Base_Bounds)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings);
-typedef void (*Enesim_Renderer_Text_Base_Destination_Boundings)(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds);
+typedef void (*Enesim_Renderer_Text_Base_Destination_Bounds)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings);
+		Eina_Rectangle *bounds);
 
 typedef Eina_Bool (*Enesim_Renderer_Text_Base_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
@@ -64,8 +64,8 @@ typedef struct _Enesim_Renderer_Text_Base_Descriptor
 	/* common */
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Text_Base_Boundings boundings;
-	Enesim_Renderer_Text_Base_Destination_Boundings destination_boundings;
+	Enesim_Renderer_Text_Base_Bounds bounds;
+	Enesim_Renderer_Text_Base_Destination_Bounds destination_bounds;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Hints_Get hints_get;
 	Enesim_Renderer_Inside is_inside;

@@ -172,7 +172,7 @@ static void _cache_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 	enesim_renderer_hints_get(thiz->proxied, hints);
 }
 
-static void _cache_boundings(Enesim_Renderer *r,
+static void _cache_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
 {
@@ -187,25 +187,25 @@ static void _cache_boundings(Enesim_Renderer *r,
 		rect->h = 0;
 		return;
 	}
-	enesim_renderer_boundings(thiz->proxied, rect);
+	enesim_renderer_bounds(thiz->proxied, rect);
 }
 
-static void _cache_destination_boundings(Enesim_Renderer *r,
+static void _cache_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Cache *thiz;
 
 	thiz = _cache_get(r);
 	if (!thiz->proxied)
 	{
-		boundings->x = 0;
-		boundings->y = 0;
-		boundings->w = 0;
-		boundings->h = 0;
+		bounds->x = 0;
+		bounds->y = 0;
+		bounds->w = 0;
+		bounds->h = 0;
 		return;
 	}
-	enesim_renderer_destination_boundings(thiz->proxied, boundings, 0, 0);
+	enesim_renderer_destination_bounds(thiz->proxied, bounds, 0, 0);
 }
 
 static Eina_Bool _cache_has_changed(Enesim_Renderer *r,
@@ -221,7 +221,7 @@ static Eina_Bool _cache_has_changed(Enesim_Renderer *r,
 }
 
 static void _cache_damage(Enesim_Renderer *r,
-		const Eina_Rectangle *old_boundings,
+		const Eina_Rectangle *old_bounds,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -274,8 +274,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _cache_name,
 	/* .free = 			*/ _cache_free,
-	/* .boundings = 		*/ _cache_boundings,
-	/* .destination_boundings =	*/ _cache_destination_boundings,
+	/* .bounds = 		*/ _cache_bounds,
+	/* .destination_bounds =	*/ _cache_destination_bounds,
 	/* .flags = 			*/ _cache_flags,
 	/* .hints_get = 		*/ _cache_hints,
 	/* .is_inside = 		*/ NULL,

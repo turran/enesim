@@ -207,7 +207,7 @@ static const char * _circle_name(Enesim_Renderer *r EINA_UNUSED)
 /* FIXME we still need to decide what to do with the stroke
  * transformation
  */
-static void _circle_boundings(Enesim_Renderer *r,
+static void _circle_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
@@ -250,15 +250,15 @@ static void _circle_boundings(Enesim_Renderer *r,
 	}
 }
 
-static void _circle_destination_boundings(Enesim_Renderer *r,
+static void _circle_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
-	_circle_boundings(r, states, sstates, &oboundings);
+	_circle_bounds(r, states, sstates, &obounds);
 	/* apply the inverse matrix */
 	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
@@ -266,18 +266,18 @@ static void _circle_destination_boundings(Enesim_Renderer *r,
 		Enesim_Matrix m;
 
 		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
-		enesim_quad_rectangle_to(&q, &oboundings);
+		enesim_matrix_rectangle_transform(&m, &obounds, &q);
+		enesim_quad_rectangle_to(&q, &obounds);
 		/* fix the antialias scaling */
-		oboundings.x -= m.xx;
-		oboundings.y -= m.yy;
-		oboundings.w += m.xx;
-		oboundings.h += m.yy;
+		obounds.x -= m.xx;
+		obounds.y -= m.yy;
+		obounds.w += m.xx;
+		obounds.h += m.yy;
 	}
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
-	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
+	bounds->x = floor(obounds.x);
+	bounds->y = floor(obounds.y);
+	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
+	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
 static Eina_Bool _circle_sw_setup(Enesim_Renderer *r,
@@ -376,8 +376,8 @@ static void _circle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _circle_descriptor = {
 	/* .name = 			*/ _circle_name,
 	/* .free = 			*/ _circle_free,
-	/* .boundings = 		*/ _circle_boundings,
-	/* .destination_boundings = 	*/ _circle_destination_boundings,
+	/* .bounds = 		*/ _circle_bounds,
+	/* .destination_bounds = 	*/ _circle_destination_bounds,
 	/* .flags = 			*/ _circle_flags,
 	/* .hints_get = 		*/ _circle_hints,
 	/* .is_inside = 		*/ NULL,

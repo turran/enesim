@@ -1715,7 +1715,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			}
 		}
 	}
-	/* do our own internal boundings */
+	/* do our own internal bounds */
 	/* FIXME this tyy and byy in theory should be the same as the max/min of the under/over
 	 * bounds, why do we need a double check on the span function? rendering only on the bounding
 	 * box is something that is controlled on the path, i.e the renderer that *uses* this internal
@@ -1727,8 +1727,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		double uxmax, xmax;
 		double uymax, ymax;
 
-		enesim_figure_boundings(thiz->under_figure, &uxmin, &uymin, &uxmax, &uymax);
-		enesim_figure_boundings(thiz->over_figure, &xmin, &ymin, &xmax, &ymax);
+		enesim_figure_bounds(thiz->under_figure, &uxmin, &uymin, &uxmax, &uymax);
+		enesim_figure_bounds(thiz->over_figure, &xmin, &ymin, &xmax, &ymax);
 
 		if (uxmin < xmin)
 			xmin = uxmin;

@@ -244,7 +244,7 @@ static void _figure_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state
 	enesim_renderer_hints_get(thiz->path, hints);
 }
 
-static void _figure_boundings(Enesim_Renderer *r,
+static void _figure_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
@@ -255,13 +255,13 @@ static void _figure_boundings(Enesim_Renderer *r,
 
 	thiz = _figure_get(r);
 	_figure_path_setup(thiz, cs, css);
-	enesim_renderer_boundings(thiz->path, rect);
+	enesim_renderer_bounds(thiz->path, rect);
 }
 
-static void _figure_destination_boundings(Enesim_Renderer *r,
+static void _figure_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Figure *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -269,7 +269,7 @@ static void _figure_destination_boundings(Enesim_Renderer *r,
 
 	thiz = _figure_get(r);
 	_figure_path_setup(thiz, cs, css);
-	enesim_renderer_destination_boundings(thiz->path, boundings, 0, 0);
+	enesim_renderer_destination_bounds(thiz->path, bounds, 0, 0);
 }
 
 static void _figure_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
@@ -304,8 +304,8 @@ static void _figure_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _figure_descriptor = {
 	/* .name = 			*/ _figure_name,
 	/* .free = 			*/ _free,
-	/* .boundings = 		*/ _figure_boundings,
-	/* .destination_boundings = 	*/ _figure_destination_boundings,
+	/* .bounds = 		*/ _figure_bounds,
+	/* .destination_bounds = 	*/ _figure_destination_bounds,
 	/* .flags = 			*/ _figure_flags,
 	/* .hints_get = 			*/ _figure_hints,
 	/* .is_inside = 		*/ NULL,

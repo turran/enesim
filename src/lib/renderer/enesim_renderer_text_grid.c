@@ -147,7 +147,7 @@ static void _enesim_text_grid_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _enesim_text_grid_boundings(Enesim_Renderer *r,
+static void _enesim_text_grid_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
 {
@@ -183,7 +183,7 @@ static Enesim_Renderer_Descriptor _enesim_text_grid_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _enesim_text_grid_name,
 	/* .free = 			*/ _enesim_text_grid_free,
-	/* .boundings = 		*/ _enesim_text_grid_boundings,
+	/* .bounds = 		*/ _enesim_text_grid_bounds,
 	/* .destination_transform = 	*/ NULL,
 	/* .flags = 			*/ _enesim_text_grid_flags,
 	/* .is_inside = 		*/ NULL,

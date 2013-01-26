@@ -257,8 +257,8 @@ typedef struct _Enesim_Renderer_Gradient_Descriptor
 	/* common renderer functions */
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Boundings boundings;
-	Enesim_Renderer_Destination_Boundings destination_boundings;
+	Enesim_Renderer_Bounds bounds;
+	Enesim_Renderer_Destination_Bounds destination_bounds;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Has_Changed has_changed;
 	/* software based functions */

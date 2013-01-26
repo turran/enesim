@@ -39,8 +39,8 @@ typedef struct _Enesim_Renderer_Text_Base
 	Enesim_Renderer_Text_Base_State past, current;
 	Enesim_Text_Font *font;
 	/* interface */
-	Enesim_Renderer_Text_Base_Boundings boundings;
-	Enesim_Renderer_Text_Base_Destination_Boundings destination_boundings;
+	Enesim_Renderer_Text_Base_Bounds bounds;
+	Enesim_Renderer_Text_Base_Destination_Bounds destination_bounds;
 	Enesim_Renderer_Text_Base_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	Enesim_Renderer_Text_Base_OpenCL_Setup opencl_setup;
@@ -105,53 +105,53 @@ static void _enesim_renderer_text_base_common_cleanup(Enesim_Renderer_Text_Base 
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static void _enesim_renderer_text_base_destination_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_text_base_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Text_Base *thiz;
 	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
 	thiz = _enesim_renderer_text_base_get(r);
-	if (!thiz->destination_boundings)
+	if (!thiz->destination_bounds)
 	{
-		boundings->x = INT_MIN / 2;
-		boundings->y = INT_MIN / 2;
-		boundings->w = INT_MAX;
-		boundings->h = INT_MAX;
+		bounds->x = INT_MIN / 2;
+		bounds->y = INT_MIN / 2;
+		bounds->w = INT_MAX;
+		bounds->h = INT_MAX;
 
 		return;
 	}
 
 	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
 	tstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->destination_boundings(r, states, sstates, tstates, boundings);
+	thiz->destination_bounds(r, states, sstates, tstates, bounds);
 
 }
 
-static void _enesim_renderer_text_base_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_text_base_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Text_Base *thiz;
 	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
 	thiz = _enesim_renderer_text_base_get(r);
-	if (!thiz->boundings)
+	if (!thiz->bounds)
 	{
-		boundings->x = INT_MIN / 2;
-		boundings->y = INT_MIN / 2;
-		boundings->w = INT_MAX;
-		boundings->h = INT_MAX;
+		bounds->x = INT_MIN / 2;
+		bounds->y = INT_MIN / 2;
+		bounds->w = INT_MAX;
+		bounds->h = INT_MAX;
 
 		return;
 	}
 
 	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
 	tstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->boundings(r, states, sstates, tstates, boundings);
+	thiz->bounds(r, states, sstates, tstates, bounds);
 }
 
 
@@ -318,14 +318,14 @@ Enesim_Renderer * enesim_renderer_text_base_new(Etex *etex,
 	thiz->opengl_cleanup = descriptor->opengl_cleanup;
 	thiz->opencl_setup = descriptor->opencl_setup;
 	thiz->opencl_cleanup = descriptor->opencl_cleanup;
-	thiz->destination_boundings = descriptor->destination_boundings;
-	thiz->boundings = descriptor->boundings;
+	thiz->destination_bounds = descriptor->destination_bounds;
+	thiz->bounds = descriptor->bounds;
 	/* set the parent descriptor */
 //	pdescriptor.version = ENESIM_RENDERER_API;
 	pdescriptor.name = descriptor->name;
 	pdescriptor.free = _enesim_renderer_text_base_free;
-	pdescriptor.boundings = _enesim_renderer_text_base_boundings;
-	pdescriptor.destination_boundings = _enesim_renderer_text_base_destination_boundings;
+	pdescriptor.bounds = _enesim_renderer_text_base_bounds;
+	pdescriptor.destination_bounds = _enesim_renderer_text_base_destination_bounds;
 	pdescriptor.flags = descriptor->flags;
 	pdescriptor.hints_get = descriptor->hints_get;
 	pdescriptor.is_inside = descriptor->is_inside;

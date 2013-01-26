@@ -211,18 +211,18 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _radial_boundings(Enesim_Renderer *r,
+static void _radial_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
 	thiz = _radial_get(r);
 
-	boundings->x = thiz->center.x - fabs(thiz->radius);
-	boundings->y = thiz->center.y - fabs(thiz->radius);
-	boundings->w = fabs(thiz->radius) * 2;
-	boundings->h = fabs(thiz->radius) * 2;
+	bounds->x = thiz->center.x - fabs(thiz->radius);
+	bounds->y = thiz->center.y - fabs(thiz->radius);
+	bounds->w = fabs(thiz->radius) * 2;
+	bounds->h = fabs(thiz->radius) * 2;
 }
 
 static Eina_Bool _radial_has_changed(Enesim_Renderer *r,
@@ -242,8 +242,8 @@ static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
 	/* .sw_setup = 			*/ _state_setup,
 	/* .name = 			*/ _radial_name,
 	/* .free = 			*/ NULL,
-	/* .boundings = 		*/ _radial_boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .bounds = 		*/ _radial_bounds,
+	/* .destination_bounds = 	*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .has_changed = 		*/ _radial_has_changed,
 	/* .sw_cleanup = 		*/ _state_cleanup,

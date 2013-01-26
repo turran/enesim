@@ -359,7 +359,7 @@ static Eina_Bool _enesim_renderer_text_span_calculate(Enesim_Renderer *r,
 
 	thiz = _enesim_renderer_text_span_get(r);
 
-	/* FIXME if we do the setup/boundings/whatever that calls this
+	/* FIXME if we do the setup/bounds/whatever that calls this
 	 * function  from multiple threads the invalidate must be locked
 	 */
 
@@ -516,7 +516,7 @@ static void _enesim_renderer_text_span_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _enesim_renderer_text_span_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		const Enesim_Text_Base_State *estates[ENESIM_RENDERER_STATES],
@@ -540,16 +540,16 @@ static void _enesim_renderer_text_span_boundings(Enesim_Renderer *r,
 	rect->y += cs->oy;
 }
 
-static void _enesim_renderer_text_span_destination_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_text_span_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		const Enesim_Text_Base_State *estates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
-	_enesim_renderer_text_span_boundings(r, states, sstates, estates, &oboundings);
+	_enesim_renderer_text_span_bounds(r, states, sstates, estates, &obounds);
 	/* now apply the inverse transformation */
 	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
@@ -557,18 +557,18 @@ static void _enesim_renderer_text_span_destination_boundings(Enesim_Renderer *r,
 		Enesim_Matrix m;
 
 		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
-		enesim_quad_rectangle_to(&q, &oboundings);
+		enesim_matrix_rectangle_transform(&m, &obounds, &q);
+		enesim_quad_rectangle_to(&q, &obounds);
 		/* fix the antialias scaling */
-		oboundings.x -= m.xx;
-		oboundings.y -= m.yy;
-		oboundings.w += m.xx;
-		oboundings.h += m.yy;
+		obounds.x -= m.xx;
+		obounds.y -= m.yy;
+		obounds.w += m.xx;
+		obounds.h += m.yy;
 	}
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.w);
-	boundings->h = ceil(oboundings.h);
+	bounds->x = floor(obounds.x);
+	bounds->y = floor(obounds.y);
+	bounds->w = ceil(obounds.w);
+	bounds->h = ceil(obounds.h);
 }
 
 static void _enesim_renderer_text_span_flags(Enesim_Renderer *r,
@@ -583,8 +583,8 @@ static void _enesim_renderer_text_span_flags(Enesim_Renderer *r,
 static Enesim_Text_Base_Descriptor _enesim_renderer_text_span_descriptor = {
 	/* .name = 			*/ _enesim_renderer_text_span_name,
 	/* .free = 			*/ _enesim_renderer_text_span_free,
-	/* .boundings = 		*/ _enesim_renderer_text_span_boundings,
-	/* .destination_boundings = 	*/ _enesim_renderer_text_span_destination_boundings,
+	/* .bounds = 		*/ _enesim_renderer_text_span_bounds,
+	/* .destination_bounds = 	*/ _enesim_renderer_text_span_destination_bounds,
 	/* .flags = 			*/ _enesim_renderer_text_span_flags,
 	/* .hint_get = 			*/ NULL,
 	/* .is_inside = 		*/ NULL,

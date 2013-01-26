@@ -486,7 +486,7 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
 	eina_rectangle_coords_from(&span, x, y, len, 1);
-	rbounds = r->current_destination_boundings;
+	rbounds = r->current_destination_bounds;
 	if (!eina_rectangle_intersection(&rbounds, &span))
 	{
 		return;

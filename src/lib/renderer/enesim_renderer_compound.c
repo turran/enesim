@@ -83,7 +83,7 @@ typedef struct _Layer
 {
 	Enesim_Renderer *r;
 	/* generated at state setup */
-	Eina_Rectangle destination_boundings;
+	Eina_Rectangle destination_bounds;
 } Layer;
 
 static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
@@ -167,7 +167,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		/* set the span given the color */
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
-		enesim_renderer_destination_boundings(l->r, &l->destination_boundings, 0, 0);
+		enesim_renderer_destination_bounds(l->r, &l->destination_bounds, 0, 0);
 		if (thiz->post_cb)
 		{
 			if (!thiz->post_cb(r, l->r, thiz->post_data))
@@ -299,19 +299,19 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
-		Eina_Rectangle lboundings;
+		Eina_Rectangle lbounds;
 		unsigned int offset;
 
 		l = eina_list_data_get(ll);
 
-		lboundings = l->destination_boundings;
-		if (!eina_rectangle_intersection(&lboundings, &span))
+		lbounds = l->destination_bounds;
+		if (!eina_rectangle_intersection(&lbounds, &span))
 		{
 			continue;
 		}
 
-		offset = lboundings.x - span.x;
-		enesim_renderer_sw_draw(l->r, lboundings.x, lboundings.y, lboundings.w, dst + offset);
+		offset = lbounds.x - span.x;
+		enesim_renderer_sw_draw(l->r, lbounds.x, lbounds.y, lbounds.w, dst + offset);
 	}
 }
 
@@ -381,7 +381,7 @@ static void _compound_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_compound_state_cleanup(thiz, s);
 }
 
-static void _compound_boundings(Enesim_Renderer *r,
+static void _compound_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
@@ -401,7 +401,7 @@ static void _compound_boundings(Enesim_Renderer *r,
 		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
-		enesim_renderer_destination_boundings(lr, &tmp, 0, 0);
+		enesim_renderer_destination_bounds(lr, &tmp, 0, 0);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w;
@@ -420,7 +420,7 @@ static void _compound_boundings(Enesim_Renderer *r,
 		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
-		enesim_renderer_destination_boundings(lr, &tmp, 0, 0);
+		enesim_renderer_destination_bounds(lr, &tmp, 0, 0);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w;
@@ -438,17 +438,17 @@ static void _compound_boundings(Enesim_Renderer *r,
 	rect->h = y2 - y1;
 }
 
-static void _compound_destination_boundings(Enesim_Renderer *r,
+static void _compound_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 
-	_compound_boundings(r, states, &oboundings);
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w);
-	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h);
+	_compound_bounds(r, states, &obounds);
+	bounds->x = floor(obounds.x);
+	bounds->y = floor(obounds.y);
+	bounds->w = ceil(obounds.x - bounds->x + obounds.w);
+	bounds->h = ceil(obounds.y - bounds->y + obounds.h);
 }
 
 static void _compound_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
@@ -563,7 +563,7 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r,
 }
 
 static void _compound_damage(Enesim_Renderer *r,
-		const Eina_Rectangle *old_boundings,
+		const Eina_Rectangle *old_bounds,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -580,11 +580,11 @@ static void _compound_damage(Enesim_Renderer *r,
 	 */
 	if (common_changed)
 	{
-		Eina_Rectangle current_boundings;
+		Eina_Rectangle current_bounds;
 
-		enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
-		cb(r, old_boundings, EINA_TRUE, data);
-		cb(r, &current_boundings, EINA_FALSE, data);
+		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
+		cb(r, old_bounds, EINA_TRUE, data);
+		cb(r, &current_bounds, EINA_FALSE, data);
 		return;
 	}
 	/* if some layer has been added or removed after the last draw
@@ -595,13 +595,13 @@ static void _compound_damage(Enesim_Renderer *r,
 	{
 		EINA_LIST_FOREACH(thiz->removed, ll, l)
 		{
-			cb(l->r, &l->destination_boundings, EINA_FALSE, data);
+			cb(l->r, &l->destination_bounds, EINA_FALSE, data);
 		}
 		EINA_LIST_FOREACH(thiz->added, ll, l)
 		{
 			Eina_Rectangle db;
 
-			enesim_renderer_destination_boundings(l->r, &db, 0, 0);
+			enesim_renderer_destination_bounds(l->r, &db, 0, 0);
 			cb(l->r, &db, EINA_FALSE, data);
 		}
 	}
@@ -652,8 +652,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _compound_name,
 	/* .free = 			*/ _compound_free,
-	/* .boundings =  		*/ _compound_boundings,
-	/* .destination_boundings = 	*/ _compound_destination_boundings,
+	/* .bounds =  		*/ _compound_bounds,
+	/* .destination_bounds = 	*/ _compound_destination_bounds,
 	/* .flags = 			*/ _compound_flags,
 	/* .hints_get = 		*/ _compound_hints,
 	/* .is_inside = 		*/ _compound_is_inside,

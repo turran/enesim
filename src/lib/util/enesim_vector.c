@@ -174,7 +174,7 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 		free(first);
 	}
 	thiz->points = eina_list_merge(thiz->points, to_merge->points);
-	/* update the boundings */
+	/* update the bounds */
 	if (to_merge->xmax > thiz->xmax) thiz->xmax = to_merge->xmax;
 	if (to_merge->ymax > thiz->ymax) thiz->ymax = to_merge->ymax;
 	if (to_merge->xmin < thiz->xmin) thiz->xmin = to_merge->xmin;
@@ -186,7 +186,7 @@ void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
 	thiz->closed = close;
 }
 
-Eina_Bool enesim_polygon_boundings(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
+Eina_Bool enesim_polygon_bounds(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
 {
 	if (!thiz->points) return EINA_FALSE;
 	*xmin = thiz->xmin;
@@ -210,7 +210,7 @@ void enesim_figure_delete(Enesim_Figure *thiz)
 	free(thiz);
 }
 
-Eina_Bool enesim_figure_boundings(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
+Eina_Bool enesim_figure_bounds(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)
 {
 	Enesim_Polygon *p;
 	Eina_Bool valid = EINA_FALSE;
@@ -231,7 +231,7 @@ Eina_Bool enesim_figure_boundings(const Enesim_Figure *thiz, double *xmin, doubl
 		double pymin;
 		double pymax;
 
-		if (!enesim_polygon_boundings(p, &pxmin, &pymin, &pxmax, &pymax))
+		if (!enesim_polygon_bounds(p, &pxmin, &pymin, &pxmax, &pymax))
 			continue;
 
 		if (pxmax > fxmax) fxmax = pxmax;

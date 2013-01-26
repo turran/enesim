@@ -119,7 +119,7 @@ void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, do
 void enesim_polygon_clear(Enesim_Polygon *thiz);
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close);
 void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge);
-Eina_Bool enesim_polygon_boundings(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
+Eina_Bool enesim_polygon_bounds(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
 void enesim_polygon_threshold_set(Enesim_Polygon *p, double threshold);
 
 Enesim_Figure * enesim_figure_new(void);
@@ -127,7 +127,7 @@ void enesim_figure_delete(Enesim_Figure *thiz);
 int enesim_figure_polygon_count(Enesim_Figure *thiz);
 void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p);
 void enesim_figure_polygon_remove(Enesim_Figure *thiz, Enesim_Polygon *p);
-Eina_Bool enesim_figure_boundings(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
+Eina_Bool enesim_figure_bounds(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
 void enesim_figure_clear(Enesim_Figure *thiz);
 void enesim_figure_dump(Enesim_Figure *f);
 

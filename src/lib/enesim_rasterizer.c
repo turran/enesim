@@ -134,7 +134,7 @@ static void _rasterizer_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
-static void _rasterizer_boundings(Enesim_Renderer *r, Enesim_Renderer *boundings)
+static void _rasterizer_bounds(Enesim_Renderer *r, Enesim_Renderer *bounds)
 {
 	Enesim_Rasterizer *thiz;
 
@@ -151,7 +151,7 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 	Enesim_Renderer_Shape_Descriptor pdescriptor = {
 		/* .name = 			*/ _rasterizer_name,
 		/* .free = 			*/ _rasterizer_free,
-		/* .boundings = 		*/ NULL,
+		/* .bounds = 		*/ NULL,
 		/* .destination_transform = 	*/ NULL,
 		/* .flags = 			*/ _rasterizer_flags,
 		/* .hint_get = 			*/ _rasterizer_hints,

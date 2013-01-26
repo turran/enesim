@@ -449,9 +449,9 @@ static void _pattern_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _pattern_boundings(Enesim_Renderer *r,
+static void _pattern_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Pattern *thiz;
 
@@ -461,17 +461,17 @@ static void _pattern_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *cs;
 
 		cs = states[ENESIM_STATE_CURRENT];
-		_pattern_tile_source_size(thiz, cs, boundings);
+		_pattern_tile_source_size(thiz, cs, bounds);
 	}
 	else
 	{
-		enesim_rectangle_coords_from(boundings, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
+		enesim_rectangle_coords_from(bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	}
 }
 
-static void _pattern_destination_boundings(Enesim_Renderer *r,
+static void _pattern_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Pattern *thiz;
 
@@ -481,11 +481,11 @@ static void _pattern_destination_boundings(Enesim_Renderer *r,
 		const Enesim_Renderer_State *cs;
 
 		cs = states[ENESIM_STATE_CURRENT];
-		_pattern_tile_destination_size(thiz, cs, boundings);
+		_pattern_tile_destination_size(thiz, cs, bounds);
 	}
 	else
 	{
-		eina_rectangle_coords_from(boundings, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
+		eina_rectangle_coords_from(bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	}
 
 }
@@ -536,8 +536,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _pattern_name,
 	/* .free = 			*/ _pattern_free,
-	/* .boundings = 		*/ _pattern_boundings,
-	/* .destination_boundings = 	*/ _pattern_destination_boundings,
+	/* .bounds = 		*/ _pattern_bounds,
+	/* .destination_bounds = 	*/ _pattern_destination_bounds,
 	/* .flags = 			*/ _pattern_flags,
 	/* .hints_get = 			*/ _pattern_hints,
 	/* .is_inside = 		*/ NULL,

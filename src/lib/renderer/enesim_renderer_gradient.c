@@ -257,23 +257,23 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _gradient_boundings(Enesim_Renderer *r,
+static void _gradient_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Gradient *thiz;
 
 	thiz = _gradient_get(r);
-	if (thiz->current.mode == ENESIM_RESTRICT && thiz->descriptor->boundings)
+	if (thiz->current.mode == ENESIM_RESTRICT && thiz->descriptor->bounds)
 	{
-		thiz->descriptor->boundings(r, states, boundings);
+		thiz->descriptor->bounds(r, states, bounds);
 	}
 	else
 	{
-		boundings->x = INT_MIN / 2;
-		boundings->y = INT_MIN / 2;
-		boundings->w = INT_MAX;
-		boundings->h = INT_MAX;
+		bounds->x = INT_MIN / 2;
+		bounds->y = INT_MIN / 2;
+		bounds->w = INT_MAX;
+		bounds->h = INT_MAX;
 	}
 }
 
@@ -362,8 +362,8 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _gradient_name,
 	/* .free = 			*/ _gradient_free,
-	/* .boundings = 		*/ _gradient_boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .bounds = 		*/ _gradient_bounds,
+	/* .destination_bounds = 	*/ NULL,
 	/* .flags = 			*/ _gradient_flags,
 	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,

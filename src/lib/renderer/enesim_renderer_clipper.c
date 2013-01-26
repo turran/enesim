@@ -49,7 +49,7 @@
 
 typedef struct _Enesim_Renderer_Clipper_Damage_Data
 {
-	Eina_Rectangle *boundings;
+	Eina_Rectangle *bounds;
 	Enesim_Renderer_Damage_Cb real_cb;
 	void *real_data;
 } Enesim_Renderer_Clipper_Damage_Data;
@@ -115,7 +115,7 @@ static Eina_Bool _clipper_damage_cb(Enesim_Renderer *r,
 	Eina_Rectangle new_area = *area;
 
 	/* here we just intersect the damages with our bounds */
-	if (eina_rectangle_intersection(&new_area, ddata->boundings))
+	if (eina_rectangle_intersection(&new_area, ddata->bounds))
 		ddata->real_cb(r, &new_area, past, ddata->real_data);
 	return EINA_TRUE;
 }
@@ -226,7 +226,7 @@ static void _clipper_hints(Enesim_Renderer *r, const Enesim_Renderer_State *stat
 	}
 }
 
-static void _clipper_boundings(Enesim_Renderer *r,
+static void _clipper_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
 {
@@ -240,17 +240,17 @@ static void _clipper_boundings(Enesim_Renderer *r,
 	rect->h = thiz->current.height;
 }
 
-static void _clipper_destination_boundings(Enesim_Renderer *r,
+static void _clipper_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 
-	_clipper_boundings(r, states, &oboundings);
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
-	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
+	_clipper_bounds(r, states, &obounds);
+	bounds->x = floor(obounds.x);
+	bounds->y = floor(obounds.y);
+	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
+	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
 static Eina_Bool _clipper_has_changed(Enesim_Renderer *r,
@@ -272,23 +272,23 @@ end:
 }
 
 static void _clipper_damage(Enesim_Renderer *r,
-		const Eina_Rectangle *old_boundings,
+		const Eina_Rectangle *old_bounds,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Clipper *thiz;
-	Eina_Rectangle current_boundings;
+	Eina_Rectangle current_bounds;
 
 	thiz = _clipper_get(r);
 
-	/* get the current boundings */
-	enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
+	/* get the current bounds */
+	enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 	/* if we have changed then send the old and the current */
 	/* FIXME we use the origin but dont take care of the origin property here */
 	if (_clipper_changed_basic(thiz))
 	{
-		cb(r, old_boundings, EINA_TRUE, data);
-		cb(r, &current_boundings, EINA_FALSE, data);
+		cb(r, old_bounds, EINA_TRUE, data);
+		cb(r, &current_bounds, EINA_FALSE, data);
 	}
 	/* if not, send the content only */
 	else
@@ -298,7 +298,7 @@ static void _clipper_damage(Enesim_Renderer *r,
 		if (!thiz->current.content) return;
 		ddata.real_cb = cb;
 		ddata.real_data = data;
-		ddata.boundings = &current_boundings;
+		ddata.bounds = &current_bounds;
 
 		enesim_renderer_damages_get(thiz->current.content, _clipper_damage_cb, &ddata);
 	}
@@ -344,8 +344,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _clipper_name,
 	/* .free = 			*/ _clipper_free,
-	/* .boundings = 		*/ _clipper_boundings,
-	/* .destination_boundings =	*/ _clipper_destination_boundings,
+	/* .bounds = 		*/ _clipper_bounds,
+	/* .destination_bounds =	*/ _clipper_destination_bounds,
 	/* .flags = 			*/ _clipper_flags,
 	/* .hints_get = 		*/ _clipper_hints,
 	/* .is_inside = 		*/ NULL,

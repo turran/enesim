@@ -888,10 +888,10 @@ static void _path_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Featu
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
-static void _path_boundings(Enesim_Renderer *r,
+static void _path_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Path *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -913,83 +913,83 @@ static void _path_boundings(Enesim_Renderer *r,
 
 	if (!thiz->fill_figure)
 	{
-		boundings->x = 0;
-		boundings->y = 0;
-		boundings->w = 0;
-		boundings->h = 0;
+		bounds->x = 0;
+		bounds->y = 0;
+		bounds->w = 0;
+		bounds->h = 0;
 		return;
 	}
 
 	if ((css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && (css->stroke.weight > 1.0))
 	{
-		if (!enesim_figure_boundings(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax))
+		if (!enesim_figure_bounds(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax))
 			goto failed;
 	}
 	else
 	{
-		if (!enesim_figure_boundings(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax))
+		if (!enesim_figure_bounds(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax))
 			goto failed;
 	}
 
-	boundings->x = xmin;
-	boundings->w = xmax - xmin;
-	boundings->y = ymin;
-	boundings->h = ymax - ymin;
+	bounds->x = xmin;
+	bounds->w = xmax - xmin;
+	bounds->y = ymin;
+	bounds->h = ymax - ymin;
 
 	/* translate by the origin */
-	boundings->x += cs->ox;
-	boundings->y += cs->oy;
+	bounds->x += cs->ox;
+	bounds->y += cs->oy;
 	return;
 
 failed:
-	boundings->x = 0;
-	boundings->y = 0;
-	boundings->w = 0;
-	boundings->h = 0;
+	bounds->x = 0;
+	bounds->y = 0;
+	bounds->w = 0;
+	bounds->h = 0;
 }
 
-static void _path_destination_boundings(Enesim_Renderer *r,
+static void _path_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Path *thiz;
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	thiz = _path_get(r);
 
-	_path_boundings(r, states, sstates, &oboundings);
-	if (oboundings.w == 0 && oboundings.h == 0)
+	_path_bounds(r, states, sstates, &obounds);
+	if (obounds.w == 0 && obounds.h == 0)
 	{
-		boundings->x = 0;
-		boundings->y = 0;
-		boundings->w = 0;
-		boundings->h = 0;
+		bounds->x = 0;
+		bounds->y = 0;
+		bounds->w = 0;
+		bounds->h = 0;
 
 		return;
 	}
 
 	/* apply the inverse matrix */
 	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY
-			&& boundings->w != INT_MAX && boundings->h != INT_MAX)
+			&& bounds->w != INT_MAX && bounds->h != INT_MAX)
 	{
 		Enesim_Quad q;
 		Enesim_Matrix m;
 
 		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
-		enesim_quad_rectangle_to(&q, &oboundings);
+		enesim_matrix_rectangle_transform(&m, &obounds, &q);
+		enesim_quad_rectangle_to(&q, &obounds);
 		/* fix the antialias scaling */
-		oboundings.x -= m.xx;
-		oboundings.y -= m.yy;
-		oboundings.w += m.xx;
-		oboundings.h += m.yy;
+		obounds.x -= m.xx;
+		obounds.y -= m.yy;
+		obounds.w += m.xx;
+		obounds.h += m.yy;
 	}
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
-	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
+	bounds->x = floor(obounds.x);
+	bounds->y = floor(obounds.y);
+	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
+	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
 #if BUILD_OPENGL
@@ -1054,8 +1054,8 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .name =			*/ _path_name,
 	/* .free =			*/ NULL,
-	/* .boundings =			*/ _path_boundings,
-	/* .destination_boundings =	*/ _path_destination_boundings,
+	/* .bounds =			*/ _path_bounds,
+	/* .destination_bounds =	*/ _path_destination_bounds,
 	/* .flags =			*/ _path_flags,
 	/* .hints_get =			*/ _path_hints,
 	/* .is_inside =			*/ NULL,

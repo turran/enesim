@@ -235,7 +235,7 @@ static void _ellipse_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_ellipse_state_cleanup(r, s);
 }
 
-static void _ellipse_boundings(Enesim_Renderer *r,
+static void _ellipse_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
@@ -278,15 +278,15 @@ static void _ellipse_boundings(Enesim_Renderer *r,
 	}
 }
 
-static void _ellipse_destination_boundings(Enesim_Renderer *r,
+static void _ellipse_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
-	_ellipse_boundings(r, states, sstates, &oboundings);
+	_ellipse_bounds(r, states, sstates, &obounds);
 	/* apply the inverse matrix */
 	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
@@ -294,18 +294,18 @@ static void _ellipse_destination_boundings(Enesim_Renderer *r,
 		Enesim_Matrix m;
 
 		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
-		enesim_quad_rectangle_to(&q, &oboundings);
+		enesim_matrix_rectangle_transform(&m, &obounds, &q);
+		enesim_quad_rectangle_to(&q, &obounds);
 		/* fix the antialias scaling */
-		boundings->x -= m.xx;
-		boundings->y -= m.yy;
-		boundings->w += m.xx;
-		boundings->h += m.yy;
+		bounds->x -= m.xx;
+		bounds->y -= m.yy;
+		bounds->w += m.xx;
+		bounds->h += m.yy;
 	}
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
-	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
+	bounds->x = floor(obounds.x);
+	bounds->y = floor(obounds.y);
+	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
+	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
 static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r,
@@ -376,8 +376,8 @@ static void _ellipse_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _ellipse_descriptor = {
 	/* .name = 			*/ _ellipse_name,
 	/* .free = 			*/ _free,
-	/* .boundings =  		*/ _ellipse_boundings,
-	/* .destination_boundings = 	*/ _ellipse_destination_boundings,
+	/* .bounds =  		*/ _ellipse_bounds,
+	/* .destination_bounds = 	*/ _ellipse_destination_bounds,
 	/* .flags = 			*/ _ellipse_flags,
 	/* .hints_get = 		*/ _ellipse_hints,
 	/* .is_inside = 		*/ NULL,

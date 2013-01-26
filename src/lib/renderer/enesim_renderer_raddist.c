@@ -162,7 +162,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 	thiz->past = thiz->current;
 }
 
-static void _boundings(Enesim_Renderer *r,
+static void _bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
@@ -227,8 +227,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _raddist_name,
 	/* .free = 			*/ _free,
-	/* .boundings =  		*/ _boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .bounds =  		*/ _bounds,
+	/* .destination_bounds = 	*/ NULL,
 	/* .flags = 			*/ _raddist_flags,
 	/* .hints_get = 			*/ NULL,
 	/* .is_inside = 		*/ NULL,

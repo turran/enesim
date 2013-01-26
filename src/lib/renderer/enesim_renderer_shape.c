@@ -36,7 +36,7 @@
  *   the renderer has a fill renderer, if so, we should call the damage
  *   on the fill renderer in case the shape hasnt changed
  * - when the bounds are requested, if we are using a fill renderer
- *   and our draw mode is fill we should intersect our boundings
+ *   and our draw mode is fill we should intersect our bounds
  *   with the one of the fill renderer
  */
 /*============================================================================*
@@ -52,7 +52,7 @@
 
 typedef struct _Enesim_Renderer_Shape_Damage_Data
 {
-	Eina_Rectangle *boundings;
+	Eina_Rectangle *bounds;
 	Enesim_Renderer_Damage_Cb real_cb;
 	void *real_data;
 } Enesim_Renderer_Shape_Damage_Data;
@@ -66,8 +66,8 @@ typedef struct _Enesim_Renderer_Shape
 	/* private */
 	Eina_Bool changed : 1;
 	/* interface */
-	Enesim_Renderer_Shape_Boundings boundings;
-	Enesim_Renderer_Shape_Destination_Boundings destination_boundings;
+	Enesim_Renderer_Shape_Bounds bounds;
+	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
 	Enesim_Renderer_Shape_Sw_Setup sw_setup;
 	Enesim_Renderer_Shape_Sw_Draw sw_draw;
 	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
@@ -160,7 +160,7 @@ static Eina_Bool _shape_damage_cb(Enesim_Renderer *r,
 	Eina_Rectangle new_area = *area;
 
 	/* here we just intersect the damages with our bounds */
-	if (eina_rectangle_intersection(&new_area, ddata->boundings))
+	if (eina_rectangle_intersection(&new_area, ddata->bounds))
 		ddata->real_cb(r, &new_area, past, ddata->real_data);
 	return EINA_TRUE;
 }
@@ -177,19 +177,19 @@ static void _enesim_renderer_shape_sw_draw(Enesim_Renderer *r,
 	thiz->sw_draw(r, state, &thiz->current, x, y, len, dst);
 }
 
-static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_shape_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = enesim_renderer_data_get(r);
-	if (!thiz->destination_boundings)
+	if (!thiz->destination_bounds)
 	{
-		boundings->x = INT_MIN / 2;
-		boundings->y = INT_MIN / 2;
-		boundings->w = INT_MAX;
-		boundings->h = INT_MAX;
+		bounds->x = INT_MIN / 2;
+		bounds->y = INT_MIN / 2;
+		bounds->w = INT_MAX;
+		bounds->h = INT_MAX;
 	}
 	else
 	{
@@ -197,7 +197,7 @@ static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
 
 		sstates[ENESIM_STATE_CURRENT] = &thiz->current;
 		sstates[ENESIM_STATE_PAST] = &thiz->past;
-		thiz->destination_boundings(r, states, sstates, boundings);
+		thiz->destination_bounds(r, states, sstates, bounds);
 	}
 
 #if 0
@@ -206,41 +206,41 @@ static void _enesim_renderer_shape_destination_boundings(Enesim_Renderer *r,
 	{
 		Enesim_Rectangle fbounds;
 
-		enesim_renderer_destination_boundings(thiz->current.fill.r, &fbounds, 0, 0);
-		eina_rectangle_intersection(boundings, &fbounds);
+		enesim_renderer_destination_bounds(thiz->current.fill.r, &fbounds, 0, 0);
+		eina_rectangle_intersection(bounds, &fbounds);
 	}
 #endif
 }
 
-static void _enesim_renderer_shape_boundings(Enesim_Renderer *r,
+static void _enesim_renderer_shape_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Shape *thiz;
 	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
-	if (!thiz->boundings)
+	if (!thiz->bounds)
 	{
-		boundings->x = INT_MIN / 2;
-		boundings->y = INT_MIN / 2;
-		boundings->w = INT_MAX;
-		boundings->h = INT_MAX;
+		bounds->x = INT_MIN / 2;
+		bounds->y = INT_MIN / 2;
+		bounds->w = INT_MAX;
+		bounds->h = INT_MAX;
 
 		return;
 	}
 
 	sstates[ENESIM_STATE_CURRENT] = &thiz->current;
 	sstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->boundings(r, states, sstates, boundings);
+	thiz->bounds(r, states, sstates, bounds);
 #if 0
 	if (thiz->current.fill.r &&
 			(thiz->current.draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL))
 	{
 		Enesim_Rectangle fbounds;
 
-		enesim_renderer_destination_boundings(thiz->current.fill.r, &fbounds, 0, 0);
-		enesim_rectangle_intersection(boundings, &fbounds);
+		enesim_renderer_destination_bounds(thiz->current.fill.r, &fbounds, 0, 0);
+		enesim_rectangle_intersection(bounds, &fbounds);
 	}
 #endif
 }
@@ -401,18 +401,18 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r,
 }
 
 static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
-		const Eina_Rectangle *old_boundings,
+		const Eina_Rectangle *old_bounds,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Shape *thiz;
-	Eina_Rectangle current_boundings;
+	Eina_Rectangle current_bounds;
 	Eina_Bool do_send_old = EINA_FALSE;
 
 	thiz = enesim_renderer_data_get(r);
 
-	/* get the current boundings */
-	enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
+	/* get the current bounds */
+	enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 
 	/* first check if the common properties have changed */
 	do_send_old = _common_changed(states[ENESIM_STATE_CURRENT],
@@ -430,8 +430,8 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 send_old:
 	if (do_send_old)
 	{
-		cb(r, old_boundings, EINA_TRUE, data);
-		cb(r, &current_boundings, EINA_FALSE, data);
+		cb(r, old_bounds, EINA_TRUE, data);
+		cb(r, &current_bounds, EINA_FALSE, data);
 	}
 	else
 	{
@@ -453,16 +453,16 @@ send_old:
 			Enesim_Renderer_Shape_Damage_Data ddata;
 			ddata.real_cb = cb;
 			ddata.real_data = data;
-			ddata.boundings = &current_boundings;
+			ddata.bounds = &current_bounds;
 
 			enesim_renderer_damages_get(thiz->current.fill.r, _shape_damage_cb, &ddata);
 		}
-		/* otherwise send the current boundings only */
+		/* otherwise send the current bounds only */
 		else
 		{
 			if (stroke_changed)
 			{
-				cb(r, &current_boundings, EINA_FALSE, data);
+				cb(r, &current_bounds, EINA_FALSE, data);
 			}
 		}
 	}
@@ -490,15 +490,15 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	thiz->sw_setup = descriptor->sw_setup;
 	thiz->opengl_setup = descriptor->opengl_setup;
 	thiz->opencl_setup = descriptor->opencl_setup;
-	thiz->destination_boundings = descriptor->destination_boundings;
-	thiz->boundings = descriptor->boundings;
+	thiz->destination_bounds = descriptor->destination_bounds;
+	thiz->bounds = descriptor->bounds;
 	thiz->feature_get = descriptor->feature_get;
 	/* set the parent descriptor */
 	pdescriptor.version = ENESIM_RENDERER_API;
 	pdescriptor.name = descriptor->name;
 	pdescriptor.free = descriptor->free;
-	pdescriptor.boundings = _enesim_renderer_shape_boundings;
-	pdescriptor.destination_boundings = _enesim_renderer_shape_destination_boundings;
+	pdescriptor.bounds = _enesim_renderer_shape_bounds;
+	pdescriptor.destination_bounds = _enesim_renderer_shape_destination_bounds;
 	pdescriptor.flags = descriptor->flags;
 	pdescriptor.hints_get = descriptor->hints_get;
 	pdescriptor.is_inside = descriptor->is_inside;

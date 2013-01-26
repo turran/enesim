@@ -99,7 +99,7 @@ typedef struct _Enesim_Rasterizer_Basic
 	const Enesim_Figure *figure;
 	Eina_Bool changed : 1;
 
-	/* FIXME this are the boundings calculated at the setup
+	/* FIXME this are the bounds calculated at the setup
 	 * we either generate them at the Enesim_Polygon level
 	 * or something like that
 	 */

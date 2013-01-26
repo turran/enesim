@@ -95,10 +95,10 @@ static inline Enesim_Renderer_Image * _image_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _image_transform_boundings(Enesim_Renderer *r EINA_UNUSED,
+static void _image_transform_bounds(Enesim_Renderer *r EINA_UNUSED,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *oboundings,
-		Eina_Rectangle *boundings)
+		Enesim_Rectangle *obounds,
+		Eina_Rectangle *bounds)
 {
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
@@ -109,18 +109,18 @@ static void _image_transform_boundings(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Matrix m;
 
 		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, oboundings, &q);
-		enesim_quad_rectangle_to(&q, oboundings);
+		enesim_matrix_rectangle_transform(&m, obounds, &q);
+		enesim_quad_rectangle_to(&q, obounds);
 		/* fix the antialias scaling */
-		oboundings->x -= m.xx;
-		oboundings->y -= m.yy;
-		oboundings->w += m.xx;
-		oboundings->h += m.yy;
+		obounds->x -= m.xx;
+		obounds->y -= m.yy;
+		obounds->w += m.xx;
+		obounds->h += m.yy;
 	}
-	boundings->x = floor(oboundings->x);
-	boundings->y = floor(oboundings->y);
-	boundings->w = ceil(oboundings->w);
-	boundings->h = ceil(oboundings->h);
+	bounds->x = floor(obounds->x);
+	bounds->y = floor(obounds->y);
+	bounds->w = ceil(obounds->w);
+	bounds->h = ceil(obounds->h);
 }
 
 /* blend simple */
@@ -1365,7 +1365,7 @@ static const char * _image_name(Enesim_Renderer *r EINA_UNUSED)
 	return "image";
 }
 
-static void _image_boundings(Enesim_Renderer *r,
+static void _image_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
 {
@@ -1392,14 +1392,14 @@ static void _image_boundings(Enesim_Renderer *r,
 	}
 }
 
-static void _image_destination_boundings(Enesim_Renderer *r,
+static void _image_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 
-	_image_boundings(r, states, &oboundings);
-	_image_transform_boundings(r, states, &oboundings, boundings);
+	_image_bounds(r, states, &obounds);
+	_image_transform_bounds(r, states, &obounds, bounds);
 }
 
 static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
@@ -1594,7 +1594,7 @@ static Eina_Bool _image_has_changed(Enesim_Renderer *r,
 }
 
 static void _image_damages(Enesim_Renderer *r,
-		const Eina_Rectangle *old_boundings,
+		const Eina_Rectangle *old_bounds,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -1609,8 +1609,8 @@ static void _image_damages(Enesim_Renderer *r,
 	 */
 	if (enesim_renderer_has_changed(r))
 	{
-		cb(r, old_boundings, EINA_TRUE, data);
-		_image_destination_boundings(r, states, &bounds);
+		cb(r, old_bounds, EINA_TRUE, data);
+		_image_destination_bounds(r, states, &bounds);
 		cb(r, &bounds, EINA_FALSE, data);
 	}
 	/* in other case, send the surface damages tansformed
@@ -1628,8 +1628,8 @@ static void _image_damages(Enesim_Renderer *r,
 			/* the coordinates are relative to the image */
 			sdd.x += thiz->current.x;
 			sdd.y += thiz->current.y;
-			/* TODO clip it to the source boundings */
-			_image_transform_boundings(r, states, &sdd, &bounds);
+			/* TODO clip it to the source bounds */
+			_image_transform_bounds(r, states, &sdd, &bounds);
 			cb(r, &bounds, EINA_FALSE, data);
 		}
 	}
@@ -1649,8 +1649,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _image_name,
 	/* .free = 			*/ _image_free,
-	/* .boundings = 		*/ _image_boundings,
-	/* .destination_boundings = 	*/ _image_destination_boundings,
+	/* .bounds = 		*/ _image_bounds,
+	/* .destination_bounds = 	*/ _image_destination_bounds,
 	/* .flags = 			*/ _image_flags,
 	/* .hints_get =			*/ _image_hints,
 	/* .is_inside = 		*/ NULL,

@@ -485,10 +485,10 @@ static void _line_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _line_boundings(Enesim_Renderer *r,
+static void _line_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Line *thiz;
 	Enesim_Quad q;
@@ -515,10 +515,10 @@ static void _line_boundings(Enesim_Renderer *r,
 		return;
 	}
 
-	boundings->x = thiz->current.x0;
-	boundings->y = thiz->current.y0;
-	boundings->w = fabs(thiz->current.x1 - thiz->current.x0);
-	boundings->h = fabs(thiz->current.y1 - thiz->current.y0);
+	bounds->x = thiz->current.x0;
+	bounds->y = thiz->current.y0;
+	bounds->w = fabs(thiz->current.x1 - thiz->current.x0);
+	bounds->h = fabs(thiz->current.y1 - thiz->current.y0);
 }
 
 static Eina_Bool _line_has_changed(Enesim_Renderer *r,
@@ -550,8 +550,8 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r,
 static Enesim_Renderer_Shape_Descriptor _line_descriptor = {
 	/* .name = 			*/ _line_name,
 	/* .free = 			*/ _line_free,
-	/* .boundings = 		*/ NULL,// _line_boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .bounds = 		*/ NULL,// _line_bounds,
+	/* .destination_bounds = 	*/ NULL,
 	/* .flags = 			*/ _line_flags,
 	/* .hints_get = 		*/ _line_hints,
 	/* .is_inside = 		*/ NULL,

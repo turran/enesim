@@ -151,7 +151,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_cleanup(t->r1.r, s);
 }
 
-static void _boundings(Enesim_Renderer *r,
+static void _bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
@@ -168,8 +168,8 @@ static void _boundings(Enesim_Renderer *r,
 	if (!trans->r0.r) return;
 	if (!trans->r1.r) return;
 
-	enesim_renderer_boundings(trans->r0.r, &r0_rect);
-	enesim_renderer_boundings(trans->r1.r, &r1_rect);
+	enesim_renderer_bounds(trans->r0.r, &r0_rect);
+	enesim_renderer_bounds(trans->r1.r, &r1_rect);
 
 	rect->x = r0_rect.x < r1_rect.x ? r0_rect.x : r1_rect.x;
 	rect->y = r0_rect.y < r1_rect.y ? r0_rect.y : r1_rect.y;
@@ -197,8 +197,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _transition_name,
 	/* .free = 			*/ _free,
-	/* .boundings = 		*/ _boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .bounds = 		*/ _bounds,
+	/* .destination_bounds = 	*/ NULL,
 	/* .flags = 			*/ _transition_flags,
 	/* .hints_get = 			*/ NULL,
 	/* .is_inside = 		*/ NULL,

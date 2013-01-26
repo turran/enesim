@@ -45,14 +45,14 @@ typedef void (*Enesim_Renderer_Shape_Sw_Draw)(Enesim_Renderer *r,
 		unsigned int len,
 		void *data);
 
-typedef void (*Enesim_Renderer_Shape_Boundings)(Enesim_Renderer *r,
+typedef void (*Enesim_Renderer_Shape_Bounds)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings);
-typedef void (*Enesim_Renderer_Shape_Destination_Boundings)(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds);
+typedef void (*Enesim_Renderer_Shape_Destination_Bounds)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings);
+		Eina_Rectangle *bounds);
 
 typedef Eina_Bool (*Enesim_Renderer_Shape_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
@@ -80,8 +80,8 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	/* common */
 	Enesim_Renderer_Name name;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Shape_Boundings boundings;
-	Enesim_Renderer_Shape_Destination_Boundings destination_boundings;
+	Enesim_Renderer_Shape_Bounds bounds;
+	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
 	Enesim_Renderer_Flags flags;
 	Enesim_Renderer_Hints_Get hints_get;
 	Enesim_Renderer_Inside is_inside;

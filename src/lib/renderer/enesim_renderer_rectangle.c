@@ -428,10 +428,10 @@ static void _rectangle_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _rectangle_boundings(Enesim_Renderer *r,
+static void _rectangle_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *boundings)
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -470,33 +470,33 @@ static void _rectangle_boundings(Enesim_Renderer *r,
 		}
 	}
 
-	boundings->x = x;
-	boundings->y = y;
-	boundings->w = w;
-	boundings->h = h;
+	bounds->x = x;
+	bounds->y = y;
+	bounds->w = w;
+	bounds->h = h;
 
 	/* translate by the origin */
-	boundings->x += cs->ox;
-	boundings->y += cs->oy;
+	bounds->x += cs->ox;
+	bounds->y += cs->oy;
 	/* apply the geometry transformation */
 	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Quad q;
 
-		enesim_matrix_rectangle_transform(&cs->geometry_transformation, boundings, &q);
-		enesim_quad_rectangle_to(&q, boundings);
+		enesim_matrix_rectangle_transform(&cs->geometry_transformation, bounds, &q);
+		enesim_quad_rectangle_to(&q, bounds);
 	}
 }
 
-static void _rectangle_destination_boundings(Enesim_Renderer *r,
+static void _rectangle_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
-	Enesim_Rectangle oboundings;
+	Enesim_Rectangle obounds;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
-	_rectangle_boundings(r, states, sstates, &oboundings);
+	_rectangle_bounds(r, states, sstates, &obounds);
 	/* apply the inverse matrix */
 	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
@@ -504,18 +504,18 @@ static void _rectangle_destination_boundings(Enesim_Renderer *r,
 		Enesim_Matrix m;
 
 		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, &oboundings, &q);
-		enesim_quad_rectangle_to(&q, &oboundings);
+		enesim_matrix_rectangle_transform(&m, &obounds, &q);
+		enesim_quad_rectangle_to(&q, &obounds);
 		/* fix the antialias scaling */
-		boundings->x -= m.xx;
-		boundings->y -= m.yy;
-		boundings->w += m.xx;
-		boundings->h += m.yy;
+		bounds->x -= m.xx;
+		bounds->y -= m.yy;
+		bounds->w += m.xx;
+		bounds->h += m.yy;
 	}
-	boundings->x = floor(oboundings.x);
-	boundings->y = floor(oboundings.y);
-	boundings->w = ceil(oboundings.x - boundings->x + oboundings.w) + 1;
-	boundings->h = ceil(oboundings.y - boundings->y + oboundings.h) + 1;
+	bounds->x = floor(obounds.x);
+	bounds->y = floor(obounds.y);
+	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
+	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
 static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r,
@@ -598,8 +598,8 @@ static void _rectangle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 	/* .name = 			*/ _rectangle_name,
 	/* .free = 			*/ _rectangle_free,
-	/* .boundings = 		*/ _rectangle_boundings,
-	/* .destination_boundings = 	*/ _rectangle_destination_boundings,
+	/* .bounds = 		*/ _rectangle_bounds,
+	/* .destination_bounds = 	*/ _rectangle_destination_bounds,
 	/* .flags = 			*/ _rectangle_flags,
 	/* .hints_get = 			*/ _rectangle_hints,
 	/* .is_inside = 		*/ NULL,

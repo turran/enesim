@@ -33,10 +33,10 @@ struct _Enesim_Renderer
 	Eina_Lock lock;
 	Eina_Hash *prv_data;
 	Enesim_Renderer_Flag current_flags;
-	Enesim_Rectangle current_boundings;
-	Enesim_Rectangle past_boundings;
-	Eina_Rectangle current_destination_boundings;
-	Eina_Rectangle past_destination_boundings;
+	Enesim_Rectangle current_bounds;
+	Enesim_Rectangle past_bounds;
+	Eina_Rectangle current_destination_bounds;
+	Eina_Rectangle past_destination_bounds;
 	/* the descriptor */
 	Enesim_Renderer_Descriptor descriptor;
 	void *data;

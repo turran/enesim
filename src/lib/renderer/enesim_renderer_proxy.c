@@ -164,7 +164,7 @@ static void _proxy_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state 
 	enesim_renderer_hints_get(thiz->proxied, hints);
 }
 
-static void _proxy_boundings(Enesim_Renderer *r,
+static void _proxy_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
@@ -179,25 +179,25 @@ static void _proxy_boundings(Enesim_Renderer *r,
 		rect->h = 0;
 		return;
 	}
-	enesim_renderer_boundings(thiz->proxied, rect);
+	enesim_renderer_bounds(thiz->proxied, rect);
 }
 
-static void _proxy_destination_boundings(Enesim_Renderer *r,
+static void _proxy_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
-		Eina_Rectangle *boundings)
+		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Proxy *thiz;
 
 	thiz = _proxy_get(r);
 	if (!thiz->proxied)
 	{
-		boundings->x = 0;
-		boundings->y = 0;
-		boundings->w = 0;
-		boundings->h = 0;
+		bounds->x = 0;
+		bounds->y = 0;
+		bounds->w = 0;
+		bounds->h = 0;
 		return;
 	}
-	enesim_renderer_destination_boundings(thiz->proxied, boundings, 0, 0);
+	enesim_renderer_destination_bounds(thiz->proxied, bounds, 0, 0);
 }
 
 static Eina_Bool _proxy_has_changed(Enesim_Renderer *r,
@@ -213,7 +213,7 @@ static Eina_Bool _proxy_has_changed(Enesim_Renderer *r,
 }
 
 static void _proxy_damage(Enesim_Renderer *r,
-		const Eina_Rectangle *old_boundings,
+		const Eina_Rectangle *old_bounds,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -225,11 +225,11 @@ static void _proxy_damage(Enesim_Renderer *r,
 	/* we need to take care of the visibility */
 	if (cs->visibility != ps->visibility)
 	{
-		Eina_Rectangle current_boundings;
+		Eina_Rectangle current_bounds;
 
-		enesim_renderer_destination_boundings(r, &current_boundings, 0, 0);
-		cb(r, old_boundings, EINA_TRUE, data);
-		cb(r, &current_boundings, EINA_FALSE, data);
+		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
+		cb(r, old_bounds, EINA_TRUE, data);
+		cb(r, &current_bounds, EINA_FALSE, data);
 		return;
 	}
 	if (!thiz->proxied)
@@ -278,8 +278,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _proxy_name,
 	/* .free = 			*/ _proxy_free,
-	/* .boundings = 		*/ _proxy_boundings,
-	/* .destination_boundings =	*/ _proxy_destination_boundings,
+	/* .bounds = 		*/ _proxy_bounds,
+	/* .destination_bounds =	*/ _proxy_destination_bounds,
 	/* .flags = 			*/ _proxy_flags,
 	/* .hints_get = 		*/ _proxy_hints,
 	/* .is_inside = 		*/ NULL,

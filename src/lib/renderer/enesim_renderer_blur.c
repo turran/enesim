@@ -439,7 +439,7 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_blur_state_cleanup(thiz, r, s);
 }
 
-static void _blur_boundings(Enesim_Renderer *r,
+static void _blur_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
@@ -490,8 +490,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _blur_name,
 	/* .free = 			*/ _blur_free,
-	/* .boundings = 		*/ _blur_boundings,
-	/* .destination_boundings = 	*/ NULL,
+	/* .bounds = 		*/ _blur_bounds,
+	/* .destination_bounds = 	*/ NULL,
 	/* .flags = 			*/ _blur_flags,
 	/* .hints_get = 		*/ _blur_hints,
 	/* .is_inside = 		*/ NULL,
