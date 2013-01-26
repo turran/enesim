@@ -31,6 +31,7 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_dispmap.h"
 
+#include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
 /*
  * P'(x,y) <- P(x + scale * (XC(x,y) - .5), y + scale * (YC(x,y) - .5))
@@ -121,7 +122,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	enesim_surface_data_get(thiz->map, (void **)&map, &mstride);		\
 	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
-	enesim_renderer_identity_setup(r, x, y, &xx, &yy);			\
+	enesim_coord_identity_setup(&xx, &yy, x, y, state->ox, state->oy);	\
 	x = eina_f16p16_int_to(xx);						\
 	y = eina_f16p16_int_to(yy);						\
 	map = argb8888_at(map, mstride, x, y);					\
@@ -180,7 +181,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
 	/* TODO move by the origin */						\
-	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);		\
+	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy,		\
+			&thiz->matrix);						\
 										\
 	while (dst < end)							\
 	{									\

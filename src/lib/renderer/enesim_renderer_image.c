@@ -1382,10 +1382,10 @@ static void _image_bounds(Enesim_Renderer *r,
 	}
 	else
 	{
-		rect->x = cs->sx * thiz->current.x;
-		rect->y = cs->sy * thiz->current.y;
-		rect->w = cs->sx * thiz->current.w;
-		rect->h = cs->sy * thiz->current.h;
+		rect->x = thiz->current.x;
+		rect->y = thiz->current.y;
+		rect->w = thiz->current.w;
+		rect->h = thiz->current.h;
 		/* the translate */
 		rect->x += cs->ox;
 		rect->y += cs->oy;
@@ -1441,8 +1441,6 @@ static Eina_Bool _image_state_setup(Enesim_Renderer *r,
 	enesim_surface_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
 	x = thiz->current.x;  y = thiz->current.y;
 	w = thiz->current.w;  h = thiz->current.h;
-	x *= cs->sx;  y *= cs->sy;
-	w *= cs->sx;  h *= cs->sy;
 
 	enesim_matrix_f16p16_matrix_to(&cs->transformation, &thiz->matrix);
 	mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
@@ -1551,7 +1549,6 @@ static void _image_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_S
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888 |

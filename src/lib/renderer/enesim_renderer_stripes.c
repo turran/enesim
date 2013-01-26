@@ -34,6 +34,7 @@
 #include "Enesim_OpenGL.h"
 #endif
 
+#include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -188,7 +189,7 @@ static void _span_projective(Enesim_Renderer *r,
 	unsigned int *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx, zz;
 
-	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, state->ox, state->oy, &thiz->matrix);
 
 	while (d < e)
 	{
@@ -253,7 +254,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 		s = sbuf;
 	}
 
-	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, state->ox, state->oy, &thiz->matrix);
 	while (d < e)
 	{
 		Eina_F16p16 syy, syyy;
@@ -310,7 +311,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_State *state,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -323,7 +324,7 @@ static void _span_affine(Enesim_Renderer *r,
 	unsigned int *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx;
 
-	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy,  &thiz->matrix);
 	while (d < e)
 	{
 		unsigned int p0 = c0;
@@ -382,7 +383,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 		s = sbuf;
 	}
 
-	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy, &thiz->matrix);
 	while (d < e)
 	{
 		unsigned int p0 = c0, p1 = c1;

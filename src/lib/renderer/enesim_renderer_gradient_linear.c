@@ -31,6 +31,7 @@
 #include "enesim_renderer_gradient_linear.h"
 
 #include "enesim_renderer_private.h"
+#include "enesim_coord_private.h"
 #include "enesim_renderer_gradient_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -104,7 +105,7 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r,
 	Eina_F16p16 d;
 
 	thiz = _linear_get(r);
-	enesim_renderer_identity_setup(r, x, y, &xx, &yy);
+	enesim_coord_identity_setup(r, x, y, &xx, &yy);
 	d = _linear_distance_internal(thiz, xx, yy);
 	while (dst < end)
 	{
@@ -173,9 +174,9 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	y1 = thiz->current.y1;
 
 	/* handle the geometry transformation */
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
-		const Enesim_Matrix *gm = &cs->geometry_transformation;
+		const Enesim_Matrix *gm = &cs->transformation;
 		enesim_matrix_point_transform(gm, x0, y0, &x0, &y0);
 		enesim_matrix_point_transform(gm, x1, y1, &x1, &y1);
 	}

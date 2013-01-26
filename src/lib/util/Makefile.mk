@@ -1,5 +1,6 @@
 
 src_lib_libenesim_la_SOURCES += \
+src/lib/util/enesim_coord.c \
 src/lib/util/enesim_path.c \
 src/lib/util/enesim_perlin.c \
 src/lib/util/enesim_vector.c \

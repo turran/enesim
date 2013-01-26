@@ -40,6 +40,8 @@
 #endif
 
 #include "enesim_renderer_private.h"
+#include "enesim_coord_private.h"
+
 /**
  * @todo
  * - Optimize the case where both colors are the same
@@ -117,7 +119,6 @@ static Enesim_Renderer_OpenGL_Program *_checker_programs[] = {
 static Eina_Bool _checker_opengl_shader_setup(GLenum pid,
 		Enesim_Color odd_color, Enesim_Color even_color,
 		int sw, int sh)
-		
 {
 	int odd_color_u;
 	int even_color_u;
@@ -213,7 +214,7 @@ static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
 static void _span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -232,7 +233,7 @@ static void _span_identity(Enesim_Renderer *r,
 	color[1] = thiz->final_color2;
 
 	/* translate to the origin */
-	enesim_renderer_identity_setup(r, x, y, &xx, &yy);
+	enesim_coord_identity_setup(&xx, &yy, x, y, state->ox, state->oy);
 	/* normalize the modulo */
 	sy = ((yy  >> 16) % h2);
 	if (sy < 0)
@@ -270,7 +271,7 @@ static void _span_identity(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -279,7 +280,7 @@ static void _span_affine(Enesim_Renderer *r,
 	uint32_t *end = dst + len;
 
 	thiz = _checker_get(r);
-	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy, &thiz->matrix);
 	ww = thiz->ww;
 	ww2 = thiz->ww2;
 	hh = thiz->hh;
@@ -357,7 +358,7 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -367,7 +368,7 @@ static void _span_projective(Enesim_Renderer *r,
 
 	thiz = _checker_get(r);
 	/* translate to the origin */
-	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, state->ox, state->oy, &thiz->matrix);
 	ww = thiz->ww;
 	ww2 = thiz->ww2;
 	hh = thiz->hh;

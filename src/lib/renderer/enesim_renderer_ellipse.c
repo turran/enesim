@@ -119,7 +119,7 @@ static void _ellipse_path_propagate(Enesim_Renderer_Ellipse *thiz,
 pass:
 	enesim_renderer_color_set(thiz->path, cs->color);
 	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
 
 	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
 	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
@@ -269,11 +269,11 @@ static void _ellipse_bounds(Enesim_Renderer *r,
 	rect->x += cs->ox;
 	rect->y += cs->oy;
 	/* apply the geometry transformation */
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Quad q;
 
-		enesim_matrix_rectangle_transform(&cs->geometry_transformation, rect, &q);
+		enesim_matrix_rectangle_transform(&cs->transformation, rect, &q);
 		enesim_quad_rectangle_to(&q, rect);
 	}
 }
@@ -332,8 +332,7 @@ static void _ellipse_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY;
+			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
 static void _ellipse_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,

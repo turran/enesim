@@ -117,8 +117,7 @@ static void _rasterizer_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Rende
 		Enesim_Renderer_Flag *flags)
 {
 	/* FIXME we should use the rasterizer implementation flags */
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
+	*flags = ENESIM_RENDERER_FLAG_AFFINE |
 			ENESIM_RENDERER_FLAG_PROJECTIVE |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }

@@ -32,4 +32,20 @@
 #define enesim_coord_int_to
 #define enesim_coord_int_from
 
+/* Helper functions needed by other renderers */
+static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
+		Eina_F16p16 cx, Eina_F16p16 cy, Eina_F16p16 cz)
+{
+	return eina_f16p16_mul(cx, x) + eina_f16p16_mul(cy, y) + cz;
+}
+
+void enesim_coord_identity_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
+		int x, int y, double pre_x, double pre_y);
+void enesim_coord_affine_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
+		int x, int y, double pre_x, double pre_y, 
+		const Enesim_F16p16_Matrix *matrix);
+void enesim_coord_projective_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
+		Eina_F16p16 *fpz, int x, int y, double pre_x, double pre_y,
+		const Enesim_F16p16_Matrix *matrix);
+
 #endif

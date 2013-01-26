@@ -79,22 +79,6 @@ void enesim_renderer_opengl_shutdown(void);
 #endif
 
 
-/* Helper functions needed by other renderers */
-static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
-		Eina_F16p16 cx, Eina_F16p16 cy, Eina_F16p16 cz)
-{
-	return eina_f16p16_mul(cx, x) + eina_f16p16_mul(cy, y) + cz;
-}
-
-void enesim_renderer_identity_setup(Enesim_Renderer *r, int x, int y,
-		Eina_F16p16 *fpx, Eina_F16p16 *fpy);
-void enesim_renderer_affine_setup(Enesim_Renderer *r, int x, int y,
-		const Enesim_F16p16_Matrix *matrix,
-		Eina_F16p16 *fpx, Eina_F16p16 *fpy);
-void enesim_renderer_projective_setup(Enesim_Renderer *r, int x, int y,
-		const Enesim_F16p16_Matrix *matrix,
-		Eina_F16p16 *fpx, Eina_F16p16 *fpy, Eina_F16p16 *fpz);
-
 void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);
 void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data);
 

@@ -126,7 +126,7 @@ static Eina_Bool _line_generate(Enesim_Renderer_Line *thiz,
 	const Enesim_Renderer_Shape_State *css)
 {
 	Enesim_Point p0, p1;
-	const Enesim_Matrix *cgm = &cs->geometry_transformation;
+	const Enesim_Matrix *cgm = &cs->transformation;
 	double vx, vy;
 	double x0, x1, y0, y1;
 	double x01, y01;
@@ -141,12 +141,12 @@ static Eina_Bool _line_generate(Enesim_Renderer_Line *thiz,
 	y0 = thiz->current.y0;
 	y1 = thiz->current.y1;
 
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
-		enesim_matrix_point_transform(&cs->geometry_transformation, x0, y0, &x0, &y0);
-		enesim_matrix_point_transform(&cs->geometry_transformation, x1, y1, &x1, &y1);
+		enesim_matrix_point_transform(&cs->transformation, x0, y0, &x0, &y0);
+		enesim_matrix_point_transform(&cs->transformation, x1, y1, &x1, &y1);
 		/* TODO handle the scale of the stroke on both directions, x and y */
-		stroke = stroke * cs->geometry_transformation.xx;
+		stroke = stroke * cs->transformation.xx;
 	}
 
 	if (y1 < y0)
@@ -462,8 +462,7 @@ static void _line_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_St
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
 			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY;
+			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
 static void _line_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,

@@ -468,8 +468,7 @@ static void _blur_bounds(Enesim_Renderer *r,
 static void _blur_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
 static void _blur_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,

@@ -141,7 +141,7 @@ static void _rectangle_path_propagate(Enesim_Renderer_Rectangle *thiz,
 	 * because we only need to generate the vertices for x,y,w,h
 	 * change
 	 */
-	/* FIXME or prev->geometry_transformation_type == IDENTITY && curr->geometry_transformation_type != IDENTITY */
+	/* FIXME or prev->transformation_type == IDENTITY && curr->transformation_type != IDENTITY */
 	if (!_rectangle_properties_have_changed(thiz))
 		goto pass;
 
@@ -197,7 +197,7 @@ pass:
 	/* pass all the properties to the path */
 	enesim_renderer_color_set(thiz->path, cs->color);
 	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
 	/* base properties */
 	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
 	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
@@ -315,16 +315,16 @@ static inline Eina_Bool _rectangle_generate_geometry(Enesim_Renderer_Rectangle *
 	double w;
 	double h;
 
-	w = thiz->current.width * cs->sx;
-	h = thiz->current.height * cs->sy;
+	w = thiz->current.width;
+	h = thiz->current.height;
 	if ((w < 1) || (h < 1))
 	{
 		ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g", w, h);
 		return EINA_FALSE;
 	}
 
-	x = thiz->current.x * cs->sx;
-	y = thiz->current.y * cs->sy;
+	x = thiz->current.x;
+	y = thiz->current.y;
 
 	rx = thiz->current.corner.rx;
 	if (rx > (w / 2.0))
@@ -373,7 +373,7 @@ static Eina_Bool _rectangle_sw_setup(Enesim_Renderer *r,
 
 #if 0
 	/* TODO: check if we should use the path approach or a simple rect */
-	thiz->use_path = _rectangle_use_path(cs->geometry_transformation_type);
+	thiz->use_path = _rectangle_use_path(cs->transformation_type);
 	if (thiz->use_path)
 	{
 		_rectangle_path_setup(thiz, x, y, w, h, rx, ry, states, sstates, s, error);
@@ -401,9 +401,7 @@ static void _rectangle_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Render
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_GEOMETRY |
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
@@ -441,10 +439,10 @@ static void _rectangle_bounds(Enesim_Renderer *r,
 	thiz = _rectangle_get(r);
 
 	/* first scale */
-	x = thiz->current.x * cs->sx;
-	y = thiz->current.y * cs->sy;
-	w = thiz->current.width * cs->sx;
-	h = thiz->current.height * cs->sy;
+	x = thiz->current.x;
+	y = thiz->current.y;
+	w = thiz->current.width;
+	h = thiz->current.height;
 	/* for the stroke location get the real width */
 	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -479,11 +477,11 @@ static void _rectangle_bounds(Enesim_Renderer *r,
 	bounds->x += cs->ox;
 	bounds->y += cs->oy;
 	/* apply the geometry transformation */
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Quad q;
 
-		enesim_matrix_rectangle_transform(&cs->geometry_transformation, bounds, &q);
+		enesim_matrix_rectangle_transform(&cs->transformation, bounds, &q);
 		enesim_quad_rectangle_to(&q, bounds);
 	}
 }

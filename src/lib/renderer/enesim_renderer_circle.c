@@ -114,8 +114,7 @@ static void _circle_path_propagate(Enesim_Renderer_Circle *thiz,
 pass:
 	/* pass all the properties to the path */
 	enesim_renderer_color_set(thiz->path, cs->color);
-	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
 	/* base properties */
 	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
 	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
@@ -237,15 +236,12 @@ static void _circle_bounds(Enesim_Renderer *r,
 	rect->y = thiz->current.y - thiz->current.r - sw;
 	rect->w = rect->h = (thiz->current.r + sw) * 2;
 
-	/* translate by the origin */
-	rect->x += cs->ox;
-	rect->y += cs->oy;
 	/* apply the geometry transformation */
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Quad q;
 
-		enesim_matrix_rectangle_transform(&cs->geometry_transformation, rect, &q);
+		enesim_matrix_rectangle_transform(&cs->transformation, rect, &q);
 		enesim_quad_rectangle_to(&q, rect);
 	}
 }
@@ -309,10 +305,7 @@ static void _circle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static void _circle_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY;
+	*flags = ENESIM_RENDERER_FLAG_AFFINE | ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
 static void _circle_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,

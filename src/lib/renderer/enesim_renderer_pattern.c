@@ -84,7 +84,7 @@ static void _pattern_tile_source_size(Enesim_Renderer_Pattern *thiz,
 
 	enesim_rectangle_coords_from(&src, thiz->current.x, thiz->current.y,
 			thiz->current.width, thiz->current.height);
-	enesim_matrix_rectangle_transform(&state->geometry_transformation, &src, &q);
+	enesim_matrix_rectangle_transform(&state->transformation, &src, &q);
 	enesim_quad_rectangle_to(&q, size);
 }
 
@@ -97,7 +97,7 @@ static void _pattern_tile_destination_size(Enesim_Renderer_Pattern *thiz,
 
 	enesim_rectangle_coords_from(&src, thiz->current.x, thiz->current.y,
 			thiz->current.width, thiz->current.height);
-	enesim_matrix_rectangle_transform(&state->geometry_transformation, &src, &q);
+	enesim_matrix_rectangle_transform(&state->transformation, &src, &q);
 	enesim_quad_eina_rectangle_to(&q, size);
 }
 

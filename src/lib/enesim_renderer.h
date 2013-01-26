@@ -29,13 +29,11 @@ typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
 typedef enum _Enesim_Renderer_Flag
 {
 	ENESIM_RENDERER_FLAG_TRANSLATE		= (1 << 0), /**< The renderer can be translated using the origin property */
-	ENESIM_RENDERER_FLAG_SCALE		= (1 << 1), /**< The renderer can be scaled using the scale property */
-	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 2), /**< Affine transformation */
-	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 3), /**< Perspective transformations */
-	ENESIM_RENDERER_FLAG_A8 		= (1 << 4), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 5), /**< Supports ARGB8888 surfaces */
-	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 6), /**< Supports the quality property */
-	ENESIM_RENDERER_FLAG_GEOMETRY 		= (1 << 7), /**< Geometry transformation */
+	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 1), /**< Affine transformation */
+	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 2), /**< Perspective transformations */
+	ENESIM_RENDERER_FLAG_A8 		= (1 << 3), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 4), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 5), /**< Supports the quality property */
 } Enesim_Renderer_Flag;
 
 typedef enum _Enesim_Renderer_Hint
@@ -68,20 +66,12 @@ EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name);
 EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name);
 EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m);
 EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m);
-EAPI void enesim_renderer_geometry_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m);
-EAPI void enesim_renderer_geometry_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y);
 EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y);
 EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x);
 EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x);
 EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y);
 EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y);
-EAPI void enesim_renderer_scale_set(Enesim_Renderer *r, double x, double y);
-EAPI void enesim_renderer_scale_get(Enesim_Renderer *r, double *x, double *y);
-EAPI void enesim_renderer_x_scale_set(Enesim_Renderer *r, double x);
-EAPI void enesim_renderer_x_scale_get(Enesim_Renderer *r, double *x);
-EAPI void enesim_renderer_y_scale_set(Enesim_Renderer *r, double y);
-EAPI void enesim_renderer_y_scale_get(Enesim_Renderer *r, double *y);
 EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visibility);
 EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visibility);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
@@ -138,12 +128,9 @@ typedef struct _Enesim_Renderer_State
 	Enesim_Color color;
 	Enesim_Quality quality;
 	double ox, oy; /* the origin */
-	double sx, sy; /* the scale */
 	Enesim_Renderer *mask;
 	Enesim_Matrix transformation;
 	Enesim_Matrix_Type transformation_type;
-	Enesim_Matrix geometry_transformation;
-	Enesim_Matrix_Type geometry_transformation_type;
 } Enesim_Renderer_State;
 
 /* common descriptor functions */

@@ -135,11 +135,10 @@ static void _figure_path_setup(Enesim_Renderer_Figure *thiz,
 	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
 	/* base properties */
 	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
-	enesim_renderer_geometry_transformation_set(thiz->path, &cs->geometry_transformation);
+	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
 	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
 	enesim_renderer_color_set(thiz->path, cs->color);
 	enesim_renderer_rop_set(thiz->path, cs->rop);
-	enesim_renderer_scale_set(thiz->path, cs->sx, cs->sy);
 }
 
 static Eina_Bool _figure_state_setup(Enesim_Renderer *r,

@@ -121,11 +121,6 @@ static inline Eina_Bool _common_changed(const Enesim_Renderer_State *current,
 	{
 		return EINA_TRUE;
 	}
-	/* the scale */
-	if (current->sx != past->sx || current->sy != past->sy)
-	{
-		return EINA_TRUE;
-	}
 	/* the transformation */
 	if (current->transformation_type != past->transformation_type)
 	{
@@ -137,16 +132,6 @@ static inline Eina_Bool _common_changed(const Enesim_Renderer_State *current,
 		return EINA_TRUE;
 	}
 
-	/* the geometry_transformation */
-	if (current->geometry_transformation_type != past->geometry_transformation_type)
-	{
-		return EINA_TRUE;
-	}
-
-	if (!enesim_matrix_is_equal(&current->geometry_transformation, &past->geometry_transformation))
-	{
-		return EINA_TRUE;
-	}
 	return EINA_FALSE;
 }
 

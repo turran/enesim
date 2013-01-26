@@ -726,7 +726,7 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 	else if (thiz->last_cap != cap)
 		ret = EINA_TRUE;
 	else if (thiz->last_stroke_weight != stroke_width)
-		ret = EINA_TRUE; 
+		ret = EINA_TRUE;
 	/* the geometry transformation is different */
 	else if (!enesim_matrix_is_equal(cgm, &thiz->last_matrix))
 		ret = EINA_TRUE;
@@ -736,7 +736,7 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path *thiz,
 static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 		Enesim_Shape_Draw_Mode dm,
 		double sw,
-		const Enesim_Matrix *geometry_transformation,
+		const Enesim_Matrix *transformation,
 		double sx,
 		double sy,
 		Enesim_Shape_Stroke_Join join,
@@ -760,7 +760,7 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 
 		enesim_path_figure_set(thiz->stroke_path, thiz->fill_figure);
 		enesim_path_scale_set(thiz->stroke_path, sx, sy);
-		enesim_path_transformation_set(thiz->stroke_path, geometry_transformation);
+		enesim_path_transformation_set(thiz->stroke_path, transformation);
 
 		enesim_path_generate(thiz->stroke_path, thiz->commands);
 
@@ -771,7 +771,7 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 	{
 		enesim_path_figure_set(thiz->strokeless_path, thiz->fill_figure);
 		enesim_path_scale_set(thiz->strokeless_path, sx, sy);
-		enesim_path_transformation_set(thiz->strokeless_path, geometry_transformation);
+		enesim_path_transformation_set(thiz->strokeless_path, transformation);
 
 		enesim_path_generate(thiz->strokeless_path, thiz->commands);
 
@@ -783,7 +783,7 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 	/* update the last values */
 	thiz->last_join = join;
 	thiz->last_cap = cap;
-	thiz->last_matrix = *geometry_transformation;
+	thiz->last_matrix = *transformation;
 	thiz->last_stroke_weight = sw;
 #if BUILD_OPENGL
 	thiz->gl.fill.needs_tesselate = EINA_TRUE;
@@ -822,12 +822,12 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	thiz = _path_get(r);
 
 	/* generate the list of points/polygons */
-	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+	if (_path_needs_generate(thiz, &cs->transformation,
 			css->stroke.weight,
 			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
-				&cs->geometry_transformation, cs->sx, cs->sy,
+				&cs->transformation, 1, 1,
 				css->stroke.join, css->stroke.cap);
 	}
 
@@ -862,10 +862,8 @@ static void _path_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_St
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_SCALE |
 			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_GEOMETRY;
+			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
 static void _path_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
@@ -902,12 +900,12 @@ static void _path_bounds(Enesim_Renderer *r,
 	double ymax;
 
 	thiz = _path_get(r);
-	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+	if (_path_needs_generate(thiz, &cs->transformation,
 			css->stroke.weight,
 			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
-				&cs->geometry_transformation, cs->sx, cs->sy,
+				&cs->transformation, 1, 1,
 				css->stroke.join, css->stroke.cap);
 	}
 
@@ -1020,12 +1018,12 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	gl = &thiz->gl;
 
 	/* generate the figures */
-	if (_path_needs_generate(thiz, &cs->geometry_transformation,
+	if (_path_needs_generate(thiz, &cs->transformation,
 			css->stroke.weight,
 			css->stroke.join, css->stroke.cap))
 	{
 		_path_generate_figures(thiz, css->draw_mode, css->stroke.weight,
-				&cs->geometry_transformation, cs->sx, cs->sy,
+				&cs->transformation, 1, 1,
 				css->stroke.join, css->stroke.cap);
 	}
 

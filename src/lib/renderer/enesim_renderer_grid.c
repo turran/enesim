@@ -152,7 +152,7 @@ static void _span_identity(Enesim_Renderer *r,
 
 	thiz = _grid_get(r);
 #if 0
-	enesim_renderer_identity_setup(r, x, y, &xx, &yy);
+	enesim_coord_identity_setup(r, x, y, &xx, &yy);
 	while (dst < end)
 	{
 		uint32_t p0;
@@ -207,7 +207,7 @@ static void _span_affine(Enesim_Renderer *r,
 	Eina_F16p16 yy, xx;
 
 	thiz = _grid_get(r);
-	enesim_renderer_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	enesim_coord_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
 
 	while (dst < end)
 	{
@@ -231,7 +231,7 @@ static void _span_projective(Enesim_Renderer *r,
 	Eina_F16p16 yy, xx, zz;
 
 	thiz = _grid_get(r);
-	enesim_renderer_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	enesim_coord_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
 
 	while (dst < end)
 	{

@@ -31,6 +31,7 @@
 #include "enesim_renderer_gradient_radial.h"
 
 #include "enesim_renderer_private.h"
+#include "enesim_coord_private.h"
 #include "enesim_renderer_gradient_private.h"
 
 /*============================================================================*
@@ -163,9 +164,9 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	glen = ceil(rad) + 1;
 
 	enesim_matrix_identity(&thiz->m);
-	if (cs->geometry_transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
 	{
-		const Enesim_Matrix *gm = &cs->geometry_transformation;
+		const Enesim_Matrix *gm = &cs->transformation;
 		double mx, my;
 
 		mx = hypot(gm->xx, gm->yx);

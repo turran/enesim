@@ -245,11 +245,6 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 	{
 		return EINA_TRUE;
 	}
-	/* the scale */
-	if (r->current.sx != r->past.sx || r->current.sy != r->past.sy)
-	{
-		return EINA_TRUE;
-	}
 	/* the transformation */
 	if (r->current.transformation_type != r->past.transformation_type)
 	{
@@ -257,17 +252,6 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
 	}
 
 	if (!enesim_matrix_is_equal(&r->current.transformation, &r->past.transformation))
-	{
-		return EINA_TRUE;
-	}
-
-	/* the geometry_transformation */
-	if (r->current.geometry_transformation_type != r->past.geometry_transformation_type)
-	{
-		return EINA_TRUE;
-	}
-
-	if (!enesim_matrix_is_equal(&r->current.geometry_transformation, &r->past.geometry_transformation))
 	{
 		return EINA_TRUE;
 	}
@@ -291,75 +275,6 @@ void enesim_renderer_shutdown(void)
 	eina_hash_free(_factories);
 	_factories = NULL;
 	enesim_renderer_sw_shutdown();
-}
-
-void enesim_renderer_identity_setup(Enesim_Renderer *r, int x, int y,
-		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
-{
-	Eina_F16p16 ox, oy;
-
-	ox = eina_f16p16_double_from(r->current.ox);
-	oy = eina_f16p16_double_from(r->current.oy);
-
-	*fpx = eina_f16p16_int_from(x);
-	*fpy = eina_f16p16_int_from(y);
-
-	*fpx = eina_f16p16_sub(*fpx, ox);
-	*fpy = eina_f16p16_sub(*fpy, oy);
-}
-
-/*
- * x' = (xx * x) + (xy * y) + xz;
- * y' = (yx * x) + (yy * y) + yz;
- */
-void enesim_renderer_affine_setup(Enesim_Renderer *r, int x, int y,
-		const Enesim_F16p16_Matrix *matrix,
-		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
-{
-	Eina_F16p16 xx, yy;
-	Eina_F16p16 ox, oy;
-
-	ox = eina_f16p16_double_from(r->current.ox);
-	oy = eina_f16p16_double_from(r->current.oy);
-
-	xx = eina_f16p16_int_from(x);
-	yy = eina_f16p16_int_from(y);
-
-	*fpx = enesim_point_f16p16_transform(xx, yy, matrix->xx,
-			matrix->xy, matrix->xz);
-	*fpy = enesim_point_f16p16_transform(xx, yy, matrix->yx,
-			matrix->yy, matrix->yz);
-
-	*fpx = eina_f16p16_sub(*fpx, ox);
-	*fpy = eina_f16p16_sub(*fpy, oy);
-}
-
-/*
- * x' = (xx * x) + (xy * y) + xz;
- * y' = (yx * x) + (yy * y) + yz;
- * z' = (zx * x) + (zy * y) + zz;
- */
-void enesim_renderer_projective_setup(Enesim_Renderer *r, int x, int y,
-		const Enesim_F16p16_Matrix *matrix,
-		Eina_F16p16 *fpx, Eina_F16p16 *fpy, Eina_F16p16 *fpz)
-{
-	Eina_F16p16 xx, yy;
-	Eina_F16p16 ox, oy;
-
-	ox = eina_f16p16_double_from(r->current.ox);
-	oy = eina_f16p16_double_from(r->current.oy);
-
-	xx = eina_f16p16_int_from(x);
-	yy = eina_f16p16_int_from(y);
-	*fpx = enesim_point_f16p16_transform(xx, yy, matrix->xx,
-			matrix->xy, matrix->xz);
-	*fpy = enesim_point_f16p16_transform(xx, yy, matrix->yx,
-			matrix->yy, matrix->yz);
-	*fpz = enesim_point_f16p16_transform(xx, yy, matrix->zx,
-			matrix->zy, matrix->zz);
-
-	*fpx = eina_f16p16_sub(*fpx, ox);
-	*fpy = eina_f16p16_sub(*fpy, oy);
 }
 
 /* FIXME export this */
@@ -406,20 +321,14 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	r->current.visibility = r->past.visibility = EINA_TRUE;
 	r->current.ox = r->past.ox = 0;
 	r->current.oy = r->past.oy = 0;
-	r->current.sx = r->past.sx = 1;
-	r->current.sy = r->past.sy = 1;
 	r->current.color = r->past.color = ENESIM_COLOR_FULL;
 	r->current.rop = r->past.rop = ENESIM_FILL;
 	enesim_matrix_identity(&r->current.transformation);
 	enesim_matrix_identity(&r->past.transformation);
 	r->current.transformation_type = ENESIM_MATRIX_IDENTITY;
 	r->past.transformation_type = ENESIM_MATRIX_IDENTITY;
-	enesim_matrix_identity(&r->current.geometry_transformation);
-	enesim_matrix_identity(&r->past.geometry_transformation);
 	/* private stuff */
 	r->current_flags = 0;
-	r->current.geometry_transformation_type = ENESIM_MATRIX_IDENTITY;
-	r->past.geometry_transformation_type = ENESIM_MATRIX_IDENTITY;
 	enesim_rectangle_coords_from(&r->past_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	eina_rectangle_coords_from(&r->past_destination_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	r->prv_data = eina_hash_string_superfast_new(NULL);
@@ -660,27 +569,6 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_geometry_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->current.geometry_transformation = *m;
-	r->current.geometry_transformation_type = enesim_matrix_type_get(&r->current.geometry_transformation);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_geometry_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (m) *m = r->current.transformation;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -759,66 +647,6 @@ EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y)
 	if (y) *y = r->current.oy;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_scale_set(Enesim_Renderer *r, double x, double y)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->current.sx = x;
-	r->current.sy = y;
-}
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_scale_get(Enesim_Renderer *r, double *x, double *y)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (x) *x = r->current.sx;
-	if (y) *y = r->current.sy;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_x_scale_set(Enesim_Renderer *r, double x)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->current.sx = x;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_x_scale_get(Enesim_Renderer *r, double *x)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (x) *x = r->current.sx;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_y_scale_set(Enesim_Renderer *r, double y)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->current.sy = y;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_y_scale_get(Enesim_Renderer *r, double *y)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (y) *y = r->current.sy;
-}
 /**
  * To  be documented
  * FIXME: To be fixed
