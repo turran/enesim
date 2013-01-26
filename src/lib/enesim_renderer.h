@@ -275,7 +275,15 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data);
 EAPI void * enesim_renderer_data_get(Enesim_Renderer *r);
 
-EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r);
+typedef struct _Enesim_Renderer_Sw_Data
+{
+	/* TODO for later we might need a pointer to the function that calls
+	 *  the fill only or both, to avoid the if
+	 */
+	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Compositor_Span span;
+} Enesim_Renderer_Sw_Data;
+
 EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
 
 #endif

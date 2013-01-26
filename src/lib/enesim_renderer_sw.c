@@ -461,19 +461,6 @@ void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Renderer_Sw_Fill enesim_renderer_sw_fill_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Sw_Data *sw_data;
-
-	//ENESIM_MAGIC_CHECK_RENDERER(r);
-	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
-	return sw_data->fill;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
 {
 	Enesim_Renderer_Sw_Data *sw_data;

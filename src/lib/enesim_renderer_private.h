@@ -79,16 +79,6 @@ void enesim_renderer_opengl_shutdown(void);
 #endif
 
 
-typedef struct _Enesim_Renderer_Sw_Data
-{
-	/* TODO for later we might need a pointer to the function that calls the fill only
-	 * or both, to avoid the if
-	 */
-	Enesim_Renderer_Sw_Fill fill;
-	Enesim_Compositor_Span span;
-} Enesim_Renderer_Sw_Data;
-
-
 /* Helper functions needed by other renderers */
 static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
 		Eina_F16p16 cx, Eina_F16p16 cy, Eina_F16p16 cz)
