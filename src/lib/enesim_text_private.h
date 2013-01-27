@@ -19,19 +19,19 @@
 #define DBG(...) EINA_LOG_DOM_DBG(enesim_text_log_dom_global, __VA_ARGS__)
 
 /* SIMD intrinsics */
-#ifdef EFL_HAVE_MMX
+#ifdef ENS_HAVE_MMX
 #define LIBARGB_MMX 1
 #else
 #define LIBARGB_MMX 0
 #endif
 
-#ifdef  EFL_HAVE_SSE
+#ifdef  ENS_HAVE_SSE
 #define LIBARGB_SSE 1
 #else
 #define LIBARGB_SSE 0
 #endif
 
-#ifdef EFL_HAVE_SSE2
+#ifdef ENS_HAVE_SSE2
 #define LIBARGB_SSE2 1
 #else
 #define LIBARGB_SSE2 0

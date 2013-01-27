@@ -3,10 +3,10 @@ dnl That code is public domain and can be freely used or copied.
 
 dnl Macros for checking if the compiler supports some __attribute__ uses
 
-dnl Usage: EFL_ATTRIBUTE_VECTOR
+dnl Usage: ENS_ATTRIBUTE_VECTOR
 dnl call AC_DEFINE for HAVE_GCC_ATTRIBUTE_VECTOR if __attribute__((vector)) is available
 
-AC_DEFUN([EFL_ATTRIBUTE_VECTOR],
+AC_DEFUN([ENS_ATTRIBUTE_VECTOR],
 [
 AC_MSG_CHECKING([for __attribute__ ((vector))])
 AC_COMPILE_IFELSE(
@@ -29,4 +29,4 @@ if test "x${have_attribute_vector}" = "xyes" ; then
 fi
 ])
 
-dnl End of efl_attribute.m4
+dnl End of ens_attribute.m4

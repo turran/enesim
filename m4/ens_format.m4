@@ -1,5 +1,5 @@
-dnl use: ENESIM_SURFACE_FORMAT(format[, default-enabled])
-AC_DEFUN([ENESIM_SURFACE_FORMAT],
+dnl use: ENS_SURFACE_FORMAT(format[, default-enabled])
+AC_DEFUN([ENS_SURFACE_FORMAT],
 [
 pushdef([UP], translit([$1], [a-z], [A-Z]))dnl
 pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl
@@ -31,11 +31,13 @@ AC_MSG_CHECKING(whether to build $1 surface format support)
 AC_MSG_RESULT($format_[]DOWN)
 
 if test "x$format_[]DOWN" = "xyes" ; then
-  AC_DEFINE(BUILD_SURFACE_[]UP, 1, [$1 Surface Fromat Support])  
+  AC_DEFINE(BUILD_SURFACE_[]UP, 1, [$1 Surface Fromat Support])
 fi
 
-AM_CONDITIONAL(BUILD_SURFACE_[]UP, test "x$format_[]DOWN" = "xyes")
+AM_CONDITIONAL(BUILD_SURFACE_[]UP, [test "x$format_[]DOWN" = "xyes"])
 
 popdef([UP])
 popdef([DOWN])
 ])
+
+dnl End of ens_format.m4

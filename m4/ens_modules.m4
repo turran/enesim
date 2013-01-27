@@ -1,6 +1,6 @@
-dnl use: ENESIM_MODULE(module, want_module, have_module)
+dnl use: ENS_MODULE(module, want_module, have_module)
 
-AC_DEFUN([ENESIM_MODULE],
+AC_DEFUN([ENS_MODULE],
 [
 
 m4_pushdef([UP], m4_toupper([$1]))
@@ -23,8 +23,7 @@ AC_ARG_ENABLE([module-[]DOWN],
           want_module="no"
        fi
     fi
-   ]
-)
+   ])
 
 AC_MSG_CHECKING([whether to enable $1 module])
 AC_MSG_RESULT([${want_module}])
@@ -62,3 +61,5 @@ m4_popdef([UP])
 m4_popdef([DOWN])
 
 ])
+
+dnl End of ens_modules.m4

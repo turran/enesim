@@ -74,7 +74,7 @@ src_lib_libenesim_la_CPPFLAGS = \
 
 src_lib_libenesim_la_LIBADD = \
 @ENESIM_LIBS@ \
-@EFL_SIMD_FLAGS@ \
+@ENS_SIMD_FLAGS@ \
 -lm
 
 src_lib_libenesim_la_LDFLAGS = -no-undefined -version-info @version_info@

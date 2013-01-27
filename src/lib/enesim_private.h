@@ -22,40 +22,50 @@
 #include "config.h"
 #endif
 
+#ifdef WIN32
+# ifndef WIN32_LEAN_AND_MEAN
+#  define WIN32_LEAN_AND_MEAN
+# endif
+# include <windows.h>
+# undef WIN32_LEAN_AND_MEAN
+#else
 /* we need to include this pthreads headers before eina */
-#ifdef BUILD_PTHREAD
-# ifdef HAVE_SCHED_H
-#  include <sched.h>
-# endif
-# ifdef HAVE_PTHREAD_H
-#  include <pthread.h>
-# endif
-# ifdef HAVE_PTHREAD_NP_H
-#  include <pthread_np.h>
-# endif
-# ifdef HAVE_SYS_PARAM_H
-#  include <sys/param.h>
-# endif
-# ifdef HAVE_SYS_CPUSET_H
-#  include <sys/cpuset.h>
+# ifdef BUILD_PTHREAD
+#  ifdef HAVE_SCHED_H
+#   include <sched.h>
+#  endif
+#  ifdef HAVE_PTHREAD_H
+#   include <pthread.h>
+#  endif
+#  ifdef HAVE_PTHREAD_NP_H
+#   include <pthread_np.h>
+#  endif
+#  ifdef HAVE_SYS_PARAM_H
+#   include <sys/param.h>
+#  endif
+#  ifdef HAVE_SYS_CPUSET_H
+#   include <sys/cpuset.h>
+#  endif
 # endif
 #endif
 
+/* FIXME: now that libargb is in the enesim tree, why not using ENS_** in it directly ? */
+
 /* the libargb needed macros */
 /* SIMD intrinsics */
-#ifdef EFL_HAVE_MMX
+#ifdef ENS_HAVE_MMX
 #define LIBARGB_MMX 1
 #else
 #define LIBARGB_MMX 0
 #endif
 
-#ifdef  EFL_HAVE_SSE
+#ifdef  ENS_HAVE_SSE
 #define LIBARGB_SSE 1
 #else
 #define LIBARGB_SSE 0
 #endif
 
-#ifdef EFL_HAVE_SSE2
+#ifdef ENS_HAVE_SSE2
 #define LIBARGB_SSE2 1
 #else
 #define LIBARGB_SSE2 0

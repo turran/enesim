@@ -89,7 +89,7 @@ endif
 check-local:
 	@echo "reconfigure with --enable-tests"
 
-if EFL_ENABLE_COVERAGE
+if ENS_ENABLE_COVERAGE
 lcov-reset:
 	@rm -rf coverage
 	@find . -name "*.gcda" -exec rm {} \;

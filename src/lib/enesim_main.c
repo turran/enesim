@@ -170,10 +170,10 @@ EAPI int enesim_init(void)
 	enesim_renderer_init();
 	enesim_converter_init();
 	enesim_image_init();
-#ifdef EFL_HAVE_MMX
+#ifdef ENS_HAVE_MMX
 	/* EINA_ERROR_PINFO("MMX Drawer available\n"); */
 #endif
-#ifdef EFL_HAVE_SSE2
+#ifdef ENS_HAVE_SSE2
 	/* EINA_ERROR_PINFO("SSE2 Drawer available\n"); */
 #endif
 #if CHECK_FE

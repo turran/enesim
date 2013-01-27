@@ -81,18 +81,24 @@ AC_ARG_ENABLE([opengl],
 
 AC_CANONICAL_HOST
 
-EFL_CHECK_CPU_MMX([have_mmx="yes"], [have_mmx="no"])
-EFL_CHECK_CPU_SSE([have_sse="yes"], [have_sse="no"])
-EFL_CHECK_CPU_SSE2([have_sse2="yes"], [have_sse2="no"])
-EFL_CHECK_CPU_ALTIVEC([have_altivec="yes"], [have_altivec="no"])
+ENS_CHECK_CPU_MMX([have_mmx="yes"], [have_mmx="no"])
+ENS_CHECK_CPU_SSE([have_sse="yes"], [have_sse="no"])
+ENS_CHECK_CPU_SSE2([have_sse2="yes"], [have_sse2="no"])
+ENS_CHECK_CPU_ALTIVEC([have_altivec="yes"], [have_altivec="no"])
 
 # Add conditionals for every surface format but the argb8888_pre, it is
 # the core format and cannot be optional
-ENESIM_SURFACE_FORMAT([argb8888_unpre], [yes])
-ENESIM_SURFACE_FORMAT([rgb888_a8], [no])
-ENESIM_SURFACE_FORMAT([rgb565_xa5], [no])
-ENESIM_SURFACE_FORMAT([rgb565_b1a3], [yes])
-ENESIM_SURFACE_FORMAT([rgb888], [yes])
+ENS_SURFACE_FORMAT([argb8888_unpre], [yes])
+ENS_SURFACE_FORMAT([rgb888_a8], [no])
+ENS_SURFACE_FORMAT([rgb565_xa5], [no])
+ENS_SURFACE_FORMAT([rgb565_b1a3], [yes])
+ENS_SURFACE_FORMAT([rgb888], [yes])
+
+case "$host_os" in
+   mingw*)
+      want_pthreads="no"
+   ;;
+esac
 
 
 ### Checks for programs
@@ -103,7 +109,7 @@ AC_PROG_CC
 PKG_PROG_PKG_CONFIG
 
 # doxygen program for documentation building
-EFL_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
+ENS_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 
 ### Checks for libraries
@@ -185,11 +191,11 @@ AC_CHECK_HEADER([jpeglib.h],
 
 AC_C_BIGENDIAN
 AM_PROG_CC_C_O
-EFL_CHECK_COMPILER_FLAGS([ENESIM], [-Wall -Wextra -Wshadow -Wpointer-arith -Wno-missing-field-initializers -fvisibility=hidden -fdata-sections -ffunction-sections])
+ENS_CHECK_COMPILER_FLAGS([ENESIM], [-Wall -Wextra -Wshadow -Wpointer-arith -Wno-missing-field-initializers -fvisibility=hidden -fdata-sections -ffunction-sections])
 
 ### Checks for linker characteristics
 
-EFL_CHECK_LINKER_FLAGS([ENESIM], [-fvisibility=hidden -Wl,--no-copy-dt-needed-entries])
+ENS_CHECK_LINKER_FLAGS([ENESIM], [-fvisibility=hidden -Wl,--no-copy-dt-needed-entries])
 # FIXME: what about : -fdata-sections -ffunction-sections -Wl,--gc-sections -fno-strict-aliasing ?
 
 ### Checks for library functions
@@ -305,8 +311,8 @@ if test "x${build_opengl}" = "xyes"; then
 fi
 AM_CONDITIONAL([HAVE_OPENGL], [test "x${build_opengl}" = "xyes"])
 
-ENESIM_MODULE([Png], [${enable_png}], [yes])
-ENESIM_MODULE([Jpg], [${enable_jpg}], [yes])
+ENS_MODULE([Png], [${enable_png}], [yes])
+ENS_MODULE([Jpg], [${enable_jpg}], [yes])
 
 #######################################
 ## PTHREADS
@@ -315,11 +321,11 @@ ENESIM_MODULE([Jpg], [${enable_jpg}], [yes])
 
 # Unit tests, coverage and benchmarking
 
-EFL_CHECK_TESTS([enable_tests="yes"], [enable_tests="no"])
+ENS_CHECK_TESTS([enable_tests="yes"], [enable_tests="no"])
 
-EFL_CHECK_COVERAGE([${enable_tests}], [enable_coverage="yes"], [enable_coverage="no"])
+ENS_CHECK_COVERAGE([${enable_tests}], [enable_coverage="yes"], [enable_coverage="no"])
 
-EFL_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
+ENS_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
 
 ### Substitutions
 
@@ -328,8 +334,8 @@ AC_SUBST([build_opengl])
 AC_SUBST([requirements_cflags])
 AC_SUBST([requirements_libs])
 AC_SUBST([requirements_pc])
-ENESIM_CFLAGS="${ENESIM_CFLAGS} ${requirements_cflags} -DENESIM_EXTENSION ${EFL_SIMD_FLAGS} ${EFL_COVERAGE_CFLAGS}"
-ENESIM_LIBS="${ENESIM_LIBS} ${requirements_libs} ${EFL_COVERAGE_LIBS}"
+ENESIM_CFLAGS="${ENESIM_CFLAGS} ${requirements_cflags} -DENESIM_EXTENSION ${ENS_SIMD_FLAGS} ${ENS_COVERAGE_CFLAGS}"
+ENESIM_LIBS="${ENESIM_LIBS} ${requirements_libs} ${ENS_COVERAGE_LIBS}"
 
 
 ## Make the debug preprocessor configurable

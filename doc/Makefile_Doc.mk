@@ -3,13 +3,13 @@
 
 PACKAGE_DOCNAME = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)-doc
 
-if EFL_BUILD_DOC
+if ENS_BUILD_DOC
 
 doc-clean:
 	rm -rf doc/html/ doc/latex/ doc/man/ doc/xml/ $(PACKAGE_DOCNAME).tar*
 
 doc: doc-clean
-	$(efl_doxygen) doc/Doxyfile
+	$(ens_doxygen) doc/Doxyfile
 	cp $(srcdir)/doc/img/* doc/html/
 	cp $(srcdir)/doc/img/* doc/latex/
 	rm -rf $(PACKAGE_DOCNAME).tar*
