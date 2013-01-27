@@ -1,5 +1,10 @@
-#include "Enesim_Image.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdio.h>
+
+#include "Enesim.h"
 
 int end = 0;
 
@@ -8,7 +13,7 @@ static void help(void)
 	printf("enesim_image_example [load | save] [async | sync ] FILE\n");
 }
 
-static void async_load_cb(Enesim_Surface *s, void *data, int error)
+static void async_load_cb(Enesim_Surface *s EINA_UNUSED, void *data, int error)
 {
 	char *file = data;
 
@@ -19,7 +24,7 @@ static void async_load_cb(Enesim_Surface *s, void *data, int error)
 	end = 1;
 }
 
-static void async_save_cb(Enesim_Surface *s, void *data, int error)
+static void async_save_cb(Enesim_Surface *s EINA_UNUSED, void *data, int error)
 {
 	char *file = data;
 
@@ -63,7 +68,7 @@ int main(int argc, char **argv)
 	}
 	file = argv[3];
 
-	enesim_image_init();
+	enesim_init();
 	if (!async)
 		end = 1;
 
@@ -122,7 +127,7 @@ int main(int argc, char **argv)
 	{
 		enesim_image_dispatch();
 	}
-	enesim_image_shutdown();
+	enesim_shutdown();
 	return 0;
 }
 

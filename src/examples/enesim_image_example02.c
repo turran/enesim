@@ -1,4 +1,10 @@
-#include "Enesim_Image.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <stdio.h>
+
+#include "Enesim.h"
 
 static void help(void)
 {
@@ -22,7 +28,7 @@ int main(int argc, char **argv)
 
 	printf("%s -> %s\n", fload, fsave);
 
-	enesim_image_init();
+	enesim_init();
 	if (!enesim_image_file_load(fload, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL))
 	{
 		printf("Impossible to load the image\n");
@@ -35,7 +41,7 @@ int main(int argc, char **argv)
 	}
 
 end:
-	enesim_image_shutdown();
+	enesim_shutdown();
 	return 0;
 }
 
