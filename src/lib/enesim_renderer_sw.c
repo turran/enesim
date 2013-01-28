@@ -542,6 +542,15 @@ void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	}
 	if (r->descriptor.sw_cleanup) r->descriptor.sw_cleanup(r, s);
 }
+
+void enesim_renderer_sw_free(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Sw_Data *sw_data;
+
+	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
+	if (!sw_data) return;
+	free(sw_data);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

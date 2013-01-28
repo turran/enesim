@@ -408,14 +408,15 @@ void enesim_renderer_opengl_shutdown(void)
 	/* TODO destroy the lut */
 }
 
-/* we need a way to destroy the renderer data
-void enesim_renderer_opengl_delete(Enesim_Renderer *r)
+/* we need a way to destroy the renderer data */
+void enesim_renderer_opengl_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	if (!rdata) return;
+
 	glDeleteFramebuffersEXT(1, &rdata->fbo);
 }
-*/
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

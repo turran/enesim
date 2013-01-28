@@ -50,6 +50,7 @@ struct _Enesim_Renderer
 
 void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
+void enesim_renderer_sw_free(Enesim_Renderer *r);
 
 #if BUILD_OPENCL
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
@@ -61,6 +62,7 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 		int x, int y);
 void enesim_renderer_opencl_init(void);
 void enesim_renderer_opencl_shutdown(void);
+void enesim_renderer_opencl_free(Enesim_Renderer *r);
 
 #endif
 
@@ -75,6 +77,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Ei
 
 void enesim_renderer_opengl_init(void);
 void enesim_renderer_opengl_shutdown(void);
+void enesim_renderer_opengl_free(Enesim_Renderer *r);
 
 #endif
 

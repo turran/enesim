@@ -375,7 +375,18 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 		if (r->descriptor.free)
 			r->descriptor.free(r);
 		eina_lock_free(&r->lock);
-		/* TODO remove all the private data */
+		
+		eina_hash_free(r->prv_data);
+
+		/* remove all the private data */
+		enesim_renderer_sw_free(r);
+#if BUILD_OPENGL
+		enesim_renderer_opengl_free(r);
+#endif
+#if BUILD_OPENCL
+		enesim_renderer_opencl_free(r);
+#endif
+		/* finally */
 		free(r);
 	}
 }
