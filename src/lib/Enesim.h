@@ -114,6 +114,8 @@ extern "C" {
 #include "enesim_renderer_perlin.h"
 #include "enesim_renderer_proxy.h"
 #include "enesim_renderer_clipper.h"
+#include "enesim_renderer_text_base.h"
+#include "enesim_renderer_text_span.h"
 #include "enesim_renderer_transition.h"
 
 #ifdef __cplusplus
