@@ -47,11 +47,11 @@ include src/tests/Makefile_Tests.mk
 
 ### Examples
 
-include src/examples/Makefile_Examples.mk
+include src/examples/Makefile.mk
 
 ### Documentation
 
-include doc/Makefile_Doc.mk
+include doc/Makefile.mk
 
 EXTRA_DIST += \
 AUTHORS \
