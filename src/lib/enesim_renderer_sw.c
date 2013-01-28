@@ -180,6 +180,7 @@ typedef struct _Enesim_Renderer_Thread
 {
 	int cpuidx;
 	enesim_thread tid;
+	Eina_Bool done;
 } Enesim_Renderer_Thread;
 
 static unsigned int _num_cpus;
@@ -262,7 +263,7 @@ enesim_thread_new(pthread_t *thread, void *(*callback)(void *d), void *data)
 	pthread_attr_init(&attr);
 	return pthread_create(thread, &attr, callback, data);
 }
-#define enesim_thread_free(thread)
+#define enesim_thread_free(thread) pthread_join(thread, NULL)
 #endif
 
 static inline void _sw_surface_draw_rop_threaded(Enesim_Renderer *r,
@@ -319,8 +320,11 @@ static void * _thread_run(void *data)
 	Enesim_Renderer_Thread *thiz = data;
 	Enesim_Renderer_Thread_Operation *op = &_op;
 
-	do {
+	do
+	{
 		enesim_barrier_wait(&_start);
+		if (thiz->done) goto end;
+
 		if (op->span)
 		{
 			uint8_t *tmp;
@@ -356,6 +360,7 @@ static void * _thread_run(void *data)
 		enesim_barrier_wait(&_end);
 	} while (1);
 
+end:
 #ifdef _WIN32
 	return 0;
 #else
@@ -425,6 +430,7 @@ void enesim_renderer_sw_init(void)
 	for (i = 0; i < _num_cpus; i++)
 	{
 		_threads[i].cpuidx = i;
+		_threads[i].done = EINA_FALSE;
 		enesim_thread_new(&_threads[i].tid, _thread_run, (void *)&_threads[i]);
 		_enesim_affinity_set(_threads[i].tid, i);
 
@@ -436,6 +442,13 @@ void enesim_renderer_sw_shutdown(void)
 {
 #ifdef BUILD_THREAD
 	unsigned int i;
+
+	/* first mark all the threads to leave */
+	for (i = 0; i < _num_cpus; i++)
+		_threads[i].done = EINA_TRUE;
+
+	/* now increment the barrier so the threads start again */
+	enesim_barrier_wait(&_start);
 	/* destroy the threads */
 	for (i = 0; i < _num_cpus; i++)
 		enesim_thread_free(_threads[i].tid);
