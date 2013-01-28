@@ -156,7 +156,7 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                            Threaded rendering                              *
  *----------------------------------------------------------------------------*/
-#if defined BUILD_PTHREAD || defined _WIN32
+#ifdef BUILD_THREAD
 
 #ifdef _WIN32
 typedef HANDLE enesim_thread;
@@ -414,7 +414,7 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r,
  *============================================================================*/
 void enesim_renderer_sw_init(void)
 {
-#if defined BUILD_PTHREAD || defined _WIN32
+#ifdef BUILD_THREAD
 	unsigned int i = 0;
 
 	_num_cpus = eina_cpu_count();
@@ -434,7 +434,7 @@ void enesim_renderer_sw_init(void)
 
 void enesim_renderer_sw_shutdown(void)
 {
-#if defined BUILD_PTHREAD || defined _WIN32
+#ifdef BUILD_THREAD
 	unsigned int i;
 	/* destroy the threads */
 	for (i = 0; i < _num_cpus; i++)
@@ -462,7 +462,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	area->x -= x;
 	area->y -= y;
 
-#if defined BUILD_PTHREAD || defined _WIN32
+#ifdef BUILD_THREAD
 	_sw_draw_threaded(r, area, ddata, stride, dfmt);
 #else
 	_sw_draw_no_threaded(r, area, ddata, stride, dfmt);

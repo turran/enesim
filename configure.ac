@@ -52,17 +52,17 @@ AC_ARG_WITH([equanime],
    [want_equanime="yes"],
    [want_equanime="no"])
 
-## OpenCL
-AC_ARG_ENABLE([opencl],
-   [AS_HELP_STRING([--enable-opencl], [enable OpenCL backend])],
-   [
-    if test "x$enableval" = "xyes" ; then
-       want_opencl="yes"
-    else
-       want_opencl="no"
-    fi
-   ],
-   [want_opencl="no"])
+## OpenCL (disabled)
+#AC_ARG_ENABLE([opencl],
+#   [AS_HELP_STRING([--enable-opencl], [enable OpenCL backend])],
+#   [
+#    if test "x$enableval" = "xyes" ; then
+#       want_opencl="yes"
+#    else
+#       want_opencl="no"
+#    fi
+#   ],
+#   [want_opencl="no"])
 
 ## OpenGL
 AC_ARG_ENABLE([opengl],
@@ -94,9 +94,12 @@ ENS_SURFACE_FORMAT([rgb565_xa5], [no])
 ENS_SURFACE_FORMAT([rgb565_b1a3], [yes])
 ENS_SURFACE_FORMAT([rgb888], [yes])
 
+build_win32threads="no"
 case "$host_os" in
    mingw*)
       want_pthreads="no"
+      build_win32threads="yes"
+      AC_DEFINE([BUILD_THREAD], [1], [Build Threaded Rendering])
    ;;
 esac
 
@@ -168,10 +171,10 @@ if test "x${want_pthreads}" = "xyes" ; then
 fi
 
 ## openCL
-have_opencl="no"
-if test "x${want_opencl}" = "xyes" ; then
-   AC_CHECK_HEADERS([CL/cl.h], [have_opencl="yes"], [have_opencl="no"])
-fi
+#have_opencl="no"
+#if test "x${want_opencl}" = "xyes" ; then
+#   AC_CHECK_HEADERS([CL/cl.h], [have_opencl="yes"], [have_opencl="no"])
+#fi
 
 ## libjpeg
 AC_CHECK_HEADER([jpeglib.h],
@@ -208,7 +211,7 @@ if test "x${want_pthreads}" = "xyes" ; then
        AC_CHECK_LIB([pthread], [pthread_barrier_wait],
           [
            build_pthreads="yes"
-           AC_DEFINE([BUILD_PTHREAD], [1], [Build Threaded Rendering])
+           AC_DEFINE([BUILD_THREAD], [1], [Build Threaded Rendering])
            requirements_cflags="${requirements_cflags} -pthread"
            requirements_libs="${requirements_libs} -pthread"
           ],
@@ -238,17 +241,22 @@ fi
 AC_MSG_CHECKING([whether to build pthread code])
 AC_MSG_RESULT([${build_pthreads}])
 
+build_threads="no"
+if test "x${build_pthreads}" = "xyes" && test "x${build_win32threads}" = "xyes" ; then
+   build_threads="yes"
+fi
+
 ## OpenCL
 build_opencl="no"
-if test "x${have_opencl}" = "xyes" ; then
-   AC_CHECK_LIB([OpenCL], [clGetPlatformIDs],
-      [
-       build_opencl="yes"
-       requirements_libs="-lOpenCL ${requirements_libs}"
-       AC_DEFINE([BUILD_OPENCL], [1], [Build OpenCL Backend])
-      ],
-      [build_opencl="no"])
-fi
+#if test "x${have_opencl}" = "xyes" ; then
+#   AC_CHECK_LIB([OpenCL], [clGetPlatformIDs],
+#      [
+#       build_opencl="yes"
+#       requirements_libs="-lOpenCL ${requirements_libs}"
+#       AC_DEFINE([BUILD_OPENCL], [1], [Build OpenCL Backend])
+#      ],
+#      [build_opencl="no"])
+#fi
 
 AM_CONDITIONAL([HAVE_OPENCL], [test "x${build_opencl}" = "xyes"])
 
@@ -314,10 +322,6 @@ AM_CONDITIONAL([HAVE_OPENGL], [test "x${build_opengl}" = "xyes"])
 ENS_MODULE([Png], [${enable_png}], [yes])
 ENS_MODULE([Jpg], [${enable_jpg}], [yes])
 
-#######################################
-## PTHREADS
-
-
 
 # Unit tests, coverage and benchmarking
 
@@ -374,7 +378,7 @@ echo "  Build RGB565_b1A3 format support..........: ${format_rgb565_b1a3}"
 echo
 echo "CPU Specific Extensions:"
 echo
-echo "  Multi Core ...............................: ${build_pthreads}"
+echo "  Multi Core ...............................: ${build_threads}"
 echo "  MMX.......................................: ${have_mmx}"
 echo "  SSE.......................................: ${have_sse}"
 echo "  SSE2......................................: ${have_sse2}"
