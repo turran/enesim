@@ -43,6 +43,7 @@ src/lib/enesim_rasterizer.c \
 src/lib/enesim_renderer.c \
 src/lib/enesim_renderer_sw.c \
 src/lib/enesim_surface.c \
+src/lib/enesim_text.c \
 src/lib/enesim_private.h \
 src/lib/enesim_buffer_private.h \
 src/lib/enesim_compositor_private.h \

@@ -35,7 +35,7 @@ typedef struct _Enesim_Text_Grid_Cell
 
 typedef struct _Enesim_Text_Grid
 {
-	Etex *etex;
+	Enesim_Text_Engine *engine;
 	Enesim_Text_Font *font;
 	unsigned int cell_width;
 	unsigned int cell_height;
@@ -193,7 +193,7 @@ static Enesim_Renderer_Descriptor _enesim_text_grid_descriptor = {
 	/* .sw_cleanup = 		*/ _enesim_text_grid_cleanup,
 };
 
-static Enesim_Renderer * _enesim_text_grid_new(Etex *etex)
+static Enesim_Renderer * _enesim_text_grid_new(Enesim_Text_Engine *engine)
 {
 	Enesim_Text_Grid *thiz;
 	Enesim_Renderer *r;
@@ -202,9 +202,9 @@ static Enesim_Renderer * _enesim_text_grid_new(Etex *etex)
 	if (!thiz)
 		return NULL;
 
-	thiz->etex = etex;
+	thiz->engine = engine;
 
-	r = enesim_text_base_new(etex, &_enesim_text_grid_descriptor, thiz);
+	r = enesim_text_base_new(engine, &_enesim_text_grid_descriptor, thiz);
 	if (!thiz) goto renderer_err;
 
 	return r;
@@ -226,14 +226,14 @@ renderer_err:
  */
 EAPI Enesim_Renderer * enesim_text_grid_new(void)
 {
-	return _enesim_text_grid_new(enesim_text_default_get());
+	return _enesim_text_grid_new(enesim_text_engine_default_get());
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Renderer * enesim_text_grid_new_from_etex(Etex *e)
+EAPI Enesim_Renderer * enesim_text_grid_new_from_engine(Enesim_Text_Engine *e)
 {
 	return _enesim_text_grid_new(e);
 }

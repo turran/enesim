@@ -84,7 +84,7 @@ typedef struct _Enesim_Renderer_Text_Base_Descriptor
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 } Enesim_Renderer_Text_Base_Descriptor;
 
-Enesim_Renderer * enesim_renderer_text_base_new(Etex *etex, Enesim_Renderer_Text_Base_Descriptor *descriptor, void *data);
+Enesim_Renderer * enesim_renderer_text_base_new(Enesim_Text_Engine *engine, Enesim_Renderer_Text_Base_Descriptor *descriptor, void *data);
 void * enesim_renderer_text_base_data_get(Enesim_Renderer *r);
 void enesim_renderer_text_base_setup(Enesim_Renderer *r);
 

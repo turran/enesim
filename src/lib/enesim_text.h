@@ -44,7 +44,7 @@ EAPI int enesim_text_init(void);
 EAPI int enesim_text_shutdown(void);
 
 typedef struct _Enesim_Text_Engine Enesim_Text_Engine;
-EAPI Enesim_Text_Engine * enesim_text_default_get(void);
+EAPI Enesim_Text_Engine * enesim_text_engine_default_get(void);
 EAPI Enesim_Text_Engine * enesim_text_freetype_get(void);
 EAPI void enesim_text_engine_delete(Enesim_Text_Engine *e);
 

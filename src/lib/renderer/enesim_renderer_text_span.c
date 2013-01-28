@@ -1,5 +1,5 @@
-/* ETEX - Enesim's Text Renderer
- * Copyright (C) 2010 Jorge Luis Zapata
+/* ENESIM - Direct Rendering Library
+ * Copyright (C) 2007-2011 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,14 +15,25 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
+#include "enesim_private.h"
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "enesim_main.h"
+#include "enesim_eina.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+#include "enesim_renderer_shape.h"
 
-#include "Enesim_Text.h"
+#include "enesim_text.h"
 #include "enesim_text_private.h"
-#include <math.h>
+#include "enesim_renderer_shape_private.h"
+#include "enesim_renderer_text_base_private.h"
 /**
  * @todo
  * Add a buffer interface, this way an API user might want to use each own
@@ -32,6 +43,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_text
+
 typedef struct _Enesim_Renderer_Text_Span_State
 {
 	Enesim_Text_Buffer *buffer;
@@ -41,7 +54,7 @@ typedef struct _Enesim_Renderer_Text_Span
 {
 	Enesim_Renderer_Text_Span_State old, curr;
 	Enesim_Text_Direction direction;
-	Etex *etex;
+	Enesim_Text_Engine *engine;
 	Enesim_Text_Font *font;
 	unsigned int width;
 	unsigned int height;
@@ -255,7 +268,7 @@ next:
 
 static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstates,
+		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -424,7 +437,7 @@ unload:
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
- *                           The Etex Base interface                          *
+ *                           The Text Base interface                          *
  *----------------------------------------------------------------------------*/
 static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r)
 {
@@ -434,7 +447,7 @@ static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r)
 static Eina_Bool _enesim_text_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		const Enesim_Text_Base_State *estates[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Text_Base_State *estates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Shape_Sw_Draw *fill, Enesim_Error **error)
 {
@@ -519,7 +532,7 @@ static void _enesim_renderer_text_span_free(Enesim_Renderer *r)
 static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		const Enesim_Text_Base_State *estates[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Text_Base_State *estates[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -543,7 +556,7 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 static void _enesim_renderer_text_span_destination_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		const Enesim_Text_Base_State *estates[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Text_Base_State *estates[ENESIM_RENDERER_STATES],
 		Eina_Rectangle *bounds)
 {
 	Enesim_Rectangle obounds;
@@ -580,10 +593,10 @@ static void _enesim_renderer_text_span_flags(Enesim_Renderer *r,
 			ENESIM_RENDERER_FLAG_AFFINE;
 }
 
-static Enesim_Text_Base_Descriptor _enesim_renderer_text_span_descriptor = {
+static Enesim_Renderer_Text_Base_Descriptor _enesim_renderer_text_span_descriptor = {
 	/* .name = 			*/ _enesim_renderer_text_span_name,
 	/* .free = 			*/ _enesim_renderer_text_span_free,
-	/* .bounds = 		*/ _enesim_renderer_text_span_bounds,
+	/* .bounds = 			*/ _enesim_renderer_text_span_bounds,
 	/* .destination_bounds = 	*/ _enesim_renderer_text_span_destination_bounds,
 	/* .flags = 			*/ _enesim_renderer_text_span_flags,
 	/* .hint_get = 			*/ NULL,
@@ -594,7 +607,7 @@ static Enesim_Text_Base_Descriptor _enesim_renderer_text_span_descriptor = {
 	/* .sw_cleanup = 		*/ _enesim_text_sw_cleanup,
 };
 
-static Enesim_Renderer * _enesim_renderer_text_span_new(Etex *etex)
+static Enesim_Renderer * _enesim_renderer_text_span_new(Enesim_Text_Engine *engine)
 {
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Renderer *r;
@@ -602,11 +615,11 @@ static Enesim_Renderer * _enesim_renderer_text_span_new(Etex *etex)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Text_Span));
 	if (!thiz) return NULL;
 
-	thiz->etex = etex;
+	thiz->engine = engine;
 	thiz->curr.buffer = enesim_text_buffer_new(0);
 	thiz->old.buffer = enesim_text_buffer_new(0);
 
-	r = enesim_renderer_text_base_new(etex, &_enesim_renderer_text_span_descriptor, thiz);
+	r = enesim_renderer_text_base_new(engine, &_enesim_renderer_text_span_descriptor, thiz);
 	if (!r) goto renderer_err;
 
 	return r;
@@ -628,14 +641,14 @@ renderer_err:
  */
 EAPI Enesim_Renderer * enesim_renderer_text_span_new(void)
 {
-	return _enesim_renderer_text_span_new(enesim_text_default_get());
+	return _enesim_renderer_text_span_new(enesim_text_engine_default_get());
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Renderer * enesim_renderer_text_span_new_from_etex(Etex *e)
+EAPI Enesim_Renderer * enesim_renderer_text_span_new_from_engine(Enesim_Text_Engine *e)
 {
 	return _enesim_renderer_text_span_new(e);
 }

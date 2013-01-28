@@ -1,23 +1,6 @@
 #ifndef _ENESIM_TEXT_PRIVATE_H
 #define _ENESIM_TEXT_PRIVATE_H
 
-#define ENESIM_TEXT_LOG_COLOR_DEFAULT EINA_COLOR_BLUE
-
-#ifdef ERR
-# undef ERR
-#endif
-#define ERR(...) EINA_LOG_DOM_ERR(enesim_text_log_dom_global, __VA_ARGS__)
-
-#ifdef WRN
-# undef WRN
-#endif
-#define WRN(...) EINA_LOG_DOM_WARN(enesim_text_log_dom_global, __VA_ARGS__)
-
-#ifdef DBG
-# undef DBG
-#endif
-#define DBG(...) EINA_LOG_DOM_DBG(enesim_text_log_dom_global, __VA_ARGS__)
-
 /* SIMD intrinsics */
 #ifdef ENS_HAVE_MMX
 #define LIBARGB_MMX 1
@@ -40,8 +23,6 @@
 #define LIBARGB_DEBUG 0
 
 #include "libargb.h"
-
-extern int enesim_text_log_dom_global;
 
 /* font interface */
 typedef struct _Enesim_Text_Glyph Enesim_Text_Glyph;

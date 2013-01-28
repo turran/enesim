@@ -43,7 +43,7 @@ typedef struct _Enesim_Text_Grid_String
 } Enesim_Text_Grid_String;
 
 EAPI Enesim_Renderer * enesim_text_grid_new(void);
-EAPI Enesim_Renderer * enesim_text_grid_new_from_etex(Etex *e);
+EAPI Enesim_Renderer * enesim_text_grid_new_from_engine(Enesim_Text_Engine *e);
 EAPI void enesim_text_grid_columns_set(Enesim_Renderer *r, unsigned int columns);
 EAPI void enesim_text_grid_rows_set(Enesim_Renderer *r, unsigned int rows);
 

@@ -57,6 +57,7 @@ struct log
 static struct log logs[] = {
 	{ &enesim_log_global,			"enesim" },
 	{ &enesim_log_image,			"enesim_image" },
+	{ &enesim_log_text,			"enesim_text" },
 	{ &enesim_log_pool,			"enesim_pool" },
 	{ &enesim_log_buffer,			"enesim_buffer" },
 	{ &enesim_log_surface,			"enesim_surface" },
@@ -115,6 +116,7 @@ static void _unregister_domains(void)
  *============================================================================*/
 int enesim_log_global = -1;
 int enesim_log_image = -1;
+int enesim_log_text = -1;
 int enesim_log_pool = -1;
 int enesim_log_surface = -1;
 int enesim_log_buffer = -1;

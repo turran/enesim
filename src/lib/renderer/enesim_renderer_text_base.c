@@ -27,15 +27,18 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_shape.h"
 
 #include "enesim_text.h"
 #include "enesim_text_private.h"
+#include "enesim_renderer_shape_private.h"
+#include "enesim_renderer_text_base_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 typedef struct _Enesim_Renderer_Text_Base
 {
-	Etex *etex;
+	Enesim_Text_Engine *engine;
 	Enesim_Renderer_Text_Base_State past, current;
 	Enesim_Text_Font *font;
 	/* interface */
@@ -91,7 +94,7 @@ static void _enesim_renderer_text_base_common_setup(Enesim_Renderer_Text_Base *t
 			thiz->font = NULL;
 		}
 		if (thiz->current.font_name && thiz->current.size)
-			thiz->font = enesim_text_font_load(thiz->etex, thiz->current.font_name, thiz->current.size);
+			thiz->font = enesim_text_font_load(thiz->engine, thiz->current.font_name, thiz->current.size);
 		thiz->has_changed = EINA_FALSE;
 	}
 }
@@ -294,7 +297,7 @@ static void _enesim_renderer_text_base_feature_get(Enesim_Renderer *r, Enesim_Sh
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Renderer * enesim_renderer_text_base_new(Etex *etex,
+Enesim_Renderer * enesim_renderer_text_base_new(Enesim_Text_Engine *engine,
 		Enesim_Renderer_Text_Base_Descriptor *descriptor,
 		void *data)
 
@@ -308,7 +311,7 @@ Enesim_Renderer * enesim_renderer_text_base_new(Etex *etex,
 		return NULL;
 
 	thiz->data = data;
-	thiz->etex = etex;
+	thiz->engine = engine;
 
 	thiz->free = descriptor->free;
 	thiz->has_changed = descriptor->has_changed;

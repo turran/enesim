@@ -17,83 +17,32 @@
  */
 #include "enesim_private.h"
 
+#include "enesim_main.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
 #include "enesim_text.h"
+
 #include "enesim_text_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static int _enesim_text_init_count = 0;
+#define ENESIM_LOG_DEFAULT enesim_log_text
 
 static void _enesim_text_setup(Enesim_Text_Engine *e)
 {
-	e->data = e->engine->init();
+	e->data = e->d->init();
 	e->fonts = eina_hash_string_superfast_new(NULL);
 }
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-int enesim_text_log_dom_global = -1;
-
 #if HAVE_FREETYPE
-extern Enesim_Text_Engine enesim_text_freetype;
+extern Enesim_Text_Engine_Descriptor enesim_text_freetype;
 #endif
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI int enesim_text_init(void)
-{
-	if (++_enesim_text_init_count != 1)
-		return _enesim_text_init_count;
-
-	if (!eina_init())
-	{
-		fprintf(stderr, "Enesim_Text_Engine: Eina init failed");
-		return --_enesim_text_init_count;
-	}
-
-	enesim_text_log_dom_global = eina_log_domain_register("etex", ENESIM_TEXT_LOG_COLOR_DEFAULT);
-	if (enesim_text_log_dom_global < 0)
-	{
-		EINA_LOG_ERR("Enesim_Text_Engine: Can not create a general log domain.");
-		goto shutdown_eina;
-	}
-
-	if (!enesim_init())
-	{
-		ERR("Enesim init failed");
-		goto unregister_log_domain;
-	}
-
-	return _enesim_text_init_count;
-
-  unregister_log_domain:
-	eina_log_domain_unregister(enesim_text_log_dom_global);
-	enesim_text_log_dom_global = -1;
-  shutdown_eina:
-	eina_shutdown();
-	return --_enesim_text_init_count;
-}
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI int enesim_text_shutdown(void)
-{
-	if (--_enesim_text_init_count != 0)
-		return _enesim_text_init_count;
-
-	enesim_shutdown();
-	eina_log_domain_unregister(enesim_text_log_dom_global);
-	enesim_text_log_dom_global = -1;
-	eina_shutdown();
-
-	return _enesim_text_init_count;
-}
 /**
  * To be documented
  * FIXME: To be fixed
@@ -108,7 +57,7 @@ EAPI Enesim_Text_Engine * enesim_text_freetype_get(void)
 	if (!e)
 	{
 		e = calloc(1, sizeof(Enesim_Text_Engine));
-		e->engine = &enesim_text_freetype;
+		e->d = &enesim_text_freetype;
 		_enesim_text_setup(e);
 	}
 	return e;
@@ -125,7 +74,7 @@ EAPI Enesim_Text_Engine * enesim_text_freetype_get(void)
 EAPI void enesim_text_engine_delete(Enesim_Text_Engine *e)
 {
 #if HAVE_FREETYPE
-	e->engine->shutdown(e->data);
+	e->d->shutdown(e->data);
 #endif
 }
 
