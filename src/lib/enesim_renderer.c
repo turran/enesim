@@ -64,8 +64,13 @@ typedef struct _Enesim_Renderer_Factory
 
 static Eina_Hash *_factories = NULL;
 
+static void _enesim_renderer_factory_free(void *data)
+{
+	Enesim_Renderer_Factory *f = data;
+	free(f);
+}
 /*----------------------------------------------------------------------------*
- *                   Functions to transform the bounds                     *
+ *                     Functions to transform the bounds                      *
  *----------------------------------------------------------------------------*/
 static inline void _enesim_renderer_bounds(Enesim_Renderer *r, Enesim_Rectangle *bounds,
 		const Enesim_Renderer_State *current,
@@ -263,7 +268,8 @@ static Eina_Bool _enesim_renderer_common_changed(Enesim_Renderer *r)
  *============================================================================*/
 void enesim_renderer_init(void)
 {
-	_factories = eina_hash_string_superfast_new(NULL);
+	_factories = eina_hash_string_superfast_new(
+			_enesim_renderer_factory_free);
 	enesim_renderer_sw_init();
 #if BUILD_OPENGL
 	enesim_renderer_opengl_init();
