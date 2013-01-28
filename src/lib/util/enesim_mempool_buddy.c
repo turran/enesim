@@ -92,7 +92,7 @@ static void *_buddy_init(EINA_UNUSED const char *context,
 	heap = va_arg(args, void *);
 	size = va_arg(args, size_t);
 	min_order = va_arg(args, int);
-	DBG("Creating a buddy allocator with heap %p, size %zu, min_order %d",
+	DBG("Creating a buddy allocator with heap %p, size %zu, min_order %zd",
 			heap, size, min_order);
 	/* the minimum order we support is 15 (32K) */
 	min_order = min_order < 15 ? 15 : min_order;
@@ -263,7 +263,7 @@ static void _buddy_statistics(void *data)
 		printf("\n2^%d:", b->min_order + i);
 		EINA_INLIST_FOREACH(b->areas[i], block)
 		{
-			printf(" %d", (block - &b->blocks[0]));
+			printf(" %zd", (block - &b->blocks[0]));
 		}
 	}
 	printf("\nBlocks dumping:\n");

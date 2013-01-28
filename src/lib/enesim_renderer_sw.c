@@ -208,7 +208,7 @@ enesim_barrier_new(Enesim_Barrier *barrier, int needed)
 }
 
 static void
-enesim_barrier_free(Eina_Barrier *barrier)
+enesim_barrier_free(Enesim_Barrier *barrier)
 {
    eina_condition_free(&(barrier->cond));
    eina_lock_free(&(barrier->cond_lock));
@@ -217,7 +217,7 @@ enesim_barrier_free(Eina_Barrier *barrier)
 }
 
 static Eina_Bool
-eina_barrier_wait(Eina_Barrier *barrier)
+enesim_barrier_wait(Enesim_Barrier *barrier)
 {
    eina_lock_take(&(barrier->cond_lock));
    barrier->called++;
@@ -238,8 +238,7 @@ enesim_thread_new(HANDLE *thread, LPTHREAD_START_ROUTINE callback, void *data)
 	return *thread != NULL;
 }
 #define enesim_thread_free(thread) CloseHandle(thread)
-{
-}
+
 #define _enesim_affinity_set(thread, cpunum) SetThreadAffinityMask(thread, 1 << (cpunum))
 #else
 static pthread_barrier_t _start;
@@ -358,7 +357,7 @@ static void * _thread_run(void *data)
 	} while (1);
 
 #ifdef _WIN32
-	return O;
+	return 0;
 #else
 	return NULL;
 #endif
@@ -463,7 +462,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	area->x -= x;
 	area->y -= y;
 
-#ifdef BUILD_PTHREAD
+#if defined BUILD_PTHREAD || defined _WIN32
 	_sw_draw_threaded(r, area, ddata, stride, dfmt);
 #else
 	_sw_draw_no_threaded(r, area, ddata, stride, dfmt);

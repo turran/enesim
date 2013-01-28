@@ -345,9 +345,9 @@ Enesim_Renderer * enesim_renderer_text_base_new(Enesim_Text_Engine *engine,
 	pdescriptor.opengl_setup = _enesim_renderer_text_base_opengl_setup;
 	pdescriptor.opengl_cleanup = _enesim_renderer_text_base_opengl_cleanup;
 #else
-	pdescriptor.opengl_initialize = NULL,
-	pdescriptor.opengl_setup = NULL,
-	pdescriptor.opengl_cleanup = NULL
+	pdescriptor.opengl_initialize = NULL;
+	pdescriptor.opengl_setup = NULL;
+	pdescriptor.opengl_cleanup = NULL;
 #endif
 
 	r = enesim_renderer_shape_new(&pdescriptor, thiz);
