@@ -380,6 +380,8 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 	{
 		if (r->descriptor.free)
 			r->descriptor.free(r);
+		if (r->name)
+			free(r->name);
 		eina_lock_free(&r->lock);
 		
 		eina_hash_free(r->prv_data);
