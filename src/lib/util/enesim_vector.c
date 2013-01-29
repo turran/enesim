@@ -78,6 +78,11 @@ Enesim_Point * enesim_point_new_from_coords(double x, double y)
 	return thiz;
 }
 
+double enesim_point_distance(Enesim_Point *p0, Enesim_Point *p1)
+{
+	return hypot(p1->x - p0->x, p1->y - p0->y);
+}
+
 Enesim_Polygon * enesim_polygon_new(void)
 {
 	Enesim_Polygon *p;

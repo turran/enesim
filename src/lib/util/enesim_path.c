@@ -37,21 +37,40 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Enesim_Path_Dashed
+{
+	/* keep the original path */
+	Enesim_Path *p;
+	/* the properties */
+	Enesim_Figure *stroke_figure;
+	Enesim_Shape_Stroke_Cap cap;
+	Enesim_Shape_Stroke_Join join;
+	double sw;
+	const Eina_List *dashes;
+	/* our own private data */
+	Enesim_Polygon *original_polygon;
+	Enesim_Polygon *dash_polygon;
+	Enesim_Figure *dash_figure;
+	const Enesim_Shape_Stroke_Dash *current;
+	double dist;
+} Enesim_Path_Dashed;
+
 typedef struct _Enesim_Path_Stroke
 {
 	/* keep the original path */
 	Enesim_Path *p;
+	/* the properties */
+	Enesim_Figure *stroke_figure;
+	Enesim_Shape_Stroke_Cap cap;
+	Enesim_Shape_Stroke_Join join;
+	double sw;
 	/* our own private data */
 	Enesim_Polygon *original_polygon;
 	Enesim_Polygon *offset_polygon;
 	Enesim_Polygon *inset_polygon;
-	Enesim_Figure *stroke_figure;
 	Enesim_Point first;
 	Enesim_Point p0, p1, p2;
 	Enesim_Point n01, n12;
-	Enesim_Shape_Stroke_Join join;
-	Enesim_Shape_Stroke_Cap cap;
-	double sw;
 	double rx;
 	double ry;
 	int count;
@@ -516,6 +535,89 @@ static Enesim_Path_Descriptor _full_descriptor = {
 	/* .path_begin 		= */ _stroke_path_begin,
 	/* .path_done 		= */ _stroke_path_done,
 };
+/*----------------------------------------------------------------------------*
+ *                              Dashed stroke                                 *
+ *----------------------------------------------------------------------------*/
+static void _dashed_path_vertex_add(double x, double y, void *data)
+{
+	Enesim_Path_Dashed *thiz = data;
+	Enesim_Point *prev;
+
+	/* generate the fill polygon */
+	enesim_polygon_point_append_from_coords(thiz->original_polygon, x, y);
+
+	/* check if we can add a new vertex */
+	prev = eina_list_data_get(eina_list_last(thiz->dash_polygon->points));
+	if (!prev)
+	{
+		enesim_polygon_point_append_from_coords(thiz->dash_polygon, x, y);
+	}
+	else
+	{
+		Enesim_Point p;
+		double d;
+
+		/* TODO calculate the vector description of this new line */
+		/* divide the edge by the current dash, etc */
+		p.x = x;
+		p.y = y;
+		p.z = 0;
+		d = enesim_point_distance(prev, &p);
+		thiz->dist += d;
+	}
+}
+
+static void _dashed_path_polygon_add(void *data)
+{
+        Enesim_Path_Dashed *thiz = data;
+	Enesim_Path *path = thiz->p;
+	Enesim_Polygon *p;
+
+	p = enesim_polygon_new();
+	enesim_polygon_threshold_set(p, 1/256.0); // FIXME make 1/256.0 a constant */
+	enesim_figure_polygon_append(path->figure, p);
+	thiz->original_polygon = p;
+
+	p = enesim_polygon_new();
+	enesim_polygon_threshold_set(p, 1/256.0); // FIXME make 1/256.0 a constant */
+	enesim_figure_polygon_append(thiz->dash_figure, p);
+	thiz->dash_polygon = p;
+}
+
+static void _dashed_path_begin(void *data)
+{
+	Enesim_Path_Dashed *thiz = data;
+	Enesim_Path *path = thiz->p;
+
+	/* initialize our state */
+	thiz->dash_figure = enesim_figure_new();
+	thiz->current = eina_list_data_get(thiz->dashes);
+	thiz->dist = 0;
+}
+
+static void _dashed_path_done(void *data)
+{
+        Enesim_Path_Dashed *thiz = data;
+	/* TODO once everything's done, generate the stroke
+	 * for that we need to split the full descriptor into something
+	 * more usable that will note generate the fill figure too
+	 */
+}
+
+static void _dashed_path_polygon_close(Eina_Bool close, void *data)
+{
+        Enesim_Path_Dashed *thiz = data;
+
+	enesim_polygon_close(thiz->original_polygon, close);
+}
+
+static Enesim_Path_Descriptor _dashed_descriptor = {
+	/* .vertex_add		= */ _dashed_path_vertex_add, 
+	/* .polygon_add 	= */ _dashed_path_polygon_add,
+	/* .polygon_close 	= */ _dashed_path_polygon_close,
+	/* .path_begin 		= */ _dashed_path_begin,
+	/* .path_done 		= */ _dashed_path_done,
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -600,6 +702,48 @@ void enesim_path_full_stroke_weight_set(Enesim_Path *thiz, double sw)
 {
 	Enesim_Path_Stroke *s = thiz->data;
 	s->sw = sw;
+}
+
+Enesim_Path * enesim_path_dashed_new(void)
+{
+	Enesim_Path_Dashed *d;
+	Enesim_Path *thiz;
+
+	d = calloc(1, sizeof(Enesim_Path_Dashed));
+	thiz = enesim_path_new(&_dashed_descriptor, d);
+	d->p = thiz;
+
+	return thiz;
+}
+
+void enesim_path_dashed_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke)
+{
+	Enesim_Path_Dashed *s = thiz->data;
+	s->stroke_figure = stroke;
+}
+
+void enesim_path_dashed_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap)
+{
+	Enesim_Path_Dashed *s = thiz->data;
+	s->cap = cap;
+}
+
+void enesim_path_dashed_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join)
+{
+	Enesim_Path_Dashed *s = thiz->data;
+	s->join = join;
+}
+
+void enesim_path_dashed_stroke_weight_set(Enesim_Path *thiz, double sw)
+{
+	Enesim_Path_Dashed *s = thiz->data;
+	s->sw = sw;
+}
+
+void enesim_path_dashed_stroke_dash_set(Enesim_Path *thiz, const Eina_List *dashes)
+{
+	Enesim_Path_Dashed *s = thiz->data;
+	s->dashes = dashes;
 }
 
 void * enesim_path_data_get(Enesim_Path *thiz)

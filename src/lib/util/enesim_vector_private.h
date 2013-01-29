@@ -110,6 +110,7 @@ static inline Eina_F16p16 enesim_f16p16_line_affine_setup(Enesim_F16p16_Line *l,
 
 Enesim_Point * enesim_point_new(void);
 Enesim_Point * enesim_point_new_from_coords(double x, double y);
+double enesim_point_distance(Enesim_Point *p0, Enesim_Point *p1);
 
 Enesim_Polygon * enesim_polygon_new(void);
 void enesim_polygon_delete(Enesim_Polygon *thiz);

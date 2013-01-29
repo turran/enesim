@@ -59,4 +59,11 @@ void enesim_path_full_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap 
 void enesim_path_full_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join);
 void enesim_path_full_stroke_weight_set(Enesim_Path *thiz, double sw);
 
+Enesim_Path * enesim_path_dashed_new(void);
+void enesim_path_dashed_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke);
+void enesim_path_dashed_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap);
+void enesim_path_dashed_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join);
+void enesim_path_dashed_stroke_weight_set(Enesim_Path *thiz, double sw);
+void enesim_path_dashed_stroke_dash_set(Enesim_Path *thiz, const Eina_List *dashes);
+
 #endif

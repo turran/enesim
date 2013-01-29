@@ -43,6 +43,12 @@ typedef enum _Enesim_Shape_Stroke_Location
 	ENESIM_SHAPE_STROKE_CENTER,
 } Enesim_Shape_Stroke_Location;
 
+typedef struct _Enesim_Shape_Stroke_Dash
+{
+	double length;
+	double gap;
+} Enesim_Shape_Stroke_Dash;
+
 #define ENESIM_SHAPE_DRAW_MODE_STROKE_FILL (ENESIM_SHAPE_DRAW_MODE_FILL | ENESIM_SHAPE_DRAW_MODE_STROKE)
 
 typedef enum _Enesim_Shape_Stroke_Cap
@@ -84,7 +90,9 @@ EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Shape
 EAPI void enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Join *join);
 EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
 EAPI void enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r, Enesim_Renderer **o);
-
+EAPI void enesim_renderer_shape_stroke_dash_add_simple(Enesim_Renderer *r, double length, double gap);
+EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r, const Enesim_Shape_Stroke_Dash *dash);
+EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r);
 /* fill properties */
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color fill_color);
 EAPI void enesim_renderer_shape_fill_color_get(Enesim_Renderer *r, Enesim_Color *fill_color);

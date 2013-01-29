@@ -28,6 +28,7 @@ typedef struct _Enesim_Renderer_Shape_State
 		Enesim_Shape_Stroke_Location location;
 		Enesim_Shape_Stroke_Cap cap;
 		Enesim_Shape_Stroke_Join join;
+		Eina_List *dashes;
 	} stroke;
 
 	struct {

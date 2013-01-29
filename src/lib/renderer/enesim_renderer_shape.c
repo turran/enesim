@@ -65,6 +65,7 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_Shape_State past;
 	/* private */
 	Eina_Bool changed : 1;
+	Eina_Bool dash_changed : 1;
 	/* interface */
 	Enesim_Renderer_Shape_Bounds bounds;
 	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
@@ -297,6 +298,11 @@ static Eina_Bool _enesim_renderer_shape_changed_basic(Enesim_Renderer_Shape *thi
 {
 	if (!thiz->changed)
 		return EINA_FALSE;
+	/* we wont compare the stroke dashes, it has changed, then
+	 * modify it directly
+	 */
+	if (thiz->dash_changed)
+		return EINA_TRUE;
 	/* the stroke */
 	/* color */
 	if (thiz->current.stroke.color != thiz->past.stroke.color)
@@ -518,7 +524,12 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		enesim_renderer_cleanup(thiz->current.stroke.r, s);
 	}
+	/* swap the states */
+	/* TODO given that we keep a ref, we should this more smartly */
 	thiz->past = thiz->current;
+	/* unmark the changes */
+	thiz->changed = EINA_FALSE;
+	thiz->dash_changed = EINA_FALSE;
 }
 
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
@@ -866,4 +877,55 @@ EAPI void enesim_renderer_shape_feature_get(Enesim_Renderer *r, Enesim_Shape_Fea
 	*features = 0;
 	if (thiz->feature_get)
 		thiz->feature_get(r, features);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_dash_add_simple(Enesim_Renderer *r,
+		double length, double gap)
+{
+	Enesim_Shape_Stroke_Dash dash;
+
+	dash.length = length;
+	dash.gap = gap;
+	enesim_renderer_shape_stroke_dash_add(r, &dash);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r,
+		const Enesim_Shape_Stroke_Dash *dash)
+{
+	Enesim_Renderer_Shape *thiz;
+	Enesim_Shape_Stroke_Dash *d;
+
+	thiz = _shape_get(r);
+	d = malloc(sizeof(Enesim_Shape_Stroke_Dash));
+	*d = *dash;
+	thiz->current.stroke.dashes = eina_list_append(thiz->current.stroke.dashes, d);
+	thiz->changed = EINA_TRUE;
+	thiz->dash_changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *thiz;
+	Enesim_Shape_Stroke_Dash *d;
+
+	thiz = _shape_get(r);
+	EINA_LIST_FREE (thiz->current.stroke.dashes, d)
+	{
+		free(d);
+	}
+	thiz->changed = EINA_TRUE;
+	thiz->dash_changed = EINA_TRUE;
+	thiz->current.stroke.dashes = NULL;
 }
