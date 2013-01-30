@@ -744,6 +744,9 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 		Enesim_Shape_Stroke_Cap cap,
 		Eina_List *dashes)
 {
+	Enesim_Path *path;
+	Enesim_Figure *stroke_figure = NULL;
+
 	if (thiz->fill_figure)
 		enesim_figure_clear(thiz->fill_figure);
 	else
@@ -755,45 +758,31 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 		thiz->stroke_figure = enesim_figure_new();
 	if ((dm & ENESIM_SHAPE_DRAW_MODE_STROKE) && (sw > 1.0))
 	{
-		Enesim_Path *path;
 		if (!dashes)
-		{
-			enesim_path_full_stroke_figure_set(thiz->stroke_path, thiz->stroke_figure);
-			enesim_path_full_stroke_cap_set(thiz->stroke_path, cap);
-			enesim_path_full_stroke_join_set(thiz->stroke_path, join);
-			enesim_path_full_stroke_weight_set(thiz->stroke_path, sw);
 			path = thiz->stroke_path;
-		}
 		else
-		{
-			enesim_path_dashed_stroke_figure_set(thiz->dashed_path, thiz->stroke_figure);
-			enesim_path_dashed_stroke_cap_set(thiz->dashed_path, cap);
-			enesim_path_dashed_stroke_join_set(thiz->dashed_path, join);
-			enesim_path_dashed_stroke_weight_set(thiz->dashed_path, sw);
-			enesim_path_dashed_stroke_dash_set(thiz->dashed_path, dashes);
 			path = thiz->dashed_path;
-		}
-
-		enesim_path_figure_set(path, thiz->fill_figure);
-		enesim_path_scale_set(path, sx, sy);
-		enesim_path_transformation_set(path, transformation);
-
-		enesim_path_generate(path, thiz->commands);
-
-		enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
-		enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, thiz->stroke_figure);
+		stroke_figure = thiz->stroke_figure;
 	}
 	else
 	{
-		enesim_path_figure_set(thiz->strokeless_path, thiz->fill_figure);
-		enesim_path_scale_set(thiz->strokeless_path, sx, sy);
-		enesim_path_transformation_set(thiz->strokeless_path, transformation);
+		path = thiz->strokeless_path;
 
-		enesim_path_generate(thiz->strokeless_path, thiz->commands);
-
-		/* set the fill figure on the bifigure as its under polys */
-		enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 	}
+	enesim_path_figure_set(path, thiz->fill_figure);
+	enesim_path_stroke_figure_set(path, thiz->stroke_figure);
+	enesim_path_stroke_cap_set(path, cap);
+	enesim_path_stroke_join_set(path, join);
+	enesim_path_stroke_weight_set(path, sw);
+	enesim_path_stroke_dash_set(path, dashes);
+	enesim_path_scale_set(path, sx, sy);
+	enesim_path_transformation_set(path, transformation);
+	enesim_path_generate(path, thiz->commands);
+
+	/* set the fill figure on the bifigure as its under polys */
+	enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
+	/* set the stroke figure on the bifigure as its under polys */
+	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, stroke_figure);
 
 	thiz->generated = EINA_TRUE;
 	/* update the last values */
@@ -1115,7 +1104,7 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 	thiz->bifigure = r;
 
 	/* create the different path implementations */
-	thiz->stroke_path = enesim_path_full_new();
+	thiz->stroke_path = enesim_path_stroke_dashless_new();
 	thiz->strokeless_path = enesim_path_strokeless_new();
 	thiz->dashed_path = enesim_path_dashed_new();
 

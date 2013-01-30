@@ -36,10 +36,15 @@ typedef struct _Enesim_Path
 {
 	Enesim_Path_Descriptor *descriptor;
 	Enesim_Curve_State st;
-	Enesim_Figure *figure;
 	const Enesim_Matrix *gm;
 	double scale_x;
 	double scale_y;
+	Enesim_Figure *figure;
+	Enesim_Figure *stroke_figure;
+	Enesim_Shape_Stroke_Cap cap;
+	Enesim_Shape_Stroke_Join join;
+	double sw;
+	const Eina_List *dashes;
 	void *data;
 } Enesim_Path;
 
@@ -48,22 +53,17 @@ void enesim_path_free(Enesim_Path *thiz);
 void enesim_path_figure_set(Enesim_Path *thiz, Enesim_Figure *figure);
 void enesim_path_transformation_set(Enesim_Path *thiz, const Enesim_Matrix *matrix);
 void enesim_path_scale_set(Enesim_Path *thiz, double scale_x, double scale_y);
+void enesim_path_stroke_dash_set(Enesim_Path *thiz, const Eina_List *dashes);
+void enesim_path_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke);
+void enesim_path_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap);
+void enesim_path_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join);
+void enesim_path_stroke_weight_set(Enesim_Path *thiz, double sw);
+
 void * enesim_path_data_get(Enesim_Path *thiz);
 void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands);
 
 Enesim_Path * enesim_path_strokeless_new(void);
-
-Enesim_Path * enesim_path_full_new(void);
-void enesim_path_full_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke);
-void enesim_path_full_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap);
-void enesim_path_full_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join);
-void enesim_path_full_stroke_weight_set(Enesim_Path *thiz, double sw);
-
+Enesim_Path * enesim_path_stroke_dashless_new(void);
 Enesim_Path * enesim_path_dashed_new(void);
-void enesim_path_dashed_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke);
-void enesim_path_dashed_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap);
-void enesim_path_dashed_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join);
-void enesim_path_dashed_stroke_weight_set(Enesim_Path *thiz, double sw);
-void enesim_path_dashed_stroke_dash_set(Enesim_Path *thiz, const Eina_List *dashes);
 
 #endif
