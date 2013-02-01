@@ -378,6 +378,7 @@ static void jpg_provider_shutdown(void)
 {
 	enesim_image_finder_unregister(&_finder);
 	enesim_image_provider_unregister(&_provider, "image/jpg");
+	enesim_image_provider_unregister(&_provider, "image/jpeg");
 	eina_log_domain_unregister(enesim_image_log_dom_jpg);
 	enesim_image_log_dom_jpg = -1;
 }

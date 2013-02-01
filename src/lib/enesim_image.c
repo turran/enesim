@@ -335,6 +335,9 @@ EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd,
 		{
 			eina_hash_del(_providers, mime, tmp);
 		}
+		/* finally free the provider itself */
+		free(p);
+
 		break;
 	}
 }
