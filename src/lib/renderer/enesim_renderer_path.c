@@ -42,6 +42,12 @@
 #include "enesim_curve_private.h"
 #include "enesim_path_private.h"
 
+/* Some useful macros for debugging */
+/* In case this is set, if the path has a stroke, only the stroke will be
+ * rendered
+ */
+#define WIREFRAME 0
+
 /**
  * TODO
  * - Use the threshold on the curve state
@@ -781,8 +787,12 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 
 	/* set the fill figure on the bifigure as its under polys */
 	enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
+#if WIREFRAME
+	enesim_rasterizer_figure_set(thiz->bifigure, stroke_figure);
+#else
 	/* set the stroke figure on the bifigure as its under polys */
 	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, stroke_figure);
+#endif
 
 	thiz->generated = EINA_TRUE;
 	/* update the last values */
@@ -856,7 +866,11 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 				css->stroke.join, css->stroke.cap, css->stroke.dashes);
 	}
 
+#if WIREFRAME
+	enesim_renderer_shape_draw_mode_set(thiz->bifigure, ENESIM_SHAPE_DRAW_MODE_STROKE);
+#else
 	enesim_renderer_shape_draw_mode_set(thiz->bifigure, css->draw_mode);
+#endif
 	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, css->stroke.weight);
 	enesim_renderer_shape_stroke_color_set(thiz->bifigure, css->stroke.color);
 	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, css->stroke.r);
