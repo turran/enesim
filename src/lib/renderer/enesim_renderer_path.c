@@ -820,6 +820,10 @@ static void _path_free(Enesim_Renderer *r)
 
 	/* TODO: not finished */
 	thiz = _path_get(r);
+	if (thiz->stroke_figure)
+		enesim_figure_delete(thiz->stroke_figure);
+	if (thiz->fill_figure)
+		enesim_figure_delete(thiz->fill_figure);
 	if (thiz->dashed_path)
 		enesim_path_free(thiz->dashed_path);
 	if (thiz->strokeless_path)
