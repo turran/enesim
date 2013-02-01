@@ -826,6 +826,7 @@ static void _path_free(Enesim_Renderer *r)
 		enesim_path_free(thiz->strokeless_path);
 	if (thiz->stroke_path)
 		enesim_path_free(thiz->stroke_path);
+	enesim_renderer_path_command_clear(r);
 	free(thiz);
 }
 
@@ -1147,6 +1148,7 @@ EAPI void enesim_renderer_path_command_clear(Enesim_Renderer *r)
 	{
 		free(c);
 	}
+	thiz->commands = eina_list_free(thiz->commands);
 }
 
 /**
