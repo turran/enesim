@@ -75,6 +75,7 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_Shape_Feature_Get feature_get;
 	Enesim_Renderer_Has_Changed has_changed;
+	Enesim_Renderer_Delete free;
 	void *data;
 } Enesim_Renderer_Shape;
 
@@ -458,6 +459,17 @@ send_old:
 		}
 	}
 }
+
+static void _enesim_renderer_shape_free(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = _shape_get(r);
+	if (thiz->free)
+		thiz->free(r);
+	/* TODO unref the stroke renderer and fill renderer */
+	free(thiz);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -484,10 +496,11 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	thiz->destination_bounds = descriptor->destination_bounds;
 	thiz->bounds = descriptor->bounds;
 	thiz->feature_get = descriptor->feature_get;
+	thiz->free = descriptor->free;
 	/* set the parent descriptor */
 	pdescriptor.version = ENESIM_RENDERER_API;
 	pdescriptor.name = descriptor->name;
-	pdescriptor.free = descriptor->free;
+	pdescriptor.free = _enesim_renderer_shape_free;
 	pdescriptor.bounds = _enesim_renderer_shape_bounds;
 	pdescriptor.destination_bounds = _enesim_renderer_shape_destination_bounds;
 	pdescriptor.flags = descriptor->flags;

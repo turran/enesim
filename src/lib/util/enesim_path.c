@@ -908,7 +908,11 @@ static Enesim_Path_Descriptor _full_descriptor = {
 
 static void _stroke_dashless_path_free(void *data)
 {
-	free(data);
+	Enesim_Path_Stroke_Dashless *thiz = data;
+
+	enesim_path_free(thiz->fill);
+	enesim_path_free(thiz->stroke);
+	free(thiz);
 }
 
 static void _stroke_dashless_path_vertex_add(double x, double y, void *data)

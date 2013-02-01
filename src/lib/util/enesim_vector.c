@@ -155,9 +155,7 @@ void enesim_polygon_clear(Enesim_Polygon *thiz)
 
 void enesim_polygon_delete(Enesim_Polygon *thiz)
 {
-	Enesim_Point *pt;
-	EINA_LIST_FREE(thiz->points, pt)
-		free(pt);
+	enesim_polygon_clear(thiz);
 	free(thiz);
 }
 
