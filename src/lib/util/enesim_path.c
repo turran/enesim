@@ -1012,7 +1012,6 @@ static void _dashed_path_free(void *data)
 {
 	Enesim_Path_Dashed *d = data;
 
-	printf("dashed_free\n");
 	if (d->stroke)
 		enesim_path_free(d->stroke);
 	if (d->fill)
