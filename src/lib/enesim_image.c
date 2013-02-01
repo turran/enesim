@@ -140,6 +140,7 @@ int enesim_image_shutdown(void)
 
 	/* unload every module */
 	eina_module_list_free(_modules);
+	eina_array_free(_modules);
 #if BUILD_STATIC_MODULE_PNG
 	png_provider_shutdown();
 #endif
