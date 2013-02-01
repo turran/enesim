@@ -136,7 +136,6 @@ static void _figure_path_setup(Enesim_Renderer_Figure *thiz,
 	/* base properties */
 	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
 	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
-	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
 	enesim_renderer_color_set(thiz->path, cs->color);
 	enesim_renderer_rop_set(thiz->path, cs->rop);
 }

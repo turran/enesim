@@ -428,7 +428,9 @@ static Eina_Bool _line_state_setup(Enesim_Renderer *r,
 
 	if (!_line_generate(thiz, cs, css))
 	{
-		ENESIM_RENDERER_ERROR(r, error, "Invalid size");
+		ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g -> %g %g",
+				thiz->current.x0, thiz->current.y0,
+				thiz->current.x1, thiz->current.y1);
 		return EINA_FALSE;
 	}
 

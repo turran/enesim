@@ -89,7 +89,7 @@ typedef struct _Enesim_Path_Stroke
 	Enesim_Polygon *offset_polygon;
 	Enesim_Polygon *inset_polygon;
 	Enesim_Point first;
-	Enesim_Point first_on_polygon;
+	Enesim_Point last;
 	Enesim_Point p0, p1, p2;
 	Enesim_Point n01, n12;
 	double rx;
@@ -502,13 +502,9 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Path_Stroke *thiz = data;
 
-	/* just save the first vertex on the polygon for later */
-	if (!thiz->count)
-	{
-		thiz->first_on_polygon.x = x;
-		thiz->first_on_polygon.y = y;
-	}
 	_stroke_path_vertex_process(x, y, data);
+	thiz->last.x = x;
+	thiz->last.y = y;
 }
 
 static void _stroke_path_polygon_add(void *data)
@@ -567,10 +563,12 @@ static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 	if (close)
 	{
 		/* also close the figure itself */
+		//printf("adding %g %g\n", thiz->first.x, thiz->first.y);
 		_stroke_path_vertex_process(thiz->first.x, thiz->first.y, thiz);
 		/* close the inset/off with the join cap */
-		_stroke_path_vertex_process(thiz->first_on_polygon.x,
-				thiz->first_on_polygon.y, thiz);
+		//printf("adding %g %g\n", thiz->last.x, thiz->last.y);
+		_stroke_path_vertex_process(thiz->last.x,
+				thiz->last.y, thiz);
 
 		/* reset the inset/offset */
 		thiz->inset_polygon = NULL;
@@ -851,10 +849,12 @@ static void _full_path_polygon_close(Eina_Bool close, void *data)
 		Eina_List *l;
 		/* also close the figure itself */
 		_full_path_vertex_process(thiz->first.x, thiz->first.y, thiz);
+		//printf("adding %g %g\n", thiz->first.x, thiz->first.y);
 		enesim_polygon_close(thiz->original_polygon, EINA_TRUE);
 		/* close the inset/off with the join cap */
 		l = eina_list_next(thiz->original_polygon->points);
 		p = eina_list_data_get(l);
+		//printf("adding %g %g\n", p->x, p->y);
 		_full_path_vertex_process(p->x, p->y, thiz);
 
 		/* reset the inset/offset */
@@ -882,7 +882,7 @@ static void _full_path_done(void *data)
         Enesim_Path_Full *thiz = data;
 
 	/* check that we are not closed */
-	if (!thiz->original_polygon->closed)
+	if (thiz->original_polygon && !thiz->original_polygon->closed)
 	{
 		enesim_polygon_close(thiz->original_polygon, EINA_TRUE);
 		_full_path_merge(thiz);
@@ -934,7 +934,6 @@ static void _stroke_dashless_path_polygon_close(Eina_Bool close, void *data)
 	_path_polygon_close(thiz->fill, close);
 	_path_polygon_close(thiz->stroke, close);
 }
-
 
 static void _stroke_dashless_path_begin(void *data)
 {
@@ -1300,7 +1299,7 @@ Enesim_Path * enesim_path_stroke_new(void)
 
 Enesim_Path * enesim_path_stroke_dashless_new(void)
 {
-#if 0
+#if 1
 	Enesim_Path_Stroke_Dashless *s;
 	Enesim_Path *thiz;
 
