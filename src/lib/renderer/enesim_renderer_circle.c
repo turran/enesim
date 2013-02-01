@@ -252,24 +252,8 @@ static void _circle_destination_bounds(Enesim_Renderer *r,
 		Eina_Rectangle *bounds)
 {
 	Enesim_Rectangle obounds;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 
 	_circle_bounds(r, states, sstates, &obounds);
-	/* apply the inverse matrix */
-	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
-	{
-		Enesim_Quad q;
-		Enesim_Matrix m;
-
-		enesim_matrix_inverse(&cs->transformation, &m);
-		enesim_matrix_rectangle_transform(&m, &obounds, &q);
-		enesim_quad_rectangle_to(&q, &obounds);
-		/* fix the antialias scaling */
-		obounds.x -= m.xx;
-		obounds.y -= m.yy;
-		obounds.w += m.xx;
-		obounds.h += m.yy;
-	}
 	bounds->x = floor(obounds.x);
 	bounds->y = floor(obounds.y);
 	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
