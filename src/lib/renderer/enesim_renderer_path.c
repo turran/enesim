@@ -814,6 +814,21 @@ static const char * _path_name(Enesim_Renderer *r EINA_UNUSED)
 	return "path";
 }
 
+static void _path_free(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Path *thiz;
+
+	/* TODO: not finished */
+	thiz = _path_get(r);
+	if (thiz->dashed_path)
+		enesim_path_free(thiz->dashed_path);
+	if (thiz->strokeless_path)
+		enesim_path_free(thiz->strokeless_path);
+	if (thiz->stroke_path)
+		enesim_path_free(thiz->stroke_path);
+	free(thiz);
+}
+
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
@@ -1056,7 +1071,7 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .name =			*/ _path_name,
-	/* .free =			*/ NULL,
+	/* .free =			*/ _path_free,
 	/* .bounds =			*/ _path_bounds,
 	/* .destination_bounds =	*/ _path_destination_bounds,
 	/* .flags =			*/ _path_flags,

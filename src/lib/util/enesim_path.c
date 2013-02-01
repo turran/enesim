@@ -163,6 +163,12 @@ static void _path_move_to(Enesim_Path *thiz,
 /*----------------------------------------------------------------------------*
  *                              Without stroke                                *
  *----------------------------------------------------------------------------*/
+
+static void _strokeless_path_free(void *data)
+{
+	free(data);
+}
+
 static void _strokeless_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Path_Strokeless *thiz = data;
@@ -200,6 +206,7 @@ static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 
 /* the strokeless path generator */
 static Enesim_Path_Descriptor _strokeless_descriptor = {
+	/* .free		= */ _strokeless_path_free,
 	/* .vertex_add		= */ _strokeless_path_vertex_add,
 	/* .polygon_add 	= */ _strokeless_path_polygon_add,
 	/* .polygon_close 	= */ _strokeless_path_polygon_close,
@@ -486,6 +493,11 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Stroke *
 	thiz->count++;
 }
 
+static void _stroke_path_free(void *data)
+{
+	free(data);
+}
+
 static void _stroke_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Path_Stroke *thiz = data;
@@ -567,7 +579,8 @@ static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 }
 
 static Enesim_Path_Descriptor _stroke_descriptor = {
-	/* .vertex_add		= */ _stroke_path_vertex_add, 
+	/* .free		= */ _stroke_path_free,
+	/* .vertex_add		= */ _stroke_path_vertex_add,
 	/* .polygon_add 	= */ _stroke_path_polygon_add,
 	/* .polygon_close 	= */ _stroke_path_polygon_close,
 	/* .path_begin 		= */ _stroke_path_begin,
@@ -578,6 +591,12 @@ static Enesim_Path_Descriptor _stroke_descriptor = {
 /*----------------------------------------------------------------------------*
  *            Old full code (once everything's done, remove this)             *
  *----------------------------------------------------------------------------*/
+
+static void _full_path_free(void *data)
+{
+	free(data);
+}
+
 static void _full_path_merge(Enesim_Path_Full *thiz)
 {
 	Enesim_Polygon *to_merge;
@@ -875,7 +894,8 @@ static void _full_path_done(void *data)
 }
 
 static Enesim_Path_Descriptor _full_descriptor = {
-	/* .vertex_add		= */ _full_path_vertex_add, 
+	/* .free		= */ _full_path_free,
+	/* .vertex_add		= */ _full_path_vertex_add,
 	/* .polygon_add 	= */ _full_path_polygon_add,
 	/* .polygon_close 	= */ _full_path_polygon_close,
 	/* .path_begin 		= */ _full_path_begin,
@@ -885,6 +905,12 @@ static Enesim_Path_Descriptor _full_descriptor = {
 /*----------------------------------------------------------------------------*
  *                          Stroke and dashless                               *
  *----------------------------------------------------------------------------*/
+
+static void _stroke_dashless_path_free(void *data)
+{
+	free(data);
+}
+
 static void _stroke_dashless_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Path_Stroke_Dashless *thiz = data;
@@ -956,7 +982,8 @@ static void _stroke_dashless_path_done(void *data)
 }
 
 static Enesim_Path_Descriptor _stroke_dashless_descriptor = {
-	/* .vertex_add		= */ _stroke_dashless_path_vertex_add, 
+	/* .free		= */ _stroke_dashless_path_free,
+	/* .vertex_add		= */ _stroke_dashless_path_vertex_add,
 	/* .polygon_add 	= */ _stroke_dashless_path_polygon_add,
 	/* .polygon_close 	= */ _stroke_dashless_path_polygon_close,
 	/* .path_begin 		= */ _stroke_dashless_path_begin,
@@ -979,6 +1006,18 @@ static void _dashed_point_at(Enesim_Point *pc, double d, Enesim_Point *p0,
 
 	pc->x = tmp.x;
 	pc->y = tmp.y;
+}
+
+static void _dashed_path_free(void *data)
+{
+	Enesim_Path_Dashed *d = data;
+
+	printf("dashed_free\n");
+	if (d->stroke)
+		enesim_path_free(d->stroke);
+	if (d->fill)
+		enesim_path_free(d->fill);
+	free(d);
 }
 
 static void _dashed_path_vertex_add(double x, double y, void *data)
@@ -1159,7 +1198,8 @@ static void _dashed_path_done(void *data)
 }
 
 static Enesim_Path_Descriptor _dashed_descriptor = {
-	/* .vertex_add		= */ _dashed_path_vertex_add, 
+	/* .free		= */ _dashed_path_free,
+	/* .vertex_add		= */ _dashed_path_vertex_add,
 	/* .polygon_add 	= */ _dashed_path_polygon_add,
 	/* .polygon_close 	= */ _dashed_path_polygon_close,
 	/* .path_begin 		= */ _dashed_path_begin,
@@ -1184,6 +1224,8 @@ void enesim_path_free(Enesim_Path *thiz)
 	/* TODO call the interface to free the path implementation
 	 * data
 	 */
+	if (thiz->descriptor->free)
+		thiz->descriptor->free(thiz->data);
 	free(thiz);
 }
 

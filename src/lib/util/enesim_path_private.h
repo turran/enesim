@@ -18,6 +18,7 @@
 #ifndef _PATH_H
 #define _PATH_H
 
+typedef void (*Enesim_Path_Delete)(void *data);
 typedef void (*Enesim_Path_Begin)(void *data);
 typedef void (*Enesim_Path_Polygon_Add)(void *data);
 typedef void (*Enesim_Path_Polygon_Close)(Eina_Bool close, void *data);
@@ -25,6 +26,7 @@ typedef void (*Enesim_Path_Done)(void *data);
 
 typedef struct _Enesim_Path_Descriptor
 {
+	Enesim_Path_Delete free;
 	Enesim_Curve_Vertex_Add vertex_add;
 	Enesim_Path_Polygon_Add polygon_add;
 	Enesim_Path_Polygon_Close polygon_close;
@@ -63,6 +65,7 @@ void * enesim_path_data_get(Enesim_Path *thiz);
 void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands);
 
 Enesim_Path * enesim_path_strokeless_new(void);
+Enesim_Path * enesim_path_stroke_new(void);
 Enesim_Path * enesim_path_stroke_dashless_new(void);
 Enesim_Path * enesim_path_dashed_new(void);
 
