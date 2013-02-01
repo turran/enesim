@@ -26,10 +26,11 @@
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
+#include "enesim_text.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
+#include "enesim_renderer_text_base.h"
 
-#include "enesim_text.h"
 #include "enesim_text_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_text_base_private.h"
@@ -288,7 +289,7 @@ static void _enesim_renderer_text_base_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _enesim_renderer_text_base_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _enesim_renderer_text_base_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER;
 }

@@ -27,10 +27,12 @@
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
+#include "enesim_text.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
+#include "enesim_renderer_text_base.h"
+#include "enesim_renderer_text_span.h"
 
-#include "enesim_text.h"
 #include "enesim_text_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_text_base_private.h"
@@ -198,8 +200,8 @@ static inline void _renderer_affine_setup(Enesim_Renderer *r, int x, int y,
  * then fetch such pixel value and finally fill the destination surface
  */
 static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstates,
+		const Enesim_Renderer_State *state EINA_UNUSED,
+		const Enesim_Renderer_Shape_State *sstates EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -439,17 +441,17 @@ unload:
 /*----------------------------------------------------------------------------*
  *                           The Text Base interface                          *
  *----------------------------------------------------------------------------*/
-static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r)
+static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "text_span";
 }
 
 static Eina_Bool _enesim_text_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Text_Base_State *estates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Shape_Sw_Draw *fill, Enesim_Error **error)
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		const Enesim_Renderer_Text_Base_State *estates[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_Shape_Sw_Draw *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Text_Span *e;
 	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
@@ -498,7 +500,7 @@ static void _enesim_text_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
@@ -531,8 +533,8 @@ static void _enesim_renderer_text_span_free(Enesim_Renderer *r)
 
 static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Text_Base_State *estates[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		const Enesim_Renderer_Text_Base_State *estates[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -584,8 +586,8 @@ static void _enesim_renderer_text_span_destination_bounds(Enesim_Renderer *r,
 	bounds->h = ceil(obounds.h);
 }
 
-static void _enesim_renderer_text_span_flags(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
+static void _enesim_renderer_text_span_flags(Enesim_Renderer *r EINA_UNUSED,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
