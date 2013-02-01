@@ -36,6 +36,7 @@
 #include "enesim_converter.h"
 #include "enesim_image.h"
 
+#include "enesim_pool_private.h"
 #include "enesim_image_private.h"
 #include "enesim_compositor_private.h"
 #include "enesim_renderer_private.h"
@@ -168,6 +169,7 @@ EAPI int enesim_init(void)
 	 */
 	enesim_mempool_aligned_init();
 	enesim_mempool_buddy_init();
+	enesim_pool_init();
 	enesim_compositor_init();
 	enesim_renderer_init();
 	enesim_converter_init();
@@ -215,6 +217,7 @@ EAPI int enesim_shutdown(void)
 	enesim_converter_shutdown();
 	enesim_renderer_shutdown();
 	enesim_compositor_shutdown();
+	enesim_pool_shutdown();
 	enesim_mempool_aligned_shutdown();
 	enesim_mempool_buddy_shutdown();
 	_unregister_domains();

@@ -60,6 +60,9 @@ struct _Enesim_Pool
 	void *data;
 };
 
+void enesim_pool_init(void);
+void enesim_pool_shutdown(void);
+
 Enesim_Pool * enesim_pool_new(Enesim_Pool_Descriptor *descriptor, void *data);
 Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Backend *backend, void **data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);

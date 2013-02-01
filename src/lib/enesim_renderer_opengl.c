@@ -254,6 +254,12 @@ static void _opengl_draw_own_geometry(Enesim_Renderer_OpenGL_Data *rdata,
 }
 #endif
 
+static void _program_free(void *data)
+{
+	Enesim_Renderer_OpenGL_Program_Data *d = data;
+	free(d);
+}
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -400,12 +406,12 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Ei
 
 void enesim_renderer_opengl_init(void)
 {
-	_program_lut = eina_hash_string_superfast_new(NULL);
+	_program_lut = eina_hash_string_superfast_new(_program_free);
 }
 
 void enesim_renderer_opengl_shutdown(void)
 {
-	/* TODO destroy the lut */
+	eina_hash_free(_program_lut);
 }
 
 /* we need a way to destroy the renderer data */

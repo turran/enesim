@@ -25,6 +25,8 @@
 typedef struct _Enesim_Pool Enesim_Pool;
 
 EAPI Enesim_Pool * enesim_pool_default_get(void);
+EAPI void enesim_pool_default_set(Enesim_Pool *thiz);
+
 EAPI void enesim_pool_delete(Enesim_Pool *p);
 
 EAPI Enesim_Pool * enesim_pool_eina_new(Eina_Mempool *mp);

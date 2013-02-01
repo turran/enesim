@@ -100,6 +100,7 @@ EAPI void enesim_image_data_free(Enesim_Image_Data *thiz)
 {
 	if (thiz->descriptor->free)
 		thiz->descriptor->free(thiz->data);
+	free(thiz);
 }
 
 

@@ -281,6 +281,9 @@ void enesim_renderer_shutdown(void)
 	eina_hash_free(_factories);
 	_factories = NULL;
 	enesim_renderer_sw_shutdown();
+#if BUILD_OPENGL
+	enesim_renderer_opengl_shutdown();
+#endif
 }
 
 /* FIXME export this */
