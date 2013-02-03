@@ -406,6 +406,17 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
+EAPI int enesim_renderer_ref_count(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	return r->ref;
+}
+
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_lock(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);

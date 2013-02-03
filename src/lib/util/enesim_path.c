@@ -338,6 +338,7 @@ static void _stroke_path_merge(Enesim_Path_Stroke *thiz)
 	to_merge = thiz->inset_polygon;
 	enesim_figure_polygon_remove(thiz->p->stroke_figure, to_merge);
 	enesim_polygon_merge(thiz->offset_polygon, thiz->inset_polygon);
+	thiz->inset_polygon = NULL;
 }
 
 static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Stroke *thiz)

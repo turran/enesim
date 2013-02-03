@@ -413,7 +413,7 @@ static void _compound_bounds(Enesim_Renderer *r,
 		if (nx2 > x2) x2 = nx2;
 		if (ny2 > y2) y2 = ny2;
 	}
-	/* now the already there layers */	
+	/* now the already there layers */
 	EINA_LIST_FOREACH (thiz->layers, ll, l)
 	{
 		Enesim_Renderer *lr = l->r;
@@ -504,14 +504,32 @@ static void _compound_hints(Enesim_Renderer *r, const Enesim_Renderer_State *sta
 static void _compound_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Compound *thiz;
+	Layer *l;
 
 	thiz = _compound_get(r);
-	enesim_renderer_compound_layer_clear(r);
+	/* just remove the visible layers as is, every visible layer
+	 * should be part of the compound layers
+	 */
 	if (thiz->visible_layers)
 	{
 		eina_list_free(thiz->visible_layers);
 		thiz->visible_layers = NULL;
 	}
+	/* check the added lists, it must be empty, if not remove it too */
+	EINA_LIST_FREE(thiz->added, l)
+	{
+		enesim_renderer_unref(l->r);
+		free(l);
+	}
+	enesim_renderer_compound_layer_clear(r);
+	/* finally unref every removed layer */
+	EINA_LIST_FREE(thiz->removed, l)
+	{
+		/* now is safe to destroy the layer */
+		enesim_renderer_unref(l->r);
+		free(l);
+	}
+
 	free(thiz);
 }
 
@@ -697,7 +715,7 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 /**
  * Adds a layer
  * @param[in] r The compound renderer
- * @param[in] rend The renderer for the new layer
+ * @param[in] rend The renderer for the new layer [transfer full]
  */
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer *rend)
@@ -709,8 +727,7 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 	thiz = _compound_get(r);
 
 	l = calloc(1, sizeof(Layer));
-	l->r = enesim_renderer_ref(rend);
-
+	l->r = rend;
 	thiz->added = eina_list_append(thiz->added, l);
 	thiz->changed = EINA_TRUE;
 }

@@ -182,6 +182,9 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 	if (to_merge->ymax > thiz->ymax) thiz->ymax = to_merge->ymax;
 	if (to_merge->xmin < thiz->xmin) thiz->xmin = to_merge->xmin;
 	if (to_merge->ymin < thiz->ymin) thiz->ymin = to_merge->ymin;
+
+	/* finally remove the to_merge polygon */
+	free(to_merge);
 }
 
 void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close)
