@@ -152,6 +152,7 @@ static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data edata, Enesi
 		if (face->glyph->format == FT_GLYPH_FORMAT_OUTLINE)
 		{
 			Enesim_Text_Freetype_Glyph efg;
+			Enesim_Buffer_Sw_Data sdata;
 			FT_Raster_Params params;
 			unsigned int width, height;
 			void *gdata;
@@ -161,13 +162,17 @@ static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data edata, Enesi
 			if (!width || !height) goto no_surface;
 			gdata = calloc(width * height, sizeof(uint32_t));
 
-			efg.data = (Enesim_Buffer_Sw_Data *)&gdata;
+			sdata.argb8888_pre.plane0 = gdata;
+			sdata.argb8888_pre.plane0_stride = width * 4;
+
+			efg.data = &sdata;
 			efg.glyph = face->glyph;
 
 			memset(&params, 0, sizeof(params));
 			params.flags = FT_RASTER_FLAG_AA | FT_RASTER_FLAG_DIRECT;
 			params.gray_spans = _raster_callback;
 			params.user = &efg;
+
 			//printf("getting glyph %c of size %d %d\n", c, width, height);
 			FT_Outline_Render(library, &face->glyph->outline, &params);
 			g->surface = enesim_surface_new_data_from(
