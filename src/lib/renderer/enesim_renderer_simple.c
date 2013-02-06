@@ -35,7 +35,7 @@ typedef struct _Enesim_Renderer_State
 	} current, past;
 	char *name;
 	Eina_Bool changed;
-} Enesim_Renderer_Simple_State;
+} Enesim_Renderer_State;
 
 typedef struct _Enesim_Renderer_Simple
 {
@@ -246,7 +246,7 @@ void enesim_renderer_state_commit(Enesim_Renderer_State *thiz)
 
 	/* keep the referenceable objects */
 	old_mask = thiz->past.mask;
-	/* swp the state */
+	/* swap the state */
 	thiz->past = thiz->current;
 	/* increment the referenceable objects */
 	if (thiz->past.mask)
@@ -275,19 +275,6 @@ Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State *thiz)
 	{
 		return EINA_TRUE;
 	}
-	/* the mask */
-	if (thiz->current.mask && !thiz->past.mask)
-		return EINA_TRUE;
-	if (!thiz->current.mask && thiz->past.mask)
-		return EINA_TRUE;
-	if (thiz->current.mask)
-	{
-		if (enesim_renderer_has_changed(thiz->current.mask))
-		{
-			DBG("The mask renderer '%s' has changed", thiz->current.mask->name);
-			return EINA_TRUE;
-		}
-	}
 	/* the origin */
 	if (thiz->current.ox != thiz->past.ox || thiz->current.oy != thiz->past.oy)
 	{
@@ -303,9 +290,21 @@ Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State *thiz)
 	{
 		return EINA_TRUE;
 	}
+	/* the mask should be the last as it implies a renderer change */
+	if (thiz->current.mask && !thiz->past.mask)
+		return EINA_TRUE;
+	if (!thiz->current.mask && thiz->past.mask)
+		return EINA_TRUE;
+	if (thiz->current.mask)
+	{
+		if (enesim_renderer_has_changed(thiz->current.mask))
+		{
+			DBG("The mask renderer '%s' has changed", thiz->current.mask->name);
+			return EINA_TRUE;
+		}
+	}
 
 	return EINA_FALSE;
-
 }
 
 void enesim_renderer_state_clear(Enesim_Renderer_State *thiz)
