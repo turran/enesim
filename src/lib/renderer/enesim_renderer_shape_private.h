@@ -18,6 +18,31 @@
 #ifndef SHAPE_H_
 #define SHAPE_H_
 
+typedef struct _Enesim_Renderer_Shape_State2
+{
+	struct {
+		struct {
+			Enesim_Color color;
+			Enesim_Renderer *r;
+			double weight;
+			Enesim_Shape_Stroke_Location location;
+			Enesim_Shape_Stroke_Cap cap;
+			Enesim_Shape_Stroke_Join join;
+		} stroke;
+
+		struct {
+			Enesim_Color color;
+			Enesim_Renderer *r;
+			Enesim_Shape_Fill_Rule rule;
+		} fill;
+		Enesim_Shape_Draw_Mode draw_mode;
+	} current, past;
+	Eina_List *stroke_dashes;
+
+	Eina_Bool stroke_dashes_changed;
+	Eina_Bool changed;
+} Enesim_Renderer_Shape_State2;
+
 /* common shape renderer functions */
 typedef struct _Enesim_Renderer_Shape_State
 {

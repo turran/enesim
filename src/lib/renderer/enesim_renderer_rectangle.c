@@ -580,10 +580,10 @@ static void _rectangle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
 	/* .name = 			*/ _rectangle_name,
 	/* .free = 			*/ _rectangle_free,
-	/* .bounds = 		*/ _rectangle_bounds,
+	/* .bounds = 			*/ _rectangle_bounds,
 	/* .destination_bounds = 	*/ _rectangle_destination_bounds,
 	/* .flags = 			*/ _rectangle_flags,
-	/* .hints_get = 			*/ _rectangle_hints,
+	/* .hints_get = 		*/ _rectangle_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _rectangle_has_changed,
