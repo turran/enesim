@@ -1193,7 +1193,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 
 	draw_mode = css->draw_mode;
 	if ((pss->draw_mode != draw_mode) &&
-        		((thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
+			((thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
 			(draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)))
 		thiz->changed = 1;
 
@@ -1203,6 +1203,8 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		Enesim_F16p16_Vector *vec;
 		Eina_List *l1;
 		int nvectors = 0;
+		double sx = 1, sy = 1;
+		double lx, rx, ty, by;
 
 		if (thiz->vectors)
 		{
@@ -1228,7 +1230,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			first_point = eina_list_data_get(p->points);
 			last_point = eina_list_data_get(eina_list_last(p->points));
 			{
-				double x0, x1,y0, y1;
+				double x0, x1, y0, y1;
 				double x01, y01;
 				double len;
 
@@ -1266,6 +1268,19 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->tyy = thiz->lxx;
 		thiz->byy = -thiz->tyy;
 
+		if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
+			return EINA_FALSE;
+		if ((css->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) &&
+			 (lx != rx) && (ty != by))
+		{
+			sx = (rx - lx - 1) / (rx - lx);
+			if (sx < (1 / 16.0))
+				sx = 1 / 16.0;
+			sy = (by - ty - 1) / (by - ty);
+			if (sy < (1 / 16.0))
+				sy = 1 / 16.0;
+		}
+
 		/* FIXME why this loop can't be done on the upper one? */
 		EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
 		{
@@ -1285,7 +1300,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			last_point = eina_list_data_get(eina_list_last(p->points));
 
 			{
-				double x0, x1,y0, y1;
+				double x0, x1, y0, y1;
 				double x01, y01;
 				double len;
 
@@ -1321,10 +1336,10 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				npt = eina_list_data_get(l2);
 				if ((n == (enesim_polygon_point_count(p) - 1)) && !sopen)
 					npt = first_point;
-				x0 = pt->x;
-				y0 = pt->y;
-				x1 = npt->x;
-				y1 = npt->y;
+				x0 = sx * (pt->x - lx) + lx;
+				y0 = sy * (pt->y - ty) + ty;
+				x1 = sx * (npt->x - lx) + lx;
+				y1 = sy * (npt->y - ty) + ty;
 				x0 = ((int) (x0 * 256)) / 256.0;
 				x1 = ((int) (x1 * 256)) / 256.0;
 				y0 = ((int) (y0 * 256)) / 256.0;
