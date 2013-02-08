@@ -1,5 +1,12 @@
 Enesim
 ======
++ Make the simple renderer work
++ Make every renderer that now inherits from enesim renderer depend on enesim renderer simple
++ Make every shape renderer use the shape simple, we need to figure out what to do with
+  stroke location givne that the path does not support it.
++ Add a multi path backend renderer. Given that we make every shape renderer use the simple
+  shape renderer. We can define a multi backend renderer (where backend can be agg, cairo,
+  enesim, skia, whatever) to render a path with all the shape properties.
 + We have a performance problem when some renderer has changed. Basically on the practice
   we end having a full tree of renderers, several levels, proxies, whatever. When we need
   to know what area to draw we basically iterate over all the tree. That means that we start

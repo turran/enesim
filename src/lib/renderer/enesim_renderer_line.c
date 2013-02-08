@@ -35,7 +35,7 @@
 
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
-#include "enesim_vector_private.h"
+#include "enesim_renderer_shape_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -60,35 +60,24 @@ typedef struct _Enesim_Renderer_Line
 	/* properties */
 	Enesim_Renderer_Line_State current;
 	Enesim_Renderer_Line_State past;
-	/* private */
-	/* the path renderer */
-	Enesim_Renderer *path;
+	Eina_Bool changed;
+	Eina_Bool generated;
 } Enesim_Renderer_Line;
 
 static inline Enesim_Renderer_Line * _line_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = enesim_renderer_shape_data_get(r);
+	thiz = enesim_renderer_shape_simple_data_get(r);
 	ENESIM_RENDERER_LINE_MAGIC_CHECK(thiz);
 
 	return thiz;
 }
 
-/*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
- *----------------------------------------------------------------------------*/
-static const char * _line_name(Enesim_Renderer *r EINA_UNUSED)
+static Eina_Bool _line_changed(Enesim_Renderer_Line *thiz)
 {
-	return "line";
-}
-
-static Eina_Bool _line_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
-{
-	Enesim_Renderer_Line *thiz;
-
-	thiz = _line_get(r);
+	if (!thiz->changed)
+		return EINA_FALSE;
 
 	/* x0 */
 	if (thiz->current.x0 != thiz->past.x0)
@@ -106,76 +95,47 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
-static void _line_path_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
-		int x, int y,
-		unsigned int len, void *ddata)
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _line_name(Enesim_Renderer *r EINA_UNUSED)
 {
-	Enesim_Renderer_Line *thiz;
-
-	thiz = _line_get(r);
-	enesim_renderer_sw_draw(thiz->path, x, y, len, ddata);
+	return "line";
 }
 
-static Eina_Bool _line_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
+static Eina_Bool _line_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
 {
 	Enesim_Renderer_Line *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+	Eina_Bool ret;
 
 	thiz = _line_get(r);
+	ret = _line_changed(thiz);
+	return ret;
+}
 
-	if (_line_has_changed(r, states))
+static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path)
+{
+	Enesim_Renderer_Line *thiz;
+
+	thiz = _line_get(r);
+	if (_line_changed(thiz) && !thiz->generated)
 	{
-		enesim_renderer_path_command_clear(thiz->path);
-		enesim_renderer_path_move_to(thiz->path, thiz->current.x0, thiz->current.y0);
-		enesim_renderer_path_line_to(thiz->path, thiz->current.x1, thiz->current.y1);
+		enesim_renderer_path_command_clear(path);
+		enesim_renderer_path_move_to(path, thiz->current.x0, thiz->current.y0);
+		enesim_renderer_path_line_to(path, thiz->current.x1, thiz->current.y1);
+		thiz->generated = EINA_TRUE;
 	}
-	/* pass all the properties to the path */
-	enesim_renderer_color_set(thiz->path, cs->color);
-	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
-	/* base properties */
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
-	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
-	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
-	enesim_renderer_shape_stroke_cap_set(thiz->path, css->stroke.cap);
-	enesim_renderer_shape_draw_mode_set(thiz->path, ENESIM_SHAPE_DRAW_MODE_STROKE);
-	if (!enesim_renderer_setup(thiz->path, s, error))
-		return EINA_FALSE;
-
-	*draw = _line_path_span;
-
 	return EINA_TRUE;
 }
 
-static void _line_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _line_cleanup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = _line_get(r);
-	enesim_renderer_shape_cleanup(r, s);
-	if (thiz->path)
-		enesim_renderer_cleanup(thiz->path, s);
 	thiz->past = thiz->current;
-}
-
-static void _line_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
-{
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
-}
-
-static void _line_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
-		Enesim_Renderer_Hint *hints)
-{
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+	thiz->changed = EINA_FALSE;
 }
 
 static void _line_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
@@ -188,53 +148,18 @@ static void _line_free(Enesim_Renderer *r)
 	Enesim_Renderer_Line *thiz;
 
 	thiz = _line_get(r);
-	if (thiz->path)
-		enesim_renderer_unref(thiz->path);
 	free(thiz);
 }
 
-static void _line_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *bounds)
-{
-	Enesim_Renderer_Line *thiz;
-
-	thiz = _line_get(r);
-	/* get the bounds from the path */
-	enesim_renderer_bounds(thiz->path, bounds);
-}
-
-static void _line_destination_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *bounds)
-{
-	Enesim_Renderer_Line *thiz;
-
-	thiz = _line_get(r);
-	/* get the bounds from the path */
-	enesim_renderer_destination_bounds(thiz->path, bounds, 0, 0);
-}
-
-static Enesim_Renderer_Shape_Descriptor _line_descriptor = {
+static Enesim_Renderer_Shape_Simple_Descriptor _line_descriptor = {
 	/* .name = 			*/ _line_name,
 	/* .free = 			*/ _line_free,
-	/* .bounds = 			*/ _line_bounds,
-	/* .destination_bounds = 	*/ _line_destination_bounds,
-	/* .flags = 			*/ _line_flags,
-	/* .hints_get = 		*/ _line_hints,
-	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _line_has_changed,
 	/* .feature_get =		*/ _line_feature_get,
-	/* .sw_setup = 			*/ _line_state_setup,
-	/* .sw_cleanup = 		*/ _line_state_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_setup = 		*/ NULL,
-	/* .opengl_cleanup = 		*/ NULL
+	/* .bounds = 			*/ NULL,
+	/* .destination_bounds = 	*/ NULL,
+	/* .setup = 			*/ _line_setup,
+	/* .cleanup = 			*/ _line_cleanup,
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -257,10 +182,9 @@ EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Line));
 	if (!thiz) return NULL;
-	thiz->path = enesim_renderer_path_new();
 
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_LINE_MAGIC);
-	r = enesim_renderer_shape_new(&_line_descriptor, thiz);
+	r = enesim_renderer_shape_simple_new(&_line_descriptor, thiz);
 	return r;
 }
 
@@ -279,6 +203,8 @@ EAPI void enesim_renderer_line_x0_set(Enesim_Renderer *r, double x0)
 
 	thiz = _line_get(r);
 	thiz->current.x0 = x0;
+	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -313,6 +239,8 @@ EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0)
 
 	thiz = _line_get(r);
 	thiz->current.y0 = y0;
+	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -347,6 +275,8 @@ EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1)
 
 	thiz = _line_get(r);
 	thiz->current.x1 = x1;
+	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -381,6 +311,8 @@ EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
 
 	thiz = _line_get(r);
 	thiz->current.y1 = y1;
+	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -421,6 +353,8 @@ EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double 
 	thiz->current.y0 = y0;
 	thiz->current.x1 = x1;
 	thiz->current.y1 = y1;
+	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**

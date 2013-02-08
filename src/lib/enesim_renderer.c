@@ -296,6 +296,184 @@ void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void
 {
 	r->backend_data[b] = data;
 }
+
+Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State2 *thiz,
+		const Enesim_Matrix *m)
+{
+	if (!m) return EINA_FALSE;
+	thiz->current.transformation = *m;
+	thiz->changed = EINA_TRUE;
+	return EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State2 *thiz,
+		Enesim_Matrix *m)
+{
+	if (!m) return EINA_FALSE;
+	*m = thiz->current.transformation;
+	return EINA_TRUE;
+}
+
+void enesim_renderer_state_rop_set(Enesim_Renderer_State2 *thiz,
+		Enesim_Rop rop)
+{
+	thiz->current.rop = rop;
+	thiz->changed = EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_state_rop_get(Enesim_Renderer_State2 *thiz,
+		Enesim_Rop *rop)
+{
+	if (!rop) return EINA_FALSE;
+	*rop = thiz->current.rop;
+	return EINA_TRUE;
+}
+
+void enesim_renderer_state_visibility_set(Enesim_Renderer_State2 *thiz,
+		Eina_Bool visibility)
+{
+	thiz->current.visibility = visibility;
+	thiz->changed = EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_state_visibility_get(Enesim_Renderer_State2 *thiz,
+		Eina_Bool *visibility)
+{
+	if (!visibility) return EINA_FALSE;
+	*visibility = thiz->current.visibility;
+	return EINA_TRUE;
+}
+
+void enesim_renderer_state_color_set(Enesim_Renderer_State2 *thiz,
+		Enesim_Color color)
+{
+	thiz->current.color = color;
+	thiz->changed = EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_state_color_get(Enesim_Renderer_State2 *thiz,
+		Enesim_Color *color)
+{
+	if (!color) return EINA_FALSE;
+	*color = thiz->current.color;
+	return EINA_TRUE;
+}
+
+void enesim_renderer_state_x_set(Enesim_Renderer_State2 *thiz, double x)
+{
+	thiz->current.ox = x;
+	thiz->changed = EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_state_x_get(Enesim_Renderer_State2 *thiz, double *x)
+{
+	if (!x) return EINA_FALSE;
+	*x = thiz->current.ox;
+	return EINA_FALSE;
+}
+
+void enesim_renderer_state_y_set(Enesim_Renderer_State2 *thiz, double y)
+{
+	thiz->current.oy = y;
+	thiz->changed = EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_state_y_get(Enesim_Renderer_State2 *thiz, double *y)
+{
+	if (!y) return EINA_FALSE;
+	*y = thiz->current.oy;
+	return EINA_FALSE;
+}
+
+void enesim_renderer_state_commit(Enesim_Renderer_State2 *thiz)
+{
+	Enesim_Renderer *old_mask;
+
+	/* keep the referenceable objects */
+	old_mask = thiz->past.mask;
+	/* swap the state */
+	thiz->past = thiz->current;
+	/* increment the referenceable objects */
+	if (thiz->past.mask)
+		enesim_renderer_ref(thiz->past.mask);
+	/* release the referenceable objects */
+	if (old_mask)
+		enesim_renderer_unref(old_mask);
+}
+
+Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State2 *thiz)
+{
+	if (!thiz->changed)
+		return EINA_FALSE;
+	/* the visibility */
+	if (thiz->current.visibility != thiz->past.visibility)
+	{
+		return EINA_TRUE;
+	}
+	/* the rop */
+	if (thiz->current.rop != thiz->past.rop)
+	{
+		return EINA_TRUE;
+	}
+	/* the color */
+	if (thiz->current.color != thiz->past.color)
+	{
+		return EINA_TRUE;
+	}
+	/* the origin */
+	if (thiz->current.ox != thiz->past.ox || thiz->current.oy != thiz->past.oy)
+	{
+		return EINA_TRUE;
+	}
+	/* the transformation */
+	if (thiz->current.transformation_type != thiz->past.transformation_type)
+	{
+		return EINA_TRUE;
+	}
+
+	if (!enesim_matrix_is_equal(&thiz->current.transformation, &thiz->past.transformation))
+	{
+		return EINA_TRUE;
+	}
+	/* the mask should be the last as it implies a renderer change */
+	if (thiz->current.mask && !thiz->past.mask)
+		return EINA_TRUE;
+	if (!thiz->current.mask && thiz->past.mask)
+		return EINA_TRUE;
+	if (thiz->current.mask)
+	{
+		if (enesim_renderer_has_changed(thiz->current.mask))
+		{
+			return EINA_TRUE;
+		}
+	}
+
+	return EINA_FALSE;
+}
+
+void enesim_renderer_state_clear(Enesim_Renderer_State2 *thiz)
+{
+	/* past */
+	if (thiz->past.mask)
+	{
+		enesim_renderer_unref(thiz->past.mask);
+		thiz->past.mask = NULL;
+	}
+	/* current */
+	if (thiz->current.mask)
+	{
+		enesim_renderer_unref(thiz->current.mask);
+		thiz->current.mask = NULL;
+	}
+
+	if (thiz->name)
+	{
+		free(thiz->name);
+		thiz->name = NULL;
+	}
+}
+
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

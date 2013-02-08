@@ -52,6 +52,46 @@ void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
 void enesim_renderer_sw_free(Enesim_Renderer *r);
 
+typedef struct _Enesim_Renderer_State2
+{
+	struct {
+		Enesim_Matrix transformation;
+		Enesim_Matrix_Type transformation_type;
+		Eina_Bool visibility;
+		Enesim_Rop rop;
+		Enesim_Color color;
+		Enesim_Renderer *mask;
+		double ox;
+		double oy;
+	} current, past;
+	char *name;
+	Eina_Bool changed;
+} Enesim_Renderer_State2;
+
+Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State2 *thiz,
+		const Enesim_Matrix *m);
+Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State2 *thiz,
+		Enesim_Matrix *m);
+void enesim_renderer_state_rop_set(Enesim_Renderer_State2 *thiz,
+		Enesim_Rop rop);
+Eina_Bool enesim_renderer_state_rop_get(Enesim_Renderer_State2 *thiz,
+		Enesim_Rop *rop);
+void enesim_renderer_state_visibility_set(Enesim_Renderer_State2 *thiz,
+		Eina_Bool visibility);
+Eina_Bool enesim_renderer_state_visibility_get(Enesim_Renderer_State2 *thiz,
+		Eina_Bool *visibility);
+void enesim_renderer_state_color_set(Enesim_Renderer_State2 *thiz,
+		Enesim_Color color);
+Eina_Bool enesim_renderer_state_color_get(Enesim_Renderer_State2 *thiz,
+		Enesim_Color *color);
+void enesim_renderer_state_x_set(Enesim_Renderer_State2 *thiz, double x);
+Eina_Bool enesim_renderer_state_x_get(Enesim_Renderer_State2 *thiz, double *x);
+void enesim_renderer_state_y_set(Enesim_Renderer_State2 *thiz, double y);
+Eina_Bool enesim_renderer_state_y_get(Enesim_Renderer_State2 *thiz, double *y);
+void enesim_renderer_state_commit(Enesim_Renderer_State2 *thiz);
+Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State2 *thiz);
+void enesim_renderer_state_clear(Enesim_Renderer_State2 *thiz);
+
 #if BUILD_OPENCL
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],

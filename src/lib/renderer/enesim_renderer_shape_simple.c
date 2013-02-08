@@ -53,6 +53,58 @@ static inline Enesim_Renderer_Shape_Simple * _shape_simple_get(Enesim_Renderer *
 	thiz = enesim_renderer_shape_data_get(r);
 	return thiz;
 }
+
+static Eina_Bool _shape_simple_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+		Enesim_Error **error)
+{
+	Enesim_Renderer_Shape_Simple *thiz;
+	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+
+	thiz = _shape_simple_get(r);
+	/* TODO this should fo away once we handle ourselves the state */
+	/* first set the properties from the state */
+	enesim_renderer_color_set(thiz->path, cs->color);
+	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
+	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
+
+	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
+	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
+	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
+	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
+	enesim_renderer_shape_stroke_cap_set(thiz->path, css->stroke.cap);
+	enesim_renderer_shape_stroke_join_set(thiz->path, css->stroke.join);
+	enesim_renderer_shape_stroke_location_set(r, css->stroke.location);
+	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
+
+	/* now let the implementation override whatever it wants to */
+	if (thiz->descriptor->setup)
+		if (!thiz->descriptor->setup(r, thiz->path))
+			return EINA_FALSE;
+
+	if (!enesim_renderer_setup(thiz->path, s, error))
+	{
+		if (thiz->descriptor->cleanup)
+			thiz->descriptor->cleanup(r);
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static void _shape_simple_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Shape_Simple *thiz;
+
+	thiz = _shape_simple_get(r);
+	/* TODO this should fo away once we handle ourselves the state */
+	enesim_renderer_shape_cleanup(r, s);
+	enesim_renderer_cleanup(thiz->path, s);
+	if (thiz->descriptor->cleanup)
+		thiz->descriptor->cleanup(r);
+}
 /*----------------------------------------------------------------------------*
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
@@ -94,16 +146,12 @@ static const char * _shape_simple_name(Enesim_Renderer *r)
 }
 
 static Eina_Bool _shape_simple_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
 {
-	Enesim_Renderer_Shape_Simple *thiz;
-
-	thiz = _shape_simple_get(r);
-	thiz->descriptor->generate(r, thiz->path);
-	if (!enesim_renderer_setup(thiz->path, s, error))
+	if (!_shape_simple_setup(r, s, states, sstates, error))
 		return EINA_FALSE;
 	*draw = _shape_simple_path_span;
 	return EINA_TRUE;
@@ -111,10 +159,7 @@ static Eina_Bool _shape_simple_sw_setup(Enesim_Renderer *r,
 
 static void _shape_simple_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Shape_Simple *thiz;
-
-	thiz = _shape_simple_get(r);
-	enesim_renderer_cleanup(thiz->path, s);
+	_shape_simple_cleanup(r, s);
 }
 
 static void _shape_simple_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
@@ -169,7 +214,7 @@ static void _shape_simple_bounds(Enesim_Renderer *r,
 	}
 	else
 	{
-		thiz->descriptor->generate(r, thiz->path);
+		thiz->descriptor->setup(r, thiz->path);
 		enesim_renderer_bounds(thiz->path, bounds);
 	}
 }
@@ -188,7 +233,7 @@ static void _shape_simple_destination_bounds(Enesim_Renderer *r,
 	}
 	else
 	{
-		thiz->descriptor->generate(r, thiz->path);
+		thiz->descriptor->setup(r, thiz->path);
 		enesim_renderer_destination_bounds(thiz->path, bounds, 0, 0);
 	}
 }
@@ -208,16 +253,13 @@ static Eina_Bool _shape_simple_has_changed(Enesim_Renderer *r,
 
 #if BUILD_OPENGL
 static Eina_Bool _shape_simple_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES] EINA_UNUSED,
+		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
+		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
 {
-	Enesim_Renderer_Shape_Simple *thiz;
-
-	thiz = _shape_simple_get(r);
-	if (!enesim_renderer_setup(thiz->path, s, error))
+	if (!_shape_simple_setup(r, s, states, sstates, error))
 		return EINA_FALSE;
 
 	*draw = _shape_simple_opengl_draw;
@@ -226,10 +268,7 @@ static Eina_Bool _shape_simple_opengl_setup(Enesim_Renderer *r,
 
 static void _shape_simple_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Shape_Simple *thiz;
-
-	thiz = _shape_simple_get(r);
-	enesim_renderer_cleanup(thiz->path, s);
+	_shape_simple_cleanup(r, s);
 }
 #endif
 

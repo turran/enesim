@@ -18,8 +18,9 @@
 #ifndef ENESIM_RENDERER_SHAPE_SIMPLE_PRIVATE_H_
 #define ENESIM_RENDERER_SHAPE_SIMPLE_PRIVATE_H_
 
-typedef Eina_Bool (*Enesim_Renderer_Shape_Simple_Generate)(Enesim_Renderer *r,
+typedef Eina_Bool (*Enesim_Renderer_Shape_Simple_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer *path);
+typedef void (*Enesim_Renderer_Shape_Simple_Cleanup)(Enesim_Renderer *r);
 typedef struct _Enesim_Renderer_Shape_Simple_Descriptor
 {
 	Enesim_Renderer_Name name;
@@ -28,7 +29,8 @@ typedef struct _Enesim_Renderer_Shape_Simple_Descriptor
 	Enesim_Renderer_Shape_Feature_Get feature_get;
 	Enesim_Renderer_Shape_Bounds bounds;
 	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
-	Enesim_Renderer_Shape_Simple_Generate generate;
+	Enesim_Renderer_Shape_Simple_Setup setup;
+	Enesim_Renderer_Shape_Simple_Cleanup cleanup;
 } Enesim_Renderer_Shape_Simple_Descriptor;
 
 Enesim_Renderer * enesim_renderer_shape_simple_new(
