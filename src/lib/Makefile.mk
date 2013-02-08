@@ -1,18 +1,9 @@
 
 lib_LTLIBRARIES = src/lib/libenesim.la
 
-include_HEADERS = src/lib/Enesim.h
-
-if HAVE_OPENCL
-include_HEADERS += src/lib/Enesim_OpenCL.h
-endif
-
-if HAVE_OPENGL
-include_HEADERS += src/lib/Enesim_OpenGL.h
-endif
-
-installed_headersdir = $(pkgincludedir)
+installed_headersdir = $(pkgincludedir)-$(VMAJ)
 dist_installed_headers_DATA = \
+src/lib/Enesim.h \
 src/lib/enesim_buffer.h \
 src/lib/enesim_color.h \
 src/lib/enesim_compositor.h \
@@ -28,6 +19,14 @@ src/lib/enesim_rectangle.h \
 src/lib/enesim_renderer.h \
 src/lib/enesim_surface.h \
 src/lib/enesim_text.h
+
+if HAVE_OPENCL
+dist_installed_headers_DATA += src/lib/Enesim_OpenCL.h
+endif
+
+if HAVE_OPENGL
+dist_installed_headers_DATA += src/lib/Enesim_OpenGL.h
+endif
 
 src_lib_libenesim_la_SOURCES = \
 src/lib/enesim_buffer.c \

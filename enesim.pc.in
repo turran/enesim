@@ -2,6 +2,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
+pkgincludedir=@pkgincludedir@-@VMAJ@
 
 opencl=@build_opencl@
 opengl=@build_opengl@
@@ -12,4 +13,4 @@ Description: Enesim
 Requires.private: @requirements_pc@
 Libs.private: @requirements_libs@
 Libs: -L${libdir} -lenesim
-Cflags: -I${includedir} -I${includedir}/enesim @requirements_cflags@
+Cflags: -I${pkgincludedir} @requirements_cflags@

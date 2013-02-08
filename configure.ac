@@ -31,6 +31,9 @@ AC_DEFINE_UNQUOTED([VERSION_MAJOR], [v_maj], [Major version])
 AC_DEFINE_UNQUOTED([VERSION_MINOR], [v_min], [Minor version])
 AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 
+VMAJ=v_maj
+AC_SUBST([VMAJ])
+
 
 ### Additional options to configure
 
@@ -346,7 +349,6 @@ ENESIM_LIBS="${ENESIM_LIBS} ${requirements_libs} ${ENS_COVERAGE_LIBS}"
 
 AC_CONFIG_FILES([
 Makefile
-enesim.pc
 enesim_opencl.pc
 enesim_opengl.pc
 doc/Doxyfile
