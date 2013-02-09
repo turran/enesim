@@ -36,6 +36,7 @@
 
 #include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -70,7 +71,7 @@ static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_STRIPES_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -586,7 +587,7 @@ static Eina_Bool _stripes_has_changed(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _stripes_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
@@ -634,16 +635,15 @@ static void _stripes_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 #endif
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _stripes_name,
-	/* .free = 			*/ _free,
-	/* .bounds = 		*/ NULL,
-	/* .destination_bounds = 	*/ NULL,
-	/* .flags = 			*/ _stripes_flags,
-	/* .hints_get = 			*/ _stripes_hints,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _stripes_name,
+	/* .free = 			*/ _stripes_free,
+	/* .bounds_get = 		*/ NULL,
+	/* .destination_bounds_get = 	*/ NULL,
+	/* .flags_get = 		*/ _stripes_flags,
+	/* .hints_get = 		*/ _stripes_hints,
 	/* .is_inside = 		*/ NULL,
-	/* .damage =			*/ NULL,
+	/* .damages_get =		*/ NULL,
 	/* .has_changed = 		*/ _stripes_has_changed,
 	/* .sw_setup =			*/ _stripes_sw_setup,
 	/* .sw_cleanup = 		*/ _stripes_sw_cleanup,
@@ -655,6 +655,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .opengl_setup =          	*/ _stripes_opengl_setup,
 	/* .opengl_cleanup =        	*/ _stripes_opengl_cleanup
 #else
+	/* .opengl_initialize =        	*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 #endif
@@ -681,7 +682,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	thiz->current.even.color = 0xffffffff;
 	thiz->current.odd.color = 0xff000000;
 	thiz->changed = 1;
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }
