@@ -34,6 +34,7 @@
 #include "enesim_renderer_shape.h"
 
 #include "enesim_vector_private.h"
+#include "enesim_renderer_private.h"
 #include "enesim_rasterizer_private.h"
 /*============================================================================*
  *                                  Local                                     *

@@ -32,6 +32,7 @@
 #include "enesim_renderer_text_base.h"
 
 #include "enesim_text_private.h"
+#include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_text_base_private.h"
 /*============================================================================*
