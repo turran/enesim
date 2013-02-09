@@ -39,6 +39,7 @@
 #endif
 
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -63,7 +64,7 @@ static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Background *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_BACKGROUND_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -320,20 +321,18 @@ static Eina_Bool _background_has_changed(Enesim_Renderer *r,
 
 	thiz = _background_get(r);
 	if (!thiz->changed) return EINA_FALSE;
-	/* FIXME */
 	return EINA_TRUE;
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _background_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _background_name,
 	/* .free = 			*/ _background_free,
-	/* .bounds = 		*/ NULL,
-	/* .destination_bounds =	*/ NULL,
-	/* .flags = 			*/ _background_flags,
+	/* .bounds_get = 		*/ NULL,
+	/* .destination_bounds_get =	*/ NULL,
+	/* .flags_get = 		*/ _background_flags,
 	/* .hints_get = 		*/ _background_hints,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _background_has_changed,
 	/* .sw_setup = 			*/ _background_sw_setup,
 	/* .sw_cleanup = 		*/ _background_sw_cleanup,
@@ -371,7 +370,7 @@ EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Background));
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_BACKGROUND_MAGIC);
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 	return r;
 }
 /**
