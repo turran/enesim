@@ -15,8 +15,24 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+#include "libargb.h"
+
+#include "enesim_main.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+#include "enesim_renderer_background.h"
+#include "enesim_perlin.h"
+
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -41,7 +57,7 @@ static inline Enesim_Renderer_Perlin * _perlin_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Perlin *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_PERLIN_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -114,7 +130,7 @@ static const char * _perlin_name(Enesim_Renderer *r EINA_UNUSED)
 	return "perlin";
 }
 
-static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
+static Eina_Bool _perlin_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
@@ -143,7 +159,7 @@ static Eina_Bool _perlin_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _perlin_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+static void _perlin_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Perlin *thiz;
 
@@ -170,22 +186,22 @@ static void _perlin_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _perlin_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _perlin_name,
 	/* .free = 			*/ _perlin_free,
-	/* .bounds =  		*/ NULL,
-	/* .destination_bounds = 	*/ NULL,
-	/* .flags = 			*/ _perlin_flags,
-	/* .hints_get = 			*/ NULL,
+	/* .bounds_get = 		*/ NULL,
+	/* .destination_bounds_get = 	*/ NULL,
+	/* .flags_get = 		*/ _perlin_flags,
+	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .sw_setup = 			*/ _perlin_state_setup,
-	/* .sw_cleanup = 		*/ _perlin_state_cleanup,
+	/* .sw_setup = 			*/ _perlin_sw_setup,
+	/* .sw_cleanup = 		*/ _perlin_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+	/* .opengl_initialize =        	*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 };
@@ -211,7 +227,7 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 	thiz->yfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->ampl.val = 1; /* p p2 p3 p4 ... */
 
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }

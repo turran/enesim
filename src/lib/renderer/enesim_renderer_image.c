@@ -40,6 +40,7 @@
 #endif
 
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /**
  * @todo
  * - add support for sw and sh
@@ -89,7 +90,7 @@ static inline Enesim_Renderer_Image * _image_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_IMAGE_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -1642,22 +1643,22 @@ static void _image_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _image_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _image_name,
 	/* .free = 			*/ _image_free,
-	/* .bounds = 		*/ _image_bounds,
-	/* .destination_bounds = 	*/ _image_destination_bounds,
-	/* .flags = 			*/ _image_flags,
+	/* .bounds_get = 		*/ _image_bounds,
+	/* .destination_bounds_get = 	*/ _image_destination_bounds,
+	/* .flags_get = 		*/ _image_flags,
 	/* .hints_get =			*/ _image_hints,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ _image_damages,
+	/* .damages_get = 		*/ _image_damages,
 	/* .has_changed = 		*/ _image_has_changed,
 	/* .sw_setup = 			*/ _image_state_setup,
 	/* .sw_cleanup = 		*/ _image_state_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+	/* .opengl_initialize =        	*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 };
@@ -1713,7 +1714,7 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 	if (!thiz) return NULL;
 
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMAGE_MAGIC);
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }

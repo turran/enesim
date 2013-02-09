@@ -33,6 +33,7 @@
 
 #include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*
  * P'(x,y) <- P(x + scale * (XC(x,y) - .5), y + scale * (YC(x,y) - .5))
  */
@@ -62,7 +63,7 @@ static inline Enesim_Renderer_Dispmap * _dispmap_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_DISPMAP_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -233,12 +234,12 @@ static const char * _dispmap_name(Enesim_Renderer *r EINA_UNUSED)
 	return "dispmap";
 }
 
-static void _state_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
+static void _dispmap_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
+static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
@@ -259,7 +260,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _bounds(Enesim_Renderer *r,
+static void _dispmap_bounds(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
@@ -295,7 +296,7 @@ static void _dispmap_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _dispmap_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
@@ -303,22 +304,22 @@ static void _free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _dispmap_name,
-	/* .free = 			*/ _free,
-	/* .bounds = 		*/ _bounds,
-	/* .destination_bounds = 	*/ NULL,
-	/* .flags = 			*/ _dispmap_flags,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _dispmap_name,
+	/* .free = 			*/ _dispmap_free,
+	/* .bounds_get = 		*/ _dispmap_bounds,
+	/* .destination_bounds_get = 	*/ NULL,
+	/* .flags_get = 		*/ _dispmap_flags,
 	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .sw_setup = 			*/ _dispmap_sw_setup,
+	/* .sw_cleanup = 		*/ _dispmap_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+	/* .opengl_initialize =        	*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 };
@@ -357,7 +358,7 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 	thiz->x_channel = ENESIM_CHANNEL_RED;
 	thiz->y_channel = ENESIM_CHANNEL_GREEN;
 	/* common renderer setup */
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }

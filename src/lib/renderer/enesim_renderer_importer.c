@@ -28,6 +28,9 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_importer.h"
+
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -339,22 +342,22 @@ static void _importer_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Rendere
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version =			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _importer_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _importer_name,
 	/* .free =			*/ _importer_free,
-	/* .bounds = 		*/ _importer_bounds,
-	/* .destination_bounds = 	*/ _importer_destination_bounds,
- 	/* .flags = 			*/ _importer_flags,
+	/* .bounds_get = 		*/ _importer_bounds,
+	/* .destination_bounds_get = 	*/ _importer_destination_bounds,
+ 	/* .flags_get = 		*/ _importer_flags,
  	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
 	/* .sw_setup =			*/ _importer_state_setup,
 	/* .sw_cleanup = 		*/ NULL,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+	/* .opengl_initilize =         	*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 };
@@ -380,7 +383,7 @@ EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMPORTER_MAGIC);
 
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }

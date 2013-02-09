@@ -40,6 +40,7 @@
 #endif
 
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -72,7 +73,7 @@ static inline Enesim_Renderer_Raddist * _raddist_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Raddist *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_RADDIST_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -111,11 +112,11 @@ static void _span_identity(Enesim_Renderer *r,
 		Eina_F16p16 sxx, syy;
 		uint32_t p0;
 		int sx, sy;
-		double r = hypot(x, y);
+		double rad = hypot(x, y);
 
-		r = (((thiz->current.scale * (thiz->current.radius - r)) + r) * r_inv);
-		sxx = eina_f16p16_double_from((r * x) + thiz->current.orx);
-		syy = eina_f16p16_double_from((r * y) + thiz->current.ory);
+		rad = (((thiz->current.scale * (thiz->current.radius - rad)) + rad) * r_inv);
+		sxx = eina_f16p16_double_from((rad * x) + thiz->current.orx);
+		syy = eina_f16p16_double_from((rad * y) + thiz->current.ory);
 
 		sy = (syy >> 16);
 		sx = (sxx >> 16);
@@ -133,7 +134,7 @@ static const char * _raddist_name(Enesim_Renderer *r EINA_UNUSED)
 	return "raddist";
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
+static Eina_Bool _raddist_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
@@ -152,7 +153,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+static void _raddist_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Raddist *thiz;
 
@@ -223,19 +224,18 @@ static void _free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _raddist_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _raddist_name,
 	/* .free = 			*/ _free,
-	/* .bounds =  		*/ _bounds,
-	/* .destination_bounds = 	*/ NULL,
-	/* .flags = 			*/ _raddist_flags,
-	/* .hints_get = 			*/ NULL,
+	/* .bounds_get =  		*/ _bounds,
+	/* .destination_bounds_get = 	*/ NULL,
+	/* .flags_get = 		*/ _raddist_flags,
+	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _raddist_has_changed,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .sw_setup = 			*/ _raddist_sw_setup,
+	/* .sw_cleanup = 		*/ _raddist_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
@@ -253,7 +253,7 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Raddist));
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_RADDIST_MAGIC);
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }
