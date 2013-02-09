@@ -30,7 +30,9 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_grid.h"
 
+#include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -62,7 +64,7 @@ static inline Enesim_Renderer_Grid * _grid_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Grid *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRID_MAGIC);
 
 	return thiz;
@@ -207,7 +209,7 @@ static void _span_affine(Enesim_Renderer *r,
 	Eina_F16p16 yy, xx;
 
 	thiz = _grid_get(r);
-	enesim_coord_affine_setup(r, x, y, &thiz->matrix, &xx, &yy);
+	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy, &thiz->matrix);
 
 	while (dst < end)
 	{
@@ -231,7 +233,7 @@ static void _span_projective(Enesim_Renderer *r,
 	Eina_F16p16 yy, xx, zz;
 
 	thiz = _grid_get(r);
-	enesim_coord_projective_setup(r, x, y, &thiz->matrix, &xx, &yy, &zz);
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, state->ox, state->oy, &thiz->matrix);
 
 	while (dst < end)
 	{
@@ -257,12 +259,12 @@ static const char * _grid_name(Enesim_Renderer *r EINA_UNUSED)
 	return "grid";
 }
 
-static void _state_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
+static void _grid_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
 
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
+static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
@@ -314,7 +316,7 @@ static void _grid_flags(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _grid_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Grid *thiz;
 
@@ -322,19 +324,18 @@ static void _free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _grid_name,
-	/* .free = 			*/ _free,
-	/* .bounds = 		*/ NULL,
-	/* .destination_bounds = 	*/ NULL,
-	/* .flags = 			*/ _grid_flags,
-	/* .hints_get = 			*/ NULL,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _grid_name,
+	/* .free = 			*/ _grid_free,
+	/* .bounds_get = 		*/ NULL,
+	/* .destination_bounds_get = 	*/ NULL,
+	/* .flags_get =			*/ _grid_flags,
+	/* .hints_get =			*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .sw_cleanup = 		*/ _state_cleanup,
+	/* .sw_setup = 			*/ _grid_sw_setup,
+	/* .sw_cleanup = 		*/ _grid_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
@@ -369,7 +370,7 @@ EAPI Enesim_Renderer * enesim_renderer_grid_new(void)
 	thiz->outside.w = 1;
 	thiz->outside.h = 1;
 	/* common renderer setup */
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }
