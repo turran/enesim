@@ -32,6 +32,7 @@
 #include "enesim_renderer.h"
 
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /* We should not implement:
  * damages
  * bounds
@@ -45,9 +46,17 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+typedef struct _Enesim_Renderer_Simple_Descriptor_Private
+{
+	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Has_Changed has_changed;
+} Enesim_Renderer_Simple_Descriptor_Private;
+
 typedef struct _Enesim_Renderer_Simple
 {
 	Enesim_Renderer_State2 state;
+	Enesim_Renderer_Simple_Descriptor_Private descriptor;
+	void *data;
 } Enesim_Renderer_Simple;
 
 static inline Enesim_Renderer_Simple * _simple_get(Enesim_Renderer *r)
@@ -60,16 +69,18 @@ static inline Enesim_Renderer_Simple * _simple_get(Enesim_Renderer *r)
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static void _enesim_renderer_free(Enesim_Renderer *r)
+static void _simple_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Simple *thiz;
 
 	thiz = _simple_get(r);
+	if (thiz->descriptor.free)
+		thiz->descriptor.free(r);
 	enesim_renderer_state_clear(&thiz->state);
 	free(thiz);
 }
 
-static void _enesim_renderer_transformation_set(Enesim_Renderer *r,
+static void _simple_transformation_set(Enesim_Renderer *r,
 		const Enesim_Matrix *m)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -78,7 +89,7 @@ static void _enesim_renderer_transformation_set(Enesim_Renderer *r,
 	enesim_renderer_state_transformation_set(&thiz->state, m);
 }
 
-static void _enesim_renderer_transformation_get(Enesim_Renderer *r,
+static void _simple_transformation_get(Enesim_Renderer *r,
 		Enesim_Matrix *m)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -87,7 +98,7 @@ static void _enesim_renderer_transformation_get(Enesim_Renderer *r,
 	enesim_renderer_state_transformation_get(&thiz->state, m);
 }
 
-static void _enesim_renderer_rop_set(Enesim_Renderer *r,
+static void _simple_rop_set(Enesim_Renderer *r,
 		Enesim_Rop rop)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -96,7 +107,7 @@ static void _enesim_renderer_rop_set(Enesim_Renderer *r,
 	enesim_renderer_state_rop_set(&thiz->state, rop);
 }
 
-static void _enesim_renderer_rop_get(Enesim_Renderer *r,
+static void _simple_rop_get(Enesim_Renderer *r,
 		Enesim_Rop *rop)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -105,7 +116,7 @@ static void _enesim_renderer_rop_get(Enesim_Renderer *r,
 	enesim_renderer_state_rop_get(&thiz->state, rop);
 }
 
-static void _enesim_renderer_visibility_set(Enesim_Renderer *r,
+static void _simple_visibility_set(Enesim_Renderer *r,
 		Eina_Bool visibility)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -114,7 +125,7 @@ static void _enesim_renderer_visibility_set(Enesim_Renderer *r,
 	enesim_renderer_state_visibility_set(&thiz->state, visibility);
 }
 
-static void _enesim_renderer_visibility_get(Enesim_Renderer *r,
+static void _simple_visibility_get(Enesim_Renderer *r,
 		Eina_Bool *visibility)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -123,7 +134,7 @@ static void _enesim_renderer_visibility_get(Enesim_Renderer *r,
 	enesim_renderer_state_visibility_get(&thiz->state, visibility);
 }
 
-static void _enesim_renderer_color_set(Enesim_Renderer *r,
+static void _simple_color_set(Enesim_Renderer *r,
 		Enesim_Color color)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -132,7 +143,7 @@ static void _enesim_renderer_color_set(Enesim_Renderer *r,
 	enesim_renderer_state_color_set(&thiz->state, color);
 }
 
-static void _enesim_renderer_color_get(Enesim_Renderer *r,
+static void _simple_color_get(Enesim_Renderer *r,
 		Enesim_Color *color)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -141,7 +152,7 @@ static void _enesim_renderer_color_get(Enesim_Renderer *r,
 	enesim_renderer_state_color_get(&thiz->state, color);
 }
 
-static void _enesim_renderer_x_set(Enesim_Renderer *r,
+static void _simple_x_set(Enesim_Renderer *r,
 		double x)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -150,7 +161,7 @@ static void _enesim_renderer_x_set(Enesim_Renderer *r,
 	enesim_renderer_state_x_set(&thiz->state, x);
 }
 
-static void _enesim_renderer_x_get(Enesim_Renderer *r,
+static void _simple_x_get(Enesim_Renderer *r,
 		double *x)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -159,7 +170,7 @@ static void _enesim_renderer_x_get(Enesim_Renderer *r,
 	enesim_renderer_state_x_get(&thiz->state, x);
 }
 
-static void _enesim_renderer_y_set(Enesim_Renderer *r,
+static void _simple_y_set(Enesim_Renderer *r,
 		double y)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -168,7 +179,7 @@ static void _enesim_renderer_y_set(Enesim_Renderer *r,
 	enesim_renderer_state_y_set(&thiz->state, y);
 }
 
-static void _enesim_renderer_y_get(Enesim_Renderer *r,
+static void _simple_y_get(Enesim_Renderer *r,
 		double *y)
 {
 	Enesim_Renderer_Simple *thiz;
@@ -176,9 +187,87 @@ static void _enesim_renderer_y_get(Enesim_Renderer *r,
 	thiz = _simple_get(r);
 	enesim_renderer_state_y_get(&thiz->state, y);
 }
+
+static Eina_Bool _simple_has_changed(Enesim_Renderer *r,
+		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES])
+{
+	Enesim_Renderer_Simple *thiz;
+	Eina_Bool ret;
+
+	thiz = _simple_get(r);
+	ret = enesim_renderer_state_changed(&thiz->state);
+	if (ret) return ret;
+
+	if (thiz->descriptor.has_changed)
+		ret = thiz->descriptor.has_changed(r, state);
+
+	return ret;
+}
+
+Enesim_Renderer_Descriptor _simple_descriptor = {
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .name = 			*/ NULL,
+	/* .free = 			*/ _simple_free,
+	/* .bounds = 			*/ NULL,
+	/* .destination_bounds =	*/ NULL,
+	/* .flags = 			*/ NULL,
+	/* .hints_get = 		*/ NULL,
+	/* .is_inside = 		*/ NULL,
+	/* .damage = 			*/ NULL,
+	/* .has_changed = 		*/ _simple_has_changed,
+	/* .sw_setup = 			*/ NULL,
+	/* .sw_cleanup = 		*/ NULL,
+	/* .opencl_setup = 		*/ NULL,
+	/* .opencl_kernel_setup = 	*/ NULL,
+	/* .opencl_cleanup = 		*/ NULL,
+	/* .opengl_initialize = 	*/ NULL,
+	/* .opengl_setup = 		*/ NULL,
+	/* .opengl_cleanup = 		*/ NULL
+};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+Enesim_Renderer * enesim_renderer_simple_new(
+		Enesim_Renderer_Simple_Descriptor *descriptor, void *data)
+{
+	Enesim_Renderer *r;
+	Enesim_Renderer_Descriptor d;
+	Enesim_Renderer_Simple *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Renderer_Simple));
+	if (!thiz) return NULL;
+	thiz->data = data;
+
+	d = _simple_descriptor;
+	d.name = descriptor->name_get;
+	d.bounds = descriptor->bounds_get;
+	d.destination_bounds = descriptor->destination_bounds_get;
+	d.flags = descriptor->flags_get;
+	d.hints_get = descriptor->hints_get;
+	d.damage = descriptor->damages_get;
+	d.sw_setup = descriptor->sw_setup;
+	d.sw_cleanup = descriptor->sw_cleanup;
+	d.opencl_setup = descriptor->opencl_setup;
+	d.opencl_kernel_setup = descriptor->opencl_kernel_setup;
+	d.opencl_cleanup = descriptor->opencl_cleanup;
+	d.opengl_initialize = descriptor->opengl_initialize;
+	d.opengl_setup = descriptor->opengl_setup;
+	d.opengl_cleanup = descriptor->opengl_cleanup;
+
+	thiz->descriptor.free = descriptor->free;
+	thiz->descriptor.has_changed = descriptor->has_changed;
+
+	r = enesim_renderer_new(&d, thiz);
+	return r;
+}
+
+void * enesim_renderer_simple_data_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Simple *thiz;
+
+	thiz = _simple_get(r);
+	return thiz->data;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
