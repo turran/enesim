@@ -39,6 +39,7 @@
 #endif
 
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -71,7 +72,7 @@ static inline Enesim_Renderer_Pattern * _pattern_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	return thiz;
 }
 
@@ -140,7 +141,6 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 	if (!thiz->cache)
 	{
 		thiz->cache = enesim_surface_new(format, dst_bounds.w, dst_bounds.h);
-		printf("%d %d\n", dst_bounds.w, dst_bounds.h);
 		if (!thiz->cache)
 		{
 			ENESIM_RENDERER_ERROR(r, error,
@@ -409,7 +409,6 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 	/* do the common setup */
 	if (!_pattern_state_setup(thiz, r, states, s, error)) return EINA_FALSE;
 	*fill = _spans[thiz->current.repeat_mode][cs->transformation_type];
-	printf("repeat mode %d %p\n", thiz->current.repeat_mode, *fill);
 
 	return EINA_TRUE;
 }
@@ -532,22 +531,22 @@ static Eina_Bool _pattern_has_changed(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _pattern_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _pattern_name,
 	/* .free = 			*/ _pattern_free,
-	/* .bounds = 		*/ _pattern_bounds,
-	/* .destination_bounds = 	*/ _pattern_destination_bounds,
-	/* .flags = 			*/ _pattern_flags,
-	/* .hints_get = 			*/ _pattern_hints,
+	/* .bounds_get = 		*/ _pattern_bounds,
+	/* .destination_bounds_get = 	*/ _pattern_destination_bounds,
+	/* .flags_get = 		*/ _pattern_flags,
+	/* .hints_get = 		*/ _pattern_hints,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _pattern_has_changed,
 	/* .sw_setup = 			*/ _pattern_sw_setup,
 	/* .sw_cleanup = 		*/ _pattern_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
+	/* .opengl_initialize = 	*/ NULL,
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 };
@@ -583,7 +582,7 @@ EAPI Enesim_Renderer * enesim_renderer_pattern_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Pattern));
 	if (!thiz) return NULL;
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 	return r;
 }
 

@@ -38,6 +38,7 @@
 #endif
 
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -76,7 +77,7 @@ static inline Enesim_Renderer_Clipper * _clipper_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_CLIPPER_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -194,12 +195,9 @@ static void _clipper_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_clipper_state_cleanup(thiz, s);
 }
 
-static void _clipper_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _clipper_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
-	Enesim_Renderer_Clipper *thiz;
-
-	thiz = _clipper_get(r);
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE;
 }
 
@@ -340,16 +338,15 @@ static void _clipper_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 #endif
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _clipper_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _clipper_name,
 	/* .free = 			*/ _clipper_free,
-	/* .bounds = 		*/ _clipper_bounds,
-	/* .destination_bounds =	*/ _clipper_destination_bounds,
-	/* .flags = 			*/ _clipper_flags,
+	/* .bounds_get = 		*/ _clipper_bounds,
+	/* .destination_bounds_get =	*/ _clipper_destination_bounds,
+	/* .flags_get = 		*/ _clipper_flags,
 	/* .hints_get = 		*/ _clipper_hints,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ _clipper_damage,
+	/* .damages_get = 		*/ _clipper_damage,
 	/* .has_changed = 		*/ _clipper_has_changed,
 	/* .sw_setup = 			*/ _clipper_sw_setup,
 	/* .sw_cleanup = 		*/ _clipper_sw_cleanup,
@@ -381,7 +378,7 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Clipper));
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_CLIPPER_MAGIC);
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 	return r;
 }
 
