@@ -15,17 +15,14 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef RENDERER_H_
-#define RENDERER_H_
-
-typedef struct _Enesim_Renderer_State2 Enesim_Renderer_State2; /**< Renderer state */
-typedef struct _Enesim_Renderer_Descriptor Enesim_Renderer_Descriptor; /**< Renderer Descriptor Handler */
+#ifndef ENESIM_RENDERER_PRIVATE_H_
+#define ENESIM_RENDERER_PRIVATE_H_
 
 /*----------------------------------------------------------------------------*
  *                          State related functions                           *
  *----------------------------------------------------------------------------*/
 
-struct _Enesim_Renderer_State2
+typedef struct _Enesim_Renderer_State2
 {
 	struct {
 		Enesim_Matrix transformation;
@@ -39,7 +36,7 @@ struct _Enesim_Renderer_State2
 	} current, past;
 	char *name;
 	Eina_Bool changed;
-};
+} Enesim_Renderer_State2;
 
 Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State2 *thiz,
 		const Enesim_Matrix *m);
@@ -111,6 +108,18 @@ typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data);
 
+#if 0
+/* TODO properties callbacks */
+typedef void (*Enesim_Renderer_X_Set_Cb)(void *p, double x);
+typedef double (*Enesim_Renderer_X_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Y_Set_Cb)(void *p, double x);
+typedef double (*Enesim_Renderer_Y_Get_Cb)(void *p);
+typedef void (*Enesim_Renderer_Transformation_Set_Cb)(void *p, Enesim_Matrix *m);
+typedef void (*Enesim_Renderer_Transformation_Get_Cb)(void *p, Enesim_Matrix *m);
+typedef void (*Enesim_Renderer_Quality_Set_Cb)(void *p, Enesim_Quality q);
+typedef Enesim_Quality (*Enesim_Renderer_Quality_Get_Cb)(void *p);
+#endif
+
 /* software backend descriptor functions */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
@@ -133,10 +142,6 @@ typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_OpenCL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s);
 
-
-
-
-
 /* OpenGL descriptor functions */
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Initialize)(Enesim_Renderer *r,
 		int *num_programs,
@@ -148,22 +153,7 @@ typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
 		Enesim_Error **error);
 typedef void (*Enesim_Renderer_OpenGL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 
-#if 0
-/* TODO properties callbacks */
-typedef void (*Enesim_Renderer_X_Set_Cb)(void *p, double x);
-typedef double (*Enesim_Renderer_X_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Y_Set_Cb)(void *p, double x);
-typedef double (*Enesim_Renderer_Y_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Transformation_Set_Cb)(void *p, Enesim_Matrix *m);
-typedef void (*Enesim_Renderer_Transformation_Get_Cb)(void *p, Enesim_Matrix *m);
-typedef void (*Enesim_Renderer_Quality_Set_Cb)(void *p, Enesim_Quality q);
-typedef Enesim_Quality (*Enesim_Renderer_Quality_Get_Cb)(void *p);
-
-EAPI Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_Flag flags, Enesim_Renderer_State *curr, Enesim_Renderer_State *prev);
-EAPI void enesim_renderer_state_update(Enesim_Renderer_Flag flags, Enesim_Renderer_State *curr, Enesim_Renderer_State *prev);
-#endif
-
-struct _Enesim_Renderer_Descriptor {
+typedef struct _Enesim_Renderer_Descriptor {
 	/* common */
 	unsigned int version;
 	Enesim_Renderer_Name name;
@@ -187,7 +177,7 @@ struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* we should expand from here */
-};
+} Enesim_Renderer_Descriptor;
 
 /*----------------------------------------------------------------------------*
  *                         Renderer related functions                         *
@@ -273,4 +263,5 @@ void enesim_renderer_opengl_init(void);
 void enesim_renderer_opengl_shutdown(void);
 void enesim_renderer_opengl_free(Enesim_Renderer *r);
 #endif
+
 #endif
