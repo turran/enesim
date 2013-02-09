@@ -32,6 +32,7 @@
 #include "enesim_renderer_blur.h"
 
 #include "enesim_renderer_private.h"
+#include "enesim_renderer_simple_private.h"
 /*
  * A box-like blur filter - initial slow version.
  */
@@ -82,7 +83,7 @@ static inline Enesim_Renderer_Blur * _blur_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = enesim_renderer_data_get(r);
+	thiz = enesim_renderer_simple_data_get(r);
 	ENESIM_RENDERER_BLUR_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -485,22 +486,22 @@ static void _blur_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _blur_name,
+static Enesim_Renderer_Simple_Descriptor _descriptor = {
+	/* .name_get = 			*/ _blur_name,
 	/* .free = 			*/ _blur_free,
-	/* .bounds = 		*/ _blur_bounds,
-	/* .destination_bounds = 	*/ NULL,
-	/* .flags = 			*/ _blur_flags,
+	/* .bounds_get = 		*/ _blur_bounds,
+	/* .destination_bounds_get = 	*/ NULL,
+	/* .flags_get = 		*/ _blur_flags,
 	/* .hints_get = 		*/ _blur_hints,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
 	/* .sw_setup = 			*/ _blur_sw_setup,
 	/* .sw_cleanup = 		*/ _blur_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup = 		*/ NULL,
+	/* .opengl_initialize =		*/ NULL,
 	/* .opengl_setup = 		*/ NULL,
 	/* .opengl_cleanup = 		*/ NULL
 };
@@ -536,7 +537,7 @@ EAPI Enesim_Renderer * enesim_renderer_blur_new(void)
 	thiz->channel = ENESIM_BLUR_CHANNEL_COLOR;
 	thiz->rx = thiz->ry = 0.5;
 	/* common renderer setup */
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = enesim_renderer_simple_new(&_descriptor, thiz);
 
 	return r;
 }
