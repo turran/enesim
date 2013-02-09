@@ -23,7 +23,7 @@ typedef Eina_Bool (*Enesim_Renderer_Shape_Simple_Setup)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_Shape_Simple_Cleanup)(Enesim_Renderer *r);
 typedef struct _Enesim_Renderer_Shape_Simple_Descriptor
 {
-	Enesim_Renderer_Name name;
+	Enesim_Renderer_Name_Get name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Has_Changed has_changed;
 	Enesim_Renderer_Shape_Feature_Get feature_get;

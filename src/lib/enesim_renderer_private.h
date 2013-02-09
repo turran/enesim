@@ -80,22 +80,30 @@ typedef struct _Enesim_Renderer_State
 	Enesim_Matrix transformation;
 	Enesim_Matrix_Type transformation_type;
 } Enesim_Renderer_State;
-
-
 /*----------------------------------------------------------------------------*
  *                        Descriptor related functions                        *
  *----------------------------------------------------------------------------*/
+/* TODO we need to
+ * 1. remove every state, in long term states are useless and will give
+ * problems with the refcounting objects, just use the API to get a specific
+ * property in case you inherit from a high level renderer interface.
+ * If you are using the normal renderer interface you already have all the
+ * properties yourself
+ * 2. rename name_get to base_name_get or something like that as we need
+ * also a callback to set the name and get the name
+ *
+ */
 /* common descriptor functions */
-typedef const char * (*Enesim_Renderer_Name)(Enesim_Renderer *r);
+typedef const char * (*Enesim_Renderer_Name_Get)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Inside)(Enesim_Renderer *r, double x, double y);
-typedef void (*Enesim_Renderer_Bounds)(Enesim_Renderer *r,
+typedef void (*Enesim_Renderer_Bounds_Get)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *rect);
-typedef void (*Enesim_Renderer_Destination_Bounds)(Enesim_Renderer *r,
+typedef void (*Enesim_Renderer_Destination_Bounds_Get)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Eina_Rectangle *dbounds);
-typedef void (*Enesim_Renderer_Flags)(Enesim_Renderer *r,
+typedef void (*Enesim_Renderer_Flags_Get)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state,
 		Enesim_Renderer_Flag *flags);
 typedef void (*Enesim_Renderer_Hints_Get)(Enesim_Renderer *r,
@@ -103,22 +111,22 @@ typedef void (*Enesim_Renderer_Hints_Get)(Enesim_Renderer *r,
 		Enesim_Renderer_Hint *hints);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed)(Enesim_Renderer *r,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES]);
-typedef void (*Enesim_Renderer_Damage)(Enesim_Renderer *r,
+typedef void (*Enesim_Renderer_Damages_Get)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		const Enesim_Renderer_State *state[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data);
 
-#if 0
-/* TODO properties callbacks */
-typedef void (*Enesim_Renderer_X_Set_Cb)(void *p, double x);
-typedef double (*Enesim_Renderer_X_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Y_Set_Cb)(void *p, double x);
-typedef double (*Enesim_Renderer_Y_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Transformation_Set_Cb)(void *p, Enesim_Matrix *m);
-typedef void (*Enesim_Renderer_Transformation_Get_Cb)(void *p, Enesim_Matrix *m);
-typedef void (*Enesim_Renderer_Quality_Set_Cb)(void *p, Enesim_Quality q);
-typedef Enesim_Quality (*Enesim_Renderer_Quality_Get_Cb)(void *p);
-#endif
+typedef void (*Enesim_Renderer_Origin_X_Set_Cb)(Enesim_Renderer *r, double x);
+typedef double (*Enesim_Renderer_Origin_X_Get_Cb)(Enesim_Renderer *r);
+typedef void (*Enesim_Renderer_Origin_Y_Set_Cb)(Enesim_Renderer *r, double x);
+typedef double (*Enesim_Renderer_Origin_Y_Get_Cb)(Enesim_Renderer *r);
+typedef void (*Enesim_Renderer_Transformation_Set_Cb)(Enesim_Renderer *r,
+		Enesim_Matrix *m);
+typedef void (*Enesim_Renderer_Transformation_Get_Cb)(Enesim_Renderer *r,
+		Enesim_Matrix *m);
+typedef void (*Enesim_Renderer_Quality_Set_Cb)(Enesim_Renderer *r,
+		Enesim_Quality q);
+typedef Enesim_Quality (*Enesim_Renderer_Quality_Get_Cb)(Enesim_Renderer *r);
 
 /* software backend descriptor functions */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
@@ -156,14 +164,14 @@ typedef void (*Enesim_Renderer_OpenGL_Cleanup)(Enesim_Renderer *r, Enesim_Surfac
 typedef struct _Enesim_Renderer_Descriptor {
 	/* common */
 	unsigned int version;
-	Enesim_Renderer_Name name;
+	Enesim_Renderer_Name_Get name;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Bounds bounds;
-	Enesim_Renderer_Destination_Bounds destination_bounds;
-	Enesim_Renderer_Flags flags;
+	Enesim_Renderer_Bounds_Get bounds;
+	Enesim_Renderer_Destination_Bounds_Get destination_bounds;
+	Enesim_Renderer_Flags_Get flags;
 	Enesim_Renderer_Hints_Get hints_get;
 	Enesim_Renderer_Inside is_inside;
-	Enesim_Renderer_Damage damage;
+	Enesim_Renderer_Damages_Get damage;
 	Enesim_Renderer_Has_Changed has_changed;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;

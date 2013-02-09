@@ -31,7 +31,7 @@ typedef void (*Enesim_Rasterizer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface 
 
 typedef struct _Enesim_Rasterizer_Descriptor
 {
-	Enesim_Renderer_Name name;
+	Enesim_Renderer_Name_Get name;
 	Enesim_Renderer_Delete free;
 	Enesim_Rasterizer_Figure_Set figure_set;
 	Enesim_Rasterizer_Sw_Setup sw_setup;

@@ -104,14 +104,14 @@ typedef void (*Enesim_Renderer_Shape_Feature_Get)(Enesim_Renderer *r, Enesim_Sha
 
 typedef struct _Enesim_Renderer_Shape_Descriptor {
 	/* common */
-	Enesim_Renderer_Name name;
+	Enesim_Renderer_Name_Get name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Shape_Bounds bounds;
 	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
-	Enesim_Renderer_Flags flags;
+	Enesim_Renderer_Flags_Get flags;
 	Enesim_Renderer_Hints_Get hints_get;
 	Enesim_Renderer_Inside is_inside;
-	Enesim_Renderer_Damage damage;
+	Enesim_Renderer_Damages_Get damage;
 	Enesim_Renderer_Has_Changed has_changed;
 	Enesim_Renderer_Shape_Feature_Get feature_get;
 	/* software based functions */

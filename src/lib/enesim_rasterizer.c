@@ -48,7 +48,7 @@ typedef struct _Enesim_Rasterizer
 	/* private */
 	void *data;
 	/* interface */
-	Enesim_Renderer_Name name;
+	Enesim_Renderer_Name_Get name;
 	Enesim_Renderer_Delete free;
 	Enesim_Rasterizer_Figure_Set figure_set;
 	Enesim_Rasterizer_Sw_Setup sw_setup;

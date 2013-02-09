@@ -262,10 +262,10 @@ typedef struct _Enesim_Renderer_Gradient_Descriptor
 	Enesim_Renderer_Gradient_Length length;
 	Enesim_Renderer_Gradient_Sw_Setup sw_setup;
 	/* common renderer functions */
-	Enesim_Renderer_Name name;
+	Enesim_Renderer_Name_Get name;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Bounds bounds;
-	Enesim_Renderer_Destination_Bounds destination_bounds;
+	Enesim_Renderer_Bounds_Get bounds;
+	Enesim_Renderer_Destination_Bounds_Get destination_bounds;
 	Enesim_Renderer_Inside is_inside;
 	Enesim_Renderer_Has_Changed has_changed;
 	/* software based functions */
