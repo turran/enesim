@@ -20,15 +20,15 @@
 
 typedef struct _Enesim_Renderer_Simple_Descriptor
 {
-	Enesim_Renderer_Name_Get name_get;
+	Enesim_Renderer_Base_Name_Get_Cb name_get;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Bounds_Get bounds_get;
-	Enesim_Renderer_Destination_Bounds_Get destination_bounds_get;
-	Enesim_Renderer_Flags_Get flags_get;
-	Enesim_Renderer_Hints_Get hints_get;
-	Enesim_Renderer_Inside is_inside;
-	Enesim_Renderer_Damages_Get damages_get;
-	Enesim_Renderer_Has_Changed has_changed;
+	Enesim_Renderer_Bounds_Get_Cb bounds_get;
+	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
+	Enesim_Renderer_Flags_Get_Cb flags_get;
+	Enesim_Renderer_Hints_Get_Cb hints_get;
+	Enesim_Renderer_Is_Inside_Cb is_inside;
+	Enesim_Renderer_Damages_Get_Cb damages_get;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;

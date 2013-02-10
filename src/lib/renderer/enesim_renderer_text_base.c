@@ -52,7 +52,7 @@ typedef struct _Enesim_Renderer_Text_Base
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
 	Enesim_Renderer_Text_Base_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
-	Enesim_Renderer_Has_Changed has_changed;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
 	Enesim_Renderer_Delete free;
 	/* private */
 	void *data;

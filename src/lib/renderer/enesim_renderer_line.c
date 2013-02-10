@@ -35,7 +35,7 @@
 
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
-#include "enesim_renderer_shape_simple_private.h"
+#include "enesim_renderer_shape_path_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -68,7 +68,7 @@ static inline Enesim_Renderer_Line * _line_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = enesim_renderer_shape_simple_data_get(r);
+	thiz = enesim_renderer_shape_path_data_get(r);
 	ENESIM_RENDERER_LINE_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -151,7 +151,7 @@ static void _line_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Shape_Simple_Descriptor _line_descriptor = {
+static Enesim_Renderer_Shape_Path_Descriptor _line_descriptor = {
 	/* .name = 			*/ _line_name,
 	/* .free = 			*/ _line_free,
 	/* .has_changed = 		*/ _line_has_changed,
@@ -184,7 +184,7 @@ EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 	if (!thiz) return NULL;
 
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_LINE_MAGIC);
-	r = enesim_renderer_shape_simple_new(&_line_descriptor, thiz);
+	r = enesim_renderer_shape_path_new(&_line_descriptor, thiz);
 	return r;
 }
 

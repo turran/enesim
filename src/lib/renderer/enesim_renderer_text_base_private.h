@@ -62,15 +62,15 @@ typedef Eina_Bool (*Enesim_Renderer_Text_Base_OpenGL_Setup)(Enesim_Renderer *r,
 typedef struct _Enesim_Renderer_Text_Base_Descriptor
 {
 	/* common */
-	Enesim_Renderer_Name_Get name;
+	Enesim_Renderer_Base_Name_Get_Cb name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Text_Base_Bounds bounds;
 	Enesim_Renderer_Text_Base_Destination_Bounds destination_bounds;
-	Enesim_Renderer_Flags_Get flags;
-	Enesim_Renderer_Hints_Get hints_get;
-	Enesim_Renderer_Inside is_inside;
-	Enesim_Renderer_Damages_Get damage;
-	Enesim_Renderer_Has_Changed has_changed;
+	Enesim_Renderer_Flags_Get_Cb flags;
+	Enesim_Renderer_Hints_Get_Cb hints_get;
+	Enesim_Renderer_Is_Inside_Cb is_inside;
+	Enesim_Renderer_Damages_Get_Cb damage;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* software based functions */
 	Enesim_Renderer_Text_Base_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;

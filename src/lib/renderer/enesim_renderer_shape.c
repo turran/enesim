@@ -74,7 +74,7 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
 	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_Shape_Feature_Get feature_get;
-	Enesim_Renderer_Has_Changed has_changed;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
 	Enesim_Renderer_Delete free;
 	void *data;
 } Enesim_Renderer_Shape;
@@ -823,7 +823,18 @@ void enesim_renderer_shape_state_clear(Enesim_Renderer_Shape_State2 *thiz)
 {
 	/* unref */
 	/* free */
-}/*============================================================================*
+}
+
+Eina_Bool enesim_renderer_shape_state_setup(Enesim_Renderer_Shape_State2 *thiz)
+{
+
+}
+
+void enesim_renderer_shape_state_cleanup(Enesim_Renderer_Shape_State2 *thiz)
+{
+
+}
+/*============================================================================*
  *                                   API                                      *
  *============================================================================*/
 /**

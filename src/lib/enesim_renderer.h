@@ -44,7 +44,7 @@ typedef enum _Enesim_Renderer_Hint
 } Enesim_Renderer_Hint;
 
 /**
- * Callback function of the Enesim_Renderer_Damages_Get descriptor function
+ * Callback function of the Enesim_Renderer_Damages_Get_Cb descriptor function
  * @param r
  * @param area
  * @param past

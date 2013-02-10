@@ -49,7 +49,7 @@
 typedef struct _Enesim_Renderer_Simple_Descriptor_Private
 {
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Has_Changed has_changed;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
 } Enesim_Renderer_Simple_Descriptor_Private;
 
 typedef struct _Enesim_Renderer_Simple

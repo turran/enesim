@@ -15,26 +15,26 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_RENDERER_SHAPE_SIMPLE_PRIVATE_H_
-#define ENESIM_RENDERER_SHAPE_SIMPLE_PRIVATE_H_
+#ifndef ENESIM_RENDERER_SHAPE_PATH_PRIVATE_H_
+#define ENESIM_RENDERER_SHAPE_PATH_PRIVATE_H_
 
-typedef Eina_Bool (*Enesim_Renderer_Shape_Simple_Setup)(Enesim_Renderer *r,
+typedef Eina_Bool (*Enesim_Renderer_Shape_Path_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer *path);
-typedef void (*Enesim_Renderer_Shape_Simple_Cleanup)(Enesim_Renderer *r);
-typedef struct _Enesim_Renderer_Shape_Simple_Descriptor
+typedef void (*Enesim_Renderer_Shape_Path_Cleanup)(Enesim_Renderer *r);
+typedef struct _Enesim_Renderer_Shape_Path_Descriptor
 {
-	Enesim_Renderer_Name_Get name;
+	Enesim_Renderer_Base_Name_Get_Cb name;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Has_Changed has_changed;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
 	Enesim_Renderer_Shape_Feature_Get feature_get;
 	Enesim_Renderer_Shape_Bounds bounds;
 	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
-	Enesim_Renderer_Shape_Simple_Setup setup;
-	Enesim_Renderer_Shape_Simple_Cleanup cleanup;
-} Enesim_Renderer_Shape_Simple_Descriptor;
+	Enesim_Renderer_Shape_Path_Setup setup;
+	Enesim_Renderer_Shape_Path_Cleanup cleanup;
+} Enesim_Renderer_Shape_Path_Descriptor;
 
-Enesim_Renderer * enesim_renderer_shape_simple_new(
-		Enesim_Renderer_Shape_Simple_Descriptor *descriptor, void *data);
-void * enesim_renderer_shape_simple_data_get(Enesim_Renderer *r);
+Enesim_Renderer * enesim_renderer_shape_path_new(
+		Enesim_Renderer_Shape_Path_Descriptor *descriptor, void *data);
+void * enesim_renderer_shape_path_data_get(Enesim_Renderer *r);
 
 #endif

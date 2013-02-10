@@ -64,105 +64,108 @@ typedef struct _Enesim_Renderer_Shape_State
 	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape_State;
 
-typedef void (*Enesim_Renderer_Shape_Sw_Draw)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
-		int x, int y,
-		unsigned int len,
-		void *data);
+Eina_Bool enesim_renderer_shape_state_setup(Enesim_Renderer_Shape_State2 *thiz);
+void enesim_renderer_shape_state_cleanup(Enesim_Renderer_Shape_State2 *thiz);
 
-typedef void (*Enesim_Renderer_Shape_Bounds)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
-		Enesim_Rectangle *bounds);
-typedef void (*Enesim_Renderer_Shape_Destination_Bounds)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
-		Eina_Rectangle *bounds);
+typedef void (*Enesim_Renderer_Shape_Feature_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
+typedef void (*Enesim_Renderer_Shape_Stroke_Color_Set_Cb)(Enesim_Renderer *r, Enesim_Color color);
+typedef Enesim_Color (*Enesim_Renderer_Shape_Stroke_Color_Get_Cb)(Enesim_Renderer *r);
 
-typedef Eina_Bool (*Enesim_Renderer_Shape_Sw_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Shape_Sw_Draw *draw,
-		Enesim_Error **error);
-typedef Eina_Bool (*Enesim_Renderer_Shape_OpenCL_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		const char **program_name, const char **program_source,
-		size_t *program_length,
-		Enesim_Error **error);
-typedef Eina_Bool (*Enesim_Renderer_Shape_OpenGL_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstate[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error);
+typedef void (*Enesim_Renderer_Shape_Stroke_Renderer_Set_Cb)(Enesim_Renderer *r, Enesim_Renderer *rr);
+typedef Enesim_Renderer *(*Enesim_Renderer_Shape_Stroke_Renderer_Get_Cb)(Enesim_Renderer *r);
 
-typedef void (*Enesim_Renderer_Shape_Feature_Get)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
+typedef void (*Enesim_Renderer_Shape_Stroke_Weight_Set_Cb)(Enesim_Renderer *r, double weight);
+typedef double (*Enesim_Renderer_Shape_Stroke_Weight_Get_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Stroke_Location_Set_Cb)(Enesim_Renderer *r, Enesim_Shape_Stroke_Location l);
+typedef Enesim_Shape_Stroke_Location (*Enesim_Renderer_Shape_Stroke_Location_Get_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Stroke_Cap_Set_Cb)(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap l);
+typedef Enesim_Shape_Stroke_Cap (*Enesim_Renderer_Shape_Stroke_Cap_Get_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Stroke_Join_Set_Cb)(Enesim_Renderer *r, Enesim_Shape_Stroke_Join l);
+typedef Enesim_Shape_Stroke_Join (*Enesim_Renderer_Shape_Stroke_Join_Get_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Stroke_Dash_Add_Cb)(Enesim_Renderer *r, const Enesim_Shape_Stroke_Dash *dash);
+typedef void (*Enesim_Renderer_Shape_Stroke_Dash_Clear_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Fill_Color_Set_Cb)(Enesim_Renderer *r, Enesim_Color color);
+typedef Enesim_Color (*Enesim_Renderer_Shape_Fill_Color_Get_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Fill_Renderer_Set_Cb)(Enesim_Renderer *r, Enesim_Renderer *rr);
+typedef Enesim_Renderer *(*Enesim_Renderer_Shape_Fill_Renderer_Get_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Fill_Rule_Set_Cb)(Enesim_Renderer *r, Enesim_Shape_Fill_Rule rule);
+typedef Enesim_Shape_Fill_Rule (*Enesim_Renderer_Shape_Fill_Rule_Get_Cb)(Enesim_Renderer *r);
+
+typedef void (*Enesim_Renderer_Shape_Draw_Mode_Set_Cb)(Enesim_Renderer *r, Enesim_Shape_Draw_Mode mode);
+typedef Enesim_Shape_Draw_Mode (*Enesim_Renderer_Shape_Draw_Mode_Get_Cb)(Enesim_Renderer *r);
 
 typedef struct _Enesim_Renderer_Shape_Descriptor {
-	/* common */
-	Enesim_Renderer_Name_Get name;
+	unsigned int version;
+	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
 	Enesim_Renderer_Delete free;
-	Enesim_Renderer_Shape_Bounds bounds;
-	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
-	Enesim_Renderer_Flags_Get flags;
-	Enesim_Renderer_Hints_Get hints_get;
-	Enesim_Renderer_Inside is_inside;
-	Enesim_Renderer_Damages_Get damage;
-	Enesim_Renderer_Has_Changed has_changed;
-	Enesim_Renderer_Shape_Feature_Get feature_get;
+	Enesim_Renderer_Bounds_Get_Cb bounds_get;
+	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
+	Enesim_Renderer_Flags_Get_Cb flags_get;
+	Enesim_Renderer_Hints_Get_Cb hints_get;
+	Enesim_Renderer_Is_Inside_Cb is_inside;
+	Enesim_Renderer_Damages_Get_Cb damages_get;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
+	/* properties */
+	Enesim_Renderer_Name_Set_Cb name_set;
+	Enesim_Renderer_Name_Get_Cb name_get;
+	Enesim_Renderer_Color_Set_Cb color_set;
+	Enesim_Renderer_Color_Get_Cb color_get;
+	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
+	Enesim_Renderer_Origin_X_Get_Cb origin_x_get;
+	Enesim_Renderer_Origin_Y_Set_Cb origin_y_set;
+	Enesim_Renderer_Origin_Y_Get_Cb origin_y_get;
+	Enesim_Renderer_Transformation_Set_Cb transformation_set;
+	Enesim_Renderer_Transformation_Get_Cb transformation_get;
+	Enesim_Renderer_Quality_Set_Cb quality_set;
+	Enesim_Renderer_Quality_Get_Cb quality_get;
+	Enesim_Renderer_Mask_Set_Cb mask_set;
+	Enesim_Renderer_Mask_Get_Cb mask_get;
 	/* software based functions */
-	Enesim_Renderer_Shape_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	/* opencl based functions */
-	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
+	Enesim_Renderer_OpenCL_Setup opencl_setup;
 	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
 	/* opengl based functions */
 	Enesim_Renderer_OpenGL_Initialize opengl_initialize;
-	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
+	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
+	/* shape related functions */
+	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
+	Enesim_Renderer_Shape_Draw_Mode_Set_Cb draw_mode_set;
+	Enesim_Renderer_Shape_Draw_Mode_Get_Cb draw_mode_get;
+	Enesim_Renderer_Shape_Stroke_Color_Set_Cb stroke_color_set;
+	Enesim_Renderer_Shape_Stroke_Color_Get_Cb stroke_color_get;
+	Enesim_Renderer_Shape_Stroke_Renderer_Set_Cb stroke_renderer_set;
+	Enesim_Renderer_Shape_Stroke_Renderer_Get_Cb stroke_renderer_get;
+	Enesim_Renderer_Shape_Stroke_Weight_Set_Cb stroke_weight_set;
+	Enesim_Renderer_Shape_Stroke_Weight_Get_Cb stroke_weight_get;
+	Enesim_Renderer_Shape_Stroke_Location_Set_Cb stroke_location_set;
+	Enesim_Renderer_Shape_Stroke_Location_Get_Cb stroke_location_get;
+	Enesim_Renderer_Shape_Stroke_Cap_Set_Cb stroke_cap_set;
+	Enesim_Renderer_Shape_Stroke_Cap_Get_Cb stroke_cap_get;
+	Enesim_Renderer_Shape_Stroke_Join_Set_Cb stroke_join_set;
+	Enesim_Renderer_Shape_Stroke_Join_Get_Cb stroke_join_get;
+	Enesim_Renderer_Shape_Stroke_Dash_Add_Cb stroke_add;
+	Enesim_Renderer_Shape_Stroke_Dash_Clear_Cb stroke_clear;
+	Enesim_Renderer_Shape_Fill_Color_Set_Cb fill_color_set;
+	Enesim_Renderer_Shape_Fill_Color_Get_Cb fill_color_get;
+	Enesim_Renderer_Shape_Fill_Renderer_Set_Cb fill_renderer_set;
+	Enesim_Renderer_Shape_Fill_Renderer_Get_Cb fill_renderer_get;
+	Enesim_Renderer_Shape_Fill_Rule_Set_Cb fill_rule_set;
+	Enesim_Renderer_Shape_Fill_Rule_Get_Cb fill_rule_get;
 } Enesim_Renderer_Shape_Descriptor;
 
 Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor, void *data);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
-void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
-Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Error **error);
-
-#if 0
-/* TODO properties callbacks */
-typedef void (*Enesim_Renderer_Shape_Stroke_Color_Set_Cb)(void *p, Enesim_Color color);
-typedef Enesim_Color (*Enesim_Renderer_Shape_Stroke_Color_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Shape_Stroke_Renderer_Set_Cb)(void *p, Enesim_Renderer *r);
-typedef Enesim_Renderer *(*Enesim_Renderer_Shape_Stroke_Renderer_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Shape_Stroke_Weight_Set_Cb)(void *p, double weight);
-typedef double (*Enesim_Renderer_Shape_Stroke_Weight_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Shape_Stroke_Location_Set_Cb)(void *p, Enesim_Shape_Stroke_Location l);
-typedef Enesim_Shape_Stroke_Location (*Enesim_Renderer_Shape_Stroke_Location_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Shape_Stroke_Cap_Set_Cb)(void *p, Enesim_Shape_Stroke_Cap l);
-typedef Enesim_Shape_Stroke_Cap (*Enesim_Renderer_Shape_Stroke_Cap_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Shape_Stroke_Join_Set_Cb)(void *p, Enesim_Shape_Stroke_Join l);
-typedef Enesim_Shape_Stroke_Join (*Enesim_Renderer_Shape_Stroke_Join_Get_Cb)(void *p);
-
-typedef void (*Enesim_Renderer_Shape_Fill_Color_Set_Cb)(void *p, Enesim_Color color);
-typedef Enesim_Color (*Enesim_Renderer_Shape_Fill_Color_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Shape_Fill_Renderer_Set_Cb)(void *p, Enesim_Renderer *r);
-typedef Enesim_Renderer *(*Enesim_Renderer_Shape_Fill_Renderer_Get_Cb)(void *p);
-typedef void (*Enesim_Renderer_Shape_Fill_Rule_Set_Cb)(void *p, Enesim_Shape_Fill_Rule rule);
-typedef Enesim_Shape_Fill_Rule (*Enesim_Renderer_Shape_Fill_Rule_Get_Cb)(void *p);
-
-typedef void (*Enesim_Renderer_Shape_Draw_Mode_Set_Cb)(void *p, Enesim_Shape_Draw_Mode mode);
-typedef Enesim_Shape_Draw_Mode (*Enesim_Renderer_Shape_Draw_Mode_Get_Cb)(void *p);
-
-EAPI Eina_Bool enesim_renderer_shape_state_changed(Enesim_Renderer_Flag flags, Enesim_Renderer_Shape_State *curr, Enesim_Renderer_Shape_State *prev);
-EAPI void enesim_renderer_shape_state_update(Enesim_Renderer_Flag flags, Enesim_Renderer_Shape_State *curr, Enesim_Renderer_Shape_State *prev);
-#endif
 
 #endif
 

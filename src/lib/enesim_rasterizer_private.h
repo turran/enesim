@@ -21,21 +21,14 @@
 #include "enesim_renderer_shape_private.h"
 
 typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Figure *figure);
-typedef Eina_Bool (*Enesim_Rasterizer_Sw_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Shape_Sw_Draw *draw,
-		Enesim_Error **error);
-typedef void (*Enesim_Rasterizer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 
 typedef struct _Enesim_Rasterizer_Descriptor
 {
-	Enesim_Renderer_Name_Get name;
+	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
 	Enesim_Renderer_Delete free;
 	Enesim_Rasterizer_Figure_Set figure_set;
-	Enesim_Rasterizer_Sw_Setup sw_setup;
-	Enesim_Rasterizer_Sw_Cleanup sw_cleanup;
+	Enesim_Renderer_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 } Enesim_Rasterizer_Descriptor;
 
 Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *data);
