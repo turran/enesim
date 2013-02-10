@@ -829,8 +829,13 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (color && r->descriptor.color_set)
-		*color = r->descriptor.color_get(r);
+	if (color)
+	{
+		if (r->descriptor.color_set)
+			*color = r->descriptor.color_get(r);
+		else
+			*color = ENESIM_COLOR_FULL;
+	}
 }
 /**
  * To  be documented
@@ -957,8 +962,13 @@ EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (rop && r->descriptor.rop_get)
-		*rop = r->descriptor.rop_get(r);
+	if (rop)
+	{
+		if (r->descriptor.rop_get)
+			*rop = r->descriptor.rop_get(r);
+		else
+			*rop = ENESIM_FILL;
+	}
 }
 
 /**

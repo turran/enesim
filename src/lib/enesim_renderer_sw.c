@@ -48,8 +48,11 @@
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
 		Enesim_Renderer_Hint hints)
 {
-	Enesim_Color color = r->current.color;
-	Enesim_Rop rop = r->current.rop;
+	Enesim_Color color;
+	Enesim_Rop rop;
+
+	enesim_renderer_color_get(r, &color);
+	enesim_renderer_rop_get(r, &rop);
 
 	if (hints & ENESIM_RENDERER_HINT_COLORIZE)
 		color = ENESIM_COLOR_FULL;
@@ -101,19 +104,27 @@ static inline void _sw_surface_draw_rop_mask(Enesim_Renderer *r,
 		size_t len,
 		Eina_Rectangle *area)
 {
+	Enesim_Renderer *mask;
+	Enesim_Color color;
+
+	enesim_renderer_mask_get(r, &mask);
+	enesim_renderer_color_get(r, &color);
+
 	while (area->h--)
 	{
 		/* FIXME we should not memset this */
 		memset(tmp_mask, 0, len);
 		memset(tmp, 0, len);
 
-		fill(r, &r->current, area->x, area->y, area->w, tmp);
-		mask_fill(r->current.mask, &r->current.mask->current, area->x, area->y, area->w, tmp_mask);
+		fill(r, area->x, area->y, area->w, tmp);
+		mask_fill(mask, area->x, area->y, area->w, tmp_mask);
 		area->y++;
 		/* compose the filled and the destination spans */
-		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, (uint32_t *)tmp_mask);
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, color, (uint32_t *)tmp_mask);
 		ddata += stride;
 	}
+	if (mask)
+		enesim_renderer_unref(mask);
 }
 
 /* rop = any (~FLAG_ROP)
@@ -126,14 +137,17 @@ static inline void _sw_surface_draw_rop(Enesim_Renderer *r,
 		uint8_t *tmp, size_t len,
 		Eina_Rectangle *area)
 {
+	Enesim_Color color;
+
+	enesim_renderer_color_get(r, &color);
 	while (area->h--)
 	{
 		/* FIXME we should not memset this */
 		memset(tmp, 0, len);
-		fill(r, &r->current, area->x, area->y, area->w, tmp);
+		fill(r, area->x, area->y, area->w, tmp);
 		area->y++;
 		/* compose the filled and the destination spans */
-		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, NULL);
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, color, NULL);
 		ddata += stride;
 	}
 }
@@ -148,7 +162,7 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 {
 	while (area->h--)
 	{
-		fill(r, &r->current, area->x, area->y, area->w, ddata);
+		fill(r, area->x, area->y, area->w, ddata);
 		area->y++;
 		ddata += stride;
 	}
@@ -272,18 +286,20 @@ static inline void _sw_surface_draw_rop_threaded(Enesim_Renderer *r,
 		uint8_t *ddata, size_t stride,
 		uint8_t *tmp, size_t len, Eina_Rectangle *area)
 {
+	Enesim_Color color;
 	int h = area->h;
 	int y = area->y;
 
+	enesim_renderer_color_get(r, &color);
 	while (h)
 	{
 		if (h % _num_cpus != thread) goto end;
 
 		/* FIXME we should not memset this */
 		memset(tmp, 0, len);
-		fill(r, &r->current, area->x, y, area->w, tmp);
+		fill(r, area->x, y, area->w, tmp);
 		/* compose the filled and the destination spans */
-		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, r->current.color, NULL);
+		span((uint32_t *)ddata, area->w, (uint32_t *)tmp, color, NULL);
 end:
 		ddata += stride;
 		h--;
@@ -303,7 +319,7 @@ static inline void _sw_surface_draw_simple_threaded(Enesim_Renderer *r,
 	{
 		if (h % _num_cpus != thread) goto end;
 
-		fill(r, &r->current, area->x, y, area->w, ddata);
+		fill(r, area->x, y, area->w, ddata);
 end:
 		ddata += stride;
 		h--;
@@ -462,11 +478,13 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 		int x, int y)
 {
 	Enesim_Format dfmt;
+	Eina_Bool visible;
 	uint8_t *ddata;
 	size_t stride;
 	size_t bpp;
 
-	if (!r->current.visibility) return;
+	enesim_renderer_visibility_get(r, &visible);
+	if (!visible) return;
 
 	_sw_surface_setup(s, &dfmt, (void **)&ddata, &stride, &bpp);
 	ddata = ddata + (area->y * stride) + (area->x * bpp);
@@ -483,7 +501,6 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 }
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {
@@ -491,21 +508,34 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	Enesim_Compositor_Span span = NULL;
 	Enesim_Renderer_Sw_Data *sw_data;
 	Enesim_Renderer_Hint hints;
+	Enesim_Renderer *mask;
+	Enesim_Color color;
+	Enesim_Rop rop;
+	const char *name;
+
+	enesim_renderer_name_get(r, &name);
+	enesim_renderer_mask_get(r, &mask);
+	enesim_renderer_color_get(r, &color);
+	enesim_renderer_rop_get(r, &rop);
 
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
-	if (r->current.mask)
+	if (mask)
 	{
-		if (!enesim_renderer_setup(r->current.mask, s, error))
+		Eina_Bool ret;
+
+		ret = enesim_renderer_setup(mask, s, error);
+		enesim_renderer_unref(mask);
+		if (!ret)
 		{
-			WRN("Mask %s setup callback on %s failed", r->current.mask->name, r->name);
+			WRN("Mask setup callback on '%s' failed", name);
 			return EINA_FALSE;
 		}
 	}
 	if (!r->descriptor.sw_setup) return EINA_TRUE;
-	if (!r->descriptor.sw_setup(r, states, s, &fill, error))
+	if (!r->descriptor.sw_setup(r, s, &fill, error))
 	{
-		WRN("Setup callback on %s failed", r->name);
+		WRN("Setup callback on '%s' failed", name);
 		return EINA_FALSE;
 
 	}
@@ -529,12 +559,12 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		Enesim_Format dfmt;
 
 		dfmt = enesim_surface_format_get(s);
-		span = enesim_compositor_span_get(r->current.rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				r->current.color, ENESIM_FORMAT_NONE);
+		span = enesim_compositor_span_get(rop, &dfmt, ENESIM_FORMAT_ARGB8888,
+				color, ENESIM_FORMAT_NONE);
 		if (!span)
 		{
 			WRN("No suitable span compositor to render %p with rop "
-					"%d and color %08x", r, r->current.rop, r->current.color);
+					"%d and color %08x", r, rop, color);
 			return EINA_FALSE;
 		}
 	}
@@ -547,11 +577,15 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer *mask;
+
+	enesim_renderer_mask_get(r, &mask);
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
-	if (r->current.mask)
+	if (mask)
 	{
-		enesim_renderer_cleanup(r->current.mask, s);
+		enesim_renderer_cleanup(mask, s);
+		enesim_renderer_unref(mask);
 	}
 	if (r->descriptor.sw_cleanup) r->descriptor.sw_cleanup(r, s);
 }
@@ -576,10 +610,12 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 	Enesim_Renderer_Sw_Data *sw_data;
 	Eina_Rectangle span;
 	Eina_Rectangle rbounds;
+	Eina_Bool visible;
 	unsigned int left;
 	unsigned int right;
 
-	if (!r->current.visibility) return;
+	enesim_renderer_visibility_get(r, &visible);
+	if (!visible) return;
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
 	eina_rectangle_coords_from(&span, x, y, len, 1);
@@ -592,20 +628,22 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 	right = (span.x + span.w) - (rbounds.x + rbounds.w);
 	if (sw_data->span)
 	{
+		Enesim_Color color;
 		uint32_t *tmp;
 		size_t bytes;
 
+		enesim_renderer_color_get(r, &color);
 		bytes = rbounds.w * sizeof(uint32_t);
 		tmp = alloca(bytes);
 		/* FIXME for now */
 		memset(tmp, 0, bytes);
-		sw_data->fill(r, &r->current, rbounds.x, rbounds.y, rbounds.w, tmp);
+		sw_data->fill(r, rbounds.x, rbounds.y, rbounds.w, tmp);
 		/* compose the filled and the destination spans */
-		sw_data->span(data + left, rbounds.w, tmp, r->current.color, NULL);
+		sw_data->span(data + left, rbounds.w, tmp, color, NULL);
 	}
 	else
 	{
-		sw_data->fill(r, &r->current, rbounds.x, rbounds.y, rbounds.w, data + left);
+		sw_data->fill(r, rbounds.x, rbounds.y, rbounds.w, data + left);
 	}
 #if 0
 	if (left > 0)
