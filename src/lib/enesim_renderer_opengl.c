@@ -264,7 +264,6 @@ static void _program_free(void *data)
  *                                 Global                                     *
  *============================================================================*/
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {
@@ -292,7 +291,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 			const char *name;
 			int num = 0;
 
-			name = r->descriptor.name(r);
+			enesim_renderer_name_get(r, &name);
 			if (!name)
 			{
 				ENESIM_RENDERER_ERROR(r, error, "Renderer with no name?");
@@ -335,7 +334,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 setup:
 	/* do the setup */
 	if (!r->descriptor.opengl_setup) return EINA_FALSE;
-	if (!r->descriptor.opengl_setup(r, states, s,
+	if (!r->descriptor.opengl_setup(r, s,
 			&draw,
 			error))
 		return EINA_FALSE;
