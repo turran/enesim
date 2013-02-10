@@ -69,8 +69,24 @@
 /* State generated at the state_setup process
  * the colors are already multiplied by the renderer color
  */
+/* TODO ok, this needs to change easily:
+ * 1. dont put draw specific data on the type put all the draw
+ *    on its own structure. that own structure should be filled
+ *    on setup() and cleaned on cleanup()
+ * 2. Move the draw algorithm into its own draw function, not the
+ *    renderer one, but a specific one that receives the struct
+ *    above.
+ * The above might sound absurd, but once the different algorithms
+ * are isolated, not only is simple to work with them but also
+ * is simple to port them to other backends, like opengl with
+ * its own types. But for now on the first round of the refactoring
+ * we keep the current way :-/
+ */
 typedef struct _Enesim_Rasterizer_Basic_State
 {
+	double ox;
+	double oy;
+
 	Enesim_Renderer *fpaint;
 	Enesim_Color fcolor;
 
