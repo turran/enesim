@@ -115,6 +115,10 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	/* properties */
 	Enesim_Renderer_Name_Set_Cb name_set;
 	Enesim_Renderer_Name_Get_Cb name_get;
+	Enesim_Renderer_Rop_Set_Cb rop_set;
+	Enesim_Renderer_Rop_Get_Cb rop_get;
+	Enesim_Renderer_Visibility_Set_Cb visibility_set;
+	Enesim_Renderer_Visibility_Get_Cb visibility_get;
 	Enesim_Renderer_Color_Set_Cb color_set;
 	Enesim_Renderer_Color_Get_Cb color_get;
 	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;

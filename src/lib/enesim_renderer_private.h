@@ -95,6 +95,10 @@ typedef void (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data);
 
+typedef void (*Enesim_Renderer_Rop_Set_Cb)(Enesim_Renderer *r, Enesim_Rop v);
+typedef Enesim_Rop (*Enesim_Renderer_Rop_Get_Cb)(Enesim_Renderer *r);
+typedef void (*Enesim_Renderer_Visibility_Set_Cb)(Enesim_Renderer *r, Eina_Bool v);
+typedef Eina_Bool (*Enesim_Renderer_Visibility_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Color_Set_Cb)(Enesim_Renderer *r, Enesim_Color c);
 typedef Enesim_Color (*Enesim_Renderer_Color_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Origin_X_Set_Cb)(Enesim_Renderer *r, double x);
@@ -102,7 +106,7 @@ typedef double (*Enesim_Renderer_Origin_X_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Origin_Y_Set_Cb)(Enesim_Renderer *r, double x);
 typedef double (*Enesim_Renderer_Origin_Y_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Transformation_Set_Cb)(Enesim_Renderer *r,
-		Enesim_Matrix *m);
+		const Enesim_Matrix *m);
 typedef void (*Enesim_Renderer_Transformation_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Matrix *m);
 typedef void (*Enesim_Renderer_Quality_Set_Cb)(Enesim_Renderer *r,
@@ -156,6 +160,10 @@ typedef struct _Enesim_Renderer_Descriptor {
 	/* properties */
 	Enesim_Renderer_Name_Set_Cb name_set;
 	Enesim_Renderer_Name_Get_Cb name_get;
+	Enesim_Renderer_Rop_Set_Cb rop_set;
+	Enesim_Renderer_Rop_Get_Cb rop_get;
+	Enesim_Renderer_Visibility_Set_Cb visibility_set;
+	Enesim_Renderer_Visibility_Get_Cb visibility_get;
 	Enesim_Renderer_Color_Set_Cb color_set;
 	Enesim_Renderer_Color_Get_Cb color_get;
 	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
