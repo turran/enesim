@@ -21,20 +21,26 @@
 /*----------------------------------------------------------------------------*
  *                          State related functions                           *
  *----------------------------------------------------------------------------*/
+typedef struct _Enesim_Renderer_State_Internal
+{
+	struct {
+		Enesim_Color color;
+		Enesim_Renderer *mask;
+		Eina_Bool visibility;
+		Enesim_Rop rop;
+	} current, past;
+	char *name;
+	Eina_Bool changed;
+} Enesim_Renderer_State_Internal;
 
 typedef struct _Enesim_Renderer_State2
 {
 	struct {
 		Enesim_Matrix transformation;
 		Enesim_Matrix_Type transformation_type;
-		Eina_Bool visibility;
-		Enesim_Rop rop;
-		Enesim_Color color;
-		Enesim_Renderer *mask;
 		double ox;
 		double oy;
 	} current, past;
-	char *name;
 	Eina_Bool changed;
 } Enesim_Renderer_State2;
 
@@ -42,18 +48,6 @@ Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State2 *thiz,
 		const Enesim_Matrix *m);
 Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State2 *thiz,
 		Enesim_Matrix *m);
-void enesim_renderer_state_rop_set(Enesim_Renderer_State2 *thiz,
-		Enesim_Rop rop);
-Eina_Bool enesim_renderer_state_rop_get(Enesim_Renderer_State2 *thiz,
-		Enesim_Rop *rop);
-void enesim_renderer_state_visibility_set(Enesim_Renderer_State2 *thiz,
-		Eina_Bool visibility);
-Eina_Bool enesim_renderer_state_visibility_get(Enesim_Renderer_State2 *thiz,
-		Eina_Bool *visibility);
-void enesim_renderer_state_color_set(Enesim_Renderer_State2 *thiz,
-		Enesim_Color color);
-Eina_Bool enesim_renderer_state_color_get(Enesim_Renderer_State2 *thiz,
-		Enesim_Color *color);
 void enesim_renderer_state_x_set(Enesim_Renderer_State2 *thiz, double x);
 Eina_Bool enesim_renderer_state_x_get(Enesim_Renderer_State2 *thiz, double *x);
 void enesim_renderer_state_y_set(Enesim_Renderer_State2 *thiz, double y);
@@ -78,8 +72,6 @@ void enesim_renderer_state_cleanup(Enesim_Renderer_State2 *thiz);
  */
 /* common descriptor functions */
 typedef const char * (*Enesim_Renderer_Base_Name_Get_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Name_Set_Cb)(Enesim_Renderer *r, const char *name);
-typedef const char * (*Enesim_Renderer_Name_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Is_Inside_Cb)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
@@ -95,12 +87,6 @@ typedef void (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data);
 
-typedef void (*Enesim_Renderer_Rop_Set_Cb)(Enesim_Renderer *r, Enesim_Rop v);
-typedef Enesim_Rop (*Enesim_Renderer_Rop_Get_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Visibility_Set_Cb)(Enesim_Renderer *r, Eina_Bool v);
-typedef Eina_Bool (*Enesim_Renderer_Visibility_Get_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Color_Set_Cb)(Enesim_Renderer *r, Enesim_Color c);
-typedef Enesim_Color (*Enesim_Renderer_Color_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Origin_X_Set_Cb)(Enesim_Renderer *r, double x);
 typedef double (*Enesim_Renderer_Origin_X_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Origin_Y_Set_Cb)(Enesim_Renderer *r, double x);
@@ -112,9 +98,6 @@ typedef void (*Enesim_Renderer_Transformation_Get_Cb)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_Quality_Set_Cb)(Enesim_Renderer *r,
 		Enesim_Quality q);
 typedef Enesim_Quality (*Enesim_Renderer_Quality_Get_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Mask_Set_Cb)(Enesim_Renderer *r,
-		Enesim_Renderer *m);
-typedef Enesim_Renderer * (*Enesim_Renderer_Mask_Get_Cb)(Enesim_Renderer *r);
 
 /* software backend descriptor functions */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
@@ -158,14 +141,6 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* properties */
-	Enesim_Renderer_Name_Set_Cb name_set;
-	Enesim_Renderer_Name_Get_Cb name_get;
-	Enesim_Renderer_Rop_Set_Cb rop_set;
-	Enesim_Renderer_Rop_Get_Cb rop_get;
-	Enesim_Renderer_Visibility_Set_Cb visibility_set;
-	Enesim_Renderer_Visibility_Get_Cb visibility_get;
-	Enesim_Renderer_Color_Set_Cb color_set;
-	Enesim_Renderer_Color_Get_Cb color_get;
 	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
 	Enesim_Renderer_Origin_X_Get_Cb origin_x_get;
 	Enesim_Renderer_Origin_Y_Set_Cb origin_y_set;
@@ -174,8 +149,6 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Transformation_Get_Cb transformation_get;
 	Enesim_Renderer_Quality_Set_Cb quality_set;
 	Enesim_Renderer_Quality_Get_Cb quality_get;
-	Enesim_Renderer_Mask_Set_Cb mask_set;
-	Enesim_Renderer_Mask_Get_Cb mask_get;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
@@ -205,6 +178,7 @@ struct _Enesim_Renderer
 	Enesim_Rectangle past_bounds;
 	Eina_Rectangle current_destination_bounds;
 	Eina_Rectangle past_destination_bounds;
+	Enesim_Renderer_State_Internal state;
 	/* the descriptor */
 	Enesim_Renderer_Descriptor descriptor;
 	void *data;

@@ -102,7 +102,7 @@ static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 err_rasterizer:
 	enesim_renderer_shape_state_cleanup(&thiz->sstate);
 err_shape:
-	enesim_renderer_state_cleaup(&thiz->rstate);
+	enesim_renderer_state_cleanup(&thiz->rstate);
 err_renderer:
 	return EINA_FALSE;
 }
@@ -115,7 +115,7 @@ static void _rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	if (thiz->sw_cleanup)
 		thiz->sw_cleanup(r, s);
 	enesim_renderer_shape_state_cleanup(&thiz->sstate);
-	enesim_renderer_state_cleaup(&thiz->rstate);
+	enesim_renderer_state_cleanup(&thiz->rstate);
 }
 
 static void _rasterizer_free(Enesim_Renderer *r)
@@ -148,24 +148,55 @@ static void _rasterizer_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape
 }
 
 static Enesim_Renderer_Shape_Descriptor _descriptor = {
-	/* .name = 			*/ _rasterizer_base_name_get,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _rasterizer_base_name_get,
 	/* .free = 			*/ _rasterizer_free,
-	/* .bounds = 			*/ NULL,
-	/* .destination_transform = 	*/ NULL,
-	/* .flags = 			*/ _rasterizer_flags,
-	/* .hint_get = 			*/ _rasterizer_hints,
+	/* .bounds_get = 		*/ NULL,
+	/* .destination_bounds_get = 	*/ NULL,
+	/* .flags_get = 		*/ NULL,
+	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
+	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .feature_get =		*/ _rasterizer_feature_get,
-	/* .sw_setup = 			*/ _rasterizer_sw_setup,
-	/* .sw_cleanup = 		*/ _rasterizer_sw_cleanup,
+	/* .origin_x_set = 		*/ NULL,
+	/* .origin_x_get = 		*/ NULL,
+	/* .origin_y_set = 		*/ NULL,
+	/* .origin_y_get = 		*/ NULL,
+	/* .transformation_set = 	*/ NULL,
+	/* .transformation_get = 	*/ NULL,
+	/* .quality_set = 		*/ NULL,
+	/* .quality_get = 		*/ NULL,
+	/* .sw_setup = 			*/ NULL,
+	/* .sw_cleanup = 		*/ NULL,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_shader_setup =   	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
+	/* .opengl_initialize =         */ NULL,
+	/* .opengl_setup =   		*/ NULL,
+	/* .opengl_cleanup =        	*/ NULL,
+	/* .feature_get = 		*/ NULL,
+	/* .draw_mode_set = 		*/ NULL,
+	/* .draw_mode_get = 		*/ NULL,
+	/* .stroke_color_set = 		*/ NULL,
+	/* .stroke_color_get = 		*/ NULL,
+	/* .stroke_renderer_set = 	*/ NULL,
+	/* .stroke_renderer_get = 	*/ NULL,
+	/* .stroke_weight_set = 	*/ NULL,
+	/* .stroke_weight_get = 	*/ NULL,
+	/* .stroke_location_set = 	*/ NULL,
+	/* .stroke_location_get = 	*/ NULL,
+	/* .stroke_cap_set = 		*/ NULL,
+	/* .stroke_cap_get = 		*/ NULL,
+	/* .stroke_join_set = 		*/ NULL,
+	/* .stroke_join_get = 		*/ NULL,
+	/* .stroke_add = 		*/ NULL,
+	/* .stroke_clear = 		*/ NULL,
+	/* .fill_color_set = 		*/ NULL,
+	/* .fill_color_get = 		*/ NULL,
+	/* .fill_renderer_set = 	*/ NULL,
+	/* .fill_renderer_get = 	*/ NULL,
+	/* .fill_rule_set = 		*/ NULL,
+	/* .fill_rule_get = 		*/ NULL,
 };
 /*============================================================================*
  *                                 Global                                     *

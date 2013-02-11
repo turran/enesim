@@ -24,11 +24,40 @@ typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Fi
 
 typedef struct _Enesim_Rasterizer_Descriptor
 {
+	/* inherited from the renderer */
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
 	Enesim_Renderer_Delete free;
-	Enesim_Rasterizer_Figure_Set figure_set;
+	Enesim_Renderer_Flags_Get_Cb flags_get;
+	/* properties */
+	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
+	Enesim_Renderer_Origin_X_Get_Cb origin_x_get;
+	Enesim_Renderer_Origin_Y_Set_Cb origin_y_set;
+	Enesim_Renderer_Origin_Y_Get_Cb origin_y_get;
+	Enesim_Renderer_Transformation_Set_Cb transformation_set;
+	Enesim_Renderer_Transformation_Get_Cb transformation_get;
+	Enesim_Renderer_Quality_Set_Cb quality_set;
+	Enesim_Renderer_Quality_Get_Cb quality_get;
+	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* inherited from the shape */
+	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
+	Enesim_Renderer_Shape_Draw_Mode_Set_Cb draw_mode_set;
+	Enesim_Renderer_Shape_Draw_Mode_Get_Cb draw_mode_get;
+	Enesim_Renderer_Shape_Stroke_Color_Set_Cb stroke_color_set;
+	Enesim_Renderer_Shape_Stroke_Color_Get_Cb stroke_color_get;
+	Enesim_Renderer_Shape_Stroke_Renderer_Set_Cb stroke_renderer_set;
+	Enesim_Renderer_Shape_Stroke_Renderer_Get_Cb stroke_renderer_get;
+	Enesim_Renderer_Shape_Stroke_Weight_Set_Cb stroke_weight_set;
+	Enesim_Renderer_Shape_Stroke_Weight_Get_Cb stroke_weight_get;
+	Enesim_Renderer_Shape_Fill_Color_Set_Cb fill_color_set;
+	Enesim_Renderer_Shape_Fill_Color_Get_Cb fill_color_get;
+	Enesim_Renderer_Shape_Fill_Renderer_Set_Cb fill_renderer_set;
+	Enesim_Renderer_Shape_Fill_Renderer_Get_Cb fill_renderer_get;
+	Enesim_Renderer_Shape_Fill_Rule_Set_Cb fill_rule_set;
+	Enesim_Renderer_Shape_Fill_Rule_Get_Cb fill_rule_get;
+	/* our own interface */
+	Enesim_Rasterizer_Figure_Set figure_set;
 } Enesim_Rasterizer_Descriptor;
 
 Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *data);

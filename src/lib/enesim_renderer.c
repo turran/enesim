@@ -97,7 +97,169 @@ static inline void _enesim_renderer_destination_bounds(Enesim_Renderer *r,
 		eina_rectangle_coords_from(bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	}
 }
+/*----------------------------------------------------------------------------*
+ *                     Internal state related functions                       *
+ *----------------------------------------------------------------------------*/
+static void _state_internal_name_set(Enesim_Renderer_State_Internal *thiz, const char *name)
+{
+	if (thiz->name) free(thiz->name);
+	thiz->name = strdup(name);
+}
 
+static const char * _state_internal_name_get(Enesim_Renderer_State_Internal *thiz)
+{
+	return thiz->name;
+}
+
+static void _state_internal_rop_set(Enesim_Renderer_State_Internal *thiz,
+		Enesim_Rop rop)
+{
+	thiz->current.rop = rop;
+	thiz->changed = EINA_TRUE;
+}
+
+static Eina_Bool _state_internal_rop_get(Enesim_Renderer_State_Internal *thiz,
+		Enesim_Rop *rop)
+{
+	if (!rop) return EINA_FALSE;
+	*rop = thiz->current.rop;
+	return EINA_TRUE;
+}
+
+static void _state_internal_visibility_set(Enesim_Renderer_State_Internal *thiz,
+		Eina_Bool visibility)
+{
+	thiz->current.visibility = visibility;
+	thiz->changed = EINA_TRUE;
+}
+
+static Eina_Bool _state_internal_visibility_get(Enesim_Renderer_State_Internal *thiz,
+		Eina_Bool *visibility)
+{
+	if (!visibility) return EINA_FALSE;
+	*visibility = thiz->current.visibility;
+	return EINA_TRUE;
+}
+
+static void _state_internal_color_set(Enesim_Renderer_State_Internal *thiz,
+		Enesim_Color color)
+{
+	thiz->current.color = color;
+	thiz->changed = EINA_TRUE;
+}
+
+static Eina_Bool _state_internal_color_get(Enesim_Renderer_State_Internal *thiz,
+		Enesim_Color *color)
+{
+	if (!color) return EINA_FALSE;
+	*color = thiz->current.color;
+	return EINA_TRUE;
+}
+
+static void _state_internal_mask_set(Enesim_Renderer_State_Internal * thiz,
+		Enesim_Renderer *mask)
+{
+	Enesim_Renderer *old_mask;
+
+	old_mask = thiz->current.mask;
+	thiz->current.mask = mask;
+	if (old_mask)
+		enesim_renderer_unref(old_mask);
+}
+
+static Eina_Bool _state_internal_mask_get(Enesim_Renderer_State_Internal * thiz,
+		Enesim_Renderer **mask)
+{
+	if (!mask) return EINA_FALSE;
+	*mask = thiz->current.mask;
+	if (*mask)
+		enesim_renderer_ref(*mask);
+	return EINA_TRUE;
+}
+
+static Eina_Bool _state_internal_changed(Enesim_Renderer_State_Internal *thiz)
+{
+	if (!thiz->changed)
+		return EINA_FALSE;
+	/* the visibility */
+	if (thiz->current.visibility != thiz->past.visibility)
+	{
+		return EINA_TRUE;
+	}
+	/* the rop */
+	if (thiz->current.rop != thiz->past.rop)
+	{
+		return EINA_TRUE;
+	}
+	/* the color */
+	if (thiz->current.color != thiz->past.color)
+	{
+		return EINA_TRUE;
+	}
+	/* the mask should be the last as it implies a renderer change */
+	if (thiz->current.mask && !thiz->past.mask)
+		return EINA_TRUE;
+	if (!thiz->current.mask && thiz->past.mask)
+		return EINA_TRUE;
+	if (thiz->current.mask)
+	{
+		if (enesim_renderer_has_changed(thiz->current.mask))
+		{
+			return EINA_TRUE;
+		}
+	}
+	return EINA_FALSE;
+}
+
+static void _state_internal_clear(Enesim_Renderer_State_Internal *thiz)
+{
+	/* past */
+	if (thiz->past.mask)
+	{
+		enesim_renderer_unref(thiz->past.mask);
+		thiz->past.mask = NULL;
+	}
+	/* current */
+	if (thiz->current.mask)
+	{
+		enesim_renderer_unref(thiz->current.mask);
+		thiz->current.mask = NULL;
+	}
+
+	if (thiz->name)
+	{
+		free(thiz->name);
+		thiz->name = NULL;
+	}
+
+}
+
+static void _state_internal_init(Enesim_Renderer_State_Internal *thiz)
+{
+	thiz->current.visibility = thiz->past.visibility = EINA_TRUE;
+	thiz->current.color = thiz->past.color = ENESIM_COLOR_FULL;
+	thiz->current.rop = thiz->past.rop = ENESIM_FILL;
+}
+
+static void _state_internal_commit(Enesim_Renderer_State_Internal *thiz)
+{
+	Enesim_Renderer *old_mask;
+
+	/* keep the referenceable objects */
+	old_mask = thiz->past.mask;
+	/* swap the state */
+	thiz->past = thiz->current;
+	/* increment the referenceable objects */
+	if (thiz->past.mask)
+		enesim_renderer_ref(thiz->past.mask);
+	/* release the referenceable objects */
+	if (old_mask)
+		enesim_renderer_unref(old_mask);
+	thiz->changed = EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
+ *                             Helper functions                               *
+ *----------------------------------------------------------------------------*/
 static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_Rectangle *area, int x, int y)
 {
@@ -261,62 +423,6 @@ Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State2 *thiz,
 }
 
 
-void enesim_renderer_state_name_set(Enesim_Renderer_State2 *thiz, const char *name)
-{
-	if (thiz->name) free(thiz->name);
-	thiz->name = strdup(name);
-}
-
-const char * enesim_renderer_state_name_get(Enesim_Renderer_State2 *thiz)
-{
-	return thiz->name;
-}
-
-void enesim_renderer_state_rop_set(Enesim_Renderer_State2 *thiz,
-		Enesim_Rop rop)
-{
-	thiz->current.rop = rop;
-	thiz->changed = EINA_TRUE;
-}
-
-Eina_Bool enesim_renderer_state_rop_get(Enesim_Renderer_State2 *thiz,
-		Enesim_Rop *rop)
-{
-	if (!rop) return EINA_FALSE;
-	*rop = thiz->current.rop;
-	return EINA_TRUE;
-}
-
-void enesim_renderer_state_visibility_set(Enesim_Renderer_State2 *thiz,
-		Eina_Bool visibility)
-{
-	thiz->current.visibility = visibility;
-	thiz->changed = EINA_TRUE;
-}
-
-Eina_Bool enesim_renderer_state_visibility_get(Enesim_Renderer_State2 *thiz,
-		Eina_Bool *visibility)
-{
-	if (!visibility) return EINA_FALSE;
-	*visibility = thiz->current.visibility;
-	return EINA_TRUE;
-}
-
-void enesim_renderer_state_color_set(Enesim_Renderer_State2 *thiz,
-		Enesim_Color color)
-{
-	thiz->current.color = color;
-	thiz->changed = EINA_TRUE;
-}
-
-Eina_Bool enesim_renderer_state_color_get(Enesim_Renderer_State2 *thiz,
-		Enesim_Color *color)
-{
-	if (!color) return EINA_FALSE;
-	*color = thiz->current.color;
-	return EINA_TRUE;
-}
-
 void enesim_renderer_state_x_set(Enesim_Renderer_State2 *thiz, double x)
 {
 	thiz->current.ox = x;
@@ -345,39 +451,15 @@ Eina_Bool enesim_renderer_state_y_get(Enesim_Renderer_State2 *thiz, double *y)
 
 void enesim_renderer_state_commit(Enesim_Renderer_State2 *thiz)
 {
-	Enesim_Renderer *old_mask;
-
-	/* keep the referenceable objects */
-	old_mask = thiz->past.mask;
 	/* swap the state */
 	thiz->past = thiz->current;
-	/* increment the referenceable objects */
-	if (thiz->past.mask)
-		enesim_renderer_ref(thiz->past.mask);
-	/* release the referenceable objects */
-	if (old_mask)
-		enesim_renderer_unref(old_mask);
+	thiz->changed = EINA_FALSE;
 }
 
 Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State2 *thiz)
 {
 	if (!thiz->changed)
 		return EINA_FALSE;
-	/* the visibility */
-	if (thiz->current.visibility != thiz->past.visibility)
-	{
-		return EINA_TRUE;
-	}
-	/* the rop */
-	if (thiz->current.rop != thiz->past.rop)
-	{
-		return EINA_TRUE;
-	}
-	/* the color */
-	if (thiz->current.color != thiz->past.color)
-	{
-		return EINA_TRUE;
-	}
 	/* the origin */
 	if (thiz->current.ox != thiz->past.ox || thiz->current.oy != thiz->past.oy)
 	{
@@ -393,66 +475,26 @@ Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State2 *thiz)
 	{
 		return EINA_TRUE;
 	}
-	/* the mask should be the last as it implies a renderer change */
-	if (thiz->current.mask && !thiz->past.mask)
-		return EINA_TRUE;
-	if (!thiz->current.mask && thiz->past.mask)
-		return EINA_TRUE;
-	if (thiz->current.mask)
-	{
-		if (enesim_renderer_has_changed(thiz->current.mask))
-		{
-			return EINA_TRUE;
-		}
-	}
 
 	return EINA_FALSE;
 }
 
-void enesim_renderer_state_clear(Enesim_Renderer_State2 *thiz)
+void enesim_renderer_state_clear(Enesim_Renderer_State2 *thiz EINA_UNUSED)
 {
-	/* past */
-	if (thiz->past.mask)
-	{
-		enesim_renderer_unref(thiz->past.mask);
-		thiz->past.mask = NULL;
-	}
-	/* current */
-	if (thiz->current.mask)
-	{
-		enesim_renderer_unref(thiz->current.mask);
-		thiz->current.mask = NULL;
-	}
-
-	if (thiz->name)
-	{
-		free(thiz->name);
-		thiz->name = NULL;
-	}
 }
 
 void enesim_renderer_state_init(Enesim_Renderer_State2 *thiz)
 {
 	/* common properties */
-	thiz->current.visibility = thiz->past.visibility = EINA_TRUE;
 	thiz->current.ox = thiz->past.ox = 0;
 	thiz->current.oy = thiz->past.oy = 0;
-	thiz->current.color = thiz->past.color = ENESIM_COLOR_FULL;
-	thiz->current.rop = thiz->past.rop = ENESIM_FILL;
 	enesim_matrix_identity(&thiz->current.transformation);
 	enesim_matrix_identity(&thiz->past.transformation);
 	thiz->current.transformation_type = ENESIM_MATRIX_IDENTITY;
 	thiz->past.transformation_type = ENESIM_MATRIX_IDENTITY;
 }
 
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
+Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data)
 {
 	Enesim_Renderer *r;
@@ -476,6 +518,7 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	/* now initialize the renderer common properties */
 	EINA_MAGIC_SET(r, ENESIM_MAGIC_RENDERER);
 	/* private stuff */
+	_state_internal_init(&r->state);
 	r->current_flags = 0;
 	enesim_rectangle_coords_from(&r->past_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	eina_rectangle_coords_from(&r->past_destination_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
@@ -488,17 +531,17 @@ EAPI Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	return r;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void * enesim_renderer_data_get(Enesim_Renderer *r)
+void * enesim_renderer_data_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
 	return r->data;
 }
 
+
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
 /**
  * To be documented
  * FIXME: To be fixed
@@ -523,7 +566,6 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 		if (r->descriptor.free)
 			r->descriptor.free(r);
 		eina_lock_free(&r->lock);
-
 		eina_hash_free(r->prv_data);
 		/* remove all the private data */
 		enesim_renderer_sw_free(r);
@@ -534,6 +576,7 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 		enesim_renderer_opencl_free(r);
 #endif
 		/* finally */
+		_state_internal_clear(&r->state);
 		free(r);
 	}
 }
@@ -675,6 +718,7 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	r->past_bounds = r->current_bounds;
 	r->past_destination_bounds = r->current_destination_bounds;
 	r->in_setup = EINA_FALSE;
+	_state_internal_commit(&r->state);
 
 	enesim_renderer_unlock(r);
 }
@@ -731,8 +775,7 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor.name_set)
-		r->descriptor.name_set(r, name);
+	_state_internal_name_set(&r->state, name);
 }
 
 /**
@@ -743,8 +786,7 @@ EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!name) return;
-	if (r->descriptor.name_get)
-		*name = r->descriptor.name_get(r);
+	*name = _state_internal_name_get(&r->state);
 }
 
 /**
@@ -819,8 +861,7 @@ EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y)
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor.color_set)
-		r->descriptor.color_set(r, color);
+	_state_internal_color_set(&r->state, color);
 }
 /**
  * To  be documented
@@ -829,13 +870,7 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (color)
-	{
-		if (r->descriptor.color_set)
-			*color = r->descriptor.color_get(r);
-		else
-			*color = ENESIM_COLOR_FULL;
-	}
+	_state_internal_color_get(&r->state, color);
 }
 /**
  * To  be documented
@@ -844,8 +879,7 @@ EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor.visibility_set)
-		r->descriptor.visibility_set(r, visible);
+	_state_internal_visibility_set(&r->state, visible);
 }
 /**
  * To  be documented
@@ -854,8 +888,7 @@ EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
 EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visible)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (visible && r->descriptor.visibility_get)
-		*visible = r->descriptor.visibility_get(r);
+	_state_internal_visibility_get(&r->state, visible);
 }
 
 /**
@@ -951,8 +984,7 @@ EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r,
 EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor.rop_set)
-		r->descriptor.rop_set(r, rop);
+	_state_internal_rop_set(&r->state, rop);
 }
 
 /**
@@ -962,13 +994,7 @@ EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (rop)
-	{
-		if (r->descriptor.rop_get)
-			*rop = r->descriptor.rop_get(r);
-		else
-			*rop = ENESIM_FILL;
-	}
+	_state_internal_rop_get(&r->state, rop);
 }
 
 /**
@@ -978,10 +1004,7 @@ EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor.mask_set)
-		r->descriptor.mask_set(r, mask);
-	else
-		enesim_renderer_unref(mask);
+	_state_internal_mask_set(&r->state, mask);
 }
 
 /**
@@ -991,8 +1014,7 @@ EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask)
 EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (mask && r->descriptor.mask_get)
-		*mask = r->descriptor.mask_get(r);
+	_state_internal_mask_get(&r->state, mask);
 }
 
 /**
@@ -1220,6 +1242,8 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 	/* TODO split the below code into an internal version */
 	/* TODO modify the logic a bit */
 #endif
+	ret = _state_internal_changed(&r->state);
+	if (ret) goto done;
 
 	/* if the renderer does not has the descriptor
 	 * function we assume it is always true */
@@ -1233,7 +1257,7 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 		enesim_renderer_name_get(r, &name);
 		WRN("The renderer '%s' does not implement the change callback", name);
 	}
-
+done:
 	if (ret)
 	{
 		const char *name;

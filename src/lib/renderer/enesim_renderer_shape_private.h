@@ -113,14 +113,6 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* properties */
-	Enesim_Renderer_Name_Set_Cb name_set;
-	Enesim_Renderer_Name_Get_Cb name_get;
-	Enesim_Renderer_Rop_Set_Cb rop_set;
-	Enesim_Renderer_Rop_Get_Cb rop_get;
-	Enesim_Renderer_Visibility_Set_Cb visibility_set;
-	Enesim_Renderer_Visibility_Get_Cb visibility_get;
-	Enesim_Renderer_Color_Set_Cb color_set;
-	Enesim_Renderer_Color_Get_Cb color_get;
 	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
 	Enesim_Renderer_Origin_X_Get_Cb origin_x_get;
 	Enesim_Renderer_Origin_Y_Set_Cb origin_y_set;
@@ -129,8 +121,6 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_Transformation_Get_Cb transformation_get;
 	Enesim_Renderer_Quality_Set_Cb quality_set;
 	Enesim_Renderer_Quality_Get_Cb quality_get;
-	Enesim_Renderer_Mask_Set_Cb mask_set;
-	Enesim_Renderer_Mask_Get_Cb mask_get;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
