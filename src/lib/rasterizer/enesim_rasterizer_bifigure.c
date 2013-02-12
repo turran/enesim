@@ -70,6 +70,24 @@
 	} while(0)
 
 
+typedef struct _Enesim_Rasterizer_BiFigure_State
+{
+	double ox;
+	double oy;
+
+	struct {
+		Enesim_Renderer *r;
+		Enesim_Color color;
+	} fill;
+
+	struct {
+		Enesim_Renderer *r;
+		Enesim_Color color;
+	} stroke;
+
+	Enesim_Color color;
+} Enesim_Rasterizer_BiFigure_State;
+
 typedef struct _Enesim_Rasterizer_BiFigure
 {
 	EINA_MAGIC
@@ -77,6 +95,7 @@ typedef struct _Enesim_Rasterizer_BiFigure
 	Enesim_Renderer *under;
 	Enesim_Figure *over_figure;
 	const Enesim_Figure *under_figure;
+	Enesim_Rasterizer_BiFigure_State state;
 
 	int tyy, byy;
 
@@ -354,12 +373,11 @@ repeat: \
 
 
 static void _bifig_stroke_fill_paint_nz(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -405,9 +423,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 		color = state->color;
 		if (color != 0xffffffff)
 		{
@@ -533,12 +551,11 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_nz(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -584,9 +601,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
 		color = state->color;
 		if (color != 0xffffffff)
 		{
@@ -686,12 +703,11 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_paint_nz(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -738,10 +754,10 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 		color = state->color;
 		if (color != 0xffffffff)
 		{
@@ -983,11 +999,10 @@ get_out:
 
 
 static void _bifig_stroke_fill_paint_eo_u(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -1032,9 +1047,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 		color = state->color;
 		if (color != 0xffffffff)
 		{
@@ -1161,11 +1176,10 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_eo_u(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -1210,9 +1224,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
 		color = state->color;
 		if (color != 0xffffffff)
 		{
@@ -1313,11 +1327,10 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_paint_eo_u(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = _bifigure_get(r);
+	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -1363,10 +1376,10 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 		color = state->color;
 		if (color != 0xffffffff)
 		{
@@ -1492,11 +1505,7 @@ get_out:
 	}
 }
 
-
-
 static void _over_figure_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
-		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
@@ -1506,8 +1515,6 @@ static void _over_figure_span(Enesim_Renderer *r,
 }
 
 static void _under_figure_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
-		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
@@ -1547,22 +1554,20 @@ static void _bifigure_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure
 }
 
 static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Shape_Sw_Draw *draw,
+		Enesim_Renderer_Sw_Fill *draw,
 		Enesim_Error **error)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+	Enesim_Rasterizer_BiFigure_State *state;
 	Enesim_Shape_Draw_Mode draw_mode;
 	Enesim_Shape_Fill_Rule rule;
-	Enesim_Renderer *spaint, *fpaint;
-	Enesim_Color color, scolor, fcolor;
+	Enesim_Matrix matrix;
 	double sw;
 
 	thiz = _bifigure_get(r);
+	state = &thiz->state;
+
 	if (!thiz->under_figure && thiz->over_figure)
 	{
 		ENESIM_RENDERER_ERROR(r, error, "No figure to rasterize");
@@ -1574,14 +1579,17 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	color = cs->color;
-	draw_mode = css->draw_mode;
-	sw = css->stroke.weight;
-	scolor = css->stroke.color;
-	spaint = css->stroke.r;
-	fcolor = css->fill.color;
-	fpaint = css->fill.r;
-	rule = css->fill.rule;
+	/* this is needed to know what span function to use */
+	enesim_renderer_shape_fill_rule_get(r, &rule);
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	/* this is for our own state */
+	enesim_renderer_origin_get(r, &state->ox, &state->oy);
+	enesim_renderer_color_get(r, &state->color);
+	enesim_renderer_shape_stroke_color_get(r, &state->stroke.color);
+	enesim_renderer_shape_stroke_renderer_get(r, &state->stroke.r);
+	enesim_renderer_shape_fill_color_get(r, &state->fill.color);
+	enesim_renderer_shape_fill_renderer_get(r, &state->fill.r);
 
 	if (thiz->changed)
 	{
@@ -1608,16 +1616,17 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		thiz->changed = EINA_FALSE;
 	}
 
-	enesim_matrix_f16p16_matrix_to(&cs->transformation,
+	enesim_renderer_transformation_get(r, &matrix);
+	enesim_matrix_f16p16_matrix_to(&matrix,
 			&thiz->matrix);
 	/* setup the figures and get span funcs */
 	if (!thiz->under)
 	{
-		enesim_renderer_origin_set(thiz->over, cs->ox, cs->oy);
-		enesim_renderer_transformation_set(thiz->over, &cs->transformation);
-		enesim_renderer_color_set(thiz->over, color);
-		enesim_renderer_shape_fill_color_set(thiz->over, scolor);
-		enesim_renderer_shape_fill_renderer_set(thiz->over, spaint);
+		enesim_renderer_origin_set(thiz->over, state->ox, state->oy);
+		enesim_renderer_transformation_set(thiz->over, &matrix);
+		enesim_renderer_color_set(thiz->over, state->color);
+		enesim_renderer_shape_fill_color_set(thiz->over, state->stroke.color);
+		enesim_renderer_shape_fill_renderer_set(thiz->over, enesim_renderer_ref(state->stroke.r));
 		enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
 
 		thiz->over_used = EINA_TRUE;
@@ -1629,15 +1638,15 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	{
 		if ( (sw <= 1) || (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) )
 		{
-			enesim_renderer_origin_set(thiz->under, cs->ox, cs->oy);
-			enesim_renderer_transformation_set(thiz->under, &cs->transformation);
-			enesim_renderer_color_set(thiz->under, color);
+			enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
+			enesim_renderer_transformation_set(thiz->under, &matrix);
+			enesim_renderer_color_set(thiz->under, state->color);
 			enesim_renderer_shape_draw_mode_set(thiz->under, draw_mode);
 			enesim_renderer_shape_stroke_weight_set(thiz->under, 1);
-			enesim_renderer_shape_stroke_color_set(thiz->under, scolor);
-			enesim_renderer_shape_stroke_renderer_set(thiz->under, spaint);
-			enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
-			enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
+			enesim_renderer_shape_stroke_color_set(thiz->under, state->stroke.color);
+			enesim_renderer_shape_stroke_renderer_set(thiz->under, enesim_renderer_ref(state->stroke.r));
+			enesim_renderer_shape_fill_color_set(thiz->under, state->fill.color);
+			enesim_renderer_shape_fill_renderer_set(thiz->under, enesim_renderer_ref(state->fill.r));
 			enesim_renderer_shape_fill_rule_set(thiz->under, rule);
 
 			thiz->under_used = EINA_TRUE;
@@ -1649,20 +1658,20 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		{
 			if (thiz->over)
 			{
-				enesim_renderer_origin_set(thiz->over, cs->ox, cs->oy);
-				enesim_renderer_transformation_set(thiz->over, &cs->transformation);
-				enesim_renderer_color_set(thiz->over, color);
+				enesim_renderer_origin_set(thiz->over, state->ox, state->oy);
+				enesim_renderer_transformation_set(thiz->over, &matrix);
+				enesim_renderer_color_set(thiz->over, state->color);
 				enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
-				enesim_renderer_shape_fill_color_set(thiz->over, scolor);
-				enesim_renderer_shape_fill_renderer_set(thiz->over, spaint);
+				enesim_renderer_shape_fill_color_set(thiz->over, state->stroke.color);
+				enesim_renderer_shape_fill_renderer_set(thiz->over, enesim_renderer_ref(state->stroke.r));
 				if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 				{
-					enesim_renderer_origin_set(thiz->under, cs->ox, cs->oy);
-					enesim_renderer_transformation_set(thiz->under, &cs->transformation);
-					enesim_renderer_color_set(thiz->under, color);
+					enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
+					enesim_renderer_transformation_set(thiz->under, &matrix);
+					enesim_renderer_color_set(thiz->under, state->color);
 					enesim_renderer_shape_draw_mode_set(thiz->under, ENESIM_SHAPE_DRAW_MODE_STROKE_FILL);
-					enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
-					enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
+					enesim_renderer_shape_fill_color_set(thiz->under, state->fill.color);
+					enesim_renderer_shape_fill_renderer_set(thiz->under, enesim_renderer_ref(state->fill.r));
 					enesim_renderer_shape_fill_rule_set(thiz->under, rule);
 
 					thiz->under_used = EINA_TRUE;
@@ -1678,17 +1687,17 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 					if (rule == ENESIM_SHAPE_FILL_RULE_NON_ZERO)
 					{
 						*draw = _bifig_stroke_paint_fill_paint_nz;
-						if (!spaint)
+						if (!enesim_renderer_ref(state->stroke.r))
 							*draw = _bifig_stroke_fill_paint_nz;
-						else if (!fpaint)
+						else if (!enesim_renderer_ref(state->fill.r))
 							*draw = _bifig_stroke_paint_fill_nz;
 					}
 					else
 					{
 						*draw= _bifig_stroke_paint_fill_paint_eo_u;
-						if (!spaint)
+						if (!enesim_renderer_ref(state->stroke.r))
 							*draw = _bifig_stroke_fill_paint_eo_u;
-						else if (!fpaint)
+						else if (!enesim_renderer_ref(state->fill.r))
 							*draw = _bifig_stroke_paint_fill_eo_u;
 					}
 				}
@@ -1699,15 +1708,15 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			}
 			else
 			{
-				enesim_renderer_origin_set(thiz->under, cs->ox, cs->oy);
-				enesim_renderer_transformation_set(thiz->under, &cs->transformation);
-				enesim_renderer_color_set(thiz->under, color);
+				enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
+				enesim_renderer_transformation_set(thiz->under, &matrix);
+				enesim_renderer_color_set(thiz->under, state->color);
 				enesim_renderer_shape_draw_mode_set(thiz->under, draw_mode);
 				enesim_renderer_shape_stroke_weight_set(thiz->under, 1);
-				enesim_renderer_shape_stroke_color_set(thiz->under, scolor);
-				enesim_renderer_shape_stroke_renderer_set(thiz->under, spaint);
-				enesim_renderer_shape_fill_color_set(thiz->under, fcolor);
-				enesim_renderer_shape_fill_renderer_set(thiz->under, fpaint);
+				enesim_renderer_shape_stroke_color_set(thiz->under, state->stroke.color);
+				enesim_renderer_shape_stroke_renderer_set(thiz->under, enesim_renderer_ref(state->stroke.r));
+				enesim_renderer_shape_fill_color_set(thiz->under, state->fill.color);
+				enesim_renderer_shape_fill_renderer_set(thiz->under, enesim_renderer_ref(state->fill.r));
 				enesim_renderer_shape_fill_rule_set(thiz->under, rule);
 
 				thiz->under_used = EINA_TRUE;
@@ -1751,8 +1760,10 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
+	Enesim_Rasterizer_BiFigure_State *state;
 
 	thiz = _bifigure_get(r);
+	state = &thiz->state;
 	/* FIXME We need to check that the over or under renderers were actually setup */
 	if (thiz->over && thiz->over_used)
 	{
@@ -1763,6 +1774,16 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	{
 		enesim_renderer_cleanup(thiz->under, s);
 		thiz->under_used = EINA_FALSE;
+	}
+	if (state->stroke.r)
+	{
+		enesim_renderer_unref(state->stroke.r);
+		state->stroke.r = NULL;
+	}
+	if (state->fill.r)
+	{
+		enesim_renderer_unref(state->fill.r);
+		state->fill.r = NULL;
 	}
 	thiz->changed = EINA_FALSE;
 }

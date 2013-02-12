@@ -45,5 +45,9 @@ typedef struct _Enesim_Renderer_Simple_Descriptor
 Enesim_Renderer * enesim_renderer_simple_new(
 		Enesim_Renderer_Simple_Descriptor *descriptor, void *data);
 void * enesim_renderer_simple_data_get(Enesim_Renderer *r);
+void enesim_renderer_simple_state_get(Enesim_Renderer *r,
+		const Enesim_Renderer_State2 **state);
+void enesim_renderer_simple_transformation_type_get(Enesim_Renderer *r,
+		Enesim_Matrix_Type *type);
 
 #endif

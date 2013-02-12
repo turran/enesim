@@ -71,7 +71,6 @@ static inline Enesim_Renderer_Background * _background_get(Enesim_Renderer *r)
 }
 
 static void _background_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len, void *ddata)
 {
@@ -190,7 +189,6 @@ static const char * _background_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
@@ -269,7 +267,6 @@ static Eina_Bool _background_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error EINA_UNUSED)
@@ -292,7 +289,7 @@ static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EIN
 }
 #endif
 
-static void _background_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _background_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_AFFINE |
@@ -300,7 +297,7 @@ static void _background_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Rende
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _background_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _background_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_COLORIZE;
@@ -314,8 +311,7 @@ static void _background_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Eina_Bool _background_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _background_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Background *thiz;
 

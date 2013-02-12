@@ -87,26 +87,21 @@ typedef struct _Enesim_Rasterizer_Basic_State
 	double ox;
 	double oy;
 
-	Enesim_Renderer *fpaint;
-	Enesim_Color fcolor;
+	struct {
+		Enesim_Renderer *r;
+		Enesim_Color color;
+		Enesim_Shape_Fill_Rule rule;
+	} fill;
 
-	Eina_Bool stroke;
-	Enesim_Renderer *spaint;
-	Enesim_Color scolor;
-	/* the stroke width */
-	Eina_F16p16 sww;
+	struct {
+		Enesim_Renderer *r;
+		Enesim_Color color;
+		double weight;
+	} stroke;
+
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Color color;
 } Enesim_Rasterizer_Basic_State;
-
-/* State generated at every span */
-typedef struct _Enesim_Rasterizer_Basic_Span_State
-{
-	/* the edges calculated for the span x, y, len */
-	Enesim_F16p16_Edge *edges;
-	int nedges;
-
-	int x;
-	unsigned int len;
-} Enesim_Rasterizer_Basic_Span_State;
 
 typedef struct _Enesim_Rasterizer_Basic
 {
@@ -117,6 +112,7 @@ typedef struct _Enesim_Rasterizer_Basic
 	const Enesim_Figure *figure;
 	Eina_Bool changed : 1;
 
+	Enesim_Rasterizer_Basic_State state;
 	/* FIXME this are the bounds calculated at the setup
 	 * we either generate them at the Enesim_Polygon level
 	 * or something like that
@@ -134,20 +130,6 @@ static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
 	ENESIM_RASTERIZER_BASIC_MAGIC_CHECK(thiz);
 
 	return thiz;
-}
-
-/* Initialize the span state, we need to do it in a macro because the alloca
- * only works on the calling scope. At most we need @n vectors
- */
-#define _basic_span_state_init (s, n) \
-	s->edges = alloca(n * sizeof(Enesim_F16p16_Edge));
-
-/* Generate the edges for the current span */
-static inline void _basic_span_state_generate_edges(
-		Enesim_Rasterizer_Basic_Span_State *s EINA_UNUSED,
-		Enesim_F16p16_Vector *vectors EINA_UNUSED, int nvectors EINA_UNUSED)
-{
-
 }
 
 #define SETUP_EDGES \
@@ -304,11 +286,10 @@ repeat: \
 /* identity */
 /* stroke and/or fill with possibly a fill renderer non-zero rule */
 static void _stroke_fill_paint_nz(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -348,9 +329,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 		color = state->color;
 		if (color != 0xffffffff)
 		{
@@ -358,8 +339,8 @@ get_out:
 			fcolor = argb8888_mul4_sym(color, fcolor);
 		}
 
-		sw = sstate->stroke.weight;
-		if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+		sw = state->stroke.weight;
+		if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 		{
 			sww = 65536;
 			scolor = fcolor;
@@ -367,7 +348,7 @@ get_out:
 			if (fpaint)
 				enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
 		}
-		else if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+		else if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 		{
 			stroke = 1;
 			if (sw <= 0)
@@ -380,7 +361,7 @@ get_out:
 			if (fpaint)
 				enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
 		}
-		else  // if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		else  // if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		{
 			if (sw <= 0)
 			{
@@ -470,11 +451,10 @@ get_out:
 
 /* stroke with a renderer and possibly fill with color non-zero rule */
 static void _stroke_paint_fill_nz(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -513,9 +493,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
 
 		color = state->color;
 		if (color != 0xffffffff)
@@ -524,10 +504,10 @@ get_out:
 			fcolor = argb8888_mul4_sym(color, fcolor);
 		}
 
-		sw = sstate->stroke.weight;
+		sw = state->stroke.weight;
 		sww = sqrt(sw) * 65536;
 
-		if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 			fcolor = 0;
 
 		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
@@ -578,11 +558,10 @@ get_out:
 
 /* stroke and fill with renderers non-zero rule */
 static void _stroke_paint_fill_paint_nz(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -623,10 +602,10 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 
 		color = state->color;
 		if (color != 0xffffffff)
@@ -635,7 +614,7 @@ get_out:
 			fcolor = argb8888_mul4_sym(color, fcolor);
 		}
 
-		sw = sstate->stroke.weight;
+		sw = state->stroke.weight;
 		sww = sqrt(sw) * 65536;
 
 		enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
@@ -753,11 +732,10 @@ get_out:
 /* identity */
 /* stroke and/or fill with possibly a fill renderer even-odd rule */
 static void _stroke_fill_paint_eo(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -797,9 +775,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 
 		color = state->color;
 		if (color != 0xffffffff)
@@ -808,8 +786,8 @@ get_out:
 			fcolor = argb8888_mul4_sym(color, fcolor);
 		}
 
-		sw = sstate->stroke.weight;
-		if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
+		sw = state->stroke.weight;
+		if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL)
 		{
 			sww = 65536;
 			scolor = fcolor;
@@ -817,7 +795,7 @@ get_out:
 			if (fpaint)
 				enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
 		}
-		else if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+		else if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 		{
 			stroke = 1;
 			if (sw <= 0)
@@ -830,7 +808,7 @@ get_out:
 			if (fpaint)
 				enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
 		}
-		else  // if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		else  // if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 		{
 			if (sw <= 0)
 			{
@@ -920,11 +898,10 @@ get_out:
 
 /* stroke with a renderer and possibly fill with color even-odd rule */
 static void _stroke_paint_fill_eo(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -963,9 +940,9 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
 
 		color = state->color;
 		if (color != 0xffffffff)
@@ -974,10 +951,10 @@ get_out:
 			fcolor = argb8888_mul4_sym(color, fcolor);
 		}
 
-		sw = sstate->stroke.weight;
+		sw = state->stroke.weight;
 		sww = sqrt(sw) * 65536;
 
-		if (sstate->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
+		if (state->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)
 			fcolor = 0;
 
 		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
@@ -1029,11 +1006,10 @@ get_out:
 
 /* stroke and fill with renderers even-odd rule */
 static void _stroke_paint_fill_paint_eo(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
-		const Enesim_Renderer_Shape_State *sstate,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
 	Enesim_Color scolor;
@@ -1074,10 +1050,10 @@ get_out:
 	if (first)
 	{
 		first = 0;
-		scolor = sstate->stroke.color;
-		spaint = sstate->stroke.r;
-		fcolor = sstate->fill.color;
-		fpaint = sstate->fill.r;
+		scolor = state->stroke.color;
+		spaint = state->stroke.r;
+		fcolor = state->fill.color;
+		fpaint = state->fill.r;
 
 		color = state->color;
 		if (color != 0xffffffff)
@@ -1086,7 +1062,7 @@ get_out:
 			fcolor = argb8888_mul4_sym(color, fcolor);
 		}
 
-		sw = sstate->stroke.weight;
+		sw = state->stroke.weight;
 		sww = sqrt(sw) * 65536;
 
 		enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
@@ -1186,33 +1162,31 @@ static int _tysort(const void *l, const void *r)
 
 
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Shape_Sw_Draw *draw,
+		Enesim_Renderer_Sw_Fill *draw,
 		Enesim_Error **error)
 {
 	Enesim_Rasterizer_Basic *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_Shape_State *pss = sstates[ENESIM_STATE_PAST];
+	Enesim_Rasterizer_Basic_State *state;
 	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Shape_Fill_Rule rule;
-	Enesim_Renderer *spaint;
-	double sw;
+	Enesim_Matrix matrix;
 
 	thiz = _basic_get(r);
+	state = &thiz->state;
 	if (!thiz->figure)
 	{
 		ENESIM_RENDERER_ERROR(r, error, "No figure to rasterize");
 		return EINA_FALSE;
 	}
 
-	draw_mode = css->draw_mode;
-	if ((pss->draw_mode != draw_mode) &&
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	if ((thiz->draw_mode != draw_mode) &&
 			((thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
 			(draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)))
-		thiz->changed = 1;
+	{
+		thiz->changed = EINA_TRUE;
+		thiz->draw_mode = draw_mode;
+	}
 
 	if (thiz->changed)
 	{
@@ -1287,7 +1261,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 
 		if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
 			return EINA_FALSE;
-		if ((css->draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) &&
+		if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) &&
 			 (lx != rx) && (ty != by))
 		{
 			sx = (rx - lx - 1) / (rx - lx);
@@ -1433,36 +1407,31 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->changed = EINA_FALSE;
 	}
 
-	enesim_matrix_f16p16_matrix_to(&cs->transformation,
+	enesim_renderer_transformation_get(r, &matrix);
+	enesim_matrix_f16p16_matrix_to(&matrix,
 			&thiz->matrix);
+	enesim_renderer_shape_stroke_weight_get(r, &state->stroke.weight);
+	enesim_renderer_shape_stroke_renderer_get(r, &state->stroke.r);
+	enesim_renderer_shape_fill_renderer_get(r, &state->fill.r);
+	enesim_renderer_shape_fill_rule_get(r, &state->fill.rule);
 
-	sw = css->stroke.weight;
-	spaint = css->stroke.r;
-	rule = css->fill.rule;
-
-	if (rule == ENESIM_SHAPE_FILL_RULE_NON_ZERO)
+	if (state->fill.rule == ENESIM_SHAPE_FILL_RULE_NON_ZERO)
 	{
 		*draw = _stroke_fill_paint_nz;
-		if ((sw > 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		if ((state->stroke.weight > 0.0) && state->stroke.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
-			Enesim_Renderer *fpaint;
-
 			*draw = _stroke_paint_fill_nz;
-			fpaint = css->fill.r;
-			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+			if (state->stroke.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 				*draw = _stroke_paint_fill_paint_nz;
 		}
 	}
 	else
 	{
 		*draw = _stroke_fill_paint_eo;
-		if ((sw > 0.0) && spaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+		if ((state->stroke.weight > 0.0) && state->stroke.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
-			Enesim_Renderer *fpaint;
-
 			*draw = _stroke_paint_fill_eo;
-			fpaint = css->fill.r;
-			if (fpaint && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+			if (state->fill.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 				*draw = _stroke_paint_fill_paint_eo;
 		}
 	}
@@ -1472,6 +1441,15 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 
 static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
+	Enesim_Rasterizer_Basic *thiz;
+	Enesim_Rasterizer_Basic_State *state;
+
+	thiz = _basic_get(r);
+	state = &thiz->state;
+	if (state->fill.r)
+		enesim_renderer_unref(state->fill.r);
+	if (state->stroke.r)
+		enesim_renderer_unref(state->stroke.r);
 }
 
 static Enesim_Rasterizer_Descriptor _descriptor = {

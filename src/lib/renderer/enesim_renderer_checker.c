@@ -76,6 +76,8 @@ typedef struct _Enesim_Renderer_Checker
 	Enesim_F16p16_Matrix matrix;
 	Enesim_Color final_color1;
 	Enesim_Color final_color2;
+	double ox;
+	double oy;
 	Eina_F16p16 ww, hh;
 	Eina_F16p16 ww2, hh2;
 } Enesim_Renderer_Checker;
@@ -185,8 +187,7 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUS
 }
 #endif
 
-static Eina_Bool _checker_state_setup(Enesim_Renderer_Checker *thiz,
-		const Enesim_Renderer_State *state)
+static Eina_Bool _checker_state_setup(Enesim_Renderer *r, Enesim_Renderer_Checker *thiz)
 {
 	Enesim_Color final_color1;
 	Enesim_Color final_color2;
@@ -195,12 +196,13 @@ static Eina_Bool _checker_state_setup(Enesim_Renderer_Checker *thiz,
 	final_color1 = thiz->current.color1;
 	final_color2 = thiz->current.color2;
 
-	rend_color = state->color;
+	enesim_renderer_color_get(r, &rend_color);
 	if (rend_color != ENESIM_COLOR_FULL)
 	{
 		final_color1 = argb8888_mul4_sym(rend_color, final_color1);
 		final_color2 = argb8888_mul4_sym(rend_color, final_color2);
 	}
+	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
 	thiz->final_color1 = final_color1;
 	thiz->final_color2 = final_color2;
 	return EINA_TRUE;
@@ -215,7 +217,6 @@ static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
 static void _span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -234,7 +235,7 @@ static void _span_identity(Enesim_Renderer *r,
 	color[1] = thiz->final_color2;
 
 	/* translate to the origin */
-	enesim_coord_identity_setup(&xx, &yy, x, y, state->ox, state->oy);
+	enesim_coord_identity_setup(&xx, &yy, x, y, thiz->ox, thiz->oy);
 	/* normalize the modulo */
 	sy = ((yy  >> 16) % h2);
 	if (sy < 0)
@@ -272,7 +273,6 @@ static void _span_identity(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -281,7 +281,7 @@ static void _span_affine(Enesim_Renderer *r,
 	uint32_t *end = dst + len;
 
 	thiz = _checker_get(r);
-	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy, &thiz->matrix);
+	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 	ww = thiz->ww;
 	ww2 = thiz->ww2;
 	hh = thiz->hh;
@@ -359,7 +359,6 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -369,7 +368,7 @@ static void _span_projective(Enesim_Renderer *r,
 
 	thiz = _checker_get(r);
 	/* translate to the origin */
-	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, state->ox, state->oy, &thiz->matrix);
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 	ww = thiz->ww;
 	ww2 = thiz->ww2;
 	hh = thiz->hh;
@@ -466,35 +465,37 @@ static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 }
 
 static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
-	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
+	Enesim_Matrix_Type type;
+	Enesim_Matrix matrix;
 
 	thiz = _checker_get(r);
-	_checker_state_setup(thiz, state);
+	_checker_state_setup(r, thiz);
 
 	thiz->ww = eina_f16p16_int_from(thiz->current.sw);
 	thiz->ww2 = thiz->ww * 2;
 	thiz->hh = eina_f16p16_int_from(thiz->current.sh);
 	thiz->hh2 = thiz->hh * 2;
 
-	switch (state->transformation_type)
+	enesim_renderer_simple_transformation_type_get(r, &type);
+	enesim_renderer_transformation_get(r, &matrix);
+	switch (type)
 	{
 		case ENESIM_MATRIX_IDENTITY:
 		*fill = _span_identity;
 		break;
 
 		case ENESIM_MATRIX_AFFINE:
-		enesim_matrix_f16p16_matrix_to(&state->transformation,
+		enesim_matrix_f16p16_matrix_to(&matrix,
 				&thiz->matrix);
 		*fill = _span_affine;
 		break;
 
 		case ENESIM_MATRIX_PROJECTIVE:
-		enesim_matrix_f16p16_matrix_to(&state->transformation,
+		enesim_matrix_f16p16_matrix_to(&matrix,
 				&thiz->matrix);
 		*fill = _span_projective;
 		break;
@@ -514,8 +515,7 @@ static void _checker_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Eina_Bool _checker_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _checker_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Checker *thiz;
 
@@ -534,7 +534,7 @@ static Eina_Bool _checker_has_changed(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
-static void _checker_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _checker_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -543,7 +543,7 @@ static void _checker_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _checker_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _checker_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -560,16 +560,14 @@ static Eina_Bool _checker_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
-	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
 
  	thiz = _checker_get(r);
-	if (!_checker_state_setup(thiz, state)) return EINA_FALSE;
+	if (!_checker_state_setup(r, thiz)) return EINA_FALSE;
 
 	*draw = _checker_opengl_draw;
 

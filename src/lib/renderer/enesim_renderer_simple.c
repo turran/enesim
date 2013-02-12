@@ -268,6 +268,24 @@ void * enesim_renderer_simple_data_get(Enesim_Renderer *r)
 	thiz = _simple_get(r);
 	return thiz->data;
 }
+
+void enesim_renderer_simple_state_get(Enesim_Renderer *r,
+		const Enesim_Renderer_State2 **state)
+{
+	Enesim_Renderer_Simple *thiz;
+
+	thiz = _simple_get(r);
+	*state = thiz->state.
+}
+
+void enesim_renderer_simple_transformation_type_get(Enesim_Renderer *r,
+		Enesim_Matrix_Type *type)
+{
+	Enesim_Renderer_Simple *thiz;
+
+	thiz = _simple_get(r);
+	*type = thiz->state.transformation_type;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

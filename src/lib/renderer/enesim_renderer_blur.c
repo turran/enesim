@@ -73,7 +73,7 @@ typedef struct _Enesim_Renderer_Blur
 	Enesim_Blur_Channel channel;
 	double rx, ry;
 	/* The state variables */
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Color color;
 //	int irx, iry;
 //	int iaxx, iayy;
 	int ibxx, ibyy;
@@ -115,7 +115,6 @@ static Enesim_Renderer_Sw_Fill _spans[ENESIM_BLUR_CHANNELS];
  *                        The Software fill variants                          *
  *----------------------------------------------------------------------------*/
 static void _argb8888_span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len,
 		void *ddata)
 {
@@ -125,7 +124,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	uint32_t *src, *pbuf;
 	size_t sstride;
 	int sw, sh;
-	Enesim_Color color = state->color;
+	Enesim_Color color = thiz->color;
 	Eina_F16p16 xx, yy;
 	int ibyy, ibxx;
 	int ix, ix0, iy, iy0;
@@ -264,7 +263,6 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 }
 
 static void _a8_span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state,
 		int x, int y, unsigned int len,
 		void *ddata)
 {
@@ -274,7 +272,7 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	uint32_t *src, *pbuf;
 	size_t sstride;
 	int sw, sh;
-	Enesim_Color color = state->color;
+	Enesim_Color color = thiz->color;
 	Eina_F16p16 xx, yy;
 	int ibyy, ibxx;
 	int ix, ix0, iy, iy0;
@@ -402,7 +400,6 @@ static const char * _blur_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -410,6 +407,7 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 	double rx, ry;
 
 	thiz = _blur_get(r);
+	enesim_renderer_color_get(r, &thiz->color);
 	if (!_blur_state_setup(thiz, r, s, error))
 		return EINA_FALSE;
 
@@ -441,7 +439,6 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _blur_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Blur *thiz;
@@ -466,13 +463,13 @@ static void _blur_bounds(Enesim_Renderer *r,
 	}
 }
 
-static void _blur_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _blur_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _blur_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _blur_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;

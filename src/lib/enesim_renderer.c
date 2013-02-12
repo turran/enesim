@@ -548,6 +548,7 @@ void * enesim_renderer_data_get(Enesim_Renderer *r)
  */
 EAPI Enesim_Renderer * enesim_renderer_ref(Enesim_Renderer *r)
 {
+	if (!r) return r;
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	r->ref++;
 	return r;
@@ -559,6 +560,8 @@ EAPI Enesim_Renderer * enesim_renderer_ref(Enesim_Renderer *r)
  */
 EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 {
+	if (!r) return;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	r->ref--;
 	if (!r->ref)

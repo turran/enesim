@@ -46,8 +46,7 @@ typedef struct _Enesim_Rasterizer
 	EINA_MAGIC
 	/* public */
 	/* private */
-	Enesim_Renderer_State2 rstate;
-	Enesim_Renderer_Shape_State2 sstate;
+	Enesim_Rasterizer_State state;
 	void *data;
 	/* interface */
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
@@ -89,10 +88,10 @@ static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 	if (!thiz->sw_setup) return EINA_FALSE;
 
 	/* setup the renderer state */
-	if (!enesim_renderer_state_setup(&thiz->rstate))
+	if (!enesim_renderer_state_setup(&thiz->state.rstate))
 		goto err_renderer;
 	/* setup the shape state */
-	if (!enesim_renderer_shape_state_setup(&thiz->sstate))
+	if (!enesim_renderer_shape_state_setup(&thiz->state.sstate))
 		goto err_shape;
 	/* finally call the interface */
 	if (!thiz->sw_setup(r, s, draw, error))
@@ -100,9 +99,9 @@ static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 
 err_rasterizer:
-	enesim_renderer_shape_state_cleanup(&thiz->sstate);
+	enesim_renderer_shape_state_cleanup(&thiz->state.sstate);
 err_shape:
-	enesim_renderer_state_cleanup(&thiz->rstate);
+	enesim_renderer_state_cleanup(&thiz->state.rstate);
 err_renderer:
 	return EINA_FALSE;
 }
@@ -114,8 +113,8 @@ static void _rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = _rasterizer_get(r);
 	if (thiz->sw_cleanup)
 		thiz->sw_cleanup(r, s);
-	enesim_renderer_shape_state_cleanup(&thiz->sstate);
-	enesim_renderer_state_cleanup(&thiz->rstate);
+	enesim_renderer_shape_state_cleanup(&thiz->state.sstate);
+	enesim_renderer_state_cleanup(&thiz->state.rstate);
 }
 
 static void _rasterizer_free(Enesim_Renderer *r)
