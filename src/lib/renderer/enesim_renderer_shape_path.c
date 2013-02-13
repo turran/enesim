@@ -502,6 +502,15 @@ void * enesim_renderer_shape_path_data_get(Enesim_Renderer *r)
 	thiz = _shape_simple_get(r);
 	return thiz->data;
 }
+
+void enesim_renderer_shape_path_transformation_type_get(Enesim_Renderer *r,
+		Enesim_Matrix_Type *type)
+{
+	Enesim_Renderer_Shape_Path *thiz;
+
+	thiz = _shape_simple_get(r);
+	*type = thiz->sstate.transformation_type;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

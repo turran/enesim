@@ -26,9 +26,9 @@ typedef struct _Enesim_Renderer_Shape_Path_Descriptor
 	Enesim_Renderer_Base_Name_Get_Cb name;
 	Enesim_Renderer_Delete free;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
-	Enesim_Renderer_Shape_Feature_Get feature_get;
-	Enesim_Renderer_Shape_Bounds bounds;
-	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
+	Enesim_Renderer_Shape_Feature_Get_Cb features_get;
+	Enesim_Renderer_Bounds_Get_Cb bounds_get;
+	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
 	Enesim_Renderer_Shape_Path_Setup setup;
 	Enesim_Renderer_Shape_Path_Cleanup cleanup;
 } Enesim_Renderer_Shape_Path_Descriptor;
@@ -36,5 +36,7 @@ typedef struct _Enesim_Renderer_Shape_Path_Descriptor
 Enesim_Renderer * enesim_renderer_shape_path_new(
 		Enesim_Renderer_Shape_Path_Descriptor *descriptor, void *data);
 void * enesim_renderer_shape_path_data_get(Enesim_Renderer *r);
+void enesim_renderer_shape_path_transformation_type_get(Enesim_Renderer *r,
+		Enesim_Matrix_Type *type);
 
 #endif
