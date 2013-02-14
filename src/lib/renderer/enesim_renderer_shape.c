@@ -67,14 +67,6 @@ typedef struct _Enesim_Renderer_Shape
 	Eina_Bool changed : 1;
 	Eina_Bool dash_changed : 1;
 	/* interface */
-	Enesim_Renderer_Shape_Bounds bounds;
-	Enesim_Renderer_Shape_Destination_Bounds destination_bounds;
-	Enesim_Renderer_Shape_Sw_Setup sw_setup;
-	Enesim_Renderer_Shape_Sw_Draw sw_draw;
-	Enesim_Renderer_Shape_OpenCL_Setup opencl_setup;
-	Enesim_Renderer_Shape_OpenGL_Setup opengl_setup;
-	Enesim_Renderer_Shape_Feature_Get feature_get;
-	Enesim_Renderer_Has_Changed_Cb has_changed;
 	Enesim_Renderer_Delete free;
 	void *data;
 } Enesim_Renderer_Shape;
@@ -165,7 +157,6 @@ static void _enesim_renderer_shape_sw_draw(Enesim_Renderer *r,
 }
 
 static void _enesim_renderer_shape_destination_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -180,11 +171,7 @@ static void _enesim_renderer_shape_destination_bounds(Enesim_Renderer *r,
 	}
 	else
 	{
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
-
-		sstates[ENESIM_STATE_CURRENT] = &thiz->current;
-		sstates[ENESIM_STATE_PAST] = &thiz->past;
-		thiz->destination_bounds(r, states, sstates, bounds);
+		thiz->destination_bounds(r, bounds);
 	}
 
 #if 0
@@ -200,11 +187,9 @@ static void _enesim_renderer_shape_destination_bounds(Enesim_Renderer *r,
 }
 
 static void _enesim_renderer_shape_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Shape *thiz;
-	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->bounds)
@@ -233,13 +218,11 @@ static void _enesim_renderer_shape_bounds(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
-	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->sw_setup) return EINA_FALSE;
@@ -257,13 +240,11 @@ static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
-	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->opengl_setup) return EINA_FALSE;
@@ -276,14 +257,12 @@ static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape *thiz;
-	const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES];
 
 	thiz = enesim_renderer_data_get(r);
 	if (!thiz->opencl_setup) return EINA_FALSE;
@@ -373,8 +352,7 @@ done:
 	return ret;
 }
 
-static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
 	Eina_Bool ret = EINA_TRUE;
@@ -394,7 +372,6 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r,
 
 static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -499,12 +476,12 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	thiz->free = descriptor->free;
 	/* set the parent descriptor */
 	pdescriptor.version = ENESIM_RENDERER_API;
-	pdescriptor.name = descriptor->name;
+	pdescriptor.base_name_get = descriptor->base_name_get;
 	pdescriptor.free = _enesim_renderer_shape_free;
-	pdescriptor.bounds = _enesim_renderer_shape_bounds;
-	pdescriptor.destination_bounds = _enesim_renderer_shape_destination_bounds;
+	pdescriptor.bounds_get = _enesim_renderer_shape_bounds;
+	pdescriptor.destination_bounds_get = _enesim_renderer_shape_destination_bounds;
 	pdescriptor.flags = descriptor->flags;
-	pdescriptor.hints_get = descriptor->hints_get;
+	pdescriptor.sw_hints_get = descriptor->sw_hints_get;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damage = _enesim_renderer_shape_damage;
 	pdescriptor.has_changed = _enesim_renderer_shape_has_changed;
@@ -546,7 +523,6 @@ void enesim_renderer_shape_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 Eina_Bool enesim_renderer_shape_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Error **error)
 {

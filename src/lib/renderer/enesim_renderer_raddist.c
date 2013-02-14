@@ -80,7 +80,6 @@ static inline Enesim_Renderer_Raddist * _raddist_get(Enesim_Renderer *r)
 }
 
 static void _span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
@@ -135,18 +134,17 @@ static const char * _raddist_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _raddist_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Raddist *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	Enesim_Matrix_Type type;
 
 	thiz = _raddist_get(r);
 	if (!thiz->src) return EINA_FALSE;
 
-	*fill = _span_identity;
-	if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
+	enesim_renderer_simple_transformation_type_get(r, &type);
+	if (type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_identity;
 	else
 		return EINA_FALSE;
@@ -164,7 +162,6 @@ static void _raddist_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 }
 
 static void _bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Raddist *thiz;
@@ -189,8 +186,7 @@ static void _bounds(Enesim_Renderer *r,
 	}
 }
 
-static Eina_Bool _raddist_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _raddist_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Raddist *thiz;
 
@@ -209,7 +205,7 @@ static Eina_Bool _raddist_has_changed(Enesim_Renderer *r,
 	return EINA_FALSE;
 }
 
-static void _raddist_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _raddist_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |

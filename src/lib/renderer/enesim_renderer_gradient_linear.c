@@ -155,16 +155,16 @@ static void _linear_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNU
 }
 
 static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	double x0, x1, y0, y1;
+	Enesim_Matrix m;
+	Enesim_Matrix_Type type;
 	Eina_F16p16 xx0, xx1, yy0, yy1;
 	Eina_F16p16 f;
+	double x0, x1, y0, y1;
 
 	thiz = _linear_get(r);
 
@@ -173,12 +173,13 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	y0 = thiz->current.y0;
 	y1 = thiz->current.y1;
 
+	enesim_renderer_transformation_get(r, &m);
+	type = enesim_matrix_type_get(&m);
 	/* handle the geometry transformation */
-	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_IDENTITY)
 	{
-		const Enesim_Matrix *gm = &cs->transformation;
-		enesim_matrix_point_transform(gm, x0, y0, &x0, &y0);
-		enesim_matrix_point_transform(gm, x1, y1, &x1, &y1);
+		enesim_matrix_point_transform(&m, x0, y0, &x0, &y0);
+		enesim_matrix_point_transform(&m, x1, y1, &x1, &y1);
 	}
 
 	thiz->xx = xx0 = eina_f16p16_double_from(x0);
@@ -201,16 +202,15 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	thiz->length = eina_f16p16_int_to(f);
 #if 0
 	/* just override the identity case */
-	if (cs->transformation_type == ENESIM_MATRIX_IDENTITY)
+	if (type == ENESIM_MATRIX_IDENTITY)
 		*fill = _argb8888_pad_span_identity;
 #endif
-	*draw = _spans[gstate->mode][cs->transformation_type];
+	*draw = _spans[gstate->mode][type];
 
 	return EINA_TRUE;
 }
 
-static Eina_Bool _linear_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _linear_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 

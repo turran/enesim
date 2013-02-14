@@ -136,15 +136,16 @@ static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
 	type *thiz;							\
 	const Enesim_Renderer_Gradient_Sw_State 			\
 			*gstate = data->sw_state;			\
-	const Enesim_Renderer_State 					\
-			*state = data->state;				\
+	const Enesim_Renderer_State2 					\
+			*state = &data->gstate->state;			\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
 	Eina_F16p16 xx, yy, zz;						\
 									\
 	thiz = type_get(r);						\
-	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, state->ox,	\
-			state->oy, &gstate->matrix);			\
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, 		\
+			state->current.ox, state->current.oy,		\
+			&gstate->matrix);				\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 syy, sxx;					\
@@ -171,15 +172,15 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
 	type *thiz;							\
 	const Enesim_Renderer_Gradient_Sw_State 			\
 			*gstate = data->sw_state;			\
-	const Enesim_Renderer_State 					\
-			*state = data->state;				\
+	const Enesim_Renderer_State2 					\
+			*state = &data->gstate->state;			\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
 	Eina_F16p16 xx, yy;						\
 									\
 	thiz = type_get(r);						\
-	enesim_coord_identity_setup(&xx, &yy, x, y, state->ox,		\
-			state->oy);					\
+	enesim_coord_identity_setup(&xx, &yy, x, y, state->current.ox,	\
+			state->current.oy);				\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
@@ -199,15 +200,15 @@ static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
 	type *thiz;							\
 	const Enesim_Renderer_Gradient_Sw_State 			\
 			*gstate = data->sw_state;			\
-	const Enesim_Renderer_State 					\
-			*state = data->state;				\
+	const Enesim_Renderer_State2					\
+			*state = &data->gstate->state;			\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
 	Eina_F16p16 xx, yy;						\
 									\
 	thiz = type_get(r);						\
-	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy, \
-			&gstate->matrix);				\
+	enesim_coord_affine_setup(&xx, &yy, x, y, state->current.ox, 	\
+			state->current.oy, &gstate->matrix);		\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
@@ -224,6 +225,7 @@ static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
 /* common gradient renderer functions */
 typedef struct _Enesim_Renderer_Gradient_State
 {
+	Enesim_Renderer_State2 state;
 	Enesim_Repeat_Mode mode;
 	Eina_List *stops;
 } Enesim_Renderer_Gradient_State;
@@ -237,7 +239,6 @@ typedef struct _Enesim_Renderer_Gradient_Sw_State
 
 typedef struct _Enesim_Renderer_Gradient_Sw_Draw_Data
 {
-	const Enesim_Renderer_State2 *state;
 	const Enesim_Renderer_Gradient_State *gstate;
 	const Enesim_Renderer_Gradient_Sw_State *sw_state;
 } Enesim_Renderer_Gradient_Sw_Draw_Data;

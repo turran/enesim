@@ -51,6 +51,8 @@ typedef struct _Enesim_Renderer_Grid
 		unsigned int h;
 	} inside, outside;
 	/* the state */
+	double ox;
+	double oy;
 	Enesim_F16p16_Matrix matrix;
 	int wt;
 	int ht;
@@ -143,7 +145,6 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 
 
 static void _span_identity(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
@@ -200,7 +201,6 @@ static void _span_identity(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
@@ -209,7 +209,7 @@ static void _span_affine(Enesim_Renderer *r,
 	Eina_F16p16 yy, xx;
 
 	thiz = _grid_get(r);
-	enesim_coord_affine_setup(&xx, &yy, x, y, state->ox, state->oy, &thiz->matrix);
+	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 
 	while (dst < end)
 	{
@@ -224,7 +224,6 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_projective(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
@@ -233,7 +232,7 @@ static void _span_projective(Enesim_Renderer *r,
 	Eina_F16p16 yy, xx, zz;
 
 	thiz = _grid_get(r);
-	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, state->ox, state->oy, &thiz->matrix);
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 
 	while (dst < end)
 	{
@@ -265,12 +264,12 @@ static void _grid_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s E
 }
 
 static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Grid *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	Enesim_Matrix m;
+	Enesim_Matrix_Type type;
 
 	thiz = _grid_get(r);
 	if (!thiz->inside.w || !thiz->inside.h || !thiz->outside.w || !thiz->outside.h)
@@ -281,21 +280,22 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 	thiz->hht = eina_f16p16_int_from(thiz->ht);
 	thiz->wwt = eina_f16p16_int_from(thiz->wt);
 
-	switch (cs->transformation_type)
+	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
+	enesim_renderer_transformation_get(r, &m);
+	enesim_renderer_simple_transformation_type_get(r, &type);
+	switch (type)
 	{
 		case ENESIM_MATRIX_IDENTITY:
 		*fill = _span_identity;
 		break;
 
 		case ENESIM_MATRIX_AFFINE:
-		enesim_matrix_f16p16_matrix_to(&cs->transformation,
-				&thiz->matrix);
+		enesim_matrix_f16p16_matrix_to(&m, &thiz->matrix);
 		*fill = _span_affine;
 		break;
 
 		case ENESIM_MATRIX_PROJECTIVE:
-		enesim_matrix_f16p16_matrix_to(&cs->transformation,
-				&thiz->matrix);
+		enesim_matrix_f16p16_matrix_to(&m, &thiz->matrix);
 		*fill = _span_projective;
 		break;
 
@@ -307,7 +307,6 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 }
 
 static void _grid_flags(Enesim_Renderer *r EINA_UNUSED,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |

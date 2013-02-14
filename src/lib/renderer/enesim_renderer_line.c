@@ -103,8 +103,7 @@ static const char * _line_name(Enesim_Renderer *r EINA_UNUSED)
 	return "line";
 }
 
-static Eina_Bool _line_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Line *thiz;
 	Eina_Bool ret;

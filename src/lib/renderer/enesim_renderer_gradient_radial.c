@@ -139,13 +139,14 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 }
 
 static Eina_Bool _state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Error **error EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
+	Enesim_Matrix om;
+	Enesim_Matrix m;
+	Enesim_Matrix_Type type;
 	double cx, cy;
 	double fx, fy;
 	double rad, scale, small = (1 / 8192.0);
@@ -163,22 +164,23 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	scale = 1;
 	glen = ceil(rad) + 1;
 
-	enesim_matrix_identity(&thiz->m);
-	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	enesim_matrix_identity(&m);
+	enesim_renderer_transformation_get(r, &om);
+	type = enesim_matrix_type_get(&om);
+	if (type != ENESIM_MATRIX_IDENTITY)
 	{
-		const Enesim_Matrix *gm = &cs->transformation;
 		double mx, my;
 
-		mx = hypot(gm->xx, gm->yx);
-		my = hypot(gm->xy, gm->yy);
+		mx = hypot(om.xx, om.yx);
+		my = hypot(om.xy, om.yy);
 		scale = hypot(mx, my) / sqrt(2);
 		glen = ceil(rad * scale) + 1;
 
-		enesim_matrix_inverse(gm, &thiz->m);
+		enesim_matrix_inverse(&om, &m);
 	}
-	enesim_renderer_transformation_set(r, &thiz->m);
+	enesim_renderer_transformation_set(r, &m);
 	DBG("Using a transformation matrix of %" ENESIM_MATRIX_FORMAT,
-			ENESIM_MATRIX_ARGS (&thiz->m));
+			ENESIM_MATRIX_ARGS (&m));
 
 	if (glen < 4)
 	{
@@ -213,7 +215,6 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 }
 
 static void _radial_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -226,8 +227,7 @@ static void _radial_bounds(Enesim_Renderer *r,
 	bounds->h = fabs(thiz->radius) * 2;
 }
 
-static Eina_Bool _radial_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _radial_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 

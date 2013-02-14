@@ -39,6 +39,7 @@
 
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
+#include "enesim_renderer_shape_path_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -72,9 +73,7 @@ typedef struct _Enesim_Renderer_Rectangle
 	Enesim_Renderer_Rectangle_State past;
 	/* internal state */
 	Eina_Bool changed : 1;
-	Eina_Bool use_path : 1;
-	/* for the case we use the path renderer */
-	Enesim_Renderer *path;
+	Eina_Bool generated : 1;
 } Enesim_Renderer_Rectangle;
 
 
@@ -82,7 +81,7 @@ static inline Enesim_Renderer_Rectangle * _rectangle_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
-	thiz = enesim_renderer_shape_data_get(r);
+	thiz = enesim_renderer_shape_path_data_get(r);
 	ENESIM_RENDERER_RECTANGLE_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -117,303 +116,144 @@ static Eina_Bool _rectangle_properties_have_changed(Enesim_Renderer_Rectangle *t
 	return EINA_FALSE;
 }
 
-
-static Eina_Bool _rectangle_use_path(Enesim_Matrix_Type geometry_type)
-{
-	/* Also need to check if coords are int aligned, no corners, etc */
-	if (geometry_type != ENESIM_MATRIX_IDENTITY)
-		return EINA_TRUE;
-	return EINA_FALSE;
-}
-
 static void _rectangle_path_propagate(Enesim_Renderer_Rectangle *thiz,
-		double x, double y, double w, double h, double rx, double ry,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES])
+		Enesim_Renderer *path, 
+		double x, double y, double w, double h, double rx, double ry)
 {
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	int count = 0;
-
-	if (!thiz->path)
-		thiz->path = enesim_renderer_path_new();
-	/* FIXME the best approach would be to know *what* has changed
-	 * because we only need to generate the vertices for x,y,w,h
-	 * change
-	 */
-	/* FIXME or prev->transformation_type == IDENTITY && curr->transformation_type != IDENTITY */
-	if (!_rectangle_properties_have_changed(thiz))
-		goto pass;
-
-	enesim_renderer_path_command_clear(thiz->path);
-
+	enesim_renderer_path_command_clear(path);
 	if (thiz->current.corner.tl && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_move_to(thiz->path, x, y + ry);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
-		count++;
+		enesim_renderer_path_move_to(path, x, y + ry);
+		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
 	}
 	else
 	{
-		enesim_renderer_path_move_to(thiz->path, x, y);
-		count++;
+		enesim_renderer_path_move_to(path, x, y);
 	}
 	if (thiz->current.corner.tr && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_line_to(thiz->path, x + w - rx, y);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w, y + ry);
-		count++;
+		enesim_renderer_path_line_to(path, x + w - rx, y);
+		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w, y + ry);
 	}
 	else
 	{
-		enesim_renderer_path_line_to(thiz->path, x + w, y);
-		count++;
+		enesim_renderer_path_line_to(path, x + w, y);
 	}
 	if (thiz->current.corner.br && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_line_to(thiz->path, x + w, y + h - ry);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w - rx, y + h);
-		count++;
+		enesim_renderer_path_line_to(path, x + w, y + h - ry);
+		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w - rx, y + h);
 	}
 	else
 	{
-		enesim_renderer_path_line_to(thiz->path, x + w, y + h);
-		count++;
+		enesim_renderer_path_line_to(path, x + w, y + h);
 	}
 	if (thiz->current.corner.bl && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_line_to(thiz->path, x + rx, y + h);
-		enesim_renderer_path_arc_to(thiz->path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + h - ry);
-		count++;
+		enesim_renderer_path_line_to(path, x + rx, y + h);
+		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + h - ry);
 	}
 	else
 	{
-		enesim_renderer_path_line_to(thiz->path, x, y + h);
-		count++;
+		enesim_renderer_path_line_to(path, x, y + h);
 	}
-	enesim_renderer_path_close(thiz->path, EINA_TRUE);
-
-pass:
-	/* pass all the properties to the path */
-	enesim_renderer_color_set(thiz->path, cs->color);
-	enesim_renderer_origin_set(thiz->path, cs->ox, cs->oy);
-	enesim_renderer_transformation_set(thiz->path, &cs->transformation);
-	/* base properties */
-	enesim_renderer_shape_fill_renderer_set(thiz->path, css->fill.r);
-	enesim_renderer_shape_fill_color_set(thiz->path, css->fill.color);
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, css->stroke.r);
-	enesim_renderer_shape_stroke_weight_set(thiz->path, css->stroke.weight);
-	enesim_renderer_shape_stroke_color_set(thiz->path, css->stroke.color);
-	enesim_renderer_shape_draw_mode_set(thiz->path, css->draw_mode);
+	enesim_renderer_path_close(path, EINA_TRUE);
 }
 
-static Eina_Bool _rectangle_path_setup(Enesim_Renderer_Rectangle *thiz,
-		double x, double y, double w, double h, double rx, double ry,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Error **error)
-{
-	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	double sw;
-
-	sw = css->stroke.weight;
-	/* in case of a stroked rectangle we need to convert the location of the stroke to center */
-	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
-	{
-		switch (css->stroke.location)
-		{
-			case ENESIM_SHAPE_STROKE_OUTSIDE:
-			x -= sw / 2.0;
-			y -= sw / 2.0;
-			w += sw;
-			h += sw;
-			rx += sw / 2.0;
-			ry += sw / 2.0;
-			break;
-
-			case ENESIM_SHAPE_STROKE_INSIDE:
-			x += sw / 2.0;
-			y += sw / 2.0;
-			w -= sw;
-			h -= sw;
-			rx -= sw / 2.0;
-			ry -= sw / 2.0;
-			break;
-
-			default:
-			break;
-		}
-	}
-	_rectangle_path_propagate(thiz, x, y, w, h, rx, ry, states, sstates);
-	if (!enesim_renderer_setup(thiz->path, s, error))
-	{
-		return EINA_FALSE;
-	}
-	return EINA_TRUE;
-}
-
-static void _rectangle_state_cleanup(Enesim_Renderer_Rectangle *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s)
-{
-	enesim_renderer_shape_cleanup(r, s);
-	/* check if we should use the path approach */
-	if (thiz->path)
-	{
-		enesim_renderer_cleanup(thiz->path, s);
-	}
-	thiz->past = thiz->current;
-	thiz->use_path = EINA_FALSE;
-	thiz->changed = EINA_FALSE;
-}
-
-#if BUILD_OPENGL
-static void _rectangle_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int w, int h)
-{
-	Enesim_Renderer_Rectangle *thiz;
-
-	thiz = _rectangle_get(r);
-	enesim_renderer_opengl_draw(thiz->path, s, area, w, h);
-}
-#endif
-
-
-/*----------------------------------------------------------------------------*
- *                               Span functions                               *
- *----------------------------------------------------------------------------*/
-/* Use the internal path for drawing */
-static void _rectangle_path_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
-		const Enesim_Renderer_Shape_State *sstate EINA_UNUSED,
-		int x, int y,
-		unsigned int len, void *ddata)
-{
-	Enesim_Renderer_Rectangle *thiz;
-
-	thiz = _rectangle_get(r);
-	enesim_renderer_sw_draw(thiz->path, x, y, len, ddata);
-}
 
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _rectangle_name(Enesim_Renderer *r EINA_UNUSED)
+static const char * _rectangle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "rectangle";
 }
 
-static inline Eina_Bool _rectangle_generate_geometry(Enesim_Renderer_Rectangle *thiz,
-		Enesim_Renderer *r,
-		const Enesim_Renderer_State *cs,
-		double *dx, double *dy, double *dw, double *dh, double *drx, double *dry,
+static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 		Enesim_Error **error)
 {
-	double rx, ry;
-	double x;
-	double y;
-	double w;
-	double h;
-
-	w = thiz->current.width;
-	h = thiz->current.height;
-	if ((w < 1) || (h < 1))
-	{
-		ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g", w, h);
-		return EINA_FALSE;
-	}
-
-	x = thiz->current.x;
-	y = thiz->current.y;
-
-	rx = thiz->current.corner.rx;
-	if (rx > (w / 2.0))
-		rx = w / 2.0;
-	ry = thiz->current.corner.ry;
-	if (ry > (h / 2.0))
-		ry = h / 2.0;
-
-	*dx = x;
-	*dy = y;
-	*dw = w;
-	*dh = h;
-	*drx = rx;
-	*dry = ry;
-	return EINA_TRUE;
-}
-
-static Eina_Bool _rectangle_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_Shape_Sw_Draw *draw, Enesim_Error **error)
-{
 	Enesim_Renderer_Rectangle *thiz;
-	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Renderer *spaint;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
-	double rx, ry;
-	double x;
-	double y;
-	double w;
-	double h;
 
 	thiz = _rectangle_get(r);
-	if (!thiz)
+	if (_rectangle_properties_have_changed(thiz) && !thiz->generated)
 	{
-		return EINA_FALSE;
+		Enesim_Shape_Draw_Mode draw_mode;
+		double rx, ry;
+		double x;
+		double y;
+		double w;
+		double h;
+
+		w = thiz->current.width;
+		h = thiz->current.height;
+		if ((w < 1) || (h < 1))
+		{
+			ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g", w, h);
+			return EINA_FALSE;
+		}
+
+		x = thiz->current.x;
+		y = thiz->current.y;
+
+		rx = thiz->current.corner.rx;
+		if (rx > (w / 2.0))
+			rx = w / 2.0;
+		ry = thiz->current.corner.ry;
+		if (ry > (h / 2.0))
+			ry = h / 2.0;
+
+		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+
+		if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		{
+			Enesim_Shape_Stroke_Location location;
+			double sw;
+
+			enesim_renderer_shape_stroke_location_get(r, &location);
+			enesim_renderer_shape_stroke_weight_get(r, &sw);
+			switch (location)
+			{
+				case ENESIM_SHAPE_STROKE_OUTSIDE:
+				x -= sw / 2.0;
+				y -= sw / 2.0;
+				w += sw;
+				h += sw;
+				rx += sw / 2.0;
+				ry += sw / 2.0;
+				break;
+
+				case ENESIM_SHAPE_STROKE_INSIDE:
+				x += sw / 2.0;
+				y += sw / 2.0;
+				w -= sw;
+				h -= sw;
+				rx -= sw / 2.0;
+				ry -= sw / 2.0;
+				break;
+
+				default:
+				break;
+			}
+		}
+		/* generate the four arcs */
+		_rectangle_path_propagate(thiz, path, x, y, w, h, rx, ry);
+		thiz->generated = EINA_TRUE;
 	}
-
-	if (!_rectangle_generate_geometry(thiz, r, cs, &x, &y, &w, &h, &rx, &ry, error))
-		return EINA_FALSE;
-
-	_rectangle_path_setup(thiz, x, y, w, h, rx, ry, states, sstates, s, error);
-	*draw = _rectangle_path_span;
-
-#if 0
-	/* TODO: check if we should use the path approach or a simple rect */
-	thiz->use_path = _rectangle_use_path(cs->transformation_type);
-	if (thiz->use_path)
-	{
-		_rectangle_path_setup(thiz, x, y, w, h, rx, ry, states, sstates, s, error);
-		*draw = _rectangle_path_span;
-
-		return EINA_TRUE;
-	}
-	else
-	{
-
-	}
-#endif
 	return EINA_TRUE;
 }
 
-static void _rectangle_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _rectangle_cleanup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	_rectangle_state_cleanup(thiz, r, s);
+	thiz->past = thiz->current;
+	thiz->changed = EINA_FALSE;
 }
 
-static void _rectangle_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _rectangle_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
-}
-
-static void _rectangle_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
-{
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
-}
-
-static void _rectangle_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
-{
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER | ENESIM_SHAPE_FLAG_STROKE_LOCATION;
 }
 
 static void _rectangle_free(Enesim_Renderer *r)
@@ -421,19 +261,15 @@ static void _rectangle_free(Enesim_Renderer *r)
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = _rectangle_get(r);
-	if (thiz->path)
-		enesim_renderer_unref(thiz->path);
 	free(thiz);
 }
 
-static void _rectangle_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+static void _rectangle_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Rectangle *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_Shape_State *css = sstates[ENESIM_STATE_CURRENT];
+	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Matrix_Type type;
 	double x, y, w, h;
 
 	thiz = _rectangle_get(r);
@@ -444,10 +280,15 @@ static void _rectangle_bounds(Enesim_Renderer *r,
 	w = thiz->current.width;
 	h = thiz->current.height;
 	/* for the stroke location get the real width */
-	if (css->draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
-		double sw = css->stroke.weight;
-		switch (css->stroke.location)
+		Enesim_Shape_Stroke_Location location;
+		double sw;
+
+		enesim_renderer_shape_stroke_weight_get(r, &sw);
+		enesim_renderer_shape_stroke_location_get(r, &location);
+		switch (location)
 		{
 			case ENESIM_SHAPE_STROKE_CENTER:
 			x -= sw / 2.0;
@@ -473,35 +314,32 @@ static void _rectangle_bounds(Enesim_Renderer *r,
 	bounds->w = w;
 	bounds->h = h;
 
-	/* translate by the origin */
-	bounds->x += cs->ox;
-	bounds->y += cs->oy;
 	/* apply the geometry transformation */
-	if (cs->transformation_type != ENESIM_MATRIX_IDENTITY)
+	enesim_renderer_shape_path_transformation_type_get(r, &type);
+	if (type != ENESIM_MATRIX_IDENTITY)
 	{
+		Enesim_Matrix m;
 		Enesim_Quad q;
 
-		enesim_matrix_rectangle_transform(&cs->transformation, bounds, &q);
+		enesim_renderer_transformation_get(r, &m);
+		enesim_matrix_rectangle_transform(&m, bounds, &q);
 		enesim_quad_rectangle_to(&q, bounds);
 	}
 }
 
-static void _rectangle_destination_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
+static void _rectangle_destination_bounds_get(Enesim_Renderer *r,
 		Eina_Rectangle *bounds)
 {
 	Enesim_Rectangle obounds;
 
-	_rectangle_bounds(r, states, sstates, &obounds);
+	_rectangle_bounds_get(r, &obounds);
 	bounds->x = floor(obounds.x);
 	bounds->y = floor(obounds.y);
 	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
 	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
-static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
@@ -509,99 +347,15 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r,
 	return _rectangle_properties_have_changed(thiz);
 }
 
-#if BUILD_OPENGL
-/* TODO instead of trying to do our own geometry shader it might be better
- * to use the path renderer and only create a shader there, this will simplify the code
- * given that at the end we'll generate vertices too
- */
-static Eina_Bool _rectangle_opengl_initialize(Enesim_Renderer *r,
-		int *num_programs,
-		Enesim_Renderer_OpenGL_Program ***programs)
-{
-#if 0
-	*num_shaders = 2;
-	*shaders = shader = calloc(*num_shaders, sizeof(Enesim_Renderer_OpenGL_Shader));
-	shader->type = ENESIM_SHADER_GEOMETRY;
-	shader->name = "rectangle";
-		//"#version 150\n"
-	shader->source =
-		"#version 120\n"
-		"#extension GL_EXT_geometry_shader4 : enable\n"
-	#include "enesim_renderer_rectangle.glsl"
-
-	/* FIXME for now we should use the background renderer for the color */
-	/* if we have a renderer set use that one but render into another texture
-	 * if it has some geometric shader
-	 */
-	shader++;
-	shader->type = ENESIM_SHADER_FRAGMENT;
-	shader->name = "stripes";
-	shader->source =
-	#include "enesim_renderer_stripes.glsl"
-	;
-#endif
-	return EINA_TRUE;
-}
-
-static Eina_Bool _rectangle_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
-{
-	Enesim_Renderer_Rectangle *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	double rx, ry;
-	double x;
-	double y;
-	double w;
-	double h;
-
- 	thiz = _rectangle_get(r);
-
-	thiz->use_path = EINA_TRUE;
-	if (!_rectangle_generate_geometry(thiz, r, cs, &x, &y, &w, &h, &rx, &ry, error))
-		return EINA_FALSE;
-	_rectangle_path_setup(thiz, x, y, w, h, rx, ry, states, sstates, s, error);
-	*draw = _rectangle_opengl_draw;
-	return EINA_TRUE;
-}
-
-static void _rectangle_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	Enesim_Renderer_Rectangle *thiz;
-
- 	thiz = _rectangle_get(r);
-	_rectangle_state_cleanup(thiz, r, s);
-}
-#endif
-
-static Enesim_Renderer_Shape_Descriptor _rectangle_descriptor = {
-	/* .name = 			*/ _rectangle_name,
+static Enesim_Renderer_Shape_Path_Descriptor _rectangle_descriptor = {
+	/* .base_name_get = 		*/ _rectangle_base_name_get,
 	/* .free = 			*/ _rectangle_free,
-	/* .bounds = 			*/ _rectangle_bounds,
-	/* .destination_bounds = 	*/ _rectangle_destination_bounds,
-	/* .flags = 			*/ _rectangle_flags,
-	/* .hints_get = 		*/ _rectangle_hints,
-	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _rectangle_has_changed,
-	/* .feature_get =		*/ _rectangle_feature_get,
-	/* .sw_setup = 			*/ _rectangle_sw_setup,
-	/* .sw_cleanup = 		*/ _rectangle_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-#if BUILD_OPENGL
-	/* .opengl_initialize =         */ _rectangle_opengl_initialize,
-	/* .opengl_setup =          	*/ _rectangle_opengl_setup,
-	/* .opengl_cleanup =        	*/ _rectangle_opengl_cleanup,
-#else
-	/* .opengl_initialize =         */ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
-#endif
+	/* .feature_get =		*/ _rectangle_features_get,
+	/* .bounds = 			*/ _rectangle_bounds_get,
+	/* .destination_bounds = 	*/ _rectangle_destination_bounds_get,
+	/* .setup = 			*/ _rectangle_setup,
+	/* .cleanup = 			*/ _rectangle_cleanup,
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -625,7 +379,7 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Rectangle));
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_RECTANGLE_MAGIC);
-	r = enesim_renderer_shape_new(&_rectangle_descriptor, thiz);
+	r = enesim_renderer_shape_path_new(&_rectangle_descriptor, thiz);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(r, ENESIM_SHAPE_STROKE_INSIDE);
 	return r;
@@ -647,6 +401,7 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double width)
 	thiz = _rectangle_get(r);
 	thiz->current.width = width;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -682,6 +437,7 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double height
 	thiz = _rectangle_get(r);
 	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -717,6 +473,7 @@ EAPI void enesim_renderer_rectangle_x_set(Enesim_Renderer *r, double x)
 	thiz = _rectangle_get(r);
 	thiz->current.x = x;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -752,6 +509,7 @@ EAPI void enesim_renderer_rectangle_y_set(Enesim_Renderer *r, double y)
 	thiz = _rectangle_get(r);
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -788,6 +546,7 @@ EAPI void enesim_renderer_rectangle_position_set(Enesim_Renderer *r, double x, d
 	thiz->current.x = x;
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -827,6 +586,7 @@ EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double width, d
 	thiz->current.width = width;
 	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 /**
@@ -860,6 +620,7 @@ EAPI void enesim_renderer_rectangle_corner_radius_x_set(Enesim_Renderer *r, doub
 		return;
 	thiz->current.corner.rx = rx;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_corner_radius_y_set(Enesim_Renderer *r, double ry)
@@ -873,6 +634,7 @@ EAPI void enesim_renderer_rectangle_corner_radius_y_set(Enesim_Renderer *r, doub
 		return;
 	thiz->current.corner.ry = ry;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_corner_radius_x_get(Enesim_Renderer *r, double *rx)
@@ -915,6 +677,7 @@ EAPI void enesim_renderer_rectangle_corner_radii_set(Enesim_Renderer *r, double 
 	thiz->current.corner.rx = rx;
 	thiz->current.corner.ry = ry;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_corner_radii_get(Enesim_Renderer *r, double *rx, double *ry)
@@ -945,6 +708,7 @@ EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina
 	thiz = _rectangle_get(r);
 	thiz->current.corner.tl = rounded;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_top_left_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
@@ -973,6 +737,7 @@ EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Ein
 	thiz = _rectangle_get(r);
 	thiz->current.corner.tr = rounded;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_top_right_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
@@ -1002,6 +767,7 @@ EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, E
 	thiz = _rectangle_get(r);
 	thiz->current.corner.bl = rounded;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_bottom_left_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
@@ -1030,6 +796,7 @@ EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, 
 	thiz = _rectangle_get(r);
 	thiz->current.corner.br = rounded;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_bottom_right_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
@@ -1069,6 +836,7 @@ EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *r,
 	thiz->current.corner.tl = tl;  thiz->current.corner.tr = tr;
 	thiz->current.corner.bl = bl;  thiz->current.corner.br = br;
 	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
 }
 
 EAPI void enesim_renderer_rectangle_corners_get(Enesim_Renderer *r,

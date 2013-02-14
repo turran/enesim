@@ -67,7 +67,6 @@ static inline Enesim_Renderer_Proxy * _proxy_get(Enesim_Renderer *r)
 }
 
 static void _proxy_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y,
 		unsigned int len, void *dst)
 {
@@ -124,7 +123,6 @@ static const char * _proxy_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -146,14 +144,14 @@ static void _proxy_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_proxy_state_cleanup(thiz, s);
 }
 
-static void _proxy_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _proxy_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	/* we dont support anything */
 	*flags = 0;
 }
 
-static void _proxy_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _proxy_hints(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -166,7 +164,6 @@ static void _proxy_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state 
 }
 
 static void _proxy_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -184,7 +181,6 @@ static void _proxy_bounds(Enesim_Renderer *r,
 }
 
 static void _proxy_destination_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -201,8 +197,7 @@ static void _proxy_destination_bounds(Enesim_Renderer *r,
 	enesim_renderer_destination_bounds(thiz->proxied, bounds, 0, 0);
 }
 
-static Eina_Bool _proxy_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _proxy_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Proxy *thiz;
 	Eina_Bool ret = EINA_FALSE;
@@ -215,16 +210,15 @@ static Eina_Bool _proxy_has_changed(Enesim_Renderer *r,
 
 static void _proxy_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Proxy *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
-	const Enesim_Renderer_State *ps = states[ENESIM_STATE_CURRENT];
+	Eina_Bool common_changed;
 
 	thiz = _proxy_get(r);
 	/* we need to take care of the visibility */
-	if (cs->visibility != ps->visibility)
+	common_changed = enesim_renderer_common_has_changed(r);
+	if (common_changed)
 	{
 		Eina_Rectangle current_bounds;
 
@@ -251,7 +245,6 @@ static void _proxy_free(Enesim_Renderer *r)
 
 #if BUILD_OPENGL
 static Eina_Bool _proxy_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
