@@ -1558,7 +1558,7 @@ static void _image_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_S
 }
 
 static void _image_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
-		Enesim_Renderer_Hint *hints)
+		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 	if (state->rop != ENESIM_FILL)

@@ -36,12 +36,12 @@ typedef enum _Enesim_Renderer_Flag
 	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 5), /**< Supports the quality property */
 } Enesim_Renderer_Flag;
 
-typedef enum _Enesim_Renderer_Hint
+typedef enum _Enesim_Renderer_Sw_Hint
 {
 	ENESIM_RENDERER_HINT_COLORIZE 		= (1 << 0), /**< Can draw directly using the color property */
 	ENESIM_RENDERER_HINT_ROP 		= (1 << 1), /**< Can draw directly using the raster operation */
 	ENESIM_RENDERER_HINT_MASK 		= (1 << 2), /**< Can draw directly using the mask renderer */
-} Enesim_Renderer_Hint;
+} Enesim_Renderer_Sw_Hint;
 
 /**
  * Callback function of the Enesim_Renderer_Damages_Get_Cb descriptor function
@@ -89,9 +89,10 @@ EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle 
 EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
 
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
-EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hints);
+EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
+EAPI Eina_Bool enesim_renderer_common_has_changed(Enesim_Renderer *r);
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error);

@@ -204,12 +204,10 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient *thiz;
-	const Enesim_Renderer_State *cs = states[ENESIM_STATE_CURRENT];
 	int slen;
 
 	thiz = _gradient_get(r);
@@ -258,7 +256,6 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 }
 
 static void _gradient_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -266,7 +263,7 @@ static void _gradient_bounds(Enesim_Renderer *r,
 	thiz = _gradient_get(r);
 	if (thiz->current.mode == ENESIM_RESTRICT && thiz->descriptor->bounds)
 	{
-		thiz->descriptor->bounds(r, states, bounds);
+		thiz->descriptor->bounds(r, bounds);
 	}
 	else
 	{
@@ -309,8 +306,7 @@ static const char * _gradient_name(Enesim_Renderer *r)
 		return "gradient";
 }
 
-static Eina_Bool _gradient_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+static Eina_Bool _gradient_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Eina_Bool ret = EINA_TRUE;
@@ -341,7 +337,6 @@ static Eina_Bool _gradient_opengl_initialize(Enesim_Renderer *r,
 }
 
 static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)

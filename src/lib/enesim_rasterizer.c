@@ -136,7 +136,7 @@ static void _rasterizer_flags(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _rasterizer_hints(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Hint *hints)
+		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }

@@ -67,7 +67,7 @@ typedef struct _Enesim_Renderer_Text_Base_Descriptor
 	Enesim_Renderer_Text_Base_Bounds bounds;
 	Enesim_Renderer_Text_Base_Destination_Bounds destination_bounds;
 	Enesim_Renderer_Flags_Get_Cb flags;
-	Enesim_Renderer_Hints_Get_Cb hints_get;
+	Enesim_Renderer_Sw_Hints_Get_Cb hints_get;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Damages_Get_Cb damage;
 	Enesim_Renderer_Has_Changed_Cb has_changed;

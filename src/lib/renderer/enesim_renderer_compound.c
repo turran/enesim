@@ -67,6 +67,7 @@ typedef struct _Enesim_Renderer_Compound
 	/* properties */
 	Eina_List *layers;
 	/* private */
+	Enesim_Renderer_State2 rstate;
 	Eina_List *visible_layers; /* FIXME maybe is time to change from lists to arrays */
 	Eina_List *added;
 	Eina_List *removed;
@@ -94,28 +95,6 @@ static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
 	ENESIM_RENDERER_COMPOUND_MAGIC_CHECK(thiz);
 
 	return thiz;
-}
-
-static Eina_Bool _compound_common_changed(Enesim_Renderer_Compound *thiz EINA_UNUSED,
-		const Enesim_Renderer_State *current,
-		const Enesim_Renderer_State *past)
-{
-	/* the visibility */
-	if (current->visibility != past->visibility)
-	{
-		return EINA_TRUE;
-	}
-	/* the rop */
-	if (current->rop != past->rop)
-	{
-		return EINA_TRUE;
-	}
-	/* the color */
-	if (current->color != past->color)
-	{
-		return EINA_TRUE;
-	}
-	return EINA_FALSE;
 }
 
 static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
@@ -317,7 +296,6 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 
 /* whenever the compound needs to fill, we need to zeros the whole destination buffer */
 static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -331,7 +309,6 @@ static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
 
 /* whenever the compound needs to blend, we only need to draw the area of each layer */
 static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -349,19 +326,64 @@ static const char * _compound_name(Enesim_Renderer *r EINA_UNUSED)
 	return "compound";
 }
 
+static void _compound_sw_hints(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Hint *hints)
+{
+	Enesim_Renderer_Compound *thiz;
+	Enesim_Renderer_Flag f = 0xffffffff;
+	Enesim_Rop rop;
+	Eina_Bool same_rop = EINA_TRUE;
+	Eina_List *ll;
+
+	thiz = _compound_get(r);
+	if (!thiz->layers)
+	{
+		*hints = 0;
+		return;
+	}
+
+	/* TODO we need to find an heuristic to set the colorize/rop flag
+	 * that reduces the number of raster operations we have to do
+	 * (i.e a passthrough)
+	 * - if every renderer has the same rop as the compund then
+	 * there is no need to do a post composition of the result. but how to
+	 * handle the colorize?
+	 */
+	enesim_renderer_rop_get(r, &rop);
+	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
+	{
+		Layer *l = eina_list_data_get(ll);
+		Enesim_Renderer *lr = l->r;
+		Enesim_Renderer_Sw_Hint tmp;
+		Enesim_Rop lrop;
+
+		/* intersect with every flag */
+		enesim_renderer_hints_get(lr, &tmp);
+		enesim_renderer_rop_get(lr, &lrop);
+		if (lrop != rop)
+			same_rop = EINA_FALSE;
+
+		f &= tmp;
+	}
+	if (same_rop)
+		f |= ENESIM_RENDERER_HINT_ROP;
+	*hints = f;
+}
+
+
 static Eina_Bool _compound_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Compound *thiz;
-	const Enesim_Renderer_State *state = states[ENESIM_STATE_CURRENT];
+	Enesim_Rop rop;
 
 	thiz = _compound_get(r);
 	if (!_compound_state_setup(thiz, r, s, error))
 		return EINA_FALSE;
 
-	if (state->rop == ENESIM_FILL)
+	enesim_renderer_rop_get(r, &rop);
+	if (rop == ENESIM_FILL)
 	{
 		*fill = _compound_fill_span_blend_layer;
 	}
@@ -382,7 +404,6 @@ static void _compound_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _compound_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -439,66 +460,22 @@ static void _compound_bounds(Enesim_Renderer *r,
 }
 
 static void _compound_destination_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Eina_Rectangle *bounds)
 {
 	Enesim_Rectangle obounds;
 
-	_compound_bounds(r, states, &obounds);
+	_compound_bounds(r, &obounds);
 	bounds->x = floor(obounds.x);
 	bounds->y = floor(obounds.y);
 	bounds->w = ceil(obounds.x - bounds->x + obounds.w);
 	bounds->h = ceil(obounds.y - bounds->y + obounds.h);
 }
 
-static void _compound_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _compound_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	/* TODO here we should only support the destination formats of the surfaces */
 	*flags = 0;
-}
-
-static void _compound_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
-		Enesim_Renderer_Hint *hints)
-{
-	Enesim_Renderer_Compound *thiz;
-	Enesim_Renderer_Flag f = 0xffffffff;
-	Enesim_Rop rop = state->rop;
-	Eina_Bool same_rop = EINA_TRUE;
-	Eina_List *ll;
-
-	thiz = _compound_get(r);
-	if (!thiz->layers)
-	{
-		*hints = 0;
-		return;
-	}
-
-	/* TODO we need to find an heuristic to set the colorize/rop flag
-	 * that reduces the number of raster operations we have to do
-	 * (i.e a passthrough)
-	 * - if every renderer has the same rop as the compund then
-	 * there is no need to do a post composition of the result. but how to
-	 * handle the colorize?
-	 */
-	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
-	{
-		Layer *l = eina_list_data_get(ll);
-		Enesim_Renderer *lr = l->r;
-		Enesim_Renderer_Hint tmp;
-		Enesim_Rop lrop;
-
-		/* intersect with every flag */
-		enesim_renderer_hints_get(lr, &tmp);
-		enesim_renderer_rop_get(lr, &lrop);
-		if (lrop != rop)
-			same_rop = EINA_FALSE;
-
-		f &= tmp;
-	}
-	if (same_rop)
-		f |= ENESIM_RENDERER_HINT_ROP;
-	*hints = f;
 }
 
 static void _compound_free(Enesim_Renderer *r)
@@ -552,8 +529,7 @@ static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
 	return is_inside;
 }
 
-static Eina_Bool _compound_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED)
+static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_Bool ret;
@@ -582,7 +558,6 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r,
 
 static void _compound_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -591,8 +566,7 @@ static void _compound_damage(Enesim_Renderer *r,
 	Layer *l;
 
 	thiz = _compound_get(r);
-	common_changed = _compound_common_changed(thiz, states[ENESIM_STATE_CURRENT],
-		states[ENESIM_STATE_PAST]);
+	common_changed = enesim_renderer_common_has_changed(r);
 	/* given that we do support the visibility, color, rop, we need to take into
 	 * account such change
 	 */
@@ -643,7 +617,6 @@ static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
@@ -670,13 +643,13 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _compound_name,
 	/* .free = 			*/ _compound_free,
-	/* .bounds =  		*/ _compound_bounds,
-	/* .destination_bounds = 	*/ _compound_destination_bounds,
+	/* .bounds_get =  		*/ _compound_bounds,
+	/* .destination_bounds_get = 	*/ _compound_destination_bounds,
 	/* .flags = 			*/ _compound_flags,
-	/* .hints_get = 		*/ _compound_hints,
 	/* .is_inside = 		*/ _compound_is_inside,
 	/* .damage = 			*/ _compound_damage,
 	/* .has_changed = 		*/ _compound_has_changed,
+	/* .sw_hints_get = 		*/ _compound_sw_hints,
 	/* .sw_setup = 			*/ _compound_sw_setup,
 	/* .sw_cleanup = 		*/ _compound_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

@@ -154,7 +154,7 @@ static void _proxy_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_S
 }
 
 static void _proxy_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state EINA_UNUSED,
-		Enesim_Renderer_Hint *hints)
+		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Proxy *thiz;
 

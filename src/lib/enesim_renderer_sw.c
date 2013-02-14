@@ -46,7 +46,7 @@
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
-		Enesim_Renderer_Hint hints)
+		Enesim_Renderer_Sw_Hint hints)
 {
 	Enesim_Color color;
 	Enesim_Rop rop;
@@ -507,7 +507,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Sw_Fill fill = NULL;
 	Enesim_Compositor_Span span = NULL;
 	Enesim_Renderer_Sw_Data *sw_data;
-	Enesim_Renderer_Hint hints;
+	Enesim_Renderer_Sw_Hint hints;
 	Enesim_Renderer *mask;
 	Enesim_Color color;
 	Enesim_Rop rop;

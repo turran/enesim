@@ -475,7 +475,6 @@ Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State2 *thiz)
 	{
 		return EINA_TRUE;
 	}
-
 	return EINA_FALSE;
 }
 
@@ -1024,7 +1023,7 @@ EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Hint *hints)
+EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!hints) return;
@@ -1227,6 +1226,19 @@ EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
 
 
 #endif
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool enesim_renderer_common_has_changed(Enesim_Renderer *r)
+{
+	Eina_Bool ret;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	ret = _state_internal_changed(&r->state);
+	return ret;
+}
 
 /**
  * To  be documented

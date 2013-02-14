@@ -161,7 +161,7 @@ static void _cache_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 }
 
 static void _cache_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
-		Enesim_Renderer_Hint *hints)
+		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Cache *thiz;
 

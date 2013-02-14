@@ -542,7 +542,7 @@ static void _stripes_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer
 }
 
 static void _stripes_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
-		Enesim_Renderer_Hint *hints)
+		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }

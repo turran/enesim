@@ -237,7 +237,7 @@ typedef struct _Enesim_Renderer_Gradient_Sw_State
 
 typedef struct _Enesim_Renderer_Gradient_Sw_Draw_Data
 {
-	const Enesim_Renderer_State *state;
+	const Enesim_Renderer_State2 *state;
 	const Enesim_Renderer_Gradient_State *gstate;
 	const Enesim_Renderer_Gradient_Sw_State *sw_state;
 } Enesim_Renderer_Gradient_Sw_Draw_Data;
@@ -250,7 +250,6 @@ typedef void (*Enesim_Renderer_Gradient_Sw_Draw)(Enesim_Renderer *r,
 
 typedef int (*Enesim_Renderer_Gradient_Length)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Gradient_Sw_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Gradient_Sw_Draw *draw,
