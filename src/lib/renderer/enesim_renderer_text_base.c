@@ -111,12 +111,9 @@ static void _enesim_renderer_text_base_common_cleanup(Enesim_Renderer_Text_Base 
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
 static void _enesim_renderer_text_base_destination_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Eina_Rectangle *bounds)
 {
 	Enesim_Renderer_Text_Base *thiz;
-	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
 	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->destination_bounds)
@@ -129,19 +126,14 @@ static void _enesim_renderer_text_base_destination_bounds(Enesim_Renderer *r,
 		return;
 	}
 
-	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	tstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->destination_bounds(r, states, sstates, tstates, bounds);
+	thiz->destination_bounds(r, bounds);
 
 }
 
 static void _enesim_renderer_text_base_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Text_Base *thiz;
-	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
 	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->bounds)
@@ -154,29 +146,21 @@ static void _enesim_renderer_text_base_bounds(Enesim_Renderer *r,
 		return;
 	}
 
-	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	tstates[ENESIM_STATE_PAST] = &thiz->past;
-	thiz->bounds(r, states, sstates, tstates, bounds);
+	thiz->bounds(r, bounds);
 }
 
 
 static Eina_Bool _enesim_renderer_text_base_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_Shape_Sw_Draw *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Text_Base *thiz;
-	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
 	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->sw_setup) return EINA_FALSE;
 
-	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	tstates[ENESIM_STATE_PAST] = &thiz->past;
-
 	_enesim_renderer_text_base_common_setup(thiz);
-	return thiz->sw_setup(r, states, sstates, tstates, s, fill, error);
+	return thiz->sw_setup(r, s, fill, error);
 }
 
 static void _enesim_renderer_text_base_sw_cleanup(Enesim_Renderer *r,
@@ -191,24 +175,17 @@ static void _enesim_renderer_text_base_sw_cleanup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_text_base_opengl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Text_Base *thiz;
-	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
 	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->opengl_setup) return EINA_FALSE;
 
-	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	tstates[ENESIM_STATE_PAST] = &thiz->past;
-
 	_enesim_renderer_text_base_common_setup(thiz);
-	return thiz->opengl_setup(r, states, sstates, tstates, s,
-		draw, error);
+	return thiz->opengl_setup(r, s, draw, error);
 }
 
 static void _enesim_renderer_text_base_opengl_cleanup(Enesim_Renderer *r,
@@ -223,25 +200,19 @@ static void _enesim_renderer_text_base_opengl_cleanup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_text_base_opencl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		const Enesim_Renderer_Shape_State *sstates[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Text_Base *thiz;
-	const Enesim_Renderer_Text_Base_State *tstates[ENESIM_RENDERER_STATES];
 
 	thiz = _enesim_renderer_text_base_get(r);
 	if (!thiz->opengl_setup) return EINA_FALSE;
 
-	tstates[ENESIM_STATE_CURRENT] = &thiz->current;
-	tstates[ENESIM_STATE_PAST] = &thiz->past;
 
 	_enesim_renderer_text_base_common_setup(thiz);
-	return thiz->opencl_setup(r, states, sstates, tstates, s,
-		program_name, program_source, program_length, error);
+	return thiz->opencl_setup(r, s, program_name, program_source, program_length, error);
 }
 
 static void _enesim_renderer_text_base_opencl_cleanup(Enesim_Renderer *r,
@@ -255,8 +226,7 @@ static void _enesim_renderer_text_base_opencl_cleanup(Enesim_Renderer *r,
 	_enesim_renderer_text_base_common_cleanup(thiz);
 }
 
-static Eina_Bool _enesim_renderer_text_base_has_changed(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES])
+static Eina_Bool _enesim_renderer_text_base_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Base *thiz;
 	Eina_Bool ret = EINA_TRUE;

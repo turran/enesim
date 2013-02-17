@@ -25,7 +25,6 @@ src/lib/renderer/enesim_renderer_rectangle.h \
 src/lib/renderer/enesim_renderer_shape.h \
 src/lib/renderer/enesim_renderer_stripes.h \
 src/lib/renderer/enesim_renderer_transition.h \
-src/lib/renderer/enesim_renderer_text_base.h \
 src/lib/renderer/enesim_renderer_text_span.h
 
 src_lib_libenesim_la_SOURCES += \
@@ -58,9 +57,7 @@ src/lib/renderer/enesim_renderer_transition.c \
 src/lib/renderer/enesim_renderer_gradient_private.h \
 src/lib/renderer/enesim_renderer_shape_private.h \
 src/lib/renderer/enesim_renderer_shape_path_private.h \
-src/lib/renderer/enesim_renderer_text_base.c \
-src/lib/renderer/enesim_renderer_text_span.c \
-src/lib/renderer/enesim_renderer_text_base_private.h
+src/lib/renderer/enesim_renderer_text_span.c
 
 EXTRA_DIST += \
 src/lib/renderer/enesim_renderer_checker.glsl \
