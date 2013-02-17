@@ -202,7 +202,7 @@ static void _ellipse_bounds_get(Enesim_Renderer *r,
 	rect->h = (thiz->current.ry + sw) * 2;
 
 	/* apply the geometry transformation */
-	enesim_renderer_shape_path_transformation_type_get(r, &type);
+	enesim_renderer_transformation_type_get(r, &type);
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Matrix m;
