@@ -1023,6 +1023,26 @@ EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
  * To  be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality)
+{
+
+}
+
+
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_quality_get(Enesim_Renderer *r, Enesim_Quality *quality)
+{
+
+}
+
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);

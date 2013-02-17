@@ -81,6 +81,8 @@ EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask);
+EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality);
+EAPI void enesim_renderer_quality_get(Enesim_Renderer *r, Enesim_Quality *quality);
 
 EAPI void enesim_renderer_bounds(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_bounds_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);
