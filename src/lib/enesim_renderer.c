@@ -482,6 +482,11 @@ void enesim_renderer_state_clear(Enesim_Renderer_State *thiz EINA_UNUSED)
 {
 }
 
+const Enesim_Renderer_State * enesim_renderer_state_get(Enesim_Renderer *r)
+{
+	return &r->state;
+}
+
 void enesim_renderer_state_init(Enesim_Renderer_State *thiz)
 {
 	/* common properties */

@@ -62,8 +62,8 @@ static Eina_Bool _shape_simple_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	const Enesim_Renderer_Shape_State2 *sstate;
 
 	thiz = _shape_simple_get(r);
-	enesim_renderer_shape_state_get(r, &sstate);
-	enesim_renderer_state_get(r, &rstate);
+	rstate = enesim_renderer_shape_state_get(r);
+	sstate = enesim_renderer_state_get(r);
 	/* TODO this should fo away once we handle ourselves the state */
 	/* first set the properties from the state */
 	//enesim_renderer_color_set(thiz->path, rstate->current.color);

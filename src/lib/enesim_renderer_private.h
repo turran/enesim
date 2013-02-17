@@ -186,6 +186,7 @@ struct _Enesim_Renderer
 
 void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
+const Enesim_Renderer_State * enesim_renderer_state_get(Enesim_Renderer *r);
 void enesim_renderer_sw_free(Enesim_Renderer *r);
 Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data);
