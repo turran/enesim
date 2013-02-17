@@ -252,7 +252,7 @@ static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
 
 	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
 	enesim_renderer_transformation_get(r, &m);
-	enesim_renderer_simple_transformation_type_get(r, &type);
+	enesim_renderer_transformation_type_get(r, &type);
 	enesim_matrix_f16p16_matrix_to(&m, &thiz->matrix);
 
 	*fill = _spans[thiz->x_channel][thiz->y_channel][type];

@@ -143,7 +143,7 @@ static Eina_Bool _raddist_sw_setup(Enesim_Renderer *r,
 	thiz = _raddist_get(r);
 	if (!thiz->src) return EINA_FALSE;
 
-	enesim_renderer_simple_transformation_type_get(r, &type);
+	enesim_renderer_transformation_type_get(r, &type);
 	if (type == ENESIM_MATRIX_IDENTITY)
 		*fill = _span_identity;
 	else

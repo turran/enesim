@@ -150,7 +150,7 @@ static Eina_Bool _perlin_sw_setup(Enesim_Renderer *r,
 		thiz->yfreq.val, thiz->ampl.val, thiz->xfreq.coeff, thiz->yfreq.coeff,
 		thiz->ampl.coeff);
 
-	enesim_renderer_simple_transformation_type_get(r, &type);
+	enesim_renderer_transformation_type_get(r, &type);
 	if (type != ENESIM_MATRIX_IDENTITY)
 		return EINA_FALSE;
 

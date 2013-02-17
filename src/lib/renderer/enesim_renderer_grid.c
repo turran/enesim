@@ -282,7 +282,7 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 
 	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
 	enesim_renderer_transformation_get(r, &m);
-	enesim_renderer_simple_transformation_type_get(r, &type);
+	enesim_renderer_transformation_type_get(r, &type);
 	switch (type)
 	{
 		case ENESIM_MATRIX_IDENTITY:

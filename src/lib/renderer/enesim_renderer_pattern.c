@@ -396,7 +396,7 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
  	thiz = _pattern_get(r);
 
 	/* do the common setup */
-	enesim_renderer_simple_transformation_type_get(r, &type);
+	enesim_renderer_transformation_type_get(r, &type);
 	if (!_pattern_state_setup(thiz, r, s, error)) return EINA_FALSE;
 	*fill = _spans[thiz->current.repeat_mode][type];
 

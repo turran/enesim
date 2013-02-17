@@ -1385,7 +1385,7 @@ static void _image_destination_bounds(Enesim_Renderer *r,
 
 	_image_bounds(r, &obounds);
 	enesim_renderer_transformation_get(r, &m);
-	enesim_renderer_simple_transformation_type_get(r, &type);
+	enesim_renderer_transformation_type_get(r, &type);
 	_image_transform_bounds(r, &m, type, &obounds, bounds);
 }
 
@@ -1618,7 +1618,7 @@ static void _image_damages(Enesim_Renderer *r,
 		Eina_List *l;
 
 		enesim_renderer_transformation_get(r, &m);
-		enesim_renderer_simple_transformation_type_get(r, &type);
+		enesim_renderer_transformation_type_get(r, &type);
 		EINA_LIST_FOREACH(thiz->surface_damages, l, sd)
 		{
 			Enesim_Rectangle sdd;
