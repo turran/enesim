@@ -72,7 +72,6 @@ static inline Enesim_Renderer_Transition * _transition_get(Enesim_Renderer *r)
 }
 
 static void _transition_span_general(Enesim_Renderer *r,
-		const Enesim_Renderer_State *state EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Transition *t;
@@ -118,7 +117,6 @@ static const char * _transition_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
@@ -152,7 +150,6 @@ static void _transition_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _transition_bounds(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES] EINA_UNUSED,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Transition *trans;
@@ -177,7 +174,7 @@ static void _transition_bounds(Enesim_Renderer *r,
 	rect->h = r0_rect.h > r1_rect.h ? r0_rect.h : r1_rect.h;
 }
 
-static void _transition_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _transition_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;

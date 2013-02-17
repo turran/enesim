@@ -53,8 +53,6 @@ src/lib/renderer/enesim_renderer_rectangle.c \
 src/lib/renderer/enesim_renderer_raddist.c \
 src/lib/renderer/enesim_renderer_shape.c \
 src/lib/renderer/enesim_renderer_shape_path.c \
-src/lib/renderer/enesim_renderer_simple.c \
-src/lib/renderer/enesim_renderer_simple_private.h \
 src/lib/renderer/enesim_renderer_stripes.c \
 src/lib/renderer/enesim_renderer_transition.c \
 src/lib/renderer/enesim_renderer_gradient_private.h \
