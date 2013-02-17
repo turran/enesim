@@ -100,25 +100,25 @@ static inline void _enesim_renderer_destination_bounds(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                     Internal state related functions                       *
  *----------------------------------------------------------------------------*/
-static void _state_internal_name_set(Enesim_Renderer_State_Internal *thiz, const char *name)
+static void _state_internal_name_set(Enesim_Renderer_State *thiz, const char *name)
 {
 	if (thiz->name) free(thiz->name);
 	thiz->name = strdup(name);
 }
 
-static const char * _state_internal_name_get(Enesim_Renderer_State_Internal *thiz)
+static const char * _state_internal_name_get(Enesim_Renderer_State *thiz)
 {
 	return thiz->name;
 }
 
-static void _state_internal_rop_set(Enesim_Renderer_State_Internal *thiz,
+static void _state_internal_rop_set(Enesim_Renderer_State *thiz,
 		Enesim_Rop rop)
 {
 	thiz->current.rop = rop;
 	thiz->changed = EINA_TRUE;
 }
 
-static Eina_Bool _state_internal_rop_get(Enesim_Renderer_State_Internal *thiz,
+static Eina_Bool _state_internal_rop_get(Enesim_Renderer_State *thiz,
 		Enesim_Rop *rop)
 {
 	if (!rop) return EINA_FALSE;
@@ -126,14 +126,14 @@ static Eina_Bool _state_internal_rop_get(Enesim_Renderer_State_Internal *thiz,
 	return EINA_TRUE;
 }
 
-static void _state_internal_visibility_set(Enesim_Renderer_State_Internal *thiz,
+static void _state_internal_visibility_set(Enesim_Renderer_State *thiz,
 		Eina_Bool visibility)
 {
 	thiz->current.visibility = visibility;
 	thiz->changed = EINA_TRUE;
 }
 
-static Eina_Bool _state_internal_visibility_get(Enesim_Renderer_State_Internal *thiz,
+static Eina_Bool _state_internal_visibility_get(Enesim_Renderer_State *thiz,
 		Eina_Bool *visibility)
 {
 	if (!visibility) return EINA_FALSE;
@@ -141,14 +141,14 @@ static Eina_Bool _state_internal_visibility_get(Enesim_Renderer_State_Internal *
 	return EINA_TRUE;
 }
 
-static void _state_internal_color_set(Enesim_Renderer_State_Internal *thiz,
+static void _state_internal_color_set(Enesim_Renderer_State *thiz,
 		Enesim_Color color)
 {
 	thiz->current.color = color;
 	thiz->changed = EINA_TRUE;
 }
 
-static Eina_Bool _state_internal_color_get(Enesim_Renderer_State_Internal *thiz,
+static Eina_Bool _state_internal_color_get(Enesim_Renderer_State *thiz,
 		Enesim_Color *color)
 {
 	if (!color) return EINA_FALSE;
@@ -156,7 +156,7 @@ static Eina_Bool _state_internal_color_get(Enesim_Renderer_State_Internal *thiz,
 	return EINA_TRUE;
 }
 
-static void _state_internal_mask_set(Enesim_Renderer_State_Internal * thiz,
+static void _state_internal_mask_set(Enesim_Renderer_State * thiz,
 		Enesim_Renderer *mask)
 {
 	Enesim_Renderer *old_mask;
@@ -167,7 +167,7 @@ static void _state_internal_mask_set(Enesim_Renderer_State_Internal * thiz,
 		enesim_renderer_unref(old_mask);
 }
 
-static Eina_Bool _state_internal_mask_get(Enesim_Renderer_State_Internal * thiz,
+static Eina_Bool _state_internal_mask_get(Enesim_Renderer_State * thiz,
 		Enesim_Renderer **mask)
 {
 	if (!mask) return EINA_FALSE;
@@ -177,7 +177,7 @@ static Eina_Bool _state_internal_mask_get(Enesim_Renderer_State_Internal * thiz,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _state_internal_changed(Enesim_Renderer_State_Internal *thiz)
+static Eina_Bool _state_internal_changed(Enesim_Renderer_State *thiz)
 {
 	if (!thiz->changed)
 		return EINA_FALSE;
@@ -211,7 +211,7 @@ static Eina_Bool _state_internal_changed(Enesim_Renderer_State_Internal *thiz)
 	return EINA_FALSE;
 }
 
-static void _state_internal_clear(Enesim_Renderer_State_Internal *thiz)
+static void _state_internal_clear(Enesim_Renderer_State *thiz)
 {
 	/* past */
 	if (thiz->past.mask)
@@ -234,14 +234,14 @@ static void _state_internal_clear(Enesim_Renderer_State_Internal *thiz)
 
 }
 
-static void _state_internal_init(Enesim_Renderer_State_Internal *thiz)
+static void _state_internal_init(Enesim_Renderer_State *thiz)
 {
 	thiz->current.visibility = thiz->past.visibility = EINA_TRUE;
 	thiz->current.color = thiz->past.color = ENESIM_COLOR_FULL;
 	thiz->current.rop = thiz->past.rop = ENESIM_FILL;
 }
 
-static void _state_internal_commit(Enesim_Renderer_State_Internal *thiz)
+static void _state_internal_commit(Enesim_Renderer_State *thiz)
 {
 	Enesim_Renderer *old_mask;
 
@@ -400,7 +400,7 @@ void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void
 	r->backend_data[b] = data;
 }
 
-Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State2 *thiz,
+Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State *thiz,
 		const Enesim_Matrix *m)
 {
 	if (!m)
@@ -414,7 +414,7 @@ Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State2 *thiz,
 	return EINA_TRUE;
 }
 
-Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State2 *thiz,
+Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State *thiz,
 		Enesim_Matrix *m)
 {
 	if (!m) return EINA_FALSE;
@@ -423,40 +423,40 @@ Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State2 *thiz,
 }
 
 
-void enesim_renderer_state_x_set(Enesim_Renderer_State2 *thiz, double x)
+void enesim_renderer_state_x_set(Enesim_Renderer_State *thiz, double x)
 {
 	thiz->current.ox = x;
 	thiz->changed = EINA_TRUE;
 }
 
-Eina_Bool enesim_renderer_state_x_get(Enesim_Renderer_State2 *thiz, double *x)
+Eina_Bool enesim_renderer_state_x_get(Enesim_Renderer_State *thiz, double *x)
 {
 	if (!x) return EINA_FALSE;
 	*x = thiz->current.ox;
 	return EINA_FALSE;
 }
 
-void enesim_renderer_state_y_set(Enesim_Renderer_State2 *thiz, double y)
+void enesim_renderer_state_y_set(Enesim_Renderer_State *thiz, double y)
 {
 	thiz->current.oy = y;
 	thiz->changed = EINA_TRUE;
 }
 
-Eina_Bool enesim_renderer_state_y_get(Enesim_Renderer_State2 *thiz, double *y)
+Eina_Bool enesim_renderer_state_y_get(Enesim_Renderer_State *thiz, double *y)
 {
 	if (!y) return EINA_FALSE;
 	*y = thiz->current.oy;
 	return EINA_FALSE;
 }
 
-void enesim_renderer_state_commit(Enesim_Renderer_State2 *thiz)
+void enesim_renderer_state_commit(Enesim_Renderer_State *thiz)
 {
 	/* swap the state */
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
 
-Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State2 *thiz)
+Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State *thiz)
 {
 	if (!thiz->changed)
 		return EINA_FALSE;
@@ -478,11 +478,11 @@ Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State2 *thiz)
 	return EINA_FALSE;
 }
 
-void enesim_renderer_state_clear(Enesim_Renderer_State2 *thiz EINA_UNUSED)
+void enesim_renderer_state_clear(Enesim_Renderer_State *thiz EINA_UNUSED)
 {
 }
 
-void enesim_renderer_state_init(Enesim_Renderer_State2 *thiz)
+void enesim_renderer_state_init(Enesim_Renderer_State *thiz)
 {
 	/* common properties */
 	thiz->current.ox = thiz->past.ox = 0;

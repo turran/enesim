@@ -21,7 +21,7 @@
 typedef struct _Enesim_Renderer_Simple_Descriptor
 {
 	Enesim_Renderer_Base_Name_Get_Cb name_get;
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
 	Enesim_Renderer_Flags_Get_Cb flags_get;
@@ -46,7 +46,7 @@ Enesim_Renderer * enesim_renderer_simple_new(
 		Enesim_Renderer_Simple_Descriptor *descriptor, void *data);
 void * enesim_renderer_simple_data_get(Enesim_Renderer *r);
 void enesim_renderer_simple_state_get(Enesim_Renderer *r,
-		const Enesim_Renderer_State2 **state);
+		const Enesim_Renderer_State **state);
 void enesim_renderer_simple_transformation_type_get(Enesim_Renderer *r,
 		Enesim_Matrix_Type *type);
 

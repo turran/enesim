@@ -50,7 +50,7 @@ typedef struct _Enesim_Rasterizer
 	void *data;
 	/* interface */
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Rasterizer_Figure_Set figure_set;
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;

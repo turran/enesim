@@ -48,13 +48,13 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Simple_Descriptor_Private
 {
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 } Enesim_Renderer_Simple_Descriptor_Private;
 
 typedef struct _Enesim_Renderer_Simple
 {
-	Enesim_Renderer_State2 state;
+	Enesim_Renderer_State state;
 	Enesim_Renderer_Simple_Descriptor_Private descriptor;
 	void *data;
 } Enesim_Renderer_Simple;
@@ -270,7 +270,7 @@ void * enesim_renderer_simple_data_get(Enesim_Renderer *r)
 }
 
 void enesim_renderer_simple_state_get(Enesim_Renderer *r,
-		const Enesim_Renderer_State2 **state)
+		const Enesim_Renderer_State **state)
 {
 	Enesim_Renderer_Simple *thiz;
 

@@ -53,7 +53,7 @@ typedef struct _Enesim_Renderer_Text_Base
 	Enesim_Renderer_Text_Base_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	/* private */
 	void *data;
 	Eina_Bool changed : 1;

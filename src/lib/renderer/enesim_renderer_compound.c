@@ -67,7 +67,7 @@ typedef struct _Enesim_Renderer_Compound
 	/* properties */
 	Eina_List *layers;
 	/* private */
-	Enesim_Renderer_State2 rstate;
+	Enesim_Renderer_State rstate;
 	Eina_List *visible_layers; /* FIXME maybe is time to change from lists to arrays */
 	Eina_List *added;
 	Eina_List *removed;

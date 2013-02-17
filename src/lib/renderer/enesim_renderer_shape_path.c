@@ -58,7 +58,7 @@ static Eina_Bool _shape_simple_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape_Path *thiz;
-	const Enesim_Renderer_State2 *rstate;
+	const Enesim_Renderer_State *rstate;
 	const Enesim_Renderer_Shape_State2 *sstate;
 
 	thiz = _shape_simple_get(r);

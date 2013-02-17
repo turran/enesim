@@ -63,7 +63,7 @@ typedef struct _Enesim_Renderer_Text_Base_Descriptor
 {
 	/* common */
 	Enesim_Renderer_Base_Name_Get_Cb name;
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Text_Base_Bounds bounds;
 	Enesim_Renderer_Text_Base_Destination_Bounds destination_bounds;
 	Enesim_Renderer_Flags_Get_Cb flags;

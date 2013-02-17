@@ -104,7 +104,7 @@ typedef Enesim_Shape_Draw_Mode (*Enesim_Renderer_Shape_Draw_Mode_Get_Cb)(Enesim_
 typedef struct _Enesim_Renderer_Shape_Descriptor {
 	unsigned int version;
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
 	Enesim_Renderer_Flags_Get_Cb flags_get;

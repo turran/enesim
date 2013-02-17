@@ -24,7 +24,7 @@ typedef void (*Enesim_Renderer_Shape_Path_Cleanup)(Enesim_Renderer *r);
 typedef struct _Enesim_Renderer_Shape_Path_Descriptor
 {
 	Enesim_Renderer_Base_Name_Get_Cb name;
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	Enesim_Renderer_Shape_Feature_Get_Cb features_get;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;

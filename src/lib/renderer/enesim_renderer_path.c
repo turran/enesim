@@ -92,7 +92,7 @@ typedef struct _Enesim_Renderer_Path_OpenGL
 
 typedef struct _Enesim_Renderer_Path_State
 {
-	Enesim_Renderer_State2 rstate;
+	Enesim_Renderer_State rstate;
 	Enesim_Renderer_Shape_State2 sstate;
 } Enesim_Renderer_Path_State;
 
@@ -133,7 +133,7 @@ static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
 	return thiz;
 }
 static void _path_span(Enesim_Renderer *r,
-		const Enesim_Renderer_State2 *state EINA_UNUSED,
+		const Enesim_Renderer_State *state EINA_UNUSED,
 		const Enesim_Renderer_Shape_State2 *sstate EINA_UNUSED,
 		int x, int y, unsigned int len, void *ddata)
 {
@@ -858,7 +858,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Color color;
-	const Enesim_Renderer_State2 *cs = &thiz->state.rstate;
+	const Enesim_Renderer_State *cs = &thiz->state.rstate;
 	const Enesim_Renderer_Shape_State2 *css = &thiz->state.sstate;
 
 	thiz = _path_get(r);
@@ -904,7 +904,7 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_path_state_cleanup(r, s);
 }
 
-static void _path_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State2 *state EINA_UNUSED,
+static void _path_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -912,7 +912,7 @@ static void _path_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_St
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _path_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State2 *state EINA_UNUSED,
+static void _path_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -935,7 +935,7 @@ static void _path_bounds(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Path *thiz;
-	Enesim_Renderer_State2 *cs;
+	Enesim_Renderer_State *cs;
 	Enesim_Renderer_Shape_State2 *css;
 	double xmin;
 	double ymin;
@@ -1036,7 +1036,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Path_OpenGL *gl;
 	Enesim_Shape_Draw_Mode dm;
 	double sw;
-	const Enesim_Renderer_State2 *cs;
+	const Enesim_Renderer_State *cs;
 	const Enesim_Renderer_Shape_State2 *css;
 
 	thiz = _path_get(r);

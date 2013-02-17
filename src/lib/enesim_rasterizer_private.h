@@ -22,7 +22,7 @@
 
 typedef struct _Enesim_Rasterizer_State
 {
-	Enesim_Renderer_State2 rstate;
+	Enesim_Renderer_State rstate;
 	Enesim_Renderer_Shape_State2 sstate;
 } Enesim_Rasterizer_State;
 
@@ -32,7 +32,7 @@ typedef struct _Enesim_Rasterizer_Descriptor
 {
 	/* inherited from the renderer */
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Flags_Get_Cb flags_get;
 	/* properties */
 	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;

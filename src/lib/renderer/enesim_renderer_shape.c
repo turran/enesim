@@ -67,7 +67,7 @@ typedef struct _Enesim_Renderer_Shape
 	Eina_Bool changed : 1;
 	Eina_Bool dash_changed : 1;
 	/* interface */
-	Enesim_Renderer_Delete free;
+	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
