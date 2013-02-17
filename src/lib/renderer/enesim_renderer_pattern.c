@@ -72,7 +72,7 @@ static inline Enesim_Renderer_Pattern * _pattern_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	return thiz;
 }
 
@@ -512,7 +512,7 @@ static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _pattern_name,
 	/* .free = 			*/ _pattern_free,
 	/* .bounds_get = 		*/ _pattern_bounds,
@@ -563,7 +563,7 @@ EAPI Enesim_Renderer * enesim_renderer_pattern_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Pattern));
 	if (!thiz) return NULL;
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 	return r;
 }
 

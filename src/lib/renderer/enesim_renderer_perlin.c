@@ -57,7 +57,7 @@ static inline Enesim_Renderer_Perlin * _perlin_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Perlin *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_PERLIN_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -185,7 +185,7 @@ static void _perlin_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _perlin_name,
 	/* .free = 			*/ _perlin_free,
 	/* .bounds_get = 		*/ NULL,
@@ -226,7 +226,7 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 	thiz->yfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->ampl.val = 1; /* p p2 p3 p4 ... */
 
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

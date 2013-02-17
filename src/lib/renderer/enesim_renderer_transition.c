@@ -65,7 +65,7 @@ static inline Enesim_Renderer_Transition * _transition_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Transition *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_TRANSITION_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -188,7 +188,7 @@ static void _transition_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _transition_name,
 	/* .free = 			*/ _transition_free,
 	/* .bounds_get = 		*/ _transition_bounds,
@@ -225,7 +225,7 @@ EAPI Enesim_Renderer * enesim_renderer_transition_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Transition));
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_TRANSITION_MAGIC);
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

@@ -47,7 +47,7 @@ Enesim_Renderer * enesim_renderer_simple_new(
 void * enesim_renderer_simple_data_get(Enesim_Renderer *r);
 void enesim_renderer_simple_state_get(Enesim_Renderer *r,
 		const Enesim_Renderer_State **state);
-void enesim_renderer_transformation_type_get(Enesim_Renderer *r,
+void enesim_renderer_simple_transformation_type_get(Enesim_Renderer *r,
 		Enesim_Matrix_Type *type);
 
 #endif

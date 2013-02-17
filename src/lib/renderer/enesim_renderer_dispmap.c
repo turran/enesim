@@ -65,7 +65,7 @@ static inline Enesim_Renderer_Dispmap * _dispmap_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_DISPMAP_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -306,7 +306,7 @@ static void _dispmap_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _dispmap_name,
 	/* .free = 			*/ _dispmap_free,
 	/* .bounds_get = 		*/ _dispmap_bounds,
@@ -360,7 +360,7 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 	thiz->x_channel = ENESIM_CHANNEL_RED;
 	thiz->y_channel = ENESIM_CHANNEL_GREEN;
 	/* common renderer setup */
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

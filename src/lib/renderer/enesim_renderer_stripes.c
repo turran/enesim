@@ -73,7 +73,7 @@ static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_STRIPES_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -634,7 +634,7 @@ static void _stripes_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 #endif
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _stripes_name,
 	/* .free = 			*/ _stripes_free,
 	/* .bounds_get = 		*/ NULL,
@@ -681,7 +681,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	thiz->current.even.color = 0xffffffff;
 	thiz->current.odd.color = 0xff000000;
 	thiz->changed = 1;
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

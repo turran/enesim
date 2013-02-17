@@ -77,7 +77,7 @@ static inline Enesim_Renderer_Clipper * _clipper_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_CLIPPER_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -333,7 +333,7 @@ static void _clipper_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 #endif
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _clipper_name,
 	/* .free = 			*/ _clipper_free,
 	/* .bounds_get = 		*/ _clipper_bounds,
@@ -373,7 +373,7 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Clipper));
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_CLIPPER_MAGIC);
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 	return r;
 }
 

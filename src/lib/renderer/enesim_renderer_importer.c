@@ -333,7 +333,7 @@ static void _importer_flags(Enesim_Renderer *r EINA_UNUSED,
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _importer_name,
 	/* .free =			*/ _importer_free,
 	/* .bounds_get = 		*/ _importer_bounds,
@@ -374,7 +374,7 @@ EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 	if (!thiz) return NULL;
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMPORTER_MAGIC);
 
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

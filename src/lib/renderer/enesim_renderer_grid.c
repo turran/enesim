@@ -66,7 +66,7 @@ static inline Enesim_Renderer_Grid * _grid_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Grid *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRID_MAGIC);
 
 	return thiz;
@@ -323,7 +323,7 @@ static void _grid_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _grid_name,
 	/* .free = 			*/ _grid_free,
 	/* .bounds_get = 		*/ NULL,
@@ -369,7 +369,7 @@ EAPI Enesim_Renderer * enesim_renderer_grid_new(void)
 	thiz->outside.w = 1;
 	thiz->outside.h = 1;
 	/* common renderer setup */
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }

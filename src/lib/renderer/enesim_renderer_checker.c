@@ -86,7 +86,7 @@ static Enesim_Renderer_Checker * _checker_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Checker *thiz;
 
-	thiz = enesim_renderer_simple_data_get(r);
+	thiz = enesim_renderer_data_get(r);
 	ENESIM_RENDERER_CHECKER_MAGIC_CHECK(thiz);
 
 	return thiz;
@@ -583,7 +583,7 @@ static void _checker_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 }
 #endif
 
-static Enesim_Renderer_Simple_Descriptor _descriptor = {
+static Enesim_Renderer_Descriptor _descriptor = {
 	/* .name_get = 			*/ _checker_name,
 	/* .free = 			*/ _checker_free,
 	/* .bounds_get = 		*/ NULL,
@@ -629,7 +629,7 @@ EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
 	/* specific renderer setup */
 	thiz->current.sw = 1;
 	thiz->current.sh = 1;
-	r = enesim_renderer_simple_new(&_descriptor, thiz);
+	r = enesim_renderer_new(&_descriptor, thiz);
 
 	return r;
 }
