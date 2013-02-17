@@ -1268,7 +1268,7 @@ EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool enesim_renderer_common_has_changed(Enesim_Renderer *r)
+EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
 {
 	Eina_Bool ret;
 

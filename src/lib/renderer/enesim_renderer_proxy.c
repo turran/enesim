@@ -217,7 +217,7 @@ static void _proxy_damage(Enesim_Renderer *r,
 
 	thiz = _proxy_get(r);
 	/* we need to take care of the visibility */
-	common_changed = enesim_renderer_common_has_changed(r);
+	common_changed = enesim_renderer_state_has_changed(r);
 	if (common_changed)
 	{
 		Eina_Rectangle current_bounds;

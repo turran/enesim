@@ -263,7 +263,7 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 	enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 
 	/* first check if the common properties have changed */
-	do_send_old = enesim_renderer_common_changed(r);
+	do_send_old = enesim_renderer_state_has_changed(r);
 	if (do_send_old) goto send_old;
 
 	/* check if the common shape properties have changed */

@@ -96,7 +96,7 @@ EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
 EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
-EAPI Eina_Bool enesim_renderer_common_has_changed(Enesim_Renderer *r);
+EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r);
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error);

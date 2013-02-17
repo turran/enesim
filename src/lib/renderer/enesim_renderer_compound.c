@@ -566,7 +566,7 @@ static void _compound_damage(Enesim_Renderer *r,
 	Layer *l;
 
 	thiz = _compound_get(r);
-	common_changed = enesim_renderer_common_has_changed(r);
+	common_changed = enesim_renderer_state_has_changed(r);
 	/* given that we do support the visibility, color, rop, we need to take into
 	 * account such change
 	 */
