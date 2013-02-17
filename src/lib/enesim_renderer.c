@@ -1025,10 +1025,10 @@ EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
  */
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality)
 {
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->state.current.quality = quality;
 
 }
-
-
 
 /**
  * To  be documented
@@ -1036,7 +1036,19 @@ EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality
  */
 EAPI void enesim_renderer_quality_get(Enesim_Renderer *r, Enesim_Quality *quality)
 {
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	*quality = r->state.current.quality;
+}
 
+/**
+ * To  be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_transformation_type_get(Enesim_Renderer *r,
+		Enesim_Matrix_Type *type)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	*type = r->state.current.transformation_type;
 }
 
 /**

@@ -67,6 +67,8 @@ EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name);
 EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name);
 EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m);
 EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m);
+EAPI void enesim_renderer_transformation_type_get(Enesim_Renderer *r,
+		Enesim_Matrix_Type *type);
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y);
 EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y);
 EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x);
