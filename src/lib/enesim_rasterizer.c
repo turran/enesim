@@ -77,46 +77,6 @@ static const char * _rasterizer_base_name_get(Enesim_Renderer *r)
 	return thiz->base_name_get(r);
 }
 
-static Eina_Bool _rasterizer_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Error **error)
-{
-	Enesim_Rasterizer *thiz;
-	Eina_Bool ret;
-
-	thiz = _rasterizer_get(r);
-	if (!thiz->sw_setup) return EINA_FALSE;
-
-	/* setup the renderer state */
-	if (!enesim_renderer_state_setup(&thiz->state.rstate))
-		goto err_renderer;
-	/* setup the shape state */
-	if (!enesim_renderer_shape_state_setup(&thiz->state.sstate))
-		goto err_shape;
-	/* finally call the interface */
-	if (!thiz->sw_setup(r, s, draw, error))
-		goto err_rasterizer;
-	return EINA_TRUE;
-
-err_rasterizer:
-	enesim_renderer_shape_state_cleanup(&thiz->state.sstate);
-err_shape:
-	enesim_renderer_state_cleanup(&thiz->state.rstate);
-err_renderer:
-	return EINA_FALSE;
-}
-
-static void _rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	Enesim_Rasterizer *thiz;
-
-	thiz = _rasterizer_get(r);
-	if (thiz->sw_cleanup)
-		thiz->sw_cleanup(r, s);
-	enesim_renderer_shape_state_cleanup(&thiz->state.sstate);
-	enesim_renderer_state_cleanup(&thiz->state.rstate);
-}
-
 static void _rasterizer_free(Enesim_Renderer *r)
 {
 	Enesim_Rasterizer *thiz;
@@ -126,7 +86,7 @@ static void _rasterizer_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _rasterizer_flags(Enesim_Renderer *r EINA_UNUSED,
+static void _rasterizer_flags_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	/* FIXME we should use the rasterizer implementation flags */
@@ -135,7 +95,7 @@ static void _rasterizer_flags(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _rasterizer_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _rasterizer_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -152,11 +112,11 @@ static Enesim_Renderer_Shape_Descriptor _descriptor = {
 	/* .free = 			*/ _rasterizer_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ NULL,
+	/* .flags_get = 		*/ _rasterizer_flags_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
-	/* .sw_hints_get = 		*/ NULL,
+	/* .sw_hints_get = 		*/ _rasterizer_sw_hints_get,
 	/* .sw_setup = 			*/ NULL,
 	/* .sw_cleanup = 		*/ NULL,
 	/* .opencl_setup =		*/ NULL,
@@ -165,7 +125,7 @@ static Enesim_Renderer_Shape_Descriptor _descriptor = {
 	/* .opengl_initialize =         */ NULL,
 	/* .opengl_setup =   		*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL,
-	/* .feature_get = 		*/ NULL,
+	/* .feature_get = 		*/ _rasterizer_feature_get,
 	/* .draw_mode_set = 		*/ NULL,
 	/* .draw_mode_get = 		*/ NULL,
 	/* .stroke_color_set = 		*/ NULL,
@@ -202,6 +162,8 @@ Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *d
 	if (!thiz) return NULL;
 
 	descriptor = _descriptor;
+	descriptor.sw_setup = d->sw_setup;
+	descriptor.sw_cleanup = d->sw_cleanup;
 
 	EINA_MAGIC_SET(thiz, ENESIM_RASTERIZER_MAGIC);
 	thiz->base_name_get = d->base_name_get;
