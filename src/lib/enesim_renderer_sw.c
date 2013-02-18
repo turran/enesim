@@ -553,7 +553,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
 	}
 
-	enesim_renderer_hints_get(r, &hints);
+	enesim_renderer_sw_hints_get(r, &hints);
 	if (_is_sw_draw_composed(r, hints))
 	{
 		Enesim_Format dfmt;

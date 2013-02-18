@@ -169,7 +169,7 @@ static void _cache_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
 	*hints = 0;
 	if (!thiz->proxied)
 		return;
-	enesim_renderer_hints_get(thiz->proxied, hints);
+	enesim_renderer_sw_hints_get(thiz->proxied, hints);
 }
 
 static void _cache_bounds(Enesim_Renderer *r,

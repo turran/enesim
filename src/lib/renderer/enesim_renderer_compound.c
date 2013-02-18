@@ -358,7 +358,7 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 		Enesim_Rop lrop;
 
 		/* intersect with every flag */
-		enesim_renderer_hints_get(lr, &tmp);
+		enesim_renderer_sw_hints_get(lr, &tmp);
 		enesim_renderer_rop_get(lr, &lrop);
 		if (lrop != rop)
 			same_rop = EINA_FALSE;

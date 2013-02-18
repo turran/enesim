@@ -212,7 +212,7 @@ static void _clipper_hints(Enesim_Renderer *r,
 		Enesim_Rop rop, own_rop;
 		Enesim_Color color, own_color;
 
-		enesim_renderer_hints_get(thiz->current.content, &content_hints);
+		enesim_renderer_sw_hints_get(thiz->current.content, &content_hints);
 
 		enesim_renderer_rop_get(thiz->current.content, &rop);
 		enesim_renderer_rop_get(r, &own_rop);

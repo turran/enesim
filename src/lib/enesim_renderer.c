@@ -962,7 +962,7 @@ EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r,
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints)
+EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!hints) return;

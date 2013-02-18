@@ -171,7 +171,7 @@ static void _shape_simple_hints(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = _shape_simple_get(r);
-	enesim_renderer_hints_get(thiz->path, hints);
+	enesim_renderer_sw_hints_get(thiz->path, hints);
 }
 
 static void _shape_simple_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)

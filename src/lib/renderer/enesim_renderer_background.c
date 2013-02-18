@@ -297,7 +297,7 @@ static void _background_flags(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _background_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _background_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_COLORIZE;
@@ -327,10 +327,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get =	*/ NULL,
 	/* .flags_get = 		*/ _background_flags,
-	/* .hints_get = 		*/ _background_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _background_has_changed,
+	/* .sw_hints_get = 		*/ _background_sw_hints,
 	/* .sw_setup = 			*/ _background_sw_setup,
 	/* .sw_cleanup = 		*/ _background_sw_cleanup,
 #if BUILD_OPENCL

@@ -96,7 +96,7 @@ EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle 
 EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
 
 EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
-EAPI void enesim_renderer_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints);
+EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r);

@@ -143,8 +143,8 @@ static Eina_Bool _checker_opengl_shader_setup(GLenum pid,
 			argb8888_green_get(odd_color) / 255.0,
 			argb8888_blue_get(odd_color) / 255.0,
 			argb8888_alpha_get(odd_color) / 255.0);
-	glUniform1i(sw, sw);
-	glUniform1i(sh, sh);
+	glUniform1i(sw_u, sw);
+	glUniform1i(sh_u, sh);
 
 	return EINA_TRUE;
 }
@@ -471,6 +471,7 @@ static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Checker *thiz;
 	Enesim_Matrix_Type type;
 	Enesim_Matrix matrix;
+	Enesim_Matrix inv;
 
 	thiz = _checker_get(r);
 	_checker_state_setup(r, thiz);
@@ -489,13 +490,15 @@ static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 		break;
 
 		case ENESIM_MATRIX_AFFINE:
-		enesim_matrix_f16p16_matrix_to(&matrix,
+		enesim_matrix_inverse(&matrix, &inv);
+		enesim_matrix_f16p16_matrix_to(&inv,
 				&thiz->matrix);
 		*fill = _span_affine;
 		break;
 
 		case ENESIM_MATRIX_PROJECTIVE:
-		enesim_matrix_f16p16_matrix_to(&matrix,
+		enesim_matrix_inverse(&matrix, &inv);
+		enesim_matrix_f16p16_matrix_to(&inv,
 				&thiz->matrix);
 		*fill = _span_projective;
 		break;
@@ -543,7 +546,7 @@ static void _checker_flags(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _checker_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _checker_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -590,10 +593,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,
 	/* .flags_get = 		*/ _checker_flags,
-	/* .hints_get = 		*/ _checker_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get =		*/ NULL,
 	/* .has_changed = 		*/ _checker_has_changed,
+	/* .sw_hints_get = 		*/ _checker_sw_hints,
 	/* .sw_setup = 			*/ _checker_sw_setup,
 	/* .sw_cleanup = 		*/ _checker_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

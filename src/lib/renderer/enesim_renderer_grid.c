@@ -269,6 +269,7 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Grid *thiz;
 	Enesim_Matrix m;
+	Enesim_Matrix inv;
 	Enesim_Matrix_Type type;
 
 	thiz = _grid_get(r);
@@ -282,6 +283,7 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 
 	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
 	enesim_renderer_transformation_get(r, &m);
+	enesim_matrix_inverse(&m, &inv);
 	enesim_renderer_transformation_type_get(r, &type);
 	switch (type)
 	{
@@ -290,12 +292,12 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 		break;
 
 		case ENESIM_MATRIX_AFFINE:
-		enesim_matrix_f16p16_matrix_to(&m, &thiz->matrix);
+		enesim_matrix_f16p16_matrix_to(&inv, &thiz->matrix);
 		*fill = _span_affine;
 		break;
 
 		case ENESIM_MATRIX_PROJECTIVE:
-		enesim_matrix_f16p16_matrix_to(&m, &thiz->matrix);
+		enesim_matrix_f16p16_matrix_to(&inv, &thiz->matrix);
 		*fill = _span_projective;
 		break;
 
@@ -330,10 +332,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,
 	/* .flags_get =			*/ _grid_flags,
-	/* .hints_get =			*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,
+	/* .sw_hints_get =		*/ NULL,
 	/* .sw_setup = 			*/ _grid_sw_setup,
 	/* .sw_cleanup = 		*/ _grid_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

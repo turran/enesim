@@ -481,6 +481,7 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
 	Enesim_Matrix_Type type;
 	Enesim_Matrix matrix;
+	Enesim_Matrix inv;
 
 	if (!thiz)
 		return EINA_FALSE;
@@ -502,7 +503,8 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
 	enesim_renderer_transformation_type_get(r, &type);
 	enesim_renderer_transformation_get(r, &matrix);
-	enesim_matrix_f16p16_matrix_to(&matrix,
+	enesim_matrix_inverse(&matrix, &inv);
+	enesim_matrix_f16p16_matrix_to(&inv,
 			&thiz->matrix);
 	switch (type)
 	{
@@ -542,7 +544,7 @@ static void _stripes_flags(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _stripes_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _stripes_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -641,10 +643,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,
 	/* .flags_get = 		*/ _stripes_flags,
-	/* .hints_get = 		*/ _stripes_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get =		*/ NULL,
 	/* .has_changed = 		*/ _stripes_has_changed,
+	/* .sw_hints_get = 		*/ _stripes_sw_hints,
 	/* .sw_setup =			*/ _stripes_sw_setup,
 	/* .sw_cleanup = 		*/ _stripes_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
