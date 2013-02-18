@@ -38,19 +38,7 @@ typedef struct _Enesim_Renderer_State
 	Eina_Bool changed;
 } Enesim_Renderer_State;
 
-Eina_Bool enesim_renderer_state_transformation_set(Enesim_Renderer_State *thiz,
-		const Enesim_Matrix *m);
-Eina_Bool enesim_renderer_state_transformation_get(Enesim_Renderer_State *thiz,
-		Enesim_Matrix *m);
-void enesim_renderer_state_x_set(Enesim_Renderer_State *thiz, double x);
-Eina_Bool enesim_renderer_state_x_get(Enesim_Renderer_State *thiz, double *x);
-void enesim_renderer_state_y_set(Enesim_Renderer_State *thiz, double y);
-Eina_Bool enesim_renderer_state_y_get(Enesim_Renderer_State *thiz, double *y);
-void enesim_renderer_state_commit(Enesim_Renderer_State *thiz);
 Eina_Bool enesim_renderer_state_changed(Enesim_Renderer_State *thiz);
-void enesim_renderer_state_clear(Enesim_Renderer_State *thiz);
-Eina_Bool enesim_renderer_state_setup(Enesim_Renderer_State *thiz);
-void enesim_renderer_state_cleanup(Enesim_Renderer_State *thiz);
 /*----------------------------------------------------------------------------*
  *                        Descriptor related functions                        *
  *----------------------------------------------------------------------------*/

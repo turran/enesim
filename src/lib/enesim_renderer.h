@@ -36,6 +36,9 @@ typedef enum _Enesim_Renderer_Flag
 	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 5), /**< Supports the quality property */
 } Enesim_Renderer_Flag;
 
+#define ENESIM_RENDERER_FLAG_TRANSFORMATION (ENESIM_RENDERER_FLAG_AFFINE & ENESIM_RENDERER_FLAG_PROJECTIVE)
+
+/* TODO rmove this to the sw backend */
 typedef enum _Enesim_Renderer_Sw_Hint
 {
 	ENESIM_RENDERER_HINT_COLORIZE 		= (1 << 0), /**< Can draw directly using the color property */
