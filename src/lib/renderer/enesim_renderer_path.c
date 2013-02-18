@@ -352,11 +352,11 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_OpenGL_Figure *glf,
 	/* TODO we could use the tesselator directly on our own vertex generator? */
 	t = gluNewTess();
 	gluTessProperty(t, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);
-	gluTessCallback(t, GLU_TESS_VERTEX_DATA, &_path_opengl_vertex_cb);
-	gluTessCallback(t, GLU_TESS_BEGIN_DATA, &_path_opengl_begin_cb);
-	gluTessCallback(t, GLU_TESS_END_DATA, &_path_opengl_end_cb);
-	gluTessCallback(t, GLU_TESS_COMBINE_DATA, &_path_opengl_combine_cb);
-	gluTessCallback(t, GLU_TESS_ERROR_DATA, &_path_opengl_error_cb);
+	gluTessCallback(t, GLU_TESS_VERTEX_DATA, (_GLUfuncptr)&_path_opengl_vertex_cb);
+	gluTessCallback(t, GLU_TESS_BEGIN_DATA, (_GLUfuncptr)&_path_opengl_begin_cb);
+	gluTessCallback(t, GLU_TESS_END_DATA, (_GLUfuncptr)&_path_opengl_end_cb);
+	gluTessCallback(t, GLU_TESS_COMBINE_DATA, (_GLUfuncptr)&_path_opengl_combine_cb);
+	gluTessCallback(t, GLU_TESS_ERROR_DATA, (_GLUfuncptr)&_path_opengl_error_cb);
 
 	gluTessBeginPolygon(t, glf);
 	EINA_LIST_FOREACH (f->polygons, l1, p)
