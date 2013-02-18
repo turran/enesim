@@ -199,7 +199,7 @@ static void _clipper_flags(Enesim_Renderer *r EINA_UNUSED,
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE;
 }
 
-static void _clipper_hints(Enesim_Renderer *r,
+static void _clipper_sw_hints_get(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Clipper *thiz;
@@ -340,10 +340,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ _clipper_bounds,
 	/* .destination_bounds_get =	*/ _clipper_destination_bounds,
 	/* .flags_get = 		*/ _clipper_flags,
-	/* .hints_get = 		*/ _clipper_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ _clipper_damage,
 	/* .has_changed = 		*/ _clipper_has_changed,
+	/* .sw_hints_get = 		*/ _clipper_sw_hints_get,
 	/* .sw_setup = 			*/ _clipper_sw_setup,
 	/* .sw_cleanup = 		*/ _clipper_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

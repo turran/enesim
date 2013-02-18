@@ -124,7 +124,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	uint32_t *src, *pbuf;
 	size_t sstride;
 	int sw, sh;
-	Enesim_Color color = thiz->color;
+	Enesim_Color color;
 	Eina_F16p16 xx, yy;
 	int ibyy, ibxx;
 	int ix, ix0, iy, iy0;
@@ -132,6 +132,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	int tyy0, ntyy0, ty0, nty0;
 
 	thiz = _blur_get(r);
+ 	color = thiz->color;
 	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
 	/* setup the parameters */
 
@@ -272,7 +273,7 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	uint32_t *src, *pbuf;
 	size_t sstride;
 	int sw, sh;
-	Enesim_Color color = thiz->color;
+	Enesim_Color color;
 	Eina_F16p16 xx, yy;
 	int ibyy, ibxx;
 	int ix, ix0, iy, iy0;
@@ -280,6 +281,7 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	int tyy0, ntyy0, ty0, nty0;
 
 	thiz = _blur_get(r);
+	color = thiz->color;
 
 	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
 	/* setup the parameters */
@@ -469,7 +471,7 @@ static void _blur_flags(Enesim_Renderer *r EINA_UNUSED,
 	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _blur_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _blur_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -490,10 +492,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ _blur_bounds,
 	/* .destination_bounds_get = 	*/ NULL,
 	/* .flags_get = 		*/ _blur_flags,
-	/* .hints_get = 		*/ _blur_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
+	/* .sw_hints_get = 		*/ _blur_sw_hints_get,
 	/* .sw_setup = 			*/ _blur_sw_setup,
 	/* .sw_cleanup = 		*/ _blur_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
