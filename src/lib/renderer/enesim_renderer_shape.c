@@ -686,6 +686,13 @@ void enesim_renderer_shape_state_cleanup(Enesim_Renderer_Shape_State2 *thiz)
 {
 
 }
+
+const Enesim_Renderer_Shape_State2 * enesim_renderer_shape_state_get(
+		Enesim_Renderer *r)
+{
+	return NULL;
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
