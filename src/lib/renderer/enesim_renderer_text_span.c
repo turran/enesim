@@ -583,12 +583,13 @@ static void _enesim_renderer_text_span_flags(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Enesim_Renderer_Shape_Descriptor _enesim_renderer_text_span_descriptor = {
-	/* .name = 			*/ _enesim_renderer_text_span_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _enesim_renderer_text_span_name,
 	/* .free = 			*/ _enesim_renderer_text_span_free,
-	/* .bounds = 			*/ _enesim_renderer_text_span_bounds,
-	/* .destination_bounds = 	*/ _enesim_renderer_text_span_destination_bounds,
-	/* .flags = 			*/ _enesim_renderer_text_span_flags,
-	/* .hint_get = 			*/ NULL,
+	/* .bounds_get = 		*/ _enesim_renderer_text_span_bounds,
+	/* .destination_bounds_get = 	*/ _enesim_renderer_text_span_destination_bounds,
+	/* .flags_get = 		*/ _enesim_renderer_text_span_flags,
+	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _enesim_renderer_text_span_has_changed,

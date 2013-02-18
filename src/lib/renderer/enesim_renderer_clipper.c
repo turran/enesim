@@ -334,7 +334,8 @@ static void _clipper_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 #endif
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _clipper_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _clipper_name,
 	/* .free = 			*/ _clipper_free,
 	/* .bounds_get = 		*/ _clipper_bounds,
 	/* .destination_bounds_get =	*/ _clipper_destination_bounds,

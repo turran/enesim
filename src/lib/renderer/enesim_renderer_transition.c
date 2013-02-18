@@ -189,7 +189,8 @@ static void _transition_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _transition_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _transition_name,
 	/* .free = 			*/ _transition_free,
 	/* .bounds_get = 		*/ _transition_bounds,
 	/* .destination_bounds_get = 	*/ NULL,

@@ -186,7 +186,8 @@ static void _perlin_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _perlin_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _perlin_name,
 	/* .free = 			*/ _perlin_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,

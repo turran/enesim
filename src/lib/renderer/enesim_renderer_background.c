@@ -321,7 +321,8 @@ static Eina_Bool _background_has_changed(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _background_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _background_name,
 	/* .free = 			*/ _background_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get =	*/ NULL,

@@ -324,7 +324,8 @@ static void _grid_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _grid_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _grid_name,
 	/* .free = 			*/ _grid_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,

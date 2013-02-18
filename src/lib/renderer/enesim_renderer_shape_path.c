@@ -428,6 +428,7 @@ static void _shape_simple_stroke_dash_clear(Enesim_Renderer *r)
 #endif
 
 static Enesim_Renderer_Shape_Descriptor _shape_simple_descriptor = {
+	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _shape_simple_name,
 	/* .free = 			*/ _shape_simple_free,
 	/* .bounds = 			*/ _shape_simple_bounds,

@@ -584,7 +584,8 @@ static void _checker_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 #endif
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _checker_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _checker_name,
 	/* .free = 			*/ _checker_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,

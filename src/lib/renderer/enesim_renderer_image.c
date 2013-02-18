@@ -1645,7 +1645,8 @@ static void _image_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _image_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _image_name,
 	/* .free = 			*/ _image_free,
 	/* .bounds_get = 		*/ _image_bounds,
 	/* .destination_bounds_get = 	*/ _image_destination_bounds,

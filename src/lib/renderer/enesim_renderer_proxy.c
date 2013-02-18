@@ -269,7 +269,8 @@ static void _proxy_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 #endif
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _proxy_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _proxy_name,
 	/* .free = 			*/ _proxy_free,
 	/* .bounds_get = 		*/ _proxy_bounds,
 	/* .destination_bounds_get =	*/ _proxy_destination_bounds,

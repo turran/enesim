@@ -212,7 +212,7 @@ static void _raddist_flags(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _free(Enesim_Renderer *r)
+static void _raddist_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Raddist *thiz;
 
@@ -221,8 +221,9 @@ static void _free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _raddist_name,
-	/* .free = 			*/ _free,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _raddist_name,
+	/* .free = 			*/ _raddist_free,
 	/* .bounds_get =  		*/ _bounds,
 	/* .destination_bounds_get = 	*/ NULL,
 	/* .flags_get = 		*/ _raddist_flags,

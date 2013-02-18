@@ -513,7 +513,8 @@ static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _pattern_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _pattern_name,
 	/* .free = 			*/ _pattern_free,
 	/* .bounds_get = 		*/ _pattern_bounds,
 	/* .destination_bounds_get = 	*/ _pattern_destination_bounds,

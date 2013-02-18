@@ -484,7 +484,8 @@ static void _blur_free(Enesim_Renderer *r)
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _blur_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _blur_name,
 	/* .free = 			*/ _blur_free,
 	/* .bounds_get = 		*/ _blur_bounds,
 	/* .destination_bounds_get = 	*/ NULL,

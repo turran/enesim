@@ -334,7 +334,8 @@ static void _importer_flags(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
-	/* .name_get = 			*/ _importer_name,
+	/* .version = 			*/ ENESIM_RENDERER_API,
+	/* .base_name_get = 		*/ _importer_name,
 	/* .free =			*/ _importer_free,
 	/* .bounds_get = 		*/ _importer_bounds,
 	/* .destination_bounds_get = 	*/ _importer_destination_bounds,
