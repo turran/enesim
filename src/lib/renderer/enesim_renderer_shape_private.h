@@ -108,20 +108,11 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
 	Enesim_Renderer_Flags_Get_Cb flags_get;
-	Enesim_Renderer_Sw_Hints_Get_Cb hints_get;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
-	/* properties */
-	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
-	Enesim_Renderer_Origin_X_Get_Cb origin_x_get;
-	Enesim_Renderer_Origin_Y_Set_Cb origin_y_set;
-	Enesim_Renderer_Origin_Y_Get_Cb origin_y_get;
-	Enesim_Renderer_Transformation_Set_Cb transformation_set;
-	Enesim_Renderer_Transformation_Get_Cb transformation_get;
-	Enesim_Renderer_Quality_Set_Cb quality_set;
-	Enesim_Renderer_Quality_Get_Cb quality_get;
 	/* software based functions */
+	Enesim_Renderer_Sw_Hints_Get_Cb hints_get;
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	/* opencl based functions */

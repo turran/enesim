@@ -34,15 +34,6 @@ typedef struct _Enesim_Rasterizer_Descriptor
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
 	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Flags_Get_Cb flags_get;
-	/* properties */
-	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
-	Enesim_Renderer_Origin_X_Get_Cb origin_x_get;
-	Enesim_Renderer_Origin_Y_Set_Cb origin_y_set;
-	Enesim_Renderer_Origin_Y_Get_Cb origin_y_get;
-	Enesim_Renderer_Transformation_Set_Cb transformation_set;
-	Enesim_Renderer_Transformation_Get_Cb transformation_get;
-	Enesim_Renderer_Quality_Set_Cb quality_set;
-	Enesim_Renderer_Quality_Get_Cb quality_get;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;

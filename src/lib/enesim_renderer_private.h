@@ -62,30 +62,18 @@ typedef void (*Enesim_Renderer_Destination_Bounds_Get_Cb)(Enesim_Renderer *r,
 		Eina_Rectangle *dbounds);
 typedef void (*Enesim_Renderer_Flags_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Renderer_Flag *flags);
-typedef void (*Enesim_Renderer_Sw_Hints_Get_Cb)(Enesim_Renderer *r,
-		Enesim_Renderer_Sw_Hint *hints);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data);
-
-typedef void (*Enesim_Renderer_Origin_X_Set_Cb)(Enesim_Renderer *r, double x);
-typedef double (*Enesim_Renderer_Origin_X_Get_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Origin_Y_Set_Cb)(Enesim_Renderer *r, double x);
-typedef double (*Enesim_Renderer_Origin_Y_Get_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Transformation_Set_Cb)(Enesim_Renderer *r,
-		const Enesim_Matrix *m);
-typedef void (*Enesim_Renderer_Transformation_Get_Cb)(Enesim_Renderer *r,
-		Enesim_Matrix *m);
-typedef void (*Enesim_Renderer_Quality_Set_Cb)(Enesim_Renderer *r,
-		Enesim_Quality q);
-typedef Enesim_Quality (*Enesim_Renderer_Quality_Get_Cb)(Enesim_Renderer *r);
 
 /* software backend descriptor functions */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *dst);
 
+typedef void (*Enesim_Renderer_Sw_Hints_Get_Cb)(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Hint *hints);
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
@@ -121,15 +109,6 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
-	/* properties */
-	Enesim_Renderer_Origin_X_Set_Cb origin_x_set;
-	Enesim_Renderer_Origin_X_Get_Cb origin_x_get;
-	Enesim_Renderer_Origin_Y_Set_Cb origin_y_set;
-	Enesim_Renderer_Origin_Y_Get_Cb origin_y_get;
-	Enesim_Renderer_Transformation_Set_Cb transformation_set;
-	Enesim_Renderer_Transformation_Get_Cb transformation_get;
-	Enesim_Renderer_Quality_Set_Cb quality_set;
-	Enesim_Renderer_Quality_Get_Cb quality_get;
 	/* software based functions */
 	Enesim_Renderer_Sw_Hints_Get_Cb hints_get;
 	Enesim_Renderer_Sw_Setup sw_setup;
