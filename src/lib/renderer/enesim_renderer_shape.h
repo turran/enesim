@@ -29,6 +29,7 @@ typedef enum _Enesim_Shape_Feature
 	ENESIM_SHAPE_FLAG_FILL_RENDERER 	= (1 << 0),
 	ENESIM_SHAPE_FLAG_STROKE_RENDERER	= (1 << 1),
 	ENESIM_SHAPE_FLAG_STROKE_LOCATION	= (1 << 2),
+	ENESIM_SHAPE_FLAG_STROKE_DASH		= (1 << 3),
 } Enesim_Shape_Feature;
 
 typedef enum _Enesim_Shape_Draw_Mode

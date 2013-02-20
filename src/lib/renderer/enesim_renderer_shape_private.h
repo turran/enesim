@@ -95,6 +95,8 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 
 Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor, void *data);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
+const Enesim_Renderer_Shape_State2 * enesim_renderer_shape_state_get(
+		Enesim_Renderer *r);
 
 #endif
 

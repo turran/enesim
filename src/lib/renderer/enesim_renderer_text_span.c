@@ -581,7 +581,6 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 	if (!thiz) return;
 
 	/* we should calculate the current width/height */
-	enesim_renderer_shape_setup(r);
 	_enesim_renderer_text_span_calculate(r);
 	rect->x = 0;
 	rect->y = 0;
