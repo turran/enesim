@@ -966,8 +966,8 @@ EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hi
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!hints) return;
-	if (r->descriptor.hints_get)
-		r->descriptor.hints_get(r, hints);
+	if (r->descriptor.sw_hints_get)
+		r->descriptor.sw_hints_get(r, hints);
 	else
 		*hints = 0;
 }

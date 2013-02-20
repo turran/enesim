@@ -858,10 +858,12 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Color color;
-	const Enesim_Renderer_State *cs = &thiz->state.rstate;
-	const Enesim_Renderer_Shape_State2 *css = &thiz->state.sstate;
+	const Enesim_Renderer_State *cs;
+	const Enesim_Renderer_Shape_State2 *css;
 
 	thiz = _path_get(r);
+	cs = enesim_renderer_state_get(r);
+	css = enesim_renderer_shape_state_get(r);
 
 	enesim_renderer_color_get(r, &color);
 	/* generate the list of points/polygons */
@@ -904,7 +906,7 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_path_state_cleanup(r, s);
 }
 
-static void _path_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _path_flags(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Flag *flags)
 {
 	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
@@ -912,7 +914,7 @@ static void _path_flags(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_St
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _path_hints(Enesim_Renderer *r EINA_UNUSED, const Enesim_Renderer_State *state EINA_UNUSED,
+static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -1083,11 +1085,10 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .bounds =			*/ _path_bounds,
 	/* .destination_bounds =	*/ _path_destination_bounds,
 	/* .flags =			*/ _path_flags,
-	/* .hints_get =			*/ _path_hints,
 	/* .is_inside =			*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed =		*/ _path_has_changed,
-	/* .feature_get =		*/ _path_feature_get,
+	/* .sw_hints_get =		*/ _path_sw_hints,
 	/* .sw_setup =			*/ _path_sw_setup,
 	/* .sw_cleanup =		*/ _path_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,
@@ -1102,6 +1103,7 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .opengl_setup =		*/ NULL,
 	/* .opengl_cleanup =		*/ NULL
 #endif
+	/* .feature_get =		*/ _path_feature_get,
 };
 /*============================================================================*
  *                                 Global                                     *

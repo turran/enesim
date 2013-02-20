@@ -638,10 +638,10 @@ static Enesim_Renderer_Shape_Descriptor _enesim_renderer_text_span_descriptor = 
 	/* .bounds_get = 		*/ _enesim_renderer_text_span_bounds,
 	/* .destination_bounds_get = 	*/ _enesim_renderer_text_span_destination_bounds,
 	/* .flags_get = 		*/ _enesim_renderer_text_span_flags,
-	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _enesim_renderer_text_span_has_changed,
+	/* .sw_hints_get = 		*/ NULL,
 	/* .sw_setup = 			*/ _enesim_text_sw_setup,
 	/* .sw_cleanup = 		*/ _enesim_text_sw_cleanup,
 };

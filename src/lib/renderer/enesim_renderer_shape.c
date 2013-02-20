@@ -357,10 +357,10 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	pdescriptor.bounds_get = descriptor->bounds_get;
 	pdescriptor.destination_bounds_get = descriptor->destination_bounds_get;
 	pdescriptor.flags_get = descriptor->flags_get;
-	pdescriptor.hints_get = descriptor->hints_get;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damages_get = _enesim_renderer_shape_damage;
 	pdescriptor.has_changed = _enesim_renderer_shape_has_changed;
+	pdescriptor.sw_hints_get = descriptor->sw_hints_get;
 	pdescriptor.sw_setup = _enesim_renderer_shape_sw_setup;
 	pdescriptor.sw_cleanup = descriptor->sw_cleanup;
 	pdescriptor.opencl_setup = _enesim_renderer_shape_opencl_setup;

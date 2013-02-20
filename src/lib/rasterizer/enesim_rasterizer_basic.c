@@ -1455,9 +1455,11 @@ static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s 
 static Enesim_Rasterizer_Descriptor _descriptor = {
 	/* .name = 		*/ _basic_name,
 	/* .free = 		*/ _basic_free,
-	/* .figure_set =	*/ _basic_figure_set,
+	/* .flags_get =		*/ NULL,
 	/* .sw_setup = 		*/ _basic_sw_setup,
 	/* .sw_cleanup = 	*/ _basic_sw_cleanup,
+	/* .feature_get = 	*/ NULL,
+	/* .figure_set =	*/ _basic_figure_set,
 };
 /*============================================================================*
  *                                 Global                                     *

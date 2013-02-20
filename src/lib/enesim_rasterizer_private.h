@@ -39,20 +39,6 @@ typedef struct _Enesim_Rasterizer_Descriptor
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	/* inherited from the shape */
 	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
-	Enesim_Renderer_Shape_Draw_Mode_Set_Cb draw_mode_set;
-	Enesim_Renderer_Shape_Draw_Mode_Get_Cb draw_mode_get;
-	Enesim_Renderer_Shape_Stroke_Color_Set_Cb stroke_color_set;
-	Enesim_Renderer_Shape_Stroke_Color_Get_Cb stroke_color_get;
-	Enesim_Renderer_Shape_Stroke_Renderer_Set_Cb stroke_renderer_set;
-	Enesim_Renderer_Shape_Stroke_Renderer_Get_Cb stroke_renderer_get;
-	Enesim_Renderer_Shape_Stroke_Weight_Set_Cb stroke_weight_set;
-	Enesim_Renderer_Shape_Stroke_Weight_Get_Cb stroke_weight_get;
-	Enesim_Renderer_Shape_Fill_Color_Set_Cb fill_color_set;
-	Enesim_Renderer_Shape_Fill_Color_Get_Cb fill_color_get;
-	Enesim_Renderer_Shape_Fill_Renderer_Set_Cb fill_renderer_set;
-	Enesim_Renderer_Shape_Fill_Renderer_Get_Cb fill_renderer_get;
-	Enesim_Renderer_Shape_Fill_Rule_Set_Cb fill_rule_set;
-	Enesim_Renderer_Shape_Fill_Rule_Get_Cb fill_rule_get;
 	/* our own interface */
 	Enesim_Rasterizer_Figure_Set figure_set;
 } Enesim_Rasterizer_Descriptor;

@@ -110,7 +110,7 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* software based functions */
-	Enesim_Renderer_Sw_Hints_Get_Cb hints_get;
+	Enesim_Renderer_Sw_Hints_Get_Cb sw_hints_get;
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	/* opencl based functions */
