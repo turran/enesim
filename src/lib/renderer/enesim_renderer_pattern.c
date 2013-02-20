@@ -422,7 +422,7 @@ static void _pattern_flags(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FLAG_ARGB8888;
 }
 
-static void _pattern_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _pattern_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -519,10 +519,10 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ _pattern_bounds,
 	/* .destination_bounds_get = 	*/ _pattern_destination_bounds,
 	/* .flags_get = 		*/ _pattern_flags,
-	/* .hints_get = 		*/ _pattern_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _pattern_has_changed,
+	/* .sw_hints_get = 		*/ _pattern_sw_hints,
 	/* .sw_setup = 			*/ _pattern_sw_setup,
 	/* .sw_cleanup = 		*/ _pattern_sw_cleanup,
 	/* .opencl_setup =		*/ NULL,

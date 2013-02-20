@@ -1389,7 +1389,7 @@ static void _image_destination_bounds(Enesim_Renderer *r,
 	_image_transform_bounds(r, &m, type, &obounds, bounds);
 }
 
-static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz;
 	Eina_Rectangle *sd;
@@ -1405,7 +1405,7 @@ static void _image_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUS
 		free(sd);
 }
 
-static Eina_Bool _image_state_setup(Enesim_Renderer *r,
+static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
 {
@@ -1553,7 +1553,7 @@ static void _image_flags(Enesim_Renderer *r EINA_UNUSED,
 
 }
 
-static void _image_hints(Enesim_Renderer *r,
+static void _image_sw_image_hints(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Rop rop;
@@ -1651,12 +1651,12 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .bounds_get = 		*/ _image_bounds,
 	/* .destination_bounds_get = 	*/ _image_destination_bounds,
 	/* .flags_get = 		*/ _image_flags,
-	/* .hints_get =			*/ _image_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ _image_damages,
 	/* .has_changed = 		*/ _image_has_changed,
-	/* .sw_setup = 			*/ _image_state_setup,
-	/* .sw_cleanup = 		*/ _image_state_cleanup,
+	/* .sw_hints_get =		*/ _image_sw_image_hints,
+	/* .sw_setup = 			*/ _image_sw_state_setup,
+	/* .sw_cleanup = 		*/ _image_sw_state_cleanup,
 	/* .opencl_setup =		*/ NULL,
 	/* .opencl_kernel_setup =	*/ NULL,
 	/* .opencl_cleanup =		*/ NULL,
