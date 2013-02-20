@@ -70,7 +70,8 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, 
 	return NULL;
 }
 
-Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Image_Data *data, const char *mime)
+Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Image_Data *data EINA_UNUSED,
+		const char *mime)
 {
 	Enesim_Image_Provider *p;
 	Eina_List *providers;

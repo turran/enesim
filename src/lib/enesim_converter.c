@@ -74,12 +74,19 @@ Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
  *                                   API                                      *
  *============================================================================*/
 /**
- *
+ * Converts a surface into a buffer. Basically it will do a color space
+ * conversion.
+ * @param[in] s The surface to convert
+ * @param[in] dst The destination buffer
+ * @param[in] angle The rotation angle
+ * @param[in] clip A clipping area on the source surface
+ * @param[in] x The destination x coordinate to put the surface
+ * @param[in] y The destination y coordinate to put the surface
  */
 EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 		Enesim_Angle angle,
 		Eina_Rectangle *clip,
-		int x, int y)
+		int x EINA_UNUSED, int y EINA_UNUSED)
 {
 	Enesim_Converter_2D converter;
 	Enesim_Buffer_Format dfmt;
