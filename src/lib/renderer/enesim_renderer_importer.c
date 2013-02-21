@@ -30,7 +30,6 @@
 #include "enesim_renderer_importer.h"
 
 #include "enesim_renderer_private.h"
-#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

@@ -20,12 +20,6 @@
 
 #include "enesim_renderer_shape_private.h"
 
-typedef struct _Enesim_Rasterizer_State
-{
-	Enesim_Renderer_State rstate;
-	Enesim_Renderer_Shape_State2 sstate;
-} Enesim_Rasterizer_State;
-
 typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Figure *figure);
 
 typedef struct _Enesim_Rasterizer_Descriptor

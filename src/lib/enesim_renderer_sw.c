@@ -622,6 +622,11 @@ EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int
 	rbounds = r->current_destination_bounds;
 	if (!eina_rectangle_intersection(&rbounds, &span))
 	{
+		DBG("Drawing span %" EINA_RECTANGLE_FORMAT " and bounds %"
+				EINA_RECTANGLE_FORMAT " do not intersect on "
+				"'%s'", EINA_RECTANGLE_ARGS (&span),
+				EINA_RECTANGLE_ARGS (&rbounds),
+				r->state.name);
 		return;
 	}
 	left = rbounds.x - span.x;

@@ -33,7 +33,6 @@
 
 #include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
-#include "enesim_renderer_simple_private.h"
 /*
  * P'(x,y) <- P(x + scale * (XC(x,y) - .5), y + scale * (YC(x,y) - .5))
  */

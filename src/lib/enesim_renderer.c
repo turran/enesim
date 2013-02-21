@@ -230,6 +230,8 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_surface_lock(s, EINA_TRUE);
 	b = enesim_surface_backend_get(s);
+	DBG("Drawing area %" EINA_RECTANGLE_FORMAT,
+			EINA_RECTANGLE_ARGS (area));
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
@@ -307,6 +309,17 @@ static inline void _surface_bounds(Enesim_Surface *s, Eina_Rectangle *bounds)
 	enesim_surface_size_get(s, &bounds->w, &bounds->h);
 }
 
+static const char * _base_name_get(Enesim_Renderer *r)
+{
+	const char *descriptor_name = NULL;
+	if (r->descriptor.base_name_get)
+		descriptor_name = r->descriptor.base_name_get(r);
+	if (!descriptor_name)
+		descriptor_name = "unknown";
+
+	return descriptor_name;
+}
+
 static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Factory *f;
@@ -314,10 +327,7 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 	const char *descriptor_name = NULL;
 
 	if (!_factories) return;
-	if (r->descriptor.base_name_get)
-		descriptor_name = r->descriptor.base_name_get(r);
-	if (!descriptor_name)
-		descriptor_name = "unknown";
+	descriptor_name = _base_name_get(r);
 	f = eina_hash_find(_factories, descriptor_name);
 	if (!f)
 	{
@@ -372,6 +382,7 @@ Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data)
 {
 	Enesim_Renderer *r;
+	const char *bname;
 
 	if (!descriptor) return NULL;
 	if (descriptor->version > ENESIM_RENDERER_API) {
@@ -380,13 +391,6 @@ Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	}
 
 	r = calloc(1, sizeof(Enesim_Renderer));
-	/* first check the passed in functions */
-	if (!descriptor->is_inside) WRN("No is_inside() function available");
-	if (!descriptor->bounds_get) WRN("No bounding() function available");
-	if (!descriptor->flags_get) WRN("No flags() function available");
-	if (!descriptor->sw_setup) WRN("No sw_setup() function available");
-	if (!descriptor->sw_cleanup) WRN("No sw_cleanup() function available");
-	if (!descriptor->free) WRN("No free() function available");
 	r->descriptor = *descriptor;
 	r->data = data;
 	/* now initialize the renderer common properties */
@@ -401,6 +405,21 @@ Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	/* always set the first reference */
 	r = enesim_renderer_ref(r);
 	_enesim_renderer_factory_setup(r);
+
+	/* check the passed in functions */
+	bname = _base_name_get(r);
+	if (!descriptor->is_inside)
+		WRN("No is_inside() function available on '%s'", bname);
+	if (!descriptor->bounds_get)
+		WRN("No bounding() function available on '%s'", bname);
+	if (!descriptor->flags_get)
+		WRN("No flags() function available on '%s'", bname);
+	if (!descriptor->sw_setup)
+		WRN("No sw_setup() function available on '%s'", bname);
+	if (!descriptor->sw_cleanup)
+		WRN("No sw_cleanup() function available on '%s'", bname);
+	if (!descriptor->free)
+		WRN("No free() function available on '%s'", bname);
 
 	return r;
 }
@@ -497,14 +516,12 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 {
 	Enesim_Backend b;
 	Eina_Bool ret = EINA_TRUE;
-	const char *name;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	enesim_renderer_name_get(r, &name);
-	DBG("Setting up the renderer '%s'", name);
+	DBG("Setting up the renderer '%s'", r->state.name);
 	if (r->in_setup)
 	{
-		WRN("Renderer '%s' already in the setup process", name);
+		INF("Renderer '%s' already in the setup process", r->state.name);
 		return EINA_TRUE;
 	}
 	enesim_renderer_lock(r);
@@ -515,7 +532,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		case ENESIM_BACKEND_SOFTWARE:
 		if (!enesim_renderer_sw_setup(r, s, error))
 		{
-			ENESIM_RENDERER_ERROR(r, error, "Software setup failed on '%s'", name);
+			ENESIM_RENDERER_ERROR(r, error, "Software setup failed on '%s'", r->state.name);
 			ret = EINA_FALSE;
 			break;
 		}
@@ -565,14 +582,12 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Backend b;
-	const char *name;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	enesim_renderer_name_get(r, &name);
-	DBG("Cleaning up the renderer '%s'", name);
+	DBG("Cleaning up the renderer '%s'", r->state.name);
 	if (!r->in_setup)
 	{
-		WRN("Renderer '%s' has not done the setup first", name);
+		WRN("Renderer '%s' has not done the setup first", r->state.name);
 		return;
 	}
 
@@ -636,6 +651,7 @@ EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Ma
 		return;
 	}
 	r->state.current.transformation = *m;
+	r->state.current.transformation_type = enesim_matrix_type_get(m);
 	r->state.changed = EINA_TRUE;
 }
 
@@ -1172,8 +1188,8 @@ EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
  */
 EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
 {
-	Eina_Bool ret;
 	Enesim_Renderer_Flag flags;
+	Eina_Bool ret;
 
 	enesim_renderer_flags(r, &flags);
 	ret = _state_changed(&r->state, flags);
@@ -1208,16 +1224,12 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 	}
 	else
 	{
-		const char *name;
-		enesim_renderer_name_get(r, &name);
-		WRN("The renderer '%s' does not implement the change callback", name);
+		WRN("The renderer '%s' does not implement the change callback", r->state.name);
 	}
 done:
 	if (ret)
 	{
-		const char *name;
-		enesim_renderer_name_get(r, &name);
-		DBG("The renderer '%s' has changed", name);
+		INF("The renderer '%s' has changed", r->state.name);
 	}
 	return ret;
 }

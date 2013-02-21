@@ -18,7 +18,7 @@
 #ifndef SHAPE_H_
 #define SHAPE_H_
 
-typedef struct _Enesim_Renderer_Shape_State2
+typedef struct _Enesim_Renderer_Shape_State
 {
 	struct {
 		struct {
@@ -41,29 +41,7 @@ typedef struct _Enesim_Renderer_Shape_State2
 
 	Eina_Bool stroke_dashes_changed;
 	Eina_Bool changed;
-} Enesim_Renderer_Shape_State2;
-
-/* common shape renderer functions */
-typedef struct _Enesim_Renderer_Shape_State
-{
-	struct {
-		Enesim_Color color;
-		Enesim_Renderer *r;
-		double weight;
-		Enesim_Shape_Stroke_Location location;
-		Enesim_Shape_Stroke_Cap cap;
-		Enesim_Shape_Stroke_Join join;
-		Eina_List *dashes;
-	} stroke;
-
-	struct {
-		Enesim_Color color;
-		Enesim_Renderer *r;
-		Enesim_Shape_Fill_Rule rule;
-	} fill;
-	Enesim_Shape_Draw_Mode draw_mode;
 } Enesim_Renderer_Shape_State;
-
 
 typedef void (*Enesim_Renderer_Shape_Feature_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
 
@@ -95,7 +73,7 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 
 Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor, void *data);
 void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
-const Enesim_Renderer_Shape_State2 * enesim_renderer_shape_state_get(
+const Enesim_Renderer_Shape_State * enesim_renderer_shape_state_get(
 		Enesim_Renderer *r);
 
 #endif

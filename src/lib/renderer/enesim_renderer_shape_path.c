@@ -58,24 +58,48 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Error **error)
 {
 	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer *fill, *stroke;
 	const Enesim_Renderer_State *rstate;
-	const Enesim_Renderer_Shape_State2 *sstate;
+	const Enesim_Renderer_Shape_State *sstate;
 
 	thiz = _shape_path_get(r);
-	rstate = enesim_renderer_shape_state_get(r);
-	sstate = enesim_renderer_state_get(r);
+	rstate = enesim_renderer_state_get(r);
+	sstate = enesim_renderer_shape_state_get(r);
+
+	/* common properties */
 	enesim_renderer_color_set(thiz->path, rstate->current.color);
 	enesim_renderer_origin_set(thiz->path, rstate->current.ox, rstate->current.oy);
 	enesim_renderer_transformation_set(thiz->path, &rstate->current.transformation);
 
-	enesim_renderer_shape_fill_renderer_set(thiz->path, sstate->current.fill.r);
+	/* shape properties */
+	fill = sstate->current.fill.r;
+	if (fill) fill = enesim_renderer_ref(fill);
+	enesim_renderer_shape_fill_renderer_set(thiz->path, fill);
 	enesim_renderer_shape_fill_color_set(thiz->path, sstate->current.fill.color);
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, sstate->current.stroke.r);
+	enesim_renderer_shape_fill_rule_set(thiz->path, sstate->current.fill.rule);
+
+	stroke = sstate->current.stroke.r;
+	if (stroke) stroke = enesim_renderer_ref(stroke);
+	enesim_renderer_shape_stroke_renderer_set(thiz->path, stroke);
 	enesim_renderer_shape_stroke_weight_set(thiz->path, sstate->current.stroke.weight);
 	enesim_renderer_shape_stroke_color_set(thiz->path, sstate->current.stroke.color);
 	enesim_renderer_shape_stroke_cap_set(thiz->path, sstate->current.stroke.cap);
 	enesim_renderer_shape_stroke_join_set(thiz->path, sstate->current.stroke.join);
-	enesim_renderer_shape_stroke_location_set(r, sstate->current.stroke.location);
+	/* FIXME in fact the path renderer does not support the stroke location */
+	enesim_renderer_shape_stroke_location_set(thiz->path, sstate->current.stroke.location);
+
+	if (sstate->stroke_dashes_changed)
+	{
+		Enesim_Shape_Stroke_Dash *d;
+		const Eina_List *l;
+
+		enesim_renderer_shape_stroke_dash_clear(thiz->path);
+		EINA_LIST_FOREACH (sstate->stroke_dashes, l, d)
+		{
+			enesim_renderer_shape_stroke_dash_add(thiz->path, d);
+		}
+	}
+
 	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->current.draw_mode);
 
 	/* now let the implementation override whatever it wants to */

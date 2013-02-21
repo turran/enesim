@@ -1,5 +1,7 @@
 Enesim
 ======
++ Rename Enesim_Error to Enesim_Log
++ Rename Enesim_Renderer_Flag to Enesim_Renderer_Feature
 + Make the simple renderer work
 + Make every renderer that now inherits from enesim renderer depend on enesim renderer simple
 + Make every shape renderer use the shape simple, we need to figure out what to do with

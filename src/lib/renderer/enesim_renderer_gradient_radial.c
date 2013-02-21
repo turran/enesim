@@ -60,7 +60,6 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	double fx, fy;
 	double scale;
 	int glen;
-	Enesim_Matrix m;
 	Eina_Bool simple : 1;
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Gradient_Radial;
@@ -210,7 +209,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	if ((fabs(fx) < small) && (fabs(fy) < small))
 		thiz->simple = 1;
 
-	*draw = _spans[gstate->mode][enesim_matrix_type_get(&thiz->m)];
+	*draw = _spans[gstate->mode][type];
 	return EINA_TRUE;
 }
 

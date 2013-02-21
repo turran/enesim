@@ -32,7 +32,6 @@
 
 #include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
-#include "enesim_renderer_simple_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/

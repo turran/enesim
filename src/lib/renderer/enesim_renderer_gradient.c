@@ -52,6 +52,7 @@ typedef struct _Enesim_Renderer_Gradient
 	Enesim_Renderer_Gradient_Sw_State sw;
 	uint32_t *src;
 	int slen;
+	const Enesim_Renderer_State *rstate;
 	/* private */
 	Enesim_Repeat_Mode past_mode;
 	Eina_Bool changed : 1;
@@ -178,6 +179,7 @@ static void _gradient_draw(Enesim_Renderer *r,
 	thiz = _gradient_get(r);
 
 	data.gstate = &thiz->state;
+	data.state = thiz->rstate;
 	data.sw_state = &thiz->sw;
 
 	thiz->draw(r, &data, x, y, len, ddata);
@@ -194,6 +196,7 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz->changed = EINA_FALSE;
 	thiz->stops_changed = EINA_FALSE;
 	thiz->past_mode = thiz->state.mode;
+	thiz->rstate = NULL;
 
 	if (thiz->descriptor->sw_cleanup)
 	{
@@ -206,6 +209,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
 {
 	Enesim_Renderer_Gradient *thiz;
+	const Enesim_Renderer_State *rstate;
 	int slen;
 
 	thiz = _gradient_get(r);
@@ -229,7 +233,9 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 	/* setup the matrix. TODO this should be done on every sw based renderer */
-	enesim_matrix_f16p16_matrix_to(&thiz->state.state.current.transformation,
+	rstate = enesim_renderer_state_get(r);
+	thiz->rstate = rstate;
+	enesim_matrix_f16p16_matrix_to(&rstate->current.transformation,
 			&thiz->sw.matrix);
 	/* get the length */
 	slen = thiz->descriptor->length(r);

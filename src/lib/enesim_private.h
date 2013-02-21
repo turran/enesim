@@ -104,6 +104,7 @@ extern int enesim_log_renderer_gradient_radial;
 
 #define ERR(...) EINA_LOG_DOM_ERR(ENESIM_LOG_DEFAULT, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(ENESIM_LOG_DEFAULT, __VA_ARGS__)
+#define INF(...) EINA_LOG_DOM_INFO(ENESIM_LOG_DEFAULT, __VA_ARGS__)
 #define DBG(...) EINA_LOG_DOM_DBG(ENESIM_LOG_DEFAULT, __VA_ARGS__)
 
 /* define here every renderer magic */

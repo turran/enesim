@@ -46,7 +46,6 @@ typedef struct _Enesim_Rasterizer
 	EINA_MAGIC
 	/* public */
 	/* private */
-	Enesim_Rasterizer_State state;
 	void *data;
 	/* interface */
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;

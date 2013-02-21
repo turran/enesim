@@ -40,7 +40,6 @@
 #endif
 
 #include "enesim_renderer_private.h"
-#include "enesim_renderer_simple_private.h"
 /**
  * @todo
  * - add support for sw and sh

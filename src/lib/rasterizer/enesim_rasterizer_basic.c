@@ -90,7 +90,6 @@ typedef struct _Enesim_Rasterizer_Basic_State
 	struct {
 		Enesim_Renderer *r;
 		Enesim_Color color;
-		Enesim_Shape_Fill_Rule rule;
 	} fill;
 
 	struct {
@@ -119,7 +118,6 @@ typedef struct _Enesim_Rasterizer_Basic
 	 */
 	int lxx, rxx, tyy, byy;
 	Enesim_F16p16_Matrix matrix;
-	int draw_mode; // a temp workaround for dealing with 'closed'
 } Enesim_Rasterizer_Basic;
 
 static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
@@ -1169,6 +1167,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	Enesim_Rasterizer_Basic *thiz;
 	Enesim_Rasterizer_Basic_State *state;
 	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Shape_Fill_Rule fill_rule;
 	Enesim_Matrix matrix;
 
 	thiz = _basic_get(r);
@@ -1180,12 +1179,11 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	}
 
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	if ((thiz->draw_mode != draw_mode) &&
-			((thiz->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
+	if ((state->draw_mode != draw_mode) &&
+			((state->draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) ||
 			(draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE)))
 	{
 		thiz->changed = EINA_TRUE;
-		thiz->draw_mode = draw_mode;
 	}
 
 	if (thiz->changed)
@@ -1410,12 +1408,17 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &matrix);
 	enesim_matrix_f16p16_matrix_to(&matrix,
 			&thiz->matrix);
+
+	enesim_renderer_color_get(r, &state->color);
+	enesim_renderer_shape_stroke_color_get(r, &state->stroke.color);
 	enesim_renderer_shape_stroke_weight_get(r, &state->stroke.weight);
 	enesim_renderer_shape_stroke_renderer_get(r, &state->stroke.r);
+	enesim_renderer_shape_fill_color_get(r, &state->fill.color);
 	enesim_renderer_shape_fill_renderer_get(r, &state->fill.r);
-	enesim_renderer_shape_fill_rule_get(r, &state->fill.rule);
+	enesim_renderer_shape_fill_rule_get(r, &fill_rule);
+	state->draw_mode = draw_mode;
 
-	if (state->fill.rule == ENESIM_SHAPE_FILL_RULE_NON_ZERO)
+	if (fill_rule == ENESIM_SHAPE_FILL_RULE_NON_ZERO)
 	{
 		*draw = _stroke_fill_paint_nz;
 		if ((state->stroke.weight > 0.0) && state->stroke.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))

@@ -137,7 +137,7 @@ static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
 	const Enesim_Renderer_Gradient_Sw_State 			\
 			*gstate = data->sw_state;			\
 	const Enesim_Renderer_State 					\
-			*state = &data->gstate->state;			\
+			*state = data->state;				\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
 	Eina_F16p16 xx, yy, zz;						\
@@ -173,7 +173,7 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
 	const Enesim_Renderer_Gradient_Sw_State 			\
 			*gstate = data->sw_state;			\
 	const Enesim_Renderer_State 					\
-			*state = &data->gstate->state;			\
+			*state = data->state;				\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
 	Eina_F16p16 xx, yy;						\
@@ -201,7 +201,7 @@ static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
 	const Enesim_Renderer_Gradient_Sw_State 			\
 			*gstate = data->sw_state;			\
 	const Enesim_Renderer_State					\
-			*state = &data->gstate->state;			\
+			*state = data->state;				\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
 	Eina_F16p16 xx, yy;						\
@@ -225,7 +225,6 @@ static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
 /* common gradient renderer functions */
 typedef struct _Enesim_Renderer_Gradient_State
 {
-	Enesim_Renderer_State state;
 	Enesim_Repeat_Mode mode;
 	Eina_List *stops;
 } Enesim_Renderer_Gradient_State;
@@ -239,6 +238,7 @@ typedef struct _Enesim_Renderer_Gradient_Sw_State
 
 typedef struct _Enesim_Renderer_Gradient_Sw_Draw_Data
 {
+	const Enesim_Renderer_State *state;
 	const Enesim_Renderer_Gradient_State *gstate;
 	const Enesim_Renderer_Gradient_Sw_State *sw_state;
 } Enesim_Renderer_Gradient_Sw_Draw_Data;

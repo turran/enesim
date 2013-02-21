@@ -19,6 +19,8 @@
 #define ENESIM_EINA_H_
 
 /* Here we put all the stuff that should be moved to eina */
+#define EINA_RECTANGLE_FORMAT "d %d - %dx%d"
+#define EINA_RECTANGLE_ARGS(r) (r)->x, (r)->y, (r)->w, (r)->h
 
 #define EINA_F16P16_ONE (1 << 16)
 #define EINA_F16P16_HALF (1 << 15)

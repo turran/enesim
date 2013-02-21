@@ -160,7 +160,6 @@ static void _rectangle_path_propagate(Enesim_Renderer_Rectangle *thiz,
 	enesim_renderer_path_close(path, EINA_TRUE);
 }
 
-
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/

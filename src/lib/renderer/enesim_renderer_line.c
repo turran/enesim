@@ -119,6 +119,8 @@ static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 	Enesim_Renderer_Line *thiz;
 
 	thiz = _line_get(r);
+	/* the draw mode should be always a stroke only */
+	enesim_renderer_shape_draw_mode_set(path, ENESIM_SHAPE_DRAW_MODE_STROKE);
 	if (_line_changed(thiz) && !thiz->generated)
 	{
 		enesim_renderer_path_command_clear(path);
