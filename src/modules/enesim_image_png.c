@@ -393,7 +393,7 @@ static Eina_Bool png_provider_init(void)
 	 * - Register png specific errors
 	 */
 	if (!enesim_image_provider_register(&_provider,
-			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, "image/png"))
+			ENESIM_PRIORITY_PRIMARY, "image/png"))
 		return EINA_FALSE;
 
 	if (!enesim_image_finder_register(&_finder))

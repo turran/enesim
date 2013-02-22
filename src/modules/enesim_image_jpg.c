@@ -359,12 +359,12 @@ static Eina_Bool jpg_provider_init(void)
 	 * - Register jpg specific errors
 	 */
 	if (!enesim_image_provider_register(&_provider,
-			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, "image/jpg"))
+			ENESIM_PRIORITY_PRIMARY, "image/jpg"))
 		return EINA_FALSE;
 	/* some define the mime type for jpg as jpeg, or is the other
 	 * the wrong one ? */
 	if (!enesim_image_provider_register(&_provider,
-			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, "image/jpeg"))
+			ENESIM_PRIORITY_PRIMARY, "image/jpeg"))
 		return EINA_FALSE;
 	if (!enesim_image_finder_register(&_finder))
 	{

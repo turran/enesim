@@ -129,7 +129,7 @@ static Eina_Bool raw_provider_init(void)
 		return EINA_FALSE;
 	}
 	if (!enesim_image_provider_register(&_provider,
-			ENESIM_IMAGE_PROVIDER_PRIORITY_PRIMARY, MIME))
+			ENESIM_PRIORITY_PRIMARY, MIME))
 		return EINA_FALSE;
 
 	if (!enesim_image_finder_register(&_finder))

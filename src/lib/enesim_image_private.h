@@ -28,7 +28,7 @@
 struct _Enesim_Image_Provider
 {
 	const char *mime;
-	Enesim_Image_Provider_Priority priority;
+	Enesim_Priority priority;
 	Enesim_Image_Provider_Descriptor *d;
 };
 

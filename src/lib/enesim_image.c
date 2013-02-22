@@ -266,7 +266,7 @@ EAPI void enesim_image_dispatch(void)
  *
  */
 EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd,
-		Enesim_Image_Provider_Priority priority, const char *mime)
+		Enesim_Priority priority, const char *mime)
 {
 	Enesim_Image_Provider *p;
 	Eina_List *providers;
@@ -303,7 +303,7 @@ EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *
  *
  */
 EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
-		Enesim_Image_Provider_Priority priority)
+		Enesim_Priority priority)
 {
 	p->priority = priority;
 	/* reorder the list */

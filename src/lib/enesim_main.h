@@ -55,6 +55,18 @@ typedef enum _Enesim_Quality
 } Enesim_Quality;
 
 /**
+ * Priorities
+ */
+typedef enum _Enesim_Priority
+{
+	ENESIM_PRIORITY_NONE = 0,
+	ENESIM_PRIORITY_MARGINAL = 64,
+	ENESIM_PRIORITY_SECONDARY = 128,
+	ENESIM_PRIORITY_PRIMARY = 256,
+} Enesim_Priority;
+
+
+/**
  * Surface formats
  */
 typedef enum _Enesim_Format

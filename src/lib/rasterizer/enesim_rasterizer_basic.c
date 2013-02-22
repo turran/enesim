@@ -1336,6 +1336,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				x01 = x1 - x0;
 				y01 = y1 - y0;
 				len = hypot(x01, y01);
+#if 0
 				if (len < (1 / 512.0))
 				{
 					/* FIXME what to do here?
@@ -1343,6 +1344,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 					ENESIM_RENDERER_ERROR(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/512.0, x0, y0, x1, y1);
 					return EINA_FALSE;
 				}
+#endif
 				len *= 1 + (1 / 32.0);
 				vec->a = -(y01 * 65536) / len;
 				vec->b = (x01 * 65536) / len;

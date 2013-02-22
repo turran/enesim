@@ -678,35 +678,35 @@ EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_coords_get(const Enesim_Quad *q, double *x1, double *y1,
-		double *x2, double *y2, double *x3, double *y3, double *x4,
-		double *y4)
+EAPI void enesim_quad_coords_get(const Enesim_Quad *q, double *qx0, double *qy0,
+		double *qx1, double *qy1, double *qx2, double *qy2, double *qx3,
+		double *qy3)
 {
-	if (x1) *x1 = q->x0;
-	if (y1) *y1 = q->y0;
-	if (x2) *x2 = q->x1;
-	if (y2) *y2 = q->y1;
-	if (x3) *x3 = q->x2;
-	if (y3) *y3 = q->y2;
-	if (x4) *x4 = q->x3;
-	if (y4) *y4 = q->y3;
+	if (qx0) *qx0 = q->x0;
+	if (qy0) *qy0 = q->y0;
+	if (qx1) *qx1 = q->x1;
+	if (qy1) *qy1 = q->y1;
+	if (qx2) *qx2 = q->x2;
+	if (qy2) *qy2 = q->y2;
+	if (qx3) *qx3 = q->x3;
+	if (qy3) *qy3 = q->y3;
 }
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_quad_coords_set(Enesim_Quad *q, double x1,
-		double y1, double x2, double y2, double x3, double y3, double x4,
-		double y4)
+EAPI void enesim_quad_coords_set(Enesim_Quad *q, double qx0, double qy0,
+		double qx1, double qy1, double qx2, double qy2, double qx3,
+		double qy3)
 {
-	QUAD_X0(q) = x1;
-	QUAD_Y0(q) = y1;
-	QUAD_X1(q) = x2;
-	QUAD_Y1(q) = y2;
-	QUAD_X2(q) = x3;
-	QUAD_Y2(q) = y3;
-	QUAD_X3(q) = x4;
-	QUAD_Y3(q) = y4;
+	QUAD_X0(q) = qx0;
+	QUAD_Y0(q) = qy0;
+	QUAD_X1(q) = qx1;
+	QUAD_Y1(q) = qy1;
+	QUAD_X2(q) = qx2;
+	QUAD_Y2(q) = qy2;
+	QUAD_X3(q) = qx3;
+	QUAD_Y3(q) = qy3;
 }
 /**
  * To be documented
