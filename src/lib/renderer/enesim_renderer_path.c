@@ -47,7 +47,7 @@
  * rendered
  */
 #define WIREFRAME 0
-
+#define DUMP 0
 /**
  * TODO
  * - Use the threshold on the curve state
@@ -790,6 +790,16 @@ static void _path_generate_figures(Enesim_Renderer_Path *thiz,
 #else
 	/* set the stroke figure on the bifigure as its under polys */
 	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, stroke_figure);
+#endif
+
+#if DUMP
+	if (stroke_figure)
+	{
+		printf("stroke figure\n");
+		enesim_figure_dump(stroke_figure);
+	}
+	printf("fill figure\n");
+	enesim_figure_dump(thiz->fill_figure);
 #endif
 
 	thiz->generated = EINA_TRUE;
