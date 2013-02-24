@@ -17,6 +17,7 @@
  */
 
 #include "enesim_private.h"
+#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_error.h"
@@ -46,6 +47,7 @@ typedef struct _Enesim_Renderer_Path_Cairo
 	cairo_surface_t *recording;
 	cairo_surface_t *surface;
 	unsigned char *data;
+	int stride;
 	Enesim_Rectangle bounds;
 	Eina_Bool changed;
 	Eina_Bool generated;
@@ -59,11 +61,19 @@ Enesim_Renderer_Path_Cairo * _path_cairo_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _path_cairo_generate(Enesim_Renderer_Path_Cairo *thiz)
+static void _path_cairo_generate(Enesim_Renderer *r,
+		Enesim_Renderer_Path_Cairo *thiz)
 {
 	Enesim_Renderer_Path_Command *cmd;
+	const Enesim_Renderer_Shape_State *sstate;
+	const Enesim_Renderer_State *rstate;
 	const Eina_List *l;
+	cairo_matrix_t matrix;
 
+	sstate = enesim_renderer_shape_state_get(r);
+	rstate = enesim_renderer_state_get(r);
+
+	cairo_new_path(thiz->cairo);
 	EINA_LIST_FOREACH(thiz->commands, l, cmd)
 	{
 		switch (cmd->type)
@@ -81,7 +91,10 @@ static void _path_cairo_generate(Enesim_Renderer_Path_Cairo *thiz)
 			break;
 
 			case ENESIM_COMMAND_ARC_TO:
-			//cairo_arc (cr, xc, yc, radius, angle1, angle1);
+			/*cairo_arc(thiz->cairo, cmd->definition.arc_to.x,
+					cmd->definition.arc_to.y,
+					cmd->definition.yc, radius, angle1, angle1);
+			*/
 			break;
 
 			case ENESIM_COMMAND_CLOSE:
@@ -95,15 +108,44 @@ static void _path_cairo_generate(Enesim_Renderer_Path_Cairo *thiz)
 			break;
 		}
 	}
-	//cairo_fill_preserve (cr);
-	//cairo_stroke (cr);
+	/* set the matrix */
+	matrix.xx = rstate->current.transformation.xx;
+	matrix.xy = rstate->current.transformation.xy;
+	matrix.yx = rstate->current.transformation.yx;
+	matrix.yy = rstate->current.transformation.yy;
+	matrix.x0 = rstate->current.transformation.xz;
+	matrix.y0 = rstate->current.transformation.zy;
+	cairo_set_matrix(thiz->cairo, &matrix);
+
+	if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL)
+	{
+		/* TODO use the correct values */
+		cairo_set_source_rgba(thiz->cairo, 1, 0.2, 0.2, 0.6);
+		if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+			cairo_fill_preserve(thiz->cairo);
+		else
+			cairo_fill(thiz->cairo);
+	}
+
+	if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	{
+		/* TODO use the correct values */
+		cairo_set_source_rgba(thiz->cairo, 1, 0.2, 1.0, 0.6);
+		cairo_stroke(thiz->cairo);
+	}
 	thiz->generated = EINA_TRUE;
 }
 
 static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
 		void *ddata)
 {
+	Enesim_Renderer_Path_Cairo *thiz;
+	unsigned char *src;
+
+	thiz = _path_cairo_get(r);
 	/* just copy the pixels from the cairo rendered surface to the destination */
+	src = argb8888_at((uint32_t *)thiz->data, thiz->stride, x, y);
+	memcpy(ddata, src, len * 4);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -130,6 +172,7 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Error **error)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
+	cairo_t *cr;
 	int width = 0;
 	int height = 0;
 	int rwidth;
@@ -139,7 +182,7 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 
 	if (thiz->changed && !thiz->generated)
 	{
-		_path_cairo_generate(thiz);
+		_path_cairo_generate(r, thiz);
 		cairo_recording_surface_ink_extents(thiz->recording,
 				&thiz->bounds.x, &thiz->bounds.y,
 				&thiz->bounds.w, &thiz->bounds.h);
@@ -162,9 +205,20 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 	}
 
 	if (!thiz->surface)
+	{
+		ENESIM_RENDERER_ERROR(r, error, "No surface created for size %d %d", rwidth, rheight);
 		return EINA_FALSE;
+	}
 
 	thiz->data = cairo_image_surface_get_data(thiz->surface);
+	thiz->stride = cairo_image_surface_get_stride(thiz->surface);
+
+	printf("%d %d\n", rwidth, rheight);
+	/* finally draw */
+	cr = cairo_create(thiz->surface);
+	cairo_set_source_surface(cr, thiz->recording, 0, 0);
+	cairo_paint(cr);
+	cairo_destroy(cr);
 
 	*draw = _path_cairo_draw;
 
@@ -210,7 +264,7 @@ static void _path_cairo_bounds(Enesim_Renderer *r,
 	thiz = _path_cairo_get(r);
 	if (thiz->changed && !thiz->generated)
 	{
-		_path_cairo_generate(thiz);
+		_path_cairo_generate(r, thiz);
 		cairo_recording_surface_ink_extents(thiz->recording,
 				&thiz->bounds.x, &thiz->bounds.y,
 				&thiz->bounds.w, &thiz->bounds.h);

@@ -112,6 +112,24 @@ void enesim_renderer_path_abstract_commands_set(Enesim_Renderer *r, const Eina_L
 	thiz->commands_set(r, commands);
 }
 
+#if 0
+void enesim_renderer_path_abstract_state_set(Enesim_Renderer *r, const Enesim_Renderer_State *state)
+{
+	Enesim_Renderer_Path_Abstract *thiz;
+
+	thiz = _path_abstract_get(r);
+	thiz->state_set(r, state);
+}
+
+void enesim_renderer_path_abstract_shape_state_set(Enesim_Renderer *r,
+		const Enesim_Renderer_Shape_State *state)
+{
+	Enesim_Renderer_Path_Abstract *thiz;
+
+	thiz = _path_abstract_get(r);
+	thiz->shape_state_set(r, state);
+}
+#endif
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

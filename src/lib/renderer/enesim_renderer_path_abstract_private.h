@@ -21,7 +21,16 @@
 /* TODO later instead of inheriting from a shape, just inherit from
  * a renderer and pass the state directly
  */
+typedef struct _Enesim_Renderer_Path_Abstract_State
+{
+	Eina_List *commands;
+	Eina_Bool changed;
+} Enesim_Renderer_Path_Abstract_State;
+
 typedef void (*Enesim_Renderer_Path_Abstract_Commands_Set_Cb)(Enesim_Renderer *r, const Eina_List *commands);
+typedef void (*Enesim_Renderer_Path_Abstract_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_State *state);
+typedef void (*Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Shape_State *state);
+typedef void (*Enesim_Renderer_Path_Abstract_Path_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Path_Abstract_State *state);
 
 typedef struct _Enesim_Renderer_Path_Abstract_Descriptor {
 	unsigned int version;
@@ -49,6 +58,9 @@ typedef struct _Enesim_Renderer_Path_Abstract_Descriptor {
 	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
 	/* path related functions */
 	Enesim_Renderer_Path_Abstract_Commands_Set_Cb commands_set;
+	Enesim_Renderer_Path_Abstract_Path_State_Set_Cb path_state_set;
+	Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb shape_state_set;
+	Enesim_Renderer_Path_Abstract_State_Set_Cb state_set;
 } Enesim_Renderer_Path_Abstract_Descriptor;
 
 Enesim_Renderer * enesim_renderer_path_abstract_new(Enesim_Renderer_Path_Abstract_Descriptor *descriptor, void *data);

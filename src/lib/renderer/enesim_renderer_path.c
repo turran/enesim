@@ -84,7 +84,8 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	sstate = enesim_renderer_shape_state_get(r);
 
 	/* TODO get the best implementation for such properties and flags */
-	ret = thiz->enesim;
+	//ret = thiz->enesim;
+	ret = thiz->cairo;
 
 	/* propagate all the shape properties */
 	enesim_renderer_shape_propagate(r, ret);
@@ -123,7 +124,7 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	thiz = _path_get(r);
 	thiz->current = _path_implementation_get(r);
-	if (!enesim_renderer_setup(thiz->enesim, s, error))
+	if (!enesim_renderer_setup(thiz->current, s, error))
 	{
 		return EINA_FALSE;
 	}
@@ -151,6 +152,9 @@ static void _path_free(Enesim_Renderer *r)
 
 	thiz = _path_get(r);
 	enesim_renderer_unref(thiz->enesim);
+#if BUILD_CAIRO
+	enesim_renderer_unref(thiz->cairo);
+#endif
 	free(thiz);
 }
 
