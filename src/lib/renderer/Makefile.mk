@@ -59,6 +59,11 @@ src/lib/renderer/enesim_renderer_shape_private.h \
 src/lib/renderer/enesim_renderer_shape_path_private.h \
 src/lib/renderer/enesim_renderer_text_span.c
 
+if BUILD_CAIRO
+src_lib_libenesim_la_SOURCES += \
+src/lib/renderer/enesim_renderer_path_cairo.c
+endif
+
 EXTRA_DIST += \
 src/lib/renderer/enesim_renderer_checker.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_ambient.glsl \

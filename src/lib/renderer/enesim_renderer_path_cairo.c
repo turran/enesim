@@ -16,8 +16,24 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cairo.h>
+#include "enesim_private.h"
 
+#include "enesim_main.h"
+#include "enesim_error.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_compositor.h"
+#include "enesim_renderer.h"
+#include "enesim_renderer_shape.h"
+
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_shape_private.h"
+
+#include <cairo.h>
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -44,6 +60,7 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Error **error)
 {
+	/* iterate over the list of commands and generate the cairo commands */
 	return EINA_TRUE;
 }
 
@@ -67,10 +84,7 @@ static void _path_cairo_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 
 static Eina_Bool _path_cairo_has_changed(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Path *thiz;
-
-	thiz = _path_cairo_get(r);
-	return thiz->changed;
+	return EINA_FALSE;
 }
 
 static void _path_cairo_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
@@ -88,7 +102,7 @@ static void _path_cairo_destination_bounds(Enesim_Renderer *r,
 {
 }
 
-static Enesim_Renderer_Path_Descriptor _path_cairo_descriptor = {
+static Enesim_Renderer_Shape_Descriptor _path_cairo_descriptor = {
 	/* .version =			*/ ENESIM_RENDERER_API,
 	/* .name =			*/ _path_cairo_name,
 	/* .free =			*/ _path_cairo_free,
@@ -106,8 +120,8 @@ static Enesim_Renderer_Path_Descriptor _path_cairo_descriptor = {
 	/* .opencl_cleanup =		*/ NULL,
 	/* .opengl_initialize =		*/ NULL,
 	/* .opengl_setup =		*/ NULL,
-	/* .opengl_cleanup =		*/ NULL
-	/* .feature_get =		*/ _path_cairo_feature_get,
+	/* .opengl_cleanup =		*/ NULL,
+	/* .feature_get =		*/ _path_cairo_feature_get
 };
 
 static Enesim_Renderer * _path_cairo_new(void)
@@ -119,13 +133,17 @@ static Enesim_Renderer * _path_cairo_new(void)
  *============================================================================*/
 void enesim_renderer_path_cairo_init(void)
 {
+#if 0
 	enesim_renderer_path_descriptor_register(_path_cairo_new,
 		ENESIM_PRIORITY_MARGINAL);
+#endif
 }
 
 void enesim_renderer_path_cairo_shutdown(void)
 {
+#if 0
 	enesim_renderer_path_descriptor_unregister(_path_cairo_new);
+#endif
 }
 /*============================================================================*
  *                                   API                                      *

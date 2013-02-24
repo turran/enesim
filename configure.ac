@@ -148,6 +148,32 @@ PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
 
 AM_CONDITIONAL([HAVE_FREETYPE], [test "x${have_freetype}" = "xyes"])
 
+## Cairo
+want_cairo="yes"
+AC_ARG_ENABLE([cairo],
+   [AS_HELP_STRING([--enable-cairo], [enable cairo path backend])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_cairo="yes"
+    else
+       want_cairo="no"
+    fi
+   ],[])
+
+have_cairo="no"
+PKG_CHECK_EXISTS([cairo >= 1.10.0], [have_cairo="yes"],[have_cairo="no"])
+
+build_cairo="no"
+if test "x${have_cairo}" = "xyes" -a "x${want_cairo}" = "xyes"; then
+  build_cairo="yes"
+  requirements_pc="${requirements_pc} cairo >= 1.10.0"
+fi
+
+if test "x${build_cairo}" = "xyes"; then
+  AC_DEFINE([BUILD_CAIRO], [1], [Have support for cairo])
+fi
+AM_CONDITIONAL([BUILD_CAIRO], [test "x${build_cairo}" = "xyes"])
+
 ## Glew
 
 PKG_CHECK_EXISTS([glew],
@@ -388,6 +414,7 @@ echo "  ALTIVEC...................................: ${have_altivec}"
 echo
 echo "Backends:"
 echo "  Software..................................: yes"
+echo "  OpenGL....................................: ${build_opengl}"
 echo
 echo "Buffer Pools:"
 echo "  Eina......................................: yes"
@@ -400,6 +427,10 @@ echo "  JPG.......................................: ${have_module_jpg}"
 echo
 echo "Font Engines:"
 echo "  Freetype..................................: ${have_freetype}"
+echo
+echo "Path Backends:"
+echo "  Enesim....................................: yes"
+echo "  Cairo.....................................: ${build_cairo}"
 echo
 echo "Compilation.................................: make (or gmake)"
 echo "  CPPFLAGS..................................: $CPPFLAGS"
