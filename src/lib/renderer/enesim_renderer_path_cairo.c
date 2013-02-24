@@ -45,6 +45,8 @@ typedef struct _Enesim_Renderer_Path_Cairo
 	cairo_t *cairo;
 	cairo_surface_t *recording;
 	cairo_surface_t *surface;
+	unsigned char *data;
+	Enesim_Rectangle bounds;
 	Eina_Bool changed;
 	Eina_Bool generated;
 } Enesim_Renderer_Path_Cairo;
@@ -60,7 +62,7 @@ Enesim_Renderer_Path_Cairo * _path_cairo_get(Enesim_Renderer *r)
 static void _path_cairo_generate(Enesim_Renderer_Path_Cairo *thiz)
 {
 	Enesim_Renderer_Path_Command *cmd;
-	Eina_List *l;
+	const Eina_List *l;
 
 	EINA_LIST_FOREACH(thiz->commands, l, cmd)
 	{
@@ -95,6 +97,13 @@ static void _path_cairo_generate(Enesim_Renderer_Path_Cairo *thiz)
 	}
 	//cairo_fill_preserve (cr);
 	//cairo_stroke (cr);
+	thiz->generated = EINA_TRUE;
+}
+
+static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
+		void *ddata)
+{
+	/* just copy the pixels from the cairo rendered surface to the destination */
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -120,7 +129,45 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Error **error)
 {
-	/* iterate over the list of commands and generate the cairo commands */
+	Enesim_Renderer_Path_Cairo *thiz;
+	int width = 0;
+	int height = 0;
+	int rwidth;
+	int rheight;
+
+	thiz = _path_cairo_get(r);
+
+	if (thiz->changed && !thiz->generated)
+	{
+		_path_cairo_generate(thiz);
+		cairo_recording_surface_ink_extents(thiz->recording,
+				&thiz->bounds.x, &thiz->bounds.y,
+				&thiz->bounds.w, &thiz->bounds.h);
+	}
+
+	if (thiz->surface)
+	{
+		width = cairo_image_surface_get_width(thiz->surface);
+		height = cairo_image_surface_get_height(thiz->surface);
+	}
+
+	rwidth = ceil(thiz->bounds.w);
+	rheight = ceil(thiz->bounds.h);
+
+	if (width != rwidth || height != rheight)
+	{
+		if (thiz->surface)
+			cairo_surface_destroy(thiz->surface);
+		thiz->surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, rwidth, rheight);
+	}
+
+	if (!thiz->surface)
+		return EINA_FALSE;
+
+	thiz->data = cairo_image_surface_get_data(thiz->surface);
+
+	*draw = _path_cairo_draw;
+
 	return EINA_TRUE;
 }
 
@@ -162,9 +209,13 @@ static void _path_cairo_bounds(Enesim_Renderer *r,
 
 	thiz = _path_cairo_get(r);
 	if (thiz->changed && !thiz->generated)
+	{
 		_path_cairo_generate(thiz);
-	cairo_recording_surface_ink_extents(thiz->recording,
-			&bounds->x, &bounds->y, &bounds->w, &bounds->h);
+		cairo_recording_surface_ink_extents(thiz->recording,
+				&thiz->bounds.x, &thiz->bounds.y,
+				&thiz->bounds.w, &thiz->bounds.h);
+	}
+	*bounds = thiz->bounds;
 }
 
 static void _path_cairo_destination_bounds(Enesim_Renderer *r,
