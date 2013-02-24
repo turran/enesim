@@ -15,37 +15,15 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef SHAPE_H_
-#define SHAPE_H_
+#ifndef ENESIM_RENDERER_PATH_ABSTRACT_H
+#define ENESIM_RENDERER_PATH_ABSTRACT_H
 
-typedef struct _Enesim_Renderer_Shape_State
-{
-	struct {
-		struct {
-			Enesim_Color color;
-			Enesim_Renderer *r;
-			double weight;
-			Enesim_Shape_Stroke_Location location;
-			Enesim_Shape_Stroke_Cap cap;
-			Enesim_Shape_Stroke_Join join;
-		} stroke;
+/* TODO later instead of inheriting from a shape, just inherit from
+ * a renderer and pass the state directly
+ */
+typedef void (*Enesim_Renderer_Path_Abstract_Commands_Set_Cb)(Enesim_Renderer *r, const Eina_List *commands);
 
-		struct {
-			Enesim_Color color;
-			Enesim_Renderer *r;
-			Enesim_Shape_Fill_Rule rule;
-		} fill;
-		Enesim_Shape_Draw_Mode draw_mode;
-	} current, past;
-	Eina_List *stroke_dashes;
-
-	Eina_Bool stroke_dashes_changed;
-	Eina_Bool changed;
-} Enesim_Renderer_Shape_State;
-
-typedef void (*Enesim_Renderer_Shape_Feature_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
-
-typedef struct _Enesim_Renderer_Shape_Descriptor {
+typedef struct _Enesim_Renderer_Path_Abstract_Descriptor {
 	unsigned int version;
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
 	Enesim_Renderer_Delete_Cb free;
@@ -69,13 +47,18 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* shape related functions */
 	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
-} Enesim_Renderer_Shape_Descriptor;
+	/* path related functions */
+	Enesim_Renderer_Path_Abstract_Commands_Set_Cb commands_set;
+} Enesim_Renderer_Path_Abstract_Descriptor;
 
-Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor, void *data);
-void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
-const Enesim_Renderer_Shape_State * enesim_renderer_shape_state_get(
-		Enesim_Renderer *r);
-void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *to);
+Enesim_Renderer * enesim_renderer_path_abstract_new(Enesim_Renderer_Path_Abstract_Descriptor *descriptor, void *data);
+void enesim_renderer_path_abstract_commands_set(Enesim_Renderer *r, const Eina_List *commands);
+void * enesim_renderer_path_abstract_data_get(Enesim_Renderer *r);
 
+/* abstract implementations */
+Enesim_Renderer * enesim_renderer_path_enesim_new(void);
+#if BUILD_CAIRO
+Enesim_Renderer * enesim_renderer_path_cairo_new(void);
 #endif
 
+#endif

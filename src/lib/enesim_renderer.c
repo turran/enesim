@@ -431,6 +431,23 @@ void * enesim_renderer_data_get(Enesim_Renderer *r)
 	return r->data;
 }
 
+void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to)
+{
+	Enesim_Renderer *mask;
+	const Enesim_Renderer_State *state;
+
+	state = &r->state;
+	/* TODO we should compare agains the state of 'to' */
+	/* mandatory properties */
+	enesim_renderer_rop_set(to, state->current.rop);
+	enesim_renderer_mask_get(r, &mask);
+	enesim_renderer_mask_set(to, mask);
+	enesim_renderer_color_set(to, state->current.color);
+	/* optional properties */
+	enesim_renderer_origin_set(to, state->current.ox, state->current.oy);
+	enesim_renderer_transformation_set(to, &state->current.transformation);
+	enesim_renderer_quality_set(to, state->current.quality);
+}
 
 /*============================================================================*
  *                                   API                                      *

@@ -591,6 +591,31 @@ const Enesim_Renderer_Shape_State * enesim_renderer_shape_state_get(
 	return &thiz->state;
 }
 
+void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *to)
+{
+	Enesim_Renderer_Shape *thiz;
+	Enesim_Renderer *fill;
+	Enesim_Renderer *stroke;
+	const Enesim_Renderer_Shape_State *sstate;
+	
+
+	thiz = _shape_get(r);
+	sstate = &thiz->state;
+
+	/* TODO we should compare agains the state of 'to' */
+	enesim_renderer_shape_draw_mode_set(to, sstate->current.draw_mode);
+	enesim_renderer_shape_stroke_weight_set(to, sstate->current.stroke.weight);
+	enesim_renderer_shape_stroke_color_set(to, sstate->current.stroke.color);
+	enesim_renderer_shape_stroke_renderer_get(r, &stroke);
+	enesim_renderer_shape_stroke_renderer_set(to, stroke);
+
+	enesim_renderer_shape_fill_color_set(to, sstate->current.fill.color);
+	enesim_renderer_shape_fill_renderer_get(r, &fill);
+	enesim_renderer_shape_fill_renderer_set(to, fill);
+	enesim_renderer_shape_fill_rule_set(to, sstate->current.fill.rule);
+
+	/* TODO add the dashes */
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

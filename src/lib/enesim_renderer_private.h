@@ -158,6 +158,7 @@ void enesim_renderer_sw_free(Enesim_Renderer *r);
 Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		*descriptor, void *data);
 void * enesim_renderer_data_get(Enesim_Renderer *r);
+void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to);
 void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);
 void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data);
 
