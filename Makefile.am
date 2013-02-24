@@ -28,6 +28,7 @@ EXTRA_DIST =
 ### Library
 
 include src/lib/Makefile.mk
+include src/lib/argb/Makefile.mk
 include src/lib/compositor/Makefile.mk
 include src/lib/converter/Makefile.mk
 include src/lib/image/Makefile.mk
