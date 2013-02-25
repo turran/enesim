@@ -38,6 +38,9 @@
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_path_abstract_private.h"
+
+/* TODO later we need to use the priority system to choose the backend */
+#define CHOOSE_CAIRO 0
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -84,8 +87,11 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	sstate = enesim_renderer_shape_state_get(r);
 
 	/* TODO get the best implementation for such properties and flags */
-	//ret = thiz->enesim;
+#if CHOOSE_CAIRO
 	ret = thiz->cairo;
+#else
+	ret = thiz->enesim;
+#endif
 
 	/* propagate all the shape properties */
 	enesim_renderer_shape_propagate(r, ret);

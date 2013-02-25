@@ -213,7 +213,6 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 	thiz->data = cairo_image_surface_get_data(thiz->surface);
 	thiz->stride = cairo_image_surface_get_stride(thiz->surface);
 
-	printf("%d %d\n", rwidth, rheight);
 	/* finally draw */
 	cr = cairo_create(thiz->surface);
 	cairo_set_source_surface(cr, thiz->recording, 0, 0);
