@@ -464,10 +464,10 @@ static void _blur_bounds(Enesim_Renderer *r,
 	}
 }
 
-static void _blur_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _blur_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _blur_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
@@ -490,7 +490,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _blur_free,
 	/* .bounds_get = 		*/ _blur_bounds,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ _blur_flags,
+	/* .features_get = 		*/ _blur_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,

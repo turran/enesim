@@ -170,10 +170,10 @@ static void _perlin_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED
 		free(thiz->ampl.coeff);
 }
 
-static void _perlin_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _perlin_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _perlin_free(Enesim_Renderer *r)
@@ -190,7 +190,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _perlin_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ _perlin_flags,
+	/* .features_get = 		*/ _perlin_features_get,
 	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,

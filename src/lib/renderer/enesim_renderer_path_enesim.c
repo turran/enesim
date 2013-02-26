@@ -906,12 +906,12 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_path_state_cleanup(r, s);
 }
 
-static void _path_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _path_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED,
@@ -1094,7 +1094,7 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_descriptor = {
 	/* .free =			*/ _path_free,
 	/* .bounds =			*/ _path_bounds,
 	/* .destination_bounds =	*/ _path_destination_bounds,
-	/* .flags =			*/ _path_flags,
+	/* .features_get =			*/ _path_features_get,
 	/* .is_inside =			*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed =		*/ _path_has_changed,

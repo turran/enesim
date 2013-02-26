@@ -622,12 +622,12 @@ static void _enesim_renderer_text_span_destination_bounds(Enesim_Renderer *r,
 	bounds->h = ceil(obounds.h);
 }
 
-static void _enesim_renderer_text_span_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _enesim_renderer_text_span_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_AFFINE;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_ARGB8888 |
+			ENESIM_RENDERER_FEATURE_AFFINE;
 }
 
 static Enesim_Renderer_Shape_Descriptor _enesim_renderer_text_span_descriptor = {
@@ -636,7 +636,7 @@ static Enesim_Renderer_Shape_Descriptor _enesim_renderer_text_span_descriptor = 
 	/* .free = 			*/ _enesim_renderer_text_span_free,
 	/* .bounds_get = 		*/ _enesim_renderer_text_span_bounds,
 	/* .destination_bounds_get = 	*/ _enesim_renderer_text_span_destination_bounds,
-	/* .flags_get = 		*/ _enesim_renderer_text_span_flags,
+	/* .features_get = 		*/ _enesim_renderer_text_span_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _enesim_renderer_text_span_has_changed,

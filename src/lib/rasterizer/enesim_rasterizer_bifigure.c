@@ -1791,7 +1791,7 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static Enesim_Rasterizer_Descriptor _descriptor = {
 	/* .name = 		*/ _bifigure_name,
 	/* .free = 		*/ _bifigure_free,
-	/* .flags_get =		*/ NULL,
+	/* .features_get =		*/ NULL,
 	/* .sw_setup = 		*/ _bifigure_sw_setup,
 	/* .sw_cleanup = 	*/ _bifigure_sw_cleanup,
 	/* .shape_features_get = 	*/ NULL,

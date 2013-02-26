@@ -41,7 +41,7 @@
  *   transform bounds, we need to fix the maximum and minimum for a
  *   coordinate and length
  *
- * - Maybe checking the flags for every origin/value set is too much
+ * - Maybe checking the features for every origin/value set is too much
  * another option is to make every renderer responsable of changing the origin/scale/etc
  * if the owned renderer handles that
  */
@@ -101,13 +101,13 @@ static inline void _enesim_renderer_destination_bounds(Enesim_Renderer *r,
  *                     Internal state related functions                       *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _state_changed(Enesim_Renderer_State *thiz,
-		Enesim_Renderer_Flag flags)
+		Enesim_Renderer_Feature features)
 {
 	if (!thiz->changed)
 		return EINA_FALSE;
 	/* the optional properties */
 	/* the origin */
-	if (flags & ENESIM_RENDERER_FLAG_TRANSLATE)
+	if (features & ENESIM_RENDERER_FEATURE_TRANSLATE)
 	{
 		if (thiz->current.ox != thiz->past.ox || thiz->current.oy != thiz->past.oy)
 		{
@@ -115,7 +115,7 @@ static Eina_Bool _state_changed(Enesim_Renderer_State *thiz,
 		}
 	}
 	/* the transformation */
-	if (flags & ENESIM_RENDERER_FLAG_TRANSFORMATION)
+	if (features & ENESIM_RENDERER_FEATURE_TRANSFORMATION)
 	{
 		if (thiz->current.transformation_type != thiz->past.transformation_type)
 		{
@@ -128,7 +128,7 @@ static Eina_Bool _state_changed(Enesim_Renderer_State *thiz,
 		}
 	}
 	/* the quality */
-	if (flags & ENESIM_RENDERER_FLAG_QUALITY)
+	if (features & ENESIM_RENDERER_FEATURE_QUALITY)
 	{
 		if (thiz->current.rop != thiz->past.rop)
 		{
@@ -397,7 +397,7 @@ Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 	EINA_MAGIC_SET(r, ENESIM_MAGIC_RENDERER);
 	/* private stuff */
 	_state_init(&r->state);
-	r->current_flags = 0;
+	r->current_features_get = 0;
 	enesim_rectangle_coords_from(&r->past_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	eina_rectangle_coords_from(&r->past_destination_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	r->prv_data = eina_hash_string_superfast_new(NULL);
@@ -412,8 +412,8 @@ Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
 		WRN("No is_inside() function available on '%s'", bname);
 	if (!descriptor->bounds_get)
 		WRN("No bounding() function available on '%s'", bname);
-	if (!descriptor->flags_get)
-		WRN("No flags() function available on '%s'", bname);
+	if (!descriptor->features_get)
+		WRN("No features() function available on '%s'", bname);
 	if (!descriptor->sw_setup)
 		WRN("No sw_setup() function available on '%s'", bname);
 	if (!descriptor->sw_cleanup)
@@ -586,7 +586,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		 */
 		_enesim_renderer_bounds(r, &r->current_bounds);
 		_enesim_renderer_destination_bounds(r, &r->current_destination_bounds);
-		enesim_renderer_flags(r, &r->current_flags);
+		enesim_renderer_features_get(r, &r->current_features_get);
 	}
 
 	return ret;
@@ -636,20 +636,20 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
-	if (!flags) return;
-	*flags = 0;
+	if (!features) return;
+	*features = 0;
 	if (r->in_setup)
 	{
-		*flags = r->current_flags;
+		*features = r->current_features_get;
 		return;
 	}
-	if (r->descriptor.flags_get)
+	if (r->descriptor.features_get)
 	{
-		r->descriptor.flags_get(r, flags);
+		r->descriptor.features_get(r, features);
 		return;
 	}
 }
@@ -1205,11 +1205,11 @@ EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
  */
 EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Flag flags;
+	Enesim_Renderer_Feature features;
 	Eina_Bool ret;
 
-	enesim_renderer_flags(r, &flags);
-	ret = _state_changed(&r->state, flags);
+	enesim_renderer_features_get(r, &features);
+	ret = _state_changed(&r->state, features);
 	return ret;
 }
 

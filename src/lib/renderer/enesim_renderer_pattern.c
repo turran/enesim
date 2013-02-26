@@ -412,13 +412,13 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 	thiz->changed = EINA_FALSE;
 }
 
-static void _pattern_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _pattern_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _pattern_sw_hints(Enesim_Renderer *r EINA_UNUSED,
@@ -517,7 +517,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _pattern_free,
 	/* .bounds_get = 		*/ _pattern_bounds,
 	/* .destination_bounds_get = 	*/ _pattern_destination_bounds,
-	/* .flags_get = 		*/ _pattern_flags,
+	/* .features_get = 		*/ _pattern_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _pattern_has_changed,

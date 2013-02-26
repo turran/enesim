@@ -144,11 +144,11 @@ static void _proxy_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_proxy_state_cleanup(thiz, s);
 }
 
-static void _proxy_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _proxy_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
 	/* we dont support anything */
-	*flags = 0;
+	*features = 0;
 }
 
 static void _proxy_sw_hints_get(Enesim_Renderer *r,
@@ -274,7 +274,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _proxy_free,
 	/* .bounds_get = 		*/ _proxy_bounds,
 	/* .destination_bounds_get =	*/ _proxy_destination_bounds,
-	/* .flags_get =			*/ _proxy_flags,
+	/* .features_get =			*/ _proxy_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get =		*/ _proxy_damage,
 	/* .has_changed = 		*/ _proxy_has_changed,

@@ -544,7 +544,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	pdescriptor.free = _enesim_renderer_shape_free;
 	pdescriptor.bounds_get = descriptor->bounds_get;
 	pdescriptor.destination_bounds_get = descriptor->destination_bounds_get;
-	pdescriptor.flags_get = descriptor->flags_get;
+	pdescriptor.features_get = descriptor->features_get;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damages_get = _enesim_renderer_shape_damage;
 	pdescriptor.has_changed = _enesim_renderer_shape_has_changed;

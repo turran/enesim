@@ -85,13 +85,13 @@ static void _rasterizer_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _rasterizer_flags_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _rasterizer_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	/* FIXME we should use the rasterizer implementation flags */
-	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	/* FIXME we should use the rasterizer implementation features */
+	*features = ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _rasterizer_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
@@ -111,7 +111,7 @@ static Enesim_Renderer_Shape_Descriptor _descriptor = {
 	/* .free = 			*/ _rasterizer_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ _rasterizer_flags_get,
+	/* .features_get = 		*/ _rasterizer_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,

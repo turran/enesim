@@ -233,12 +233,12 @@ static void _path_cairo_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 }
 
-static void _path_cairo_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _path_cairo_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _path_cairo_sw_hints(Enesim_Renderer *r EINA_UNUSED,
@@ -301,7 +301,7 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_cairo_descriptor = {
 	/* .free =			*/ _path_cairo_free,
 	/* .bounds =			*/ _path_cairo_bounds,
 	/* .destination_bounds =	*/ _path_cairo_destination_bounds,
-	/* .flags =			*/ _path_cairo_flags,
+	/* .features_get =			*/ _path_cairo_features_get,
 	/* .is_inside =			*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed =		*/ _path_cairo_has_changed,

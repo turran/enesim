@@ -26,17 +26,17 @@
 typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
 
 /** Flags that specify what a renderer supports */
-typedef enum _Enesim_Renderer_Flag
+typedef enum _Enesim_Renderer_Feature
 {
-	ENESIM_RENDERER_FLAG_TRANSLATE		= (1 << 0), /**< The renderer can be translated using the origin property */
-	ENESIM_RENDERER_FLAG_AFFINE 		= (1 << 1), /**< Affine transformation */
-	ENESIM_RENDERER_FLAG_PROJECTIVE 	= (1 << 2), /**< Perspective transformations */
-	ENESIM_RENDERER_FLAG_A8 		= (1 << 3), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FLAG_ARGB8888 		= (1 << 4), /**< Supports ARGB8888 surfaces */
-	ENESIM_RENDERER_FLAG_QUALITY 		= (1 << 5), /**< Supports the quality property */
-} Enesim_Renderer_Flag;
+	ENESIM_RENDERER_FEATURE_TRANSLATE	= (1 << 0), /**< The renderer can be translated using the origin property */
+	ENESIM_RENDERER_FEATURE_AFFINE 		= (1 << 1), /**< Affine transformation */
+	ENESIM_RENDERER_FEATURE_PROJECTIVE 	= (1 << 2), /**< Perspective transformations */
+	ENESIM_RENDERER_FEATURE_A8 		= (1 << 3), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FEATURE_ARGB8888 	= (1 << 4), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FEATURE_QUALITY 	= (1 << 5), /**< Supports the quality property */
+} Enesim_Renderer_Feature;
 
-#define ENESIM_RENDERER_FLAG_TRANSFORMATION (ENESIM_RENDERER_FLAG_AFFINE & ENESIM_RENDERER_FLAG_PROJECTIVE)
+#define ENESIM_RENDERER_FEATURE_TRANSFORMATION (ENESIM_RENDERER_FEATURE_AFFINE & ENESIM_RENDERER_FEATURE_PROJECTIVE)
 
 /* TODO rmove this to the sw backend */
 typedef enum _Enesim_Renderer_Sw_Hint
@@ -95,7 +95,7 @@ EAPI void enesim_renderer_bounds_extended(Enesim_Renderer *r, Enesim_Rectangle *
 EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
 EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
 
-EAPI void enesim_renderer_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags);
+EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features);
 EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);

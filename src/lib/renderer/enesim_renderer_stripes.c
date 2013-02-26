@@ -534,13 +534,13 @@ static void _stripes_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_stripes_state_cleanup(thiz, s);
 }
 
-static void _stripes_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _stripes_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _stripes_sw_hints(Enesim_Renderer *r EINA_UNUSED,
@@ -641,7 +641,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _stripes_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ _stripes_flags,
+	/* .features_get = 		*/ _stripes_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get =		*/ NULL,
 	/* .has_changed = 		*/ _stripes_has_changed,

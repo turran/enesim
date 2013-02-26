@@ -173,10 +173,10 @@ static void _transition_bounds(Enesim_Renderer *r,
 	rect->h = r0_rect.h > r1_rect.h ? r0_rect.h : r1_rect.h;
 }
 
-static void _transition_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _transition_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _transition_free(Enesim_Renderer *r)
@@ -193,7 +193,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _transition_free,
 	/* .bounds_get = 		*/ _transition_bounds,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ _transition_flags,
+	/* .features_get = 		*/ _transition_features_get,
 	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

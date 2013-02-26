@@ -178,11 +178,11 @@ static void _shape_path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_shape_path_cleanup(r, s);
 }
 
-static void _shape_path_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _shape_path_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-		ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_AFFINE |
+		ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _shape_path_sw_hints(Enesim_Renderer *r,
@@ -453,7 +453,7 @@ static Enesim_Renderer_Shape_Descriptor _shape_path_descriptor = {
 	/* .free = 			*/ _shape_path_free,
 	/* .bounds = 			*/ _shape_path_bounds,
 	/* .destination_bounds = 	*/ _shape_path_destination_bounds,
-	/* .flags = 			*/ _shape_path_flags,
+	/* .features_get = 			*/ _shape_path_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _shape_path_has_changed,

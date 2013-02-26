@@ -151,13 +151,13 @@ static void _cache_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_cache_state_cleanup(thiz, s);
 }
 
-static void _cache_flags(Enesim_Renderer *r, const Enesim_Renderer_State *state,
-		Enesim_Renderer_Flag *flags)
+static void _cache_features_get(Enesim_Renderer *r, const Enesim_Renderer_State *state,
+		Enesim_Renderer_Feature *features)
 {
 	Enesim_Renderer_Cache *thiz;
 
 	thiz = _cache_get(r);
-	*flags = 0;
+	*features = 0;
 }
 
 static void _cache_hints(Enesim_Renderer *r, const Enesim_Renderer_State *state,
@@ -276,7 +276,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _cache_free,
 	/* .bounds = 		*/ _cache_bounds,
 	/* .destination_bounds =	*/ _cache_destination_bounds,
-	/* .flags = 			*/ _cache_flags,
+	/* .features_get = 			*/ _cache_features_get,
 	/* .hints_get = 		*/ _cache_hints,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ _cache_damage,

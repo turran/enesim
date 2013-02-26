@@ -290,13 +290,13 @@ static void _gradient_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _gradient_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _gradient_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static const char * _gradient_name(Enesim_Renderer *r)
@@ -362,7 +362,7 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .free = 			*/ _gradient_free,
 	/* .bounds = 		*/ _gradient_bounds,
 	/* .destination_bounds = 	*/ NULL,
-	/* .flags = 			*/ _gradient_flags,
+	/* .features_get = 			*/ _gradient_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _gradient_has_changed,

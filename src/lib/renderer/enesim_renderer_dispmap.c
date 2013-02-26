@@ -289,12 +289,12 @@ static void _dispmap_bounds(Enesim_Renderer *r,
 	}
 }
 
-static void _dispmap_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _dispmap_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _dispmap_free(Enesim_Renderer *r)
@@ -311,7 +311,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _dispmap_free,
 	/* .bounds_get = 		*/ _dispmap_bounds,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ _dispmap_flags,
+	/* .features_get = 		*/ _dispmap_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,

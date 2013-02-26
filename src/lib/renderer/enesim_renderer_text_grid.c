@@ -165,18 +165,18 @@ static void _enesim_text_grid_bounds(Enesim_Renderer *r,
 	rect->w = thiz->cell_width * size;
 }
 
-static void _enesim_text_grid_flags(Enesim_Renderer *r, Enesim_Renderer_Flag *flags)
+static void _enesim_text_grid_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features)
 {
 	Enesim_Text_Grid *thiz;
 
 	thiz = _enesim_text_grid_get(r);
 	if (!thiz)
 	{
-		*flags = 0;
+		*features = 0;
 		return;
 	}
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static Enesim_Renderer_Descriptor _enesim_text_grid_descriptor = {
@@ -185,7 +185,7 @@ static Enesim_Renderer_Descriptor _enesim_text_grid_descriptor = {
 	/* .free = 			*/ _enesim_text_grid_free,
 	/* .bounds = 		*/ _enesim_text_grid_bounds,
 	/* .destination_transform = 	*/ NULL,
-	/* .flags = 			*/ _enesim_text_grid_flags,
+	/* .features_get = 			*/ _enesim_text_grid_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ NULL,

@@ -86,7 +86,7 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	rstate = enesim_renderer_state_get(r);
 	sstate = enesim_renderer_shape_state_get(r);
 
-	/* TODO get the best implementation for such properties and flags */
+	/* TODO get the best implementation for such properties and features */
 #if CHOOSE_CAIRO
 	ret = thiz->cairo;
 #else
@@ -180,13 +180,13 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_path_cleanup(r, s);
 }
 
-static void _path_flags(Enesim_Renderer *r,
-		Enesim_Renderer_Flag *flags)
+static void _path_features_get(Enesim_Renderer *r,
+		Enesim_Renderer_Feature *features)
 {
 	Enesim_Renderer *current;
 
 	current = _path_implementation_get(r);
-	enesim_renderer_flags(current, flags);
+	enesim_renderer_features_get(current, features);
 }
 
 static void _path_sw_hints(Enesim_Renderer *r,
@@ -257,7 +257,7 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .free =			*/ _path_free,
 	/* .bounds =			*/ _path_bounds,
 	/* .destination_bounds =	*/ _path_destination_bounds,
-	/* .flags =			*/ _path_flags,
+	/* .features_get =			*/ _path_features_get,
 	/* .is_inside =			*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed =		*/ _path_has_changed,

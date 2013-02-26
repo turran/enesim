@@ -330,7 +330,7 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Compound *thiz;
-	Enesim_Renderer_Flag f = 0xffffffff;
+	Enesim_Renderer_Feature f = 0xffffffff;
 	Enesim_Rop rop;
 	Eina_Bool same_rop = EINA_TRUE;
 	Eina_List *ll;
@@ -471,11 +471,11 @@ static void _compound_destination_bounds(Enesim_Renderer *r,
 	bounds->h = ceil(obounds.y - bounds->y + obounds.h);
 }
 
-static void _compound_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _compound_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
 	/* TODO here we should only support the destination formats of the surfaces */
-	*flags = 0;
+	*features = 0;
 }
 
 static void _compound_free(Enesim_Renderer *r)
@@ -645,7 +645,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _compound_free,
 	/* .bounds_get =  		*/ _compound_bounds,
 	/* .destination_bounds_get = 	*/ _compound_destination_bounds,
-	/* .flags = 			*/ _compound_flags,
+	/* .features_get = 			*/ _compound_features_get,
 	/* .is_inside = 		*/ _compound_is_inside,
 	/* .damage = 			*/ _compound_damage,
 	/* .has_changed = 		*/ _compound_has_changed,

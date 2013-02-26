@@ -60,8 +60,8 @@ typedef void (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Rectangle *rect);
 typedef void (*Enesim_Renderer_Destination_Bounds_Get_Cb)(Enesim_Renderer *r,
 		Eina_Rectangle *dbounds);
-typedef void (*Enesim_Renderer_Flags_Get_Cb)(Enesim_Renderer *r,
-		Enesim_Renderer_Flag *flags);
+typedef void (*Enesim_Renderer_Features_Get)(Enesim_Renderer *r,
+		Enesim_Renderer_Feature *features);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
@@ -105,7 +105,7 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
-	Enesim_Renderer_Flags_Get_Cb flags_get;
+	Enesim_Renderer_Features_Get features_get;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
@@ -134,7 +134,7 @@ struct _Enesim_Renderer
 	/* the private data */
 	Eina_Lock lock;
 	Eina_Hash *prv_data;
-	Enesim_Renderer_Flag current_flags;
+	Enesim_Renderer_Feature current_features_get;
 	Enesim_Rectangle current_bounds;
 	Enesim_Rectangle past_bounds;
 	Eina_Rectangle current_destination_bounds;

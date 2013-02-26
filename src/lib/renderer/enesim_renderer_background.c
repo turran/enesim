@@ -288,12 +288,12 @@ static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EIN
 }
 #endif
 
-static void _background_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _background_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _background_sw_hints(Enesim_Renderer *r EINA_UNUSED,
@@ -325,7 +325,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _background_free,
 	/* .bounds_get = 		*/ NULL,
 	/* .destination_bounds_get =	*/ NULL,
-	/* .flags_get = 		*/ _background_flags,
+	/* .features_get = 		*/ _background_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _background_has_changed,

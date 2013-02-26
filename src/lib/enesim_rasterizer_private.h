@@ -27,7 +27,7 @@ typedef struct _Enesim_Rasterizer_Descriptor
 	/* inherited from the renderer */
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
 	Enesim_Renderer_Delete_Cb free;
-	Enesim_Renderer_Flags_Get_Cb flags_get;
+	Enesim_Renderer_Features_Get features_get;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;

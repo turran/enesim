@@ -51,7 +51,7 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
-	Enesim_Renderer_Flags_Get_Cb flags_get;
+	Enesim_Renderer_Features_Get features_get;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;

@@ -204,11 +204,11 @@ static Eina_Bool _raddist_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
-static void _raddist_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _raddist_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _raddist_free(Enesim_Renderer *r)
@@ -225,7 +225,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _raddist_free,
 	/* .bounds_get =  		*/ _bounds,
 	/* .destination_bounds_get = 	*/ NULL,
-	/* .flags_get = 		*/ _raddist_flags,
+	/* .features_get = 		*/ _raddist_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _raddist_has_changed,

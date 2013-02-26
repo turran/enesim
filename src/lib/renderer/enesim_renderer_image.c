@@ -1541,14 +1541,14 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _image_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _image_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_TRANSLATE |
-			ENESIM_RENDERER_FLAG_AFFINE |
-			ENESIM_RENDERER_FLAG_PROJECTIVE |
-			ENESIM_RENDERER_FLAG_ARGB8888 |
-			ENESIM_RENDERER_FLAG_QUALITY; 
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_ARGB8888 |
+			ENESIM_RENDERER_FEATURE_QUALITY; 
 
 }
 
@@ -1649,7 +1649,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free = 			*/ _image_free,
 	/* .bounds_get = 		*/ _image_bounds,
 	/* .destination_bounds_get = 	*/ _image_destination_bounds,
-	/* .flags_get = 		*/ _image_flags,
+	/* .features_get = 		*/ _image_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ _image_damages,
 	/* .has_changed = 		*/ _image_has_changed,

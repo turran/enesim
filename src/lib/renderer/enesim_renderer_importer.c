@@ -326,10 +326,10 @@ static void _importer_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _importer_flags(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Flag *flags)
+static void _importer_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
 {
-	*flags = ENESIM_RENDERER_FLAG_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static Enesim_Renderer_Descriptor _descriptor = {
@@ -338,7 +338,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .free =			*/ _importer_free,
 	/* .bounds_get = 		*/ _importer_bounds,
 	/* .destination_bounds_get = 	*/ _importer_destination_bounds,
- 	/* .flags_get = 		*/ _importer_flags,
+ 	/* .features_get = 		*/ _importer_features_get,
  	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
