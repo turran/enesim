@@ -43,7 +43,7 @@ typedef struct _Enesim_Renderer_Shape_State
 	Eina_Bool changed;
 } Enesim_Renderer_Shape_State;
 
-typedef void (*Enesim_Renderer_Shape_Feature_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
+typedef void (*Enesim_Renderer_Shape_Features_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
 
 typedef struct _Enesim_Renderer_Shape_Descriptor {
 	unsigned int version;
@@ -68,7 +68,7 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* shape related functions */
-	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
+	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
 } Enesim_Renderer_Shape_Descriptor;
 
 Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor, void *data);

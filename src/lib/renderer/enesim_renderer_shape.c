@@ -77,7 +77,7 @@ typedef struct _Enesim_Renderer_Shape
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* shape functions */
-	Enesim_Renderer_Shape_Feature_Get_Cb features_get;
+	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
 	void *data;
 } Enesim_Renderer_Shape;
 
@@ -292,7 +292,7 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 
 	thiz = _shape_get(r);
 	state = &thiz->state;
-	enesim_renderer_shape_feature_get(r, &features);
+	enesim_renderer_shape_features_get(r, &features);
 	if (features & ENESIM_SHAPE_FLAG_FILL_RENDERER)
 	{
 		if (state->current.fill.r &&
@@ -351,7 +351,7 @@ static void _enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r,
 	Enesim_Shape_Feature features;
 
 	thiz = enesim_renderer_data_get(r);
-	enesim_renderer_shape_feature_get(r, &features);
+	enesim_renderer_shape_features_get(r, &features);
 	_shape_cleanup(thiz, features, s);
 	if (thiz->sw_cleanup)
 		thiz->sw_cleanup(r, s);
@@ -379,7 +379,7 @@ static void _enesim_renderer_shape_opengl_cleanup(Enesim_Renderer *r,
 	Enesim_Shape_Feature features;
 
 	thiz = enesim_renderer_data_get(r);
-	enesim_renderer_shape_feature_get(r, &features);
+	enesim_renderer_shape_features_get(r, &features);
 	_shape_cleanup(thiz, features, s);
 	if (thiz->opengl_cleanup)
 		thiz->opengl_cleanup(r, s);
@@ -408,7 +408,7 @@ static void _enesim_renderer_shape_opencl_cleanup(Enesim_Renderer *r,
 	Enesim_Shape_Feature features;
 
 	thiz = enesim_renderer_data_get(r);
-	enesim_renderer_shape_feature_get(r, &features);
+	enesim_renderer_shape_features_get(r, &features);
 	_shape_cleanup(thiz, features, s);
 	if (thiz->opencl_cleanup)
 		thiz->opencl_cleanup(r, s);
@@ -448,7 +448,7 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 	/* get the current bounds */
 	enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 	/* get the features */
-	enesim_renderer_shape_feature_get(r, &features);
+	enesim_renderer_shape_features_get(r, &features);
 
 	/* first check if the common properties have changed */
 	do_send_old = enesim_renderer_state_has_changed(r);
@@ -536,7 +536,7 @@ Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *de
 	thiz->opengl_cleanup = descriptor->opengl_cleanup;
 	thiz->opencl_setup = descriptor->opencl_setup;
 	thiz->opencl_cleanup = descriptor->opencl_cleanup;
-	thiz->features_get = descriptor->feature_get;
+	thiz->shape_features_get = descriptor->shape_features_get;
 	thiz->free = descriptor->free;
 	/* set the parent descriptor */
 	pdescriptor.version = ENESIM_RENDERER_API;
@@ -577,7 +577,7 @@ Eina_Bool enesim_renderer_shape_state_has_changed(Enesim_Renderer *r)
 	Eina_Bool ret;
 
 	thiz = _shape_get(r);
-	enesim_renderer_shape_feature_get(r, &features);
+	enesim_renderer_shape_features_get(r, &features);
 	ret = _state_changed(&thiz->state, features);
 	return ret;
 }
@@ -909,14 +909,14 @@ EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_D
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+EAPI void enesim_renderer_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = _shape_get(r);
 	*features = 0;
-	if (thiz->features_get)
-		thiz->features_get(r, features);
+	if (thiz->shape_features_get)
+		thiz->shape_features_get(r, features);
 }
 
 /**

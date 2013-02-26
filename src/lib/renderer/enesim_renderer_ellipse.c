@@ -246,7 +246,7 @@ static void _ellipse_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _ellipse_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _ellipse_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER |
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER |
@@ -257,7 +257,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _ellipse_descriptor = {
 	/* .base_name_get = 		*/ _ellipse_base_name_get,
 	/* .free = 			*/ _ellipse_free,
 	/* .has_changed = 		*/ _ellipse_has_changed,
-	/* .feature_get =		*/ _ellipse_features_get,
+	/* .shape_features_get =		*/ _ellipse_shape_features_get,
 	/* .bounds = 			*/ _ellipse_bounds_get,
 	/* .destination_bounds = 	*/ _ellipse_destination_bounds_get,
 	/* .setup = 			*/ _ellipse_setup,

@@ -140,7 +140,7 @@ static void _line_cleanup(Enesim_Renderer *r)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _line_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _line_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
@@ -157,7 +157,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _line_descriptor = {
 	/* .name = 			*/ _line_name,
 	/* .free = 			*/ _line_free,
 	/* .has_changed = 		*/ _line_has_changed,
-	/* .feature_get =		*/ _line_feature_get,
+	/* .shape_features_get =		*/ _line_shape_features_get,
 	/* .bounds = 			*/ NULL,
 	/* .destination_bounds = 	*/ NULL,
 	/* .setup = 			*/ _line_setup,

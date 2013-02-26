@@ -223,7 +223,7 @@ static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
 	return _circle_properties_have_changed(thiz);
 }
 
-static void _circle_features_get(Enesim_Renderer *r EINA_UNUSED,
+static void _circle_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER |
@@ -243,7 +243,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _circle_descriptor = {
 	/* .base_name_get = 		*/ _circle_base_name_get,
 	/* .free = 			*/ _circle_free,
 	/* .has_changed = 		*/ _circle_has_changed,
-	/* .feature_get =		*/ _circle_features_get,
+	/* .shape_features_get =		*/ _circle_shape_features_get,
 	/* .bounds = 			*/ _circle_bounds_get,
 	/* .destination_bounds = 	*/ _circle_destination_bounds_get,
 	/* .setup = 			*/ _circle_setup,

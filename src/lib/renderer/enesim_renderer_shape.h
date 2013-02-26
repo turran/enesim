@@ -75,7 +75,7 @@ typedef enum _Enesim_Shape_Fill_Rule
     ENESIM_SHAPE_FILL_RULE_EVEN_ODD,
 } Enesim_Shape_Fill_Rule;
 
-EAPI void enesim_renderer_shape_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features);
+EAPI void enesim_renderer_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features);
 
 /* stroke properties */
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);

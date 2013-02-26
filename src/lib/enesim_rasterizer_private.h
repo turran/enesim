@@ -32,7 +32,7 @@ typedef struct _Enesim_Rasterizer_Descriptor
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	/* inherited from the shape */
-	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
+	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
 	/* our own interface */
 	Enesim_Rasterizer_Figure_Set figure_set;
 } Enesim_Rasterizer_Descriptor;

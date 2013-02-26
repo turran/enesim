@@ -249,7 +249,7 @@ static void _rectangle_cleanup(Enesim_Renderer *r)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _rectangle_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _rectangle_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER | ENESIM_SHAPE_FLAG_STROKE_LOCATION;
 }
@@ -349,7 +349,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _rectangle_descriptor = {
 	/* .base_name_get = 		*/ _rectangle_base_name_get,
 	/* .free = 			*/ _rectangle_free,
 	/* .has_changed = 		*/ _rectangle_has_changed,
-	/* .feature_get =		*/ _rectangle_features_get,
+	/* .shape_features_get =		*/ _rectangle_shape_features_get,
 	/* .bounds = 			*/ _rectangle_bounds_get,
 	/* .destination_bounds = 	*/ _rectangle_destination_bounds_get,
 	/* .setup = 			*/ _rectangle_setup,

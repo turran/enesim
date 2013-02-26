@@ -55,7 +55,7 @@ typedef struct _Enesim_Renderer_Path_Abstract_Descriptor {
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* shape related functions */
-	Enesim_Renderer_Shape_Feature_Get_Cb feature_get;
+	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
 	/* path related functions */
 	Enesim_Renderer_Path_Abstract_Commands_Set_Cb commands_set;
 	Enesim_Renderer_Path_Abstract_Path_State_Set_Cb path_state_set;

@@ -1794,7 +1794,7 @@ static Enesim_Rasterizer_Descriptor _descriptor = {
 	/* .flags_get =		*/ NULL,
 	/* .sw_setup = 		*/ _bifigure_sw_setup,
 	/* .sw_cleanup = 	*/ _bifigure_sw_cleanup,
-	/* .feature_get = 	*/ NULL,
+	/* .shape_features_get = 	*/ NULL,
 	/* .figure_set =	*/ _bifigure_figure_set,
 };
 /*============================================================================*

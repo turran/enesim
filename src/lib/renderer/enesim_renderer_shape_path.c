@@ -194,15 +194,15 @@ static void _shape_path_sw_hints(Enesim_Renderer *r,
 	enesim_renderer_sw_hints_get(thiz->path, hints);
 }
 
-static void _shape_path_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _shape_path_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = _shape_path_get(r);
-	if (thiz->descriptor->features_get)
-		thiz->descriptor->features_get(r, features);
+	if (thiz->descriptor->shape_features_get)
+		thiz->descriptor->shape_features_get(r, features);
 	else
-		enesim_renderer_shape_feature_get(thiz->path, features);
+		enesim_renderer_shape_features_get(thiz->path, features);
 }
 
 static void _shape_path_free(Enesim_Renderer *r)
@@ -423,7 +423,7 @@ static void _shape_path_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_Draw_Mode
 	thiz = _shape_path_get(r);
 }
 
-static void _shape_path_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _shape_path_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
@@ -478,7 +478,7 @@ static Enesim_Renderer_Shape_Descriptor _shape_path_descriptor = {
 	/* .opengl_setup =          	*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL
 #endif
-	/* .feature_get =		*/ _shape_path_feature_get,
+	/* .shape_features_get =		*/ _shape_path_shape_features_get,
 };
 /*============================================================================*
  *                                 Global                                     *

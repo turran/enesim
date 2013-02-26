@@ -100,7 +100,7 @@ static void _rasterizer_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
-static void _rasterizer_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _rasterizer_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
@@ -124,7 +124,7 @@ static Enesim_Renderer_Shape_Descriptor _descriptor = {
 	/* .opengl_initialize =         */ NULL,
 	/* .opengl_setup =   		*/ NULL,
 	/* .opengl_cleanup =        	*/ NULL,
-	/* .feature_get = 		*/ _rasterizer_feature_get,
+	/* .shape_features_get = 		*/ _rasterizer_shape_features_get,
 };
 /*============================================================================*
  *                                 Global                                     *

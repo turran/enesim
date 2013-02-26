@@ -110,7 +110,7 @@ static Eina_Bool _figure_has_changed(Enesim_Renderer *r)
 	return thiz->changed;
 }
 
-static void _figure_features_get(Enesim_Renderer *r EINA_UNUSED,
+static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
@@ -163,7 +163,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _figure_descriptor = {
 	/* .base_name_get = 		*/ _figure_base_name_get,
 	/* .free = 			*/ _figure_free,
 	/* .has_changed = 		*/ _figure_has_changed,
-	/* .feature_get =		*/ _figure_features_get,
+	/* .shape_features_get =		*/ _figure_shape_features_get,
 	/* .bounds = 			*/ NULL,
 	/* .destination_bounds = 	*/ NULL,
 	/* .setup = 			*/ _figure_setup,

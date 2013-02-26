@@ -206,12 +206,12 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	return thiz->changed;
 }
 
-static void _path_feature_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+static void _path_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
 {
 	Enesim_Renderer *current;
 
 	current = _path_implementation_get(r);
-	enesim_renderer_shape_feature_get(current, features);
+	enesim_renderer_shape_features_get(current, features);
 }
 
 static void _path_bounds(Enesim_Renderer *r,
@@ -276,7 +276,7 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
 	/* .opengl_setup =		*/ NULL,
 	/* .opengl_cleanup =		*/ NULL
 #endif
-	/* .feature_get =		*/ _path_feature_get,
+	/* .shape_features_get =		*/ _path_shape_features_get,
 };
 /*============================================================================*
  *                                 Global                                     *

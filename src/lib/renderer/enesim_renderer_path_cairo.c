@@ -37,6 +37,11 @@
 #include "enesim_renderer_path_abstract_private.h"
 
 #include <cairo.h>
+/* TODO
+ * - Add cairo versions of every command
+ * - Check what cairo version handles correctly the recording surface
+ * -
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -250,7 +255,7 @@ static Eina_Bool _path_cairo_has_changed(Enesim_Renderer *r)
 	return thiz->changed;
 }
 
-static void _path_cairo_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _path_cairo_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = 0;
 }
@@ -309,7 +314,7 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_cairo_descriptor = {
 	/* .opengl_initialize =		*/ NULL,
 	/* .opengl_setup =		*/ NULL,
 	/* .opengl_cleanup =		*/ NULL,
-	/* .feature_get =		*/ _path_cairo_feature_get,
+	/* .shape_features_get =		*/ _path_cairo_shape_features_get,
 	/* .commands_set = 		*/ _path_cairo_commands_set,
 };
 

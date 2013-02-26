@@ -928,7 +928,7 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	return thiz->changed;
 }
 
-static void _path_feature_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _path_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
@@ -1113,7 +1113,7 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_descriptor = {
 	/* .opengl_setup =		*/ NULL,
 	/* .opengl_cleanup =		*/ NULL
 #endif
-	/* .feature_get =		*/ _path_feature_get,
+	/* .shape_features_get =		*/ _path_shape_features_get,
 	/* .commands_set = 		*/ _path_commands_set,
 };
 /*============================================================================*

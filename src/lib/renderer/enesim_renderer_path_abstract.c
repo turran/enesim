@@ -90,7 +90,7 @@ Enesim_Renderer * enesim_renderer_path_abstract_new(Enesim_Renderer_Path_Abstrac
 	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
 	pdescriptor.opencl_setup = descriptor->opencl_setup;
 	pdescriptor.opencl_cleanup = descriptor->opencl_cleanup;
-	pdescriptor.feature_get = descriptor->feature_get;
+	pdescriptor.shape_features_get = descriptor->shape_features_get;
 
 	r = enesim_renderer_shape_new(&pdescriptor, thiz);
 	return r;
