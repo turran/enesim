@@ -155,12 +155,30 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Proxy *thiz;
+	Enesim_Renderer_Sw_Hint proxied_hints;
+	const Enesim_Renderer_State *state;
+	const Enesim_Renderer_State *proxied_state;
 
 	thiz = _proxy_get(r);
 	*hints = 0;
 	if (!thiz->proxied)
 		return;
-	enesim_renderer_sw_hints_get(thiz->proxied, hints);
+
+	state = enesim_renderer_state_get(r);
+	proxied_state = enesim_renderer_state_get(thiz->proxied);
+	enesim_renderer_sw_hints_get(thiz->proxied, &proxied_hints);
+	/* check if we can to colorize */
+	if (proxied_hints & ENESIM_RENDERER_HINT_COLORIZE)
+	{
+		if (proxied_state->current.color == state->current.color)
+			*hints != ENESIM_RENDERER_HINT_COLORIZE;
+	}
+	/* check if we can rop */
+	if (proxied_hints & ENESIM_RENDERER_HINT_ROP)
+	{
+		if (proxied_state->current.rop == state->current.rop)
+			*hints != ENESIM_RENDERER_HINT_ROP;
+	}
 }
 
 static void _proxy_bounds(Enesim_Renderer *r,
