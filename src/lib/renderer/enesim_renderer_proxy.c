@@ -171,13 +171,13 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r,
 	if (proxied_hints & ENESIM_RENDERER_HINT_COLORIZE)
 	{
 		if (proxied_state->current.color == state->current.color)
-			*hints != ENESIM_RENDERER_HINT_COLORIZE;
+			*hints |= ENESIM_RENDERER_HINT_COLORIZE;
 	}
 	/* check if we can rop */
 	if (proxied_hints & ENESIM_RENDERER_HINT_ROP)
 	{
 		if (proxied_state->current.rop == state->current.rop)
-			*hints != ENESIM_RENDERER_HINT_ROP;
+			*hints |= ENESIM_RENDERER_HINT_ROP;
 	}
 }
 
