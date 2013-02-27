@@ -66,7 +66,16 @@ Enesim_Renderer_Path_Cairo * _path_cairo_get(Enesim_Renderer *r)
 	return thiz;
 }
 
-static void _path_cairo_generate(Enesim_Renderer *r,
+static void _path_cairo_colors_get(Enesim_Color color,
+		double *a, double *r, double *g, double *b)
+{
+	*a = argb8888_alpha_get(color) / 255.0;
+	*r = argb8888_red_get(color) / 255.0;
+	*g = argb8888_green_get(color) / 255.0;
+	*b = argb8888_blue_get(color) / 255.0;
+}
+
+static void _path_cairo_generate(Enesim_Renderer *rend,
 		Enesim_Renderer_Path_Cairo *thiz)
 {
 	Enesim_Renderer_Path_Command *cmd;
@@ -75,8 +84,8 @@ static void _path_cairo_generate(Enesim_Renderer *r,
 	const Eina_List *l;
 	cairo_matrix_t matrix;
 
-	sstate = enesim_renderer_shape_state_get(r);
-	rstate = enesim_renderer_state_get(r);
+	sstate = enesim_renderer_shape_state_get(rend);
+	rstate = enesim_renderer_state_get(rend);
 
 	cairo_new_path(thiz->cairo);
 	EINA_LIST_FOREACH(thiz->commands, l, cmd)
@@ -124,8 +133,10 @@ static void _path_cairo_generate(Enesim_Renderer *r,
 
 	if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL)
 	{
-		/* TODO use the correct values */
-		cairo_set_source_rgba(thiz->cairo, 1, 0.2, 0.2, 0.6);
+		double a, r, g, b;
+
+		_path_cairo_colors_get(sstate->current.fill.color, &a, &r, &g, &b);
+		cairo_set_source_rgba(thiz->cairo, r, g, b, a);
 		if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 			cairo_fill_preserve(thiz->cairo);
 		else
@@ -134,8 +145,10 @@ static void _path_cairo_generate(Enesim_Renderer *r,
 
 	if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
-		/* TODO use the correct values */
-		cairo_set_source_rgba(thiz->cairo, 1, 0.2, 1.0, 0.6);
+		double a, r, g, b;
+
+		_path_cairo_colors_get(sstate->current.stroke.color, &a, &r, &g, &b);
+		cairo_set_source_rgba(thiz->cairo, r, g, b, a);
 		cairo_stroke(thiz->cairo);
 	}
 	thiz->generated = EINA_TRUE;
