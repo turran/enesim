@@ -224,7 +224,7 @@ static void _clipper_sw_hints_get(Enesim_Renderer *r,
 	}
 }
 
-static void _clipper_bounds(Enesim_Renderer *r,
+static void _clipper_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Clipper *thiz;
@@ -234,18 +234,6 @@ static void _clipper_bounds(Enesim_Renderer *r,
 	enesim_renderer_y_origin_get(r, &rect->y);
 	rect->w = thiz->current.width;
 	rect->h = thiz->current.height;
-}
-
-static void _clipper_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Rectangle obounds;
-
-	_clipper_bounds(r, &obounds);
-	bounds->x = floor(obounds.x);
-	bounds->y = floor(obounds.y);
-	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
-	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
 static Eina_Bool _clipper_has_changed(Enesim_Renderer *r)
@@ -336,8 +324,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .base_name_get = 		*/ _clipper_name,
 	/* .free = 			*/ _clipper_free,
-	/* .bounds_get = 		*/ _clipper_bounds,
-	/* .destination_bounds_get =	*/ _clipper_destination_bounds,
+	/* .bounds_get = 		*/ _clipper_bounds_get,
 	/* .features_get = 		*/ _clipper_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ _clipper_damage,

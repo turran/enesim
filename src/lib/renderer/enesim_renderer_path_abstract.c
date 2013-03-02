@@ -76,7 +76,6 @@ Enesim_Renderer * enesim_renderer_path_abstract_new(Enesim_Renderer_Path_Abstrac
 	pdescriptor.base_name_get = descriptor->base_name_get;
 	pdescriptor.free = _path_abstract_free;
 	pdescriptor.bounds_get = descriptor->bounds_get;
-	pdescriptor.destination_bounds_get = descriptor->destination_bounds_get;
 	pdescriptor.features_get = descriptor->features_get;
 	pdescriptor.is_inside = descriptor->is_inside;
 	pdescriptor.damages_get = descriptor->damages_get;

@@ -189,7 +189,6 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .base_name_get = 		*/ _perlin_name,
 	/* .free = 			*/ _perlin_free,
 	/* .bounds_get = 		*/ NULL,
-	/* .destination_bounds_get = 	*/ NULL,
 	/* .features_get = 		*/ _perlin_features_get,
 	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,

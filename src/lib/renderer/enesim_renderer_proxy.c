@@ -175,7 +175,7 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r,
 		*hints |= ENESIM_RENDERER_HINT_ROP;
 }
 
-static void _proxy_bounds(Enesim_Renderer *r,
+static void _proxy_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -190,23 +190,6 @@ static void _proxy_bounds(Enesim_Renderer *r,
 		return;
 	}
 	enesim_renderer_bounds(thiz->proxied, rect);
-}
-
-static void _proxy_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Renderer_Proxy *thiz;
-
-	thiz = _proxy_get(r);
-	if (!thiz->proxied)
-	{
-		bounds->x = 0;
-		bounds->y = 0;
-		bounds->w = 0;
-		bounds->h = 0;
-		return;
-	}
-	enesim_renderer_destination_bounds(thiz->proxied, bounds, 0, 0);
 }
 
 static Eina_Bool _proxy_has_changed(Enesim_Renderer *r)
@@ -284,9 +267,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .base_name_get = 		*/ _proxy_name,
 	/* .free = 			*/ _proxy_free,
-	/* .bounds_get = 		*/ _proxy_bounds,
-	/* .destination_bounds_get =	*/ _proxy_destination_bounds,
-	/* .features_get =			*/ _proxy_features_get,
+	/* .bounds_get = 		*/ _proxy_bounds_get,
+	/* .features_get =		*/ _proxy_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get =		*/ _proxy_damage,
 	/* .has_changed = 		*/ _proxy_has_changed,

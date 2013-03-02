@@ -403,7 +403,7 @@ static void _compound_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_compound_state_cleanup(thiz, s);
 }
 
-static void _compound_bounds(Enesim_Renderer *r,
+static void _compound_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Compound *thiz;
@@ -457,18 +457,6 @@ static void _compound_bounds(Enesim_Renderer *r,
 	rect->y = y1;
 	rect->w = x2 - x1;
 	rect->h = y2 - y1;
-}
-
-static void _compound_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Rectangle obounds;
-
-	_compound_bounds(r, &obounds);
-	bounds->x = floor(obounds.x);
-	bounds->y = floor(obounds.y);
-	bounds->w = ceil(obounds.x - bounds->x + obounds.w);
-	bounds->h = ceil(obounds.y - bounds->y + obounds.h);
 }
 
 static void _compound_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -643,9 +631,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _compound_name,
 	/* .free = 			*/ _compound_free,
-	/* .bounds_get =  		*/ _compound_bounds,
-	/* .destination_bounds_get = 	*/ _compound_destination_bounds,
-	/* .features_get = 			*/ _compound_features_get,
+	/* .bounds_get =  		*/ _compound_bounds_get,
+	/* .features_get = 		*/ _compound_features_get,
 	/* .is_inside = 		*/ _compound_is_inside,
 	/* .damage = 			*/ _compound_damage,
 	/* .has_changed = 		*/ _compound_has_changed,

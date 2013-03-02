@@ -575,6 +575,7 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Text_Span *thiz;
+	Enesim_Matrix_Type type;
 	double ox, oy;
 
 	thiz = _enesim_renderer_text_span_get(r);
@@ -590,15 +591,7 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 	enesim_renderer_origin_get(r, &ox, &oy);
 	rect->x += ox;
 	rect->y += oy;
-}
 
-static void _enesim_renderer_text_span_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Rectangle obounds;
-	Enesim_Matrix_Type type;
-
-	_enesim_renderer_text_span_bounds(r, &obounds);
 	enesim_renderer_transformation_type_get(r, &type);
 	/* now apply the inverse transformation */
 	if (type != ENESIM_MATRIX_IDENTITY)
@@ -608,18 +601,14 @@ static void _enesim_renderer_text_span_destination_bounds(Enesim_Renderer *r,
 
 		enesim_renderer_transformation_get(r, &tx);
 		enesim_matrix_inverse(&tx, &m);
-		enesim_matrix_rectangle_transform(&m, &obounds, &q);
-		enesim_quad_rectangle_to(&q, &obounds);
+		enesim_matrix_rectangle_transform(&m, rect, &q);
+		enesim_quad_rectangle_to(&q, rect);
 		/* fix the antialias scaling */
-		obounds.x -= m.xx;
-		obounds.y -= m.yy;
-		obounds.w += m.xx;
-		obounds.h += m.yy;
+		rect->x -= m.xx;
+		rect->y -= m.yy;
+		rect->w += m.xx;
+		rect->h += m.yy;
 	}
-	bounds->x = floor(obounds.x);
-	bounds->y = floor(obounds.y);
-	bounds->w = ceil(obounds.w);
-	bounds->h = ceil(obounds.h);
 }
 
 static void _enesim_renderer_text_span_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -635,7 +624,6 @@ static Enesim_Renderer_Shape_Descriptor _enesim_renderer_text_span_descriptor = 
 	/* .base_name_get = 		*/ _enesim_renderer_text_span_name,
 	/* .free = 			*/ _enesim_renderer_text_span_free,
 	/* .bounds_get = 		*/ _enesim_renderer_text_span_bounds,
-	/* .destination_bounds_get = 	*/ _enesim_renderer_text_span_destination_bounds,
 	/* .features_get = 		*/ _enesim_renderer_text_span_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,

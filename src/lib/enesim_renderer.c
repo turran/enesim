@@ -88,14 +88,10 @@ static inline void _enesim_renderer_bounds(Enesim_Renderer *r,
 static inline void _enesim_renderer_destination_bounds(Enesim_Renderer *r,
 		Eina_Rectangle *bounds)
 {
-	if (r->descriptor.destination_bounds_get)
-	{
-		r->descriptor.destination_bounds_get(r, bounds);
-	}
-	else
-	{
-		eina_rectangle_coords_from(bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-	}
+	Enesim_Rectangle obounds;
+
+	_enesim_renderer_bounds(r, &obounds);
+	enesim_rectangle_normalize(&obounds, bounds);
 }
 /*----------------------------------------------------------------------------*
  *                     Internal state related functions                       *

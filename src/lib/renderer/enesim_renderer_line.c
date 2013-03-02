@@ -157,9 +157,8 @@ static Enesim_Renderer_Shape_Path_Descriptor _line_descriptor = {
 	/* .name = 			*/ _line_name,
 	/* .free = 			*/ _line_free,
 	/* .has_changed = 		*/ _line_has_changed,
-	/* .shape_features_get =		*/ _line_shape_features_get,
-	/* .bounds = 			*/ NULL,
-	/* .destination_bounds = 	*/ NULL,
+	/* .shape_features_get =	*/ _line_shape_features_get,
+	/* .bounds_get = 			*/ NULL,
 	/* .setup = 			*/ _line_setup,
 	/* .cleanup = 			*/ _line_cleanup,
 };

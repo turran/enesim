@@ -265,7 +265,6 @@ typedef struct _Enesim_Renderer_Gradient_Descriptor
 	Enesim_Renderer_Base_Name_Get_Cb name;
 	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Bounds_Get_Cb bounds;
-	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* software based functions */

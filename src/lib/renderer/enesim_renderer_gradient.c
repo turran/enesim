@@ -259,7 +259,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _gradient_bounds(Enesim_Renderer *r,
+static void _gradient_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -360,9 +360,8 @@ static Enesim_Renderer_Descriptor _gradient_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _gradient_name,
 	/* .free = 			*/ _gradient_free,
-	/* .bounds = 		*/ _gradient_bounds,
-	/* .destination_bounds = 	*/ NULL,
-	/* .features_get = 			*/ _gradient_features_get,
+	/* .bounds_get = 		*/ _gradient_bounds_get,
+	/* .features_get = 		*/ _gradient_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _gradient_has_changed,

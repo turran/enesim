@@ -640,7 +640,6 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .base_name_get = 		*/ _stripes_name,
 	/* .free = 			*/ _stripes_free,
 	/* .bounds_get = 		*/ NULL,
-	/* .destination_bounds_get = 	*/ NULL,
 	/* .features_get = 		*/ _stripes_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get =		*/ NULL,

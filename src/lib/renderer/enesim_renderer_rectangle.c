@@ -325,18 +325,6 @@ static void _rectangle_bounds_get(Enesim_Renderer *r,
 	}
 }
 
-static void _rectangle_destination_bounds_get(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Rectangle obounds;
-
-	_rectangle_bounds_get(r, &obounds);
-	bounds->x = floor(obounds.x);
-	bounds->y = floor(obounds.y);
-	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
-	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
-}
-
 static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
@@ -349,9 +337,8 @@ static Enesim_Renderer_Shape_Path_Descriptor _rectangle_descriptor = {
 	/* .base_name_get = 		*/ _rectangle_base_name_get,
 	/* .free = 			*/ _rectangle_free,
 	/* .has_changed = 		*/ _rectangle_has_changed,
-	/* .shape_features_get =		*/ _rectangle_shape_features_get,
-	/* .bounds = 			*/ _rectangle_bounds_get,
-	/* .destination_bounds = 	*/ _rectangle_destination_bounds_get,
+	/* .shape_features_get =	*/ _rectangle_shape_features_get,
+	/* .bounds_get = 		*/ _rectangle_bounds_get,
 	/* .setup = 			*/ _rectangle_setup,
 	/* .cleanup = 			*/ _rectangle_cleanup,
 };

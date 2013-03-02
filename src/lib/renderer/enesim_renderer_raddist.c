@@ -160,7 +160,7 @@ static void _raddist_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 	thiz->past = thiz->current;
 }
 
-static void _bounds(Enesim_Renderer *r,
+static void _raddist_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Raddist *thiz;
@@ -223,8 +223,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .base_name_get = 		*/ _raddist_name,
 	/* .free = 			*/ _raddist_free,
-	/* .bounds_get =  		*/ _bounds,
-	/* .destination_bounds_get = 	*/ NULL,
+	/* .bounds_get =  		*/ _raddist_bounds_get,
 	/* .features_get = 		*/ _raddist_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,

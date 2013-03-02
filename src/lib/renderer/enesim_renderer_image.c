@@ -103,8 +103,9 @@ static void _image_transform_bounds(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Matrix *tx,
 		Enesim_Matrix_Type type,
 		Enesim_Rectangle *obounds,
-		Eina_Rectangle *bounds)
+		Enesim_Rectangle *bounds)
 {
+	*bounds = *obounds;
 	/* apply the inverse matrix */
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
@@ -112,18 +113,24 @@ static void _image_transform_bounds(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Matrix m;
 
 		enesim_matrix_inverse(tx, &m);
-		enesim_matrix_rectangle_transform(&m, obounds, &q);
-		enesim_quad_rectangle_to(&q, obounds);
+		enesim_matrix_rectangle_transform(&m, bounds, &q);
+		enesim_quad_rectangle_to(&q, bounds);
 		/* fix the antialias scaling */
-		obounds->x -= m.xx;
-		obounds->y -= m.yy;
-		obounds->w += m.xx;
-		obounds->h += m.yy;
+		bounds->x -= m.xx;
+		bounds->y -= m.yy;
+		bounds->w += m.xx;
+		bounds->h += m.yy;
 	}
-	bounds->x = floor(obounds->x);
-	bounds->y = floor(obounds->y);
-	bounds->w = ceil(obounds->w);
-	bounds->h = ceil(obounds->h);
+
+}
+
+static void _image_transform_destination_bounds(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Matrix *tx,
+		Enesim_Matrix_Type type,
+		Enesim_Rectangle *obounds,
+		Eina_Rectangle *bounds)
+{
+	enesim_rectangle_normalize(obounds, bounds);
 }
 
 /* blend simple */
@@ -1346,18 +1353,21 @@ static const char * _image_name(Enesim_Renderer *r EINA_UNUSED)
 	return "image";
 }
 
-static void _image_bounds(Enesim_Renderer *r,
+static void _image_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Image *thiz;
+	Enesim_Rectangle obounds;
+	Enesim_Matrix m;
+	Enesim_Matrix_Type type;
 
 	thiz = _image_get(r);
 	if (!thiz->current.s)
 	{
-		rect->x = 0;
-		rect->y = 0;
-		rect->w = 0;
-		rect->h = 0;
+		obounds.x = 0;
+		obounds.y = 0;
+		obounds.w = 0;
+		obounds.h = 0;
 	}
 	else
 	{
@@ -1365,27 +1375,17 @@ static void _image_bounds(Enesim_Renderer *r,
 		double oy;
 
 		enesim_renderer_origin_get(r, &ox, &oy);
-		rect->x = thiz->current.x;
-		rect->y = thiz->current.y;
-		rect->w = thiz->current.w;
-		rect->h = thiz->current.h;
+		obounds.x = thiz->current.x;
+		obounds.y = thiz->current.y;
+		obounds.w = thiz->current.w;
+		obounds.h = thiz->current.h;
 		/* the translate */
-		rect->x += ox;
-		rect->y += oy;
+		obounds.x += ox;
+		obounds.y += oy;
 	}
-}
-
-static void _image_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Rectangle obounds;
-	Enesim_Matrix m;
-	Enesim_Matrix_Type type;
-
-	_image_bounds(r, &obounds);
 	enesim_renderer_transformation_get(r, &m);
 	enesim_renderer_transformation_type_get(r, &type);
-	_image_transform_bounds(r, &m, type, &obounds, bounds);
+	_image_transform_bounds(r, &m, type, &obounds, rect);
 }
 
 static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
@@ -1603,8 +1603,11 @@ static void _image_damages(Enesim_Renderer *r,
 	 */
 	if (enesim_renderer_has_changed(r))
 	{
+		Enesim_Rectangle curr_bounds;
+
 		cb(r, old_bounds, EINA_TRUE, data);
-		_image_destination_bounds(r, &bounds);
+		_image_bounds_get(r, &curr_bounds);
+		enesim_rectangle_normalize(&curr_bounds, &bounds);
 		cb(r, &bounds, EINA_FALSE, data);
 	}
 	/* in other case, send the surface damages tansformed
@@ -1627,7 +1630,7 @@ static void _image_damages(Enesim_Renderer *r,
 			sdd.x += thiz->current.x;
 			sdd.y += thiz->current.y;
 			/* TODO clip it to the source bounds */
-			_image_transform_bounds(r, &m, type, &sdd, &bounds);
+			_image_transform_destination_bounds(r, &m, type, &sdd, &bounds);
 			cb(r, &bounds, EINA_FALSE, data);
 		}
 	}
@@ -1647,8 +1650,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .base_name_get = 		*/ _image_name,
 	/* .free = 			*/ _image_free,
-	/* .bounds_get = 		*/ _image_bounds,
-	/* .destination_bounds_get = 	*/ _image_destination_bounds,
+	/* .bounds_get = 		*/ _image_bounds_get,
 	/* .features_get = 		*/ _image_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ _image_damages,

@@ -1,7 +1,5 @@
 Enesim
 ======
-+ Remove the destination bounds and use just the bounds , we no longer need to
-  different types of bounds
 + Rename Enesim_Error to Enesim_Log
 + We have a performance problem when some renderer has changed. Basically on the practice
   we end having a full tree of renderers, several levels, proxies, whatever. When we need

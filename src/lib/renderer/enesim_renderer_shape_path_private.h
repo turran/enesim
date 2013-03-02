@@ -28,7 +28,6 @@ typedef struct _Enesim_Renderer_Shape_Path_Descriptor
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
-	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
 	Enesim_Renderer_Shape_Path_Setup setup;
 	Enesim_Renderer_Shape_Path_Cleanup cleanup;
 } Enesim_Renderer_Shape_Path_Descriptor;

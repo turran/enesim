@@ -58,8 +58,6 @@ typedef void (*Enesim_Renderer_Delete_Cb)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Is_Inside_Cb)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Rectangle *rect);
-typedef void (*Enesim_Renderer_Destination_Bounds_Get_Cb)(Enesim_Renderer *r,
-		Eina_Rectangle *dbounds);
 typedef void (*Enesim_Renderer_Features_Get)(Enesim_Renderer *r,
 		Enesim_Renderer_Feature *features);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed_Cb)(Enesim_Renderer *r);
@@ -104,7 +102,6 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
 	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
-	Enesim_Renderer_Destination_Bounds_Get_Cb destination_bounds_get;
 	Enesim_Renderer_Features_Get features_get;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Damages_Get_Cb damages_get;

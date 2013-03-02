@@ -273,7 +273,7 @@ static void _path_cairo_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesi
 	*features = 0;
 }
 
-static void _path_cairo_bounds(Enesim_Renderer *r,
+static void _path_cairo_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
@@ -287,15 +287,6 @@ static void _path_cairo_bounds(Enesim_Renderer *r,
 				&thiz->bounds.w, &thiz->bounds.h);
 	}
 	*bounds = thiz->bounds;
-}
-
-static void _path_cairo_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Rectangle obounds;
-
-	_path_cairo_bounds(r, &obounds);
-	enesim_rectangle_normalize(&obounds, bounds);
 }
 
 static void _path_cairo_commands_set(Enesim_Renderer *r, const Eina_List *commands)
@@ -312,9 +303,8 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_cairo_descriptor = {
 	/* .version =			*/ ENESIM_RENDERER_API,
 	/* .name =			*/ _path_cairo_name,
 	/* .free =			*/ _path_cairo_free,
-	/* .bounds =			*/ _path_cairo_bounds,
-	/* .destination_bounds =	*/ _path_cairo_destination_bounds,
-	/* .features_get =			*/ _path_cairo_features_get,
+	/* .bounds_get =		*/ _path_cairo_bounds_get,
+	/* .features_get =		*/ _path_cairo_features_get,
 	/* .is_inside =			*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed =		*/ _path_cairo_has_changed,

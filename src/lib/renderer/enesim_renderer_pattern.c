@@ -437,7 +437,7 @@ static void _pattern_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _pattern_bounds(Enesim_Renderer *r,
+static void _pattern_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -451,23 +451,6 @@ static void _pattern_bounds(Enesim_Renderer *r,
 	{
 		enesim_rectangle_coords_from(bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	}
-}
-
-static void _pattern_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Renderer_Pattern *thiz;
-
-	thiz = _pattern_get(r);
-	if (thiz->current.repeat_mode == ENESIM_RESTRICT)
-	{
-		_pattern_tile_destination_size(thiz, r, bounds);
-	}
-	else
-	{
-		eina_rectangle_coords_from(bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-	}
-
 }
 
 static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
@@ -515,8 +498,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .base_name_get = 		*/ _pattern_name,
 	/* .free = 			*/ _pattern_free,
-	/* .bounds_get = 		*/ _pattern_bounds,
-	/* .destination_bounds_get = 	*/ _pattern_destination_bounds,
+	/* .bounds_get = 		*/ _pattern_bounds_get,
 	/* .features_get = 		*/ _pattern_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,

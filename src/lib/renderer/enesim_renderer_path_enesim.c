@@ -933,7 +933,7 @@ static void _path_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shap
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
-static void _path_bounds(Enesim_Renderer *r,
+static void _path_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
@@ -992,31 +992,6 @@ failed:
 	bounds->y = 0;
 	bounds->w = 0;
 	bounds->h = 0;
-}
-
-static void _path_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Rectangle obounds;
-
-	thiz = _path_get(r);
-
-	_path_bounds(r, &obounds);
-	if (obounds.w == 0 && obounds.h == 0)
-	{
-		bounds->x = 0;
-		bounds->y = 0;
-		bounds->w = 0;
-		bounds->h = 0;
-
-		return;
-	}
-
-	bounds->x = floor(obounds.x);
-	bounds->y = floor(obounds.y);
-	bounds->w = ceil(obounds.x - bounds->x + obounds.w) + 1;
-	bounds->h = ceil(obounds.y - bounds->y + obounds.h) + 1;
 }
 
 #if BUILD_OPENGL
@@ -1092,9 +1067,8 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_descriptor = {
 	/* .version =			*/ ENESIM_RENDERER_API,
 	/* .name =			*/ _path_name,
 	/* .free =			*/ _path_free,
-	/* .bounds =			*/ _path_bounds,
-	/* .destination_bounds =	*/ _path_destination_bounds,
-	/* .features_get =			*/ _path_features_get,
+	/* .bounds_get =		*/ _path_bounds_get,
+	/* .features_get =		*/ _path_features_get,
 	/* .is_inside =			*/ NULL,
 	/* .damage =			*/ NULL,
 	/* .has_changed =		*/ _path_has_changed,

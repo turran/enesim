@@ -163,9 +163,8 @@ static Enesim_Renderer_Shape_Path_Descriptor _figure_descriptor = {
 	/* .base_name_get = 		*/ _figure_base_name_get,
 	/* .free = 			*/ _figure_free,
 	/* .has_changed = 		*/ _figure_has_changed,
-	/* .shape_features_get =		*/ _figure_shape_features_get,
-	/* .bounds = 			*/ NULL,
-	/* .destination_bounds = 	*/ NULL,
+	/* .shape_features_get =	*/ _figure_shape_features_get,
+	/* .bounds_get = 			*/ NULL,
 	/* .setup = 			*/ _figure_setup,
 	/* .cleanup = 			*/ _figure_cleanup,
 };

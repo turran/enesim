@@ -148,7 +148,7 @@ static void _transition_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_cleanup(t->r1.r, s);
 }
 
-static void _transition_bounds(Enesim_Renderer *r,
+static void _transition_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Transition *trans;
@@ -191,8 +191,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .base_name_get = 		*/ _transition_name,
 	/* .free = 			*/ _transition_free,
-	/* .bounds_get = 		*/ _transition_bounds,
-	/* .destination_bounds_get = 	*/ NULL,
+	/* .bounds_get = 		*/ _transition_bounds_get,
 	/* .features_get = 		*/ _transition_features_get,
 	/* .hints_get = 		*/ NULL,
 	/* .is_inside = 		*/ NULL,

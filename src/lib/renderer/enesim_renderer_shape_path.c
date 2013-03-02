@@ -216,7 +216,7 @@ static void _shape_path_free(Enesim_Renderer *r)
 	free(thiz);
 }
 
-static void _shape_path_bounds(Enesim_Renderer *r,
+static void _shape_path_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Shape_Path *thiz;
@@ -230,23 +230,6 @@ static void _shape_path_bounds(Enesim_Renderer *r,
 	{
 		thiz->descriptor->setup(r, thiz->path, NULL);
 		enesim_renderer_bounds(thiz->path, bounds);
-	}
-}
-
-static void _shape_path_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *bounds)
-{
-	Enesim_Renderer_Shape_Path *thiz;
-
-	thiz = _shape_path_get(r);
-	if (thiz->descriptor->destination_bounds_get)
-	{
-		thiz->descriptor->destination_bounds_get(r, bounds);
-	}
-	else
-	{
-		thiz->descriptor->setup(r, thiz->path, NULL);
-		enesim_renderer_destination_bounds(thiz->path, bounds, 0, 0);
 	}
 }
 
@@ -451,9 +434,8 @@ static Enesim_Renderer_Shape_Descriptor _shape_path_descriptor = {
 	/* .version = 			*/ ENESIM_RENDERER_API,
 	/* .name = 			*/ _shape_path_name,
 	/* .free = 			*/ _shape_path_free,
-	/* .bounds = 			*/ _shape_path_bounds,
-	/* .destination_bounds = 	*/ _shape_path_destination_bounds,
-	/* .features_get = 			*/ _shape_path_features_get,
+	/* .bounds_get = 		*/ _shape_path_bounds_get,
+	/* .features_get = 		*/ _shape_path_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damage = 			*/ NULL,
 	/* .has_changed = 		*/ _shape_path_has_changed,
