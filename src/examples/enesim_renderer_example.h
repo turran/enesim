@@ -7,7 +7,7 @@
 	{								\
 		Enesim_Renderer *r;					\
 		Enesim_Surface *s;					\
-		Enesim_Error *error = NULL;				\
+		Enesim_Log *error = NULL;				\
 									\
 		enesim_init();						\
 									\
@@ -16,7 +16,7 @@
 				256, 256);				\
 		if (!enesim_renderer_draw(r, s, NULL, 0, 0, &error))	\
 		{							\
-			enesim_error_dump(error);			\
+			enesim_log_dump(error);			\
 		}							\
 		enesim_image_file_save(#name ".png", s, NULL);		\
 									\

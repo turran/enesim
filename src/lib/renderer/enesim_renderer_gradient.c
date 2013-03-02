@@ -73,7 +73,7 @@ static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
 }
 
 static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enesim_Renderer *r,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Gradient_Stop *curr, *next, *last;
 	Eina_F16p16 xx, inc;
@@ -206,7 +206,7 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Gradient *thiz;
 	const Enesim_Renderer_State *rstate;
@@ -343,7 +343,7 @@ static Eina_Bool _gradient_opengl_initialize(Enesim_Renderer *r,
 static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Gradient *thiz;
 

@@ -135,7 +135,7 @@ static Eina_Bool _clipper_changed_basic(Enesim_Renderer_Clipper *thiz)
 }
 
 static Eina_Bool _clipper_state_setup(Enesim_Renderer_Clipper *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
 {
 	if (!thiz->current.content)
 	{
@@ -173,7 +173,7 @@ static const char * _clipper_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _clipper_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Clipper *thiz;
 
@@ -299,7 +299,7 @@ static void _clipper_free(Enesim_Renderer *r)
 static Eina_Bool _clipper_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Clipper *thiz;
 

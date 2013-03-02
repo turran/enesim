@@ -117,7 +117,7 @@ static const char * _transition_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Transition *t;
 

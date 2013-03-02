@@ -265,7 +265,7 @@ static void _program_free(void *data)
  *============================================================================*/
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Draw draw;

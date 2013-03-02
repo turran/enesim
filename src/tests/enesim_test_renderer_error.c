@@ -4,7 +4,7 @@ int main(int argc, char **argv)
 {
 	Enesim_Renderer *r;
 	Enesim_Surface *s;
-	Enesim_Error *error = NULL;
+	Enesim_Log *error = NULL;
 
 	enesim_init();
 	r = enesim_renderer_rectangle_new();
@@ -15,8 +15,8 @@ int main(int argc, char **argv)
 
 	if (!enesim_renderer_draw(r, s, NULL, 0, 0, &error))
 	{
-		enesim_error_dump(error);
-		enesim_error_delete(error);
+		enesim_log_dump(error);
+		enesim_log_delete(error);
 	}
 
 	enesim_shutdown();

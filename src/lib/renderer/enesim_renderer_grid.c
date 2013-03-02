@@ -264,7 +264,7 @@ static void _grid_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s E
 
 static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Renderer_Grid *thiz;
 	Enesim_Matrix m;

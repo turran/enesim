@@ -168,7 +168,7 @@ static const char * _rectangle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Rectangle *thiz;
 

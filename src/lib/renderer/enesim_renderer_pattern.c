@@ -107,7 +107,7 @@ static void _pattern_tile_destination_size(Enesim_Renderer_Pattern *thiz,
 
 static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 		Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Error **error)
+		Enesim_Surface *s, Enesim_Log **error)
 {
 	Eina_Rectangle dst_bounds;
 	Enesim_Backend backend;
@@ -387,7 +387,7 @@ static const char * _pattern_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Pattern *thiz;
 	Enesim_Matrix_Type type;

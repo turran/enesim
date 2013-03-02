@@ -182,7 +182,7 @@ static void _path_nvpr_free(Enesim_Renderer *r)
 static Eina_Bool _path_nvpr_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error EINA_UNUSED)
+		Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Nvpr *thiz;
 

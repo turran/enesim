@@ -502,7 +502,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Sw_Fill fill = NULL;
 	Enesim_Compositor_Span span = NULL;

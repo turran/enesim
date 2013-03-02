@@ -75,14 +75,14 @@ typedef void (*Enesim_Renderer_Sw_Hints_Get_Cb)(Enesim_Renderer *r,
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
-		Enesim_Error **error);
+		Enesim_Log **error);
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 /* opencl backend descriptor functions */
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
-		Enesim_Error **error);
+		Enesim_Log **error);
 typedef void (*Enesim_Renderer_OpenCL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s);
 
@@ -93,7 +93,7 @@ typedef Eina_Bool (*Enesim_Renderer_OpenGL_Initialize)(Enesim_Renderer *r,
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error);
+		Enesim_Log **error);
 typedef void (*Enesim_Renderer_OpenGL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 
 typedef struct _Enesim_Renderer_Descriptor {
@@ -176,13 +176,13 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r,
 		Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y);
 
-Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error);
+Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 
 #if BUILD_OPENCL
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Error **error);
+		Enesim_Log **error);
 void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
 		int x, int y);
@@ -194,7 +194,7 @@ void enesim_renderer_opencl_free(Enesim_Renderer *r);
 #if BUILD_OPENGL
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Error **error);
+		Enesim_Log **error);
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Eina_Rectangle *area,
 		int x, int y);

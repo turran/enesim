@@ -140,7 +140,7 @@ static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 static Eina_Bool _state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Error **error EINA_UNUSED)
+		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 	Enesim_Matrix om;

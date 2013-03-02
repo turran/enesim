@@ -1162,7 +1162,7 @@ static int _tysort(const void *l, const void *r)
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Rasterizer_Basic *thiz;
 	Enesim_Rasterizer_Basic_State *state;

@@ -187,7 +187,7 @@ static void _path_cairo_free(Enesim_Renderer *r)
 
 static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
 	cairo_t *cr;

@@ -89,7 +89,7 @@ static void _proxy_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 static Eina_Bool _proxy_state_setup(Enesim_Renderer_Proxy *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
 {
 	if (!thiz->proxied)
 	{
@@ -124,7 +124,7 @@ static const char * _proxy_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Proxy *thiz;
 
@@ -242,7 +242,7 @@ static void _proxy_free(Enesim_Renderer *r)
 static Eina_Bool _proxy_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Proxy *thiz;
 

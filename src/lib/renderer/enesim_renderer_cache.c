@@ -95,7 +95,7 @@ static void _cache_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 static Eina_Bool _cache_state_setup(Enesim_Renderer_Cache *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
 {
 	if (!thiz->proxied)
 	{
@@ -131,7 +131,7 @@ static const char * _cache_name(Enesim_Renderer *r)
 static Eina_Bool _cache_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Cache *thiz;
 
@@ -249,7 +249,7 @@ static Eina_Bool _cache_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Cache *thiz;
 

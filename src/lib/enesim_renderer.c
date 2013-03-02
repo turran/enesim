@@ -525,7 +525,7 @@ EAPI void enesim_renderer_unlock(Enesim_Renderer *r)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Error **error)
+EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
 {
 	Enesim_Backend b;
 	Eina_Bool ret = EINA_TRUE;
@@ -1042,7 +1042,7 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  * TODO What about the mask?
  */
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_Rectangle *clip, int x, int y, Enesim_Error **error)
+		Eina_Rectangle *clip, int x, int y, Enesim_Log **error)
 {
 	Eina_Rectangle final;
 	Eina_Bool ret = EINA_FALSE;
@@ -1097,7 +1097,7 @@ end:
  * @param[in] y The y origin of the destination surface
  */
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_List *clips, int x, int y, Enesim_Error **error)
+		Eina_List *clips, int x, int y, Enesim_Log **error)
 {
 	Eina_Rectangle surface_size;
 	Eina_Bool ret = EINA_FALSE;
@@ -1135,7 +1135,7 @@ end:
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, const char *file,
+EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Log **error, const char *file,
 		const char *function, int line, char *fmt, ...)
 {
 	const char *name;
@@ -1154,7 +1154,7 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Error **error, co
 	str[num] = '\0';
 	va_end(args);
 
-	*error = enesim_error_add(*error, str);
+	*error = enesim_log_add(*error, str);
 }
 
 #if 0

@@ -1556,7 +1556,7 @@ static void _bifigure_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure
 static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	Enesim_Rasterizer_BiFigure_State *state;

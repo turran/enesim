@@ -93,7 +93,7 @@ static const char * _circle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _circle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Circle *thiz;
 

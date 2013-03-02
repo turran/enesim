@@ -19,7 +19,7 @@
 #define ENESIM_RENDERER_SHAPE_PATH_PRIVATE_H_
 
 typedef Eina_Bool (*Enesim_Renderer_Shape_Path_Setup)(Enesim_Renderer *r,
-		Enesim_Renderer *path, Enesim_Error **error);
+		Enesim_Renderer *path, Enesim_Log **error);
 typedef void (*Enesim_Renderer_Shape_Path_Cleanup)(Enesim_Renderer *r);
 typedef struct _Enesim_Renderer_Shape_Path_Descriptor
 {

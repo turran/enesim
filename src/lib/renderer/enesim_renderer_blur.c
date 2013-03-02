@@ -90,7 +90,7 @@ static inline Enesim_Renderer_Blur * _blur_get(Enesim_Renderer *r)
 
 static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
 		Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	if (!thiz->src)
 	{
@@ -402,7 +402,7 @@ static const char * _blur_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Blur *thiz;
 	double rx, ry;

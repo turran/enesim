@@ -1406,7 +1406,7 @@ static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 
 static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz;
 	Enesim_Format fmt;

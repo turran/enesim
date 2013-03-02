@@ -21,22 +21,22 @@
 /**
  * @def ENESIM_ERROR(err, fmt, ...)
  *
- * Calls enesim_error_add_parametric() with current file, function and line.
+ * Calls enesim_log_add_parametric() with current file, function and line.
  *
- * @see enesim_error_add_parametric()
+ * @see enesim_log_add_parametric()
  */
-#define ENESIM_ERROR(err, fmt, ...) (enesim_error_add_parametric(err, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__)
+#define ENESIM_ERROR(err, fmt, ...) (enesim_log_add_parametric(err, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__)
 
 /**
- * @typedef Enesim_Error
+ * @typedef Enesim_Log
  * Abstract error type.
  */
-typedef struct _Enesim_Error Enesim_Error;
+typedef struct _Enesim_Log Enesim_Log;
 
-EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string);
-EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char *file, const char *function, int line, char *fmt, va_list args);
-EAPI void enesim_error_delete(Enesim_Error *error);
-EAPI void enesim_error_dump(const Enesim_Error *error);
+EAPI Enesim_Log * enesim_log_add(Enesim_Log *error, const char *string);
+EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *error, const char *file, const char *function, int line, char *fmt, va_list args);
+EAPI void enesim_log_delete(Enesim_Log *error);
+EAPI void enesim_log_dump(const Enesim_Log *error);
 
 #endif
 

@@ -856,7 +856,7 @@ static void _path_free(Enesim_Renderer *r)
 
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	const Enesim_Renderer_State *cs;
@@ -1007,7 +1007,7 @@ static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error EINA_UNUSED)
+		Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	Enesim_Renderer_Path_Enesim_OpenGL *gl;

@@ -107,7 +107,7 @@ static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 
 static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Error **error)
+		Enesim_Surface *s, Enesim_Log **error)
 {
 	Eina_List *ll;
 	Layer *l;
@@ -373,7 +373,7 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 
 static Eina_Bool _compound_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Rop rop;
@@ -607,7 +607,7 @@ static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Compound *thiz;
 

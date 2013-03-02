@@ -475,7 +475,7 @@ static const char * _stripes_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
 	Enesim_Matrix_Type type;
@@ -614,7 +614,7 @@ static Eina_Bool _stripes_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error EINA_UNUSED)
+		Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Renderer_Stripes *thiz;
 

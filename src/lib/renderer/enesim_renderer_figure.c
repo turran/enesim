@@ -117,7 +117,7 @@ static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Figure *thiz;
 

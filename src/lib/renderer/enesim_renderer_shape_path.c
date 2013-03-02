@@ -55,7 +55,7 @@ static inline Enesim_Renderer_Shape_Path * _shape_path_get(Enesim_Renderer *r)
 }
 
 static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 	Enesim_Renderer *fill, *stroke;
@@ -165,7 +165,7 @@ static const char * _shape_path_name(Enesim_Renderer *r)
 
 static Eina_Bool _shape_path_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
 {
 	if (!_shape_path_setup(r, s, error))
 		return EINA_FALSE;
@@ -249,7 +249,7 @@ static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
 static Eina_Bool _shape_path_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	if (!_shape_path_setup(r, s, error))
 		return EINA_FALSE;

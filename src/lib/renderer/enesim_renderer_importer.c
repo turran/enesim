@@ -237,7 +237,7 @@ static const char *_importer_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Error **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
 {
 	Enesim_Renderer_Importer *thiz;
 

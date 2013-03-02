@@ -21,7 +21,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-struct _Enesim_Error
+struct _Enesim_Log
 {
 	Eina_List *trace;
 };
@@ -40,20 +40,20 @@ struct _Enesim_Error
  *
  * This function add the description @p string to the list or errors
  * @p error. If @p string is @c NULL, @c NULL is returned. if @p error
- * is @c NULL, an #Enesim_Error is allocated. @p string is added to
+ * is @c NULL, an #Enesim_Log is allocated. @p string is added to
  * @p error. On memory allocation error, @C NULL is returned,
  * otherwise @p error is returned.
  *
- * @see enesim_error_add_parametric()
- * @see enesim_error_delete()
+ * @see enesim_log_add_parametric()
+ * @see enesim_log_delete()
  */
-EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
+EAPI Enesim_Log * enesim_log_add(Enesim_Log *error, const char *string)
 {
 	if (!string)
 		return NULL;
 	if (!error)
 	{
-		error = malloc(sizeof(Enesim_Error));
+		error = malloc(sizeof(Enesim_Log));
 		if (!error)
 			return NULL;
 		error->trace = NULL;
@@ -74,13 +74,13 @@ EAPI Enesim_Error * enesim_error_add(Enesim_Error *error, const char *string)
  * @return The new list of errors.
  *
  * This function formats the description of the error with @p file,
- * @p function and @p line and calls enesim_error_add() with the
+ * @p function and @p line and calls enesim_log_add() with the
  * built string. User defined description can be appended with @p fmt.
  *
- * @see enesim_error_add()
- * @see enesim_error_delete()
+ * @see enesim_log_add()
+ * @see enesim_log_delete()
  */
-EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char *file, const char *function, int line, char *fmt, va_list args)
+EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *error, const char *file, const char *function, int line, char *fmt, va_list args)
 {
 	char str[PATH_MAX];
 	int num;
@@ -89,7 +89,7 @@ EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char 
 	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
 	str[num] = '\n';
 
-	return enesim_error_add(error, str);
+	return enesim_log_add(error, str);
 }
 
 /**
@@ -100,10 +100,10 @@ EAPI Enesim_Error * enesim_error_add_parametric(Enesim_Error *error, const char 
  * This function frees the list of errors @p error. If @p error is @c
  * NULL, this function returns immediatly.
  *
- * @see enesim_error_add()
- * @see enesim_error_add_parametric()
+ * @see enesim_log_add()
+ * @see enesim_log_add_parametric()
  */
-EAPI void enesim_error_delete(Enesim_Error *error)
+EAPI void enesim_log_delete(Enesim_Log *error)
 {
 	char *str;
 
@@ -125,7 +125,7 @@ EAPI void enesim_error_delete(Enesim_Error *error)
  * stored in @p error. if @p error is @c NULL, this function returns
  * immediatly.
  */
-EAPI void enesim_error_dump(const Enesim_Error *error)
+EAPI void enesim_log_dump(const Enesim_Log *error)
 {
 	Eina_List *l;
 	char *str;

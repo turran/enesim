@@ -283,7 +283,7 @@ static void _shape_cleanup(Enesim_Renderer_Shape *thiz,
 
 static Eina_Bool _shape_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Shape *thiz;
 	Enesim_Renderer_Shape_State *state;
@@ -330,7 +330,7 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -361,7 +361,7 @@ static void _enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r,
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -389,7 +389,7 @@ static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Shape *thiz;
 

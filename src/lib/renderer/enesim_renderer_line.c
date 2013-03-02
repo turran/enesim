@@ -114,7 +114,7 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 }
 
 static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_Line *thiz;
 

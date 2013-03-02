@@ -55,7 +55,7 @@ static size_t _roundup(size_t local_size, size_t num)
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Error **error)
+		Enesim_Log **error)
 {
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *data;
