@@ -18,7 +18,7 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -283,7 +283,7 @@ static void _shape_cleanup(Enesim_Renderer_Shape *thiz,
 
 static Eina_Bool _shape_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Shape *thiz;
 	Enesim_Renderer_Shape_State *state;
@@ -299,9 +299,9 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 				(state->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 		{
 			fill_renderer = EINA_TRUE;
-			if (!enesim_renderer_setup(state->current.fill.r, s, error))
+			if (!enesim_renderer_setup(state->current.fill.r, s, log))
 			{
-				ENESIM_RENDERER_ERROR(r, error, "Fill renderer failed");
+				ENESIM_RENDERER_LOG(r, log, "Fill renderer failed");
 				return EINA_FALSE;
 			}
 		}
@@ -311,9 +311,9 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 		if (state->current.stroke.r &&
 				(state->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
-			if (!enesim_renderer_setup(state->current.stroke.r, s, error))
+			if (!enesim_renderer_setup(state->current.stroke.r, s, log))
 			{
-				ENESIM_RENDERER_ERROR(r, error, "Stroke renderer failed");
+				ENESIM_RENDERER_LOG(r, log, "Stroke renderer failed");
 				/* clean up the fill renderer setup */
 				if (fill_renderer)
 				{
@@ -330,15 +330,15 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = enesim_renderer_data_get(r);
-	if (!_shape_setup(r, s, error)) return EINA_FALSE;
+	if (!_shape_setup(r, s, log)) return EINA_FALSE;
 	if (!thiz->sw_setup) return EINA_FALSE;
 
-	if (!thiz->sw_setup(r, s, fill, error))
+	if (!thiz->sw_setup(r, s, fill, log))
 		return EINA_FALSE;
 
 	return EINA_TRUE;
@@ -361,15 +361,15 @@ static void _enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r,
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = enesim_renderer_data_get(r);
-	if (!_shape_setup(r, s, error)) return EINA_FALSE;
+	if (!_shape_setup(r, s, log)) return EINA_FALSE;
 	if (!thiz->opengl_setup) return EINA_FALSE;
 
-	return thiz->opengl_setup(r, s, draw, error);
+	return thiz->opengl_setup(r, s, draw, log);
 }
 
 static void _enesim_renderer_shape_opengl_cleanup(Enesim_Renderer *r,
@@ -389,16 +389,16 @@ static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Shape *thiz;
 
 	thiz = enesim_renderer_data_get(r);
-	if (!_shape_setup(r, s, error)) return EINA_FALSE;
+	if (!_shape_setup(r, s, log)) return EINA_FALSE;
 	if (!thiz->opencl_setup) return EINA_FALSE;
 
 	return thiz->opencl_setup(r, s, program_name, program_source,
-			program_length, error);
+			program_length, log);
 }
 
 static void _enesim_renderer_shape_opencl_cleanup(Enesim_Renderer *r,

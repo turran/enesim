@@ -18,7 +18,7 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -107,7 +107,7 @@ static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 
 static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Log **error)
+		Enesim_Surface *s, Enesim_Log **log)
 {
 	Eina_List *ll;
 	Layer *l;
@@ -135,12 +135,12 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 				continue;
 			}
 		}
-		if (!enesim_renderer_setup(l->r, s, error))
+		if (!enesim_renderer_setup(l->r, s, log))
 		{
 			const char *name;
 
 			enesim_renderer_name_get(l->r, &name);
-			ENESIM_RENDERER_ERROR(r, error, "Child renderer %s can not setup", name);
+			ENESIM_RENDERER_LOG(r, log, "Child renderer %s can not setup", name);
 			continue;
 		}
 		/* set the span given the color */
@@ -373,13 +373,13 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 
 static Eina_Bool _compound_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Rop rop;
 
 	thiz = _compound_get(r);
-	if (!_compound_state_setup(thiz, r, s, error))
+	if (!_compound_state_setup(thiz, r, s, log))
 		return EINA_FALSE;
 
 	enesim_renderer_rop_get(r, &rop);
@@ -607,12 +607,12 @@ static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Compound *thiz;
 
  	thiz = _compound_get(r);
-	if (!_compound_state_setup(thiz, r, s, error)) return EINA_FALSE;
+	if (!_compound_state_setup(thiz, r, s, log)) return EINA_FALSE;
 
 	*draw = _compound_opengl_draw;
 	return EINA_TRUE;

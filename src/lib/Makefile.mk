@@ -9,7 +9,7 @@ src/lib/enesim_color.h \
 src/lib/enesim_compositor.h \
 src/lib/enesim_converter.h \
 src/lib/enesim_eina.h \
-src/lib/enesim_error.h \
+src/lib/enesim_log.h \
 src/lib/enesim_image.h \
 src/lib/enesim_main.h \
 src/lib/enesim_matrix.h \
@@ -33,7 +33,7 @@ src/lib/enesim_buffer.c \
 src/lib/enesim_color.c \
 src/lib/enesim_compositor.c \
 src/lib/enesim_converter.c \
-src/lib/enesim_error.c \
+src/lib/enesim_log.c \
 src/lib/enesim_image.c \
 src/lib/enesim_main.c \
 src/lib/enesim_matrix.c \

@@ -20,7 +20,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -114,7 +114,7 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 }
 
 static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Line *thiz;
 
@@ -174,7 +174,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _line_descriptor = {
  * @return A new line renderer.
  *
  * This function returns a newly allocated line renderer. On memory
- * error, this function returns @c NULL.
+ * log, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 {

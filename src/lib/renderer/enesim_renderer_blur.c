@@ -20,7 +20,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -90,11 +90,11 @@ static inline Enesim_Renderer_Blur * _blur_get(Enesim_Renderer *r)
 
 static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
 		Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	if (!thiz->src)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "No surface set");
+		ENESIM_RENDERER_LOG(r, log, "No surface set");
 		return EINA_FALSE;
 	}
 	/* lock the surface for read only */
@@ -402,14 +402,14 @@ static const char * _blur_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
 {
 	Enesim_Renderer_Blur *thiz;
 	double rx, ry;
 
 	thiz = _blur_get(r);
 	enesim_renderer_color_get(r, &thiz->color);
-	if (!_blur_state_setup(thiz, r, s, error))
+	if (!_blur_state_setup(thiz, r, s, log))
 		return EINA_FALSE;
 
 	rx = ((2 * thiz->rx) + 1.01) / 2.0;

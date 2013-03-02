@@ -26,7 +26,7 @@
 
 #if BUILD_OPENGL
 #include "enesim_surface.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
 #include "enesim_color.h"

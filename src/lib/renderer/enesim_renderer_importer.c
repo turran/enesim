@@ -18,7 +18,7 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -237,7 +237,7 @@ static const char *_importer_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
 {
 	Enesim_Renderer_Importer *thiz;
 
@@ -274,7 +274,7 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 		break;
 
 		default:
-		ENESIM_RENDERER_ERROR(r, error, "Invalid format %d", thiz->cfmt);
+		ENESIM_RENDERER_LOG(r, log, "Invalid format %d", thiz->cfmt);
 		return EINA_FALSE;
 		break;
 	}

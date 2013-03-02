@@ -20,7 +20,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -545,7 +545,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 		case ENESIM_BACKEND_SOFTWARE:
 		if (!enesim_renderer_sw_setup(r, s, error))
 		{
-			ENESIM_RENDERER_ERROR(r, error, "Software setup failed on '%s'", r->state.name);
+			ENESIM_RENDERER_LOG(r, error, "Software setup failed on '%s'", r->state.name);
 			ret = EINA_FALSE;
 			break;
 		}
@@ -555,7 +555,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 #if BUILD_OPENCL
 		if (!enesim_renderer_opencl_setup(r, s, error))
 		{
-			ENESIM_RENDERER_ERROR(r, error, "OpenCL setup failed");
+			ENESIM_RENDERER_LOG(r, error, "OpenCL setup failed");
 			ret = EINA_FALSE;
 		}
 #endif
@@ -565,7 +565,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 #if BUILD_OPENGL
 		if (!enesim_renderer_opengl_setup(r, s, error))
 		{
-			ENESIM_RENDERER_ERROR(r, error, "OpenGL setup failed");
+			ENESIM_RENDERER_LOG(r, error, "OpenGL setup failed");
 			ret = EINA_FALSE;
 		}
 #endif

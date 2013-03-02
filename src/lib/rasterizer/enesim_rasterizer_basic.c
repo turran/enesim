@@ -22,7 +22,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -1174,7 +1174,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	state = &thiz->state;
 	if (!thiz->figure)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "No figure to rasterize");
+		ENESIM_RENDERER_LOG(r, error, "No figure to rasterize");
 		return EINA_FALSE;
 	}
 
@@ -1212,7 +1212,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			if ((npts < 2) ||
 					((npts < 3) && (draw_mode != ENESIM_SHAPE_DRAW_MODE_STROKE)))
 			{
-				ENESIM_RENDERER_ERROR(r, error, "Not enough points %d", npts);
+				ENESIM_RENDERER_LOG(r, error, "Not enough points %d", npts);
 				return EINA_FALSE;
 			}
 			nvectors += npts;
@@ -1341,7 +1341,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				{
 					/* FIXME what to do here?
 					 * skip this point, pick the next? */
-					ENESIM_RENDERER_ERROR(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/512.0, x0, y0, x1, y1);
+					ENESIM_RENDERER_LOG(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/512.0, x0, y0, x1, y1);
 					return EINA_FALSE;
 				}
 #endif

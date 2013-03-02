@@ -20,7 +20,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -240,7 +240,7 @@ static void _dispmap_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *
 
 static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Dispmap *thiz;
 	Enesim_Matrix m;

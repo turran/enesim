@@ -15,17 +15,17 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_ERROR_H_
-#define ENESIM_ERROR_H_
+#ifndef ENESIM_LOG_H_
+#define ENESIM_LOG_H_
 
 /**
- * @def ENESIM_ERROR(err, fmt, ...)
+ * @def ENESIM_LOG(err, fmt, ...)
  *
  * Calls enesim_log_add_parametric() with current file, function and line.
  *
  * @see enesim_log_add_parametric()
  */
-#define ENESIM_ERROR(err, fmt, ...) (enesim_log_add_parametric(err, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__)
+#define ENESIM_LOG(log, fmt, ...) (enesim_log_add_parametric(log, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__)
 
 /**
  * @typedef Enesim_Log
@@ -34,9 +34,9 @@
 typedef struct _Enesim_Log Enesim_Log;
 
 EAPI Enesim_Log * enesim_log_add(Enesim_Log *error, const char *string);
-EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *error, const char *file, const char *function, int line, char *fmt, va_list args);
-EAPI void enesim_log_delete(Enesim_Log *error);
-EAPI void enesim_log_dump(const Enesim_Log *error);
+EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *log, const char *file, const char *function, int line, char *fmt, va_list args);
+EAPI void enesim_log_delete(Enesim_Log *log);
+EAPI void enesim_log_dump(const Enesim_Log *log);
 
 #endif
 

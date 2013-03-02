@@ -19,7 +19,7 @@
 #include "libargb.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -189,7 +189,7 @@ static const char * _background_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
@@ -219,7 +219,7 @@ static Eina_Bool _background_opencl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		const char **program_name, const char **program_source,
-		size_t *program_length, Enesim_Log **error)
+		size_t *program_length, Enesim_Log **log)
 {
 	Enesim_Renderer_Background *thiz;
 
@@ -268,7 +268,7 @@ static Eina_Bool _background_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **error EINA_UNUSED)
+		Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 

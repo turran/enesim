@@ -22,7 +22,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -1570,12 +1570,12 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 
 	if (!thiz->under_figure && thiz->over_figure)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "No figure to rasterize");
+		ENESIM_RENDERER_LOG(r, error, "No figure to rasterize");
 		return EINA_FALSE;
 	}
 	if (!thiz->over && !thiz->under)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "No rasterizers to use");
+		ENESIM_RENDERER_LOG(r, error, "No rasterizers to use");
 		return EINA_FALSE;
 	}
 
@@ -1598,7 +1598,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		{
 			if (!thiz->over)
 			{
-				ENESIM_RENDERER_ERROR(r, error, "No over rasterizer");
+				ENESIM_RENDERER_LOG(r, error, "No over rasterizer");
 				return EINA_FALSE;
 			}
 			enesim_rasterizer_figure_set(thiz->over, thiz->over_figure);
@@ -1608,7 +1608,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		{
 			if (!thiz->under)
 			{
-				ENESIM_RENDERER_ERROR(r, error, "No under rasterizer");
+				ENESIM_RENDERER_LOG(r, error, "No under rasterizer");
 				return EINA_FALSE;
 			}
 			enesim_rasterizer_figure_set(thiz->under, thiz->under_figure);

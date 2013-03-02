@@ -18,7 +18,7 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -117,15 +117,15 @@ static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = _figure_get(r);
 	if (!enesim_figure_polygon_count(thiz->figure))
 	{
-		/* TODO no polys do nothing, error? ok? */
-		ENESIM_RENDERER_ERROR(r, error, "No points on the polygon, nothing to draw");
+		/* TODO no polys do nothing, log? ok? */
+		ENESIM_RENDERER_LOG(r, log, "No points on the polygon, nothing to draw");
 		return EINA_FALSE;
 	}
 

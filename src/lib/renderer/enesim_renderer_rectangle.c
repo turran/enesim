@@ -19,7 +19,7 @@
 #include "libargb.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -168,7 +168,7 @@ static const char * _rectangle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
@@ -186,7 +186,7 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 		h = thiz->current.height;
 		if ((w < 1) || (h < 1))
 		{
-			ENESIM_RENDERER_ERROR(r, error, "Invalid size %g %g", w, h);
+			ENESIM_RENDERER_LOG(r, log, "Invalid size %g %g", w, h);
 			return EINA_FALSE;
 		}
 
@@ -354,7 +354,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _rectangle_descriptor = {
  * @return A new rectangle renderer.
  *
  * This function returns a newly allocated rectangle renderer. On memory
- * error, this function returns @c NULL.
+ * log, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 {

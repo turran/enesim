@@ -24,7 +24,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -541,7 +541,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	}
 	if (!fill)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "Even if the setup did not failed, there's no fill function");
+		ENESIM_RENDERER_LOG(r, error, "Even if the setup did not failed, there's no fill function");
 		enesim_renderer_sw_cleanup(r, s);
 		return EINA_FALSE;
 	}

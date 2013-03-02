@@ -18,7 +18,7 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -294,7 +294,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 			enesim_renderer_name_get(r, &name);
 			if (!name)
 			{
-				ENESIM_RENDERER_ERROR(r, error, "Renderer with no name?");
+				ENESIM_RENDERER_LOG(r, error, "Renderer with no name?");
 				return EINA_FALSE;
 			}
 
@@ -360,7 +360,7 @@ setup:
         status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
         if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
         {
-		ENESIM_RENDERER_ERROR(r, error, "Impossible too setup the framebuffer %d", status);
+		ENESIM_RENDERER_LOG(r, error, "Impossible too setup the framebuffer %d", status);
         }
 
 	/* store the data returned by the setup */

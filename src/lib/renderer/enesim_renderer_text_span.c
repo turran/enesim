@@ -19,7 +19,7 @@
 
 #include "enesim_main.h"
 #include "enesim_eina.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -492,7 +492,7 @@ static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r EINA_UNUS
 
 static Eina_Bool _enesim_text_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Matrix_Type type;

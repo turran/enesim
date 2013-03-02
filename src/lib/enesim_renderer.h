@@ -115,7 +115,7 @@ EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Log **error, cons
 
 #ifdef ENESIM_EXTENSION
 /** Helper macro to add an error on a renderer based function */
-#define ENESIM_RENDERER_ERROR(r, error, fmt, ...) \
+#define ENESIM_RENDERER_LOG(r, error, fmt, ...) \
 	enesim_renderer_error_add(r, error, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__);
 
 /** Renderer API/ABI version */

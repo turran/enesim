@@ -19,7 +19,7 @@
 #include "libargb.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -856,7 +856,7 @@ static void _path_free(Enesim_Renderer *r)
 
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **log)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	const Enesim_Renderer_State *cs;
@@ -891,7 +891,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_color_set(thiz->bifigure, cs->current.color);
 	enesim_renderer_origin_set(thiz->bifigure, cs->current.ox, cs->current.oy);
 
-	if (!enesim_renderer_setup(thiz->bifigure, s, error))
+	if (!enesim_renderer_setup(thiz->bifigure, s, log))
 	{
 		return EINA_FALSE;
 	}
@@ -1007,7 +1007,7 @@ static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **error EINA_UNUSED)
+		Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	Enesim_Renderer_Path_Enesim_OpenGL *gl;

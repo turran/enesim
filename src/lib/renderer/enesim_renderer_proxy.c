@@ -18,7 +18,7 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_error.h"
+#include "enesim_log.h"
 #include "enesim_eina.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
@@ -89,20 +89,20 @@ static void _proxy_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 static Eina_Bool _proxy_state_setup(Enesim_Renderer_Proxy *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **log)
 {
 	if (!thiz->proxied)
 	{
-		ENESIM_RENDERER_ERROR(r, error, "No proxied");
+		ENESIM_RENDERER_LOG(r, log, "No proxied");
 		return EINA_FALSE;
 	}
 
-	if (!enesim_renderer_setup(thiz->proxied, s, error))
+	if (!enesim_renderer_setup(thiz->proxied, s, log))
 	{
 		const char *name;
 
 		enesim_renderer_name_get(thiz->proxied, &name);
-		ENESIM_RENDERER_ERROR(r, error, "Proxy renderer %s can not setup", name);
+		ENESIM_RENDERER_LOG(r, log, "Proxy renderer %s can not setup", name);
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
@@ -124,12 +124,12 @@ static const char * _proxy_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
 {
 	Enesim_Renderer_Proxy *thiz;
 
  	thiz = _proxy_get(r);
-	if (!_proxy_state_setup(thiz, r, s, error))
+	if (!_proxy_state_setup(thiz, r, s, log))
 		return EINA_FALSE;
 
 	*fill = _proxy_span;
@@ -242,12 +242,12 @@ static void _proxy_free(Enesim_Renderer *r)
 static Eina_Bool _proxy_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Enesim_Renderer_Proxy *thiz;
 
  	thiz = _proxy_get(r);
-	if (!_proxy_state_setup(thiz, r, s, error))
+	if (!_proxy_state_setup(thiz, r, s, log))
 		return EINA_FALSE;
 
 	*draw = _proxy_opengl_draw;

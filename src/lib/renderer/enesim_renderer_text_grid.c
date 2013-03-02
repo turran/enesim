@@ -119,7 +119,7 @@ static const char * _enesim_text_grid_name(Enesim_Renderer *r)
 static Eina_Bool _enesim_text_grid_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **error)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
 {
 	Enesim_Text_Grid *e;
 

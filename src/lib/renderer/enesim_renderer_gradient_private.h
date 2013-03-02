@@ -254,7 +254,7 @@ typedef Eina_Bool (*Enesim_Renderer_Gradient_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s,
 		Enesim_Renderer_Gradient_Sw_Draw *draw,
-		Enesim_Log **error);
+		Enesim_Log **log);
 
 typedef struct _Enesim_Renderer_Gradient_Descriptor
 {
