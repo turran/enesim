@@ -31,6 +31,7 @@
 #include "enesim_renderer.h"
 
 #include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
 
 #include "enesim_pool_private.h"
 #include "enesim_buffer_private.h"

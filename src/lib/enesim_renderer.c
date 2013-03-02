@@ -445,6 +445,27 @@ void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to)
 	enesim_renderer_quality_set(to, state->current.quality);
 }
 
+void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char *file,
+		const char *function, int line, char *fmt, ...)
+{
+	const char *name;
+	va_list args;
+	char str[PATH_MAX];
+	int num;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	if (!error)
+		return;
+	enesim_renderer_name_get(r, &name);
+	va_start(args, fmt);
+	num = snprintf(str, PATH_MAX, "%s:%d %s %s ", file, line, function, name);
+	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
+	str[num++] = '\n';
+	str[num] = '\0';
+	va_end(args);
+
+	*error = enesim_log_add(*error, str);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -1129,32 +1150,6 @@ end:
 	enesim_renderer_cleanup(r, s);
 
 	return ret;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Log **error, const char *file,
-		const char *function, int line, char *fmt, ...)
-{
-	const char *name;
-	va_list args;
-	char str[PATH_MAX];
-	int num;
-
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!error)
-		return;
-	enesim_renderer_name_get(r, &name);
-	va_start(args, fmt);
-	num = snprintf(str, PATH_MAX, "%s:%d %s %s ", file, line, function, name);
-	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
-	str[num++] = '\n';
-	str[num] = '\0';
-	va_end(args);
-
-	*error = enesim_log_add(*error, str);
 }
 
 #if 0

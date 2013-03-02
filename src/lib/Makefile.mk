@@ -49,6 +49,7 @@ src/lib/enesim_compositor_private.h \
 src/lib/enesim_converter_private.h \
 src/lib/enesim_image_private.h \
 src/lib/enesim_matrix_private.h \
+src/lib/enesim_opengl_private.h \
 src/lib/enesim_pool_private.h \
 src/lib/enesim_renderer_private.h \
 src/lib/enesim_rasterizer_private.h \

@@ -29,23 +29,14 @@
 #include "enesim_renderer.h"
 
 #include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
-#if 0
-EAPI void enesim_renderer_opengl_compile_program(Enesim_Renderer *r ...)
-{
-
-}
-#endif
-
-EAPI GLenum enesim_opengl_texture_new(int width, int height)
+GLenum enesim_opengl_texture_new(int width, int height)
 {
 	GLenum id;
 
@@ -60,18 +51,18 @@ EAPI GLenum enesim_opengl_texture_new(int width, int height)
 	return id;
 }
 
-EAPI void enesim_opengl_texture_free(GLenum id)
+void enesim_opengl_texture_free(GLenum id)
 {
 	glDeleteTextures(1, &id);
 }
 
-EAPI void enesim_opengl_compiled_program_set(Enesim_Renderer_OpenGL_Compiled_Program *cp)
+void enesim_opengl_compiled_program_set(Enesim_Renderer_OpenGL_Compiled_Program *cp)
 {
 	if (!cp) glUseProgramObjectARB(0);
 	else glUseProgramObjectARB(cp->id);
 }
 
-EAPI void enesim_opengl_rop_set(Enesim_Rop rop)
+void enesim_opengl_rop_set(Enesim_Rop rop)
 {
 	glBlendEquation(GL_FUNC_ADD);
 	switch (rop)
@@ -89,12 +80,12 @@ EAPI void enesim_opengl_rop_set(Enesim_Rop rop)
 	}
 }
 
-EAPI void enesim_opengl_clip_unset(void)
+void enesim_opengl_clip_unset(void)
 {
 	glDisable(GL_SCISSOR_TEST);
 }
 
-EAPI void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww EINA_UNUSED, int hh)
+void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww EINA_UNUSED, int hh)
 {
 	GLint x;
 	GLint y;
@@ -117,7 +108,7 @@ EAPI void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww EINA_UNUSED,
 }
 
 /* area is the destination of area of a viewport of size WxH */
-EAPI void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
+void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
 		int w, int h, int tx EINA_UNUSED, int ty EINA_UNUSED)
 {
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -149,10 +140,20 @@ EAPI void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
-EAPI void enesim_opengl_init(void)
+void enesim_opengl_init(void)
 {
 	static int _init = 0;
 
 	if (++_init != 1) return;
 	glewInit();
+}/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+#if 0
+EAPI void enesim_renderer_opengl_compile_program(Enesim_Renderer *r ...)
+{
+
 }
+#endif
+
+

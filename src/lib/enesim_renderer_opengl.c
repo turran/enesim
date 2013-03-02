@@ -30,6 +30,7 @@
 
 #if BUILD_OPENGL
 #include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
 #endif
 
 #include "enesim_buffer_private.h"

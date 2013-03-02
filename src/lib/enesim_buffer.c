@@ -33,6 +33,7 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 #include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
 #endif
 /*============================================================================*
  *                                  Local                                     *

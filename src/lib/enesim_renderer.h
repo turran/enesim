@@ -110,17 +110,7 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_List *clips, int x, int y, Enesim_Log **error);
 
-EAPI void enesim_renderer_error_add(Enesim_Renderer *r, Enesim_Log **error, const char *file,
-		const char *function, int line, char *fmt, ...);
-
 #ifdef ENESIM_EXTENSION
-/** Helper macro to add an error on a renderer based function */
-#define ENESIM_RENDERER_LOG(r, error, fmt, ...) \
-	enesim_renderer_error_add(r, error, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__);
-
-/** Renderer API/ABI version */
-#define ENESIM_RENDERER_API 0
-
 /* opengl backend descriptor functions */
 typedef enum _Enesim_Renderer_OpenGL_Shader_Type
 {

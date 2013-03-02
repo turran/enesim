@@ -1,6 +1,5 @@
 Enesim
 ======
-+ Rename Enesim_Error to Enesim_Log
 + We have a performance problem when some renderer has changed. Basically on the practice
   we end having a full tree of renderers, several levels, proxies, whatever. When we need
   to know what area to draw we basically iterate over all the tree. That means that we start
