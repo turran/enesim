@@ -36,6 +36,10 @@
 #include "enesim_converter.h"
 #include "enesim_image.h"
 
+#if BUILD_OPENGL
+#include "enesim_opengl_private.h"
+#endif
+
 #include "enesim_pool_private.h"
 #include "enesim_image_private.h"
 #include "enesim_compositor_private.h"

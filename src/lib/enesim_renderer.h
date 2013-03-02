@@ -110,39 +110,6 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Eina_List *clips, int x, int y, Enesim_Log **error);
 
-#ifdef ENESIM_EXTENSION
-/* opengl backend descriptor functions */
-typedef enum _Enesim_Renderer_OpenGL_Shader_Type
-{
-	ENESIM_SHADER_VERTEX,
-	ENESIM_SHADER_GEOMETRY,
-	ENESIM_SHADER_FRAGMENT,
-	ENESIM_SHADERS,
-} Enesim_Renderer_OpenGL_Shader_Type;
-
-typedef struct _Enesim_Renderer_OpenGL_Shader Enesim_Renderer_OpenGL_Shader;
-typedef struct _Enesim_Renderer_OpenGL_Program Enesim_Renderer_OpenGL_Program;
-
-struct _Enesim_Renderer_OpenGL_Shader
-{
-	Enesim_Renderer_OpenGL_Shader_Type type;
-	const char *name;
-	const char *source;
-};
-
-struct _Enesim_Renderer_OpenGL_Program
-{
-	const char *name;
-	Enesim_Renderer_OpenGL_Shader **shaders;
-	int num_shaders;
-};
-
-typedef void (*Enesim_Renderer_OpenGL_Draw)(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int dw, int dh);
-
-
-#endif
-
 /**
  * @}
  */

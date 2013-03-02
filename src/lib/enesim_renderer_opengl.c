@@ -127,7 +127,7 @@ static Eina_Bool _opengl_shader_compile(GLenum pid,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _opengl_compiled_program_link(Enesim_Renderer_OpenGL_Compiled_Program *cp)
+static Eina_Bool _opengl_compiled_program_link(Enesim_OpenGL_Compiled_Program *cp)
 {
 	int ok = 0;
 
@@ -147,7 +147,7 @@ static Eina_Bool _opengl_compiled_program_link(Enesim_Renderer_OpenGL_Compiled_P
 }
 
 static Eina_Bool _opengl_compiled_program_new(
-		Enesim_Renderer_OpenGL_Compiled_Program *cp,
+		Enesim_OpenGL_Compiled_Program *cp,
 		Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Data *rdata EINA_UNUSED,
@@ -191,7 +191,7 @@ error:
 }
 
 static void _opengl_compiled_program_free(
-		Enesim_Renderer_OpenGL_Compiled_Program *cp)
+		Enesim_OpenGL_Compiled_Program *cp)
 {
 	int i;
 
@@ -316,11 +316,11 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 			if (!programs)
 				goto setup;
 
-			pdata->compiled = calloc(pdata->num_programs, sizeof(Enesim_Renderer_OpenGL_Compiled_Program));
+			pdata->compiled = calloc(pdata->num_programs, sizeof(Enesim_OpenGL_Compiled_Program));
 			for (i = 0; i < pdata->num_programs; i++)
 			{
 				Enesim_Renderer_OpenGL_Program *p;
-				Enesim_Renderer_OpenGL_Compiled_Program *cp;
+				Enesim_OpenGL_Compiled_Program *cp;
 
 				p = pdata->programs[i];
 				cp = &pdata->compiled[i];

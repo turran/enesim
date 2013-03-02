@@ -471,7 +471,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		Eina_Bool silhoutte,
 		const Eina_Rectangle *area)
 {
-	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_OpenGL_Compiled_Program *cp;
 	/* TODO we still miss to render the relative renderer in case we have one */
 	/* if so, render the inner renderer first into a temporary texture */
 	/* else use the ambient shader */
@@ -645,7 +645,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Path_Enesim_OpenGL *gl;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
-	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_OpenGL_Compiled_Program *cp;
 	Enesim_Renderer *rel;
 	Enesim_Color color;
 	Enesim_Color final_color;

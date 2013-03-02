@@ -129,7 +129,7 @@ static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 {
 	Enesim_Renderer_Background * thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_OpenGL_Compiled_Program *cp;
 
 	thiz = _background_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);

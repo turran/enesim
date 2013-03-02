@@ -154,7 +154,7 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUS
 {
 	Enesim_Renderer_Checker *thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Renderer_OpenGL_Compiled_Program *cp;
+	Enesim_OpenGL_Compiled_Program *cp;
 
 	thiz = _checker_get(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);

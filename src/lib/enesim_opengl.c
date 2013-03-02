@@ -56,7 +56,7 @@ void enesim_opengl_texture_free(GLenum id)
 	glDeleteTextures(1, &id);
 }
 
-void enesim_opengl_compiled_program_set(Enesim_Renderer_OpenGL_Compiled_Program *cp)
+void enesim_opengl_compiled_program_set(Enesim_OpenGL_Compiled_Program *cp)
 {
 	if (!cp) glUseProgramObjectARB(0);
 	else glUseProgramObjectARB(cp->id);

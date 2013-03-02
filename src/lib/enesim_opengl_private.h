@@ -18,33 +18,12 @@
 #ifndef ENESIM_OPENGL_PRIVATE_H_
 #define ENESIM_OPENGL_PRIVATE_H_
 
-typedef struct _Enesim_Renderer_OpenGL_Compiled_Program
+typedef struct _Enesim_OpenGL_Compiled_Program
 {
 	GLenum id;
 	GLenum *shaders;
 	int num_shaders;
-} Enesim_Renderer_OpenGL_Compiled_Program;
-
-typedef struct _Enesim_Renderer_OpenGL_Program_Data
-{
-	Enesim_Renderer_OpenGL_Program **programs;
-	int num_programs;
-	/* generated */
-	Enesim_Renderer_OpenGL_Compiled_Program *compiled;
-} Enesim_Renderer_OpenGL_Program_Data;
-
-typedef struct _Enesim_Renderer_OpenGL_Data
-{
-	/* data fetch on the initialize */
-	Enesim_Renderer_OpenGL_Program_Data *program;
-	/* data fetch on the setup */
-	Enesim_Renderer_OpenGL_Draw draw;
-	GLuint fbo;
-	/* FIXME remove this */
-	Eina_Bool has_geometry; /* has a geometry shader */
-	Eina_Bool has_vertex; /* has a vertex shader */
-	Eina_Bool does_geometry; /* the renderer defines the geometry */
-} Enesim_Renderer_OpenGL_Data;
+} Enesim_OpenGL_Compiled_Program;
 
 typedef struct _Enesim_Buffer_OpenGL_Data
 {
@@ -55,7 +34,7 @@ typedef struct _Enesim_Buffer_OpenGL_Data
 void enesim_opengl_init(void);
 GLenum enesim_opengl_texture_new(int width, int height);
 void enesim_opengl_texture_free(GLenum id);
-void enesim_opengl_compiled_program_set(Enesim_Renderer_OpenGL_Compiled_Program *cp);
+void enesim_opengl_compiled_program_set(Enesim_OpenGL_Compiled_Program *cp);
 void enesim_opengl_rop_set(Enesim_Rop rop);
 void enesim_opengl_clip_unset(void);
 void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww, int hh);
