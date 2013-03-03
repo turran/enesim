@@ -264,12 +264,6 @@ EAPI const char * enesim_format_name_get(Enesim_Format f)
 		case ENESIM_FORMAT_ARGB8888:
 		return "argb8888";
 
-		case ENESIM_FORMAT_XRGB8888:
-		return "xrgb8888";
-
-		case ENESIM_FORMAT_ARGB8888_SPARSE:
-		return "argb8888sp";
-
 		case ENESIM_FORMAT_A8:
 		return "a8";
 
@@ -296,8 +290,6 @@ EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h)
 	switch (f)
 	{
 		case ENESIM_FORMAT_ARGB8888:
-		case ENESIM_FORMAT_XRGB8888:
-		case ENESIM_FORMAT_ARGB8888_SPARSE:
 		return w * h * sizeof(uint32_t);
 
 		case ENESIM_FORMAT_A8:

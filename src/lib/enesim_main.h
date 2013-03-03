@@ -73,9 +73,7 @@ typedef enum _Enesim_Format
 {
 	ENESIM_FORMAT_NONE,
 	ENESIM_FORMAT_ARGB8888,  /**< argb32 */
-	ENESIM_FORMAT_ARGB8888_SPARSE,  /**< argb32 with alpha-sparse pixels */
-	ENESIM_FORMAT_XRGB8888,  /**< argb32 with alpha = 255 */
-	ENESIM_FORMAT_A8, /**< assume all a8 is sparse? */
+	ENESIM_FORMAT_A8, /**< a8 */
 	ENESIM_FORMATS
 } Enesim_Format;
 

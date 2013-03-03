@@ -46,8 +46,6 @@ static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
 	switch (fmt)
 	{
 		case ENESIM_FORMAT_ARGB8888:
-		case ENESIM_FORMAT_ARGB8888_SPARSE:
-		case ENESIM_FORMAT_XRGB8888:
 		*buf_fmt = ENESIM_BUFFER_FORMAT_ARGB8888_PRE;
 		return EINA_TRUE;
 
@@ -140,8 +138,6 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 	switch (fmt)
 	{
 		case ENESIM_FORMAT_ARGB8888:
-		case ENESIM_FORMAT_ARGB8888_SPARSE:
-		case ENESIM_FORMAT_XRGB8888:
 		sw_data.argb8888_pre.plane0 = data;
 		sw_data.argb8888_pre.plane0_stride = stride ? stride : w * 4;
 		break;
@@ -331,8 +327,6 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *s
 	switch (s->format)
 	{
 		case ENESIM_FORMAT_ARGB8888:
-		case ENESIM_FORMAT_ARGB8888_SPARSE:
-		case ENESIM_FORMAT_XRGB8888:
 		*data = sw_data.argb8888_pre.plane0;
 		if (stride) *stride = sw_data.argb8888_pre.plane0_stride;
 		break;
