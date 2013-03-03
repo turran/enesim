@@ -61,6 +61,9 @@ static inline void enesim_rectangle_coords_from(Enesim_Rectangle *r, double x, d
 	r->h = h;
 }
 
+EAPI void enesim_rectangle_union(Enesim_Rectangle *rr1, Enesim_Rectangle *rr2,
+		Enesim_Rectangle *dst);
+
 /**
  * @}
  */

@@ -39,6 +39,7 @@ src/lib/enesim_main.c \
 src/lib/enesim_matrix.c \
 src/lib/enesim_pool.c \
 src/lib/enesim_rasterizer.c \
+src/lib/enesim_rectangle.c \
 src/lib/enesim_renderer.c \
 src/lib/enesim_renderer_sw.c \
 src/lib/enesim_surface.c \
