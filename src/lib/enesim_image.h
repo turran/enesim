@@ -140,6 +140,7 @@ typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
 /* FIXME We need to fix the saveable functions */
 typedef void * (*Enesim_Image_Provider_Options_Parse_Cb)(const char *options);
 typedef void (*Enesim_Image_Provider_Options_Free_Cb)(void *options);
+/* TODO also pass the backend, pool and desired format? */
 typedef Eina_Bool (*Enesim_Image_Provider_Loadable_Cb)(Enesim_Image_Data *data);
 typedef Eina_Bool (*Enesim_Image_Provider_Saveable_Cb)(const char *file);
 typedef Eina_Error (*Enesim_Image_Provider_Info_Get_Cb)(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options);
@@ -149,16 +150,14 @@ typedef Eina_Bool (*Enesim_Image_Provider_Save_Cb)(Enesim_Image_Data *data, Enes
 typedef struct _Enesim_Image_Provider_Descriptor
 {
 	const char *name;
-	void * (*options_parse)(const char *options);
-	void (*options_free)(void *options);
-	/* TODO also pass the backend, pool and desired format? */
-	Eina_Bool (*loadable)(Enesim_Image_Data *data);
-	Eina_Bool (*saveable)(const char *file); /* FIXME fix the arg */
-	Eina_Error (*info_get)(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options);
-	Eina_Error (*load)(Enesim_Image_Data *data, Enesim_Buffer *b, void *options);
-	Eina_Bool (*save)(Enesim_Image_Data *data, Enesim_Surface *s, void *options);
+	Enesim_Image_Provider_Options_Parse_Cb options_parse;
+	Enesim_Image_Provider_Options_Free_Cb options_free;
+	Enesim_Image_Provider_Loadable_Cb loadable;
+	Enesim_Image_Provider_Saveable_Cb saveable;
+	Enesim_Image_Provider_Info_Get_Cb info_get;
+	Enesim_Image_Provider_Load_Cb load;
+	Enesim_Image_Provider_Save_Cb save;
 } Enesim_Image_Provider_Descriptor;
-
 
 EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd, Enesim_Priority priority, const char *mime);
 EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd, const char *mime);
@@ -180,10 +179,13 @@ EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
  * @{
  */
 
+typedef const char *(*Enesim_Image_Finder_Data_From_Cb)(Enesim_Image_Data *data);
+typedef const char *(*Enesim_Image_Finder_Extension_From_Cb)(const char *ext);
+
 typedef struct _Enesim_Image_Finder
 {
-	const char *(*data_from)(Enesim_Image_Data *data);
-	const char *(*extension_from)(const char *ext);
+	Enesim_Image_Finder_Data_From_Cb data_from;
+	Enesim_Image_Finder_Extension_From_Cb extension_from;
 } Enesim_Image_Finder;
 
 EAPI Eina_Bool enesim_image_finder_register(Enesim_Image_Finder *f);
