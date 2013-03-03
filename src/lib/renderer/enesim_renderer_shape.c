@@ -769,8 +769,6 @@ EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_R
 	if (thiz->state.current.stroke.r)
 		enesim_renderer_unref(thiz->state.current.stroke.r);
 	thiz->state.current.stroke.r = stroke;
-	if (stroke)
-		thiz->state.current.stroke.r = enesim_renderer_ref(stroke);
 	thiz->state.changed = EINA_TRUE;
 }
 
@@ -830,8 +828,6 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 	if (thiz->state.current.fill.r)
 		enesim_renderer_unref(thiz->state.current.fill.r);
 	thiz->state.current.fill.r = fill;
-	if (fill)
-		thiz->state.current.fill.r = enesim_renderer_ref(fill);
 	thiz->state.changed = EINA_TRUE;
 }
 
