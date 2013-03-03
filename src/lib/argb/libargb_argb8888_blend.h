@@ -108,6 +108,8 @@ static inline void argb8888_pt_argb8888_none_none_blend(uint32_t *d,
 /*============================================================================*
  *                              Span operations                               *
  *============================================================================*/
+
+/* no mask */
 static inline void argb8888_sp_none_color_none_blend(uint32_t *d,
 		unsigned int len, uint32_t *s EINA_UNUSED,
 		uint32_t color, uint32_t *m EINA_UNUSED)
@@ -233,44 +235,10 @@ static inline void argb8888_sp_argb8888_color_none_blend(uint32_t *d,
 #endif
 }
 
-
-static inline void argb8888_sp_none_color_argb8888_blend(uint32_t *d, unsigned int len,
-		uint32_t *s EINA_UNUSED, uint32_t color,
-		uint32_t *m)
-{
-	uint16_t ca = 256 - (color >> 24);
-	uint32_t *end = d + len;
-	while (d < end)
-	{
-		uint16_t ma = (*m) >> 24;
-
-		switch (ma)
-		{
-			case 0:
-			break;
-
-			case 255:
-			argb8888_blend(d, ca, color);
-			break;
-
-			default:
-			{
-				uint32_t mc;
-
-				mc = argb8888_mul_sym(ma, color);
-				ma = 256 - (mc >> 24);
-				argb8888_blend(d, ma, mc);
-			}
-			break;
-		}
-		d++;
-		m++;
-	}
-}
+/* a8 mask */
 
 static inline void argb8888_sp_none_color_a8_blend(uint32_t *d, unsigned int len,
-		uint32_t *s EINA_UNUSED, uint32_t color,
-		uint8_t *m)
+		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
 {
 	uint16_t ca = 256 - (color >> 24);
 	uint32_t *end = d + len;
@@ -302,27 +270,162 @@ static inline void argb8888_sp_none_color_a8_blend(uint32_t *d, unsigned int len
 	}
 }
 
-static inline void argb8888_sp_argb8888_none_argb8888_blend(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color EINA_UNUSED,
-		uint32_t *m)
+/* argb luminance-channel masking */
+static inline void argb8888_sp_argb8888_none_argb_luminance_blend(uint32_t *d, unsigned int len,
+		uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
 
 	while (d < end)
 	{
-		uint16_t ma = (*m) >> 24;
+		uint32_t p = *m;
 
-		switch (ma)
+		switch (p)
 		{
 			case 0:
 			break;
 
-			case 255:
+			case 0xffffffff:
 			{
 				uint16_t sa;
 
 				sa = 256 - ((*s) >> 24);
-				argb8888_blend(d, sa, *s);
+				if (sa < 256)
+					argb8888_blend(d, sa, *s);
+			}
+			break;
+
+			default:
+			{
+				uint16_t sa;
+
+				sa = 1 + ((55 * (p & 0xff0000)) >> 24) + 
+					((184 * (p & 0xff00)) >> 16) + 
+					((19 * (p & 0xff)) >> 8);
+				p = argb8888_mul_256(sa, *s);
+				sa = 256 - (p >> 24);
+				if (sa < 256)
+					argb8888_blend(d, sa, p);
+			}
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+}
+
+static inline void argb8888_sp_argb8888_color_argb_luminance_blend(uint32_t *d, unsigned int len,
+		uint32_t *s, uint32_t color, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	uint16_t ca = 1 + (color >> 24);
+/*
+   We use only the color aplha since using the luminace
+   channel for masks, as per svg, when used in conjunction
+   with an argb src, really only has the 'color' being opacity.
+
+*/
+	while (d < end)
+	{
+		uint32_t p = *m;
+
+		switch (p)
+		{
+			case 0:
+			break;
+
+			case 0xffffffff:
+			{
+				if (p == *s)
+				{
+					uint16_t sa;
+
+					p = argb8888_mul_256(ca, p);
+					sa = 256 - (p >> 24);
+					argb8888_blend(d, sa, p);
+				}
+			}
+			break;
+
+			default:
+			{
+				if (*s)
+				{
+					uint16_t sa;
+
+					sa = 1 + ((55 * (p & 0xff0000)) >> 24) + 
+						((184 * (p & 0xff00)) >> 16) + 
+						((19 * (p & 0xff)) >> 8);
+					sa = (ca * sa) >> 8;
+					p = argb8888_mul_256(sa, *s);
+					sa = 256 - (p >> 24);
+					argb8888_blend(d, sa, p);
+				}
+			}
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+}
+
+/* argb alpha-channel masking */
+static inline void argb8888_sp_none_color_argb8888_blend(uint32_t *d, unsigned int len,
+		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
+{
+	uint16_t ca = 256 - (color >> 24);
+	uint32_t *end = d + len;
+	while (d < end)
+	{
+		uint16_t ma = 1 + ((*m) >> 24);
+
+		switch (ma)
+		{
+			case 1:
+			break;
+
+			case 256:
+			argb8888_blend(d, ca, color);
+			break;
+
+			default:
+			{
+				uint32_t mc;
+
+				mc = argb8888_mul_256(ma, color);
+				ma = 256 - (mc >> 24);
+				argb8888_blend(d, ma, mc);
+			}
+			break;
+		}
+		d++;
+		m++;
+	}
+}
+
+static inline void argb8888_sp_argb8888_none_argb8888_blend(uint32_t *d, unsigned int len,
+		uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+{
+	uint32_t *end = d + len;
+
+	while (d < end)
+	{
+		uint16_t ma = 1 + ((*m) >> 24);
+
+		switch (ma)
+		{
+			case 1:
+			break;
+
+			case 256:
+			{
+				uint16_t sa;
+
+				sa = 256 - ((*s) >> 24);
+				if (sa < 256)
+					argb8888_blend(d, sa, *s);
 			}
 			break;
 
@@ -330,9 +433,60 @@ static inline void argb8888_sp_argb8888_none_argb8888_blend(uint32_t *d, unsigne
 			{
 				uint32_t mc;
 
-				mc = argb8888_mul_sym(ma, *s);
+				mc = argb8888_mul_256(ma, *s);
 				ma = 256 - (mc >> 24);
-				argb8888_blend(d, ma, mc);
+				if (ma < 256)
+					argb8888_blend(d, ma, mc);
+			}
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+}
+
+
+static inline void argb8888_sp_argb8888_color_argb8888_blend(uint32_t *d, unsigned int len,
+		uint32_t *s, uint32_t color, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	uint16_t ca = 1 + (color >> 24);
+/*
+   We probably should just use the color's alpha only,
+   since that's somewhat faster and it's all that svg
+   considers when there's also an argb src
+   (ie. the color is purely opacity then).
+*/
+	while (d < end)
+	{
+		uint16_t ma = 1 + ((*m) >> 24);
+
+		switch (ma)
+		{
+			case 1:
+			break;
+
+			case 256:
+			{
+				uint32_t mc;
+
+				mc = argb8888_mul_256(ca, *s);
+				ma = 256 - (mc >> 24);
+				if (ma < 256)
+					argb8888_blend(d, ma, mc);
+			}
+			break;
+
+			default:
+			{
+				uint32_t mc;
+
+				ma = (ma * ca) >> 8;
+				mc = argb8888_mul_256(ma, *s);
+				ma = 256 - (mc >> 24);
+				if (ma < 256)
+					argb8888_blend(d, ma, mc);
 			}
 			break;
 		}

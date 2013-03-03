@@ -79,8 +79,8 @@ static inline void argb8888_pt_argb8888_color_none_fill(uint32_t *d,
  *                              Span operations                               *
  *============================================================================*/
 
-/** "fill" functions - do a copy shaped by a mask **/
-/** dst = src*color*ma + dst*(1 - ma) **/
+/** "fill" functions - do a straight copy **/
+/** dst = src*color*ma **/
 /** no mask or src is equivalent to them being 1 everywhere **/
 static inline void argb8888_sp_none_color_none_fill(uint32_t *d, uint32_t len,
 		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m EINA_UNUSED)
@@ -130,7 +130,210 @@ static inline void argb8888_sp_argb8888_color_none_fill(uint32_t *d, uint32_t le
 	}
 }
 
+static inline void argb8888_sp_argb8888_color_argb8888_fill(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	while (d < end)
+	{
+		uint16_t a = *m >> 24;
+
+		switch (a)
+		{
+			case 0:
+			*d = 0;
+			break;
+
+			case 255:
+			*d = argb8888_mul4_sym(color, *s);
+			break;
+
+			default:
+			{
+				uint32_t _tmp_color = argb8888_mul4_sym(color, *s);
+
+				*d = argb8888_mul_sym(a, _tmp_color);
+			}
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+
+}
+
+static inline void argb8888_sp_argb8888_none_argb8888_fill(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	while (d < end)
+	{
+		uint16_t a = *m >> 24;
+		switch (a)
+		{
+			case 0:
+			*d = 0;
+			break;
+
+			case 255:
+			*d = *s;
+			break;
+
+			default:
+			*d = argb8888_mul_sym(a, *s);
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+
+}
+
 static inline void argb8888_sp_none_color_argb8888_fill(uint32_t *d, uint32_t len,
+		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	while (d < end)
+	{
+		uint16_t a = *m >> 24;
+		switch (a)
+		{
+			case 0:
+			*d = 0;
+			break;
+
+			case 255:
+			*d = color;
+			break;
+
+			default:
+			*d = argb8888_mul_sym(a, color);
+			break;
+		}
+		d++;
+		m++;
+	}
+}
+
+static inline void argb8888_sp_none_none_argb8888_fill(uint32_t *d, uint32_t len,
+		uint32_t *s EINA_UNUSED, uint32_t color EINA_UNUSED, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	while (d < end)
+	{
+		// really should be result = ma<<24|ma<<16|ma<<8|ma
+		// but this is much faster and works for us
+		*d = *m;
+		d++;
+		m++;
+	}
+}
+
+static inline void argb8888_sp_none_color_a8_fill(uint32_t *d, uint32_t len,
+		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
+{
+	uint32_t *end = d + len;
+	while (d < end)
+	{
+		uint16_t a = *m;
+		switch (a)
+		{
+			case 0:
+			*d = 0;
+			break;
+
+			case 255:
+			*d = color;
+			break;
+
+			default:
+			*d = argb8888_mul_256(a + 1, color);
+			break;
+		}
+		d++;
+		m++;
+	}
+}
+
+static inline void argb8888_sp_argb8888_color_argb_luminance_fill(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	uint16_t ca = 1 + (color >> 24);
+	while (d < end)
+	{
+		uint32_t p = *m;
+
+		switch (p)
+		{
+			case 0:
+			*d = 0;
+			break;
+
+			case 0xffffffff:
+			*d = argb8888_mul_256(ca, *s);
+			break;
+
+			default:
+			{
+				uint16_t ma;
+
+				ma = 1 + ((55 * (p & 0xff0000)) >> 24) +
+					((184 * (p & 0xff00)) >> 16) +
+					((19 * (p & 0xff)) >> 8);
+				ma = (ca * ma) >> 8;
+				*d = argb8888_mul_256(ma, *s);
+			}
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+}
+
+static inline void argb8888_sp_argb8888_none_argb_luminance_fill(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	while (d < end)
+	{
+		uint32_t p = *m;
+		switch (p)
+		{
+			case 0:
+			*d = 0;
+			break;
+
+			case 0xffffffff:
+			*d = *s;
+			break;
+
+			default:
+			{
+				uint16_t ma;
+
+				ma = 1 + ((55 * (p & 0xff0000)) >> 24) +
+					((184 * (p & 0xff00)) >> 16) +
+					((19 * (p & 0xff)) >> 8);
+				*d = argb8888_mul_256(ma, *s);
+			}
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+
+}
+
+
+/** "copy" functions - do a copy shaped by a mask **/
+/** dst = src*color*ma + dst*(1 - ma) **/
+/** case of no mask agrees with the copy versions, so omitted **/
+static inline void argb8888_sp_none_color_argb8888_copy(uint32_t *d, uint32_t len,
 		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -155,7 +358,7 @@ static inline void argb8888_sp_none_color_argb8888_fill(uint32_t *d, uint32_t le
 	}
 }
 
-static inline void argb8888_sp_none_none_argb8888_fill(uint32_t *d, uint32_t len,
+static inline void argb8888_sp_none_none_argb8888_copy(uint32_t *d, uint32_t len,
 		uint32_t *s EINA_UNUSED, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -180,9 +383,8 @@ static inline void argb8888_sp_none_none_argb8888_fill(uint32_t *d, uint32_t len
 	}
 }
 
-static inline void argb8888_sp_argb8888_none_argb8888_fill(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED,
-		uint32_t *m)
+static inline void argb8888_sp_argb8888_none_argb8888_copy(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -207,7 +409,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_fill(uint32_t *d,
 	}
 }
 
-static inline void argb8888_sp_argb8888_color_argb8888_fill(uint32_t *d,
+static inline void argb8888_sp_argb8888_color_argb8888_copy(uint32_t *d,
 		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -237,7 +439,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_fill(uint32_t *d,
 
 }
 
-static inline void argb8888_sp_none_color_a8_fill(uint32_t *d, uint32_t len,
+static inline void argb8888_sp_none_color_a8_copy(uint32_t *d, uint32_t len,
 		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
 {
 	uint32_t *end = d + len;
@@ -262,30 +464,66 @@ static inline void argb8888_sp_none_color_a8_fill(uint32_t *d, uint32_t len,
 	}
 }
 
-/** "copy" functions - do a straight copy **/
-/** dst = src*color*ma **/
-/** case of no mask agrees with the fill versions, so omitted **/
-static inline void argb8888_sp_argb8888_color_argb8888_copy(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
+static inline void argb8888_sp_argb8888_none_argb_luminance_copy(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
-		switch (a)
+		uint32_t p = *m;
+		switch (p)
 		{
 			case 0:
-			*d = 0;
 			break;
 
-			case 255:
-			*d = argb8888_mul4_sym(color, *s);
+			case 0xffffffff:
+			*d = *s;
 			break;
 
 			default:
 			{
-				uint32_t _tmp_color = argb8888_mul4_sym(color, *s);
-				*d = argb8888_mul_sym(a, _tmp_color);
+				uint16_t ma;
+
+				ma = 1 + ((55 * (p & 0xff0000)) >> 24) +
+					((184 * (p & 0xff00)) >> 16) +
+					((19 * (p & 0xff)) >> 8);
+				*d = argb8888_interp_256(ma, *s, *d);
+			}
+			break;
+		}
+		m++;
+		s++;
+		d++;
+	}
+}
+
+static inline void argb8888_sp_argb8888_color_argb_luminance_copy(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
+{
+	uint32_t *end = d + len;
+	uint16_t ca = 1 + (color >> 24);
+	/* use color alpha only */
+	while (d < end)
+	{
+		uint32_t p = *m;
+		switch (p)
+		{
+			case 0:
+			break;
+
+			case 0xffffffff:
+			*d = argb8888_interp_256(ca, *s, *d);
+			break;
+
+			default:
+			{
+				uint16_t ma;
+
+				ma = 1 + ((55 * (p & 0xff0000)) >> 24) +
+					((184 * (p & 0xff00)) >> 16) +
+					((19 * (p & 0xff)) >> 8);
+				ma = (ca * ma) >> 8;
+				*d = argb8888_interp_256(ma, *s, *d);
 			}
 			break;
 		}
@@ -295,75 +533,6 @@ static inline void argb8888_sp_argb8888_color_argb8888_copy(uint32_t *d,
 	}
 
 }
-
-static inline void argb8888_sp_argb8888_none_argb8888_copy(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
-{
-	uint32_t *end = d + len;
-	while (d < end)
-	{
-		uint16_t a = *m >> 24;
-		switch (a)
-		{
-			case 0:
-			*d = 0;
-			break;
-
-			case 255:
-			*d = *s;
-			break;
-
-			default:
-			*d = argb8888_mul_sym(a, *s);
-			break;
-		}
-		m++;
-		s++;
-		d++;
-	}
-
-}
-
-static inline void argb8888_sp_none_color_argb8888_copy(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
-{
-	uint32_t *end = d + len;
-	while (d < end)
-	{
-		uint16_t a = *m >> 24;
-		switch (a)
-		{
-			case 0:
-			*d = 0;
-			break;
-
-			case 255:
-			*d = color;
-			break;
-
-			default:
-			*d = argb8888_mul_sym(a, color);
-			break;
-		}
-		d++;
-		m++;
-	}
-}
-
-static inline void argb8888_sp_none_none_argb8888_copy(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color EINA_UNUSED, uint32_t *m)
-{
-	uint32_t *end = d + len;
-	while (d < end)
-	{
-		// really should be result = ma<<24|ma<<16|ma<<8|ma
-		// but this is much faster and works for us
-		*d = *m;
-		d++;
-		m++;
-	}
-}
-
 
 #if 0
 static void argb8888_sp_pixel_fill_argb8888_mmx(Enesim_Surface_Data *d,
