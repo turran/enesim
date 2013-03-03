@@ -466,7 +466,7 @@ static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 
 static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
 	Enesim_Matrix_Type type;
@@ -565,7 +565,7 @@ static Eina_Bool _checker_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **log EINA_UNUSED)
+		Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
 

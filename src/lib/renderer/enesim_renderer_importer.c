@@ -108,7 +108,7 @@ static void _span_a8_none_argb8888(Enesim_Renderer *r,
 	}
 }
 
-static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
+static void _span_rgb888_none_argb8888(Enesim_Renderer *rend,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -116,7 +116,7 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(r);
+	thiz = _importer_get(rend);
  	ssrc = thiz->cdata.rgb888.plane0;
 	stride = thiz->cdata.rgb888.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -133,7 +133,7 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *r,
 	}
 }
 
-static void _span_bgr888_none_argb8888(Enesim_Renderer *r,
+static void _span_bgr888_none_argb8888(Enesim_Renderer *rend,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -141,7 +141,7 @@ static void _span_bgr888_none_argb8888(Enesim_Renderer *r,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(r);
+	thiz = _importer_get(rend);
  	ssrc = thiz->cdata.bgr888.plane0;
 	stride = thiz->cdata.bgr888.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -173,7 +173,7 @@ static void _span_bgr888_none_argb8888(Enesim_Renderer *r,
 /*
  * Note: a / 255 is well approximated by (a + 255) / 256
  */
-static void _span_cmyk_none_argb8888(Enesim_Renderer *r,
+static void _span_cmyk_none_argb8888(Enesim_Renderer *rend,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -181,7 +181,7 @@ static void _span_cmyk_none_argb8888(Enesim_Renderer *r,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(r);
+	thiz = _importer_get(rend);
  	ssrc = thiz->cdata.cmyk.plane0;
 	stride = thiz->cdata.cmyk.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -202,7 +202,7 @@ static void _span_cmyk_none_argb8888(Enesim_Renderer *r,
 /* According to libjpeg doc, Photoshop inverse the values of C, M, Y and K, */
 /* that is C is replaces by 255 - C, etc...*/
 /* See the comment above for the computation of RGB values from CMYK ones. */
-static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *r,
+static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *rend,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -210,7 +210,7 @@ static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *r,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(r);
+	thiz = _importer_get(rend);
  	ssrc = thiz->cdata.cmyk.plane0;
 	stride = thiz->cdata.cmyk.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -237,7 +237,7 @@ static const char *_importer_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Importer *thiz;
 
@@ -274,7 +274,7 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 		break;
 
 		default:
-		ENESIM_RENDERER_LOG(r, log, "Invalid format %d", thiz->cfmt);
+		ENESIM_RENDERER_LOG(r, l, "Invalid format %d", thiz->cfmt);
 		return EINA_FALSE;
 		break;
 	}
@@ -306,18 +306,6 @@ static void _importer_bounds(Enesim_Renderer *r,
 	}
 }
 
-static void _importer_destination_bounds(Enesim_Renderer *r,
-		Eina_Rectangle *rect)
-{
-	Enesim_Rectangle obounds;
-
-	_importer_bounds(r, &obounds);
-	rect->x = obounds.x;
-	rect->y = obounds.x;
-	rect->w = obounds.w;
-	rect->h = obounds.h;
-}
-
 static void _importer_free(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -337,7 +325,6 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .base_name_get = 		*/ _importer_name,
 	/* .free =			*/ _importer_free,
 	/* .bounds_get = 		*/ _importer_bounds,
-	/* .destination_bounds_get = 	*/ _importer_destination_bounds,
  	/* .features_get = 		*/ _importer_features_get,
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,

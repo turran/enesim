@@ -117,15 +117,15 @@ static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = _figure_get(r);
 	if (!enesim_figure_polygon_count(thiz->figure))
 	{
-		/* TODO no polys do nothing, log? ok? */
-		ENESIM_RENDERER_LOG(r, log, "No points on the polygon, nothing to draw");
+		/* TODO no polys do nothing, l? ok? */
+		ENESIM_RENDERER_LOG(r, l, "No points on the polygon, nothing to draw");
 		return EINA_FALSE;
 	}
 

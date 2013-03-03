@@ -114,7 +114,7 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 }
 
 static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Line *thiz;
 
@@ -174,7 +174,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _line_descriptor = {
  * @return A new line renderer.
  *
  * This function returns a newly allocated line renderer. On memory
- * log, this function returns @c NULL.
+ * l, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 {

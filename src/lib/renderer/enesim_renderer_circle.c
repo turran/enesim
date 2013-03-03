@@ -93,7 +93,7 @@ static const char * _circle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _circle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Circle *thiz;
 
@@ -248,7 +248,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _circle_descriptor = {
  * @return A new circle renderer.
  *
  * This function returns a newly allocated circle renderer. On memory
- * log, this function returns @c NULL.
+ * l, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 {

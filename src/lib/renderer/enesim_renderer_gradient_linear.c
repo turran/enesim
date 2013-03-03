@@ -159,7 +159,7 @@ static void _linear_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNU
 static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Log **log EINA_UNUSED)
+		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
 	Enesim_Matrix m;

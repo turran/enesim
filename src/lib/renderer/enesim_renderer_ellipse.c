@@ -135,7 +135,7 @@ static const char * _ellipse_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Ellipse *thiz;
 	double rx, ry;
@@ -145,7 +145,7 @@ static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 	_ellipse_get_real(thiz, r, &x, &y, &rx, &ry);
 	if (!thiz || (thiz->current.rx <= 0) || (thiz->current.ry <= 0))
 	{
-		ENESIM_RENDERER_LOG(r, log, "Wrong size %gx%g",
+		ENESIM_RENDERER_LOG(r, l, "Wrong size %gx%g",
 				thiz->current.rx, thiz->current.ry);
 		return EINA_FALSE;
 	}
@@ -262,7 +262,7 @@ static Enesim_Renderer_Shape_Path_Descriptor _ellipse_descriptor = {
  * @return A new ellipse renderer.
  *
  * This function returns a newly allocated ellipse renderer. On memory
- * log, this function returns @c NULL.
+ * l, this function returns @c NULL.
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 {

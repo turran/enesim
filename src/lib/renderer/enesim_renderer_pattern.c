@@ -107,7 +107,7 @@ static void _pattern_tile_destination_size(Enesim_Renderer_Pattern *thiz,
 
 static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 		Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Log **log)
+		Enesim_Surface *s, Enesim_Log **l)
 {
 	Eina_Rectangle dst_bounds;
 	Enesim_Backend backend;
@@ -118,7 +118,7 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 	/* setup the renderer */
 	if (!thiz->current.source)
 	{
-		ENESIM_RENDERER_LOG(r, log, "You need to set a source renderer");
+		ENESIM_RENDERER_LOG(r, l, "You need to set a source renderer");
 		return EINA_FALSE;
 	}
 
@@ -144,7 +144,7 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 		thiz->cache = enesim_surface_new(format, dst_bounds.w, dst_bounds.h);
 		if (!thiz->cache)
 		{
-			ENESIM_RENDERER_LOG(r, log,
+			ENESIM_RENDERER_LOG(r, l,
 					"Impossible to create the surface of size %d %d",
 					dst_bounds.w, dst_bounds.h);
 			return EINA_FALSE;
@@ -164,9 +164,9 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 		/* TODO The surface backend might be different, still there are some
 		 * issues with the API on the surface/pool side
 		 */
-		if (!enesim_renderer_setup(thiz->current.source, thiz->cache, log))
+		if (!enesim_renderer_setup(thiz->current.source, thiz->cache, l))
 		{
-			ENESIM_RENDERER_LOG(r, log,
+			ENESIM_RENDERER_LOG(r, l,
 					"Impossible to setup the source renderer");
 			return EINA_FALSE;
 		}
@@ -387,7 +387,7 @@ static const char * _pattern_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Pattern *thiz;
 	Enesim_Matrix_Type type;
@@ -396,7 +396,7 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 
 	/* do the common setup */
 	enesim_renderer_transformation_type_get(r, &type);
-	if (!_pattern_state_setup(thiz, r, s, log)) return EINA_FALSE;
+	if (!_pattern_state_setup(thiz, r, s, l)) return EINA_FALSE;
 	*fill = _spans[thiz->current.repeat_mode][type];
 
 	return EINA_TRUE;

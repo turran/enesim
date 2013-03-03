@@ -136,19 +136,19 @@ static Eina_Bool _clipper_changed_basic(Enesim_Renderer_Clipper *thiz)
 }
 
 static Eina_Bool _clipper_state_setup(Enesim_Renderer_Clipper *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **log)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **l)
 {
 	if (!thiz->current.content)
 	{
-		ENESIM_RENDERER_LOG(r, log, "No content");
+		ENESIM_RENDERER_LOG(r, l, "No content");
 		return EINA_FALSE;
 	}
-	if (!enesim_renderer_setup(thiz->current.content, s, log))
+	if (!enesim_renderer_setup(thiz->current.content, s, l))
 	{
 		const char *name;
 
 		enesim_renderer_name_get(thiz->current.content, &name);
-		ENESIM_RENDERER_LOG(r, log, "Content renderer %s can not setup", name);
+		ENESIM_RENDERER_LOG(r, l, "Content renderer %s can not setup", name);
 		return EINA_FALSE;
 	}
 
@@ -174,12 +174,12 @@ static const char * _clipper_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _clipper_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = _clipper_get(r);
-	if (!_clipper_state_setup(thiz, r, s, log))
+	if (!_clipper_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
 	*fill = _clipper_span;
 	return EINA_TRUE;
@@ -300,12 +300,12 @@ static void _clipper_free(Enesim_Renderer *r)
 static Eina_Bool _clipper_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = _clipper_get(r);
-	if (!_clipper_state_setup(thiz, r, s, log))
+	if (!_clipper_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
 
 	*draw = _clipper_opengl_draw;

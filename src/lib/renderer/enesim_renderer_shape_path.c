@@ -55,7 +55,7 @@ static inline Enesim_Renderer_Shape_Path * _shape_path_get(Enesim_Renderer *r)
 }
 
 static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 	Enesim_Renderer *fill, *stroke;
@@ -104,10 +104,10 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	/* now let the implementation override whatever it wants to */
 	if (thiz->descriptor->setup)
-		if (!thiz->descriptor->setup(r, thiz->path, log))
+		if (!thiz->descriptor->setup(r, thiz->path, l))
 			return EINA_FALSE;
 
-	if (!enesim_renderer_setup(thiz->path, s, log))
+	if (!enesim_renderer_setup(thiz->path, s, l))
 	{
 		if (thiz->descriptor->cleanup)
 			thiz->descriptor->cleanup(r);
@@ -165,9 +165,9 @@ static const char * _shape_path_name(Enesim_Renderer *r)
 
 static Eina_Bool _shape_path_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
-	if (!_shape_path_setup(r, s, log))
+	if (!_shape_path_setup(r, s, l))
 		return EINA_FALSE;
 	*draw = _shape_path_path_span;
 	return EINA_TRUE;
@@ -249,9 +249,9 @@ static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
 static Eina_Bool _shape_path_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
-	if (!_shape_path_setup(r, s, log))
+	if (!_shape_path_setup(r, s, l))
 		return EINA_FALSE;
 
 	*draw = _shape_path_opengl_draw;

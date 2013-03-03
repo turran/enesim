@@ -96,20 +96,20 @@ static void _cache_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 static Eina_Bool _cache_state_setup(Enesim_Renderer_Cache *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **log)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **l)
 {
 	if (!thiz->proxied)
 	{
-		ENESIM_RENDERER_LOG(r, log, "No proxied");
+		ENESIM_RENDERER_LOG(r, l, "No proxied");
 		return EINA_FALSE;
 	}
 
-	if (!enesim_renderer_setup(thiz->proxied, s, log))
+	if (!enesim_renderer_setup(thiz->proxied, s, l))
 	{
 		const char *name;
 
 		enesim_renderer_name_get(thiz->proxied, &name);
-		ENESIM_RENDERER_LOG(r, log, "Cache renderer %s can not setup", name);
+		ENESIM_RENDERER_LOG(r, l, "Cache renderer %s can not setup", name);
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
@@ -132,12 +132,12 @@ static const char * _cache_name(Enesim_Renderer *r)
 static Eina_Bool _cache_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Cache *thiz;
 
  	thiz = _cache_get(r);
-	if (!_cache_state_setup(thiz, r, s, log))
+	if (!_cache_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
 
 	*fill = _cache_span;
@@ -250,12 +250,12 @@ static Eina_Bool _cache_opengl_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Cache *thiz;
 
  	thiz = _cache_get(r);
-	if (!_cache_state_setup(thiz, r, s, log))
+	if (!_cache_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
 
 	*draw = _cache_opengl_draw;

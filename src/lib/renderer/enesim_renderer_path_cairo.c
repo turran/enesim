@@ -187,7 +187,7 @@ static void _path_cairo_free(Enesim_Renderer *r)
 
 static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
 	cairo_t *cr;
@@ -224,7 +224,7 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 
 	if (!thiz->surface)
 	{
-		ENESIM_RENDERER_LOG(r, log, "No surface created for size %d %d", rwidth, rheight);
+		ENESIM_RENDERER_LOG(r, l, "No surface created for size %d %d", rwidth, rheight);
 		return EINA_FALSE;
 	}
 

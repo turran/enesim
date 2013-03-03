@@ -130,7 +130,7 @@ static const char * _perlin_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _perlin_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Perlin *thiz;
 	Enesim_Matrix_Type type;

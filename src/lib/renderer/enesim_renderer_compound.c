@@ -108,59 +108,59 @@ static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 
 static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Log **log)
+		Enesim_Surface *s, Enesim_Log **l)
 {
 	Eina_List *ll;
-	Layer *l;
+	Layer *layer;
 
 	if (thiz->visible_layers)
 	{
 		eina_list_free(thiz->visible_layers);
 		thiz->visible_layers = NULL;
 	}
-	EINA_LIST_FREE(thiz->added, l)
+	EINA_LIST_FREE(thiz->added, layer)
 	{
 		/* add the recently added layers to the layers to calculate */
-		thiz->layers = eina_list_append(thiz->layers, l);
+		thiz->layers = eina_list_append(thiz->layers, layer);
 	}
 	/* setup every layer */
-	EINA_LIST_FOREACH(thiz->layers, ll, l)
+	EINA_LIST_FOREACH(thiz->layers, ll, layer)
 	{
 		Eina_Bool visible;
 
 		/* the position and the matrix */
 		if (thiz->pre_cb)
 		{
-			if (!thiz->pre_cb(r, l->r, thiz->pre_data))
+			if (!thiz->pre_cb(r, layer->r, thiz->pre_data))
 			{
 				continue;
 			}
 		}
-		if (!enesim_renderer_setup(l->r, s, log))
+		if (!enesim_renderer_setup(layer->r, s, l))
 		{
 			const char *name;
 
-			enesim_renderer_name_get(l->r, &name);
-			ENESIM_RENDERER_LOG(r, log, "Child renderer %s can not setup", name);
+			enesim_renderer_name_get(layer->r, &name);
+			ENESIM_RENDERER_LOG(r, l, "Child renderer %s can not setup", name);
 			continue;
 		}
 		/* set the span given the color */
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
-		enesim_renderer_destination_bounds(l->r, &l->destination_bounds, 0, 0);
+		enesim_renderer_destination_bounds(layer->r, &layer->destination_bounds, 0, 0);
 		if (thiz->post_cb)
 		{
-			if (!thiz->post_cb(r, l->r, thiz->post_data))
+			if (!thiz->post_cb(r, layer->r, thiz->post_data))
 			{
 				continue;
 			}
 		}
 
-		enesim_renderer_visibility_get(l->r, &visible);
+		enesim_renderer_visibility_get(layer->r, &visible);
 		if (!visible) continue;
 
 		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
-		thiz->visible_layers = eina_list_append(thiz->visible_layers, l);
+		thiz->visible_layers = eina_list_append(thiz->visible_layers, layer);
 	}
 
 	return EINA_TRUE;
@@ -608,12 +608,12 @@ static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Compound *thiz;
 
  	thiz = _compound_get(r);
-	if (!_compound_state_setup(thiz, r, s, log)) return EINA_FALSE;
+	if (!_compound_state_setup(thiz, r, s, l)) return EINA_FALSE;
 
 	*draw = _compound_opengl_draw;
 	return EINA_TRUE;

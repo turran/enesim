@@ -73,7 +73,7 @@ static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
 }
 
 static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enesim_Renderer *r,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Gradient_Stop *curr, *next, *last;
 	Eina_F16p16 xx, inc;
@@ -105,7 +105,7 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 	}
 	if (!diff)
 	{
-		ENESIM_RENDERER_LOG(r, log, "No valid offset between stops");
+		ENESIM_RENDERER_LOG(r, l, "No valid offset between stops");
 		return EINA_FALSE;
 	}
 	inc = eina_f16p16_double_from(1.0 / (diff * slen));
@@ -206,7 +206,7 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Gradient *thiz;
 	const Enesim_Renderer_State *rstate;
@@ -216,20 +216,20 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	/* check that we have at least two stops */
 	if (eina_list_count(thiz->state.stops) < 2)
 	{
-		ENESIM_RENDERER_LOG(r, log, "Less than two stops");
+		ENESIM_RENDERER_LOG(r, l, "Less than two stops");
 		return EINA_FALSE;
 	}
 	/* always call our own fill */
 	*fill = _gradient_draw;
 	/* setup the implementation */
-	if (!thiz->descriptor->sw_setup(r, &thiz->state, s, &thiz->draw, log))
+	if (!thiz->descriptor->sw_setup(r, &thiz->state, s, &thiz->draw, l))
 	{
-		ENESIM_RENDERER_LOG(r, log, "Gradient implementation failed");
+		ENESIM_RENDERER_LOG(r, l, "Gradient implementation failed");
 		return EINA_FALSE;
 	}
 	if (!thiz->draw)
 	{
-		ENESIM_RENDERER_LOG(r, log, "Gradient implementation didnt return a draw function");
+		ENESIM_RENDERER_LOG(r, l, "Gradient implementation didnt return a draw function");
 		return EINA_FALSE;
 	}
 	/* setup the matrix. TODO this should be done on every sw based renderer */
@@ -241,7 +241,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	slen = thiz->descriptor->length(r);
 	if (slen <= 0)
 	{
-		ENESIM_RENDERER_LOG(r, log, "Gradient length %d <= 0", slen);
+		ENESIM_RENDERER_LOG(r, l, "Gradient length %d <= 0", slen);
 		return EINA_FALSE;
 	}
 	if (!thiz->sw.src || slen != thiz->sw.len)
@@ -251,7 +251,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 			free(thiz->sw.src);
 		thiz->sw.src = malloc(sizeof(uint32_t) * thiz->sw.len);
 	}
-	if (!_gradient_generate_1d_span(thiz, r, log))
+	if (!_gradient_generate_1d_span(thiz, r, l))
 	{
 		return EINA_FALSE;
 	}
@@ -343,7 +343,7 @@ static Eina_Bool _gradient_opengl_initialize(Enesim_Renderer *r,
 static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **log)
+		Enesim_Log **l)
 {
 	Enesim_Renderer_Gradient *thiz;
 
@@ -352,7 +352,7 @@ static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
 	{
 		return EINA_FALSE;
 	}
-	return thiz->descriptor->opengl_setup(r, s, draw, log);
+	return thiz->descriptor->opengl_setup(r, s, draw, l);
 }
 #endif
 

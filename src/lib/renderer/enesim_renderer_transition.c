@@ -118,7 +118,7 @@ static const char * _transition_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Transition *t;
 
@@ -126,9 +126,9 @@ static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
 	if (!t || !t->r0.r || !t->r1.r)
 		return EINA_FALSE;
 
-	if (!enesim_renderer_setup(t->r0.r, s, log))
+	if (!enesim_renderer_setup(t->r0.r, s, l))
 		goto r0_end;
-	if (!enesim_renderer_setup(t->r1.r, s, log))
+	if (!enesim_renderer_setup(t->r1.r, s, l))
 		goto r1_end;
 
 	*fill = _transition_span_general;

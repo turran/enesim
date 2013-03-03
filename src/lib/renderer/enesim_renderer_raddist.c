@@ -135,7 +135,7 @@ static const char * _raddist_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _raddist_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Raddist *thiz;
 	Enesim_Matrix_Type type;
