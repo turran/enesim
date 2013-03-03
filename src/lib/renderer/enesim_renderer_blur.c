@@ -493,6 +493,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ NULL,
+	/* .alpha_hints_get =		*/ NULL,
 	/* .sw_hints_get = 		*/ _blur_sw_hints_get,
 	/* .sw_setup = 			*/ _blur_sw_setup,
 	/* .sw_cleanup = 		*/ _blur_sw_cleanup,

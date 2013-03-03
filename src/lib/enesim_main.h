@@ -77,6 +77,14 @@ typedef enum _Enesim_Format
 	ENESIM_FORMATS
 } Enesim_Format;
 
+typedef enum _Enesim_Alpha_Hint
+{
+	ENESIM_ALPHA_HINT_NORMAL,
+	ENESIM_ALPHA_HINT_SPARSE,
+	ENESIM_ALPHA_HINT_OPAQUE,
+	ENESIM_ALPHA_HINTS
+} Enesim_Alpha_Hint;
+
 typedef enum _Enesim_Direction
 {
 	ENESIM_DIRECTION_NONE,

@@ -107,20 +107,11 @@ typedef struct _Enesim_Renderer_OpenGL_Data
 /*----------------------------------------------------------------------------*
  *                        Descriptor related functions                        *
  *----------------------------------------------------------------------------*/
-/* TODO we need to
- * 1. remove every state, in long term states are useless and will give
- * problems with the refcounting objects, just use the API to get a specific
- * property in case you inherit from a high level renderer interface.
- * If you are using the normal renderer interface you already have all the
- * properties yourself
- * 2. rename name_get to base_name_get or something like that as we need
- * also a callback to set the name and get the name
- *
- */
 /* common descriptor functions */
 typedef const char * (*Enesim_Renderer_Base_Name_Get_Cb)(Enesim_Renderer *r);
 typedef void (*Enesim_Renderer_Delete_Cb)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Is_Inside_Cb)(Enesim_Renderer *r, double x, double y);
+typedef void (*Enesim_Renderer_Alpha_Hints_Get_Cb)(Enesim_Renderer *r, Enesim_Alpha_Hint *hints);
 typedef void (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Rectangle *rect);
 typedef void (*Enesim_Renderer_Features_Get)(Enesim_Renderer *r,
@@ -171,6 +162,7 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_Is_Inside_Cb is_inside;
 	Enesim_Renderer_Damages_Get_Cb damages_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
+	Enesim_Renderer_Alpha_Hints_Get_Cb alpha_hints_get;
 	/* software based functions */
 	Enesim_Renderer_Sw_Hints_Get_Cb sw_hints_get;
 	Enesim_Renderer_Sw_Setup sw_setup;

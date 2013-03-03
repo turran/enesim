@@ -1655,6 +1655,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ _image_damages,
 	/* .has_changed = 		*/ _image_has_changed,
+	/* .alpha_hints_get =		*/ NULL,
 	/* .sw_hints_get =		*/ _image_sw_image_hints,
 	/* .sw_setup = 			*/ _image_sw_state_setup,
 	/* .sw_cleanup = 		*/ _image_sw_state_cleanup,

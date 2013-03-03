@@ -330,6 +330,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ _clipper_damage,
 	/* .has_changed = 		*/ _clipper_has_changed,
+	/* .alpha_hints_get =		*/ NULL,
 	/* .sw_hints_get = 		*/ _clipper_sw_hints_get,
 	/* .sw_setup = 			*/ _clipper_sw_setup,
 	/* .sw_cleanup = 		*/ _clipper_sw_cleanup,

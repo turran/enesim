@@ -503,6 +503,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get = 		*/ NULL,
 	/* .has_changed = 		*/ _pattern_has_changed,
+	/* .alpha_hints_get =		*/ NULL,
 	/* .sw_hints_get = 		*/ _pattern_sw_hints,
 	/* .sw_setup = 			*/ _pattern_sw_setup,
 	/* .sw_cleanup = 		*/ _pattern_sw_cleanup,

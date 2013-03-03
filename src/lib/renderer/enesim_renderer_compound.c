@@ -637,6 +637,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ _compound_is_inside,
 	/* .damage = 			*/ _compound_damage,
 	/* .has_changed = 		*/ _compound_has_changed,
+	/* .alpha_hints_get =		*/ NULL,
 	/* .sw_hints_get = 		*/ _compound_sw_hints,
 	/* .sw_setup = 			*/ _compound_sw_setup,
 	/* .sw_cleanup = 		*/ _compound_sw_cleanup,

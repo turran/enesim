@@ -273,6 +273,7 @@ static Enesim_Renderer_Descriptor _descriptor = {
 	/* .is_inside = 		*/ NULL,
 	/* .damages_get =		*/ _proxy_damage,
 	/* .has_changed = 		*/ _proxy_has_changed,
+	/* .alpha_hints_get =		*/ NULL,
 	/* .sw_hints_get = 		*/ _proxy_sw_hints_get,
 	/* .sw_setup = 			*/ _proxy_sw_setup,
 	/* .sw_cleanup = 		*/ _proxy_sw_cleanup,
