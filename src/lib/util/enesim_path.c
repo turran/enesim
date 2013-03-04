@@ -1166,3 +1166,15 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 	/* in case we delay the creation of the vertices this triggers that */
 	_path_done(thiz);
 }
+
+#if 0
+/* The idea here is to normalize the path into move_to, line_to,
+ * cubic_to and close commands. For that we need to abstract more the
+ * curve functions on enesim_curve.c
+ */
+void enesim_path_normalize(Enesim_Path *thiz, Enesim_Path *normalized)
+{
+
+}
+
+#endif

@@ -18,6 +18,14 @@
 #include "enesim_private.h"
 
 #include "enesim_curve_private.h"
+/* We should change how we generate the curves.
+ * This is the first implementation which just makes every curve
+ * type be transformed into a vertex_add
+ * We need to add functions to convert also to cubic curves
+ * directly. This is useful for the future normalize function
+ * So basically we could have a simple curve -> normalized curve ->
+ * lines, for example, but it complicates a bit the quadratic cases
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -387,3 +395,4 @@ void enesim_curve_arc_to(Enesim_Curve_State *state, double rx, double ry, double
 		sin_theta1 = sin_theta2;
 	}
 }
+
