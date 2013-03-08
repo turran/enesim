@@ -16,11 +16,16 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "enesim_path.h"
+#include "enesim_path_normalizer_private.h"
+
+typedef void (*Enesim_Path_Normalizer_Move_To_Cb)(Enesim_Path_Command_Move_To move_to,
+		Enesim_Path_Normalizer_State *state, void *data);
 typedef void (*Enesim_Path_Normalizer_Line_To_Cb)(Enesim_Path_Command_Line_To line_to,
 		Enesim_Path_Normalizer_State *state, void *data);
-typedef void (*Enesim_Path_Normalizer_Move_To_Cb)(Enesim_Path_Command_Move_To line_to,
+typedef void (*Enesim_Path_Normalizer_Cubic_To_Cb)(Enesim_Path_Command_Cubic_To cubic_to,
 		Enesim_Path_Normalizer_State *state, void *data);
-typedef void (*Enesim_Path_Normalizer_Cubic_To_Cb)(Enesim_Path_Command_Cubic_To line_to,
+typedef void (*Enesim_Path_Normalizer_Close_Cb)(Enesim_Path_Command_Close close,
 		Enesim_Path_Normalizer_State *state, void *data);
 
 typedef struct _Enesim_Path_Normalizer_State
@@ -47,21 +52,15 @@ typedef struct _Enesim_Path_Normalizer
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                            Figure normalizer                               *
+ *----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*
+ *                             Path normalizer                                *
+ *----------------------------------------------------------------------------*/
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/* generate a figure only (line, move) commands */
-Enesim_Path_Normalizer * enesim_path_normalizer_to_figure(void)
-{
-
-}
-
-/* generate a path simplifed (line, move, cubic) */
-Enesim_Path_Normalizer * enesim_path_normalizer_to_path(void)
-{
-
-}
-
 Enesim_Path_Normalizer * enesim_path_normalizer_new(
 		Enesim_Path_Normalizer_Descriptor *descriptor,
 		void *data)
@@ -72,6 +71,22 @@ Enesim_Path_Normalizer * enesim_path_normalizer_new(
 	thiz->data = data;
 	thiz->descriptor = descriptor;
 	return thiz;
+}
+
+/* generate a figure only (line, move, close) commands */
+Enesim_Path_Normalizer * enesim_path_normalizer_figure_new(
+		Enesim_Path_Normalizer_Figure_Descriptor *descriptor,
+		void *data)
+{
+
+}
+
+/* generate a path simplifed (line, move, cubic, close) */
+Enesim_Path_Normalizer * enesim_path_normalizer_path_new(
+		Enesim_Path_Normalizer_Path *descriptor,
+		void *data)
+{
+
 }
 
 void enesim_path_normalizer_normalize(Enesim_Path_Normalizer *thiz,

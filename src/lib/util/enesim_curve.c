@@ -395,13 +395,3 @@ void enesim_curve_arc_to(Enesim_Curve_State *state, double rx, double ry, double
 		sin_theta1 = sin_theta2;
 	}
 }
-
-/* we should change the API to be something like this:
- * typedef struct _Enesim_Curve_Simplifier_Descriptor {
-      *quadratic_to
-      *cubic_to
-      *move_to
-   } Enesim_Curve_Simplifier_Descriptor
-
- enesim_path_simplify(Eneism_Path *p, Enesim_Cmd_Cb cb, void *user_data);
- */
