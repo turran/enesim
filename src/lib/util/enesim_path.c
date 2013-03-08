@@ -33,7 +33,7 @@
 
 #include "enesim_curve_private.h"
 #include "enesim_vector_private.h"
-#include "enesim_path_private.h"
+#include "enesim_path_generator_private.h"
 
 /*
  * - The strokeless path descriptor should generate a simple figure appending
@@ -52,9 +52,9 @@
  *============================================================================*/
 typedef struct _Enesim_Path_Dashed
 {
-	Enesim_Path *p; /* ourselves */
-	Enesim_Path *fill;
-	Enesim_Path *stroke;
+	Enesim_Path_Generator *p; /* ourselves */
+	Enesim_Path_Generator *fill;
+	Enesim_Path_Generator *stroke;
 	/* our own private data */
 	Eina_Bool started;
 	Eina_Bool first;
@@ -67,7 +67,7 @@ typedef struct _Enesim_Path_Dashed
 typedef struct _Enesim_Path_Full
 {
 	/* keep the original path */
-	Enesim_Path *p;
+	Enesim_Path_Generator *p;
 	/* our own private data */
 	Enesim_Polygon *original_polygon;
 	Enesim_Polygon *offset_polygon;
@@ -84,7 +84,7 @@ typedef struct _Enesim_Path_Full
 typedef struct _Enesim_Path_Stroke
 {
 	/* keep the original path */
-	Enesim_Path *p;
+	Enesim_Path_Generator *p;
 	/* our own private data */
 	Enesim_Polygon *offset_polygon;
 	Enesim_Polygon *inset_polygon;
@@ -99,14 +99,14 @@ typedef struct _Enesim_Path_Stroke
 
 typedef struct _Enesim_Path_Stroke_Dashless
 {
-	Enesim_Path *p; /* ourselves */
-	Enesim_Path *fill;
-	Enesim_Path *stroke;
+	Enesim_Path_Generator *p; /* ourselves */
+	Enesim_Path_Generator *fill;
+	Enesim_Path_Generator *stroke;
 } Enesim_Path_Stroke_Dashless;
 
 typedef struct _Enesim_Path_Strokeless
 {
-	Enesim_Path *p;
+	Enesim_Path_Generator *p;
 } Enesim_Path_Strokeless;
 
 typedef struct _Enesim_Path_Edge
@@ -119,28 +119,28 @@ typedef struct _Enesim_Path_Edge
 /*----------------------------------------------------------------------------*
  *                         Descriptor interface                               *
  *----------------------------------------------------------------------------*/
-static void _path_vertex_add(Enesim_Path *thiz, double x, double y)
+static void _path_vertex_add(Enesim_Path_Generator *thiz, double x, double y)
 {
 	thiz->descriptor->vertex_add(x, y, thiz->data);
 }
 
-static void _path_polygon_add(Enesim_Path *thiz)
+static void _path_polygon_add(Enesim_Path_Generator *thiz)
 {
 	thiz->descriptor->polygon_add(thiz->data);
 }
 
-static void _path_polygon_close(Enesim_Path *thiz, Eina_Bool close)
+static void _path_polygon_close(Enesim_Path_Generator *thiz, Eina_Bool close)
 {
 	thiz->descriptor->polygon_close(close, thiz->data);
 }
 
-static void _path_done(Enesim_Path *thiz)
+static void _path_done(Enesim_Path_Generator *thiz)
 {
 	if (thiz->descriptor->path_done)
 		thiz->descriptor->path_done(thiz->data);
 }
 
-static void _path_begin(Enesim_Path *thiz)
+static void _path_begin(Enesim_Path_Generator *thiz)
 {
 	if (thiz->descriptor->path_begin)
 		thiz->descriptor->path_begin(thiz->data);
@@ -148,7 +148,7 @@ static void _path_begin(Enesim_Path *thiz)
 /*----------------------------------------------------------------------------*
  *                                 Commands                                   *
  *----------------------------------------------------------------------------*/
-static void _path_move_to(Enesim_Path *thiz,
+static void _path_move_to(Enesim_Path_Generator *thiz,
 		double x, double y)
 {
 	/* we have to reset the curve state too */
@@ -172,7 +172,7 @@ static void _strokeless_path_free(void *data)
 static void _strokeless_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Path_Strokeless *thiz = data;
-	Enesim_Path *path = thiz->p;
+	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Polygon *p;
 	Eina_List *last;
 
@@ -184,7 +184,7 @@ static void _strokeless_path_vertex_add(double x, double y, void *data)
 static void _strokeless_path_polygon_add(void *data)
 {
 	Enesim_Path_Strokeless *thiz = data;
-	Enesim_Path *path = thiz->p;
+	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Polygon *p;
 
 	p = enesim_polygon_new();
@@ -195,7 +195,7 @@ static void _strokeless_path_polygon_add(void *data)
 static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 {
 	Enesim_Path_Strokeless *thiz = data;
-	Enesim_Path *path = thiz->p;
+	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Polygon *p;
 	Eina_List *last;
 
@@ -510,12 +510,12 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 
 static void _stroke_path_polygon_add(void *data)
 {
-        Enesim_Path_Stroke *thiz = data;
-	Enesim_Path *path = thiz->p;
-        Enesim_Polygon *p;
+	Enesim_Path_Stroke *thiz = data;
+	Enesim_Path_Generator *path = thiz->p;
+	Enesim_Polygon *p;
 
-        /* just reset */
-        thiz->count = 0;
+	/* just reset */
+	thiz->count = 0;
 
 	/* we are adding a new polygon, check that we need to merge the previous ones */
 	if (thiz->offset_polygon && thiz->inset_polygon)
@@ -537,7 +537,7 @@ static void _stroke_path_polygon_add(void *data)
 static void _stroke_path_begin(void *data)
 {
 	Enesim_Path_Stroke *thiz = data;
-	Enesim_Path *path = thiz->p;
+	Enesim_Path_Generator *path = thiz->p;
 
 	/* initialize our state */
 	thiz->count = 0;
@@ -592,8 +592,8 @@ static void _stroke_dashless_path_free(void *data)
 {
 	Enesim_Path_Stroke_Dashless *thiz = data;
 
-	enesim_path_free(thiz->fill);
-	enesim_path_free(thiz->stroke);
+	enesim_path_generator_free(thiz->fill);
+	enesim_path_generator_free(thiz->stroke);
 	free(thiz);
 }
 
@@ -624,23 +624,23 @@ static void _stroke_dashless_path_polygon_close(Eina_Bool close, void *data)
 static void _stroke_dashless_path_begin(void *data)
 {
 	Enesim_Path_Stroke_Dashless *thiz = data;
-	Enesim_Path *path = thiz->p;
-	Enesim_Path *paths[2] = { thiz->fill, thiz->stroke };
+	Enesim_Path_Generator *path = thiz->p;
+	Enesim_Path_Generator *paths[2] = { thiz->fill, thiz->stroke };
 	int i;
 
 	/* set the properties on both paths */
 	for (i = 0; i < 2; i++)
 	{
-		Enesim_Path *p = paths[i];
+		Enesim_Path_Generator *p = paths[i];
 
-		enesim_path_figure_set(p, path->figure);
-		enesim_path_stroke_figure_set(p, path->stroke_figure);
-		enesim_path_stroke_cap_set(p, path->cap);
-		enesim_path_stroke_join_set(p, path->join);
-		enesim_path_stroke_weight_set(p, path->sw);
-		enesim_path_stroke_dash_set(p, path->dashes);
-		enesim_path_scale_set(p, path->scale_x, path->scale_y);
-		enesim_path_transformation_set(p, path->gm);
+		enesim_path_generator_figure_set(p, path->figure);
+		enesim_path_generator_stroke_figure_set(p, path->stroke_figure);
+		enesim_path_generator_stroke_cap_set(p, path->cap);
+		enesim_path_generator_stroke_join_set(p, path->join);
+		enesim_path_generator_stroke_weight_set(p, path->sw);
+		enesim_path_generator_stroke_dash_set(p, path->dashes);
+		enesim_path_generator_scale_set(p, path->scale_x, path->scale_y);
+		enesim_path_generator_transformation_set(p, path->gm);
 	}
 
 	_path_begin(thiz->fill);
@@ -698,9 +698,9 @@ static void _dashed_path_free(void *data)
 	Enesim_Path_Dashed *d = data;
 
 	if (d->stroke)
-		enesim_path_free(d->stroke);
+		enesim_path_generator_free(d->stroke);
 	if (d->fill)
-		enesim_path_free(d->fill);
+		enesim_path_generator_free(d->fill);
 	free(d);
 }
 
@@ -822,8 +822,8 @@ static void _dashed_path_vertex_add(double x, double y, void *data)
 
 static void _dashed_path_polygon_add(void *data)
 {
-        Enesim_Path_Dashed *thiz = data;
-	Enesim_Path *path = thiz->p;
+	Enesim_Path_Dashed *thiz = data;
+	Enesim_Path_Generator *path = thiz->p;
 
 	_path_polygon_add(thiz->fill);
 
@@ -842,23 +842,23 @@ static void _dashed_path_polygon_close(Eina_Bool close, void *data)
 static void _dashed_path_begin(void *data)
 {
 	Enesim_Path_Dashed *thiz = data;
-	Enesim_Path *path = thiz->p;
-	Enesim_Path *paths[2] = { thiz->fill, thiz->stroke };
+	Enesim_Path_Generator *path = thiz->p;
+	Enesim_Path_Generator *paths[2] = { thiz->fill, thiz->stroke };
 	int i;
 
 	/* set the properties on both paths */
 	for (i = 0; i < 2; i++)
 	{
-		Enesim_Path *p = paths[i];
+		Enesim_Path_Generator *p = paths[i];
 
-		enesim_path_figure_set(p, path->figure);
-		enesim_path_stroke_figure_set(p, path->stroke_figure);
-		enesim_path_stroke_cap_set(p, path->cap);
-		enesim_path_stroke_join_set(p, path->join);
-		enesim_path_stroke_weight_set(p, path->sw);
-		enesim_path_stroke_dash_set(p, path->dashes);
-		enesim_path_scale_set(p, path->scale_x, path->scale_y);
-		enesim_path_transformation_set(p, path->gm);
+		enesim_path_generator_figure_set(p, path->figure);
+		enesim_path_generator_stroke_figure_set(p, path->stroke_figure);
+		enesim_path_generator_stroke_cap_set(p, path->cap);
+		enesim_path_generator_stroke_join_set(p, path->join);
+		enesim_path_generator_stroke_weight_set(p, path->sw);
+		enesim_path_generator_stroke_dash_set(p, path->dashes);
+		enesim_path_generator_scale_set(p, path->scale_x, path->scale_y);
+		enesim_path_generator_transformation_set(p, path->gm);
 	}
 
 	_path_begin(thiz->fill);
@@ -892,18 +892,18 @@ static Enesim_Path_Descriptor _dashed_descriptor = {
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Path * enesim_path_new(Enesim_Path_Descriptor *descriptor,
+Enesim_Path_Generator * enesim_path_generator_new(Enesim_Path_Descriptor *descriptor,
 		void *data)
 {
-	Enesim_Path *thiz;
+	Enesim_Path_Generator *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Path));
+	thiz = calloc(1, sizeof(Enesim_Path_Generator));
 	thiz->descriptor = descriptor;
 	thiz->data = data;
 	return thiz;
 }
 
-void enesim_path_free(Enesim_Path *thiz)
+void enesim_path_generator_free(Enesim_Path_Generator *thiz)
 {
 	/* TODO call the interface to free the path implementation
 	 * data
@@ -913,115 +913,115 @@ void enesim_path_free(Enesim_Path *thiz)
 	free(thiz);
 }
 
-void enesim_path_figure_set(Enesim_Path *thiz, Enesim_Figure *figure)
+void enesim_path_generator_figure_set(Enesim_Path_Generator *thiz, Enesim_Figure *figure)
 {
 	thiz->figure = figure;
 }
 
-void enesim_path_transformation_set(Enesim_Path *thiz, const Enesim_Matrix *matrix)
+void enesim_path_generator_transformation_set(Enesim_Path_Generator *thiz, const Enesim_Matrix *matrix)
 {
 	thiz->gm = matrix;
 }
 
-void enesim_path_scale_set(Enesim_Path *thiz, double scale_x, double scale_y)
+void enesim_path_generator_scale_set(Enesim_Path_Generator *thiz, double scale_x, double scale_y)
 {
 	thiz->scale_x = scale_x;
 	thiz->scale_y = scale_y;
 }
 
-void enesim_path_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke)
+void enesim_path_generator_stroke_figure_set(Enesim_Path_Generator *thiz, Enesim_Figure *stroke)
 {
 	thiz->stroke_figure = stroke;
 }
 
-void enesim_path_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap)
+void enesim_path_generator_stroke_cap_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Cap cap)
 {
 	thiz->cap = cap;
 }
 
-void enesim_path_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join)
+void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Join join)
 {
 	thiz->join = join;
 }
 
-void enesim_path_stroke_weight_set(Enesim_Path *thiz, double sw)
+void enesim_path_generator_stroke_weight_set(Enesim_Path_Generator *thiz, double sw)
 {
 	thiz->sw = sw;
 }
 
-void enesim_path_stroke_dash_set(Enesim_Path *thiz, const Eina_List *dashes)
+void enesim_path_generator_stroke_dash_set(Enesim_Path_Generator *thiz, const Eina_List *dashes)
 {
 	thiz->dashes = dashes;
 }
 
-void * enesim_path_data_get(Enesim_Path *thiz)
+void * enesim_path_generator_data_get(Enesim_Path_Generator *thiz)
 {
 	return thiz->data;
 }
 
-Enesim_Path * enesim_path_strokeless_new(void)
+Enesim_Path_Generator * enesim_path_generator_strokeless_new(void)
 {
 	Enesim_Path_Strokeless *s;
-	Enesim_Path *thiz;
+	Enesim_Path_Generator *thiz;
 
 	s = calloc(1, sizeof(Enesim_Path_Strokeless));
-	thiz = enesim_path_new(&_strokeless_descriptor, s);
+	thiz = enesim_path_generator_new(&_strokeless_descriptor, s);
 	s->p = thiz;
 
 	return thiz;
 }
 
-Enesim_Path * enesim_path_stroke_new(void)
+Enesim_Path_Generator * enesim_path_generator_stroke_new(void)
 {
 	Enesim_Path_Stroke *s;
-	Enesim_Path *thiz;
+	Enesim_Path_Generator *thiz;
 
 	s = calloc(1, sizeof(Enesim_Path_Stroke));
-	thiz = enesim_path_new(&_stroke_descriptor, s);
+	thiz = enesim_path_generator_new(&_stroke_descriptor, s);
 	s->p = thiz;
 
 	return thiz;
 }
 
-Enesim_Path * enesim_path_stroke_dashless_new(void)
+Enesim_Path_Generator * enesim_path_generator_stroke_dashless_new(void)
 {
 #if 1
 	Enesim_Path_Stroke_Dashless *s;
-	Enesim_Path *thiz;
+	Enesim_Path_Generator *thiz;
 
 	s = calloc(1, sizeof(Enesim_Path_Stroke_Dashless));
-	thiz = enesim_path_new(&_stroke_dashless_descriptor, s);
+	thiz = enesim_path_generator_new(&_stroke_dashless_descriptor, s);
 	s->p = thiz;
-	s->fill = enesim_path_strokeless_new();
-	s->stroke = enesim_path_stroke_new();
+	s->fill = enesim_path_generator_strokeless_new();
+	s->stroke = enesim_path_generator_stroke_new();
 #else
 	Enesim_Path_Full *s;
-	Enesim_Path *thiz;
+	Enesim_Path_Generator *thiz;
 
 	s = calloc(1, sizeof(Enesim_Path_Full));
-	thiz = enesim_path_new(&_full_descriptor, s);
+	thiz = enesim_path_generator_new(&_full_descriptor, s);
 	s->p = thiz;
 #endif
 
 	return thiz;
 }
 
-Enesim_Path * enesim_path_dashed_new(void)
+Enesim_Path_Generator * enesim_path_generator_dashed_new(void)
 {
 	Enesim_Path_Dashed *d;
-	Enesim_Path *thiz;
+	Enesim_Path_Generator *thiz;
 
 	d = calloc(1, sizeof(Enesim_Path_Dashed));
-	thiz = enesim_path_new(&_dashed_descriptor, d);
+	thiz = enesim_path_generator_new(&_dashed_descriptor, d);
 	d->p = thiz;
-	d->fill = enesim_path_strokeless_new();
-	d->stroke = enesim_path_stroke_new();
+	d->fill = enesim_path_generator_strokeless_new();
+	d->stroke = enesim_path_generator_stroke_new();
 
 	return thiz;
 }
 
 
-void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
+void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands)
 {
 	Eina_List *l;
 	Enesim_Renderer_Path_Command *cmd;
@@ -1177,7 +1177,7 @@ typedef struct _Enesim_Path_Generator
  * cubic_to and close commands. For that we need to abstract more the
  * curve functions on enesim_curve.c
  */
-void enesim_path_normalize(Enesim_Path *thiz, Enesim_Path *normalized)
+void enesim_path_generator_normalize(Enesim_Path_Generator *thiz, Enesim_Path_Generator *normalized)
 {
 
 }

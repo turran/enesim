@@ -11,5 +11,5 @@ src/lib/util/enesim_coord_private.h \
 src/lib/util/enesim_curve_private.h \
 src/lib/util/enesim_mempool_aligned_private.h \
 src/lib/util/enesim_mempool_buddy_private.h \
-src/lib/util/enesim_path_private.h \
+src/lib/util/enesim_path_generator_private.h \
 src/lib/util/enesim_vector_private.h

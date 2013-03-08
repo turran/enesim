@@ -42,7 +42,7 @@
 #include "enesim_vector_private.h"
 #include "enesim_rasterizer_private.h"
 #include "enesim_curve_private.h"
-#include "enesim_path_private.h"
+#include "enesim_path_generator_private.h"
 
 /* Some useful macros for debugging */
 /* In case this is set, if the path has a stroke, only the stroke will be
@@ -98,9 +98,9 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	/* properties */
 	Eina_List *commands;
 	/* private */
-	Enesim_Path *stroke_path;
-	Enesim_Path *strokeless_path;
-	Enesim_Path *dashed_path;
+	Enesim_Path_Generator *stroke_path;
+	Enesim_Path_Generator *strokeless_path;
+	Enesim_Path_Generator *dashed_path;
 #if BUILD_OPENGL
 	Enesim_Renderer_Path_Enesim_OpenGL gl;
 #endif
@@ -750,7 +750,7 @@ static void _path_generate_figures(Enesim_Renderer_Path_Enesim *thiz,
 		Enesim_Shape_Stroke_Cap cap,
 		Eina_List *dashes)
 {
-	Enesim_Path *path;
+	Enesim_Path_Generator *path;
 	Enesim_Figure *stroke_figure = NULL;
 
 	if (thiz->fill_figure)
@@ -775,15 +775,15 @@ static void _path_generate_figures(Enesim_Renderer_Path_Enesim *thiz,
 		path = thiz->strokeless_path;
 
 	}
-	enesim_path_figure_set(path, thiz->fill_figure);
-	enesim_path_stroke_figure_set(path, thiz->stroke_figure);
-	enesim_path_stroke_cap_set(path, cap);
-	enesim_path_stroke_join_set(path, join);
-	enesim_path_stroke_weight_set(path, sw);
-	enesim_path_stroke_dash_set(path, dashes);
-	enesim_path_scale_set(path, sx, sy);
-	enesim_path_transformation_set(path, transformation);
-	enesim_path_generate(path, thiz->commands);
+	enesim_path_generator_figure_set(path, thiz->fill_figure);
+	enesim_path_generator_stroke_figure_set(path, thiz->stroke_figure);
+	enesim_path_generator_stroke_cap_set(path, cap);
+	enesim_path_generator_stroke_join_set(path, join);
+	enesim_path_generator_stroke_weight_set(path, sw);
+	enesim_path_generator_stroke_dash_set(path, dashes);
+	enesim_path_generator_scale_set(path, sx, sy);
+	enesim_path_generator_transformation_set(path, transformation);
+	enesim_path_generator_generate(path, thiz->commands);
 
 	/* set the fill figure on the bifigure as its under polys */
 	enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
@@ -844,11 +844,11 @@ static void _path_free(Enesim_Renderer *r)
 	if (thiz->fill_figure)
 		enesim_figure_delete(thiz->fill_figure);
 	if (thiz->dashed_path)
-		enesim_path_free(thiz->dashed_path);
+		enesim_path_generator_free(thiz->dashed_path);
 	if (thiz->strokeless_path)
-		enesim_path_free(thiz->strokeless_path);
+		enesim_path_generator_free(thiz->strokeless_path);
 	if (thiz->stroke_path)
-		enesim_path_free(thiz->stroke_path);
+		enesim_path_generator_free(thiz->stroke_path);
 	if (thiz->bifigure)
 		enesim_renderer_unref(thiz->bifigure);
 	enesim_renderer_path_command_clear(r);
@@ -1106,9 +1106,9 @@ Enesim_Renderer * enesim_renderer_path_enesim_new(void)
 	thiz->bifigure = r;
 
 	/* create the different path implementations */
-	thiz->stroke_path = enesim_path_stroke_dashless_new();
-	thiz->strokeless_path = enesim_path_strokeless_new();
-	thiz->dashed_path = enesim_path_dashed_new();
+	thiz->stroke_path = enesim_path_generator_stroke_dashless_new();
+	thiz->strokeless_path = enesim_path_generator_strokeless_new();
+	thiz->dashed_path = enesim_path_generator_dashed_new();
 
 	r = enesim_renderer_path_abstract_new(&_path_descriptor, thiz);
 	/* FIXME for now */

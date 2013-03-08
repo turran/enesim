@@ -48,25 +48,25 @@ typedef struct _Enesim_Path
 	double sw;
 	const Eina_List *dashes;
 	void *data;
-} Enesim_Path;
+} Enesim_Path_Generator;
 
-Enesim_Path * enesim_path_new(Enesim_Path_Descriptor *descriptor, void *data);
-void enesim_path_free(Enesim_Path *thiz);
-void enesim_path_figure_set(Enesim_Path *thiz, Enesim_Figure *figure);
-void enesim_path_transformation_set(Enesim_Path *thiz, const Enesim_Matrix *matrix);
-void enesim_path_scale_set(Enesim_Path *thiz, double scale_x, double scale_y);
-void enesim_path_stroke_dash_set(Enesim_Path *thiz, const Eina_List *dashes);
-void enesim_path_stroke_figure_set(Enesim_Path *thiz, Enesim_Figure *stroke);
-void enesim_path_stroke_cap_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Cap cap);
-void enesim_path_stroke_join_set(Enesim_Path *thiz, Enesim_Shape_Stroke_Join join);
-void enesim_path_stroke_weight_set(Enesim_Path *thiz, double sw);
+Enesim_Path_Generator * enesim_path_generator_new(Enesim_Path_Descriptor *descriptor, void *data);
+void enesim_path_generator_free(Enesim_Path_Generator *thiz);
+void enesim_path_generator_figure_set(Enesim_Path_Generator *thiz, Enesim_Figure *figure);
+void enesim_path_generator_transformation_set(Enesim_Path_Generator *thiz, const Enesim_Matrix *matrix);
+void enesim_path_generator_scale_set(Enesim_Path_Generator *thiz, double scale_x, double scale_y);
+void enesim_path_generator_stroke_dash_set(Enesim_Path_Generator *thiz, const Eina_List *dashes);
+void enesim_path_generator_stroke_figure_set(Enesim_Path_Generator *thiz, Enesim_Figure *stroke);
+void enesim_path_generator_stroke_cap_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Cap cap);
+void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Join join);
+void enesim_path_generator_stroke_weight_set(Enesim_Path_Generator *thiz, double sw);
 
-void * enesim_path_data_get(Enesim_Path *thiz);
-void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands);
+void * enesim_path_generator_data_get(Enesim_Path_Generator *thiz);
+void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands);
 
-Enesim_Path * enesim_path_strokeless_new(void);
-Enesim_Path * enesim_path_stroke_new(void);
-Enesim_Path * enesim_path_stroke_dashless_new(void);
-Enesim_Path * enesim_path_dashed_new(void);
+Enesim_Path_Generator * enesim_path_generator_strokeless_new(void);
+Enesim_Path_Generator * enesim_path_generator_stroke_new(void);
+Enesim_Path_Generator * enesim_path_generator_stroke_dashless_new(void);
+Enesim_Path_Generator * enesim_path_generator_dashed_new(void);
 
 #endif
