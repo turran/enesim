@@ -146,42 +146,38 @@ static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
 static void _path_cairo_move_to(Enesim_Path_Command_Move_To *move_to,
 		void *data)
 {
-#if 0
-	cairo_move_to(c, cmd->definition.move_to.x, cmd->definition.move_to.y);
-	state->last_ctrl_x = state->last_x = cmd->definition.move_to.x;
-	state->last_ctrl_y = state->last_y = cmd->definition.move_to.y;
-#endif
+	Enesim_Renderer_Path_Cairo *thiz = data;
+	double x, y;
+
+	enesim_path_command_move_to_values_to(move_to, &x, &y);
+	cairo_move_to(thiz->cairo, x, y);
 }
 
 static void _path_cairo_line_to(Enesim_Path_Command_Line_To *line_to,
 		void *data)
 {
-#if 0
-	cairo_line_to(c, cmd->definition.line_to.x, cmd->definition.line_to.y);
-	state->last_ctrl_x = state->last_x;
-	state->last_ctrl_y = state->last_y;
-	state->last_x = cmd->definition.line_to.x;
-	state->last_y = cmd->definition.line_to.y;
-#endif
+	Enesim_Renderer_Path_Cairo *thiz = data;
+	double x, y;
+
+	enesim_path_command_line_to_values_to(line_to, &x, &y);
+	cairo_line_to(thiz->cairo, x, y);
 }
 
 static void _path_cairo_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
 		void *data)
 {
-#if 0
-	cairo_curve_to(c, cmd->definition.cubic_to.x,
-	cmd->definition.cubic_to.y,
-	cmd->definition.cubic_to.ctrl_x0,
-	cmd->definition.cubic_to.ctrl_y0,
-	cmd->definition.cubic_to.ctrl_x1,
-	cmd->definition.cubic_to.ctrl_y1);
-#endif
+	Enesim_Renderer_Path_Cairo *thiz = data;
+	double x, y, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1;
+
+	enesim_path_command_cubic_to_values_to(cubic_to, &x, &y, &ctrl_x0, &ctrl_y0, &ctrl_x1, &ctrl_y1);
+	cairo_curve_to(thiz->cairo, x, y, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1);
 }
 
 static void _path_cairo_close(Enesim_Path_Command_Close *close,
 		void *data)
 {
-
+	Enesim_Renderer_Path_Cairo *thiz = data;
+	cairo_close_path(thiz->cairo);
 }
 
 static Enesim_Path_Normalizer_Path_Descriptor _normalizer_descriptor = {
@@ -362,6 +358,7 @@ Enesim_Renderer * enesim_renderer_path_cairo_new(void)
 	thiz = calloc(1, sizeof(Enesim_Renderer_Path_Cairo));
 	thiz->recording = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
 	thiz->cairo = cairo_create(thiz->recording);
+	thiz->normalizer = enesim_path_normalizer_path_new(&_normalizer_descriptor, thiz);
 
 	r = enesim_renderer_path_abstract_new(&_path_cairo_descriptor, thiz);
 	return r;
