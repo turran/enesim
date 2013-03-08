@@ -36,6 +36,7 @@
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_path_abstract_private.h"
+#include "enesim_path_normalizer_private.h"
 
 #include <cairo.h>
 /* TODO
@@ -48,6 +49,8 @@
  *============================================================================*/
 typedef struct _Enesim_Renderer_Path_Cairo
 {
+	Enesim_Path_Normalizer *normalizer;
+
 	const Eina_List *commands;
 	cairo_t *cairo;
 	cairo_surface_t *recording;
@@ -59,60 +62,12 @@ typedef struct _Enesim_Renderer_Path_Cairo
 	Eina_Bool generated;
 } Enesim_Renderer_Path_Cairo;
 
-typedef struct _Enesim_Renderer_Path_Cairo_Curve_State
-{
-	double last_x;
-	double last_y;
-	double last_ctrl_x;
-	double last_ctrl_y;
-} Enesim_Renderer_Path_Cairo_Curve_State;
-
 Enesim_Renderer_Path_Cairo * _path_cairo_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
 
 	thiz = enesim_renderer_path_abstract_data_get(r);
 	return thiz;
-}
-
-static void _path_cairo_move_to(cairo_t *c, Enesim_Path_Command *cmd,
-		Enesim_Renderer_Path_Cairo_Curve_State *state)
-{
-	cairo_move_to(c, cmd->definition.move_to.x, cmd->definition.move_to.y);
-	state->last_ctrl_x = state->last_x = cmd->definition.move_to.x;
-	state->last_ctrl_y = state->last_y = cmd->definition.move_to.y;
-}
-
-static void _path_cairo_line_to(cairo_t *c, Enesim_Path_Command *cmd,
-		Enesim_Renderer_Path_Cairo_Curve_State *state)
-{
-	cairo_line_to(c, cmd->definition.line_to.x, cmd->definition.line_to.y);
-	state->last_ctrl_x = state->last_x;
-	state->last_ctrl_y = state->last_y;
-	state->last_x = cmd->definition.line_to.x;
-	state->last_y = cmd->definition.line_to.y;
-}
-
-static void _path_cairo_cubic_to(cairo_t *c, Enesim_Path_Command *cmd,
-		Enesim_Renderer_Path_Cairo_Curve_State *state)
-{
-	cairo_curve_to(c, cmd->definition.cubic_to.x,
-	cmd->definition.cubic_to.y,
-	cmd->definition.cubic_to.ctrl_x0,
-	cmd->definition.cubic_to.ctrl_y0,
-	cmd->definition.cubic_to.ctrl_x1,
-	cmd->definition.cubic_to.ctrl_y1);
-}
-
-static void _path_cairo_scubic_to(cairo_t *c, Enesim_Path_Command *cmd,
-		Enesim_Renderer_Path_Cairo_Curve_State *state)
-{
-	cairo_curve_to(c, cmd->definition.cubic_to.x,
-	cmd->definition.cubic_to.y,
-	cmd->definition.cubic_to.ctrl_x0,
-	cmd->definition.cubic_to.ctrl_y0,
-	cmd->definition.cubic_to.ctrl_x1,
-	cmd->definition.cubic_to.ctrl_y1);
 }
 
 static void _path_cairo_colors_get(Enesim_Color color,
@@ -128,7 +83,6 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 		Enesim_Renderer_Path_Cairo *thiz)
 {
 	Enesim_Path_Command *cmd;
-	Enesim_Renderer_Path_Cairo_Curve_State cstate = { 0 };
 	const Enesim_Renderer_Shape_State *sstate;
 	const Enesim_Renderer_State *rstate;
 	const Eina_List *l;
@@ -140,40 +94,7 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 	cairo_new_path(thiz->cairo);
 	EINA_LIST_FOREACH(thiz->commands, l, cmd)
 	{
-		switch (cmd->type)
-		{
-			case ENESIM_PATH_COMMAND_MOVE_TO:
-			_path_cairo_move_to(thiz->cairo, cmd, &cstate);
-			break;
-
-			case ENESIM_PATH_COMMAND_LINE_TO:
-			_path_cairo_line_to(thiz->cairo, cmd, &cstate);
-			break;
-
-			case ENESIM_PATH_COMMAND_CUBIC_TO:
-			_path_cairo_cubic_to(thiz->cairo, cmd, &cstate);
-			break;
-
-			case ENESIM_PATH_COMMAND_SCUBIC_TO:
-			_path_cairo_scubic_to(thiz->cairo, cmd, &cstate);
-			break;
-
-			case ENESIM_PATH_COMMAND_ARC_TO:
-			/*cairo_arc(thiz->cairo, cmd->definition.arc_to.x,
-					cmd->definition.arc_to.y,
-					cmd->definition.yc, radius, angle1, angle1);
-			*/
-			break;
-
-			case ENESIM_PATH_COMMAND_CLOSE:
-			cairo_close_path(thiz->cairo);
-			break;
-
-			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
-			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
-			default:
-			break;
-		}
+		enesim_path_normalizer_normalize(thiz->normalizer, cmd);
 	}
 	/* set the matrix */
 	matrix.xx = rstate->current.transformation.xx;
@@ -219,6 +140,56 @@ static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
 	src = (unsigned char *)argb8888_at((uint32_t *)thiz->data, thiz->stride, x, y);
 	memcpy(ddata, src, len * 4);
 }
+/*----------------------------------------------------------------------------*
+ *                       The path normalizer interface                        *
+ *----------------------------------------------------------------------------*/
+static void _path_cairo_move_to(Enesim_Path_Command_Move_To *move_to,
+		void *data)
+{
+#if 0
+	cairo_move_to(c, cmd->definition.move_to.x, cmd->definition.move_to.y);
+	state->last_ctrl_x = state->last_x = cmd->definition.move_to.x;
+	state->last_ctrl_y = state->last_y = cmd->definition.move_to.y;
+#endif
+}
+
+static void _path_cairo_line_to(Enesim_Path_Command_Line_To *line_to,
+		void *data)
+{
+#if 0
+	cairo_line_to(c, cmd->definition.line_to.x, cmd->definition.line_to.y);
+	state->last_ctrl_x = state->last_x;
+	state->last_ctrl_y = state->last_y;
+	state->last_x = cmd->definition.line_to.x;
+	state->last_y = cmd->definition.line_to.y;
+#endif
+}
+
+static void _path_cairo_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
+		void *data)
+{
+#if 0
+	cairo_curve_to(c, cmd->definition.cubic_to.x,
+	cmd->definition.cubic_to.y,
+	cmd->definition.cubic_to.ctrl_x0,
+	cmd->definition.cubic_to.ctrl_y0,
+	cmd->definition.cubic_to.ctrl_x1,
+	cmd->definition.cubic_to.ctrl_y1);
+#endif
+}
+
+static void _path_cairo_close(Enesim_Path_Command_Close *close,
+		void *data)
+{
+
+}
+
+static Enesim_Path_Normalizer_Path_Descriptor _normalizer_descriptor = {
+	/* .move_to = 	*/ _path_cairo_move_to,
+	/* .line_to = 	*/ _path_cairo_line_to,
+	/* .cubic_to = 	*/ _path_cairo_cubic_to,
+	/* .close = 	*/ _path_cairo_close,
+};
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/

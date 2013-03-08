@@ -190,25 +190,29 @@ static Enesim_Path_Normalizer_Descriptor _figure_descriptor = {
 static void _path_move_to(Enesim_Path_Command_Move_To *move_to,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
-
+	Enesim_Path_Normalizer_Path *thiz = data;
+	thiz->descriptor->move_to(move_to, thiz->data);
 }
 
 static void _path_line_to(Enesim_Path_Command_Line_To *line_to,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
-
+	Enesim_Path_Normalizer_Path *thiz = data;
+	thiz->descriptor->line_to(line_to, thiz->data);
 }
 
 static void _path_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
-
+	Enesim_Path_Normalizer_Path *thiz = data;
+	thiz->descriptor->cubic_to(cubic_to, thiz->data);
 }
 
 static void _path_close(Enesim_Path_Command_Close *close,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
-
+	Enesim_Path_Normalizer_Path *thiz = data;
+	thiz->descriptor->close(close, thiz->data);
 }
 
 static void _path_free(void *data)
@@ -238,30 +242,10 @@ Enesim_Path_Normalizer * enesim_path_normalizer_new(
 	return thiz;
 }
 
-/* generate a figure only (line, move, close) commands */
-Enesim_Path_Normalizer * enesim_path_normalizer_figure_new(
-		Enesim_Path_Normalizer_Figure_Descriptor *descriptor,
-		void *data)
+void enesim_path_normalizer_free(Enesim_Path_Normalizer *thiz)
 {
-	Enesim_Path_Normalizer_Figure *thiz;
-
-	thiz = calloc(1, sizeof(Enesim_Path_Normalizer_Figure));
-	thiz->descriptor = descriptor;
-	thiz->data = data;
-	return enesim_path_normalizer_new(&_figure_descriptor, thiz);
-}
-
-/* generate a path simplifed (line, move, cubic, close) */
-Enesim_Path_Normalizer * enesim_path_normalizer_path_new(
-		Enesim_Path_Normalizer_Path_Descriptor *descriptor,
-		void *data)
-{
-	Enesim_Path_Normalizer_Path *thiz;
-
-	thiz = calloc(1, sizeof(Enesim_Path_Normalizer_Path));
-	thiz->descriptor = descriptor;
-	thiz->data = data;
-	return enesim_path_normalizer_new(&_path_descriptor, thiz);
+	thiz->descriptor->free(thiz->data);
+	free(thiz);
 }
 
 void enesim_path_normalizer_scubic_to(Enesim_Path_Normalizer *thiz,
@@ -495,7 +479,15 @@ void enesim_path_normalizer_line_to(Enesim_Path_Normalizer *thiz,
 void enesim_path_normalizer_cubic_to(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command_Cubic_To *cubic_to)
 {
+	Enesim_Path_Normalizer_State *state = &thiz->state;
+	double x, y, unused, ctrl_x1, ctrl_y1;
 
+	enesim_path_command_cubic_to_values_to(cubic_to, &x, &y, &unused, &unused, &ctrl_x1, &ctrl_y1);
+	state->last_ctrl_x = ctrl_x1;
+	state->last_ctrl_y = ctrl_y1;
+	state->last_x = x;
+	state->last_y = y;
+	thiz->descriptor->cubic_to(cubic_to, state, thiz->data);
 }
 
 void enesim_path_normalizer_move_to(Enesim_Path_Normalizer *thiz,
@@ -505,8 +497,8 @@ void enesim_path_normalizer_move_to(Enesim_Path_Normalizer *thiz,
 	double x, y;
 
 	enesim_path_command_move_to_values_to(move_to, &x, &y);
-	state->last_ctrl_x = state->last_x;
-	state->last_ctrl_y = state->last_y;
+	state->last_ctrl_x = x;
+	state->last_ctrl_y = y;
 	state->last_x = x;
 	state->last_y = y;
 	thiz->descriptor->move_to(move_to, state, thiz->data);
@@ -551,9 +543,38 @@ void enesim_path_normalizer_normalize(Enesim_Path_Normalizer *thiz,
 		break;
 
 		case ENESIM_PATH_COMMAND_CLOSE:
+		enesim_path_normalizer_close(thiz, &cmd->definition.close);
 		break;
 
 		default:
 		break;
 	}
 }
+
+/* generate a figure only (line, move, close) commands */
+Enesim_Path_Normalizer * enesim_path_normalizer_figure_new(
+		Enesim_Path_Normalizer_Figure_Descriptor *descriptor,
+		void *data)
+{
+	Enesim_Path_Normalizer_Figure *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Path_Normalizer_Figure));
+	thiz->descriptor = descriptor;
+	thiz->data = data;
+	return enesim_path_normalizer_new(&_figure_descriptor, thiz);
+}
+
+/* generate a path simplifed (line, move, cubic, close) */
+Enesim_Path_Normalizer * enesim_path_normalizer_path_new(
+		Enesim_Path_Normalizer_Path_Descriptor *descriptor,
+		void *data)
+{
+	Enesim_Path_Normalizer_Path *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Path_Normalizer_Path));
+	thiz->descriptor = descriptor;
+	thiz->data = data;
+	return enesim_path_normalizer_new(&_path_descriptor, thiz);
+}
+
+
