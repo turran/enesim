@@ -81,6 +81,7 @@ extern "C" {
 /* util headers */
 #include "enesim_perlin.h"
 #include "enesim_matrix.h"
+#include "enesim_path.h"
 /* main subsystems */
 #include "enesim_buffer.h"
 #include "enesim_surface.h"

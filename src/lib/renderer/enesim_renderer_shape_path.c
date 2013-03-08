@@ -25,6 +25,7 @@
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
+#include "enesim_path.h"
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
@@ -91,10 +92,10 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	if (sstate->stroke_dashes_changed)
 	{
 		Enesim_Shape_Stroke_Dash *d;
-		const Eina_List *l;
+		const Eina_List *ll;
 
 		enesim_renderer_shape_stroke_dash_clear(thiz->path);
-		EINA_LIST_FOREACH (sstate->stroke_dashes, l, d)
+		EINA_LIST_FOREACH (sstate->stroke_dashes, ll, d)
 		{
 			enesim_renderer_shape_stroke_dash_add(thiz->path, d);
 		}

@@ -13,6 +13,7 @@ src/lib/enesim_log.h \
 src/lib/enesim_image.h \
 src/lib/enesim_main.h \
 src/lib/enesim_matrix.h \
+src/lib/enesim_path.h \
 src/lib/enesim_perlin.h \
 src/lib/enesim_pool.h \
 src/lib/enesim_rectangle.h \

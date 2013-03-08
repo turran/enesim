@@ -23,6 +23,7 @@
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
+#include "enesim_path.h"
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"

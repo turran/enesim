@@ -23,6 +23,7 @@
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
+#include "enesim_path.h"
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
@@ -1024,7 +1025,7 @@ Enesim_Path_Generator * enesim_path_generator_dashed_new(void)
 void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands)
 {
 	Eina_List *l;
-	Enesim_Renderer_Path_Command *cmd;
+	Enesim_Path_Command *cmd;
 	const Enesim_Matrix *gm;
 	double scale_x;
 	double scale_y;
@@ -1057,7 +1058,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 		/* send the new vertex to the figure renderer */
 		switch (cmd->type)
 		{
-			case ENESIM_COMMAND_MOVE_TO:
+			case ENESIM_PATH_COMMAND_MOVE_TO:
 			x = scale_x * cmd->definition.move_to.x;
 			y = scale_y * cmd->definition.move_to.y;
 
@@ -1067,7 +1068,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			_path_move_to(thiz, x, y);
 			break;
 
-			case ENESIM_COMMAND_LINE_TO:
+			case ENESIM_PATH_COMMAND_LINE_TO:
 			x = scale_x * cmd->definition.line_to.x;
 			y = scale_y * cmd->definition.line_to.y;
 
@@ -1077,7 +1078,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_curve_line_to(&thiz->st, x, y);
 			break;
 
-			case ENESIM_COMMAND_QUADRATIC_TO:
+			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
 			x = scale_x * cmd->definition.quadratic_to.x;
 			y = scale_y * cmd->definition.quadratic_to.y;
 			ctrl_x0 = scale_x * cmd->definition.quadratic_to.ctrl_x;
@@ -1090,7 +1091,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_curve_quadratic_to(&thiz->st, ctrl_x0, ctrl_y0, x, y);
 			break;
 
-			case ENESIM_COMMAND_SQUADRATIC_TO:
+			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
 			x = scale_x * cmd->definition.squadratic_to.x;
 			y = scale_y * cmd->definition.squadratic_to.y;
 
@@ -1100,7 +1101,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_curve_squadratic_to(&thiz->st, x, y);
 			break;
 
-			case ENESIM_COMMAND_CUBIC_TO:
+			case ENESIM_PATH_COMMAND_CUBIC_TO:
 			x = scale_x * cmd->definition.cubic_to.x;
 			y = scale_y * cmd->definition.cubic_to.y;
 			ctrl_x0 = scale_x * cmd->definition.cubic_to.ctrl_x0;
@@ -1118,7 +1119,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 					x, y);
 			break;
 
-			case ENESIM_COMMAND_SCUBIC_TO:
+			case ENESIM_PATH_COMMAND_SCUBIC_TO:
 			x = scale_x * cmd->definition.scubic_to.x;
 			y = scale_y * cmd->definition.scubic_to.y;
 			ctrl_x0 = scale_x * cmd->definition.scubic_to.ctrl_x;
@@ -1132,7 +1133,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 					x, y);
 			break;
 
-			case ENESIM_COMMAND_ARC_TO:
+			case ENESIM_PATH_COMMAND_ARC_TO:
 			x = scale_x * cmd->definition.arc_to.x;
 			y = scale_y * cmd->definition.arc_to.y;
 			rx = scale_x * cmd->definition.arc_to.rx;
@@ -1155,7 +1156,7 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 					x, y);
 			break;
 
-			case ENESIM_COMMAND_CLOSE:
+			case ENESIM_PATH_COMMAND_CLOSE:
 			_path_polygon_close(thiz, cmd->definition.close.close);
 			break;
 

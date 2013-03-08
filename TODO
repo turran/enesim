@@ -1,10 +1,6 @@
 Enesim
 ======
 + Some more renamings:
-  Enesim_Path -> Enesim_Path_Generator
-  enesim_path_* -> enesim_path_generator
-  ENESIM_COMMAND_ -> ENESIM_PATH_COMMAND
-  Enesim_Renderer_Path_Command -> Enesim_Path_Command
   enesim_curve_* -> enesim_path_normalizer
   
 + Add the luminance format
