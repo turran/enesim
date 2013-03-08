@@ -69,5 +69,6 @@ void enesim_path_normalizer_scubic_to(Enesim_Path_Normalizer *thiz,
 void enesim_path_normalizer_close(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command_Close *close);
 void enesim_path_normalizer_free(Enesim_Path_Normalizer *thiz);
+void enesim_path_normalizer_reset(Enesim_Path_Normalizer *thiz);
 
 #endif

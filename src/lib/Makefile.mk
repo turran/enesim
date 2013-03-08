@@ -38,6 +38,7 @@ src/lib/enesim_log.c \
 src/lib/enesim_image.c \
 src/lib/enesim_main.c \
 src/lib/enesim_matrix.c \
+src/lib/enesim_path.c \
 src/lib/enesim_pool.c \
 src/lib/enesim_rasterizer.c \
 src/lib/enesim_rectangle.c \

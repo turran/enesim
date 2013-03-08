@@ -1021,6 +1021,150 @@ Enesim_Path_Generator * enesim_path_generator_dashed_new(void)
 	return thiz;
 }
 
+#if 0
+void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands)
+{
+	Eina_List *l;
+	Enesim_Path_Command *cmd;
+	Enesim_Path_Command_Line_To line_to;
+	Enesim_Path_Command_Move_To move_to;
+	Enesim_Path_Command_Cubic_To cubic_to;
+	Enesim_Path_Command_Scubic_To scubic_to;
+	Enesim_Path_Command_Quadratic_To quadratic_to;
+	Enesim_Path_Command_Squadratic_To squadratic_to;
+	Enesim_Path_Command_Arc_To arc_to;
+	Enesim_Path_Command_Close close;
+	const Enesim_Matrix *gm;
+	double scale_x;
+	double scale_y;
+
+	_path_begin(thiz);
+
+	EINA_LIST_FOREACH(commands, l, cmd)
+	{
+		double x, y;
+		double rx;
+		double ry;
+		double ctrl_x0;
+		double ctrl_y0;
+		double ctrl_x1;
+		double ctrl_y1;
+		double ca, sa;
+		/* send the new vertex to the figure renderer */
+		switch (cmd->type)
+		{
+			case ENESIM_PATH_COMMAND_MOVE_TO:
+			x = scale_x * cmd->definition.move_to.x;
+			y = scale_y * cmd->definition.move_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			_path_move_to(thiz, x, y);
+			break;
+
+			case ENESIM_PATH_COMMAND_LINE_TO:
+			x = scale_x * cmd->definition.line_to.x;
+			y = scale_y * cmd->definition.line_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_curve_line_to(&thiz->st, x, y);
+			break;
+
+			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
+			x = scale_x * cmd->definition.quadratic_to.x;
+			y = scale_y * cmd->definition.quadratic_to.y;
+			ctrl_x0 = scale_x * cmd->definition.quadratic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->definition.quadratic_to.ctrl_y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_curve_quadratic_to(&thiz->st, ctrl_x0, ctrl_y0, x, y);
+			break;
+
+			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
+			x = scale_x * cmd->definition.squadratic_to.x;
+			y = scale_y * cmd->definition.squadratic_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_curve_squadratic_to(&thiz->st, x, y);
+			break;
+
+			case ENESIM_PATH_COMMAND_CUBIC_TO:
+			x = scale_x * cmd->definition.cubic_to.x;
+			y = scale_y * cmd->definition.cubic_to.y;
+			ctrl_x0 = scale_x * cmd->definition.cubic_to.ctrl_x0;
+			ctrl_y0 = scale_y * cmd->definition.cubic_to.ctrl_y0;
+			ctrl_x1 = scale_x * cmd->definition.cubic_to.ctrl_x1;
+			ctrl_y1 = scale_y * cmd->definition.cubic_to.ctrl_y1;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+			enesim_matrix_point_transform(gm, ctrl_x1, ctrl_y1, &ctrl_x1, &ctrl_y1);
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_curve_cubic_to(&thiz->st,
+					ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1,
+					x, y);
+			break;
+
+			case ENESIM_PATH_COMMAND_SCUBIC_TO:
+			x = scale_x * cmd->definition.scubic_to.x;
+			y = scale_y * cmd->definition.scubic_to.y;
+			ctrl_x0 = scale_x * cmd->definition.scubic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->definition.scubic_to.ctrl_y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_curve_scubic_to(&thiz->st, ctrl_x0, ctrl_y0,
+					x, y);
+			break;
+
+			case ENESIM_PATH_COMMAND_ARC_TO:
+			x = scale_x * cmd->definition.arc_to.x;
+			y = scale_y * cmd->definition.arc_to.y;
+			rx = scale_x * cmd->definition.arc_to.rx;
+			ry = scale_y * cmd->definition.arc_to.ry;
+			ca = cos(cmd->definition.arc_to.angle * M_PI / 180.0);
+			sa = sin(cmd->definition.arc_to.angle * M_PI / 180.0);
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			rx = rx * hypot((ca * gm->xx) + (sa * gm->xy), (ca * gm->yx) + (sa * gm->yy));
+			ry = ry * hypot((ca * gm->xy) - (sa * gm->xx), (ca * gm->yy) - (sa * gm->yx));
+			ca = atan2((ca * gm->yx) + (sa * gm->yy), (ca * gm->xx) + (sa * gm->xy));
+
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_curve_arc_to(&thiz->st,
+					rx, ry,
+					ca * 180.0 / M_PI,
+					cmd->definition.arc_to.large,
+					cmd->definition.arc_to.sweep,
+					x, y);
+			break;
+
+			case ENESIM_PATH_COMMAND_CLOSE:
+			_path_polygon_close(thiz, cmd->definition.close.close);
+			break;
+
+			default:
+			break;
+		}
+	}
+	/* in case we delay the creation of the vertices this triggers that */
+	_path_done(thiz);
+}
+
+}
+#endif
 
 void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands)
 {

@@ -71,16 +71,6 @@ typedef struct _Enesim_Path_Normalizer_Path
  *                                  Local                                     *
  *============================================================================*/
 #if 0
-void enesim_curve_line_to(Enesim_Curve_State *state,
-		double x, double y)
-{
-	state->vertex_add(x, y, state->data);
-	state->last_ctrl_x = state->last_x;
-	state->last_ctrl_y = state->last_y;
-	state->last_x = x;
-	state->last_y = y;
-}
-
 /* these subdiv approximations need to be done more carefully */
 void enesim_curve_quadratic_to(Enesim_Curve_State *state,
 		double ctrl_x, double ctrl_y,
@@ -256,7 +246,7 @@ void enesim_path_normalizer_scubic_to(Enesim_Path_Normalizer *thiz,
 	double ctrl_x, ctrl_y, x, y;
 	double x0, y0, cx0, cy0;
 
-	enesim_path_command_scubic_to_values_to(scubic_to, &ctrl_x, &ctrl_y, &x, &y);
+	enesim_path_command_scubic_to_values_to(scubic_to, &x, &y, &ctrl_x, &ctrl_y);
 	x0 = state->last_x;
 	y0 = state->last_y;
 	cx0 = state->last_ctrl_x;
@@ -264,7 +254,7 @@ void enesim_path_normalizer_scubic_to(Enesim_Path_Normalizer *thiz,
 	cx0 = (2 * x0) - cx0;
 	cy0 = (2 * y0) - cy0;
 
-	enesim_path_command_cubic_to_values_from(&cubic_to, cx0, cy0, ctrl_x, ctrl_y, x, y);
+	enesim_path_command_cubic_to_values_from(&cubic_to, x, y, cx0, cy0, ctrl_x, ctrl_y);
 	enesim_path_normalizer_cubic_to(thiz, &cubic_to);
 	state->last_x = x;
 	state->last_y = y;
@@ -449,7 +439,7 @@ void enesim_path_normalizer_arc_to(Enesim_Path_Normalizer *thiz,
 		double c2x = ex + bcp * (cos_phi_rx * sin_theta2 + sin_phi_ry * cos_theta2);
 		double c2y = ey + bcp * (sin_phi_rx * sin_theta2 - cos_phi_ry * cos_theta2);
 
-		enesim_path_command_cubic_to_values_from(&cubic_to, c1x, c1y, c2x, c2y, ex, ey);
+		enesim_path_command_cubic_to_values_from(&cubic_to, ex, ey, c1x, c1y, c2x, c2y);
 		enesim_path_normalizer_cubic_to(thiz, &cubic_to);
 
 		// next start point is the current end point (same for angle)
@@ -577,4 +567,10 @@ Enesim_Path_Normalizer * enesim_path_normalizer_path_new(
 	return enesim_path_normalizer_new(&_path_descriptor, thiz);
 }
 
-
+void enesim_path_normalizer_reset(Enesim_Path_Normalizer *thiz)
+{
+	thiz->state.last_ctrl_x = 0;
+	thiz->state.last_ctrl_y = 0;
+	thiz->state.last_x = 0;
+	thiz->state.last_y = 0;
+}
