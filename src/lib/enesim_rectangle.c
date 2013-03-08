@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Eina.h"
 #include "enesim_rectangle.h"
 /*============================================================================*
  *                                  Local                                     *

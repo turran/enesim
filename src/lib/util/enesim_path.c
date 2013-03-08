@@ -1168,6 +1168,11 @@ void enesim_path_generate(Enesim_Path *thiz, Eina_List *commands)
 }
 
 #if 0
+typedef struct _Enesim_Path_Generator
+{
+
+} Enesim_Path_Generator;
+
 /* The idea here is to normalize the path into move_to, line_to,
  * cubic_to and close commands. For that we need to abstract more the
  * curve functions on enesim_curve.c

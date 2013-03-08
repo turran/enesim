@@ -58,12 +58,60 @@ typedef struct _Enesim_Renderer_Path_Cairo
 	Eina_Bool generated;
 } Enesim_Renderer_Path_Cairo;
 
+typedef struct _Enesim_Renderer_Path_Cairo_Curve_State
+{
+	double last_x;
+	double last_y;
+	double last_ctrl_x;
+	double last_ctrl_y;
+} Enesim_Renderer_Path_Cairo_Curve_State;
+
 Enesim_Renderer_Path_Cairo * _path_cairo_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
 
 	thiz = enesim_renderer_path_abstract_data_get(r);
 	return thiz;
+}
+
+static void _path_cairo_move_to(cairo_t *c, Enesim_Renderer_Path_Command *cmd,
+		Enesim_Renderer_Path_Cairo_Curve_State *state)
+{
+	cairo_move_to(c, cmd->definition.move_to.x, cmd->definition.move_to.y);
+	state->last_ctrl_x = state->last_x = cmd->definition.move_to.x;
+	state->last_ctrl_y = state->last_y = cmd->definition.move_to.y;
+}
+
+static void _path_cairo_line_to(cairo_t *c, Enesim_Renderer_Path_Command *cmd,
+		Enesim_Renderer_Path_Cairo_Curve_State *state)
+{
+	cairo_line_to(c, cmd->definition.line_to.x, cmd->definition.line_to.y);
+	state->last_ctrl_x = state->last_x;
+	state->last_ctrl_y = state->last_y;
+	state->last_x = cmd->definition.line_to.x;
+	state->last_y = cmd->definition.line_to.y;
+}
+
+static void _path_cairo_cubic_to(cairo_t *c, Enesim_Renderer_Path_Command *cmd,
+		Enesim_Renderer_Path_Cairo_Curve_State *state)
+{
+	cairo_curve_to(c, cmd->definition.cubic_to.x,
+	cmd->definition.cubic_to.y,
+	cmd->definition.cubic_to.ctrl_x0,
+	cmd->definition.cubic_to.ctrl_y0,
+	cmd->definition.cubic_to.ctrl_x1,
+	cmd->definition.cubic_to.ctrl_y1);
+}
+
+static void _path_cairo_scubic_to(cairo_t *c, Enesim_Renderer_Path_Command *cmd,
+		Enesim_Renderer_Path_Cairo_Curve_State *state)
+{
+	cairo_curve_to(c, cmd->definition.cubic_to.x,
+	cmd->definition.cubic_to.y,
+	cmd->definition.cubic_to.ctrl_x0,
+	cmd->definition.cubic_to.ctrl_y0,
+	cmd->definition.cubic_to.ctrl_x1,
+	cmd->definition.cubic_to.ctrl_y1);
 }
 
 static void _path_cairo_colors_get(Enesim_Color color,
@@ -79,6 +127,7 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 		Enesim_Renderer_Path_Cairo *thiz)
 {
 	Enesim_Renderer_Path_Command *cmd;
+	Enesim_Renderer_Path_Cairo_Curve_State cstate = { 0 };
 	const Enesim_Renderer_Shape_State *sstate;
 	const Enesim_Renderer_State *rstate;
 	const Eina_List *l;
@@ -93,15 +142,19 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 		switch (cmd->type)
 		{
 			case ENESIM_COMMAND_MOVE_TO:
-        		cairo_move_to(thiz->cairo, cmd->definition.move_to.x, cmd->definition.move_to.y);
+			_path_cairo_move_to(thiz->cairo, cmd, &cstate);
 			break;
 
 			case ENESIM_COMMAND_LINE_TO:
-			cairo_line_to(thiz->cairo, cmd->definition.line_to.x, cmd->definition.line_to.y);
+			_path_cairo_line_to(thiz->cairo, cmd, &cstate);
 			break;
 
 			case ENESIM_COMMAND_CUBIC_TO:
-			//cairo_curve_to(cr, x0 ,y0, x0, y0, (x0 + x1)/2, y0);
+			_path_cairo_cubic_to(thiz->cairo, cmd, &cstate);
+			break;
+
+			case ENESIM_COMMAND_SCUBIC_TO:
+			_path_cairo_scubic_to(thiz->cairo, cmd, &cstate);
 			break;
 
 			case ENESIM_COMMAND_ARC_TO:
@@ -117,7 +170,6 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 
 			case ENESIM_COMMAND_QUADRATIC_TO:
 			case ENESIM_COMMAND_SQUADRATIC_TO:
-			case ENESIM_COMMAND_SCUBIC_TO:
 			default:
 			break;
 		}
@@ -149,6 +201,7 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 
 		_path_cairo_colors_get(sstate->current.stroke.color, &a, &r, &g, &b);
 		cairo_set_source_rgba(thiz->cairo, r, g, b, a);
+		cairo_set_line_width (thiz->cairo, sstate->current.stroke.weight);
 		cairo_stroke(thiz->cairo);
 	}
 	thiz->generated = EINA_TRUE;
@@ -162,7 +215,7 @@ static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
 
 	thiz = _path_cairo_get(r);
 	/* just copy the pixels from the cairo rendered surface to the destination */
-	src = argb8888_at((uint32_t *)thiz->data, thiz->stride, x, y);
+	src = (unsigned char *)argb8888_at((uint32_t *)thiz->data, thiz->stride, x, y);
 	memcpy(ddata, src, len * 4);
 }
 /*----------------------------------------------------------------------------*
@@ -233,16 +286,21 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 
 	/* finally draw */
 	cr = cairo_create(thiz->surface);
+#if 0
 	cairo_set_source_surface(cr, thiz->recording, 0, 0);
 	cairo_paint(cr);
 	cairo_destroy(cr);
+#else
+	thiz->cairo = cr;
+	_path_cairo_generate(r, thiz);
+#endif
 
 	*draw = _path_cairo_draw;
 
 	return EINA_TRUE;
 }
 
-static void _path_cairo_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _path_cairo_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
 }
 
@@ -317,7 +375,7 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_cairo_descriptor = {
 	/* .opengl_initialize =		*/ NULL,
 	/* .opengl_setup =		*/ NULL,
 	/* .opengl_cleanup =		*/ NULL,
-	/* .shape_features_get =		*/ _path_cairo_shape_features_get,
+	/* .shape_features_get =	*/ _path_cairo_shape_features_get,
 	/* .commands_set = 		*/ _path_cairo_commands_set,
 };
 
