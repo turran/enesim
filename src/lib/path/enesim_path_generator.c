@@ -1167,20 +1167,3 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 	/* in case we delay the creation of the vertices this triggers that */
 	_path_done(thiz);
 }
-
-#if 0
-typedef struct _Enesim_Path_Generator
-{
-
-} Enesim_Path_Generator;
-
-/* The idea here is to normalize the path into move_to, line_to,
- * cubic_to and close commands. For that we need to abstract more the
- * curve functions on enesim_curve.c
- */
-void enesim_path_generator_normalize(Enesim_Path_Generator *thiz, Enesim_Path_Generator *normalized)
-{
-
-}
-
-#endif

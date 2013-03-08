@@ -18,24 +18,26 @@
 #ifndef _ENESIM_PATH_NORMALIZER_PRIVATE_H
 #define _ENESIM_PATH_NORMALIZER_PRIVATE_H
 
-typedef void (*Enesim_Path_Normalizer_Move_To_Cb)(Enesim_Path_Command_Move_To move_to,
+typedef struct _Enesim_Path_Normalizer Enesim_Path_Normalizer;
+
+typedef void (*Enesim_Path_Normalizer_Path_Move_To_Cb)(Enesim_Path_Command_Move_To move_to,
 		void *data);
-typedef void (*Enesim_Path_Normalizer_Line_To_Cb)(Enesim_Path_Command_Line_To line_to,
+typedef void (*Enesim_Path_Normalizer_Path_Line_To_Cb)(Enesim_Path_Command_Line_To line_to,
 		void *data);
-typedef void (*Enesim_Path_Normalizer_Cubic_To_Cb)(Enesim_Path_Command_Cubic_To cubic_to,
+typedef void (*Enesim_Path_Normalizer_Path_Cubic_To_Cb)(Enesim_Path_Command_Cubic_To cubic_to,
 		void *data);
-typedef void (*Enesim_Path_Normalizer_Close_Cb)(Enesim_Path_Command_Close close,
+typedef void (*Enesim_Path_Normalizer_Path_Close_Cb)(Enesim_Path_Command_Close close,
 		void *data);
 
 typedef struct _Enesim_Path_Normalizer_Path_Descriptor {
-	Enesim_Path_Normalizer_Move_To_Cb move_to;
-	Enesim_Path_Normalizer_Line_To_Cb line_to;
-	Enesim_Path_Normalizer_Cubic_To_Cb cubic_to;
-	Enesim_Path_Normalizer_Close_Cb close;
+	Enesim_Path_Normalizer_Path_Move_To_Cb move_to;
+	Enesim_Path_Normalizer_Path_Line_To_Cb line_to;
+	Enesim_Path_Normalizer_Path_Cubic_To_Cb cubic_to;
+	Enesim_Path_Normalizer_Path_Close_Cb close;
 } Enesim_Path_Normalizer_Path_Descriptor;
 
 Enesim_Path_Normalizer * enesim_path_normalizer_path_new(
-		Enesim_Path_Normalizer_Path *descriptor,
+		Enesim_Path_Normalizer_Path_Descriptor *descriptor,
 		void *data);
 
 typedef void (*Enesim_Path_Normalizer_Figure_Vertex_Add)(double x, double y, void *data);
@@ -54,5 +56,17 @@ Enesim_Path_Normalizer * enesim_path_normalizer_figure_new(
 
 void enesim_path_normalizer_normalize(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command *cmd);
+void enesim_path_normalizer_line_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Line_To *line_to);
+void enesim_path_normalizer_cubic_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Cubic_To *cubic_to);
+void enesim_path_normalizer_move_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Move_To *move_to);
+void enesim_path_normalizer_arc_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Arc_To *arc);
+void enesim_path_normalizer_scubic_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Scubic_To *scubic_to);
+void enesim_path_normalizer_close(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Close *close);
 
 #endif
