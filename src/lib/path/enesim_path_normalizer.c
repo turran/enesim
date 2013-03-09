@@ -141,25 +141,35 @@ void enesim_curve_cubic_to(Enesim_Curve_State *state,
 static void _figure_move_to(Enesim_Path_Command_Move_To *move_to,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
+	Enesim_Path_Normalizer_Figure *thiz = data;
+	double x, y;
 
+	enesim_path_command_move_to_values_to(move_to, &x, &y);
+	thiz->descriptor->polygon_add(thiz->data);
+	thiz->descriptor->vertex_add(x, y, thiz->data);
 }
 
 static void _figure_line_to(Enesim_Path_Command_Line_To *line_to,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
+	Enesim_Path_Normalizer_Figure *thiz = data;
+	double x, y;
 
+	enesim_path_command_line_to_values_to(line_to, &x, &y);
+	thiz->descriptor->vertex_add(x, y, thiz->data);
 }
 
 static void _figure_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
-
+	/* normalize the cubic command */
 }
 
 static void _figure_close(Enesim_Path_Command_Close *close,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
-
+	Enesim_Path_Normalizer_Figure *thiz = data;
+	thiz->descriptor->polygon_close(close->close, thiz->data);
 }
 
 static void _figure_free(void *data)
