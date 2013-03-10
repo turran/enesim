@@ -20,6 +20,8 @@
 #include "enesim_main.h"
 #include "enesim_eina.h"
 #include "enesim_path.h"
+
+#include "enesim_path_private.h"
 #include "enesim_path_normalizer_private.h"
 
 typedef struct _Enesim_Path_Normalizer_State

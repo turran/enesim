@@ -33,6 +33,7 @@
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_path.h"
 
+#include "enesim_path_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_path_abstract_private.h"

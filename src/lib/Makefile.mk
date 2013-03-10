@@ -31,32 +31,33 @@ endif
 
 src_lib_libenesim_la_SOURCES = \
 src/lib/enesim_buffer.c \
+src/lib/enesim_buffer_private.h \
 src/lib/enesim_color.c \
 src/lib/enesim_compositor.c \
+src/lib/enesim_compositor_private.h \
 src/lib/enesim_converter.c \
+src/lib/enesim_converter_private.h \
 src/lib/enesim_log.c \
 src/lib/enesim_image.c \
+src/lib/enesim_image_private.h \
 src/lib/enesim_main.c \
 src/lib/enesim_matrix.c \
-src/lib/enesim_path.c \
-src/lib/enesim_pool.c \
-src/lib/enesim_rasterizer.c \
-src/lib/enesim_rectangle.c \
-src/lib/enesim_renderer.c \
-src/lib/enesim_renderer_sw.c \
-src/lib/enesim_surface.c \
-src/lib/enesim_text.c \
-src/lib/enesim_private.h \
-src/lib/enesim_buffer_private.h \
-src/lib/enesim_compositor_private.h \
-src/lib/enesim_converter_private.h \
-src/lib/enesim_image_private.h \
 src/lib/enesim_matrix_private.h \
 src/lib/enesim_opengl_private.h \
+src/lib/enesim_path.c \
+src/lib/enesim_path_private.h \
+src/lib/enesim_pool.c \
 src/lib/enesim_pool_private.h \
-src/lib/enesim_renderer_private.h \
+src/lib/enesim_private.h \
+src/lib/enesim_rasterizer.c \
 src/lib/enesim_rasterizer_private.h \
+src/lib/enesim_rectangle.c \
+src/lib/enesim_renderer.c \
+src/lib/enesim_renderer_private.h \
+src/lib/enesim_renderer_sw.c \
+src/lib/enesim_surface.c \
 src/lib/enesim_surface_private.h \
+src/lib/enesim_text.c \
 src/lib/enesim_text_private.h
 
 if HAVE_OPENCL
