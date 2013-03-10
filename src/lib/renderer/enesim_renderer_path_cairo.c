@@ -52,7 +52,8 @@ typedef struct _Enesim_Renderer_Path_Cairo
 	Enesim_Path_Normalizer *normalizer;
 
 	const Eina_List *commands;
-	cairo_t *cairo;
+	cairo_t *cairo_rec;
+	cairo_t *cairo_draw;
 	cairo_surface_t *recording;
 	cairo_surface_t *surface;
 	unsigned char *data;
@@ -61,6 +62,7 @@ typedef struct _Enesim_Renderer_Path_Cairo
 	Eina_Rectangle destination_bounds;
 	Eina_Bool changed;
 	Eina_Bool generated;
+	Eina_Bool drawing;
 } Enesim_Renderer_Path_Cairo;
 
 Enesim_Renderer_Path_Cairo * _path_cairo_get(Enesim_Renderer *r)
@@ -81,14 +83,19 @@ static void _path_cairo_colors_get(Enesim_Color color,
 }
 
 static void _path_cairo_generate(Enesim_Renderer *rend,
-		Enesim_Renderer_Path_Cairo *thiz,
-		Eina_Bool final)
+		Enesim_Renderer_Path_Cairo *thiz)
 {
 	Enesim_Path_Command *cmd;
 	const Enesim_Renderer_Shape_State *sstate;
 	const Enesim_Renderer_State *rstate;
 	const Eina_List *l;
 	cairo_matrix_t matrix;
+	cairo_t *cairo;
+
+	if (thiz->drawing)
+		cairo = thiz->cairo_draw;
+	else
+		cairo = thiz->cairo_rec;
 
 	sstate = enesim_renderer_shape_state_get(rend);
 	rstate = enesim_renderer_state_get(rend);
@@ -100,15 +107,15 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 	matrix.yy = rstate->current.transformation.yy;
 	matrix.x0 = rstate->current.transformation.xz;
 	matrix.y0 = rstate->current.transformation.zy;
-	cairo_set_matrix(thiz->cairo, &matrix);
+	cairo_set_matrix(cairo, &matrix);
 	/* we need to translate by the bounds, to align to the temporary
 	 * surface
 	 */
-	if (final)
+	if (thiz->drawing)
 	{
-		cairo_translate(thiz->cairo, -thiz->bounds.x, -thiz->bounds.y);
+		cairo_translate(cairo, -thiz->bounds.x, -thiz->bounds.y);
 	}
-	cairo_new_path(thiz->cairo);
+	cairo_new_path(cairo);
 	EINA_LIST_FOREACH(thiz->commands, l, cmd)
 	{
 		enesim_path_normalizer_normalize(thiz->normalizer, cmd);
@@ -119,11 +126,11 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 		double a, r, g, b;
 
 		_path_cairo_colors_get(sstate->current.fill.color, &a, &r, &g, &b);
-		cairo_set_source_rgba(thiz->cairo, r, g, b, a);
+		cairo_set_source_rgba(cairo, r, g, b, a);
 		if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
-			cairo_fill_preserve(thiz->cairo);
+			cairo_fill_preserve(cairo);
 		else
-			cairo_fill(thiz->cairo);
+			cairo_fill(cairo);
 	}
 
 	if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
@@ -131,9 +138,9 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 		double a, r, g, b;
 
 		_path_cairo_colors_get(sstate->current.stroke.color, &a, &r, &g, &b);
-		cairo_set_source_rgba(thiz->cairo, r, g, b, a);
-		cairo_set_line_width (thiz->cairo, sstate->current.stroke.weight);
-		cairo_stroke(thiz->cairo);
+		cairo_set_source_rgba(cairo, r, g, b, a);
+		cairo_set_line_width(cairo, sstate->current.stroke.weight);
+		cairo_stroke(cairo);
 	}
 	thiz->generated = EINA_TRUE;
 }
@@ -160,41 +167,62 @@ static void _path_cairo_move_to(Enesim_Path_Command_Move_To *move_to,
 		void *data)
 {
 	Enesim_Renderer_Path_Cairo *thiz = data;
+	cairo_t *cairo;
 	double x, y;
 
+	if (thiz->drawing)
+		cairo = thiz->cairo_draw;
+	else
+		cairo = thiz->cairo_rec;
 	enesim_path_command_move_to_values_to(move_to, &x, &y);
 	//printf("M %g %g", x, y);
-	cairo_move_to(thiz->cairo, x, y);
+	cairo_move_to(cairo, x, y);
 }
 
 static void _path_cairo_line_to(Enesim_Path_Command_Line_To *line_to,
 		void *data)
 {
 	Enesim_Renderer_Path_Cairo *thiz = data;
+	cairo_t *cairo;
 	double x, y;
 
+	if (thiz->drawing)
+		cairo = thiz->cairo_draw;
+	else
+		cairo = thiz->cairo_rec;
 	enesim_path_command_line_to_values_to(line_to, &x, &y);
 	//printf(" L %g %g", x, y);
-	cairo_line_to(thiz->cairo, x, y);
+	cairo_line_to(cairo, x, y);
 }
 
 static void _path_cairo_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
 		void *data)
 {
 	Enesim_Renderer_Path_Cairo *thiz = data;
+	cairo_t *cairo;
 	double x, y, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1;
 
+	if (thiz->drawing)
+		cairo = thiz->cairo_draw;
+	else
+		cairo = thiz->cairo_rec;
 	enesim_path_command_cubic_to_values_to(cubic_to, &x, &y, &ctrl_x0, &ctrl_y0, &ctrl_x1, &ctrl_y1);
 	//printf(" C %g %g %g %g %g %g", ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1, x, y);
-	cairo_curve_to(thiz->cairo, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1, x, y);
+	cairo_curve_to(cairo, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1, x, y);
 }
 
 static void _path_cairo_close(Enesim_Path_Command_Close *close,
 		void *data)
 {
 	Enesim_Renderer_Path_Cairo *thiz = data;
+	cairo_t *cairo;
+
+	if (thiz->drawing)
+		cairo = thiz->cairo_draw;
+	else
+		cairo = thiz->cairo_rec;
 	//printf(" Z\n");
-	cairo_close_path(thiz->cairo);
+	cairo_close_path(cairo);
 }
 
 static Enesim_Path_Normalizer_Path_Descriptor _normalizer_descriptor = {
@@ -219,7 +247,10 @@ static void _path_cairo_free(Enesim_Renderer *r)
 	cairo_surface_destroy(thiz->recording);
 	if (thiz->surface)
 		cairo_surface_destroy(thiz->surface);
-	cairo_destroy(thiz->cairo);
+	cairo_destroy(thiz->cairo_rec);
+	if (thiz->cairo_draw)
+		cairo_destroy(thiz->cairo_draw);
+	enesim_path_normalizer_free(thiz->normalizer);
 	free(thiz);
 }
 
@@ -238,7 +269,8 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 
 	if (thiz->changed && !thiz->generated)
 	{
-		_path_cairo_generate(r, thiz, EINA_FALSE);
+		thiz->drawing = EINA_FALSE;
+		_path_cairo_generate(r, thiz);
 		cairo_recording_surface_ink_extents(thiz->recording,
 				&thiz->bounds.x, &thiz->bounds.y,
 				&thiz->bounds.w, &thiz->bounds.h);
@@ -260,6 +292,7 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 			cairo_surface_destroy(thiz->surface);
 		thiz->surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, rwidth, rheight);
 		//printf("surface of %d %d\n", rwidth, rheight);
+		thiz->cairo_draw = cairo_create(thiz->surface);
 	}
 
 	if (!thiz->surface)
@@ -272,15 +305,8 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 	thiz->stride = cairo_image_surface_get_stride(thiz->surface);
 
 	/* finally draw */
-	cr = cairo_create(thiz->surface);
-#if 0
-	cairo_set_source_surface(cr, thiz->recording, 0, 0);
-	cairo_paint(cr);
-	cairo_destroy(cr);
-#else
-	thiz->cairo = cr;
-	_path_cairo_generate(r, thiz, EINA_TRUE);
-#endif
+	thiz->drawing = EINA_TRUE;
+	_path_cairo_generate(r, thiz);
 
 	*draw = _path_cairo_draw;
 
@@ -326,7 +352,8 @@ static void _path_cairo_bounds_get(Enesim_Renderer *r,
 	thiz = _path_cairo_get(r);
 	if (thiz->changed && !thiz->generated)
 	{
-		_path_cairo_generate(r, thiz, EINA_FALSE);
+		thiz->drawing = EINA_FALSE;
+		_path_cairo_generate(r, thiz);
 		cairo_recording_surface_ink_extents(thiz->recording,
 				&thiz->bounds.x, &thiz->bounds.y,
 				&thiz->bounds.w, &thiz->bounds.h);
@@ -378,7 +405,7 @@ Enesim_Renderer * enesim_renderer_path_cairo_new(void)
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_Path_Cairo));
 	thiz->recording = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
-	thiz->cairo = cairo_create(thiz->recording);
+	thiz->cairo_rec = cairo_create(thiz->recording);
 	thiz->normalizer = enesim_path_normalizer_path_new(&_normalizer_descriptor, thiz);
 
 	r = enesim_renderer_path_abstract_new(&_path_cairo_descriptor, thiz);
