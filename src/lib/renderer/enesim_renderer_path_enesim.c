@@ -37,6 +37,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_buffer_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_path_abstract_private.h"

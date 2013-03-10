@@ -35,6 +35,7 @@
 #endif
 
 #include "enesim_renderer_private.h"
+#include "enesim_buffer_private.h"
 
 /**
  * @todo
