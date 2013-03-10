@@ -100,6 +100,16 @@ static inline void enesim_path_command_quadratic_values_from(
 	thiz->ctrl_y = ctrl_y;
 }
 
+static inline void enesim_path_command_quadratic_values_to(
+		Enesim_Path_Command_Quadratic_To *thiz,
+		double *x, double *y, double *ctrl_x, double *ctrl_y)
+{
+	*x = thiz->x;
+	*y = thiz->y;
+	*ctrl_x = thiz->ctrl_x;
+	*ctrl_y = thiz->ctrl_y;
+}
+
 static inline void enesim_path_command_scubic_to_values_from(
 		Enesim_Path_Command_Scubic_To *thiz,
 		double x, double y, double ctrl_x, double ctrl_y)

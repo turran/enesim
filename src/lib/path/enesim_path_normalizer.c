@@ -513,8 +513,17 @@ void enesim_path_normalizer_squadratic_to(Enesim_Path_Normalizer *thiz,
 void enesim_path_normalizer_quadratic_to(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command_Quadratic_To *quadratic)
 {
-	/* TODO generate the cubic */
+	Enesim_Path_Normalizer_State *state = &thiz->state;
+	Enesim_Path_Command_Cubic_To cubic_to;
+	Enesim_Path_Quadratic q;
+	Enesim_Path_Cubic c;
 
+	q.start_x = state->last_x;
+	q.start_y = state->last_y;
+	enesim_path_command_quadratic_values_to(quadratic, &q.end_x, &q.end_y, &q.ctrl_x, &q.ctrl_y);
+	enesim_path_quadratic_cubic_to(&q, &c);
+	enesim_path_command_cubic_to_values_from(&cubic_to, c.end_x, c.end_y, c.ctrl_x0, c.ctrl_y0, c.ctrl_x1, c.ctrl_y1);
+	enesim_path_normalizer_cubic_to(thiz, &cubic_to);
 }
 
 void enesim_path_normalizer_cubic_to(Enesim_Path_Normalizer *thiz,
