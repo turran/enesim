@@ -15,8 +15,8 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _BUFFER_H
-#define _BUFFER_H
+#ifndef _ENESIM_BUFFER_PRIVATE_H
+#define _ENESIM_BUFFER_PRIVATE_H
 
 #define ENESIM_MAGIC_BUFFER 0xe7e51430
 #define ENESIM_MAGIC_CHECK_BUFFER(d)\
@@ -49,5 +49,13 @@ struct _Enesim_Buffer
 	Eina_RWLock lock;
 	void *user; /* user provided data */
 };
+
+#if BUILD_OPENGL
+typedef struct _Enesim_Buffer_OpenGL_Data
+{
+	GLuint texture;
+	unsigned int num_textures;
+} Enesim_Buffer_OpenGL_Data;
+#endif
 
 #endif

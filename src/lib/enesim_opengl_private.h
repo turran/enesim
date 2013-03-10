@@ -25,12 +25,6 @@ typedef struct _Enesim_OpenGL_Compiled_Program
 	int num_shaders;
 } Enesim_OpenGL_Compiled_Program;
 
-typedef struct _Enesim_Buffer_OpenGL_Data
-{
-	GLuint texture;
-	unsigned int num_textures;
-} Enesim_Buffer_OpenGL_Data;
-
 void enesim_opengl_init(void);
 GLenum enesim_opengl_texture_new(int width, int height);
 void enesim_opengl_texture_free(GLenum id);

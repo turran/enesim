@@ -1087,9 +1087,9 @@ static Enesim_Renderer_Path_Abstract_Descriptor _path_descriptor = {
 #else
 	/* .opengl_initialize =		*/ NULL,
 	/* .opengl_setup =		*/ NULL,
-	/* .opengl_cleanup =		*/ NULL
+	/* .opengl_cleanup =		*/ NULL,
 #endif
-	/* .shape_features_get =		*/ _path_shape_features_get,
+	/* .shape_features_get =	*/ _path_shape_features_get,
 	/* .commands_set = 		*/ _path_commands_set,
 };
 /*============================================================================*

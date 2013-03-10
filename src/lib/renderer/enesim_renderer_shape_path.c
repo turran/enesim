@@ -459,9 +459,9 @@ static Enesim_Renderer_Shape_Descriptor _shape_path_descriptor = {
 #else
 	/* .opengl_initialize =         */ NULL,
 	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
+	/* .opengl_cleanup =        	*/ NULL,
 #endif
-	/* .shape_features_get =		*/ _shape_path_shape_features_get,
+	/* .shape_features_get =	*/ _shape_path_shape_features_get,
 };
 /*============================================================================*
  *                                 Global                                     *
