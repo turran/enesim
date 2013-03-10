@@ -77,7 +77,7 @@ AC_ARG_ENABLE([opengl],
        want_opengl="no"
     fi
    ],
-   [want_opengl="no"])
+   [want_opengl="yes"])
 
 
 ### Needed information
@@ -290,7 +290,7 @@ build_opencl="no"
 AM_CONDITIONAL([HAVE_OPENCL], [test "x${build_opencl}" = "xyes"])
 
 ## OpenGL
-build_opengl="no"
+have_opengl="no"
 if test "x${have_glew}" = "xyes" ; then
 # in libGL ?
    LIBS_save=${LIBS}
@@ -307,17 +307,17 @@ glGenFramebuffersEXT(0, NULL);
           ]])
       ],
       [
-       build_opengl="yes"
-       requirements_libs="-lGL -lGLU ${requirements_libs}"
+       have_opengl="yes"
+       OPENGL_LIBS="-lGL -lGLU"
       ],
-      [build_opengl="no"])
+      [have_opengl="no"])
    LIBS=${LIBS_save}
 
    AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
-   AC_MSG_RESULT([${build_opengl}])
+   AC_MSG_RESULT([${have_opengl}])
 
 # in libopengl32 ?
-   if test "x${build_opengl}" = "xno" ; then
+   if test "x${have_opengl}" = "xno" ; then
       LIBS_save=${LIBS}
       LIBS="${LIBS} -lopengl32"
       AC_LINK_IFELSE(
@@ -332,21 +332,25 @@ glGenFramebuffersEXT(0, NULL);
              ]])
          ],
          [
-          build_opengl="yes"
-          requirements_libs="-lopengl32 -lGLU ${requirements_libs}"
+          have_opengl="yes"
+          OPENGL_LIBS="-lopengl32 -lGLU"
          ],
-         [build_opengl="no"])
+         [have_opengl="no"])
       LIBS=${LIBS_save}
 
       AC_MSG_CHECKING([whether glGenFramebffersEXT is in libopengl32.a])
-      AC_MSG_RESULT([${build_opengl}])
+      AC_MSG_RESULT([${have_opengl}])
    fi
 fi
 
-if test "x${build_opengl}" = "xyes"; then
+build_opengl="no"
+if test "x${want_opengl}" = "xyes" -a "x${have_opengl}"; then
+  build_opengl="yes"
+  requirements_libs="${OPENGL_LIBS} ${requirements_libs}"
   AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
 fi
-AM_CONDITIONAL([HAVE_OPENGL], [test "x${build_opengl}" = "xyes"])
+
+AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
 
 ENS_MODULE([Png], [${enable_png}], [yes])
 ENS_MODULE([Jpg], [${enable_jpg}], [yes])

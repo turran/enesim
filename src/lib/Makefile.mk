@@ -25,7 +25,7 @@ if HAVE_OPENCL
 dist_installed_headers_DATA += src/lib/Enesim_OpenCL.h
 endif
 
-if HAVE_OPENGL
+if BUILD_OPENGL
 dist_installed_headers_DATA += src/lib/Enesim_OpenGL.h
 endif
 
@@ -63,7 +63,7 @@ if HAVE_OPENCL
 src_lib_libenesim_la_SOURCES += src/lib/enesim_renderer_opencl.c
 endif
 
-if HAVE_OPENGL
+if BUILD_OPENGL
 src_lib_libenesim_la_SOURCES += src/lib/enesim_renderer_opengl.c src/lib/enesim_opengl.c
 endif
 

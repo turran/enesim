@@ -6,6 +6,6 @@ if HAVE_OPENCL
 src_lib_libenesim_la_SOURCES += src/lib/pool/enesim_pool_opencl.c
 endif
 
-if HAVE_OPENGL
+if BUILD_OPENGL
 src_lib_libenesim_la_SOURCES += src/lib/pool/enesim_pool_opengl.c
 endif
