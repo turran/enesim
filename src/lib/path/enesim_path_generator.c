@@ -32,9 +32,12 @@
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_path.h"
 
+
+#include "enesim_path_private.h"
 #include "enesim_curve_private.h"
 #include "enesim_vector_private.h"
 #include "enesim_path_generator_private.h"
+#include "enesim_path_normalizer_private.h"
 
 /*
  * - The strokeless path descriptor should generate a simple figure appending
@@ -1024,7 +1027,8 @@ Enesim_Path_Generator * enesim_path_generator_dashed_new(void)
 #if 0
 void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands)
 {
-	Eina_List *l;
+	Enesim_Path_Normalizer *normalizer;
+	Enesim_Path_Normalizer_Figure_Descriptor descriptor;
 	Enesim_Path_Command *cmd;
 	Enesim_Path_Command_Line_To line_to;
 	Enesim_Path_Command_Move_To move_to;
@@ -1035,9 +1039,21 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 	Enesim_Path_Command_Arc_To arc_to;
 	Enesim_Path_Command_Close close;
 	const Enesim_Matrix *gm;
+	Eina_List *l;
 	double scale_x;
 	double scale_y;
 
+	/* set the needed variables */
+	scale_x = thiz->scale_x;
+	scale_y = thiz->scale_y;
+	gm = thiz->gm;
+
+	/* set the normalizer functions based on the generator functions */
+	descriptor.vertex_add = thiz->descriptor->vertex_add;
+	descriptor.polygon_add = thiz->descriptor->polygon_add;
+	descriptor.polygon_close = thiz->descriptor->polygon_close;
+
+	normalizer = enesim_path_normalizer_figure_new(&descriptor, thiz->data);
 	_path_begin(thiz);
 
 	EINA_LIST_FOREACH(commands, l, cmd)
@@ -1060,7 +1076,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			_path_move_to(thiz, x, y);
+			enesim_path_command_move_to_values_from(&move_to, x, y);
+			enesim_path_normalizer_move_to(normalizer, &move_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_LINE_TO:
@@ -1070,7 +1087,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_line_to(&thiz->st, x, y);
+			enesim_path_command_line_to_values_from(&line_to, x, y);
+			enesim_path_normalizer_line_to(normalizer, &line_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
@@ -1083,7 +1101,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_quadratic_to(&thiz->st, ctrl_x0, ctrl_y0, x, y);
+			enesim_path_command_quadratic_to_values_from(&quadratic_to, x, y, ctrl_x0, ctrl_y0);
+			enesim_path_normalizer_quadratic_to(normalizer, &quadratic_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
@@ -1093,7 +1112,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_squadratic_to(&thiz->st, x, y);
+			enesim_path_command_squadratic_to_values_from(&squadratic_to, x, y);
+			enesim_path_normalizer_squadratic_to(normalizer, &squadratic_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_CUBIC_TO:
@@ -1109,9 +1129,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_matrix_point_transform(gm, ctrl_x1, ctrl_y1, &ctrl_x1, &ctrl_y1);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_cubic_to(&thiz->st,
-					ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1,
-					x, y);
+			enesim_path_command_cubic_to_values_from(&cubic_to, x, y, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1);
+			enesim_path_normalizer_cubic_to(normalizer, &cubic_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_SCUBIC_TO:
@@ -1124,8 +1143,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_scubic_to(&thiz->st, ctrl_x0, ctrl_y0,
-					x, y);
+			enesim_path_command_scubic_to_values_from(&scubic_to, x, y, ctrl_x0, ctrl_y0);
+			enesim_path_normalizer_scubic_to(normalizer, &scubic_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_ARC_TO:
@@ -1143,16 +1162,15 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
-			enesim_curve_arc_to(&thiz->st,
-					rx, ry,
-					ca * 180.0 / M_PI,
-					cmd->definition.arc_to.large,
-					cmd->definition.arc_to.sweep,
-					x, y);
+			enesim_path_command_arc_to_values_from(&arc_to, rx, ry, ca * 180.0 / M_PI,
+					x, y, cmd->definition.arc_to.large,
+					cmd->definition.arc_to.sweep);
+			enesim_path_normalizer_arc_to(normalizer, &arc_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_CLOSE:
-			_path_polygon_close(thiz, cmd->definition.close.close);
+			close.close = cmd->definition.close.close;
+			enesim_path_normalizer_close(normalizer, &close);
 			break;
 
 			default:
@@ -1161,11 +1179,9 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 	}
 	/* in case we delay the creation of the vertices this triggers that */
 	_path_done(thiz);
+	enesim_path_normalizer_free(normalizer);
 }
-
-}
-#endif
-
+#else
 void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands)
 {
 	Eina_List *l;
@@ -1311,3 +1327,4 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 	/* in case we delay the creation of the vertices this triggers that */
 	_path_done(thiz);
 }
+#endif

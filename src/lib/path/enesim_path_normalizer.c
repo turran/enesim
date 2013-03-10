@@ -72,71 +72,6 @@ typedef struct _Enesim_Path_Normalizer_Path
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#if 0
-/* these subdiv approximations need to be done more carefully */
-void enesim_curve_quadratic_to(Enesim_Curve_State *state,
-		double ctrl_x, double ctrl_y,
-		double x, double y)
-{
-	_curve_quadratic_to(state, ctrl_x, ctrl_y, x, y);
-	state->last_x = x;
-	state->last_y = y;
-	state->last_ctrl_x = ctrl_x;
-	state->last_ctrl_y = ctrl_y;
-}
-
-void enesim_curve_squadratic_to(Enesim_Curve_State *state,
-		double x, double y)
-{
-	double x0, y0, cx0, cy0;
-
-	x0 = state->last_x;
-	y0 = state->last_y;
-	cx0 = state->last_ctrl_x;
-	cy0 = state->last_ctrl_y;
-	cx0 = (2 * x0) - cx0;
-	cy0 = (2 * y0) - cy0;
-
-	enesim_curve_quadratic_to(state, cx0, cy0, x, y);
-	state->last_x = x;
-	state->last_y = y;
-	state->last_ctrl_x = cx0;
-	state->last_ctrl_y = cy0;
-}
-
-void enesim_curve_cubic_to(Enesim_Curve_State *state,
-		double ctrl_x0, double ctrl_y0,
-		double ctrl_x, double ctrl_y,
-		double x, double y)
-{
-	/* force one initial subdivision */
-	double x01 = (state->last_x + ctrl_x0) / 2;
-	double y01 = (state->last_y + ctrl_y0) / 2;
-	double xc = (ctrl_x0 + ctrl_x) / 2;
-	double yc = (ctrl_y0 + ctrl_y) / 2;
-	double x23 = (x + ctrl_x) / 2;
-	double y23 = (y + ctrl_y) / 2;
-	double xa = (x01 + xc) / 2;
-	double ya = (y01 + yc) / 2;
-	double xb = (x23 + xc) / 2;
-	double yb = (y23 + yc) / 2;
-
-	xc = (xa + xb) / 2;
-	yc = (ya + yb) / 2;
-	_curve_cubic_to(state, x01, y01, xa, ya, xc, yc);
-	state->last_x = xc;
-	state->last_y = yc;
-	state->last_ctrl_x = xa;
-	state->last_ctrl_y = ya;
-
-	_curve_cubic_to(state, xb, yb, x23, y23, x, y);
-	state->last_x = x;
-	state->last_y = y;
-	state->last_ctrl_x = x23;
-	state->last_ctrl_y = y23;
-}
-
-#endif
 /*----------------------------------------------------------------------------*
  *                            Figure normalizer                               *
  *----------------------------------------------------------------------------*/
@@ -498,14 +433,14 @@ void enesim_path_normalizer_squadratic_to(Enesim_Path_Normalizer *thiz,
 	Enesim_Path_Command_Quadratic_To quadratic_to;
 	double x, y, x0, y0, cx0, cy0;
 
-	enesim_path_command_squadratic_values_to(squadratic, &x, &y);
+	enesim_path_command_squadratic_to_values_to(squadratic, &x, &y);
 	x0 = state->last_x;
 	y0 = state->last_y;
 	cx0 = state->last_ctrl_x;
 	cy0 = state->last_ctrl_y;
 	cx0 = (2 * x0) - cx0;
 	cy0 = (2 * y0) - cy0;
-	enesim_path_command_quadratic_values_from(&quadratic_to,
+	enesim_path_command_quadratic_to_values_from(&quadratic_to,
 		x, y, cx0, cy0);
 	enesim_path_normalizer_quadratic_to(thiz, &quadratic_to);
 }
@@ -520,7 +455,7 @@ void enesim_path_normalizer_quadratic_to(Enesim_Path_Normalizer *thiz,
 
 	q.start_x = state->last_x;
 	q.start_y = state->last_y;
-	enesim_path_command_quadratic_values_to(quadratic, &q.end_x, &q.end_y, &q.ctrl_x, &q.ctrl_y);
+	enesim_path_command_quadratic_to_values_to(quadratic, &q.end_x, &q.end_y, &q.ctrl_x, &q.ctrl_y);
 	enesim_path_quadratic_cubic_to(&q, &c);
 	enesim_path_command_cubic_to_values_from(&cubic_to, c.end_x, c.end_y, c.ctrl_x0, c.ctrl_y0, c.ctrl_x1, c.ctrl_y1);
 	enesim_path_normalizer_cubic_to(thiz, &cubic_to);

@@ -82,7 +82,7 @@ static inline void enesim_path_command_arc_to_values_to(
 	*sweep = thiz->sweep;
 }
 
-static inline void enesim_path_command_squadratic_values_to(
+static inline void enesim_path_command_squadratic_to_values_to(
 		Enesim_Path_Command_Squadratic_To *thiz,
 		double *x, double *y)
 {
@@ -90,7 +90,15 @@ static inline void enesim_path_command_squadratic_values_to(
 	*y = thiz->y;
 }
 
-static inline void enesim_path_command_quadratic_values_from(
+static inline void enesim_path_command_squadratic_to_values_from(
+		Enesim_Path_Command_Squadratic_To *thiz,
+		double x, double y)
+{
+	thiz->x = x;
+	thiz->y = y;
+}
+
+static inline void enesim_path_command_quadratic_to_values_from(
 		Enesim_Path_Command_Quadratic_To *thiz,
 		double x, double y, double ctrl_x, double ctrl_y)
 {
@@ -100,7 +108,7 @@ static inline void enesim_path_command_quadratic_values_from(
 	thiz->ctrl_y = ctrl_y;
 }
 
-static inline void enesim_path_command_quadratic_values_to(
+static inline void enesim_path_command_quadratic_to_values_to(
 		Enesim_Path_Command_Quadratic_To *thiz,
 		double *x, double *y, double *ctrl_x, double *ctrl_y)
 {
