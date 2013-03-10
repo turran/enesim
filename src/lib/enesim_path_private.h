@@ -41,8 +41,16 @@ typedef struct _Enesim_Path_Cubic
 	double ctrl_y1;
 } Enesim_Path_Cubic;
 
-void enesim_path_command_quadratic_cubic_to(Enesim_Path_Quadratic *q,
+typedef void (*Enesim_Path_Vertex_Add)(double x, double y, void *data);
+
+void enesim_path_quadratic_cubic_to(Enesim_Path_Quadratic *q,
 		Enesim_Path_Cubic *c);
+void enesim_path_quadratic_flatten(Enesim_Path_Quadratic *thiz,
+		double tolerance, Enesim_Path_Vertex_Add vertex_add,
+		void *data);
+void enesim_path_cubic_flatten(Enesim_Path_Cubic *thiz,
+		double tolerance, Enesim_Path_Vertex_Add vertex_add,
+		void *data);
 
 static inline void enesim_path_command_arc_to_values_from(
 		Enesim_Path_Command_Arc_To *thiz,
