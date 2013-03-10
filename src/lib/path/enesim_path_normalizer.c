@@ -494,7 +494,20 @@ void enesim_path_normalizer_line_to(Enesim_Path_Normalizer *thiz,
 void enesim_path_normalizer_squadratic_to(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command_Squadratic_To *squadratic)
 {
-	/* TODO generate the quadratic */
+	Enesim_Path_Normalizer_State *state = &thiz->state;
+	Enesim_Path_Command_Quadratic_To quadratic_to;
+	double x, y, x0, y0, cx0, cy0;
+
+	enesim_path_command_squadratic_values_to(squadratic, &x, &y);
+	x0 = state->last_x;
+	y0 = state->last_y;
+	cx0 = state->last_ctrl_x;
+	cy0 = state->last_ctrl_y;
+	cx0 = (2 * x0) - cx0;
+	cy0 = (2 * y0) - cy0;
+	enesim_path_command_quadratic_values_from(&quadratic_to,
+		x, y, cx0, cy0);
+	enesim_path_normalizer_quadratic_to(thiz, &quadratic_to);
 }
 
 void enesim_path_normalizer_quadratic_to(Enesim_Path_Normalizer *thiz,
