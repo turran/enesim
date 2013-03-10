@@ -141,7 +141,7 @@ void enesim_curve_cubic_to(Enesim_Curve_State *state,
  *                            Figure normalizer                               *
  *----------------------------------------------------------------------------*/
 static void _figure_move_to(Enesim_Path_Command_Move_To *move_to,
-		Enesim_Path_Normalizer_State *state, void *data)
+		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Figure *thiz = data;
 	double x, y;
@@ -152,7 +152,7 @@ static void _figure_move_to(Enesim_Path_Command_Move_To *move_to,
 }
 
 static void _figure_line_to(Enesim_Path_Command_Line_To *line_to,
-		Enesim_Path_Normalizer_State *state, void *data)
+		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Figure *thiz = data;
 	double x, y;
@@ -164,11 +164,24 @@ static void _figure_line_to(Enesim_Path_Command_Line_To *line_to,
 static void _figure_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
 		Enesim_Path_Normalizer_State *state, void *data)
 {
+	Enesim_Path_Normalizer_Figure *thiz = data;
+	Enesim_Path_Cubic q;
+
+	q.start_x = state->last_x;
+	q.start_y = state->last_y;
+	q.ctrl_x0 = cubic_to->ctrl_x0;
+	q.ctrl_y0 = cubic_to->ctrl_y0;
+	q.ctrl_x1 = cubic_to->ctrl_x1;
+	q.ctrl_y1 = cubic_to->ctrl_y1;
+	q.end_x = cubic_to->x;
+	q.end_y = cubic_to->y;
 	/* normalize the cubic command */
+	/* TODO add a tolerance/quality paramter */
+	enesim_path_cubic_flatten(&q, 1/64.0, thiz->descriptor->vertex_add, thiz->data);
 }
 
 static void _figure_close(Enesim_Path_Command_Close *close,
-		Enesim_Path_Normalizer_State *state, void *data)
+		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Figure *thiz = data;
 	thiz->descriptor->polygon_close(close->close, thiz->data);
@@ -190,28 +203,28 @@ static Enesim_Path_Normalizer_Descriptor _figure_descriptor = {
  *                             Path normalizer                                *
  *----------------------------------------------------------------------------*/
 static void _path_move_to(Enesim_Path_Command_Move_To *move_to,
-		Enesim_Path_Normalizer_State *state, void *data)
+		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Path *thiz = data;
 	thiz->descriptor->move_to(move_to, thiz->data);
 }
 
 static void _path_line_to(Enesim_Path_Command_Line_To *line_to,
-		Enesim_Path_Normalizer_State *state, void *data)
+		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Path *thiz = data;
 	thiz->descriptor->line_to(line_to, thiz->data);
 }
 
 static void _path_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
-		Enesim_Path_Normalizer_State *state, void *data)
+		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Path *thiz = data;
 	thiz->descriptor->cubic_to(cubic_to, thiz->data);
 }
 
 static void _path_close(Enesim_Path_Command_Close *close,
-		Enesim_Path_Normalizer_State *state, void *data)
+		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Path *thiz = data;
 	thiz->descriptor->close(close, thiz->data);
@@ -478,6 +491,19 @@ void enesim_path_normalizer_line_to(Enesim_Path_Normalizer *thiz,
 	thiz->descriptor->line_to(line_to, state, thiz->data);
 }
 
+void enesim_path_normalizer_squadratic_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Squadratic_To *squadratic)
+{
+	/* TODO generate the quadratic */
+}
+
+void enesim_path_normalizer_quadratic_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Quadratic_To *quadratic)
+{
+	/* TODO generate the cubic */
+
+}
+
 void enesim_path_normalizer_cubic_to(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command_Cubic_To *cubic_to)
 {
@@ -527,9 +553,11 @@ void enesim_path_normalizer_normalize(Enesim_Path_Normalizer *thiz,
 		break;
 
 		case ENESIM_PATH_COMMAND_QUADRATIC_TO:
+		enesim_path_normalizer_quadratic_to(thiz, &cmd->definition.quadratic_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
+		enesim_path_normalizer_squadratic_to(thiz, &cmd->definition.squadratic_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_CUBIC_TO:

@@ -58,6 +58,10 @@ void enesim_path_normalizer_normalize(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command *cmd);
 void enesim_path_normalizer_line_to(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command_Line_To *line_to);
+void enesim_path_normalizer_squadratic_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Squadratic_To *squadratic);
+void enesim_path_normalizer_quadratic_to(Enesim_Path_Normalizer *thiz,
+		Enesim_Path_Command_Quadratic_To *quadratic);
 void enesim_path_normalizer_cubic_to(Enesim_Path_Normalizer *thiz,
 		Enesim_Path_Command_Cubic_To *cubic_to);
 void enesim_path_normalizer_move_to(Enesim_Path_Normalizer *thiz,
