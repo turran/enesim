@@ -39,22 +39,10 @@
 #include "enesim_path_generator_private.h"
 #include "enesim_path_normalizer_private.h"
 
-/*
- * - The strokeless path descriptor should generate a simple figure appending
- *   all the vertices that it receives
- * - The stroke path descriptor should generate a stroke figure based on the
- *   vertices received
- * - The stroke_dashless should generate the fill figure and the stroke figure
- *   For that it uses the above two descriptors.
- * - The stroke_dash descriptor should generate the fill figure and the
- *   dashed stroke using the strokeless descriptor and its own dash algorithm
- * - The full descriptor has the above two descriptors and decides what to use
- *   depending if there are dashes or not
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Path_Dashed
+typedef struct _Enesim_Path_Generator_Dashed
 {
 	Enesim_Path_Generator *p; /* ourselves */
 	Enesim_Path_Generator *fill;
@@ -66,9 +54,9 @@ typedef struct _Enesim_Path_Dashed
 	Enesim_Point prev_point;
 	const Eina_List *current;
 	double dist;
-} Enesim_Path_Dashed;
+} Enesim_Path_Generator_Dashed;
 
-typedef struct _Enesim_Path_Full
+typedef struct _Enesim_Path_Generator_Full
 {
 	/* keep the original path */
 	Enesim_Path_Generator *p;
@@ -83,9 +71,9 @@ typedef struct _Enesim_Path_Full
 	double rx;
 	double ry;
 	int count;
-} Enesim_Path_Full;
+} Enesim_Path_Generator_Full;
 
-typedef struct _Enesim_Path_Stroke
+typedef struct _Enesim_Path_Generator_Stroke
 {
 	/* keep the original path */
 	Enesim_Path_Generator *p;
@@ -99,19 +87,19 @@ typedef struct _Enesim_Path_Stroke
 	double rx;
 	double ry;
 	int count;
-} Enesim_Path_Stroke;
+} Enesim_Path_Generator_Stroke;
 
-typedef struct _Enesim_Path_Stroke_Dashless
+typedef struct _Enesim_Path_Generator_Stroke_Dashless
 {
 	Enesim_Path_Generator *p; /* ourselves */
 	Enesim_Path_Generator *fill;
 	Enesim_Path_Generator *stroke;
-} Enesim_Path_Stroke_Dashless;
+} Enesim_Path_Generator_Stroke_Dashless;
 
-typedef struct _Enesim_Path_Strokeless
+typedef struct _Enesim_Path_Generator_Strokeless
 {
 	Enesim_Path_Generator *p;
-} Enesim_Path_Strokeless;
+} Enesim_Path_Generator_Strokeless;
 
 typedef struct _Enesim_Path_Edge
 {
@@ -175,7 +163,7 @@ static void _strokeless_path_free(void *data)
 
 static void _strokeless_path_vertex_add(double x, double y, void *data)
 {
-	Enesim_Path_Strokeless *thiz = data;
+	Enesim_Path_Generator_Strokeless *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Polygon *p;
 	Eina_List *last;
@@ -187,7 +175,7 @@ static void _strokeless_path_vertex_add(double x, double y, void *data)
 
 static void _strokeless_path_polygon_add(void *data)
 {
-	Enesim_Path_Strokeless *thiz = data;
+	Enesim_Path_Generator_Strokeless *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Polygon *p;
 
@@ -198,7 +186,7 @@ static void _strokeless_path_polygon_add(void *data)
 
 static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 {
-	Enesim_Path_Strokeless *thiz = data;
+	Enesim_Path_Generator_Strokeless *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Polygon *p;
 	Eina_List *last;
@@ -292,7 +280,7 @@ static void _stroke_curve_prepend(double x, double y, void *data)
 	enesim_polygon_point_prepend_from_coords(p, x, y);
 }
 
-static void _stroke_path_merge(Enesim_Path_Stroke *thiz)
+static void _stroke_path_merge(Enesim_Path_Generator_Stroke *thiz)
 {
 	Enesim_Polygon *to_merge;
 	Enesim_Point *off, *ofl;
@@ -345,7 +333,7 @@ static void _stroke_path_merge(Enesim_Path_Stroke *thiz)
 	thiz->inset_polygon = NULL;
 }
 
-static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Stroke *thiz)
+static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generator_Stroke *thiz)
 {
 	Enesim_Polygon *inset = thiz->inset_polygon;
 	Enesim_Polygon *offset = thiz->offset_polygon;
@@ -505,7 +493,7 @@ static void _stroke_path_free(void *data)
 
 static void _stroke_path_vertex_add(double x, double y, void *data)
 {
-	Enesim_Path_Stroke *thiz = data;
+	Enesim_Path_Generator_Stroke *thiz = data;
 
 	_stroke_path_vertex_process(x, y, data);
 	thiz->last.x = x;
@@ -514,7 +502,7 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 
 static void _stroke_path_polygon_add(void *data)
 {
-	Enesim_Path_Stroke *thiz = data;
+	Enesim_Path_Generator_Stroke *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Polygon *p;
 
@@ -540,7 +528,7 @@ static void _stroke_path_polygon_add(void *data)
 
 static void _stroke_path_begin(void *data)
 {
-	Enesim_Path_Stroke *thiz = data;
+	Enesim_Path_Generator_Stroke *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 
 	/* initialize our state */
@@ -553,7 +541,7 @@ static void _stroke_path_begin(void *data)
 
 static void _stroke_path_done(void *data)
 {
-        Enesim_Path_Stroke *thiz = data;
+        Enesim_Path_Generator_Stroke *thiz = data;
 
 	if (thiz->offset_polygon)
 		enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
@@ -563,7 +551,7 @@ static void _stroke_path_done(void *data)
 
 static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 {
-        Enesim_Path_Stroke *thiz = data;
+        Enesim_Path_Generator_Stroke *thiz = data;
 
 	if (close)
 	{
@@ -594,7 +582,7 @@ static Enesim_Path_Descriptor _stroke_descriptor = {
 
 static void _stroke_dashless_path_free(void *data)
 {
-	Enesim_Path_Stroke_Dashless *thiz = data;
+	Enesim_Path_Generator_Stroke_Dashless *thiz = data;
 
 	enesim_path_generator_free(thiz->fill);
 	enesim_path_generator_free(thiz->stroke);
@@ -603,7 +591,7 @@ static void _stroke_dashless_path_free(void *data)
 
 static void _stroke_dashless_path_vertex_add(double x, double y, void *data)
 {
-	Enesim_Path_Stroke_Dashless *thiz = data;
+	Enesim_Path_Generator_Stroke_Dashless *thiz = data;
 
 	_path_vertex_add(thiz->fill, x, y);
 	_path_vertex_add(thiz->stroke, x, y);
@@ -611,7 +599,7 @@ static void _stroke_dashless_path_vertex_add(double x, double y, void *data)
 
 static void _stroke_dashless_path_polygon_add(void *data)
 {
-	Enesim_Path_Stroke_Dashless *thiz = data;
+	Enesim_Path_Generator_Stroke_Dashless *thiz = data;
 
 	_path_polygon_add(thiz->fill);
 	_path_polygon_add(thiz->stroke);
@@ -619,7 +607,7 @@ static void _stroke_dashless_path_polygon_add(void *data)
 
 static void _stroke_dashless_path_polygon_close(Eina_Bool close, void *data)
 {
-	Enesim_Path_Stroke_Dashless *thiz = data;
+	Enesim_Path_Generator_Stroke_Dashless *thiz = data;
 
 	_path_polygon_close(thiz->fill, close);
 	_path_polygon_close(thiz->stroke, close);
@@ -627,7 +615,7 @@ static void _stroke_dashless_path_polygon_close(Eina_Bool close, void *data)
 
 static void _stroke_dashless_path_begin(void *data)
 {
-	Enesim_Path_Stroke_Dashless *thiz = data;
+	Enesim_Path_Generator_Stroke_Dashless *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Path_Generator *paths[2] = { thiz->fill, thiz->stroke };
 	int i;
@@ -653,7 +641,7 @@ static void _stroke_dashless_path_begin(void *data)
 
 static void _stroke_dashless_path_done(void *data)
 {
-	Enesim_Path_Stroke_Dashless *thiz = data;
+	Enesim_Path_Generator_Stroke_Dashless *thiz = data;
 	Enesim_Polygon *last;
 
 	/* check if the last polygon is closed and if so
@@ -699,7 +687,7 @@ static void _dashed_point_at(Enesim_Point *pc, double d, Enesim_Point *p0,
 
 static void _dashed_path_free(void *data)
 {
-	Enesim_Path_Dashed *d = data;
+	Enesim_Path_Generator_Dashed *d = data;
 
 	if (d->stroke)
 		enesim_path_generator_free(d->stroke);
@@ -710,7 +698,7 @@ static void _dashed_path_free(void *data)
 
 static void _dashed_path_vertex_add(double x, double y, void *data)
 {
-	Enesim_Path_Dashed *thiz = data;
+	Enesim_Path_Generator_Dashed *thiz = data;
 	Enesim_Point p;
 	double d;
 
@@ -826,7 +814,7 @@ static void _dashed_path_vertex_add(double x, double y, void *data)
 
 static void _dashed_path_polygon_add(void *data)
 {
-	Enesim_Path_Dashed *thiz = data;
+	Enesim_Path_Generator_Dashed *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 
 	_path_polygon_add(thiz->fill);
@@ -839,13 +827,13 @@ static void _dashed_path_polygon_add(void *data)
 
 static void _dashed_path_polygon_close(Eina_Bool close, void *data)
 {
-        Enesim_Path_Dashed *thiz = data;
+        Enesim_Path_Generator_Dashed *thiz = data;
 	_path_polygon_close(thiz->fill, close);
 }
 
 static void _dashed_path_begin(void *data)
 {
-	Enesim_Path_Dashed *thiz = data;
+	Enesim_Path_Generator_Dashed *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
 	Enesim_Path_Generator *paths[2] = { thiz->fill, thiz->stroke };
 	int i;
@@ -875,7 +863,7 @@ static void _dashed_path_begin(void *data)
 
 static void _dashed_path_done(void *data)
 {
-        Enesim_Path_Dashed *thiz = data;
+        Enesim_Path_Generator_Dashed *thiz = data;
 
 	_path_done(thiz->fill);
 	if (thiz->started)
@@ -965,10 +953,10 @@ void * enesim_path_generator_data_get(Enesim_Path_Generator *thiz)
 
 Enesim_Path_Generator * enesim_path_generator_strokeless_new(void)
 {
-	Enesim_Path_Strokeless *s;
+	Enesim_Path_Generator_Strokeless *s;
 	Enesim_Path_Generator *thiz;
 
-	s = calloc(1, sizeof(Enesim_Path_Strokeless));
+	s = calloc(1, sizeof(Enesim_Path_Generator_Strokeless));
 	thiz = enesim_path_generator_new(&_strokeless_descriptor, s);
 	s->p = thiz;
 
@@ -977,10 +965,10 @@ Enesim_Path_Generator * enesim_path_generator_strokeless_new(void)
 
 Enesim_Path_Generator * enesim_path_generator_stroke_new(void)
 {
-	Enesim_Path_Stroke *s;
+	Enesim_Path_Generator_Stroke *s;
 	Enesim_Path_Generator *thiz;
 
-	s = calloc(1, sizeof(Enesim_Path_Stroke));
+	s = calloc(1, sizeof(Enesim_Path_Generator_Stroke));
 	thiz = enesim_path_generator_new(&_stroke_descriptor, s);
 	s->p = thiz;
 
@@ -990,19 +978,19 @@ Enesim_Path_Generator * enesim_path_generator_stroke_new(void)
 Enesim_Path_Generator * enesim_path_generator_stroke_dashless_new(void)
 {
 #if 1
-	Enesim_Path_Stroke_Dashless *s;
+	Enesim_Path_Generator_Stroke_Dashless *s;
 	Enesim_Path_Generator *thiz;
 
-	s = calloc(1, sizeof(Enesim_Path_Stroke_Dashless));
+	s = calloc(1, sizeof(Enesim_Path_Generator_Stroke_Dashless));
 	thiz = enesim_path_generator_new(&_stroke_dashless_descriptor, s);
 	s->p = thiz;
 	s->fill = enesim_path_generator_strokeless_new();
 	s->stroke = enesim_path_generator_stroke_new();
 #else
-	Enesim_Path_Full *s;
+	Enesim_Path_Generator_Full *s;
 	Enesim_Path_Generator *thiz;
 
-	s = calloc(1, sizeof(Enesim_Path_Full));
+	s = calloc(1, sizeof(Enesim_Path_Generator_Full));
 	thiz = enesim_path_generator_new(&_full_descriptor, s);
 	s->p = thiz;
 #endif
@@ -1012,10 +1000,10 @@ Enesim_Path_Generator * enesim_path_generator_stroke_dashless_new(void)
 
 Enesim_Path_Generator * enesim_path_generator_dashed_new(void)
 {
-	Enesim_Path_Dashed *d;
+	Enesim_Path_Generator_Dashed *d;
 	Enesim_Path_Generator *thiz;
 
-	d = calloc(1, sizeof(Enesim_Path_Dashed));
+	d = calloc(1, sizeof(Enesim_Path_Generator_Dashed));
 	thiz = enesim_path_generator_new(&_dashed_descriptor, d);
 	d->p = thiz;
 	d->fill = enesim_path_generator_strokeless_new();
@@ -1024,7 +1012,7 @@ Enesim_Path_Generator * enesim_path_generator_dashed_new(void)
 	return thiz;
 }
 
-#if 0
+#if 1
 void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *commands)
 {
 	Enesim_Path_Normalizer *normalizer;

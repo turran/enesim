@@ -112,7 +112,7 @@ static void _figure_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
 	q.end_y = cubic_to->y;
 	/* normalize the cubic command */
 	/* TODO add a tolerance/quality paramter */
-	enesim_path_cubic_flatten(&q, 1/64.0, thiz->descriptor->vertex_add, thiz->data);
+	enesim_path_cubic_flatten(&q, 1/32.0, thiz->descriptor->vertex_add, thiz->data);
 }
 
 static void _figure_close(Enesim_Path_Command_Close *close,
@@ -468,11 +468,11 @@ void enesim_path_normalizer_cubic_to(Enesim_Path_Normalizer *thiz,
 	double x, y, unused, ctrl_x1, ctrl_y1;
 
 	enesim_path_command_cubic_to_values_to(cubic_to, &x, &y, &unused, &unused, &ctrl_x1, &ctrl_y1);
+	thiz->descriptor->cubic_to(cubic_to, state, thiz->data);
 	state->last_ctrl_x = ctrl_x1;
 	state->last_ctrl_y = ctrl_y1;
 	state->last_x = x;
 	state->last_y = y;
-	thiz->descriptor->cubic_to(cubic_to, state, thiz->data);
 }
 
 void enesim_path_normalizer_move_to(Enesim_Path_Normalizer *thiz,
