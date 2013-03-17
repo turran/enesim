@@ -153,10 +153,17 @@ EAPI int enesim_init(void)
 	if (++_enesim_init_count != 1)
 		return _enesim_init_count;
 
+#ifdef HAVE_EVIL
+	if (!evil_init())
+	{
+		fprintf(stderr, "Enesim: Evil init failed");
+		return --_enesim_init_count;
+	}
+#endif
 	if (!eina_init())
 	{
 		fprintf(stderr, "Enesim: Eina init failed");
-		return --_enesim_init_count;
+		goto shutdown_evil;
 	}
 	if (!eina_threads_init())
 	{
@@ -196,6 +203,10 @@ shutdown_eina_threads:
 	eina_threads_shutdown();
 shutdown_eina:
 	eina_shutdown();
+shutdown_evil:
+#ifdef HAVE_EVIL
+	evil_shutdown();
+#endif
 	return --_enesim_init_count;
 }
 
@@ -226,6 +237,9 @@ EAPI int enesim_shutdown(void)
 	enesim_mempool_buddy_shutdown();
 	_unregister_domains();
 	eina_shutdown();
+#ifdef HAVE_EVIL
+	evil_shutdown();
+#endif
 
 	return _enesim_init_count;
 }

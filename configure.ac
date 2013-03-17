@@ -128,13 +128,19 @@ requirements_pc=""
 
 case "$host_os" in
    mingw*)
+      PKG_CHECK_EXISTS([evil >= 1.0.0],
+         [
+          requirements_pc="${requirements_pc} evil >= 1.0.0"
+          AC_DEFINE([HAVE_EVIL], [1], [Define to 1 if you have Evil library.])
+         ],
+         [AC_MSG_ERROR([Evil is required. Be sure to have it installed.])])
       requirements_libs="${requirements_libs} -lws2_32"
    ;;
 esac
 
 ## Eina
 
-requirements_pc="${requirements_pc} eina >= 1.0.0"
+requirements_pc="eina >= 1.0.0 ${requirements_pc}"
 
 ## Freetype
 
