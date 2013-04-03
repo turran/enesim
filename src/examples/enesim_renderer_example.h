@@ -23,6 +23,7 @@
 			enesim_log_dump(error);			\
 		}							\
 		enesim_image_file_save(#name ".png", s, NULL);		\
+		enesim_renderer_unref(r);				\
 									\
 		enesim_shutdown();					\
 		return 0;						\

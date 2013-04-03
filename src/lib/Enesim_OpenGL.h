@@ -31,4 +31,10 @@ EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f, 
 EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format f, uint32_t w, uint32_t h,
 		GLuint texture);
 
+typedef struct _Enesim_Buffer_OpenGL_Data
+{
+	GLuint texture;
+	unsigned int num_textures;
+} Enesim_Buffer_OpenGL_Data;
+
 #endif

@@ -50,12 +50,4 @@ struct _Enesim_Buffer
 	void *user; /* user provided data */
 };
 
-#if BUILD_OPENGL
-typedef struct _Enesim_Buffer_OpenGL_Data
-{
-	GLuint texture;
-	unsigned int num_textures;
-} Enesim_Buffer_OpenGL_Data;
-#endif
-
 #endif
