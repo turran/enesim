@@ -112,7 +112,7 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 		Enesim_Shape_Feature features)
 {
 	if (!thiz->changed)
-		return EINA_TRUE;
+		return EINA_FALSE;
 	/* optional properties */
 	/* the stroke */
 	/* color */
@@ -419,11 +419,6 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Shape *thiz;
 	Eina_Bool ret = EINA_TRUE;
 
-	ret = enesim_renderer_state_has_changed(r);
-	if (ret)
-	{
-		return ret;
-	}
 	thiz = enesim_renderer_data_get(r);
 	/* call the has_changed on the descriptor */
 	if (thiz->has_changed)

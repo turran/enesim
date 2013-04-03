@@ -144,6 +144,7 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = _path_get(r);
 	enesim_renderer_cleanup(thiz->current, s);
+	thiz->changed = EINA_FALSE;
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
