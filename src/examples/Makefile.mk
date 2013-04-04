@@ -2,6 +2,7 @@ examples_CPPFLAGS = \
 -I. \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib/renderer \
+-I$(top_srcdir)/src/lib/object \
 @ENESIM_CFLAGS@
 
 examples_LDADD = \

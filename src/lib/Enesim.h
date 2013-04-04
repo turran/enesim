@@ -78,6 +78,10 @@ extern "C" {
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_pool.h"
+/* object headers */
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 /* util headers */
 #include "enesim_perlin.h"
 #include "enesim_matrix.h"

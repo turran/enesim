@@ -11,6 +11,7 @@ src_modules_enesim_image_png_la_SOURCES = src/modules/enesim_image_png.c
 src_modules_enesim_image_png_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib/renderer \
+-I$(top_srcdir)/src/lib/object \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@ \
 @ENESIM_MODULES_CFLAGS@
@@ -37,6 +38,7 @@ src_modules_enesim_image_jpg_la_SOURCES = src/modules/enesim_image_jpg.c
 src_modules_enesim_image_jpg_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib/renderer \
+-I$(top_srcdir)/src/lib/object \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@ \
 @ENESIM_MODULES_CFLAGS@
@@ -61,6 +63,7 @@ src_modules_enesim_image_raw_la_SOURCES = src/modules/enesim_image_raw.c
 src_modules_enesim_image_raw_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib/renderer \
+-I$(top_srcdir)/src/lib/object \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@
 
