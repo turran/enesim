@@ -46,7 +46,7 @@ include src/modules/Makefile.mk
 
 ### Tests
 
-include src/tests/Makefile_Tests.mk
+include src/tests/Makefile.mk
 
 ### Examples
 

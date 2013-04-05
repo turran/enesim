@@ -1,8 +1,7 @@
 Enesim
 ======
-+ Some more renamings:
-  enesim_curve_* -> enesim_path_normalizer
-  
++ Rename the enesim_image_data to enesim_io or enesim_stream_ as it makes more sense to split
+  it from the image subsytem to be used on other places
 + Add the luminance format
 + We have a performance problem when some renderer has changed. Basically on the practice
   we end having a full tree of renderers, several levels, proxies, whatever. When we need
@@ -23,7 +22,8 @@ Enesim
 + Make use of the flags on the surface draw function
 + We need to optimize and avoid the need to always call
   enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
-  to receive the data already fetch with enesim_renderer_data_get(r) but on the surface_draw
+  to receive the data already fetch with enesim_renderer_data_get(r) but on the surface_draw.
+  A better approach would be to use the brand new object system
 + Change very renderer to use *thiz* as the variable for itself
 + We need to get rid of the hypot function, it is used on a lot places
   but with f16p16 values
