@@ -34,6 +34,7 @@ struct _Enesim_Object_Descriptor
 	size_t instance_size;
 	size_t class_size;
 	const char *name;
+	void *prv;
 };
 
 /*============================================================================*
@@ -100,28 +101,28 @@ EAPI Enesim_Object_Descriptor * enesim_object_descriptor_new(
 		Enesim_Object_Descriptor_Instance_Deinit instance_deinit,
 		const char *name)
 {
-	Enesim_Object_Descriptor *d;
+	Enesim_Object_Descriptor *thiz;
 
-	d = calloc(1, sizeof(Enesim_Object_Descriptor));
-	d->parent = parent;
-	d->class_size = class_size;
-	d->class_init = class_init;
-	d->instance_size = instance_size;
-	d->instance_init = instance_init;
-	d->instance_deinit = instance_deinit;
-	d->name = name ? strdup(name) : NULL;
+	thiz = calloc(1, sizeof(Enesim_Object_Descriptor));
+	thiz->parent = parent;
+	thiz->class_size = class_size;
+	thiz->class_init = class_init;
+	thiz->instance_size = instance_size;
+	thiz->instance_init = instance_init;
+	thiz->instance_deinit = instance_deinit;
+	thiz->name = name ? strdup(name) : NULL;
 
-	return d;
+	return thiz;
 }
 
 EAPI Enesim_Object_Descriptor * enesim_object_descriptor_get(void)
 {
-	static Enesim_Object_Descriptor *d = NULL;
+	static Enesim_Object_Descriptor *thiz = NULL;
 
-	if (!d) d = enesim_object_descriptor_new(NULL,
+	if (!thiz) thiz = enesim_object_descriptor_new(NULL,
 		sizeof(Enesim_Object_Class), NULL,
 		sizeof(Enesim_Object_Instance), NULL, NULL, NULL);
-	return d;
+	return thiz;
 }
 
 EAPI void * enesim_object_descriptor_instance_new(
@@ -144,3 +145,13 @@ EAPI void * enesim_object_descriptor_instance_new(
 	return i;
 }
 
+EAPI void * enesim_object_descriptor_private_get(Enesim_Object_Descriptor *thiz)
+{
+	return thiz->prv;
+}
+
+EAPI void enesim_object_descriptor_private_set(Enesim_Object_Descriptor *thiz, void *prv)
+{
+	if (thiz->prv) return;
+	thiz->prv = prv;
+}

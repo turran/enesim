@@ -67,5 +67,7 @@ EAPI void * enesim_object_descriptor_instance_new(
 		Enesim_Object_Descriptor *thiz,
 		void *k);
 EAPI Enesim_Object_Descriptor * enesim_object_descriptor_get(void);
+EAPI void * enesim_object_descriptor_private_get(Enesim_Object_Descriptor *thiz);
+EAPI void enesim_object_descriptor_private_set(Enesim_Object_Descriptor *thiz, void *prv);
 
 #endif
