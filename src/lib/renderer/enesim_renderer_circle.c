@@ -32,6 +32,9 @@
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_path.h"
 #include "enesim_renderer_circle.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"

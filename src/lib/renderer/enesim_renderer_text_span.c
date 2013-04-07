@@ -32,6 +32,9 @@
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_text_span.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 
 #include "enesim_text_private.h"
 #include "enesim_renderer_private.h"

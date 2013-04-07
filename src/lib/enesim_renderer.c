@@ -29,6 +29,9 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 
 #include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
@@ -50,6 +53,9 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Enesim_Renderer,
+		Enesim_Renderer_Class, enesim_renderer);
+
 #define ENESIM_MAGIC_RENDERER 0xe7e51420
 #define ENESIM_MAGIC_CHECK_RENDERER(d)\
 	do {\
@@ -68,6 +74,23 @@ static void _enesim_renderer_factory_free(void *data)
 {
 	Enesim_Renderer_Factory *f = data;
 	free(f);
+}
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+static void _enesim_renderer_class_init(void *k)
+{
+
+}
+
+static void _enesim_renderer_instance_init(void *o)
+{
+
+}
+
+static void _enesim_renderer_instance_deinit(void *o)
+{
+
 }
 /*----------------------------------------------------------------------------*
  *                     Functions to transform the bounds                      *

@@ -31,6 +31,9 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_path.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 
 #ifdef BUILD_OPENGL
 #include "Enesim_OpenGL.h"

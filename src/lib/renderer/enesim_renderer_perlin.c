@@ -30,6 +30,9 @@
 #include "enesim_renderer.h"
 #include "enesim_renderer_background.h"
 #include "enesim_perlin.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 
 #include "enesim_renderer_private.h"
 /*============================================================================*

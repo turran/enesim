@@ -28,6 +28,8 @@ typedef void (*Enesim_Object_Descriptor_Instance_Deinit)(void *i);
 
 typedef struct _Enesim_Object_Descriptor Enesim_Object_Descriptor;
 
+#define ENESIM_OBJECT_DESCRIPTOR enesim_object_descriptor_get()
+
 #define ENESIM_OBJECT_BOILERPLATE(parent, type, class_type, prefix) 		\
 	static void _##prefix##_class_init(void *k);				\
 	static void _##prefix##_instance_init(void *o);				\

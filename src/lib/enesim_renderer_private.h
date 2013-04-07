@@ -23,6 +23,11 @@
 #include "enesim_opengl_private.h"
 #endif
 
+Enesim_Object_Descriptor * enesim_renderer_descriptor_get(void);
+#define ENESIM_RENDERER_DESCRIPTOR enesim_renderer_descriptor_get()
+#define ENESIM_RENDERER_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, Enesim_Renderer_Class, ENESIM_RENDERER_DESCRIPTOR)
+#define ENESIM_RENDERER(o) ENESIM_OBJECT_INSTANCE_CHECK(o, Enesim_Renderer, ENESIM_RENDERER_DESCRIPTOR)
+
 /** Helper macro to add an error on a renderer based function */
 #define ENESIM_RENDERER_LOG(r, error, fmt, ...) \
 	enesim_renderer_log_add(r, error, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__);
@@ -181,6 +186,7 @@ typedef struct _Enesim_Renderer_Descriptor {
  *----------------------------------------------------------------------------*/
 struct _Enesim_Renderer
 {
+	Enesim_Object_Instance base;
 	EINA_MAGIC
 	int ref;
 	/* the private data */
@@ -202,6 +208,11 @@ struct _Enesim_Renderer
 	void *backend_data[ENESIM_BACKENDS];
 	Eina_Bool in_setup : 1;
 };
+
+typedef struct _Enesim_Renderer_Class
+{
+	Enesim_Object_Class base;
+} Enesim_Renderer_Class;
 
 void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
