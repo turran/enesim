@@ -40,7 +40,7 @@ EAPI Eina_Bool enesim_object_instance_inherits(Enesim_Object_Instance *thiz,
 	return enesim_object_descriptor_inherits(od, d);
 }
 
-void enesim_object_instance_free(Enesim_Object_Instance *thiz)
+EAPI void enesim_object_instance_free(Enesim_Object_Instance *thiz)
 {
 	Enesim_Object_Descriptor *od;
 

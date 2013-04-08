@@ -24,6 +24,9 @@
 #define ENESIM_OBJECT_INSTANCE_CHECK(i, type, d) (type*)i
 #endif
 
+#define ENESIM_OBJECT_INSTANCE(i) ENESIM_OBJECT_INSTANCE_CHECK(i, \
+		Enesim_Object_Instance, ENESIM_OBJECT_DESCRIPTOR)
+
 typedef struct _Enesim_Object_Instance {
 	Enesim_Object_Class *klass;
 } Enesim_Object_Instance;
