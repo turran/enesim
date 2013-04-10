@@ -13,7 +13,7 @@ typedef struct _Abstract01_Class
 	const char *(*name_get)(Abstract01 *o);
 } Abstract01_Class;
 
-ENESIM_OBJECT_ABSTRACT_BOILERPLATE(enesim_object_descriptor_get(), Abstract01, Abstract01_Class, abstract01);
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Abstract01, Abstract01_Class, abstract01);
 
 static void _abstract01_class_init(void *k)
 {
