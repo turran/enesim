@@ -103,7 +103,18 @@ EAPI Enesim_Object_Descriptor * enesim_object_descriptor_new(
 {
 	Enesim_Object_Descriptor *thiz;
 
+	/* some safety checks */
+	/* TODO replace the printf with something else */
+	if (parent)
+	{
+		if (class_size < parent->class_size)
+			printf("Wrong size %s %zu\n", name, class_size);
+		if (instance_size < parent->instance_size)
+			printf("Wrong size %s %zu\n", name, instance_size);
+	}
+
 	thiz = calloc(1, sizeof(Enesim_Object_Descriptor));
+	
 	thiz->parent = parent;
 	thiz->class_size = class_size;
 	thiz->class_init = class_init;
@@ -139,8 +150,8 @@ EAPI void * enesim_object_descriptor_instance_new(
 	}
 
 	i = calloc(1, thiz->instance_size);
-	enesim_object_descriptor_instance_init(thiz, i);
 	i->klass = k;
+	enesim_object_descriptor_instance_init(thiz, i);
 
 	return i;
 }
