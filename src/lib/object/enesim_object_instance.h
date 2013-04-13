@@ -26,7 +26,8 @@
 
 #define ENESIM_OBJECT_INSTANCE(i) ENESIM_OBJECT_INSTANCE_CHECK(i, \
 		Enesim_Object_Instance, ENESIM_OBJECT_DESCRIPTOR)
-#define ENESIM_OBJECT_INSTANCE_DESCRIPTOR_GET(i) (ENESIM_OBJECT_INSTANCE(i))->klass->descriptor
+#define ENESIM_OBJECT_INSTANCE_CLASS(i) (ENESIM_OBJECT_INSTANCE(i)->klass)
+#define ENESIM_OBJECT_INSTANCE_DESCRIPTOR_GET(i) (ENESIM_OBJECT_INSTANCE_CLASS(i))->descriptor
 
 typedef struct _Enesim_Object_Instance {
 	Enesim_Object_Class *klass;
