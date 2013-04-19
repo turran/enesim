@@ -40,41 +40,6 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_gradient
 
-#define ENESIM_RENDERER_GRADIENT_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRADIENT_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRADIENT_MAGIC);\
-	} while(0)
-
-typedef struct _Enesim_Renderer_Gradient
-{
-	EINA_MAGIC
-	/* properties */
-	Enesim_Renderer_Gradient_State state;
-	/* generated at state setup */
-	Enesim_Renderer_Gradient_Sw_State sw;
-	uint32_t *src;
-	int slen;
-	const Enesim_Renderer_State *rstate;
-	/* private */
-	Enesim_Repeat_Mode past_mode;
-	Eina_Bool changed : 1;
-	Eina_Bool stops_changed : 1;
-	Enesim_Renderer_Gradient_Descriptor *descriptor;
-	Enesim_Renderer_Gradient_Sw_Draw draw;
-	void *data;
-} Enesim_Renderer_Gradient;
-
-static inline Enesim_Renderer_Gradient * _gradient_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Gradient *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	ENESIM_RENDERER_GRADIENT_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
-
 static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enesim_Renderer *r,
 		Enesim_Log **l)
 {
@@ -179,7 +144,7 @@ static void _gradient_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Sw_Draw_Data data;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 
 	data.gstate = &thiz->state;
 	data.state = thiz->rstate;
@@ -193,17 +158,19 @@ static void _gradient_draw(Enesim_Renderer *r,
 static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Class *klass;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 	thiz->sw.len = 0;
 	thiz->changed = EINA_FALSE;
 	thiz->stops_changed = EINA_FALSE;
 	thiz->past_mode = thiz->state.mode;
 	thiz->rstate = NULL;
 
-	if (thiz->descriptor->sw_cleanup)
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	if (klass->sw_cleanup)
 	{
-		thiz->descriptor->sw_cleanup(r, s);
+		klass->sw_cleanup(r, s);
 	}
 }
 
@@ -212,10 +179,13 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Class *klass;
 	const Enesim_Renderer_State *rstate;
 	int slen;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+
 	/* check that we have at least two stops */
 	if (eina_list_count(thiz->state.stops) < 2)
 	{
@@ -225,7 +195,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	/* always call our own fill */
 	*fill = _gradient_draw;
 	/* setup the implementation */
-	if (!thiz->descriptor->sw_setup(r, &thiz->state, s, &thiz->draw, l))
+	if (!klass->sw_setup(r, &thiz->state, s, &thiz->draw, l))
 	{
 		ENESIM_RENDERER_LOG(r, l, "Gradient implementation failed");
 		return EINA_FALSE;
@@ -241,7 +211,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	enesim_matrix_f16p16_matrix_to(&rstate->current.transformation,
 			&thiz->sw.matrix);
 	/* get the length */
-	slen = thiz->descriptor->length(r);
+	slen = klass->length(r);
 	if (slen <= 0)
 	{
 		ENESIM_RENDERER_LOG(r, l, "Gradient length %d <= 0", slen);
@@ -266,11 +236,13 @@ static void _gradient_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Class *klass;
 
-	thiz = _gradient_get(r);
-	if (thiz->state.mode == ENESIM_RESTRICT && thiz->descriptor->bounds)
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+	klass = ENESIM_RENDERER_GRADIENT_CLASS(r);
+	if (thiz->state.mode == ENESIM_RESTRICT && klass->bounds_get)
 	{
-		thiz->descriptor->bounds(r, bounds);
+		klass->bounds_get(r, bounds);
 	}
 	else
 	{
@@ -279,18 +251,6 @@ static void _gradient_bounds_get(Enesim_Renderer *r,
 		bounds->w = INT_MAX;
 		bounds->h = INT_MAX;
 	}
-}
-
-static void _gradient_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Gradient *thiz;
-
-	thiz = _gradient_get(r);
-	if (thiz->sw.src)
-		free(thiz->sw.src);
-	if (thiz->descriptor->free)
-		thiz->descriptor->free(r);
-	free(thiz);
 }
 
 static void _gradient_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -302,123 +262,56 @@ static void _gradient_features_get(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
-static const char * _gradient_name(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Gradient *thiz;
-
-	thiz = _gradient_get(r);
-	if (thiz->descriptor->name)
-		return thiz->descriptor->name(r);
-	else
-		return "gradient";
-}
-
 static Eina_Bool _gradient_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Class *klass;
 	Eina_Bool ret = EINA_TRUE;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 	ret = _gradient_changed(thiz);
 	if (ret)
 		goto done;
-	if (thiz->descriptor->has_changed)
-		ret = thiz->descriptor->has_changed(r);
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	if (klass->has_changed)
+		ret = klass->has_changed(r);
 done:
 	return ret;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Gradient, Enesim_Renderer_Gradient_Class,
+		enesim_renderer_gradient);
 
-#if BUILD_OPENGL
-static Eina_Bool _gradient_opengl_initialize(Enesim_Renderer *r,
-		int *num_programs,
-		Enesim_Renderer_OpenGL_Program ***programs)
+static void _enesim_renderer_gradient_class_init(void *k)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->bounds_get = _gradient_bounds_get;
+	klass->features_get = _gradient_features_get;
+	klass->has_changed = _gradient_has_changed;
+	klass->sw_setup = _gradient_state_setup;
+	klass->sw_cleanup = _gradient_state_cleanup;
+}
+
+static void _enesim_renderer_gradient_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_gradient_instance_deinit(void *o)
 {
 	Enesim_Renderer_Gradient *thiz;
 
-	thiz = _gradient_get(r);
-	if (!thiz->descriptor->opengl_initialize)
-	{
-		return EINA_TRUE;
-	}
-	return thiz->descriptor->opengl_initialize(r, num_programs, programs);
+	thiz = ENESIM_RENDERER_GRADIENT(o);
+	if (thiz->sw.src)
+		free(thiz->sw.src);
 }
-
-static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **l)
-{
-	Enesim_Renderer_Gradient *thiz;
-
-	thiz = _gradient_get(r);
-	if (!thiz->descriptor->opengl_setup)
-	{
-		return EINA_FALSE;
-	}
-	return thiz->descriptor->opengl_setup(r, s, draw, l);
-}
-#endif
-
-static Enesim_Renderer_Descriptor _gradient_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _gradient_name,
-	/* .free = 			*/ _gradient_free,
-	/* .bounds_get = 		*/ _gradient_bounds_get,
-	/* .features_get = 		*/ _gradient_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
-	/* .has_changed = 		*/ _gradient_has_changed,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get = 		*/ NULL,
-	/* .sw_setup = 			*/ _gradient_state_setup,
-	/* .sw_cleanup = 		*/ _gradient_state_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-#if BUILD_OPENGL
-	/* .opengl_initialize = 	*/ _gradient_opengl_initialize,
-	/* .opengl_setup =          	*/ _gradient_opengl_setup,
-	/* .opengl_cleanup =        	*/ NULL
-#else
-	/* .opengl_initialize = 	*/ NULL,
-	/* .opengl_setup = 		*/ NULL,
-	/* .opengl_cleanup = 		*/ NULL
-#endif
-};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descriptor *gdescriptor, void *data)
-{
-	Enesim_Renderer *r;
-	Enesim_Renderer_Gradient *thiz;
-	if (!gdescriptor->length)
-	{
-		ERR("No suitable gradient length function");
-		return NULL;
-	}
-
-	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRADIENT_MAGIC);
-
-	thiz->data = data;
-	thiz->descriptor = gdescriptor;
-	/* set default properties */
-	thiz->state.stops = NULL;
-
-	r = enesim_renderer_new(&_gradient_descriptor, thiz);
-	return r;
-}
-
-void * enesim_renderer_gradient_data_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Gradient *thiz;
-
-	thiz = _gradient_get(r);
-	return thiz->data;
-}
-
 int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -426,7 +319,7 @@ int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r)
 	Eina_List *curr, *next, *last;
 	double dp = 1.0, small = 1.0 / 16384.0;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 
 	curr = thiz->state.stops;
 	curr_stop = eina_list_data_get(curr);
@@ -470,7 +363,7 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_
 	else if (pos > 1)
 		pos = 1;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 	s = malloc(sizeof(Enesim_Renderer_Gradient_Stop));
 	s->argb = stop->argb;
 	s->pos = pos;
@@ -513,7 +406,7 @@ EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 	Eina_List *l;
 	Eina_List *l_next;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 	EINA_LIST_FOREACH_SAFE(thiz->state.stops, l, l_next, stop)
 	{
 		thiz->state.stops = eina_list_remove_list(thiz->state.stops, l);
@@ -547,7 +440,7 @@ EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Gradient *thiz;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 	thiz->state.mode = mode;
 	thiz->changed = EINA_TRUE;
 }
@@ -560,6 +453,6 @@ EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mo
 {
 	Enesim_Renderer_Gradient *thiz;
 
-	thiz = _gradient_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 	*mode = thiz->state.mode;
 }

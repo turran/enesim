@@ -15,8 +15,16 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef SHAPE_H_
-#define SHAPE_H_
+#ifndef _ENESIM_RENDERER_SHAPE_PRIVATE_H_
+#define _ENESIM_RENDERER_SHAPE_PRIVATE_H_
+
+#define ENESIM_RENDERER_SHAPE_DESCRIPTOR enesim_renderer_shape_descriptor_get()
+#define ENESIM_RENDERER_SHAPE_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k,		\
+		Enesim_Renderer_Shape_Class, ENESIM_RENDERER_SHAPE_DESCRIPTOR)
+#define ENESIM_RENDERER_SHAPE_CLASS_GET(o) ENESIM_RENDERER_SHAPE_CLASS(		\
+		ENESIM_OBJECT_INSTANCE_CLASS(o));
+#define ENESIM_RENDERER_SHAPE(o) ENESIM_OBJECT_INSTANCE_CHECK(o, 		\
+		Enesim_Renderer_Shape, ENESIM_RENDERER_SHAPE_DESCRIPTOR)
 
 typedef struct _Enesim_Renderer_Shape_State
 {
@@ -43,19 +51,23 @@ typedef struct _Enesim_Renderer_Shape_State
 	Eina_Bool changed;
 } Enesim_Renderer_Shape_State;
 
+typedef struct _Enesim_Renderer_Shape
+{
+	Enesim_Renderer parent;
+	/* properties */
+	Enesim_Renderer_Shape_State state;
+	/* private */
+	/* interface */
+} Enesim_Renderer_Shape;
+
+
 typedef void (*Enesim_Renderer_Shape_Features_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
 
-typedef struct _Enesim_Renderer_Shape_Descriptor {
-	unsigned int version;
-	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
-	Enesim_Renderer_Delete_Cb free;
-	Enesim_Renderer_Bounds_Get_Cb bounds_get;
-	Enesim_Renderer_Features_Get features_get;
-	Enesim_Renderer_Is_Inside_Cb is_inside;
-	Enesim_Renderer_Damages_Get_Cb damages_get;
+typedef struct _Enesim_Renderer_Shape_Class {
+	Enesim_Renderer_Class parent;
+
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* software based functions */
-	Enesim_Renderer_Sw_Hints_Get_Cb sw_hints_get;
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	/* opencl based functions */
@@ -63,15 +75,13 @@ typedef struct _Enesim_Renderer_Shape_Descriptor {
 	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
 	/* opengl based functions */
-	Enesim_Renderer_OpenGL_Initialize opengl_initialize;
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
-	/* shape related functions */
-	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
-} Enesim_Renderer_Shape_Descriptor;
+	/* shape functions */
+	Enesim_Renderer_Shape_Features_Get_Cb features_get;
+} Enesim_Renderer_Shape_Class;
 
-Enesim_Renderer * enesim_renderer_shape_new(Enesim_Renderer_Shape_Descriptor *descriptor, void *data);
-void * enesim_renderer_shape_data_get(Enesim_Renderer *r);
+Enesim_Object_Descriptor * enesim_renderer_shape_descriptor_get(void);
 const Enesim_Renderer_Shape_State * enesim_renderer_shape_state_get(
 		Enesim_Renderer *r);
 void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *to);

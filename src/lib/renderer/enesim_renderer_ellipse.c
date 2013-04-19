@@ -42,11 +42,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_ELLIPSE_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_ELLIPSE_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_ELLIPSE_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_ELLIPSE(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Ellipse,					\
+		enesim_renderer_ellipse_descriptor_get())
 
 typedef struct _Enesim_Renderer_Ellipse_State {
 	double x;
@@ -57,7 +55,7 @@ typedef struct _Enesim_Renderer_Ellipse_State {
 
 typedef struct _Enesim_Renderer_Ellipse
 {
-	EINA_MAGIC
+	Enesim_Renderer_Shape_Path parent;
 	/* properties */
 	Enesim_Renderer_Ellipse_State current;
 	Enesim_Renderer_Ellipse_State past;
@@ -66,15 +64,9 @@ typedef struct _Enesim_Renderer_Ellipse
 	Eina_Bool generated : 1;
 } Enesim_Renderer_Ellipse;
 
-static inline Enesim_Renderer_Ellipse * _ellipse_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Ellipse *thiz;
-
-	thiz = enesim_renderer_shape_path_data_get(r);
-	ENESIM_RENDERER_ELLIPSE_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Ellipse_Class {
+	Enesim_Renderer_Shape_Path_Class parent;
+} Enesim_Renderer_Ellipse_Class;
 
 static Eina_Bool _ellipse_properties_have_changed(Enesim_Renderer_Ellipse *thiz)
 {
@@ -145,7 +137,7 @@ static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 	double rx, ry;
 	double x, y;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	_ellipse_get_real(thiz, r, &x, &y, &rx, &ry);
 	if (!thiz || (thiz->current.rx <= 0) || (thiz->current.ry <= 0))
 	{
@@ -170,7 +162,7 @@ static void _ellipse_cleanup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Ellipse *thiz;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
@@ -183,7 +175,7 @@ static void _ellipse_bounds_get(Enesim_Renderer *r,
 	Enesim_Matrix_Type type;
 	double sw = 0;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 	if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -226,16 +218,8 @@ static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Ellipse *thiz;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	return _ellipse_properties_have_changed(thiz);
-}
-
-static void _ellipse_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Ellipse *thiz;
-
-	thiz = _ellipse_get(r);
-	free(thiz);
 }
 
 static void _ellipse_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
@@ -244,16 +228,45 @@ static void _ellipse_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_S
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER |
 			ENESIM_SHAPE_FLAG_STROKE_LOCATION;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_SHAPE_PATH_DESCRIPTOR,
+		Enesim_Renderer_Ellipse, Enesim_Renderer_Ellipse_Class,
+		enesim_renderer_ellipse);
 
-static Enesim_Renderer_Shape_Path_Descriptor _ellipse_descriptor = {
-	/* .base_name_get = 		*/ _ellipse_base_name_get,
-	/* .free = 			*/ _ellipse_free,
-	/* .has_changed = 		*/ _ellipse_has_changed,
-	/* .shape_features_get =	*/ _ellipse_shape_features_get,
-	/* .bounds_get = 			*/ _ellipse_bounds_get,
-	/* .setup = 			*/ _ellipse_setup,
-	/* .cleanup = 			*/ _ellipse_cleanup,
-};
+static void _enesim_renderer_ellipse_class_init(void *k)
+{
+	Enesim_Renderer_Class *r_klass;
+	Enesim_Renderer_Shape_Class *s_klass;
+	Enesim_Renderer_Shape_Path_Class *klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _ellipse_base_name_get;
+	r_klass->bounds_get = _ellipse_bounds_get;
+
+	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	s_klass->features_get = _ellipse_shape_features_get;
+
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS(k);
+	klass->has_changed = _ellipse_has_changed;
+	klass->setup = _ellipse_setup;
+	klass->cleanup = _ellipse_cleanup;
+}
+
+static void _enesim_renderer_ellipse_instance_init(void *o)
+{
+	Enesim_Renderer_Ellipse *thiz;
+
+	thiz = ENESIM_RENDERER_ELLIPSE(o);
+	/* to maintain compatibility */
+	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
+			ENESIM_SHAPE_STROKE_INSIDE);
+}
+
+static void _enesim_renderer_ellipse_instance_deinit(void *o EINA_UNUSED)
+{
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -271,14 +284,8 @@ static Enesim_Renderer_Shape_Path_Descriptor _ellipse_descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Ellipse *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Ellipse));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_ELLIPSE_MAGIC);
-	r = enesim_renderer_shape_path_new(&_ellipse_descriptor, thiz);
-	/* to maintain compatibility */
-	enesim_renderer_shape_stroke_location_set(r, ENESIM_SHAPE_STROKE_INSIDE);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_ellipse);
 	return r;
 }
 /**
@@ -295,7 +302,7 @@ EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *r, double x, doubl
 {
 	Enesim_Renderer_Ellipse *thiz;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	if (!thiz) return;
 	if ((thiz->current.x == x) && (thiz->current.y == y))
 		return;
@@ -319,7 +326,7 @@ EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *r, double *x, doub
 {
 	Enesim_Renderer_Ellipse *thiz;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	if (x) *x = thiz->current.x;
 	if (y) *y = thiz->current.y;
 }
@@ -338,7 +345,7 @@ EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *r, double radius_x,
 {
 	Enesim_Renderer_Ellipse *thiz;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	if (!thiz) return;
 	if ((thiz->current.rx == radius_x) && (thiz->current.ry == radius_y))
 		return;
@@ -363,7 +370,7 @@ EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *r, double *radius_x
 {
 	Enesim_Renderer_Ellipse *thiz;
 
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	if (radius_x) *radius_x = thiz->current.rx;
 	if (radius_y) *radius_y = thiz->current.ry;
 }
@@ -380,7 +387,7 @@ EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *r, double *radius_x
 EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
 {
 	Enesim_Renderer_Ellipse *thiz;
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	thiz->current.x = x;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
@@ -398,7 +405,7 @@ EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
 EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Ellipse *thiz;
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
@@ -416,7 +423,7 @@ EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
 EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *r, double rx)
 {
 	Enesim_Renderer_Ellipse *thiz;
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	thiz->current.rx = rx;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
@@ -434,7 +441,7 @@ EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *r, double rx)
 EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *r, double ry)
 {
 	Enesim_Renderer_Ellipse *thiz;
-	thiz = _ellipse_get(r);
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	thiz->current.ry = ry;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;

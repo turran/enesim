@@ -19,6 +19,16 @@
 #define GRADIENT_H_
 
 #include "libargb.h"
+
+#define ENESIM_RENDERER_GRADIENT_DESCRIPTOR enesim_renderer_gradient_descriptor_get()
+#define ENESIM_RENDERER_GRADIENT_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k,		\
+		Enesim_Renderer_Gradient_Class,					\
+		ENESIM_RENDERER_GRADIENT_DESCRIPTOR)
+#define ENESIM_RENDERER_GRADIENT_CLASS_GET(o) ENESIM_RENDERER_GRADIENT_CLASS(	\
+		ENESIM_OBJECT_INSTANCE_CLASS(o));
+#define ENESIM_RENDERER_GRADIENT(o) ENESIM_OBJECT_INSTANCE_CHECK(o, 		\
+		Enesim_Renderer_Gradient, ENESIM_RENDERER_GRADIENT_DESCRIPTOR)
+
 /* helper functions for different spread modes */
 static inline uint32_t enesim_renderer_gradient_pad_color_get(Enesim_Color *src, size_t len, Eina_F16p16 p)
 {
@@ -249,6 +259,23 @@ typedef void (*Enesim_Renderer_Gradient_Sw_Draw)(Enesim_Renderer *r,
 		unsigned int len,
 		void *data);
 
+typedef struct _Enesim_Renderer_Gradient
+{
+	Enesim_Renderer parent;
+	/* properties */
+	Enesim_Renderer_Gradient_State state;
+	/* generated at state setup */
+	Enesim_Renderer_Gradient_Sw_State sw;
+	Enesim_Renderer_Gradient_Sw_Draw draw;
+	uint32_t *src;
+	int slen;
+	const Enesim_Renderer_State *rstate;
+	/* private */
+	Enesim_Repeat_Mode past_mode;
+	Eina_Bool changed : 1;
+	Eina_Bool stops_changed : 1;
+} Enesim_Renderer_Gradient;
+
 typedef int (*Enesim_Renderer_Gradient_Length)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Gradient_Sw_Setup)(Enesim_Renderer *r,
 		const Enesim_Renderer_Gradient_State *gstate,
@@ -256,26 +283,18 @@ typedef Eina_Bool (*Enesim_Renderer_Gradient_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer_Gradient_Sw_Draw *draw,
 		Enesim_Log **l);
 
-typedef struct _Enesim_Renderer_Gradient_Descriptor
+typedef struct _Enesim_Renderer_Gradient_Class
 {
+	Enesim_Renderer_Class parent;
 	/* gradient based functions */
 	Enesim_Renderer_Gradient_Length length;
 	Enesim_Renderer_Gradient_Sw_Setup sw_setup;
-	/* common renderer functions */
-	Enesim_Renderer_Base_Name_Get_Cb name;
-	Enesim_Renderer_Delete_Cb free;
-	Enesim_Renderer_Bounds_Get_Cb bounds;
-	Enesim_Renderer_Is_Inside_Cb is_inside;
-	Enesim_Renderer_Has_Changed_Cb has_changed;
-	/* software based functions */
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
-	/* opengl based functions */
-	Enesim_Renderer_OpenGL_Initialize opengl_initialize;
-	Enesim_Renderer_OpenGL_Setup opengl_setup;
-} Enesim_Renderer_Gradient_Descriptor;
+	Enesim_Renderer_Bounds_Get_Cb bounds_get;
+	Enesim_Renderer_Has_Changed_Cb has_changed;
+} Enesim_Renderer_Gradient_Class;
 
-Enesim_Renderer * enesim_renderer_gradient_new(Enesim_Renderer_Gradient_Descriptor *gdescriptor, void *data);
-void * enesim_renderer_gradient_data_get(Enesim_Renderer *r);
+Enesim_Object_Descriptor * enesim_renderer_gradient_descriptor_get(void);
 int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r);
 
 #endif

@@ -26,6 +26,7 @@
 Enesim_Object_Descriptor * enesim_renderer_descriptor_get(void);
 #define ENESIM_RENDERER_DESCRIPTOR enesim_renderer_descriptor_get()
 #define ENESIM_RENDERER_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, Enesim_Renderer_Class, ENESIM_RENDERER_DESCRIPTOR)
+#define ENESIM_RENDERER_CLASS_GET(o) ENESIM_RENDERER_CLASS(ENESIM_OBJECT_INSTANCE_CLASS(o))
 #define ENESIM_RENDERER(o) ENESIM_OBJECT_INSTANCE_CHECK(o, Enesim_Renderer, ENESIM_RENDERER_DESCRIPTOR)
 
 /** Helper macro to add an error on a renderer based function */
@@ -112,7 +113,6 @@ typedef struct _Enesim_Renderer_OpenGL_Data
  *----------------------------------------------------------------------------*/
 /* common descriptor functions */
 typedef const char * (*Enesim_Renderer_Base_Name_Get_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Delete_Cb)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Is_Inside_Cb)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Alpha_Hints_Get_Cb)(Enesim_Renderer *r, Enesim_Alpha_Hint *hints);
 typedef void (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
@@ -155,11 +155,10 @@ typedef Eina_Bool (*Enesim_Renderer_OpenGL_Setup)(Enesim_Renderer *r,
 		Enesim_Log **error);
 typedef void (*Enesim_Renderer_OpenGL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 
-typedef struct _Enesim_Renderer_Descriptor {
-	/* common */
-	unsigned int version;
+typedef struct _Enesim_Renderer_Class
+{
+	Enesim_Object_Class base;
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
-	Enesim_Renderer_Delete_Cb free;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Features_Get features_get;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
@@ -179,7 +178,8 @@ typedef struct _Enesim_Renderer_Descriptor {
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* we should expand from here */
-} Enesim_Renderer_Descriptor;
+} Enesim_Renderer_Class;
+
 
 /*----------------------------------------------------------------------------*
  *                         Renderer related functions                         *
@@ -198,9 +198,6 @@ struct _Enesim_Renderer
 	Eina_Rectangle current_destination_bounds;
 	Eina_Rectangle past_destination_bounds;
 	Enesim_Renderer_State state;
-	/* the descriptor */
-	Enesim_Renderer_Descriptor descriptor;
-	void *data;
 	/* backend data */
 	/* given that we can use the same renderer to draw into a software
 	 * surface or opencl surface, we need an array to keep *ALL* the
@@ -209,18 +206,10 @@ struct _Enesim_Renderer
 	Eina_Bool in_setup : 1;
 };
 
-typedef struct _Enesim_Renderer_Class
-{
-	Enesim_Object_Class base;
-} Enesim_Renderer_Class;
-
 void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
 const Enesim_Renderer_State * enesim_renderer_state_get(Enesim_Renderer *r);
 void enesim_renderer_sw_free(Enesim_Renderer *r);
-Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
-		*descriptor, void *data);
-void * enesim_renderer_data_get(Enesim_Renderer *r);
 void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to);
 void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);
 void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data);

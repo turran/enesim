@@ -46,29 +46,21 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_PROXY_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_PROXY_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_PROXY_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_PROXY(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Proxy,						\
+		enesim_renderer_proxy_descriptor_get())
 
 typedef struct _Enesim_Renderer_Proxy {
-	EINA_MAGIC
+	Enesim_Renderer parent;
 	/* the properties */
 	Enesim_Renderer *proxied;
 	/* generated at state setup */
 	Enesim_Renderer_Sw_Fill proxied_fill;
 } Enesim_Renderer_Proxy;
 
-static inline Enesim_Renderer_Proxy * _proxy_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Proxy *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	ENESIM_RENDERER_PROXY_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Proxy_Class {
+	Enesim_Renderer_Class parent;
+} Enesim_Renderer_Proxy_Class;
 
 static void _proxy_span(Enesim_Renderer *r,
 		int x, int y,
@@ -76,7 +68,7 @@ static void _proxy_span(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Proxy *thiz;
 
- 	thiz = _proxy_get(r);
+ 	thiz = ENESIM_RENDERER_PROXY(r);
 	/* FIXME isnt enough to call the proxied fill */
 	enesim_renderer_sw_draw(thiz->proxied, x, y, len, dst);
 }
@@ -87,7 +79,7 @@ static void _proxy_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Renderer_Proxy *thiz;
 
- 	thiz = _proxy_get(r);
+ 	thiz = ENESIM_RENDERER_PROXY(r);
 	enesim_renderer_opengl_draw(thiz->proxied, s, area, w, h);
 }
 #endif
@@ -132,7 +124,7 @@ static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Proxy *thiz;
 
- 	thiz = _proxy_get(r);
+ 	thiz = ENESIM_RENDERER_PROXY(r);
 	if (!_proxy_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
 
@@ -144,7 +136,7 @@ static void _proxy_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Proxy *thiz;
 
- 	thiz = _proxy_get(r);
+ 	thiz = ENESIM_RENDERER_PROXY(r);
 	_proxy_state_cleanup(thiz, s);
 }
 
@@ -163,7 +155,7 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r,
 	const Enesim_Renderer_State *state;
 	const Enesim_Renderer_State *proxied_state;
 
-	thiz = _proxy_get(r);
+	thiz = ENESIM_RENDERER_PROXY(r);
 	*hints = 0;
 	if (!thiz->proxied)
 		return;
@@ -184,7 +176,7 @@ static void _proxy_bounds_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Proxy *thiz;
 
-	thiz = _proxy_get(r);
+	thiz = ENESIM_RENDERER_PROXY(r);
 	if (!thiz->proxied)
 	{
 		rect->x = 0;
@@ -201,7 +193,7 @@ static Eina_Bool _proxy_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Proxy *thiz;
 	Eina_Bool ret = EINA_FALSE;
 
-	thiz = _proxy_get(r);
+	thiz = ENESIM_RENDERER_PROXY(r);
 	if (thiz->proxied)
 		ret = enesim_renderer_has_changed(thiz->proxied);
 	return ret;
@@ -214,7 +206,7 @@ static void _proxy_damage(Enesim_Renderer *r,
 	Enesim_Renderer_Proxy *thiz;
 	Eina_Bool common_changed;
 
-	thiz = _proxy_get(r);
+	thiz = ENESIM_RENDERER_PROXY(r);
 	/* we need to take care of the visibility */
 	common_changed = enesim_renderer_state_has_changed(r);
 	if (common_changed)
@@ -232,16 +224,6 @@ static void _proxy_damage(Enesim_Renderer *r,
 			cb, data);
 }
 
-static void _proxy_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Proxy *thiz;
-
-	thiz = _proxy_get(r);
-	if (thiz->proxied)
-		enesim_renderer_unref(thiz->proxied);
-	free(thiz);
-}
-
 #if BUILD_OPENGL
 static Eina_Bool _proxy_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
@@ -250,7 +232,7 @@ static Eina_Bool _proxy_opengl_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Proxy *thiz;
 
- 	thiz = _proxy_get(r);
+ 	thiz = ENESIM_RENDERER_PROXY(r);
 	if (!_proxy_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
 
@@ -262,37 +244,48 @@ static void _proxy_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Proxy *thiz;
 
- 	thiz = _proxy_get(r);
+ 	thiz = ENESIM_RENDERER_PROXY(r);
 	_proxy_state_cleanup(thiz, s);
 }
 #endif
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Proxy, Enesim_Renderer_Proxy_Class,
+		enesim_renderer_proxy);
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .base_name_get = 		*/ _proxy_name,
-	/* .free = 			*/ _proxy_free,
-	/* .bounds_get = 		*/ _proxy_bounds_get,
-	/* .features_get =		*/ _proxy_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damages_get =		*/ _proxy_damage,
-	/* .has_changed = 		*/ _proxy_has_changed,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get = 		*/ _proxy_sw_hints_get,
-	/* .sw_setup = 			*/ _proxy_sw_setup,
-	/* .sw_cleanup = 		*/ _proxy_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
+static void _enesim_renderer_proxy_class_init(void *k)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _proxy_name;
+	klass->bounds_get = _proxy_bounds_get;
+	klass->features_get = _proxy_features_get;
+	klass->damages_get = _proxy_damage;
+	klass->has_changed = _proxy_has_changed;
+	klass->sw_hints_get = _proxy_sw_hints_get;
+	klass->sw_setup = _proxy_sw_setup;
+	klass->sw_cleanup = _proxy_sw_cleanup;
 #if BUILD_OPENGL
-	/* .opengl_initialize = 	*/ NULL,
-	/* .opengl_setup = 		*/ _proxy_opengl_setup,
-	/* .opengl_cleanup = 		*/ _proxy_opengl_cleanup,
-#else
-	/* .opengl_initialize = 	*/ NULL,
-	/* .opengl_setup = 		*/ NULL,
-	/* .opengl_cleanup = 		*/ NULL
+	klass->opengl_setup = _proxy_opengl_setup;
+	klass->opengl_cleanup = _proxy_opengl_cleanup;
 #endif
-};
+}
+
+static void _enesim_renderer_proxy_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_proxy_instance_deinit(void *o)
+{
+	Enesim_Renderer_Proxy *thiz;
+
+	thiz = ENESIM_RENDERER_PROXY(o);
+	if (thiz->proxied)
+		enesim_renderer_unref(thiz->proxied);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -303,12 +296,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_proxy_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Proxy *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Proxy));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_PROXY_MAGIC);
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_proxy);
 	return r;
 }
 
@@ -321,7 +310,7 @@ EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Proxy *thiz;
 
-	thiz = _proxy_get(r);
+	thiz = ENESIM_RENDERER_PROXY(r);
 	if (thiz->proxied)
 		enesim_renderer_unref(thiz->proxied);
 	thiz->proxied = proxied;
@@ -338,7 +327,7 @@ EAPI void enesim_renderer_proxy_proxied_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Proxy *thiz;
 
-	thiz = _proxy_get(r);
+	thiz = ENESIM_RENDERER_PROXY(r);
 	if (!proxied) return;
 	*proxied = thiz->proxied;
 	if (thiz->proxied)

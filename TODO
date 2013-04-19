@@ -20,11 +20,6 @@ Enesim
   of a change.
 + Add log levels on every subsystem/renderer
 + Make use of the flags on the surface draw function
-+ We need to optimize and avoid the need to always call
-  enesim_renderer_data_get(r) whenever we want to render a span, for such, extend such function
-  to receive the data already fetch with enesim_renderer_data_get(r) but on the surface_draw.
-  A better approach would be to use the brand new object system
-+ Change very renderer to use *thiz* as the variable for itself
 + We need to get rid of the hypot function, it is used on a lot places
   but with f16p16 values
 + We need to use the real types on the rendering functions
@@ -33,14 +28,6 @@ Enesim
   algorithm for other backends
 + Split the hswitch and transition common parts into a common transition renderer
   with properties as src, target and step, that's all
-+ This one is important, is time to worry about the memory, given that renderers can go inside others
-  and so forth, why not instead of doing enesim_delete we do enesim_ref/unref, this might do our lifes
-  easier
-  already done:
-  other/compound
-  other/clipper
-  shape/shape
-  transition/transition
 + Normalize the stride/pitch
 + Initialize every renderer to some sane vales
 + We need to use whenever possible functions for fixed point operations. This way later we can just

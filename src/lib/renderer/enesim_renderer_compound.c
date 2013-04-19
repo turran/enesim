@@ -60,15 +60,13 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_compound
 
-#define ENESIM_RENDERER_COMPOUND_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_COMPOUND_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_COMPOUND_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_COMPOUND(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Compound,					\
+		enesim_renderer_compound_descriptor_get())
 
 typedef struct _Enesim_Renderer_Compound
 {
-	EINA_MAGIC
+	Enesim_Renderer parent;
 	/* properties */
 	Eina_List *layers;
 	/* private */
@@ -85,22 +83,16 @@ typedef struct _Enesim_Renderer_Compound
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Compound;
 
+typedef struct _Enesim_Renderer_Compound_Class {
+	Enesim_Renderer_Class parent;
+} Enesim_Renderer_Compound_Class;
+
 typedef struct _Layer
 {
 	Enesim_Renderer *r;
 	/* generated at state setup */
 	Eina_Rectangle destination_bounds;
 } Layer;
-
-static inline Enesim_Renderer_Compound * _compound_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Compound *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	ENESIM_RENDERER_COMPOUND_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
 
 static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 		Layer *l)
@@ -213,7 +205,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	int sw;
 	int sh;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -305,7 +297,7 @@ static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	/* we might need to add this memset in case the layers for this span dont fill the whole area */
 	memset(ddata, 0, len * sizeof(uint32_t));
@@ -318,7 +310,7 @@ static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	/* we should only do one memset, here instead of per each layer */
 	_compound_span_layer_blend(thiz, x, y, len, ddata);
@@ -340,7 +332,7 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 	Eina_Bool same_rop = EINA_TRUE;
 	Eina_List *ll;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	if (!thiz->layers)
 	{
 		*hints = 0;
@@ -383,7 +375,7 @@ static Eina_Bool _compound_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Rop rop;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	if (!_compound_state_setup(thiz, r, s, log))
 		return EINA_FALSE;
 
@@ -404,7 +396,7 @@ static void _compound_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Compound *thiz;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	_compound_state_cleanup(thiz, s);
 }
 
@@ -419,7 +411,7 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 	int x2 = -INT_MAX;
 	int y2 = -INT_MAX;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	/* first the just added layers */
 	EINA_LIST_FOREACH (thiz->added, ll, l)
 	{
@@ -471,45 +463,13 @@ static void _compound_features_get(Enesim_Renderer *r EINA_UNUSED,
 	*features = 0;
 }
 
-static void _compound_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Compound *thiz;
-	Layer *l;
-
-	thiz = _compound_get(r);
-	/* just remove the visible layers as is, every visible layer
-	 * should be part of the compound layers
-	 */
-	if (thiz->visible_layers)
-	{
-		eina_list_free(thiz->visible_layers);
-		thiz->visible_layers = NULL;
-	}
-	/* check the added lists, it must be empty, if not remove it too */
-	EINA_LIST_FREE(thiz->added, l)
-	{
-		enesim_renderer_unref(l->r);
-		free(l);
-	}
-	enesim_renderer_compound_layer_clear(r);
-	/* finally unref every removed layer */
-	EINA_LIST_FREE(thiz->removed, l)
-	{
-		/* now is safe to destroy the layer */
-		enesim_renderer_unref(l->r);
-		free(l);
-	}
-
-	free(thiz);
-}
-
 static Eina_Bool _compound_is_inside(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
 	Eina_Bool is_inside = EINA_FALSE;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
@@ -527,7 +487,7 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Compound *thiz;
 	Eina_Bool ret;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	ret = thiz->changed;
 	if (!ret)
 	{
@@ -558,7 +518,7 @@ static void _compound_damage(Enesim_Renderer *r,
 	Eina_Bool common_changed;
 	Layer *l;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	common_changed = enesim_renderer_state_has_changed(r);
 	/* given that we do support the visibility, color, rop, we need to take into
 	 * account such change
@@ -616,7 +576,7 @@ static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 
- 	thiz = _compound_get(r);
+ 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	if (!_compound_state_setup(thiz, r, s, l)) return EINA_FALSE;
 
 	*draw = _compound_opengl_draw;
@@ -627,37 +587,74 @@ static void _compound_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Compound *thiz;
 
- 	thiz = _compound_get(r);
+ 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	_compound_state_cleanup(thiz, s);
 }
 #endif
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Compound, Enesim_Renderer_Compound_Class,
+		enesim_renderer_compound);
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _compound_name,
-	/* .free = 			*/ _compound_free,
-	/* .bounds_get =  		*/ _compound_bounds_get,
-	/* .features_get = 		*/ _compound_features_get,
-	/* .is_inside = 		*/ _compound_is_inside,
-	/* .damage = 			*/ _compound_damage,
-	/* .has_changed = 		*/ _compound_has_changed,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get = 		*/ _compound_sw_hints,
-	/* .sw_setup = 			*/ _compound_sw_setup,
-	/* .sw_cleanup = 		*/ _compound_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
+static void _enesim_renderer_compound_class_init(void *k)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _compound_name;
+	klass->bounds_get = _compound_bounds_get;
+	klass->features_get = _compound_features_get;
+	klass->is_inside = _compound_is_inside;
+	klass->damages_get = _compound_damage;
+	klass->has_changed = _compound_has_changed;
+	klass->sw_hints_get = _compound_sw_hints;
+	klass->sw_setup = _compound_sw_setup;
+	klass->sw_cleanup = _compound_sw_cleanup;
 #if BUILD_OPENGL
-	/* .opengl_initialize = 	*/ _compound_opengl_initialize,
-	/* .opengl_setup = 		*/ _compound_opengl_setup,
-	/* .opengl_cleanup = 		*/ _compound_opengl_cleanup,
-#else
-	/* .opengl_initialize = 	*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
+	klass->opengl_initialize = _compound_opengl_initialize;
+	klass->opengl_setup = _compound_opengl_setup;
+	klass->opengl_cleanup = _compound_opengl_cleanup;
 #endif
-};
+}
+
+static void _enesim_renderer_compound_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_compound_instance_deinit(void *o)
+{
+	Enesim_Renderer_Compound *thiz;
+	Enesim_Renderer *r;
+	Layer *l;
+
+	thiz = ENESIM_RENDERER_COMPOUND(o);
+	/* just remove the visible layers as is, every visible layer
+	 * should be part of the compound layers
+	 */
+	if (thiz->visible_layers)
+	{
+		eina_list_free(thiz->visible_layers);
+		thiz->visible_layers = NULL;
+	}
+	/* check the added lists, it must be empty, if not remove it too */
+	EINA_LIST_FREE(thiz->added, l)
+	{
+		enesim_renderer_unref(l->r);
+		free(l);
+	}
+
+	r = ENESIM_RENDERER(o);
+	enesim_renderer_compound_layer_clear(r);
+	/* finally unref every removed layer */
+	EINA_LIST_FREE(thiz->removed, l)
+	{
+		/* now is safe to destroy the layer */
+		enesim_renderer_unref(l->r);
+		free(l);
+	}
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -667,15 +664,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
  */
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 {
-	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Compound));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_COMPOUND_MAGIC);
-
-	r = enesim_renderer_new(&_descriptor, thiz);
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_compound);
 	return r;
 }
 /**
@@ -690,7 +681,7 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 	Layer *l;
 
 	if (!rend) return;
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	l = calloc(1, sizeof(Layer));
 	l->r = rend;
@@ -710,7 +701,7 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 	Eina_List *l_next;
 
 	if (!rend) return;
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
@@ -733,7 +724,7 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
 	Eina_List *l;
 	Eina_List *l_next;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
 		_compound_layer_remove(thiz, layer);
@@ -767,7 +758,7 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 	Layer *layer;
 	Eina_List *l;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	EINA_LIST_FOREACH(thiz->layers, l, layer)
 	{
 		if (!cb(r, layer->r, data))
@@ -785,7 +776,7 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 	Layer *layer;
 	Eina_List *l;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	EINA_LIST_REVERSE_FOREACH(thiz->layers, l, layer)
 	{
 		if (!cb(r, layer->r, data))
@@ -801,7 +792,7 @@ EAPI void enesim_renderer_compound_pre_setup_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	thiz->pre_cb = cb;
 	thiz->pre_data = data;
 }
@@ -814,7 +805,7 @@ EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 
-	thiz = _compound_get(r);
+	thiz = ENESIM_RENDERER_COMPOUND(r);
 	thiz->post_cb = cb;
 	thiz->post_data = data;
 }

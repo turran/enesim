@@ -18,6 +18,19 @@
 #ifndef ENESIM_RENDERER_PATH_ABSTRACT_H
 #define ENESIM_RENDERER_PATH_ABSTRACT_H
 
+#define ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR 				\
+		enesim_renderer_path_abstract_descriptor_get()
+#define ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k,	\
+		Enesim_Renderer_Path_Abstract_Class,				\
+		ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR())
+#define ENESIM_RENDERER_PATH_ABSTRACT_CLASS_GET(o)				\
+		ENESIM_RENDERER_PATH_ABSTRACT_CLASS(				\
+		ENESIM_OBJECT_INSTANCE_CLASS(o));
+#define ENESIM_RENDERER_PATH_ABSTRACT(o) ENESIM_OBJECT_INSTANCE_CHECK(o, 	\
+		Enesim_Renderer_Path_Abstract,					\
+		ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR)
+
+
 /* TODO later instead of inheriting from a shape, just inherit from
  * a renderer and pass the state directly
  */
@@ -27,44 +40,26 @@ typedef struct _Enesim_Renderer_Path_Abstract_State
 	Eina_Bool changed;
 } Enesim_Renderer_Path_Abstract_State;
 
+typedef struct _Enesim_Renderer_Path_Abstract
+{
+	Enesim_Renderer_Shape parent;
+} Enesim_Renderer_Path_Abstract;
+
 typedef void (*Enesim_Renderer_Path_Abstract_Commands_Set_Cb)(Enesim_Renderer *r, const Eina_List *commands);
 typedef void (*Enesim_Renderer_Path_Abstract_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_State *state);
 typedef void (*Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Shape_State *state);
 typedef void (*Enesim_Renderer_Path_Abstract_Path_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Path_Abstract_State *state);
 
-typedef struct _Enesim_Renderer_Path_Abstract_Descriptor {
-	unsigned int version;
-	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
-	Enesim_Renderer_Delete_Cb free;
-	Enesim_Renderer_Bounds_Get_Cb bounds_get;
-	Enesim_Renderer_Features_Get features_get;
-	Enesim_Renderer_Is_Inside_Cb is_inside;
-	Enesim_Renderer_Damages_Get_Cb damages_get;
-	Enesim_Renderer_Has_Changed_Cb has_changed;
-	/* software based functions */
-	Enesim_Renderer_Sw_Hints_Get_Cb sw_hints_get;
-	Enesim_Renderer_Sw_Setup sw_setup;
-	Enesim_Renderer_Sw_Cleanup sw_cleanup;
-	/* opencl based functions */
-	Enesim_Renderer_OpenCL_Setup opencl_setup;
-	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
-	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
-	/* opengl based functions */
-	Enesim_Renderer_OpenGL_Initialize opengl_initialize;
-	Enesim_Renderer_OpenGL_Setup opengl_setup;
-	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
-	/* shape related functions */
-	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
-	/* path related functions */
+typedef struct _Enesim_Renderer_Path_Abstract_Class {
+	Enesim_Renderer_Shape_Class parent;
 	Enesim_Renderer_Path_Abstract_Commands_Set_Cb commands_set;
 	Enesim_Renderer_Path_Abstract_Path_State_Set_Cb path_state_set;
 	Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb shape_state_set;
 	Enesim_Renderer_Path_Abstract_State_Set_Cb state_set;
-} Enesim_Renderer_Path_Abstract_Descriptor;
+} Enesim_Renderer_Path_Abstract_Class;
 
-Enesim_Renderer * enesim_renderer_path_abstract_new(Enesim_Renderer_Path_Abstract_Descriptor *descriptor, void *data);
+Enesim_Object_Descriptor * enesim_renderer_path_abstract_descriptor_get(void);
 void enesim_renderer_path_abstract_commands_set(Enesim_Renderer *r, const Eina_List *commands);
-void * enesim_renderer_path_abstract_data_get(Enesim_Renderer *r);
 
 /* abstract implementations */
 Enesim_Renderer * enesim_renderer_path_enesim_new(void);

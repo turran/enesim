@@ -42,17 +42,15 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_gradient_radial
 
-#define ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_GRADIENT_RADIAL(o) ENESIM_OBJECT_INSTANCE_CHECK(o,	\
+		Enesim_Renderer_Gradient_Radial,				\
+		enesim_renderer_gradient_radial_descriptor_get())
 
 static Enesim_Renderer_Gradient_Sw_Draw _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
 
 typedef struct _Enesim_Renderer_Gradient_Radial
 {
-	EINA_MAGIC
+	Enesim_Renderer_Gradient parent;
 	/* properties */
 	struct {
 		double x, y;
@@ -67,15 +65,9 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Gradient_Radial;
 
-static inline Enesim_Renderer_Gradient_Radial * _radial_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Gradient_Radial *thiz;
-
-	thiz = enesim_renderer_gradient_data_get(r);
-	ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Gradient_Radial_Class {
+	Enesim_Renderer_Gradient_Class parent;
+} Enesim_Renderer_Gradient_Radial_Class;
 
 static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz,
 		Eina_F16p16 x, Eina_F16p16 y)
@@ -103,20 +95,20 @@ static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz
 	return ret;
 }
 
-GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, restrict);
-GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, repeat);
-GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, pad);
-GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, reflect);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, restrict);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, repeat);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, pad);
+GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, reflect);
 
-GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, restrict);
-GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, repeat);
-GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, pad);
-GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, reflect);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, restrict);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, repeat);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, pad);
+GRADIENT_AFFINE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, reflect);
 
-GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, restrict);
-GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, repeat);
-GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, pad);
-GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, _radial_get, _radial_distance, reflect);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, restrict);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, repeat);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, pad);
+GRADIENT_PROJECTIVE(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, reflect);
 /*----------------------------------------------------------------------------*
  *                The Enesim's gradient renderer interface                    *
  *----------------------------------------------------------------------------*/
@@ -124,7 +116,7 @@ static int _radial_length(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	return thiz->glen;
 }
 
@@ -133,14 +125,14 @@ static const char * _radial_name(Enesim_Renderer *r EINA_UNUSED)
 	return "gradient_radial";
 }
 
-static void _state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+static void _radial_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->changed = EINA_FALSE;
 }
 
-static Eina_Bool _state_setup(Enesim_Renderer *r,
+static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Log **l EINA_UNUSED)
@@ -154,7 +146,7 @@ static Eina_Bool _state_setup(Enesim_Renderer *r,
 	double rad, scale, small = (1 / 8192.0);
 	int glen;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	cx = thiz->center.x;
 	cy = thiz->center.y;
 	rad = fabs(thiz->radius);
@@ -221,7 +213,7 @@ static void _radial_bounds_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 
 	bounds->x = thiz->center.x - fabs(thiz->radius);
 	bounds->y = thiz->center.y - fabs(thiz->radius);
@@ -233,25 +225,59 @@ static Eina_Bool _radial_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (!thiz->changed)
 		return EINA_FALSE;
 	/* TODO check if we have really changed */
 	return EINA_TRUE;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_GRADIENT_DESCRIPTOR,
+		Enesim_Renderer_Gradient_Radial,
+		Enesim_Renderer_Gradient_Radial_Class,
+		enesim_renderer_gradient_radial);
 
-static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
-	/* .length = 			*/ _radial_length,
-	/* .sw_setup = 			*/ _state_setup,
-	/* .name = 			*/ _radial_name,
-	/* .free = 			*/ NULL,
-	/* .bounds_get = 		*/ _radial_bounds_get,
-	/* .is_inside = 		*/ NULL,
-	/* .has_changed = 		*/ _radial_has_changed,
-	/* .sw_cleanup = 		*/ _state_cleanup,
-	/* .opengl_initialize = 	*/ NULL,
-	/* .opengl_setup = 		*/ NULL,
-};
+static void _enesim_renderer_gradient_radial_class_init(void *k)
+{
+	Enesim_Renderer_Class *r_klass;
+	Enesim_Renderer_Gradient_Class *klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _radial_name;
+
+	klass = ENESIM_RENDERER_GRADIENT_CLASS(k);
+	klass->length = _radial_length;
+	klass->sw_setup = _radial_sw_setup;
+	klass->has_changed = _radial_has_changed;
+	klass->sw_cleanup = _radial_sw_cleanup;
+	klass->bounds_get = _radial_bounds_get;
+
+	_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
+	_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
+	_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
+	_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
+	_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
+	_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
+	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
+	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
+	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
+	_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
+	_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
+	_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+}
+
+static void _enesim_renderer_gradient_radial_instance_init(void *o)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(o);
+}
+
+static void _enesim_renderer_gradient_radial_instance_deinit(void *o EINA_UNUSED)
+{
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -261,33 +287,9 @@ static Enesim_Renderer_Gradient_Descriptor _radial_descriptor = {
  */
 EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 {
-	Enesim_Renderer_Gradient_Radial *thiz;
 	Enesim_Renderer *r;
-	static Eina_Bool spans_initialized = EINA_FALSE;
 
-	if (!spans_initialized)
-	{
-		spans_initialized = EINA_TRUE;
-		/* first the span functions */
-		_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
-		_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
-		_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
-		_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
-		_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
-		_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
-		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
-		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
-		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
-		_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
-		_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
-		_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
-	}
-
-	thiz = calloc(1, sizeof(Enesim_Renderer_Gradient_Radial));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_GRADIENT_RADIAL_MAGIC);
-	r = enesim_renderer_gradient_new(&_radial_descriptor, thiz);
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_gradient_radial);
 	return r;
 }
 
@@ -299,7 +301,7 @@ EAPI void enesim_renderer_gradient_radial_center_set(Enesim_Renderer *r, double 
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->center.x = center_x;
 	thiz->center.y = center_y;
 	thiz->changed = EINA_TRUE;
@@ -314,7 +316,7 @@ EAPI void enesim_renderer_gradient_radial_center_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (center_x)
 		*center_x = thiz->center.x;
 	if (center_y)
@@ -328,7 +330,7 @@ EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, doubl
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->center.x = center_x;
 	thiz->changed = EINA_TRUE;
 }
@@ -340,7 +342,7 @@ EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, doubl
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->center.y = center_y;
 	thiz->changed = EINA_TRUE;
 }
@@ -352,7 +354,7 @@ EAPI void enesim_renderer_gradient_radial_center_x_get(Enesim_Renderer *r, doubl
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (center_x)
 		*center_x = thiz->center.x;
 }
@@ -364,7 +366,7 @@ EAPI void enesim_renderer_gradient_radial_center_y_get(Enesim_Renderer *r, doubl
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (center_y)
 		*center_y = thiz->center.y;
 }
@@ -377,7 +379,7 @@ EAPI void enesim_renderer_gradient_radial_focus_set(Enesim_Renderer *r, double f
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->focus.x = focus_x;
 	thiz->focus.y = focus_y;
 	thiz->changed = EINA_TRUE;
@@ -392,7 +394,7 @@ EAPI void enesim_renderer_gradient_radial_focus_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (focus_x)
 		*focus_x = thiz->focus.x;
 	if (focus_y)
@@ -406,7 +408,7 @@ EAPI void enesim_renderer_gradient_radial_focus_x_set(Enesim_Renderer *r, double
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->focus.x = focus_x;
 	thiz->changed = EINA_TRUE;
 }
@@ -418,7 +420,7 @@ EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->focus.y = focus_y;
 	thiz->changed = EINA_TRUE;
 }
@@ -430,7 +432,7 @@ EAPI void enesim_renderer_gradient_radial_focus_x_get(Enesim_Renderer *r, double
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (focus_x)
 		*focus_x = thiz->focus.x;
 }
@@ -442,7 +444,7 @@ EAPI void enesim_renderer_gradient_radial_focus_y_get(Enesim_Renderer *r, double
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (focus_y)
 		*focus_y = thiz->focus.y;
 }
@@ -455,7 +457,7 @@ EAPI void enesim_renderer_gradient_radial_radius_set(Enesim_Renderer *r, double 
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	thiz->radius = radius;
 	thiz->changed = EINA_TRUE;
 }
@@ -467,7 +469,7 @@ EAPI void enesim_renderer_gradient_radial_radius_get(Enesim_Renderer *r, double 
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
-	thiz = _radial_get(r);
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	if (radius)
 		*radius = thiz->radius;
 }

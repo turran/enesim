@@ -43,11 +43,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_STRIPES_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_STRIPES_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_STRIPES_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_STRIPES(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Stripes,					\
+		enesim_renderer_stripes_descriptor_get())
 
 typedef struct _Enesim_Renderer_Stripes_State {
 	struct {
@@ -58,7 +56,7 @@ typedef struct _Enesim_Renderer_Stripes_State {
 } Enesim_Renderer_Stripes_State;
 
 typedef struct _Enesim_Renderer_Stripes {
-	EINA_MAGIC
+	Enesim_Renderer parent;
 	/* properties */
 	Enesim_Renderer_Stripes_State current;
 	Enesim_Renderer_Stripes_State past;
@@ -72,15 +70,9 @@ typedef struct _Enesim_Renderer_Stripes {
 	double oy;
 } Enesim_Renderer_Stripes;
 
-static inline Enesim_Renderer_Stripes * _stripes_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Stripes *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	ENESIM_RENDERER_STRIPES_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Stripes_Class {
+	Enesim_Renderer_Class parent;
+} Enesim_Renderer_Stripes_Class;
 
 #if BUILD_OPENGL
 
@@ -149,7 +141,7 @@ static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUS
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_OpenGL_Compiled_Program *cp;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	cp = &rdata->program->compiled[0];
 	_stripes_opengl_shader_setup(cp->id,
@@ -186,7 +178,7 @@ static void _span_projective(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
+	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
 	Enesim_Color c0 = thiz->final_color1;
 	Enesim_Color c1 = thiz->final_color2;
@@ -235,7 +227,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
+	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
 	Enesim_Color c0 = thiz->final_color1;
 	Enesim_Color c1 = thiz->final_color2;
@@ -318,7 +310,7 @@ static void _span_affine(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
+	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int ayx = thiz->matrix.yx;
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
 	Enesim_Color c0 = thiz->final_color1;
@@ -361,7 +353,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
+	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int ayx = thiz->matrix.yx;
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
 	Enesim_Color c0 = thiz->final_color1;
@@ -481,7 +473,7 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
-	Enesim_Renderer_Stripes *thiz = _stripes_get(r);
+	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	Enesim_Matrix_Type type;
 	Enesim_Matrix matrix;
 	Enesim_Matrix inv;
@@ -534,7 +526,7 @@ static void _stripes_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	_stripes_state_cleanup(thiz, s);
 }
 
@@ -557,7 +549,7 @@ static Eina_Bool _stripes_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (!thiz->changed) return EINA_FALSE;
 
 	if (thiz->current.even.paint && enesim_renderer_has_changed(thiz->current.even.paint))
@@ -592,19 +584,6 @@ static Eina_Bool _stripes_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
-static void _stripes_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Stripes *thiz;
-
-	thiz = _stripes_get(r);
-	if (!thiz) return;
-	if (thiz->current.even.paint)
-		enesim_renderer_unref(thiz->current.even.paint);
-	if (thiz->current.odd.paint)
-		enesim_renderer_unref(thiz->current.odd.paint);
-	free(thiz);
-}
-
 #if BUILD_OPENGL
 static Eina_Bool _stripes_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_shaders,
@@ -622,7 +601,7 @@ static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Stripes *thiz;
 
- 	thiz = _stripes_get(r);
+ 	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (!_stripes_state_setup(thiz, r)) return EINA_FALSE;
 
 	*draw = _stripes_opengl_draw;
@@ -634,38 +613,58 @@ static void _stripes_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Stripes *thiz;
 
- 	thiz = _stripes_get(r);
+ 	thiz = ENESIM_RENDERER_STRIPES(r);
 	_stripes_state_cleanup(thiz, s);
 }
 #endif
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Stripes, Enesim_Renderer_Stripes_Class,
+		enesim_renderer_stripes);
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .base_name_get = 		*/ _stripes_name,
-	/* .free = 			*/ _stripes_free,
-	/* .bounds_get = 		*/ NULL,
-	/* .features_get = 		*/ _stripes_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damages_get =		*/ NULL,
-	/* .has_changed = 		*/ _stripes_has_changed,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get = 		*/ _stripes_sw_hints,
-	/* .sw_setup =			*/ _stripes_sw_setup,
-	/* .sw_cleanup = 		*/ _stripes_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
+static void _enesim_renderer_stripes_class_init(void *k)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _stripes_name;
+	klass->features_get = _stripes_features_get;
+	klass->has_changed = _stripes_has_changed;
+	klass->sw_hints_get = _stripes_sw_hints;
+	klass->sw_setup = _stripes_sw_setup;
+	klass->sw_cleanup = _stripes_sw_cleanup;
 #if BUILD_OPENGL
-	/* .opengl_initialize =        	*/ _stripes_opengl_initialize,
-	/* .opengl_setup =          	*/ _stripes_opengl_setup,
-	/* .opengl_cleanup =        	*/ _stripes_opengl_cleanup
-#else
-	/* .opengl_initialize =        	*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
+	klass->opengl_initialize = _stripes_opengl_initialize;
+	klass->opengl_setup = _stripes_opengl_setup;
+	klass->opengl_cleanup = _stripes_opengl_cleanup;
 #endif
-};
+}
 
+static void _enesim_renderer_stripes_instance_init(void *o)
+{
+	Enesim_Renderer_Stripes *thiz;
+
+	thiz = ENESIM_RENDERER_STRIPES(o);
+	/* specific renderer setup */
+	thiz->current.even.thickness = 1;
+	thiz->current.odd.thickness = 1;
+	thiz->current.even.color = 0xffffffff;
+	thiz->current.odd.color = 0xff000000;
+	thiz->changed = 1;
+}
+
+static void _enesim_renderer_stripes_instance_deinit(void *o)
+{
+	Enesim_Renderer_Stripes *thiz;
+
+	thiz = ENESIM_RENDERER_STRIPES(o);
+	if (thiz->current.even.paint)
+		enesim_renderer_unref(thiz->current.even.paint);
+	if (thiz->current.odd.paint)
+		enesim_renderer_unref(thiz->current.odd.paint);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -676,19 +675,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Stripes *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Stripes));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_STRIPES_MAGIC);
-	/* specific renderer setup */
-	thiz->current.even.thickness = 1;
-	thiz->current.odd.thickness = 1;
-	thiz->current.even.color = 0xffffffff;
-	thiz->current.odd.color = 0xff000000;
-	thiz->changed = 1;
-	r = enesim_renderer_new(&_descriptor, thiz);
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_stripes);
 	return r;
 }
 /**
@@ -701,7 +689,7 @@ EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	thiz->current.even.color = color;
 	thiz->changed = EINA_TRUE;
 }
@@ -714,7 +702,7 @@ EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Colo
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (color) *color = thiz->current.even.color;
 }
 /**
@@ -727,7 +715,7 @@ EAPI void enesim_renderer_stripes_even_renderer_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (thiz->current.even.paint == paint)
 		return;
 	if (thiz->current.even.paint)
@@ -746,7 +734,7 @@ EAPI void enesim_renderer_stripes_even_renderer_get(Enesim_Renderer *r, Enesim_R
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (paint) *paint = thiz->current.even.paint;
 }
 /**
@@ -759,7 +747,7 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (thickness < 0.99999)
 		thickness = 1;
 	thiz->current.even.thickness = thickness;
@@ -774,7 +762,7 @@ EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double 
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (thickness) *thickness = thiz->current.even.thickness;
 }
 /**
@@ -787,7 +775,7 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	thiz->current.odd.color = color;
 	thiz->changed = EINA_TRUE;
 }
@@ -800,7 +788,7 @@ EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (color) *color = thiz->current.odd.color;
 }
 /**
@@ -813,7 +801,7 @@ EAPI void enesim_renderer_stripes_odd_renderer_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (thiz->current.odd.paint == paint)
 		return;
 	if (thiz->current.odd.paint)
@@ -832,7 +820,7 @@ EAPI void enesim_renderer_stripes_odd_renderer_get(Enesim_Renderer *r, Enesim_Re
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (paint) *paint = thiz->current.odd.paint;
 }
 /**
@@ -845,7 +833,7 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (thickness < 0.99999)
 		thickness = 1;
 	thiz->current.odd.thickness = thickness;
@@ -860,7 +848,7 @@ EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *
 {
 	Enesim_Renderer_Stripes *thiz;
 
-	thiz = _stripes_get(r);
+	thiz = ENESIM_RENDERER_STRIPES(r);
 	if (thickness) *thickness = thiz->current.odd.thickness;
 }
 

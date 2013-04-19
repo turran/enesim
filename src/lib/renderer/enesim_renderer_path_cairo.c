@@ -51,8 +51,13 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RENDERER_PATH_CAIRO(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Path_Cairo,					\
+		enesim_renderer_path_cairo_descriptor_get())
+
 typedef struct _Enesim_Renderer_Path_Cairo
 {
+	Enesim_Renderer_Path_Abstract parent;
 	Enesim_Path_Normalizer *normalizer;
 
 	const Eina_List *commands;
@@ -69,13 +74,10 @@ typedef struct _Enesim_Renderer_Path_Cairo
 	Eina_Bool drawing;
 } Enesim_Renderer_Path_Cairo;
 
-Enesim_Renderer_Path_Cairo * _path_cairo_get(Enesim_Renderer *r)
+typedef struct _Enesim_Renderer_Path_Cairo_Class
 {
-	Enesim_Renderer_Path_Cairo *thiz;
-
-	thiz = enesim_renderer_path_abstract_data_get(r);
-	return thiz;
-}
+	Enesim_Renderer_Path_Abstract_Class parent;
+} Enesim_Renderer_Path_Cairo_Class;
 
 static void _path_cairo_colors_get(Enesim_Color color,
 		double *a, double *r, double *g, double *b)
@@ -155,7 +157,7 @@ static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
 	Enesim_Renderer_Path_Cairo *thiz;
 	unsigned char *src;
 
-	thiz = _path_cairo_get(r);
+	thiz = ENESIM_RENDERER_PATH_CAIRO(r);
 	/* translate to our own origin */
 	x -= thiz->destination_bounds.x;
 	y -= thiz->destination_bounds.y;
@@ -243,21 +245,6 @@ static const char * _path_cairo_name(Enesim_Renderer *r EINA_UNUSED)
 	return "path_cairo";
 }
 
-static void _path_cairo_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path_Cairo *thiz;
-
-	thiz = _path_cairo_get(r);
-	cairo_surface_destroy(thiz->recording);
-	if (thiz->surface)
-		cairo_surface_destroy(thiz->surface);
-	cairo_destroy(thiz->cairo_rec);
-	if (thiz->cairo_draw)
-		cairo_destroy(thiz->cairo_draw);
-	enesim_path_normalizer_free(thiz->normalizer);
-	free(thiz);
-}
-
 static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
@@ -269,7 +256,7 @@ static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
 	int rwidth;
 	int rheight;
 
-	thiz = _path_cairo_get(r);
+	thiz = ENESIM_RENDERER_PATH_CAIRO(r);
 
 	if (thiz->changed && !thiz->generated)
 	{
@@ -339,7 +326,7 @@ static Eina_Bool _path_cairo_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
 
-	thiz = _path_cairo_get(r);
+	thiz = ENESIM_RENDERER_PATH_CAIRO(r);
 	return thiz->changed;
 }
 
@@ -353,7 +340,7 @@ static void _path_cairo_bounds_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path_Cairo *thiz;
 
-	thiz = _path_cairo_get(r);
+	thiz = ENESIM_RENDERER_PATH_CAIRO(r);
 	if (thiz->changed && !thiz->generated)
 	{
 		thiz->drawing = EINA_FALSE;
@@ -371,48 +358,71 @@ static void _path_cairo_commands_set(Enesim_Renderer *r, const Eina_List *comman
 {
 	Enesim_Renderer_Path_Cairo *thiz;
 
-	thiz = _path_cairo_get(r);
+	thiz = ENESIM_RENDERER_PATH_CAIRO(r);
 	thiz->commands = commands;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR,
+		Enesim_Renderer_Path_Cairo, Enesim_Renderer_Path_Cairo_Class,
+		enesim_renderer_path_cairo);
 
-static Enesim_Renderer_Path_Abstract_Descriptor _path_cairo_descriptor = {
-	/* .version =			*/ ENESIM_RENDERER_API,
-	/* .name =			*/ _path_cairo_name,
-	/* .free =			*/ _path_cairo_free,
-	/* .bounds_get =		*/ _path_cairo_bounds_get,
-	/* .features_get =		*/ _path_cairo_features_get,
-	/* .is_inside =			*/ NULL,
-	/* .damage =			*/ NULL,
-	/* .has_changed =		*/ _path_cairo_has_changed,
-	/* .sw_hints_get =		*/ _path_cairo_sw_hints,
-	/* .sw_setup =			*/ _path_cairo_sw_setup,
-	/* .sw_cleanup =		*/ _path_cairo_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_initialize =		*/ NULL,
-	/* .opengl_setup =		*/ NULL,
-	/* .opengl_cleanup =		*/ NULL,
-	/* .shape_features_get =	*/ _path_cairo_shape_features_get,
-	/* .commands_set = 		*/ _path_cairo_commands_set,
-};
+static void _enesim_renderer_path_cairo_class_init(void *k)
+{
+	Enesim_Renderer_Path_Abstract_Class *klass;
+	Enesim_Renderer_Shape_Class *s_klass;
+	Enesim_Renderer_Class *r_klass;
 
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _path_cairo_name;
+	r_klass->bounds_get = _path_cairo_bounds_get;
+	r_klass->features_get = _path_cairo_features_get;
+	r_klass->has_changed = _path_cairo_has_changed;
+	r_klass->sw_hints_get = _path_cairo_sw_hints;
+
+	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	s_klass->features_get = _path_cairo_shape_features_get;
+	s_klass->sw_setup = _path_cairo_sw_setup;
+	s_klass->sw_cleanup = _path_cairo_sw_cleanup;
+
+	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
+	klass->commands_set = _path_cairo_commands_set;
+}
+
+static void _enesim_renderer_path_cairo_instance_init(void *o)
+{
+	Enesim_Renderer_Path_Cairo *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_CAIRO(o);
+	thiz->recording = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
+	thiz->cairo_rec = cairo_create(thiz->recording);
+	thiz->normalizer = enesim_path_normalizer_path_new(&_normalizer_descriptor, thiz);
+}
+
+static void _enesim_renderer_path_cairo_instance_deinit(void *o)
+{
+	Enesim_Renderer_Path_Cairo *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_CAIRO(o);
+	cairo_surface_destroy(thiz->recording);
+	if (thiz->surface)
+		cairo_surface_destroy(thiz->surface);
+	cairo_destroy(thiz->cairo_rec);
+	if (thiz->cairo_draw)
+		cairo_destroy(thiz->cairo_draw);
+	enesim_path_normalizer_free(thiz->normalizer);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Enesim_Renderer * enesim_renderer_path_cairo_new(void)
 {
-	Enesim_Renderer_Path_Cairo *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Path_Cairo));
-	thiz->recording = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
-	thiz->cairo_rec = cairo_create(thiz->recording);
-	thiz->normalizer = enesim_path_normalizer_path_new(&_normalizer_descriptor, thiz);
-
-	r = enesim_renderer_path_abstract_new(&_path_cairo_descriptor, thiz);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_path_cairo);
 	return r;
 }
 /*============================================================================*

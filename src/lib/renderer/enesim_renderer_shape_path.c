@@ -43,30 +43,18 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Renderer_Shape_Path
-{
-	Enesim_Renderer *path;
-	Enesim_Renderer_Shape_Path_Descriptor *descriptor;
-	void *data;
-} Enesim_Renderer_Shape_Path;
-
-static inline Enesim_Renderer_Shape_Path * _shape_path_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Shape_Path *thiz;
-
-	thiz = enesim_renderer_shape_data_get(r);
-	return thiz;
-}
-
 static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Log **l)
 {
 	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer_Shape_Path_Class *klass;
 	Enesim_Renderer *fill, *stroke;
 	const Enesim_Renderer_State *rstate;
 	const Enesim_Renderer_Shape_State *sstate;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
+
 	rstate = enesim_renderer_state_get(r);
 	sstate = enesim_renderer_shape_state_get(r);
 
@@ -107,14 +95,14 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->current.draw_mode);
 
 	/* now let the implementation override whatever it wants to */
-	if (thiz->descriptor->setup)
-		if (!thiz->descriptor->setup(r, thiz->path, l))
+	if (klass->setup)
+		if (!klass->setup(r, thiz->path, l))
 			return EINA_FALSE;
 
 	if (!enesim_renderer_setup(thiz->path, s, l))
 	{
-		if (thiz->descriptor->cleanup)
-			thiz->descriptor->cleanup(r);
+		if (klass->cleanup)
+			klass->cleanup(r);
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
@@ -123,11 +111,13 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 static void _shape_path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer_Shape_Path_Class *klass;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
 	enesim_renderer_cleanup(thiz->path, s);
-	if (thiz->descriptor->cleanup)
-		thiz->descriptor->cleanup(r);
+	if (klass->cleanup)
+		klass->cleanup(r);
 }
 /*----------------------------------------------------------------------------*
  *                               Span functions                               *
@@ -139,7 +129,7 @@ static void _shape_path_path_span(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	enesim_renderer_sw_draw(thiz->path, x, y, len, ddata);
 }
 
@@ -149,24 +139,13 @@ static void _shape_path_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	enesim_renderer_opengl_draw(thiz->path, s, area, w, h);
 }
 #endif
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _shape_path_name(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Shape_Path *thiz;
-
-	thiz = _shape_path_get(r);
-	if (thiz->descriptor->name)
-		return thiz->descriptor->name(r);
-	else
-		return "shape_simple";
-}
-
 static Eina_Bool _shape_path_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
@@ -194,58 +173,21 @@ static void _shape_path_sw_hints(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	enesim_renderer_sw_hints_get(thiz->path, hints);
-}
-
-static void _shape_path_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
-{
-	Enesim_Renderer_Shape_Path *thiz;
-
-	thiz = _shape_path_get(r);
-	if (thiz->descriptor->shape_features_get)
-		thiz->descriptor->shape_features_get(r, features);
-	else
-		enesim_renderer_shape_features_get(thiz->path, features);
-}
-
-static void _shape_path_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Shape_Path *thiz;
-
-	thiz = _shape_path_get(r);
-	if (thiz->descriptor->free)
-		thiz->descriptor->free(r);
-	enesim_renderer_unref(thiz->path);
-	free(thiz);
-}
-
-static void _shape_path_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
-{
-	Enesim_Renderer_Shape_Path *thiz;
-
-	thiz = _shape_path_get(r);
-	if (thiz->descriptor->bounds_get)
-	{
-		thiz->descriptor->bounds_get(r, bounds);
-	}
-	else
-	{
-		thiz->descriptor->setup(r, thiz->path, NULL);
-		enesim_renderer_bounds(thiz->path, bounds);
-	}
 }
 
 static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer_Shape_Path_Class *klass;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
 	if (enesim_renderer_has_changed(thiz->path))
 		return EINA_TRUE;
-	if (thiz->descriptor->has_changed)
-		return thiz->descriptor->has_changed(r);
+	if (klass->has_changed)
+		return klass->has_changed(r);
 	return EINA_FALSE;
 }
 
@@ -274,147 +216,147 @@ static void _shape_path_stroke_weight_set(Enesim_Renderer *r, double weight)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_weight_get(Enesim_Renderer *r, double *weight)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_location_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Location location)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_location_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Location *location)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap cap)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap *cap)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_join_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Join join)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_join_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Join *join)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *stroke)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_renderer_get(Enesim_Renderer *r, Enesim_Renderer **stroke)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_fill_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_fill_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *fill)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_fill_renderer_get(Enesim_Renderer *r, Enesim_Renderer **fill)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_fill_rule_set(Enesim_Renderer *r, Enesim_Shape_Fill_Rule rule)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_fill_rule_get(Enesim_Renderer *r, Enesim_Shape_Fill_Rule *rule)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_Draw_Mode draw_mode)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_Draw_Mode *draw_mode)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 
 }
 
@@ -423,80 +365,85 @@ static void _shape_path_stroke_dash_add(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 
 static void _shape_path_stroke_dash_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = _shape_path_get(r);
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 }
 #endif
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_RENDERER_SHAPE_DESCRIPTOR,
+		Enesim_Renderer_Shape_Path,
+		Enesim_Renderer_Shape_Path_Class,
+		enesim_renderer_shape_path);
 
-static Enesim_Renderer_Shape_Descriptor _shape_path_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .name = 			*/ _shape_path_name,
-	/* .free = 			*/ _shape_path_free,
-	/* .bounds_get = 		*/ _shape_path_bounds_get,
-	/* .features_get = 		*/ _shape_path_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
-	/* .has_changed = 		*/ _shape_path_has_changed,
-	/* .sw_hints_get = 		*/ _shape_path_sw_hints,
-	/* .sw_setup = 			*/ _shape_path_sw_setup,
-	/* .sw_cleanup = 		*/ _shape_path_sw_cleanup,
-#if BUILD_OPENCL
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-#else
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-#endif
+static void _enesim_renderer_shape_path_class_init(void *k)
+{
+	Enesim_Renderer_Shape_Class *shape_klass;
+	Enesim_Renderer_Class *klass;
+
+	shape_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	shape_klass->features_get = enesim_renderer_shape_path_shape_features_get_default;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->sw_setup = _shape_path_sw_setup;
+	klass->sw_cleanup = _shape_path_sw_cleanup;
 #if BUILD_OPENGL
-	/* .opengl_initialize =         */ NULL,
-	/* .opengl_setup =          	*/ _shape_path_opengl_setup,
-	/* .opengl_cleanup =        	*/ _shape_path_opengl_cleanup,
-#else
-	/* .opengl_initialize =         */ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL,
+	klass->opengl_setup = _shape_path_opengl_setup;
+	klass->opengl_cleanup = _shape_path_opengl_cleanup;
 #endif
-	/* .shape_features_get =	*/ _shape_path_shape_features_get,
-};
+	klass->bounds_get = enesim_renderer_shape_path_bounds_get_default;
+	klass->features_get = _shape_path_features_get;
+	klass->has_changed = _shape_path_has_changed;
+	klass->sw_hints_get = _shape_path_sw_hints;
+}
+
+static void _enesim_renderer_shape_path_instance_init(void *o)
+{
+	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer *r;
+
+	thiz = ENESIM_RENDERER_SHAPE_PATH(o);
+	r = enesim_renderer_path_new();
+	thiz->path = r;
+}
+
+static void _enesim_renderer_shape_path_instance_deinit(void *o)
+{
+	Enesim_Renderer_Shape_Path *thiz;
+
+	thiz = ENESIM_RENDERER_SHAPE_PATH(o);
+	enesim_renderer_unref(thiz->path);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Renderer * enesim_renderer_shape_path_new(
-		Enesim_Renderer_Shape_Path_Descriptor *descriptor, void *data)
+void enesim_renderer_shape_path_shape_features_get_default(Enesim_Renderer *r,
+		Enesim_Shape_Feature *features)
 {
-	Enesim_Renderer *r;
 	Enesim_Renderer_Shape_Path *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Shape_Path));
-	if (!thiz) return NULL;
-	r = enesim_renderer_path_new();
-	if (!r)
-	{
-		free(thiz);
-		return NULL;
-	}
-	thiz->path = r;
-	thiz->data = data;
-	thiz->descriptor = descriptor;
-
-	r = enesim_renderer_shape_new(&_shape_path_descriptor, thiz);
-	return r;
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	enesim_renderer_shape_features_get(thiz->path, features);
 }
 
-void * enesim_renderer_shape_path_data_get(Enesim_Renderer *r)
+void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer_Shape_Path_Class *klass;
 
-	thiz = _shape_path_get(r);
-	return thiz->data;
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
+	/* first propagate the properties to the path */
+	klass->setup(r, thiz->path, NULL);
+	enesim_renderer_bounds(thiz->path, bounds);
 }
 /*============================================================================*
  *                                   API                                      *

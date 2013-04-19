@@ -41,17 +41,14 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_BLUR_MAGIC 0xe7e51465
-#define ENESIM_RENDERER_BLUR_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_BLUR_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_BLUR_MAGIC);\
-	} while(0)
-
-
 #define MUL_A_256(a, c) \
  ( (((((c) >> 8) & 0x00ff00ff) * (a)) & 0xff00ff00) + \
    (((((c) & 0x00ff00ff) * (a)) >> 8) & 0x00ff00ff) )
+
+#define ENESIM_RENDERER_BLUR(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Blur,					\
+		enesim_renderer_blur_descriptor_get())
+
 
 static int _atable[256];
 static void _init_atable(void)
@@ -70,7 +67,7 @@ static void _init_atable(void)
 
 typedef struct _Enesim_Renderer_Blur
 {
-	EINA_MAGIC
+	Enesim_Renderer parent;
 	Enesim_Surface *src;
 	Enesim_Blur_Channel channel;
 	double rx, ry;
@@ -81,15 +78,9 @@ typedef struct _Enesim_Renderer_Blur
 	int ibxx, ibyy;
 } Enesim_Renderer_Blur;
 
-static inline Enesim_Renderer_Blur * _blur_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Blur *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	ENESIM_RENDERER_BLUR_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Blur_Class {
+	Enesim_Renderer_Class parent;
+} Enesim_Renderer_Blur_Class;
 
 static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
 		Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
@@ -133,7 +124,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	int txx0, ntxx0, tx0, ntx0;
 	int tyy0, ntyy0, ty0, nty0;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
  	color = thiz->color;
 	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
 	/* setup the parameters */
@@ -282,7 +273,7 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	int txx0, ntxx0, tx0, ntx0;
 	int tyy0, ntyy0, ty0, nty0;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 	color = thiz->color;
 
 	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
@@ -410,7 +401,7 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Blur *thiz;
 	double rx, ry;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 	enesim_renderer_color_get(r, &thiz->color);
 	if (!_blur_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
@@ -438,7 +429,7 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 	_blur_state_cleanup(thiz, r, s);
 }
 
@@ -447,7 +438,7 @@ static void _blur_bounds_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 	if (!thiz->src)
 	{
 		rect->x = 0;
@@ -478,35 +469,45 @@ static void _blur_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Blur, Enesim_Renderer_Blur_Class,
+		enesim_renderer_blur);
 
-static void _blur_free(Enesim_Renderer *r)
+static void _enesim_renderer_blur_class_init(void *k)
 {
-	Enesim_Renderer_Blur *thiz;
+	Enesim_Renderer_Class *klass;
 
-	thiz = _blur_get(r);
-	free(thiz);
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _blur_name;
+	klass->bounds_get = _blur_bounds_get;
+	klass->features_get = _blur_features_get;
+	klass->sw_hints_get = _blur_sw_hints_get;
+	klass->sw_setup = _blur_sw_setup;
+	klass->sw_cleanup = _blur_sw_cleanup;
+	/* initialize the static information */
+	_init_atable();
+	_spans[ENESIM_BLUR_CHANNEL_COLOR]
+		= _argb8888_span_identity;
+	_spans[ENESIM_BLUR_CHANNEL_ALPHA]
+		= _a8_span_identity;
 }
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .base_name_get = 		*/ _blur_name,
-	/* .free = 			*/ _blur_free,
-	/* .bounds_get = 		*/ _blur_bounds_get,
-	/* .features_get = 		*/ _blur_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damages_get = 		*/ NULL,
-	/* .has_changed = 		*/ NULL,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get = 		*/ _blur_sw_hints_get,
-	/* .sw_setup = 			*/ _blur_sw_setup,
-	/* .sw_cleanup = 		*/ _blur_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup = 		*/ NULL,
-	/* .opengl_initialize =		*/ NULL,
-	/* .opengl_setup = 		*/ NULL,
-	/* .opengl_cleanup = 		*/ NULL
-};
+static void _enesim_renderer_blur_instance_init(void *o)
+{
+	Enesim_Renderer_Blur *thiz = ENESIM_RENDERER_BLUR(o);
+
+	/* specific renderer setup */
+	thiz->channel = ENESIM_BLUR_CHANNEL_COLOR;
+	thiz->rx = thiz->ry = 0.5;
+	/* common renderer setup */
+}
+
+static void _enesim_renderer_blur_instance_deinit(void *o EINA_UNUSED)
+{
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -517,30 +518,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
  */
 EAPI Enesim_Renderer * enesim_renderer_blur_new(void)
 {
-	Enesim_Renderer_Blur *thiz;
 	Enesim_Renderer *r;
-	static Eina_Bool spans_initialized = EINA_FALSE;
 
-	if (!spans_initialized)
-	{
-		spans_initialized = EINA_TRUE;
-		_init_atable();
-		_spans[ENESIM_BLUR_CHANNEL_COLOR]
-			= _argb8888_span_identity;
-		_spans[ENESIM_BLUR_CHANNEL_ALPHA]
-			= _a8_span_identity;
-	}
-
-	thiz = calloc(1, sizeof(Enesim_Renderer_Blur));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_BLUR_MAGIC);
-
-	/* specific renderer setup */
-	thiz->channel = ENESIM_BLUR_CHANNEL_COLOR;
-	thiz->rx = thiz->ry = 0.5;
-	/* common renderer setup */
-	r = enesim_renderer_new(&_descriptor, thiz);
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_blur);
 	return r;
 }
 /**
@@ -553,7 +533,7 @@ EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 
 	thiz->channel = channel;
 }
@@ -566,7 +546,7 @@ EAPI Enesim_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 
 	return thiz->channel;
 }
@@ -580,7 +560,7 @@ EAPI void enesim_renderer_blur_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 	if (thiz->src)
 		enesim_surface_unref(thiz->src);
 	thiz->src = src;
@@ -595,7 +575,7 @@ EAPI void enesim_renderer_blur_src_get(Enesim_Renderer *r, Enesim_Surface **src)
 	Enesim_Renderer_Blur *thiz;
 
 	if (!src) return;
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 	*src = thiz->src;
 	if (thiz->src)
 		thiz->src = enesim_surface_ref(thiz->src);
@@ -609,7 +589,7 @@ EAPI void enesim_renderer_blur_radius_x_set(Enesim_Renderer *r, double rx)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 
 	thiz->rx = rx;
 }
@@ -622,7 +602,7 @@ EAPI double enesim_renderer_blur_radius_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 
 	return thiz->rx;
 }
@@ -636,7 +616,7 @@ EAPI void enesim_renderer_blur_radius_y_set(Enesim_Renderer *r, double ry)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 
 	thiz->ry = ry;
 }
@@ -649,7 +629,7 @@ EAPI double enesim_renderer_blur_radius_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Blur *thiz;
 
-	thiz = _blur_get(r);
+	thiz = ENESIM_RENDERER_BLUR(r);
 
 	return thiz->ry;
 }

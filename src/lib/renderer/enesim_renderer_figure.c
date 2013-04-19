@@ -42,30 +42,21 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_FIGURE_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_FIGURE_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_FIGURE_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_FIGURE(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Figure, enesim_renderer_figure_descriptor_get())
 
 typedef struct _Enesim_Renderer_Figure
 {
-	EINA_MAGIC
+	Enesim_Renderer_Shape_Path parent;
 	Enesim_Figure *figure;
 	Enesim_Polygon *last_polygon;
 	Eina_Bool changed :1;
 	Eina_Bool generated :1;
 } Enesim_Renderer_Figure;
 
-static inline Enesim_Renderer_Figure * _figure_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Figure *thiz;
-
-	thiz = enesim_renderer_shape_path_data_get(r);
-	ENESIM_RENDERER_FIGURE_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Figure_Class {
+	Enesim_Renderer_Shape_Path_Class parent;
+} Enesim_Renderer_Figure_Class;
 
 static void _figure_generate_commands(Enesim_Renderer_Figure *thiz,
 		Enesim_Renderer *path)
@@ -110,7 +101,7 @@ static Eina_Bool _figure_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(r);
 	return thiz->changed;
 }
 
@@ -125,7 +116,7 @@ static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 {
 	Enesim_Renderer_Figure *thiz;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(r);
 	if (!enesim_figure_polygon_count(thiz->figure))
 	{
 		/* TODO no polys do nothing, l? ok? */
@@ -146,32 +137,56 @@ static void _figure_cleanup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(r);
 	thiz->changed = EINA_FALSE;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_SHAPE_PATH_DESCRIPTOR,
+		Enesim_Renderer_Figure, Enesim_Renderer_Figure_Class,
+		enesim_renderer_figure);
 
-static void _figure_free(Enesim_Renderer *r)
+static void _enesim_renderer_figure_class_init(void *k)
+{
+	Enesim_Renderer_Class *r_klass;
+	Enesim_Renderer_Shape_Class *s_klass;
+	Enesim_Renderer_Shape_Path_Class *klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _figure_base_name_get;
+
+	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	s_klass->features_get = _figure_shape_features_get;
+
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS(k);
+	klass->has_changed = _figure_has_changed;
+	klass->setup = _figure_setup;
+	klass->cleanup = _figure_cleanup;
+}
+
+static void _enesim_renderer_figure_instance_init(void *o)
 {
 	Enesim_Renderer_Figure *thiz;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(o);
+	/* to maintain compatibility */
+	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
+			ENESIM_SHAPE_STROKE_INSIDE);
+	thiz->figure = enesim_figure_new();
+}
+
+static void _enesim_renderer_figure_instance_deinit(void *o EINA_UNUSED)
+{
+	Enesim_Renderer_Figure *thiz;
+
+	thiz = ENESIM_RENDERER_FIGURE(o);
 	if (thiz->figure)
 	{
 		enesim_figure_delete(thiz->figure);
 		thiz->figure = NULL;
 	}
-	free(thiz);
 }
-
-static Enesim_Renderer_Shape_Path_Descriptor _figure_descriptor = {
-	/* .base_name_get = 		*/ _figure_base_name_get,
-	/* .free = 			*/ _figure_free,
-	/* .has_changed = 		*/ _figure_has_changed,
-	/* .shape_features_get =	*/ _figure_shape_features_get,
-	/* .bounds_get = 			*/ NULL,
-	/* .setup = 			*/ _figure_setup,
-	/* .cleanup = 			*/ _figure_cleanup,
-};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -185,14 +200,8 @@ static Enesim_Renderer_Shape_Path_Descriptor _figure_descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Figure *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Figure));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_FIGURE_MAGIC);
-	thiz->figure = enesim_figure_new();
-
-	r = enesim_renderer_shape_path_new(&_figure_descriptor, thiz);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_figure);
 	return r;
 }
 
@@ -205,7 +214,7 @@ EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *r)
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Polygon *p;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(r);
 
 	p = enesim_polygon_new();
 	enesim_figure_polygon_append(thiz->figure, p);
@@ -225,7 +234,7 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Polygon *p;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(r);
 
 	p = thiz->last_polygon;
 	if (!p) return;
@@ -243,7 +252,7 @@ EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r, Eina_Bool clo
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Polygon *p;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(r);
 
 	p = thiz->last_polygon;
 	if (!p) return;
@@ -261,7 +270,7 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
 
-	thiz = _figure_get(r);
+	thiz = ENESIM_RENDERER_FIGURE(r);
 	enesim_figure_clear(thiz->figure);
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;

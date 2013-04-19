@@ -24,6 +24,9 @@
 #define ENESIM_OBJECT_CLASS_CHECK(i, type, d) (type*)i
 #endif
 
+#define ENESIM_OBJECT_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, \
+		Enesim_Object_Class, ENESIM_OBJECT_DESCRIPTOR)
+
 typedef struct _Enesim_Object_Class {
 	Enesim_Object_Descriptor *descriptor;
 } Enesim_Object_Class;

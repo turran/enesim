@@ -76,31 +76,15 @@ static void _enesim_renderer_factory_free(void *data)
 	free(f);
 }
 /*----------------------------------------------------------------------------*
- *                            Object definition                               *
- *----------------------------------------------------------------------------*/
-static void _enesim_renderer_class_init(void *k)
-{
-
-}
-
-static void _enesim_renderer_instance_init(void *o)
-{
-
-}
-
-static void _enesim_renderer_instance_deinit(void *o)
-{
-
-}
-/*----------------------------------------------------------------------------*
  *                     Functions to transform the bounds                      *
  *----------------------------------------------------------------------------*/
 static inline void _enesim_renderer_bounds(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
-	if (r->descriptor.bounds_get)
+	Enesim_Renderer_Class *klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (klass->bounds_get)
 	{
-		r->descriptor.bounds_get(r, bounds);
+		klass->bounds_get(r, bounds);
 	}
 	else
 	{
@@ -330,9 +314,12 @@ static inline void _surface_bounds(Enesim_Surface *s, Eina_Rectangle *bounds)
 
 static const char * _base_name_get(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Class *k;
 	const char *descriptor_name = NULL;
-	if (r->descriptor.base_name_get)
-		descriptor_name = r->descriptor.base_name_get(r);
+
+	k = ENESIM_RENDERER_CLASS_GET(r);
+	if (k->base_name_get)
+		descriptor_name = k->base_name_get(r);
 	if (!descriptor_name)
 		descriptor_name = "unknown";
 
@@ -341,11 +328,14 @@ static const char * _base_name_get(Enesim_Renderer *r)
 
 static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Class *k;
 	Enesim_Renderer_Factory *f;
 	char renderer_name[PATH_MAX];
 	const char *descriptor_name = NULL;
 
 	if (!_factories) return;
+
+	k = ENESIM_RENDERER_CLASS(k);
 	descriptor_name = _base_name_get(r);
 	f = eina_hash_find(_factories, descriptor_name);
 	if (!f)
@@ -357,7 +347,67 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 	snprintf(renderer_name, PATH_MAX, "%s%d", descriptor_name, f->id++);
 	enesim_renderer_name_set(r, renderer_name);
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+static void _enesim_renderer_class_init(void *k)
+{
+	Enesim_Object_Class *object_klass;
+	Enesim_Renderer_Class *klass;
+	const char *dname;
 
+	object_klass = ENESIM_OBJECT_CLASS(k);
+	dname = enesim_object_descriptor_name_get(object_klass->descriptor);
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	/* check the passed in functions */
+	if (!klass->is_inside)
+		WRN("No is_inside() function available on '%s'", dname);
+	if (!klass->bounds_get)
+		WRN("No bounding() function available on '%s'", dname);
+	if (!klass->features_get)
+		WRN("No features() function available on '%s'", dname);
+	if (!klass->sw_setup)
+		WRN("No sw_setup() function available on '%s'", dname);
+	if (!klass->sw_cleanup)
+		WRN("No sw_cleanup() function available on '%s'", dname);
+}
+
+static void _enesim_renderer_instance_init(void *o)
+{
+	Enesim_Renderer *thiz = ENESIM_RENDERER(o);
+
+	/* now initialize the renderer common properties */
+	EINA_MAGIC_SET(thiz, ENESIM_MAGIC_RENDERER);
+	/* private stuff */
+	_state_init(&thiz->state);
+	thiz->current_features_get = 0;
+	enesim_rectangle_coords_from(&thiz->past_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
+	eina_rectangle_coords_from(&thiz->past_destination_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
+	thiz->prv_data = eina_hash_string_superfast_new(NULL);
+	eina_lock_new(&thiz->lock);
+	/* always set the first reference */
+	thiz = enesim_renderer_ref(thiz);
+	_enesim_renderer_factory_setup(thiz);
+}
+
+static void _enesim_renderer_instance_deinit(void *o)
+{
+	Enesim_Renderer *thiz = ENESIM_RENDERER(o);
+
+	eina_lock_free(&thiz->lock);
+	eina_hash_free(thiz->prv_data);
+	/* remove all the private data */
+	enesim_renderer_sw_free(thiz);
+#if BUILD_OPENGL
+	enesim_renderer_opengl_free(thiz);
+#endif
+#if BUILD_OPENCL
+	enesim_renderer_opencl_free(thiz);
+#endif
+	/* finally */
+	_state_clear(&thiz->state);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -395,59 +445,6 @@ void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void
 const Enesim_Renderer_State * enesim_renderer_state_get(Enesim_Renderer *r)
 {
 	return &r->state;
-}
-
-Enesim_Renderer * enesim_renderer_new(Enesim_Renderer_Descriptor
-		*descriptor, void *data)
-{
-	Enesim_Renderer *r;
-	const char *bname;
-
-	if (!descriptor) return NULL;
-	if (descriptor->version > ENESIM_RENDERER_API) {
-		ERR("API version %d is greater than %d", descriptor->version, ENESIM_RENDERER_API);
-		return NULL;
-	}
-
-	r = calloc(1, sizeof(Enesim_Renderer));
-	r->descriptor = *descriptor;
-	r->data = data;
-	/* now initialize the renderer common properties */
-	EINA_MAGIC_SET(r, ENESIM_MAGIC_RENDERER);
-	/* private stuff */
-	_state_init(&r->state);
-	r->current_features_get = 0;
-	enesim_rectangle_coords_from(&r->past_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-	eina_rectangle_coords_from(&r->past_destination_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-	r->prv_data = eina_hash_string_superfast_new(NULL);
-	eina_lock_new(&r->lock);
-	/* always set the first reference */
-	r = enesim_renderer_ref(r);
-	_enesim_renderer_factory_setup(r);
-
-	/* check the passed in functions */
-	bname = _base_name_get(r);
-	if (!descriptor->is_inside)
-		WRN("No is_inside() function available on '%s'", bname);
-	if (!descriptor->bounds_get)
-		WRN("No bounding() function available on '%s'", bname);
-	if (!descriptor->features_get)
-		WRN("No features() function available on '%s'", bname);
-	if (!descriptor->sw_setup)
-		WRN("No sw_setup() function available on '%s'", bname);
-	if (!descriptor->sw_cleanup)
-		WRN("No sw_cleanup() function available on '%s'", bname);
-	if (!descriptor->free)
-		WRN("No free() function available on '%s'", bname);
-
-	return r;
-}
-
-void * enesim_renderer_data_get(Enesim_Renderer *r)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-
-	return r->data;
 }
 
 void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to)
@@ -516,21 +513,7 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 	r->ref--;
 	if (!r->ref)
 	{
-		if (r->descriptor.free)
-			r->descriptor.free(r);
-		eina_lock_free(&r->lock);
-		eina_hash_free(r->prv_data);
-		/* remove all the private data */
-		enesim_renderer_sw_free(r);
-#if BUILD_OPENGL
-		enesim_renderer_opengl_free(r);
-#endif
-#if BUILD_OPENCL
-		enesim_renderer_opencl_free(r);
-#endif
-		/* finally */
-		_state_clear(&r->state);
-		free(r);
+		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(r));
 	}
 }
 
@@ -678,7 +661,10 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
  */
 EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features)
 {
+	Enesim_Renderer_Class *klass;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 
 	if (!features) return;
 	*features = 0;
@@ -687,9 +673,9 @@ EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Featu
 		*features = r->current_features_get;
 		return;
 	}
-	if (r->descriptor.features_get)
+	if (klass->features_get)
 	{
-		r->descriptor.features_get(r, features);
+		klass->features_get(r, features);
 		return;
 	}
 }
@@ -1037,10 +1023,14 @@ EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r,
  */
 EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints)
 {
+	Enesim_Renderer_Class *klass;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+
 	if (!hints) return;
-	if (r->descriptor.sw_hints_get)
-		r->descriptor.sw_hints_get(r, hints);
+	if (klass->sw_hints_get)
+		klass->sw_hints_get(r, hints);
 	else
 		*hints = 0;
 }
@@ -1051,8 +1041,12 @@ EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hi
  */
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 {
+	Enesim_Renderer_Class *klass;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->descriptor.is_inside) return r->descriptor.is_inside(r, x, y);
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+
+	if (klass->is_inside) return klass->is_inside(r, x, y);
 	return EINA_TRUE;
 }
 
@@ -1233,9 +1227,11 @@ EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
  */
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Class *klass;
 	Eina_Bool ret = EINA_TRUE;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 #if 0
 	/* in case the renderer has not notified about a change just return
 	 * false
@@ -1249,9 +1245,9 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 
 	/* if the renderer does not has the descriptor
 	 * function we assume it is always true */
-	if (r->descriptor.has_changed)
+	if (klass->has_changed)
 	{
-		ret = r->descriptor.has_changed(r);
+		ret = klass->has_changed(r);
 	}
 	else
 	{
@@ -1271,7 +1267,10 @@ done:
  */
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
+	Enesim_Renderer_Class *klass;
+
 	ENESIM_MAGIC_CHECK_RENDERER(r);
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 
 	if (!cb) return;
 #if 0
@@ -1281,9 +1280,9 @@ EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage
 	/* use the internal has changed function */
 #endif
 
-	if (r->descriptor.damages_get)
+	if (klass->damages_get)
 	{
-		r->descriptor.damages_get(r, &r->past_destination_bounds, cb,
+		klass->damages_get(r, &r->past_destination_bounds, cb,
 				data);
 	}
 	else

@@ -52,14 +52,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_CACHE_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_CACHE_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_CACHE_MAGIC);\
-	} while(0)
-
 typedef struct _Enesim_Renderer_Cache {
-	EINA_MAGIC
+	Enesim_Renderer_Base parent;
 	/* the properties */
 	/* generated at state setup */
 	Enesim_Renderer_Sw_Fill fill;

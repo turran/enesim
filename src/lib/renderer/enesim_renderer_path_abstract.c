@@ -41,78 +41,34 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef struct _Enesim_Renderer_Path_Abstract
-{
-	Enesim_Renderer_Path_Abstract_Commands_Set_Cb commands_set;
-	Enesim_Renderer_Delete_Cb free;
-	void *data;
-} Enesim_Renderer_Path_Abstract;
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_RENDERER_SHAPE_DESCRIPTOR,
+		Enesim_Renderer_Path_Abstract,
+		Enesim_Renderer_Path_Abstract_Class,
+		enesim_renderer_path_abstract);
 
-static Enesim_Renderer_Path_Abstract * _path_abstract_get(Enesim_Renderer *r)
+static void _enesim_renderer_path_abstract_class_init(void *k EINA_UNUSED)
 {
-	Enesim_Renderer_Path_Abstract *thiz;
-	thiz = enesim_renderer_shape_data_get(r);
-	return thiz;
 }
 
-static void _path_abstract_free(Enesim_Renderer *r)
+static void _enesim_renderer_path_abstract_instance_init(void *o EINA_UNUSED)
 {
-	Enesim_Renderer_Path_Abstract *thiz;
-	thiz = enesim_renderer_shape_data_get(r);
-	thiz->free(r);
-	free(thiz);
+}
+
+static void _enesim_renderer_path_abstract_instance_deinit(void *o EINA_UNUSED)
+{
 }
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Renderer * enesim_renderer_path_abstract_new(Enesim_Renderer_Path_Abstract_Descriptor *descriptor, void *data)
-{
-	Enesim_Renderer_Path_Abstract *thiz;
-	Enesim_Renderer_Shape_Descriptor pdescriptor;
-	Enesim_Renderer *r;
-
-	thiz = calloc(1, sizeof(Enesim_Renderer_Path_Abstract));
-	thiz->data = data;
-	thiz->free = descriptor->free;
-	thiz->commands_set = descriptor->commands_set;
-
-	pdescriptor.version = descriptor->version;
-	pdescriptor.base_name_get = descriptor->base_name_get;
-	pdescriptor.free = _path_abstract_free;
-	pdescriptor.bounds_get = descriptor->bounds_get;
-	pdescriptor.features_get = descriptor->features_get;
-	pdescriptor.is_inside = descriptor->is_inside;
-	pdescriptor.damages_get = descriptor->damages_get;
-	pdescriptor.has_changed = descriptor->has_changed;
-	pdescriptor.sw_hints_get = descriptor->sw_hints_get;
-	pdescriptor.sw_setup = descriptor->sw_setup;
-	pdescriptor.sw_cleanup = descriptor->sw_cleanup;
-	pdescriptor.opengl_initialize = descriptor->opengl_initialize;
-	pdescriptor.opengl_setup = descriptor->opengl_setup;
-	pdescriptor.opengl_cleanup = descriptor->opengl_cleanup;
-	pdescriptor.opencl_kernel_setup = descriptor->opencl_kernel_setup;
-	pdescriptor.opencl_setup = descriptor->opencl_setup;
-	pdescriptor.opencl_cleanup = descriptor->opencl_cleanup;
-	pdescriptor.shape_features_get = descriptor->shape_features_get;
-
-	r = enesim_renderer_shape_new(&pdescriptor, thiz);
-	return r;
-}
-
-void * enesim_renderer_path_abstract_data_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path_Abstract *thiz;
-
-	thiz = _path_abstract_get(r);
-	return thiz->data;
-}
-
 void enesim_renderer_path_abstract_commands_set(Enesim_Renderer *r, const Eina_List *commands)
 {
-	Enesim_Renderer_Path_Abstract *thiz;
+	Enesim_Renderer_Path_Abstract_Class *klass;
 
-	thiz = _path_abstract_get(r);
-	thiz->commands_set(r, commands);
+	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS_GET(r);
+	klass->commands_set(r, commands);
 }
 
 #if 0

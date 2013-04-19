@@ -48,19 +48,17 @@
  * - add support for sw and sh
  * - add support for qualities (good scaler, interpolate between the four neighbours)
  * - all the span functions have a memset ... that has to be fixed to:
- *   + whenever the color = 0, use a background renderer and call it directly
- *   + on sw hints check the same condition and use the background renderer hints
+ *   + whenever the color = 0, use a image renderer and call it directly
+ *   + on sw hints check the same condition and use the image renderer hints
  */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_image
 
-#define ENESIM_RENDERER_IMAGE_MAGIC_CHECK(d)\
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_IMAGE_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_IMAGE_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_IMAGE(o) ENESIM_OBJECT_INSTANCE_CHECK(o,	\
+		Enesim_Renderer_Image,					\
+		enesim_renderer_image_descriptor_get())
 
 typedef struct _Enesim_Renderer_Image_State
 {
@@ -71,7 +69,7 @@ typedef struct _Enesim_Renderer_Image_State
 
 typedef struct _Enesim_Renderer_Image
 {
-	EINA_MAGIC
+	Enesim_Renderer parent;
 	Enesim_Renderer_Image_State current;
 	Enesim_Renderer_Image_State past;
 	/* private */
@@ -91,16 +89,9 @@ typedef struct _Enesim_Renderer_Image
 	Eina_Bool src_changed : 1;
 } Enesim_Renderer_Image;
 
-
-static inline Enesim_Renderer_Image * _image_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Image *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	ENESIM_RENDERER_IMAGE_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Image_Class {
+	Enesim_Renderer_Class parent;
+} Enesim_Renderer_Image_Class;
 
 static void _image_transform_bounds(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Matrix *tx,
@@ -140,7 +131,7 @@ static void _image_transform_destination_bounds(Enesim_Renderer *r EINA_UNUSED,
 static void _argb8888_blend_span(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *src = thiz->src;
 	uint32_t *dst = ddata;
 
@@ -164,7 +155,7 @@ static void _argb8888_blend_span(Enesim_Renderer *r,
 static void _argb8888_image_no_scale_affine_fast(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -206,14 +197,14 @@ static void _argb8888_image_no_scale_affine_fast(Enesim_Renderer *r,
 static void _argb8888_image_no_scale_projective_fast(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 }
 
 /* fast - pre-scaling */
 static void _argb8888_image_scale_identity_fast(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -264,7 +255,7 @@ static void _argb8888_image_scale_identity_fast(Enesim_Renderer *r,
 static void _argb8888_image_scale_affine_fast(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -315,7 +306,7 @@ static void _argb8888_image_scale_affine_fast(Enesim_Renderer *r,
 static void _argb8888_image_scale_projective_fast(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 
 }
 
@@ -324,7 +315,7 @@ static void _argb8888_image_scale_projective_fast(Enesim_Renderer *r,
 static void _argb8888_image_no_scale_identity(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *src = thiz->src;
 	uint32_t *dst = ddata;
 
@@ -355,7 +346,7 @@ static void _argb8888_image_no_scale_identity(Enesim_Renderer *r,
 static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -419,14 +410,14 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 static void _argb8888_image_no_scale_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 }
 
 /* good - pre-scaling */
 static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -507,7 +498,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -589,7 +580,7 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 static void _argb8888_image_scale_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 
 }
 
@@ -598,7 +589,7 @@ static void _argb8888_image_scale_projective(Enesim_Renderer *r,
 static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src, *q;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -706,7 +697,7 @@ static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
 static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src, *q;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -818,7 +809,7 @@ static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 static void _argb8888_image_scale_d_d_identity(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src, *q;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -957,7 +948,7 @@ static void _argb8888_image_scale_d_d_identity(Enesim_Renderer *r,
 static void _argb8888_image_scale_d_u_affine(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -1061,7 +1052,7 @@ static void _argb8888_image_scale_d_u_affine(Enesim_Renderer *r,
 static void _argb8888_image_scale_u_d_affine(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -1166,7 +1157,7 @@ static void _argb8888_image_scale_u_d_affine(Enesim_Renderer *r,
 static void _argb8888_image_scale_d_d_affine(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
 	int sw = thiz->sw, sh = thiz->sh;
@@ -1302,26 +1293,26 @@ static void _argb8888_image_scale_d_d_affine(Enesim_Renderer *r,
 static void _argb8888_image_scale_d_u_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 }
 
 static void _argb8888_image_scale_u_d_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 }
 
 static void _argb8888_image_scale_d_d_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 }
 
 
 static void _a8_to_argb8888_noscale(Enesim_Renderer *r,
 		int x, int y, unsigned int len, uint32_t *dst)
 {
-	Enesim_Renderer_Image *thiz = _image_get(r);
+	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint8_t *src = (uint8_t *)thiz->src;
 	int sw = thiz->sw;
 
@@ -1364,7 +1355,7 @@ static void _image_bounds_get(Enesim_Renderer *r,
 	Enesim_Matrix m;
 	Enesim_Matrix_Type type;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz->current.s)
 	{
 		obounds.x = 0;
@@ -1396,7 +1387,7 @@ static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 	Enesim_Renderer_Image *thiz;
 	Eina_Rectangle *sd;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	thiz->span = NULL;
 	thiz->changed = EINA_FALSE;
 	thiz->src_changed = EINA_FALSE;
@@ -1419,7 +1410,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 	double x, y, w, h;
 	double ox, oy;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz->current.s)
 	{
 		WRN("No surface set");
@@ -1564,7 +1555,7 @@ static void _image_sw_image_hints(Enesim_Renderer *r,
 	enesim_renderer_rop_get(r, &rop);
 	if (rop != ENESIM_FILL)
 	{
-		Enesim_Renderer_Image *thiz = _image_get(r);
+		Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 
 		if (thiz->span)
 			*hints |= ENESIM_RENDERER_HINT_ROP;
@@ -1576,7 +1567,7 @@ static Eina_Bool _image_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (thiz->src_changed) return EINA_TRUE;
 	if (!thiz->changed) return EINA_FALSE;
 
@@ -1600,7 +1591,7 @@ static void _image_damages(Enesim_Renderer *r,
 	Eina_Rectangle bounds;
 
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	/* if we have changed just send the previous bounds
 	 * and the current one
 	 */
@@ -1638,37 +1629,66 @@ static void _image_damages(Enesim_Renderer *r,
 		}
 	}
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Image, Enesim_Renderer_Image_Class,
+		enesim_renderer_image);
 
-static void _image_free(Enesim_Renderer *r)
+static void _enesim_renderer_image_class_init(void *k)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _image_name;
+	klass->bounds_get = _image_bounds_get;
+	klass->features_get = _image_features_get;
+	klass->damages_get = _image_damages;
+	klass->has_changed = _image_has_changed;
+	klass->sw_hints_get = _image_sw_image_hints;
+	klass->sw_setup = _image_sw_state_setup;
+	klass->sw_cleanup = _image_sw_state_cleanup;
+	_spans_best[0][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
+	_spans_best[0][0][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
+	_spans_best[0][0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_projective;
+	_spans_best[1][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_d_u_identity;
+	_spans_best[1][0][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_d_u_affine;
+	_spans_best[1][0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_d_u_projective;
+	_spans_best[0][1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_u_d_identity;
+	_spans_best[0][1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_u_d_affine;
+	_spans_best[0][1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_u_d_projective;
+	_spans_best[1][1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_d_d_identity;
+	_spans_best[1][1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_d_d_affine;
+	_spans_best[1][1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_d_d_projective;
+
+	_spans_good[0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_no_scale_identity;
+	_spans_good[0][ENESIM_MATRIX_AFFINE] = _argb8888_image_no_scale_affine;
+	_spans_good[0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_no_scale_projective;
+	_spans_good[1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
+	_spans_good[1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
+	_spans_good[1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_projective;
+
+	_spans_fast[0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_no_scale_identity;
+	_spans_fast[0][ENESIM_MATRIX_AFFINE] = _argb8888_image_no_scale_affine_fast;
+	_spans_fast[0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_no_scale_projective_fast;
+	_spans_fast[1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity_fast;
+	_spans_fast[1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine_fast;
+	_spans_fast[1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_projective_fast;
+}
+
+static void _enesim_renderer_image_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_image_instance_deinit(void *o)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(o);
 	if (thiz->current.s)
 		enesim_surface_unref(thiz->current.s);
-	free(thiz);
 }
-
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .base_name_get = 		*/ _image_name,
-	/* .free = 			*/ _image_free,
-	/* .bounds_get = 		*/ _image_bounds_get,
-	/* .features_get = 		*/ _image_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damages_get = 		*/ _image_damages,
-	/* .has_changed = 		*/ _image_has_changed,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get =		*/ _image_sw_image_hints,
-	/* .sw_setup = 			*/ _image_sw_state_setup,
-	/* .sw_cleanup = 		*/ _image_sw_state_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_initialize =        	*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
-};
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -1682,47 +1702,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Image *thiz;
-	static Eina_Bool spans_initialized = EINA_FALSE;
 
-	if (!spans_initialized)
-	{
-		spans_initialized = EINA_TRUE;
-
-		_spans_best[0][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
-		_spans_best[0][0][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
-		_spans_best[0][0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_projective;
-		_spans_best[1][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_d_u_identity;
-		_spans_best[1][0][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_d_u_affine;
-		_spans_best[1][0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_d_u_projective;
-		_spans_best[0][1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_u_d_identity;
-		_spans_best[0][1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_u_d_affine;
-		_spans_best[0][1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_u_d_projective;
-		_spans_best[1][1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_d_d_identity;
-		_spans_best[1][1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_d_d_affine;
-		_spans_best[1][1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_d_d_projective;
-
-		_spans_good[0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_no_scale_identity;
-		_spans_good[0][ENESIM_MATRIX_AFFINE] = _argb8888_image_no_scale_affine;
-		_spans_good[0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_no_scale_projective;
-		_spans_good[1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
-		_spans_good[1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
-		_spans_good[1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_projective;
-
-		_spans_fast[0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_no_scale_identity;
-		_spans_fast[0][ENESIM_MATRIX_AFFINE] = _argb8888_image_no_scale_affine_fast;
-		_spans_fast[0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_no_scale_projective_fast;
-		_spans_fast[1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity_fast;
-		_spans_fast[1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine_fast;
-		_spans_fast[1][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_scale_projective_fast;
-	}
-
-	thiz = calloc(1, sizeof(Enesim_Renderer_Image));
-	if (!thiz) return NULL;
-
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMAGE_MAGIC);
-	r = enesim_renderer_new(&_descriptor, thiz);
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_image);
 	return r;
 }
 
@@ -1734,7 +1715,7 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	thiz->current.x = x;
 	thiz->changed = EINA_TRUE;
@@ -1748,7 +1729,7 @@ EAPI void enesim_renderer_image_x_get(Enesim_Renderer *r, double *x)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	if (x) *x = thiz->current.x;
 }
@@ -1761,7 +1742,7 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
@@ -1775,7 +1756,7 @@ EAPI void enesim_renderer_image_y_get(Enesim_Renderer *r, double *y)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	if (y) *y = thiz->current.y;
 }
@@ -1787,7 +1768,7 @@ EAPI void enesim_renderer_image_position_set(Enesim_Renderer *r, double x, doubl
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	thiz->current.x = x;
 	thiz->current.y = y;
@@ -1802,7 +1783,7 @@ EAPI void enesim_renderer_image_position_get(Enesim_Renderer *r, double *x, doub
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	if (x) *x = thiz->current.x;
 	if (y) *y = thiz->current.y;
@@ -1816,7 +1797,7 @@ EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	thiz->current.w = w;
 	thiz->changed = EINA_TRUE;
@@ -1830,7 +1811,7 @@ EAPI void enesim_renderer_image_width_get(Enesim_Renderer *r, double *w)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	if (w) *w = thiz->current.w;
 }
@@ -1843,7 +1824,7 @@ EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	thiz->current.h = h;
 	thiz->changed = EINA_TRUE;
@@ -1857,7 +1838,7 @@ EAPI void enesim_renderer_image_height_get(Enesim_Renderer *r, double *h)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	if (h) *h = thiz->current.h;
 }
@@ -1870,7 +1851,7 @@ EAPI void enesim_renderer_image_size_set(Enesim_Renderer *r, double w, double h)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	thiz->current.w = w;
 	thiz->current.h = h;
@@ -1885,7 +1866,7 @@ EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	if (w) *w = thiz->current.w;
 	if (h) *h = thiz->current.h;
@@ -1899,7 +1880,7 @@ EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 
 	if (thiz->current.s)
@@ -1918,7 +1899,7 @@ EAPI void enesim_renderer_image_src_get(Enesim_Renderer *r, Enesim_Surface **src
 {
 	Enesim_Renderer_Image *thiz;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!thiz) return;
 	if (*src)
 		*src = thiz->current.s;
@@ -1933,7 +1914,7 @@ EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, Eina_Rectangle *a
 	Enesim_Renderer_Image *thiz;
 	Eina_Rectangle *d;
 
-	thiz = _image_get(r);
+	thiz = ENESIM_RENDERER_IMAGE(r);
 
 	d = calloc(1, sizeof(Eina_Rectangle));
 	*d = *area;

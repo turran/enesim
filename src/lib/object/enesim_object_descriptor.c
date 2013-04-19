@@ -136,6 +136,11 @@ EAPI Enesim_Object_Descriptor * enesim_object_descriptor_get(void)
 	return thiz;
 }
 
+EAPI const char * enesim_object_descriptor_name_get(Enesim_Object_Descriptor *thiz)
+{
+	return thiz->name;
+}
+
 EAPI void * enesim_object_descriptor_instance_new(
 		Enesim_Object_Descriptor *thiz,
 		void *klass)
@@ -145,8 +150,8 @@ EAPI void * enesim_object_descriptor_instance_new(
 
 	if (!k->descriptor)
 	{
-		enesim_object_descriptor_class_init(thiz, k);
 		k->descriptor = thiz;
+		enesim_object_descriptor_class_init(thiz, k);
 	}
 
 	i = calloc(1, thiz->instance_size);

@@ -389,7 +389,7 @@ end:
 
 static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 		uint8_t *ddata, size_t stride,
-		Enesim_Format dfmt)
+		Enesim_Format dfmt EINA_UNUSED)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 
@@ -507,6 +507,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Log **error)
 {
+	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_Sw_Fill fill = NULL;
 	Enesim_Compositor_Span span = NULL;
 	Enesim_Renderer_Sw_Data *sw_data;
@@ -516,6 +517,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	Enesim_Rop rop;
 	const char *name;
 
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 	enesim_renderer_name_get(r, &name);
 	enesim_renderer_mask_get(r, &mask);
 	enesim_renderer_color_get(r, &color);
@@ -535,8 +537,8 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 			return EINA_FALSE;
 		}
 	}
-	if (!r->descriptor.sw_setup) return EINA_TRUE;
-	if (!r->descriptor.sw_setup(r, s, &fill, error))
+	if (!klass->sw_setup) return EINA_TRUE;
+	if (!klass->sw_setup(r, s, &fill, error))
 	{
 		WRN("Setup callback on '%s' failed", name);
 		return EINA_FALSE;
@@ -581,7 +583,9 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer *mask;
+	Enesim_Renderer_Class *klass;
 
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 	enesim_renderer_mask_get(r, &mask);
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
@@ -590,7 +594,7 @@ void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		enesim_renderer_cleanup(mask, s);
 		enesim_renderer_unref(mask);
 	}
-	if (r->descriptor.sw_cleanup) r->descriptor.sw_cleanup(r, s);
+	if (klass->sw_cleanup) klass->sw_cleanup(r, s);
 }
 
 void enesim_renderer_sw_free(Enesim_Renderer *r)

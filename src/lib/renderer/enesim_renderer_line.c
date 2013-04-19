@@ -43,12 +43,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_LINE_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_LINE_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_LINE_MAGIC);\
-	} while(0)
-
+#define ENESIM_RENDERER_LINE(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Line,					\
+		enesim_renderer_line_descriptor_get())
 
 typedef struct _Enesim_Renderer_Line_State
 {
@@ -60,7 +57,7 @@ typedef struct _Enesim_Renderer_Line_State
 
 typedef struct _Enesim_Renderer_Line
 {
-	EINA_MAGIC
+	Enesim_Renderer_Shape_Path parent;
 	/* properties */
 	Enesim_Renderer_Line_State current;
 	Enesim_Renderer_Line_State past;
@@ -68,15 +65,9 @@ typedef struct _Enesim_Renderer_Line
 	Eina_Bool generated;
 } Enesim_Renderer_Line;
 
-static inline Enesim_Renderer_Line * _line_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Line *thiz;
-
-	thiz = enesim_renderer_shape_path_data_get(r);
-	ENESIM_RENDERER_LINE_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Line_Class {
+	Enesim_Renderer_Shape_Path_Class parent;
+} Enesim_Renderer_Line_Class;
 
 static Eina_Bool _line_changed(Enesim_Renderer_Line *thiz)
 {
@@ -112,7 +103,7 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Line *thiz;
 	Eina_Bool ret;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	ret = _line_changed(thiz);
 	return ret;
 }
@@ -122,7 +113,7 @@ static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	/* the draw mode should be always a stroke only */
 	enesim_renderer_shape_draw_mode_set(path, ENESIM_SHAPE_DRAW_MODE_STROKE);
 	if (_line_changed(thiz) && !thiz->generated)
@@ -139,7 +130,7 @@ static void _line_cleanup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
@@ -148,24 +139,38 @@ static void _line_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shap
 {
 	*features = ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_SHAPE_PATH_DESCRIPTOR,
+		Enesim_Renderer_Line, Enesim_Renderer_Line_Class,
+		enesim_renderer_line);
 
-static void _line_free(Enesim_Renderer *r)
+static void _enesim_renderer_line_class_init(void *k)
 {
-	Enesim_Renderer_Line *thiz;
+	Enesim_Renderer_Class *r_klass;
+	Enesim_Renderer_Shape_Class *s_klass;
+	Enesim_Renderer_Shape_Path_Class *klass;
 
-	thiz = _line_get(r);
-	free(thiz);
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _line_name;
+
+	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	s_klass->features_get = _line_shape_features_get;
+
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS(k);
+	klass->has_changed = _line_has_changed;
+	klass->setup = _line_setup;
+	klass->cleanup = _line_cleanup;
 }
 
-static Enesim_Renderer_Shape_Path_Descriptor _line_descriptor = {
-	/* .name = 			*/ _line_name,
-	/* .free = 			*/ _line_free,
-	/* .has_changed = 		*/ _line_has_changed,
-	/* .shape_features_get =	*/ _line_shape_features_get,
-	/* .bounds_get = 			*/ NULL,
-	/* .setup = 			*/ _line_setup,
-	/* .cleanup = 			*/ _line_cleanup,
-};
+static void _enesim_renderer_line_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_line_instance_deinit(void *o EINA_UNUSED)
+{
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -183,13 +188,8 @@ static Enesim_Renderer_Shape_Path_Descriptor _line_descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Line *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Line));
-	if (!thiz) return NULL;
-
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_LINE_MAGIC);
-	r = enesim_renderer_shape_path_new(&_line_descriptor, thiz);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_line);
 	return r;
 }
 
@@ -206,7 +206,7 @@ EAPI void enesim_renderer_line_x0_set(Enesim_Renderer *r, double x0)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	thiz->current.x0 = x0;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
@@ -225,7 +225,7 @@ EAPI void enesim_renderer_line_x0_get(Enesim_Renderer *r, double *x0)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	*x0 = thiz->current.x0;
 }
 
@@ -242,7 +242,7 @@ EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	thiz->current.y0 = y0;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
@@ -261,7 +261,7 @@ EAPI void enesim_renderer_line_y0_get(Enesim_Renderer *r, double *y0)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	*y0 = thiz->current.y0;
 }
 
@@ -278,7 +278,7 @@ EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	thiz->current.x1 = x1;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
@@ -297,7 +297,7 @@ EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	*x1 = thiz->current.x1;
 }
 
@@ -314,7 +314,7 @@ EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	thiz->current.y1 = y1;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
@@ -333,7 +333,7 @@ EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	*y1 = thiz->current.y1;
 }
 
@@ -353,7 +353,7 @@ EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double 
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	thiz->current.x0 = x0;
 	thiz->current.y0 = y0;
 	thiz->current.x1 = x1;
@@ -379,7 +379,7 @@ EAPI void enesim_renderer_line_coords_get(Enesim_Renderer *r, double *x0, double
 {
 	Enesim_Renderer_Line *thiz;
 
-	thiz = _line_get(r);
+	thiz = ENESIM_RENDERER_LINE(r);
 	if (x0) *x0 = thiz->current.x0;
 	if (y0) *y0 = thiz->current.y0;
 	if (x1) *x1 = thiz->current.x1;

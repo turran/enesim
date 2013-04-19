@@ -271,12 +271,14 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Log **error)
 {
+	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Draw draw;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	GLenum status;
 	int i;
 
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
@@ -288,7 +290,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Data));
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENGL, rdata);
-		if (r->descriptor.opengl_initialize)
+		if (klass->opengl_initialize)
 		{
 			Enesim_Renderer_OpenGL_Program **programs = NULL;
 			Enesim_Renderer_OpenGL_Program_Data *pdata;
@@ -309,7 +311,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 				goto setup;
 			}
 			pdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Program_Data));
-			if (!r->descriptor.opengl_initialize(r, &num, &programs))
+			if (!klass->opengl_initialize(r, &num, &programs))
 				return EINA_FALSE;
 			pdata->programs = programs;
 			pdata->num_programs = num;
@@ -337,8 +339,8 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	}
 setup:
 	/* do the setup */
-	if (!r->descriptor.opengl_setup) return EINA_FALSE;
-	if (!r->descriptor.opengl_setup(r, s,
+	if (!klass->opengl_setup) return EINA_FALSE;
+	if (!klass->opengl_setup(r, s,
 			&draw,
 			error))
 		return EINA_FALSE;
@@ -375,8 +377,11 @@ setup:
 
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	if (!r->descriptor.opengl_cleanup) return;
-	r->descriptor.opengl_cleanup(r, s);
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (!klass->opengl_cleanup) return;
+	klass->opengl_cleanup(r, s);
 }
 
 /* FIXME this should be exported and normalize in the same way as the one on the enesim_renderer_sw.c

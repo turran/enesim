@@ -43,6 +43,10 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_RASTERIZER_BASIC(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Rasterizer_Basic,					\
+		enesim_rasterizer_basic_descriptor_get())
+
 #ifndef MIN
 # define MIN(a,b) ((a) < (b)) ? (a) : (b)
 #endif
@@ -62,13 +66,6 @@
 	  ((((c >> 16) & 0xff) * a) & 0xff0000) + \
 	  ((((c & 0xff00) * a) >> 16) & 0xff00) + \
 	  ((((c & 0xff) * a) >> 16) & 0xff) )
-
-#define ENESIM_RASTERIZER_BASIC_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RASTERIZER_BASIC_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RASTERIZER_BASIC_MAGIC);\
-	} while(0)
-
 
 /* State generated at the state_setup process
  * the colors are already multiplied by the renderer color
@@ -108,7 +105,7 @@ typedef struct _Enesim_Rasterizer_Basic_State
 
 typedef struct _Enesim_Rasterizer_Basic
 {
-	EINA_MAGIC
+	Enesim_Rasterizer parent;
 	/* private */
 	Enesim_F16p16_Vector *vectors;
 	int nvectors;
@@ -124,15 +121,9 @@ typedef struct _Enesim_Rasterizer_Basic
 	Enesim_F16p16_Matrix matrix;
 } Enesim_Rasterizer_Basic;
 
-static inline Enesim_Rasterizer_Basic * _basic_get(Enesim_Renderer *r)
-{
-	Enesim_Rasterizer_Basic *thiz;
-
-	thiz = enesim_rasterizer_data_get(r);
-	ENESIM_RASTERIZER_BASIC_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Rasterizer_Basic_Class {
+	Enesim_Rasterizer_Class parent;
+} Enesim_Rasterizer_Basic_Class;
 
 #define SETUP_EDGES \
 	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
@@ -290,7 +281,7 @@ repeat: \
 static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
@@ -455,7 +446,7 @@ get_out:
 static void _stroke_paint_fill_nz(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
@@ -562,7 +553,7 @@ get_out:
 static void _stroke_paint_fill_paint_nz(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
@@ -736,7 +727,7 @@ get_out:
 static void _stroke_fill_paint_eo(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
@@ -902,7 +893,7 @@ get_out:
 static void _stroke_paint_fill_eo(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
@@ -1010,7 +1001,7 @@ get_out:
 static void _stroke_paint_fill_paint_eo(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
-	Enesim_Rasterizer_Basic *thiz = _basic_get(r);
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
 	Enesim_Color color;
 	Enesim_Color fcolor;
@@ -1133,21 +1124,11 @@ static const char * _basic_name(Enesim_Renderer *r EINA_UNUSED)
 	return "basic";
 }
 
-static void _basic_free(Enesim_Renderer *r)
-{
-	Enesim_Rasterizer_Basic *thiz;
-
-	thiz = _basic_get(r);
-	if (thiz->vectors)
-		free(thiz->vectors);
-	free(thiz);
-}
-
 static void _basic_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
 {
 	Enesim_Rasterizer_Basic *thiz;
 
-	thiz = _basic_get(r);
+	thiz = ENESIM_RASTERIZER_BASIC(r);
 	thiz->figure = figure;
 	thiz->changed = EINA_TRUE;
 }
@@ -1174,7 +1155,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	Enesim_Shape_Fill_Rule fill_rule;
 	Enesim_Matrix matrix;
 
-	thiz = _basic_get(r);
+	thiz = ENESIM_RASTERIZER_BASIC(r);
 	state = &thiz->state;
 	if (!thiz->figure)
 	{
@@ -1453,35 +1434,54 @@ static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s 
 	Enesim_Rasterizer_Basic *thiz;
 	Enesim_Rasterizer_Basic_State *state;
 
-	thiz = _basic_get(r);
+	thiz = ENESIM_RASTERIZER_BASIC(r);
 	state = &thiz->state;
 	if (state->fill.r)
 		enesim_renderer_unref(state->fill.r);
 	if (state->stroke.r)
 		enesim_renderer_unref(state->stroke.r);
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RASTERIZER_DESCRIPTOR,
+		Enesim_Rasterizer_Basic, Enesim_Rasterizer_Basic_Class,
+		enesim_rasterizer_basic);
 
-static Enesim_Rasterizer_Descriptor _descriptor = {
-	/* .name = 		*/ _basic_name,
-	/* .free = 		*/ _basic_free,
-	/* .features_get =		*/ NULL,
-	/* .sw_setup = 		*/ _basic_sw_setup,
-	/* .sw_cleanup = 	*/ _basic_sw_cleanup,
-	/* .shape_features_get = 	*/ NULL,
-	/* .figure_set =	*/ _basic_figure_set,
-};
+static void _enesim_rasterizer_basic_class_init(void *k)
+{
+	Enesim_Renderer_Class *r_klass;
+	Enesim_Rasterizer_Class *klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _basic_name;
+	r_klass->sw_setup = _basic_sw_setup;
+	r_klass->sw_cleanup = _basic_sw_cleanup;
+
+	klass = ENESIM_RASTERIZER_CLASS(k);
+	klass->figure_set = _basic_figure_set;
+}
+
+static void _enesim_rasterizer_basic_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_rasterizer_basic_instance_deinit(void *o)
+{
+	Enesim_Rasterizer_Basic *thiz;
+
+	thiz = ENESIM_RASTERIZER_BASIC(o);
+	if (thiz->vectors)
+		free(thiz->vectors);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Enesim_Renderer * enesim_rasterizer_basic_new(void)
 {
-	Enesim_Rasterizer_Basic *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Enesim_Rasterizer_Basic));
-	r = enesim_rasterizer_new(&_descriptor, thiz);
-	EINA_MAGIC_SET(thiz, ENESIM_RASTERIZER_BASIC_MAGIC);
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_rasterizer_basic);
 	return r;
 }
 
@@ -1490,7 +1490,7 @@ void enesim_rasterizer_basic_vectors_get(Enesim_Renderer *r, int *nvectors,
 {
 	Enesim_Rasterizer_Basic *thiz;
 
-	thiz = _basic_get(r);
+	thiz = ENESIM_RASTERIZER_BASIC(r);
 	*nvectors = thiz->nvectors;
 	*vectors = thiz->vectors;
 }

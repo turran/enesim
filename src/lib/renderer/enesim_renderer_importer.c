@@ -36,30 +36,22 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_IMPORTER_MAGIC_CHECK(d)\
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_IMPORTER_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_IMPORTER_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_IMPORTER(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Importer,					\
+		enesim_renderer_importer_descriptor_get())
 
 typedef struct _Enesim_Renderer_Importer
 {
-	EINA_MAGIC
+	Enesim_Renderer parent;
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
 	Enesim_Buffer_Format cfmt;
 	Enesim_Angle angle;
 } Enesim_Renderer_Importer;
 
-static inline Enesim_Renderer_Importer * _importer_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Importer *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	ENESIM_RENDERER_IMPORTER_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Importer_Class {
+	Enesim_Renderer_Class parent;
+} Enesim_Renderer_Importer_Class;
 
 static void _span_argb8888_none_argb8888(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
@@ -69,7 +61,7 @@ static void _span_argb8888_none_argb8888(Enesim_Renderer *r,
 	uint32_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(r);
+	thiz = ENESIM_RENDERER_IMPORTER(r);
 	ssrc = thiz->cdata.argb8888.plane0;
 	stride = thiz->cdata.argb8888.plane0_stride;
 	ssrc = (uint32_t *)((uint8_t *)ssrc + (stride * y) + x);
@@ -98,7 +90,7 @@ static void _span_a8_none_argb8888(Enesim_Renderer *r,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(r);
+	thiz = ENESIM_RENDERER_IMPORTER(r);
  	ssrc = thiz->cdata.a8.plane0;
 	stride = thiz->cdata.a8.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -119,7 +111,7 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *rend,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(rend);
+	thiz = ENESIM_RENDERER_IMPORTER(rend);
  	ssrc = thiz->cdata.rgb888.plane0;
 	stride = thiz->cdata.rgb888.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -144,7 +136,7 @@ static void _span_bgr888_none_argb8888(Enesim_Renderer *rend,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(rend);
+	thiz = ENESIM_RENDERER_IMPORTER(rend);
  	ssrc = thiz->cdata.bgr888.plane0;
 	stride = thiz->cdata.bgr888.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -184,7 +176,7 @@ static void _span_cmyk_none_argb8888(Enesim_Renderer *rend,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(rend);
+	thiz = ENESIM_RENDERER_IMPORTER(rend);
  	ssrc = thiz->cdata.cmyk.plane0;
 	stride = thiz->cdata.cmyk.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -213,7 +205,7 @@ static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *rend,
 	uint8_t *ssrc;
 	size_t stride;
 
-	thiz = _importer_get(rend);
+	thiz = ENESIM_RENDERER_IMPORTER(rend);
  	ssrc = thiz->cdata.cmyk.plane0;
 	stride = thiz->cdata.cmyk.plane0_stride;
 	ssrc = ssrc + (stride * y) + x;
@@ -244,7 +236,7 @@ static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Importer *thiz;
 
-	thiz = _importer_get(r);
+	thiz = ENESIM_RENDERER_IMPORTER(r);
 	if (!thiz->buffer) return EINA_FALSE;
 
 	enesim_buffer_data_get(thiz->buffer, &thiz->cdata);
@@ -289,7 +281,7 @@ static void _importer_bounds(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Importer *thiz;
 
-	thiz = _importer_get(r);
+	thiz = ENESIM_RENDERER_IMPORTER(r);
 	if (thiz->buffer)
 	{
 		int w, h;
@@ -309,40 +301,36 @@ static void _importer_bounds(Enesim_Renderer *r,
 	}
 }
 
-static void _importer_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Importer *thiz;
-
-	thiz = _importer_get(r);
-	free(thiz);
-}
-
 static void _importer_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Feature *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Importer, Enesim_Renderer_Importer_Class,
+		enesim_renderer_importer);
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .base_name_get = 		*/ _importer_name,
-	/* .free =			*/ _importer_free,
-	/* .bounds_get = 		*/ _importer_bounds,
- 	/* .features_get = 		*/ _importer_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damages_get = 		*/ NULL,
-	/* .has_changed = 		*/ NULL,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get = 		*/ NULL,
-	/* .sw_setup =			*/ _importer_state_setup,
-	/* .sw_cleanup = 		*/ NULL,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_initilize =         	*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
-};
+static void _enesim_renderer_importer_class_init(void *k)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _importer_name;
+	klass->bounds_get = _importer_bounds;
+ 	klass->features_get = _importer_features_get;
+	klass->sw_setup =  _importer_state_setup;
+}
+
+static void _enesim_renderer_importer_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_importer_instance_deinit(void *o EINA_UNUSED)
+{
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -358,15 +346,9 @@ static Enesim_Renderer_Descriptor _descriptor = {
  */
 EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 {
-	Enesim_Renderer_Importer *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Importer));
-	if (!thiz) return NULL;
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_IMPORTER_MAGIC);
-
-	r = enesim_renderer_new(&_descriptor, thiz);
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_importer);
 	return r;
 }
 /**
@@ -378,7 +360,7 @@ EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle an
 {
 	Enesim_Renderer_Importer *thiz;
 
-	thiz = _importer_get(r);
+	thiz = ENESIM_RENDERER_IMPORTER(r);
 	thiz->angle = angle;
 }
 
@@ -391,7 +373,7 @@ EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer 
 {
 	Enesim_Renderer_Importer *thiz;
 
-	thiz = _importer_get(r);
+	thiz = ENESIM_RENDERER_IMPORTER(r);
 	if (thiz->buffer)
 		enesim_buffer_unref(thiz->buffer);
 	thiz->buffer = buffer;

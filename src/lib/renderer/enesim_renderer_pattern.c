@@ -47,6 +47,10 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_pattern
 
+#define ENESIM_RENDERER_PATTERN(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Pattern,					\
+		enesim_renderer_pattern_descriptor_get())
+
 typedef struct _Enesim_Renderer_Pattern_State
 {
 	double x;
@@ -70,13 +74,9 @@ typedef struct _Enesim_Renderer_Pattern {
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Pattern;
 
-static inline Enesim_Renderer_Pattern * _pattern_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Pattern *thiz;
-
-	thiz = enesim_renderer_data_get(r);
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Pattern_Class {
+	Enesim_Renderer_Class parent;
+} Enesim_Renderer_Pattern_Class;
 
 static void _pattern_tile_source_size(Enesim_Renderer_Pattern *thiz,
 		Enesim_Renderer *r,
@@ -187,7 +187,7 @@ static void _argb8888_repeat_span_identity(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 	uint32_t *src;
 	int sw = thiz->cache_w;
 	int sh = thiz->cache_h;
@@ -223,7 +223,7 @@ static void _argb8888_repeat_span_affine(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -231,7 +231,7 @@ static void _argb8888_repeat_span_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -239,7 +239,7 @@ static void _argb8888_reflect_span_identity(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 	uint32_t *src;
 	int sw = thiz->cache_w;
 	int sh = thiz->cache_h;
@@ -269,7 +269,7 @@ static void _argb8888_reflect_span_affine(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -277,7 +277,7 @@ static void _argb8888_reflect_span_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -285,7 +285,7 @@ static void _argb8888_restrict_span_identity(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 	uint32_t *src;
 	int sw = thiz->cache_w;
 	int sh = thiz->cache_h;
@@ -318,7 +318,7 @@ static void _argb8888_restrict_span_affine(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -326,7 +326,7 @@ static void _argb8888_restrict_span_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -334,7 +334,7 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r,
 		int x, int y,
 		unsigned int len, void *ddata)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 	uint32_t *src;
 	int sw = thiz->current.width;
 	int sh = thiz->current.height;
@@ -367,7 +367,7 @@ static void _argb8888_pad_span_affine(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -375,7 +375,7 @@ static void _argb8888_pad_span_projective(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED,
 		unsigned int len EINA_UNUSED, void *ddata EINA_UNUSED)
 {
-	Enesim_Renderer_Pattern *thiz = _pattern_get(r);
+	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -395,7 +395,7 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Pattern *thiz;
 	Enesim_Matrix_Type type;
 
- 	thiz = _pattern_get(r);
+ 	thiz = ENESIM_RENDERER_PATTERN(r);
 
 	/* do the common setup */
 	enesim_renderer_transformation_type_get(r, &type);
@@ -409,7 +409,7 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 {
 	Enesim_Renderer_Pattern *thiz;
 
- 	thiz = _pattern_get(r);
+ 	thiz = ENESIM_RENDERER_PATTERN(r);
 	enesim_renderer_color_set(thiz->current.source, thiz->src_color);
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
@@ -430,22 +430,12 @@ static void _pattern_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
-static void _pattern_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Pattern *thiz;
-
-	thiz = _pattern_get(r);
-	if (thiz->cache)
-		enesim_surface_unref(thiz->cache);
-	free(thiz);
-}
-
 static void _pattern_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (thiz->current.repeat_mode == ENESIM_RESTRICT)
 	{
 		_pattern_tile_source_size(thiz, r, bounds);
@@ -460,7 +450,7 @@ static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (thiz->current.source)
 	{
 		if (enesim_renderer_has_changed(thiz->current.source))
@@ -496,27 +486,51 @@ static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 
 	return EINA_FALSE;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
+		Enesim_Renderer_Pattern, Enesim_Renderer_Pattern_Class,
+		enesim_renderer_pattern);
 
-static Enesim_Renderer_Descriptor _descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .base_name_get = 		*/ _pattern_name,
-	/* .free = 			*/ _pattern_free,
-	/* .bounds_get = 		*/ _pattern_bounds_get,
-	/* .features_get = 		*/ _pattern_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damages_get = 		*/ NULL,
-	/* .has_changed = 		*/ _pattern_has_changed,
-	/* .alpha_hints_get =		*/ NULL,
-	/* .sw_hints_get = 		*/ _pattern_sw_hints,
-	/* .sw_setup = 			*/ _pattern_sw_setup,
-	/* .sw_cleanup = 		*/ _pattern_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
-	/* .opengl_initialize = 	*/ NULL,
-	/* .opengl_setup =          	*/ NULL,
-	/* .opengl_cleanup =        	*/ NULL
-};
+static void _enesim_renderer_pattern_class_init(void *k)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _pattern_name;
+	klass->bounds_get = _pattern_bounds_get;
+	klass->features_get = _pattern_features_get;
+	klass->has_changed = _pattern_has_changed;
+	klass->sw_hints_get = _pattern_sw_hints;
+	klass->sw_setup = _pattern_sw_setup;
+	klass->sw_cleanup = _pattern_sw_cleanup;
+	_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
+	_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
+	_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
+	_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
+	_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
+	_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
+	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
+	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
+	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
+	_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
+	_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
+	_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+}
+
+static void _enesim_renderer_pattern_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_pattern_instance_deinit(void *o)
+{
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = ENESIM_RENDERER_PATTERN(o);
+	if (thiz->cache)
+		enesim_surface_unref(thiz->cache);
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -527,29 +541,8 @@ static Enesim_Renderer_Descriptor _descriptor = {
 EAPI Enesim_Renderer * enesim_renderer_pattern_new(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Renderer_Pattern *thiz;
-	static Eina_Bool spans_initialized = EINA_FALSE;
 
-	if (!spans_initialized)
-	{
-		spans_initialized = EINA_TRUE;
-		_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
-		_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
-		_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
-		_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
-		_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
-		_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
-		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
-		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
-		_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
-		_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
-		_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
-		_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
-	}
-
-	thiz = calloc(1, sizeof(Enesim_Renderer_Pattern));
-	if (!thiz) return NULL;
-	r = enesim_renderer_new(&_descriptor, thiz);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_pattern);
 	return r;
 }
 
@@ -562,7 +555,7 @@ EAPI void enesim_renderer_pattern_width_set(Enesim_Renderer *r, double width)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	thiz->current.width = width;
 	thiz->changed = EINA_TRUE;
 }
@@ -575,7 +568,7 @@ EAPI void enesim_renderer_pattern_width_get(Enesim_Renderer *r, double *width)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (width) *width = thiz->current.width;
 }
 /**
@@ -587,7 +580,7 @@ EAPI void enesim_renderer_pattern_height_set(Enesim_Renderer *r, double height)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
 }
@@ -600,7 +593,7 @@ EAPI void enesim_renderer_pattern_height_get(Enesim_Renderer *r, double *height)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (height) *height = thiz->current.height;
 }
 
@@ -613,7 +606,7 @@ EAPI void enesim_renderer_pattern_x_set(Enesim_Renderer *r, double x)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	thiz->current.x = x;
 	thiz->changed = EINA_TRUE;
 }
@@ -626,7 +619,7 @@ EAPI void enesim_renderer_pattern_x_get(Enesim_Renderer *r, double *x)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (x) *x = thiz->current.x;
 }
 /**
@@ -638,7 +631,7 @@ EAPI void enesim_renderer_pattern_y_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 }
@@ -651,7 +644,7 @@ EAPI void enesim_renderer_pattern_y_get(Enesim_Renderer *r, double *y)
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (y) *y = thiz->current.y;
 }
 
@@ -662,7 +655,7 @@ EAPI void enesim_renderer_pattern_y_get(Enesim_Renderer *r, double *y)
 EAPI void enesim_renderer_pattern_position_set(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Pattern *thiz;
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	thiz->current.x = x;
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
@@ -675,7 +668,7 @@ EAPI void enesim_renderer_pattern_position_get(Enesim_Renderer *r, double *x, do
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (x) *x = thiz->current.x;
 	if (y) *y = thiz->current.y;
 }
@@ -688,7 +681,7 @@ EAPI void enesim_renderer_pattern_size_set(Enesim_Renderer *r, double width, dou
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	thiz->current.width = width;
 	thiz->current.height = height;
 	thiz->changed = EINA_TRUE;
@@ -702,7 +695,7 @@ EAPI void enesim_renderer_pattern_size_get(Enesim_Renderer *r, double *width, do
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (width) *width = thiz->current.width;
 	if (height) *height = thiz->current.height;
 }
@@ -715,7 +708,7 @@ EAPI void enesim_renderer_pattern_source_set(Enesim_Renderer *r, Enesim_Renderer
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	if (thiz->current.source)
 		enesim_renderer_unref(thiz->current.source);
 	thiz->current.source = source;
@@ -732,7 +725,7 @@ EAPI void enesim_renderer_pattern_source_get(Enesim_Renderer *r, Enesim_Renderer
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	*source = thiz->current.source;
 	if (thiz->current.source)
 		thiz->current.source = enesim_renderer_ref(thiz->current.source);
@@ -746,7 +739,7 @@ EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Rep
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	thiz->current.repeat_mode = mode;
 	thiz->changed = EINA_TRUE;
 }
@@ -759,7 +752,7 @@ EAPI void enesim_renderer_pattern_repeat_mode_get(Enesim_Renderer *r, Enesim_Rep
 {
 	Enesim_Renderer_Pattern *thiz;
 
-	thiz = _pattern_get(r);
+	thiz = ENESIM_RENDERER_PATTERN(r);
 	*mode = thiz->current.repeat_mode;
 }
 

@@ -20,25 +20,37 @@
 
 #include "enesim_renderer_shape_private.h"
 
+#define ENESIM_RASTERIZER_DESCRIPTOR 					\
+		enesim_rasterizer_descriptor_get()
+#define ENESIM_RASTERIZER_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, 	\
+		Enesim_Rasterizer_Class,				\
+		ENESIM_RASTERIZER_DESCRIPTOR())
+#define ENESIM_RASTERIZER_CLASS_GET(o)					\
+		ENESIM_RASTERIZER_CLASS(				\
+		ENESIM_OBJECT_INSTANCE_CLASS(o));
+#define ENESIM_RASTERIZER(o) ENESIM_OBJECT_INSTANCE_CHECK(o, 		\
+		Enesim_Rasterizer,					\
+		ENESIM_RASTERIZER_DESCRIPTOR)
+
+typedef struct _Enesim_Rasterizer
+{
+	Enesim_Renderer_Shape parent;
+} Enesim_Rasterizer;
+
 typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Figure *figure);
 
-typedef struct _Enesim_Rasterizer_Descriptor
+/* FIXME we should not inherit from the shape, but use a new interface that only has
+ * a subset of the properties. For example we dont need the dash list, or the stroke
+ * width. A rasterizer should only rasterize a figure
+ */
+typedef struct _Enesim_Rasterizer_Class
 {
-	/* inherited from the renderer */
-	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
-	Enesim_Renderer_Delete_Cb free;
-	Enesim_Renderer_Features_Get features_get;
-	/* software based functions */
-	Enesim_Renderer_Sw_Setup sw_setup;
-	Enesim_Renderer_Sw_Cleanup sw_cleanup;
-	/* inherited from the shape */
-	Enesim_Renderer_Shape_Features_Get_Cb shape_features_get;
-	/* our own interface */
+	Enesim_Renderer_Shape_Class parent;
 	Enesim_Rasterizer_Figure_Set figure_set;
-} Enesim_Rasterizer_Descriptor;
+} Enesim_Rasterizer_Class;
 
-Enesim_Renderer * enesim_rasterizer_new(Enesim_Rasterizer_Descriptor *d, void *data);
-void * enesim_rasterizer_data_get(Enesim_Renderer *r);
+Enesim_Object_Descriptor * enesim_rasterizer_descriptor_get(void);
+
 void enesim_rasterizer_figure_set(Enesim_Renderer *r, const Enesim_Figure *f);
 
 Enesim_Renderer * enesim_rasterizer_basic_new(void);

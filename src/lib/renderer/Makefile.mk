@@ -31,15 +31,15 @@ src_lib_libenesim_la_SOURCES += \
 src/lib/renderer/enesim_renderer_background.c \
 src/lib/renderer/enesim_renderer_blur.c \
 src/lib/renderer/enesim_renderer_checker.c \
-src/lib/renderer/enesim_renderer_circle.c \
 src/lib/renderer/enesim_renderer_clipper.c \
+src/lib/renderer/enesim_renderer_circle.c \
 src/lib/renderer/enesim_renderer_compound.c \
 src/lib/renderer/enesim_renderer_dispmap.c \
 src/lib/renderer/enesim_renderer_ellipse.c \
 src/lib/renderer/enesim_renderer_figure.c \
 src/lib/renderer/enesim_renderer_gradient.c \
+src/lib/renderer/enesim_renderer_gradient_private.h \
 src/lib/renderer/enesim_renderer_gradient_linear.c \
-src/lib/renderer/enesim_renderer_gradient_radial.c \
 src/lib/renderer/enesim_renderer_grid.c \
 src/lib/renderer/enesim_renderer_image.c \
 src/lib/renderer/enesim_renderer_importer.c \
@@ -50,16 +50,16 @@ src/lib/renderer/enesim_renderer_path_enesim.c \
 src/lib/renderer/enesim_renderer_pattern.c \
 src/lib/renderer/enesim_renderer_perlin.c \
 src/lib/renderer/enesim_renderer_proxy.c \
-src/lib/renderer/enesim_renderer_rectangle.c \
+src/lib/renderer/enesim_renderer_gradient_radial.c \
 src/lib/renderer/enesim_renderer_raddist.c \
+src/lib/renderer/enesim_renderer_rectangle.c \
 src/lib/renderer/enesim_renderer_shape.c \
-src/lib/renderer/enesim_renderer_shape_path.c \
-src/lib/renderer/enesim_renderer_stripes.c \
-src/lib/renderer/enesim_renderer_transition.c \
-src/lib/renderer/enesim_renderer_gradient_private.h \
 src/lib/renderer/enesim_renderer_shape_private.h \
+src/lib/renderer/enesim_renderer_shape_path.c \
 src/lib/renderer/enesim_renderer_shape_path_private.h \
-src/lib/renderer/enesim_renderer_text_span.c
+src/lib/renderer/enesim_renderer_stripes.c \
+src/lib/renderer/enesim_renderer_text_span.c \
+src/lib/renderer/enesim_renderer_transition.c
 
 if BUILD_CAIRO
 src_lib_libenesim_la_SOURCES += \

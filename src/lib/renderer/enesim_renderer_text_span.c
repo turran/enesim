@@ -50,6 +50,10 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_text
 
+#define ENESIM_RENDERER_TEXT_SPAN(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Text_Span,					\
+		enesim_renderer_text_span_descriptor_get())
+
 typedef struct _Enesim_Renderer_Text_Span_State
 {
 	struct {
@@ -64,6 +68,7 @@ typedef struct _Enesim_Renderer_Text_Span_State
 
 typedef struct _Enesim_Renderer_Text_Span
 {
+	Enesim_Renderer_Shape parent;
 	Enesim_Renderer_Text_Span_State state;
 	Enesim_Text_Direction direction;
 	Enesim_Text_Engine *engine;
@@ -74,15 +79,11 @@ typedef struct _Enesim_Renderer_Text_Span
 	int bottom;
 } Enesim_Renderer_Text_Span;
 
+typedef struct _Enesim_Renderer_Text_Span_Class {
+	Enesim_Renderer_Shape_Class parent;
+} Enesim_Renderer_Text_Span_Class;
+
 static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r);
-
-static inline Enesim_Renderer_Text_Span * _enesim_renderer_text_span_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	thiz = enesim_renderer_shape_data_get(r);
-	return thiz;
-}
 
 static Eina_Bool _enesim_renderer_text_span_changed(Enesim_Renderer_Text_Span *thiz)
 {
@@ -122,7 +123,7 @@ static void _enesim_renderer_text_span_setup(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	_enesim_renderer_text_span_common_setup(thiz);
 }
 
@@ -262,7 +263,7 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 	uint32_t *end = dst + len;
 
 	/* setup the affine coordinates */
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	enesim_renderer_transformation_get(r, &dmatrix);
 	enesim_matrix_f16p16_matrix_to(&dmatrix, &matrix);
 
@@ -334,7 +335,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	Enesim_Renderer *fpaint = NULL;
 	uint32_t *fbuf = NULL, *buf = NULL;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	enesim_renderer_origin_get(r, &ox, &oy);
 	y -= oy;
 	x -= ox;
@@ -419,7 +420,7 @@ static Eina_Bool _enesim_renderer_text_span_calculate(Enesim_Renderer *r)
 	char last;
 	unsigned int width = 0;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 
 	/* FIXME if we do the setup/bounds/whatever that calls this
 	 * function  from multiple threads the invalidate must be locked
@@ -501,7 +502,7 @@ static Eina_Bool _enesim_text_sw_setup(Enesim_Renderer *r,
 	Enesim_Matrix_Type type;
 	const char *text;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return EINA_FALSE;
 
 	text = enesim_text_buffer_string_get(thiz->state.current.buffer);
@@ -538,7 +539,7 @@ static void _enesim_text_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 //	enesim_renderer_shape_cleanup(r, s);
 }
@@ -550,7 +551,7 @@ static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r)
 	const char *old_text;
 	const char *curr_text;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	/* FIXME for later */
 	old_text = enesim_text_buffer_string_get(thiz->state.past.buffer);
 	curr_text = enesim_text_buffer_string_get(thiz->state.current.buffer);
@@ -560,20 +561,6 @@ static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
-static void _enesim_renderer_text_span_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	thiz = _enesim_renderer_text_span_get(r);
-	if (!thiz) return;
-
-	if (thiz->font)
-		enesim_text_font_unref(thiz->font);
-	//if (thiz->state.current.str) free(thiz->state.current.str);
-	//if (thiz->state.past.str) fre(thiz->state.past.str);
-	free(thiz);
-}
-
 static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
@@ -581,7 +568,7 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 	Enesim_Matrix_Type type;
 	double ox, oy;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 
 	/* we should calculate the current width/height */
@@ -621,41 +608,58 @@ static void _enesim_renderer_text_span_features_get(Enesim_Renderer *r EINA_UNUS
 			ENESIM_RENDERER_FEATURE_ARGB8888 |
 			ENESIM_RENDERER_FEATURE_AFFINE;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_SHAPE_DESCRIPTOR,
+		Enesim_Renderer_Text_Span, Enesim_Renderer_Text_Span_Class,
+		enesim_renderer_text_span);
 
-static Enesim_Renderer_Shape_Descriptor _enesim_renderer_text_span_descriptor = {
-	/* .version = 			*/ ENESIM_RENDERER_API,
-	/* .base_name_get = 		*/ _enesim_renderer_text_span_name,
-	/* .free = 			*/ _enesim_renderer_text_span_free,
-	/* .bounds_get = 		*/ _enesim_renderer_text_span_bounds,
-	/* .features_get = 		*/ _enesim_renderer_text_span_features_get,
-	/* .is_inside = 		*/ NULL,
-	/* .damage = 			*/ NULL,
-	/* .has_changed = 		*/ _enesim_renderer_text_span_has_changed,
-	/* .sw_hints_get = 		*/ NULL,
-	/* .sw_setup = 			*/ _enesim_text_sw_setup,
-	/* .sw_cleanup = 		*/ _enesim_text_sw_cleanup,
-};
+static void _enesim_renderer_text_span_class_init(void *k)
+{
+	Enesim_Renderer_Class *r_klass;
+	Enesim_Renderer_Shape_Class *klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _enesim_renderer_text_span_name;
+	r_klass->bounds_get = _enesim_renderer_text_span_bounds;
+	r_klass->features_get = _enesim_renderer_text_span_features_get;
+
+	klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	klass->has_changed = _enesim_renderer_text_span_has_changed;
+	klass->sw_setup = _enesim_text_sw_setup;
+	klass->sw_cleanup = _enesim_text_sw_cleanup;
+}
+
+static void _enesim_renderer_text_span_instance_init(void *o)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(o);
+	thiz->state.current.buffer = enesim_text_buffer_new(0);
+	thiz->state.past.buffer = enesim_text_buffer_new(0);
+}
+
+static void _enesim_renderer_text_span_instance_deinit(void *o)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(o);
+	if (thiz->font)
+		enesim_text_font_unref(thiz->font);
+	//if (thiz->state.current.str) free(thiz->state.current.str);
+	//if (thiz->state.past.str) fre(thiz->state.past.str);
+}
 
 static Enesim_Renderer * _enesim_renderer_text_span_new(Enesim_Text_Engine *engine)
 {
-	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Renderer *r;
+	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Text_Span));
-	if (!thiz) return NULL;
-
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_text_span);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	thiz->engine = engine;
-	thiz->state.current.buffer = enesim_text_buffer_new(0);
-	thiz->state.past.buffer = enesim_text_buffer_new(0);
-
-	r = enesim_renderer_shape_new(&_enesim_renderer_text_span_descriptor, thiz);
-	if (!r) goto renderer_err;
-
 	return r;
-
-renderer_err:
-	free(thiz);
-	return NULL;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -691,7 +695,7 @@ EAPI void enesim_renderer_text_span_text_set(Enesim_Renderer *r, const char *str
 	Enesim_Renderer_Text_Span *thiz;
 
 	if (!str) return;
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 
 	enesim_text_buffer_string_set(thiz->state.current.buffer, str, -1);
@@ -706,7 +710,7 @@ EAPI void enesim_renderer_text_span_text_get(Enesim_Renderer *r, const char **st
 	Enesim_Renderer_Text_Span *thiz;
 
 	if (!str) return;
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 
 	*str = enesim_text_buffer_string_get(thiz->state.current.buffer);
@@ -720,7 +724,7 @@ EAPI void enesim_renderer_text_span_direction_get(Enesim_Renderer *r, Enesim_Tex
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 	*direction = thiz->direction;
 }
@@ -733,7 +737,7 @@ EAPI void enesim_renderer_text_span_direction_set(Enesim_Renderer *r, Enesim_Tex
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 	thiz->direction = direction;
 }
@@ -747,7 +751,7 @@ EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_B
 	Enesim_Renderer_Text_Span *thiz;
 
 	if (!b) return;
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 	*b = thiz->state.current.buffer;
 }
@@ -761,7 +765,7 @@ EAPI void enesim_renderer_text_span_font_name_set(Enesim_Renderer *r, const char
 	Enesim_Renderer_Text_Span *thiz;
 
 	if (!font) return;
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 	if (thiz->state.current.font_name) free(thiz->state.current.font_name);
 	thiz->state.current.font_name = strdup(font);
@@ -777,7 +781,7 @@ EAPI void enesim_renderer_text_span_font_name_get(Enesim_Renderer *r, const char
 	Enesim_Renderer_Text_Span *thiz;
 
 	if (!font) return;
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 	*font = thiz->state.current.font_name;
 }
@@ -790,7 +794,7 @@ EAPI void enesim_renderer_text_span_size_set(Enesim_Renderer *r, unsigned int si
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 
 	thiz->state.current.size = size;
@@ -805,7 +809,7 @@ EAPI void enesim_renderer_text_span_size_get(Enesim_Renderer *r, unsigned int *s
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 
 	*size = thiz->state.current.size;
@@ -820,7 +824,7 @@ EAPI void enesim_renderer_text_span_max_ascent_get(Enesim_Renderer *r, int *masc
 	Enesim_Renderer_Text_Span *thiz;
 
 	*masc = 0;
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 	_enesim_renderer_text_span_setup(r);
 	if (!thiz->font) return;
@@ -836,7 +840,7 @@ EAPI void enesim_renderer_text_span_max_descent_get(Enesim_Renderer *r, int *mde
 	Enesim_Renderer_Text_Span *thiz;
 
 	*mdesc = 0;
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 	_enesim_renderer_text_span_setup(r);
 	if (!thiz->font) return;
@@ -851,7 +855,7 @@ EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	thiz = _enesim_renderer_text_span_get(r);
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	_enesim_renderer_text_span_setup(r);
 
 	return enesim_text_font_ref(thiz->font);

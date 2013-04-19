@@ -69,11 +69,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_PATH_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_PATH_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_PATH_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_PATH_ENESIM(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Path_Enesim,					\
+		enesim_renderer_path_enesim_descriptor_get())
 
 #if BUILD_OPENGL
 typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Polygon
@@ -99,7 +97,7 @@ typedef struct _Enesim_Renderer_Path_Enesim_OpenGL
 
 typedef struct _Enesim_Renderer_Path_Enesim
 {
-	EINA_MAGIC
+	Enesim_Renderer_Path_Abstract parent;
 	/* properties */
 	Eina_List *commands;
 	/* private */
@@ -123,21 +121,17 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	Eina_Bool generated : 1;
 } Enesim_Renderer_Path_Enesim;
 
-static inline Enesim_Renderer_Path_Enesim * _path_get(Enesim_Renderer *r)
+typedef struct _Enesim_Renderer_Path_Enesim_Class
 {
-	Enesim_Renderer_Path_Enesim *thiz;
+	Enesim_Renderer_Path_Abstract_Class parent;
+} Enesim_Renderer_Path_Enesim_Class;
 
-	thiz = enesim_renderer_path_abstract_data_get(r);
-	ENESIM_RENDERER_PATH_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
 static void _path_span(Enesim_Renderer *r,
 		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	enesim_renderer_sw_draw(thiz->bifigure, x, y, len, ddata);
 }
 
@@ -578,7 +572,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	GLint viewport[4];
 	GLenum texture;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	gl = &thiz->gl;
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -657,7 +651,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	GLenum textures[2];
 	GLint viewport[4];
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	gl = &thiz->gl;
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -826,7 +820,7 @@ static void _path_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	enesim_renderer_cleanup(thiz->bifigure, s);
 	thiz->changed = EINA_FALSE;
 }
@@ -838,27 +832,6 @@ static const char * _path_name(Enesim_Renderer *r EINA_UNUSED)
 	return "path";
 }
 
-static void _path_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path_Enesim *thiz;
-
-	/* TODO: not finished */
-	thiz = _path_get(r);
-	if (thiz->stroke_figure)
-		enesim_figure_delete(thiz->stroke_figure);
-	if (thiz->fill_figure)
-		enesim_figure_delete(thiz->fill_figure);
-	if (thiz->dashed_path)
-		enesim_path_generator_free(thiz->dashed_path);
-	if (thiz->strokeless_path)
-		enesim_path_generator_free(thiz->strokeless_path);
-	if (thiz->stroke_path)
-		enesim_path_generator_free(thiz->stroke_path);
-	if (thiz->bifigure)
-		enesim_renderer_unref(thiz->bifigure);
-	free(thiz);
-}
-
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
@@ -867,7 +840,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	const Enesim_Renderer_State *cs;
 	const Enesim_Renderer_Shape_State *css;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	cs = enesim_renderer_state_get(r);
 	css = enesim_renderer_shape_state_get(r);
 
@@ -929,7 +902,7 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	return thiz->changed;
 }
 
@@ -949,7 +922,7 @@ static void _path_bounds_get(Enesim_Renderer *r,
 	double xmax;
 	double ymax;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	cs = enesim_renderer_state_get(r);
 	css = enesim_renderer_shape_state_get(r);
 
@@ -1021,7 +994,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	const Enesim_Renderer_State *cs;
 	const Enesim_Renderer_Shape_State *css;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	cs = enesim_renderer_state_get(r);
 	css = enesim_renderer_shape_state_get(r);
 	gl = &thiz->gl;
@@ -1062,49 +1035,51 @@ static void _path_commands_set(Enesim_Renderer *r, const Eina_List *commands)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	thiz->commands = commands;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
 }
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR,
+		Enesim_Renderer_Path_Enesim, Enesim_Renderer_Path_Enesim_Class,
+		enesim_renderer_path_enesim);
 
-static Enesim_Renderer_Path_Abstract_Descriptor _path_descriptor = {
-	/* .version =			*/ ENESIM_RENDERER_API,
-	/* .name =			*/ _path_name,
-	/* .free =			*/ _path_free,
-	/* .bounds_get =		*/ _path_bounds_get,
-	/* .features_get =		*/ _path_features_get,
-	/* .is_inside =			*/ NULL,
-	/* .damage =			*/ NULL,
-	/* .has_changed =		*/ _path_has_changed,
-	/* .sw_hints_get =		*/ _path_sw_hints,
-	/* .sw_setup =			*/ _path_sw_setup,
-	/* .sw_cleanup =		*/ _path_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
+static void _enesim_renderer_path_enesim_class_init(void *k)
+{
+	Enesim_Renderer_Path_Abstract_Class *klass;
+	Enesim_Renderer_Shape_Class *s_klass;
+	Enesim_Renderer_Class *r_klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _path_name;
+	r_klass->bounds_get = _path_bounds_get;
+	r_klass->features_get = _path_features_get;
+	r_klass->has_changed = _path_has_changed;
+	r_klass->sw_hints_get = _path_sw_hints;
 #if BUILD_OPENGL
-	/* .opengl_initialize =		*/ _path_opengl_initialize,
-	/* .opengl_setup =		*/ _path_opengl_setup,
-	/* .opengl_cleanup =		*/ _path_opengl_cleanup,
-#else
-	/* .opengl_initialize =		*/ NULL,
-	/* .opengl_setup =		*/ NULL,
-	/* .opengl_cleanup =		*/ NULL,
+	r_klass->opengl_initialize = _path_opengl_initialize;
 #endif
-	/* .shape_features_get =	*/ _path_shape_features_get,
-	/* .commands_set = 		*/ _path_commands_set,
-};
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Enesim_Renderer * enesim_renderer_path_enesim_new(void)
+
+	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	s_klass->features_get = _path_shape_features_get;
+	s_klass->sw_setup = _path_sw_setup;
+	s_klass->sw_cleanup = _path_sw_cleanup;
+	s_klass->opengl_setup = _path_opengl_setup;
+	s_klass->opengl_cleanup = _path_opengl_cleanup;
+
+	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
+	klass->commands_set = _path_commands_set;
+}
+
+static void _enesim_renderer_path_enesim_instance_init(void *o)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Path_Enesim));
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_PATH_MAGIC);
+	thiz = ENESIM_RENDERER_PATH_ENESIM(o);
 
 	r = enesim_rasterizer_bifigure_new();
 	thiz->bifigure = r;
@@ -1113,10 +1088,37 @@ Enesim_Renderer * enesim_renderer_path_enesim_new(void)
 	thiz->stroke_path = enesim_path_generator_stroke_dashless_new();
 	thiz->strokeless_path = enesim_path_generator_strokeless_new();
 	thiz->dashed_path = enesim_path_generator_dashed_new();
-
-	r = enesim_renderer_path_abstract_new(&_path_descriptor, thiz);
 	/* FIXME for now */
-	enesim_renderer_shape_stroke_join_set(r, ENESIM_JOIN_ROUND);
+	enesim_renderer_shape_stroke_join_set(ENESIM_RENDERER(o), ENESIM_JOIN_ROUND);
+}
+
+static void _enesim_renderer_path_enesim_instance_deinit(void *o)
+{
+	Enesim_Renderer_Path_Enesim *thiz;
+
+	/* TODO: not finished */
+	thiz = ENESIM_RENDERER_PATH_ENESIM(o);
+	if (thiz->stroke_figure)
+		enesim_figure_delete(thiz->stroke_figure);
+	if (thiz->fill_figure)
+		enesim_figure_delete(thiz->fill_figure);
+	if (thiz->dashed_path)
+		enesim_path_generator_free(thiz->dashed_path);
+	if (thiz->strokeless_path)
+		enesim_path_generator_free(thiz->strokeless_path);
+	if (thiz->stroke_path)
+		enesim_path_generator_free(thiz->stroke_path);
+	if (thiz->bifigure)
+		enesim_renderer_unref(thiz->bifigure);
+}
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Enesim_Renderer * enesim_renderer_path_enesim_new(void)
+{
+	Enesim_Renderer *r;
+
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_path_enesim);
 	return r;
 }
 /*============================================================================*

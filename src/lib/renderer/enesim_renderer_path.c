@@ -48,15 +48,13 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_RENDERER_PATH_MAGIC_CHECK(d) \
-	do {\
-		if (!EINA_MAGIC_CHECK(d, ENESIM_RENDERER_PATH_MAGIC))\
-			EINA_MAGIC_FAIL(d, ENESIM_RENDERER_PATH_MAGIC);\
-	} while(0)
+#define ENESIM_RENDERER_PATH(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Path,					\
+		enesim_renderer_path_descriptor_get())
 
 typedef struct _Enesim_Renderer_Path
 {
-	EINA_MAGIC
+	Enesim_Renderer_Shape parent;
 	/* properties */
 	Eina_List *commands;
 	Eina_Bool changed;
@@ -68,15 +66,9 @@ typedef struct _Enesim_Renderer_Path
 	Enesim_Renderer *current;
 } Enesim_Renderer_Path;
 
-static inline Enesim_Renderer_Path * _path_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path *thiz;
-
-	thiz = enesim_renderer_shape_data_get(r);
-	ENESIM_RENDERER_PATH_MAGIC_CHECK(thiz);
-
-	return thiz;
-}
+typedef struct _Enesim_Renderer_Path_Class {
+	Enesim_Renderer_Shape_Class parent;
+} Enesim_Renderer_Path_Class;
 
 static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 {
@@ -85,7 +77,7 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	const Enesim_Renderer_Shape_State *sstate;
 	Enesim_Renderer *ret;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 	/* get the state properties */
 	rstate = enesim_renderer_state_get(r);
 	sstate = enesim_renderer_shape_state_get(r);
@@ -112,7 +104,7 @@ static void _path_span(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 	enesim_renderer_sw_draw(thiz->current, x, y, len, ddata);
 }
 
@@ -122,7 +114,7 @@ static void _path_opengl_draw(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 	enesim_renderer_opengl_draw(thiz->current, s, area, w, h);
 }
 #endif
@@ -132,7 +124,7 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 	thiz->current = _path_implementation_get(r);
 	if (!enesim_renderer_setup(thiz->current, s, l))
 	{
@@ -145,7 +137,7 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 	enesim_renderer_cleanup(thiz->current, s);
 	thiz->changed = EINA_FALSE;
 }
@@ -155,18 +147,6 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static const char * _path_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "path";
-}
-
-static void _path_free(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path *thiz;
-
-	thiz = _path_get(r);
-	enesim_renderer_unref(thiz->enesim);
-#if BUILD_CAIRO
-	enesim_renderer_unref(thiz->cairo);
-#endif
-	free(thiz);
 }
 
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
@@ -207,7 +187,7 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path *thiz;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 	return thiz->changed;
 }
 
@@ -246,33 +226,59 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_path_cleanup(r, s);
 }
 #endif
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_SHAPE_DESCRIPTOR,
+		Enesim_Renderer_Path, Enesim_Renderer_Path_Class,
+		enesim_renderer_path);
 
-static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
-	/* .version =			*/ ENESIM_RENDERER_API,
-	/* .name =			*/ _path_name,
-	/* .free =			*/ _path_free,
-	/* .bounds_get =		*/ _path_bounds_get,
-	/* .features_get =		*/ _path_features_get,
-	/* .is_inside =			*/ NULL,
-	/* .damage =			*/ NULL,
-	/* .has_changed =		*/ _path_has_changed,
-	/* .sw_hints_get =		*/ _path_sw_hints,
-	/* .sw_setup =			*/ _path_sw_setup,
-	/* .sw_cleanup =		*/ _path_sw_cleanup,
-	/* .opencl_setup =		*/ NULL,
-	/* .opencl_kernel_setup =	*/ NULL,
-	/* .opencl_cleanup =		*/ NULL,
+static void _enesim_renderer_path_class_init(void *k)
+{
+	Enesim_Renderer_Class *r_klass;
+	Enesim_Renderer_Shape_Class *klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _path_name;
+	r_klass->sw_hints_get = _path_sw_hints;
+	r_klass->bounds_get = _path_bounds_get;
+	r_klass->features_get = _path_features_get;
+
+	klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	klass->has_changed = _path_has_changed;
+	klass->sw_setup = _path_sw_setup;
+	klass->sw_cleanup = _path_sw_cleanup;
 #if BUILD_OPENGL
-	/* .opengl_initialize =		*/ NULL,
-	/* .opengl_setup =		*/ _path_opengl_setup,
-	/* .opengl_cleanup =		*/ _path_opengl_cleanup,
-#else
-	/* .opengl_initialize =		*/ NULL,
-	/* .opengl_setup =		*/ NULL,
-	/* .opengl_cleanup =		*/ NULL,
+	klass->opengl_setup = _path_opengl_setup;
+	klass->opengl_cleanup = _path_opengl_cleanup;
 #endif
-	/* .shape_features_get =	*/ _path_shape_features_get,
-};
+	klass->features_get = _path_shape_features_get;
+}
+
+static void _enesim_renderer_path_instance_init(void *o)
+{
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer *r;
+
+	thiz = ENESIM_RENDERER_PATH(o);
+	r = enesim_renderer_path_enesim_new();
+	thiz->enesim = r;
+#if BUILD_CAIRO
+	r = enesim_renderer_path_cairo_new();
+	thiz->cairo = r;
+#endif
+}
+
+static void _enesim_renderer_path_instance_deinit(void *o)
+{
+	Enesim_Renderer_Path *thiz;
+
+	thiz = ENESIM_RENDERER_PATH(o);
+	enesim_renderer_unref(thiz->enesim);
+#if BUILD_CAIRO
+	enesim_renderer_unref(thiz->cairo);
+#endif
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -285,19 +291,9 @@ static Enesim_Renderer_Shape_Descriptor _path_descriptor = {
  */
 EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 {
-	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer *r;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_Path));
-	EINA_MAGIC_SET(thiz, ENESIM_RENDERER_PATH_MAGIC);
-
-	r = enesim_renderer_path_enesim_new();
-	thiz->enesim = r;
-#if BUILD_CAIRO
-	r = enesim_renderer_path_cairo_new();
-	thiz->cairo = r;
-#endif
-	r = enesim_renderer_shape_new(&_path_descriptor, thiz);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_path);
 	return r;
 }
 
@@ -310,7 +306,7 @@ EAPI void enesim_renderer_path_command_clear(Enesim_Renderer *r)
 	Enesim_Renderer_Path *thiz;
 	Enesim_Path_Command *c;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 	EINA_LIST_FREE(thiz->commands, c)
 	{
 		free(c);
@@ -327,7 +323,7 @@ EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Path_Comma
 	Enesim_Renderer_Path *thiz;
 	Enesim_Path_Command *new_command;
 
-	thiz = _path_get(r);
+	thiz = ENESIM_RENDERER_PATH(r);
 
 	/* do not allow a move to command after another move to, just simplfiy them */
 	if (cmd->type == ENESIM_PATH_COMMAND_MOVE_TO)
