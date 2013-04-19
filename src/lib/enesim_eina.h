@@ -72,4 +72,6 @@ static inline int eina_f16p16_trunc(Eina_F16p16 v EINA_UNUSED)
 	return 0;
 }
 
+EAPI double eina_strtod(const char *nptr, char **endptr);
+
 #endif
