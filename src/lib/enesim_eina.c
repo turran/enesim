@@ -132,3 +132,34 @@ EAPI double eina_strtod(const char *nptr, char **endptr)
   return res;
 }
 
+/* TODO later this can go to eina? */
+EAPI size_t eina_str_printf_length(const char *format, va_list args)
+{
+	char c;
+	size_t len;
+
+	len = vsnprintf(&c, 1, format, args) + 1;
+	return len;
+}
+
+EAPI char * eina_str_dup_vprintf(const char *format, va_list args)
+{
+	size_t length;
+	char *ret;
+
+	length = eina_str_printf_length(format, args);
+	ret = calloc(length, sizeof(char));
+	vsprintf(ret, format, args);
+	return ret;
+}
+
+EAPI char * eina_str_dup_printf(const char *format, ...)
+{
+	char *ret;
+	va_list args;
+
+	va_start(args, format);
+	ret = eina_str_dup_vprintf(format, args);
+	va_end(args);
+	return ret;
+}
