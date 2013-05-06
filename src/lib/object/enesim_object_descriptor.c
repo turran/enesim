@@ -25,6 +25,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_global
+
 struct _Enesim_Object_Descriptor
 {
 	Enesim_Object_Descriptor *parent;
@@ -108,9 +110,13 @@ EAPI Enesim_Object_Descriptor * enesim_object_descriptor_new(
 	if (parent)
 	{
 		if (class_size < parent->class_size)
-			printf("Wrong size %s %zu\n", name, class_size);
+			CRI("Wrong class size of '%s' (%zu) with parent '%s' (%zu)",
+					name, class_size,
+					parent->name, parent->class_size);
 		if (instance_size < parent->instance_size)
-			printf("Wrong size %s %zu\n", name, instance_size);
+			CRI("Wrong instance size of '%s' (%zu) with parent '%s' (%zu)",
+					name, instance_size,
+					parent->name, parent->instance_size);
 	}
 
 	thiz = calloc(1, sizeof(Enesim_Object_Descriptor));

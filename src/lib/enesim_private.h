@@ -102,6 +102,7 @@ extern int enesim_log_renderer_gradient_radial;
 #endif
 #define ENESIM_DEFAULT_LOG_COLOR EINA_COLOR_LIGHTRED
 
+#define CRI(...) EINA_LOG_DOM_CRIT(ENESIM_LOG_DEFAULT, __VA_ARGS__)
 #define ERR(...) EINA_LOG_DOM_ERR(ENESIM_LOG_DEFAULT, __VA_ARGS__)
 #define WRN(...) EINA_LOG_DOM_WARN(ENESIM_LOG_DEFAULT, __VA_ARGS__)
 #define INF(...) EINA_LOG_DOM_INFO(ENESIM_LOG_DEFAULT, __VA_ARGS__)
