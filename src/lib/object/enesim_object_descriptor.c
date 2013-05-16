@@ -62,7 +62,7 @@ Eina_Bool enesim_object_descriptor_inherits(Enesim_Object_Descriptor *thiz,
 			ret = EINA_TRUE;
 			break;
 		}
-		thiz = from->parent;
+		thiz = thiz->parent;
 	}
 	return ret;
 }
