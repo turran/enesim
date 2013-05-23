@@ -146,8 +146,15 @@ EAPI char * eina_str_dup_vprintf(const char *format, va_list args)
 {
 	size_t length;
 	char *ret;
+	va_list copy;
 
-	length = eina_str_printf_length(format, args);
+	/* be sure to use a copy or the printf implementation will
+	 * step into the args
+	 */
+	va_copy(copy, args);
+	length = eina_str_printf_length(format, copy);
+	va_end(copy);
+
 	ret = calloc(length, sizeof(char));
 	vsprintf(ret, format, args);
 	return ret;
