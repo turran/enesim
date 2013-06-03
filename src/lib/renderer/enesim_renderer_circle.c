@@ -367,8 +367,6 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
 	Enesim_Renderer_Circle *thiz;
 
 	thiz = ENESIM_RENDERER_CIRCLE(r);
-	if (radius < 1)
-		radius = 1;
 	thiz->current.r = radius;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
