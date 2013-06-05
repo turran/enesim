@@ -186,7 +186,7 @@ PKG_CHECK_EXISTS([glew],
    [
     have_glew="yes"
     requirements_pc="${requirements_pc} glew"
-    AC_DEFINE([HAVE_FREETYPE], [1], [Have support for freetype])
+    AC_DEFINE([HAVE_GLEW], [1], [Have support for glew])
    ],
    [have_glew="no"])
 
@@ -350,7 +350,7 @@ glGenFramebuffersEXT(0, NULL);
 fi
 
 build_opengl="no"
-if test "x${want_opengl}" = "xyes" -a "x${have_opengl}"; then
+if test "x${want_opengl}" = "xyes" -a "x${have_opengl}" = "xyes"; then
   build_opengl="yes"
   requirements_libs="${OPENGL_LIBS} ${requirements_libs}"
   AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
