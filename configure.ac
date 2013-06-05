@@ -236,6 +236,11 @@ ENS_CHECK_COMPILER_FLAGS([ENESIM], [-Wall -Wextra -Wshadow -Wpointer-arith -Wno-
 ENS_CHECK_LINKER_FLAGS([ENESIM], [-fvisibility=hidden -Wl,--no-copy-dt-needed-entries])
 # FIXME: what about : -fdata-sections -ffunction-sections -Wl,--gc-sections -fno-strict-aliasing ?
 
+# Check for posix_memalign() support
+AC_CHECK_FUNCS(posix_memalign, [
+  AC_DEFINE(HAVE_POSIX_MEMALIGN, 1,
+            [Define to 1 if you have the posix_memalign() function.])])
+
 ### Checks for library functions
 
 ## Pthreads

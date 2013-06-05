@@ -30,6 +30,10 @@
 # include <unistd.h>
 #endif
 
+#if !defined(_WIN32) && !defined(HAVE_POSIX_MEMALIGN)
+#include <errno.h>
+#endif
+
 #include "enesim_mempool_aligned_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -141,7 +145,12 @@ static void * _enesim_mempool_aligned_alloc(void *data, unsigned int size)
 	if (!element)
 		return NULL;
 #else
+#ifdef HAVE_POSIX_MEMALIGN
 	ret = posix_memalign(&element, thiz->alignment, size);
+#else
+	element = memalign(thiz->alignment, size);
+	if (!element) ret = -EINVAL;
+#endif
 	if (ret)
 		return NULL;
 #endif
