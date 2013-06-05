@@ -1067,8 +1067,10 @@ static void _enesim_renderer_path_enesim_class_init(void *k)
 	s_klass->features_get = _path_shape_features_get;
 	s_klass->sw_setup = _path_sw_setup;
 	s_klass->sw_cleanup = _path_sw_cleanup;
+#if BUILD_OPENGL
 	s_klass->opengl_setup = _path_opengl_setup;
 	s_klass->opengl_cleanup = _path_opengl_cleanup;
+#endif
 
 	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
 	klass->commands_set = _path_commands_set;
