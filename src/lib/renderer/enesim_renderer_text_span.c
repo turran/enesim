@@ -551,6 +551,7 @@ static void _enesim_text_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
 //	enesim_renderer_shape_cleanup(r, s);
+	enesim_text_buffer_smart_clear(thiz->state.buffer);
 }
 
 static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r)
