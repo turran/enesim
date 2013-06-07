@@ -88,14 +88,27 @@ typedef struct _Enesim_Text_Buffer_Descriptor
 	Enesim_Text_Buffer_Free free;
 } Enesim_Text_Buffer_Descriptor;
 
-EAPI Enesim_Text_Buffer * enesim_text_buffer_new(int initial_length);
+EAPI Enesim_Text_Buffer * enesim_text_buffer_new(void);
 EAPI Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_Descriptor *descriptor, void *data);
-EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *b, const char *string, int length);
-EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *b);
-EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *b, const char *string, int length, ssize_t offset);
-EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *b, int length, ssize_t offset);
-EAPI void enesim_text_buffer_delete(Enesim_Text_Buffer *b);
-EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *b);
+EAPI Enesim_Text_Buffer * enesim_text_buffer_ref(Enesim_Text_Buffer *thiz);
+EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz);
+
+EAPI void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz);
+
+EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *string, int length);
+EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz);
+EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *string, int length, ssize_t offset);
+EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, ssize_t offset);
+EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz);
+
+EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length);
+
+EAPI Enesim_Text_Buffer * enesim_text_buffer_smart_new(Enesim_Text_Buffer *thiz);
+EAPI void enesim_text_buffer_smart_real_set(Enesim_Text_Buffer *b,
+		Enesim_Text_Buffer *real);
+EAPI void enesim_text_buffer_smart_dirty(Enesim_Text_Buffer *b);
+EAPI void enesim_text_buffer_smart_clear(Enesim_Text_Buffer *b);
+EAPI Eina_Bool enesim_text_buffer_smart_is_dirty(Enesim_Text_Buffer *b);
 
 /**
  * @}

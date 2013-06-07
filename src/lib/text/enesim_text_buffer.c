@@ -29,106 +29,9 @@
  *============================================================================*/
 struct _Enesim_Text_Buffer
 {
+	int ref;
 	void *data;
 	Enesim_Text_Buffer_Descriptor *descriptor;
-};
-
-typedef struct _Enesim_Text_Buffer_Default
-{
-	char *string;
-	size_t length; /* string length */
-	size_t bytes; /* alloced length */
-} Enesim_Text_Buffer_Default;
-
-static void _default_string_set(void *data, const char *string, int length)
-{
-	Enesim_Text_Buffer_Default *thiz = data;
-
-	/* first create the needed space */
-	if (length < 0)
-		length = strlen(string);
-	if ((unsigned int)length + 1 > thiz->bytes)
-	{
-		thiz->string = realloc(thiz->string, sizeof(char) * length + 1);
-		thiz->bytes = length + 1;
-	}
-	/* now set */
-	strncpy(thiz->string, string, length);
-	thiz->string[length] = '\0';
-	thiz->length = length;
-}
-
-static int _default_string_insert(void *data, const char *string, int length, ssize_t offset)
-{
-	Enesim_Text_Buffer_Default *thiz = data;
-	unsigned int new_length;
-	int to_move;
-	int i;
-
-	/* first create the needed space */
-	if (length < 0)
-		length = strlen(string);
-	if (offset < 0)
-		offset = 0;
-	else if ((unsigned int)offset > thiz->length)
-		offset = thiz->length;
-
-	new_length = length + thiz->length;
-	to_move = thiz->length - offset;
-	if (new_length + 1 > thiz->bytes)
-	{
-		thiz->string = realloc(thiz->string, sizeof(char) * new_length + 1);
-		thiz->bytes = new_length + 1;
-	}
-	/* now insert */
-	/* make the needed space */
-	for (i = 0; i < to_move; i++)
-	{
-		thiz->string[new_length - i - 1] = thiz->string[offset + to_move - i - 1];
-	}
-	/* insert */
-	strncpy(thiz->string + offset, string, length);
-	thiz->string[new_length] = '\0';
-	thiz->length = new_length;
-
-	return length;
-}
-
-static int _default_string_delete(void *data, int length EINA_UNUSED, ssize_t offset EINA_UNUSED)
-{
-	Enesim_Text_Buffer_Default *thiz = data;
-
-	return 0;
-}
-
-static const char * _default_string_get(void *data)
-{
-	Enesim_Text_Buffer_Default *thiz = data;
-	return thiz->string;
-}
-
-static int _default_string_length(void *data)
-{
-	Enesim_Text_Buffer_Default *thiz = data;
-	return thiz->length;
-}
-
-static void _default_free(void *data)
-{
-	Enesim_Text_Buffer_Default *thiz = data;
-
-	free(thiz->string);
-	free(thiz);
-}
-
-/* the default buffer */
-Enesim_Text_Buffer_Descriptor _enesim_text_buffer_default = {
-	/* .string_get = */ _default_string_get,
-	/* .string_set = */ _default_string_set,
-	/* .string_insert = */ _default_string_insert,
-	/* .string_delete = */ _default_string_delete,
-	/* .string_length = */ _default_string_length,
-	/* .free = */ _default_free,
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -136,22 +39,9 @@ Enesim_Text_Buffer_Descriptor _enesim_text_buffer_default = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Text_Buffer * enesim_text_buffer_new(int initial_length)
+EAPI Enesim_Text_Buffer * enesim_text_buffer_new(void)
 {
-	Enesim_Text_Buffer_Default *bd;
-
-	bd = calloc(1, sizeof(Enesim_Text_Buffer_Default));
-	if (initial_length <= 0)
-		initial_length = PATH_MAX;
-	bd->string = calloc(initial_length, sizeof(char));
-	bd->bytes = initial_length;
-	bd->length = 0;
-
-	return enesim_text_buffer_new_from_descriptor(&_enesim_text_buffer_default, bd);
+	return enesim_text_buffer_simple_new(0);
 }
 
 /**
@@ -160,53 +50,80 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_new(int initial_length)
  */
 EAPI Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_Descriptor *descriptor, void *data)
 {
-	Enesim_Text_Buffer *b;
+	Enesim_Text_Buffer *thiz;
 
 	if (!descriptor) return NULL;
 
-	b = calloc(1, sizeof(Enesim_Text_Buffer));
-	b->descriptor = descriptor;
-	b->data = data;
+	thiz = calloc(1, sizeof(Enesim_Text_Buffer));
+	thiz->ref = 1;
+	thiz->descriptor = descriptor;
+	thiz->data = data;
 
-	return b;
+	return thiz;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_buffer_delete(Enesim_Text_Buffer *b)
+EAPI Enesim_Text_Buffer * enesim_text_buffer_ref(Enesim_Text_Buffer *thiz)
 {
-	if (!b) return;
+	if (!thiz) return thiz;
 
-	if (b->descriptor->free)
-		b->descriptor->free(b->data);
-	free(b);
+	thiz->ref++;
+	return thiz;
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *b, const char *string, int length)
+EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz)
+{
+	if (!thiz) return;
+
+	thiz->ref--;
+	if (!thiz->ref)
+	{
+		if (thiz->descriptor->free)
+			thiz->descriptor->free(thiz->data);
+		free(thiz);
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz)
+{
+	if (!thiz) return NULL;
+	return thiz->data;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *string, int length)
 {
 	if (!length) return;
-	if (!b) return;
+	if (!thiz) return;
 
-	if (b->descriptor->string_set)
-		b->descriptor->string_set(b->data, string, length);
+	if (thiz->descriptor->string_set)
+		thiz->descriptor->string_set(thiz->data, string, length);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *b, const char *string, int length, ssize_t offset)
+EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *string, int length, ssize_t offset)
 {
 	if (!length) return length;
 
-	if (b->descriptor->string_insert)
-		return b->descriptor->string_insert(b->data, string, length, offset);
+	if (thiz->descriptor->string_insert)
+		return thiz->descriptor->string_insert(thiz->data, string, length, offset);
 	return 0;
 }
 
@@ -214,10 +131,10 @@ EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *b, const char *str
  * To be documented
  * FIXME: To be fixed
  */
-EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *b)
+EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz)
 {
-	if (b->descriptor->string_get)
-		return b->descriptor->string_get(b->data);
+	if (thiz->descriptor->string_get)
+		return thiz->descriptor->string_get(thiz->data);
 	return NULL;
 }
 
@@ -225,12 +142,12 @@ EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *b)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *b, int length, ssize_t offset)
+EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, ssize_t offset)
 {
 	if (!length) return length;
 
-	if (b->descriptor->string_delete)
-		return b->descriptor->string_delete(b->data, length, offset);
+	if (thiz->descriptor->string_delete)
+		return thiz->descriptor->string_delete(thiz->data, length, offset);
 	return 0;
 }
 
@@ -238,10 +155,10 @@ EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *b, int length, ssi
  * To be documented
  * FIXME: To be fixed
  */
-EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *b)
+EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz)
 {
-	if (!b) return 0;
-	if (b->descriptor->string_length)
-		return b->descriptor->string_length(b->data);
+	if (!thiz) return 0;
+	if (thiz->descriptor->string_length)
+		return thiz->descriptor->string_length(thiz->data);
 	return 0;
 }

@@ -38,6 +38,7 @@ include src/lib/pool/Makefile.mk
 include src/lib/rasterizer/Makefile.mk
 include src/lib/renderer/Makefile.mk
 include src/lib/text/Makefile.mk
+include src/lib/text/buffer/Makefile.mk
 include src/lib/util/Makefile.mk
 
 ### Modules
