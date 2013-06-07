@@ -120,6 +120,18 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_smart_new(Enesim_Text_Buffer *real)
 	return enesim_text_buffer_new_from_descriptor(&_enesim_text_buffer_smart, thiz);
 }
 
+EAPI void enesim_text_buffer_smart_real_get(Enesim_Text_Buffer *b,
+		Enesim_Text_Buffer **real)
+{
+	Enesim_Text_Buffer_Smart *thiz;
+
+	if (!real) return;
+
+	thiz = enesim_text_buffer_data_get(b);
+	if (thiz->real) *real = enesim_text_buffer_ref(thiz->real);
+	else *real = NULL;
+}
+
 EAPI void enesim_text_buffer_smart_real_set(Enesim_Text_Buffer *b,
 		Enesim_Text_Buffer *real)
 {

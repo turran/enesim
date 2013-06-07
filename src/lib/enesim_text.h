@@ -104,6 +104,8 @@ EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz);
 EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length);
 
 EAPI Enesim_Text_Buffer * enesim_text_buffer_smart_new(Enesim_Text_Buffer *thiz);
+EAPI void enesim_text_buffer_smart_real_get(Enesim_Text_Buffer *b,
+		Enesim_Text_Buffer **real);
 EAPI void enesim_text_buffer_smart_real_set(Enesim_Text_Buffer *b,
 		Enesim_Text_Buffer *real);
 EAPI void enesim_text_buffer_smart_dirty(Enesim_Text_Buffer *b);

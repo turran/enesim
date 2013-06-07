@@ -764,7 +764,21 @@ EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_B
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_text_span_buffer_set(Enesim_Renderer *r, Enesim_Text_Buffer *b)
+EAPI void enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	if (!b) return;
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	if (!thiz) return;
+	enesim_text_buffer_smart_real_get(thiz->state.buffer, b);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_Text_Buffer *b)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
