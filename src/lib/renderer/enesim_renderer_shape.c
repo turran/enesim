@@ -80,22 +80,37 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 	/* the stroke */
 	/* color */
 	if (thiz->current.stroke.color != thiz->past.stroke.color)
+	{
+		DBG("Stroke color changed");
 		return EINA_TRUE;
+	}
 	/* weight */
 	if (thiz->current.stroke.weight != thiz->past.stroke.weight)
+	{
+		DBG("Stroke weight changed");
 		return EINA_TRUE;
+	}
 	/* location */
 	if (features & ENESIM_SHAPE_FLAG_STROKE_LOCATION)
 	{
 		if (thiz->current.stroke.location != thiz->past.stroke.location)
+		{
+			DBG("Stroke location changed");
 			return EINA_TRUE;
+		}
 	}
 	/* join */
 	if (thiz->current.stroke.join != thiz->past.stroke.join)
+	{
+		DBG("Stroke join changed");
 		return EINA_TRUE;
+	}
 	/* cap */
 	if (thiz->current.stroke.cap != thiz->past.stroke.cap)
+	{
+		DBG("Stroke cap changed");
 		return EINA_TRUE;
+	}
 	/* dashes */
 	if (features & ENESIM_SHAPE_FLAG_STROKE_DASH)
 	{
@@ -103,34 +118,38 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 		 * modify it directly
 		 */
 		if (thiz->stroke_dashes_changed)
+		{
+			DBG("Stroke dashes changed");
 			return EINA_TRUE;
+		}
 	}
 
 	/* fill */
 	/* color */
 	if (thiz->current.fill.color != thiz->past.fill.color)
+	{
+		DBG("Fill color changed");
 		return EINA_TRUE;
-	/* fill rule */
-	if (thiz->current.fill.rule != thiz->past.fill.rule)
-		return EINA_TRUE;
-	/* draw mode */
-	if (thiz->current.draw_mode != thiz->past.draw_mode)
-		return EINA_TRUE;
-	/* we wont compare the stroke dashes, it has changed, then
-	 * modify it directly
-	 */
-	/* color */
-	if (thiz->current.fill.color != thiz->past.fill.color)
-		return EINA_TRUE;
+	}
 	/* renderer */
 	if (thiz->current.fill.r != thiz->past.fill.r)
+	{
+		DBG("Fill renderer changed");
 		return EINA_TRUE;
+	}
 	/* fill rule */
 	if (thiz->current.fill.rule != thiz->past.fill.rule)
+	{
+		DBG("Fill rule changed");
 		return EINA_TRUE;
+	}
 	/* draw mode */
 	if (thiz->current.draw_mode != thiz->past.draw_mode)
+	{
+		DBG("Draw mode changed %d %d", thiz->current.draw_mode,
+				thiz->past.draw_mode);
 		return EINA_TRUE;
+	}
 
 	return EINA_FALSE;
 }
@@ -186,13 +205,25 @@ static void _state_clear(Enesim_Renderer_Shape_State *thiz)
 	Enesim_Shape_Stroke_Dash *d;
 
 	if (thiz->current.fill.r)
+	{
 		enesim_renderer_unref(thiz->current.fill.r);
+		thiz->current.fill.r = NULL;
+	}
 	if (thiz->past.fill.r)
+	{
 		enesim_renderer_unref(thiz->past.fill.r);
+		thiz->past.fill.r = NULL;
+	}
 	if (thiz->current.stroke.r)
+	{
 		enesim_renderer_unref(thiz->current.stroke.r);
+		thiz->current.stroke.r = NULL;
+	}
 	if (thiz->past.stroke.r)
+	{
 		enesim_renderer_unref(thiz->past.stroke.r);
+		thiz->past.stroke.r = NULL;
+	}
 	EINA_LIST_FREE (thiz->stroke_dashes, d)
 	{
 		free(d);
