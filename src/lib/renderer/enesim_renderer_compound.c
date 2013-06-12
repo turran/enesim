@@ -54,6 +54,9 @@
  * - Another way to optmize this is to make the setup() function of every
  *   layer thread safe, that way given that each layer does not depend on the other
  *   the setup can be done on parallel
+ * - It would be interesting to add a background color as property and a flag
+ *   to enable such renderer. This way the bounds will be still the sum of every
+ *   renderer inside but the final draw will have a fill based renderer set
  */
 /*============================================================================*
  *                                  Local                                     *
@@ -299,7 +302,7 @@ static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	/* we might need to add this memset in case the layers for this span dont fill the whole area */
-	memset(ddata, 0xf0, len * sizeof(uint32_t));
+	memset(ddata, 0, len * sizeof(uint32_t));
 	_compound_span_layer_blend(thiz, x, y, len, ddata);
 }
 
@@ -363,6 +366,8 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 	}
 	if (same_rop)
 		f |= ENESIM_RENDERER_HINT_ROP;
+	else
+		f &= ~ENESIM_RENDERER_HINT_ROP;
 	*hints = f;
 }
 
