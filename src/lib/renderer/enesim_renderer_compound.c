@@ -98,7 +98,6 @@ static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 		Layer *l)
 {
 	thiz->removed = eina_list_append(thiz->removed, l);
-	thiz->layers = eina_list_remove(thiz->layers, l);
 	thiz->changed = EINA_TRUE;
 }
 
@@ -300,7 +299,7 @@ static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	/* we might need to add this memset in case the layers for this span dont fill the whole area */
-	memset(ddata, 0, len * sizeof(uint32_t));
+	memset(ddata, 0xf0, len * sizeof(uint32_t));
 	_compound_span_layer_blend(thiz, x, y, len, ddata);
 }
 
@@ -342,7 +341,7 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 	/* TODO we need to find an heuristic to set the colorize/rop flag
 	 * that reduces the number of raster operations we have to do
 	 * (i.e a passthrough)
-	 * - if every renderer has the same rop as the compund then
+	 * - if every renderer has the same rop as the compound then
 	 * there is no need to do a post composition of the result. but how to
 	 * handle the colorize?
 	 */
@@ -699,6 +698,7 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 	Layer *layer;
 	Eina_List *l;
 	Eina_List *l_next;
+	Eina_Bool found = EINA_FALSE;
 
 	if (!rend) return;
 	thiz = ENESIM_RENDERER_COMPOUND(r);
@@ -708,6 +708,19 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 		if (layer->r == rend)
 		{
 			_compound_layer_remove(thiz, layer);
+ 			thiz->layers = eina_list_remove_list(thiz->layers, l);
+			found = EINA_TRUE;
+			break;
+		}
+	}
+	if (found) return;
+	EINA_LIST_FOREACH_SAFE(thiz->added, l, l_next, layer)
+	{
+		if (layer->r == rend)
+		{
+			_compound_layer_remove(thiz, layer);
+ 			thiz->added = eina_list_remove_list(thiz->added, l);
+			found = EINA_TRUE;
 			break;
 		}
 	}
@@ -725,9 +738,17 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
 	Eina_List *l_next;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
+	/* remove the current layers */
 	EINA_LIST_FOREACH_SAFE(thiz->layers, l, l_next, layer)
 	{
 		_compound_layer_remove(thiz, layer);
+ 		thiz->layers = eina_list_remove_list(thiz->layers, l);
+	}
+	/* remove the added layers */
+	EINA_LIST_FOREACH_SAFE(thiz->added, l, l_next, layer)
+	{
+		_compound_layer_remove(thiz, layer);
+ 		thiz->added = eina_list_remove_list(thiz->added, l);
 	}
 	thiz->changed = EINA_TRUE;
 }
