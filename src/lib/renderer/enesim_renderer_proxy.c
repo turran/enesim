@@ -62,15 +62,29 @@ typedef struct _Enesim_Renderer_Proxy_Class {
 	Enesim_Renderer_Class parent;
 } Enesim_Renderer_Proxy_Class;
 
-static void _proxy_span(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *dst)
+/* whenever the proxy needs to fill, we need to zeros the whole destination buffer
+ * before given that the proxied renderer will blend and thus expects a clean
+ * buffer
+ */
+static void _proxy_fill_span_blend(Enesim_Renderer *r,
+		int x, int y, unsigned int len, void *ddata)
 {
 	Enesim_Renderer_Proxy *thiz;
 
- 	thiz = ENESIM_RENDERER_PROXY(r);
-	/* FIXME isnt enough to call the proxied fill */
-	enesim_renderer_sw_draw(thiz->proxied, x, y, len, dst);
+	thiz = ENESIM_RENDERER_PROXY(r);
+
+	memset(ddata, 0, len * sizeof(uint32_t));
+	enesim_renderer_sw_draw(thiz->proxied, x, y, len, ddata);
+}
+
+/* whenever the proxy needs to blend, we just draw the inner renderer */
+static void _proxy_blend_or_equal_span(Enesim_Renderer *r,
+		int x, int y, unsigned int len, void *ddata)
+{
+	Enesim_Renderer_Proxy *thiz;
+
+	thiz = ENESIM_RENDERER_PROXY(r);
+	enesim_renderer_sw_draw(thiz->proxied, x, y, len, ddata);
 }
 
 #if BUILD_OPENGL
@@ -123,12 +137,24 @@ static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Proxy *thiz;
+	Enesim_Rop rop;
+	Enesim_Rop proxy_rop;
 
  	thiz = ENESIM_RENDERER_PROXY(r);
 	if (!_proxy_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
 
-	*fill = _proxy_span;
+	enesim_renderer_rop_get(r, &rop);
+	enesim_renderer_rop_get(thiz->proxied, &proxy_rop);
+	if (rop != proxy_rop && rop == ENESIM_FILL)
+	{
+		*fill = _proxy_fill_span_blend;
+	}
+	else
+	{
+		*fill = _proxy_blend_or_equal_span;
+	}
+
 	return EINA_TRUE;
 }
 
