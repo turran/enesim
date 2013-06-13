@@ -62,6 +62,7 @@ typedef struct _Enesim_Renderer_Shape
 
 
 typedef void (*Enesim_Renderer_Shape_Features_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
+typedef Eina_Bool (*Enesim_Renderer_Shape_Geometry_Get_Cb)(Enesim_Renderer *r, Enesim_Rectangle *geometry);
 
 typedef struct _Enesim_Renderer_Shape_Class {
 	Enesim_Renderer_Class parent;
@@ -79,6 +80,7 @@ typedef struct _Enesim_Renderer_Shape_Class {
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
 	/* shape functions */
 	Enesim_Renderer_Shape_Features_Get_Cb features_get;
+	Enesim_Renderer_Shape_Geometry_Get_Cb geometry_get;
 } Enesim_Renderer_Shape_Class;
 
 Enesim_Object_Descriptor * enesim_renderer_shape_descriptor_get(void);

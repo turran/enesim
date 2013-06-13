@@ -496,14 +496,9 @@ unload:
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
- *                           The Text Base interface                          *
+ *                               Shape interface                              *
  *----------------------------------------------------------------------------*/
-static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r EINA_UNUSED)
-{
-	return "text_span";
-}
-
-static Eina_Bool _enesim_text_sw_setup(Enesim_Renderer *r,
+static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
@@ -544,7 +539,7 @@ static Eina_Bool _enesim_text_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _enesim_text_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _enesim_renderer_text_span_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
@@ -562,27 +557,40 @@ static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r)
 	return enesim_text_buffer_smart_is_dirty(thiz->state.buffer);
 }
 
-static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _enesim_renderer_text_span_geometry_get(Enesim_Renderer *r,
+		Enesim_Rectangle *geometry)
 {
 	Enesim_Renderer_Text_Span *thiz;
-	Enesim_Matrix_Type type;
 	double ox, oy;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-
 	/* we should calculate the current width/height */
 	_enesim_renderer_text_span_calculate(r);
-	rect->x = 0;
-	rect->y = 0;
-	rect->w = thiz->width;
-	rect->h = thiz->height;
+	geometry->x = 0;
+	geometry->y = 0;
+	geometry->w = thiz->width;
+	geometry->h = thiz->height;
 	/* first translate */
 	enesim_renderer_origin_get(r, &ox, &oy);
-	rect->x += ox;
-	rect->y += oy;
+	geometry->x += ox;
+	geometry->y += oy;
 
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                             Renderer interface                             *
+ *----------------------------------------------------------------------------*/
+static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r EINA_UNUSED)
+{
+	return "text_span";
+}
+
+static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
+		Enesim_Rectangle *rect)
+{
+	Enesim_Matrix_Type type;
+
+	_enesim_renderer_text_span_geometry_get(r, rect);
 	enesim_renderer_transformation_type_get(r, &type);
 	/* now apply the inverse transformation */
 	if (type != ENESIM_MATRIX_IDENTITY)
@@ -628,8 +636,9 @@ static void _enesim_renderer_text_span_class_init(void *k)
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	klass->has_changed = _enesim_renderer_text_span_has_changed;
-	klass->sw_setup = _enesim_text_sw_setup;
-	klass->sw_cleanup = _enesim_text_sw_cleanup;
+	klass->sw_setup = _enesim_renderer_text_span_sw_setup;
+	klass->sw_cleanup = _enesim_renderer_text_span_sw_cleanup;
+	klass->geometry_get = _enesim_renderer_text_span_geometry_get;
 }
 
 static void _enesim_renderer_text_span_instance_init(void *o)

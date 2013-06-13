@@ -564,7 +564,6 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *to)
 	Enesim_Renderer *fill;
 	Enesim_Renderer *stroke;
 	const Enesim_Renderer_Shape_State *sstate;
-	
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	sstate = &thiz->state;
@@ -931,4 +930,18 @@ EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 	thiz->state.changed = EINA_TRUE;
 	thiz->state.stroke_dashes_changed = EINA_TRUE;
 	thiz->state.stroke_dashes = NULL;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool enesim_renderer_shape_geometry_get(Enesim_Renderer *r, Enesim_Rectangle *geometry)
+{
+	Enesim_Renderer_Shape_Class *klass;
+
+	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
+	if (klass->geometry_get)
+		return klass->geometry_get(r, geometry);
+	return EINA_FALSE;
 }
