@@ -32,6 +32,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_text
+
 typedef struct _Enesim_Text_Freetype_Glyph
 {
 	FT_GlyphSlot glyph;
@@ -62,7 +64,11 @@ static Enesim_Text_Engine_Font_Data _enesim_text_freetype_font_load(Enesim_Text_
 	FT_Error error;
 
 	error = FT_New_Face(library, name, 0, &face);
-	if (error) return NULL;
+	if (error)
+	{
+		ERR("Error %d loading font '%s' with size %d", error, name, size);
+		return NULL;
+	}
 	FT_Set_Pixel_Sizes(face, size, size);
 
 	return face;

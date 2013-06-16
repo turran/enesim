@@ -114,7 +114,9 @@ static void _enesim_renderer_text_span_common_setup(Enesim_Renderer_Text_Span *t
 			thiz->font = NULL;
 		}
 		if (thiz->state.current.font_name && thiz->state.current.size)
+		{
 			thiz->font = enesim_text_font_load(thiz->engine, thiz->state.current.font_name, thiz->state.current.size);
+		}
 		thiz->state.changed = EINA_FALSE;
 	}
 }
@@ -358,11 +360,15 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	if (!font)
 	{
 		/* weird case ... it might be related to the multiple threads */
+		ERR("No font available?");
 		return;
 	}
 	/* advance to the first character that is inside the x+len span */
 	if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, x, y, &position))
+	{
+		DBG("Can not get glyph at %d %d", x, y);
 		return;
+	}
 	rx = x - position.distance;
 	text = enesim_text_buffer_string_get(thiz->state.buffer);
 	for (c = text + position.index; c && *c && dst < end; c++)
