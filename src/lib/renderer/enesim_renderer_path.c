@@ -48,6 +48,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_renderer
+
 #define ENESIM_RENDERER_PATH(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Path,					\
 		enesim_renderer_path_descriptor_get())
@@ -126,6 +128,11 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	thiz = ENESIM_RENDERER_PATH(r);
 	thiz->current = _path_implementation_get(r);
+	if (!thiz->current)
+	{
+		ENESIM_RENDERER_LOG(r, l, "No path implementation found");
+		return EINA_FALSE;
+	}
 	if (!enesim_renderer_setup(thiz->current, s, l))
 	{
 		return EINA_FALSE;
@@ -138,7 +145,13 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Path *thiz;
 
 	thiz = ENESIM_RENDERER_PATH(r);
+	if (!thiz->current)
+	{
+		WRN("Doing a cleanup without a setup");
+		return;
+	}
 	enesim_renderer_cleanup(thiz->current, s);
+	thiz->current = NULL;
 	thiz->changed = EINA_FALSE;
 }
 /*----------------------------------------------------------------------------*

@@ -48,7 +48,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define ENESIM_LOG_DEFAULT enesim_log_text
+#define ENESIM_LOG_DEFAULT enesim_log_renderer
 
 #define ENESIM_RENDERER_TEXT_SPAN(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Text_Span,					\
