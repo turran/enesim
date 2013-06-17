@@ -241,8 +241,37 @@ static void _state_init(Enesim_Renderer_Shape_State *thiz)
 
 static void _state_commit(Enesim_Renderer_Shape_State *thiz)
 {
-	/* TODO given that we keep a ref, we should this more smartly */
-	thiz->past = thiz->current;
+	/* swap the states */
+	thiz->past.draw_mode = thiz->current.draw_mode;
+	/* the stroke */
+	thiz->past.stroke.color = thiz->current.stroke.color;
+	thiz->past.stroke.weight = thiz->current.stroke.weight;
+	thiz->past.stroke.location = thiz->current.stroke.location;
+	thiz->past.stroke.join = thiz->current.stroke.join;
+	thiz->past.stroke.cap = thiz->current.stroke.cap;
+	/* the fill */
+	thiz->past.fill.color = thiz->current.fill.color;
+	thiz->past.fill.rule = thiz->current.fill.rule;
+	if (thiz->past.fill.r)
+	{
+		enesim_renderer_unref(thiz->past.fill.r);
+		thiz->past.fill.r = NULL;
+	}
+	if (thiz->current.fill.r)
+	{
+		thiz->past.fill.r = enesim_renderer_ref(thiz->current.fill.r);
+	}
+
+	if (thiz->past.stroke.r)
+	{
+		enesim_renderer_unref(thiz->past.stroke.r);
+		thiz->past.stroke.r = NULL;
+	}
+	if (thiz->current.stroke.r)
+	{
+		thiz->past.stroke.r = enesim_renderer_ref(thiz->current.stroke.r);
+	}
+
 	/* unmark the changes */
 	thiz->changed = EINA_FALSE;
 	thiz->stroke_dashes_changed = EINA_FALSE;
@@ -355,7 +384,6 @@ static void _enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r,
 		klass->sw_cleanup(r, s);
 }
 
-
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Renderer_OpenGL_Draw *draw,
@@ -447,11 +475,19 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 
 	/* first check if the common properties have changed */
 	do_send_old = enesim_renderer_state_has_changed(r);
-	if (do_send_old) goto send_old;
+	if (do_send_old)
+	{
+		DBG("Common properties have changed");
+		goto send_old;
+	}
 
 	/* check if the common shape properties have changed */
 	do_send_old = _state_changed_basic(state, features);
-	if (do_send_old) goto send_old;
+	if (do_send_old)
+	{
+		DBG("Common shape properties have changed");
+		goto send_old;
+	}
 
 	/* check if the shape implementation has changed */
 	if (klass->has_changed)
@@ -460,6 +496,7 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 send_old:
 	if (do_send_old)
 	{
+		DBG("Sending old bounds");
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
 	}
@@ -492,6 +529,7 @@ send_old:
 		{
 			if (stroke_changed)
 			{
+				DBG("Stroke changed, sending current bounds");
 				cb(r, &current_bounds, EINA_FALSE, data);
 			}
 		}

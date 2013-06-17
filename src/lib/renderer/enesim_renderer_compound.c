@@ -531,6 +531,7 @@ static void _compound_damage(Enesim_Renderer *r,
 	{
 		Eina_Rectangle current_bounds;
 
+		DBG("Common properties have changed");
 		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
@@ -544,12 +545,16 @@ static void _compound_damage(Enesim_Renderer *r,
 	{
 		EINA_LIST_FOREACH(thiz->removed, ll, l)
 		{
+			DBG("Sending deleted layer '%s' bounds",
+					l->r->state.name);
 			cb(l->r, &l->destination_bounds, EINA_FALSE, data);
 		}
 		EINA_LIST_FOREACH(thiz->added, ll, l)
 		{
 			Eina_Rectangle db;
 
+			DBG("Sending added layer '%s' bounds",
+					l->r->state.name);
 			enesim_renderer_destination_bounds(l->r, &db, 0, 0);
 			cb(l->r, &db, EINA_FALSE, data);
 		}
