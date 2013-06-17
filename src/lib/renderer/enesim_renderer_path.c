@@ -248,24 +248,27 @@ ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_SHAPE_DESCRIPTOR,
 
 static void _enesim_renderer_path_class_init(void *k)
 {
-	Enesim_Renderer_Class *r_klass;
-	Enesim_Renderer_Shape_Class *klass;
+	Enesim_Renderer_Class *klass;
+	Enesim_Renderer_Shape_Class *shape_klass;
 
-	r_klass = ENESIM_RENDERER_CLASS(k);
-	r_klass->base_name_get = _path_name;
-	r_klass->sw_hints_get = _path_sw_hints;
-	r_klass->bounds_get = _path_bounds_get;
-	r_klass->features_get = _path_features_get;
+	shape_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	shape_klass->has_changed = _path_has_changed;
+	shape_klass->features_get = _path_shape_features_get;
 
-	klass = ENESIM_RENDERER_SHAPE_CLASS(k);
-	klass->has_changed = _path_has_changed;
+	klass = ENESIM_RENDERER_CLASS(k);
+	klass->base_name_get = _path_name;
+	klass->sw_hints_get = _path_sw_hints;
+	klass->bounds_get = _path_bounds_get;
+	klass->features_get = _path_features_get;
+	/* override the renderer setup or we will do the setup of the
+	 * fill/stroke renderers twice
+	 */
 	klass->sw_setup = _path_sw_setup;
 	klass->sw_cleanup = _path_sw_cleanup;
 #if BUILD_OPENGL
 	klass->opengl_setup = _path_opengl_setup;
 	klass->opengl_cleanup = _path_opengl_cleanup;
 #endif
-	klass->features_get = _path_shape_features_get;
 }
 
 static void _enesim_renderer_path_instance_init(void *o)

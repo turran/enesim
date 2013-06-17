@@ -392,18 +392,21 @@ static void _enesim_renderer_shape_path_class_init(void *k)
 
 	shape_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	shape_klass->has_changed = _shape_path_has_changed;
-	shape_klass->sw_setup = _shape_path_sw_setup;
-	shape_klass->sw_cleanup = _shape_path_sw_cleanup;
-#if BUILD_OPENGL
-	shape_klass->opengl_setup = _shape_path_opengl_setup;
-	shape_klass->opengl_cleanup = _shape_path_opengl_cleanup;
-#endif
 	shape_klass->features_get = enesim_renderer_shape_path_shape_features_get_default;
 
 	klass = ENESIM_RENDERER_CLASS(k);
 	klass->bounds_get = enesim_renderer_shape_path_bounds_get_default;
 	klass->features_get = _shape_path_features_get;
 	klass->sw_hints_get = _shape_path_sw_hints;
+	/* override the renderer setup or we will do the setup of the
+	 * fill/stroke renderers twice
+	 */
+	klass->sw_setup = _shape_path_sw_setup;
+	klass->sw_cleanup = _shape_path_sw_cleanup;
+#if BUILD_OPENGL
+	klass->opengl_setup = _shape_path_opengl_setup;
+	klass->opengl_cleanup = _shape_path_opengl_cleanup;
+#endif
 }
 
 static void _enesim_renderer_shape_path_instance_init(void *o)
