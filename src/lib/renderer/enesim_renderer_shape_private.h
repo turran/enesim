@@ -84,6 +84,8 @@ typedef struct _Enesim_Renderer_Shape_Class {
 } Enesim_Renderer_Shape_Class;
 
 Enesim_Object_Descriptor * enesim_renderer_shape_descriptor_get(void);
+void enesim_renderer_shape_state_commit(Enesim_Renderer *r);
+Eina_Bool enesim_renderer_shape_state_has_changed(Enesim_Renderer *r);
 const Enesim_Renderer_Shape_State * enesim_renderer_shape_state_get(
 		Enesim_Renderer *r);
 void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *to);

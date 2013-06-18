@@ -117,6 +117,7 @@ static void _shape_path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
+	enesim_renderer_shape_state_commit(r);
 	enesim_renderer_cleanup(thiz->path, s);
 	if (klass->cleanup)
 		klass->cleanup(r);

@@ -150,6 +150,7 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		WRN("Doing a cleanup without a setup");
 		return;
 	}
+	enesim_renderer_shape_state_commit(r);
 	enesim_renderer_cleanup(thiz->current, s);
 	thiz->current = NULL;
 	thiz->changed = EINA_FALSE;

@@ -575,6 +575,14 @@ static void _enesim_renderer_shape_instance_deinit(void *o)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+void enesim_renderer_shape_state_commit(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = ENESIM_RENDERER_SHAPE(r);
+	_state_commit(&thiz->state);
+}
+
 Eina_Bool enesim_renderer_shape_state_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
