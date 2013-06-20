@@ -51,6 +51,10 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, 
 	Eina_List *providers;
 	Eina_List *l;
 
+	/* FIXME we dont need to pass the mime parameter on the functions
+	 * it can be autodetected already
+	 * mime = enesim_image_mime_data_from(data);
+	 */
 	providers = eina_hash_find(_providers, mime);
 	/* iterate over the list of providers and check for a compatible loader */
 	EINA_LIST_FOREACH (providers, l, p)

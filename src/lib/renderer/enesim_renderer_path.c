@@ -385,6 +385,27 @@ EAPI void enesim_renderer_path_command_set(Enesim_Renderer *r,
  * To be documented
  * FIXME: To be fixed
  */
+EAPI void enesim_renderer_path_command_get(Enesim_Renderer *r,
+		Eina_List **list)
+{
+	Enesim_Renderer_Path *thiz;
+	Enesim_Path_Command *cmd;
+	Eina_List *l;
+
+	thiz = ENESIM_RENDERER_PATH(r);
+	EINA_LIST_FOREACH(thiz->commands, l, cmd)
+	{
+		Enesim_Path_Command *new_cmd;
+		new_cmd = calloc(1, sizeof(Enesim_Path_Command));
+		*new_cmd = *cmd;
+		*list = eina_list_append(*list, new_cmd);
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
 EAPI void enesim_renderer_path_move_to(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Path_Command cmd;

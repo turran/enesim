@@ -39,7 +39,11 @@ Enesim
   with a simple callback that whenever a some damage area is returned then we should just abort and return
   true
 
-Etex
+Image
+=====
++ Remove the mime parameter, we can autodetect it when loading
+
+Text
 ====
 + Add fontconfig support
 + Add a path-follow-span, i.e a text span that can receive
