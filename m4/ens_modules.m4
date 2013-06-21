@@ -13,7 +13,7 @@ build_module_[]DOWN="no"
 build_static_module_[]DOWN="no"
 
 AC_ARG_ENABLE([module-[]DOWN],
-   [AS_HELP_STRING([--enable-module-[]DOWN]@<:@=ARG@:>@, [enable $1 module: yes, no, static [default=yes]])],
+   [AS_HELP_STRING([--enable-module-[]DOWN]@<:@=ARG@:>@, [enable $1 module: yes, no, static [default=$2]])],
    [
     if test "x${enableval}" = "xyes" ; then
        want_module="yes"
