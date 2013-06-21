@@ -130,7 +130,13 @@ int enesim_image_init(void)
 	_modules = eina_module_list_get(_modules, PACKAGE_LIB_DIR"/enesim/image/", 1, NULL, NULL);
 	eina_module_list_load(_modules);
 #if BUILD_STATIC_MODULE_PNG
-	png_provider_init();
+	enesim_image_png_provider_init();
+#endif
+#if BUILD_STATIC_MODULE_JPG
+	enesim_image_jpg_provider_init();
+#endif
+#if BUILD_STATIC_MODULE_RAW
+	enesim_image_raw_provider_init();
 #endif
 	/* create our main context */
 	_main_context = enesim_image_context_new();
@@ -153,7 +159,13 @@ int enesim_image_shutdown(void)
 	eina_module_list_free(_modules);
 	eina_array_free(_modules);
 #if BUILD_STATIC_MODULE_PNG
-	png_provider_shutdown();
+	enesim_image_png_provider_shutdown();
+#endif
+#if BUILD_STATIC_MODULE_JPG
+	enesim_image_jpg_provider_shutdown();
+#endif
+#if BUILD_STATIC_MODULE_RAW
+	enesim_image_raw_provider_shutdown();
 #endif
 	/* remove the finders */
 	eina_list_free(_finders);

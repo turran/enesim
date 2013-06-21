@@ -193,9 +193,9 @@ PKG_CHECK_EXISTS([glew],
 PKG_CHECK_MODULES([ENESIM], [${requirements_pc}])
 
 # libpng
-PKG_CHECK_MODULES([ENESIM_MODULES], [libpng >= 0.22],
-   [enable_png="yes"],
-   [enable_png="no"])
+PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
+   [have_png="yes"],
+   [have_png="no"])
 
 
 ### Checks for header files
@@ -212,13 +212,15 @@ fi
 #fi
 
 ## libjpeg
+JPG_LIBS=""
+JPG_CFLAGS=""
 AC_CHECK_HEADER([jpeglib.h],
    [
-    enable_jpg="yes"
-    ENESIM_MODULES_LIBS="${ENESIM_MODULES_LIBS} -ljpeg"
+    have_jpg="yes"
+    JPG_LIBS="-ljpeg"
+    JPG_CFLAGS=""
    ],
-   [enable_jpg="no"])
-
+   [have_jpg="no"])
 ### Checks for types
 
 
@@ -363,8 +365,9 @@ fi
 
 AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
 
-ENS_MODULE([Png], [${enable_png}], [yes])
-ENS_MODULE([Jpg], [${enable_jpg}], [yes])
+ENS_MODULE([Png], [yes], [${have_png}])
+ENS_MODULE([Jpg], [yes], [${have_jpg}])
+ENS_MODULE([Raw], [static], [yes])
 
 
 # Unit tests, coverage and benchmarking
@@ -382,6 +385,8 @@ AC_SUBST([build_opengl])
 AC_SUBST([requirements_cflags])
 AC_SUBST([requirements_libs])
 AC_SUBST([requirements_pc])
+AC_SUBST([JPG_CFLAGS])
+AC_SUBST([JPG_LIBS])
 ENESIM_CFLAGS="${ENESIM_CFLAGS} ${requirements_cflags} -DENESIM_EXTENSION ${ENS_SIMD_FLAGS} ${ENS_COVERAGE_CFLAGS}"
 ENESIM_LIBS="${ENESIM_LIBS} ${requirements_libs} ${ENS_COVERAGE_LIBS}"
 
@@ -437,8 +442,9 @@ echo "  OpenCL....................................: ${build_opencl}"
 echo "  OpenGL....................................: ${build_opengl}"
 echo
 echo "Image Providers:"
-echo "  PNG.......................................: ${have_module_png}"
-echo "  JPG.......................................: ${have_module_jpg}"
+echo "  PNG.......................................: ${build_module_png}"
+echo "  JPG.......................................: ${build_module_jpg}"
+echo "  Raw.......................................: ${build_module_raw}"
 echo
 echo "Font Engines:"
 echo "  Freetype..................................: ${have_freetype}"

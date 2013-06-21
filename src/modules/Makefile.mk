@@ -14,12 +14,12 @@ src_modules_enesim_image_png_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib/object \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@ \
-@ENESIM_MODULES_CFLAGS@
+@PNG_CFLAGS@
 
 src_modules_enesim_image_png_la_LIBADD = \
 src/lib/libenesim.la \
 @ENESIM_LIBS@ \
-@ENESIM_MODULES_LIBS@
+@PNG_LIBS@
 
 src_modules_enesim_image_png_la_LDFLAGS = -no-undefined -module -avoid-version
 src_modules_enesim_image_png_la_LIBTOOLFLAGS = --tag=disable-static
@@ -41,12 +41,12 @@ src_modules_enesim_image_jpg_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib/object \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@ \
-@ENESIM_MODULES_CFLAGS@
+@JPG_CFLAGS@
 
 src_modules_enesim_image_jpg_la_LIBADD = \
 src/lib/libenesim.la \
 @ENESIM_LIBS@ \
-@ENESIM_MODULES_LIBS@
+@JPG_LIBS@
 
 src_modules_enesim_image_jpg_la_LDFLAGS = -no-undefined -module -avoid-version
 src_modules_enesim_image_jpg_la_LIBTOOLFLAGS = --tag=disable-static
@@ -54,6 +54,8 @@ src_modules_enesim_image_jpg_la_LIBTOOLFLAGS = --tag=disable-static
 endif
 
 ## Raw
+
+if BUILD_MODULE_RAW
 
 enesim_image_raw_LTLIBRARIES = src/modules/enesim_image_raw.la
 enesim_image_rawdir = $(pkglibdir)/image
@@ -73,3 +75,5 @@ src/lib/libenesim.la \
 
 src_modules_enesim_image_raw_la_LDFLAGS = -no-undefined -module -avoid-version
 src_modules_enesim_image_raw_la_LIBTOOLFLAGS = --tag=disable-static
+
+endif

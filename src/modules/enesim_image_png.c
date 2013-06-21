@@ -381,7 +381,11 @@ static Enesim_Image_Finder _finder = {
 /*============================================================================*
  *                             Module API                                     *
  *============================================================================*/
-static Eina_Bool png_provider_init(void)
+#if BUILD_STATIC_MODULE_PNG
+Eina_Bool enesim_image_png_provider_init(void)
+#else
+static Eina_Bool enesim_image_png_provider_init(void)
+#endif
 {
 	enesim_image_log_dom_png = eina_log_domain_register("enesim_image_png", ENESIM_IMAGE_LOG_COLOR_DEFAULT);
 	if (enesim_image_log_dom_png < 0)
@@ -404,7 +408,11 @@ static Eina_Bool png_provider_init(void)
 	return EINA_TRUE;
 }
 
-static void png_provider_shutdown(void)
+#if BUILD_STATIC_MODULE_PNG
+void enesim_image_png_provider_shutdown(void)
+#else
+static void enesim_image_png_provider_shutdown(void)
+#endif
 {
 	enesim_image_finder_unregister(&_finder);
 	enesim_image_provider_unregister(&_provider, "image/png");
@@ -412,6 +420,8 @@ static void png_provider_shutdown(void)
 	enesim_image_log_dom_png = -1;
 }
 
-EINA_MODULE_INIT(png_provider_init);
-EINA_MODULE_SHUTDOWN(png_provider_shutdown);
+#if !BUILD_STATIC_MODULE_PNG
+EINA_MODULE_INIT(enesim_image_png_provider_init);
+EINA_MODULE_SHUTDOWN(enesim_image_png_provider_shutdown);
+#endif
 

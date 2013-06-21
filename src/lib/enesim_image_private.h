@@ -37,4 +37,19 @@ int enesim_image_shutdown(void);
 Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, const char *mime);
 Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Image_Data *data, const char *mime);
 
+#if BUILD_STATIC_MODULE_PNG
+Eina_Bool enesim_image_png_provider_init(void);
+void enesim_image_png_provider_shutdown(void);
+#endif
+
+#if BUILD_STATIC_MODULE_JPG
+Eina_Bool enesim_image_jpg_provider_init(void);
+void enesim_image_jpg_provider_shutdown(void);
+#endif
+
+#if BUILD_STATIC_MODULE_RAW
+Eina_Bool enesim_image_raw_provider_init(void);
+void enesim_image_raw_provider_shutdown(void);
+#endif
+
 #endif /*ENESIM_IMAGE_PRIVATE_H_*/
