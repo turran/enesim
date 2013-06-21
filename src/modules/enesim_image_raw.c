@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 
 #include "Enesim.h"
@@ -145,9 +149,9 @@ static Eina_Bool enesim_image_raw_provider_init(void)
 }
 
 #if BUILD_STATIC_MODULE_RAW
-static void enesim_image_provider_shutdown(void)
+void enesim_image_raw_provider_shutdown(void)
 #else
-void enesim_image_provider_shutdown(void)
+static void enesim_image_raw_provider_shutdown(void)
 #endif
 {
 	enesim_image_finder_unregister(&_finder);
@@ -157,6 +161,6 @@ void enesim_image_provider_shutdown(void)
 }
 
 #if !BUILD_STATIC_MODULE_RAW
-EINA_MODULE_INIT(raw_provider_init);
-EINA_MODULE_SHUTDOWN(raw_provider_shutdown);
+EINA_MODULE_INIT(enesim_image_raw_provider_init);
+EINA_MODULE_SHUTDOWN(enesim_image_raw_provider_shutdown);
 #endif
