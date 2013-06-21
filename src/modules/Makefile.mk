@@ -1,6 +1,14 @@
 
 ## Png
 
+if BUILD_STATIC_MODULE_PNG
+
+src_lib_libenesim_la_SOURCES += src/modules/enesim_image_png.c
+src_lib_libenesim_la_CPPFLAGS += @PNG_CFLAGS@
+src_lib_libenesim_la_LIBADD += @PNG_LIBS@
+
+endif
+
 if BUILD_MODULE_PNG
 
 enesim_image_png_LTLIBRARIES = src/modules/enesim_image_png.la
@@ -28,6 +36,14 @@ endif
 
 ## Jpeg
 
+if BUILD_STATIC_MODULE_JPG
+
+src_lib_libenesim_la_SOURCES += src/modules/enesim_image_jpg.c
+src_lib_libenesim_la_CPPFLAGS += @JPG_CFLAGS@
+src_lib_libenesim_la_LIBADD += @JPG_LIBS@
+
+endif
+
 if BUILD_MODULE_JPG
 
 enesim_image_jpg_LTLIBRARIES = src/modules/enesim_image_jpg.la
@@ -54,6 +70,12 @@ src_modules_enesim_image_jpg_la_LIBTOOLFLAGS = --tag=disable-static
 endif
 
 ## Raw
+
+if BUILD_STATIC_MODULE_RAW
+
+src_lib_libenesim_la_SOURCES += src/modules/enesim_image_raw.c
+
+endif
 
 if BUILD_MODULE_RAW
 

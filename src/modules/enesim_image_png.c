@@ -424,4 +424,3 @@ static void enesim_image_png_provider_shutdown(void)
 EINA_MODULE_INIT(enesim_image_png_provider_init);
 EINA_MODULE_SHUTDOWN(enesim_image_png_provider_shutdown);
 #endif
-
