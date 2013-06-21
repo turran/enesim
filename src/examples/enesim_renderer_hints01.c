@@ -26,7 +26,7 @@ static Enesim_Renderer * enesim_renderer_hints01(void)
 	Enesim_Renderer *compound;
 	Enesim_Renderer *background;
 	Enesim_Color colors[] = { 0xffff0000, 0xff00ff00, 0xff0000ff };
-	int i;
+	unsigned int i;
 	double x = 60;
 	double y = 60;
 

@@ -46,6 +46,7 @@ src/lib/renderer/enesim_renderer_importer.c \
 src/lib/renderer/enesim_renderer_line.c \
 src/lib/renderer/enesim_renderer_path.c \
 src/lib/renderer/enesim_renderer_path_abstract.c \
+src/lib/renderer/enesim_renderer_path_abstract_private.h \
 src/lib/renderer/enesim_renderer_path_enesim.c \
 src/lib/renderer/enesim_renderer_pattern.c \
 src/lib/renderer/enesim_renderer_perlin.c \

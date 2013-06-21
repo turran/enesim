@@ -114,6 +114,9 @@ if BUILD_OPENGL
 pkgconfig_DATA += enesim_opengl.pc
 endif
 
+clean-local:
+	-rm -rf enesim.pc
+
 .PHONY: coverage benchmark
 
 # Unit tests
