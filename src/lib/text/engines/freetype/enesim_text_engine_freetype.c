@@ -34,49 +34,109 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_text
 
+typedef struct _Enesim_Text_Freetype
+{
+	FT_Library library;
+	Eina_Lock lock;
+} Enesim_Text_Freetype;
+
 typedef struct _Enesim_Text_Freetype_Glyph
 {
 	FT_GlyphSlot glyph;
 	Enesim_Buffer_Sw_Data *data;
 } Enesim_Text_Freetype_Glyph;
 
+static void _raster_callback(const int y,
+               const int count,
+               const FT_Span * const spans,
+               void * const user)
+{
+	Enesim_Text_Freetype_Glyph *efg = (Enesim_Text_Freetype_Glyph *)user;
+	int i;
+	int ry;
+	uint32_t *yptr;
+
+#if 0
+	int width;
+	int height;
+	/* get the real y */
+	width = efg->glyph->metrics.width >> 6;
+	height = efg->glyph->metrics.height >> 6;
+#endif
+
+	ry = (efg->glyph->metrics.horiBearingY >> 6) - y - 1;
+	yptr = (uint32_t *)((uint8_t *)efg->data->argb8888_pre.plane0 + (ry * efg->data->argb8888_pre.plane0_stride));
+	for (i = 0; i < count; i++)
+	{
+		int x;
+		int rx;
+		uint32_t *xptr;
+		uint8_t a;
+
+		/* get the real x */
+		rx = spans[i].x - (efg->glyph->metrics.horiBearingX >> 6);
+		a = spans[i].coverage;
+		xptr = yptr + rx;
+		for (x = 0; x < spans[i].len; x++)
+		{
+			*xptr = a << 24 | a << 16 | a << 8 | a;
+			xptr++;
+		}
+	}
+}
+
+/*----------------------------------------------------------------------------*
+ *                        The Enesim's text interface                         *
+ *----------------------------------------------------------------------------*/
 
 static void * _enesim_text_freetype_init(void)
 {
-	static FT_Library library = NULL;
+	Enesim_Text_Freetype *thiz;
 
-	if (!library) FT_Init_FreeType(&library);
-
-	return library;
+	thiz = calloc(1, sizeof(Enesim_Text_Freetype));
+	FT_Init_FreeType(&thiz->library);
+	eina_lock_new(&thiz->lock);
+	
+	return thiz;
 }
 
 static void _enesim_text_freetype_shutdown(void *data)
 {
-	FT_Library library = data;
+	Enesim_Text_Freetype *thiz = data;
 
-	FT_Done_FreeType(library);
+	FT_Done_FreeType(thiz->library);
+	eina_lock_free(&thiz->lock);
+	free(thiz);
 }
 
 static Enesim_Text_Engine_Font_Data _enesim_text_freetype_font_load(Enesim_Text_Engine_Data data, const char *name, int size)
 {
-	FT_Library library = data;
+	Enesim_Text_Freetype *thiz = data;
 	FT_Face face;
 	FT_Error error;
 
-	error = FT_New_Face(library, name, 0, &face);
+	eina_lock_take(&thiz->lock);
+	error = FT_New_Face(thiz->library, name, 0, &face);
 	if (error)
 	{
 		ERR("Error %d loading font '%s' with size %d", error, name, size);
+		eina_lock_release(&thiz->lock);
 		return NULL;
 	}
 	FT_Set_Pixel_Sizes(face, size, size);
+	eina_lock_release(&thiz->lock);
 
 	return face;
 }
 
-static void _enesim_text_freetype_font_delete(Enesim_Text_Engine_Data data EINA_UNUSED, Enesim_Text_Engine_Font_Data fdata EINA_UNUSED)
+static void _enesim_text_freetype_font_delete(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
 {
+	Enesim_Text_Freetype *thiz = data;
+	FT_Face face = fdata;
 
+	eina_lock_take(&thiz->lock);
+	FT_Done_Face(face);
+	eina_lock_release(&thiz->lock);
 }
 
 static int _enesim_text_freetype_font_max_ascent_get(Enesim_Text_Engine_Data data EINA_UNUSED, Enesim_Text_Engine_Font_Data fdata)
@@ -109,49 +169,13 @@ static int _enesim_text_freetype_font_max_descent_get(Enesim_Text_Engine_Data da
 	return desc;
 }
 
-static void _raster_callback(const int y,
-               const int count,
-               const FT_Span * const spans,
-               void * const user)
-{
-	Enesim_Text_Freetype_Glyph *efg = (Enesim_Text_Freetype_Glyph *)user;
-	int width;
-	int height;
-	int i;
-	int ry;
-	uint32_t *yptr;
-
-	/* get the real y */
-	width = efg->glyph->metrics.width >> 6;
-	height = efg->glyph->metrics.height >> 6;
-
-	ry = (efg->glyph->metrics.horiBearingY >> 6) - y - 1;
-	yptr = (uint32_t *)((uint8_t *)efg->data->argb8888_pre.plane0 + (ry * efg->data->argb8888_pre.plane0_stride));
-	for (i = 0; i < count; i++)
-	{
-		int x;
-		int rx;
-		uint32_t *xptr;
-		uint8_t a;
-
-		/* get the real x */
-		rx = spans[i].x - (efg->glyph->metrics.horiBearingX >> 6);
-		a = spans[i].coverage;
-		xptr = yptr + rx;
-		for (x = 0; x < spans[i].len; x++)
-		{
-			*xptr = a << 24 | a << 16 | a << 8 | a;
-			xptr++;
-		}
-	}
-}
-
 static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data edata, Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g)
 {
+	Enesim_Text_Freetype *thiz = edata;
 	FT_UInt gindex;
 	FT_Face face = fdata;
-	FT_Library library = edata;
 
+	eina_lock_take(&thiz->lock);
 	gindex = FT_Get_Char_Index(face, c);
 	if (FT_Load_Glyph(face, gindex, FT_LOAD_NO_BITMAP) == 0)
 	{
@@ -180,7 +204,7 @@ static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data edata, Enesi
 			params.user = &efg;
 
 			//printf("getting glyph %c of size %d %d\n", c, width, height);
-			FT_Outline_Render(library, &face->glyph->outline, &params);
+			FT_Outline_Render(thiz->library, &face->glyph->outline, &params);
 			g->surface = enesim_surface_new_data_from(
 					ENESIM_FORMAT_ARGB8888, width, height,
 					EINA_FALSE, gdata, width * 4, NULL,
@@ -190,18 +214,19 @@ no_surface:
 			g->x_advance = (face->glyph->metrics.horiAdvance >> 6);
 		}
 	}
+	eina_lock_release(&thiz->lock);
 }
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Enesim_Text_Engine_Descriptor enesim_text_freetype  = {
-	.init = _enesim_text_freetype_init,
-	.shutdown = _enesim_text_freetype_shutdown,
-	.font_load = _enesim_text_freetype_font_load,
-	.font_delete = _enesim_text_freetype_font_delete,
-	.font_max_ascent_get = _enesim_text_freetype_font_max_ascent_get,
-	.font_max_descent_get = _enesim_text_freetype_font_max_descent_get,
-	.font_glyph_get = _enesim_text_freetype_glyph_get,
+	/* .init 			= */ _enesim_text_freetype_init,
+	/* .shutdown 			= */ _enesim_text_freetype_shutdown,
+	/* .font_load 			= */ _enesim_text_freetype_font_load,
+	/* .font_delete 		= */ _enesim_text_freetype_font_delete,
+	/* .font_max_ascent_get 	= */ _enesim_text_freetype_font_max_ascent_get,
+	/* .font_max_descent_get 	= */ _enesim_text_freetype_font_max_descent_get,
+	/* .font_glyph_get 		= */ _enesim_text_freetype_glyph_get,
 };
 /*============================================================================*
  *                                   API                                      *
