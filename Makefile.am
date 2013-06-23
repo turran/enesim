@@ -24,6 +24,7 @@ m4/ltsugar.m4 \
 m4/ltversion.m4
 
 EXTRA_DIST =
+CLEAN_LOCAL = enesim.pc
 
 ### Library
 
@@ -88,6 +89,7 @@ $(SED) \
 -e 's,@libdir\@,$(libdir),g' \
 -e 's,@includedir\@,$(includedir),g' \
 -e 's,@pkgincludedir\@,$(pkgincludedir),g' \
+-e 's,@pkglibdir\@,$(pkglibdir),g' \
 -e 's,@requirements_pc\@,$(requirements_pc),g' \
 -e 's,@requirements_libs\@,$(requirements_libs),g' \
 -e 's,@requirements_cflags\@,$(requirements_cflags),g' \
@@ -113,9 +115,6 @@ endif
 if BUILD_OPENGL
 pkgconfig_DATA += enesim_opengl.pc
 endif
-
-clean-local:
-	-rm -rf enesim.pc
 
 .PHONY: coverage benchmark
 
@@ -144,8 +143,7 @@ coverage:
 	@make check
 	@make lcov-report
 
-clean-local:
-	@rm -rf coverage
+CLEAN_LOCAL += coverage
 else
 lcov-reset:
 	@echo "reconfigure with --enable-coverage"
@@ -156,3 +154,6 @@ lcov-report:
 coverage:
 	@echo "reconfigure with --enable-tests --enable-coverage"
 endif
+
+clean-local: doc-clean
+	-rm -rf $(CLEAN_LOCAL)

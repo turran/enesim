@@ -19,8 +19,6 @@ doc: doc-clean
 	bzip2 -9 $(PACKAGE_DOCNAME).tar
 	rm -rf $(PACKAGE_DOCNAME)/
 
-clean-local: doc-clean
-
 else
 
 doc:

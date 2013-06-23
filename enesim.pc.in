@@ -3,6 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 pkgincludedir=@pkgincludedir@-@VMAJ@
+pkglibdir=@pkglibdir@/image
 
 opencl=@build_opencl@
 opengl=@build_opengl@
