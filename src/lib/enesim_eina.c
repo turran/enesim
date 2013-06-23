@@ -170,3 +170,23 @@ EAPI char * eina_str_dup_printf(const char *format, ...)
 	va_end(args);
 	return ret;
 }
+
+EAPI char *
+eina_strndup(const char *str, size_t size)
+{
+	size_t length;
+	char *p;
+
+	if (!str)
+		return NULL;
+
+	length = strlen(str);
+	length = (length < size) ? (length + 1) : (size + 1);
+	p = (char *)malloc(length * sizeof(char));
+	if (!p)
+		return NULL;
+	memcpy(p, str, length);
+	p[length - 1] = '\0';
+
+	return p;
+}

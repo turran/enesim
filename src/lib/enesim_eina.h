@@ -76,5 +76,6 @@ EAPI double eina_strtod(const char *nptr, char **endptr);
 EAPI size_t eina_str_printf_length(const char *format, va_list args);
 EAPI char * eina_str_dup_vprintf(const char *format, va_list args);
 EAPI char * eina_str_dup_printf(const char *format, ...);
+EAPI char * eina_strndup(const char *str, size_t size);
 
 #endif
