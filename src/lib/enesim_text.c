@@ -29,16 +29,24 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_text
 
-static void _enesim_text_setup(Enesim_Text_Engine *e)
-{
-	e->data = e->d->init();
-	e->fonts = eina_hash_string_superfast_new(NULL);
-}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 #if HAVE_FREETYPE
 extern Enesim_Text_Engine_Descriptor enesim_text_freetype;
+#endif
+
+#if 0
+/* TODO we need this for later, to create the cache for example */
+void enesim_text_init(void)
+{
+
+}
+
+void enesim_text_shutdown(void)
+{
+
+}
 #endif
 /*============================================================================*
  *                                   API                                      *
@@ -56,9 +64,7 @@ EAPI Enesim_Text_Engine * enesim_text_freetype_get(void)
 
 	if (!e)
 	{
-		e = calloc(1, sizeof(Enesim_Text_Engine));
-		e->d = &enesim_text_freetype;
-		_enesim_text_setup(e);
+		e = enesim_text_engine_new(&enesim_text_freetype);
 	}
 	return e;
 #else

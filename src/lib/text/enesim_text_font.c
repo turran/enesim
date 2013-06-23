@@ -28,6 +28,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_text
+
 struct _Enesim_Text_Font
 {
 	Enesim_Text_Engine *engine;
@@ -52,7 +54,7 @@ static void _font_unref(Enesim_Text_Font *f)
 {
 	if (f->ref <= 0)
 	{
-		printf("unreffing error\n");
+		ERR("Unreffing error");
 		return;
 	}
 
