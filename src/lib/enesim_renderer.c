@@ -19,7 +19,6 @@
 #include "libargb.h"
 
 #include "enesim_main.h"
-#include "enesim_eina.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
@@ -233,8 +232,8 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_surface_lock(s, EINA_TRUE);
 	b = enesim_surface_backend_get(s);
-	DBG("Drawing area %" EINA_RECTANGLE_FORMAT,
-			EINA_RECTANGLE_ARGS (area));
+	DBG("Drawing area %" EINA_EXTRA_RECTANGLE_FORMAT,
+			EINA_EXTRA_RECTANGLE_ARGS (area));
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:

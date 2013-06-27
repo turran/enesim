@@ -18,7 +18,6 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_eina.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
@@ -233,8 +232,8 @@ static inline void _renderer_affine_setup(Enesim_Renderer *r, int x, int y,
 	enesim_renderer_transformation_get(r, &dmatrix);
 	enesim_matrix_f16p16_matrix_to(&dmatrix, &matrix);
 
-	ox = eina_f16p16_double_from(oox);
-	oy = eina_f16p16_double_from(ooy);
+	ox = eina_extra_f16p16_double_from(oox);
+	oy = eina_extra_f16p16_double_from(ooy);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);

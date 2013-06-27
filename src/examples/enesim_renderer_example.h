@@ -14,8 +14,8 @@
 									\
 		r = name();						\
 		enesim_renderer_destination_bounds(r, &bounds, 0, 0);	\
-		printf("bounds %" EINA_RECTANGLE_FORMAT "\n", 		\
-				EINA_RECTANGLE_ARGS(&bounds)); \
+		printf("bounds %" EINA_EXTRA_RECTANGLE_FORMAT "\n", 		\
+				EINA_EXTRA_RECTANGLE_ARGS(&bounds)); \
 		s = enesim_surface_new(ENESIM_FORMAT_ARGB8888,		\
 				256, 256);				\
 		if (!enesim_renderer_draw(r, s, NULL, 0, 0, &error))	\

@@ -72,7 +72,6 @@
 extern "C" {
 #endif
 /* core headers */
-#include "enesim_eina.h"
 #include "enesim_log.h"
 #include "enesim_main.h"
 #include "enesim_color.h"

@@ -64,7 +64,7 @@ static inline uint32_t enesim_renderer_gradient_restrict_color_get(Enesim_Color 
 	if (fp < 0)
 	{
 		v = 0;
-		if (p >= -EINA_F16P16_ONE)
+		if (p >= -EINA_EXTRA_F16P16_ONE)
 		{
 			uint16_t a;
 
@@ -77,7 +77,7 @@ static inline uint32_t enesim_renderer_gradient_restrict_color_get(Enesim_Color 
 		Eina_F16p16 slen = eina_f16p16_int_from(len - 1);
 
 		v = 0;
-		if (p - slen <= EINA_F16P16_ONE)
+		if (p - slen <= EINA_EXTRA_F16P16_ONE)
 		{
 			uint16_t a;
 
@@ -198,7 +198,7 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
 		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
 				gstate->src,				\
 				gstate->len, d);			\
-		xx += EINA_F16P16_ONE;					\
+		xx += EINA_EXTRA_F16P16_ONE;					\
 	}								\
 }
 

@@ -18,7 +18,6 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_eina.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
@@ -76,7 +75,7 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 		ENESIM_RENDERER_LOG(r, l, "No valid offset between stops");
 		return EINA_FALSE;
 	}
-	inc = eina_f16p16_double_from(1.0 / (diff * slen));
+	inc = eina_extra_f16p16_double_from(1.0 / (diff * slen));
 	xx = 0;
 
 	start = curr->pos * slen;
@@ -111,7 +110,7 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 			{
 				continue;
 			}
-			inc = eina_f16p16_double_from(1.0 / (diff * slen));
+			inc = eina_extra_f16p16_double_from(1.0 / (diff * slen));
 			xx = 0;
 		}
 		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);

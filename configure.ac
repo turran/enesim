@@ -140,7 +140,7 @@ esac
 
 ## Eina
 
-requirements_pc="eina >= 1.0.0 ${requirements_pc}"
+requirements_pc="eina-extra eina >= 1.0.0 ${requirements_pc}"
 
 ## Freetype
 

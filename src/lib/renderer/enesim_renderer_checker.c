@@ -19,7 +19,6 @@
 #include "libargb.h"
 
 #include "enesim_main.h"
-#include "enesim_eina.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
@@ -263,7 +262,7 @@ static void _span_identity(Enesim_Renderer *r,
 			p0 = color[1];
 		}
 		*dst++ = p0;
-		xx += EINA_F16P16_ONE;
+		xx += EINA_EXTRA_F16P16_ONE;
 	}
 }
 

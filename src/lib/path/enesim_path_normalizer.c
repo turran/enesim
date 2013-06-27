@@ -18,7 +18,6 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_eina.h"
 #include "enesim_path.h"
 
 #include "enesim_path_private.h"

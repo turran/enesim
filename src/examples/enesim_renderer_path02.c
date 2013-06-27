@@ -1,3 +1,4 @@
+#include <Eina_Extra.h>
 #include "Enesim.h"
 #include "enesim_renderer_example.h"
 

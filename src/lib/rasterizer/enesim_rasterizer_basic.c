@@ -21,7 +21,6 @@
 #include <math.h>
 
 #include "enesim_main.h"
-#include "enesim_eina.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
@@ -306,8 +305,8 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_f16p16_double_from(ox);
-	yy -= eina_f16p16_double_from(oy);
+	xx -= eina_extra_f16p16_double_from(ox);
+	yy -= eina_extra_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -470,8 +469,8 @@ static void _stroke_paint_fill_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_f16p16_double_from(ox);
-	yy -= eina_f16p16_double_from(oy);
+	xx -= eina_extra_f16p16_double_from(ox);
+	yy -= eina_extra_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -579,8 +578,8 @@ static void _stroke_paint_fill_paint_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_f16p16_double_from(ox);
-	yy -= eina_f16p16_double_from(oy);
+	xx -= eina_extra_f16p16_double_from(ox);
+	yy -= eina_extra_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -752,8 +751,8 @@ static void _stroke_fill_paint_eo(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_f16p16_double_from(ox);
-	yy -= eina_f16p16_double_from(oy);
+	xx -= eina_extra_f16p16_double_from(ox);
+	yy -= eina_extra_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -917,8 +916,8 @@ static void _stroke_paint_fill_eo(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_f16p16_double_from(ox);
-	yy -= eina_f16p16_double_from(oy);
+	xx -= eina_extra_f16p16_double_from(ox);
+	yy -= eina_extra_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -1027,8 +1026,8 @@ static void _stroke_paint_fill_paint_eo(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_f16p16_double_from(ox);
-	yy -= eina_f16p16_double_from(oy);
+	xx -= eina_extra_f16p16_double_from(ox);
+	yy -= eina_extra_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))

@@ -18,7 +18,6 @@
 #include "enesim_private.h"
 #include "libargb.h"
 
-#include "enesim_eina.h"
 #include "enesim_main.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
@@ -109,8 +108,8 @@ static void _span_identity(Enesim_Renderer *r,
 		double rad = hypot(x, y);
 
 		rad = (((thiz->current.scale * (thiz->current.radius - rad)) + rad) * r_inv);
-		sxx = eina_f16p16_double_from((rad * x) + thiz->current.orx);
-		syy = eina_f16p16_double_from((rad * y) + thiz->current.ory);
+		sxx = eina_extra_f16p16_double_from((rad * x) + thiz->current.orx);
+		syy = eina_extra_f16p16_double_from((rad * y) + thiz->current.ory);
 
 		sy = (syy >> 16);
 		sx = (sxx >> 16);

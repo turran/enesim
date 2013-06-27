@@ -18,7 +18,6 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_eina.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
@@ -179,16 +178,16 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 		enesim_matrix_point_transform(&m, x1, y1, &x1, &y1);
 	}
 
-	thiz->xx = xx0 = eina_f16p16_double_from(x0);
-	xx1 = eina_f16p16_double_from(x1);
-	thiz->yy = yy0 = eina_f16p16_double_from(y0);
-	yy1 = eina_f16p16_double_from(y1);
+	thiz->xx = xx0 = eina_extra_f16p16_double_from(x0);
+	xx1 = eina_extra_f16p16_double_from(x1);
+	thiz->yy = yy0 = eina_extra_f16p16_double_from(y0);
+	yy1 = eina_extra_f16p16_double_from(y1);
 
 	xx0 = xx1 - xx0;
 	yy0 = yy1 - yy0;
 
 	/* we need to use floats because of the limitation of 16.16 values */
-	f = eina_f16p16_double_from(hypot(eina_f16p16_double_to(xx0), eina_f16p16_double_to(yy0)));
+	f = eina_extra_f16p16_double_from(hypot(eina_extra_f16p16_double_to(xx0), eina_extra_f16p16_double_to(yy0)));
 	f += 32768;
 	thiz->ayx = ((int64_t)xx0 << 16) / f;
 	thiz->ayy = ((int64_t)yy0 << 16) / f;

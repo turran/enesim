@@ -21,6 +21,8 @@ doc: doc-clean
 
 else
 
+doc-clean:
+
 doc:
 	@echo "Documentation not built. Run ./configure --help"
 

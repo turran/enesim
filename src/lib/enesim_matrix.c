@@ -17,7 +17,6 @@
  */
 #include "enesim_private.h"
 
-#include "enesim_eina.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
 
@@ -207,15 +206,15 @@ EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
 		Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i)
 {
-	if (a) *a = eina_f16p16_double_from(MATRIX_XX(m));
-	if (b) *b = eina_f16p16_double_from(MATRIX_XY(m));
-	if (c) *c = eina_f16p16_double_from(MATRIX_XZ(m));
-	if (d) *d = eina_f16p16_double_from(MATRIX_YX(m));
-	if (e) *e = eina_f16p16_double_from(MATRIX_YY(m));
-	if (f) *f = eina_f16p16_double_from(MATRIX_YZ(m));
-	if (g) *g = eina_f16p16_double_from(MATRIX_ZX(m));
-	if (h) *h = eina_f16p16_double_from(MATRIX_ZY(m));
-	if (i) *i = eina_f16p16_double_from(MATRIX_ZZ(m));
+	if (a) *a = eina_extra_f16p16_double_from(MATRIX_XX(m));
+	if (b) *b = eina_extra_f16p16_double_from(MATRIX_XY(m));
+	if (c) *c = eina_extra_f16p16_double_from(MATRIX_XZ(m));
+	if (d) *d = eina_extra_f16p16_double_from(MATRIX_YX(m));
+	if (e) *e = eina_extra_f16p16_double_from(MATRIX_YY(m));
+	if (f) *f = eina_extra_f16p16_double_from(MATRIX_YZ(m));
+	if (g) *g = eina_extra_f16p16_double_from(MATRIX_ZX(m));
+	if (h) *h = eina_extra_f16p16_double_from(MATRIX_ZY(m));
+	if (i) *i = eina_extra_f16p16_double_from(MATRIX_ZZ(m));
 }
 
 /**
