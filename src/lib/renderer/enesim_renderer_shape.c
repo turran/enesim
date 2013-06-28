@@ -468,8 +468,6 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
 	state = &thiz->state;
 
-	/* get the current bounds */
-	enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 	/* get the features */
 	enesim_renderer_shape_features_get(r, &features);
 
@@ -496,6 +494,8 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 send_old:
 	if (do_send_old)
 	{
+		/* get the current bounds */
+		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 		DBG("Sending old bounds");
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
@@ -505,19 +505,24 @@ send_old:
 		/* optimized case */
 		Enesim_Shape_Draw_Mode dm = state->current.draw_mode;
 		Eina_Bool stroke_changed = EINA_FALSE;
+		Eina_Bool fill_changed = EINA_FALSE;
 
 		if (state->current.stroke.r &&
 					(dm & ENESIM_SHAPE_DRAW_MODE_STROKE))
 			stroke_changed = enesim_renderer_has_changed(state->current.stroke.r);
 
+		if (state->current.fill.r &&
+				(dm & ENESIM_SHAPE_DRAW_MODE_FILL))
+			fill_changed = enesim_renderer_has_changed(state->current.fill.r);
+
 		/* if we fill with a renderer which has changed then only
 		 * send the damages of that fill
 		 */
-		if (state->current.fill.r &&
-				(dm & ENESIM_SHAPE_DRAW_MODE_FILL) &&
-				!stroke_changed)
+		if (fill_changed && !stroke_changed)
 		{
 			Enesim_Renderer_Shape_Damage_Data ddata;
+
+			enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 			ddata.real_cb = cb;
 			ddata.real_data = data;
 			ddata.bounds = &current_bounds;
@@ -530,6 +535,7 @@ send_old:
 			if (stroke_changed)
 			{
 				DBG("Stroke changed, sending current bounds");
+				enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 				cb(r, &current_bounds, EINA_FALSE, data);
 			}
 		}

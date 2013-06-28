@@ -201,9 +201,11 @@ static void _circle_bounds_get(Enesim_Renderer *r,
 static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Circle *thiz;
+	Eina_Bool ret;
 
 	thiz = ENESIM_RENDERER_CIRCLE(r);
-	return _circle_properties_have_changed(thiz);
+	ret = _circle_properties_have_changed(thiz);
+	return ret;
 }
 
 static void _circle_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
