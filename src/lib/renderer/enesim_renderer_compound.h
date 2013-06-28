@@ -45,6 +45,7 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Cb cb, void *data);
 
+EAPI void enesim_renderer_compound_background_renderer_set(Enesim_Renderer *r, Enesim_Renderer *background);
 /**
  * @}
  */

@@ -67,6 +67,13 @@
 		Enesim_Renderer_Compound,					\
 		enesim_renderer_compound_descriptor_get())
 
+typedef struct _Layer
+{
+	Enesim_Renderer *r;
+	/* generated at state setup */
+	Eina_Rectangle destination_bounds;
+} Layer;
+
 typedef struct _Enesim_Renderer_Compound
 {
 	Enesim_Renderer parent;
@@ -78,24 +85,22 @@ typedef struct _Enesim_Renderer_Compound
 	Eina_List *added;
 	Eina_List *removed;
 
+	Layer background;
+	Enesim_Renderer *cur_background;
+	Enesim_Renderer *prev_background;
+
 	Enesim_Renderer_Compound_Cb pre_cb;
 	void *pre_data;
 	Enesim_Renderer_Compound_Cb post_cb;
 	void *post_data;
 
 	Eina_Bool changed : 1;
+	Eina_Bool background_changed : 1;
 } Enesim_Renderer_Compound;
 
 typedef struct _Enesim_Renderer_Compound_Class {
 	Enesim_Renderer_Class parent;
 } Enesim_Renderer_Compound_Class;
-
-typedef struct _Layer
-{
-	Enesim_Renderer *r;
-	/* generated at state setup */
-	Eina_Rectangle destination_bounds;
-} Layer;
 
 static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 		Layer *l)
@@ -104,12 +109,53 @@ static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 	thiz->changed = EINA_TRUE;
 }
 
+static inline void _compound_layer_sw_hints_merge(Layer *l, Enesim_Rop rop,
+		Eina_Bool *same_rop, Enesim_Renderer_Feature *f)
+{
+	Enesim_Renderer_Sw_Hint tmp;
+	Enesim_Rop lrop;
+
+	/* intersect with every flag */
+	enesim_renderer_sw_hints_get(l->r, &tmp);
+	enesim_renderer_rop_get(l->r, &lrop);
+	if (lrop != rop)
+		*same_rop = EINA_FALSE;
+	*f &= tmp;
+}
+
+static inline void _compound_layer_span_blend(Layer *l, Eina_Rectangle *span, void *ddata)
+{
+	Eina_Rectangle lbounds;
+	uint32_t *dst = ddata;
+	unsigned int offset;
+
+	lbounds = l->destination_bounds;
+	if (!eina_rectangle_intersection(&lbounds, span))
+	{
+		return;
+	}
+
+	offset = lbounds.x - span->x;
+	enesim_renderer_sw_draw(l->r, lbounds.x, lbounds.y, lbounds.w, dst + offset);
+}
+
 static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Log **l)
 {
 	Eina_List *ll;
 	Layer *layer;
+
+	/* setup the background */
+	if (thiz->background.r)
+	{
+		if (!enesim_renderer_setup(thiz->background.r, s, l))
+		{
+			ENESIM_RENDERER_LOG(r, l, "Background renderer can not setup");
+			return EINA_FALSE;
+		}
+		enesim_renderer_destination_bounds(thiz->background.r, &thiz->background.destination_bounds, 0, 0);
+	}
 
 	if (thiz->visible_layers)
 	{
@@ -169,6 +215,12 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 	Layer *layer;
 	Eina_List *ll;
 
+	/* cleanup the background */
+	if (thiz->background.r)
+	{
+		enesim_renderer_cleanup(thiz->background.r, s);
+	}
+
 	/* cleanup every layer */
 	EINA_LIST_FOREACH(thiz->layers, ll, layer)
 	{
@@ -187,6 +239,7 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 		free(layer);
 	}
 	thiz->changed = EINA_FALSE;
+	thiz->background_changed = EINA_FALSE;
 }
 
 #if BUILD_OPENGL
@@ -271,25 +324,20 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 {
 	Eina_List *ll;
 	Eina_Rectangle span;
-	uint32_t *dst = ddata;
 
 	eina_rectangle_coords_from(&span, x, y, len, 1);
+	/* first the background */
+	if (thiz->background.r)
+	{
+		_compound_layer_span_blend(&thiz->background, &span, ddata);
+	}
+	/* now the layers */
 	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l;
-		Eina_Rectangle lbounds;
-		unsigned int offset;
 
 		l = eina_list_data_get(ll);
-
-		lbounds = l->destination_bounds;
-		if (!eina_rectangle_intersection(&lbounds, &span))
-		{
-			continue;
-		}
-
-		offset = lbounds.x - span.x;
-		enesim_renderer_sw_draw(l->r, lbounds.x, lbounds.y, lbounds.w, dst + offset);
+		_compound_layer_span_blend(l, &span, ddata);
 	}
 }
 
@@ -317,6 +365,7 @@ static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
 	/* we should only do one memset, here instead of per each layer */
 	_compound_span_layer_blend(thiz, x, y, len, ddata);
 }
+
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -341,6 +390,13 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 		return;
 	}
 
+	enesim_renderer_rop_get(r, &rop);
+	/* the background too */
+	if (thiz->background.r)
+	{
+		_compound_layer_sw_hints_merge(&thiz->background, rop, &same_rop, &f);
+	}
+
 	/* TODO we need to find an heuristic to set the colorize/rop flag
 	 * that reduces the number of raster operations we have to do
 	 * (i.e a passthrough)
@@ -348,21 +404,10 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 	 * there is no need to do a post composition of the result. but how to
 	 * handle the colorize?
 	 */
-	enesim_renderer_rop_get(r, &rop);
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Layer *l = eina_list_data_get(ll);
-		Enesim_Renderer *lr = l->r;
-		Enesim_Renderer_Sw_Hint tmp;
-		Enesim_Rop lrop;
-
-		/* intersect with every flag */
-		enesim_renderer_sw_hints_get(lr, &tmp);
-		enesim_renderer_rop_get(lr, &lrop);
-		if (lrop != rop)
-			same_rop = EINA_FALSE;
-
-		f &= tmp;
+		_compound_layer_sw_hints_merge(l, rop, &same_rop, &f);
 	}
 	if (same_rop)
 		f |= ENESIM_RENDERER_HINT_ROP;
@@ -409,6 +454,8 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 	Layer *l;
+	Eina_Bool added = EINA_FALSE;
+	Eina_Bool layers = EINA_FALSE;
 	Eina_List *ll;
 	int x1 = INT_MAX;
 	int y1 = INT_MAX;
@@ -416,6 +463,9 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 	int y2 = -INT_MAX;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
+	if (!thiz->added) goto no_added;
+	added = EINA_TRUE;
+
 	/* first the just added layers */
 	EINA_LIST_FOREACH (thiz->added, ll, l)
 	{
@@ -435,6 +485,10 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 		if (nx2 > x2) x2 = nx2;
 		if (ny2 > y2) y2 = ny2;
 	}
+no_added:
+	if (!thiz->layers) goto no_layers;
+	layers = EINA_TRUE;
+
 	/* now the already there layers */
 	EINA_LIST_FOREACH (thiz->layers, ll, l)
 	{
@@ -454,10 +508,16 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 		if (nx2 > x2) x2 = nx2;
 		if (ny2 > y2) y2 = ny2;
 	}
-	rect->x = x1;
-	rect->y = y1;
-	rect->w = x2 - x1;
-	rect->h = y2 - y1;
+no_layers:
+	/* empty bounds */
+	if (!layers && !added)
+	{
+		enesim_rectangle_coords_from(rect, 0, 0, 0, 0);
+	}
+	else
+	{
+		enesim_rectangle_coords_from(rect, x1, y1, x2 - x1, y2 - y1);
+	}
 }
 
 static void _compound_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -520,14 +580,21 @@ static void _compound_damage(Enesim_Renderer *r,
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
 	Eina_Bool common_changed;
+	Eina_Bool background_changed = EINA_FALSE;
 	Layer *l;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	common_changed = enesim_renderer_state_has_changed(r);
+	/* in case the backround has changed, send again the previous bounds */
+	if (thiz->background_changed)
+	{
+		if (thiz->background.r && enesim_renderer_has_changed(thiz->background.r))
+			background_changed = EINA_TRUE;
+	}
 	/* given that we do support the visibility, color, rop, we need to take into
 	 * account such change
 	 */
-	if (common_changed)
+	if (common_changed || background_changed)
 	{
 		Eina_Rectangle current_bounds;
 
@@ -639,6 +706,11 @@ static void _enesim_renderer_compound_instance_deinit(void *o)
 	Layer *l;
 
 	thiz = ENESIM_RENDERER_COMPOUND(o);
+	if (thiz->background.r)
+	{
+		enesim_renderer_unref(thiz->background.r);
+		thiz->background.r = NULL;
+	}
 	/* just remove the visible layers as is, every visible layer
 	 * should be part of the compound layers
 	 */
@@ -839,4 +911,21 @@ EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	thiz->post_cb = cb;
 	thiz->post_data = data;
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_compound_background_renderer_set(Enesim_Renderer *r, Enesim_Renderer *b)
+{
+	Enesim_Renderer_Compound *thiz;
+
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	if (thiz->background.r)
+	{
+		enesim_renderer_unref(thiz->background.r);
+		thiz->background.r = NULL;
+	}
+	thiz->background.r = b;
+	thiz->background_changed = EINA_TRUE;
 }
