@@ -27,6 +27,7 @@
 #include "enesim_surface.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_background.h"
 #include "enesim_renderer_compound.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -95,7 +96,7 @@ typedef struct _Enesim_Renderer_Compound
 	void *post_data;
 
 	Eina_Bool changed : 1;
-	Eina_Bool background_changed : 1;
+	Eina_Bool background_enabled : 1;
 } Enesim_Renderer_Compound;
 
 typedef struct _Enesim_Renderer_Compound_Class {
@@ -147,7 +148,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 	Layer *layer;
 
 	/* setup the background */
-	if (thiz->background.r)
+	if (thiz->background_enabled)
 	{
 		if (!enesim_renderer_setup(thiz->background.r, s, l))
 		{
@@ -216,7 +217,7 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 	Eina_List *ll;
 
 	/* cleanup the background */
-	if (thiz->background.r)
+	if (thiz->background_enabled)
 	{
 		enesim_renderer_cleanup(thiz->background.r, s);
 	}
@@ -239,7 +240,6 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 		free(layer);
 	}
 	thiz->changed = EINA_FALSE;
-	thiz->background_changed = EINA_FALSE;
 }
 
 #if BUILD_OPENGL
@@ -251,11 +251,13 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Format format;
 	Enesim_Surface *tmp;
 	Enesim_Buffer_OpenGL_Data *sdata;
-	Enesim_Buffer_OpenGL_Data *tmp_sdata;
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Rop rop;
 	Eina_List *l;
+#if 0
+	Enesim_Buffer_OpenGL_Data *tmp_sdata;
+	Enesim_Rop rop;
 	GLint viewport[4];
+#endif
 	Layer *layer;
 	int sw;
 	int sh;
@@ -327,7 +329,7 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 
 	eina_rectangle_coords_from(&span, x, y, len, 1);
 	/* first the background */
-	if (thiz->background.r)
+	if (thiz->background_enabled)
 	{
 		_compound_layer_span_blend(&thiz->background, &span, ddata);
 	}
@@ -392,7 +394,7 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 
 	enesim_renderer_rop_get(r, &rop);
 	/* the background too */
-	if (thiz->background.r)
+	if (thiz->background_enabled)
 	{
 		_compound_layer_sw_hints_merge(&thiz->background, rop, &same_rop, &f);
 	}
@@ -579,30 +581,22 @@ static void _compound_damage(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Compound *thiz;
 	Eina_List *ll;
-	Eina_Bool common_changed;
-	Eina_Bool background_changed = EINA_FALSE;
 	Layer *l;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
-	common_changed = enesim_renderer_state_has_changed(r);
 	/* in case the backround has changed, send again the previous bounds */
-	if (thiz->background_changed)
+	if (enesim_renderer_has_changed(thiz->background.r))
 	{
-		if (thiz->background.r && enesim_renderer_has_changed(thiz->background.r))
-			background_changed = EINA_TRUE;
+		DBG("Background has changed, sending old and new bounds");
+		goto full_bounds;
 	}
 	/* given that we do support the visibility, color, rop, we need to take into
 	 * account such change
 	 */
-	if (common_changed || background_changed)
+	if (enesim_renderer_state_has_changed(r))
 	{
-		Eina_Rectangle current_bounds;
-
 		DBG("Common properties have changed");
-		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
-		cb(r, old_bounds, EINA_TRUE, data);
-		cb(r, &current_bounds, EINA_FALSE, data);
-		return;
+		goto full_bounds;
 	}
 	/* if some layer has been added or removed after the last draw
 	 * we need to inform of those areas even if those have damages
@@ -631,12 +625,23 @@ static void _compound_damage(Enesim_Renderer *r,
 	{
 		enesim_renderer_damages_get(l->r, cb, data);
 	}
+	return;
+
+full_bounds:
+	{
+		Eina_Rectangle current_bounds;
+
+		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
+		cb(r, old_bounds, EINA_TRUE, data);
+		cb(r, &current_bounds, EINA_FALSE, data);
+		return;
+	}
 }
 
 #if BUILD_OPENGL
 static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
-		int *num_programs,
-		Enesim_Renderer_OpenGL_Program ***programs)
+		int *num_programs EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Program ***programs EINA_UNUSED)
 {
 #if 0
 	*num_programs = 1;
@@ -695,8 +700,15 @@ static void _enesim_renderer_compound_class_init(void *k)
 #endif
 }
 
-static void _enesim_renderer_compound_instance_init(void *o EINA_UNUSED)
+static void _enesim_renderer_compound_instance_init(void *o)
 {
+	Enesim_Renderer_Compound *thiz;
+	Enesim_Renderer *r;
+
+	thiz = ENESIM_RENDERER_COMPOUND(o);
+	r = enesim_renderer_background_new();
+	enesim_renderer_rop_set(r, ENESIM_FILL);
+	thiz->background.r = r;
 }
 
 static void _enesim_renderer_compound_instance_deinit(void *o)
@@ -913,19 +925,26 @@ EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
 	thiz->post_data = data;
 }
 
+
 /**
  *
  */
-EAPI void enesim_renderer_compound_background_renderer_set(Enesim_Renderer *r, Enesim_Renderer *b)
+EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Eina_Bool enable)
 {
 	Enesim_Renderer_Compound *thiz;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
-	if (thiz->background.r)
-	{
-		enesim_renderer_unref(thiz->background.r);
-		thiz->background.r = NULL;
-	}
-	thiz->background.r = b;
-	thiz->background_changed = EINA_TRUE;
+	enesim_renderer_visibility_set(r, enable);
+	thiz->background_enabled = enable;
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_compound_background_color_set(Enesim_Renderer *r, Enesim_Color c)
+{
+	Enesim_Renderer_Compound *thiz;
+
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	enesim_renderer_background_color_set(thiz->background.r, c);
 }
