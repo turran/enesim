@@ -908,6 +908,7 @@ EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r)
 	return enesim_text_font_ref(thiz->font);
 }
 
+#if 0
 /**
  * TODO
  * implement it
@@ -918,5 +919,5 @@ EAPI int enesim_renderer_text_span_index_at(Enesim_Renderer *r, int x, int y)
 	/* get the glyph at that position */
 	return 0;
 }
-
+#endif
 
