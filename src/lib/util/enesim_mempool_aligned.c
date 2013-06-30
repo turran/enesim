@@ -21,6 +21,7 @@
 # ifndef WIN32_LEAN_AND_MEAN
 #  define WIN32_LEAN_AND_MEAN
 # endif
+# include <malloc.h>
 # include <windows.h>
 # undef WIN32_LEAN_AND_MEAN
 #elif (defined (__MACH__) && defined (__APPLE__)) || defined (__FreeBSD__)
@@ -137,7 +138,9 @@ static void _enesim_mempool_aligned_free(void *data EINA_UNUSED, void *element)
 static void * _enesim_mempool_aligned_alloc(void *data, unsigned int size)
 {
 	Enesim_Mempool_Aligned *thiz = (Enesim_Mempool_Aligned *)data;
+#ifdef HAVE_POSIX_MEMALIGN
 	int ret;
+#endif
 	void *element = NULL;
 
 #ifdef _WIN32
@@ -145,14 +148,14 @@ static void * _enesim_mempool_aligned_alloc(void *data, unsigned int size)
 	if (!element)
 		return NULL;
 #else
-#ifdef HAVE_POSIX_MEMALIGN
+# ifdef HAVE_POSIX_MEMALIGN
 	ret = posix_memalign(&element, thiz->alignment, size);
-#else
-	element = memalign(thiz->alignment, size);
-	if (!element) ret = -EINVAL;
-#endif
 	if (ret)
 		return NULL;
+# else
+	element = memalign(thiz->alignment, size);
+	if (!element) ret = -EINVAL;
+# endif
 #endif
 	return element;
 }

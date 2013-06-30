@@ -70,6 +70,9 @@ struct _Enesim_Text_Engine
 	Enesim_Text_Engine_Data data;
 };
 
+Enesim_Text_Engine * enesim_text_engine_new(Enesim_Text_Engine_Descriptor *d);
+void enesim_text_engine_free(Enesim_Text_Engine *thiz);
+
 Enesim_Text_Font * enesim_text_font_load(Enesim_Text_Engine *e, const char *name, int size);
 Enesim_Text_Font * enesim_text_font_ref(Enesim_Text_Font *f);
 void enesim_text_font_unref(Enesim_Text_Font *f);
