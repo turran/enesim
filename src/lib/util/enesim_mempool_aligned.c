@@ -21,7 +21,6 @@
 # ifndef WIN32_LEAN_AND_MEAN
 #  define WIN32_LEAN_AND_MEAN
 # endif
-# include <malloc.h>
 # include <windows.h>
 # undef WIN32_LEAN_AND_MEAN
 #elif (defined (__MACH__) && defined (__APPLE__)) || defined (__FreeBSD__)
