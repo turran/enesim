@@ -93,13 +93,13 @@ Enesim_Text_Font * enesim_text_font_load(Enesim_Text_Engine *e, const char *name
 	len = strlen(name) + 4;
 	key = malloc(len); // 4 numbers
 	snprintf(key, len, "%s%d", name, size);
-	f = eina_hash_find(e->fonts, name);
+	f = eina_hash_find(e->fonts, key);
 	if (f)
 	{
 		_font_ref(f);
 		free(key);
 		return f;
-	};
+	}
 	data = e->d->font_load(e->data, name, size);
 	if (!data)
 	{
