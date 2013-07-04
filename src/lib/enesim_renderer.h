@@ -36,7 +36,7 @@ typedef enum _Enesim_Renderer_Feature
 	ENESIM_RENDERER_FEATURE_QUALITY 	= (1 << 5), /**< Supports the quality property */
 } Enesim_Renderer_Feature;
 
-#define ENESIM_RENDERER_FEATURE_TRANSFORMATION (ENESIM_RENDERER_FEATURE_AFFINE & ENESIM_RENDERER_FEATURE_PROJECTIVE)
+#define ENESIM_RENDERER_FEATURE_TRANSFORMATION (ENESIM_RENDERER_FEATURE_AFFINE | ENESIM_RENDERER_FEATURE_PROJECTIVE)
 
 /* TODO rmove this to the sw backend */
 typedef enum _Enesim_Renderer_Sw_Hint
