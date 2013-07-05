@@ -161,8 +161,7 @@ static const char * _rectangle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 	return "rectangle";
 }
 
-static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **l)
+static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
@@ -180,7 +179,6 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 		h = thiz->current.height;
 		if ((w < 1) || (h < 1))
 		{
-			ENESIM_RENDERER_LOG(r, l, "Invalid size %g %g", w, h);
 			return EINA_FALSE;
 		}
 

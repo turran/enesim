@@ -130,8 +130,7 @@ static const char * _ellipse_base_name_get(Enesim_Renderer *r EINA_UNUSED)
 	return "ellipse";
 }
 
-static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **l)
+static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 {
 	Enesim_Renderer_Ellipse *thiz;
 	double rx, ry;
@@ -141,8 +140,6 @@ static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path,
 	_ellipse_get_real(thiz, r, &x, &y, &rx, &ry);
 	if (!thiz || (thiz->current.rx <= 0) || (thiz->current.ry <= 0))
 	{
-		ENESIM_RENDERER_LOG(r, l, "Wrong size %gx%g",
-				thiz->current.rx, thiz->current.ry);
 		return EINA_FALSE;
 	}
 

@@ -111,16 +111,13 @@ static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
-static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path,
-		Enesim_Log **l)
+static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 {
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = ENESIM_RENDERER_FIGURE(r);
 	if (!enesim_figure_polygon_count(thiz->figure))
 	{
-		/* TODO no polys do nothing, l? ok? */
-		ENESIM_RENDERER_LOG(r, l, "No points on the polygon, nothing to draw");
 		return EINA_FALSE;
 	}
 

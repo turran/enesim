@@ -45,8 +45,7 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_shape
 
-static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Log **l)
+static Eina_Bool _shape_path_propagate(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 	Enesim_Renderer_Shape_Path_Class *klass;
@@ -54,11 +53,11 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	const Enesim_Renderer_State *rstate;
 	const Enesim_Renderer_Shape_State *sstate;
 
-	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
-
 	rstate = enesim_renderer_state_get(r);
 	sstate = enesim_renderer_shape_state_get(r);
+
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
 
 	/* common properties */
 	enesim_renderer_color_set(thiz->path, rstate->current.color);
@@ -95,11 +94,24 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	}
 
 	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->current.draw_mode);
-
 	/* now let the implementation override whatever it wants to */
 	if (klass->setup)
-		if (!klass->setup(r, thiz->path, l))
+		if (!klass->setup(r, thiz->path))
 			return EINA_FALSE;
+	return EINA_TRUE;
+}
+
+static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Log **l)
+{
+	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer_Shape_Path_Class *klass;
+
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
+
+	if (!_shape_path_propagate(r))
+		return EINA_FALSE;
 
 	if (!enesim_renderer_setup(thiz->path, s, l))
 	{
@@ -280,9 +292,7 @@ void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Path_Class *klass;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
-	/* first propagate the properties to the path */
-	klass->setup(r, thiz->path, NULL);
+	_shape_path_propagate(r);
 	enesim_renderer_bounds(thiz->path, bounds);
 }
 /*============================================================================*
