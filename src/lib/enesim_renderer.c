@@ -977,7 +977,7 @@ EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
 	if (!rect) return;
-	if (r->in_setup)
+	if (r->in_setup || !enesim_renderer_has_changed(r))
 	{
 		*rect = r->current_destination_bounds;
 		return;
