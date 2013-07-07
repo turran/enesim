@@ -1105,15 +1105,9 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		_surface_bounds(s, &surface_size);
 		if (!eina_rectangle_intersection(&final, &surface_size))
 		{
-			WRN("The renderer %p bounds does not intersect with the surface", r);
+			WRN("The clipping area does not intersect with the surface");
 			goto end;
 		}
-	}
-	/* clip against the destination rectangle */
-	if (!eina_rectangle_intersection(&final, &r->current_destination_bounds))
-	{
-		WRN("The renderer %p bounds does not intersect on the destination rectangle", r);
-		goto end;
 	}
 	_draw_internal(r, s, &final, x, y);
 	ret = EINA_TRUE;
@@ -1153,13 +1147,7 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		goto end;
 
 	_surface_bounds(s, &surface_size);
-	/* clip against the destination rectangle */
-	if (!eina_rectangle_intersection(&r->current_destination_bounds, &surface_size))
-	{
-		WRN("The renderer %p bounds does not intersect on the destination rectangle", r);
-		goto end;
-	}
-	_draw_list_internal(r, s, &r->current_destination_bounds, clips, x, y);
+	_draw_list_internal(r, s, &surface_size, clips, x, y);
 	ret = EINA_TRUE;
 	/* TODO set the format again */
 end:

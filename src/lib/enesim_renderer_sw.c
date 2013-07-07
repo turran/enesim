@@ -169,6 +169,32 @@ static inline void _sw_surface_draw_simple(Enesim_Renderer *r,
 		ddata += stride;
 	}
 }
+
+static inline void _sw_clear(uint8_t *ddata, size_t stride, int bpp,
+		Eina_Rectangle *area)
+{
+	ddata = ddata + (area->y * stride) + (area->x * bpp);
+	while (area->h--)
+	{
+		memset(ddata, 0x00, area->w * bpp);
+		ddata += stride;
+	}
+}
+
+#if 0
+static inline void _sw_clear2(uint8_t *ddata, size_t stride, int bpp,
+		Eina_Rectangle *area)
+{
+	ddata = ddata + (area->y * stride) + (area->x * bpp);
+	printf("clearing2 %" EINA_EXTRA_RECTANGLE_FORMAT "\n", EINA_EXTRA_RECTANGLE_ARGS(area));
+	while (area->h--)
+	{
+		memset(ddata, 0x33, area->w * bpp);
+		ddata += stride;
+	}
+	printf("done\n");
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Threaded rendering                              *
  *----------------------------------------------------------------------------*/
@@ -480,21 +506,54 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 		int x, int y)
 {
 	Enesim_Format dfmt;
+	Eina_Rectangle final;
 	Eina_Bool visible;
+	Eina_Bool intersect;
 	uint8_t *ddata;
 	size_t stride;
 	size_t bpp;
 
-	enesim_renderer_visibility_get(r, &visible);
-	if (!visible) return;
-
+	/* get the destination pointer */
 	_sw_surface_setup(s, &dfmt, (void **)&ddata, &stride, &bpp);
-	ddata = ddata + (area->y * stride) + (area->x * bpp);
 
-	/* translate the origin */
-	area->x -= x;
-	area->y -= y;
+	/* be sure to clip the area to the renderer bounds */
+	final = r->current_destination_bounds;
+	/* final translation */
+	final.x -= x;
+	final.x -= y;
 
+	intersect = eina_rectangle_intersection(&final, area);
+	if (r->state.current.rop == ENESIM_FILL)
+	{
+		/* just memset the whole area */
+		if (!intersect)
+		{
+			_sw_clear(ddata, stride, bpp, area);
+			return;
+		}
+		/* clear the difference rectangle */
+		else
+		{
+			Eina_Rectangle subs[4];
+			int i;
+
+			eina_extra_rectangle_substract(area, &final, subs);
+			for (i = 0; i < 4; i++)
+			{
+				if (!eina_extra_rectangle_is_valid(&subs[i]))
+					continue;
+				_sw_clear(ddata, stride, bpp, &subs[i]);
+			}
+		}
+	}
+
+	enesim_renderer_visibility_get(r, &visible);
+	if (!visible)
+		return;
+	if (!intersect || !eina_extra_rectangle_is_valid(&final))
+		return;
+
+	ddata = ddata + (final.y * stride) + (final.x * bpp);
 #ifdef BUILD_THREAD
 	_sw_draw_threaded(r, area, ddata, stride, dfmt);
 #else
