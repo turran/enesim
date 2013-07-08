@@ -555,9 +555,9 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 
 	ddata = ddata + (final.y * stride) + (final.x * bpp);
 #ifdef BUILD_THREAD
-	_sw_draw_threaded(r, area, ddata, stride, dfmt);
+	_sw_draw_threaded(r, &final, ddata, stride, dfmt);
 #else
-	_sw_draw_no_threaded(r, area, ddata, stride, dfmt);
+	_sw_draw_no_threaded(r, &final, ddata, stride, dfmt);
 #endif
 }
 
