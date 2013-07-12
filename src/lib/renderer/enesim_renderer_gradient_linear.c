@@ -64,6 +64,7 @@ typedef struct _Enesim_Renderer_Gradient_Linear
 	Eina_Bool changed : 1;
 	/* generated at state setup */
 	Eina_F16p16 xx, yy;
+	Eina_F16p16 scale;
 	Eina_F16p16 ayx, ayy;
 	int length;
 } Enesim_Renderer_Gradient_Linear;
@@ -72,17 +73,25 @@ typedef struct _Enesim_Renderer_Gradient_Linear_Class {
 	Enesim_Renderer_Gradient_Class parent;
 } Enesim_Renderer_Gradient_Linear_Class;
 
+/* get the input on origin coordinates and return the distance on destination
+ * coordinates
+ * FIXME the next iteration will use its own functions for drawing so we will
+ * not need to do a transformation twice
+ */
 static Eina_F16p16 _linear_distance(Enesim_Renderer_Gradient_Linear *thiz, Eina_F16p16 x,
 		Eina_F16p16 y)
 {
 	Eina_F16p16 a, b;
 	Eina_F16p16 d;
 
+	/* input is on origin coordinates */
 	x = x - thiz->xx;
 	y = y - thiz->yy;
-	a = eina_f16p16_mul(thiz->ayx, x + 32768);
-	b = eina_f16p16_mul(thiz->ayy, y + 32768);
-	d = eina_f16p16_sub(eina_f16p16_add(a, b), 32768);
+	a = eina_f16p16_mul(thiz->ayx, x);
+	b = eina_f16p16_mul(thiz->ayy, y);
+	d = eina_f16p16_add(a, b);
+	/* d is on origin coordinates */
+	d = eina_f16p16_mul(d, thiz->scale);
 
 	return d;
 }
@@ -156,11 +165,13 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
+	Enesim_Matrix om;
 	Enesim_Matrix m;
 	Enesim_Matrix_Type type;
-	Eina_F16p16 xx0, xx1, yy0, yy1;
-	Eina_F16p16 f;
+	double xx0, yy0;
 	double x0, x1, y0, y1;
+	double orig_len;
+	double dst_len;
 
 	thiz = ENESIM_RENDERER_GRADIENT_LINEAR(r);
 
@@ -169,33 +180,43 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	y0 = thiz->current.y0;
 	y1 = thiz->current.y1;
 
-	enesim_renderer_transformation_get(r, &m);
-	type = enesim_matrix_type_get(&m);
+	enesim_matrix_identity(&m);
+	enesim_renderer_transformation_get(r, &om);
+	type = enesim_matrix_type_get(&om);
+
+	xx0 = x1 - x0;
+	yy0 = y1 - y0;
+	/* we need to translate by our min x and min y */
+	thiz->yy = y0 < y1 ? eina_extra_f16p16_double_from(y0) : eina_extra_f16p16_double_from(y1);
+	thiz->xx = x0 < x1 ? eina_extra_f16p16_double_from(x0) : eina_extra_f16p16_double_from(x1);
+
+	/* calculate the increment on x and y */
+	orig_len = hypot(xx0, yy0);
+	thiz->ayx = eina_extra_f16p16_double_from(xx0 / orig_len);
+	thiz->ayy = eina_extra_f16p16_double_from(yy0 / orig_len);
+
 	/* handle the geometry transformation */
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
-		enesim_matrix_point_transform(&m, x0, y0, &x0, &y0);
-		enesim_matrix_point_transform(&m, x1, y1, &x1, &y1);
+
+		enesim_matrix_point_transform(&om, x0, y0, &x0, &y0);
+		enesim_matrix_point_transform(&om, x1, y1, &x1, &y1);
+		enesim_matrix_inverse(&om, &m);
+
+		dst_len = hypot(x1 - x0, y1 - y0);
 	}
+	else
+	{
+		dst_len = orig_len;
+	}
+	enesim_renderer_transformation_set(r, &m);
 
-	thiz->xx = xx0 = eina_extra_f16p16_double_from(x0);
-	xx1 = eina_extra_f16p16_double_from(x1);
-	thiz->yy = yy0 = eina_extra_f16p16_double_from(y0);
-	yy1 = eina_extra_f16p16_double_from(y1);
-
-	xx0 = xx1 - xx0;
-	yy0 = yy1 - yy0;
-
-	/* we need to use floats because of the limitation of 16.16 values */
-	f = eina_extra_f16p16_double_from(hypot(eina_extra_f16p16_double_to(xx0), eina_extra_f16p16_double_to(yy0)));
-	f += 32768;
-	thiz->ayx = ((int64_t)xx0 << 16) / f;
-	thiz->ayy = ((int64_t)yy0 << 16) / f;
-
-	/* TODO check that the difference between x0 - x1 and y0 - y1 is
-	 * < tolerance
+	/* TODO check that the difference between x0 - x1 and y0 - y1 is < tolerance */
+	thiz->length = ceil(dst_len);
+	/* the scale factor, this is useful to know the original length and transformed
+	 * length scale
 	 */
-	thiz->length = eina_f16p16_int_to(f);
+	thiz->scale = eina_extra_f16p16_double_from(dst_len / orig_len);
 #if 0
 	/* just override the identity case */
 	if (type == ENESIM_MATRIX_IDENTITY)

@@ -198,7 +198,7 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
 		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
 				gstate->src,				\
 				gstate->len, d);			\
-		xx += EINA_EXTRA_F16P16_ONE;					\
+		xx += EINA_EXTRA_F16P16_ONE;				\
 	}								\
 }
 

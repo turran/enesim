@@ -62,6 +62,7 @@ typedef struct _Enesim_Renderer_Pattern_State
 } Enesim_Renderer_Pattern_State;
 
 typedef struct _Enesim_Renderer_Pattern {
+	Enesim_Renderer base;
 	/* the properties */
 	Enesim_Renderer_Pattern_State current;
 	Enesim_Renderer_Pattern_State past;
@@ -410,7 +411,7 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 	Enesim_Renderer_Pattern *thiz;
 
  	thiz = ENESIM_RENDERER_PATTERN(r);
-	enesim_renderer_color_set(thiz->current.source, thiz->src_color);
+	//enesim_renderer_color_set(thiz->current.source, thiz->src_color);
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
