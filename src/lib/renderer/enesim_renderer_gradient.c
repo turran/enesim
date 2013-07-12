@@ -120,7 +120,7 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 	}
 	/* in case we dont end at 1.0 */
 	for (i = end; i < thiz->sw.len; i++)
-		*dst++ = curr->argb;
+		*dst++ = next->argb;
 	return EINA_TRUE;
 }
 
