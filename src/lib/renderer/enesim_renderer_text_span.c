@@ -37,13 +37,8 @@
 
 #include "enesim_text_private.h"
 #include "enesim_renderer_private.h"
+#include "enesim_coord_private.h"
 #include "enesim_renderer_shape_private.h"
-/**
- * @todo
- * Add a buffer interface, this way an API user might want to use each own
- * buffer implementation instead of always doing a strdup()
- *
- */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -74,8 +69,12 @@ typedef struct _Enesim_Renderer_Text_Span
 	Enesim_Text_Direction direction;
 	Enesim_Text_Engine *engine;
 	Enesim_Text_Font *font;
+	/* sw drawing */
+	Enesim_F16p16_Matrix matrix;
+	/* span geometry */
 	unsigned int width;
 	unsigned int height;
+	/* max ascent/descent */
 	int top;
 	int bottom;
 } Enesim_Renderer_Text_Span;
@@ -222,13 +221,17 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(Enesim_Rende
 			continue;
 		}
 		if (!g->surface) goto advance;
+		/* check if the coord is inside the surface */
 		enesim_surface_size_get(g->surface, &w, &h);
-		if (x >= rcoord && x <= rcoord + w)
+		w = g->x_advance < w ? g->x_advance : w;
+		//printf("%c %d %d -> %d %d %d\n", *c, x, y, g->x_advance, w, h);
+		if (x >= rcoord && x < rcoord + w)
 		{
 			position->glyph = g;
 			position->index = idx;
 			position->distance = rcoord;
 			ret = EINA_TRUE;
+			//printf("returning %c\n", *c);
 			break;
 		}
 advance:
@@ -282,43 +285,6 @@ advance:
 }
 #endif
 /*----------------------------------------------------------------------------*
- *               Functions that might need to be exported on Enesim           *
- *----------------------------------------------------------------------------*/
-static inline Eina_F16p16 _enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p16 y,
-		Eina_F16p16 cx, Eina_F16p16 cy, Eina_F16p16 cz)
-{
-	return eina_f16p16_mul(cx, x) + eina_f16p16_mul(cy, y) + cz;
-}
-
-/* FIXME store the fixed point matrix */
-static inline void _renderer_affine_setup(Enesim_Renderer *r, int x, int y,
-		Eina_F16p16 *fpx, Eina_F16p16 *fpy)
-{
-	Enesim_F16p16_Matrix matrix;
-	Enesim_Matrix dmatrix;
-	Eina_F16p16 xx, yy;
-	Eina_F16p16 ox, oy;
-	double oox, ooy;
-
-	enesim_renderer_origin_get(r, &oox, &ooy);
-	enesim_renderer_transformation_get(r, &dmatrix);
-	enesim_matrix_f16p16_matrix_to(&dmatrix, &matrix);
-
-	ox = eina_extra_f16p16_double_from(oox);
-	oy = eina_extra_f16p16_double_from(ooy);
-
-	xx = eina_f16p16_int_from(x);
-	yy = eina_f16p16_int_from(y);
-
-	*fpx = _enesim_point_f16p16_transform(xx, yy, matrix.xx,
-			matrix.xy, matrix.xz);
-	*fpy = _enesim_point_f16p16_transform(xx, yy, matrix.yx,
-			matrix.yy, matrix.yz);
-
-	*fpx = eina_f16p16_sub(*fpx, ox);
-	*fpy = eina_f16p16_sub(*fpy, oy);
-}
-/*----------------------------------------------------------------------------*
  *                            The drawing functions                           *
  *----------------------------------------------------------------------------*/
 /* This might the worst case possible, we need to fetch at every pixel what glyph we are at
@@ -329,16 +295,13 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Text_Font *font;
-	Enesim_F16p16_Matrix matrix;
-	Enesim_Matrix dmatrix;
 	Eina_F16p16 xx, yy;
+	double ox, oy;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 
 	/* setup the affine coordinates */
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	enesim_renderer_transformation_get(r, &dmatrix);
-	enesim_matrix_f16p16_matrix_to(&dmatrix, &matrix);
 
 	font = thiz->font;
 	if (!font)
@@ -346,7 +309,8 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 		/* weird case ... it might be related to the multiple threads */
 		return;
 	}
-	_renderer_affine_setup(r, x, y, &xx, &yy);
+	enesim_renderer_origin_get(r, &ox, &oy);
+	enesim_coord_affine_setup(&xx, &yy, x, y, ox, oy, &thiz->matrix);
 	while (dst < end)
 	{
 		Enesim_Text_Glyph_Position position;
@@ -372,21 +336,11 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 		enesim_surface_data_get(g->surface, (void **)&src, &stride);
 		gx = sx - position.distance;
 		gy = sy - (thiz->top - g->origin);
-#if 1
+
 		p0 = argb8888_sample_good(src, stride, w, h, xx, yy, gx, gy);
-#else
-		/* TODO use 4 samples and generate a better looking pixel */
-		if (gy < 0 || gy >= h)
-			goto next;
-		if (gx < 0 || gx >= w)
-			goto next;
-		/* get the pixel from the surface and fill from it */
-		src = src + (gy * stride) + gx;
-		p0 = *src;
-#endif
 next:
-		yy += matrix.yx;
-		xx += matrix.xx;
+		yy += thiz->matrix.yx;
+		xx += thiz->matrix.xx;
 		*dst++ = p0;
 	}
 }
@@ -490,6 +444,7 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Matrix_Type type;
+	Enesim_Matrix matrix, inv;
 	const char *text;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
@@ -503,6 +458,7 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 	}
 	if (!_enesim_renderer_text_span_generate(thiz))
 		return EINA_FALSE;
+
 	enesim_renderer_transformation_type_get(r, &type);
 	switch (type)
 	{
@@ -511,6 +467,10 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 		break;
 
 		case ENESIM_MATRIX_AFFINE:
+		enesim_renderer_transformation_get(r, &matrix);
+		enesim_matrix_inverse(&matrix, &inv);
+		enesim_matrix_f16p16_matrix_to(&inv,
+			&thiz->matrix);
 		*fill = _enesim_renderer_text_span_draw_affine;
 		break;
 
@@ -525,7 +485,8 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _enesim_renderer_text_span_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _enesim_renderer_text_span_sw_cleanup(Enesim_Renderer *r,
+		Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
@@ -594,21 +555,15 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 
 	_enesim_renderer_text_span_geometry_get(r, rect);
 	enesim_renderer_transformation_type_get(r, &type);
-	/* now apply the inverse transformation */
+	/* transform the geometry */
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Quad q;
-		Enesim_Matrix m, tx;
+		Enesim_Matrix m;
 
-		enesim_renderer_transformation_get(r, &tx);
-		enesim_matrix_inverse(&tx, &m);
+		enesim_renderer_transformation_get(r, &m);
 		enesim_matrix_rectangle_transform(&m, rect, &q);
 		enesim_quad_rectangle_to(&q, rect);
-		/* fix the antialias scaling */
-		rect->x -= m.xx;
-		rect->y -= m.yy;
-		rect->w += m.xx;
-		rect->h += m.yy;
 	}
 }
 
