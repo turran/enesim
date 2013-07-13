@@ -154,13 +154,8 @@ static void _rectangle_path_propagate(Enesim_Renderer_Rectangle *thiz,
 }
 
 /*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
+ *                            Shape path interface                            *
  *----------------------------------------------------------------------------*/
-static const char * _rectangle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
-{
-	return "rectangle";
-}
-
 static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 {
 	Enesim_Renderer_Rectangle *thiz;
@@ -241,80 +236,41 @@ static void _rectangle_cleanup(Enesim_Renderer *r)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _rectangle_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
-{
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER | ENESIM_SHAPE_FLAG_STROKE_LOCATION;
-}
-
-static void _rectangle_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
-{
-	Enesim_Renderer_Rectangle *thiz;
-	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Matrix_Type type;
-	double x, y, w, h;
-
-	thiz = ENESIM_RENDERER_RECTANGLE(r);
-
-	/* first scale */
-	x = thiz->current.x;
-	y = thiz->current.y;
-	w = thiz->current.width;
-	h = thiz->current.height;
-	/* for the stroke location get the real width */
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
-	{
-		Enesim_Shape_Stroke_Location location;
-		double sw;
-
-		enesim_renderer_shape_stroke_weight_get(r, &sw);
-		enesim_renderer_shape_stroke_location_get(r, &location);
-		switch (location)
-		{
-			case ENESIM_SHAPE_STROKE_CENTER:
-			x -= sw / 2.0;
-			y -= sw / 2.0;
-			w += sw;
-			h += sw;
-			break;
-
-			case ENESIM_SHAPE_STROKE_OUTSIDE:
-			x -= sw;
-			y -= sw;
-			w += sw * 2.0;
-			h += sw * 2.0;
-			break;
-
-			default:
-			break;
-		}
-	}
-
-	bounds->x = x;
-	bounds->y = y;
-	bounds->w = w;
-	bounds->h = h;
-
-	/* apply the geometry transformation */
-	enesim_renderer_transformation_type_get(r, &type);
-	if (type != ENESIM_MATRIX_IDENTITY)
-	{
-		Enesim_Matrix m;
-		Enesim_Quad q;
-
-		enesim_renderer_transformation_get(r, &m);
-		enesim_matrix_rectangle_transform(&m, bounds, &q);
-		enesim_quad_rectangle_to(&q, bounds);
-	}
-}
-
 static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
 	return _rectangle_properties_have_changed(thiz);
+}
+/*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static void _rectangle_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER |
+			ENESIM_SHAPE_FLAG_STROKE_RENDERER |
+			ENESIM_SHAPE_FLAG_STROKE_LOCATION;
+}
+
+static Eina_Bool _rectangle_geometry_get(Enesim_Renderer *r,
+		Enesim_Rectangle *geometry)
+{
+	Enesim_Renderer_Rectangle *thiz;
+
+	thiz = ENESIM_RENDERER_RECTANGLE(r);
+	enesim_rectangle_coords_from(geometry, thiz->current.x,
+			thiz->current.y, thiz->current.width,
+			thiz->current.height);
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _rectangle_base_name_get(Enesim_Renderer *r EINA_UNUSED)
+{
+	return "rectangle";
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -331,10 +287,10 @@ static void _enesim_renderer_rectangle_class_init(void *k)
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _rectangle_base_name_get;
-	r_klass->bounds_get = _rectangle_bounds_get;
 
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	s_klass->features_get = _rectangle_shape_features_get;
+	s_klass->geometry_get = _rectangle_geometry_get;
 
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS(k);
 	klass->has_changed = _rectangle_has_changed;
@@ -344,9 +300,6 @@ static void _enesim_renderer_rectangle_class_init(void *k)
 
 static void _enesim_renderer_rectangle_instance_init(void *o)
 {
-	Enesim_Renderer_Rectangle *thiz;
-
-	thiz = ENESIM_RENDERER_RECTANGLE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
 			ENESIM_SHAPE_STROKE_INSIDE);

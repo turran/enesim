@@ -482,7 +482,7 @@ advance:
 }
 
 /*----------------------------------------------------------------------------*
- *                               Shape interface                              *
+ *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,

@@ -90,13 +90,8 @@ static Eina_Bool _line_changed(Enesim_Renderer_Line *thiz)
 }
 
 /*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
+ *                            Shape path interface                            *
  *----------------------------------------------------------------------------*/
-static const char * _line_name(Enesim_Renderer *r EINA_UNUSED)
-{
-	return "line";
-}
-
 static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Line *thiz;
@@ -132,10 +127,34 @@ static void _line_cleanup(Enesim_Renderer *r)
 	thiz->past = thiz->current;
 	thiz->changed = EINA_FALSE;
 }
-
-static void _line_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+/*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static void _line_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+}
+
+static Eina_Bool _line_geometry_get(Enesim_Renderer *r,
+		Enesim_Rectangle *geometry)
+{
+	Enesim_Renderer_Line *thiz;
+
+	thiz = ENESIM_RENDERER_LINE(r);
+	enesim_rectangle_coords_from(geometry,
+			thiz->current.x0 < thiz->current.x1 ? thiz->current.x0 : thiz->current.x1,
+			thiz->current.y0 < thiz->current.y1 ? thiz->current.y0 : thiz->current.y1,
+			fabs(thiz->current.x0 - thiz->current.x1),
+			fabs(thiz->current.y0 - thiz->current.y1));
+	return EINA_TRUE;	
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _line_name(Enesim_Renderer *r EINA_UNUSED)
+{
+	return "line";
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -155,6 +174,7 @@ static void _enesim_renderer_line_class_init(void *k)
 
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	s_klass->features_get = _line_shape_features_get;
+	s_klass->geometry_get = _line_geometry_get;
 
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS(k);
 	klass->has_changed = _line_has_changed;
@@ -231,17 +251,17 @@ EAPI void enesim_renderer_line_x0_get(Enesim_Renderer *r, double *x0)
  * @brief Set the Y coordinate of the first point of a line renderer.
  *
  * @param[in] r The line renderer.
- * @param[in] y0 The Y coordinate.
+ * @param[in] y The Y coordinate.
  *
  * This function sets the Y coordinate of the first point of the line
- * renderer @p r to the value @p y0.
+ * renderer @p r to the value @p y.
  */
-EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0)
+EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = ENESIM_RENDERER_LINE(r);
-	thiz->current.y0 = y0;
+	thiz->current.y0 = y;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
 }
@@ -250,34 +270,34 @@ EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0)
  * @brief Retrieve the Y coordinate of the first point of a line renderer.
  *
  * @param[in] r The line renderer.
- * @param[out] y0 The Y coordinate.
+ * @param[out] y The Y coordinate.
  *
  * This function stores the Y coordinate value of the first point of
- * the line renderer @p r in the buffer @p y0.
+ * the line renderer @p r in the buffer @p y.
  */
-EAPI void enesim_renderer_line_y0_get(Enesim_Renderer *r, double *y0)
+EAPI void enesim_renderer_line_y0_get(Enesim_Renderer *r, double *y)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = ENESIM_RENDERER_LINE(r);
-	*y0 = thiz->current.y0;
+	*y = thiz->current.y0;
 }
 
 /**
  * @brief Set the X coordinate of the second point of a line renderer.
  *
  * @param[in] r The line renderer.
- * @param[in] x1 The X coordinate.
+ * @param[in] x The X coordinate.
  *
  * This function sets the X coordinate of the second point of the line
- * renderer @p r to the value @p x1.
+ * renderer @p r to the value @p x.
  */
-EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1)
+EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = ENESIM_RENDERER_LINE(r);
-	thiz->current.x1 = x1;
+	thiz->current.x1 = x;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
 }
@@ -286,34 +306,34 @@ EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1)
  * @brief Retrieve the X coordinate of the second point of a line renderer.
  *
  * @param[in] r The line renderer.
- * @param[out] x1 The X coordinate.
+ * @param[out] x The X coordinate.
  *
  * This function stores the X coordinate value of the second point of
- * the line renderer @p r in the buffer @p x1.
+ * the line renderer @p r in the buffer @p x.
  */
-EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1)
+EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = ENESIM_RENDERER_LINE(r);
-	*x1 = thiz->current.x1;
+	*x = thiz->current.x1;
 }
 
 /**
  * @brief Set the Y coordinate of the second point of a line renderer.
  *
  * @param[in] r The line renderer.
- * @param[in] y1 The Y coordinate.
+ * @param[in] y The Y coordinate.
  *
  * This function sets the Y coordinate of the second point of the line
- * renderer @p r to the value @p y1.
+ * renderer @p r to the value @p y.
  */
-EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
+EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = ENESIM_RENDERER_LINE(r);
-	thiz->current.y1 = y1;
+	thiz->current.y1 = y;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
 }
@@ -322,17 +342,17 @@ EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1)
  * @brief Retrieve the Y coordinate of the second point of a line renderer.
  *
  * @param[in] r The line renderer.
- * @param[out] y1 The Y coordinate.
+ * @param[out] y The Y coordinate.
  *
  * This function stores the Y coordinate value of the second point of
- * the line renderer @p r in the buffer @p y1.
+ * the line renderer @p r in the buffer @p y.
  */
-EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1)
+EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = ENESIM_RENDERER_LINE(r);
-	*y1 = thiz->current.y1;
+	*y = thiz->current.y1;
 }
 
 /**

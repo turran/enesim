@@ -159,6 +159,22 @@ static void _shape_path_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 }
 #endif
 /*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape_Path *thiz;
+	Enesim_Renderer_Shape_Path_Class *klass;
+
+	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
+	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
+	if (enesim_renderer_has_changed(thiz->path))
+		return EINA_TRUE;
+	if (klass->has_changed)
+		return klass->has_changed(r);
+	return EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _shape_path_sw_setup(Enesim_Renderer *r,
@@ -190,20 +206,6 @@ static void _shape_path_sw_hints(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	enesim_renderer_sw_hints_get(thiz->path, hints);
-}
-
-static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Shape_Path *thiz;
-	Enesim_Renderer_Shape_Path_Class *klass;
-
-	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
-	if (enesim_renderer_has_changed(thiz->path))
-		return EINA_TRUE;
-	if (klass->has_changed)
-		return klass->has_changed(r);
-	return EINA_FALSE;
 }
 
 #if BUILD_OPENGL

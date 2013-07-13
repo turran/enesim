@@ -123,13 +123,8 @@ static void _ellipse_get_real(Enesim_Renderer_Ellipse *thiz,
 	}
 }
 /*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
+ *                            Shape path interface                            *
  *----------------------------------------------------------------------------*/
-static const char * _ellipse_base_name_get(Enesim_Renderer *r EINA_UNUSED)
-{
-	return "ellipse";
-}
-
 static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 {
 	Enesim_Renderer_Ellipse *thiz;
@@ -164,53 +159,6 @@ static void _ellipse_cleanup(Enesim_Renderer *r)
 	thiz->changed = EINA_FALSE;
 }
 
-static void _ellipse_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
-{
-	Enesim_Renderer_Ellipse *thiz;
-	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Matrix_Type type;
-	double sw = 0;
-
-	thiz = ENESIM_RENDERER_ELLIPSE(r);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
-	{
-		Enesim_Shape_Stroke_Location location;
-		enesim_renderer_shape_stroke_weight_get(r, &sw);
-		enesim_renderer_shape_stroke_location_get(r, &location);
-		switch (location)
-		{
-			case ENESIM_SHAPE_STROKE_CENTER:
-			sw /= 2.0;
-			break;
-
-			case ENESIM_SHAPE_STROKE_INSIDE:
-			sw = 0.0;
-			break;
-
-			case ENESIM_SHAPE_STROKE_OUTSIDE:
-			break;
-		}
-	}
-	rect->x = thiz->current.x - thiz->current.rx;
-	rect->y = thiz->current.y - thiz->current.ry;
-	rect->w = (thiz->current.rx + sw) * 2;
-	rect->h = (thiz->current.ry + sw) * 2;
-
-	/* apply the geometry transformation */
-	enesim_renderer_transformation_type_get(r, &type);
-	if (type != ENESIM_MATRIX_IDENTITY)
-	{
-		Enesim_Matrix m;
-		Enesim_Quad q;
-
-		enesim_renderer_transformation_get(r, &m);
-		enesim_matrix_rectangle_transform(&m, rect, &q);
-		enesim_quad_rectangle_to(&q, rect);
-	}
-}
-
 static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Ellipse *thiz;
@@ -218,12 +166,35 @@ static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r)
 	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	return _ellipse_properties_have_changed(thiz);
 }
-
-static void _ellipse_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+/*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static void _ellipse_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Shape_Feature *features)
 {
 	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER |
 			ENESIM_SHAPE_FLAG_STROKE_RENDERER |
 			ENESIM_SHAPE_FLAG_STROKE_LOCATION;
+}
+
+static Eina_Bool _ellipse_geometry_get(Enesim_Renderer *r,
+		Enesim_Rectangle *geometry)
+{
+	Enesim_Renderer_Ellipse *thiz;
+
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
+	geometry->x = thiz->current.x - thiz->current.rx;
+	geometry->y = thiz->current.y - thiz->current.ry;
+	geometry->w = thiz->current.rx * 2;
+	geometry->h = thiz->current.ry * 2;
+	return EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _ellipse_base_name_get(Enesim_Renderer *r EINA_UNUSED)
+{
+	return "ellipse";
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -240,10 +211,10 @@ static void _enesim_renderer_ellipse_class_init(void *k)
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _ellipse_base_name_get;
-	r_klass->bounds_get = _ellipse_bounds_get;
 
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	s_klass->features_get = _ellipse_shape_features_get;
+	s_klass->geometry_get = _ellipse_geometry_get;
 
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS(k);
 	klass->has_changed = _ellipse_has_changed;

@@ -997,3 +997,27 @@ EAPI Eina_Bool enesim_renderer_shape_geometry_get(Enesim_Renderer *r, Enesim_Rec
 		return klass->geometry_get(r, geometry);
 	return EINA_FALSE;
 }
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Eina_Bool enesim_renderer_shape_destination_geometry_get(
+		Enesim_Renderer *r, Enesim_Rectangle *geometry)
+{
+	Enesim_Matrix_Type type;
+
+	if (!enesim_renderer_shape_geometry_get(r, geometry))
+		return EINA_FALSE;
+	enesim_renderer_transformation_type_get(r, &type);
+	if (type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Matrix m;
+		Enesim_Quad q;
+
+		enesim_renderer_transformation_get(r, &m);
+		enesim_matrix_rectangle_transform(&m, geometry, &q);
+		enesim_quad_rectangle_to(&q, geometry);
+	}
+	return EINA_TRUE;
+}
