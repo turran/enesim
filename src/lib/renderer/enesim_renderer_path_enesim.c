@@ -761,7 +761,7 @@ static void _path_generate_figures(Enesim_Renderer_Path_Enesim *thiz,
 		enesim_figure_clear(thiz->stroke_figure);
 	else
 		thiz->stroke_figure = enesim_figure_new();
-	if ((dm & ENESIM_SHAPE_DRAW_MODE_STROKE) && (sw > 1.0))
+	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		if (!dashes)
 			path = thiz->stroke_path;
@@ -944,7 +944,7 @@ static void _path_bounds_get(Enesim_Renderer *r,
 		return;
 	}
 
-	if ((css->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE) && (css->current.stroke.weight > 1.0))
+	if (css->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
 		if (!enesim_figure_bounds(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax))
 			goto failed;
@@ -1013,7 +1013,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	dm = css->current.draw_mode;
 	sw = css->current.stroke.weight;
 	/* fill + stroke */
-	if (dm == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL && (sw > 1.0))
+	if (dm == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		*draw = _path_opengl_fill_and_stroke_draw;
 	}
