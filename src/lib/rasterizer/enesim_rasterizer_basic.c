@@ -1236,11 +1236,8 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->nvectors = nvectors;
 
 		vec = thiz->vectors;
-		thiz->lxx = INT_MAX / 2;
-		thiz->rxx = -thiz->lxx;
-		thiz->tyy = thiz->lxx;
-		thiz->byy = -thiz->tyy;
 
+		/* generate the bounds to clip the span functions */
 		if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
 			return EINA_FALSE;
 		if ((draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) &&
@@ -1253,6 +1250,13 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			if (sy < (1 / 16.0))
 				sy = 1 / 16.0;
 		}
+		/* in theory we should add 1 here, like the path renderer
+		 * but the span functions handle that for us
+		 */
+		thiz->tyy = eina_extra_f16p16_double_from(ty);
+		thiz->byy = eina_extra_f16p16_double_from(by);
+		thiz->lxx = eina_extra_f16p16_double_from(lx);
+		thiz->rxx = eina_extra_f16p16_double_from(rx);
 
 		/* FIXME why this loop can't be done on the upper one? */
 		EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
@@ -1338,16 +1342,6 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				vec->yy0 = y0 * 65536;
 				vec->xx1 = x1 * 65536;
 				vec->yy1 = y1 * 65536;
-
-				if (vec->yy0 < thiz->tyy)
-					thiz->tyy = vec->yy0;
-				if (vec->yy0 > thiz->byy)
-					thiz->byy = vec->yy0;
-
-				if (vec->xx0 < thiz->lxx)
-					thiz->lxx = vec->xx0;
-				if (vec->xx0 > thiz->rxx)
-					thiz->rxx = vec->xx0;
 
 				if ((vec->yy0 == vec->yy1) || (vec->xx0 == vec->xx1))
 					vec->sgn = 0;

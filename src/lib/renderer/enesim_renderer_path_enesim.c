@@ -749,7 +749,7 @@ static void _path_generate_figures(Enesim_Renderer_Path_Enesim *thiz,
 		Enesim_Shape_Stroke_Cap cap,
 		Eina_List *dashes)
 {
-	Enesim_Path_Generator *path;
+	Enesim_Path_Generator *generator;
 	Enesim_Figure *stroke_figure = NULL;
 
 	if (thiz->fill_figure)
@@ -761,28 +761,34 @@ static void _path_generate_figures(Enesim_Renderer_Path_Enesim *thiz,
 		enesim_figure_clear(thiz->stroke_figure);
 	else
 		thiz->stroke_figure = enesim_figure_new();
-	if (dm & ENESIM_SHAPE_DRAW_MODE_STROKE)
+
+	/* decide what generator to use */
+	/* for a stroke smaller than 1px we will use the basic
+	 * rasterizer directly, so we dont need to generate the
+	 * stroke path
+	 */
+	if ((dm & ENESIM_SHAPE_DRAW_MODE_STROKE) && (sw > 1.0))
 	{
 		if (!dashes)
-			path = thiz->stroke_path;
+			generator = thiz->stroke_path;
 		else
-			path = thiz->dashed_path;
+			generator = thiz->dashed_path;
 		stroke_figure = thiz->stroke_figure;
 	}
 	else
 	{
-		path = thiz->strokeless_path;
+		generator = thiz->strokeless_path;
 
 	}
-	enesim_path_generator_figure_set(path, thiz->fill_figure);
-	enesim_path_generator_stroke_figure_set(path, thiz->stroke_figure);
-	enesim_path_generator_stroke_cap_set(path, cap);
-	enesim_path_generator_stroke_join_set(path, join);
-	enesim_path_generator_stroke_weight_set(path, sw);
-	enesim_path_generator_stroke_dash_set(path, dashes);
-	enesim_path_generator_scale_set(path, sx, sy);
-	enesim_path_generator_transformation_set(path, transformation);
-	enesim_path_generator_generate(path, thiz->commands);
+	enesim_path_generator_figure_set(generator, thiz->fill_figure);
+	enesim_path_generator_stroke_figure_set(generator, thiz->stroke_figure);
+	enesim_path_generator_stroke_cap_set(generator, cap);
+	enesim_path_generator_stroke_join_set(generator, join);
+	enesim_path_generator_stroke_weight_set(generator, sw);
+	enesim_path_generator_stroke_dash_set(generator, dashes);
+	enesim_path_generator_scale_set(generator, sx, sy);
+	enesim_path_generator_transformation_set(generator, transformation);
+	enesim_path_generator_generate(generator, thiz->commands);
 
 	/* set the fill figure on the bifigure as its under polys */
 	enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
@@ -946,8 +952,23 @@ static void _path_bounds_get(Enesim_Renderer *r,
 
 	if (css->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
 	{
-		if (!enesim_figure_bounds(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax))
-			goto failed;
+		if (css->current.stroke.weight > 1.0)
+		{
+			if (!enesim_figure_bounds(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax))
+				goto failed;
+		}
+		else
+		{
+			if (!enesim_figure_bounds(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax))
+				goto failed;
+			/* add the stroke offset, even if the basic figure has its own bounds
+			 * we need to define the correct one here
+			 */
+			xmin -= 0.5;
+			ymin -= 0.5;
+			xmax += 0.5;
+			ymax += 0.5;
+		}
 	}
 	else
 	{
