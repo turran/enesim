@@ -163,7 +163,7 @@ static void _circle_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_SHAPE_FLAG_STROKE_LOCATION;
 }
 
-static void _circle_geometry_get(Enesim_Renderer *r,
+static Eina_Bool _circle_geometry_get(Enesim_Renderer *r,
 		Enesim_Rectangle *geometry)
 {
 	Enesim_Renderer_Circle *thiz;
@@ -172,6 +172,7 @@ static void _circle_geometry_get(Enesim_Renderer *r,
 	geometry->x = thiz->current.x - thiz->current.r;
 	geometry->y = thiz->current.y - thiz->current.r;
 	geometry->w = geometry->h = thiz->current.r * 2;
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
