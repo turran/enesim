@@ -1515,14 +1515,10 @@ static void _under_figure_span(Enesim_Renderer *r,
 	thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	enesim_renderer_sw_draw(thiz->under, x, y, len, ddata);
 }
-/*----------------------------------------------------------------------------*
- *                    The Enesim's rasterizer interface                       *
- *----------------------------------------------------------------------------*/
-static const char * _bifigure_name(Enesim_Renderer *r EINA_UNUSED)
-{
-	return "bifigure";
-}
 
+/*----------------------------------------------------------------------------*
+ *                           Rasterizer interface                             *
+ *----------------------------------------------------------------------------*/
 static void _bifigure_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
@@ -1532,6 +1528,13 @@ static void _bifigure_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure
 	if (figure && !thiz->under)
 		thiz->under = enesim_rasterizer_basic_new();
 	thiz->changed = EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _bifigure_name(Enesim_Renderer *r EINA_UNUSED)
+{
+	return "bifigure";
 }
 
 static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
@@ -1768,6 +1771,12 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	}
 	thiz->changed = EINA_FALSE;
 }
+
+static void _bifigure_sw_hints(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Sw_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -1784,6 +1793,7 @@ static void _enesim_rasterizer_bifigure_class_init(void *k)
 	r_klass->base_name_get = _bifigure_name;
 	r_klass->sw_setup = _bifigure_sw_setup;
 	r_klass->sw_cleanup = _bifigure_sw_cleanup;
+	r_klass->sw_hints_get = _bifigure_sw_hints;
 
 	klass = ENESIM_RASTERIZER_CLASS(k);
 	klass->figure_set = _bifigure_figure_set;

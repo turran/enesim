@@ -47,22 +47,16 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
-static inline Eina_Bool _is_sw_draw_composed(Enesim_Renderer *r,
-		Enesim_Renderer_Sw_Hint hints)
+static inline Eina_Bool _is_sw_draw_composed(Enesim_Color *color,
+		Enesim_Rop *rop, Enesim_Renderer_Sw_Hint hints)
 {
-	Enesim_Color color;
-	Enesim_Rop rop;
-
-	enesim_renderer_color_get(r, &color);
-	enesim_renderer_rop_get(r, &rop);
-
 	if (hints & ENESIM_RENDERER_HINT_COLORIZE)
-		color = ENESIM_COLOR_FULL;
+		*color = ENESIM_COLOR_FULL;
 	if (hints & ENESIM_RENDERER_HINT_ROP)
-		rop = ENESIM_FILL;
+		*rop = ENESIM_FILL;
 
 	/* fill rop and color is full, we use the simple draw function */
-	if ((rop == ENESIM_FILL) && (color == ENESIM_COLOR_FULL))
+	if ((*rop == ENESIM_FILL) && (*color == ENESIM_COLOR_FULL))
 		return EINA_FALSE;
 	return EINA_TRUE;
 }
@@ -617,7 +611,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	}
 
 	enesim_renderer_sw_hints_get(r, &hints);
-	if (_is_sw_draw_composed(r, hints))
+	if (_is_sw_draw_composed(&color, &rop, hints))
 	{
 		Enesim_Format dfmt;
 

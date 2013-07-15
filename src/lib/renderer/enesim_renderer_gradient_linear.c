@@ -184,13 +184,13 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &om);
 	type = enesim_matrix_type_get(&om);
 
-	xx0 = x1 - x0;
-	yy0 = y1 - y0;
-	/* we need to translate by our min x and min y */
-	thiz->yy = y0 < y1 ? eina_extra_f16p16_double_from(y0) : eina_extra_f16p16_double_from(y1);
-	thiz->xx = x0 < x1 ? eina_extra_f16p16_double_from(x0) : eina_extra_f16p16_double_from(x1);
+	/* we need to translate by the x0 and y0 */
+	thiz->yy = eina_extra_f16p16_double_from(y0);
+	thiz->xx = eina_extra_f16p16_double_from(x0);
 
 	/* calculate the increment on x and y */
+	xx0 = x1 - x0;
+	yy0 = y1 - y0;
 	orig_len = hypot(xx0, yy0);
 	thiz->ayx = eina_extra_f16p16_double_from(xx0 / orig_len);
 	thiz->ayy = eina_extra_f16p16_double_from(yy0 / orig_len);
@@ -198,7 +198,6 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	/* handle the geometry transformation */
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
-
 		enesim_matrix_point_transform(&om, x0, y0, &x0, &y0);
 		enesim_matrix_point_transform(&om, x1, y1, &x1, &y1);
 		enesim_matrix_inverse(&om, &m);

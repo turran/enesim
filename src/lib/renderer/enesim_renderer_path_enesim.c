@@ -830,12 +830,25 @@ static void _path_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_cleanup(thiz->bifigure, s);
 	thiz->changed = EINA_FALSE;
 }
+
 /*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
+ *                          Path Abstract interface                           *
  *----------------------------------------------------------------------------*/
-static const char * _path_name(Enesim_Renderer *r EINA_UNUSED)
+static void _path_commands_set(Enesim_Renderer *r, const Eina_List *commands)
 {
-	return "path";
+	Enesim_Renderer_Path_Enesim *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
+	thiz->commands = commands;
+	thiz->changed = EINA_TRUE;
+	thiz->generated = EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static void _path_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+{
+	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
@@ -890,6 +903,65 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_path_state_cleanup(r, s);
 }
 
+#if BUILD_OPENGL
+static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Log **l EINA_UNUSED)
+{
+	Enesim_Renderer_Path_Enesim *thiz;
+	Enesim_Renderer_Path_Enesim_OpenGL *gl;
+	Enesim_Shape_Draw_Mode dm;
+	double sw;
+	const Enesim_Renderer_State *cs;
+	const Enesim_Renderer_Shape_State *css;
+
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
+	cs = enesim_renderer_state_get(r);
+	css = enesim_renderer_shape_state_get(r);
+	gl = &thiz->gl;
+
+	/* generate the figures */
+	if (_path_needs_generate(thiz, &cs->current.transformation,
+			css->current.stroke.weight,
+			css->current.stroke.join, css->current.stroke.cap))
+	{
+		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
+				&cs->current.transformation, 1, 1,
+				css->current.stroke.join, css->current.stroke.cap, css->stroke_dashes);
+	}
+
+	/* check what to draw, stroke, fill or stroke + fill */
+	dm = css->current.draw_mode;
+	sw = css->current.stroke.weight;
+	/* fill + stroke */
+	if (dm == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+	{
+		*draw = _path_opengl_fill_and_stroke_draw;
+	}
+	else
+	{
+		*draw = _path_opengl_fill_or_stroke_draw;
+	}
+
+	return EINA_TRUE;
+}
+
+static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	_path_state_cleanup(r, s);
+}
+#endif
+
+
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _path_name(Enesim_Renderer *r EINA_UNUSED)
+{
+	return "path";
+}
+
 static void _path_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Feature *features)
 {
@@ -910,11 +982,6 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	return thiz->changed;
-}
-
-static void _path_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
-{
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
 }
 
 static void _path_bounds_get(Enesim_Renderer *r,
@@ -1002,65 +1069,7 @@ static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 	*num_programs = 3;
 	return EINA_TRUE;
 }
-
-static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_OpenGL_Draw *draw,
-		Enesim_Log **l EINA_UNUSED)
-{
-	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Renderer_Path_Enesim_OpenGL *gl;
-	Enesim_Shape_Draw_Mode dm;
-	double sw;
-	const Enesim_Renderer_State *cs;
-	const Enesim_Renderer_Shape_State *css;
-
-	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-	cs = enesim_renderer_state_get(r);
-	css = enesim_renderer_shape_state_get(r);
-	gl = &thiz->gl;
-
-	/* generate the figures */
-	if (_path_needs_generate(thiz, &cs->current.transformation,
-			css->current.stroke.weight,
-			css->current.stroke.join, css->current.stroke.cap))
-	{
-		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
-				&cs->current.transformation, 1, 1,
-				css->current.stroke.join, css->current.stroke.cap, css->stroke_dashes);
-	}
-
-	/* check what to draw, stroke, fill or stroke + fill */
-	dm = css->current.draw_mode;
-	sw = css->current.stroke.weight;
-	/* fill + stroke */
-	if (dm == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
-	{
-		*draw = _path_opengl_fill_and_stroke_draw;
-	}
-	else
-	{
-		*draw = _path_opengl_fill_or_stroke_draw;
-	}
-
-	return EINA_TRUE;
-}
-
-static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	_path_state_cleanup(r, s);
-}
 #endif
-
-static void _path_commands_set(Enesim_Renderer *r, const Eina_List *commands)
-{
-	Enesim_Renderer_Path_Enesim *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-	thiz->commands = commands;
-	thiz->changed = EINA_TRUE;
-	thiz->generated = EINA_FALSE;
-}
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/

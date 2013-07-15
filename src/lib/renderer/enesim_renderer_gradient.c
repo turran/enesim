@@ -380,16 +380,22 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_
 	/* else iterate until pos > prev && pos < next */
 	else
 	{
-		Eina_List *tmp;
+		Enesim_Renderer_Gradient_Stop *p;
+		Eina_List *l;
+		Eina_Bool found = EINA_FALSE;
 
-		for (tmp = thiz->state.stops; tmp; tmp = eina_list_next(tmp))
+		EINA_LIST_FOREACH(thiz->state.stops, l, p)
 		{
-			Enesim_Renderer_Gradient_Stop *p = eina_list_data_get(tmp);
-
-			if (p->pos > s->pos)
+			if (s->pos < p->pos)
+			{
+				found = EINA_TRUE;
 				break;
+			}
 		}
-		thiz->state.stops = eina_list_append_relative_list(thiz->state.stops, s, tmp);
+		if (found)
+			thiz->state.stops = eina_list_prepend_relative_list(thiz->state.stops, s, l);
+		else
+			thiz->state.stops = eina_list_append(thiz->state.stops, s);
 	}
 	thiz->stops_changed = EINA_TRUE;
 }

@@ -1114,15 +1114,9 @@ get_out:
 	}
 }
 
-
 /*----------------------------------------------------------------------------*
- *                    The Enesim's rasterizer interface                       *
+ *                           Rasterizer interface                             *
  *----------------------------------------------------------------------------*/
-static const char * _basic_name(Enesim_Renderer *r EINA_UNUSED)
-{
-	return "basic";
-}
-
 static void _basic_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
 {
 	Enesim_Rasterizer_Basic *thiz;
@@ -1130,6 +1124,13 @@ static void _basic_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
 	thiz = ENESIM_RASTERIZER_BASIC(r);
 	thiz->figure = figure;
 	thiz->changed = EINA_TRUE;
+}
+/*----------------------------------------------------------------------------*
+ *                    The Enesim's rasterizer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _basic_name(Enesim_Renderer *r EINA_UNUSED)
+{
+	return "basic";
 }
 
 static int _tysort(const void *l, const void *r)
@@ -1434,6 +1435,12 @@ static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s 
 	if (state->stroke.r)
 		enesim_renderer_unref(state->stroke.r);
 }
+
+static void _basic_sw_hints(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Sw_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -1450,6 +1457,7 @@ static void _enesim_rasterizer_basic_class_init(void *k)
 	r_klass->base_name_get = _basic_name;
 	r_klass->sw_setup = _basic_sw_setup;
 	r_klass->sw_cleanup = _basic_sw_cleanup;
+	r_klass->sw_hints_get = _basic_sw_hints;
 
 	klass = ENESIM_RASTERIZER_CLASS(k);
 	klass->figure_set = _basic_figure_set;
