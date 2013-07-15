@@ -1405,7 +1405,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		if ((state->stroke.weight > 0.0) && state->stroke.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
 		{
 			*draw = _stroke_paint_fill_nz;
-			if (state->stroke.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+			if (state->fill.r && (draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
 				*draw = _stroke_paint_fill_paint_nz;
 		}
 	}
