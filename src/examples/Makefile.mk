@@ -12,7 +12,6 @@ $(top_builddir)/src/lib/libenesim.la \
 bin_PROGRAMS = \
 src/examples/enesim_image_example01 \
 src/examples/enesim_image_example02 \
-src/examples/enesim_draw_cache01 \
 src/examples/enesim_renderer_path01 \
 src/examples/enesim_renderer_path02 \
 src/examples/enesim_renderer_path03 \
@@ -30,10 +29,6 @@ src_examples_enesim_image_example01_LDADD =  $(examples_LDADD)
 src_examples_enesim_image_example02_SOURCES = src/examples/enesim_image_example02.c
 src_examples_enesim_image_example02_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_image_example02_LDADD = $(examples_LDADD)
-
-src_examples_enesim_draw_cache01_SOURCES = src/examples/enesim_draw_cache01.c
-src_examples_enesim_draw_cache01_CPPFLAGS = $(examples_CPPFLAGS)
-src_examples_enesim_draw_cache01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_path01_SOURCES = \
 src/examples/enesim_renderer_path01.c \

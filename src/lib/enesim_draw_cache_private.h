@@ -15,8 +15,8 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_DRAW_CACHE_H_
-#define ENESIM_DRAW_CACHE_H_
+#ifndef ENESIM_DRAW_CACHE_PRIVATE_H_
+#define ENESIM_DRAW_CACHE_PRIVATE_H_
 
 /**
  * @defgroup Enesim_Draw_Cache_Group Draw cache
@@ -25,17 +25,17 @@
 
 typedef struct _Enesim_Draw_Cache Enesim_Draw_Cache; /**< Draw cache handle */
 
-EAPI Enesim_Draw_Cache * enesim_draw_cache_new(void);
-EAPI void enesim_draw_cache_free(Enesim_Draw_Cache *thiz);
+Enesim_Draw_Cache * enesim_draw_cache_new(void);
+void enesim_draw_cache_free(Enesim_Draw_Cache *thiz);
 
-EAPI void enesim_draw_cache_renderer_set(Enesim_Draw_Cache *thiz,
+void enesim_draw_cache_renderer_set(Enesim_Draw_Cache *thiz,
 		Enesim_Renderer *r);
-EAPI void enesim_draw_cache_renderer_get(Enesim_Draw_Cache *thiz,
+void enesim_draw_cache_renderer_get(Enesim_Draw_Cache *thiz,
 		Enesim_Renderer **r);
 
-EAPI Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
+Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
 		Eina_Rectangle *g);
-EAPI Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
+Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		Eina_Rectangle *area, Enesim_Buffer_Sw_Data *mapped,
 		Enesim_Format f, Enesim_Pool *p);
 
@@ -43,5 +43,5 @@ EAPI Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
  * @}
  */
 
-#endif /*ENESIM_RENDERER_H_*/
+#endif /*ENESIM_DRAW_CACHE_PRIVATE_H_*/
 

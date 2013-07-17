@@ -27,13 +27,13 @@
 #include "enesim_color.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
-#include "enesim_draw_cache.h"
 
 #if BUILD_OPENGL
 #include "Enesim_OpenGL.h"
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_draw_cache_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -67,17 +67,14 @@ static Eina_Bool _damage_cb(Enesim_Renderer *r EINA_UNUSED,
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
-EAPI Enesim_Draw_Cache * enesim_draw_cache_new(void)
+Enesim_Draw_Cache * enesim_draw_cache_new(void)
 {
 	Enesim_Draw_Cache *thiz;
 	thiz = calloc(1, sizeof(Enesim_Draw_Cache));
 	return thiz;
 }
 
-EAPI void enesim_draw_cache_free(Enesim_Draw_Cache *thiz)
+void enesim_draw_cache_free(Enesim_Draw_Cache *thiz)
 {
 	if (thiz->r)
 	{
@@ -99,7 +96,7 @@ EAPI void enesim_draw_cache_free(Enesim_Draw_Cache *thiz)
 	free(thiz);
 }
 
-EAPI void enesim_draw_cache_renderer_set(Enesim_Draw_Cache *thiz,
+void enesim_draw_cache_renderer_set(Enesim_Draw_Cache *thiz,
 		Enesim_Renderer *r)
 {
 	if (thiz->r)
@@ -111,7 +108,7 @@ EAPI void enesim_draw_cache_renderer_set(Enesim_Draw_Cache *thiz,
 	thiz->changed = EINA_TRUE;
 }
 
-EAPI void enesim_draw_cache_renderer_get(Enesim_Draw_Cache *thiz,
+void enesim_draw_cache_renderer_get(Enesim_Draw_Cache *thiz,
 		Enesim_Renderer **r)
 {
 	if (thiz->r)
@@ -120,7 +117,7 @@ EAPI void enesim_draw_cache_renderer_get(Enesim_Draw_Cache *thiz,
 		*r = NULL;
 }
 
-EAPI Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
+Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
 		Eina_Rectangle *g)
 {
 	if (!thiz->r) return EINA_FALSE;
@@ -132,7 +129,7 @@ EAPI Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
 }
 
 /* The area is in surface coordinates 0,0 -> renderer geometry width x renderer geometry height */
-EAPI Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
+Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		Eina_Rectangle *area, Enesim_Buffer_Sw_Data *mapped,
 		Enesim_Format f, Enesim_Pool *p)
 {
@@ -284,9 +281,12 @@ no_redraws:
 }
 
 #if 0
-EAPI void enesim_draw_cache_map_gl(Enesim_Draw_Cache *thiz,
+void enesim_draw_cache_map_gl(Enesim_Draw_Cache *thiz,
 		Eina_Rectangle *area, Enesim_Buffer_OpenGL_Data *mapped)
 {
 
 }
 #endif
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
