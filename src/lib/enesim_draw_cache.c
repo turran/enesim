@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
+#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -27,12 +28,16 @@
 #include "enesim_color.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 
 #if BUILD_OPENGL
 #include "Enesim_OpenGL.h"
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_renderer_private.h"
 #include "enesim_draw_cache_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -48,6 +53,8 @@ struct _Enesim_Draw_Cache
 	/* on the tiler we keep the area that needs to be redrawn from the
 	 * renderer */
 	Eina_Tiler *tiler;
+	/* given that the tiler is not lock free we need to lock it */
+	Eina_Lock tlock;
 	int tw, th;
 };
 
@@ -71,6 +78,7 @@ Enesim_Draw_Cache * enesim_draw_cache_new(void)
 {
 	Enesim_Draw_Cache *thiz;
 	thiz = calloc(1, sizeof(Enesim_Draw_Cache));
+   	eina_lock_new(&thiz->tlock);
 	return thiz;
 }
 
@@ -93,6 +101,7 @@ void enesim_draw_cache_free(Enesim_Draw_Cache *thiz)
 		eina_tiler_free(thiz->tiler);
 		thiz->tiler = NULL;
 	}
+	eina_lock_free(&thiz->tlock);
 	free(thiz);
 }
 
@@ -128,21 +137,10 @@ Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
 	return EINA_TRUE;
 }
 
-/* The area is in surface coordinates 0,0 -> renderer geometry width x renderer geometry height */
-Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
-		Eina_Rectangle *area, Enesim_Buffer_Sw_Data *mapped,
+Eina_Bool enesim_draw_cache_setup_sw(Enesim_Draw_Cache *thiz,
 		Enesim_Format f, Enesim_Pool *p)
 {
-	Enesim_Buffer *buffer;
-	Eina_Iterator *it;
-	Eina_Tiler *area_tiler;
-	Eina_Rectangle *rect;
-	Eina_Rectangle complete, real_area;
-	Eina_List *redraws = NULL;
-	Eina_Bool ret;
-
 	if (!thiz->r) return EINA_FALSE;
-
 	/* TODO check what happens if the format is different? */
 	/* in case the renderer has changed our damaged/clear rectangles
 	 * has to be invalidated
@@ -177,6 +175,7 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		if (!thiz->tiler)
 		{
 			thiz->tiler = eina_tiler_new(thiz->bounds.w, thiz->bounds.h);
+			eina_tiler_tile_size_set(thiz->tiler, 2, 2);
 			thiz->tw = thiz->bounds.w;
 			thiz->th = thiz->bounds.h;
 		}
@@ -205,6 +204,7 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		 */
 		if (full)
 		{
+			Eina_Rectangle complete;
 			eina_rectangle_coords_from(&complete, 0, 0, thiz->bounds.w, thiz->bounds.h);
 			eina_tiler_rect_add(thiz->tiler, &complete);
 		}
@@ -213,6 +213,24 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 			enesim_renderer_damages_get(thiz->r, _damage_cb, thiz);
 		}
 	}
+	return EINA_TRUE;
+}
+
+/* The area is in surface coordinates 0,0 -> renderer geometry width x renderer geometry height */
+Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
+		Eina_Rectangle *area, Enesim_Buffer_Sw_Data *mapped)
+{
+	Enesim_Buffer *buffer;
+	Eina_Iterator *it;
+	Eina_Tiler *area_tiler;
+	Eina_Rectangle *rect;
+	Eina_Rectangle real_area;
+	Eina_Bool ret;
+
+	if (!thiz->r) return EINA_FALSE;
+
+	/* TODO to minimize the impact of the lock, split this function into a setup/cleanup/map */
+	eina_lock_take(&thiz->tlock);
 
 	/* create our own requested area tiler, so we can know what areas
 	 * should be redrawn and what areas should not
@@ -226,7 +244,12 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		real_area = *area;
 	}
 	area_tiler = eina_tiler_new(real_area.w, real_area.h);
-	
+
+	/* get the mapped pointer */	
+	buffer = enesim_surface_buffer_get(thiz->s);
+	ret = enesim_buffer_data_get(buffer, mapped);
+	enesim_buffer_unref(buffer);
+
 	/* check if the requested area has been already cached or not, ie
 	 * remove rectangles from the area tiler
 	 */
@@ -243,39 +266,36 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 	eina_iterator_free(it);
 
 	/* ok, we now finally can get the damaged rectangles and draw */
+	//printf("surface of %d %d\n", thiz->tw, thiz->th);
 	it = eina_tiler_iterator_new(area_tiler);
 	EINA_ITERATOR_FOREACH(it, rect)
 	{
-		Eina_Rectangle *redraw;
+		Eina_Rectangle redraw;
+		uint8_t *dst;
+		int y;
 
-		redraw = calloc(1, sizeof(Eina_Rectangle));
-		*redraw = *rect;
+		redraw = *rect;
 		/* convert the rect from area to surface coordinates */
-		redraw->x += real_area.x;
-		redraw->y += real_area.y;
-		//printf("redrawing %d %d %d %d\n", redraw->x, redraw->y, redraw->w, redraw->h);
-		redraws = eina_list_append(redraws, redraw); 
+		redraw.x += real_area.x;
+		redraw.y += real_area.y;
+		dst = (uint8_t *)argb8888_at(mapped->argb8888.plane0,
+				mapped->argb8888.plane0_stride,
+				redraw.x, redraw.y);
+		y = redraw.y;
+		printf("redrawing into %d %d %d %d from %d %d\n", redraw.x, redraw.y, redraw.w, redraw.h,
+			redraw.x + thiz->bounds.x, redraw.y + thiz->bounds.y);
+		while (y < redraw.h)
+		{
+			enesim_renderer_sw_draw(thiz->r, redraw.x + thiz->bounds.x,
+					y + thiz->bounds.y, redraw.w, (uint32_t *)dst);
+			dst += mapped->argb8888.plane0_stride;
+			y++;
+		}
+		eina_tiler_rect_del(thiz->tiler, &redraw);
 	}
 	eina_iterator_free(it);
 	eina_tiler_free(area_tiler);
-
-	if (!redraws) goto no_redraws;
-
-	/* finally draw */
-	ret = enesim_renderer_draw_list(thiz->r, thiz->s, redraws, thiz->bounds.x, thiz->bounds.y, NULL);
-	EINA_LIST_FREE(redraws, rect)
-	{
-		//printf("removing %d %d %d %d\n", rect->x, rect->y, rect->w, rect->h);
-		eina_tiler_rect_del(thiz->tiler, rect);
-		free(rect);
-	}
-	if (!ret) return ret;
-
-	/* get the sw data from the surface */
-no_redraws:
-	buffer = enesim_surface_buffer_get(thiz->s);
-	ret = enesim_buffer_data_get(buffer, mapped);
-	enesim_buffer_unref(buffer);
+	eina_lock_release(&thiz->tlock);
 
 	return ret;
 }

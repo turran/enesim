@@ -35,9 +35,10 @@ void enesim_draw_cache_renderer_get(Enesim_Draw_Cache *thiz,
 
 Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
 		Eina_Rectangle *g);
-Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
-		Eina_Rectangle *area, Enesim_Buffer_Sw_Data *mapped,
+Eina_Bool enesim_draw_cache_setup_sw(Enesim_Draw_Cache *thiz,
 		Enesim_Format f, Enesim_Pool *p);
+Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
+		Eina_Rectangle *area, Enesim_Buffer_Sw_Data *mapped);
 
 /**
  * @}

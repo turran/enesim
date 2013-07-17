@@ -178,7 +178,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 		sw = bounds.w;
 		sh = bounds.h;
 		eina_rectangle_coords_from(&area, ix, iy, len, 20);
-		enesim_draw_cache_map_sw(thiz->cache, &area, &sw_data, ENESIM_FORMAT_ARGB8888, NULL);
+		enesim_draw_cache_map_sw(thiz->cache, &area, &sw_data);
 		src = sw_data.argb8888.plane0;
 		sstride = sw_data.argb8888.plane0_stride;
 	}
@@ -456,6 +456,8 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_color_get(r, &thiz->color);
 	if (!_blur_state_setup(thiz, r, s, l))
 		return EINA_FALSE;
+	if (thiz->src_r)
+		enesim_draw_cache_setup_sw(thiz->cache, ENESIM_FORMAT_ARGB8888, NULL);
 
 	rx = ((2 * thiz->rx) + 1.01) / 2.0;
 	if (rx <= 1) rx = 1.005;
