@@ -8,6 +8,7 @@ src/lib/enesim_buffer.h \
 src/lib/enesim_color.h \
 src/lib/enesim_compositor.h \
 src/lib/enesim_converter.h \
+src/lib/enesim_draw_cache.h \
 src/lib/enesim_log.h \
 src/lib/enesim_image.h \
 src/lib/enesim_main.h \
@@ -36,6 +37,7 @@ src/lib/enesim_compositor.c \
 src/lib/enesim_compositor_private.h \
 src/lib/enesim_converter.c \
 src/lib/enesim_converter_private.h \
+src/lib/enesim_draw_cache.c \
 src/lib/enesim_log.c \
 src/lib/enesim_image.c \
 src/lib/enesim_image_private.h \

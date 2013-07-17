@@ -29,6 +29,7 @@
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_blur.h"
+#include "enesim_draw_cache.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
@@ -67,14 +68,21 @@ static void _init_atable(void)
 typedef struct _Enesim_Renderer_Blur
 {
 	Enesim_Renderer parent;
+	/* properties */
 	Enesim_Surface *src;
+	Enesim_Renderer *src_r;
 	Enesim_Blur_Channel channel;
 	double rx, ry;
+
 	/* The state variables */
 	Enesim_Color color;
 //	int irx, iry;
 //	int iaxx, iayy;
 	int ibxx, ibyy;
+
+	/* private */
+	Enesim_Draw_Cache *cache;
+	Eina_Bool changed;
 } Enesim_Renderer_Blur;
 
 typedef struct _Enesim_Renderer_Blur_Class {
@@ -82,24 +90,50 @@ typedef struct _Enesim_Renderer_Blur_Class {
 } Enesim_Renderer_Blur_Class;
 
 static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
+		Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Log **l)
 {
-	if (!thiz->src)
+	if (!thiz->src && !thiz->src_r)
 	{
-		ENESIM_RENDERER_LOG(r, l, "No surface set");
+		if (!thiz->src)
+			ENESIM_RENDERER_LOG(r, l, "No surface set");
+		if (!thiz->src_r)
+			ENESIM_RENDERER_LOG(r, l, "No renderer set");
 		return EINA_FALSE;
 	}
-	/* lock the surface for read only */
-	enesim_surface_lock(thiz->src, EINA_FALSE);
+
+	/* Set the renderer */
+	if (thiz->src_r)
+	{
+		Enesim_Renderer *old_r;
+
+		if (!enesim_renderer_setup(thiz->src_r, s, l))
+			return EINA_FALSE;
+		enesim_draw_cache_renderer_get(thiz->cache, &old_r);
+		if (old_r != thiz->src_r)
+			enesim_draw_cache_renderer_set(thiz->cache, enesim_renderer_ref(thiz->src_r));
+		if (old_r)
+			enesim_renderer_unref(old_r);
+	}
+	else if (thiz->src)
+	{
+		/* lock the surface for read only */
+		enesim_surface_lock(thiz->src, EINA_FALSE);
+	}
 	return EINA_TRUE;
 }
 
 static void _blur_state_cleanup(Enesim_Renderer_Blur *thiz,
-		Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
+		Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s)
 {
-	if (thiz->src)
+	if (thiz->src_r)
+	{
+		enesim_renderer_cleanup(thiz->src_r, s);
+	}
+	else if (thiz->src)
+	{
 		enesim_surface_unlock(thiz->src);
+	}
 }
 
 static Enesim_Renderer_Sw_Fill _spans[ENESIM_BLUR_CHANNELS];
@@ -134,14 +168,32 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	x = xx >> 16;
 	y = yy >> 16;
 
-	enesim_surface_size_get(thiz->src, &sw, &sh);
+	if (thiz->src_r)
+	{
+		Eina_Rectangle bounds;
+		Eina_Rectangle area;
+		Enesim_Buffer_Sw_Data sw_data;
+
+		enesim_renderer_destination_bounds(thiz->src_r, &bounds, 0, 0);
+		sw = bounds.w;
+		sh = bounds.h;
+		eina_rectangle_coords_from(&area, ix, iy, len, 20);
+		enesim_draw_cache_map_sw(thiz->cache, &area, &sw_data, ENESIM_FORMAT_ARGB8888, NULL);
+		src = sw_data.argb8888.plane0;
+		sstride = sw_data.argb8888.plane0_stride;
+	}
+	else
+	{
+		enesim_surface_size_get(thiz->src, &sw, &sh);
+		enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
+	}
+	src = argb8888_at(src, sstride, ix, iy);
+
 	if ((iy < 0) || (iy >= sh))
 	{
 		memset(dst, 0, sizeof(unsigned int) * len);
 		return;
 	}
-	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
-	src = argb8888_at(src, sstride, ix, iy);
 
 	tyy0 = yy & 0xffff0000;  ty0 = (tyy0 >> 16);
 	ntyy0 = tyy0 + ibyy;  nty0 = (ntyy0 >> 16);
@@ -432,31 +484,6 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_blur_state_cleanup(thiz, r, s);
 }
 
-static void _blur_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
-{
-	Enesim_Renderer_Blur *thiz;
-
-	thiz = ENESIM_RENDERER_BLUR(r);
-	if (!thiz->src)
-	{
-		rect->x = 0;
-		rect->y = 0;
-		rect->w = 0;
-		rect->h = 0;
-	}
-	else
-	{
-		int sw, sh;
-
-		enesim_surface_size_get(thiz->src, &sw, &sh);
-		rect->x = 0;
-		rect->y = 0;
-		rect->w = sw;
-		rect->h = sh;
-	}
-}
-
 static void _blur_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Feature *features)
 {
@@ -467,6 +494,42 @@ static void _blur_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
+static Eina_Bool _blur_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Blur *thiz;
+
+	thiz = ENESIM_RENDERER_BLUR(r);
+	if (!thiz->changed) return EINA_FALSE;
+	return EINA_TRUE;
+}
+
+static void _blur_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect)
+{
+	Enesim_Renderer_Blur *thiz;
+
+	thiz = ENESIM_RENDERER_BLUR(r);
+	/* in case we have a renderer, use it */
+	if (thiz->src_r)
+	{
+		Eina_Rectangle bounds;
+		enesim_renderer_destination_bounds(thiz->src_r, &bounds, 0, 0);
+		enesim_rectangle_coords_from(rect, 0, 0, bounds.w, bounds.h);
+	}
+	/* otherwise use the surface */
+	else if (thiz->src)
+	{
+		int sw, sh;
+
+		enesim_surface_size_get(thiz->src, &sw, &sh);
+		enesim_rectangle_coords_from(rect, 0, 0, sw, sh);
+	}
+	else
+	{
+		enesim_rectangle_coords_from(rect, 0, 0, 0, 0);
+	}
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -483,6 +546,7 @@ static void _enesim_renderer_blur_class_init(void *k)
 	klass->base_name_get = _blur_name;
 	klass->bounds_get = _blur_bounds_get;
 	klass->features_get = _blur_features_get;
+	klass->has_changed =  _blur_has_changed;
 	klass->sw_hints_get = _blur_sw_hints_get;
 	klass->sw_setup = _blur_sw_setup;
 	klass->sw_cleanup = _blur_sw_cleanup;
@@ -498,14 +562,33 @@ static void _enesim_renderer_blur_instance_init(void *o)
 {
 	Enesim_Renderer_Blur *thiz = ENESIM_RENDERER_BLUR(o);
 
-	/* specific renderer setup */
+	thiz->cache = enesim_draw_cache_new();
+	/* initial properties */
 	thiz->channel = ENESIM_BLUR_CHANNEL_COLOR;
 	thiz->rx = thiz->ry = 0.5;
-	/* common renderer setup */
 }
 
 static void _enesim_renderer_blur_instance_deinit(void *o EINA_UNUSED)
 {
+	Enesim_Renderer_Blur *thiz = ENESIM_RENDERER_BLUR(o);
+
+	if (thiz->src)
+	{
+		enesim_surface_unref(thiz->src);
+		thiz->src = NULL;
+	}
+
+	if (thiz->src_r)
+	{
+		enesim_renderer_unref(thiz->src_r);
+		thiz->src_r = NULL;
+	}
+
+	if (thiz->cache)
+	{
+		enesim_draw_cache_free(thiz->cache);
+		thiz->cache = NULL;
+	}
 }
 /*============================================================================*
  *                                   API                                      *
@@ -535,6 +618,7 @@ EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_BLUR(r);
 
 	thiz->channel = channel;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * Gets the channel used in the src data
@@ -561,11 +645,14 @@ EAPI void enesim_renderer_blur_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 
 	thiz = ENESIM_RENDERER_BLUR(r);
 	if (thiz->src)
+	{
 		enesim_surface_unref(thiz->src);
+		thiz->src = NULL;
+	}
 	thiz->src = src;
-	if (thiz->src)
-		thiz->src = enesim_surface_ref(thiz->src);
+	thiz->changed = EINA_TRUE;
 }
+
 /**
  *
  */
@@ -575,10 +662,46 @@ EAPI void enesim_renderer_blur_src_get(Enesim_Renderer *r, Enesim_Surface **src)
 
 	if (!src) return;
 	thiz = ENESIM_RENDERER_BLUR(r);
-	*src = thiz->src;
 	if (thiz->src)
-		thiz->src = enesim_surface_ref(thiz->src);
+		*src = enesim_surface_ref(thiz->src);
+	else
+		*src = NULL;
 }
+
+/**
+ * Sets the renderer to use as the r data
+ * @param[in] r The blur filter renderer
+ * @param[in] r The renderer to use
+ */
+EAPI void enesim_renderer_blur_renderer_set(Enesim_Renderer *r, Enesim_Renderer *ren)
+{
+	Enesim_Renderer_Blur *thiz;
+
+	thiz = ENESIM_RENDERER_BLUR(r);
+	if (thiz->src_r)
+	{
+		enesim_renderer_unref(thiz->src_r);
+		thiz->src_r = NULL;
+	}
+	thiz->src_r = ren;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ *
+ */
+EAPI void enesim_renderer_blur_renderer_get(Enesim_Renderer *r, Enesim_Renderer **ren)
+{
+	Enesim_Renderer_Blur *thiz;
+
+	if (!ren) return;
+	thiz = ENESIM_RENDERER_BLUR(r);
+	if (thiz->src_r)
+		*ren = enesim_renderer_ref(thiz->src_r);
+	else
+		*ren = NULL;
+}
+
 /**
  * Sets the blur radius in the x direction
  * @param[in] r The blur filter renderer
@@ -591,6 +714,7 @@ EAPI void enesim_renderer_blur_radius_x_set(Enesim_Renderer *r, double rx)
 	thiz = ENESIM_RENDERER_BLUR(r);
 
 	thiz->rx = rx;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * Gets the blur radius used in the x direction
@@ -618,6 +742,7 @@ EAPI void enesim_renderer_blur_radius_y_set(Enesim_Renderer *r, double ry)
 	thiz = ENESIM_RENDERER_BLUR(r);
 
 	thiz->ry = ry;
+	thiz->changed = EINA_TRUE;
 }
 /**
  * Gets the blur radius used in the y direction

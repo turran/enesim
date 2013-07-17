@@ -91,6 +91,7 @@ extern "C" {
 #include "enesim_converter.h"
 #include "enesim_compositor.h"
 #include "enesim_renderer.h"
+#include "enesim_draw_cache.h"
 #include "enesim_image.h"
 #include "enesim_text.h"
 /* renderers */

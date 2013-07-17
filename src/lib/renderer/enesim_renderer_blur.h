@@ -34,10 +34,16 @@ typedef enum _Enesim_Blur_Channel
 EAPI Enesim_Renderer * enesim_renderer_blur_new(void);
 EAPI void enesim_renderer_blur_src_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI void enesim_renderer_blur_src_get(Enesim_Renderer *r, Enesim_Surface **src);
+
+EAPI void enesim_renderer_blur_renderer_set(Enesim_Renderer *r, Enesim_Renderer *ren);
+EAPI void enesim_renderer_blur_renderer_get(Enesim_Renderer *r, Enesim_Renderer **ren);
+
 EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r, Enesim_Blur_Channel channel);
 EAPI Enesim_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_blur_radius_x_set(Enesim_Renderer *r, double rx);
 EAPI double enesim_renderer_blur_radius_x_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_blur_radius_y_set(Enesim_Renderer *r, double ry);
 EAPI double enesim_renderer_blur_radius_y_get(Enesim_Renderer *r);
 

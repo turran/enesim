@@ -471,7 +471,6 @@ void enesim_renderer_sw_init(void)
 		_threads[i].done = EINA_FALSE;
 		enesim_thread_new(&_threads[i].tid, _thread_run, (void *)&_threads[i]);
 		_enesim_affinity_set(_threads[i].tid, i);
-
 	}
 #endif
 }
@@ -514,7 +513,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	final = r->current_destination_bounds;
 	/* final translation */
 	final.x -= x;
-	final.x -= y;
+	final.y -= y;
 
 	intersect = eina_rectangle_intersection(&final, area);
 	if (r->state.current.rop == ENESIM_FILL)
@@ -548,6 +547,12 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 		return;
 
 	ddata = ddata + (final.y * stride) + (final.x * bpp);
+	/* we know have the final area on surface coordinates
+	 * add again the offset because the draw functions use
+	 * the area on the renderer coordinate space
+	 */
+	final.x += x;
+	final.y += y;
 #ifdef BUILD_THREAD
 	_sw_draw_threaded(r, &final, ddata, stride, dfmt);
 #else
