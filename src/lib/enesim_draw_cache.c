@@ -225,9 +225,11 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 	Eina_Tiler *area_tiler;
 	Eina_Rectangle *rect;
 	Eina_Rectangle real_area;
+	Eina_Rectangle s_area;
 	Eina_Bool ret;
 
 	if (!thiz->r) return EINA_FALSE;
+	printf("requesting %d %d %d %d\n", area->x, area->y, area->w, area->h);
 
 	/* TODO to minimize the impact of the lock, split this function into a setup/cleanup/map */
 	eina_lock_take(&thiz->tlock);
@@ -266,6 +268,7 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 	eina_iterator_free(it);
 
 	/* ok, we now finally can get the damaged rectangles and draw */
+	eina_rectangle_coords_from(&s_area, 0, 0, thiz->tw, thiz->th);
 	//printf("surface of %d %d\n", thiz->tw, thiz->th);
 	it = eina_tiler_iterator_new(area_tiler);
 	EINA_ITERATOR_FOREACH(it, rect)
@@ -281,6 +284,9 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		dst = (uint8_t *)argb8888_at(mapped->argb8888.plane0,
 				mapped->argb8888.plane0_stride,
 				redraw.x, redraw.y);
+
+		if (!eina_rectangle_intersection(&redraw, &s_area))
+			continue;
 		y = redraw.y;
 		printf("redrawing into %d %d %d %d from %d %d\n", redraw.x, redraw.y, redraw.w, redraw.h,
 			redraw.x + thiz->bounds.x, redraw.y + thiz->bounds.y);
