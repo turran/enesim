@@ -308,10 +308,12 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 	xx -= eina_extra_f16p16_double_from(ox);
 	yy -= eina_extra_f16p16_double_from(oy);
 
+	printf("drawing %d -> %d %d (%d %d)\n", x, x + len, y, eina_f16p16_int_to(thiz->tyy), eina_f16p16_int_to(thiz->byy));
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
 	{
 get_out:
+		printf("getting out %d\n", len);
 		memset(d, 0, sizeof(unsigned int) * len);
 		return;
 	}
@@ -1228,7 +1230,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			if (!p->closed && (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE) && !pclosed)
 				nvectors--;
 		}
-
+		printf("nvectors %d\n", nvectors);
 		thiz->vectors = calloc(nvectors, sizeof(Enesim_F16p16_Vector));
 		if (!thiz->vectors)
 		{
@@ -1311,8 +1313,9 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 				double x01, y01;
 				double len;
 
+				printf("ok %p %d\n", l2, sopen);
 				npt = eina_list_data_get(l2);
-				if ((n == (enesim_polygon_point_count(p) - 1)) && !sopen)
+				if ((n == (enesim_polygon_point_count(p) - 1)) && sopen)
 					npt = first_point;
 				x0 = sx * (pt->x - lx) + lx;
 				y0 = sy * (pt->y - ty) + ty;
@@ -1399,6 +1402,9 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_shape_fill_rule_get(r, &fill_rule);
 	state->draw_mode = draw_mode;
 
+	printf("setup %d %d\n", eina_f16p16_int_to(thiz->tyy), eina_f16p16_int_to(thiz->byy));
+	thiz->tyy = eina_f16p16_int_from(25);
+	thiz->byy = eina_f16p16_int_from(75);
 	if (fill_rule == ENESIM_SHAPE_FILL_RULE_NON_ZERO)
 	{
 		*draw = _stroke_fill_paint_nz;

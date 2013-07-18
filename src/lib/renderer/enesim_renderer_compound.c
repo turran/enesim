@@ -948,3 +948,97 @@ EAPI void enesim_renderer_compound_background_color_set(Enesim_Renderer *r, Enes
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	enesim_renderer_background_color_set(thiz->background.r, c);
 }
+
+#if 0
+typedef struct _Enesim_Renderer_Compound_Layer
+{
+	Enesim_Rop rop;
+	Enesim_Renderer *r;
+	Enesim_Renderer *owner;
+	Eina_Bool changed;
+	int ref;
+} Enesim_Renderer_Compound_Layer;
+
+EAPI void enesim_renderer_compound_layer_new(void)
+{
+	Enesim_Renderer_Compound_Layer *l;
+	l = calloc(1, sizeof(Enesim_Renderer_Compound_Layer));
+	return l;
+}
+
+EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l)
+{
+	if (!l) return NULL;
+	l->ref++;
+	return l;
+}
+
+EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l)
+{
+	l->ref--;
+	if (!l->ref)
+	{
+		/* wrong */
+		if (l->owner)
+		{
+
+		}
+
+		if (l->r)
+		{
+			enesim_renderer_unref(l->r);
+			l->r = NULL;
+		}
+		free(l);
+	}
+}
+
+EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r, Enesim_Renderer_Compound_Layer *l)
+{
+	if (l->owner)
+	{
+		if (l->owner == r)
+			return;
+		enesim_renderer_compound_layer_remove(l->owner, enesim_renderer_compound_layer_ref(l));
+	}
+	/* add it to new added layers */
+}
+
+EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r, Enesim_Renderer_Compound_Layer *l)
+{
+	if (l->owner != r)
+	{
+		enesim_renderer_compound_layer_unref(l);
+		return;
+	}
+	/* unparent */
+	l->owner = NULL;
+	/* add it to the layers to remove */
+}
+
+EAPI void enesim_renderer_compound_layer_renderer_set(Enesim_Renderer_Compound_Layer *l, Enesim_Renderer *r)
+{
+	if (l->r)
+	{
+		enesim_renderer_unref(l->r);
+		l->r = NULL;
+	}
+	l->r = r;
+	l->changed = EINA_TRUE;
+} 
+
+EAPI void enesim_renderer_compound_layer_rop_set(Enesim_Renderer_Compound_Layer *l, Enesim_Rop rop)
+{
+	l->rop = rop;
+	l->changed = EINA_TRUE;
+}
+
+EAPI void enesim_renderer_compound_layer_owner_get(Enesim_Renderer_Compound_Layer *l, Enesim_Renderer **r)
+{
+	if (l->owner)
+		*r = enesim_renderer_ref(l->owner);
+	else
+		*r = NULL;
+}
+
+#endif
