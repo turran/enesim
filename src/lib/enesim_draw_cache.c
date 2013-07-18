@@ -175,7 +175,7 @@ Eina_Bool enesim_draw_cache_setup_sw(Enesim_Draw_Cache *thiz,
 		if (!thiz->tiler)
 		{
 			thiz->tiler = eina_tiler_new(thiz->bounds.w, thiz->bounds.h);
-			eina_tiler_tile_size_set(thiz->tiler, 1, 1);
+			eina_tiler_tile_size_set(thiz->tiler, 2, 2);
 			thiz->tw = thiz->bounds.w;
 			thiz->th = thiz->bounds.h;
 		}
@@ -229,10 +229,10 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 	Eina_Bool ret;
 
 	if (!thiz->r) return EINA_FALSE;
+	printf("requesting %d %d %d %d\n", area->x, area->y, area->w, area->h);
 
 	/* TODO to minimize the impact of the lock, split this function into a setup/cleanup/map */
 	eina_lock_take(&thiz->tlock);
-	//printf("requesting %" EINA_EXTRA_RECTANGLE_FORMAT "\n", EINA_EXTRA_RECTANGLE_ARGS(area));
 
 	/* create our own requested area tiler, so we can know what areas
 	 * should be redrawn and what areas should not
@@ -246,7 +246,6 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		real_area = *area;
 	}
 	area_tiler = eina_tiler_new(real_area.w, real_area.h);
-	eina_tiler_tile_size_set(area_tiler, 1, 1);
 
 	/* get the mapped pointer */	
 	buffer = enesim_surface_buffer_get(thiz->s);
@@ -265,34 +264,33 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		add.x -= real_area.x;
 		add.y -= real_area.y;
 		eina_tiler_rect_add(area_tiler, &add);
-		//printf("adding %" EINA_EXTRA_RECTANGLE_FORMAT "\n", EINA_EXTRA_RECTANGLE_ARGS(&add));
 	}
 	eina_iterator_free(it);
 
 	/* ok, we now finally can get the damaged rectangles and draw */
 	eina_rectangle_coords_from(&s_area, 0, 0, thiz->tw, thiz->th);
+	//printf("surface of %d %d\n", thiz->tw, thiz->th);
 	it = eina_tiler_iterator_new(area_tiler);
 	EINA_ITERATOR_FOREACH(it, rect)
 	{
 		Eina_Rectangle redraw;
 		uint8_t *dst;
-		int y, maxy;
+		int y;
 
 		redraw = *rect;
 		/* convert the rect from area to surface coordinates */
 		redraw.x += real_area.x;
 		redraw.y += real_area.y;
-
-		if (!eina_rectangle_intersection(&redraw, &s_area))
-			continue;
 		dst = (uint8_t *)argb8888_at(mapped->argb8888.plane0,
 				mapped->argb8888.plane0_stride,
 				redraw.x, redraw.y);
-		//printf("redrawing into %d %d %d %d from %d %d\n", redraw.x, redraw.y, redraw.w, redraw.h,
-		//	redraw.x + thiz->bounds.x, redraw.y + thiz->bounds.y);
+
+		if (!eina_rectangle_intersection(&redraw, &s_area))
+			continue;
 		y = redraw.y;
-		maxy = y + redraw.h;
-		while (y < maxy)
+		printf("redrawing into %d %d %d %d from %d %d\n", redraw.x, redraw.y, redraw.w, redraw.h,
+			redraw.x + thiz->bounds.x, redraw.y + thiz->bounds.y);
+		while (y < redraw.h)
 		{
 			enesim_renderer_sw_draw(thiz->r, redraw.x + thiz->bounds.x,
 					y + thiz->bounds.y, redraw.w, (uint32_t *)dst);

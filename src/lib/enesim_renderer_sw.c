@@ -662,8 +662,14 @@ void enesim_renderer_sw_free(Enesim_Renderer *r)
 	if (!sw_data) return;
 	free(sw_data);
 }
-
-void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 	Eina_Rectangle span;
@@ -734,6 +740,3 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
 	}
 #endif
 }
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/

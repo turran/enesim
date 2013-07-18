@@ -35,7 +35,6 @@
 
 #include "enesim_renderer_private.h"
 #include "enesim_draw_cache_private.h"
-#include "enesim_coord_private.h"
 /*
  * A box-like blur filter - initial slow version.
  */
@@ -135,7 +134,6 @@ static void _blur_state_cleanup(Enesim_Renderer_Blur *thiz,
 	{
 		enesim_surface_unlock(thiz->src);
 	}
-	thiz->changed = EINA_FALSE;
 }
 
 static Enesim_Renderer_Sw_Fill _spans[ENESIM_BLUR_CHANNELS];
@@ -147,14 +145,13 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 		void *ddata)
 {
 	Enesim_Renderer_Blur *thiz;
-	Enesim_Color color;
-	Eina_F16p16 xx, yy;
-	double ox, oy;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	uint32_t *src, *pbuf;
 	size_t sstride;
 	int sw, sh;
+	Enesim_Color color;
+	Eina_F16p16 xx, yy;
 	int ibyy, ibxx;
 	int ix, ix0, iy, iy0;
 	int txx0, ntxx0, tx0, ntx0;
@@ -162,31 +159,25 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_BLUR(r);
  	color = thiz->color;
-
-	enesim_renderer_origin_get(r, &ox, &oy);
-	enesim_coord_identity_setup(&xx, &yy, x, y, ox, oy);
-
-	/* setup the parameters */
 	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
-	ix = ix0 = eina_f16p16_int_to(xx);
-	iy = iy0 = eina_f16p16_int_to(yy);
-	xx = (ibxx * xx) + (ibxx >> 1) - 32768;
-	yy = (ibyy * yy) + (ibyy >> 1) - 32768;
-	x = eina_f16p16_int_to(xx);
-	y = eina_f16p16_int_to(yy);
+	/* setup the parameters */
+
+	ix = ix0 = x;  iy = iy0 = y;
+	xx = (ibxx * x) + (ibxx >> 1) - 32768;
+	yy = (ibyy * y) + (ibyy >> 1) - 32768;
+	x = xx >> 16;
+	y = yy >> 16;
 
 	if (thiz->src_r)
 	{
 		Eina_Rectangle bounds;
 		Eina_Rectangle area;
 		Enesim_Buffer_Sw_Data sw_data;
-		int rx = ceil(thiz->rx);
-		int ry = ceil(thiz->ry);
 
 		enesim_renderer_destination_bounds(thiz->src_r, &bounds, 0, 0);
 		sw = bounds.w;
 		sh = bounds.h;
-		eina_rectangle_coords_from(&area, ix - rx, iy - ry, len + (rx * 2), 1 + (ry * 2));
+		eina_rectangle_coords_from(&area, ix, iy, len, 20);
 		enesim_draw_cache_map_sw(thiz->cache, &area, &sw_data);
 		src = sw_data.argb8888.plane0;
 		sstride = sw_data.argb8888.plane0_stride;
@@ -196,8 +187,13 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 		enesim_surface_size_get(thiz->src, &sw, &sh);
 		enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
 	}
-
 	src = argb8888_at(src, sstride, ix, iy);
+
+	if ((iy < 0) || (iy >= sh))
+	{
+		memset(dst, 0, sizeof(unsigned int) * len);
+		return;
+	}
 
 	tyy0 = yy & 0xffff0000;  ty0 = (tyy0 >> 16);
 	ntyy0 = tyy0 + ibyy;  nty0 = (ntyy0 >> 16);
@@ -209,28 +205,23 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	{
 		unsigned int p0 = 0;
 
+		if ( ((unsigned)ix < sw) )
 		{
 			unsigned int ag0 = 0, rb0 = 0, ag3 = 0, rb3 = 0, dag = 0, drb = 0;
 			int tyy = tyy0, ty = ty0, ntyy = ntyy0, nty = nty0;
 
 			pbuf = src + (ix - ix0);  iy = iy0;
 
-			while (1)
+			while (iy < sh)
 			{
 				unsigned int ag2 = 0, rb2 = 0, pag2 = 0, prb2 = 0, pp3 = 0;
 				unsigned int *p = pbuf;
 				int txx = txx0, tx = tx0, ntxx = ntxx0, ntx = ntx0;
-				int px = ix;
 				int a;
 
 				while (1)
 				{
-					unsigned int p3;
-
-					if (px >= 0 && px < sw && iy >= 0 && iy < sh)
-						p3 = *p;
-					else
-						p3 = 0;
+					unsigned int p3 = *p;
 
 					if (ntx != tx)
 					{
@@ -263,7 +254,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 						ag2 += pag2;   rb2 += prb2;
 					}
 
-					p++;  txx = ntxx;  ntxx += ibxx;  ntx = (ntxx >> 16); px++;
+					p++;  txx = ntxx;  ntxx += ibxx;  ntx = (ntxx >> 16);
 				}
 
 				if (nty != ty)
@@ -498,7 +489,7 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static void _blur_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Feature *features)
 {
-	*features = ENESIM_RENDERER_FEATURE_ARGB8888 | ENESIM_RENDERER_FEATURE_TRANSLATE;
+	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _blur_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
@@ -520,7 +511,6 @@ static void _blur_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *rect)
 {
 	Enesim_Renderer_Blur *thiz;
-	double ox, oy;
 
 	thiz = ENESIM_RENDERER_BLUR(r);
 	/* in case we have a renderer, use it */
@@ -541,17 +531,7 @@ static void _blur_bounds_get(Enesim_Renderer *r,
 	else
 	{
 		enesim_rectangle_coords_from(rect, 0, 0, 0, 0);
-		return;
 	}
-	/* increment by the radius */
-	rect->x -= thiz->rx;
-	rect->y -= thiz->ry;
-	rect->w += thiz->rx;
-	rect->h += thiz->ry;
-	/* translate */
-	enesim_renderer_origin_get(r, &ox, &oy);
-	rect->x += ox;
-	rect->y += oy;
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
