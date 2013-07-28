@@ -40,7 +40,7 @@ typedef uint32_t Enesim_Color;
 /**
  * @ref ENESIM_COLOR_FULL
  *
- *Simple definition of a full (opaque white) color
+ * Simple definition of a full (opaque white) color
  */
 #define ENESIM_COLOR_FULL 0xffffffff
 

@@ -604,7 +604,7 @@ static void _enesim_renderer_text_span_instance_init(void *o)
 	Enesim_Text_Buffer *real;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(o);
-	real = enesim_text_buffer_new();
+	real = enesim_text_buffer_simple_new(0);
 	thiz->state.buffer = enesim_text_buffer_smart_new(real);
 }
 

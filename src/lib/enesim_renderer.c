@@ -485,73 +485,8 @@ void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char 
 
 	*error = enesim_log_add(*error, str);
 }
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Renderer * enesim_renderer_ref(Enesim_Renderer *r)
-{
-	if (!r) return r;
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->ref++;
-	return r;
-}
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_unref(Enesim_Renderer *r)
-{
-	if (!r) return;
-
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->ref--;
-	if (!r->ref)
-	{
-		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(r));
-	}
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI int enesim_renderer_ref_count(Enesim_Renderer *r)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	return r->ref;
-}
-
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_lock(Enesim_Renderer *r)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	eina_lock_take(&r->lock);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_unlock(Enesim_Renderer *r)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	eina_lock_release(&r->lock);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
+Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
 {
 	Enesim_Backend b;
 	Eina_Bool ret = EINA_TRUE;
@@ -614,11 +549,7 @@ EAPI Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enes
 	return ret;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	Enesim_Backend b;
 
@@ -654,9 +585,79 @@ EAPI void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_unlock(r);
 }
 
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Increase the reference counter of a renderer
+ * @param[in] r The renderer
+ * @return The input parameter @a r for programming conveniencer 
+ */
+EAPI Enesim_Renderer * enesim_renderer_ref(Enesim_Renderer *r)
+{
+	if (!r) return r;
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->ref++;
+	return r;
+}
+
+/**
+ * @brief Decrease the reference counter of a renderer
+ * @param[in] r The renderer
+ */
+EAPI void enesim_renderer_unref(Enesim_Renderer *r)
+{
+	if (!r) return;
+
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	r->ref--;
+	if (!r->ref)
+	{
+		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(r));
+	}
+}
+
+/**
+ * @brief Gets the reference counter value of a renderer
+ * @param[in] r The renedrer to get the reference counter from
+ */
+EAPI int enesim_renderer_ref_count(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	return r->ref;
+}
+
+
+/**
+ * @brief Locks a renderer
+ * @param[in] r The renderer to lock
+ *
+ * @note The renderer is automatically locked before a drawing
+ * operation
+ */
+EAPI void enesim_renderer_lock(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	eina_lock_take(&r->lock);
+}
+
+/**
+ * @brief Unlocks a renderer
+ * @param r The renderer to unlock
+ *
+ * @note The renderer is automatically unlocked after a drawing
+ * operation
+ */
+EAPI void enesim_renderer_unlock(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	eina_lock_release(&r->lock);
+}
+
+/**
+ * @brief Get the features a renderer support
+ * @param[in] r The renderer to get the features from
+ * @param[out] features The renderer features
  */
 EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features)
 {
@@ -679,9 +680,13 @@ EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Featu
 	}
 }
 /**
- * Sets the transformation matrix of a renderer
+ * @brief Sets the transformation matrix of a renderer
  * @param[in] r The renderer to set the transformation matrix on
  * @param[in] m The transformation matrix to set
+ *
+ * @note The transformation will only take effect if the renderer supports
+ * the @a ENESIM_RENDERER_FEATURE_PROJECTIVE or the @a
+ * ENESIM_RENDERER_FEATURE_PROJECTIVE feature. Otherwise it will be ignored
  */
 EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m)
 {
@@ -698,8 +703,9 @@ EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Ma
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the transformation matrix of a renderer
+ * @param[in] r The renderer to get the transformation matrix from
+ * @param[out] m The transformation matrix
  */
 EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m)
 {
@@ -709,8 +715,9 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Sets the name of a renderer
+ * @param[in] r The renderer to set the name to
+ * @param[in] name The name to set
  */
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 {
@@ -727,8 +734,9 @@ EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the name of a renderer
+ * @param[in] r The renderer to get the name from
+ * @param[out] name The renderer name
  */
 EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name)
 {
@@ -738,8 +746,13 @@ EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Sets the origin of a renderer
+ * @param[in] r The renderer to set the origin on
+ * @param[in] x The x origin coordinate
+ * @param[in] y The y origin coordinate
+ *
+ * @note The origin will only take effect if the renderer supports
+ * the @a ENESIM_RENDERER_FEATURE_TRANSLATE
  */
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y)
 {
@@ -748,8 +761,10 @@ EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y)
 	enesim_renderer_y_origin_set(r, y);
 }
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the origin of a renderer
+ * @param[in] r The renderer to get the origin from
+ * @param[out] x The x origin coordinate
+ * @param[out] y The y origin coordinate
  */
 EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y)
 {
@@ -803,8 +818,13 @@ EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y)
 }
 
 /**
- * To  be documented
- * FIXME: To be fixed
+ * @brief Sets the color of a renderer
+ * @param[in] r The renderer to set the color to
+ * @param[in] color The color
+ *
+ * Every renderer beside it's own specific attributes has a common
+ * color attribute which is used to colorize the final drawing of the
+ * renderer. This functions sets such color.
  */
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
@@ -814,8 +834,9 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 }
 
 /**
- * To  be documented
- * FIXME: To be fixed
+ * @brief Gets the color of a renderer
+ * @param[in] r The renderer to get the color from
+ * @param[out] color The color
  */
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
 {

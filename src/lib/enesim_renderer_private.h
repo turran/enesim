@@ -216,6 +216,10 @@ void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void
 void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char *file,
 		const char *function, int line, char *fmt, ...);
 
+Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error);
+void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
+
+
 /* software related functions */
 typedef struct _Enesim_Renderer_Sw_Data
 {

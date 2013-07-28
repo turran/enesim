@@ -138,11 +138,6 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt);
 EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write);
 EAPI void enesim_buffer_unlock(Enesim_Buffer *b);
 
-#ifdef ENESIM_EXTENSION
-EAPI void * enesim_buffer_backend_data_get(Enesim_Buffer *b);
-#endif
-
-
 /** @} */ //End of Enesim_Buffer_Group
 
 

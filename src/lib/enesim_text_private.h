@@ -24,6 +24,28 @@
 
 #include "libargb.h"
 
+
+/* text buffer interface */
+typedef void (*Enesim_Text_Buffer_String_Set)(void *data, const char *string, int length);
+typedef const char * (*Enesim_Text_Buffer_String_Get)(void *data);
+typedef int (*Enesim_Text_Buffer_String_Insert)(void *data, const char *string, int length, ssize_t offset);
+typedef int (*Enesim_Text_Buffer_String_Delete)(void *data, int length, ssize_t offset);
+typedef int (*Enesim_Text_Buffer_String_Length)(void *data);
+typedef void (*Enesim_Text_Buffer_Free)(void *data);
+
+typedef struct _Enesim_Text_Buffer_Descriptor
+{
+	Enesim_Text_Buffer_String_Get string_get;
+	Enesim_Text_Buffer_String_Set string_set;
+	Enesim_Text_Buffer_String_Insert string_insert;
+	Enesim_Text_Buffer_String_Delete string_delete;
+	Enesim_Text_Buffer_String_Length string_length;
+	Enesim_Text_Buffer_Free free;
+} Enesim_Text_Buffer_Descriptor;
+
+Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_Descriptor *descriptor, void *data);
+void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz);
+
 /* font interface */
 typedef struct _Enesim_Text_Glyph Enesim_Text_Glyph;
 typedef struct _Enesim_Text_Glyph_Position Enesim_Text_Glyph_Position;

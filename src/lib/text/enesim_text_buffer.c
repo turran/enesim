@@ -36,19 +36,7 @@ struct _Enesim_Text_Buffer
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-/*============================================================================*
- *                                   API                                      *
- *============================================================================*/
-EAPI Enesim_Text_Buffer * enesim_text_buffer_new(void)
-{
-	return enesim_text_buffer_simple_new(0);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_Descriptor *descriptor, void *data)
+Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_Descriptor *descriptor, void *data)
 {
 	Enesim_Text_Buffer *thiz;
 
@@ -62,6 +50,14 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buf
 	return thiz;
 }
 
+void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz)
+{
+	if (!thiz) return NULL;
+	return thiz->data;
+}
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
 /**
  * To be documented
  * FIXME: To be fixed
@@ -89,16 +85,6 @@ EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz)
 			thiz->descriptor->free(thiz->data);
 		free(thiz);
 	}
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz)
-{
-	if (!thiz) return NULL;
-	return thiz->data;
 }
 
 /**

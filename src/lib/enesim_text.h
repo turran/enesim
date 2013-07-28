@@ -40,9 +40,6 @@
  * @{
  */
 
-EAPI int enesim_text_init(void);
-EAPI int enesim_text_shutdown(void);
-
 typedef struct _Enesim_Text_Engine Enesim_Text_Engine;
 EAPI Enesim_Text_Engine * enesim_text_engine_default_get(void);
 EAPI Enesim_Text_Engine * enesim_text_freetype_get(void);
@@ -71,29 +68,8 @@ typedef struct _Enesim_Text_Font Enesim_Text_Font;
 
 typedef struct _Enesim_Text_Buffer Enesim_Text_Buffer;
 
-typedef void (*Enesim_Text_Buffer_String_Set)(void *data, const char *string, int length);
-typedef const char * (*Enesim_Text_Buffer_String_Get)(void *data);
-typedef int (*Enesim_Text_Buffer_String_Insert)(void *data, const char *string, int length, ssize_t offset);
-typedef int (*Enesim_Text_Buffer_String_Delete)(void *data, int length, ssize_t offset);
-typedef int (*Enesim_Text_Buffer_String_Length)(void *data);
-typedef void (*Enesim_Text_Buffer_Free)(void *data);
-
-typedef struct _Enesim_Text_Buffer_Descriptor
-{
-	Enesim_Text_Buffer_String_Get string_get;
-	Enesim_Text_Buffer_String_Set string_set;
-	Enesim_Text_Buffer_String_Insert string_insert;
-	Enesim_Text_Buffer_String_Delete string_delete;
-	Enesim_Text_Buffer_String_Length string_length;
-	Enesim_Text_Buffer_Free free;
-} Enesim_Text_Buffer_Descriptor;
-
-EAPI Enesim_Text_Buffer * enesim_text_buffer_new(void);
-EAPI Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_Descriptor *descriptor, void *data);
 EAPI Enesim_Text_Buffer * enesim_text_buffer_ref(Enesim_Text_Buffer *thiz);
 EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz);
-
-EAPI void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz);
 
 EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *string, int length);
 EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz);
