@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Color_Group Color
+ * @brief Color definition
  * @{
  */
 

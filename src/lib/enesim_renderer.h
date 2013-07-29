@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Group Renderer
+ * @brief Vector and raster drawing primitives
  * @{
  */
 

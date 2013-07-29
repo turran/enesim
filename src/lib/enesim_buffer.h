@@ -20,10 +20,10 @@
 
 /**
  * @defgroup Enesim_Buffer_Group Buffer
+ * @brief Target device pixel data holder
  * @{
- *
- * @todo
  */
+
 typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
 
 /*

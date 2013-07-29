@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Image_Group Image
+ * @brief Image loading and saving
  * @{
  */
 

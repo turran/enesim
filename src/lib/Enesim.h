@@ -22,18 +22,18 @@
  * @mainpage Enesim
  * @image html enesim.png
  * @section intro Introduction
- * Enesim is a direct rendering graphics library, in the sense that it does not
- * have a state. The implementation is software based only, but it has a very
- * flexible design: all the steps of the rendering process have been abstracted
- * allowing applications to only use the functionality for the drawing
- * operations they may need, not forcing on how or what to draw.
+ * The Enesim library provides a complete solution for drawing, allocating,
+ * compositing and converting pixels. All of the systems of the library
+ * are flexible enough to support drawing capabilities on any scenario
+ *
  * @section backends Backends
  * - Software based
  * - OpenCL (experimental)
- * - OpenGL (experimental)
+ * - OpenGL (alpha)
  *
  * @section dependencies Dependencies
  * - Eina
+ *
  * @file
  * @brief Enesim API
  */

@@ -258,7 +258,7 @@ EAPI Enesim_Pool * enesim_buffer_pool_get(Enesim_Buffer *b)
 /**
  * @brief Increase the reference counter of a buffer
  * @param[in] b The buffer
- * @return The input parameter @a b for programming conveniencer 
+ * @return The input parameter @a b for programming convenience
  */
 EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b)
 {

@@ -19,6 +19,7 @@
 #define ENESIM_MATRIX_H_
 /**
  * @defgroup Enesim_Matrix_Group Matrix
+ * @brief Matrix definition and operations
  * @{
  * @todo
  * - Create all this Macros

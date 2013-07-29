@@ -245,19 +245,22 @@ EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format fmt,
 #endif
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the size of a surface
+ * @param[in] s The surface to get the size from
+ * @param[out] w The width of the surface
+ * @param[out] h The height of the surface
  */
-EAPI void
-enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h)
+EAPI void enesim_surface_size_get(const Enesim_Surface *s, int *w, int *h)
 {
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	if (w) *w = s->buffer->w;
 	if (h) *h = s->buffer->h;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the format of a surface
+ * @param[in] s The surface to get the format from
+ * @return The format of the surface
  */
 EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s)
 {
@@ -266,8 +269,9 @@ EAPI Enesim_Format enesim_surface_format_get(const Enesim_Surface *s)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the backend of a surface
+ * @param[in] s The surface to get the backend from
+ * @return The backend of the surface
  */
 EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s)
 {
@@ -276,8 +280,9 @@ EAPI Enesim_Backend enesim_surface_backend_get(const Enesim_Surface *s)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the pool of a surface
+ * @param[in] s The surface to get the pool from
+ * @return The pool of the surface
  */
 EAPI Enesim_Pool * enesim_surface_pool_get(Enesim_Surface *s)
 {
@@ -285,8 +290,9 @@ EAPI Enesim_Pool * enesim_surface_pool_get(Enesim_Surface *s)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Increase the reference counter of a surface
+ * @param[in] s The surface
+ * @return The input parameter @a s for programming convenience
  */
 EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s)
 {
@@ -296,8 +302,8 @@ EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Decrease the reference counter of a surface
+ * @param[in] s The surface
  */
 EAPI void enesim_surface_unref(Enesim_Surface *s)
 {
@@ -346,6 +352,12 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *s
 	return EINA_TRUE;
 }
 
+/**
+ * @brief Gets the buffer associated with a surface
+ * @param[in] s The surface to get the buffer from
+ * @return The buffer associated with the surface. Call @ref enesim_buffer_unref()
+ * after usage.
+ */
 EAPI Enesim_Buffer * enesim_surface_buffer_get(Enesim_Surface *s)
 {
 	return enesim_buffer_ref(s->buffer);
@@ -370,8 +382,8 @@ EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Locks a surface
+ * @param[in] s The surface to lock
  */
 EAPI void enesim_surface_lock(Enesim_Surface *s, Eina_Bool write)
 {
@@ -379,8 +391,8 @@ EAPI void enesim_surface_lock(Enesim_Surface *s, Eina_Bool write)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Unlocks a surface
+ * @param[in] s The surface to unlock
  */
 EAPI void enesim_surface_unlock(Enesim_Surface *s)
 {

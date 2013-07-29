@@ -19,10 +19,11 @@
 #define ENESIM_POOL_H_
 
 /**
- * @defgroup Enesim_Pool_Group Surface Pool
+ * @defgroup Enesim_Pool_Group Pool
+ * @brief Buffer and surface pixel data allocator
  * @{
  */
-typedef struct _Enesim_Pool Enesim_Pool;
+typedef struct _Enesim_Pool Enesim_Pool; /**< Pool Handler */
 
 EAPI Enesim_Pool * enesim_pool_default_get(void);
 EAPI void enesim_pool_default_set(Enesim_Pool *thiz);

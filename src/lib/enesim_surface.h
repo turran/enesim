@@ -20,22 +20,31 @@
 
 /**
  * @defgroup Enesim_Surface_Group Surface
- * @{
+ * @brief Native pixel data holder
+ * 
+ * All the rendering process of an @ref Enesim_Renderer is done into a
+ * surface. A surface is the library's internal way to store pixel data.
+ * It is a specification of an @ref Enesim_Buffer but handled with it's own
+ * type @ref Enesim_Surface and functions. To get the buffer associated with a
+ * surface you can use @ref enesim_surface_buffer_get().
  *
- * @todo
- * - Add a pitch, this is good for different planes, still the width and height
- * are good things to have so the pitch
- * - Add a data provider: as a parameter to the new, so the destruction is
- * handled by the library itself, same for data get, etc.
- * - Add a surface iterator
- * - Normalize the occurences of argb, colors, etc. Always premul or flat
- * argb8888?
+ * A surface can be created by using @ref enesim_surface_new() and all
+ * it's variants depending on the need. You can use your own memory
+ * to store the pixel data, a specific @ref Enesim_Pool or from
+ * an @ref Enesim_Buffer if using @ref enesim_surface_new_buffer_from()
+ *
+ * 
+ * @{
  */
-typedef struct _Enesim_Surface 	Enesim_Surface; /**< Surface Handler */
+typedef struct _Enesim_Surface Enesim_Surface; /**< Surface Handler */
 
-EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h);
-EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format f, uint32_t w, uint32_t h, Eina_Bool copy, void *data, size_t stride, Enesim_Buffer_Free free_func, void *free_func_data);
-EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
+EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w,
+		uint32_t h);
+EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format f,
+		uint32_t w, uint32_t h, Eina_Bool copy, void *data,
+		size_t stride, Enesim_Buffer_Free free_func, void *free_func_data);
+EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
+		uint32_t w, uint32_t h, Enesim_Pool *p);
 EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer);
 EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s);
 EAPI void enesim_surface_unref(Enesim_Surface *s);

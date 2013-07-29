@@ -20,6 +20,8 @@
 #define _ENESIM_TEXT_H
 
 /**
+ * @defgroup Enesim_Text_Group Text
+ * @brief Text definition and operations
  * @todo
  * - Split the renderer into different types of renderers:
  *   - span renderer
@@ -31,12 +33,6 @@
  *   - FT_Glyphs from memory?
  *   - Some kind of already rendered glyphs on a buffer
  *   - We can have a table per glyphs already renderered with a refcount on them
- */
-
-
-
-/**
- * @defgroup Enesim_Text_Group Text
  * @{
  */
 

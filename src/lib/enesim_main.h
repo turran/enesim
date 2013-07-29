@@ -21,6 +21,7 @@
 
 /**
  * @defgroup Enesim_Main_Group Main
+ * @brief Common definitions
  * @{
  */
 

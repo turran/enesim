@@ -22,6 +22,7 @@
 
 /**
  * @defgroup Enesim_Rectangle_Group Rectangle
+ * @brief Rectangle definition and operations
  * @{
  * @todo
  */

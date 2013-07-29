@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Converter_Group Converter
+ * @brief Target to target and native to target pixel data converter
  * @{
  */
 
