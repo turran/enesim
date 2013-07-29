@@ -36,7 +36,7 @@
 
 
 /**
- * @defgroup Enesim_Text_Main_Group Main
+ * @defgroup Enesim_Text_Group Text
  * @{
  */
 
@@ -53,7 +53,8 @@ typedef enum _Enesim_Text_Direction
 
 /**
  * @}
- * @defgroup Enesim_Text_Font_Group Enesim Text Font
+ * @defgroup Enesim_Text_Font_Group Font
+ * @ingroup Enesim_Text_Group
  * @{
  */
 
@@ -62,7 +63,8 @@ typedef struct _Enesim_Text_Font Enesim_Text_Font;
 
 /**
  * @}
- * @defgroup Enesim_Text_Buffer_Group Enexim Text Buffer
+ * @defgroup Enesim_Text_Buffer_Group Buffer
+ * @ingroup Enesim_Text_Group
  * @{
  */
 

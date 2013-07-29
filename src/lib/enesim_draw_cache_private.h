@@ -18,11 +18,6 @@
 #ifndef ENESIM_DRAW_CACHE_PRIVATE_H_
 #define ENESIM_DRAW_CACHE_PRIVATE_H_
 
-/**
- * @defgroup Enesim_Draw_Cache_Group Draw cache
- * @{
- */
-
 typedef struct _Enesim_Draw_Cache Enesim_Draw_Cache; /**< Draw cache handle */
 
 Enesim_Draw_Cache * enesim_draw_cache_new(void);
@@ -39,10 +34,6 @@ Eina_Bool enesim_draw_cache_setup_sw(Enesim_Draw_Cache *thiz,
 		Enesim_Format f, Enesim_Pool *p);
 Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		Eina_Rectangle *area, Enesim_Buffer_Sw_Data *mapped);
-
-/**
- * @}
- */
 
 #endif /*ENESIM_DRAW_CACHE_PRIVATE_H_*/
 

@@ -18,8 +18,8 @@
 #ifndef ENESIM_IMAGE_H
 #define ENESIM_IMAGE_H
 
-/*
- * @defgroup Enesim_Image_Main_Group Main
+/**
+ * @defgroup Enesim_Image_Group Image
  * @{
  */
 
@@ -36,6 +36,7 @@ EAPI void enesim_image_dispatch(void);
 /**
  * @}
  * @defgroup Enesim_Image_Data_Group Data
+ * @ingroup Enesim_Image_Group
  * @{
  */
 typedef ssize_t (*Enesim_Image_Data_Read)(void *data, void *buffer, size_t len);
@@ -77,6 +78,7 @@ EAPI Enesim_Image_Data * enesim_image_data_base64_new(Enesim_Image_Data *d);
 /**
  * @}
  * @defgroup Enesim_Image_Context Context
+ * @ingroup Enesim_Image_Group
  * @{
  */
 typedef struct _Enesim_Image_Context Enesim_Image_Context;
@@ -97,7 +99,8 @@ EAPI int enesim_image_context_pool_size_get(Enesim_Image_Context *thiz);
 
 /**
  * @}
- * @defgroup Enesim_Image_Load_Save_Group Image Loading and Saving
+ * @defgroup Enesim_Image_Load_Save_Group Loading and Saving
+ * @ingroup Enesim_Image_Group
  * @{
  */
 
@@ -128,6 +131,7 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Surface *s, Enes
 /**
  * @}
  * @defgroup Enesim_Image_Provider_Group Providers
+ * @ingroup Enesim_Image_Group
  * @{
  */
 
@@ -176,6 +180,7 @@ EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 /**
  * @}
  * @defgroup Enesim_Image_Finder_Group Finder
+ * @ingroup Enesim_Image_Group
  * @{
  */
 
@@ -194,6 +199,7 @@ EAPI void enesim_image_finder_unregister(Enesim_Image_Finder *f);
 /**
  * @}
  * @defgroup Enesim_Image_Misc_Group Misc
+ * @ingroup Enesim_Image_Group
  * @{
  */
 

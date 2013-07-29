@@ -19,8 +19,8 @@
 #define ENESIM_RENDERER_TEXT_GRID_H_
 
 /**
- * @}
- * @defgroup Enesim_Text_Grid_Renderer_Group Grid Renderer
+ * @defgroup Enesim_Text_Grid_Renderer_Group Text Grid
+ * @ingroup Enesim_Renderer_Group
  * @{
  */
 
