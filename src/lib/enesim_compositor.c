@@ -19,7 +19,6 @@
 
 #include "enesim_main.h"
 #include "enesim_color.h"
-#include "enesim_compositor.h"
 
 #include "enesim_compositor_private.h"
 /*
@@ -210,15 +209,10 @@ void enesim_compositor_span_pixel_color_register(Enesim_Compositor_Span sp,
 {
 	_comps.sp_pixel_color[rop][dfmt][sfmt] = sp;
 }
-
 /*============================================================================*
- *                                   API                                      *
+ *                                 Global                                     *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
+Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
 		Enesim_Format mfmt)
 {
@@ -246,11 +240,8 @@ EAPI Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 
 	return NULL;
 }
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
+
+Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
 		Enesim_Format mfmt)
 {
@@ -278,3 +269,6 @@ EAPI Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
 
 	return NULL;
 }
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/

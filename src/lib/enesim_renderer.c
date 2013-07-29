@@ -26,7 +26,6 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
-#include "enesim_compositor.h"
 #include "enesim_renderer.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -643,7 +642,7 @@ EAPI void enesim_renderer_lock(Enesim_Renderer *r)
 
 /**
  * @brief Unlocks a renderer
- * @param r The renderer to unlock
+ * @param[in] r The renderer to unlock
  *
  * @note The renderer is automatically unlocked after a drawing
  * operation

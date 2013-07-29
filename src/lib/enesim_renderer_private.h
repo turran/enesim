@@ -18,6 +18,8 @@
 #ifndef ENESIM_RENDERER_PRIVATE_H_
 #define ENESIM_RENDERER_PRIVATE_H_
 
+#include "enesim_compositor_private.h"
+
 #if BUILD_OPENGL
 #include "Enesim_OpenGL.h"
 #include "enesim_opengl_private.h"

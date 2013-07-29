@@ -30,7 +30,6 @@
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
 #include "enesim_color.h"
-#include "enesim_compositor.h"
 #include "enesim_renderer.h"
 #include "Enesim_OpenGL.h"
 #include "enesim_opengl_private.h"
@@ -93,8 +92,16 @@ void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
  *                                   API                                      *
  *============================================================================*/
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Create a new buffer using a pool and data
+ * @param[in] f The format of the buffer
+ * @param[in] w The width of the buffer
+ * @param[in] h The height of the buffer
+ * @param[in] copy In case the data needs to be copied to create the buffer
+ * or used directly
+ * @param[in] data The data of the buffer pixels
+ * @param[in] free_func The function to be called whenever the data of the buffer
+ * needs to be freed
+ * @param[in] free_func_data The private data for the @a free_func callback
  */
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
@@ -137,13 +144,13 @@ EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 
 	return buf;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI Enesim_Buffer *
-enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w,
-		uint32_t h, Enesim_Pool *p)
+EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f,
+		uint32_t w, uint32_t h, Enesim_Pool *p)
 {
 	Enesim_Buffer *buf;
 	Enesim_Backend backend;
@@ -203,8 +210,10 @@ EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,
 #endif
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the size of a buffer
+ * @param[in] b The buffer to get the size from
+ * @param[out] w The width of the buffer
+ * @param[out] h The height of the buffer
  */
 EAPI void enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h)
 {
@@ -212,9 +221,11 @@ EAPI void enesim_buffer_size_get(const Enesim_Buffer *b, int *w, int *h)
 	if (w) *w = b->w;
 	if (h) *h = b->h;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the format of a buffer
+ * @param[in] b The buffer to get the format from
+ * @return The format of the buffer
  */
 EAPI Enesim_Buffer_Format enesim_buffer_format_get(const Enesim_Buffer *b)
 {
@@ -223,8 +234,9 @@ EAPI Enesim_Buffer_Format enesim_buffer_format_get(const Enesim_Buffer *b)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the backend of a buffer
+ * @param[in] b The buffer to get the backend from
+ * @return The backend of the buffer
  */
 EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b)
 {
@@ -234,8 +246,9 @@ EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b)
 
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the pool of a buffer
+ * @param[in] b The buffer to get the pool from
+ * @return The pool of the buffer
  */
 EAPI Enesim_Pool * enesim_buffer_pool_get(Enesim_Buffer *b)
 {
@@ -243,8 +256,9 @@ EAPI Enesim_Pool * enesim_buffer_pool_get(Enesim_Buffer *b)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Increase the reference counter of a buffer
+ * @param[in] b The buffer
+ * @return The input parameter @a b for programming conveniencer 
  */
 EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b)
 {
@@ -254,8 +268,8 @@ EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Decrease the reference counter of a buffer
+ * @param[in] b The buffer
  */
 EAPI void enesim_buffer_unref(Enesim_Buffer *b)
 {
@@ -270,16 +284,20 @@ EAPI void enesim_buffer_unref(Enesim_Buffer *b)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the data of a buffer
+ * @param[in] b The buffer to get the data from
+ * @param[out] data The data of the buffer
  */
 EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	return enesim_pool_data_get(b->pool, b->backend_data, b->format, b->w, b->h, data);
 }
+
 /**
- * Store a private data pointer into the buffer
+ * @brief Store a private data pointer into the buffer
+ * @param[in] b The buffer to store the data in
+ * @param[in] data The user provided data
  */
 EAPI void enesim_buffer_private_set(Enesim_Buffer *b, void *data)
 {
@@ -288,7 +306,8 @@ EAPI void enesim_buffer_private_set(Enesim_Buffer *b, void *data)
 }
 
 /**
- * Retrieve the private data pointer from the buffer
+ * @brief Retrieve the private data pointer from the buffer
+ * @param[in] b The buffer to retrieve the data from
  */
 EAPI void * enesim_buffer_private_get(Enesim_Buffer *b)
 {
@@ -296,6 +315,13 @@ EAPI void * enesim_buffer_private_get(Enesim_Buffer *b)
 	return b->user;
 }
 
+/**
+ * @brief Get the size in bytes given a format and a size
+ * @param[in] fmt The format to get the size from
+ * @param[in] w The width to get the size from
+ * @param[in] h The height to get the size from
+ * @return The size in bytes
+ */
 EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
 	switch (fmt)
@@ -327,6 +353,21 @@ EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, 
 	return 0;
 }
 
+/**
+ * @brief Get the color components offsets and lengths given a format
+ * @param[in] fmt The format to get the components from
+ * @param[out] aoffset Alpha offset
+ * @param[out] alen Alpha length
+ * @param[out] roffset Red offset
+ * @param[out] rlen Red length
+ * @param[out] goffset Green offset
+ * @param[out] glen Green length
+ * @param[out] boffset Blue offset
+ * @param[out] blen Blue length
+ * @param[out] premul Flag to indicate if the components are premultiplied
+ * @return EINA_TRUE if the format can be described as ARGB components,
+ * EINA_FALSE otherwise
+ */
 EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
 		uint8_t *aoffset, uint8_t *alen,
 		uint8_t *roffset, uint8_t *rlen,
@@ -382,9 +423,19 @@ EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
- * FIXME how to handle the gray?
+ * @brief Get the format based on the components description
+ * @param[out] fmt The format associated with the components
+ * @param[in] aoffset Alpha offset
+ * @param[in] alen Alpha length
+ * @param[in] roffset Red offset
+ * @param[in] rlen Red length
+ * @param[in] goffset Green offset
+ * @param[in] glen Green length
+ * @param[in] boffset Blue offset
+ * @param[in] blen Blue length
+ * @param[in] premul Flag to indicate if the components are premultiplied
+ * @return EINA_TRUE if the format can be described by the provided ARGB
+ * components, EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_buffer_format_rgb_components_from(Enesim_Buffer_Format *fmt,
 		uint8_t aoffset, uint8_t alen,
@@ -422,8 +473,8 @@ EAPI Eina_Bool enesim_buffer_format_rgb_components_from(Enesim_Buffer_Format *fm
 }
 
 /**
- * Gets the pixel depth of the converter format
- * @param fmt The converter format to get the depth from
+ * Gets the pixel depth of the format
+ * @param fmt The format to get the depth from
  * @return The depth in bits per pixel
  */
 EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt)
@@ -451,8 +502,8 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Locks a buffer
+ * @param[in] b The buffer to lock
  */
 EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write)
 {
@@ -463,8 +514,8 @@ EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Unlocks a buffer
+ * @param[in] b The buffer to unlock
  */
 EAPI void enesim_buffer_unlock(Enesim_Buffer *b)
 {

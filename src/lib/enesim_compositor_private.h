@@ -15,11 +15,42 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef COMPOSITOR_H_
-#define COMPOSITOR_H_
+#ifndef ENESIM_COMPOSITOR_PRIVATE_H_
+#define ENESIM_COMPOSITOR_PRIVATE_H_
 
 #define ENESIM_COMPOSITOR_SPAN(f) ((Enesim_Compositor_Span)(f))
 #define ENESIM_COMPOSITOR_POINT(f) ((Enesim_Compositor_Point)(f))
+
+/**
+ * Function to draw a point
+ * @param d Destination surface data
+ * @param s In case of using the surface as pixel source
+ * @param color To draw with a color or as a multiplier color in case of using s
+ * @param m In case of using a mask
+ */
+typedef void (*Enesim_Compositor_Point)(uint32_t *d, uint32_t s,
+		Enesim_Color color, uint32_t m);
+EAPI Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
+		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
+		Enesim_Format mfmt);
+/**
+ * Function to draw a span
+ * @param d Destination surface data
+ * @param len The length of the span
+ * @param s In case of using the surface as pixel source
+ * @param color To draw with a color or as a multiplier color in case of using s
+ * @param m In case of using a mask
+ */
+typedef void (*Enesim_Compositor_Span)(uint32_t *d, uint32_t len, uint32_t *s,
+		Enesim_Color color, uint32_t *m);
+
+Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
+		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
+		Enesim_Format mfmt);
+
+Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
+		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
+		Enesim_Format mfmt);
 
 void enesim_compositor_init(void);
 void enesim_compositor_shutdown(void);
@@ -51,4 +82,4 @@ void enesim_compositor_span_pixel_mask_register(Enesim_Compositor_Span sp,
 void enesim_compositor_span_pixel_color_register(Enesim_Compositor_Span sp,
 		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt);
 
-#endif /* COMPOSITOR_H_*/
+#endif /* ENESIM_COMPOSITOR_H_*/

@@ -31,7 +31,6 @@
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
 #include "enesim_color.h"
-#include "enesim_compositor.h"
 #include "enesim_renderer.h"
 #include "Enesim_OpenGL.h"
 #endif
