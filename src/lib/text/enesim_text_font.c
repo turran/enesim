@@ -70,12 +70,16 @@ static void _font_unref(Enesim_Text_Font *f)
 static Eina_Bool _dump(const Eina_Hash *hash EINA_UNUSED, const void *key, void *data, void *fdata)
 {
 	Enesim_Text_Glyph *g = (Enesim_Text_Glyph *)data;
+	Enesim_Buffer *b;
 	char c = *(int *)key;
 	char fout[PATH_MAX];
 	char *path = fdata;
 
+	b = enesim_surface_buffer_get(g->surface);
 	snprintf(fout, PATH_MAX, "%s/%c.png", path, c);
-	enesim_image_file_save(fout, g->surface, NULL);
+	enesim_image_file_save(fout, b, NULL);
+	enesim_buffer_unref(b);
+
 	return EINA_TRUE;
 }
 /*============================================================================*
