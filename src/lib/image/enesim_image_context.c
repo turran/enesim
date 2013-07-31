@@ -72,12 +72,11 @@ typedef struct _Enesim_Image_Job
 
 	union {
 		struct {
-			Enesim_Surface *s;
-			Enesim_Format f;
+			Enesim_Buffer *b;
 			Enesim_Pool *pool;
 		} load;
 		struct {
-			Enesim_Surface *s;
+			Enesim_Buffer *b;
 		} save;
 	} op;
 } Enesim_Image_Job;
@@ -85,10 +84,11 @@ typedef struct _Enesim_Image_Job
 /*----------------------------------------------------------------------------*
  *                        Thread related functions                            *
  *----------------------------------------------------------------------------*/
-static void _thread_finish(Enesim_Image_Job *j)
+static int _thread_finish(Enesim_Image_Job *j)
 {
 	int ret;
 	ret = pipe_write(j->thiz->fifo[1], &j, sizeof(j));
+	return ret;
 }
 
 #ifdef _WIN32
@@ -99,8 +99,8 @@ static void * _thread_load(void *data)
 {
 	Enesim_Image_Job *j = data;
 
-	if (!enesim_image_provider_load(j->prov, j->data, &j->op.load.s,
-		j->op.load.f, j->op.load.pool, j->options))
+	if (!enesim_image_provider_load(j->prov, j->data, &j->op.load.b,
+		j->op.load.pool, j->options))
 		j->err = eina_error_get();
 	_thread_finish(j);
 
@@ -119,7 +119,7 @@ static void * _thread_save(void *data)
 {
 	Enesim_Image_Job *j = data;
 
-	if (!enesim_image_provider_save(j->prov, j->data, j->op.save.s, j->options))
+	if (!enesim_image_provider_save(j->prov, j->data, j->op.save.b, j->options))
 		j->err = eina_error_get();
 	_thread_finish(j);
 
@@ -137,7 +137,7 @@ static void * _thread_save(void *data)
  * @brief Create a new context
  *
  * Create a new context. A context is the holder of every asynchronous
- * operation done on emage. 
+ * operation done. 
  */
 EAPI Enesim_Image_Context * enesim_image_context_new(void)
 {
@@ -176,23 +176,22 @@ EAPI void enesim_image_context_free(Enesim_Image_Context *thiz)
  * @param thiz The context to use for loading
  * @param data The image data to load
  * @param mime The image mime
- * @param s The surface to write the image pixels to. It must not be NULL.
- * @param f The desired format the image should be converted to
- * @param mpool The mempool that will create the surface in case the surface
+ * @param b The buffer to write the image pixels to. It must not be NULL.
+ * @param mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
  * @param cb The function that will get called once the load is done
  * @param data User provided data
- * @param options Any option the emage provider might require
+ * @param options Any option the provider might require
  */
 EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Image_Data *data,
-		const char *mime, Enesim_Surface *s, Enesim_Format f,
-		Enesim_Pool *mpool, Enesim_Image_Callback cb, void *user_data,
+		const char *mime, Enesim_Buffer *b, Enesim_Pool *mpool,
+		Enesim_Image_Callback cb, void *user_data,
 		const char *options)
 {
 	Enesim_Image_Job *j;
 	Enesim_Image_Provider *prov;
 
-	prov = enesim_image_load_provider_get(data, mime);
+	prov = enesim_image_load_provider_get(data, mime, mpool);
 	if (!prov)
 	{
 		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
@@ -209,9 +208,8 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Ima
 		j->options = strdup(options);
 	j->err = 0;
 	j->type = ENESIM_IMAGE_LOAD;
-	j->op.load.s = s;
+	j->op.load.b = b;
 	j->op.load.pool = mpool;
-	j->op.load.f = f;
 	/* FIXME we need to block the thread */
 	/* create a thread that loads the image on background and sends
 	 * a command into the fifo fd */
@@ -224,20 +222,20 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Ima
  * @param thiz The context to use for loading
  * @param data The image data to load
  * @param mime The image mime
- * @param s The surface to read the image pixels from. It must not be NULL.
+ * @param b The buffer to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
  * @param data User provided data
- * @param options Any option the emage provider might require
+ * @param options Any option the provider might require
  *
  */
 EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Image_Data *data,
-		const char *mime, Enesim_Surface *s, Enesim_Image_Callback cb,
+		const char *mime, Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
 	Enesim_Image_Job *j;
 	Enesim_Image_Provider *prov;
 
-	prov = enesim_image_save_provider_get(data, mime);
+	prov = enesim_image_save_provider_get(b, mime);
 	if (!prov)
 	{
 		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
@@ -254,7 +252,7 @@ EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Ima
 		j->options = strdup(options);
 	j->err = 0;
 	j->type = ENESIM_IMAGE_SAVE;
-	j->op.save.s = s;
+	j->op.save.b = b;
 	/* FIXME we need to block the thread */
 	/* create a thread that saves the image on background and sends
 	 * a command into the fifo fd */
@@ -262,9 +260,9 @@ EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Ima
 }
 
 /**
- * @brief Call every asynchronous callback set
+ * @brief Dispatch every asynchronous callback set
  *
- * In case emage has setup some asynchronous load, you must call this
+ * In case of requesting some asynchronous load or save, you must call this
  * function to get the status of such process
  *
  * @param thiz The context to dispatch
@@ -287,36 +285,11 @@ EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz)
 	while (pipe_read(thiz->fifo[0], &j, sizeof(j)) > 0)
 	{
 		if (j->type == ENESIM_IMAGE_LOAD)
-			j->cb(j->op.load.s, j->user_data, j->err);
+			j->cb(j->op.load.b, j->user_data, j->err);
 		else
-			j->cb(j->op.save.s, j->user_data, j->err);
+			j->cb(j->op.save.b, j->user_data, j->err);
 		if (j->options)
 			free(j->options);
 		free(j);
 	}
-}
-
-/**
- * @brief Sets the size of the thread's pool
- * @param thiz The image context
- * @param num The number of threads
- *
- * Sets the maximum number of threads the context will create to dispatch asynchronous
- * calls.
- */
-EAPI void enesim_image_context_pool_size_set(Enesim_Image_Context *thiz EINA_UNUSED, int num EINA_UNUSED)
-{
-
-}
-/**
- * @brief Gets the size of the thread's pool
- * @param thiz The image context
- *
- * @return The number of threads
- * Returns the maximum number threads the context will create the dispatch
- * asynchronous calls.
- */
-EAPI int enesim_image_context_pool_size_get(Enesim_Image_Context *thiz EINA_UNUSED)
-{
-	return 0;
 }

@@ -32,9 +32,10 @@ struct _Enesim_Image_Data
 	void *data;
 };
 /*============================================================================*
- *                                   API                                      *
+ *                                 Global                                     *
  *============================================================================*/
-EAPI Enesim_Image_Data * enesim_image_data_new(Enesim_Image_Data_Descriptor *descriptor, void *data)
+Enesim_Image_Data * enesim_image_data_new(
+		Enesim_Image_Data_Descriptor *descriptor, void *data)
 {
 	Enesim_Image_Data *thiz;
 
@@ -48,6 +49,9 @@ EAPI Enesim_Image_Data * enesim_image_data_new(Enesim_Image_Data_Descriptor *des
 	return thiz;
 }
 
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
 EAPI ssize_t enesim_image_data_read(Enesim_Image_Data *thiz, void *buffer, size_t len)
 {
 	if (thiz->descriptor->read)

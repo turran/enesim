@@ -13,7 +13,7 @@ static void help(void)
 
 int main(int argc, char **argv)
 {
-	Enesim_Surface *s = NULL;
+	Enesim_Buffer *b = NULL;
 	char *fload;
 	char *fsave;
 
@@ -29,12 +29,12 @@ int main(int argc, char **argv)
 	printf("%s -> %s\n", fload, fsave);
 
 	enesim_init();
-	if (!enesim_image_file_load(fload, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL))
+	if (!enesim_image_file_load(fload, &b, NULL, NULL))
 	{
 		printf("Impossible to load the image\n");
 		goto end;
 	}
-	if (!enesim_image_file_save(fsave, s, NULL))
+	if (!enesim_image_file_save(fsave, b, NULL))
 	{
 		printf("Impossible to save the image\n");
 		goto end;

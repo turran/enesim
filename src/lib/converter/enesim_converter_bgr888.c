@@ -25,13 +25,13 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static void _2d_bgr888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		void *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED,
-		size_t spitch)
+static void _2d_bgr888_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
+		Enesim_Buffer_Sw_Data *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED)
 {
 	uint8_t *dst = data->bgr888.plane0;
-	uint8_t *src = sdata;
+	uint8_t *src = (uint8_t *)sdata->argb8888_pre.plane0;
 	size_t dpitch = data->bgr888.plane0_stride;
+	size_t spitch = data->argb8888_pre.plane0_stride;
 
 	while (dh--)
 	{
@@ -56,10 +56,8 @@ static void _2d_bgr888_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw, u
 void enesim_converter_bgr888_init(void)
 {
 	enesim_converter_surface_register(
-			ENESIM_CONVERTER_2D(_2d_bgr888_none_argb8888),
+			ENESIM_CONVERTER_2D(_2d_bgr888_none_argb8888_pre),
 			ENESIM_BUFFER_FORMAT_BGR888,
 			ENESIM_ANGLE_0,
-			ENESIM_FORMAT_ARGB8888);
+			ENESIM_BUFFER_FORMAT_ARGB8888_PRE);
 }
-
-

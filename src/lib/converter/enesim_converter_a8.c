@@ -25,6 +25,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#if 0
 static void _1d_a8_none_argb8888(Enesim_Buffer_Sw_Data *data,
 		uint32_t len, void *sdata)
 {
@@ -39,14 +40,10 @@ static void _1d_a8_none_argb8888(Enesim_Buffer_Sw_Data *data,
 		src++;
 	}
 }
+#endif
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 void enesim_converter_a8_init(void)
 {
-	enesim_converter_span_register(
-			ENESIM_CONVERTER_1D(_1d_a8_none_argb8888),
-			ENESIM_BUFFER_FORMAT_A8,
-			ENESIM_ANGLE_0,
-			ENESIM_FORMAT_ARGB8888);
 }

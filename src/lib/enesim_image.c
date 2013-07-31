@@ -45,7 +45,34 @@ Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, const char *mime)
+Enesim_Image_Provider * enesim_image_load_info_provider_get(
+		Enesim_Image_Data *data, const char *mime)
+{
+	Enesim_Image_Provider *p;
+	Eina_List *providers;
+	Eina_List *l;
+
+	if (!mime)
+	{
+		mime = enesim_image_mime_data_from(data);
+		enesim_image_data_reset(data);
+	}
+	if (!mime)
+	{
+		WRN("No mime type detected");
+		return NULL;
+	}
+	providers = eina_hash_find(_providers, mime);
+	EINA_LIST_FOREACH (providers, l, p)
+	{
+		if (p->d->info_get)
+			return p;
+	}
+	return NULL;
+}
+
+Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data,
+		const char *mime, Enesim_Pool *pool)
 {
 	Enesim_Image_Provider *p;
 	Eina_List *providers;
@@ -71,7 +98,7 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, 
 			return p;
 
 		enesim_image_data_reset(data);
-		if (p->d->loadable(data) == EINA_TRUE)
+		if (p->d->loadable(data, pool) == EINA_TRUE)
 		{
 			enesim_image_data_reset(data);
 			return p;
@@ -80,7 +107,7 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, 
 	return NULL;
 }
 
-Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Image_Data *data EINA_UNUSED,
+Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Buffer *b,
 		const char *mime)
 {
 	Enesim_Image_Provider *p;
@@ -92,23 +119,19 @@ Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Image_Data *data E
 	EINA_LIST_FOREACH (providers, l, p)
 	{
 		/* TODO priority savers */
-		return p;
-#if 0
 		/* check if the provider can save the image */
-		if (!p->saveable)
+		if (!p->d->saveable)
 			return p;
-		if (p->saveable(data) == EINA_TRUE)
+		if (p->d->saveable(b) == EINA_TRUE)
 		{
-			enesim_image_data_reset(data);
 			return p;
 		}
-#endif
 	}
 	return NULL;
 }
 
-/**
- * Initialize emage. This function must be called before any other emage
+/*
+ * Initialize the image system. This function must be called before any other image
  * function
  */
 int enesim_image_init(void)
@@ -143,8 +166,9 @@ int enesim_image_init(void)
 
 	return _enesim_image_init_count;
 }
-/**
- * Shutdown emage library. Once you have finished using emage, shut it down.
+
+/*
+ * Shutdown the image systemibrary. Once you have finished using it, shut it down.
  */
 int enesim_image_shutdown(void)
 {
@@ -192,91 +216,89 @@ EAPI Eina_Bool enesim_image_info_load(Enesim_Image_Data *data, const char *mime,
 {
 	Enesim_Image_Provider *prov;
 
-	prov = enesim_image_load_provider_get(data, mime);
+	prov = enesim_image_load_info_provider_get(data, mime);
 	return enesim_image_provider_info_load(prov, data, w, h, sfmt);
 }
 /**
  * Load an image synchronously
  *
- * @param data The image data to load
- * @param mime The image mime
- * @param s The surface to write the image pixels to. It must not be NULL.
- * @param f The desired format the image should be converted to
- * @param mpool The mempool that will create the surface in case the surface
+ * @param data The image data to load from
+ * @param mime The image mime. It can be NULL, if so, it will be autodetected
+ * from the data itself.
+ * @param b The buffer to write the image pixels to. It must not be NULL.
+ * @param mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
- * @param options Any option the emage provider might require
+ * @param options Any option the provider might require
  * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
  */
 EAPI Eina_Bool enesim_image_load(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface **s, Enesim_Format f, Enesim_Pool *mpool,
-		const char *options)
+		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options)
 {
 	Enesim_Image_Provider *prov;
 
-	prov = enesim_image_load_provider_get(data, mime);
-	return enesim_image_provider_load(prov, data, s, f, mpool, options);
+	prov = enesim_image_load_provider_get(data, mime, mpool);
+	return enesim_image_provider_load(prov, data, b, mpool, options);
 }
 /**
  * Load an image asynchronously
  *
- * @param data The image data to load
- * @param mime The image mime
- * @param s The surface to write the image pixels to. It must not be NULL.
- * @param f The desired format the image should be converted to
- * @param mpool The mempool that will create the surface in case the surface
+ * @param data The image data to load from
+ * @param mime The image mime. It can be NULL, if so, it will be autodetected
+ * from the data itself.
+ * @param b The buffer to write the image pixels to. It must not be NULL.
+ * @param mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
  * @param cb The function that will get called once the load is done
  * @param data User provided data
- * @param options Any option the emage provider might require
+ * @param options Any option the provider might require
  */
 EAPI void enesim_image_load_async(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface *s, Enesim_Format f, Enesim_Pool *mpool,
-		Enesim_Image_Callback cb, void *user_data, const char *options)
+		Enesim_Buffer *b, Enesim_Pool *mpool, Enesim_Image_Callback cb,
+		void *user_data, const char *options)
 {
-	enesim_image_context_load_async(_main_context, data, mime, s, f, mpool, cb,
+	enesim_image_context_load_async(_main_context, data, mime, b, mpool, cb,
 			user_data, options);
 }
 /**
  * Save an image synchronously
  *
- * @param data The image data to load
+ * @param data The image data to save to
  * @param mime The image mime
- * @param s The surface to read the image pixels from. It must not be NULL.
- * @param options Any option the emage provider might require
+ * @param b The buffer to read the image pixels from. It must not be NULL.
+ * @param options Any option the provider might require
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
 EAPI Eina_Bool enesim_image_save(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface *s, const char *options)
+		Enesim_Buffer *b, const char *options)
 {
 	Enesim_Image_Provider *prov;
 
-	prov = enesim_image_save_provider_get(data, mime);
-	return enesim_image_provider_save(prov, data, s, options);
+	prov = enesim_image_save_provider_get(b, mime);
+	return enesim_image_provider_save(prov, data, b, options);
 }
 
 /**
  * Save an image asynchronously
  *
- * @param data The image data to load
+ * @param data The image data to save to
  * @param mime The image mime
- * @param s The surface to read the image pixels from. It must not be NULL.
+ * @param b The buffer to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
  * @param data User provided data
- * @param options Any option the emage provider might require
- *
+ * @param options Any option the provider might require
  */
 EAPI void enesim_image_save_async(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface *s, Enesim_Image_Callback cb,
+		Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
-	enesim_image_context_save_async(_main_context, data, mime, s, cb, user_data,
+	enesim_image_context_save_async(_main_context, data, mime, b, cb, user_data,
 			options);
 }
 
 /**
- * @brief Call every asynchronous callback set
+ * @brief Dispatch every asynchronous callback set on the main context
  *
- * In case emage has setup some asynchronous load, you must call this
+ * In case of requesting some asynchronous load or save, you must call this
  * function to get the status of such process
  */
 EAPI void enesim_image_dispatch(void)
@@ -306,6 +328,7 @@ EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *
 		WRN("Provider %s doesn't provide the load() function", pd->name);
 	}
 
+	DBG("Adding provider for mime '%s'", mime);
 	p = calloc(1, sizeof(Enesim_Image_Provider));
 	p->priority = priority;
 	p->mime = mime;
@@ -327,8 +350,28 @@ EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *
 EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
 		Enesim_Priority priority)
 {
+	Enesim_Image_Provider *pp;
+	Eina_List *providers;
+	Eina_List *l, *rel = NULL, *tmp;
+
 	p->priority = priority;
 	/* reorder the list */
+	providers = eina_hash_find(_providers, p->mime);
+	providers = tmp = eina_list_remove(providers, p);
+
+	EINA_LIST_FOREACH (providers, l, pp)
+	{
+		if (pp->priority <= priority)
+		{
+			rel = l;
+			break;
+		}
+	}
+	providers = eina_list_prepend_relative_list(providers, p, rel);
+	if (!tmp)
+	{
+		eina_hash_add(_providers, p->mime, providers);
+	}
 }
 
 /**

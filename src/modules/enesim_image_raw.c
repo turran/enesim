@@ -30,23 +30,19 @@ static int enesim_image_log_dom_raw = -1;
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _raw_saveable(const char *file)
+static Eina_Bool _raw_saveable(Enesim_Buffer *b)
 {
-	char *d;
-
-	d = strrchr(file, '.');
-	if (!d) return EINA_FALSE;
-
-	d++;
-	if (!strcasecmp(d, "raw"))
-		return EINA_TRUE;
-
-	return EINA_FALSE;
+	Enesim_Buffer_Format fmt;
+	fmt = enesim_buffer_format_get(b);
+	if (fmt != ENESIM_BUFFER_FORMAT_ARGB8888_PRE)
+		return EINA_FALSE;
+	return EINA_TRUE;
 }
-
-static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options EINA_UNUSED)
+static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Buffer *buffer,
+		void *options EINA_UNUSED)
 {
-	uint32_t *sdata;
+	Enesim_Buffer_Sw_Data sdata;
+	uint32_t *src;
 	size_t stride;
 	int32_t w;
 	int32_t h;
@@ -67,8 +63,11 @@ static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	/* dump a c byte array with the data of the surface and also
 	 * a static function to get such surface
 	 */
-	enesim_surface_data_get(s, (void **)&sdata, &stride);
-	enesim_surface_size_get(s, &w, &h);
+	enesim_buffer_data_get(buffer, &sdata);
+	enesim_buffer_size_get(buffer, &w, &h);
+	src = sdata.argb8888_pre.plane0;
+	stride = sdata.argb8888_pre.plane0_stride;
+
 	enesim_image_data_write(data, (void *)str_data, strlen(str_data));
 	for (i = 0; i < h; i++)
 	{
@@ -79,16 +78,16 @@ static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 
 			if (cols % 4 == 0)
 				enesim_image_data_write(data, "\n\t", 2);
-			enesim_color_components_to(*sdata, &a, &r, &g, &b);
+			enesim_color_components_to(*src, &a, &r, &g, &b);
 			if (i == h -1 &&  j == w - 1)
 				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x ", a, r, g, b);
 			else
 				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x, ", a, r, g, b);
 			enesim_image_data_write(data, str, strlen(str));
 			cols++;
-			sdata++;
+			src++;
 		}
-		sdata = (uint32_t *)((uint8_t *)sdata + stride);
+		src = (uint32_t *)((uint8_t *)src + stride);
 	}
 	enesim_image_data_write(data, "\n};\n", 4);
 	/* now the function to get such surface */

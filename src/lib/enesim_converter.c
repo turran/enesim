@@ -23,14 +23,13 @@
 #include "enesim_surface.h"
 #include "enesim_converter.h"
 
+#include "enesim_buffer.h"
 #include "enesim_converter_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-typedef Enesim_Converter_1D Enesim_Converter_1D_Lut[ENESIM_BUFFER_FORMATS][ENESIM_ANGLES][ENESIM_FORMATS];
-typedef Enesim_Converter_2D Enesim_Converter_2D_Lut[ENESIM_BUFFER_FORMATS][ENESIM_ANGLES][ENESIM_FORMATS];
+typedef Enesim_Converter_2D Enesim_Converter_2D_Lut[ENESIM_BUFFER_FORMATS][ENESIM_ANGLES][ENESIM_BUFFER_FORMATS];
 
-Enesim_Converter_1D_Lut _converters_1d;
 Enesim_Converter_2D_Lut _converters_2d;
 /*============================================================================*
  *                                 Global                                     *
@@ -46,29 +45,18 @@ void enesim_converter_shutdown(void)
 {
 }
 
-void enesim_converter_span_register(Enesim_Converter_1D cnv,
-		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt)
-{
-	_converters_1d[dfmt][angle][sfmt] = cnv;
-}
-
 void enesim_converter_surface_register(Enesim_Converter_2D cnv,
-		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt)
+		Enesim_Buffer_Format dfmt, Enesim_Angle angle,
+		Enesim_Buffer_Format sfmt)
 {
 	//printf("registering converter dfmt = %d sfmt = %d\n", dfmt, sfmt);
 	_converters_2d[dfmt][angle][sfmt] = cnv;
 }
 
-Enesim_Converter_1D enesim_converter_span_get(Enesim_Buffer_Format dfmt,
-		Enesim_Angle angle, Enesim_Format f)
-{
-	return _converters_1d[dfmt][angle][f];
-}
-
 Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
-		Enesim_Angle angle, Enesim_Format f)
+		Enesim_Angle angle, Enesim_Buffer_Format sfmt)
 {
-	return _converters_2d[dfmt][angle][f];
+	return _converters_2d[dfmt][angle][sfmt];
 }
 /*============================================================================*
  *                                   API                                      *
@@ -86,26 +74,52 @@ Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
 EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 		Enesim_Angle angle,
 		Eina_Rectangle *clip,
+		int x, int y)
+{
+	Enesim_Buffer *src;
+	Eina_Bool ret;
+
+	src = enesim_surface_buffer_get(s);
+	ret = enesim_converter_buffer(src, dst, angle, clip, x, y);
+	enesim_buffer_unref(src);
+	return ret;
+}
+
+/**
+ * Converts a buffer into a buffer. Basically it will do a color space
+ * conversion.
+ * @param[in] b The buffer to convert
+ * @param[in] dst The destination buffer
+ * @param[in] angle The rotation angle
+ * @param[in] clip A clipping area on the source buffer
+ * @param[in] x The destination x coordinate to put the buffer
+ * @param[in] y The destination y coordinate to put the buffer
+ */
+EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst,
+		Enesim_Angle angle,
+		Eina_Rectangle *clip,
 		int x EINA_UNUSED, int y EINA_UNUSED)
 {
 	Enesim_Converter_2D converter;
 	Enesim_Buffer_Format dfmt;
-	Enesim_Format sfmt;
-	Enesim_Buffer_Sw_Data data;
-	uint32_t *sdata;
-	size_t stride;
+	Enesim_Buffer_Format sfmt;
+	Enesim_Buffer_Sw_Data ddata;
+	Enesim_Buffer_Sw_Data sdata;
 
+	sfmt = enesim_buffer_format_get(b);
 	dfmt = enesim_buffer_format_get(dst);
-	sfmt = enesim_surface_format_get(s);
+
+	if (sfmt == dfmt) return EINA_FALSE;
 
 	converter = enesim_converter_surface_get(dfmt, angle, sfmt);
 	if (!converter) return EINA_FALSE;
 
-	enesim_buffer_data_get(dst, &data);
+	enesim_buffer_data_get(dst, &ddata);
+	enesim_buffer_data_get(b, &sdata);
+
 	/* FIXME check the stride too */
-	enesim_surface_data_get(s, (void **)&sdata, &stride);
 	/* TODO check the clip and x, y */
-	converter(&data, clip->w, clip->h, sdata, clip->w, clip->h, stride);
+	converter(&ddata, clip->w, clip->h, &sdata, clip->w, clip->h);
 
 	return EINA_TRUE;
 }

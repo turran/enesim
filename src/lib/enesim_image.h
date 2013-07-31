@@ -40,29 +40,7 @@ EAPI void enesim_image_dispatch(void);
  * @ingroup Enesim_Image_Group
  * @{
  */
-typedef ssize_t (*Enesim_Image_Data_Read)(void *data, void *buffer, size_t len);
-typedef ssize_t (*Enesim_Image_Data_Write)(void *data, void *buffer, size_t len);
-typedef void * (*Enesim_Image_Data_Mmap)(void *data, size_t *size);
-typedef void (*Enesim_Image_Data_Munmap)(void *data, void *ptr);
-typedef void (*Enesim_Image_Data_Reset)(void *data);
-typedef size_t (*Enesim_Image_Data_Length)(void *data);
-typedef char * (*Enesim_Image_Data_Location)(void *data);
-typedef void (*Enesim_Image_Data_Free)(void *data);
-
-typedef struct _Enesim_Image_Data_Descriptor
-{
-	Enesim_Image_Data_Read read;
-	Enesim_Image_Data_Write write;
-	Enesim_Image_Data_Mmap mmap;
-	Enesim_Image_Data_Munmap munmap;
-	Enesim_Image_Data_Reset reset;
-	Enesim_Image_Data_Length length;
-	Enesim_Image_Data_Location location;
-	Enesim_Image_Data_Free free;
-} Enesim_Image_Data_Descriptor;
-
 typedef struct _Enesim_Image_Data Enesim_Image_Data;
-EAPI Enesim_Image_Data * enesim_image_data_new(Enesim_Image_Data_Descriptor *d, void *data);
 EAPI ssize_t enesim_image_data_read(Enesim_Image_Data *thiz, void *buffer, size_t len);
 EAPI ssize_t enesim_image_data_write(Enesim_Image_Data *thiz, void *buffer, size_t len);
 EAPI size_t enesim_image_data_length(Enesim_Image_Data *thiz);
@@ -83,20 +61,18 @@ EAPI Enesim_Image_Data * enesim_image_data_base64_new(Enesim_Image_Data *d);
  * @{
  */
 typedef struct _Enesim_Image_Context Enesim_Image_Context;
-typedef void (*Enesim_Image_Callback)(Enesim_Surface *s, void *data, int error); /**< Function prototype called whenever an image is loaded or saved */
+typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, int error); /**< Function prototype called whenever an image is loaded or saved */
 
 EAPI Enesim_Image_Context * enesim_image_context_new(void);
 EAPI void enesim_image_context_free(Enesim_Image_Context *thiz);
 EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz,
-		Enesim_Image_Data *data, const char *mime, Enesim_Surface *s,
-		Enesim_Format f, Enesim_Pool *mpool, Enesim_Image_Callback cb,
+		Enesim_Image_Data *data, const char *mime, Enesim_Buffer *b,
+		Enesim_Pool *mpool, Enesim_Image_Callback cb,
 		void *user_data, const char *options);
 EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Image_Data *data,
-		const char *mime, Enesim_Surface *s, Enesim_Image_Callback cb,
+		const char *mime, Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options);
 EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz);
-EAPI void enesim_image_context_pool_size_set(Enesim_Image_Context *thiz, int num);
-EAPI int enesim_image_context_pool_size_get(Enesim_Image_Context *thiz);
 
 /**
  * @}
@@ -108,25 +84,24 @@ EAPI int enesim_image_context_pool_size_get(Enesim_Image_Context *thiz);
 EAPI Eina_Bool enesim_image_info_load(Enesim_Image_Data *data, const char *mime,
 		int *w, int *h, Enesim_Buffer_Format *sfmt);
 EAPI Eina_Bool enesim_image_load(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface **s, Enesim_Format f,
-		Enesim_Pool *mpool, const char *options);
+		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options);
 EAPI void enesim_image_load_async(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface *s, Enesim_Format f, Enesim_Pool *mpool,
+		Enesim_Buffer *b, Enesim_Pool *mpool,
 		Enesim_Image_Callback cb, void *user_data, const char *options);
 EAPI Eina_Bool enesim_image_save(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface *s, const char *options);
+		Enesim_Buffer *b, const char *options);
 EAPI void enesim_image_save_async(Enesim_Image_Data *data, const char *mime,
-		Enesim_Surface *s, Enesim_Image_Callback cb, void *user_data,
+		Enesim_Buffer *b, Enesim_Image_Callback cb, void *user_data,
 		const char *options);
 
 EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt);
-EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Surface **s,
-		Enesim_Format f, Enesim_Pool *mpool, const char *options);
-EAPI void enesim_image_file_load_async(const char *file, Enesim_Surface *s,
-		Enesim_Format f, Enesim_Pool *mpool,
-		Enesim_Image_Callback cb, void *user_data, const char *options);
-EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Surface *s, const char *options);
-EAPI void enesim_image_file_save_async(const char *file, Enesim_Surface *s, Enesim_Image_Callback cb,
+EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
+		Enesim_Pool *mpool, const char *options);
+EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
+		Enesim_Pool *mpool, Enesim_Image_Callback cb,
+		void *user_data, const char *options);
+EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const char *options);
+EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options);
 
 /**
@@ -138,19 +113,13 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Surface *s, Enes
 
 typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
 
-/**
- * TODO Add a way to parse options and receive options from caller
- */
-
-/* FIXME We need to fix the saveable functions */
 typedef void * (*Enesim_Image_Provider_Options_Parse_Cb)(const char *options);
 typedef void (*Enesim_Image_Provider_Options_Free_Cb)(void *options);
-/* TODO also pass the backend, pool and desired format? */
-typedef Eina_Bool (*Enesim_Image_Provider_Loadable_Cb)(Enesim_Image_Data *data);
-typedef Eina_Bool (*Enesim_Image_Provider_Saveable_Cb)(const char *file);
+typedef Eina_Bool (*Enesim_Image_Provider_Loadable_Cb)(Enesim_Image_Data *data, Enesim_Pool *p);
+typedef Eina_Bool (*Enesim_Image_Provider_Saveable_Cb)(Enesim_Buffer *b);
 typedef Eina_Error (*Enesim_Image_Provider_Info_Get_Cb)(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options);
 typedef Eina_Error (*Enesim_Image_Provider_Load_Cb)(Enesim_Image_Data *data, Enesim_Buffer *b, void *options);
-typedef Eina_Bool (*Enesim_Image_Provider_Save_Cb)(Enesim_Image_Data *data, Enesim_Surface *s, void *options);
+typedef Eina_Bool (*Enesim_Image_Provider_Save_Cb)(Enesim_Image_Data *data, Enesim_Buffer *b, void *options);
 
 typedef struct _Enesim_Image_Provider_Descriptor
 {
@@ -172,10 +141,10 @@ EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
 EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
 	Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt);
 EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
-		Enesim_Image_Data *data, Enesim_Surface **s,
-		Enesim_Format f, Enesim_Pool *mpool, const char *options);
+		Enesim_Image_Data *data, Enesim_Buffer **b,
+		Enesim_Pool *mpool, const char *options);
 EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
-		Enesim_Image_Data *data, Enesim_Surface *s,
+		Enesim_Image_Data *data, Enesim_Buffer *b,
 		const char *options);
 
 /**

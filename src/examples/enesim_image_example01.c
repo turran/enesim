@@ -13,7 +13,7 @@ static void help(void)
 	printf("enesim_image_example [load | save] [async | sync ] FILE\n");
 }
 
-static void async_load_cb(Enesim_Surface *s EINA_UNUSED, void *data, int error)
+static void async_load_cb(Enesim_Buffer *b EINA_UNUSED, void *data, int error)
 {
 	char *file = data;
 
@@ -24,7 +24,7 @@ static void async_load_cb(Enesim_Surface *s EINA_UNUSED, void *data, int error)
 	end = 1;
 }
 
-static void async_save_cb(Enesim_Surface *s EINA_UNUSED, void *data, int error)
+static void async_save_cb(Enesim_Buffer *b, void *data, int error)
 {
 	char *file = data;
 
@@ -32,13 +32,14 @@ static void async_save_cb(Enesim_Surface *s EINA_UNUSED, void *data, int error)
 		printf("Image %s saved async successfully\n", file);
 	else
 		printf("Image %s saved async with error: %s\n", file, eina_error_msg_get(error));
+	enesim_buffer_unref(b);
 	end = 1;
 }
 
 int main(int argc, char **argv)
 {
 	char *file;
-	Enesim_Surface *s = NULL;
+	Enesim_Buffer *b = NULL;
 	int async = 0;
 	int save = 0;
 
@@ -75,6 +76,7 @@ int main(int argc, char **argv)
 	if (save)
 	{
 		Enesim_Renderer *r;
+		Enesim_Surface *s;
 
 		/* generate a simple pattern with enesim */
 		s = enesim_surface_new(ENESIM_FORMAT_ARGB8888, 256, 256);
@@ -86,13 +88,14 @@ int main(int argc, char **argv)
 		enesim_renderer_draw(r, s, NULL, 0, 0, NULL);
 		enesim_renderer_unref(r);
 
+		b = enesim_surface_buffer_get(s);
 		if (async)
 		{
-			enesim_image_file_save_async(file, s, async_save_cb, file, NULL);
+			enesim_image_file_save_async(file, b, async_save_cb, file, NULL);
 		}
 		else
 		{
-			if (enesim_image_file_save(file, s, NULL))
+			if (enesim_image_file_save(file, b, NULL))
 				printf("Image %s saved sync successfully\n", file);
 			else
 			{
@@ -101,6 +104,7 @@ int main(int argc, char **argv)
 				err = eina_error_get();
 				printf("Image %s saved sync with error: %s\n", file, eina_error_msg_get(err));
 			}
+			enesim_buffer_unref(b);
 		}
 
 	}
@@ -108,11 +112,11 @@ int main(int argc, char **argv)
 	{
 		if (async)
 		{
-			enesim_image_file_load_async(file, s, ENESIM_FORMAT_ARGB8888, NULL, async_load_cb, file, NULL);
+			enesim_image_file_load_async(file, b, NULL, async_load_cb, file, NULL);
 		}
 		else
 		{
-			if (enesim_image_file_load(file, &s, ENESIM_FORMAT_ARGB8888, NULL, NULL))
+			if (enesim_image_file_load(file, &b, NULL, NULL))
 				printf("Image %s loaded sync successfully\n", file);
 			else
 			{

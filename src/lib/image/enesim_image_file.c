@@ -33,11 +33,11 @@ typedef struct _Enesim_Image_File_Data
 	Enesim_Image_Data *data;
 } Enesim_Image_File_Data;
 
-static void _enesim_image_file_cb(Enesim_Surface *s, void *user_data, int error)
+static void _enesim_image_file_cb(Enesim_Buffer *b, void *user_data, int error)
 {
 	Enesim_Image_File_Data *fdata = user_data;
 
-	fdata->cb(s, fdata->user_data, error);
+	fdata->cb(b, fdata->user_data, error);
 	enesim_image_data_free(fdata->data);
 }
 
@@ -122,14 +122,13 @@ EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Ene
  *
  * @param file The image file to load
  * @param s The surface to write the image pixels to. It must not be NULL.
- * @param f The desired format the image should be converted to
  * @param mpool The mempool that will create the surface in case the surface
  * reference is NULL
  * @param options Any option the emage provider might require
  * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Surface **s,
-		Enesim_Format f, Enesim_Pool *mpool, const char *options)
+EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
+		Enesim_Pool *mpool, const char *options)
 {
 	Enesim_Image_Data *data;
 	Eina_Bool ret;
@@ -137,7 +136,7 @@ EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Surface **s,
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = enesim_image_load(data, mime, s, f, mpool, options);
+	ret = enesim_image_load(data, mime, b, mpool, options);
 	enesim_image_data_free(data);
 	return ret;
 }
@@ -146,16 +145,15 @@ EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Surface **s,
  *
  * @param file The image file to load
  * @param s The surface to write the image pixels to. It must not be NULL.
- * @param f The desired format the image should be converted to
  * @param mpool The mempool that will create the surface in case the surface
  * reference is NULL
  * @param cb The function that will get called once the load is done
  * @param data User provided data
  * @param options Any option the emage provider might require
  */
-EAPI void enesim_image_file_load_async(const char *file, Enesim_Surface *s,
-		Enesim_Format f, Enesim_Pool *mpool,
-		Enesim_Image_Callback cb, void *user_data, const char *options)
+EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
+		Enesim_Pool *mpool, Enesim_Image_Callback cb,
+		void *user_data, const char *options)
 {
 	Enesim_Image_Data *data;
 	Enesim_Image_File_Data fdata;
@@ -170,17 +168,17 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Surface *s,
 	fdata.user_data = user_data;
 	fdata.data = data;
 
-	enesim_image_load_async(data, mime, s, f, mpool, _enesim_image_file_cb, &fdata, options);
+	enesim_image_load_async(data, mime, b, mpool, _enesim_image_file_cb, &fdata, options);
 }
 /**
  * Save an image file synchronously
  *
  * @param file The image file to save
- * @param s The surface to read the image pixels from. It must not be NULL.
+ * @param b The surface to read the image pixels from. It must not be NULL.
  * @param options Any option the emage provider might require
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Surface *s, const char *options)
+EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const char *options)
 {
 	Enesim_Image_Data *data;
 	Eina_Bool ret;
@@ -188,7 +186,7 @@ EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Surface *s, const
 
 	if (!_file_save_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = enesim_image_save(data, mime, s, options);
+	ret = enesim_image_save(data, mime, b, options);
 	enesim_image_data_free(data);
 	return ret;
 }
@@ -196,13 +194,13 @@ EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Surface *s, const
  * Save an image file asynchronously
  *
  * @param file The image file to save
- * @param s The surface to read the image pixels from. It must not be NULL.
+ * @param b The surface to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
  * @param data User provided data
  * @param options Any option the emage provider might require
  *
  */
-EAPI void enesim_image_file_save_async(const char *file, Enesim_Surface *s, Enesim_Image_Callback cb,
+EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
 	Enesim_Image_Data *data;
@@ -218,5 +216,5 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Surface *s, Enes
 	fdata.user_data = user_data;
 	fdata.data = data;
 
-	enesim_image_save_async(data, mime, s, _enesim_image_file_cb, &fdata, options);
+	enesim_image_save_async(data, mime, b, _enesim_image_file_cb, &fdata, options);
 }

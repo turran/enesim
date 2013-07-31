@@ -7,6 +7,7 @@
 	{								\
 		Enesim_Renderer *r;					\
 		Enesim_Surface *s;					\
+		Enesim_Buffer *b;					\
 		Enesim_Log *error = NULL;				\
 		Eina_Rectangle bounds;					\
 									\
@@ -14,15 +15,18 @@
 									\
 		r = name();						\
 		enesim_renderer_destination_bounds(r, &bounds, 0, 0);	\
-		printf("bounds %" EINA_EXTRA_RECTANGLE_FORMAT "\n", 		\
-				EINA_EXTRA_RECTANGLE_ARGS(&bounds)); \
+		printf("bounds %" EINA_EXTRA_RECTANGLE_FORMAT "\n", 	\
+				EINA_EXTRA_RECTANGLE_ARGS(&bounds)); 	\
 		s = enesim_surface_new(ENESIM_FORMAT_ARGB8888,		\
 				256, 256);				\
 		if (!enesim_renderer_draw(r, s, NULL, 0, 0, &error))	\
 		{							\
 			enesim_log_dump(error);			\
 		}							\
-		enesim_image_file_save(#name ".png", s, NULL);		\
+		b = enesim_surface_buffer_get(s);			\
+		enesim_image_file_save(#name ".png", b, NULL);		\
+		enesim_buffer_unref(b);					\
+		enesim_surface_unref(s);				\
 		enesim_renderer_unref(r);				\
 									\
 		enesim_shutdown();					\

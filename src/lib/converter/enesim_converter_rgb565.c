@@ -26,13 +26,13 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static void _2d_rgb565_none_argb8888(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		void *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED,
-		size_t spitch)
+static void _2d_rgb565_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
+		Enesim_Buffer_Sw_Data *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED)
 {
 	uint16_t *dst = data->rgb565.plane0;
-	uint32_t *src = sdata;
+	uint32_t *src = sdata->argb8888_pre.plane0;
 	size_t dpitch = data->rgb565.plane0_stride;
+	size_t spitch = data->argb8888_pre.plane0_stride / 4;
 
 	while (dh--)
 	{
@@ -57,9 +57,9 @@ void enesim_converter_rgb565_init(void)
 {
 	/* TODO check if the cpu is the host */
 	enesim_converter_surface_register(
-			ENESIM_CONVERTER_2D(_2d_rgb565_none_argb8888),
+			ENESIM_CONVERTER_2D(_2d_rgb565_none_argb8888_pre),
 			ENESIM_BUFFER_FORMAT_RGB565,
 			ENESIM_ANGLE_0,
-			ENESIM_FORMAT_ARGB8888);
+			ENESIM_BUFFER_FORMAT_ARGB8888_PRE);
 }
 

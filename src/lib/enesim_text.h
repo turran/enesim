@@ -23,8 +23,6 @@
  * @defgroup Enesim_Text_Group Text
  * @brief Text definition and operations
  * @todo
- * - Split the renderer into different types of renderers:
- *   - span renderer
  * - Move the actual font/face loader into a submodule that should fill a common structure
  *   - freetype
  *   - move our own loader from efl-research here, for legacy code

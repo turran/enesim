@@ -99,20 +99,6 @@ static void _png_flush(png_structp png_ptr EINA_UNUSED)
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _png_saveable(const char *file)
-{
-	char *d;
-
-	d = strrchr(file, '.');
-	if (!d) return EINA_FALSE;
-
-	d++;
-	if (!strcasecmp(d, "png"))
-		return EINA_TRUE;
-
-	return EINA_FALSE;
-}
-
 static Eina_Error _png_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
 {
 	png_uint_32 w32, h32;
@@ -270,11 +256,11 @@ error_read_struct:
 	return ENESIM_IMAGE_ERROR_LOADING;
 }
 
-static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *options EINA_UNUSED)
+static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Buffer *b, void *options EINA_UNUSED)
 {
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
-	Eina_Rectangle rect;
+	Eina_Bool convert = EINA_FALSE;;
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_bytep row_ptr;
@@ -295,10 +281,20 @@ static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	if (setjmp(png_jmpbuf(png_ptr)))
 		goto error_jmp;
 
-	enesim_surface_size_get(s, &w, &h);
-	buffer = enesim_buffer_new(ENESIM_BUFFER_FORMAT_ARGB8888, w, h);
-	if (!buffer)
-		goto error_jmp;
+	enesim_buffer_size_get(b, &w, &h);
+	/* The save process converts the input buffer into an argb8888 one */
+	if (enesim_buffer_format_get(b) != ENESIM_BUFFER_FORMAT_ARGB8888)
+	{
+		buffer = enesim_buffer_new(ENESIM_BUFFER_FORMAT_ARGB8888, w, h);
+		if (!buffer)
+			goto error_jmp;
+		convert = EINA_TRUE;
+	}
+	else
+	{
+		buffer = b;
+		convert = EINA_FALSE;
+	}
 
 	png_set_write_fn(png_ptr,(png_voidp)data, _png_write, _png_flush);
 	png_set_IHDR(png_ptr, info_ptr, w, h, 8,
@@ -320,8 +316,12 @@ static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	png_set_shift(png_ptr, &sig_bit);
 	png_set_packing(png_ptr);
 	/* fill the buffer data */
-	eina_rectangle_coords_from(&rect, 0, 0, w, h);
-	enesim_converter_surface(s, buffer, ENESIM_ANGLE_0, &rect, 0, 0);
+	if (convert)
+	{
+		Eina_Rectangle rect;
+		eina_rectangle_coords_from(&rect, 0, 0, w, h);
+		enesim_converter_buffer(b, buffer, ENESIM_ANGLE_0, &rect, 0, 0);
+	}
 	enesim_buffer_data_get(buffer, &cdata);
 	row_ptr = (png_bytep) cdata.argb8888.plane0;
 	for (y = 0; y < h; y++)
@@ -332,7 +332,8 @@ static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Surface *s, void *opt
 	png_write_end(png_ptr, info_ptr);
 	png_destroy_write_struct(&png_ptr, (png_infopp) & info_ptr);
 	png_destroy_info_struct(png_ptr, (png_infopp) & info_ptr);
-	enesim_buffer_unref(buffer);
+	if (convert)
+		enesim_buffer_unref(buffer);
 
 	return EINA_TRUE;
 
@@ -349,7 +350,7 @@ static Enesim_Image_Provider_Descriptor _provider = {
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,
-	/* .saveable = 		*/ _png_saveable,
+	/* .saveable = 		*/ NULL,
 	/* .info_get = 		*/ _png_info_load,
 	/* .load = 		*/ _png_load,
 	/* .save = 		*/ _png_save,

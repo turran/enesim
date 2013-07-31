@@ -21,6 +21,12 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_log.h"
+#include "enesim_matrix.h"
+#include "enesim_renderer.h"
+#include "enesim_renderer_importer.h"
 
 #include "enesim_pool_private.h"
 #include "enesim_buffer_private.h"
@@ -110,14 +116,26 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
 
 	buf_fmt = enesim_buffer_format_get(buffer);
 	if (!_buffer_format_to_format(buf_fmt, &fmt))
-		return NULL;
+	{
+		Enesim_Renderer *importer;
+		int w, h;
 
-	s = calloc(1, sizeof(Enesim_Surface));
-	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
-	s->format = fmt;
-	s->buffer = enesim_buffer_ref(buffer);
-	s = enesim_surface_ref(s);
-
+		enesim_buffer_size_get(buffer, &w, &h);
+		s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
+				w, h, buffer->pool);
+		importer = enesim_renderer_importer_new();
+		enesim_renderer_importer_buffer_set(importer, buffer);
+		enesim_renderer_draw(importer, s, NULL, 0, 0, NULL);
+		enesim_renderer_unref(importer);
+	}
+	else
+	{
+		s = calloc(1, sizeof(Enesim_Surface));
+		EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
+		s->format = fmt;
+		s->buffer = enesim_buffer_ref(buffer);
+		s = enesim_surface_ref(s);
+	}
 	return s;
 }
 

@@ -32,17 +32,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static void _provider_data_convert(Enesim_Buffer *buffer,
-		uint32_t w EINA_UNUSED, uint32_t h EINA_UNUSED, Enesim_Surface *s)
-{
-	Enesim_Renderer *importer;
-
-	importer = enesim_renderer_importer_new();
-	enesim_renderer_importer_buffer_set(importer, buffer);
-	enesim_renderer_draw(importer, s, NULL, 0, 0, NULL);
-	enesim_renderer_unref(importer);
-}
-
 static Eina_Error _provider_info_load(Enesim_Image_Provider *p, Enesim_Image_Data *data,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
@@ -84,17 +73,14 @@ static void _provider_options_free(Enesim_Image_Provider *p, void *options)
 		p->d->options_free(options);
 }
 
-static Eina_Bool _provider_data_load(Enesim_Image_Provider *p, Enesim_Image_Data *data,
-		Enesim_Surface **s, Enesim_Format f, Enesim_Pool *mpool,
-		void *options,
-		Eina_Error *err)
+static Eina_Bool _provider_data_load(Enesim_Image_Provider *p,
+		Enesim_Image_Data *data, Enesim_Buffer **b, Enesim_Pool *mpool,
+		void *options, Eina_Error *err)
 {
 	Enesim_Buffer_Format cfmt;
-	Enesim_Buffer *buffer;
-	Enesim_Surface *ss = *s;
-	Eina_Error error;
+	Enesim_Buffer *bb = *b;
 	Eina_Bool owned = EINA_FALSE;
-	Eina_Bool import = EINA_FALSE;
+	Eina_Error error;
 	int w, h;
 
 	error = _provider_info_load(p, data, &w, &h, &cfmt, options);
@@ -102,54 +88,52 @@ static Eina_Bool _provider_data_load(Enesim_Image_Provider *p, Enesim_Image_Data
 	{
 		goto info_err;
 	}
-	if (!ss)
+	if (!bb)
 	{
-		ss = enesim_surface_new_pool_from(f, w, h, mpool);
-		if (!ss)
+		/* create a new buffer in case the user does not provided
+		 * one
+		 */
+		bb = enesim_buffer_new_pool_from(cfmt, w, h, mpool);
+		if (!bb)
 		{
 			error = ENESIM_IMAGE_ERROR_ALLOCATOR;
 			goto surface_err;
 		}
 		owned = EINA_TRUE;
 	}
-
-	if (cfmt == ENESIM_BUFFER_FORMAT_ARGB8888_PRE || cfmt == ENESIM_BUFFER_FORMAT_A8)
-	{
-		buffer = enesim_surface_buffer_get(ss);
-	}
 	else
 	{
-		/* create a buffer of format cfmt where the provider will fill */
-		buffer = enesim_buffer_new_pool_from(cfmt, w, h, mpool);
-		if (!buffer)
+		Enesim_Buffer_Format fmt;
+		int bw, bh;
+		/* otherwise check that the provided buffer is ok */
+		fmt = enesim_buffer_format_get(bb);
+		if (cfmt != fmt)
 		{
-			error = ENESIM_IMAGE_ERROR_ALLOCATOR;
-			goto buffer_err;
+			error = ENESIM_IMAGE_ERROR_FORMAT;
+			goto surface_err;
 		}
-		import = EINA_TRUE;
+		enesim_buffer_size_get(bb, &bw, &bh);
+		if (bw != w || bh != h)
+		{
+			error = ENESIM_IMAGE_ERROR_SIZE;
+			goto surface_err;
+		}
 	}
 
 	/* load the data */
 	enesim_image_data_reset(data);
-	error = p->d->load(data, buffer, options);
+	error = p->d->load(data, bb, options);
 	if (error)
 	{
 		goto load_err;
 	}
-	if (import)
-	{
-		/* convert */
-		_provider_data_convert(buffer, w, h, ss);
-	}
 
-	*s = ss;
+	*b = bb;
 	return EINA_TRUE;
 
 load_err:
-	enesim_buffer_unref(buffer);
-buffer_err:
 	if (owned)
-		enesim_surface_unref(ss);
+		enesim_buffer_unref(bb);
 surface_err:
 info_err:
 	*err = error;
@@ -157,12 +141,12 @@ info_err:
 }
 
 static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Image_Data *data,
-		Enesim_Surface *s, Eina_Error *err)
+		Enesim_Buffer *b, void *options, Eina_Error *err)
 {
 	/* save the data */
 	if (!p->d->save) return EINA_FALSE;
 
-	if (p->d->save(data, s, NULL) == EINA_FALSE)
+	if (p->d->save(data, b, options) == EINA_FALSE)
 	{
 		*err = ENESIM_IMAGE_ERROR_SAVING;
 		return EINA_FALSE;
@@ -173,6 +157,13 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Image_Data
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Loads the info of an image
+ * @param[in] data The image data to load the info from
+ * @param[out] w The width of the image
+ * @param[out] h The height of the image
+ * @param[out] sftm The format of the image
+ */
 EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
 	Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
@@ -190,9 +181,12 @@ EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
 	return EINA_TRUE;
 }
 
+/**
+ * @brief Loads an image
+ */
 EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
-		Enesim_Image_Data *data, Enesim_Surface **s,
-		Enesim_Format f, Enesim_Pool *mpool, const char *options)
+		Enesim_Image_Data *data, Enesim_Buffer **b,
+		Enesim_Pool *mpool, const char *options)
 {
 	Eina_Error err = 0;
 	Eina_Bool ret = EINA_TRUE;
@@ -204,7 +198,7 @@ EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
 		return EINA_FALSE;
 	}
 	_provider_options_parse(thiz, options, &op);
-	if (!_provider_data_load(thiz, data, s, f, mpool, op, &err))
+	if (!_provider_data_load(thiz, data, b, mpool, op, &err))
 	{
 		eina_error_set(err);
 		ret = EINA_FALSE;
@@ -213,21 +207,27 @@ EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
 	return ret;
 }
 
+/**
+ * @brief Saves an image
+ */
 EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
-		Enesim_Image_Data *data, Enesim_Surface *s,
+		Enesim_Image_Data *data, Enesim_Buffer *b,
 		const char *options EINA_UNUSED)
 {
 	Eina_Error err = 0;
+	void *op = NULL;
 
 	if (!thiz)
 	{
 		eina_error_set(ENESIM_IMAGE_ERROR_PROVIDER);
 		return EINA_FALSE;
 	}
-	if (!_provider_data_save(thiz, data, s, &err))
+	_provider_options_parse(thiz, options, &op);
+	if (!_provider_data_save(thiz, data, b, op, &err))
 	{
 		eina_error_set(err);
 		return EINA_FALSE;
 	}
+	_provider_options_free(thiz, op);
 	return EINA_TRUE;
 }

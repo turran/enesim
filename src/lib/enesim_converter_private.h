@@ -18,12 +18,9 @@
 #ifndef CONVERTER_H_
 #define CONVERTER_H_
 
-typedef void (*Enesim_Converter_2D)(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
-		void *sdata, uint32_t sw, uint32_t sh, size_t spitch);
+typedef void (*Enesim_Converter_2D)(Enesim_Buffer_Sw_Data *ddata, uint32_t dw, uint32_t dh,
+		Enesim_Buffer_Sw_Data *sdata, uint32_t sw, uint32_t sh);
 
-typedef void (*Enesim_Converter_1D)(Enesim_Buffer_Sw_Data *data, uint32_t len, void *sdata);
-
-#define ENESIM_CONVERTER_1D(f) ((Enesim_Converter_1D)(f))
 #define ENESIM_CONVERTER_2D(f) ((Enesim_Converter_2D)(f))
 
 void enesim_converter_init(void);
@@ -35,14 +32,10 @@ void enesim_converter_bgr888_init(void);
 void enesim_converter_rgb565_init(void);
 void enesim_converter_a8_init(void);
 
-EAPI void enesim_converter_span_register(Enesim_Converter_1D cnv,
-		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt);
-EAPI void enesim_converter_surface_register(Enesim_Converter_2D cnv,
-		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Format sfmt);
+void enesim_converter_surface_register(Enesim_Converter_2D cnv,
+		Enesim_Buffer_Format dfmt, Enesim_Angle angle, Enesim_Buffer_Format sfmt);
 
-EAPI Enesim_Converter_1D enesim_converter_span_get(Enesim_Buffer_Format dfmt,
-		Enesim_Angle angle, Enesim_Format f);
-EAPI Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
-		Enesim_Angle angle, Enesim_Format f);
+Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
+		Enesim_Angle angle, Enesim_Buffer_Format sfmt);
 
 #endif
