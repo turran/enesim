@@ -201,3 +201,16 @@ void enesim_text_font_dump(Enesim_Text_Font *f, const char *path)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+#if 0
+
+EAPI Enesim_Text_Font * enesim_text_engine_font_ref(Enesim_Text_Font *thiz)
+{
+
+}
+
+EAPI void enesim_text_engine_font_unref(Enesim_Text_Font *thiz)
+{
+
+}
+
+#endif

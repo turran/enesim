@@ -1,5 +1,6 @@
 Enesim
 ======
++ Rename every enum to be part of its own system
 + Rename the enesim_image_data to enesim_io or enesim_stream_ as it makes more sense to split
   it from the image subsytem to be used on other places
 + Add the luminance format

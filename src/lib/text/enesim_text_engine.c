@@ -83,3 +83,15 @@ void enesim_text_engine_font_glyph_get(Enesim_Text_Engine *thiz,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+#if 0
+EAPI Enesim_Text_Font * enesim_text_engine_font_load_from_descriptrion(Enesim_Text_Engine *e, const char *description)
+{
+	/* TODO put here the fontconfig stuff */
+}
+
+EAPI Enesim_Text_Font * enesim_text_engine_font_load_from_file(Enesim_Text_Engine *e, const char *file, int size)
+{
+	/* TODO our old code */
+}
+
+#endif

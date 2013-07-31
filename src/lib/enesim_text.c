@@ -37,6 +37,19 @@ extern Enesim_Text_Engine_Descriptor enesim_text_freetype;
 #endif
 
 #if 0
+void enesim_text_cache_glyph_add(Enesim_Text_Glyph)
+{
+
+}
+
+void enesim_text_cache_clear()
+{
+
+}
+
+#endif
+
+#if 0
 /* TODO we need this for later, to create the cache for example */
 void enesim_text_init(void)
 {
@@ -94,3 +107,4 @@ Enesim_Text_Engine * enesim_text_engine_default_get(void)
 #endif
 	return NULL;
 }
+
