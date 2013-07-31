@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Transition_Group Transition
+ * @brief Rederer that blends two renderers
  * @ingroup Enesim_Renderer_Group
  * @{
  */

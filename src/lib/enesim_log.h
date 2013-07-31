@@ -19,6 +19,12 @@
 #define ENESIM_LOG_H_
 
 /**
+ * @defgroup Enesim_Log Log
+ * @brief Logging
+ * @{
+ */
+
+/**
  * @def ENESIM_LOG(err, fmt, ...)
  *
  * Calls enesim_log_add_parametric() with current file, function and line.
@@ -29,7 +35,7 @@
 
 /**
  * @typedef Enesim_Log
- * Abstract error type.
+ * Abstract log type.
  */
 typedef struct _Enesim_Log Enesim_Log;
 
@@ -37,6 +43,10 @@ EAPI Enesim_Log * enesim_log_add(Enesim_Log *error, const char *string);
 EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *log, const char *file, const char *function, int line, char *fmt, va_list args);
 EAPI void enesim_log_delete(Enesim_Log *log);
 EAPI void enesim_log_dump(const Enesim_Log *log);
+
+/**
+ * @}
+ */
 
 #endif
 

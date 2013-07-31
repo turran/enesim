@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Clipper_Group Clipper
+ * @brief Renderer that clips a source renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

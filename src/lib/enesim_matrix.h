@@ -38,27 +38,47 @@ typedef enum
 	ENESIM_MATRIX_TYPES
 } Enesim_Matrix_Type;
 
+/**
+ * @ingroup Enesim_Matrix_Float_Group
+ * Floating point matrix handler
+ */
 typedef struct _Enesim_Matrix
 {
 	double xx, xy, xz;
 	double yx, yy, yz;
 	double zx, zy, zz;
-} Enesim_Matrix; /**< Floating point matrix handler */
+} Enesim_Matrix;
 
+/**
+ * @ingroup Enesim_Matrix_Fixed_Group
+ * Fixed point matrix handler
+ */
 typedef struct _Enesim_F16p16_Matrix
 {
 	Eina_F16p16 xx, xy, xz;
 	Eina_F16p16 yx, yy, yz;
 	Eina_F16p16 zx, zy, zz;
-} Enesim_F16p16_Matrix; /**< Fixed point matrix handler */
+} Enesim_F16p16_Matrix;
 
+/**
+ * @ingroup Enesim_Matrix_Quad_Group
+ * Quadrangle handler
+ */
 typedef struct _Enesim_Quad
 {
 	double x0, y0;
 	double x1, y1;
 	double x2, y2;
 	double x3, y3;
-} Enesim_Quad; /**< Quadrangle handler */
+} Enesim_Quad;
+
+/**
+ * @}
+ * @defgroup Enesim_Matrix_Float_Group Floating point matrices
+ * @brief Floating point matrices operations
+ * @ingroup Enesim_Matrix_Group
+ * @{
+ */
 
 EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m);
 EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double c,
@@ -79,7 +99,6 @@ EAPI void enesim_matrix_translate(Enesim_Matrix *t, double tx, double ty);
 EAPI void enesim_matrix_scale(Enesim_Matrix *t, double sx, double sy);
 EAPI void enesim_matrix_rotate(Enesim_Matrix *t, double rad);
 EAPI void enesim_matrix_identity(Enesim_Matrix *t);
-EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m);
 
 EAPI double enesim_matrix_determinant(const Enesim_Matrix *m);
 EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar);
@@ -94,9 +113,26 @@ EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m, const Enesim_Quad *s
 EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m, const Enesim_Quad *q);
 EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m, const Enesim_Quad *q);
 
+/**
+ * @}
+ * @defgroup Enesim_Matrix_Fixed_Group Fixed point matrices
+ * @brief Fixed point matrices operations
+ * @ingroup Enesim_Matrix_Group
+ * @{
+ */
+
+EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m);
 EAPI void enesim_f16p16_matrix_compose(const Enesim_F16p16_Matrix *m1,
 		const Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
 EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix *m);
+
+/**
+ * @}
+ * @defgroup Enesim_Matrix_Quad_Group Quadrangles
+ * @brief Quadrangles operations
+ * @ingroup Enesim_Matrix_Group
+ * @{
+ */
 
 EAPI void enesim_quad_rectangle_to(const Enesim_Quad *q,
 		Enesim_Rectangle *r);

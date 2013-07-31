@@ -25,6 +25,12 @@
 #include "GL/glu.h"
 #include "GL/glext.h"
 
+/**
+ * @page Enesim_OpenGL_Page OpenGL Backend
+ * @file
+ * @brief Enesim OpenGL API
+ */
+
 EAPI Enesim_Pool * enesim_pool_opengl_new(void);
 EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h,
 		GLuint *texture, unsigned int num_textures);

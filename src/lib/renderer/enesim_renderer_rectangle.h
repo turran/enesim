@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Rectangle_Group Rectangle
+ * @brief Rectangle renderer
  * @ingroup Enesim_Renderer_Shape_Group
  * @{
  */

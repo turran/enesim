@@ -37,6 +37,7 @@ EAPI void enesim_image_dispatch(void);
 /**
  * @}
  * @defgroup Enesim_Image_Data_Group Data
+ * @brief Image data sources
  * @ingroup Enesim_Image_Group
  * @{
  */
@@ -57,6 +58,7 @@ EAPI Enesim_Image_Data * enesim_image_data_base64_new(Enesim_Image_Data *d);
 /**
  * @}
  * @defgroup Enesim_Image_Context Context
+ * @brief Asynchronous context
  * @ingroup Enesim_Image_Group
  * @{
  */
@@ -77,6 +79,7 @@ EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz);
 /**
  * @}
  * @defgroup Enesim_Image_Load_Save_Group Loading and Saving
+ * @brief Generic loading and saving using the main context
  * @ingroup Enesim_Image_Group
  * @{
  */
@@ -94,6 +97,13 @@ EAPI void enesim_image_save_async(Enesim_Image_Data *data, const char *mime,
 		Enesim_Buffer *b, Enesim_Image_Callback cb, void *user_data,
 		const char *options);
 
+/**
+ * @}
+ * @defgroup Enesim_Image_File_Group File based loading and saving
+ * @brief Generic file loading and saving using the main context
+ * @ingroup Enesim_Image_Group
+ * @{
+ */
 EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt);
 EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
 		Enesim_Pool *mpool, const char *options);
@@ -107,6 +117,7 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesi
 /**
  * @}
  * @defgroup Enesim_Image_Provider_Group Providers
+ * @brief Image format loader and saver provider
  * @ingroup Enesim_Image_Group
  * @{
  */
@@ -150,6 +161,7 @@ EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 /**
  * @}
  * @defgroup Enesim_Image_Finder_Group Finder
+ * @brief Image identification
  * @ingroup Enesim_Image_Group
  * @{
  */
@@ -169,6 +181,7 @@ EAPI void enesim_image_finder_unregister(Enesim_Image_Finder *f);
 /**
  * @}
  * @defgroup Enesim_Image_Misc_Group Misc
+ * @brief Helper functions related to images
  * @ingroup Enesim_Image_Group
  * @{
  */

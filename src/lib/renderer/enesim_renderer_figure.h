@@ -20,6 +20,7 @@
 /**
  * @}
  * @defgroup Enesim_Renderer_Figure_Group Figure
+ * @brief A figure composed of polygons renderer
  * @ingroup Enesim_Renderer_Shape_Group
  * @{
  */

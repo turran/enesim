@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Image_Group Image
+ * @brief Image based renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

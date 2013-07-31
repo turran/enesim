@@ -28,8 +28,8 @@
  *
  * @section backends Backends
  * - Software based
+ * - @ref Enesim_OpenGL_Page (alpha)
  * - OpenCL (experimental)
- * - OpenGL (alpha)
  *
  * @section dependencies Dependencies
  * - Eina

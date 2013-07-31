@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Proxy_Group Proxy
+ * @brief Renderer that renders another renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Line_Group Line
+ * @brief Line renderer
  * @ingroup Enesim_Renderer_Shape_Group
  * @{
  */

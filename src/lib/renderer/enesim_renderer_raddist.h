@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Raddist_Group Radial Distortion
+ * @brief Filters a source image using a barrel distortion
  * @ingroup Enesim_Renderer_Group
  * @{
  */

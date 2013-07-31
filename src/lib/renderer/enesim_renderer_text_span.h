@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Text_Span_Renderer_Group Text Span
+ * @brief Text span renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */
@@ -38,7 +39,6 @@ EAPI void enesim_renderer_text_span_size_set(Enesim_Renderer *r, unsigned int si
 EAPI void enesim_renderer_text_span_size_get(Enesim_Renderer *r, unsigned int *size);
 EAPI void enesim_renderer_text_span_max_ascent_get(Enesim_Renderer *r, int *masc);
 EAPI void enesim_renderer_text_span_max_descent_get(Enesim_Renderer *r, int *mdesc);
-EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r);
 
 /**
  * @}

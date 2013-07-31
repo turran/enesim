@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Grid_Group Grid
+ * @brief Grid pattern renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

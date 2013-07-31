@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Stripes_Group Stripes
+ * @brief Stripe pattern renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

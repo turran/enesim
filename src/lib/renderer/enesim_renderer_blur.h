@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Blur_Group Blur Filter
+ * @brief Blur filter renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

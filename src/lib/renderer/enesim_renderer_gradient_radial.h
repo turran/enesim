@@ -21,6 +21,7 @@
 /**
  * @}
  * @defgroup Enesim_Renderer_Gradient_Radial_Group Radial
+ * @brief Radial gradient
  * @ingroup Enesim_Renderer_Gradient_Group
  * @{
  */

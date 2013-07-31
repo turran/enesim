@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Shape_Group Shapes
+ * @brief Geometric shape renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

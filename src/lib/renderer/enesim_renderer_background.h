@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Background_Group Background
+ * @brief Generic color renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

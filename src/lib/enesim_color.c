@@ -32,7 +32,7 @@
 /**
  * @brief Transform the given premultiplied color to a ARGB one.
  *
- * @param argb The premultiplied color.
+ * @param c The premultiplied color.
  * @return the ARGB color.
  *
  * This function transforms the premultiplied color @p c to an ARGB one.

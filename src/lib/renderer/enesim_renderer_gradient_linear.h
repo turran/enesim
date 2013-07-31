@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Gradient_Linear_Group Linear
+ * @brief Linear gradient
  * @ingroup Enesim_Renderer_Gradient_Group
  * @{
  */

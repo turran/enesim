@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Compound_Group Compound
+ * @brief Renderer that contains other renderers
  * @ingroup Enesim_Renderer_Group
  * @{
  */

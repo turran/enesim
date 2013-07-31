@@ -21,7 +21,7 @@
 
 /**
  * @defgroup Enesim_Text_Group Text
- * @brief Text definition and operations
+ * @brief Text and font definitions and operations
  * @todo
  * - Move the actual font/face loader into a submodule that should fill a common structure
  *   - freetype

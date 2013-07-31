@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Checker_Group Checker
+ * @brief Checked pattern renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

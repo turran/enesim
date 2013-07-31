@@ -21,6 +21,7 @@
 /**
  * @}
  * @defgroup Enesim_Renderer_Path_Group Path
+ * @brief Path renderer
  * @ingroup Enesim_Renderer_Shape_Group
  * @{
  */

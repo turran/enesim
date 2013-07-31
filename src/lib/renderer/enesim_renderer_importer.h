@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Importer_Group Importer
+ * @brief Renderer that imports pixels from a buffer
  * @ingroup Enesim_Renderer_Group
  * @{
  */

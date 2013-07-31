@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Dispmap_Group Displacement Map
+ * @brief Renderer that displays source pixels using a map image
  * @ingroup Enesim_Renderer_Group
  * @{
  */

@@ -860,20 +860,6 @@ EAPI void enesim_renderer_text_span_max_descent_get(Enesim_Renderer *r, int *mde
 	*mdesc = enesim_text_font_max_descent_get(thiz->font);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	_enesim_renderer_text_span_font_generate(thiz);
-
-	return enesim_text_font_ref(thiz->font);
-}
-
 #if 0
 /**
  * TODO

@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Pattern_Group Pattern
+ * @brief Renderer that repeats an area of another renderer to form a pattern
  * @ingroup Enesim_Renderer_Group
  * @{
  */
