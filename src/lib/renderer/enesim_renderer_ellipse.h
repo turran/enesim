@@ -22,6 +22,7 @@
  * @defgroup Enesim_Renderer_Ellipse_Group Ellipse
  * @brief Ellipse renderer
  * @ingroup Enesim_Renderer_Shape_Group
+ * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void);
 

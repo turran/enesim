@@ -22,6 +22,7 @@
  * @defgroup Enesim_Renderer_Circle_Group Circle
  * @brief Circle renderer
  * @ingroup Enesim_Renderer_Shape_Group
+ * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void);
 EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x);
