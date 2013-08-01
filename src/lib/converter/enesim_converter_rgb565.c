@@ -31,8 +31,8 @@ static void _2d_rgb565_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t d
 {
 	uint16_t *dst = data->rgb565.plane0;
 	uint32_t *src = sdata->argb8888_pre.plane0;
-	size_t dpitch = data->rgb565.plane0_stride;
-	size_t spitch = data->argb8888_pre.plane0_stride / 4;
+	size_t dstride = data->rgb565.plane0_stride;
+	size_t sstride = data->argb8888_pre.plane0_stride / 4;
 
 	while (dh--)
 	{
@@ -46,8 +46,8 @@ static void _2d_rgb565_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t d
 			ssrc++;
 			ddst++;
 		}
-		dst += dpitch;
-		src += spitch;
+		dst += dstride;
+		src += sstride;
 	}
 }
 /*============================================================================*

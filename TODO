@@ -29,7 +29,6 @@ Enesim
   algorithm for other backends
 + Split the hswitch and transition common parts into a common transition renderer
   with properties as src, target and step, that's all
-+ Normalize the stride/pitch
 + Initialize every renderer to some sane vales
 + We need to use whenever possible functions for fixed point operations. This way later we can just
   create some #defines for them and we can easily change from 16.16 to 32.32 or stuff like that
@@ -46,7 +45,6 @@ Image
 
 Text
 ====
-+ Add fontconfig support
 + Add a path-follow-span, i.e a text span that can receive
   a shape and use that as the path to follow. We need more
   code on enesim to know whenever a renderer is of a specific

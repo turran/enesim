@@ -299,9 +299,9 @@ EAPI const char * enesim_format_name_get(Enesim_Format f)
  * @param[in] f The format.
  * @param[in] w The width.
  * @param[in] h The height.
- * @return The size in byte of a bitmap.
+ * @return The size in bytes of a bitmap.
  *
- * This function returns the size in byte of a bitmap of format @p f,
+ * This function returns the size in bytes of a bitmap of format @p f,
  * width @p w and @p height h. If the format is not valid or is not
  * supported, 0 is returned.
  */
@@ -322,19 +322,19 @@ EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h)
 }
 
 /**
- * @brief Return the pitch for a given format and width.
+ * @brief Return the stride for a given format and width.
  *
  * @param[in] fmt The format.
  * @param[in] w The width.
- * @return The pitch in byte.
+ * @return The stride in bytes.
  *
- * This function returns the pitch in byte of a bitmap of format @p fmt
+ * This function returns the stride in bytes of a bitmap of format @p fmt
  * and width @p w. If the format is not valid or is not supported, 0 is
  * returned.
  *
  * @note This function calls enesim_format_size_get() with 1 as height.
  */
-EAPI size_t enesim_format_pitch_get(Enesim_Format fmt, uint32_t w)
+EAPI size_t enesim_format_stride_get(Enesim_Format fmt, uint32_t w)
 {
 	return enesim_format_size_get(fmt, w, 1);
 }
