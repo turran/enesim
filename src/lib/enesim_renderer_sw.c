@@ -36,6 +36,7 @@
 #include "enesim_object_instance.h"
 
 #include "enesim_renderer_private.h"
+#include "enesim_surface_private.h"
 
 /**
  * @todo

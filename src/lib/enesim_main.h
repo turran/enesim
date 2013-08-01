@@ -66,6 +66,14 @@ typedef enum _Enesim_Priority
 	ENESIM_PRIORITY_PRIMARY = 256,
 } Enesim_Priority;
 
+typedef enum _Enesim_Channel
+{
+	ENESIM_CHANNEL_RED,
+	ENESIM_CHANNEL_GREEN,
+	ENESIM_CHANNEL_BLUE,
+	ENESIM_CHANNEL_ALPHA,
+	ENESIM_CHANNELS,
+} Enesim_Channel;
 
 /**
  * Surface formats
