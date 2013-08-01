@@ -24,6 +24,9 @@
 #include "enesim_text.h"
 
 #include "enesim_text_private.h"
+#ifdef HAVE_FONTCONFIG
+#include <fontconfig/fontconfig.h>
+#endif
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -32,10 +35,6 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-#if HAVE_FREETYPE
-extern Enesim_Text_Engine_Descriptor enesim_text_freetype;
-#endif
-
 #if 0
 void enesim_text_cache_glyph_add(Enesim_Text_Glyph)
 {
@@ -49,62 +48,21 @@ void enesim_text_cache_clear()
 
 #endif
 
-#if 0
-/* TODO we need this for later, to create the cache for example */
 void enesim_text_init(void)
 {
-
+	enesim_text_engine_freetype_init();
+#ifdef HAVE_FONTCONFIG
+	FcInit();
+#endif
 }
 
 void enesim_text_shutdown(void)
 {
-
-}
+#ifdef HAVE_FONTCONFIG
+	FcFini();
 #endif
+	enesim_text_engine_freetype_shutdown();
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- * TODO change this to _get()
- * add a refcount and on deletion check that
- */
-EAPI Enesim_Text_Engine * enesim_text_freetype_get(void)
-{
-#if HAVE_FREETYPE
-	static Enesim_Text_Engine *e = NULL;
-
-	if (!e)
-	{
-		e = enesim_text_engine_new(&enesim_text_freetype);
-	}
-	return e;
-#else
-	return NULL;
-#endif
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- * FIXME: remove this!
- */
-EAPI void enesim_text_engine_delete(Enesim_Text_Engine *e)
-{
-#if HAVE_FREETYPE
-	e->d->shutdown(e->data);
-#endif
-}
-
-/**
- *
- */
-Enesim_Text_Engine * enesim_text_engine_default_get(void)
-{
-#if HAVE_FREETYPE
-	return enesim_text_freetype_get();
-#endif
-	return NULL;
-}
-

@@ -52,11 +52,9 @@ typedef struct _Enesim_Renderer_Text_Span_State
 	/* our current smart text buffer */
 	Enesim_Text_Buffer *buffer;
 	struct {
-		unsigned int size;
-		char *font_name;
+		Enesim_Text_Font *font;
 	} current, past;
 	Eina_Bool changed : 1;
-	Eina_Bool font_loaded : 1;
 	Eina_Bool buffer_changed : 1;
 	Eina_Bool glyphs_generated : 1;
 } Enesim_Renderer_Text_Span_State;
@@ -67,7 +65,6 @@ typedef struct _Enesim_Renderer_Text_Span
 	Enesim_Renderer_Text_Span_State state;
 	Enesim_Text_Direction direction;
 	Enesim_Text_Engine *engine;
-	Enesim_Text_Font *font;
 	/* sw drawing */
 	Enesim_F16p16_Matrix matrix;
 	/* span geometry */
@@ -87,35 +84,18 @@ static Eina_Bool _enesim_renderer_text_span_font_changed(Enesim_Renderer_Text_Sp
 	if (!thiz->state.changed)
 		return EINA_FALSE;
 	/* check that the current state is different from the past state */
-	if (thiz->state.current.size != thiz->state.past.size)
-	{
+	if (thiz->state.current.font != thiz->state.past.font)
 		return EINA_TRUE;
-	}
-	if ((thiz->state.current.font_name != thiz->state.past.font_name) ||
-			(strcmp(thiz->state.current.font_name,
-			thiz->state.past.font_name)))
-	{
-		return EINA_TRUE;
-	}
 	return EINA_FALSE;
 }
 
 static void _enesim_renderer_text_span_font_generate(Enesim_Renderer_Text_Span *thiz)
 {
 	/* first do the setup of the fonts */
-	if (_enesim_renderer_text_span_font_changed(thiz) && !thiz->state.font_loaded)
+	if (_enesim_renderer_text_span_font_changed(thiz))
 	{
-		if (thiz->font)
-		{
-			enesim_text_font_unref(thiz->font);
-			thiz->font = NULL;
-		}
-		if (thiz->state.current.font_name && thiz->state.current.size)
-		{
-			thiz->font = enesim_text_font_load(thiz->engine, thiz->state.current.font_name, thiz->state.current.size);
-		}
 		thiz->state.changed = EINA_FALSE;
-		thiz->state.font_loaded = EINA_TRUE;
+		thiz->state.glyphs_generated = EINA_FALSE;
 	}
 }
 
@@ -131,14 +111,14 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_changed(Enesim_Renderer_Text_
  */
 static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text_Span *thiz)
 {
-	if (!thiz->font)
+	if (!thiz->state.current.font)
 	{
 		return EINA_FALSE;
 	}
 	/* we dont take into account the buffer_changed, given that we set it
 	 * to true everytime we clear it
 	 */
-	if (enesim_text_buffer_smart_is_dirty(thiz->state.buffer) && !thiz->state.glyphs_generated)
+	if (enesim_text_buffer_smart_is_dirty(thiz->state.buffer) || !thiz->state.glyphs_generated)
 	{
 		const char *text;
 		const char *c;
@@ -155,7 +135,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		{
 			Enesim_Text_Glyph *g;
 
-			g = enesim_text_font_glyph_load(thiz->font, *c);
+			g = enesim_text_font_glyph_load(thiz->state.current.font, *c);
 			if (!g) continue;
 			/* calculate the max len */
 			width += g->x_advance;
@@ -166,7 +146,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			Enesim_Text_Glyph *g;
 
 			last = *(text + len - 1);
-			g = enesim_text_font_glyph_load(thiz->font, last);
+			g = enesim_text_font_glyph_load(thiz->state.current.font, last);
 			if (g && g->surface)
 			{
 				int w, h;
@@ -176,8 +156,8 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			}
 		}
 		/* set our own bounds */
-		masc = enesim_text_font_max_ascent_get(thiz->font);
-		mdesc = enesim_text_font_max_descent_get(thiz->font);
+		masc = enesim_text_font_max_ascent_get(thiz->state.current.font);
+		mdesc = enesim_text_font_max_descent_get(thiz->state.current.font);
 		//printf("masc %d mdesc %d\n", masc, mdesc);
 		thiz->width = width;
 		thiz->height = masc + mdesc;
@@ -302,7 +282,7 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 	/* setup the affine coordinates */
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 
-	font = thiz->font;
+	font = thiz->state.current.font;
 	if (!font)
 	{
 		/* weird case ... it might be related to the multiple threads */
@@ -380,7 +360,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	if (color != 0xffffffff)
 		fcolor = argb8888_mul4_sym(color, fcolor);
 
-	font = thiz->font;
+	font = thiz->state.current.font;
 	if (!font)
 	{
 		/* weird case ... it might be related to the multiple threads */
@@ -478,7 +458,7 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 	}
 
 #if 0
-	enesim_text_font_dump(thiz->font, "/tmp/");
+	enesim_text_font_dump(thiz->state.current.font, "/tmp/");
 #endif
 
 	return EINA_TRUE;
@@ -491,16 +471,15 @@ static void _enesim_renderer_text_span_sw_cleanup(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	/* swap the states */
-	if (thiz->state.past.font_name)
+	if (thiz->state.past.font)
 	{
-		free(thiz->state.past.font_name);
-		thiz->state.past.font_name = NULL;
+		enesim_text_font_unref(thiz->state.past.font);
+		thiz->state.past.font = NULL;
 	}
-	if (thiz->state.current.font_name)
+	if (thiz->state.current.font)
 	{
-		thiz->state.past.font_name = strdup(thiz->state.current.font_name);
+		thiz->state.past.font = enesim_text_font_ref(thiz->state.current.font);
 	}
-	thiz->state.past.size = thiz->state.current.size;
 	/* clear the text buffer */
 	enesim_text_buffer_smart_clear(thiz->state.buffer);
 	/* clear our flags */
@@ -612,20 +591,15 @@ static void _enesim_renderer_text_span_instance_deinit(void *o)
 	Enesim_Renderer_Text_Span *thiz;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(o);
-	if (thiz->state.past.font_name)
+	if (thiz->state.current.font)
 	{
-		free(thiz->state.past.font_name);
-		thiz->state.past.font_name = NULL;
+		enesim_text_font_unref(thiz->state.current.font);
+		thiz->state.current.font = NULL;
 	}
-	if (thiz->state.current.font_name)
+	if (thiz->state.past.font)
 	{
-		free(thiz->state.current.font_name);
-		thiz->state.current.font_name = NULL;
-	}
-	if (thiz->font)
-	{
-		enesim_text_font_unref(thiz->font);
-		thiz->font = NULL;
+		free(thiz->state.past.font);
+		thiz->state.past.font = NULL;
 	}
 	if (thiz->state.buffer)
 	{
@@ -771,93 +745,33 @@ EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_T
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_text_span_font_name_set(Enesim_Renderer *r, const char *font)
+EAPI void enesim_renderer_text_span_font_get(Enesim_Renderer *r, Enesim_Text_Font **font)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
 	if (!font) return;
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	if (!thiz) return;
-	if (thiz->state.current.font_name) free(thiz->state.current.font_name);
-	thiz->state.current.font_name = strdup(font);
+	if (thiz->state.current.font)
+		*font = enesim_text_font_ref(thiz->state.current.font);
+	else
+		*font = NULL;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Font *font)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	if (!thiz) return;
+	if (thiz->state.current.font)
+		enesim_text_font_unref(thiz->state.current.font);
+	thiz->state.current.font = font;
 	thiz->state.changed = EINA_TRUE;
-	thiz->state.font_loaded = EINA_FALSE;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_text_span_font_name_get(Enesim_Renderer *r, const char **font)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	if (!font) return;
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-	*font = thiz->state.current.font_name;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_text_span_size_set(Enesim_Renderer *r, unsigned int size)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-
-	thiz->state.current.size = size;
-	thiz->state.changed = EINA_TRUE;
-	thiz->state.font_loaded = EINA_FALSE;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_text_span_size_get(Enesim_Renderer *r, unsigned int *size)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-
-	*size = thiz->state.current.size;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_text_span_max_ascent_get(Enesim_Renderer *r, int *masc)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	*masc = 0;
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-	_enesim_renderer_text_span_font_generate(thiz);
-	if (!thiz->font) return;
-	*masc = enesim_text_font_max_ascent_get(thiz->font);
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_text_span_max_descent_get(Enesim_Renderer *r, int *mdesc)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	*mdesc = 0;
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-	_enesim_renderer_text_span_font_generate(thiz);
-	if (!thiz->font) return;
-	*mdesc = enesim_text_font_max_descent_get(thiz->font);
 }
 
 #if 0

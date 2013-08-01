@@ -24,6 +24,9 @@
 
 #include "libargb.h"
 
+/* freetype engine */
+void enesim_text_engine_freetype_init(void);
+void enesim_text_engine_freetype_shutdown(void);
 
 /* text buffer interface */
 typedef void (*Enesim_Text_Buffer_String_Set)(void *data, const char *string, int length);
@@ -47,6 +50,15 @@ Enesim_Text_Buffer * enesim_text_buffer_new_from_descriptor(Enesim_Text_Buffer_D
 void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz);
 
 /* font interface */
+struct _Enesim_Text_Font
+{
+	Enesim_Text_Engine *engine;
+	void *data;
+	Eina_Hash *glyphs;
+	char *key;
+	int ref;
+};
+
 typedef struct _Enesim_Text_Glyph Enesim_Text_Glyph;
 typedef struct _Enesim_Text_Glyph_Position Enesim_Text_Glyph_Position;
 
@@ -67,44 +79,43 @@ struct _Enesim_Text_Glyph_Position
 	Enesim_Text_Glyph *glyph; /**< The glyph at this position */
 };
 
-/* engine interface */
-typedef void * Enesim_Text_Engine_Data;
-typedef void * Enesim_Text_Engine_Font_Data;
+Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *f, char c);
+Enesim_Text_Glyph * enesim_text_font_glyph_load(Enesim_Text_Font *f, char c);
+void enesim_text_font_glyph_unload(Enesim_Text_Font *f, char c);
 
+void enesim_text_font_dump(Enesim_Text_Font *f, const char *path);
+
+/* engine interface */
 typedef struct _Enesim_Text_Engine_Descriptor
 {
 	/* main interface */
-	Enesim_Text_Engine_Data (*init)(void);
-	void (*shutdown)(Enesim_Text_Engine_Data data);
+	void *(*init)(void);
+	void (*shutdown)(void *data);
 	/* font interface */
-	Enesim_Text_Engine_Font_Data (*font_load)(Enesim_Text_Engine_Data data, const char *name, int size);
-	void (*font_delete)(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata);
-	int (*font_max_ascent_get)(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata);
-	int (*font_max_descent_get)(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata);
-	void (*font_glyph_get)(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g);
+	void *(*font_load)(void *data, const char *name, int index, int size);
+	void (*font_delete)(void *data, void *fdata);
+	int (*font_max_ascent_get)(void *data, void *fdata);
+	int (*font_max_descent_get)(void *data, void *fdata);
+	void (*font_glyph_get)(void *data, void *fdata, char c, Enesim_Text_Glyph *g);
 } Enesim_Text_Engine_Descriptor;
+
+Enesim_Text_Engine * enesim_text_engine_new(Enesim_Text_Engine_Descriptor *d);
+void enesim_text_engine_free(Enesim_Text_Engine *thiz);
+Enesim_Text_Font * enesim_text_engine_font_new(
+		Enesim_Text_Engine *thiz, const char *file, int index, int size);
+void enesim_text_engine_font_delete(Enesim_Text_Engine *thiz,
+		Enesim_Text_Font *f);
 
 /* main interface */
 struct _Enesim_Text_Engine
 {
 	Enesim_Text_Engine_Descriptor *d;
 	Eina_Hash *fonts;
-	Enesim_Text_Engine_Data data;
+	int ref;
+	void *data;
 };
 
-Enesim_Text_Engine * enesim_text_engine_new(Enesim_Text_Engine_Descriptor *d);
-void enesim_text_engine_free(Enesim_Text_Engine *thiz);
-
-Enesim_Text_Font * enesim_text_font_load(Enesim_Text_Engine *e, const char *name, int size);
-Enesim_Text_Font * enesim_text_font_ref(Enesim_Text_Font *f);
-void enesim_text_font_unref(Enesim_Text_Font *f);
-int enesim_text_font_max_ascent_get(Enesim_Text_Font *f);
-int enesim_text_font_max_descent_get(Enesim_Text_Font *f);
-
-Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *f, char c);
-Enesim_Text_Glyph * enesim_text_font_glyph_load(Enesim_Text_Font *f, char c);
-void enesim_text_font_glyph_unload(Enesim_Text_Font *f, char c);
-
-void enesim_text_font_dump(Enesim_Text_Font *f, const char *path);
+void enesim_text_init(void);
+void enesim_text_shutdown(void);
 
 #endif

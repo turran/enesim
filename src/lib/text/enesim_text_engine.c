@@ -30,6 +30,13 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_text
 
+static void * _enesim_text_engine_font_load(Enesim_Text_Engine *thiz,
+		const char *file, int index, int size)
+{
+	if (!thiz->d->font_load) return NULL;
+	return thiz->d->font_load(thiz->data, file, index, size);
+}
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -41,6 +48,8 @@ Enesim_Text_Engine * enesim_text_engine_new(Enesim_Text_Engine_Descriptor *d)
 	thiz->d = d;
 	thiz->data = thiz->d->init();
 	thiz->fonts = eina_hash_string_superfast_new(NULL);
+	thiz->ref = 1;
+
 	return thiz;
 }
 
@@ -51,47 +60,71 @@ void enesim_text_engine_free(Enesim_Text_Engine *thiz)
 	free(thiz);
 }
 
-Enesim_Text_Engine_Font_Data enesim_text_engine_font_load(
-		Enesim_Text_Engine *thiz, const char *name, int size)
+Enesim_Text_Font * enesim_text_engine_font_new(
+		Enesim_Text_Engine *thiz, const char *file, int index, int size)
 {
-	return thiz->d->font_load(thiz->data, name, size);
+	Enesim_Text_Font *f;
+	void *data;
+	char *key;
+
+	if (!file) return NULL;
+
+	key = eina_extra_str_dup_printf("%s-%d-%d", file, index, size);
+	f = eina_hash_find(thiz->fonts, key);
+	if (f)
+	{
+		enesim_text_font_ref(f);
+		free(key);
+		return f;
+	}
+	data = _enesim_text_engine_font_load(thiz, file, index, size);
+	if (!data)
+	{
+		free(key);
+		return NULL;
+	}
+
+	f = calloc(1, sizeof(Enesim_Text_Font));
+	f->engine = enesim_text_engine_ref(thiz);
+	f->data = data;
+	f->key = key;
+	f->glyphs = eina_hash_int32_new(NULL);
+	eina_hash_add(thiz->fonts, key, f);
+	enesim_text_font_ref(f);
+
+	return f;
 }
 
 void enesim_text_engine_font_delete(Enesim_Text_Engine *thiz,
-		Enesim_Text_Engine_Font_Data fdata)
+		Enesim_Text_Font *f)
 {
-	return thiz->d->font_delete(thiz->data, fdata);
+	thiz->d->font_delete(thiz->data, f->data);
+	eina_hash_del(thiz->fonts, f->key, f);
+	enesim_text_engine_unref(thiz);
+	free(f);
 }
 
-int enesim_text_engine_font_max_ascent_get(Enesim_Text_Engine *thiz,
-		Enesim_Text_Engine_Font_Data fdata)
-{
-	return thiz->d->font_max_ascent_get(thiz->data, fdata);
-}
-
-int enesim_text_engine_font_max_descent_get(Enesim_Text_Engine *thiz,
-		Enesim_Text_Engine_Font_Data fdata)
-{
-	return thiz->d->font_max_descent_get(thiz->data, fdata);
-}
-
-void enesim_text_engine_font_glyph_get(Enesim_Text_Engine *thiz,
-		Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g)
-{
-	thiz->d->font_glyph_get(thiz->data, fdata, c, g);
-}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-#if 0
-EAPI Enesim_Text_Font * enesim_text_engine_font_load_from_descriptrion(Enesim_Text_Engine *e, const char *description)
+EAPI Enesim_Text_Engine * enesim_text_engine_ref(Enesim_Text_Engine *thiz)
 {
-	/* TODO put here the fontconfig stuff */
+	if (!thiz) return NULL;
+	thiz->ref++;
+	return thiz;
 }
 
-EAPI Enesim_Text_Font * enesim_text_engine_font_load_from_file(Enesim_Text_Engine *e, const char *file, int size)
+EAPI void enesim_text_engine_unref(Enesim_Text_Engine *thiz)
 {
-	/* TODO our old code */
+	if (!thiz) return;
+	thiz->ref--;
+	if (!thiz->ref)
+	{
+		thiz->d->shutdown(thiz->data);
+	}
 }
 
-#endif
+Enesim_Text_Engine * enesim_text_engine_default_get(void)
+{
+	return enesim_text_engine_freetype_get();
+}

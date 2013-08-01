@@ -3,7 +3,7 @@ rm -f config.cache
 
 m4_define([v_maj], [0])
 m4_define([v_min], [0])
-m4_define([v_mic], [19])
+m4_define([v_mic], [20])
 m4_define([v_ver], [v_maj.v_min.v_mic])
 
 m4_define([lt_cur], m4_eval(v_maj + v_min))
@@ -146,6 +146,17 @@ esac
 ## Eina
 
 requirements_pc="eina-extra eina >= 1.0.0 ${requirements_pc}"
+
+## Fontconfig
+PKG_CHECK_EXISTS([fontconfig >= 2.4.2],
+   [
+    have_fontconfig="yes"
+    requirements_pc="${requirements_pc} fontconfig >= 2.4.2"
+    AC_DEFINE([HAVE_FONTCONFIG], [1], [Have support for fontconfig])
+   ],
+   [have_fontconfig="no"])
+
+AM_CONDITIONAL([HAVE_FONTCONFIG], [test "x${have_fontconfig}" = "xyes"])
 
 ## Freetype
 
@@ -453,6 +464,8 @@ echo "  Raw.......................................: ${build_module_raw}"
 echo
 echo "Font Engines:"
 echo "  Freetype..................................: ${have_freetype}"
+echo
+echo "Fontconfig..................................: ${have_fontconfig}"
 echo
 echo "Path Backends:"
 echo "  Enesim....................................: yes"

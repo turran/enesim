@@ -36,8 +36,9 @@
 
 typedef struct _Enesim_Text_Engine Enesim_Text_Engine;
 EAPI Enesim_Text_Engine * enesim_text_engine_default_get(void);
-EAPI Enesim_Text_Engine * enesim_text_freetype_get(void);
-EAPI void enesim_text_engine_delete(Enesim_Text_Engine *e);
+EAPI Enesim_Text_Engine * enesim_text_engine_freetype_get(void);
+EAPI Enesim_Text_Engine * enesim_text_engine_ref(Enesim_Text_Engine *thiz);
+EAPI void enesim_text_engine_unref(Enesim_Text_Engine *thiz);
 
 typedef enum _Enesim_Text_Direction
 {
@@ -53,7 +54,15 @@ typedef enum _Enesim_Text_Direction
  */
 
 typedef struct _Enesim_Text_Font Enesim_Text_Font;
-/* TODO export more font/glyph functions */
+EAPI Enesim_Text_Font * enesim_text_font_new_description_from(
+		Enesim_Text_Engine *e, const char *description,
+		int size);
+EAPI Enesim_Text_Font * enesim_text_font_new_file_from(
+		Enesim_Text_Engine *e, const char *file, int index, int size);
+EAPI Enesim_Text_Font * enesim_text_font_ref(Enesim_Text_Font *thiz);
+EAPI void enesim_text_font_unref(Enesim_Text_Font *thiz);
+EAPI int enesim_text_font_max_ascent_get(Enesim_Text_Font *thiz);
+EAPI int enesim_text_font_max_descent_get(Enesim_Text_Font *thiz);
 
 /**
  * @}

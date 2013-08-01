@@ -25,15 +25,20 @@
 #include "enesim_text.h"
 #include "enesim_text_private.h"
 
+#if HAVE_FREETYPE
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
+#endif
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_text
+static Enesim_Text_Engine *_engine = NULL;
 
+#if HAVE_FREETYPE
 typedef struct _Enesim_Text_Freetype
 {
 	FT_Library library;
@@ -89,7 +94,7 @@ static void _raster_callback(const int y,
  *                        The Enesim's text interface                         *
  *----------------------------------------------------------------------------*/
 
-static void * _enesim_text_freetype_init(void)
+static void * _enesim_text_engine_freetype_init(void)
 {
 	Enesim_Text_Freetype *thiz;
 
@@ -100,7 +105,7 @@ static void * _enesim_text_freetype_init(void)
 	return thiz;
 }
 
-static void _enesim_text_freetype_shutdown(void *data)
+static void _enesim_text_engine_freetype_shutdown(void *data)
 {
 	Enesim_Text_Freetype *thiz = data;
 
@@ -109,14 +114,14 @@ static void _enesim_text_freetype_shutdown(void *data)
 	free(thiz);
 }
 
-static Enesim_Text_Engine_Font_Data _enesim_text_freetype_font_load(Enesim_Text_Engine_Data data, const char *name, int size)
+static void *_enesim_text_engine_freetype_font_load(void *data, const char *name, int index, int size)
 {
 	Enesim_Text_Freetype *thiz = data;
 	FT_Face face;
 	FT_Error error;
 
 	eina_lock_take(&thiz->lock);
-	error = FT_New_Face(thiz->library, name, 0, &face);
+	error = FT_New_Face(thiz->library, name, index, &face);
 	if (error)
 	{
 		ERR("Error %d loading font '%s' with size %d", error, name, size);
@@ -129,7 +134,7 @@ static Enesim_Text_Engine_Font_Data _enesim_text_freetype_font_load(Enesim_Text_
 	return face;
 }
 
-static void _enesim_text_freetype_font_delete(Enesim_Text_Engine_Data data, Enesim_Text_Engine_Font_Data fdata)
+static void _enesim_text_engine_freetype_font_delete(void *data, void *fdata)
 {
 	Enesim_Text_Freetype *thiz = data;
 	FT_Face face = fdata;
@@ -139,7 +144,7 @@ static void _enesim_text_freetype_font_delete(Enesim_Text_Engine_Data data, Enes
 	eina_lock_release(&thiz->lock);
 }
 
-static int _enesim_text_freetype_font_max_ascent_get(Enesim_Text_Engine_Data data EINA_UNUSED, Enesim_Text_Engine_Font_Data fdata)
+static int _enesim_text_engine_freetype_font_max_ascent_get(void *data EINA_UNUSED, void *fdata)
 {
 	FT_Face face = fdata;
 	int asc;
@@ -154,7 +159,7 @@ static int _enesim_text_freetype_font_max_ascent_get(Enesim_Text_Engine_Data dat
 	return asc;
 }
 
-static int _enesim_text_freetype_font_max_descent_get(Enesim_Text_Engine_Data data EINA_UNUSED, Enesim_Text_Engine_Font_Data fdata)
+static int _enesim_text_engine_freetype_font_max_descent_get(void *data EINA_UNUSED, void *fdata)
 {
 	FT_Face face = fdata;
 	int desc;
@@ -169,7 +174,7 @@ static int _enesim_text_freetype_font_max_descent_get(Enesim_Text_Engine_Data da
 	return desc;
 }
 
-static void _enesim_text_freetype_glyph_get(Enesim_Text_Engine_Data edata, Enesim_Text_Engine_Font_Data fdata, char c, Enesim_Text_Glyph *g)
+static void _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, char c, Enesim_Text_Glyph *g)
 {
 	Enesim_Text_Freetype *thiz = edata;
 	FT_UInt gindex;
@@ -216,18 +221,47 @@ no_surface:
 	}
 	eina_lock_release(&thiz->lock);
 }
+
+static Enesim_Text_Engine_Descriptor _enesim_text_engine_freetype_descriptor  = {
+	/* .init 			= */ _enesim_text_engine_freetype_init,
+	/* .shutdown 			= */ _enesim_text_engine_freetype_shutdown,
+	/* .font_load 			= */ _enesim_text_engine_freetype_font_load,
+	/* .font_delete 		= */ _enesim_text_engine_freetype_font_delete,
+	/* .font_max_ascent_get 	= */ _enesim_text_engine_freetype_font_max_ascent_get,
+	/* .font_max_descent_get 	= */ _enesim_text_engine_freetype_font_max_descent_get,
+	/* .font_glyph_get 		= */ _enesim_text_engine_freetype_glyph_get,
+};
+#endif
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Text_Engine_Descriptor enesim_text_freetype  = {
-	/* .init 			= */ _enesim_text_freetype_init,
-	/* .shutdown 			= */ _enesim_text_freetype_shutdown,
-	/* .font_load 			= */ _enesim_text_freetype_font_load,
-	/* .font_delete 		= */ _enesim_text_freetype_font_delete,
-	/* .font_max_ascent_get 	= */ _enesim_text_freetype_font_max_ascent_get,
-	/* .font_max_descent_get 	= */ _enesim_text_freetype_font_max_descent_get,
-	/* .font_glyph_get 		= */ _enesim_text_freetype_glyph_get,
-};
+void enesim_text_engine_freetype_init(void)
+{
+#if HAVE_FREETYPE
+	_engine = enesim_text_engine_new(&_enesim_text_engine_freetype_descriptor);
+#endif
+}
+
+void enesim_text_engine_freetype_shutdown(void)
+{
+#if HAVE_FREETYPE
+	enesim_text_engine_unref(_engine);
+#endif
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+EAPI Enesim_Text_Engine * enesim_text_engine_freetype_get(void)
+{
+	return enesim_text_engine_ref(_engine);
+}
+
+EAPI Enesim_Text_Engine * enesim_text_engine_freetype_new(void)
+{
+#if HAVE_FREETYPE
+	return enesim_text_engine_new(&_enesim_text_engine_freetype_descriptor);
+#else
+	return NULL;
+#endif
+}
+

@@ -34,6 +34,7 @@
 #include "enesim_renderer.h"
 #include "enesim_converter.h"
 #include "enesim_image.h"
+#include "enesim_text.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
@@ -44,6 +45,7 @@
 
 #include "enesim_pool_private.h"
 #include "enesim_image_private.h"
+#include "enesim_text_private.h"
 #include "enesim_compositor_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_converter_private.h"
@@ -187,6 +189,7 @@ EAPI int enesim_init(void)
 	enesim_renderer_init();
 	enesim_converter_init();
 	enesim_image_init();
+	enesim_text_init();
 #ifdef ENS_HAVE_MMX
 	/* EINA_ERROR_PINFO("MMX Drawer available\n"); */
 #endif
@@ -230,6 +233,7 @@ EAPI int enesim_shutdown(void)
 	if (--_enesim_init_count != 0)
 		return _enesim_init_count;
 
+	enesim_text_shutdown();
 	enesim_image_shutdown();
 	enesim_converter_shutdown();
 	enesim_renderer_shutdown();
