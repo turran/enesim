@@ -41,9 +41,9 @@ typedef enum _Enesim_Renderer_Shape_Draw_Mode
 
 typedef enum _Enesim_Renderer_Shape_Stroke_Location
 {
-	ENESIM_SHAPE_STROKE_LOCATION_INSIDE,
-	ENESIM_SHAPE_STROKE_LOCATION_OUTSIDE,
-	ENESIM_SHAPE_STROKE_LOCATION_CENTER,
+	ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE,
+	ENESIM_SHAPE_STROKE_LOCATION_LOCATION_OUTSIDE,
+	ENESIM_SHAPE_STROKE_LOCATION_LOCATION_CENTER,
 } Enesim_Renderer_Shape_Stroke_Location;
 
 typedef struct _Enesim_Renderer_Shape_Stroke_Dash

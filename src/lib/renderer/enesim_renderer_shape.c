@@ -234,7 +234,7 @@ static void _state_init(Enesim_Renderer_Shape_State *thiz)
 	/* set default properties */
 	thiz->current.fill.color = thiz->past.fill.color = 0xffffffff;
 	thiz->current.stroke.color = thiz->past.stroke.color = 0xffffffff;
-	thiz->current.stroke.location = ENESIM_SHAPE_STROKE_LOCATION_CENTER;
+	thiz->current.stroke.location = ENESIM_SHAPE_STROKE_LOCATION_LOCATION_CENTER;
 	thiz->current.draw_mode = ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL;
 }
 

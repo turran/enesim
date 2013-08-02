@@ -103,15 +103,15 @@ static Eina_Bool _circle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 			enesim_renderer_shape_stroke_weight_get(r, &sw);
 			switch (location)
 			{
-				case ENESIM_SHAPE_STROKE_LOCATION_OUTSIDE:
+				case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_OUTSIDE:
 				rad += sw / 2.0;
 				break;
 
-				case ENESIM_SHAPE_STROKE_LOCATION_INSIDE:
+				case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE:
 				rad -= sw / 2.0;
 				break;
 
-				case ENESIM_SHAPE_STROKE_LOCATION_CENTER:
+				case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_CENTER:
 				break;
 			}
 		}
@@ -214,7 +214,7 @@ static void _enesim_renderer_circle_instance_init(void *o)
 	thiz = ENESIM_RENDERER_CIRCLE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_LOCATION_INSIDE);
+			ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE);
 }
 
 static void _enesim_renderer_circle_instance_deinit(void *o EINA_UNUSED)
