@@ -106,17 +106,17 @@ static void _ellipse_get_real(Enesim_Renderer_Ellipse *thiz,
 		enesim_renderer_shape_stroke_location_get(r, &location);
 		switch (location)
 		{
-			case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_OUTSIDE:
+			case ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE:
 			*rx += sw / 2.0;
 			*ry += sw / 2.0;
 			break;
 
-			case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE:
+			case ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE:
 			*rx -= sw / 2.0;
 			*ry -= sw / 2.0;
 			break;
 
-			case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_CENTER:
+			case ENESIM_RENDERER_SHAPE_STROKE_LOCATION_CENTER:
 			break;
 		}
 	}
@@ -228,7 +228,7 @@ static void _enesim_renderer_ellipse_instance_init(void *o)
 	thiz = ENESIM_RENDERER_ELLIPSE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE);
+			ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE);
 }
 
 static void _enesim_renderer_ellipse_instance_deinit(void *o EINA_UNUSED)

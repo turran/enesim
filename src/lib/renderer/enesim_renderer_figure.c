@@ -168,7 +168,7 @@ static void _enesim_renderer_figure_instance_init(void *o)
 	thiz = ENESIM_RENDERER_FIGURE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE);
+			ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE);
 	thiz->figure = enesim_figure_new();
 }
 

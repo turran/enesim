@@ -197,7 +197,7 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 			enesim_renderer_shape_stroke_weight_get(r, &sw);
 			switch (location)
 			{
-				case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_OUTSIDE:
+				case ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE:
 				x -= sw / 2.0;
 				y -= sw / 2.0;
 				w += sw;
@@ -206,7 +206,7 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 				ry += sw / 2.0;
 				break;
 
-				case ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE:
+				case ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE:
 				x += sw / 2.0;
 				y += sw / 2.0;
 				w -= sw;
@@ -301,7 +301,7 @@ static void _enesim_renderer_rectangle_instance_init(void *o)
 {
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_LOCATION_LOCATION_INSIDE);
+			ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE);
 }
 
 static void _enesim_renderer_rectangle_instance_deinit(void *o EINA_UNUSED)
