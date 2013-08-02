@@ -41,4 +41,8 @@ typedef struct _Enesim_Object_Class {
 EAPI Eina_Bool enesim_object_class_inherits(Enesim_Object_Class *thiz,
 		Enesim_Object_Descriptor *d);
 
+/**
+ * @}
+ */
+
 #endif
