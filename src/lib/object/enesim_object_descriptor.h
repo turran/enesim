@@ -22,6 +22,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @defgroup Enesim_Object_Group Object
+ * @brief Object abstraction
+ *
+ * @defgroup Enesim_Object_Descriptor_Group Descriptor
+ * @ingroup Enesim_Object_Group
+ * @{
+ */
+
 typedef void (*Enesim_Object_Descriptor_Class_Init)(void *c);
 typedef void (*Enesim_Object_Descriptor_Instance_Init)(void *i);
 typedef void (*Enesim_Object_Descriptor_Instance_Deinit)(void *i);
@@ -70,5 +79,10 @@ EAPI Enesim_Object_Descriptor * enesim_object_descriptor_get(void);
 EAPI const char * enesim_object_descriptor_name_get(Enesim_Object_Descriptor *thiz);
 EAPI void * enesim_object_descriptor_private_get(Enesim_Object_Descriptor *thiz);
 EAPI void enesim_object_descriptor_private_set(Enesim_Object_Descriptor *thiz, void *prv);
+
+
+/**
+ * @}
+ */
 
 #endif

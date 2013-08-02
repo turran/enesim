@@ -18,6 +18,13 @@
 #ifndef ENESIM_OBJECT_INSTANCE_H_
 #define ENESIM_OBJECT_INSTANCE_H_
 
+/**
+ * @defgroup Enesim_Object_Instance_Group Instance
+ * @ingroup Enesim_Object_Group
+ * @brief Instance definition
+ * @{
+ */
+
 #if ENESIM_TYPE_DEBUG
 #define ENESIM_OBJECT_INSTANCE_CHECK(i, type, d) enesim_object_instance_inherits(i, type, d) ? (type*)i : NULL;
 #else
@@ -36,5 +43,9 @@ typedef struct _Enesim_Object_Instance {
 EAPI Eina_Bool enesim_object_instance_inherits(Enesim_Object_Instance *thiz,
 		Enesim_Object_Descriptor *d);
 EAPI void enesim_object_instance_free(Enesim_Object_Instance *thiz);
+
+/**
+ * @}
+ */
 
 #endif

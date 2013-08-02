@@ -18,6 +18,13 @@
 #ifndef ENESIM_OBJECT_CLASS_H_
 #define ENESIM_OBJECT_CLASS_H_
 
+/**
+ * @defgroup Enesim_Object_Class_Group Class
+ * @ingroup Enesim_Object_Group
+ * @brief Class definition
+ * @{
+ */
+
 #if ENESIM_TYPE_DEBUG
 #define ENESIM_OBJECT_CLASS_CHECK(i, type, d) enesim_object_class_inherits(i, type, d) ? (type*)i : NULL;
 #else
