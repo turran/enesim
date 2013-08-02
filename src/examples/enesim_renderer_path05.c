@@ -13,7 +13,7 @@ static Enesim_Renderer * enesim_renderer_path05(void)
 	enesim_renderer_path_line_to(r, 20, 40);
 	enesim_renderer_path_line_to(r, 20, 20);
 	enesim_renderer_shape_fill_color_set(r, 0xffff0000);
-	enesim_renderer_shape_draw_mode_set(r, ENESIM_SHAPE_DRAW_MODE_FILL);
+	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
 
 	return r;
 }

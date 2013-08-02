@@ -12,7 +12,7 @@ static Enesim_Renderer * _create_circle(double x, double y,
 	enesim_renderer_circle_center_set(circle, x, y);
 	enesim_renderer_circle_radius_set(circle, 60);
 	enesim_renderer_shape_fill_color_set(circle, color);
-	enesim_renderer_shape_draw_mode_set(circle, ENESIM_SHAPE_DRAW_MODE_FILL);
+	enesim_renderer_shape_draw_mode_set(circle, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
 	enesim_renderer_rop_set(circle, ENESIM_BLEND);
 
 	proxy = enesim_renderer_proxy_new();

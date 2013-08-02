@@ -11,7 +11,7 @@ static Enesim_Renderer * enesim_renderer_blur01(void)
 	enesim_renderer_circle_center_set(r1, 128, 128);
 	enesim_renderer_circle_radius_set(r1, 64);
 	enesim_renderer_shape_fill_color_set(r1, 0xffff0000);
-	enesim_renderer_shape_draw_mode_set(r1, ENESIM_SHAPE_DRAW_MODE_FILL);
+	enesim_renderer_shape_draw_mode_set(r1, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
 
 	r2 = enesim_renderer_blur_new();
 	enesim_renderer_origin_set(r2, 15, 15);

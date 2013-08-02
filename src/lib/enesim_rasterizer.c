@@ -56,9 +56,9 @@ static void _rasterizer_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
-static void _rasterizer_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _rasterizer_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Renderer_Shape_Feature *features)
 {
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 #endif
 /*----------------------------------------------------------------------------*

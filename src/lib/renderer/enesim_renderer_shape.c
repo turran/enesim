@@ -71,7 +71,7 @@ static Eina_Bool _shape_damage_cb(Enesim_Renderer *r,
  *                     Internal state related functions                       *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
-		Enesim_Shape_Feature features)
+		Enesim_Renderer_Shape_Feature features)
 {
 	if (!thiz->changed)
 		return EINA_FALSE;
@@ -90,7 +90,7 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 		return EINA_TRUE;
 	}
 	/* location */
-	if (features & ENESIM_SHAPE_FLAG_STROKE_LOCATION)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION)
 	{
 		if (thiz->current.stroke.location != thiz->past.stroke.location)
 		{
@@ -111,7 +111,7 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 		return EINA_TRUE;
 	}
 	/* dashes */
-	if (features & ENESIM_SHAPE_FLAG_STROKE_DASH)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH)
 	{
 		/* we wont compare the stroke dashes, it has changed, then
 		 * modify it directly
@@ -154,18 +154,18 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 }
 
 static Eina_Bool _state_changed(Enesim_Renderer_Shape_State *thiz,
-		Enesim_Shape_Feature features)
+		Enesim_Renderer_Shape_Feature features)
 {
 	if (_state_changed_basic(thiz, features))
 		return EINA_TRUE;
 
 	/* renderer */
-	if (features & ENESIM_SHAPE_FLAG_STROKE_RENDERER)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER)
 	{
 		if (thiz->current.stroke.r != thiz->past.stroke.r)
 			return EINA_TRUE;
 		if (thiz->current.stroke.r &&
-			(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+			(thiz->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
 		{
 			if (enesim_renderer_has_changed(thiz->current.stroke.r))
 			{
@@ -178,13 +178,13 @@ static Eina_Bool _state_changed(Enesim_Renderer_Shape_State *thiz,
 		}
 	}
 	/* renderer */
-	if (features & ENESIM_SHAPE_FLAG_FILL_RENDERER)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER)
 	{
 		if (thiz->current.fill.r != thiz->past.fill.r)
 			return EINA_TRUE;
 		/* we should first check if the fill renderer has changed */
 		if (thiz->current.fill.r &&
-				(thiz->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				(thiz->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL))
 		{
 			if (enesim_renderer_has_changed(thiz->current.fill.r))
 			{
@@ -201,7 +201,7 @@ static Eina_Bool _state_changed(Enesim_Renderer_Shape_State *thiz,
 
 static void _state_clear(Enesim_Renderer_Shape_State *thiz)
 {
-	Enesim_Shape_Stroke_Dash *d;
+	Enesim_Renderer_Shape_Stroke_Dash *d;
 
 	if (thiz->current.fill.r)
 	{
@@ -234,8 +234,8 @@ static void _state_init(Enesim_Renderer_Shape_State *thiz)
 	/* set default properties */
 	thiz->current.fill.color = thiz->past.fill.color = 0xffffffff;
 	thiz->current.stroke.color = thiz->past.stroke.color = 0xffffffff;
-	thiz->current.stroke.location = ENESIM_SHAPE_STROKE_CENTER;
-	thiz->current.draw_mode = ENESIM_SHAPE_DRAW_MODE_FILL;
+	thiz->current.stroke.location = ENESIM_SHAPE_STROKE_LOCATION_CENTER;
+	thiz->current.draw_mode = ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL;
 }
 
 static void _state_commit(Enesim_Renderer_Shape_State *thiz)
@@ -279,7 +279,7 @@ static void _state_commit(Enesim_Renderer_Shape_State *thiz)
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
 static void _shape_cleanup(Enesim_Renderer *r,
-		Enesim_Shape_Feature features, Enesim_Surface *s)
+		Enesim_Renderer_Shape_Feature features, Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape *thiz;
 	Enesim_Renderer_Shape_State *state;
@@ -287,18 +287,18 @@ static void _shape_cleanup(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	state = &thiz->state;
 
-	if (features & ENESIM_SHAPE_FLAG_FILL_RENDERER)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER)
 	{
 		if (state->current.fill.r &&
-				(state->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL))
 		{
 			enesim_renderer_cleanup(state->current.fill.r, s);
 		}
 	}
-	if (features & ENESIM_SHAPE_FLAG_STROKE_RENDERER)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER)
 	{
 		if (state->current.stroke.r &&
-				(state->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
 		{
 			enesim_renderer_cleanup(state->current.stroke.r, s);
 		}
@@ -313,16 +313,16 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Shape *thiz;
 	Enesim_Renderer_Shape_State *state;
-	Enesim_Shape_Feature features;
+	Enesim_Renderer_Shape_Feature features;
 	Eina_Bool fill_renderer = EINA_FALSE;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	state = &thiz->state;
 	enesim_renderer_shape_features_get(r, &features);
-	if (features & ENESIM_SHAPE_FLAG_FILL_RENDERER)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER)
 	{
 		if (state->current.fill.r &&
-				(state->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL))
+				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL))
 		{
 			fill_renderer = EINA_TRUE;
 			if (!enesim_renderer_setup(state->current.fill.r, s, l))
@@ -332,10 +332,10 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 			}
 		}
 	}
-	if (features & ENESIM_SHAPE_FLAG_STROKE_RENDERER)
+	if (features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER)
 	{
 		if (state->current.stroke.r &&
-				(state->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE))
+				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
 		{
 			if (!enesim_renderer_setup(state->current.stroke.r, s, l))
 			{
@@ -374,7 +374,7 @@ static void _enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r,
 		Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape_Class *klass;
-	Enesim_Shape_Feature features;
+	Enesim_Renderer_Shape_Feature features;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
 	enesim_renderer_shape_features_get(r, &features);
@@ -401,7 +401,7 @@ static void _enesim_renderer_shape_opengl_cleanup(Enesim_Renderer *r,
 		Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape_Class *klass;
-	Enesim_Shape_Feature features;
+	Enesim_Renderer_Shape_Feature features;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
 	enesim_renderer_shape_features_get(r, &features);
@@ -430,7 +430,7 @@ static void _enesim_renderer_shape_opencl_cleanup(Enesim_Renderer *r,
 		Enesim_Surface *s)
 {
 	Enesim_Renderer_Shape_Class *klass;
-	Enesim_Shape_Feature features;
+	Enesim_Renderer_Shape_Feature features;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
 	enesim_renderer_shape_features_get(r, &features);
@@ -459,7 +459,7 @@ static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
 	Enesim_Renderer_Shape *thiz;
 	Enesim_Renderer_Shape_Class *klass;
 	Enesim_Renderer_Shape_State *state;
-	Enesim_Shape_Feature features;
+	Enesim_Renderer_Shape_Feature features;
 	Eina_Rectangle current_bounds;
 	Eina_Bool do_send_old = EINA_FALSE;
 
@@ -502,16 +502,16 @@ send_old:
 	else
 	{
 		/* optimized case */
-		Enesim_Shape_Draw_Mode dm = state->current.draw_mode;
+		Enesim_Renderer_Shape_Draw_Mode dm = state->current.draw_mode;
 		Eina_Bool stroke_changed = EINA_FALSE;
 		Eina_Bool fill_changed = EINA_FALSE;
 
 		if (state->current.stroke.r &&
-					(dm & ENESIM_SHAPE_DRAW_MODE_STROKE))
+					(dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
 			stroke_changed = enesim_renderer_has_changed(state->current.stroke.r);
 
 		if (state->current.fill.r &&
-				(dm & ENESIM_SHAPE_DRAW_MODE_FILL))
+				(dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL))
 			fill_changed = enesim_renderer_has_changed(state->current.fill.r);
 
 		/* if we fill with a renderer which has changed then only
@@ -591,7 +591,7 @@ void enesim_renderer_shape_state_commit(Enesim_Renderer *r)
 Eina_Bool enesim_renderer_shape_state_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
-	Enesim_Shape_Feature features;
+	Enesim_Renderer_Shape_Feature features;
 	Eina_Bool ret;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
@@ -667,7 +667,7 @@ EAPI void enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r, double *we
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Location location)
+EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Location location)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -682,7 +682,7 @@ EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_S
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_stroke_location_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Location *location)
+EAPI void enesim_renderer_shape_stroke_location_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Location *location)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -722,7 +722,7 @@ EAPI void enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r, Enesim_Colo
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap cap)
+EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Cap cap)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -737,7 +737,7 @@ EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Shape_
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Cap *cap)
+EAPI void enesim_renderer_shape_stroke_cap_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Cap *cap)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -749,7 +749,7 @@ EAPI void enesim_renderer_shape_stroke_cap_get(Enesim_Renderer *r, Enesim_Shape_
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Shape_Stroke_Join join)
+EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Join join)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -764,7 +764,7 @@ EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Shape
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r, Enesim_Shape_Stroke_Join *join)
+EAPI void enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Join *join)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -868,7 +868,7 @@ EAPI void enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r, Enesim_Ren
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Shape_Fill_Rule rule)
+EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Fill_Rule rule)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -883,7 +883,7 @@ EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Shape_F
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r, Enesim_Shape_Fill_Rule *rule)
+EAPI void enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Fill_Rule *rule)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -895,7 +895,7 @@ EAPI void enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r, Enesim_Shape_F
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_Draw_Mode draw_mode)
+EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Draw_Mode draw_mode)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -910,7 +910,7 @@ EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Shape_D
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_Draw_Mode *draw_mode)
+EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Draw_Mode *draw_mode)
 {
 	Enesim_Renderer_Shape *thiz;
 
@@ -922,7 +922,7 @@ EAPI void enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r, Enesim_Shape_D
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Feature *features)
+EAPI void enesim_renderer_shape_features_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Feature *features)
 {
 	Enesim_Renderer_Shape_Class *klass;
 
@@ -939,7 +939,7 @@ EAPI void enesim_renderer_shape_features_get(Enesim_Renderer *r, Enesim_Shape_Fe
 EAPI void enesim_renderer_shape_stroke_dash_add_simple(Enesim_Renderer *r,
 		double length, double gap)
 {
-	Enesim_Shape_Stroke_Dash dash;
+	Enesim_Renderer_Shape_Stroke_Dash dash;
 
 	dash.length = length;
 	dash.gap = gap;
@@ -951,13 +951,13 @@ EAPI void enesim_renderer_shape_stroke_dash_add_simple(Enesim_Renderer *r,
  * FIXME: To be fixed
  */
 EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r,
-		const Enesim_Shape_Stroke_Dash *dash)
+		const Enesim_Renderer_Shape_Stroke_Dash *dash)
 {
 	Enesim_Renderer_Shape *thiz;
-	Enesim_Shape_Stroke_Dash *d;
+	Enesim_Renderer_Shape_Stroke_Dash *d;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
-	d = malloc(sizeof(Enesim_Shape_Stroke_Dash));
+	d = malloc(sizeof(Enesim_Renderer_Shape_Stroke_Dash));
 	*d = *dash;
 	thiz->state.stroke_dashes = eina_list_append(thiz->state.stroke_dashes, d);
 	thiz->state.changed = EINA_TRUE;
@@ -971,7 +971,7 @@ EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r,
 EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
-	Enesim_Shape_Stroke_Dash *d;
+	Enesim_Renderer_Shape_Stroke_Dash *d;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	EINA_LIST_FREE (thiz->state.stroke_dashes, d)

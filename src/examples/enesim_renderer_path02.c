@@ -19,9 +19,9 @@ static Enesim_Renderer * enesim_renderer_path02(void)
 	enesim_renderer_shape_stroke_weight_set(r1, 18);
 	enesim_renderer_shape_stroke_color_set(r1, 0xffffff00);
 	enesim_renderer_shape_fill_color_set(r1, 0xffff0000);
-	enesim_renderer_shape_draw_mode_set(r1, ENESIM_SHAPE_DRAW_MODE_STROKE_FILL);
-	enesim_renderer_shape_stroke_join_set(r1, ENESIM_JOIN_ROUND);
-	enesim_renderer_shape_stroke_cap_set(r1, ENESIM_CAP_ROUND);
+	enesim_renderer_shape_draw_mode_set(r1, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL);
+	enesim_renderer_shape_stroke_join_set(r1, ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND);
+	enesim_renderer_shape_stroke_cap_set(r1, ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND);
 	enesim_renderer_rop_set(r1, ENESIM_BLEND);
 
 	enesim_matrix_identity(&m);

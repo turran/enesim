@@ -88,30 +88,30 @@ static Eina_Bool _circle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 	thiz = ENESIM_RENDERER_CIRCLE(r);
 	if (_circle_properties_have_changed(thiz) && !thiz->generated)
 	{
-		Enesim_Shape_Draw_Mode draw_mode;
+		Enesim_Renderer_Shape_Draw_Mode draw_mode;
 		double rad;
 		double x, y;
 
 		rad = thiz->current.r;
 		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-		if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 		{
-			Enesim_Shape_Stroke_Location location;
+			Enesim_Renderer_Shape_Stroke_Location location;
 			double sw;
 
 			enesim_renderer_shape_stroke_location_get(r, &location);
 			enesim_renderer_shape_stroke_weight_get(r, &sw);
 			switch (location)
 			{
-				case ENESIM_SHAPE_STROKE_OUTSIDE:
+				case ENESIM_SHAPE_STROKE_LOCATION_OUTSIDE:
 				rad += sw / 2.0;
 				break;
 
-				case ENESIM_SHAPE_STROKE_INSIDE:
+				case ENESIM_SHAPE_STROKE_LOCATION_INSIDE:
 				rad -= sw / 2.0;
 				break;
 
-				case ENESIM_SHAPE_STROKE_CENTER:
+				case ENESIM_SHAPE_STROKE_LOCATION_CENTER:
 				break;
 			}
 		}
@@ -155,11 +155,11 @@ static Eina_Bool _circle_has_changed(Enesim_Renderer *r)
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static void _circle_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Shape_Feature *features)
+		Enesim_Renderer_Shape_Feature *features)
 {
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_LOCATION;
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION;
 }
 
 static Eina_Bool _circle_geometry_get(Enesim_Renderer *r,
@@ -214,7 +214,7 @@ static void _enesim_renderer_circle_instance_init(void *o)
 	thiz = ENESIM_RENDERER_CIRCLE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_INSIDE);
+			ENESIM_SHAPE_STROKE_LOCATION_INSIDE);
 }
 
 static void _enesim_renderer_circle_instance_deinit(void *o EINA_UNUSED)

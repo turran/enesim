@@ -215,7 +215,7 @@ static Eina_Bool _path_nvpr_has_changed(Enesim_Renderer *r)
 	return thiz->changed;
 }
 
-static void _path_nvpr_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _path_nvpr_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Renderer_Shape_Feature *features)
 {
 	*features = 0;
 }

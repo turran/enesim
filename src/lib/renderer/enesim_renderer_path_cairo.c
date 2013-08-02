@@ -126,19 +126,19 @@ static void _path_cairo_generate(Enesim_Renderer *rend,
 		enesim_path_normalizer_normalize(thiz->normalizer, cmd);
 	}
 
-	if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_FILL)
+	if (sstate->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
 		double a, r, g, b;
 
 		_path_cairo_colors_get(sstate->current.fill.color, &a, &r, &g, &b);
 		cairo_set_source_rgba(cairo, r, g, b, a);
-		if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		if (sstate->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 			cairo_fill_preserve(cairo);
 		else
 			cairo_fill(cairo);
 	}
 
-	if (sstate->current.draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	if (sstate->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		double a, r, g, b;
 
@@ -329,7 +329,7 @@ static Eina_Bool _path_cairo_has_changed(Enesim_Renderer *r)
 	return thiz->changed;
 }
 
-static void _path_cairo_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Shape_Feature *features)
+static void _path_cairo_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Renderer_Shape_Feature *features)
 {
 	*features = 0;
 }

@@ -89,7 +89,7 @@ static void _ellipse_get_real(Enesim_Renderer_Ellipse *thiz,
 		Enesim_Renderer *r,
 		double *x, double *y, double *rx, double *ry)
 {
-	Enesim_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer_Shape_Draw_Mode draw_mode;
 
 	*rx = thiz->current.rx;
 	*ry = thiz->current.ry;
@@ -97,26 +97,26 @@ static void _ellipse_get_real(Enesim_Renderer_Ellipse *thiz,
 	*y = thiz->current.y;
 
 	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
-		Enesim_Shape_Stroke_Location location;
+		Enesim_Renderer_Shape_Stroke_Location location;
 		double sw;
 
 		enesim_renderer_shape_stroke_weight_get(r, &sw);
 		enesim_renderer_shape_stroke_location_get(r, &location);
 		switch (location)
 		{
-			case ENESIM_SHAPE_STROKE_OUTSIDE:
+			case ENESIM_SHAPE_STROKE_LOCATION_OUTSIDE:
 			*rx += sw / 2.0;
 			*ry += sw / 2.0;
 			break;
 
-			case ENESIM_SHAPE_STROKE_INSIDE:
+			case ENESIM_SHAPE_STROKE_LOCATION_INSIDE:
 			*rx -= sw / 2.0;
 			*ry -= sw / 2.0;
 			break;
 
-			case ENESIM_SHAPE_STROKE_CENTER:
+			case ENESIM_SHAPE_STROKE_LOCATION_CENTER:
 			break;
 		}
 	}
@@ -169,11 +169,11 @@ static Eina_Bool _ellipse_has_changed(Enesim_Renderer *r)
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static void _ellipse_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Shape_Feature *features)
+		Enesim_Renderer_Shape_Feature *features)
 {
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_LOCATION;
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION;
 }
 
 static Eina_Bool _ellipse_geometry_get(Enesim_Renderer *r,
@@ -228,7 +228,7 @@ static void _enesim_renderer_ellipse_instance_init(void *o)
 	thiz = ENESIM_RENDERER_ELLIPSE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_INSIDE);
+			ENESIM_SHAPE_STROKE_LOCATION_INSIDE);
 }
 
 static void _enesim_renderer_ellipse_instance_deinit(void *o EINA_UNUSED)

@@ -208,7 +208,7 @@ static Enesim_Path_Descriptor _strokeless_descriptor = {
  *----------------------------------------------------------------------------*/
 static void _edge_join(Enesim_Path_Edge *e1,
 		Enesim_Path_Edge *e2,
-		Enesim_Shape_Stroke_Join join,
+		Enesim_Renderer_Shape_Stroke_Join join,
 		double rx,
 		double ry,
 		Eina_Bool large,
@@ -221,12 +221,12 @@ static void _edge_join(Enesim_Path_Edge *e1,
 	{
 		/* TODO here we should add the intersection of both edges */
 		/* we need a miter length variable too */
-		case ENESIM_JOIN_MITER:
+		case ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER:
 		vertex_add(e2->x0, e2->y0, data);
 		break;
 
 		/* join theme with an arc */
-		case ENESIM_JOIN_ROUND:
+		case ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND:
 		st.vertex_add = vertex_add;
 		st.last_x = e1->x1;
 		st.last_y = e1->y1;
@@ -236,7 +236,7 @@ static void _edge_join(Enesim_Path_Edge *e1,
 		enesim_curve_arc_to(&st, rx, ry, 0, large, sweep, e2->x0, e2->y0);
 		break;
 
-		case ENESIM_JOIN_BEVEL:
+		case ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL:
 		/* just join theme with a line */
 		vertex_add(e2->x0, e2->y0, data);
 		break;
@@ -286,7 +286,7 @@ static void _stroke_path_merge(Enesim_Path_Generator_Stroke *thiz)
 
 	/* FIXME is not complete yet */
 	/* TODO use the stroke cap to close the offset and the inset */
-	if (thiz->p->cap != ENESIM_CAP_BUTT)
+	if (thiz->p->cap != ENESIM_RENDERER_SHAPE_STROKE_CAP_BUTT)
 	{
 		Eina_List *l;
 
@@ -298,7 +298,7 @@ static void _stroke_path_merge(Enesim_Path_Generator_Stroke *thiz)
 		l = eina_list_last(thiz->offset_polygon->points);
 		ofl = eina_list_data_get(l);
 		/* do an arc from last offet to first inset */
-		if (thiz->p->cap == ENESIM_CAP_ROUND)
+		if (thiz->p->cap == ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND)
 		{
 			Enesim_Curve_State st;
 
@@ -726,7 +726,7 @@ static void _dashed_path_vertex_add(double x, double y, void *data)
 
 	while (d)
 	{
-		Enesim_Shape_Stroke_Dash *dash;
+		Enesim_Renderer_Shape_Stroke_Dash *dash;
 
 		dash = eina_list_data_get(thiz->current);
 		/* we are on the stroke zone */
@@ -924,12 +924,12 @@ void enesim_path_generator_stroke_figure_set(Enesim_Path_Generator *thiz, Enesim
 	thiz->stroke_figure = stroke;
 }
 
-void enesim_path_generator_stroke_cap_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Cap cap)
+void enesim_path_generator_stroke_cap_set(Enesim_Path_Generator *thiz, Enesim_Renderer_Shape_Stroke_Cap cap)
 {
 	thiz->cap = cap;
 }
 
-void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Join join)
+void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_Renderer_Shape_Stroke_Join join)
 {
 	thiz->join = join;
 }

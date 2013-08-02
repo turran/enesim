@@ -162,7 +162,7 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
 	if (_rectangle_properties_have_changed(thiz) && !thiz->generated)
 	{
-		Enesim_Shape_Draw_Mode draw_mode;
+		Enesim_Renderer_Shape_Draw_Mode draw_mode;
 		double rx, ry;
 		double x;
 		double y;
@@ -188,16 +188,16 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 
 		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
 
-		if (draw_mode & ENESIM_SHAPE_DRAW_MODE_STROKE)
+		if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 		{
-			Enesim_Shape_Stroke_Location location;
+			Enesim_Renderer_Shape_Stroke_Location location;
 			double sw;
 
 			enesim_renderer_shape_stroke_location_get(r, &location);
 			enesim_renderer_shape_stroke_weight_get(r, &sw);
 			switch (location)
 			{
-				case ENESIM_SHAPE_STROKE_OUTSIDE:
+				case ENESIM_SHAPE_STROKE_LOCATION_OUTSIDE:
 				x -= sw / 2.0;
 				y -= sw / 2.0;
 				w += sw;
@@ -206,7 +206,7 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 				ry += sw / 2.0;
 				break;
 
-				case ENESIM_SHAPE_STROKE_INSIDE:
+				case ENESIM_SHAPE_STROKE_LOCATION_INSIDE:
 				x += sw / 2.0;
 				y += sw / 2.0;
 				w -= sw;
@@ -246,11 +246,11 @@ static Eina_Bool _rectangle_has_changed(Enesim_Renderer *r)
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static void _rectangle_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Shape_Feature *features)
+		Enesim_Renderer_Shape_Feature *features)
 {
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_RENDERER |
-			ENESIM_SHAPE_FLAG_STROKE_LOCATION;
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION;
 }
 
 static Eina_Bool _rectangle_geometry_get(Enesim_Renderer *r,
@@ -301,7 +301,7 @@ static void _enesim_renderer_rectangle_instance_init(void *o)
 {
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_INSIDE);
+			ENESIM_SHAPE_STROKE_LOCATION_INSIDE);
 }
 
 static void _enesim_renderer_rectangle_instance_deinit(void *o EINA_UNUSED)

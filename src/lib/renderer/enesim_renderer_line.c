@@ -107,7 +107,7 @@ static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 
 	thiz = ENESIM_RENDERER_LINE(r);
 	/* the draw mode should be always a stroke only */
-	enesim_renderer_shape_draw_mode_set(path, ENESIM_SHAPE_DRAW_MODE_STROKE);
+	enesim_renderer_shape_draw_mode_set(path, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 	if (_line_changed(thiz) && !thiz->generated)
 	{
 		enesim_renderer_path_command_clear(path);
@@ -130,9 +130,9 @@ static void _line_cleanup(Enesim_Renderer *r)
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static void _line_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Shape_Feature *features)
+		Enesim_Renderer_Shape_Feature *features)
 {
-	*features = ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 
 static Eina_Bool _line_geometry_get(Enesim_Renderer *r,

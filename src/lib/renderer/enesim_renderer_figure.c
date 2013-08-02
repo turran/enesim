@@ -105,9 +105,9 @@ static Eina_Bool _figure_has_changed(Enesim_Renderer *r)
 }
 
 static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Shape_Feature *features)
+		Enesim_Renderer_Shape_Feature *features)
 {
-	*features = ENESIM_SHAPE_FLAG_FILL_RENDERER | ENESIM_SHAPE_FLAG_STROKE_RENDERER;
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 
 static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path)
@@ -168,7 +168,7 @@ static void _enesim_renderer_figure_instance_init(void *o)
 	thiz = ENESIM_RENDERER_FIGURE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
-			ENESIM_SHAPE_STROKE_INSIDE);
+			ENESIM_SHAPE_STROKE_LOCATION_INSIDE);
 	thiz->figure = enesim_figure_new();
 }
 

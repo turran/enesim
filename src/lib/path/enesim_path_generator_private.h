@@ -43,8 +43,8 @@ typedef struct _Enesim_Path
 	double scale_y;
 	Enesim_Figure *figure;
 	Enesim_Figure *stroke_figure;
-	Enesim_Shape_Stroke_Cap cap;
-	Enesim_Shape_Stroke_Join join;
+	Enesim_Renderer_Shape_Stroke_Cap cap;
+	Enesim_Renderer_Shape_Stroke_Join join;
 	double sw;
 	const Eina_List *dashes;
 	void *data;
@@ -57,8 +57,8 @@ void enesim_path_generator_transformation_set(Enesim_Path_Generator *thiz, const
 void enesim_path_generator_scale_set(Enesim_Path_Generator *thiz, double scale_x, double scale_y);
 void enesim_path_generator_stroke_dash_set(Enesim_Path_Generator *thiz, const Eina_List *dashes);
 void enesim_path_generator_stroke_figure_set(Enesim_Path_Generator *thiz, Enesim_Figure *stroke);
-void enesim_path_generator_stroke_cap_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Cap cap);
-void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_Shape_Stroke_Join join);
+void enesim_path_generator_stroke_cap_set(Enesim_Path_Generator *thiz, Enesim_Renderer_Shape_Stroke_Cap cap);
+void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_Renderer_Shape_Stroke_Join join);
 void enesim_path_generator_stroke_weight_set(Enesim_Path_Generator *thiz, double sw);
 
 void * enesim_path_generator_data_get(Enesim_Path_Generator *thiz);

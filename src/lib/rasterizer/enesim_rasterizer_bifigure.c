@@ -1543,8 +1543,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	Enesim_Rasterizer_BiFigure_State *state;
-	Enesim_Shape_Draw_Mode draw_mode;
-	Enesim_Shape_Fill_Rule rule;
+	Enesim_Renderer_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer_Shape_Fill_Rule rule;
 	Enesim_Matrix matrix;
 	double sw;
 
@@ -1610,7 +1610,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_color_set(thiz->over, state->color);
 		enesim_renderer_shape_fill_color_set(thiz->over, state->stroke.color);
 		enesim_renderer_shape_fill_renderer_set(thiz->over, enesim_renderer_ref(state->stroke.r));
-		enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
+		enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
 
 		thiz->over_used = EINA_TRUE;
 		if (!enesim_renderer_setup(thiz->over, s, error))
@@ -1619,7 +1619,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	}
 	else
 	{
-		if ( (sw <= 1) || (draw_mode == ENESIM_SHAPE_DRAW_MODE_FILL) )
+		if ( (sw <= 1) || (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) )
 		{
 			enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
 			enesim_renderer_transformation_set(thiz->under, &matrix);
@@ -1644,15 +1644,15 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 				enesim_renderer_origin_set(thiz->over, state->ox, state->oy);
 				enesim_renderer_transformation_set(thiz->over, &matrix);
 				enesim_renderer_color_set(thiz->over, state->color);
-				enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_SHAPE_DRAW_MODE_FILL);
+				enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
 				enesim_renderer_shape_fill_color_set(thiz->over, state->stroke.color);
 				enesim_renderer_shape_fill_renderer_set(thiz->over, enesim_renderer_ref(state->stroke.r));
-				if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+				if (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
 				{
 					enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
 					enesim_renderer_transformation_set(thiz->under, &matrix);
 					enesim_renderer_color_set(thiz->under, state->color);
-					enesim_renderer_shape_draw_mode_set(thiz->under, ENESIM_SHAPE_DRAW_MODE_STROKE_FILL);
+					enesim_renderer_shape_draw_mode_set(thiz->under, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL);
 					enesim_renderer_shape_fill_color_set(thiz->under, state->fill.color);
 					enesim_renderer_shape_fill_renderer_set(thiz->under, enesim_renderer_ref(state->fill.r));
 					enesim_renderer_shape_fill_rule_set(thiz->under, rule);
@@ -1665,9 +1665,9 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 				if (!enesim_renderer_setup(thiz->over, s, error))
 					return EINA_FALSE;
 
-				if (draw_mode == ENESIM_SHAPE_DRAW_MODE_STROKE_FILL)
+				if (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
 				{
-					if (rule == ENESIM_SHAPE_FILL_RULE_NON_ZERO)
+					if (rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)
 					{
 						*draw = _bifig_stroke_paint_fill_paint_nz;
 						if (!enesim_renderer_ref(state->stroke.r))

@@ -18,7 +18,7 @@ int main(void)
 	enesim_renderer_circle_y_set(r, 128);
 	enesim_renderer_circle_radius_set(r, 64);
 	enesim_renderer_shape_fill_color_set(r, 0xffff0000);
-	enesim_renderer_shape_draw_mode_set(r, ENESIM_SHAPE_DRAW_MODE_FILL);
+	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
 
 	cache = enesim_draw_cache_new();
 	enesim_draw_cache_renderer_set(cache, r);

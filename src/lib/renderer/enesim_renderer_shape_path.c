@@ -82,7 +82,7 @@ static Eina_Bool _shape_path_propagate(Enesim_Renderer *r)
 
 	if (sstate->stroke_dashes_changed)
 	{
-		Enesim_Shape_Stroke_Dash *d;
+		Enesim_Renderer_Shape_Stroke_Dash *d;
 		const Eina_List *ll;
 
 		enesim_renderer_shape_stroke_dash_clear(thiz->path);
@@ -278,7 +278,7 @@ static void _enesim_renderer_shape_path_instance_deinit(void *o)
  *                                 Global                                     *
  *============================================================================*/
 void enesim_renderer_shape_path_shape_features_get_default(Enesim_Renderer *r,
-		Enesim_Shape_Feature *features)
+		Enesim_Renderer_Shape_Feature *features)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 

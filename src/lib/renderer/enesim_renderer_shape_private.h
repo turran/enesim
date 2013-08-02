@@ -33,17 +33,17 @@ typedef struct _Enesim_Renderer_Shape_State
 			Enesim_Color color;
 			Enesim_Renderer *r;
 			double weight;
-			Enesim_Shape_Stroke_Location location;
-			Enesim_Shape_Stroke_Cap cap;
-			Enesim_Shape_Stroke_Join join;
+			Enesim_Renderer_Shape_Stroke_Location location;
+			Enesim_Renderer_Shape_Stroke_Cap cap;
+			Enesim_Renderer_Shape_Stroke_Join join;
 		} stroke;
 
 		struct {
 			Enesim_Color color;
 			Enesim_Renderer *r;
-			Enesim_Shape_Fill_Rule rule;
+			Enesim_Renderer_Shape_Fill_Rule rule;
 		} fill;
-		Enesim_Shape_Draw_Mode draw_mode;
+		Enesim_Renderer_Shape_Draw_Mode draw_mode;
 	} current, past;
 	Eina_List *stroke_dashes;
 
@@ -61,7 +61,7 @@ typedef struct _Enesim_Renderer_Shape
 } Enesim_Renderer_Shape;
 
 
-typedef void (*Enesim_Renderer_Shape_Features_Get_Cb)(Enesim_Renderer *r, Enesim_Shape_Feature *features);
+typedef void (*Enesim_Renderer_Shape_Features_Get_Cb)(Enesim_Renderer *r, Enesim_Renderer_Shape_Feature *features);
 typedef Eina_Bool (*Enesim_Renderer_Shape_Geometry_Get_Cb)(Enesim_Renderer *r, Enesim_Rectangle *geometry);
 
 typedef struct _Enesim_Renderer_Shape_Class {

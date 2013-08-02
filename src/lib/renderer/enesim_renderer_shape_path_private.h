@@ -51,7 +51,7 @@ typedef struct _Enesim_Renderer_Shape_Path_Class
 
 Enesim_Object_Descriptor * enesim_renderer_shape_path_descriptor_get(void);
 void enesim_renderer_shape_path_shape_features_get_default(Enesim_Renderer *r,
-		Enesim_Shape_Feature *features);
+		Enesim_Renderer_Shape_Feature *features);
 void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds);
 
