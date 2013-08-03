@@ -18,6 +18,8 @@
 #ifndef _ENESIM_PATH_GENERATOR_PRIVATE_H
 #define _ENESIM_PATH_GENERATOR_PRIVATE_H
 
+/* The generator generates a figure from a path */
+
 typedef void (*Enesim_Path_Delete)(void *data);
 typedef void (*Enesim_Path_Begin)(void *data);
 typedef void (*Enesim_Path_Polygon_Add)(void *data);
@@ -34,7 +36,7 @@ typedef struct _Enesim_Path_Descriptor
 	Enesim_Path_Done path_done;
 } Enesim_Path_Descriptor;
 
-typedef struct _Enesim_Path
+typedef struct _Enesim_Path_Generator
 {
 	Enesim_Path_Descriptor *descriptor;
 	Enesim_Curve_State st;

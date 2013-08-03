@@ -45,6 +45,7 @@ typedef struct _Enesim_Renderer_Path_Abstract
 	Enesim_Renderer_Shape parent;
 } Enesim_Renderer_Path_Abstract;
 
+/* TODO Rename the commands and pass the path directly, so we can track a change */
 typedef void (*Enesim_Renderer_Path_Abstract_Commands_Set_Cb)(Enesim_Renderer *r, const Eina_List *commands);
 typedef void (*Enesim_Renderer_Path_Abstract_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_State *state);
 typedef void (*Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Shape_State *state);

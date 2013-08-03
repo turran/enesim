@@ -7,15 +7,20 @@ static Enesim_Renderer * enesim_renderer_path02(void)
 	Enesim_Renderer *r1;
 	Enesim_Renderer *r2;
 	Enesim_Renderer *c;
-	Eina_Rectangle bounds;
+	Enesim_Path *p;
 	Enesim_Matrix m;
+	Eina_Rectangle bounds;
 
 	c = enesim_renderer_compound_new();
+
+	p = enesim_path_new();
+	enesim_path_move_to(p, 10, 10);
+	enesim_path_line_to(p, 100, 50);
+	enesim_path_line_to(p, 60, 100);
+	enesim_path_line_to(p, 30, 45);
+
 	r1 = enesim_renderer_path_new();
-	enesim_renderer_path_move_to(r1, 10, 10);
-	enesim_renderer_path_line_to(r1, 100, 50);
-	enesim_renderer_path_line_to(r1, 60, 100);
-	enesim_renderer_path_line_to(r1, 30, 45);
+	enesim_renderer_path_path_set(r1, p);
 	enesim_renderer_shape_stroke_weight_set(r1, 18);
 	enesim_renderer_shape_stroke_color_set(r1, 0xffffff00);
 	enesim_renderer_shape_fill_color_set(r1, 0xffff0000);

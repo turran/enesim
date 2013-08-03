@@ -59,40 +59,40 @@ static Eina_Bool _shape_path_propagate(Enesim_Renderer *r)
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
 
 	/* common properties */
-	enesim_renderer_color_set(thiz->path, rstate->current.color);
-	enesim_renderer_origin_set(thiz->path, rstate->current.ox, rstate->current.oy);
-	enesim_renderer_transformation_set(thiz->path, &rstate->current.transformation);
+	enesim_renderer_color_set(thiz->r_path, rstate->current.color);
+	enesim_renderer_origin_set(thiz->r_path, rstate->current.ox, rstate->current.oy);
+	enesim_renderer_transformation_set(thiz->r_path, &rstate->current.transformation);
 
 	/* shape properties */
 	fill = sstate->current.fill.r;
 	if (fill) fill = enesim_renderer_ref(fill);
-	enesim_renderer_shape_fill_renderer_set(thiz->path, fill);
-	enesim_renderer_shape_fill_color_set(thiz->path, sstate->current.fill.color);
-	enesim_renderer_shape_fill_rule_set(thiz->path, sstate->current.fill.rule);
+	enesim_renderer_shape_fill_renderer_set(thiz->r_path, fill);
+	enesim_renderer_shape_fill_color_set(thiz->r_path, sstate->current.fill.color);
+	enesim_renderer_shape_fill_rule_set(thiz->r_path, sstate->current.fill.rule);
 
 	stroke = sstate->current.stroke.r;
 	if (stroke) stroke = enesim_renderer_ref(stroke);
-	enesim_renderer_shape_stroke_renderer_set(thiz->path, stroke);
-	enesim_renderer_shape_stroke_weight_set(thiz->path, sstate->current.stroke.weight);
-	enesim_renderer_shape_stroke_color_set(thiz->path, sstate->current.stroke.color);
-	enesim_renderer_shape_stroke_cap_set(thiz->path, sstate->current.stroke.cap);
-	enesim_renderer_shape_stroke_join_set(thiz->path, sstate->current.stroke.join);
+	enesim_renderer_shape_stroke_renderer_set(thiz->r_path, stroke);
+	enesim_renderer_shape_stroke_weight_set(thiz->r_path, sstate->current.stroke.weight);
+	enesim_renderer_shape_stroke_color_set(thiz->r_path, sstate->current.stroke.color);
+	enesim_renderer_shape_stroke_cap_set(thiz->r_path, sstate->current.stroke.cap);
+	enesim_renderer_shape_stroke_join_set(thiz->r_path, sstate->current.stroke.join);
 	/* FIXME in fact the path renderer does not support the stroke location */
-	enesim_renderer_shape_stroke_location_set(thiz->path, sstate->current.stroke.location);
+	enesim_renderer_shape_stroke_location_set(thiz->r_path, sstate->current.stroke.location);
 
 	if (sstate->stroke_dashes_changed)
 	{
 		Enesim_Renderer_Shape_Stroke_Dash *d;
 		const Eina_List *ll;
 
-		enesim_renderer_shape_stroke_dash_clear(thiz->path);
+		enesim_renderer_shape_stroke_dash_clear(thiz->r_path);
 		EINA_LIST_FOREACH (sstate->stroke_dashes, ll, d)
 		{
-			enesim_renderer_shape_stroke_dash_add(thiz->path, d);
+			enesim_renderer_shape_stroke_dash_add(thiz->r_path, d);
 		}
 	}
 
-	enesim_renderer_shape_draw_mode_set(thiz->path, sstate->current.draw_mode);
+	enesim_renderer_shape_draw_mode_set(thiz->r_path, sstate->current.draw_mode);
 	/* now let the implementation override whatever it wants to */
 	if (klass->setup)
 		if (!klass->setup(r, thiz->path))
@@ -112,7 +112,7 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	if (!_shape_path_propagate(r))
 		return EINA_FALSE;
 
-	if (!enesim_renderer_setup(thiz->path, s, l))
+	if (!enesim_renderer_setup(thiz->r_path, s, l))
 	{
 		if (klass->cleanup)
 			klass->cleanup(r);
@@ -129,7 +129,7 @@ static void _shape_path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
 	enesim_renderer_shape_state_commit(r);
-	enesim_renderer_cleanup(thiz->path, s);
+	enesim_renderer_cleanup(thiz->r_path, s);
 	if (klass->cleanup)
 		klass->cleanup(r);
 }
@@ -144,7 +144,7 @@ static void _shape_path_path_span(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	enesim_renderer_sw_draw(thiz->path, x, y, len, ddata);
+	enesim_renderer_sw_draw(thiz->r_path, x, y, len, ddata);
 }
 
 #if BUILD_OPENGL
@@ -154,7 +154,7 @@ static void _shape_path_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	enesim_renderer_opengl_draw(thiz->path, s, area, w, h);
+	enesim_renderer_opengl_draw(thiz->r_path, s, area, w, h);
 }
 #endif
 /*----------------------------------------------------------------------------*
@@ -167,7 +167,7 @@ static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
-	if (enesim_renderer_has_changed(thiz->path))
+	if (enesim_renderer_has_changed(thiz->r_path))
 		return EINA_TRUE;
 	if (klass->has_changed)
 		return klass->has_changed(r);
@@ -204,7 +204,7 @@ static void _shape_path_sw_hints(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	enesim_renderer_sw_hints_get(thiz->path, hints);
+	enesim_renderer_sw_hints_get(thiz->r_path, hints);
 }
 
 #if BUILD_OPENGL
@@ -261,10 +261,16 @@ static void _enesim_renderer_shape_path_instance_init(void *o)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 	Enesim_Renderer *r;
+	Enesim_Path *path;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(o);
 	r = enesim_renderer_path_new();
-	thiz->path = r;
+	thiz->r_path = r;
+
+	path = enesim_path_new();
+	thiz->path = path;
+
+	enesim_renderer_path_path_set(thiz->r_path, enesim_path_ref(thiz->path));
 }
 
 static void _enesim_renderer_shape_path_instance_deinit(void *o)
@@ -272,7 +278,8 @@ static void _enesim_renderer_shape_path_instance_deinit(void *o)
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(o);
-	enesim_renderer_unref(thiz->path);
+	enesim_renderer_unref(thiz->r_path);
+	enesim_path_unref(thiz->path);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -283,7 +290,7 @@ void enesim_renderer_shape_path_shape_features_get_default(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	enesim_renderer_shape_features_get(thiz->path, features);
+	enesim_renderer_shape_features_get(thiz->r_path, features);
 }
 
 void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
@@ -294,7 +301,7 @@ void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	_shape_path_propagate(r);
-	enesim_renderer_bounds(thiz->path, bounds);
+	enesim_renderer_bounds(thiz->r_path, bounds);
 }
 /*============================================================================*
  *                                   API                                      *

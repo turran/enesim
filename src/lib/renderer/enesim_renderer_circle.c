@@ -29,7 +29,6 @@
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
-#include "enesim_renderer_path.h"
 #include "enesim_renderer_circle.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -81,7 +80,7 @@ static Eina_Bool _circle_properties_have_changed(Enesim_Renderer_Circle *thiz)
 /*----------------------------------------------------------------------------*
  *                            Shape path interface                            *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _circle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
+static Eina_Bool _circle_setup(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Circle *thiz;
 
@@ -118,15 +117,15 @@ static Eina_Bool _circle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 		/* generate the four arcs */
 		x = thiz->current.x;
 		y = thiz->current.y;
-		enesim_renderer_path_command_clear(path);
-		enesim_renderer_path_move_to(path, x, y - rad);
-		enesim_renderer_path_arc_to(path, rad, rad, 0, EINA_FALSE,
+		enesim_path_command_clear(path);
+		enesim_path_move_to(path, x, y - rad);
+		enesim_path_arc_to(path, rad, rad, 0, EINA_FALSE,
 				EINA_TRUE, x + rad, y);
-		enesim_renderer_path_arc_to(path, rad, rad, 0, EINA_FALSE,
+		enesim_path_arc_to(path, rad, rad, 0, EINA_FALSE,
 				EINA_TRUE, x, y + rad);
-		enesim_renderer_path_arc_to(path, rad, rad, 0, EINA_FALSE,
+		enesim_path_arc_to(path, rad, rad, 0, EINA_FALSE,
 				EINA_TRUE, x - rad, y);
-		enesim_renderer_path_arc_to(path, rad, rad, 0, EINA_FALSE,
+		enesim_path_arc_to(path, rad, rad, 0, EINA_FALSE,
 				EINA_TRUE, x, y - rad);
 		thiz->generated = EINA_TRUE;
 	}

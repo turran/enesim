@@ -28,7 +28,6 @@
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
-#include "enesim_renderer_path.h"
 #include "enesim_renderer_figure.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -58,14 +57,14 @@ typedef struct _Enesim_Renderer_Figure_Class {
 } Enesim_Renderer_Figure_Class;
 
 static void _figure_generate_commands(Enesim_Renderer_Figure *thiz,
-		Enesim_Renderer *path)
+		Enesim_Path *path)
 {
 	Enesim_Figure *f;
 	Enesim_Polygon *p;
 	Eina_List *l1;
 
 	f = thiz->figure;
-	enesim_renderer_path_command_clear(path);
+	enesim_path_command_clear(path);
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
 		Enesim_Point *pt;
@@ -78,13 +77,13 @@ static void _figure_generate_commands(Enesim_Renderer_Figure *thiz,
 		pt = eina_list_data_get(l2);
 		l2 = eina_list_next(l2);
 
-		enesim_renderer_path_move_to(path, pt->x, pt->y);
+		enesim_path_move_to(path, pt->x, pt->y);
 		EINA_LIST_FOREACH(l2, l3, pt)
 		{
-			enesim_renderer_path_line_to(path, pt->x, pt->y);
+			enesim_path_line_to(path, pt->x, pt->y);
 		}
 		if (p->closed)
-			enesim_renderer_path_close(path, EINA_TRUE);
+			enesim_path_close(path);
 	}
 }
 
@@ -110,7 +109,7 @@ static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 
-static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Renderer *path)
+static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Figure *thiz;
 

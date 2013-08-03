@@ -34,11 +34,12 @@
 typedef struct _Enesim_Renderer_Shape_Path
 {
 	Enesim_Renderer_Shape parent;
-	Enesim_Renderer *path;
+	Enesim_Renderer *r_path;
+	Enesim_Path *path;
 } Enesim_Renderer_Shape_Path;
 
 typedef Eina_Bool (*Enesim_Renderer_Shape_Path_Setup)(Enesim_Renderer *r,
-		Enesim_Renderer *path);
+		Enesim_Path *path);
 typedef void (*Enesim_Renderer_Shape_Path_Cleanup)(Enesim_Renderer *r);
 
 typedef struct _Enesim_Renderer_Shape_Path_Class

@@ -29,7 +29,6 @@
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
-#include "enesim_renderer_path.h"
 #include "enesim_renderer_ellipse.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -124,7 +123,7 @@ static void _ellipse_get_real(Enesim_Renderer_Ellipse *thiz,
 /*----------------------------------------------------------------------------*
  *                            Shape path interface                            *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path)
+static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Ellipse *thiz;
 	double rx, ry;
@@ -139,12 +138,12 @@ static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Renderer *path)
 
 	if (_ellipse_properties_have_changed(thiz) && !thiz->generated)
 	{
-		enesim_renderer_path_command_clear(path);
-		enesim_renderer_path_move_to(path, x, y - ry);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + ry);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x - rx, y);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y - ry);
+		enesim_path_command_clear(path);
+		enesim_path_move_to(path, x, y - ry);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + ry);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x - rx, y);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y - ry);
 	}
 	return EINA_TRUE;
 }

@@ -196,5 +196,13 @@ static inline void enesim_path_command_move_to_values_from(
 	thiz->y = y;
 }
 
+struct _Enesim_Path {
+	/* this is to know whenever a command has been added/removed */
+	Eina_Bool changed;
+	/* the actual list of commands */
+	Eina_List *commands;
+	/* the refcounting */
+	int ref;
+};
 
 #endif

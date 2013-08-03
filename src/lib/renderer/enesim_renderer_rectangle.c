@@ -29,7 +29,6 @@
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
-#include "enesim_renderer_path.h"
 #include "enesim_renderer_rectangle.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -109,53 +108,53 @@ static Eina_Bool _rectangle_properties_have_changed(Enesim_Renderer_Rectangle *t
 }
 
 static void _rectangle_path_propagate(Enesim_Renderer_Rectangle *thiz,
-		Enesim_Renderer *path, 
+		Enesim_Path *path, 
 		double x, double y, double w, double h, double rx, double ry)
 {
-	enesim_renderer_path_command_clear(path);
+	enesim_path_command_clear(path);
 	if (thiz->current.corner.tl && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_move_to(path, x, y + ry);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
+		enesim_path_move_to(path, x, y + ry);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + rx, y);
 	}
 	else
 	{
-		enesim_renderer_path_move_to(path, x, y);
+		enesim_path_move_to(path, x, y);
 	}
 	if (thiz->current.corner.tr && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_line_to(path, x + w - rx, y);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w, y + ry);
+		enesim_path_line_to(path, x + w - rx, y);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w, y + ry);
 	}
 	else
 	{
-		enesim_renderer_path_line_to(path, x + w, y);
+		enesim_path_line_to(path, x + w, y);
 	}
 	if (thiz->current.corner.br && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_line_to(path, x + w, y + h - ry);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w - rx, y + h);
+		enesim_path_line_to(path, x + w, y + h - ry);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x + w - rx, y + h);
 	}
 	else
 	{
-		enesim_renderer_path_line_to(path, x + w, y + h);
+		enesim_path_line_to(path, x + w, y + h);
 	}
 	if (thiz->current.corner.bl && (rx > 0.0) && (ry > 0.0))
 	{
-		enesim_renderer_path_line_to(path, x + rx, y + h);
-		enesim_renderer_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + h - ry);
+		enesim_path_line_to(path, x + rx, y + h);
+		enesim_path_arc_to(path, rx, ry, 0, EINA_FALSE, EINA_TRUE, x, y + h - ry);
 	}
 	else
 	{
-		enesim_renderer_path_line_to(path, x, y + h);
+		enesim_path_line_to(path, x, y + h);
 	}
-	enesim_renderer_path_close(path, EINA_TRUE);
+	enesim_path_close(path);
 }
 
 /*----------------------------------------------------------------------------*
  *                            Shape path interface                            *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Renderer *path)
+static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Rectangle *thiz;
 

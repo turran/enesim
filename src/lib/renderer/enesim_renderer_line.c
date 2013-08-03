@@ -29,7 +29,6 @@
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
 #include "enesim_renderer_shape.h"
-#include "enesim_renderer_path.h"
 #include "enesim_renderer_line.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -101,18 +100,16 @@ static Eina_Bool _line_has_changed(Enesim_Renderer *r)
 	return ret;
 }
 
-static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Renderer *path)
+static Eina_Bool _line_setup(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Line *thiz;
 
 	thiz = ENESIM_RENDERER_LINE(r);
-	/* the draw mode should be always a stroke only */
-	enesim_renderer_shape_draw_mode_set(path, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 	if (_line_changed(thiz) && !thiz->generated)
 	{
-		enesim_renderer_path_command_clear(path);
-		enesim_renderer_path_move_to(path, thiz->current.x0, thiz->current.y0);
-		enesim_renderer_path_line_to(path, thiz->current.x1, thiz->current.y1);
+		enesim_path_command_clear(path);
+		enesim_path_move_to(path, thiz->current.x0, thiz->current.y0);
+		enesim_path_line_to(path, thiz->current.x1, thiz->current.y1);
 		thiz->generated = EINA_TRUE;
 	}
 	return EINA_TRUE;
@@ -181,8 +178,13 @@ static void _enesim_renderer_line_class_init(void *k)
 	klass->cleanup = _line_cleanup;
 }
 
-static void _enesim_renderer_line_instance_init(void *o EINA_UNUSED)
+static void _enesim_renderer_line_instance_init(void *o)
 {
+	Enesim_Renderer *r;
+
+	r = ENESIM_RENDERER(o);
+	/* the draw mode should be always a stroke only */
+	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 }
 
 static void _enesim_renderer_line_instance_deinit(void *o EINA_UNUSED)

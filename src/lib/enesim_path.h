@@ -18,6 +18,12 @@
 #ifndef ENESIM_PATH_H_
 #define ENESIM_PATH_H_
 
+/**
+ * @defgroup Enesim_Path_Group Paths
+ * @brief Path definition
+ * @{
+ */
+
 typedef enum _Enesim_Path_Command_Type
 {
 	ENESIM_PATH_COMMAND_MOVE_TO,
@@ -105,5 +111,34 @@ typedef struct _Enesim_Path_Command
 		Enesim_Path_Command_Close close;
 	} definition;
 } Enesim_Path_Command;
+
+typedef struct _Enesim_Path Enesim_Path;
+
+EAPI Enesim_Path * enesim_path_new(void);
+EAPI Enesim_Path * enesim_path_ref(Enesim_Path *thiz);
+EAPI void enesim_path_unref(Enesim_Path *thiz);
+
+EAPI void enesim_path_command_clear(Enesim_Path *thiz);
+EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd);
+EAPI void enesim_path_command_set(Enesim_Path *thiz, Eina_List *l);
+EAPI void enesim_path_command_get(Enesim_Path *thiz, Eina_List **list);
+
+EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y);
+EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y);
+EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x, double y);
+EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
+		double ctrl_y, double x, double y);
+EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
+		double ctrl_y0, double ctrl_x, double ctrl_y, double x,
+		double y);
+EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x, double ctrl_y,
+		double x, double y);
+EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double angle,
+                   unsigned char large, unsigned char sweep, double x, double y);
+EAPI void enesim_path_close(Enesim_Path *thiz);
+
+/**
+ * @}
+ */
 
 #endif

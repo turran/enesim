@@ -21,6 +21,12 @@
 #include "enesim_path.h"
 
 #include "enesim_path_private.h"
+
+/* TODO we now can get a point at a distance X, get the length of the path
+ * etc, etc. But first we need to modify the enesim path renderer to
+ * normalize the path and store it on the enesim path directly
+ * also, add the genertad_flag here and a distance variable on the generator
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -141,3 +147,251 @@ void enesim_path_cubic_flatten(Enesim_Path_Cubic *thiz,
  *                                   API                                      *
  *============================================================================*/
 
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Path * enesim_path_new(void)
+{
+	Enesim_Path *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Path));
+	thiz->ref = 1;
+	return thiz;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI Enesim_Path * enesim_path_ref(Enesim_Path *thiz)
+{
+	if (!thiz) return NULL;
+	thiz->ref++;
+	return thiz;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_unref(Enesim_Path *thiz)
+{
+	thiz->ref--;
+	if (!thiz->ref)
+	{
+		enesim_path_command_clear(thiz);
+		free(thiz);
+	}
+}
+
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_command_clear(Enesim_Path *thiz)
+{
+	Enesim_Path_Command *c;
+
+	EINA_LIST_FREE(thiz->commands, c)
+	{
+		free(c);
+	}
+	thiz->commands = eina_list_free(thiz->commands);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
+{
+	Enesim_Path_Command *new_command;
+
+	/* do not allow a move to command after another move to, just simplfiy them */
+	if (cmd->type == ENESIM_PATH_COMMAND_MOVE_TO)
+	{
+		Enesim_Path_Command *last_command;
+		Eina_List *last;
+
+		last = eina_list_last(thiz->commands);
+		last_command = eina_list_data_get(last);
+		if (last_command && last_command->type == ENESIM_PATH_COMMAND_MOVE_TO)
+		{
+			last_command->definition.move_to.x = cmd->definition.move_to.x;
+			last_command->definition.move_to.y = cmd->definition.move_to.y;
+			return;
+		}
+	}
+
+	new_command = malloc(sizeof(Enesim_Path_Command));
+	*new_command = *cmd;
+	thiz->commands = eina_list_append(thiz->commands, new_command);
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_command_set(Enesim_Path *thiz,
+		Eina_List *list)
+{
+	Enesim_Path_Command *cmd;
+	Eina_List *l;
+
+	enesim_path_command_clear(thiz);
+	EINA_LIST_FOREACH(list, l, cmd)
+	{
+		enesim_path_command_add(thiz, cmd);
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_command_get(Enesim_Path *thiz,
+		Eina_List **list)
+{
+	Enesim_Path_Command *cmd;
+	Eina_List *l;
+
+	EINA_LIST_FOREACH(thiz->commands, l, cmd)
+	{
+		Enesim_Path_Command *new_cmd;
+		new_cmd = calloc(1, sizeof(Enesim_Path_Command));
+		*new_cmd = *cmd;
+		*list = eina_list_append(*list, new_cmd);
+	}
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_MOVE_TO;
+	cmd.definition.move_to.x = x;
+	cmd.definition.move_to.y = y;
+	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_LINE_TO;
+	cmd.definition.line_to.x = x;
+	cmd.definition.line_to.y = y;
+	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x,
+		double y)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_SQUADRATIC_TO;
+	cmd.definition.squadratic_to.x = x;
+	cmd.definition.squadratic_to.y = y;
+	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
+		double ctrl_y, double x, double y)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_QUADRATIC_TO;
+	cmd.definition.quadratic_to.x = x;
+	cmd.definition.quadratic_to.y = y;
+	cmd.definition.quadratic_to.ctrl_x = ctrl_x;
+	cmd.definition.quadratic_to.ctrl_y = ctrl_y;
+	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
+		double ctrl_y0, double ctrl_x, double ctrl_y, double x, double y)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_CUBIC_TO;
+	cmd.definition.cubic_to.x = x;
+	cmd.definition.cubic_to.y = y;
+	cmd.definition.cubic_to.ctrl_x0 = ctrl_x0;
+	cmd.definition.cubic_to.ctrl_y0 = ctrl_y0;
+	cmd.definition.cubic_to.ctrl_x1 = ctrl_x;
+	cmd.definition.cubic_to.ctrl_y1 = ctrl_y;
+	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x,
+		double ctrl_y, double x, double y)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_SCUBIC_TO;
+	cmd.definition.scubic_to.x = x;
+	cmd.definition.scubic_to.y = y;
+	cmd.definition.scubic_to.ctrl_x = ctrl_x;
+	cmd.definition.scubic_to.ctrl_y = ctrl_y;
+	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double angle,
+                   unsigned char large, unsigned char sweep, double x, double y)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_ARC_TO;
+	cmd.definition.arc_to.x = x;
+	cmd.definition.arc_to.y = y;
+	cmd.definition.arc_to.rx = rx;
+	cmd.definition.arc_to.ry = ry;
+	cmd.definition.arc_to.angle = angle;
+	cmd.definition.arc_to.large = large;
+	cmd.definition.arc_to.sweep = sweep;
+	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * To be documented
+ * FIXME: To be fixed
+ */
+EAPI void enesim_path_close(Enesim_Path *thiz)
+{
+	Enesim_Path_Command cmd;
+
+	cmd.type = ENESIM_PATH_COMMAND_CLOSE;
+	cmd.definition.close.close = EINA_TRUE;
+	enesim_path_command_add(thiz, &cmd);
+}

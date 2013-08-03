@@ -28,24 +28,8 @@
 
 EAPI Enesim_Renderer * enesim_renderer_path_new(void);
 
-EAPI void enesim_renderer_path_command_clear(Enesim_Renderer *r);
-EAPI void enesim_renderer_path_command_add(Enesim_Renderer *r, Enesim_Path_Command *cmd);
-EAPI void enesim_renderer_path_command_set(Enesim_Renderer *r, Eina_List *l);
-EAPI void enesim_renderer_path_command_get(Enesim_Renderer *r, Eina_List **list);
-
-EAPI void enesim_renderer_path_move_to(Enesim_Renderer *r, double x, double y);
-EAPI void enesim_renderer_path_line_to(Enesim_Renderer *r, double x, double y);
-EAPI void enesim_renderer_path_squadratic_to(Enesim_Renderer *r, double x, double y);
-EAPI void enesim_renderer_path_quadratic_to(Enesim_Renderer *r, double ctrl_x,
-		double ctrl_y, double x, double y);
-EAPI void enesim_renderer_path_cubic_to(Enesim_Renderer *r, double ctrl_x0,
-		double ctrl_y0, double ctrl_x, double ctrl_y, double x,
-		double y);
-EAPI void enesim_renderer_path_scubic_to(Enesim_Renderer *r, double ctrl_x, double ctrl_y,
-		double x, double y);
-EAPI void enesim_renderer_path_arc_to(Enesim_Renderer *r, double rx, double ry, double angle,
-                   unsigned char large, unsigned char sweep, double x, double y);
-EAPI void enesim_renderer_path_close(Enesim_Renderer *r, Eina_Bool close);
+EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path);
+EAPI void enesim_renderer_path_path_get(Enesim_Renderer *r, Enesim_Path **path);
 
 /**
  * @}
