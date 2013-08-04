@@ -26,13 +26,14 @@
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
 #include "enesim_renderer.h"
+#include "enesim_stream.h"
 #include "enesim_image.h"
 #include "enesim_renderer_importer.h"
 #include "enesim_image_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static Eina_Error _provider_info_load(Enesim_Image_Provider *p, Enesim_Image_Data *data,
+static Eina_Error _provider_info_load(Enesim_Image_Provider *p, Enesim_Stream *data,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options)
 {
 	Eina_Error ret = ENESIM_IMAGE_ERROR_PROVIDER;
@@ -74,7 +75,7 @@ static void _provider_options_free(Enesim_Image_Provider *p, void *options)
 }
 
 static Eina_Bool _provider_data_load(Enesim_Image_Provider *p,
-		Enesim_Image_Data *data, Enesim_Buffer **b, Enesim_Pool *mpool,
+		Enesim_Stream *data, Enesim_Buffer **b, Enesim_Pool *mpool,
 		void *options, Eina_Error *err)
 {
 	Enesim_Buffer_Format cfmt;
@@ -121,7 +122,7 @@ static Eina_Bool _provider_data_load(Enesim_Image_Provider *p,
 	}
 
 	/* load the data */
-	enesim_image_data_reset(data);
+	enesim_stream_reset(data);
 	error = p->d->load(data, bb, options);
 	if (error)
 	{
@@ -140,7 +141,7 @@ info_err:
 	return EINA_FALSE;
 }
 
-static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Image_Data *data,
+static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *data,
 		Enesim_Buffer *b, void *options, Eina_Error *err)
 {
 	/* save the data */
@@ -165,7 +166,7 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Image_Data
  * @param[out] sftm The format of the image
  */
 EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
-	Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt)
+	Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
 	Eina_Error err;
 	if (!thiz)
@@ -185,7 +186,7 @@ EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
  * @brief Loads an image
  */
 EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
-		Enesim_Image_Data *data, Enesim_Buffer **b,
+		Enesim_Stream *data, Enesim_Buffer **b,
 		Enesim_Pool *mpool, const char *options)
 {
 	Eina_Error err = 0;
@@ -211,7 +212,7 @@ EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
  * @brief Saves an image
  */
 EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
-		Enesim_Image_Data *data, Enesim_Buffer *b,
+		Enesim_Stream *data, Enesim_Buffer *b,
 		const char *options EINA_UNUSED)
 {
 	Eina_Error err = 0;

@@ -1,8 +1,6 @@
 Enesim
 ======
 + We can make the API be more user friendly and avoid being so ender-alike
-+ Rename the enesim_image_data to enesim_io or enesim_stream_ as it makes more sense to split
-  it from the image subsytem to be used on other places
 + Add the luminance format
 + We have a performance problem when some renderer has changed. Basically on the practice
   we end having a full tree of renderers, several levels, proxies, whatever. When we need

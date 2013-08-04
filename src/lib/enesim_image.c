@@ -21,6 +21,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
+#include "enesim_stream.h"
 #include "enesim_image.h"
 #include "enesim_image_private.h"
 /*============================================================================*
@@ -46,7 +47,7 @@ Eina_Error ENESIM_IMAGE_ERROR_SAVING;
  *                                 Global                                     *
  *============================================================================*/
 Enesim_Image_Provider * enesim_image_load_info_provider_get(
-		Enesim_Image_Data *data, const char *mime)
+		Enesim_Stream *data, const char *mime)
 {
 	Enesim_Image_Provider *p;
 	Eina_List *providers;
@@ -55,7 +56,7 @@ Enesim_Image_Provider * enesim_image_load_info_provider_get(
 	if (!mime)
 	{
 		mime = enesim_image_mime_data_from(data);
-		enesim_image_data_reset(data);
+		enesim_stream_reset(data);
 	}
 	if (!mime)
 	{
@@ -71,7 +72,7 @@ Enesim_Image_Provider * enesim_image_load_info_provider_get(
 	return NULL;
 }
 
-Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data,
+Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Stream *data,
 		const char *mime, Enesim_Pool *pool)
 {
 	Enesim_Image_Provider *p;
@@ -81,7 +82,7 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data,
 	if (!mime)
 	{
 		mime = enesim_image_mime_data_from(data);
-		enesim_image_data_reset(data);
+		enesim_stream_reset(data);
 	}
 	if (!mime)
 	{
@@ -97,10 +98,10 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data,
 		if (!p->d->loadable)
 			return p;
 
-		enesim_image_data_reset(data);
+		enesim_stream_reset(data);
 		if (p->d->loadable(data, pool) == EINA_TRUE)
 		{
-			enesim_image_data_reset(data);
+			enesim_stream_reset(data);
 			return p;
 		}
 	}
@@ -211,7 +212,7 @@ int enesim_image_shutdown(void)
  * @param h The image height
  * @param sfmt The image original format
  */
-EAPI Eina_Bool enesim_image_info_load(Enesim_Image_Data *data, const char *mime,
+EAPI Eina_Bool enesim_image_info_load(Enesim_Stream *data, const char *mime,
 		int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
 	Enesim_Image_Provider *prov;
@@ -231,7 +232,7 @@ EAPI Eina_Bool enesim_image_info_load(Enesim_Image_Data *data, const char *mime,
  * @param options Any option the provider might require
  * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool enesim_image_load(Enesim_Image_Data *data, const char *mime,
+EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
 		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options)
 {
 	Enesim_Image_Provider *prov;
@@ -252,7 +253,7 @@ EAPI Eina_Bool enesim_image_load(Enesim_Image_Data *data, const char *mime,
  * @param data User provided data
  * @param options Any option the provider might require
  */
-EAPI void enesim_image_load_async(Enesim_Image_Data *data, const char *mime,
+EAPI void enesim_image_load_async(Enesim_Stream *data, const char *mime,
 		Enesim_Buffer *b, Enesim_Pool *mpool, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
@@ -268,7 +269,7 @@ EAPI void enesim_image_load_async(Enesim_Image_Data *data, const char *mime,
  * @param options Any option the provider might require
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool enesim_image_save(Enesim_Image_Data *data, const char *mime,
+EAPI Eina_Bool enesim_image_save(Enesim_Stream *data, const char *mime,
 		Enesim_Buffer *b, const char *options)
 {
 	Enesim_Image_Provider *prov;
@@ -287,7 +288,7 @@ EAPI Eina_Bool enesim_image_save(Enesim_Image_Data *data, const char *mime,
  * @param data User provided data
  * @param options Any option the provider might require
  */
-EAPI void enesim_image_save_async(Enesim_Image_Data *data, const char *mime,
+EAPI void enesim_image_save_async(Enesim_Stream *data, const char *mime,
 		Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
@@ -412,7 +413,7 @@ EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd,
 /**
  *
  */
-EAPI const char * enesim_image_mime_data_from(Enesim_Image_Data *data)
+EAPI const char * enesim_image_mime_data_from(Enesim_Stream *data)
 {
 	Enesim_Image_Finder *f;
 	Eina_List *l;
@@ -423,7 +424,7 @@ EAPI const char * enesim_image_mime_data_from(Enesim_Image_Data *data)
 		if (!f->data_from)
 			continue;
 
-		enesim_image_data_reset(data);
+		enesim_stream_reset(data);
 		ret = f->data_from(data);
 		if (ret) break;
 	}

@@ -43,7 +43,7 @@ struct _Jpg_Source
 	struct jpeg_source_mgr pub;
 	JOCTET buffer[JPG_BLOCK_SIZE];
 	Eina_Bool mmaped;
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 };
 
 struct _Jpg_Error_Mgr
@@ -79,7 +79,7 @@ static boolean _jpg_enesim_image_src_fill(j_decompress_ptr cinfo)
 	Jpg_Source *thiz = (Jpg_Source *)cinfo->src;
 	ssize_t ret;
 
-	ret = enesim_image_data_read(thiz->data, thiz->buffer, JPG_BLOCK_SIZE);
+	ret = enesim_stream_read(thiz->data, thiz->buffer, JPG_BLOCK_SIZE);
 	if (ret < 0)
 	{
 		ERR("Reading failed");
@@ -114,7 +114,7 @@ static void _jpg_enesim_image_src_term(j_decompress_ptr cinfo EINA_UNUSED)
 {
 }
 
-static void _jpg_enesim_image_src(struct jpeg_decompress_struct *cinfo, Enesim_Image_Data *data)
+static void _jpg_enesim_image_src(struct jpeg_decompress_struct *cinfo, Enesim_Stream *data)
 {
 	Jpg_Source *thiz;
 
@@ -134,7 +134,7 @@ static void _jpg_enesim_image_src(struct jpeg_decompress_struct *cinfo, Enesim_I
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
-static Eina_Error _jpg_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
+static Eina_Error _jpg_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
 {
 	Jpg_Error_Mgr err;
 	struct jpeg_decompress_struct cinfo;
@@ -209,7 +209,7 @@ static Eina_Error _jpg_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim
 	return 0;
 }
 
-static Eina_Error _jpg_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
+static Eina_Error _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
 {
 	Jpg_Error_Mgr err;
 	Enesim_Buffer_Sw_Data sw_data;
@@ -302,12 +302,12 @@ static Enesim_Image_Provider_Descriptor _provider = {
 	/* .save =		*/ NULL,
 };
 
-static const char * _jpg_data_from(Enesim_Image_Data *data)
+static const char * _jpg_data_from(Enesim_Stream *data)
 {
 	unsigned char buf[3];
 	int ret;
 
-	ret = enesim_image_data_read(data, buf, 3);
+	ret = enesim_stream_read(data, buf, 3);
 	if (ret < 0) return NULL;
 	/*
 	 * Header "format"

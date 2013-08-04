@@ -1,3 +1,20 @@
+/* ENESIM - Direct Rendering Library
+ * Copyright (C) 2007-2011 Jorge Luis Zapata
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ * If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef ENESIM_IMAGE_PRIVATE_H_
 #define ENESIM_IMAGE_PRIVATE_H_
 
@@ -28,29 +45,6 @@
 int enesim_image_init(void);
 int enesim_image_shutdown(void);
 
-typedef ssize_t (*Enesim_Image_Data_Read)(void *data, void *buffer, size_t len);
-typedef ssize_t (*Enesim_Image_Data_Write)(void *data, void *buffer, size_t len);
-typedef void * (*Enesim_Image_Data_Mmap)(void *data, size_t *size);
-typedef void (*Enesim_Image_Data_Munmap)(void *data, void *ptr);
-typedef void (*Enesim_Image_Data_Reset)(void *data);
-typedef size_t (*Enesim_Image_Data_Length)(void *data);
-typedef char * (*Enesim_Image_Data_Location)(void *data);
-typedef void (*Enesim_Image_Data_Free)(void *data);
-
-typedef struct _Enesim_Image_Data_Descriptor
-{
-	Enesim_Image_Data_Read read;
-	Enesim_Image_Data_Write write;
-	Enesim_Image_Data_Mmap mmap;
-	Enesim_Image_Data_Munmap munmap;
-	Enesim_Image_Data_Reset reset;
-	Enesim_Image_Data_Length length;
-	Enesim_Image_Data_Location location;
-	Enesim_Image_Data_Free free;
-} Enesim_Image_Data_Descriptor;
-
-Enesim_Image_Data * enesim_image_data_new(Enesim_Image_Data_Descriptor *d, void *data);
-
 struct _Enesim_Image_Provider
 {
 	const char *mime;
@@ -58,8 +52,8 @@ struct _Enesim_Image_Provider
 	Enesim_Image_Provider_Descriptor *d;
 };
 
-Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Image_Data *data, const char *mime, Enesim_Pool *p);
-Enesim_Image_Provider * enesim_image_load_info_provider_get(Enesim_Image_Data *data, const char *mime);
+Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Stream *data, const char *mime, Enesim_Pool *p);
+Enesim_Image_Provider * enesim_image_load_info_provider_get(Enesim_Stream *data, const char *mime);
 Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Buffer *b, const char *mime);
 Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Buffer *b, const char *mime);
 

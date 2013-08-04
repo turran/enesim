@@ -38,7 +38,7 @@ static Eina_Bool _raw_saveable(Enesim_Buffer *b)
 		return EINA_FALSE;
 	return EINA_TRUE;
 }
-static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Buffer *buffer,
+static Eina_Bool _raw_save(Enesim_Stream *data, Enesim_Buffer *buffer,
 		void *options EINA_UNUSED)
 {
 	Enesim_Buffer_Sw_Data sdata;
@@ -68,7 +68,7 @@ static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Buffer *buffer,
 	src = sdata.argb8888_pre.plane0;
 	stride = sdata.argb8888_pre.plane0_stride;
 
-	enesim_image_data_write(data, (void *)str_data, strlen(str_data));
+	enesim_stream_write(data, (void *)str_data, strlen(str_data));
 	for (i = 0; i < h; i++)
 	{
 		for (j = 0; j < w; j++)
@@ -77,22 +77,22 @@ static Eina_Bool _raw_save(Enesim_Image_Data *data, Enesim_Buffer *buffer,
 			uint8_t a, r, g, b;
 
 			if (cols % 4 == 0)
-				enesim_image_data_write(data, "\n\t", 2);
+				enesim_stream_write(data, "\n\t", 2);
 			enesim_color_components_to(*src, &a, &r, &g, &b);
 			if (i == h -1 &&  j == w - 1)
 				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x ", a, r, g, b);
 			else
 				sprintf(str, "0x%02x, 0x%02x, 0x%02x, 0x%02x, ", a, r, g, b);
-			enesim_image_data_write(data, str, strlen(str));
+			enesim_stream_write(data, str, strlen(str));
 			cols++;
 			src++;
 		}
 		src = (uint32_t *)((uint8_t *)src + stride);
 	}
-	enesim_image_data_write(data, "\n};\n", 4);
+	enesim_stream_write(data, "\n};\n", 4);
 	/* now the function to get such surface */
 	len = snprintf(function, PATH_MAX, str_function, w, h, w * 4);
-	enesim_image_data_write(data, function, len);
+	enesim_stream_write(data, function, len);
 	return EINA_TRUE;
 }
 

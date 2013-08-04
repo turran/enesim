@@ -33,6 +33,7 @@
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
 #include "enesim_converter.h"
+#include "enesim_stream.h"
 #include "enesim_image.h"
 #include "enesim_text.h"
 #include "enesim_object_descriptor.h"

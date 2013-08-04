@@ -21,6 +21,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
+#include "enesim_stream.h"
 #include "enesim_image.h"
 #include "enesim_image_private.h"
 /*============================================================================*
@@ -30,7 +31,7 @@ typedef struct _Enesim_Image_File_Data
 {
 	Enesim_Image_Callback cb;
 	void *user_data;
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 } Enesim_Image_File_Data;
 
 static void _enesim_image_file_cb(Enesim_Buffer *b, void *user_data, int error)
@@ -38,7 +39,7 @@ static void _enesim_image_file_cb(Enesim_Buffer *b, void *user_data, int error)
 	Enesim_Image_File_Data *fdata = user_data;
 
 	fdata->cb(b, fdata->user_data, error);
-	enesim_image_data_free(fdata->data);
+	enesim_stream_free(fdata->data);
 }
 
 static const char * _enesim_image_file_get_extension(const char *file)
@@ -50,22 +51,22 @@ static const char * _enesim_image_file_get_extension(const char *file)
 	return tmp + 1;
 }
 
-static Eina_Bool _file_save_data_get(const char *file, Enesim_Image_Data **data, const char **mime)
+static Eina_Bool _file_save_data_get(const char *file, Enesim_Stream **data, const char **mime)
 {
-	Enesim_Image_Data *d;
+	Enesim_Stream *d;
 	const char *m;
 	const char *ext;
 
 	ext = _enesim_image_file_get_extension(file);
 	if (!ext) return EINA_FALSE;
 
-	d = enesim_image_data_file_new(file, "wb");
+	d = enesim_stream_file_new(file, "wb");
 	if (!d) return EINA_FALSE;
 
 	m = enesim_image_mime_extension_from(ext);
 	if (!m)
 	{
-		enesim_image_data_free(d);
+		enesim_stream_free(d);
 		return EINA_FALSE;
 	}
 	*mime = m;
@@ -74,21 +75,21 @@ static Eina_Bool _file_save_data_get(const char *file, Enesim_Image_Data **data,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _file_load_data_get(const char *file, Enesim_Image_Data **data, const char **mime)
+static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, const char **mime)
 {
-	Enesim_Image_Data *d;
+	Enesim_Stream *d;
 	const char *m;
 
-	d = enesim_image_data_file_new(file, "rb");
+	d = enesim_stream_file_new(file, "rb");
 	if (!d) return EINA_FALSE;
 
 	m = enesim_image_mime_data_from(d);
 	if (!m)
 	{
-		enesim_image_data_free(d);
+		enesim_stream_free(d);
 		return EINA_FALSE;
 	}
-	enesim_image_data_reset(d);
+	enesim_stream_reset(d);
 	*mime = m;
 	*data = d;
 
@@ -107,14 +108,14 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Image_Data **data,
  */
 EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt)
 {
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 	Eina_Bool ret;
 	const char *mime;
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = enesim_image_info_load(data, mime, w, h, sfmt);
-	enesim_image_data_free(data);
+	enesim_stream_free(data);
 	return ret;
 }
 /**
@@ -130,14 +131,14 @@ EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Ene
 EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
 		Enesim_Pool *mpool, const char *options)
 {
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 	Eina_Bool ret;
 	const char *mime;
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = enesim_image_load(data, mime, b, mpool, options);
-	enesim_image_data_free(data);
+	enesim_stream_free(data);
 	return ret;
 }
 /**
@@ -155,7 +156,7 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
 		Enesim_Pool *mpool, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 	Enesim_Image_File_Data fdata;
 	const char *mime;
 
@@ -180,14 +181,14 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
  */
 EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const char *options)
 {
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 	Eina_Bool ret;
 	const char *mime;
 
 	if (!_file_save_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = enesim_image_save(data, mime, b, options);
-	enesim_image_data_free(data);
+	enesim_stream_free(data);
 	return ret;
 }
 /**
@@ -203,7 +204,7 @@ EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const 
 EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 	Enesim_Image_File_Data fdata;
 	const char *mime;
 

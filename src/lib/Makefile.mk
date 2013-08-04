@@ -16,6 +16,7 @@ src/lib/enesim_perlin.h \
 src/lib/enesim_pool.h \
 src/lib/enesim_rectangle.h \
 src/lib/enesim_renderer.h \
+src/lib/enesim_stream.h \
 src/lib/enesim_surface.h \
 src/lib/enesim_text.h
 
@@ -55,6 +56,8 @@ src/lib/enesim_rectangle.c \
 src/lib/enesim_renderer.c \
 src/lib/enesim_renderer_private.h \
 src/lib/enesim_renderer_sw.c \
+src/lib/enesim_stream_private.h \
+src/lib/enesim_stream.c \
 src/lib/enesim_surface.c \
 src/lib/enesim_surface_private.h \
 src/lib/enesim_text.c \

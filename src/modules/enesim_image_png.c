@@ -78,18 +78,18 @@ static Eina_Bool _png_format_get(int color_type, Enesim_Buffer_Format *fmt)
 /* our own io functions */
 static void _png_read(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 
 	data = png_get_io_ptr(png_ptr);
-	enesim_image_data_read(data, buf, length);
+	enesim_stream_read(data, buf, length);
 }
 
 static void _png_write(png_structp png_ptr, png_bytep buf, png_size_t length)
 {
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 
 	data = png_get_io_ptr(png_ptr);
-	enesim_image_data_write(data, buf, length);
+	enesim_stream_write(data, buf, length);
 }
 
 static void _png_flush(png_structp png_ptr EINA_UNUSED)
@@ -99,7 +99,7 @@ static void _png_flush(png_structp png_ptr EINA_UNUSED)
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
-static Eina_Error _png_info_load(Enesim_Image_Data *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
+static Eina_Error _png_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
 {
 	png_uint_32 w32, h32;
 	png_structp png_ptr = NULL;
@@ -149,7 +149,7 @@ error_read_struct:
 	return ENESIM_IMAGE_ERROR_LOADING;
 }
 
-static Eina_Error _png_load(Enesim_Image_Data *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
+static Eina_Error _png_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
 {
 	Enesim_Buffer_Sw_Data sw_data;
 	Enesim_Buffer_Format fmt;
@@ -256,7 +256,7 @@ error_read_struct:
 	return ENESIM_IMAGE_ERROR_LOADING;
 }
 
-static Eina_Bool _png_save(Enesim_Image_Data *data, Enesim_Buffer *b, void *options EINA_UNUSED)
+static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b, void *options EINA_UNUSED)
 {
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
@@ -356,12 +356,12 @@ static Enesim_Image_Provider_Descriptor _provider = {
 	/* .save = 		*/ _png_save,
 };
 
-static const char * _png_data_from(Enesim_Image_Data *data)
+static const char * _png_data_from(Enesim_Stream *data)
 {
 	unsigned char buf[PNG_BYTES_TO_CHECK];
 	int ret;
 
-	ret = enesim_image_data_read(data, buf, PNG_BYTES_TO_CHECK);
+	ret = enesim_stream_read(data, buf, PNG_BYTES_TO_CHECK);
 	if (ret < 0) return NULL;
 	if (!png_check_sig(buf, PNG_BYTES_TO_CHECK))
 		return NULL;

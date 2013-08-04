@@ -21,6 +21,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
+#include "enesim_stream.h"
 #include "enesim_image.h"
 
 #include "enesim_text.h"

@@ -21,6 +21,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
+#include "enesim_stream.h"
 #include "enesim_image.h"
 #include "enesim_image_private.h"
 
@@ -63,7 +64,7 @@ typedef struct _Enesim_Image_Job
 {
 	Enesim_Image_Context *thiz;
 	Enesim_Image_Provider *prov;
-	Enesim_Image_Data *data;
+	Enesim_Stream *data;
 	Enesim_Image_Callback cb;
 	void *user_data;
 	Eina_Error err;
@@ -183,7 +184,7 @@ EAPI void enesim_image_context_free(Enesim_Image_Context *thiz)
  * @param data User provided data
  * @param options Any option the provider might require
  */
-EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Image_Data *data,
+EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Stream *data,
 		const char *mime, Enesim_Buffer *b, Enesim_Pool *mpool,
 		Enesim_Image_Callback cb, void *user_data,
 		const char *options)
@@ -228,7 +229,7 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Ima
  * @param options Any option the provider might require
  *
  */
-EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Image_Data *data,
+EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Stream *data,
 		const char *mime, Enesim_Buffer *b, Enesim_Image_Callback cb,
 		void *user_data, const char *options)
 {
