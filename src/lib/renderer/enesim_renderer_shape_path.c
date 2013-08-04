@@ -265,12 +265,8 @@ static void _enesim_renderer_shape_path_instance_init(void *o)
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(o);
 	r = enesim_renderer_path_new();
+	enesim_renderer_path_path_get(r, &thiz->path);
 	thiz->r_path = r;
-
-	path = enesim_path_new();
-	thiz->path = path;
-
-	enesim_renderer_path_path_set(thiz->r_path, enesim_path_ref(thiz->path));
 }
 
 static void _enesim_renderer_shape_path_instance_deinit(void *o)

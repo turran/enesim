@@ -120,8 +120,6 @@ EAPI void enesim_path_unref(Enesim_Path *thiz);
 
 EAPI void enesim_path_command_clear(Enesim_Path *thiz);
 EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd);
-EAPI void enesim_path_command_set(Enesim_Path *thiz, Eina_List *l);
-EAPI void enesim_path_command_get(Enesim_Path *thiz, Eina_List **list);
 
 EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y);
 EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y);

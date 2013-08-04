@@ -205,4 +205,7 @@ struct _Enesim_Path {
 	int ref;
 };
 
+void enesim_path_command_set(Enesim_Path *thiz, Eina_List *l);
+void enesim_path_command_get(Enesim_Path *thiz, Eina_List **list);
+
 #endif

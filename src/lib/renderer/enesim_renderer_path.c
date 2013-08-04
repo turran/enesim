@@ -98,10 +98,7 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	/* set the commands */
 	if (thiz->changed || ret != thiz->current)
 	{
-		if (thiz->path)
-			enesim_renderer_path_path_set(ret, enesim_path_ref(thiz->path));
-		else
-			enesim_renderer_path_path_set(ret, NULL);
+		enesim_renderer_path_abstract_path_set(ret, enesim_path_ref(thiz->path));
 	}
 	return ret;
 }
@@ -289,6 +286,8 @@ static void _enesim_renderer_path_instance_init(void *o)
 	r = enesim_renderer_path_cairo_new();
 	thiz->cairo = r;
 #endif
+
+	thiz->path = enesim_path_new();
 }
 
 static void _enesim_renderer_path_instance_deinit(void *o)
@@ -300,6 +299,7 @@ static void _enesim_renderer_path_instance_deinit(void *o)
 #if BUILD_CAIRO
 	enesim_renderer_unref(thiz->cairo);
 #endif
+	enesim_path_unref(thiz->path);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -328,11 +328,14 @@ EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path)
 	Enesim_Renderer_Path *thiz;
 
 	thiz = ENESIM_RENDERER_PATH(r);
-	if (thiz->path)
+	if (!path)
 	{
-		enesim_path_unref(thiz->path);
+		enesim_path_command_clear(thiz->path);
 	}
-	thiz->path = path;
+	else
+	{
+		enesim_path_command_set(thiz->path, path->commands);
+	}
 }
 
 /**
@@ -346,8 +349,5 @@ EAPI void enesim_renderer_path_path_get(Enesim_Renderer *r, Enesim_Path **path)
 	if (!path) return;
 
 	thiz = ENESIM_RENDERER_PATH(r);
-	if (thiz->path)
-		*path = enesim_path_ref(thiz->path);
-	else
-		*path = NULL;
+	*path = enesim_path_ref(thiz->path);
 }

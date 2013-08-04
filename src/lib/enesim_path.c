@@ -143,6 +143,34 @@ void enesim_path_cubic_flatten(Enesim_Path_Cubic *thiz,
 	_cubic_flatten(xc, yc, xb, yb, x23, y23, thiz->end_x, thiz->end_y,
 			tolerance, vertex_add, data);
 }
+
+void enesim_path_command_set(Enesim_Path *thiz,
+		Eina_List *list)
+{
+	Enesim_Path_Command *cmd;
+	Eina_List *l;
+
+	enesim_path_command_clear(thiz);
+	EINA_LIST_FOREACH(list, l, cmd)
+	{
+		enesim_path_command_add(thiz, cmd);
+	}
+}
+
+void enesim_path_command_get(Enesim_Path *thiz,
+		Eina_List **list)
+{
+	Enesim_Path_Command *cmd;
+	Eina_List *l;
+
+	EINA_LIST_FOREACH(thiz->commands, l, cmd)
+	{
+		Enesim_Path_Command *new_cmd;
+		new_cmd = calloc(1, sizeof(Enesim_Path_Command));
+		*new_cmd = *cmd;
+		*list = eina_list_append(*list, new_cmd);
+	}
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -229,42 +257,6 @@ EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 	*new_command = *cmd;
 	thiz->commands = eina_list_append(thiz->commands, new_command);
 	thiz->changed = EINA_TRUE;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_path_command_set(Enesim_Path *thiz,
-		Eina_List *list)
-{
-	Enesim_Path_Command *cmd;
-	Eina_List *l;
-
-	enesim_path_command_clear(thiz);
-	EINA_LIST_FOREACH(list, l, cmd)
-	{
-		enesim_path_command_add(thiz, cmd);
-	}
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_path_command_get(Enesim_Path *thiz,
-		Eina_List **list)
-{
-	Enesim_Path_Command *cmd;
-	Eina_List *l;
-
-	EINA_LIST_FOREACH(thiz->commands, l, cmd)
-	{
-		Enesim_Path_Command *new_cmd;
-		new_cmd = calloc(1, sizeof(Enesim_Path_Command));
-		*new_cmd = *cmd;
-		*list = eina_list_append(*list, new_cmd);
-	}
 }
 
 /**
