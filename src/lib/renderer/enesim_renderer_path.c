@@ -335,6 +335,7 @@ EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path)
 	else
 	{
 		enesim_path_command_set(thiz->path, path->commands);
+		enesim_path_unref(path);
 	}
 }
 
