@@ -97,7 +97,12 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	enesim_renderer_propagate(r, ret);
 	/* set the commands */
 	if (thiz->changed || ret != thiz->current)
-		enesim_renderer_path_abstract_commands_set(ret, thiz->path->commands);
+	{
+		if (thiz->path)
+			enesim_renderer_path_path_set(ret, enesim_path_ref(thiz->path));
+		else
+			enesim_renderer_path_path_set(ret, NULL);
+	}
 	return ret;
 }
 

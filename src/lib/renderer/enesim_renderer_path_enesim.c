@@ -39,7 +39,9 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_path_private.h"
 #include "enesim_buffer_private.h"
+#include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_path_abstract_private.h"
@@ -98,8 +100,8 @@ typedef struct _Enesim_Renderer_Path_Enesim
 {
 	Enesim_Renderer_Path_Abstract parent;
 	/* properties */
-	Eina_List *commands;
 	/* private */
+	Enesim_Path *path;
 	Enesim_Path_Generator *stroke_path;
 	Enesim_Path_Generator *strokeless_path;
 	Enesim_Path_Generator *dashed_path;
@@ -117,6 +119,7 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	/* internal stuff */
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
+	Eina_Bool path_changed : 1;
 	Eina_Bool generated : 1;
 } Enesim_Renderer_Path_Enesim;
 
@@ -721,8 +724,19 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path_Enesim *thiz,
 		Enesim_Renderer_Shape_Stroke_Cap cap)
 {
 	Eina_Bool ret = EINA_FALSE;
-	/* some command has been added */
-	if (thiz->changed && !thiz->generated)
+
+	/* in case some command has been changed be sure to cleanup
+	 * the path and keep the changed flag of the path to true
+	 */
+	if (thiz->path && thiz->path->changed)
+	{
+		thiz->path_changed = EINA_TRUE;
+		thiz->path->changed = EINA_FALSE;
+		thiz->generated = EINA_FALSE;
+	}
+
+	/* a new path has been set or some command has been added */
+	if ((thiz->changed || thiz->path_changed) && !thiz->generated)
 		ret = EINA_TRUE;
 	/* the stroke join is different */
 	else if (thiz->last_join != join)
@@ -787,7 +801,10 @@ static void _path_generate_figures(Enesim_Renderer_Path_Enesim *thiz,
 	enesim_path_generator_stroke_dash_set(generator, dashes);
 	enesim_path_generator_scale_set(generator, sx, sy);
 	enesim_path_generator_transformation_set(generator, transformation);
-	enesim_path_generator_generate(generator, thiz->commands);
+	if (thiz->path)
+	{
+		enesim_path_generator_generate(generator, thiz->path->commands);
+	}
 
 	/* set the fill figure on the bifigure as its under polys */
 	enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
@@ -828,19 +845,28 @@ static void _path_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	enesim_renderer_cleanup(thiz->bifigure, s);
 	thiz->changed = EINA_FALSE;
+	thiz->path_changed = EINA_FALSE;
 }
 
 /*----------------------------------------------------------------------------*
  *                          Path Abstract interface                           *
  *----------------------------------------------------------------------------*/
-static void _path_commands_set(Enesim_Renderer *r, const Eina_List *commands)
+static void _path_path_set(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-	thiz->commands = commands;
-	thiz->changed = EINA_TRUE;
-	thiz->generated = EINA_FALSE;
+	if (thiz->path != path)
+	{
+		if (thiz->path) enesim_path_unref(thiz->path);
+		thiz->path = path;
+		thiz->changed = EINA_TRUE;
+		thiz->generated = EINA_FALSE;
+	}
+	else
+	{
+		enesim_path_unref(path);
+	}
 }
 /*----------------------------------------------------------------------------*
  *                             Shape interface                                *
@@ -980,7 +1006,10 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Path_Enesim *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-	return thiz->changed;
+	if (thiz->changed || thiz->path_changed || (thiz->path && thiz->path->changed))
+		return EINA_TRUE;
+	else
+		return EINA_FALSE;
 }
 
 static void _path_bounds_get(Enesim_Renderer *r,
@@ -1102,7 +1131,7 @@ static void _enesim_renderer_path_enesim_class_init(void *k)
 #endif
 
 	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
-	klass->commands_set = _path_commands_set;
+	klass->path_set = _path_path_set;
 }
 
 static void _enesim_renderer_path_enesim_instance_init(void *o)

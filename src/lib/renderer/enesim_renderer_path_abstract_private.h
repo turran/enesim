@@ -31,36 +31,25 @@
 		ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR)
 
 
-/* TODO later instead of inheriting from a shape, just inherit from
- * a renderer and pass the state directly
- */
-typedef struct _Enesim_Renderer_Path_Abstract_State
-{
-	Eina_List *commands;
-	Eina_Bool changed;
-} Enesim_Renderer_Path_Abstract_State;
-
 typedef struct _Enesim_Renderer_Path_Abstract
 {
 	Enesim_Renderer_Shape parent;
 } Enesim_Renderer_Path_Abstract;
 
 /* TODO Rename the commands and pass the path directly, so we can track a change */
-typedef void (*Enesim_Renderer_Path_Abstract_Commands_Set_Cb)(Enesim_Renderer *r, const Eina_List *commands);
+typedef void (*Enesim_Renderer_Path_Abstract_Path_Set_Cb)(Enesim_Renderer *r, Enesim_Path *path);
 typedef void (*Enesim_Renderer_Path_Abstract_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_State *state);
 typedef void (*Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Shape_State *state);
-typedef void (*Enesim_Renderer_Path_Abstract_Path_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Path_Abstract_State *state);
 
 typedef struct _Enesim_Renderer_Path_Abstract_Class {
 	Enesim_Renderer_Shape_Class parent;
-	Enesim_Renderer_Path_Abstract_Commands_Set_Cb commands_set;
-	Enesim_Renderer_Path_Abstract_Path_State_Set_Cb path_state_set;
+	Enesim_Renderer_Path_Abstract_Path_Set_Cb path_set;
 	Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb shape_state_set;
 	Enesim_Renderer_Path_Abstract_State_Set_Cb state_set;
 } Enesim_Renderer_Path_Abstract_Class;
 
 Enesim_Object_Descriptor * enesim_renderer_path_abstract_descriptor_get(void);
-void enesim_renderer_path_abstract_commands_set(Enesim_Renderer *r, const Eina_List *commands);
+void enesim_renderer_path_abstract_path_set(Enesim_Renderer *r, Enesim_Path *path);
 
 /* abstract implementations */
 Enesim_Renderer * enesim_renderer_path_enesim_new(void);

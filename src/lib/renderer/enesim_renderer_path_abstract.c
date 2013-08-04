@@ -62,12 +62,13 @@ static void _enesim_renderer_path_abstract_instance_deinit(void *o EINA_UNUSED)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void enesim_renderer_path_abstract_commands_set(Enesim_Renderer *r, const Eina_List *commands)
+void enesim_renderer_path_abstract_path_set(Enesim_Renderer *r,
+		Enesim_Path *path)
 {
 	Enesim_Renderer_Path_Abstract_Class *klass;
 
 	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS_GET(r);
-	klass->commands_set(r, commands);
+	klass->path_set(r, path);
 }
 
 #if 0
