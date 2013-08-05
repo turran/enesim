@@ -19,9 +19,10 @@
 				EINA_EXTRA_RECTANGLE_ARGS(&bounds)); 	\
 		s = enesim_surface_new(ENESIM_FORMAT_ARGB8888,		\
 				256, 256);				\
-		if (!enesim_renderer_draw(r, s, NULL, 0, 0, &error))	\
+		if (!enesim_renderer_draw(r, s, ENESIM_FILL, NULL, 	\
+				0, 0, &error))				\
 		{							\
-			enesim_log_dump(error);			\
+			enesim_log_dump(error);				\
 		}							\
 		b = enesim_surface_buffer_get(s);			\
 		enesim_image_file_save(#name ".png", b, NULL);		\

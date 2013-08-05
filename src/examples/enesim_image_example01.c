@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 		enesim_renderer_checker_odd_color_set(r, 0xff000000);
 		enesim_renderer_checker_width_set(r, 20);
 		enesim_renderer_checker_height_set(r, 20);
-		enesim_renderer_draw(r, s, NULL, 0, 0, NULL);
+		enesim_renderer_draw(r, s, ENESIM_FILL, NULL, 0, 0, NULL);
 		enesim_renderer_unref(r);
 
 		b = enesim_surface_buffer_get(s);
