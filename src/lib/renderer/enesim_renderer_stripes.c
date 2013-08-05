@@ -174,8 +174,7 @@ static void _stripes_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUS
 #endif
 
 static void _span_projective(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
@@ -223,8 +222,7 @@ static void _span_projective(Enesim_Renderer *r,
 }
 
 static void _span_projective_paints(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
@@ -307,7 +305,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 
 static void _span_affine(Enesim_Renderer *r,
 		int x, int y,
-		unsigned int len, void *ddata)
+		int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int ayx = thiz->matrix.yx;
@@ -349,8 +347,7 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_affine_paints(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
 	int ayx = thiz->matrix.yx;
@@ -469,7 +466,7 @@ static const char * _stripes_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
@@ -485,12 +482,12 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 
 	if (thiz->current.even.paint)
 	{
-		if (!enesim_renderer_setup(thiz->current.even.paint, s, l))
+		if (!enesim_renderer_setup(thiz->current.even.paint, s, rop, l))
 			return EINA_FALSE;
 	}
 	if (thiz->current.odd.paint)
 	{
-		if (!enesim_renderer_setup(thiz->current.odd.paint, s, l))
+		if (!enesim_renderer_setup(thiz->current.odd.paint, s, rop, l))
 			return EINA_FALSE;
 	}
 
@@ -539,7 +536,7 @@ static void _stripes_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _stripes_sw_hints(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
@@ -595,6 +592,7 @@ static Eina_Bool _stripes_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 
 static Eina_Bool _stripes_opengl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l EINA_UNUSED)
 {

@@ -173,7 +173,7 @@ static Eina_Bool _path_cairo_needs_generate(Enesim_Renderer_Path_Cairo *thiz)
 	return ret;
 }
 
-static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, unsigned int len,
+static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, int len,
 		void *ddata)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
@@ -239,7 +239,7 @@ static void _path_cairo_cubic_to(Enesim_Path_Command_Cubic_To *cubic_to,
 	cairo_curve_to(cairo, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1, x, y);
 }
 
-static void _path_cairo_close(Enesim_Path_Command_Close *close,
+static void _path_cairo_close(Enesim_Path_Command_Close *close EINA_UNUSED,
 		void *data)
 {
 	Enesim_Renderer_Path_Cairo *thiz = data;
@@ -268,7 +268,7 @@ static const char * _path_cairo_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
@@ -344,6 +344,7 @@ static void _path_cairo_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _path_cairo_sw_hints(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;

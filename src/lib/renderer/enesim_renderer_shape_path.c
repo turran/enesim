@@ -65,7 +65,7 @@ static Eina_Bool _shape_path_propagate(Enesim_Renderer *r)
 }
 
 static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Log **l)
+		Enesim_Rop rop, Enesim_Log **l)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 	Enesim_Renderer_Shape_Path_Class *klass;
@@ -76,7 +76,7 @@ static Eina_Bool _shape_path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	if (!_shape_path_propagate(r))
 		return EINA_FALSE;
 
-	if (!enesim_renderer_setup(thiz->r_path, s, l))
+	if (!enesim_renderer_setup(thiz->r_path, s, rop, l))
 	{
 		if (klass->cleanup)
 			klass->cleanup(r);
@@ -102,8 +102,7 @@ static void _shape_path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
  *----------------------------------------------------------------------------*/
 /* Use the internal path for drawing */
 static void _shape_path_path_span(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
@@ -141,10 +140,10 @@ static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _shape_path_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
-	if (!_shape_path_setup(r, s, l))
+	if (!_shape_path_setup(r, s, rop, l))
 		return EINA_FALSE;
 	*draw = _shape_path_path_span;
 	return EINA_TRUE;
@@ -162,22 +161,22 @@ static void _shape_path_features_get(Enesim_Renderer *r EINA_UNUSED,
 		ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
-static void _shape_path_sw_hints(Enesim_Renderer *r,
+static void _shape_path_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	enesim_renderer_sw_hints_get(thiz->r_path, hints);
+	enesim_renderer_sw_hints_get(thiz->r_path, rop, hints);
 }
 
 #if BUILD_OPENGL
 static Eina_Bool _shape_path_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l)
 {
-	if (!_shape_path_setup(r, s, l))
+	if (!_shape_path_setup(r, s, rop, l))
 		return EINA_FALSE;
 
 	*draw = _shape_path_opengl_draw;

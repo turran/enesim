@@ -60,7 +60,7 @@ typedef struct _Enesim_Renderer_Transition_Class {
 } Enesim_Renderer_Transition_Class;
 
 static void _transition_span_general(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Transition *thiz;
 	Enesim_Renderer *s0, *s1;
@@ -105,7 +105,7 @@ static const char * _transition_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Transition *thiz;
@@ -114,9 +114,9 @@ static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
 	if (!thiz || !thiz->src || !thiz->tgt)
 		return EINA_FALSE;
 
-	if (!enesim_renderer_setup(thiz->src, s, l))
+	if (!enesim_renderer_setup(thiz->src, s, rop, l))
 		goto r0_end;
-	if (!enesim_renderer_setup(thiz->tgt, s, l))
+	if (!enesim_renderer_setup(thiz->tgt, s, rop, l))
 		goto r1_end;
 
 	*fill = _transition_span_general;

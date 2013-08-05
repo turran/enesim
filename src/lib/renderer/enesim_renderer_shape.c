@@ -305,9 +305,8 @@ static void _shape_cleanup(Enesim_Renderer *r,
 	_state_commit(state);
 }
 
-static Eina_Bool _shape_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Log **l)
+static Eina_Bool _shape_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Log **l)
 {
 	Enesim_Renderer_Shape *thiz;
 	Enesim_Renderer_Shape_State *state;
@@ -323,7 +322,7 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL))
 		{
 			fill_renderer = EINA_TRUE;
-			if (!enesim_renderer_setup(state->current.fill.r, s, l))
+			if (!enesim_renderer_setup(state->current.fill.r, s, rop, l))
 			{
 				ENESIM_RENDERER_LOG(r, l, "Fill renderer failed");
 				return EINA_FALSE;
@@ -335,7 +334,7 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 		if (state->current.stroke.r &&
 				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
 		{
-			if (!enesim_renderer_setup(state->current.stroke.r, s, l))
+			if (!enesim_renderer_setup(state->current.stroke.r, s, rop, l))
 			{
 				ENESIM_RENDERER_LOG(r, l, "Stroke renderer failed");
 				/* clean up the fill renderer setup */
@@ -352,17 +351,17 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Log **l)
 {
 	Enesim_Renderer_Shape_Class *klass;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
-	if (!_shape_setup(r, s, l)) return EINA_FALSE;
+	if (!_shape_setup(r, s, rop, l)) return EINA_FALSE;
 	if (!klass->sw_setup) return EINA_FALSE;
 
-	if (!klass->sw_setup(r, s, fill, l))
+	if (!klass->sw_setup(r, s, rop, fill, l))
 		return EINA_FALSE;
 
 	return EINA_TRUE;
@@ -382,17 +381,17 @@ static void _enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_shape_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l)
 {
 	Enesim_Renderer_Shape_Class *klass;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
-	if (!_shape_setup(r, s, l)) return EINA_FALSE;
+	if (!_shape_setup(r, s, rop, l)) return EINA_FALSE;
 	if (!klass->opengl_setup) return EINA_FALSE;
 
-	return klass->opengl_setup(r, s, draw, l);
+	return klass->opengl_setup(r, s, rop, draw, l);
 }
 
 static void _enesim_renderer_shape_opengl_cleanup(Enesim_Renderer *r,
@@ -409,7 +408,7 @@ static void _enesim_renderer_shape_opengl_cleanup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		const char **program_name, const char **program_source,
 		size_t *program_length,
 		Enesim_Log **l)
@@ -417,10 +416,10 @@ static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Class *klass;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
-	if (!_shape_setup(r, s, l)) return EINA_FALSE;
+	if (!_shape_setup(r, s, rop, l)) return EINA_FALSE;
 	if (!klass->opencl_setup) return EINA_FALSE;
 
-	return klass->opencl_setup(r, s, program_name, program_source,
+	return klass->opencl_setup(r, s, rop, program_name, program_source,
 			program_length, l);
 }
 
