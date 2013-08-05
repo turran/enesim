@@ -132,7 +132,7 @@ static void _radial_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED
 
 static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 		const Enesim_Renderer_Gradient_State *gstate,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -266,11 +266,8 @@ static void _enesim_renderer_gradient_radial_class_init(void *k)
 	_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
 }
 
-static void _enesim_renderer_gradient_radial_instance_init(void *o)
+static void _enesim_renderer_gradient_radial_instance_init(void *o EINA_UNUSED)
 {
-	Enesim_Renderer_Gradient_Radial *thiz;
-
-	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(o);
 }
 
 static void _enesim_renderer_gradient_radial_instance_deinit(void *o EINA_UNUSED)

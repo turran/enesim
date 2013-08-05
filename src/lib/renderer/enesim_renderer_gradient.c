@@ -136,8 +136,7 @@ static Eina_Bool _gradient_changed(Enesim_Renderer_Gradient *thiz)
 }
 
 static void _gradient_draw(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Sw_Draw_Data data;
@@ -173,7 +172,7 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -193,7 +192,7 @@ static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
 	/* always call our own fill */
 	*fill = _gradient_draw;
 	/* setup the implementation */
-	if (!klass->sw_setup(r, &thiz->state, s, &thiz->draw, l))
+	if (!klass->sw_setup(r, &thiz->state, s, rop, &thiz->draw, l))
 	{
 		ENESIM_RENDERER_LOG(r, l, "Gradient implementation failed");
 		return EINA_FALSE;
