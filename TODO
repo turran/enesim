@@ -28,17 +28,8 @@ Enesim
 + We need to simplify the real rendering functions into its own
   c file with its own struct, this way in the future we can reuse the
   algorithm for other backends
-+ Split the hswitch and transition common parts into a common transition renderer
-  with properties as src, target and step, that's all
-+ Initialize every renderer to some sane vales
 + We need to use whenever possible functions for fixed point operations. This way later we can just
   create some #defines for them and we can easily change from 16.16 to 32.32 or stuff like that
-+ The renderers should implement or even the change interface or the damage, there's no need to iterate
-  the rendernig tree twice, one for the change callback and another for the damage callback
-+ If we do the above then we should remove the enesim_renderer_has_changed API function, it should just
-  request the damages. If no damages, then no change, etc. Or implement the changed as a call to damages
-  with a simple callback that whenever a some damage area is returned then we should just abort and return
-  true
 
 Image
 =====
