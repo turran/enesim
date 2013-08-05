@@ -34,7 +34,7 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
-
+#include "enesim_list_private.h"
 #include "enesim_vector_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_rasterizer_private.h"

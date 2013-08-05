@@ -51,7 +51,7 @@ typedef struct _Enesim_Renderer_Shape_State
 		} fill;
 		Enesim_Renderer_Shape_Draw_Mode draw_mode;
 	} current, past;
-	Enesim_Renderer_Shape_Dash dashes;
+	Enesim_List *dashes;
 	Eina_Bool changed;
 } Enesim_Renderer_Shape_State;
 

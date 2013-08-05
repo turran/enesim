@@ -40,6 +40,7 @@
 #endif
 
 #include "enesim_path_private.h"
+#include "enesim_list_private.h"
 #include "enesim_buffer_private.h"
 #include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
@@ -120,6 +121,7 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	Enesim_Renderer *bifigure;
 	Eina_Bool changed : 1;
 	Eina_Bool path_changed : 1;
+	Eina_Bool dashes_changed : 1;
 	Eina_Bool generated : 1;
 } Enesim_Renderer_Path_Enesim;
 
@@ -357,9 +359,9 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_Enesim_OpenGL_Figure *gl
 	{
 		Enesim_Point *pt;
 		Eina_List *l2;
-		Eina_List *last;
+		//Eina_List *last;
 
-		last = eina_list_last(p->points);
+		//last = eina_list_last(p->points);
 		gluTessBeginContour(t);
 		EINA_LIST_FOREACH(p->points, l2, pt)
 		{
@@ -467,7 +469,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		Enesim_Renderer_Path_Enesim_OpenGL_Figure *gf,
 		Enesim_Figure *f,
 		Enesim_Color color,
-		Enesim_Renderer *rel,
+		Enesim_Renderer *rel EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Data *rdata,
 		Eina_Bool silhoutte,
 		const Eina_Rectangle *area)
@@ -721,7 +723,8 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path_Enesim *thiz,
 		const Enesim_Matrix *cgm,
 		double stroke_width,
 		Enesim_Renderer_Shape_Stroke_Join join,
-		Enesim_Renderer_Shape_Stroke_Cap cap)
+		Enesim_Renderer_Shape_Stroke_Cap cap,
+		Enesim_List *dashes)
 {
 	Eina_Bool ret = EINA_FALSE;
 
@@ -735,8 +738,15 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path_Enesim *thiz,
 		thiz->generated = EINA_FALSE;
 	}
 
+	if (enesim_list_has_changed(dashes))
+	{
+		thiz->dashes_changed = EINA_TRUE;
+		thiz->generated = EINA_FALSE;
+		enesim_list_clear_changed(dashes);
+	}
+
 	/* a new path has been set or some command has been added */
-	if ((thiz->changed || thiz->path_changed) && !thiz->generated)
+	if ((thiz->changed || thiz->path_changed || thiz->dashes_changed) && !thiz->generated)
 		ret = EINA_TRUE;
 	/* the stroke join is different */
 	else if (thiz->last_join != join)
@@ -749,6 +759,7 @@ static Eina_Bool _path_needs_generate(Enesim_Renderer_Path_Enesim *thiz,
 	/* the geometry transformation is different */
 	else if (!enesim_matrix_is_equal(cgm, &thiz->last_matrix))
 		ret = EINA_TRUE;
+
 	return ret;
 }
 
@@ -891,11 +902,12 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	/* generate the list of points/polygons */
 	if (_path_needs_generate(thiz, &cs->current.transformation,
 			css->current.stroke.weight,
-			css->current.stroke.join, css->current.stroke.cap))
+			css->current.stroke.join, css->current.stroke.cap,
+			css->dashes))
 	{
 		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
 				&cs->current.transformation, 1, 1,
-				css->current.stroke.join, css->current.stroke.cap, css->dashes.l);
+				css->current.stroke.join, css->current.stroke.cap, css->dashes->l);
 	}
 
 #if WIREFRAME
@@ -949,11 +961,12 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	/* generate the figures */
 	if (_path_needs_generate(thiz, &cs->current.transformation,
 			css->current.stroke.weight,
-			css->current.stroke.join, css->current.stroke.cap))
+			css->current.stroke.join, css->current.stroke.cap,
+			css->dashes))
 	{
 		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
 				&cs->current.transformation, 1, 1,
-				css->current.stroke.join, css->current.stroke.cap, css->dashes.l);
+				css->current.stroke.join, css->current.stroke.cap, css->dashes->l);
 	}
 
 	/* check what to draw, stroke, fill or stroke + fill */
@@ -1006,7 +1019,7 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Path_Enesim *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-	if (thiz->changed || thiz->path_changed || (thiz->path && thiz->path->changed))
+	if (thiz->changed || thiz->path_changed || (thiz->path && thiz->path->changed) || (thiz->dashes_changed))
 		return EINA_TRUE;
 	else
 		return EINA_FALSE;
@@ -1029,11 +1042,12 @@ static void _path_bounds_get(Enesim_Renderer *r,
 
 	if (_path_needs_generate(thiz, &cs->current.transformation,
 			css->current.stroke.weight,
-			css->current.stroke.join, css->current.stroke.cap))
+			css->current.stroke.join, css->current.stroke.cap,
+			css->dashes))
 	{
 		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
 				&cs->current.transformation, 1, 1,
-				css->current.stroke.join, css->current.stroke.cap, css->dashes.l);
+				css->current.stroke.join, css->current.stroke.cap, css->dashes->l);
 	}
 
 	if (!thiz->fill_figure)

@@ -38,6 +38,7 @@
 #include "Enesim_OpenGL.h"
 #endif
 
+#include "enesim_list_private.h"
 #include "enesim_path_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
@@ -59,7 +60,6 @@ typedef struct _Enesim_Renderer_Path
 	Enesim_Renderer_Shape parent;
 	/* properties */
 	Enesim_Path *path;
-	Eina_Bool changed;
 	/* private */
 	Enesim_Renderer *enesim;
 #if BUILD_CAIRO
@@ -75,15 +75,9 @@ typedef struct _Enesim_Renderer_Path_Class {
 static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path *thiz;
-	const Enesim_Renderer_State *rstate;
-	const Enesim_Renderer_Shape_State *sstate;
 	Enesim_Renderer *ret;
 
 	thiz = ENESIM_RENDERER_PATH(r);
-	/* get the state properties */
-	rstate = enesim_renderer_state_get(r);
-	sstate = enesim_renderer_shape_state_get(r);
-
 	/* TODO get the best implementation for such properties and features */
 #if CHOOSE_CAIRO
 	ret = thiz->cairo;
@@ -96,10 +90,7 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	/* propagate all the renderer properties */
 	enesim_renderer_propagate(r, ret);
 	/* set the commands */
-	if (thiz->changed || ret != thiz->current)
-	{
-		enesim_renderer_path_abstract_path_set(ret, enesim_path_ref(thiz->path));
-	}
+	enesim_renderer_path_abstract_path_set(ret, enesim_path_ref(thiz->path));
 	return ret;
 }
 
@@ -155,15 +146,73 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_shape_state_commit(r);
 	enesim_renderer_cleanup(thiz->current, s);
 	thiz->current = NULL;
-	thiz->changed = EINA_FALSE;
+	thiz->path->changed = EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static void _path_shape_features_get(Enesim_Renderer *r,
+		Enesim_Renderer_Shape_Feature *features)
+{
+	Enesim_Renderer *current;
+
+	current = _path_implementation_get(r);
+	enesim_renderer_shape_features_get(current, features);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
-static const char * _path_name(Enesim_Renderer *r EINA_UNUSED)
+static const char * _path_name_get(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "path";
 }
+
+static void _path_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds)
+{
+	Enesim_Renderer *current;
+
+	current = _path_implementation_get(r);
+	enesim_renderer_bounds(current, bounds);
+}
+
+static void _path_features_get(Enesim_Renderer *r,
+		Enesim_Renderer_Feature *features)
+{
+	Enesim_Renderer *current;
+
+	current = _path_implementation_get(r);
+	enesim_renderer_features_get(current, features);
+}
+
+
+static void _path_damages_get(Enesim_Renderer *r,
+		const Eina_Rectangle *old_bounds EINA_UNUSED,
+		Enesim_Renderer_Damage_Cb cb, void *data)
+{
+	Enesim_Renderer *current;
+
+	current = _path_implementation_get(r);
+	return enesim_renderer_damages_get(current, cb, data);
+}
+
+static Eina_Bool _path_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer *current;
+
+	current = _path_implementation_get(r);
+	return enesim_renderer_has_changed(current);
+}
+
+static void _path_sw_hints(Enesim_Renderer *r,
+		Enesim_Renderer_Sw_Hint *hints)
+{
+	Enesim_Renderer *current;
+
+	current = _path_implementation_get(r);
+	enesim_renderer_sw_hints_get(current, hints);
+}
+
 
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s,
@@ -179,49 +228,6 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	_path_cleanup(r, s);
-}
-
-static void _path_features_get(Enesim_Renderer *r,
-		Enesim_Renderer_Feature *features)
-{
-	Enesim_Renderer *current;
-
-	current = _path_implementation_get(r);
-	enesim_renderer_features_get(current, features);
-}
-
-static void _path_sw_hints(Enesim_Renderer *r,
-		Enesim_Renderer_Sw_Hint *hints)
-{
-	Enesim_Renderer *current;
-
-	current = _path_implementation_get(r);
-	enesim_renderer_sw_hints_get(current, hints);
-}
-
-static Eina_Bool _path_has_changed(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path *thiz;
-
-	thiz = ENESIM_RENDERER_PATH(r);
-	return thiz->changed;
-}
-
-static void _path_shape_features_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Feature *features)
-{
-	Enesim_Renderer *current;
-
-	current = _path_implementation_get(r);
-	enesim_renderer_shape_features_get(current, features);
-}
-
-static void _path_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
-{
-	Enesim_Renderer *current;
-
-	current = _path_implementation_get(r);
-	enesim_renderer_bounds(current, bounds);
 }
 
 #if BUILD_OPENGL
@@ -255,17 +261,24 @@ static void _enesim_renderer_path_class_init(void *k)
 	Enesim_Renderer_Shape_Class *shape_klass;
 
 	shape_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
-	shape_klass->has_changed = _path_has_changed;
 	shape_klass->features_get = _path_shape_features_get;
 
+	/* we need to override the default implementation on every renderer
+	 * virtual function. That is because we need to propagate the properties
+	 * before calling the function on the real renderer and because the
+	 * dash list and the path have the changed flag cleared every time
+	 * we need to calc the bounds/draw/etc. We override the setup/cleanup
+	 * too because if the renderers are set we will setup/cleanup such
+	 * renderers twice
+	 */
 	klass = ENESIM_RENDERER_CLASS(k);
-	klass->base_name_get = _path_name;
-	klass->sw_hints_get = _path_sw_hints;
+	klass->base_name_get = _path_name_get;
 	klass->bounds_get = _path_bounds_get;
 	klass->features_get = _path_features_get;
-	/* override the renderer setup or we will do the setup of the
-	 * fill/stroke renderers twice
-	 */
+	klass->damages_get = _path_damages_get;
+	klass->has_changed = _path_has_changed;
+
+	klass->sw_hints_get = _path_sw_hints;
 	klass->sw_setup = _path_sw_setup;
 	klass->sw_cleanup = _path_sw_cleanup;
 #if BUILD_OPENGL

@@ -1,5 +1,8 @@
 Enesim
 ======
++ Make the threads work on windows
++ Remove the renderers on the stripes
++ Remove the warnings
 + We can make the API be more user friendly and avoid being so ender-alike
 + Add the luminance format
 + We have a performance problem when some renderer has changed. Basically on the practice

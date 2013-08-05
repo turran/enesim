@@ -26,10 +26,8 @@ static Enesim_Renderer * enesim_renderer_path01(void)
 	enesim_renderer_shape_stroke_color_set(r, 0xffffff00);
 	enesim_renderer_shape_fill_color_set(r, 0xffff0000);
 	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL);
-#if 0
 	enesim_renderer_shape_stroke_dash_add_simple(r, 50, 20);
 	enesim_renderer_shape_stroke_cap_set(r, ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND);
-#endif
 
 	return r;
 }
