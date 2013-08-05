@@ -29,7 +29,7 @@ AC_ARG_ENABLE([module-[]DOWN],
 AC_MSG_CHECKING([whether to enable $1 module])
 AC_MSG_RESULT([${want_module}])
 
-if test "x${want_module}" = "xno" ; then
+if test "x${want_module}" = "xno" || test "x${have_module}" = "xno" ; then
    build_module="no"
 fi
 
