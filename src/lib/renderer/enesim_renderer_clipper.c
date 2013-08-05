@@ -78,8 +78,7 @@ typedef struct _Enesim_Renderer_Clipper_Class {
 } Enesim_Renderer_Clipper_Class;
 
 static void _clipper_span(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *dst)
+		int x, int y, int len, void *dst)
 {
 	Enesim_Renderer_Clipper *thiz;
 
@@ -130,14 +129,14 @@ static Eina_Bool _clipper_changed_basic(Enesim_Renderer_Clipper *thiz)
 }
 
 static Eina_Bool _clipper_state_setup(Enesim_Renderer_Clipper *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **l)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **l)
 {
 	if (!thiz->current.content)
 	{
 		ENESIM_RENDERER_LOG(r, l, "No content");
 		return EINA_FALSE;
 	}
-	if (!enesim_renderer_setup(thiz->current.content, s, l))
+	if (!enesim_renderer_setup(thiz->current.content, s, rop, l))
 	{
 		const char *name;
 
@@ -167,13 +166,13 @@ static const char * _clipper_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _clipper_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = ENESIM_RENDERER_CLIPPER(r);
-	if (!_clipper_state_setup(thiz, r, s, l))
+	if (!_clipper_state_setup(thiz, r, s, rop, l))
 		return EINA_FALSE;
 	*fill = _clipper_span;
 	return EINA_TRUE;
@@ -194,7 +193,7 @@ static void _clipper_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _clipper_sw_hints_get(Enesim_Renderer *r,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Clipper *thiz;
 
@@ -203,14 +202,11 @@ static void _clipper_sw_hints_get(Enesim_Renderer *r,
 	if (thiz->current.content)
 	{
 		Enesim_Renderer_Sw_Hint content_hints;
-		Enesim_Rop rop, own_rop;
 		Enesim_Color color, own_color;
 
-		enesim_renderer_sw_hints_get(thiz->current.content, &content_hints);
+		enesim_renderer_sw_hints_get(thiz->current.content, rop, &content_hints);
 
-		enesim_renderer_rop_get(thiz->current.content, &rop);
-		enesim_renderer_rop_get(r, &own_rop);
-		if ((own_rop == rop) && (content_hints & ENESIM_RENDERER_HINT_ROP))
+		if (content_hints & ENESIM_RENDERER_HINT_ROP)
 			*hints |= ENESIM_RENDERER_HINT_ROP;
 		enesim_renderer_color_get(thiz->current.content, &color);
 		enesim_renderer_color_get(r, &own_color);
@@ -282,14 +278,14 @@ static void _clipper_damage(Enesim_Renderer *r,
 
 #if BUILD_OPENGL
 static Eina_Bool _clipper_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l)
 {
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = ENESIM_RENDERER_CLIPPER(r);
-	if (!_clipper_state_setup(thiz, r, s, l))
+	if (!_clipper_state_setup(thiz, r, s, rop, l))
 		return EINA_FALSE;
 
 	*draw = _clipper_opengl_draw;

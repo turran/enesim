@@ -83,8 +83,10 @@ EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visibilit
 EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visibility);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
+/* JL remove this */
 EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
 EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
+/* EOFJL */
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask);
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality);
@@ -97,16 +99,15 @@ EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle 
 EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
 
 EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features);
-EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r);
 EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_Rectangle *clip, int x, int y, Enesim_Log **error);
+		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **error);
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_List *clips, int x, int y, Enesim_Log **error);
+		Enesim_Rop rop, Eina_List *clips, int x, int y, Enesim_Log **error);
 
 /**
  * @}

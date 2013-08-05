@@ -277,7 +277,7 @@ repeat: \
 /* identity */
 /* stroke and/or fill with possibly a fill renderer non-zero rule */
 static void _stroke_fill_paint_nz(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
@@ -442,7 +442,7 @@ get_out:
 
 /* stroke with a renderer and possibly fill with color non-zero rule */
 static void _stroke_paint_fill_nz(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
@@ -549,7 +549,7 @@ get_out:
 
 /* stroke and fill with renderers non-zero rule */
 static void _stroke_paint_fill_paint_nz(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
@@ -723,7 +723,7 @@ get_out:
 /* identity */
 /* stroke and/or fill with possibly a fill renderer even-odd rule */
 static void _stroke_fill_paint_eo(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
@@ -889,7 +889,7 @@ get_out:
 
 /* stroke with a renderer and possibly fill with color even-odd rule */
 static void _stroke_paint_fill_eo(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
@@ -997,7 +997,7 @@ get_out:
 
 /* stroke and fill with renderers even-odd rule */
 static void _stroke_paint_fill_paint_eo(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
@@ -1144,9 +1144,8 @@ static int _tysort(const void *l, const void *r)
 
 
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *draw,
-		Enesim_Log **error)
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
 {
 	Enesim_Rasterizer_Basic *thiz;
 	Enesim_Rasterizer_Basic_State *state;
@@ -1436,7 +1435,7 @@ static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s 
 }
 
 static void _basic_sw_hints(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }

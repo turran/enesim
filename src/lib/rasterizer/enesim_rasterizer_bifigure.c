@@ -365,9 +365,8 @@ repeat: \
 
 
 
-static void _bifig_stroke_fill_paint_nz(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+static void _bifig_stroke_fill_paint_nz(Enesim_Renderer *r, int x, int y,
+		int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
@@ -544,8 +543,7 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_nz(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
@@ -696,8 +694,7 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_paint_nz(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
@@ -991,8 +988,8 @@ get_out:
 		} \
 
 
-static void _bifig_stroke_fill_paint_eo_u(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+static void _bifig_stroke_fill_paint_eo_u(Enesim_Renderer *r, int x, int y,
+		int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
@@ -1169,7 +1166,7 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_eo_u(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
@@ -1320,7 +1317,7 @@ get_out:
 }
 
 static void _bifig_stroke_paint_fill_paint_eo_u(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	Enesim_Rasterizer_BiFigure_State *state = &thiz->state;
@@ -1499,7 +1496,7 @@ get_out:
 }
 
 static void _over_figure_span(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 
@@ -1508,7 +1505,7 @@ static void _over_figure_span(Enesim_Renderer *r,
 }
 
 static void _under_figure_span(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 
@@ -1538,7 +1535,7 @@ static const char * _bifigure_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *draw,
 		Enesim_Log **error)
 {
@@ -1614,7 +1611,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_shape_draw_mode_set(thiz->over, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
 
 		thiz->over_used = EINA_TRUE;
-		if (!enesim_renderer_setup(thiz->over, s, error))
+		if (!enesim_renderer_setup(thiz->over, s, rop, error))
 			return EINA_FALSE;
 		*draw = _over_figure_span;
 	}
@@ -1634,7 +1631,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			enesim_renderer_shape_fill_rule_set(thiz->under, rule);
 
 			thiz->under_used = EINA_TRUE;
-			if (!enesim_renderer_setup(thiz->under, s, error))
+			if (!enesim_renderer_setup(thiz->under, s, rop, error))
 				return EINA_FALSE;
 			*draw = _under_figure_span;
 		}
@@ -1659,11 +1656,11 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 					enesim_renderer_shape_fill_rule_set(thiz->under, rule);
 
 					thiz->under_used = EINA_TRUE;
-					if (!enesim_renderer_setup(thiz->under, s, error))
+					if (!enesim_renderer_setup(thiz->under, s, rop, error))
 						return EINA_FALSE;
 				}
 				thiz->over_used = EINA_TRUE;
-				if (!enesim_renderer_setup(thiz->over, s, error))
+				if (!enesim_renderer_setup(thiz->over, s, rop, error))
 					return EINA_FALSE;
 
 				if (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
@@ -1704,7 +1701,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 				enesim_renderer_shape_fill_rule_set(thiz->under, rule);
 
 				thiz->under_used = EINA_TRUE;
-				if (!enesim_renderer_setup(thiz->under, s, error))
+				if (!enesim_renderer_setup(thiz->under, s, rop, error))
 					return EINA_FALSE;
 				*draw = _under_figure_span;
 			}
@@ -1773,7 +1770,7 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _bifigure_sw_hints(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }

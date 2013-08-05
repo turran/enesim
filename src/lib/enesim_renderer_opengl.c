@@ -36,6 +36,7 @@
 #endif
 
 #include "enesim_buffer_private.h"
+#include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
 /*
  * Shall we use only one framebuffer? One framebuffer per renderer?
@@ -267,8 +268,7 @@ static void _program_free(void *data)
  *                                 Global                                     *
  *============================================================================*/
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Log **error)
+		Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **error)
 {
 	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_OpenGL_Data *rdata;
@@ -339,9 +339,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 setup:
 	/* do the setup */
 	if (!klass->opengl_setup) return EINA_FALSE;
-	if (!klass->opengl_setup(r, s,
-			&draw,
-			error))
+	if (!klass->opengl_setup(r, s, rop, &draw, error))
 		return EINA_FALSE;
 
 	if (!draw)

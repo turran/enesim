@@ -495,8 +495,20 @@ void enesim_renderer_sw_shutdown(void)
 #endif
 }
 
-void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		int x, int y)
+void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (!hints) return;
+	if (klass->sw_hints_get)
+		klass->sw_hints_get(r, rop, hints);
+	else
+		*hints = 0;
+}
+
+void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Format dfmt;
 	Eina_Rectangle final;
@@ -516,7 +528,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 	final.y -= y;
 
 	intersect = eina_rectangle_intersection(&final, area);
-	if (r->state.current.rop == ENESIM_FILL)
+	if (rop == ENESIM_FILL)
 	{
 		/* just memset the whole area */
 		if (!intersect)
@@ -561,8 +573,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s, Eina_Re
 }
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Log **error)
+		Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **error)
 {
 	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_Sw_Fill fill = NULL;
@@ -571,14 +582,12 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Sw_Hint hints;
 	Enesim_Renderer *mask;
 	Enesim_Color color;
-	Enesim_Rop rop;
 	const char *name;
 
 	klass = ENESIM_RENDERER_CLASS_GET(r);
 	enesim_renderer_name_get(r, &name);
 	enesim_renderer_mask_get(r, &mask);
 	enesim_renderer_color_get(r, &color);
-	enesim_renderer_rop_get(r, &rop);
 
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
@@ -586,7 +595,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	{
 		Eina_Bool ret;
 
-		ret = enesim_renderer_setup(mask, s, error);
+		ret = enesim_renderer_setup(mask, s, ENESIM_FILL, error);
 		enesim_renderer_unref(mask);
 		if (!ret)
 		{
@@ -595,7 +604,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		}
 	}
 	if (!klass->sw_setup) return EINA_TRUE;
-	if (!klass->sw_setup(r, s, &fill, error))
+	if (!klass->sw_setup(r, s, rop, &fill, error))
 	{
 		WRN("Setup callback on '%s' failed", name);
 		return EINA_FALSE;
@@ -615,7 +624,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
 	}
 
-	enesim_renderer_sw_hints_get(r, &hints);
+	enesim_renderer_sw_hints_get(r, rop, &hints);
 	if (_is_sw_draw_composed(&color, &rop, hints))
 	{
 		Enesim_Format dfmt;
@@ -663,7 +672,8 @@ void enesim_renderer_sw_free(Enesim_Renderer *r)
 	free(sw_data);
 }
 
-void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data)
+void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
+		unsigned int len, uint32_t *data)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 	Eina_Rectangle span;

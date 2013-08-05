@@ -210,7 +210,7 @@ static void _checker_state_cleanup(Enesim_Renderer_Checker *thiz)
  *                               Span functions                               *
  *----------------------------------------------------------------------------*/
 static void _span_identity(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx;
@@ -266,7 +266,7 @@ static void _span_identity(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx, ww, hh, ww2, hh2;
@@ -352,7 +352,7 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_projective(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Checker *thiz;
 	Eina_F16p16 yy, xx, zz, ww, hh, ww2, hh2;
@@ -458,7 +458,7 @@ static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 }
 
 static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Checker *thiz;
@@ -532,7 +532,7 @@ static void _checker_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _checker_sw_hints(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
@@ -548,7 +548,7 @@ static Eina_Bool _checker_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _checker_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l EINA_UNUSED)
 {

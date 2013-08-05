@@ -225,7 +225,7 @@ static void _state_commit(Enesim_Renderer_State *thiz)
  *                             Helper functions                               *
  *----------------------------------------------------------------------------*/
 static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_Rectangle *area, int x, int y)
+		Enesim_Rop rop, Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Backend b;
 
@@ -236,12 +236,12 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
-		enesim_renderer_sw_draw_area(r, s, area, x, y);
+		enesim_renderer_sw_draw_area(r, s, rop, area, x, y);
 		break;
 
 		case ENESIM_BACKEND_OPENCL:
 #if BUILD_OPENCL
-		enesim_renderer_opencl_draw(r, s, area, x, y);
+		enesim_renderer_opencl_draw(r, s, rop, area, x, y);
 #endif
 		break;
 
@@ -259,8 +259,8 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 }
 
 static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_Rectangle *area,
-		Eina_List *clips, int x, int y)
+		Enesim_Rop rop, Eina_Rectangle *area, Eina_List *clips, int x,
+		int y)
 {
 	Enesim_Backend b;
 	Eina_Rectangle *clip;
@@ -278,7 +278,7 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
 				continue;
-			enesim_renderer_sw_draw_area(r, s, &final, x, y);
+			enesim_renderer_sw_draw_area(r, s, rop, &final, x, y);
 		}
 		break;
 
@@ -485,7 +485,8 @@ void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char 
 	*error = enesim_log_add(*error, str);
 }
 
-Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **error)
+Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Log **error)
 {
 	Enesim_Backend b;
 	Eina_Bool ret = EINA_TRUE;
@@ -503,7 +504,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Lo
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
-		if (!enesim_renderer_sw_setup(r, s, error))
+		if (!enesim_renderer_sw_setup(r, s, rop, error))
 		{
 			ENESIM_RENDERER_LOG(r, error, "Software setup failed on '%s'", r->state.name);
 			ret = EINA_FALSE;
@@ -513,7 +514,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Lo
 
 		case ENESIM_BACKEND_OPENCL:
 #if BUILD_OPENCL
-		if (!enesim_renderer_opencl_setup(r, s, error))
+		if (!enesim_renderer_opencl_setup(r, s, rop, error))
 		{
 			ENESIM_RENDERER_LOG(r, error, "OpenCL setup failed");
 			ret = EINA_FALSE;
@@ -523,7 +524,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Lo
 
 		case ENESIM_BACKEND_OPENGL:
 #if BUILD_OPENGL
-		if (!enesim_renderer_opengl_setup(r, s, error))
+		if (!enesim_renderer_opengl_setup(r, s, rop, error))
 		{
 			ENESIM_RENDERER_LOG(r, error, "OpenGL setup failed");
 			ret = EINA_FALSE;
@@ -1040,24 +1041,6 @@ EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r,
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Renderer_Sw_Hint *hints)
-{
-	Enesim_Renderer_Class *klass;
-
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	klass = ENESIM_RENDERER_CLASS_GET(r);
-
-	if (!hints) return;
-	if (klass->sw_hints_get)
-		klass->sw_hints_get(r, hints);
-	else
-		*hints = 0;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Class *klass;
@@ -1093,13 +1076,14 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  * Draw a renderer into a surface
  * @param[in] r The renderer to draw
  * @param[in] s The surface to draw the renderer into
+ * @param[in] rop The raster operation to use for drawing
  * @param[in] clip The area on the destination surface to limit the drawing
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  * TODO What about the mask?
  */
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_Rectangle *clip, int x, int y, Enesim_Log **error)
+		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **error)
 {
 	Eina_Rectangle final;
 	Eina_Bool ret = EINA_FALSE;
@@ -1107,7 +1091,7 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	if (!enesim_renderer_setup(r, s, error))
+	if (!enesim_renderer_setup(r, s, rop, error))
 		goto end;
 
 	if (!clip)
@@ -1129,7 +1113,7 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 			goto end;
 		}
 	}
-	_draw_internal(r, s, &final, x, y);
+	_draw_internal(r, s, rop, &final, x, y);
 	ret = EINA_TRUE;
 
 	/* TODO set the format again */
@@ -1143,19 +1127,21 @@ end:
  * Draw a renderer into a surface
  * @param[in] r The renderer to draw
  * @param[in] s The surface to draw the renderer into
+ * @param[in] rop The raster operation to use for drawing
  * @param[in] clips A list of clipping areas on the destination surface to limit the drawing
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  */
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
-		Eina_List *clips, int x, int y, Enesim_Log **error)
+		Enesim_Rop rop, Eina_List *clips, int x, int y,
+		Enesim_Log **error)
 {
 	Eina_Rectangle surface_size;
 	Eina_Bool ret = EINA_FALSE;
 
 	if (!clips)
 	{
-		enesim_renderer_draw(r, s, NULL, x, y, error);
+		enesim_renderer_draw(r, s, rop, NULL, x, y, error);
 		return EINA_TRUE;
 	}
 
@@ -1163,11 +1149,11 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
 	/* setup the common parameters */
-	if (!enesim_renderer_setup(r, s, error))
+	if (!enesim_renderer_setup(r, s, rop, error))
 		goto end;
 
 	_surface_bounds(s, &surface_size);
-	_draw_list_internal(r, s, &surface_size, clips, x, y);
+	_draw_list_internal(r, s, rop, &surface_size, clips, x, y);
 	ret = EINA_TRUE;
 	/* TODO set the format again */
 end:

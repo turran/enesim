@@ -90,7 +90,7 @@ typedef struct _Enesim_Renderer_Blur_Class {
 } Enesim_Renderer_Blur_Class;
 
 static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Log **l)
 {
 	if (!thiz->src && !thiz->src_r)
@@ -107,7 +107,7 @@ static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
 	{
 		Enesim_Renderer *old_r;
 
-		if (!enesim_renderer_setup(thiz->src_r, s, l))
+		if (!enesim_renderer_setup(thiz->src_r, s, rop, l))
 			return EINA_FALSE;
 		enesim_draw_cache_renderer_get(thiz->cache, &old_r);
 		if (old_r != thiz->src_r)
@@ -142,8 +142,7 @@ static Enesim_Renderer_Sw_Fill _spans[ENESIM_BLUR_CHANNELS];
  *                        The Software fill variants                          *
  *----------------------------------------------------------------------------*/
 static void _argb8888_span_identity(Enesim_Renderer *r,
-		int x, int y, unsigned int len,
-		void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Blur *thiz;
 	Enesim_Color color;
@@ -316,8 +315,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 }
 
 static void _a8_span_identity(Enesim_Renderer *r,
-		int x, int y, unsigned int len,
-		void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Blur *thiz;
 	uint32_t *dst = ddata;
@@ -454,7 +452,7 @@ static const char * _blur_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop, 
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Blur *thiz;
@@ -462,7 +460,7 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_BLUR(r);
 	enesim_renderer_color_get(r, &thiz->color);
-	if (!_blur_state_setup(thiz, r, s, l))
+	if (!_blur_state_setup(thiz, r, s, rop, l))
 		return EINA_FALSE;
 	if (thiz->src_r)
 		enesim_draw_cache_setup_sw(thiz->cache, ENESIM_FORMAT_ARGB8888, NULL);
@@ -501,7 +499,7 @@ static void _blur_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _blur_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }

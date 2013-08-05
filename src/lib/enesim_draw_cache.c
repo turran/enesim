@@ -136,6 +136,7 @@ Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
 	return EINA_TRUE;
 }
 
+/* TODO we need to call the setup/cleanup first */
 Eina_Bool enesim_draw_cache_setup_sw(Enesim_Draw_Cache *thiz,
 		Enesim_Format f, Enesim_Pool *p)
 {
