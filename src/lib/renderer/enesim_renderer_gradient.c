@@ -423,22 +423,6 @@ EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
  * FIXME
  * To be documented
  */
-EAPI void enesim_renderer_gradient_stop_set(Enesim_Renderer *r,
-		Eina_List *list)
-{
-	Enesim_Renderer_Gradient_Stop *stop;
-	Eina_List *l;
-
-	EINA_LIST_FOREACH(list, l, stop)
-	{
-		enesim_renderer_gradient_stop_add(r, stop);
-	}
-}
-
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 		Enesim_Repeat_Mode mode)
 {

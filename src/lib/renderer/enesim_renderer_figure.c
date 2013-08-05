@@ -243,7 +243,7 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r, Eina_Bool close)
+EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
 	Enesim_Polygon *p;
@@ -253,7 +253,7 @@ EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r, Eina_Bool clo
 	p = thiz->last_polygon;
 	if (!p) return;
 
-	enesim_polygon_close(p, close);
+	enesim_polygon_close(p, EINA_TRUE);
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
 }
@@ -270,27 +270,4 @@ EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
 	enesim_figure_clear(thiz->figure);
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
-}
-
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *r, Eina_List *list)
-{
-	Enesim_Renderer_Figure_Polygon *polygon;
-	Eina_List *l1;
-
-	enesim_renderer_figure_clear(r);
-	EINA_LIST_FOREACH(list, l1, polygon)
-	{
-		Eina_List *l2;
-		Enesim_Renderer_Figure_Vertex *vertex;
-
-		enesim_renderer_figure_polygon_add(r);
-		EINA_LIST_FOREACH(polygon->vertices, l2, vertex)
-		{
-			enesim_renderer_figure_polygon_vertex_add(r, vertex->x, vertex->y);
-		}
-	}
 }

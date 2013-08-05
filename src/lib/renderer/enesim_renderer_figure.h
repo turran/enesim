@@ -38,9 +38,8 @@ typedef struct _Enesim_Renderer_Figure_Vertex
 
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void);
 EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p);
-EAPI void enesim_renderer_figure_polygon_set(Enesim_Renderer *p, Eina_List *polygons);
 EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p, double x, double y);
-EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *p, Eina_Bool close);
+EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *p);
 EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p);
 /**
  * @}
