@@ -80,13 +80,13 @@ static Eina_Bool _shape_path_propagate(Enesim_Renderer *r)
 	/* FIXME in fact the path renderer does not support the stroke location */
 	enesim_renderer_shape_stroke_location_set(thiz->r_path, sstate->current.stroke.location);
 
-	if (sstate->stroke_dashes_changed)
+	if (sstate->dashes.changed)
 	{
 		Enesim_Renderer_Shape_Stroke_Dash *d;
 		const Eina_List *ll;
 
 		enesim_renderer_shape_stroke_dash_clear(thiz->r_path);
-		EINA_LIST_FOREACH (sstate->stroke_dashes, ll, d)
+		EINA_LIST_FOREACH (sstate->dashes.l, ll, d)
 		{
 			enesim_renderer_shape_stroke_dash_add(thiz->r_path, d);
 		}

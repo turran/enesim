@@ -895,7 +895,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	{
 		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
 				&cs->current.transformation, 1, 1,
-				css->current.stroke.join, css->current.stroke.cap, css->stroke_dashes);
+				css->current.stroke.join, css->current.stroke.cap, css->dashes.l);
 	}
 
 #if WIREFRAME
@@ -953,7 +953,7 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 	{
 		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
 				&cs->current.transformation, 1, 1,
-				css->current.stroke.join, css->current.stroke.cap, css->stroke_dashes);
+				css->current.stroke.join, css->current.stroke.cap, css->dashes.l);
 	}
 
 	/* check what to draw, stroke, fill or stroke + fill */
@@ -1033,7 +1033,7 @@ static void _path_bounds_get(Enesim_Renderer *r,
 	{
 		_path_generate_figures(thiz, css->current.draw_mode, css->current.stroke.weight,
 				&cs->current.transformation, 1, 1,
-				css->current.stroke.join, css->current.stroke.cap, css->stroke_dashes);
+				css->current.stroke.join, css->current.stroke.cap, css->dashes.l);
 	}
 
 	if (!thiz->fill_figure)

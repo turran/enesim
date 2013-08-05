@@ -73,7 +73,8 @@ static Eina_Bool _shape_damage_cb(Enesim_Renderer *r,
 static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 		Enesim_Renderer_Shape_Feature features)
 {
-	if (!thiz->changed)
+	Eina_Bool support_dashes = features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH;
+	if (!thiz->changed && (support_dashes && !thiz->dashes.changed))
 		return EINA_FALSE;
 	/* optional properties */
 	/* the stroke */
@@ -111,12 +112,12 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 		return EINA_TRUE;
 	}
 	/* dashes */
-	if (features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH)
+	if (support_dashes)
 	{
 		/* we wont compare the stroke dashes, it has changed, then
 		 * modify it directly
 		 */
-		if (thiz->stroke_dashes_changed)
+		if (thiz->dashes.changed)
 		{
 			DBG("Stroke dashes changed");
 			return EINA_TRUE;
@@ -223,7 +224,7 @@ static void _state_clear(Enesim_Renderer_Shape_State *thiz)
 		enesim_renderer_unref(thiz->past.stroke.r);
 		thiz->past.stroke.r = NULL;
 	}
-	EINA_LIST_FREE (thiz->stroke_dashes, d)
+	EINA_LIST_FREE (thiz->dashes.l, d)
 	{
 		free(d);
 	}
@@ -273,7 +274,7 @@ static void _state_commit(Enesim_Renderer_Shape_State *thiz)
 
 	/* unmark the changes */
 	thiz->changed = EINA_FALSE;
-	thiz->stroke_dashes_changed = EINA_FALSE;
+	thiz->dashes.changed = EINA_FALSE;
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -959,9 +960,9 @@ EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	d = malloc(sizeof(Enesim_Renderer_Shape_Stroke_Dash));
 	*d = *dash;
-	thiz->state.stroke_dashes = eina_list_append(thiz->state.stroke_dashes, d);
+	thiz->state.dashes.l = eina_list_append(thiz->state.dashes.l, d);
 	thiz->state.changed = EINA_TRUE;
-	thiz->state.stroke_dashes_changed = EINA_TRUE;
+	thiz->state.dashes.changed = EINA_TRUE;
 }
 
 /**
@@ -974,13 +975,13 @@ EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 	Enesim_Renderer_Shape_Stroke_Dash *d;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
-	EINA_LIST_FREE (thiz->state.stroke_dashes, d)
+	EINA_LIST_FREE (thiz->state.dashes.l, d)
 	{
 		free(d);
 	}
 	thiz->state.changed = EINA_TRUE;
-	thiz->state.stroke_dashes_changed = EINA_TRUE;
-	thiz->state.stroke_dashes = NULL;
+	thiz->state.dashes.changed = EINA_TRUE;
+	thiz->state.dashes.l = NULL;
 }
 
 /**
