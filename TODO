@@ -1,5 +1,6 @@
 Enesim
 ======
++ Fix the pattern setup functions, the draw part
 + Make the threads work on windows
 + Remove the renderers on the stripes
 + Remove the warnings

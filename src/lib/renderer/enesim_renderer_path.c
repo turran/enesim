@@ -94,8 +94,7 @@ static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
 	return ret;
 }
 
-static void _path_span(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+static void _path_span(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -115,7 +114,7 @@ static void _path_opengl_draw(Enesim_Renderer *r,
 #endif
 
 static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Log **l)
+		Enesim_Rop rop, Enesim_Log **l)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -126,7 +125,7 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		ENESIM_RENDERER_LOG(r, l, "No path implementation found");
 		return EINA_FALSE;
 	}
-	if (!enesim_renderer_setup(thiz->current, s, l))
+	if (!enesim_renderer_setup(thiz->current, s, rop, l))
 	{
 		return EINA_FALSE;
 	}
@@ -204,21 +203,20 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	return enesim_renderer_has_changed(current);
 }
 
-static void _path_sw_hints(Enesim_Renderer *r,
+static void _path_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer *current;
 
 	current = _path_implementation_get(r);
-	enesim_renderer_sw_hints_get(current, hints);
+	enesim_renderer_sw_hints_get(current, rop, hints);
 }
 
 
-static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
+static Eina_Bool _path_sw_setup(Enesim_Renderer *r ,Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
-	if (!_path_setup(r, s, l))
+	if (!_path_setup(r, s, rop, l))
 		return EINA_FALSE;
 
 	*draw = _path_span;
@@ -231,12 +229,11 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 #if BUILD_OPENGL
-static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_OpenGL_Draw *draw,
+static Eina_Bool _path_opengl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l)
 {
-	if (!_path_setup(r, s, l))
+	if (!_path_setup(r, s, rop, l))
 		return EINA_FALSE;
 
 	*draw = _path_opengl_draw;

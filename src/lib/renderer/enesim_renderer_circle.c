@@ -209,9 +209,6 @@ static void _enesim_renderer_circle_class_init(void *k)
 
 static void _enesim_renderer_circle_instance_init(void *o)
 {
-	Enesim_Renderer_Circle *thiz;
-
-	thiz = ENESIM_RENDERER_CIRCLE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
 			ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE);

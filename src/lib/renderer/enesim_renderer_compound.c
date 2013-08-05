@@ -71,6 +71,7 @@
 typedef struct _Layer
 {
 	Enesim_Renderer *r;
+	Enesim_Rop rop;
 	/* generated at state setup */
 	Eina_Rectangle destination_bounds;
 } Layer;
@@ -114,12 +115,10 @@ static inline void _compound_layer_sw_hints_merge(Layer *l, Enesim_Rop rop,
 		Eina_Bool *same_rop, Enesim_Renderer_Feature *f)
 {
 	Enesim_Renderer_Sw_Hint tmp;
-	Enesim_Rop lrop;
 
 	/* intersect with every flag */
-	enesim_renderer_sw_hints_get(l->r, &tmp);
-	enesim_renderer_rop_get(l->r, &lrop);
-	if (lrop != rop)
+	enesim_renderer_sw_hints_get(l->r, l->rop, &tmp);
+	if (l->rop != rop)
 		*same_rop = EINA_FALSE;
 	*f &= tmp;
 }
@@ -141,8 +140,8 @@ static inline void _compound_layer_span_blend(Layer *l, Eina_Rectangle *span, vo
 }
 
 static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
-		Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Log **l)
+		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop,
+		Enesim_Log **l)
 {
 	Eina_List *ll;
 	Layer *layer;
@@ -150,7 +149,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 	/* setup the background */
 	if (thiz->background_enabled)
 	{
-		if (!enesim_renderer_setup(thiz->background.r, s, l))
+		if (!enesim_renderer_setup(thiz->background.r, s, rop, l))
 		{
 			ENESIM_RENDERER_LOG(r, l, "Background renderer can not setup");
 			return EINA_FALSE;
@@ -181,7 +180,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 				continue;
 			}
 		}
-		if (!enesim_renderer_setup(layer->r, s, l))
+		if (!enesim_renderer_setup(layer->r, s, layer->rop, l))
 		{
 			const char *name;
 
@@ -250,8 +249,10 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Pool *pool;
 	Enesim_Format format;
 	Enesim_Surface *tmp;
+#if 0
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Renderer_OpenGL_Data *rdata;
+#endif
 	Eina_List *l;
 #if 0
 	Enesim_Buffer_OpenGL_Data *tmp_sdata;
@@ -264,8 +265,10 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 
+#if 0
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+#endif
 	/* create a temporary texture */
 	enesim_surface_size_get(s, &sw, &sh);
 	pool = enesim_surface_pool_get(s);
@@ -322,7 +325,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 }
 #endif
 
-static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, int x, int y, unsigned int len, void *ddata)
+static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, int x, int y, int len, void *ddata)
 {
 	Eina_List *ll;
 	Eina_Rectangle span;
@@ -345,7 +348,7 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 
 /* whenever the compound needs to fill, we need to zeros the whole destination buffer */
 static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
 
@@ -358,7 +361,7 @@ static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
 
 /* whenever the compound needs to blend, we only need to draw the area of each layer */
 static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Compound *thiz;
 
@@ -376,12 +379,11 @@ static const char * _compound_name(Enesim_Renderer *r EINA_UNUSED)
 	return "compound";
 }
 
-static void _compound_sw_hints(Enesim_Renderer *r,
+static void _compound_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Feature f = 0xffffffff;
-	Enesim_Rop rop;
 	Eina_Bool same_rop = EINA_TRUE;
 	Eina_List *ll;
 
@@ -392,7 +394,6 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 		return;
 	}
 
-	enesim_renderer_rop_get(r, &rop);
 	/* the background too */
 	if (thiz->background_enabled)
 	{
@@ -420,17 +421,15 @@ static void _compound_sw_hints(Enesim_Renderer *r,
 
 
 static Eina_Bool _compound_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **log)
 {
 	Enesim_Renderer_Compound *thiz;
-	Enesim_Rop rop;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
-	if (!_compound_state_setup(thiz, r, s, log))
+	if (!_compound_state_setup(thiz, r, s, rop, log))
 		return EINA_FALSE;
 
-	enesim_renderer_rop_get(r, &rop);
 	if (rop == ENESIM_FILL)
 	{
 		*fill = _compound_fill_span_blend_layer;
@@ -651,14 +650,14 @@ static Eina_Bool _compound_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l)
 {
 	Enesim_Renderer_Compound *thiz;
 
  	thiz = ENESIM_RENDERER_COMPOUND(r);
-	if (!_compound_state_setup(thiz, r, s, l)) return EINA_FALSE;
+	if (!_compound_state_setup(thiz, r, s, rop, l)) return EINA_FALSE;
 
 	*draw = _compound_opengl_draw;
 	return EINA_TRUE;

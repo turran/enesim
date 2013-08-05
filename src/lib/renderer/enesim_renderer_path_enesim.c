@@ -887,9 +887,8 @@ static void _path_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Rend
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 
-static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
+static Eina_Bool _path_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	const Enesim_Renderer_State *cs;
@@ -925,7 +924,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_color_set(thiz->bifigure, cs->current.color);
 	enesim_renderer_origin_set(thiz->bifigure, cs->current.ox, cs->current.oy);
 
-	if (!enesim_renderer_setup(thiz->bifigure, s, l))
+	if (!enesim_renderer_setup(thiz->bifigure, s, rop, l))
 	{
 		return EINA_FALSE;
 	}
@@ -1009,7 +1008,7 @@ static void _path_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }

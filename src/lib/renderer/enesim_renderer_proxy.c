@@ -65,7 +65,7 @@ typedef struct _Enesim_Renderer_Proxy_Class {
  * buffer
  */
 static void _proxy_fill_span_blend(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Proxy *thiz;
 
@@ -77,7 +77,7 @@ static void _proxy_fill_span_blend(Enesim_Renderer *r,
 
 /* whenever the proxy needs to blend, we just draw the inner renderer */
 static void _proxy_blend_or_equal_span(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Proxy *thiz;
 
@@ -97,7 +97,8 @@ static void _proxy_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 static Eina_Bool _proxy_state_setup(Enesim_Renderer_Proxy *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Log **l)
+		Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Log **l)
 {
 	if (!thiz->proxied)
 	{
@@ -105,7 +106,7 @@ static Eina_Bool _proxy_state_setup(Enesim_Renderer_Proxy *thiz,
 		return EINA_FALSE;
 	}
 
-	if (!enesim_renderer_setup(thiz->proxied, s, l))
+	if (!enesim_renderer_setup(thiz->proxied, s, rop, l))
 	{
 		const char *name;
 
@@ -131,20 +132,16 @@ static const char * _proxy_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Proxy *thiz;
-	Enesim_Rop rop;
-	Enesim_Rop proxy_rop;
 
  	thiz = ENESIM_RENDERER_PROXY(r);
-	if (!_proxy_state_setup(thiz, r, s, l))
+	if (!_proxy_state_setup(thiz, r, s, rop, l))
 		return EINA_FALSE;
 
-	enesim_renderer_rop_get(r, &rop);
-	enesim_renderer_rop_get(thiz->proxied, &proxy_rop);
-	if (rop != proxy_rop && rop == ENESIM_FILL)
+	if (rop == ENESIM_FILL)
 	{
 		*fill = _proxy_fill_span_blend;
 	}
@@ -171,7 +168,7 @@ static void _proxy_features_get(Enesim_Renderer *r EINA_UNUSED,
 	*features = 0;
 }
 
-static void _proxy_sw_hints_get(Enesim_Renderer *r,
+static void _proxy_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Proxy *thiz;
@@ -186,13 +183,12 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r,
 
 	state = enesim_renderer_state_get(r);
 	proxied_state = enesim_renderer_state_get(thiz->proxied);
-	enesim_renderer_sw_hints_get(thiz->proxied, &proxied_hints);
+	enesim_renderer_sw_hints_get(thiz->proxied, rop, &proxied_hints);
 	/* check if we can to colorize */
 	if (proxied_state->current.color == state->current.color)
 		*hints |= ENESIM_RENDERER_HINT_COLORIZE;
-	/* check if we can rop */
-	if (proxied_state->current.rop == state->current.rop)
-		*hints |= ENESIM_RENDERER_HINT_ROP;
+	/*  we can rop */
+	*hints |= ENESIM_RENDERER_HINT_ROP;
 }
 
 static void _proxy_bounds_get(Enesim_Renderer *r,
@@ -250,14 +246,14 @@ static void _proxy_damage(Enesim_Renderer *r,
 
 #if BUILD_OPENGL
 static Eina_Bool _proxy_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l)
 {
 	Enesim_Renderer_Proxy *thiz;
 
  	thiz = ENESIM_RENDERER_PROXY(r);
-	if (!_proxy_state_setup(thiz, r, s, l))
+	if (!_proxy_state_setup(thiz, r, s, rop, l))
 		return EINA_FALSE;
 
 	*draw = _proxy_opengl_draw;
