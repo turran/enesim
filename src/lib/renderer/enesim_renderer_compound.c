@@ -543,13 +543,14 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 	return ret;
 }
 
-static void _compound_damage(Enesim_Renderer *r,
+static Eina_Bool _compound_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
-	Eina_List *ll;
 	Enesim_Renderer_Compound_Layer *l;
+	Eina_List *ll;
+	Eina_Bool ret = EINA_FALSE;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	/* in case the backround has changed, send again the previous bounds */
@@ -587,13 +588,14 @@ static void _compound_damage(Enesim_Renderer *r,
 			enesim_renderer_destination_bounds(l->r, &db, 0, 0);
 			cb(l->r, &db, EINA_FALSE, data);
 		}
+		ret = EINA_TRUE;
 	}
 	/* now for every layer send the damage */
 	EINA_LIST_FOREACH(thiz->layers, ll, l)
 	{
-		enesim_renderer_damages_get(l->r, cb, data);
+		ret = ret || enesim_renderer_damages_get(l->r, cb, data);
 	}
-	return;
+	return ret;
 
 full_bounds:
 	{
@@ -602,7 +604,7 @@ full_bounds:
 		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
-		return;
+		return EINA_TRUE;
 	}
 }
 

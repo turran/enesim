@@ -244,7 +244,7 @@ end:
 	return ret;
 }
 
-static void _clipper_damage(Enesim_Renderer *r,
+static Eina_Bool _clipper_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -261,18 +261,19 @@ static void _clipper_damage(Enesim_Renderer *r,
 	{
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
+		return EINA_TRUE;
 	}
 	/* if not, send the content only */
 	else
 	{
 		Enesim_Renderer_Clipper_Damage_Data ddata;
 
-		if (!thiz->current.content) return;
+		if (!thiz->current.content) return EINA_FALSE;
 		ddata.real_cb = cb;
 		ddata.real_data = data;
 		ddata.bounds = &current_bounds;
 
-		enesim_renderer_damages_get(thiz->current.content, _clipper_damage_cb, &ddata);
+		return enesim_renderer_damages_get(thiz->current.content, _clipper_damage_cb, &ddata);
 	}
 }
 

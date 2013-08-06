@@ -219,7 +219,7 @@ static Eina_Bool _proxy_has_changed(Enesim_Renderer *r)
 	return ret;
 }
 
-static void _proxy_damage(Enesim_Renderer *r,
+static Eina_Bool _proxy_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -236,11 +236,11 @@ static void _proxy_damage(Enesim_Renderer *r,
 		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
-		return;
+		return EINA_TRUE;
 	}
 	if (!thiz->proxied)
-		return;
-	enesim_renderer_damages_get(thiz->proxied,
+		return EINA_FALSE;;
+	return enesim_renderer_damages_get(thiz->proxied,
 			cb, data);
 }
 

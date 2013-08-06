@@ -89,8 +89,7 @@ EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r, Eina_R
 EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
-EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r);
-EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
+EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **error);

@@ -1,6 +1,5 @@
 Enesim
 ======
-+ Add a return value on the damages
 + Fix the pattern setup functions, the draw part
 + Make the threads work on windows
 + Remove the renderers on the stripes

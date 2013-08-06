@@ -185,7 +185,7 @@ static void _path_features_get(Enesim_Renderer *r,
 }
 
 
-static void _path_damages_get(Enesim_Renderer *r,
+static Eina_Bool _path_damages_get(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds EINA_UNUSED,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {

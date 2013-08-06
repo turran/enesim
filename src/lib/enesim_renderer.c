@@ -478,6 +478,16 @@ void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char 
 	*error = enesim_log_add(*error, str);
 }
 
+Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Feature features;
+	Eina_Bool ret;
+
+	enesim_renderer_features_get(r, &features);
+	ret = _state_changed(&r->state, features);
+	return ret;
+}
+
 Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **error)
 {
@@ -1175,20 +1185,6 @@ EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Feature features;
-	Eina_Bool ret;
-
-	enesim_renderer_features_get(r, &features);
-	ret = _state_changed(&r->state, features);
-	return ret;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Class *klass;
@@ -1229,36 +1225,31 @@ done:
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
+EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Class *klass;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	klass = ENESIM_RENDERER_CLASS_GET(r);
 
-	if (!cb) return;
-#if 0
-	/* TODO change the API to return TRUE/FALSE whenever there are damages or not */
-	/* in case the renderer has not notified about a change just return */
-	if (!r->notifed_change) return;
-	/* use the internal has changed function */
-#endif
-
+	if (!cb) return EINA_FALSE;
 	if (klass->damages_get)
 	{
 		klass->damages_get(r, &r->past_destination_bounds, cb,
 				data);
+		return EINA_TRUE;
 	}
 	else
 	{
 		Eina_Rectangle current_bounds;
 
 		if (!enesim_renderer_has_changed(r))
-			return;
+			return EINA_FALSE;
 
 		/* send the old bounds and the new one */
 		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
 		cb(r, &current_bounds, EINA_FALSE, data);
 		cb(r, &r->past_destination_bounds, EINA_TRUE, data);
+		return EINA_TRUE;
 	}
 }

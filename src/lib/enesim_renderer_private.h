@@ -155,7 +155,7 @@ typedef void (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_Features_Get)(Enesim_Renderer *r,
 		Enesim_Renderer_Feature *features);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed_Cb)(Enesim_Renderer *r);
-typedef void (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
+typedef Eina_Bool (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data);
 
@@ -248,7 +248,7 @@ void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);
 void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data);
 void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char *file,
 		const char *function, int line, char *fmt, ...);
-
+Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r);
 Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **error);
 void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s);

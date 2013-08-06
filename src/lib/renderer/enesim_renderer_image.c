@@ -1574,7 +1574,7 @@ static Eina_Bool _image_has_changed(Enesim_Renderer *r)
 	return EINA_FALSE;
 }
 
-static void _image_damages(Enesim_Renderer *r,
+static Eina_Bool _image_damages(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
@@ -1595,6 +1595,7 @@ static void _image_damages(Enesim_Renderer *r,
 		_image_bounds_get(r, &curr_bounds);
 		enesim_rectangle_normalize(&curr_bounds, &bounds);
 		cb(r, &bounds, EINA_FALSE, data);
+		return EINA_TRUE;
 	}
 	/* in other case, send the surface damages tansformed
 	 * to destination coordinates
@@ -1604,6 +1605,7 @@ static void _image_damages(Enesim_Renderer *r,
 		Enesim_Matrix m;
 		Enesim_Matrix_Type type;
 		Eina_List *l;
+		Eina_Bool ret = EINA_FALSE;
 
 		enesim_renderer_transformation_get(r, &m);
 		enesim_renderer_transformation_type_get(r, &type);
@@ -1618,7 +1620,9 @@ static void _image_damages(Enesim_Renderer *r,
 			/* TODO clip it to the source bounds */
 			_image_transform_destination_bounds(r, &m, type, &sdd, &bounds);
 			cb(r, &bounds, EINA_FALSE, data);
+			ret = EINA_TRUE;
 		}
+		return ret;
 	}
 }
 /*----------------------------------------------------------------------------*
