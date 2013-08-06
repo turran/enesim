@@ -223,9 +223,6 @@ static void _enesim_renderer_ellipse_class_init(void *k)
 
 static void _enesim_renderer_ellipse_instance_init(void *o)
 {
-	Enesim_Renderer_Ellipse *thiz;
-
-	thiz = ENESIM_RENDERER_ELLIPSE(o);
 	/* to maintain compatibility */
 	enesim_renderer_shape_stroke_location_set(ENESIM_RENDERER(o),
 			ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE);

@@ -65,8 +65,7 @@ typedef struct _Enesim_Renderer_Background_Class {
 } Enesim_Renderer_Background_Class;
 
 static void _background_span(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED,
-		unsigned int len, void *ddata)
+		int x EINA_UNUSED, int y EINA_UNUSED, int len, void *ddata)
 {
 	Enesim_Renderer_Background *thiz = ENESIM_RENDERER_BACKGROUND(r);
 	uint32_t *dst = ddata;
@@ -183,17 +182,15 @@ static const char * _background_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Background *thiz;
 	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
-	Enesim_Rop rop;
 
  	thiz = ENESIM_RENDERER_BACKGROUND(r);
 
 	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
-	enesim_renderer_rop_get(r, &rop);
 	thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
 			thiz->final_color, ENESIM_FORMAT_NONE);
 	*fill = _background_span;
@@ -261,7 +258,7 @@ static Eina_Bool _background_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l EINA_UNUSED)
 {
@@ -292,7 +289,7 @@ static void _background_features_get(Enesim_Renderer *r EINA_UNUSED,
 }
 
 static void _background_sw_hints(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Sw_Hint *hints)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_COLORIZE;
 }

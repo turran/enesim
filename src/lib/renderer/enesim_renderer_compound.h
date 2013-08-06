@@ -25,21 +25,25 @@
  * @{
  */
 
+typedef struct _Enesim_Renderer_Compound_Layer Enesim_Renderer_Compound_Layer;
+
+EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_new(void);
+EAPI void enesim_renderer_compound_layer_renderer_set(
+		Enesim_Renderer_Compound_Layer *l, Enesim_Renderer *r);
+EAPI void enesim_renderer_compound_layer_rop_set(
+		Enesim_Renderer_Compound_Layer *l, Enesim_Rop rop);
+EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_ref(
+		Enesim_Renderer_Compound_Layer *l);
+EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l);
+
 typedef Eina_Bool (*Enesim_Renderer_Compound_Cb)(Enesim_Renderer *r, Enesim_Renderer *layer, void *data);
 
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
-		Enesim_Renderer *rend);
+		Enesim_Renderer_Compound_Layer *layer);
 EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
-		Enesim_Renderer *rend);
+		Enesim_Renderer_Compound_Layer *layer);
 EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r);
-EAPI void enesim_renderer_compound_layer_set(Enesim_Renderer *r,
-		Eina_List *list);
-
-EAPI void enesim_renderer_compound_pre_setup_set(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Cb cb, void *data);
-EAPI void enesim_renderer_compound_post_setup_set(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Cb cb, void *data);
 
 EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Cb cb, void *data);

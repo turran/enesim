@@ -97,7 +97,7 @@ static inline Eina_F16p16 _displace(Eina_F16p16 coord, uint8_t distance, Eina_F1
 
 #define DISPMAP_IDENTITY(xch, ych, xfunction, yfunction) \
 static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
-		int x, int y, unsigned int len,					\
+		int x, int y, int len,						\
 		void *ddata)							\
 {										\
 	Enesim_Renderer_Dispmap *thiz;						\
@@ -109,7 +109,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	int sw, sh, mw, mh;							\
 	Eina_F16p16 xx, yy;							\
 										\
-	thiz = ENESIM_RENDERER_DISPMAP(r);							\
+	thiz = ENESIM_RENDERER_DISPMAP(r);					\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
@@ -147,13 +147,13 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 next:										\
 		*dst++ = p0;							\
 		map++;								\
-		xx += EINA_EXTRA_F16P16_ONE;						\
+		xx += EINA_EXTRA_F16P16_ONE;					\
 	}									\
 }
 
 #define DISPMAP_AFFINE(xch, ych, xfunction, yfunction) \
 static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
-		int x, int y, unsigned int len,					\
+		int x, int y, int len,						\
 		void *ddata)							\
 {										\
 	Enesim_Renderer_Dispmap *thiz;						\
@@ -166,7 +166,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	int sw, sh, mw, mh;							\
 	Eina_F16p16 xx, yy;							\
 										\
-	thiz = ENESIM_RENDERER_DISPMAP(r);							\
+	thiz = ENESIM_RENDERER_DISPMAP(r);					\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
@@ -232,7 +232,7 @@ static void _dispmap_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *
 }
 
 static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Dispmap *thiz;

@@ -39,14 +39,6 @@ typedef enum _Enesim_Renderer_Feature
 
 #define ENESIM_RENDERER_FEATURE_TRANSFORMATION (ENESIM_RENDERER_FEATURE_AFFINE | ENESIM_RENDERER_FEATURE_PROJECTIVE)
 
-/* TODO rmove this to the sw backend */
-typedef enum _Enesim_Renderer_Sw_Hint
-{
-	ENESIM_RENDERER_HINT_COLORIZE 		= (1 << 0), /**< Can draw directly using the color property */
-	ENESIM_RENDERER_HINT_ROP 		= (1 << 1), /**< Can draw directly using the raster operation */
-	ENESIM_RENDERER_HINT_MASK 		= (1 << 2), /**< Can draw directly using the mask renderer */
-} Enesim_Renderer_Sw_Hint;
-
 /**
  * Callback function of the Enesim_Renderer_Damages_Get_Cb descriptor function
  * @param r
@@ -83,10 +75,6 @@ EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visibilit
 EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visibility);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
-/* JL remove this */
-EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop);
-EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop);
-/* EOFJL */
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask);
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality);

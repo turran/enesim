@@ -73,8 +73,7 @@ typedef struct _Enesim_Renderer_Raddist_Class {
 } Enesim_Renderer_Raddist_Class;
 
 static void _span_identity(Enesim_Renderer *r,
-		int x, int y,
-		unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Raddist *thiz;
 	uint32_t *dst = ddata;
@@ -127,7 +126,7 @@ static const char * _raddist_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _raddist_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Raddist *thiz;

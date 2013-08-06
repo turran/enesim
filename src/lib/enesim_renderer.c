@@ -131,7 +131,7 @@ static Eina_Bool _state_changed(Enesim_Renderer_State *thiz,
 	/* the quality */
 	if (features & ENESIM_RENDERER_FEATURE_QUALITY)
 	{
-		if (thiz->current.rop != thiz->past.rop)
+		if (thiz->current.quality != thiz->past.quality)
 		{
 			return EINA_TRUE;
 		}
@@ -139,11 +139,6 @@ static Eina_Bool _state_changed(Enesim_Renderer_State *thiz,
 	/* the mandatory properties */
 	/* the visibility */
 	if (thiz->current.visibility != thiz->past.visibility)
-	{
-		return EINA_TRUE;
-	}
-	/* the rop */
-	if (thiz->current.rop != thiz->past.rop)
 	{
 		return EINA_TRUE;
 	}
@@ -194,7 +189,6 @@ static void _state_init(Enesim_Renderer_State *thiz)
 {
 	thiz->current.visibility = thiz->past.visibility = EINA_TRUE;
 	thiz->current.color = thiz->past.color = ENESIM_COLOR_FULL;
-	thiz->current.rop = thiz->past.rop = ENESIM_FILL;
 	/* common properties */
 	thiz->current.ox = thiz->past.ox = 0;
 	thiz->current.oy = thiz->past.oy = 0;
@@ -421,12 +415,12 @@ void enesim_renderer_init(void)
 
 void enesim_renderer_shutdown(void)
 {
-	eina_hash_free(_factories);
-	_factories = NULL;
 	enesim_renderer_sw_shutdown();
 #if BUILD_OPENGL
 	enesim_renderer_opengl_shutdown();
 #endif
+	eina_hash_free(_factories);
+	_factories = NULL;
 }
 
 /* FIXME export this */
@@ -453,7 +447,6 @@ void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to)
 	state = &r->state;
 	/* TODO we should compare agains the state of 'to' */
 	/* mandatory properties */
-	enesim_renderer_rop_set(to, state->current.rop);
 	enesim_renderer_mask_get(r, &mask);
 	enesim_renderer_mask_set(to, mask);
 	enesim_renderer_color_set(to, state->current.color);
@@ -492,7 +485,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	Eina_Bool ret = EINA_TRUE;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	DBG("Setting up the renderer '%s'", r->state.name);
+	DBG("Setting up the renderer '%s' with rop %d", r->state.name, rop);
 	if (r->in_setup)
 	{
 		INF("Renderer '%s' already in the setup process", r->state.name);
@@ -865,28 +858,6 @@ EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visible)
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!visible) return;
 	*visible = r->state.current.visibility;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_rop_set(Enesim_Renderer *r, Enesim_Rop rop)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	r->state.current.rop = rop;
-	r->state.changed = EINA_TRUE;
-}
-
-/**
- * To  be documented
- * FIXME: To be fixed
- */
-EAPI void enesim_renderer_rop_get(Enesim_Renderer *r, Enesim_Rop *rop)
-{
-	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!rop) return;
-	*rop = r->state.current.rop;
 }
 
 /**

@@ -131,7 +131,7 @@ typedef struct _Enesim_Renderer_Path_Enesim_Class
 } Enesim_Renderer_Path_Enesim_Class;
 
 static void _path_span(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 
@@ -941,7 +941,7 @@ static void _path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 #if BUILD_OPENGL
 static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l EINA_UNUSED)
 {
@@ -1183,6 +1183,8 @@ static void _enesim_renderer_path_enesim_instance_deinit(void *o)
 		enesim_path_generator_free(thiz->stroke_path);
 	if (thiz->bifigure)
 		enesim_renderer_unref(thiz->bifigure);
+	if (thiz->path)
+		enesim_path_unref(thiz->path);
 }
 /*============================================================================*
  *                                 Global                                     *

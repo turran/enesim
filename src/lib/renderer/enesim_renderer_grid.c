@@ -46,8 +46,8 @@ typedef struct _Enesim_Renderer_Grid
 	Enesim_Renderer parent;
 	struct {
 		Enesim_Color color;
-		unsigned int w;
-		unsigned int h;
+		int w;
+		int h;
 	} inside, outside;
 	/* the state */
 	double ox;
@@ -138,7 +138,7 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 
 
 static void _span_identity(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;
@@ -194,7 +194,7 @@ static void _span_identity(Enesim_Renderer *r,
 }
 
 static void _span_affine(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;
@@ -217,7 +217,7 @@ static void _span_affine(Enesim_Renderer *r,
 }
 
 static void _span_projective(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
 	uint32_t *dst = ddata;
@@ -257,7 +257,7 @@ static void _grid_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s E
 }
 
 static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED, 
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Grid *thiz;

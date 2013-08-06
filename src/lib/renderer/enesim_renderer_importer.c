@@ -53,7 +53,7 @@ typedef struct _Enesim_Renderer_Importer_Class {
 } Enesim_Renderer_Importer_Class;
 
 static void _span_argb8888_none_argb8888(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -82,7 +82,7 @@ static void _span_argb8888_none_argb8888(Enesim_Renderer *r,
 }
 
 static void _span_a8_none_argb8888(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -103,7 +103,7 @@ static void _span_a8_none_argb8888(Enesim_Renderer *r,
 }
 
 static void _span_rgb888_none_argb8888(Enesim_Renderer *rend,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -128,7 +128,7 @@ static void _span_rgb888_none_argb8888(Enesim_Renderer *rend,
 }
 
 static void _span_bgr888_none_argb8888(Enesim_Renderer *rend,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -168,7 +168,7 @@ static void _span_bgr888_none_argb8888(Enesim_Renderer *rend,
  * Note: a / 255 is well approximated by (a + 255) / 256
  */
 static void _span_cmyk_none_argb8888(Enesim_Renderer *rend,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -197,7 +197,7 @@ static void _span_cmyk_none_argb8888(Enesim_Renderer *rend,
 /* that is C is replaces by 255 - C, etc...*/
 /* See the comment above for the computation of RGB values from CMYK ones. */
 static void _span_cmyk_adobe_none_argb8888(Enesim_Renderer *rend,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Importer *thiz;
 	uint32_t *dst = ddata;
@@ -229,8 +229,8 @@ static const char *_importer_name(Enesim_Renderer *r EINA_UNUSED)
 	return "importer";
 }
 
-static Eina_Bool _importer_state_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+static Eina_Bool _importer_sw_setup(Enesim_Renderer *r,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Importer *thiz;
@@ -320,7 +320,7 @@ static void _enesim_renderer_importer_class_init(void *k)
 	klass->base_name_get = _importer_name;
 	klass->bounds_get = _importer_bounds;
  	klass->features_get = _importer_features_get;
-	klass->sw_setup =  _importer_state_setup;
+	klass->sw_setup =  _importer_sw_setup;
 }
 
 static void _enesim_renderer_importer_instance_init(void *o EINA_UNUSED)

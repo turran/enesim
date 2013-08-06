@@ -271,7 +271,7 @@ advance:
  * then fetch such pixel value and finally fill the destination surface
  */
 static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Text_Font *font;
@@ -326,7 +326,7 @@ next:
 }
 
 static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
-		int x, int y, unsigned int len, void *ddata)
+		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Text_Font *font;
@@ -419,7 +419,7 @@ advance:
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Text_Span *thiz;

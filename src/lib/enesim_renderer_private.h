@@ -37,6 +37,40 @@ Enesim_Object_Descriptor * enesim_renderer_descriptor_get(void);
 
 /** Renderer API/ABI version */
 #define ENESIM_RENDERER_API 0
+
+/*----------------------------------------------------------------------------*
+ *                         Software related functions                         *
+ *----------------------------------------------------------------------------*/
+typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
+		int x, int y, int len, void *dst);
+
+typedef enum _Enesim_Renderer_Sw_Hint
+{
+	ENESIM_RENDERER_HINT_COLORIZE 		= (1 << 0), /* Can draw directly using the color property */
+	ENESIM_RENDERER_HINT_ROP 		= (1 << 1), /* Can draw directly using the raster operation */
+	ENESIM_RENDERER_HINT_MASK 		= (1 << 2), /* Can draw directly using the mask renderer */
+} Enesim_Renderer_Sw_Hint;
+
+typedef struct _Enesim_Renderer_Sw_Data
+{
+	/* TODO for later we might need a pointer to the function that calls
+	 *  the fill only or both, to avoid the if
+	 */
+	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Compositor_Span span;
+} Enesim_Renderer_Sw_Data;
+
+void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints);
+void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
+void enesim_renderer_sw_init(void);
+void enesim_renderer_sw_shutdown(void);
+void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Eina_Rectangle *area, int x, int y);
+void enesim_renderer_sw_free(Enesim_Renderer *r);
+
+Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **error);
+void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
+
 /*----------------------------------------------------------------------------*
  *                          State related functions                           *
  *----------------------------------------------------------------------------*/
@@ -46,7 +80,6 @@ typedef struct _Enesim_Renderer_State
 		Enesim_Color color;
 		Enesim_Renderer *mask;
 		Eina_Bool visibility;
-		Enesim_Rop rop;
 		Enesim_Matrix transformation;
 		Enesim_Matrix_Type transformation_type;
 		Enesim_Quality quality;
@@ -127,9 +160,6 @@ typedef void (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Renderer_Damage_Cb cb, void *data);
 
 /* software backend descriptor functions */
-typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
-		int x, int y, int len, void *dst);
-
 typedef void (*Enesim_Renderer_Sw_Hints_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints);
 typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
@@ -213,7 +243,6 @@ struct _Enesim_Renderer
 void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
 const Enesim_Renderer_State * enesim_renderer_state_get(Enesim_Renderer *r);
-void enesim_renderer_sw_free(Enesim_Renderer *r);
 void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to);
 void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);
 void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data);
@@ -224,26 +253,6 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **error);
 void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 
-
-/* software related functions */
-typedef struct _Enesim_Renderer_Sw_Data
-{
-	/* TODO for later we might need a pointer to the function that calls
-	 *  the fill only or both, to avoid the if
-	 */
-	Enesim_Renderer_Sw_Fill fill;
-	Enesim_Compositor_Span span;
-} Enesim_Renderer_Sw_Data;
-
-void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints);
-void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
-void enesim_renderer_sw_init(void);
-void enesim_renderer_sw_shutdown(void);
-void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_Rectangle *area, int x, int y);
-
-Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **error);
-void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 
 #if BUILD_OPENCL
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,

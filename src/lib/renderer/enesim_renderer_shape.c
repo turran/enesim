@@ -636,7 +636,6 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 		enesim_list_unref(other->state.dashes);
 	}
 	other->state.dashes = enesim_list_ref(thiz->state.dashes);
-	
 }
 /*============================================================================*
  *                                   API                                      *
