@@ -910,7 +910,7 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	EINA_LIST_FOREACH(thiz->layers, l, layer)
 	{
-		if (!cb(r, layer->r, data))
+		if (!cb(r, layer, data))
 			break;
 	}
 }
@@ -928,7 +928,7 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	EINA_LIST_REVERSE_FOREACH(thiz->layers, l, layer)
 	{
-		if (!cb(r, layer->r, data))
+		if (!cb(r, layer, data))
 			break;
 	}
 }
