@@ -172,7 +172,7 @@ static void _path_bounds_get(Enesim_Renderer *r,
 	Enesim_Renderer *current;
 
 	current = _path_implementation_get(r);
-	enesim_renderer_bounds(current, bounds);
+	enesim_renderer_bounds_get(current, bounds);
 }
 
 static void _path_features_get(Enesim_Renderer *r,

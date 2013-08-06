@@ -153,8 +153,8 @@ static void _transition_bounds_get(Enesim_Renderer *r,
 	if (!trans->src) return;
 	if (!trans->tgt) return;
 
-	enesim_renderer_bounds(trans->src, &r0_rect);
-	enesim_renderer_bounds(trans->tgt, &r1_rect);
+	enesim_renderer_bounds_get(trans->src, &r0_rect);
+	enesim_renderer_bounds_get(trans->tgt, &r1_rect);
 
 	rect->x = r0_rect.x < r1_rect.x ? r0_rect.x : r1_rect.x;
 	rect->y = r0_rect.y < r1_rect.y ? r0_rect.y : r1_rect.y;

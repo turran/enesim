@@ -140,7 +140,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 			ENESIM_RENDERER_LOG(r, l, "Background renderer can not setup");
 			return EINA_FALSE;
 		}
-		enesim_renderer_destination_bounds(thiz->background.r, &thiz->background.destination_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(thiz->background.r, &thiz->background.destination_bounds, 0, 0);
 	}
 
 	if (thiz->visible_layers)
@@ -169,7 +169,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		/* set the span given the color */
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
-		enesim_renderer_destination_bounds(layer->r, &layer->destination_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(layer->r, &layer->destination_bounds, 0, 0);
 		enesim_renderer_visibility_get(layer->r, &visible);
 		if (!visible) continue;
 
@@ -443,7 +443,7 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
-		enesim_renderer_destination_bounds(lr, &tmp, 0, 0);
+		enesim_renderer_destination_bounds_get(lr, &tmp, 0, 0);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w;
@@ -466,7 +466,7 @@ no_added:
 		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
-		enesim_renderer_destination_bounds(lr, &tmp, 0, 0);
+		enesim_renderer_destination_bounds_get(lr, &tmp, 0, 0);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w;
@@ -585,7 +585,7 @@ static Eina_Bool _compound_damage(Enesim_Renderer *r,
 
 			DBG("Sending added layer '%s' bounds",
 					l->r->state.name);
-			enesim_renderer_destination_bounds(l->r, &db, 0, 0);
+			enesim_renderer_destination_bounds_get(l->r, &db, 0, 0);
 			cb(l->r, &db, EINA_FALSE, data);
 		}
 		ret = EINA_TRUE;
@@ -601,7 +601,7 @@ full_bounds:
 	{
 		Eina_Rectangle current_bounds;
 
-		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
 		return EINA_TRUE;

@@ -254,7 +254,7 @@ static Eina_Bool _clipper_damage(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_CLIPPER(r);
 
 	/* get the current bounds */
-	enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
+	enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
 	/* if we have changed then send the old and the current */
 	/* FIXME we use the origin but dont take care of the origin property here */
 	if (_clipper_changed_basic(thiz))

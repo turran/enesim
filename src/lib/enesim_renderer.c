@@ -76,7 +76,7 @@ static void _enesim_renderer_factory_free(void *data)
 /*----------------------------------------------------------------------------*
  *                     Functions to transform the bounds                      *
  *----------------------------------------------------------------------------*/
-static inline void _enesim_renderer_bounds(Enesim_Renderer *r,
+static inline void _enesim_renderer_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Class *klass = ENESIM_RENDERER_CLASS_GET(r);
@@ -90,12 +90,12 @@ static inline void _enesim_renderer_bounds(Enesim_Renderer *r,
 	}
 }
 
-static inline void _enesim_renderer_destination_bounds(Enesim_Renderer *r,
+static inline void _enesim_renderer_destination_bounds_get(Enesim_Renderer *r,
 		Eina_Rectangle *bounds)
 {
 	Enesim_Rectangle obounds;
 
-	_enesim_renderer_bounds(r, &obounds);
+	_enesim_renderer_bounds_get(r, &obounds);
 	enesim_rectangle_normalize(&obounds, bounds);
 }
 /*----------------------------------------------------------------------------*
@@ -544,8 +544,8 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		/* given that we already did the setup, the current and previous should be equal
 		 * when calculating the bounds
 		 */
-		_enesim_renderer_bounds(r, &r->current_bounds);
-		_enesim_renderer_destination_bounds(r, &r->current_destination_bounds);
+		_enesim_renderer_bounds_get(r, &r->current_bounds);
+		_enesim_renderer_destination_bounds_get(r, &r->current_destination_bounds);
 		enesim_renderer_features_get(r, &r->current_features_get);
 	}
 
@@ -938,7 +938,7 @@ EAPI void enesim_renderer_transformation_type_get(Enesim_Renderer *r,
  * @param[in] r The renderer to get the bounds from
  * @param[out] rect The rectangle to store the bounds
  */
-EAPI void enesim_renderer_bounds(Enesim_Renderer *r, Enesim_Rectangle *rect)
+EAPI void enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!rect) return;
@@ -948,7 +948,7 @@ EAPI void enesim_renderer_bounds(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	}
 	else
 	{
-		_enesim_renderer_bounds(r, rect);
+		_enesim_renderer_bounds_get(r, rect);
 	}
 }
 
@@ -959,12 +959,12 @@ EAPI void enesim_renderer_bounds(Enesim_Renderer *r, Enesim_Rectangle *rect)
  * @param[out] prev The rectangle to store the previous bounds
  * @param[out] curr The rectangle to store the current bounds
  */
-EAPI void enesim_renderer_bounds_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)
+EAPI void enesim_renderer_bounds_get_extended_get(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
 	if (curr)
-		_enesim_renderer_bounds(r, curr);
+		_enesim_renderer_bounds_get(r, curr);
 	if (prev)
 		*prev = r->past_bounds;
 }
@@ -973,7 +973,7 @@ EAPI void enesim_renderer_bounds_extended(Enesim_Renderer *r, Enesim_Rectangle *
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle *rect,
+EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectangle *rect,
 		int x, int y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -986,7 +986,7 @@ EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle 
 	}
 	else
 	{
-		_enesim_renderer_destination_bounds(r, rect);
+		_enesim_renderer_destination_bounds_get(r, rect);
 	}
 	if (rect->x != INT_MIN / 2)
 		rect->x -= x;
@@ -998,7 +998,7 @@ EAPI void enesim_renderer_destination_bounds(Enesim_Renderer *r, Eina_Rectangle 
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r,
+EAPI void enesim_renderer_destination_bounds_get_extended_get(Enesim_Renderer *r,
 		Eina_Rectangle *prev, Eina_Rectangle *curr,
 		int x, int y)
 {
@@ -1006,7 +1006,7 @@ EAPI void enesim_renderer_destination_bounds_extended(Enesim_Renderer *r,
 
 	if (curr)
 	{
-		enesim_renderer_destination_bounds(r, curr, x, y);
+		enesim_renderer_destination_bounds_get(r, curr, x, y);
 	}
 	if (prev)
 	{
@@ -1247,7 +1247,7 @@ EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_D
 			return EINA_FALSE;
 
 		/* send the old bounds and the new one */
-		enesim_renderer_destination_bounds(r, &current_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
 		cb(r, &current_bounds, EINA_FALSE, data);
 		cb(r, &r->past_destination_bounds, EINA_TRUE, data);
 		return EINA_TRUE;

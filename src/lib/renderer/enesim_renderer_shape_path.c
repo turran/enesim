@@ -258,7 +258,7 @@ void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	_shape_path_propagate(r);
-	enesim_renderer_bounds(thiz->r_path, bounds);
+	enesim_renderer_bounds_get(thiz->r_path, bounds);
 }
 /*============================================================================*
  *                                   API                                      *
