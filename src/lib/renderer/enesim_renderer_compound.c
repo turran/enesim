@@ -593,7 +593,7 @@ static Eina_Bool _compound_damage(Enesim_Renderer *r,
 	/* now for every layer send the damage */
 	EINA_LIST_FOREACH(thiz->layers, ll, l)
 	{
-		ret = ret || enesim_renderer_damages_get(l->r, cb, data);
+		ret = ret | enesim_renderer_damages_get(l->r, cb, data);
 	}
 	return ret;
 

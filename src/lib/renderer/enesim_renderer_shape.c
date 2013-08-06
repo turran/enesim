@@ -449,7 +449,7 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 	return ret;
 }
 
-static void _enesim_renderer_shape_damage(Enesim_Renderer *r,
+static Eina_Bool _enesim_renderer_shape_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
 		Enesim_Renderer_Damage_Cb cb, void *data)
 {
