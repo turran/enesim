@@ -5,7 +5,6 @@
 static Enesim_Renderer * enesim_renderer_blur01(void)
 {
 	Enesim_Renderer *r1, *r2;
-	Enesim_Matrix m;
 
 	r1 = enesim_renderer_circle_new();
 	enesim_renderer_circle_center_set(r1, 128, 128);
