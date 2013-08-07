@@ -211,22 +211,6 @@ static void _argb8888_repeat_span_identity(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_repeat_span_affine(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
-
-}
-
-static void _argb8888_repeat_span_projective(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
-
-}
-
 static void _argb8888_reflect_span_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
@@ -254,22 +238,6 @@ static void _argb8888_reflect_span_identity(Enesim_Renderer *r,
 		*dst++ = *(src + x);
 		x++;
 	}
-}
-
-static void _argb8888_reflect_span_affine(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
-
-}
-
-static void _argb8888_reflect_span_projective(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
-
 }
 
 static void _argb8888_restrict_span_identity(Enesim_Renderer *r,
@@ -304,22 +272,6 @@ static void _argb8888_restrict_span_identity(Enesim_Renderer *r,
 
 }
 
-static void _argb8888_restrict_span_affine(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
-
-}
-
-static void _argb8888_restrict_span_projective(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
-
-}
-
 static void _argb8888_pad_span_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
@@ -349,22 +301,6 @@ static void _argb8888_pad_span_identity(Enesim_Renderer *r,
 		*dst++ = *(src + x);
 		x++;
 	}
-
-}
-
-static void _argb8888_pad_span_affine(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
-
-}
-
-static void _argb8888_pad_span_projective(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
-		void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Pattern *thiz = ENESIM_RENDERER_PATTERN(r);
 
 }
 
@@ -407,10 +343,7 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 static void _pattern_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Feature *features)
 {
-	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
-			ENESIM_RENDERER_FEATURE_AFFINE |
-			ENESIM_RENDERER_FEATURE_PROJECTIVE |
-			ENESIM_RENDERER_FEATURE_ARGB8888;
+	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _pattern_sw_hints(Enesim_Renderer *r EINA_UNUSED,
@@ -494,18 +427,11 @@ static void _enesim_renderer_pattern_class_init(void *k)
 	klass->sw_hints_get = _pattern_sw_hints;
 	klass->sw_setup = _pattern_sw_setup;
 	klass->sw_cleanup = _pattern_sw_cleanup;
+	memset(_spans, 0, sizeof(_spans));
 	_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
-	_spans[ENESIM_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
-	_spans[ENESIM_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
 	_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
-	_spans[ENESIM_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
-	_spans[ENESIM_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
 	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
-	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
-	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
 	_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
-	_spans[ENESIM_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
-	_spans[ENESIM_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
 }
 
 static void _enesim_renderer_pattern_instance_init(void *o EINA_UNUSED)
