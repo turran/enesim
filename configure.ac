@@ -125,6 +125,8 @@ ENS_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 ### Checks for libraries
 
+efl_version="1.7.0"
+
 requirements_cflags=""
 requirements_libs=""
 requirements_pc=""
@@ -133,9 +135,9 @@ requirements_pc=""
 
 case "$host_os" in
    mingw*)
-      PKG_CHECK_EXISTS([evil >= 1.0.0],
+      PKG_CHECK_EXISTS([evil >= ${efl_version}],
          [
-          requirements_pc="${requirements_pc} evil >= 1.0.0"
+          requirements_pc="${requirements_pc} evil >= ${efl_version}"
           AC_DEFINE([HAVE_EVIL], [1], [Define to 1 if you have Evil library.])
          ],
          [AC_MSG_ERROR([Evil is required. Be sure to have it installed.])])
@@ -145,7 +147,7 @@ esac
 
 ## Eina
 
-requirements_pc="eina-extra eina >= 1.0.0 ${requirements_pc}"
+requirements_pc="eina-extra eina >= ${efl_version} ${requirements_pc}"
 
 ## Fontconfig
 PKG_CHECK_EXISTS([fontconfig >= 2.4.2],
