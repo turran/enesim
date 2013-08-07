@@ -887,6 +887,17 @@ static void _path_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Rend
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 
+static Eina_Bool _path_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Path_Enesim *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
+	if (thiz->changed || thiz->path_changed || (thiz->path && thiz->path->changed) || (thiz->dashes_changed))
+		return EINA_TRUE;
+	else
+		return EINA_FALSE;
+}
+
 static Eina_Bool _path_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
@@ -1013,17 +1024,6 @@ static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
 }
 
-static Eina_Bool _path_has_changed(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path_Enesim *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-	if (thiz->changed || thiz->path_changed || (thiz->path && thiz->path->changed) || (thiz->dashes_changed))
-		return EINA_TRUE;
-	else
-		return EINA_FALSE;
-}
-
 static void _path_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
@@ -1128,7 +1128,6 @@ static void _enesim_renderer_path_enesim_class_init(void *k)
 	r_klass->base_name_get = _path_name;
 	r_klass->bounds_get = _path_bounds_get;
 	r_klass->features_get = _path_features_get;
-	r_klass->has_changed = _path_has_changed;
 	r_klass->sw_hints_get = _path_sw_hints;
 #if BUILD_OPENGL
 	r_klass->opengl_initialize = _path_opengl_initialize;
@@ -1138,6 +1137,7 @@ static void _enesim_renderer_path_enesim_class_init(void *k)
 	s_klass->features_get = _path_shape_features_get;
 	s_klass->sw_setup = _path_sw_setup;
 	s_klass->sw_cleanup = _path_sw_cleanup;
+	s_klass->has_changed = _path_has_changed;
 #if BUILD_OPENGL
 	s_klass->opengl_setup = _path_opengl_setup;
 	s_klass->opengl_cleanup = _path_opengl_cleanup;
