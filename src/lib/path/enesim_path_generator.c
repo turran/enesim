@@ -138,6 +138,7 @@ static void _path_begin(Enesim_Path_Generator *thiz)
 /*----------------------------------------------------------------------------*
  *                                 Commands                                   *
  *----------------------------------------------------------------------------*/
+#if 0
 static void _path_move_to(Enesim_Path_Generator *thiz,
 		double x, double y)
 {
@@ -150,6 +151,7 @@ static void _path_move_to(Enesim_Path_Generator *thiz,
 	_path_polygon_add(thiz);
 	_path_vertex_add(thiz, x, y);
 }
+#endif
 /*----------------------------------------------------------------------------*
  *                              Without stroke                                *
  *----------------------------------------------------------------------------*/

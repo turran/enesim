@@ -91,7 +91,7 @@ static int _simple_string_insert(void *data, const char *string, int length, ssi
 	return length;
 }
 
-static int _simple_string_delete(void *data, int length EINA_UNUSED, ssize_t offset EINA_UNUSED)
+static int _simple_string_delete(void *data EINA_UNUSED, int length EINA_UNUSED, ssize_t offset EINA_UNUSED)
 {
 	return 0;
 }

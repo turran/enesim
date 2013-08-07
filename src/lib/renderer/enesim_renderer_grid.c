@@ -144,7 +144,9 @@ static void _span_identity(Enesim_Renderer *r,
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	int sy;
+#if 0
 	Eina_F16p16 yy, xx;
+#endif
 
 	thiz = ENESIM_RENDERER_GRID(r);
 #if 0

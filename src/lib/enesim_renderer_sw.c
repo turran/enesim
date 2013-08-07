@@ -680,7 +680,9 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	Eina_Rectangle rbounds;
 	Eina_Bool visible;
 	unsigned int left;
+#if 0
 	unsigned int right;
+#endif
 
 	enesim_renderer_visibility_get(r, &visible);
 	if (!visible) return;
@@ -698,7 +700,9 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 		return;
 	}
 	left = rbounds.x - span.x;
+#if 0
 	right = (span.x + span.w) - (rbounds.x + rbounds.w);
+#endif
 	if (sw_data->span)
 	{
 		Enesim_Color color;
