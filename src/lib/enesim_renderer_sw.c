@@ -273,7 +273,7 @@ static void * _thread_run(void *data)
 			tmp = malloc(len);
 			_sw_surface_draw_rop_threaded(op->renderer,
 					thiz->cpuidx,
-					op->fill,
+					sw_data->fill,
 					op->span,
 					op->dst,
 					op->stride,
@@ -286,7 +286,7 @@ static void * _thread_run(void *data)
 		{
 			_sw_surface_draw_simple_threaded(op->renderer,
 					thiz->cpuidx,
-					op->fill,
+					sw_data->fill,
 					op->dst,
 					op->stride,
 					&op->area);
@@ -316,7 +316,6 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 	op->dst = ddata;
 	op->stride = stride;
 	op->area = *area;
-	op->fill = sw_data->fill;
 	op->mask_fill = NULL;
 	op->span = sw_data->span;
 
@@ -390,7 +389,6 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	size_t bpp;
 #ifdef BUILD_THREAD
 	Enesim_Renderer_Sw_Data *sw_data;
-	unsigned int i = 0;
 #endif
 
 	/* get the destination pointer */
@@ -445,6 +443,8 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 	if (!sw_data->threads)
 	{
+		unsigned int i;
+
 		sw_data->threads = malloc(sizeof(Enesim_Renderer_Thread) * _num_cpus);
 
 		enesim_barrier_new(&sw_data->start, _num_cpus + 1);

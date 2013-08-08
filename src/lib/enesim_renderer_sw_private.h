@@ -25,11 +25,12 @@ typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
 		int x, int y, int len, void *dst);
 typedef struct _Enesim_Renderer_Sw_Data Enesim_Renderer_Sw_Data;
 
+#if BUILD_THREAD
 typedef struct _Enesim_Renderer_Thread_Operation
 {
 	/* common attributes */
 	Enesim_Renderer *renderer;
-	Enesim_Renderer_Sw_Fill fill;
+	Enesim_Renderer *mask;
 	Enesim_Renderer_Sw_Fill mask_fill;
 	uint8_t * dst;
 	size_t stride;
@@ -45,6 +46,7 @@ typedef struct _Enesim_Renderer_Thread
 	Eina_Bool done;
 	Enesim_Renderer_Sw_Data *sw_data;
 } Enesim_Renderer_Thread;
+#endif
 
 typedef enum _Enesim_Renderer_Sw_Hint
 {
@@ -55,11 +57,13 @@ typedef enum _Enesim_Renderer_Sw_Hint
 
 struct _Enesim_Renderer_Sw_Data
 {
+#if BUILD_THREAD
 	/* the threaded information */
 	Enesim_Renderer_Thread *threads;
 	Enesim_Renderer_Thread_Operation op;
 	Enesim_Barrier start;
 	Enesim_Barrier end;
+#endif
 	/* TODO for later we might need a pointer to the function that calls
 	 *  the fill only or both, to avoid the if
 	 */
@@ -77,6 +81,5 @@ void enesim_renderer_sw_free(Enesim_Renderer *r);
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **error);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
-
 
 #endif
