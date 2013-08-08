@@ -388,6 +388,10 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	uint8_t *ddata;
 	size_t stride;
 	size_t bpp;
+#ifdef BUILD_THREAD
+	Enesim_Renderer_Sw_Data *sw_data;
+	unsigned int i = 0;
+#endif
 
 	/* get the destination pointer */
 	_sw_surface_setup(s, &dfmt, (void **)&ddata, &stride, &bpp);
@@ -438,9 +442,9 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	final.y += y;
 #ifdef BUILD_THREAD
 	/* create the threads in case those are not created yet */
+	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
+	if (!sw_data->threads)
 	{
-		Enesim_Renderer_Sw_Data *sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
-		unsigned int i = 0;
 		sw_data->threads = malloc(sizeof(Enesim_Renderer_Thread) * _num_cpus);
 
 		enesim_barrier_new(&sw_data->start, _num_cpus + 1);
