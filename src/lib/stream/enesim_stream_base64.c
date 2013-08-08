@@ -110,7 +110,7 @@ static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t 
 static ssize_t _enesim_stream_base64_read(void *data, void *buffer, size_t len)
 {
 	Enesim_Stream_Base64 *thiz = data;
-	int extra = 0;
+	size_t extra = 0;
 	int enclen;
 	int declen;
 	int rest;
@@ -120,7 +120,7 @@ static ssize_t _enesim_stream_base64_read(void *data, void *buffer, size_t len)
 	if (thiz->last_offset)
 	{
 		int offset;
-		int i;
+		size_t i;
 
 		offset = thiz->last_offset;
 		extra = 3 - offset;

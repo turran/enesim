@@ -77,6 +77,7 @@ static void _buffer_free(Enesim_Buffer *b)
 	{
 		enesim_pool_data_free(b->pool, b->backend_data, b->format,
 				b->external_allocated);
+		enesim_pool_unref(b->pool);
 	}
 	eina_rwlock_free(&b->lock);
 	free(b);
@@ -120,7 +121,10 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 
 	if (!enesim_pool_data_from(p, &backend, &backend_data, f, w, h, copy,
 			data))
+	{
+		enesim_pool_unref(p);
 		return NULL;
+	}
 
 	buf = _buffer_new(w, h, backend, backend_data, f, p, !copy, free_func,
 			free_func_data);
@@ -163,7 +167,10 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f,
 	}
 
 	if (!enesim_pool_data_alloc(p, &backend, &backend_data, f, w, h))
+	{
+		enesim_pool_unref(p);
 		return NULL;
+	}
 
 	buf = _buffer_new(w, h, backend, backend_data, f, p, EINA_FALSE, NULL,
 			NULL);
@@ -252,7 +259,7 @@ EAPI Enesim_Backend enesim_buffer_backend_get(const Enesim_Buffer *b)
  */
 EAPI Enesim_Pool * enesim_buffer_pool_get(Enesim_Buffer *b)
 {
-	return b->pool;
+	return enesim_pool_ref(b->pool);
 }
 
 /**

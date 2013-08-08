@@ -47,6 +47,10 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
+#ifdef BUILD_THREAD
+static unsigned int _num_cpus;
+#endif
+
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Color *color,
 		Enesim_Rop *rop, Enesim_Renderer_Sw_Hint hints)
 {
@@ -193,115 +197,6 @@ static inline void _sw_clear2(uint8_t *ddata, size_t stride, int bpp,
  *                            Threaded rendering                              *
  *----------------------------------------------------------------------------*/
 #ifdef BUILD_THREAD
-
-#ifdef _WIN32
-typedef HANDLE enesim_thread;
-#else
-typedef pthread_t enesim_thread;
-#endif
-typedef struct _Enesim_Renderer_Thread_Operation
-{
-	/* common attributes */
-	Enesim_Renderer *renderer;
-	Enesim_Renderer_Sw_Fill fill;
-	Enesim_Renderer_Sw_Fill mask_fill;
-	uint8_t * dst;
-	size_t stride;
-	Eina_Rectangle area;
-	/* in case the renderer needs to use a composer */
-	Enesim_Compositor_Span span;
-} Enesim_Renderer_Thread_Operation;
-
-typedef struct _Enesim_Renderer_Thread
-{
-	int cpuidx;
-	enesim_thread tid;
-	Eina_Bool done;
-} Enesim_Renderer_Thread;
-
-static unsigned int _num_cpus;
-static Enesim_Renderer_Thread *_threads;
-static Enesim_Renderer_Thread_Operation _op;
-#ifdef _WIN32
-typedef struct _Enesim_Barrier Enesim_Barrier;
-struct _Enesim_Barrier
-{
-   int needed, called;
-   Eina_Lock cond_lock;
-   Eina_Condition cond;
-};
-static Enesim_Barrier _start;
-static Enesim_Barrier _end;
-static Eina_Bool
-enesim_barrier_new(Enesim_Barrier *barrier, int needed)
-{
-   barrier->needed = needed;
-   barrier->called = 0;
-   if (!eina_lock_new(&(barrier->cond_lock)))
-     return EINA_FALSE;
-   if (!eina_condition_new(&(barrier->cond), &(barrier->cond_lock)))
-     return EINA_FALSE;
-   return EINA_TRUE;
-}
-
-static void
-enesim_barrier_free(Enesim_Barrier *barrier)
-{
-   eina_condition_free(&(barrier->cond));
-   eina_lock_free(&(barrier->cond_lock));
-   barrier->needed = 0;
-   barrier->called = 0;
-}
-
-static Eina_Bool
-enesim_barrier_wait(Enesim_Barrier *barrier)
-{
-   eina_lock_take(&(barrier->cond_lock));
-   barrier->called++;
-   if (barrier->called == barrier->needed)
-     {
-        barrier->called = 0;
-        eina_condition_broadcast(&(barrier->cond));
-     }
-   else
-     eina_condition_wait(&(barrier->cond));
-   eina_lock_release(&(barrier->cond_lock));
-   return EINA_TRUE;
-}
-static Eina_Bool
-enesim_thread_new(HANDLE *thread, LPTHREAD_START_ROUTINE callback, void *data)
-{
-	*thread = CreateThread(NULL, 0, callback, data, 0, NULL);
-	return *thread != NULL;
-}
-#define enesim_thread_free(thread) CloseHandle(thread)
-
-#define _enesim_affinity_set(thread, cpunum) SetThreadAffinityMask(thread, 1 << (cpunum))
-#else
-static pthread_barrier_t _start;
-static pthread_barrier_t _end;
-#define _enesim_affinity_set(thread, cpunum) \
-do \
-{ \
-	enesim_cpu_set_t cpu; \
-	CPU_ZERO(&cpu); \
-	CPU_SET(cpunum, &cpu); \
-	pthread_setaffinity_np(thread, sizeof(enesim_cpu_set_t), &cpu); \
-} while (0)
-#define enesim_barrier_new(barrier, needed) pthread_barrier_init(barrier, NULL, needed)
-#define enesim_barrier_free(barrier) pthread_barrier_destroy(barrier)
-#define enesim_barrier_wait(barrier) pthread_barrier_wait(barrier)
-static Eina_Bool
-enesim_thread_new(pthread_t *thread, void *(*callback)(void *d), void *data)
-{
-	pthread_attr_t attr;
-
-	pthread_attr_init(&attr);
-	return pthread_create(thread, &attr, callback, data);
-}
-#define enesim_thread_free(thread) pthread_join(thread, NULL)
-#endif
-
 static inline void _sw_surface_draw_rop_threaded(Enesim_Renderer *r,
 		unsigned int thread,
 		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
@@ -356,11 +251,12 @@ static void * _thread_run(void *data)
 #endif
 {
 	Enesim_Renderer_Thread *thiz = data;
-	Enesim_Renderer_Thread_Operation *op = &_op;
+	Enesim_Renderer_Sw_Data *sw_data = thiz->sw_data;
+	Enesim_Renderer_Thread_Operation *op = &sw_data->op;
 
 	do
 	{
-		enesim_barrier_wait(&_start);
+		enesim_barrier_wait(&sw_data->start);
 		if (thiz->done) goto end;
 
 		if (op->span)
@@ -395,7 +291,7 @@ static void * _thread_run(void *data)
 					op->stride,
 					&op->area);
 		}
-		enesim_barrier_wait(&_end);
+		enesim_barrier_wait(&sw_data->end);
 	} while (1);
 
 end:
@@ -411,19 +307,21 @@ static void _sw_draw_threaded(Enesim_Renderer *r, Eina_Rectangle *area,
 		Enesim_Format dfmt EINA_UNUSED)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
+	Enesim_Renderer_Thread_Operation *op;
 
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
+	op = &sw_data->op;
 	/* fill the data needed for every threaded renderer */
-	_op.renderer = r;
-	_op.dst = ddata;
-	_op.stride = stride;
-	_op.area = *area;
-	_op.fill = sw_data->fill;
-	_op.mask_fill = NULL;
-	_op.span = sw_data->span;
+	op->renderer = r;
+	op->dst = ddata;
+	op->stride = stride;
+	op->area = *area;
+	op->fill = sw_data->fill;
+	op->mask_fill = NULL;
+	op->span = sw_data->span;
 
-	enesim_barrier_wait(&_start);
-	enesim_barrier_wait(&_end);
+	enesim_barrier_wait(&sw_data->start);
+	enesim_barrier_wait(&sw_data->end);
 }
 #else
 /*----------------------------------------------------------------------------*
@@ -458,40 +356,13 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r,
 void enesim_renderer_sw_init(void)
 {
 #ifdef BUILD_THREAD
-	unsigned int i = 0;
-
 	_num_cpus = eina_cpu_count();
-	_threads = malloc(sizeof(Enesim_Renderer_Thread) * _num_cpus);
-
-	enesim_barrier_new(&_start, _num_cpus + 1);
-	enesim_barrier_new(&_end, _num_cpus + 1);
-	for (i = 0; i < _num_cpus; i++)
-	{
-		_threads[i].cpuidx = i;
-		_threads[i].done = EINA_FALSE;
-		enesim_thread_new(&_threads[i].tid, _thread_run, (void *)&_threads[i]);
-		_enesim_affinity_set(_threads[i].tid, i);
-	}
 #endif
 }
 
 void enesim_renderer_sw_shutdown(void)
 {
 #ifdef BUILD_THREAD
-	unsigned int i;
-
-	/* first mark all the threads to leave */
-	for (i = 0; i < _num_cpus; i++)
-		_threads[i].done = EINA_TRUE;
-
-	/* now increment the barrier so the threads start again */
-	enesim_barrier_wait(&_start);
-	/* destroy the threads */
-	for (i = 0; i < _num_cpus; i++)
-		enesim_thread_free(_threads[i].tid);
-	free(_threads);
-	enesim_barrier_free(&_start);
-	enesim_barrier_free(&_end);
 #endif
 }
 
@@ -566,6 +437,23 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	final.x += x;
 	final.y += y;
 #ifdef BUILD_THREAD
+	/* create the threads in case those are not created yet */
+	{
+		Enesim_Renderer_Sw_Data *sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
+		unsigned int i = 0;
+		sw_data->threads = malloc(sizeof(Enesim_Renderer_Thread) * _num_cpus);
+
+		enesim_barrier_new(&sw_data->start, _num_cpus + 1);
+		enesim_barrier_new(&sw_data->end, _num_cpus + 1);
+		for (i = 0; i < _num_cpus; i++)
+		{
+			sw_data->threads[i].cpuidx = i;
+			sw_data->threads[i].done = EINA_FALSE;
+			sw_data->threads[i].sw_data = sw_data;
+			enesim_thread_new(&sw_data->threads[i].tid, _thread_run, (void *)&sw_data->threads[i]);
+			enesim_thread_affinity_set(sw_data->threads[i].tid, i);
+		}
+	}
 	_sw_draw_threaded(r, &final, ddata, stride, dfmt);
 #else
 	_sw_draw_no_threaded(r, &final, ddata, stride, dfmt);
@@ -621,7 +509,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	if (!sw_data)
 	{
 		sw_data = calloc(1, sizeof(Enesim_Renderer_Sw_Data));
-		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
+		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);	
 	}
 
 	enesim_renderer_sw_hints_get(r, rop, &hints);
@@ -665,10 +553,31 @@ void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 void enesim_renderer_sw_free(Enesim_Renderer *r)
 {
+
 	Enesim_Renderer_Sw_Data *sw_data;
+#if BUILD_THREAD
+	unsigned int i;
+#endif
 
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 	if (!sw_data) return;
+#if BUILD_THREAD
+	if (sw_data->threads)
+	{
+		/* first mark all the threads to leave */
+		for (i = 0; i < _num_cpus; i++)
+			sw_data->threads[i].done = EINA_TRUE;
+
+		/* now increment the barrier so the threads start again */
+		enesim_barrier_wait(&sw_data->start);
+		/* destroy the threads */
+		for (i = 0; i < _num_cpus; i++)
+			enesim_thread_free(sw_data->threads[i].tid);
+		free(sw_data->threads);
+		enesim_barrier_free(&sw_data->start);
+		enesim_barrier_free(&sw_data->end);
+	}
+#endif
 	free(sw_data);
 }
 

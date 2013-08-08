@@ -27,7 +27,6 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_pool
 
-static Enesim_Pool *_default_pool = NULL;
 static Enesim_Pool *_current_default_pool = NULL;
 /*----------------------------------------------------------------------------*
  *                        The Enesim's pool interface                         *
@@ -248,34 +247,47 @@ void enesim_pool_data_free(Enesim_Pool *p, void *data,
 
 void enesim_pool_init(void)
 {
+	Enesim_Pool *thiz;
 	/* create the default pool */
-	_default_pool = enesim_pool_new(&_default_descriptor, NULL);
-	enesim_pool_default_set(_default_pool);
+	thiz = enesim_pool_new(&_default_descriptor, NULL);
+	enesim_pool_default_set(thiz);
 }
 
 void enesim_pool_shutdown(void)
 {
 	/* destroy the default pool */
-	enesim_pool_delete(_default_pool);
+	enesim_pool_unref(_current_default_pool);
 }
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/* FIXME later we should return const so user can not delete this one */
 EAPI Enesim_Pool * enesim_pool_default_get(void)
 {
-	return _current_default_pool;
+	return enesim_pool_ref(_current_default_pool);
 }
 
 EAPI void enesim_pool_default_set(Enesim_Pool *thiz)
 {
+	if (_current_default_pool)
+		enesim_pool_unref(_current_default_pool);
 	_current_default_pool = thiz;
 }
 
-EAPI void enesim_pool_delete(Enesim_Pool *p)
+EAPI Enesim_Pool * enesim_pool_ref(Enesim_Pool *thiz)
 {
-	if (!p) return;
-	if (p->descriptor && p->descriptor->free)
-		p->descriptor->free(p->data);
-	free(p);
+	if (!thiz) return NULL;
+	thiz->ref++;
+	return thiz;
+}
+
+EAPI void enesim_pool_unref(Enesim_Pool *thiz)
+{
+	if (!thiz) return;
+	thiz->ref--;
+	if (!thiz->ref)
+	{
+		if (thiz->descriptor && thiz->descriptor->free)
+			thiz->descriptor->free(thiz->data);
+		free(thiz);
+	}
 }

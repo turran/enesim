@@ -180,7 +180,9 @@ static Eina_Bool _enesim_renderer_text_span_generate(Enesim_Renderer_Text_Span *
 }
 
 /* x and y must be inside the bounding box */
-static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(Enesim_Renderer_Text_Span *thiz, Enesim_Text_Font *font, int x, int y, Enesim_Text_Glyph_Position *position)
+static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
+		Enesim_Renderer_Text_Span *thiz, Enesim_Text_Font *font,
+		int x, int y EINA_UNUSED, Enesim_Text_Glyph_Position *position)
 {
 	Eina_Bool ret = EINA_FALSE;
 	int idx = 0;

@@ -47,9 +47,6 @@
  *============================================================================*/
 static Eina_Hash *_program_lut = NULL;
 
-static Eina_Bool _fragment_shader_support = EINA_FALSE;
-static Eina_Bool _geometry_shader_support = EINA_FALSE;
-
 /* FIXME for debugging purposes */
 #define GLERR {\
         GLenum err; \
@@ -58,6 +55,9 @@ static Eina_Bool _geometry_shader_support = EINA_FALSE;
         }
 
 #if 0
+static Eina_Bool _fragment_shader_support = EINA_FALSE;
+static Eina_Bool _geometry_shader_support = EINA_FALSE;
+
 static void _opengl_extensions_setup(void)
 {
 	char *extensions;
@@ -387,11 +387,9 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Ei
 		int x EINA_UNUSED, int y EINA_UNUSED)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Buffer_OpenGL_Data *sdata;
 	int width;
 	int height;
 
-	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
 	/* run it on the renderer fbo */

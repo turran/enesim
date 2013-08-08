@@ -268,11 +268,10 @@ static const char * _path_cairo_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static Eina_Bool _path_cairo_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Rop rop EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
 	Enesim_Renderer_Path_Cairo *thiz;
-	cairo_t *cr;
 	int width = 0;
 	int height = 0;
 	int rwidth;

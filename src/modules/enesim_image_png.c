@@ -105,10 +105,6 @@ static Eina_Error _png_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buf
 	png_structp png_ptr = NULL;
 	png_infop info_ptr = NULL;
 	int bit_depth, color_type, interlace_type;
-	char hasa, hasg;
-
-	hasa = 0;
-	hasg = 0;
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
 	_png_msg_error_cb, _png_msg_warning_cb);

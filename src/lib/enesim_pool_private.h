@@ -58,6 +58,7 @@ struct _Enesim_Pool
 	EINA_MAGIC
 	Enesim_Pool_Descriptor *descriptor;
 	void *data;
+	int ref;
 };
 
 void enesim_pool_init(void);

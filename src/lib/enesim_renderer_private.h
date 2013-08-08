@@ -19,6 +19,7 @@
 #define ENESIM_RENDERER_PRIVATE_H_
 
 #include "enesim_compositor_private.h"
+#include "enesim_renderer_sw_private.h"
 
 #if BUILD_OPENGL
 #include "Enesim_OpenGL.h"
@@ -41,36 +42,6 @@ Enesim_Object_Descriptor * enesim_renderer_descriptor_get(void);
 /*----------------------------------------------------------------------------*
  *                         Software related functions                         *
  *----------------------------------------------------------------------------*/
-typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
-		int x, int y, int len, void *dst);
-
-typedef enum _Enesim_Renderer_Sw_Hint
-{
-	ENESIM_RENDERER_HINT_COLORIZE 		= (1 << 0), /* Can draw directly using the color property */
-	ENESIM_RENDERER_HINT_ROP 		= (1 << 1), /* Can draw directly using the raster operation */
-	ENESIM_RENDERER_HINT_MASK 		= (1 << 2), /* Can draw directly using the mask renderer */
-} Enesim_Renderer_Sw_Hint;
-
-typedef struct _Enesim_Renderer_Sw_Data
-{
-	/* TODO for later we might need a pointer to the function that calls
-	 *  the fill only or both, to avoid the if
-	 */
-	Enesim_Renderer_Sw_Fill fill;
-	Enesim_Compositor_Span span;
-} Enesim_Renderer_Sw_Data;
-
-void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints);
-void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
-void enesim_renderer_sw_init(void);
-void enesim_renderer_sw_shutdown(void);
-void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_Rectangle *area, int x, int y);
-void enesim_renderer_sw_free(Enesim_Renderer *r);
-
-Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **error);
-void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
-
 /*----------------------------------------------------------------------------*
  *                          State related functions                           *
  *----------------------------------------------------------------------------*/

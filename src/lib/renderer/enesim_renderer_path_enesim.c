@@ -438,6 +438,7 @@ static void _path_opengl_silhoutte_draw(Enesim_Figure *f, const Eina_Rectangle *
 	glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, GL_TRUE);
 }
 
+#if 0
 static void _path_opengl_blit(GLenum fbo, GLenum dst,
 		GLenum src,
 		const Eina_Rectangle *area)
@@ -463,6 +464,7 @@ static void _path_opengl_blit(GLenum fbo, GLenum dst,
 		glVertex2d(area->x, area->y + area->h);
 	glEnd();
 }
+#endif
 
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
@@ -957,16 +959,13 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 		Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Renderer_Path_Enesim_OpenGL *gl;
 	Enesim_Renderer_Shape_Draw_Mode dm;
-	double sw;
 	const Enesim_Renderer_State *cs;
 	const Enesim_Renderer_Shape_State *css;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	cs = enesim_renderer_state_get(r);
 	css = enesim_renderer_shape_state_get(r);
-	gl = &thiz->gl;
 
 	/* generate the figures */
 	if (_path_needs_generate(thiz, &cs->current.transformation,
@@ -981,7 +980,6 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 
 	/* check what to draw, stroke, fill or stroke + fill */
 	dm = css->current.draw_mode;
-	sw = css->current.stroke.weight;
 	/* fill + stroke */
 	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
