@@ -15,8 +15,9 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Enesim.h"
 #include "enesim_private.h"
+#include "enesim_main.h"
+#include "enesim_perlin_private.h"
 /* FIXME
  * Very naive implementation of a perlin noise, this needs to be cleaned up,
  * optimized and validated.
@@ -52,6 +53,7 @@ static inline Eina_F16p16 _f16p16_interpolate(Eina_F16p16 r, Eina_F16p16 x, Eina
 	return eina_f16p16_mul((x - y), r) + y;
 }
 
+#if 0
 static Eina_F16p16 smoothnoise(int x, int y)
 {
 	Eina_F16p16 corners, sides, center;
@@ -67,6 +69,7 @@ static Eina_F16p16 smoothnoise(int x, int y)
 	center = (((int64_t) (noise(x, y)) << 16) / FP4);
 	return corners + sides + center;
 }
+#endif
 
 static Eina_F16p16 interpolatenoise(Eina_F16p16 x, Eina_F16p16 y)
 {
@@ -96,9 +99,9 @@ static Eina_F16p16 interpolatenoise(Eina_F16p16 x, Eina_F16p16 y)
 }
 
 /*============================================================================*
- *                                   API                                      *
+ *                                 Global                                     *
  *============================================================================*/
-EAPI Eina_F16p16 enesim_perlin_get(Eina_F16p16 xx, Eina_F16p16 yy,
+Eina_F16p16 enesim_perlin_get(Eina_F16p16 xx, Eina_F16p16 yy,
 	unsigned int octaves, Eina_F16p16 *xfreq, Eina_F16p16 *yfreq,
 	Eina_F16p16 *ampl)
 {
@@ -124,7 +127,7 @@ EAPI Eina_F16p16 enesim_perlin_get(Eina_F16p16 xx, Eina_F16p16 yy,
 	return total;
 }
 
-EAPI void enesim_perlin_coeff_set(unsigned int octaves, double persistence,
+void enesim_perlin_coeff_set(unsigned int octaves, double persistence,
 	double xfreq, double yfreq, double amplitude, Eina_F16p16 *xfreqcoeff,
 	Eina_F16p16 *yfreqcoeff, Eina_F16p16 *amplcoeff)
 {
@@ -142,3 +145,7 @@ EAPI void enesim_perlin_coeff_set(unsigned int octaves, double persistence,
 		amplcoeff[i] = eina_f16p16_mul(amplcoeff[i- 1], per);
 	}
 }
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+

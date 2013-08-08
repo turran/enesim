@@ -13,6 +13,7 @@ src/lib/util/enesim_mempool_aligned_private.h \
 src/lib/util/enesim_mempool_buddy.c \
 src/lib/util/enesim_mempool_buddy_private.h \
 src/lib/util/enesim_perlin.c \
+src/lib/util/enesim_perlin_private.h \
 src/lib/util/enesim_thread.c \
 src/lib/util/enesim_thread_private.h \
 src/lib/util/enesim_vector.c \
