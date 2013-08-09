@@ -341,7 +341,7 @@ static void _enesim_renderer_clipper_instance_deinit(void *o)
  *                                   API                                      *
  *============================================================================*/
 /**
- * Creates a clipper renderer
+ * @brief Creates a clipper renderer
  * @return The new renderer
  */
 EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
@@ -353,10 +353,11 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Sets the clipped renderer
+ * @param[in] r The clipper renderer to set the clip to
+ * @param[in] clipped The renderer to clip [transfer full]
  */
-EAPI void enesim_renderer_clipper_content_set(Enesim_Renderer *r,
+EAPI void enesim_renderer_clipper_clipped_set(Enesim_Renderer *r,
 		Enesim_Renderer *content)
 {
 	Enesim_Renderer_Clipper *thiz;
@@ -370,24 +371,22 @@ EAPI void enesim_renderer_clipper_content_set(Enesim_Renderer *r,
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Gets the clipped renderer
+ * @param[in] r The clipper renderer to set the clip to
+ * @return The clipped renderer [transfer none]
  */
-EAPI void enesim_renderer_clipper_content_get(Enesim_Renderer *r,
-		Enesim_Renderer **content)
+EAPI Enesim_Renderer * enesim_renderer_clipper_clipped_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	if (!content) return;
-	*content = thiz->current.content;
-	if (thiz->current.content)
-		thiz->current.content = enesim_renderer_ref(thiz->current.content);
+	return enesim_renderer_ref(thiz->current.content);
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Sets the width of the clipper
+ * @param[in] r The clipper renderer to set width to
+ * @param[in] width The width
  */
 EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
 		double width)
@@ -400,21 +399,22 @@ EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Sets the width of the clipper
+ * @param[in] r The clipper renderer to set width to
+ * @return width The width
  */
-EAPI void enesim_renderer_clipper_width_get(Enesim_Renderer *r,
-		double *width)
+EAPI double enesim_renderer_clipper_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	*width = thiz->current.width;
+	return thiz->current.width;
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Sets the height of the clipper
+ * @param[in] r The clipper renderer to set height to
+ * @param[in] height The height
  */
 EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
 		double height)
@@ -427,15 +427,15 @@ EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Sets the height of the clipper
+ * @param[in] r The clipper renderer to set height to
+ * @return height The height
  */
-EAPI void enesim_renderer_clipper_height_get(Enesim_Renderer *r,
-		double *height)
+EAPI double enesim_renderer_clipper_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	*height = thiz->current.height;
+	return thiz->current.height;
 }
 

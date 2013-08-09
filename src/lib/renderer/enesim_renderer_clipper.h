@@ -26,18 +26,17 @@
  */
 
 EAPI Enesim_Renderer * enesim_renderer_clipper_new(void);
-EAPI void enesim_renderer_clipper_content_set(Enesim_Renderer *r,
-		Enesim_Renderer *content);
-EAPI void enesim_renderer_clipper_content_get(Enesim_Renderer *r,
-		Enesim_Renderer **content);
+EAPI void enesim_renderer_clipper_clipped_set(Enesim_Renderer *r,
+		Enesim_Renderer *clipped);
+EAPI Enesim_Renderer * enesim_renderer_clipper_clipped_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
 		double width);
-EAPI void enesim_renderer_clipper_width_get(Enesim_Renderer *r,
-		double *width);
+EAPI double enesim_renderer_clipper_width_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
 		double height);
-EAPI void enesim_renderer_clipper_height_get(Enesim_Renderer *r,
-		double *height);
+EAPI double enesim_renderer_clipper_height_get(Enesim_Renderer *r);
 /**
  * @}
  */
