@@ -1,5 +1,5 @@
-/* ENESIM - Direct Rendering Library
- * Copyright (C) 2007-2011 Jorge Luis Zapata
+/* ENESIM - Drawing Library
+ * Copyright (C) 2007-2013 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

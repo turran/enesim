@@ -1,5 +1,5 @@
 /* LIBARGB - ARGB helper functions
- * Copyright (C) 2010 Jorge Luis Zapata
+ * Copyright (C) 2007-2013 Jorge Luis Zapata
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
