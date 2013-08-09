@@ -206,12 +206,12 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	while (dst < end)
 	{
 		unsigned int p0 = 0;
-
 		{
 			unsigned int ag0 = 0, rb0 = 0, ag3 = 0, rb3 = 0, dag = 0, drb = 0;
 			int tyy = tyy0, ty = ty0, ntyy = ntyy0, nty = nty0;
 
-			pbuf = src + (ix - ix0);  iy = iy0;
+			pbuf = src + (ix - ix0);
+			iy = iy0;
 
 			while (1)
 			{
@@ -318,13 +318,14 @@ static void _a8_span_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Blur *thiz;
+	Enesim_Color color;
+	Eina_F16p16 xx, yy;
+	double ox, oy;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	uint32_t *src, *pbuf;
 	size_t sstride;
 	int sw, sh;
-	Enesim_Color color;
-	Eina_F16p16 xx, yy;
 	int ibyy, ibxx;
 	int ix, ix0, iy, iy0;
 	int txx0, ntxx0, tx0, ntx0;
@@ -333,22 +334,39 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_BLUR(r);
 	color = thiz->color;
 
-	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
-	/* setup the parameters */
+	enesim_renderer_origin_get(r, &ox, &oy);
+	enesim_coord_identity_setup(&xx, &yy, x, y, ox, oy);
 
+	/* setup the parameters */
+	ibyy = thiz->ibyy, ibxx = thiz->ibxx;
 	ix = ix0 = x;  iy = iy0 = y;
 	xx = (ibxx * x) + (ibxx >> 1) - 32768;
 	yy = (ibyy * y) + (ibyy >> 1) - 32768;
-	x = xx >> 16;
-	y = yy >> 16;
+	x = eina_f16p16_int_to(xx);
+	y = eina_f16p16_int_to(yy);
 
-	enesim_surface_size_get(thiz->src, &sw, &sh);
-	if ((iy < 0) || (iy >= sh))
+	if (thiz->src_r)
 	{
-		memset(dst, 0, sizeof(unsigned int) * len);
-		return;
+		Eina_Rectangle bounds;
+		Eina_Rectangle area;
+		Enesim_Buffer_Sw_Data sw_data;
+		int rx = ceil(thiz->rx);
+		int ry = ceil(thiz->ry);
+
+		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0);
+		sw = bounds.w;
+		sh = bounds.h;
+		eina_rectangle_coords_from(&area, ix - rx, iy - ry, len + (rx * 2), 1 + (ry * 2));
+		enesim_draw_cache_map_sw(thiz->cache, &area, &sw_data);
+		src = sw_data.argb8888.plane0;
+		sstride = sw_data.argb8888.plane0_stride;
 	}
-	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
+	else
+	{
+		enesim_surface_size_get(thiz->src, &sw, &sh);
+		enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
+	}
+
 	src = argb8888_at(src, sstride, ix, iy);
 
 	tyy0 = yy & 0xffff0000;  ty0 = (tyy0 >> 16);
@@ -360,23 +378,28 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	while (dst < end)
 	{
 		unsigned int p0 = 0;
-
-		if ( ((unsigned)ix < sw) )
 		{
 			unsigned int a0 = 0, a3 = 0, da = 0;
 			int tyy = tyy0, ty = ty0, ntyy = ntyy0, nty = nty0;
 
 			pbuf = src + (ix - ix0);
 			iy = iy0;
-			while (iy < sh)
+
+			while (1)
 			{
 				unsigned int a2 = 0, pa2 = 0, pp3 = 0;
-				int txx = txx0, tx = tx0, ntxx = ntxx0, ntx = ntx0;
 				unsigned int *p = pbuf;
+				int txx = txx0, tx = tx0, ntxx = ntxx0, ntx = ntx0;
+				int px = ix;
 
 				while (1)
 				{
-					unsigned int p3 = *p;
+					unsigned int p3;
+
+					if (px >= 0 && px < sw && iy >= 0 && iy < sh)
+						p3 = *p;
+					else
+						p3 = 0;
 
 					if (ntx != tx)
 					{
