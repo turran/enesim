@@ -35,6 +35,10 @@
  * - Eina
  *
  * @file
+ * @todo
+ * - [1.1.0]
+ *   - Implement OpenGL on every renderer with rop support
+ *   - Export the pool API
  * @brief Enesim API
  */
 

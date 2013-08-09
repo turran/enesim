@@ -314,6 +314,7 @@ EAPI Enesim_Pool * enesim_surface_pool_get(Enesim_Surface *s)
  */
 EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s)
 {
+	if (!s) return NULL;
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 	s->ref++;
 	return s;

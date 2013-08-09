@@ -632,8 +632,9 @@ EAPI Enesim_Renderer * enesim_renderer_checker_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_checker);
 	return r;
 }
+
 /**
- * Sets the color of the even squares
+ * @brief Sets the color of the even squares
  * @param[in] r The checker renderer
  * @param[in] color The color
  */
@@ -646,20 +647,22 @@ EAPI void enesim_renderer_checker_even_color_set(Enesim_Renderer *r, Enesim_Colo
 	thiz->current.color1 = color;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the color of the even squares
+ * @brief Gets the color of the even squares
  * @param[in] r The checker renderer
  * @return The color
  */
-EAPI void enesim_renderer_checker_even_color_get(Enesim_Renderer *r, Enesim_Color *color)
+EAPI Enesim_Color enesim_renderer_checker_even_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
-	if (color) *color = thiz->current.color1;
+	return thiz->current.color1;
 }
+
 /**
- * Sets the color of the odd squares
+ * @brief Sets the color of the odd squares
  * @param[in] r The checker renderer
  * @param[in] color The color
  */
@@ -672,20 +675,22 @@ EAPI void enesim_renderer_checker_odd_color_set(Enesim_Renderer *r, Enesim_Color
 	thiz->current.color2 = color;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the color of the odd squares
+ * @brief Gets the color of the odd squares
  * @param[in] r The checker renderer
  * @return The color
  */
-EAPI void enesim_renderer_checker_odd_color_get(Enesim_Renderer *r, Enesim_Color *color)
+EAPI Enesim_Color enesim_renderer_checker_odd_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
-	if (color) *color = thiz->current.color2;
+	return thiz->current.color2;
 }
+
 /**
- * Sets the width of the checker rectangles
+ * @brief Sets the width of the checker rectangles
  * @param[in] width The width
  */
 EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
@@ -697,19 +702,21 @@ EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
 	thiz->current.sw = width;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the width of the checker rectangles
+ * @brief Gets the width of the checker rectangles
  * @returns The width
  */
-EAPI void enesim_renderer_checker_width_get(Enesim_Renderer *r, int *width)
+EAPI int enesim_renderer_checker_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
-	if (width) *width = thiz->current.sw;
+	return thiz->current.sh;
 }
+
 /**
- * Sets the height of the checker rectangles
+ * @brief Sets the height of the checker rectangles
  * @param[in] height The height
  */
 EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
@@ -721,15 +728,16 @@ EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
 	thiz->current.sh = height;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
- * Gets the height of the checker rectangles
- * @returns The height
+ * @brief Gets the height of the checker rectangles
+ * @return The height
  */
-EAPI void enesim_renderer_checker_height_get(Enesim_Renderer *r, int *height)
+EAPI int enesim_renderer_checker_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
-	if (height) *height = thiz->current.sh;
+	return thiz->current.sh;
 }
 

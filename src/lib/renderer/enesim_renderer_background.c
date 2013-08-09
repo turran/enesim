@@ -359,8 +359,8 @@ EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 	return r;
 }
 /**
- * Sets the color of the background
- * @param[in] r The background renderer
+ * @brief Sets the color of the background
+ * @param[in] r The background renderer to set the color to
  * @param[in] color The background color
  */
 EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
@@ -374,15 +374,14 @@ EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
 }
 
 /**
- *
+ * @brief Gets the color of the background
+ * @param[in] r The background renderer to get the color from
+ * @return The color of the renderer
  */
-EAPI void enesim_renderer_background_color_get(Enesim_Renderer *r,
-		Enesim_Color *color)
+EAPI Enesim_Color enesim_renderer_background_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Background *thiz;
 
 	thiz = ENESIM_RENDERER_BACKGROUND(r);
-	*color = thiz->color;
+	return thiz->color;
 }
-
-

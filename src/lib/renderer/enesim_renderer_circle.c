@@ -259,6 +259,20 @@ EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
 }
 
 /**
+ * @brief Gets the X coordinate of the center of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @return The X coordinate.
+ */
+EAPI double enesim_renderer_circle_x_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Circle *thiz;
+
+	thiz = ENESIM_RENDERER_CIRCLE(r);
+	return thiz->current.x;
+}
+
+/**
  * @brief Set the Y coordinate of the center of a circle renderer.
  *
  * @param[in] r The circle renderer.
@@ -275,6 +289,20 @@ EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
+}
+
+/**
+ * @brief Gets the Y coordinate of the center of a circle renderer.
+ *
+ * @param[in] r The circle renderer.
+ * @return The Y coordinate.
+ */
+EAPI double enesim_renderer_circle_y_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Circle *thiz;
+
+	thiz = ENESIM_RENDERER_CIRCLE(r);
+	return thiz->current.y;
 }
 
 /**
@@ -306,7 +334,7 @@ EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double
  * @param[out] y The Y coordinate of the center.
  *
  * This function stores the coordinates value of the center of
- * the circle renderer @p r in the buffers @p x and @p y. These buffers
+ * the circle renderer @p r in the pointers @p x and @p y. These pointers
  * can be @c NULL.
  */
 EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, double *y)
@@ -341,15 +369,12 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
  * @brief Retrieve the radius of a circle renderer.
  *
  * @param[in] r The circle renderer.
- * @param[out] radius The radius.
- *
- * This function stores the radius of the circle renderer @p r in the
- * buffer @p radius.
+ * @return The readius
  */
-EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius)
+EAPI double enesim_renderer_circle_radius_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Circle *thiz;
 
 	thiz = ENESIM_RENDERER_CIRCLE(r);
-	*radius = thiz->current.r;
+	return thiz->current.r;
 }

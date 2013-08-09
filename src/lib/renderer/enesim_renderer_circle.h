@@ -25,12 +25,18 @@
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void);
+
 EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x);
+EAPI double enesim_renderer_circle_x_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y);
+EAPI double enesim_renderer_circle_y_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_circle_center_set(Enesim_Renderer *r, double x, double y);
 EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, double *y);
+
 EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius);
-EAPI void enesim_renderer_circle_radius_get(Enesim_Renderer *r, double *radius);
+EAPI double enesim_renderer_circle_radius_get(Enesim_Renderer *r);
 /**
  * @}
  */
