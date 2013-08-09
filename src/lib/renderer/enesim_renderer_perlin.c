@@ -50,6 +50,7 @@ typedef struct _Enesim_Renderer_Perlin
 	} xfreq, yfreq, ampl;
 	double persistence;
 	int octaves;
+	Eina_Bool changed;
 } Enesim_Renderer_Perlin;
 
 typedef struct _Enesim_Renderer_Perlin_Class {
@@ -90,27 +91,37 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Perlin *thiz;
+	Enesim_Color rcolor;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	Eina_F16p16 xx, yy;
 
 	thiz = ENESIM_RENDERER_PERLIN(r);
+	rcolor = r->state.current.color;
 	/* end of state setup */
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
 	while (dst < end)
 	{
+		Enesim_Color color;
 		Eina_F16p16 per;
-		uint8_t c;
+		int i;
 
 		per = enesim_perlin_get(xx, yy, thiz->octaves, thiz->xfreq.coeff,
 				thiz->yfreq.coeff, thiz->ampl.coeff);
-		c = ((per & 0x1ffff) >> 9);
-		/* FIXME the dispmap uses a and b for x and y displacement, we must
-		 * define a better way for that, so this renderer can actually build
-		 * displacement maps useful for dispmap renderer
-		 */
-		*dst++ = 0xff << 24 | c << 16 | c << 8 | c;
+		/* the perlin noise is on the -1,1 range, so we need to get it back to 0-255 */
+		per = eina_f16p16_mul(per, eina_extra_f16p16_double_from(255));
+		per = eina_f16p16_add(per, eina_extra_f16p16_double_from(255));
+		per = eina_f16p16_div(per, eina_f16p16_int_from(2));
+		/* it is still possible to be outside the range? */
+		i = eina_f16p16_int_to(per);
+		if (i < 0) i = 0;
+		else if (i > 255) i = 255;
+		
+		color = 0xff << 24 | i << 16 | i << 8 | i;
+		if (rcolor != ENESIM_COLOR_FULL)
+			color = argb8888_mul4_sym(color, rcolor);
+		*dst++ = color;
 		xx += 65536;
 	}
 }
@@ -162,6 +173,7 @@ static void _perlin_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED
 		free(thiz->yfreq.coeff);
 	if (thiz->ampl.coeff)
 		free(thiz->ampl.coeff);
+	thiz->changed = EINA_FALSE;
 }
 
 static void _perlin_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -169,6 +181,21 @@ static void _perlin_features_get(Enesim_Renderer *r EINA_UNUSED,
 {
 	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
+
+static Eina_Bool _perlin_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Perlin *thiz;
+
+	thiz = ENESIM_RENDERER_PERLIN(r);
+	return thiz->changed;
+}
+
+static void _perlin_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
+{
+	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+}
+
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -185,6 +212,8 @@ static void _enesim_renderer_perlin_class_init(void *k)
 	klass->features_get = _perlin_features_get;
 	klass->sw_setup = _perlin_sw_setup;
 	klass->sw_cleanup = _perlin_sw_cleanup;
+	klass->has_changed = _perlin_has_changed;
+	klass->sw_hints_get = _perlin_sw_hints_get;
 }
 
 static void _enesim_renderer_perlin_instance_init(void *o)
@@ -194,6 +223,8 @@ static void _enesim_renderer_perlin_instance_init(void *o)
 	thiz->xfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->yfreq.val = 1; /* 1 2 4 8 ... */
 	thiz->ampl.val = 1; /* p p2 p3 p4 ... */
+	thiz->octaves = 1;
+	thiz->persistence = 1;
 }
 
 static void _enesim_renderer_perlin_instance_deinit(void *o EINA_UNUSED)

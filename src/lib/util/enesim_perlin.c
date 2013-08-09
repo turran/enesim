@@ -107,23 +107,21 @@ Eina_F16p16 enesim_perlin_get(Eina_F16p16 xx, Eina_F16p16 yy,
 {
 	unsigned int i;
 	Eina_F16p16 total = 0;
+	Eina_F16p16 max = 0;
 
 	for (i = 0; i < octaves; i++)
 	{
 		Eina_F16p16 x, y, res;
+		Eina_F16p16 final;
 
 		x = eina_f16p16_mul(xx, xfreq[i]);
 		y = eina_f16p16_mul(yy, yfreq[i]);
 		res = interpolatenoise(x, y);
-		total = ((int64_t)(total + (eina_f16p16_mul(res, ampl[i]) << 16))) / FP2;
+		final = eina_f16p16_mul(res, ampl[i]);
+		max += ampl[i];
+		total += final;
 	}
-	/* rescale to 0:2? */
-	//total += 65536;
-	//total = abs(total);
-/*	if (total < 0)
-		total = 0;
-	else if (total > 65536)
-		total = 65536;*/
+	total = eina_f16p16_div(total, max);
 	return total;
 }
 
@@ -135,14 +133,16 @@ void enesim_perlin_coeff_set(unsigned int octaves, double persistence,
 	unsigned int i;
 
 	per = eina_extra_f16p16_double_from(persistence);
-	xfreqcoeff[0] = eina_f16p16_mul(eina_extra_f16p16_double_from(xfreq), 131072);
-	yfreqcoeff[0] = eina_f16p16_mul(eina_extra_f16p16_double_from(yfreq), 131072);
+	xfreqcoeff[0] = eina_f16p16_mul(eina_extra_f16p16_double_from(xfreq), FP2);
+	yfreqcoeff[0] = eina_f16p16_mul(eina_extra_f16p16_double_from(yfreq), FP2);
 	amplcoeff[0] = eina_f16p16_mul(eina_extra_f16p16_double_from(amplitude), per);
 	for (i = 1; i < octaves; i++)
 	{
-		xfreqcoeff[i] = eina_f16p16_mul(xfreqcoeff[i- 1], 131072);
-		yfreqcoeff[i] = eina_f16p16_mul(yfreqcoeff[i- 1], 131072);
-		amplcoeff[i] = eina_f16p16_mul(amplcoeff[i- 1], per);
+		/* 2^i * freq */
+		xfreqcoeff[i] = eina_f16p16_mul(xfreqcoeff[i - 1], FP2);
+		yfreqcoeff[i] = eina_f16p16_mul(yfreqcoeff[i - 1], FP2);
+		/* per^i */
+		amplcoeff[i] = eina_f16p16_mul(amplcoeff[i - 1], per);
 	}
 }
 /*============================================================================*
