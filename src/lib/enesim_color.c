@@ -64,11 +64,11 @@ EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb)
 /**
  * @brief Set the given premultiplied color with the given components.
  *
- * @param argb The Enesim color to set.
- * @param a The alpha component.
- * @param r The red component.
- * @param g The green component.
- * @param b The blue component.
+ * @param[out] color The Enesim color to set.
+ * @param[in] a The alpha component.
+ * @param[in] r The red component.
+ * @param[in] g The green component.
+ * @param[in] b The blue component.
  *
  * This function sets the premultiplied color @p color with the
  * components @p a,  @p r, @p g and @p b.
@@ -87,11 +87,11 @@ EAPI void enesim_color_components_from(Enesim_Color *color,
 /**
  * @brief Retrieve the component of the given premultiplied color.
  *
- * @param argb The Enesim color to set.
- * @param a The alpha component.
- * @param r The red component.
- * @param g The green component.
- * @param b The blue component.
+ * @param[in] color The Enesim color to set.
+ * @param[out] a The alpha component.
+ * @param[out] r The red component.
+ * @param[out] g The green component.
+ * @param[out] b The blue component.
  *
  * This function retrieves the ARGB components of the premultiplied
  * color @p color and stores them into @p a,  @p r, @p g and @p b.
@@ -123,11 +123,11 @@ EAPI void enesim_color_components_to(Enesim_Color color,
 /**
  * @brief Set the given ARGB color with the given components.
  *
- * @param argb The ARGB color to set.
- * @param a The alpha component.
- * @param r The red component.
- * @param g The green component.
- * @param b The blue component.
+ * @param[out] argb The ARGB color to set.
+ * @param[in] a The alpha component.
+ * @param[in] r The red component.
+ * @param[in] g The green component.
+ * @param[in] b The blue component.
  *
  * This function sets the @p argb color with the components @p a,
  * @p r, @p g and @p b.
@@ -142,11 +142,11 @@ EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, u
 /**
  * @brief Retrieve the component of the given ARGB color.
  *
- * @param argb The ARGB color to set.
- * @param a The alpha component.
- * @param r The red component.
- * @param g The green component.
- * @param b The blue component.
+ * @param[in] argb The ARGB color to set.
+ * @param[out] a The alpha component.
+ * @param[out] r The red component.
+ * @param[out] g The green component.
+ * @param[out] b The blue component.
  *
  * This function stores the @p argb color components into @p a, @p r,
  * @p g and @p b. @p a, @p r, @p g and @p b can each be @c NULL.

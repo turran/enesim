@@ -477,7 +477,7 @@ EAPI void enesim_renderer_pattern_width_set(Enesim_Renderer *r, double width)
 /**
  * Gets the width of the pattern
  * @param[in] r The pattern renderer
- * @param[out] w The pattern width
+ * @param[out] width The pattern width
  */
 EAPI void enesim_renderer_pattern_width_get(Enesim_Renderer *r, double *width)
 {

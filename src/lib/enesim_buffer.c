@@ -97,6 +97,7 @@ void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
  * @param[in] f The format of the buffer
  * @param[in] w The width of the buffer
  * @param[in] h The height of the buffer
+ * @param[in] p The pool to use
  * @param[in] copy In case the data needs to be copied to create the buffer
  * or used directly
  * @param[in] data The data of the buffer pixels
