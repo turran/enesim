@@ -33,7 +33,7 @@ EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_B
 EAPI void enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b);
 EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_Text_Buffer *b);
 
-EAPI void enesim_renderer_text_span_font_get(Enesim_Renderer *r, Enesim_Text_Font **font);
+EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Font *font);
 
 /**

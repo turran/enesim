@@ -731,17 +731,15 @@ EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_T
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_text_span_font_get(Enesim_Renderer *r, Enesim_Text_Font **font)
+EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	if (!font) return;
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
 	if (thiz->state.current.font)
-		*font = enesim_text_font_ref(thiz->state.current.font);
+		return enesim_text_font_ref(thiz->state.current.font);
 	else
-		*font = NULL;
+		return NULL;
 }
 
 /**
