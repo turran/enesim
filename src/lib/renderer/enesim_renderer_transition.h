@@ -26,8 +26,13 @@
  */
 EAPI Enesim_Renderer * enesim_renderer_transition_new(void);
 EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level);
+EAPI double enesim_renderer_transition_level_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Renderer *r0);
+EAPI Enesim_Renderer * enesim_renderer_transition_source_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Renderer *r1);
+EAPI Enesim_Renderer * enesim_renderer_transition_target_get(Enesim_Renderer *r);
 
 /**
  * @}

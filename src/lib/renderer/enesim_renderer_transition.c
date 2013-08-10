@@ -51,6 +51,7 @@
 
 typedef struct _Enesim_Renderer_Transition {
 	int interp;
+	double level;
 	Enesim_Renderer *src;
 	Enesim_Renderer *tgt;
 } Enesim_Renderer_Transition;
@@ -109,6 +110,7 @@ static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Transition *thiz;
+	double level;
 
 	thiz = ENESIM_RENDERER_TRANSITION(r);
 	if (!thiz || !thiz->src || !thiz->tgt)
@@ -118,6 +120,12 @@ static Eina_Bool _transition_state_setup(Enesim_Renderer *r,
 		goto r0_end;
 	if (!enesim_renderer_setup(thiz->tgt, s, rop, l))
 		goto r1_end;
+	level = thiz->level;
+	if (level < 0)
+		level = 0;
+	if (level > 1)
+		level = 1;
+	thiz->interp = 1 + (255 * level);
 
 	*fill = _transition_span_general;
 
@@ -217,6 +225,7 @@ EAPI Enesim_Renderer * enesim_renderer_transition_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_transition);
 	return r;
 }
+
 /**
  * Sets the transition level
  * @param[in] r The transition renderer
@@ -229,14 +238,22 @@ EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level)
 	Enesim_Renderer_Transition *thiz;
 
 	thiz = ENESIM_RENDERER_TRANSITION(r);
-	if (level < 0.0000001)
-		level = 0;
-	if (level > 0.999999)
-		level = 1;
-	if (thiz->interp == level)
-		return;
-	thiz->interp = 1 + (255 * level);
+	thiz->level = level;
 }
+
+/**
+ * Gets the transition level
+ * @param[in] r The transition renderer
+ * @return The level
+ */
+EAPI double enesim_renderer_transition_level_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Transition *thiz;
+
+	thiz = ENESIM_RENDERER_TRANSITION(r);
+	return thiz->level;
+}
+
 /**
  * Sets the source renderer
  * @param[in] r The transition renderer
@@ -251,6 +268,20 @@ EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Rende
 		enesim_renderer_unref(thiz->src);
 	thiz->src = r0;
 }
+
+/**
+ * Gets the source renderer
+ * @param[in] r The transition renderer
+ * @return The source renderer
+ */
+EAPI Enesim_Renderer * enesim_renderer_transition_source_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Transition *thiz;
+
+	thiz = ENESIM_RENDERER_TRANSITION(r);
+	return enesim_renderer_ref(thiz->src);
+}
+
 /**
  * Sets the target renderer
  * @param[in] r The transition renderer
@@ -265,4 +296,18 @@ EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Rende
 		enesim_renderer_unref(thiz->tgt);
 	thiz->tgt = r1;
 }
+
+/**
+ * Gets the target renderer
+ * @param[in] r The transition renderer
+ * @return The target renderer
+ */
+EAPI Enesim_Renderer * enesim_renderer_transition_target_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Transition *thiz;
+
+	thiz = ENESIM_RENDERER_TRANSITION(r);
+	return enesim_renderer_ref(thiz->tgt);
+}
+
 
