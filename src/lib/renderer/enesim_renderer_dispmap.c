@@ -343,8 +343,9 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_dispmap);
 	return r;
 }
+
 /**
- * Sets the channel to use as the x coordinate displacement
+ * @brief Sets the channel to use as the x coordinate displacement
  * @param[in] r The displacement map renderer
  * @param[in] channel The channel to use
  */
@@ -357,8 +358,9 @@ EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r,
 
 	thiz->x_channel = channel;
 }
+
 /**
- * Sets the channel to use as the y coordinate displacement
+ * @brief Sets the channel to use as the y coordinate displacement
  * @param[in] r The displacement map renderer
  * @param[in] channel The channel to use
  */
@@ -371,8 +373,11 @@ EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r,
 
 	thiz->y_channel = channel;
 }
+
 /**
- *
+ * @brief Sets the map surface to use for displacing the source surface
+ * @param[in] r The displacement map renderer
+ * @param[in] map The surface map [transfer full]
  */
 EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *map)
 {
@@ -385,21 +390,24 @@ EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *ma
 	if (thiz->map)
 		thiz->map = enesim_surface_ref(thiz->map);
 }
+
 /**
- *
+ * @brief Sets the map surface to use for displacing the source surface
+ * @param[in] r The displacement map renderer
+ * @param[in] map The surface map [transfer full]
  */
-EAPI void enesim_renderer_dispmap_map_get(Enesim_Renderer *r, Enesim_Surface **map)
+EAPI Enesim_Surface * enesim_renderer_dispmap_map_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
-	if (!map) return;
 	thiz = ENESIM_RENDERER_DISPMAP(r);
-	*map = thiz->map;
-	if (thiz->map)
-		thiz->map = enesim_surface_ref(thiz->map);
+	return enesim_surface_ref(thiz->map);
 }
+
 /**
- *
+ * @brief Sets the source surface that will be displaced using the map surface
+ * @param[in] r The displacement map renderer
+ * @param[in] src The source surface to displace
  */
 EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
@@ -412,21 +420,24 @@ EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	if (thiz->src)
 		thiz->src = enesim_surface_ref(thiz->src);
 }
+
 /**
- *
+ * @brief Gets the source surface that will be displaced using the map surface
+ * @param[in] r The displacement map renderer
+ * @return The source surface
  */
-EAPI void enesim_renderer_dispmap_src_get(Enesim_Renderer *r, Enesim_Surface **src)
+EAPI Enesim_Surface * enesim_renderer_dispmap_src_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
-	if (!src) return;
 	thiz = ENESIM_RENDERER_DISPMAP(r);
-	*src = thiz->src;
-	if (thiz->src)
-		thiz->src = enesim_surface_ref(thiz->src);
+	return enesim_surface_ref(thiz->src);
 }
+
 /**
- *
+ * @brief Sets the factor of displacement for the displacement renderer
+ * @param[in] r The displacement map renderer
+ * @param[factor] The factor to use
  */
 EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor)
 {
@@ -436,8 +447,11 @@ EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor)
 
 	thiz->scale = factor;
 }
+
 /**
- *
+ * @brief Gets the factor of displacement for the displacement renderer
+ * @param[in] r The displacement map renderer
+ * @return The factor to use
  */
 EAPI double enesim_renderer_dispmap_factor_get(Enesim_Renderer *r)
 {
@@ -447,4 +461,3 @@ EAPI double enesim_renderer_dispmap_factor_get(Enesim_Renderer *r)
 
 	return thiz->scale;
 }
-

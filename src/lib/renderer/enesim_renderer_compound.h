@@ -52,7 +52,10 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Cb cb, void *data);
 
 EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Eina_Bool enable);
+EAPI Eina_Bool enesim_renderer_compound_background_enable_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_compound_background_color_set(Enesim_Renderer *r, Enesim_Color color);
+EAPI Enesim_Color enesim_renderer_compound_background_color_get(Enesim_Renderer *r);
 /**
  * @}
  */

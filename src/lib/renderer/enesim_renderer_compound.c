@@ -721,7 +721,7 @@ static void _enesim_renderer_compound_instance_deinit(void *o)
  *                                   API                                      *
  *============================================================================*/
 /**
- * Creates a compound renderer layer
+ * @brief Creates a compound renderer layer
  * @return The new layer
  */
 EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_new(void)
@@ -732,6 +732,11 @@ EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_new(void)
 	return l;
 }
 
+/**
+ * @brief Increase the reference counter of a layer
+ * @param[in] l The layer
+ * @return The input parameter @a l for programming convenience
+ */
 EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_ref(
 		Enesim_Renderer_Compound_Layer *l)
 {
@@ -740,6 +745,10 @@ EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_ref(
 	return l;
 }
 
+/**
+ * @brief Decrease the reference counter of a layer
+ * @param[in] l The layer
+ */
 EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l)
 {
 	if (!l) return;
@@ -762,6 +771,11 @@ EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l
 	}
 }
 
+/**
+ * @brief Sets the renderer of a layer
+ * @param[in] l The layer to set the renderer on
+ * @param[in] r The renderer to set on the layer [transfer full]
+ */
 EAPI void enesim_renderer_compound_layer_renderer_set(
 		Enesim_Renderer_Compound_Layer *l, Enesim_Renderer *r)
 {
@@ -779,6 +793,11 @@ EAPI void enesim_renderer_compound_layer_renderer_set(
 	}
 } 
 
+/**
+ * @brief Sets the raster operation of a layer
+ * @param[in] l The layer to set the raster operation on
+ * @param[in] rop The raster operation to set on the layer
+ */
 EAPI void enesim_renderer_compound_layer_rop_set(
 		Enesim_Renderer_Compound_Layer *l, Enesim_Rop rop)
 {
@@ -792,7 +811,7 @@ EAPI void enesim_renderer_compound_layer_rop_set(
 }
 
 /**
- * Creates a compound renderer
+ * @brief Creates a compound renderer
  * @return The new renderer
  */
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
@@ -826,7 +845,9 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 }
 
 /**
- *
+ * @brief Removes a layer
+ * @param[in] r The compound renderer
+ * @param[in] layer The layer to remove [transfer full]
  */
 EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer)
@@ -873,7 +894,7 @@ done:
 }
 
 /**
- * Clears up all the layers
+ * @brief Clears up all the layers
  * @param[in] r The compound renderer
  */
 EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
@@ -900,7 +921,10 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
 }
 
 /**
- *
+ * @brief Iterates over all the layers of a compound renderer
+ * @param[in] r The compound renderer
+ * @param[in] cb The function to call on every layer
+ * @param[in] data User provided data
  */
 EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Cb cb, void *data)
@@ -918,7 +942,10 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 }
 
 /**
- *
+ * @brief Iterates over all the layers of a compound renderer in reverse order
+ * @param[in] r The compound renderer
+ * @param[in] cb The function to call on every layer
+ * @param[in] data User provided data
  */
 EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Cb cb, void *data)
@@ -936,7 +963,9 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 }
 
 /**
- *
+ * @brief Enables or disables the background on the compound renderer
+ * @param[in] r The compound renderer
+ * @param[in] TRUE to enable, FALSE to disable
  */
 EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Eina_Bool enable)
 {
@@ -948,7 +977,22 @@ EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Ein
 }
 
 /**
- *
+ * @brief Gets the enable flag on the background
+ * @param[in] r The compound renderer
+ * @return TRUE if the background is enabled, FALSE otherwise
+ */
+EAPI Eina_Bool enesim_renderer_compound_background_enable_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Compound *thiz;
+
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	return thiz->background_enabled;
+}
+
+/**
+ * @brief Sets the background color of the compound renderer
+ * @param[in] r The compound renderer
+ * @param[in] c The color to set
  */
 EAPI void enesim_renderer_compound_background_color_set(Enesim_Renderer *r, Enesim_Color c)
 {
@@ -958,36 +1002,15 @@ EAPI void enesim_renderer_compound_background_color_set(Enesim_Renderer *r, Enes
 	enesim_renderer_background_color_set(thiz->background.r, c);
 }
 
-#if 0
-EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r, Enesim_Renderer_Compound_Layer *l)
+/**
+ * @brief Gets the background color of the compound renderer
+ * @param[in] r The compound renderer
+ * @return The color
+ */
+EAPI Enesim_Color enesim_renderer_compound_background_color_get(Enesim_Renderer *r)
 {
-	if (l->owner)
-	{
-		if (l->owner == r)
-			return;
-		enesim_renderer_compound_layer_remove(l->owner, enesim_renderer_compound_layer_ref(l));
-	}
-	/* add it to new added layers */
-}
+	Enesim_Renderer_Compound *thiz;
 
-EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r, Enesim_Renderer_Compound_Layer *l)
-{
-	if (l->owner != r)
-	{
-		enesim_renderer_compound_layer_unref(l);
-		return;
-	}
-	/* unparent */
-	l->owner = NULL;
-	/* add it to the layers to remove */
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	return enesim_renderer_background_color_get(thiz->background.r);
 }
-
-EAPI void enesim_renderer_compound_layer_owner_get(Enesim_Renderer_Compound_Layer *l, Enesim_Renderer **r)
-{
-	if (l->owner)
-		*r = enesim_renderer_ref(l->owner);
-	else
-		*r = NULL;
-}
-
-#endif
