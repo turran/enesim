@@ -19,7 +19,7 @@
 				EINA_EXTRA_RECTANGLE_ARGS(&bounds)); 	\
 		s = enesim_surface_new(ENESIM_FORMAT_ARGB8888,		\
 				256, 256);				\
-		if (!enesim_renderer_draw(r, s, ENESIM_FILL, NULL, 	\
+		if (!enesim_renderer_draw(r, s, ENESIM_ROP_FILL, NULL, 	\
 				0, 0, &error))				\
 		{							\
 			enesim_log_dump(error);				\

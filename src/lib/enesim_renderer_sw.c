@@ -57,10 +57,10 @@ static inline Eina_Bool _is_sw_draw_composed(Enesim_Color *color,
 	if (hints & ENESIM_RENDERER_HINT_COLORIZE)
 		*color = ENESIM_COLOR_FULL;
 	if (hints & ENESIM_RENDERER_HINT_ROP)
-		*rop = ENESIM_FILL;
+		*rop = ENESIM_ROP_FILL;
 
 	/* fill rop and color is full, we use the simple draw function */
-	if ((*rop == ENESIM_FILL) && (*color == ENESIM_COLOR_FULL))
+	if ((*rop == ENESIM_ROP_FILL) && (*color == ENESIM_COLOR_FULL))
 		return EINA_FALSE;
 	return EINA_TRUE;
 }
@@ -401,7 +401,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	final.y -= y;
 
 	intersect = eina_rectangle_intersection(&final, area);
-	if (rop == ENESIM_FILL)
+	if (rop == ENESIM_ROP_FILL)
 	{
 		/* just memset the whole area */
 		if (!intersect)
@@ -487,7 +487,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	{
 		Eina_Bool ret;
 
-		ret = enesim_renderer_setup(mask, s, ENESIM_FILL, error);
+		ret = enesim_renderer_setup(mask, s, ENESIM_ROP_FILL, error);
 		enesim_renderer_unref(mask);
 		if (!ret)
 		{

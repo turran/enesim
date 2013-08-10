@@ -39,8 +39,8 @@ typedef enum _Enesim_Angle
  */
 typedef enum _Enesim_Rop
 {
-	ENESIM_BLEND, /**< D = S + D(1 - Sa) */
-	ENESIM_FILL, /**< D = S */
+	ENESIM_ROP_BLEND, /**< D = S + D(1 - Sa) */
+	ENESIM_ROP_FILL, /**< D = S */
 	ENESIM_ROPS
 } Enesim_Rop;
 

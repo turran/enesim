@@ -66,11 +66,11 @@ void enesim_opengl_rop_set(Enesim_Rop rop)
 	glBlendEquation(GL_FUNC_ADD);
 	switch (rop)
 	{
-		case ENESIM_BLEND:
+		case ENESIM_ROP_BLEND:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		break;
 
-		case ENESIM_FILL:
+		case ENESIM_ROP_FILL:
 		glBlendFunc(GL_ONE, GL_ZERO);
 		break;
 

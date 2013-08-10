@@ -1457,7 +1457,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 		{
 			thiz->span = enesim_compositor_span_get(rop, &fmt,
 				ENESIM_FORMAT_ARGB8888, thiz->color, ENESIM_FORMAT_NONE);
-			if (rop == ENESIM_BLEND)
+			if (rop == ENESIM_ROP_BLEND)
 				*fill = _argb8888_blend_span;
 		}
 	}
@@ -1478,7 +1478,7 @@ static void _image_sw_image_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
-	if (rop != ENESIM_FILL)
+	if (rop != ENESIM_ROP_FILL)
 	{
 		Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 

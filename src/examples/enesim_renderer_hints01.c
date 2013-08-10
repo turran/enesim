@@ -37,7 +37,7 @@ static Enesim_Renderer * enesim_renderer_hints01(void)
 
 	lbackground = enesim_renderer_compound_layer_new();
 	enesim_renderer_compound_layer_renderer_set(lbackground, background);
-	enesim_renderer_compound_layer_rop_set(lbackground, ENESIM_FILL);
+	enesim_renderer_compound_layer_rop_set(lbackground, ENESIM_ROP_FILL);
 	enesim_renderer_compound_layer_add(compound, lbackground);
 
 	for (i = 0; i < sizeof(colors)/sizeof(Enesim_Color); i++)
@@ -48,7 +48,7 @@ static Enesim_Renderer * enesim_renderer_hints01(void)
 		shape = _create_circle(x, y, colors[i]);
 		l = enesim_renderer_compound_layer_new();
 		enesim_renderer_compound_layer_renderer_set(l, shape);
-		enesim_renderer_compound_layer_rop_set(l, ENESIM_BLEND);
+		enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_BLEND);
 		enesim_renderer_compound_layer_add(compound, l);
 		x += 60;
 	}

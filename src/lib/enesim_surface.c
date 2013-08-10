@@ -125,7 +125,7 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
 				w, h, enesim_pool_ref(buffer->pool));
 		importer = enesim_renderer_importer_new();
 		enesim_renderer_importer_buffer_set(importer, buffer);
-		enesim_renderer_draw(importer, s, ENESIM_FILL, NULL, 0, 0, NULL);
+		enesim_renderer_draw(importer, s, ENESIM_ROP_FILL, NULL, 0, 0, NULL);
 		enesim_renderer_unref(importer);
 	}
 	else

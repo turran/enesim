@@ -287,7 +287,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-	enesim_opengl_rop_set(ENESIM_FILL);
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
 #endif
 	enesim_surface_unref(tmp);
 
@@ -399,7 +399,7 @@ static Eina_Bool _compound_sw_setup(Enesim_Renderer *r,
 	if (!_compound_state_setup(thiz, r, s, rop, log))
 		return EINA_FALSE;
 
-	if (rop == ENESIM_FILL)
+	if (rop == ENESIM_ROP_FILL)
 	{
 		*fill = _compound_fill_span_blend_layer;
 	}
@@ -678,7 +678,7 @@ static void _enesim_renderer_compound_instance_init(void *o)
 	thiz = ENESIM_RENDERER_COMPOUND(o);
 	r = enesim_renderer_background_new();
 	thiz->background.r = r;
-	thiz->background.rop = ENESIM_FILL;
+	thiz->background.rop = ENESIM_ROP_FILL;
 }
 
 static void _enesim_renderer_compound_instance_deinit(void *o)

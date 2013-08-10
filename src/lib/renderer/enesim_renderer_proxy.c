@@ -141,7 +141,7 @@ static Eina_Bool _proxy_sw_setup(Enesim_Renderer *r,
 	if (!_proxy_state_setup(thiz, r, s, rop, l))
 		return EINA_FALSE;
 
-	if (rop == ENESIM_FILL)
+	if (rop == ENESIM_ROP_FILL)
 	{
 		*fill = _proxy_fill_span_blend;
 	}

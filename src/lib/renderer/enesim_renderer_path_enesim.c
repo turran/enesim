@@ -449,7 +449,7 @@ static void _path_opengl_blit(GLenum fbo, GLenum dst,
 			GL_TEXTURE_2D, dst, 0);
 
 	glBindTexture(GL_TEXTURE_2D, src);
-	enesim_opengl_rop_set(ENESIM_BLEND);
+	enesim_opengl_rop_set(ENESIM_ROP_BLEND);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);
 		glVertex2d(area->x, area->y);
@@ -491,7 +491,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	glLoadIdentity();
 	//glOrtho(area->x - area->w, area->x + area->w, area->y - area->h, area->y + area->h, -1, 1);
 
-	enesim_opengl_rop_set(ENESIM_FILL);
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, texture, 0);
@@ -617,7 +617,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glLoadIdentity();
 
 	glBindTexture(GL_TEXTURE_2D, texture);
-	enesim_opengl_rop_set(ENESIM_BLEND);
+	enesim_opengl_rop_set(ENESIM_ROP_BLEND);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);
 		glVertex2d(area->x, area->y);
@@ -634,7 +634,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	enesim_opengl_texture_free(texture);
-	enesim_opengl_rop_set(ENESIM_FILL);
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
 }
 
 /* for fill and stroke we need to draw the stroke first on a
@@ -696,7 +696,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 
-	enesim_opengl_rop_set(ENESIM_BLEND);
+	enesim_opengl_rop_set(ENESIM_ROP_BLEND);
 	//glBindTexture(GL_TEXTURE_2D, textures[0]);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);
@@ -717,7 +717,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	/* don't use any program */
 	glUseProgramObjectARB(0);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-	enesim_opengl_rop_set(ENESIM_FILL);
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
 }
 #endif
 

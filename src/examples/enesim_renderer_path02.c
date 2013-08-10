@@ -43,12 +43,12 @@ static Enesim_Renderer * enesim_renderer_path02(void)
 
 	l = enesim_renderer_compound_layer_new();
 	enesim_renderer_compound_layer_renderer_set(l, r2);
-	enesim_renderer_compound_layer_rop_set(l, ENESIM_FILL);
+	enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_FILL);
 	enesim_renderer_compound_layer_add(c, l);
 
 	l = enesim_renderer_compound_layer_new();
 	enesim_renderer_compound_layer_renderer_set(l, r1);
-	enesim_renderer_compound_layer_rop_set(l, ENESIM_BLEND);
+	enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_BLEND);
 	enesim_renderer_compound_layer_add(c, l);
 
 	return c;

@@ -56,9 +56,9 @@ static Enesim_Compositor_Point _point_color_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Color color)
 {
 	/* TODO check if the color is opaque */
-	if ((rop == ENESIM_BLEND) && (color & 0xff000000))
+	if ((rop == ENESIM_ROP_BLEND) && (color & 0xff000000))
 	{
-		rop = ENESIM_FILL;
+		rop = ENESIM_ROP_FILL;
 	}
 	return _comps.pt_color[rop][*dfmt];
 }
@@ -95,9 +95,9 @@ static Enesim_Compositor_Span _span_color_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Color color)
 {
 	/* TODO check if the color is opaque */
-	if ((rop == ENESIM_BLEND) && (color & 0xff000000))
+	if ((rop == ENESIM_ROP_BLEND) && (color & 0xff000000))
 	{
-		rop = ENESIM_FILL;
+		rop = ENESIM_ROP_FILL;
 	}
 	return _comps.sp_color[rop][*dfmt];
 }
