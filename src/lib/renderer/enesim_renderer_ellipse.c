@@ -358,6 +358,19 @@ EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
 }
 
 /**
+ * @brief Get the X coordinate of the center of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] x The X coordinate.
+ */
+EAPI double enesim_renderer_ellipse_x_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Ellipse *thiz;
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
+	return thiz->current.x;
+}
+
+/**
  * @brief Set the Y coordinate of the center of a ellipse renderer.
  *
  * @param[in] r The ellipse renderer.
@@ -373,6 +386,19 @@ EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
+}
+
+/**
+ * @brief Get the Y coordinate of the center of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @param[in] y The Y coordinate.
+ */
+EAPI double enesim_renderer_ellipse_y_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Ellipse *thiz;
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
+	return thiz->current.y;
 }
 
 /**
@@ -394,6 +420,19 @@ EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *r, double rx)
 }
 
 /**
+ * @brief Get the radius along the X axis of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @return The radius along the X axis.
+ */
+EAPI double enesim_renderer_ellipse_x_radius_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Ellipse *thiz;
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
+	return thiz->current.rx;
+}
+
+/**
  * @brief Set the radius along the Y axis of a ellipse renderer.
  *
  * @param[in] r The ellipse renderer.
@@ -410,3 +449,17 @@ EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *r, double ry)
 	thiz->changed = EINA_TRUE;
 	thiz->generated = EINA_FALSE;
 }
+
+/**
+ * @brief Get the radius along the Y axis of a ellipse renderer.
+ *
+ * @param[in] r The ellipse renderer.
+ * @return The radius along the Y axis.
+ */
+EAPI double enesim_renderer_ellipse_y_radius_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Ellipse *thiz;
+	thiz = ENESIM_RENDERER_ELLIPSE(r);
+	return thiz->current.ry;
+}
+

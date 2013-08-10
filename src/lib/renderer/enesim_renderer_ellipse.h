@@ -26,14 +26,23 @@
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void);
 
-EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *p, double x);
-EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *p, double y);
-EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *p, double r);
-EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *p, double r);
-EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *p, double x, double y);
-EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *p, double *x, double *y);
-EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *p, double radius_x, double radius_y);
-EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *p, double *radius_x, double *radius_y);
+EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x);
+EAPI double enesim_renderer_ellipse_x_get(Enesim_Renderer *r);
+
+EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y);
+EAPI double enesim_renderer_ellipse_y_get(Enesim_Renderer *r);
+
+EAPI void enesim_renderer_ellipse_x_radius_set(Enesim_Renderer *r, double rad);
+EAPI double enesim_renderer_ellipse_x_radius_get(Enesim_Renderer *r);
+
+EAPI void enesim_renderer_ellipse_y_radius_set(Enesim_Renderer *r, double rad);
+EAPI double enesim_renderer_ellipse_y_radius_get(Enesim_Renderer *r);
+
+EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *r, double x, double y);
+EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *r, double *x, double *y);
+
+EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *r, double radius_x, double radius_y);
+EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *r, double *radius_x, double *radius_y);
 /**
  * @}
  */
