@@ -280,8 +280,6 @@ EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	if (thiz->src)
 		enesim_surface_unref(thiz->src);
 	thiz->src = src;
-	if (thiz->src)
-		thiz->src = enesim_surface_ref(thiz->src);
 	thiz->src_changed = EINA_TRUE;
 }
 

@@ -379,7 +379,7 @@ EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r,
  * @param[in] r The displacement map renderer
  * @param[in] map The surface map [transfer full]
  */
-EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *map)
+EAPI void enesim_renderer_dispmap_map_surface_set(Enesim_Renderer *r, Enesim_Surface *map)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
@@ -387,8 +387,6 @@ EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *ma
 	if (thiz->map)
 		enesim_surface_unref(thiz->map);
 	thiz->map = map;
-	if (thiz->map)
-		thiz->map = enesim_surface_ref(thiz->map);
 }
 
 /**
@@ -396,7 +394,7 @@ EAPI void enesim_renderer_dispmap_map_set(Enesim_Renderer *r, Enesim_Surface *ma
  * @param[in] r The displacement map renderer
  * @param[in] map The surface map [transfer full]
  */
-EAPI Enesim_Surface * enesim_renderer_dispmap_map_get(Enesim_Renderer *r)
+EAPI Enesim_Surface * enesim_renderer_dispmap_map_surface_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
@@ -409,7 +407,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_map_get(Enesim_Renderer *r)
  * @param[in] r The displacement map renderer
  * @param[in] src The source surface to displace
  */
-EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *src)
+EAPI void enesim_renderer_dispmap_src_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
@@ -417,8 +415,6 @@ EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	if (thiz->src)
 		enesim_surface_unref(thiz->src);
 	thiz->src = src;
-	if (thiz->src)
-		thiz->src = enesim_surface_ref(thiz->src);
 }
 
 /**
@@ -426,7 +422,7 @@ EAPI void enesim_renderer_dispmap_src_set(Enesim_Renderer *r, Enesim_Surface *sr
  * @param[in] r The displacement map renderer
  * @return The source surface
  */
-EAPI Enesim_Surface * enesim_renderer_dispmap_src_get(Enesim_Renderer *r)
+EAPI Enesim_Surface * enesim_renderer_dispmap_src_surface_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 

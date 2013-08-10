@@ -14,7 +14,7 @@ static Enesim_Renderer * enesim_renderer_blur01(void)
 
 	r2 = enesim_renderer_blur_new();
 	enesim_renderer_origin_set(r2, 15, 15);
-	enesim_renderer_blur_renderer_set(r2, r1);
+	enesim_renderer_blur_source_renderer_set(r2, r1);
 	enesim_renderer_blur_radius_x_set(r2, 4.5);
 	enesim_renderer_blur_radius_y_set(r2, 4.5);
 

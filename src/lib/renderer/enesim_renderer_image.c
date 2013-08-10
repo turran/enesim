@@ -1326,7 +1326,18 @@ static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 	thiz->src_changed = EINA_FALSE;
 	if (thiz->current.s)
 		enesim_surface_unlock(thiz->current.s);
-	thiz->past = thiz->current;
+	/* swap the states */
+	if (thiz->past.s)
+	{
+		enesim_surface_unref(thiz->past.s);
+		thiz->past.s = NULL;
+	}
+	thiz->past.s = enesim_surface_ref(thiz->current.s);
+	thiz->past.x = thiz->current.x;
+	thiz->past.y = thiz->current.y;
+	thiz->past.w = thiz->current.w;
+	thiz->past.h = thiz->current.h;
+
 	EINA_LIST_FREE(thiz->surface_damages, sd)
 		free(sd);
 }
@@ -1647,13 +1658,12 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_x_get(Enesim_Renderer *r, double *x)
+EAPI double enesim_renderer_image_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (!thiz) return;
-	if (x) *x = thiz->current.x;
+	return thiz->current.x;
 }
 
 /**
@@ -1674,13 +1684,12 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_y_get(Enesim_Renderer *r, double *y)
+EAPI double enesim_renderer_image_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (!thiz) return;
-	if (y) *y = thiz->current.y;
+	return thiz->current.y;
 }
 /**
  * To be documented
@@ -1729,13 +1738,12 @@ EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_width_get(Enesim_Renderer *r, double *w)
+EAPI double enesim_renderer_image_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (!thiz) return;
-	if (w) *w = thiz->current.w;
+	return thiz->current.w;
 }
 
 /**
@@ -1756,13 +1764,12 @@ EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_height_get(Enesim_Renderer *r, double *h)
+EAPI double enesim_renderer_image_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (!thiz) return;
-	if (h) *h = thiz->current.h;
+	return thiz->current.h;
 }
 
 /**
@@ -1798,18 +1805,14 @@ EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
+EAPI void enesim_renderer_image_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Image *thiz;
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (!thiz) return;
-
 	if (thiz->current.s)
 		enesim_surface_unref(thiz->current.s);
 	thiz->current.s = src;
-	if (thiz->current.s)
-		thiz->current.s = enesim_surface_ref(thiz->current.s);
 	thiz->src_changed = EINA_TRUE;
 }
 
@@ -1817,14 +1820,12 @@ EAPI void enesim_renderer_image_src_set(Enesim_Renderer *r, Enesim_Surface *src)
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_image_src_get(Enesim_Renderer *r, Enesim_Surface **src)
+EAPI Enesim_Surface * enesim_renderer_image_source_surface_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (!thiz) return;
-	if (*src)
-		*src = thiz->current.s;
+	return enesim_surface_ref(thiz->current.s);
 }
 
 /**
