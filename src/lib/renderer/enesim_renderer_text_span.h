@@ -25,7 +25,6 @@
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_text_span_new(void);
-EAPI Enesim_Renderer * enesim_renderer_text_span_new_from_engine(Enesim_Text_Engine *e);
 EAPI void enesim_renderer_text_span_text_set(Enesim_Renderer *r, const char *str);
 EAPI void enesim_renderer_text_span_text_get(Enesim_Renderer *r, const char **str);
 EAPI void enesim_renderer_text_span_direction_get(Enesim_Renderer *r, Enesim_Text_Direction *direction);

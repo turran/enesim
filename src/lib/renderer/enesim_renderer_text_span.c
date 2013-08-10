@@ -65,7 +65,6 @@ typedef struct _Enesim_Renderer_Text_Span
 	Enesim_Renderer_Shape parent;
 	Enesim_Renderer_Text_Span_State state;
 	Enesim_Text_Direction direction;
-	Enesim_Text_Engine *engine;
 	/* sw drawing */
 	Enesim_F16p16_Matrix matrix;
 	/* span geometry */
@@ -611,16 +610,6 @@ static void _enesim_renderer_text_span_instance_deinit(void *o)
 	}
 }
 
-static Enesim_Renderer * _enesim_renderer_text_span_new(Enesim_Text_Engine *engine)
-{
-	Enesim_Renderer *r;
-	Enesim_Renderer_Text_Span *thiz;
-
-	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_text_span);
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	thiz->engine = engine;
-	return r;
-}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -634,16 +623,10 @@ static Enesim_Renderer * _enesim_renderer_text_span_new(Enesim_Text_Engine *engi
  */
 EAPI Enesim_Renderer * enesim_renderer_text_span_new(void)
 {
-	return _enesim_renderer_text_span_new(enesim_text_engine_default_get());
-}
+	Enesim_Renderer *r;
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
-EAPI Enesim_Renderer * enesim_renderer_text_span_new_from_engine(Enesim_Text_Engine *e)
-{
-	return _enesim_renderer_text_span_new(e);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_text_span);
+	return r;
 }
 
 /**
