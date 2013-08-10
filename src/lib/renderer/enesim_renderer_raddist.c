@@ -234,6 +234,10 @@ static void _enesim_renderer_raddist_instance_deinit(void *o EINA_UNUSED)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Creates a new radial distortion filter renderer
+ * @return The renderer
+ */
 EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 {
 	Enesim_Renderer *r;
@@ -242,17 +246,40 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 	return r;
 }
 
+/**
+ * @brief Sets the radius of the renderer
+ * @param[in] r The radial distortion renderer
+ * @param[in] radius The radius to use
+ */
 EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius)
 {
 	Enesim_Renderer_Raddist *thiz;
 
-	if (!radius)
-		radius = 1;
 	thiz = ENESIM_RENDERER_RADDIST(r);
+	if (!radius)
+		radius = 1.0;
 	thiz->current.radius = radius;
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Gets the radius of the renderer
+ * @param[in] r The radial distortion renderer
+ * @return The radius to use
+ */
+EAPI double enesim_renderer_raddist_radius_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Raddist *thiz;
+
+	thiz = ENESIM_RENDERER_RADDIST(r);
+	return thiz->current.radius;
+}
+
+/**
+ * @brief Sets the factor of the renderer
+ * @param[in] r The radial distortion renderer
+ * @param[in] factor The factor to use
+ */
 EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor)
 {
 	Enesim_Renderer_Raddist *thiz;
@@ -264,6 +291,11 @@ EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Gets the factor of the renderer
+ * @param[in] r The radial distortion renderer
+ * @return The factor to use
+ */
 EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Raddist *thiz;
@@ -272,7 +304,12 @@ EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 	return thiz->current.scale;
 }
 
-EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *src)
+/**
+ * @brief Sets the source surface of the renderer
+ * @param[in] r The radial distortion renderer
+ * @param[in] src The source surface [transfer full]
+ */
+EAPI void enesim_renderer_raddist_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Raddist *thiz;
 
@@ -283,17 +320,24 @@ EAPI void enesim_renderer_raddist_src_set(Enesim_Renderer *r, Enesim_Surface *sr
 	thiz->src_changed = EINA_TRUE;
 }
 
-EAPI void enesim_renderer_raddist_src_get(Enesim_Renderer *r, Enesim_Surface **src)
+/**
+ * @brief Gets the source surface of the renderer
+ * @param[in] r The radial distortion renderer
+ * @return The source surface to use
+ */
+EAPI Enesim_Surface * enesim_renderer_raddist_source_surface_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Raddist *thiz;
 
-	if (!src) return;
 	thiz = ENESIM_RENDERER_RADDIST(r);
-	*src = thiz->src;
-	if (thiz->src)
-		thiz->src = enesim_surface_ref(thiz->src);
+	return enesim_surface_ref(thiz->src);
 }
 
+/**
+ * @brief Sets the center in X of the renderer
+ * @param[in] r The radial distortion renderer
+ * @param[in] ox The center in X of the radial distortion
+ */
 EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
 {
 	Enesim_Renderer_Raddist *thiz;
@@ -303,6 +347,11 @@ EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Sets the center in Y of the renderer
+ * @param[in] r The radial distortion renderer
+ * @param[in] oy The center in Y of the radial distortion
+ */
 EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy)
 {
 	Enesim_Renderer_Raddist *thiz;

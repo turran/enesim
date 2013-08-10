@@ -646,6 +646,7 @@ EAPI Enesim_Renderer * enesim_renderer_blur_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_blur);
 	return r;
 }
+
 /**
  * @brief Sets the channel to use in the src data
  * @param[in] r The blur filter renderer
@@ -661,6 +662,7 @@ EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r,
 	thiz->channel = channel;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
  * @brief Gets the channel used in the src data
  * @param[in] r The blur filter renderer
