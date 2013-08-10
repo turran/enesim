@@ -369,7 +369,7 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
  * @brief Retrieve the radius of a circle renderer.
  *
  * @param[in] r The circle renderer.
- * @return The readius
+ * @return The radius
  */
 EAPI double enesim_renderer_circle_radius_get(Enesim_Renderer *r)
 {

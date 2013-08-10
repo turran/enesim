@@ -26,17 +26,22 @@
  */
 EAPI Enesim_Renderer * enesim_renderer_grid_new(void);
 EAPI void enesim_renderer_grid_inside_width_set(Enesim_Renderer *r, unsigned int width);
-EAPI void enesim_renderer_grid_inside_width_get(Enesim_Renderer *r, unsigned int *width);
+EAPI unsigned int enesim_renderer_grid_inside_width_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_grid_inside_height_set(Enesim_Renderer *r, unsigned int height);
-EAPI void enesim_renderer_grid_inside_height_get(Enesim_Renderer *r, unsigned int *height);
+EAPI unsigned int enesim_renderer_grid_inside_height_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_grid_inside_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_grid_inside_color_get(Enesim_Renderer *r, Enesim_Color *color);
+EAPI Enesim_Color enesim_renderer_grid_inside_color_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_grid_border_hthickness_set(Enesim_Renderer *r, unsigned int hthickness);
-EAPI void enesim_renderer_grid_border_hthickness_get(Enesim_Renderer *r, unsigned int *htickness);
+EAPI unsigned int enesim_renderer_grid_border_hthickness_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_grid_border_vthickness_set(Enesim_Renderer *r, unsigned int vthickness);
-EAPI void enesim_renderer_grid_border_vthickness_get(Enesim_Renderer *r, unsigned int *vthickness);
+EAPI unsigned int enesim_renderer_grid_border_vthickness_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_grid_border_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_grid_border_color_get(Enesim_Renderer *r, Enesim_Color *color);
+EAPI Enesim_Color enesim_renderer_grid_border_color_get(Enesim_Renderer *r);
 
 /**
  * @}
