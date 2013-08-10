@@ -407,7 +407,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_map_surface_get(Enesim_Renderer *r
  * @param[in] r The displacement map renderer
  * @param[in] src The source surface to displace
  */
-EAPI void enesim_renderer_dispmap_src_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
+EAPI void enesim_renderer_dispmap_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
@@ -422,7 +422,7 @@ EAPI void enesim_renderer_dispmap_src_surface_set(Enesim_Renderer *r, Enesim_Sur
  * @param[in] r The displacement map renderer
  * @return The source surface
  */
-EAPI Enesim_Surface * enesim_renderer_dispmap_src_surface_get(Enesim_Renderer *r)
+EAPI Enesim_Surface * enesim_renderer_dispmap_source_surface_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
