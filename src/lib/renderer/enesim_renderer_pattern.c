@@ -156,8 +156,8 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer_Pattern *thiz,
 		changed = EINA_TRUE;
 	}
 
-	enesim_renderer_color_get(r, &color);
-	enesim_renderer_color_get(thiz->current.source, &thiz->src_color);
+	color = enesim_renderer_color_get(r);
+	thiz->src_color = enesim_renderer_color_get(thiz->current.source);
 	color = argb8888_mul4_sym(color, thiz->src_color);
 	enesim_renderer_color_set(thiz->current.source, color);
 
@@ -377,10 +377,8 @@ static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)
 	{
 		if (enesim_renderer_has_changed(thiz->current.source))
 		{
-			const char *source_name;
-
-			enesim_renderer_name_get(thiz->current.source, &source_name);
-			DBG("The source renderer %s has changed", source_name);
+			DBG("The source renderer %s has changed",
+					enesim_renderer_name_get(thiz->current.source));
 			return EINA_TRUE;
 		}
 	}

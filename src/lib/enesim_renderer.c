@@ -447,7 +447,7 @@ void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to)
 	state = &r->state;
 	/* TODO we should compare agains the state of 'to' */
 	/* mandatory properties */
-	enesim_renderer_mask_get(r, &mask);
+	mask = enesim_renderer_mask_get(r);
 	enesim_renderer_mask_set(to, mask);
 	enesim_renderer_color_set(to, state->current.color);
 	/* optional properties */
@@ -467,7 +467,7 @@ void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	if (!error)
 		return;
-	enesim_renderer_name_get(r, &name);
+	name = enesim_renderer_name_get(r);
 	va_start(args, fmt);
 	num = snprintf(str, PATH_MAX, "%s:%d %s %s ", file, line, function, name);
 	num += vsnprintf(str + num, PATH_MAX - num, fmt, args);
@@ -483,7 +483,7 @@ Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Feature features;
 	Eina_Bool ret;
 
-	enesim_renderer_features_get(r, &features);
+	features = enesim_renderer_features_get(r);
 	ret = _state_changed(&r->state, features);
 	return ret;
 }
@@ -546,7 +546,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		 */
 		_enesim_renderer_bounds_get(r, &r->current_bounds);
 		_enesim_renderer_destination_bounds_get(r, &r->current_destination_bounds);
-		enesim_renderer_features_get(r, &r->current_features_get);
+		r->current_features_get = enesim_renderer_features_get(r);
 	}
 
 	return ret;
@@ -660,27 +660,27 @@ EAPI void enesim_renderer_unlock(Enesim_Renderer *r)
 /**
  * @brief Get the features a renderer support
  * @param[in] r The renderer to get the features from
- * @param[out] features The renderer features
+ * @return The renderer features
  */
-EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features)
+EAPI Enesim_Renderer_Feature enesim_renderer_features_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Class *klass;
+	Enesim_Renderer_Feature features = 0;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	klass = ENESIM_RENDERER_CLASS_GET(r);
 
-	if (!features) return;
-	*features = 0;
 	if (r->in_setup)
 	{
-		*features = r->current_features_get;
-		return;
+		features = r->current_features_get;
+		return features;
 	}
 	if (klass->features_get)
 	{
-		klass->features_get(r, features);
-		return;
+		klass->features_get(r, &features);
+		return features;
 	}
+	return features;
 }
 /**
  * @brief Sets the transformation matrix of a renderer
@@ -739,13 +739,12 @@ EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 /**
  * @brief Gets the name of a renderer
  * @param[in] r The renderer to get the name from
- * @param[out] name The renderer name
+ * @return The renderer name
  */
-EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name)
+EAPI const char * enesim_renderer_name_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!name) return;
-	*name = r->state.name;
+	return r->state.name;
 }
 
 /**
@@ -772,8 +771,8 @@ EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y)
 EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	enesim_renderer_x_origin_get(r, x);
-	enesim_renderer_y_origin_get(r, y);
+	if (x) *x = enesim_renderer_x_origin_get(r);
+	if (y) *y = enesim_renderer_y_origin_get(r);
 }
 
 /**
@@ -791,11 +790,10 @@ EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x)
+EAPI double enesim_renderer_x_origin_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!x) return;
-	*x = r->state.current.ox;
+	return r->state.current.ox;
 }
 
 /**
@@ -813,11 +811,10 @@ EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y)
+EAPI double enesim_renderer_y_origin_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!y) return;
-	*y = r->state.current.oy;
+	return r->state.current.oy;
 }
 
 /**
@@ -839,13 +836,12 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 /**
  * @brief Gets the color of a renderer
  * @param[in] r The renderer to get the color from
- * @param[out] color The color
+ * @return The color
  */
-EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color)
+EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!color) return;
-	*color = r->state.current.color;
+	return r->state.current.color;
 }
 
 /**
@@ -863,11 +859,10 @@ EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visible)
+EAPI Eina_Bool enesim_renderer_visibility_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!visible) return;
-	*visible = r->state.current.visibility;
+	return r->state.current.visibility;
 }
 
 /**
@@ -890,13 +885,10 @@ EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask)
+EAPI Enesim_Renderer * enesim_renderer_mask_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!mask) return;
-	*mask = r->state.current.mask;
-	if (*mask)
-		enesim_renderer_ref(*mask);
+	return enesim_renderer_ref(r->state.current.mask);
 }
 
 /**
@@ -914,10 +906,10 @@ EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_quality_get(Enesim_Renderer *r, Enesim_Quality *quality)
+EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	*quality = r->state.current.quality;
+	return r->state.current.quality;
 }
 
 /**

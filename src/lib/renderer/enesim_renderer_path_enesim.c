@@ -584,7 +584,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 	enesim_renderer_shape_draw_mode_get(r, &dm);
-	enesim_renderer_color_get(r, &color);
+	color = enesim_renderer_color_get(r);
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		gf = &gl->stroke;
@@ -668,7 +668,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	/* create the stroke texture */
 	textures[1] = enesim_opengl_texture_new(area->w, area->h);
 
-	enesim_renderer_color_get(r, &color);
+	color = enesim_renderer_color_get(r);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glViewport(0, 0, area->w, area->h);
 

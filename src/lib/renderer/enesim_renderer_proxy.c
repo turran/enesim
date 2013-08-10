@@ -108,10 +108,8 @@ static Eina_Bool _proxy_state_setup(Enesim_Renderer_Proxy *thiz,
 
 	if (!enesim_renderer_setup(thiz->proxied, s, rop, l))
 	{
-		const char *name;
-
-		enesim_renderer_name_get(thiz->proxied, &name);
-		ENESIM_RENDERER_LOG(r, l, "Proxy renderer %s can not setup", name);
+		ENESIM_RENDERER_LOG(r, l, "Proxy renderer %s can not setup",
+				enesim_renderer_name_get(thiz->proxied));
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;

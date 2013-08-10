@@ -189,7 +189,7 @@ static Eina_Bool _checker_state_setup(Enesim_Renderer *r, Enesim_Renderer_Checke
 	final_color1 = thiz->current.color1;
 	final_color2 = thiz->current.color2;
 
-	enesim_renderer_color_get(r, &rend_color);
+	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
 	{
 		final_color1 = argb8888_mul4_sym(rend_color, final_color1);

@@ -431,7 +431,7 @@ static Eina_Bool _stripes_state_setup(Enesim_Renderer_Stripes *thiz, Enesim_Rend
 	final_color1 = thiz->current.even.color;
 	final_color2 = thiz->current.odd.color;
 
-	enesim_renderer_color_get(r, &rend_color);
+	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
 	{
 		final_color1 = argb8888_mul4_sym(rend_color, final_color1);

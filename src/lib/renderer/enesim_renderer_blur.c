@@ -482,7 +482,7 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 	double rx, ry;
 
 	thiz = ENESIM_RENDERER_BLUR(r);
-	enesim_renderer_color_get(r, &thiz->color);
+	thiz->color = enesim_renderer_color_get(r);
 	if (!_blur_state_setup(thiz, r, s, rop, l))
 		return EINA_FALSE;
 	if (thiz->src_r)

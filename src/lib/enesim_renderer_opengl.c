@@ -296,7 +296,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 			const char *name;
 			int num = 0;
 
-			enesim_renderer_name_get(r, &name);
+			name = enesim_renderer_name_get(r);
 			if (!name)
 			{
 				ENESIM_RENDERER_LOG(r, error, "Renderer with no name?");

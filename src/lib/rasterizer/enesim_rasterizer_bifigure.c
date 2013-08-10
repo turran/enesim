@@ -1566,7 +1566,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_shape_stroke_weight_get(r, &sw);
 	/* this is for our own state */
 	enesim_renderer_origin_get(r, &state->ox, &state->oy);
-	enesim_renderer_color_get(r, &state->color);
+	state->color = enesim_renderer_color_get(r);
 	enesim_renderer_shape_stroke_color_get(r, &state->stroke.color);
 	enesim_renderer_shape_stroke_renderer_get(r, &state->stroke.r);
 	enesim_renderer_shape_fill_color_get(r, &state->fill.color);

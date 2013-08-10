@@ -1388,7 +1388,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	enesim_matrix_f16p16_matrix_to(&matrix,
 			&thiz->matrix);
 
-	enesim_renderer_color_get(r, &state->color);
+	state->color = enesim_renderer_color_get(r);
 	enesim_renderer_shape_stroke_color_get(r, &state->stroke.color);
 	enesim_renderer_shape_stroke_weight_get(r, &state->stroke.weight);
 	enesim_renderer_shape_stroke_renderer_get(r, &state->stroke.r);

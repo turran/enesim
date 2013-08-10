@@ -1352,7 +1352,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 
 	enesim_surface_lock(thiz->current.s, EINA_FALSE);
 
-	enesim_renderer_color_get(r, &thiz->color);
+	thiz->color = enesim_renderer_color_get(r);
 
 	enesim_surface_size_get(thiz->current.s, &thiz->sw, &thiz->sh);
 	enesim_surface_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
@@ -1397,7 +1397,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 
 	/* FIXME we need to use the format from the destination surface */
 	fmt = ENESIM_FORMAT_ARGB8888;
-	enesim_renderer_quality_get(r, &quality);
+	quality = enesim_renderer_quality_get(r);
 
 	if ((fabs(thiz->sw - w) > 1/256.0) || (fabs(thiz->sh - h) > 1/256.0))
 	{

@@ -171,10 +171,8 @@ static Eina_Bool _state_changed(Enesim_Renderer_Shape_State *thiz,
 		{
 			if (enesim_renderer_has_changed(thiz->current.stroke.r))
 			{
-				const char *stroke_name;
-
-				enesim_renderer_name_get(thiz->current.stroke.r, &stroke_name);
-				DBG("The stroke renderer %s has changed", stroke_name);
+				DBG("The stroke renderer %s has changed",
+						enesim_renderer_name_get(thiz->current.stroke.r));
 				return EINA_TRUE;
 			}
 		}
@@ -190,10 +188,8 @@ static Eina_Bool _state_changed(Enesim_Renderer_Shape_State *thiz,
 		{
 			if (enesim_renderer_has_changed(thiz->current.fill.r))
 			{
-				const char *fill_name;
-
-				enesim_renderer_name_get(thiz->current.fill.r, &fill_name);
-				DBG("The fill renderer %s has changed", fill_name);
+				DBG("The fill renderer %s has changed",
+						enesim_renderer_name_get(thiz->current.fill.r));
 				return EINA_TRUE;
 			}
 		}

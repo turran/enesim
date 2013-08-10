@@ -160,17 +160,15 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 
 		if (!enesim_renderer_setup(layer->r, s, layer->rop, l))
 		{
-			const char *name;
-
-			enesim_renderer_name_get(layer->r, &name);
-			ENESIM_RENDERER_LOG(r, l, "Child renderer %s can not setup", name);
+			ENESIM_RENDERER_LOG(r, l, "Child renderer %s can not setup",
+					enesim_renderer_name_get(layer->r));
 			continue;
 		}
 		/* set the span given the color */
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
 		enesim_renderer_destination_bounds_get(layer->r, &layer->destination_bounds, 0, 0);
-		enesim_renderer_visibility_get(layer->r, &visible);
+		visible = enesim_renderer_visibility_get(layer->r);
 		if (!visible) continue;
 
 		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
@@ -532,10 +530,8 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 		{
 			if ((ret = enesim_renderer_has_changed(l->r)))
 			{
-				const char *child_name;
-
-				enesim_renderer_name_get(l->r, &child_name);
-				DBG("The child %s has changed", child_name);
+				DBG("The child %s has changed",
+						enesim_renderer_name_get(l->r));
 				break;
 			}
 		}

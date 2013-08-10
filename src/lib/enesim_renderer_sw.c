@@ -107,8 +107,8 @@ static inline void _sw_surface_draw_rop_mask(Enesim_Renderer *r,
 	Enesim_Renderer *mask;
 	Enesim_Color color;
 
-	enesim_renderer_mask_get(r, &mask);
-	enesim_renderer_color_get(r, &color);
+	mask = enesim_renderer_mask_get(r);
+	color = enesim_renderer_color_get(r);
 
 	while (area->h--)
 	{
@@ -139,7 +139,7 @@ static inline void _sw_surface_draw_rop(Enesim_Renderer *r,
 {
 	Enesim_Color color;
 
-	enesim_renderer_color_get(r, &color);
+	color = enesim_renderer_color_get(r);
 	while (area->h--)
 	{
 		/* FIXME we should not memset this */
@@ -207,7 +207,7 @@ static inline void _sw_surface_draw_rop_threaded(Enesim_Renderer *r,
 	int h = area->h;
 	int y = area->y;
 
-	enesim_renderer_color_get(r, &color);
+	color = enesim_renderer_color_get(r);
 	while (h)
 	{
 		if (h % _num_cpus != thread) goto end;
@@ -425,7 +425,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 		}
 	}
 
-	enesim_renderer_visibility_get(r, &visible);
+	visible = enesim_renderer_visibility_get(r);
 	if (!visible)
 		return;
 	if (!intersect || !eina_extra_rectangle_is_valid(&final))
@@ -477,9 +477,9 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	const char *name;
 
 	klass = ENESIM_RENDERER_CLASS_GET(r);
-	enesim_renderer_name_get(r, &name);
-	enesim_renderer_mask_get(r, &mask);
-	enesim_renderer_color_get(r, &color);
+	name = enesim_renderer_name_get(r);
+	mask = enesim_renderer_mask_get(r);
+	color = enesim_renderer_color_get(r);
 
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
@@ -544,7 +544,7 @@ void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Class *klass;
 
 	klass = ENESIM_RENDERER_CLASS_GET(r);
-	enesim_renderer_mask_get(r, &mask);
+	mask = enesim_renderer_mask_get(r);
 	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
 	if (mask)
@@ -597,7 +597,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	unsigned int right;
 #endif
 
-	enesim_renderer_visibility_get(r, &visible);
+	visible = enesim_renderer_visibility_get(r);
 	if (!visible) return;
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
@@ -622,7 +622,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 		uint32_t *tmp;
 		size_t bytes;
 
-		enesim_renderer_color_get(r, &color);
+		color = enesim_renderer_color_get(r);
 		bytes = rbounds.w * sizeof(uint32_t);
 		tmp = alloca(bytes);
 		/* FIXME for now */

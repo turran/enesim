@@ -60,7 +60,7 @@ EAPI void enesim_renderer_lock(Enesim_Renderer *r);
 EAPI void enesim_renderer_unlock(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name);
-EAPI void enesim_renderer_name_get(Enesim_Renderer *r, const char **name);
+EAPI const char * enesim_renderer_name_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Matrix *m);
 EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *m);
 EAPI void enesim_renderer_transformation_type_get(Enesim_Renderer *r,
@@ -68,17 +68,17 @@ EAPI void enesim_renderer_transformation_type_get(Enesim_Renderer *r,
 EAPI void enesim_renderer_origin_set(Enesim_Renderer *r, double x, double y);
 EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y);
 EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x);
-EAPI void enesim_renderer_x_origin_get(Enesim_Renderer *r, double *x);
+EAPI double enesim_renderer_x_origin_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y);
-EAPI void enesim_renderer_y_origin_get(Enesim_Renderer *r, double *y);
+EAPI double enesim_renderer_y_origin_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visibility);
-EAPI void enesim_renderer_visibility_get(Enesim_Renderer *r, Eina_Bool *visibility);
+EAPI Eina_Bool enesim_renderer_visibility_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
-EAPI void enesim_renderer_color_get(Enesim_Renderer *r, Enesim_Color *color);
+EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
-EAPI void enesim_renderer_mask_get(Enesim_Renderer *r, Enesim_Renderer **mask);
+EAPI Enesim_Renderer * enesim_renderer_mask_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality);
-EAPI void enesim_renderer_quality_get(Enesim_Renderer *r, Enesim_Quality *quality);
+EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_bounds_get_extended_get(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);
@@ -86,7 +86,7 @@ EAPI void enesim_renderer_bounds_get_extended_get(Enesim_Renderer *r, Enesim_Rec
 EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
 EAPI void enesim_renderer_destination_bounds_get_extended_get(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
 
-EAPI void enesim_renderer_features_get(Enesim_Renderer *r, Enesim_Renderer_Feature *features);
+EAPI Enesim_Renderer_Feature enesim_renderer_features_get(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);

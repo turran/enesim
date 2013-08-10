@@ -359,8 +359,8 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	}
 
 	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_color_get(r, &color);
-	if (color != 0xffffffff)
+	color = enesim_renderer_color_get(r);
+	if (color != ENESIM_COLOR_FULL)
 		fcolor = argb8888_mul4_sym(color, fcolor);
 
 	font = thiz->state.current.font;

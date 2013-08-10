@@ -138,10 +138,8 @@ static Eina_Bool _clipper_state_setup(Enesim_Renderer_Clipper *thiz,
 	}
 	if (!enesim_renderer_setup(thiz->current.content, s, rop, l))
 	{
-		const char *name;
-
-		enesim_renderer_name_get(thiz->current.content, &name);
-		ENESIM_RENDERER_LOG(r, l, "Content renderer %s can not setup", name);
+		ENESIM_RENDERER_LOG(r, l, "Content renderer %s can not setup",
+				enesim_renderer_name_get(thiz->current.content));
 		return EINA_FALSE;
 	}
 
@@ -208,8 +206,8 @@ static void _clipper_sw_hints_get(Enesim_Renderer *r,
 
 		if (content_hints & ENESIM_RENDERER_HINT_ROP)
 			*hints |= ENESIM_RENDERER_HINT_ROP;
-		enesim_renderer_color_get(thiz->current.content, &color);
-		enesim_renderer_color_get(r, &own_color);
+		color = enesim_renderer_color_get(thiz->current.content);
+		own_color = enesim_renderer_color_get(r);
 		if ((own_color == color) && (content_hints & ENESIM_RENDERER_HINT_COLORIZE))
 			*hints |= ENESIM_RENDERER_HINT_COLORIZE;
 	}
@@ -221,8 +219,7 @@ static void _clipper_bounds_get(Enesim_Renderer *r,
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	enesim_renderer_x_origin_get(r, &rect->x);
-	enesim_renderer_y_origin_get(r, &rect->y);
+	enesim_renderer_origin_get(r, &rect->x, &rect->y);
 	rect->w = thiz->current.width;
 	rect->h = thiz->current.height;
 }

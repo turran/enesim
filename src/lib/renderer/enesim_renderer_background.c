@@ -162,7 +162,7 @@ static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesi
 	Enesim_Color final_color, rend_color;
 
 	final_color = thiz->color;
-	enesim_renderer_color_get(r, &rend_color);
+	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
 		final_color = argb8888_mul4_sym(rend_color, final_color);
 	thiz->final_color = final_color;
