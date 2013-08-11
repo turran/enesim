@@ -27,13 +27,17 @@
 
 EAPI Enesim_Renderer * enesim_renderer_line_new(void);
 EAPI void enesim_renderer_line_x0_set(Enesim_Renderer *r, double x0);
-EAPI void enesim_renderer_line_x0_get(Enesim_Renderer *r, double *x0);
+EAPI double enesim_renderer_line_x0_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y0);
-EAPI void enesim_renderer_line_y0_get(Enesim_Renderer *r, double *y0);
+EAPI double enesim_renderer_line_y0_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x1);
-EAPI void enesim_renderer_line_x1_get(Enesim_Renderer *r, double *x1);
+EAPI double enesim_renderer_line_x1_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y1);
-EAPI void enesim_renderer_line_y1_get(Enesim_Renderer *r, double *y1);
+EAPI double enesim_renderer_line_y1_get(Enesim_Renderer *r);
+
 EAPI void enesim_renderer_line_coords_set(Enesim_Renderer *r, double x0, double y0, double x1, double y1);
 EAPI void enesim_renderer_line_coords_get(Enesim_Renderer *r, double *x0, double *y0, double *x1, double *y1);
 

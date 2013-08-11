@@ -25,8 +25,8 @@
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_importer_new(void);
-EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle angle);
 EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer *buffer);
+EAPI Enesim_Buffer * enesim_renderer_importer_buffer_get(Enesim_Renderer *r);
 
 /**
  * @}

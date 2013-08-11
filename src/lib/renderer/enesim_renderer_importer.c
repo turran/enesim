@@ -45,7 +45,6 @@ typedef struct _Enesim_Renderer_Importer
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
 	Enesim_Buffer_Format cfmt;
-	Enesim_Angle angle;
 } Enesim_Renderer_Importer;
 
 typedef struct _Enesim_Renderer_Importer_Class {
@@ -350,18 +349,6 @@ EAPI Enesim_Renderer * enesim_renderer_importer_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_importer);
 	return r;
 }
-/**
- * Sets the angle
- * @param[in] r The importer renderer
- * @param[in] angle The angle
- */
-EAPI void enesim_renderer_importer_angle_set(Enesim_Renderer *r, Enesim_Angle angle)
-{
-	Enesim_Renderer_Importer *thiz;
-
-	thiz = ENESIM_RENDERER_IMPORTER(r);
-	thiz->angle = angle;
-}
 
 /**
  * Sets the buffer to import pixels from
@@ -376,7 +363,21 @@ EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer 
 	if (thiz->buffer)
 		enesim_buffer_unref(thiz->buffer);
 	thiz->buffer = buffer;
-	if (thiz->buffer)
-		thiz->buffer = enesim_buffer_ref(thiz->buffer);
 }
+
+/**
+ * Gets the buffer to import pixels from
+ * @param[in] r The importer renderer
+ * @return The buffer [transfer none]
+ */
+EAPI Enesim_Buffer * enesim_renderer_importer_buffer_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Importer *thiz;
+
+	thiz = ENESIM_RENDERER_IMPORTER(r);
+	if (thiz->buffer)
+		return enesim_buffer_ref(thiz->buffer);
+	return NULL;
+}
+
 
