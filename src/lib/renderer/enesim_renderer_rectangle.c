@@ -352,17 +352,16 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double width)
  * @brief Retrieve the width of a rectangle renderer.
  *
  * @param[in] r The rectangle renderer.
- * @param[out] width The rectangle width.
+ * @return The rectangle width.
  *
- * This function stores the width of the rectangle renderer @p r in
- * the buffer @p width.
+ * This function gets the width of the rectangle renderer @p r 
  */
-EAPI void enesim_renderer_rectangle_width_get(Enesim_Renderer *r, double *width)
+EAPI double enesim_renderer_rectangle_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	*width = thiz->current.width;
+	return thiz->current.width;
 }
 
 /**
@@ -388,17 +387,16 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double height
  * @brief Retrieve the height of a rectangle renderer.
  *
  * @param[in] r The rectangle renderer.
- * @param[out] height The rectangle height.
+ * @return The rectangle height.
  *
- * This function stores the height of the rectangle renderer @p r in
- * the buffer @p height.
+ * This function gets the height of the rectangle renderer @p r
  */
-EAPI void enesim_renderer_rectangle_height_get(Enesim_Renderer *r, double *height)
+EAPI double enesim_renderer_rectangle_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	*height = thiz->current.height;
+	return thiz->current.height;
 }
 
 /**
@@ -424,17 +422,17 @@ EAPI void enesim_renderer_rectangle_x_set(Enesim_Renderer *r, double x)
  * @brief Retrieve the top left X coordinate of a rectangle renderer.
  *
  * @param[in] r The rectangle renderer.
- * @param[out] x The top left X coordinate.
+ * @return The top left X coordinate.
  *
- * This function stores the top left X coordinate of the rectangle
- * renderer @p r in the buffer @p x.
+ * This function gets the top left X coordinate of the rectangle
+ * renderer @p r
  */
-EAPI void enesim_renderer_rectangle_x_get(Enesim_Renderer *r, double *x)
+EAPI double enesim_renderer_rectangle_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	*x = thiz->current.x;
+	return thiz->current.x;
 }
 
 /**
@@ -460,17 +458,17 @@ EAPI void enesim_renderer_rectangle_y_set(Enesim_Renderer *r, double y)
  * @brief Retrieve the top left Y coordinate of a rectangle renderer.
  *
  * @param[in] r The rectangle renderer.
- * @param[out] y The top left Y coordinate.
+ * @return The top left Y coordinate.
  *
- * This function stores the top left Y coordinate of the rectangle
- * renderer @p r in the buffer @p y.
+ * This function gets the top left Y coordinate of the rectangle
+ * renderer @p r
  */
-EAPI void enesim_renderer_rectangle_y_get(Enesim_Renderer *r, double *y)
+EAPI double enesim_renderer_rectangle_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	*y = thiz->current.y;
+	return thiz->current.y;
 }
 
 /**
@@ -501,7 +499,7 @@ EAPI void enesim_renderer_rectangle_position_set(Enesim_Renderer *r, double x, d
  * @param[out] y The top left Y coordinate.
  *
  * This function stores the top left coordinates value of the
- * rectangle renderer @p r in the buffers @p x and @p y. These buffers
+ * rectangle renderer @p r in the pointers @p x and @p y. These pointers
  * can be @c NULL.
  */
 EAPI void enesim_renderer_rectangle_position_get(Enesim_Renderer *r, double *x, double *y)
@@ -541,7 +539,7 @@ EAPI void enesim_renderer_rectangle_size_set(Enesim_Renderer *r, double width, d
  * @param[out] height The height.
  *
  * This function stores the size of the rectangle renderer @p r in the
- * buffers @p width and @p height. These buffers can be @c NULL.
+ * pointers @p width and @p height. These pointers can be @c NULL.
  */
 EAPI void enesim_renderer_rectangle_size_get(Enesim_Renderer *r, double *width, double *height)
 {
@@ -581,22 +579,18 @@ EAPI void enesim_renderer_rectangle_corner_radius_y_set(Enesim_Renderer *r, doub
 	thiz->generated = EINA_FALSE;
 }
 
-EAPI void enesim_renderer_rectangle_corner_radius_x_get(Enesim_Renderer *r, double *rx)
+EAPI double enesim_renderer_rectangle_corner_radius_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	if (!thiz) return;
-	if (rx)
-		*rx = thiz->current.corner.rx;
+	return thiz->current.corner.rx;
 }
 
-EAPI void enesim_renderer_rectangle_corner_radius_y_get(Enesim_Renderer *r, double *ry)
+EAPI double enesim_renderer_rectangle_corner_radius_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	if (!thiz) return;
-	if (ry)
-		*ry = thiz->current.corner.ry;
+	return thiz->current.corner.ry;
 }
 
 /**
@@ -655,13 +649,12 @@ EAPI void enesim_renderer_rectangle_top_left_corner_set(Enesim_Renderer *r, Eina
 	thiz->generated = EINA_FALSE;
 }
 
-EAPI void enesim_renderer_rectangle_top_left_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
+EAPI Eina_Bool enesim_renderer_rectangle_top_left_corner_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	if (rounded)
-		*rounded = thiz->current.corner.tl;
+	return thiz->current.corner.tl;
 }
 
 /**
@@ -684,13 +677,12 @@ EAPI void enesim_renderer_rectangle_top_right_corner_set(Enesim_Renderer *r, Ein
 	thiz->generated = EINA_FALSE;
 }
 
-EAPI void enesim_renderer_rectangle_top_right_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
+EAPI Eina_Bool enesim_renderer_rectangle_top_right_corner_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	if (rounded)
-		*rounded = thiz->current.corner.tr;
+	return thiz->current.corner.tr;
 }
 
 
@@ -714,13 +706,12 @@ EAPI void enesim_renderer_rectangle_bottom_left_corner_set(Enesim_Renderer *r, E
 	thiz->generated = EINA_FALSE;
 }
 
-EAPI void enesim_renderer_rectangle_bottom_left_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
+EAPI Eina_Bool enesim_renderer_rectangle_bottom_left_corner_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	if (rounded)
-		*rounded = thiz->current.corner.bl;
+	return thiz->current.corner.bl;
 }
 
 /**
@@ -743,13 +734,12 @@ EAPI void enesim_renderer_rectangle_bottom_right_corner_set(Enesim_Renderer *r, 
 	thiz->generated = EINA_FALSE;
 }
 
-EAPI void enesim_renderer_rectangle_bottom_right_corner_get(Enesim_Renderer *r, Eina_Bool *rounded)
+EAPI Eina_Bool enesim_renderer_rectangle_bottom_right_corner_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Rectangle *thiz;
 
 	thiz = ENESIM_RENDERER_RECTANGLE(r);
-	if (rounded)
-		*rounded = thiz->current.corner.br;
+	return thiz->current.corner.br;
 }
 
 /**
