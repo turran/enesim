@@ -332,22 +332,16 @@ EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 	if (thiz->proxied)
 		enesim_renderer_unref(thiz->proxied);
 	thiz->proxied = proxied;
-	if (thiz->proxied)
-		thiz->proxied = enesim_renderer_ref(thiz->proxied);
 }
 
 /**
  * To be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_proxy_proxied_get(Enesim_Renderer *r,
-		Enesim_Renderer **proxied)
+EAPI Enesim_Renderer * enesim_renderer_proxy_proxied_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Proxy *thiz;
 
 	thiz = ENESIM_RENDERER_PROXY(r);
-	if (!proxied) return;
-	*proxied = thiz->proxied;
-	if (thiz->proxied)
-		thiz->proxied = enesim_renderer_ref(thiz->proxied);
+	return enesim_renderer_ref(thiz->proxied);
 }
