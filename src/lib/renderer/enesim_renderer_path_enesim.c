@@ -536,8 +536,8 @@ static void _path_opengl_stroke_renderer_setup(Enesim_Renderer *r,
 {
 	Enesim_Color scolor;
 
-	enesim_renderer_shape_stroke_color_get(r, &scolor);
-	enesim_renderer_shape_stroke_renderer_get(r, orend);
+	scolor = enesim_renderer_shape_stroke_color_get(r);
+	*orend = enesim_renderer_shape_stroke_renderer_get(r);
 	/* multiply the color */
 	if (scolor != ENESIM_COLOR_FULL)
 		*final_color = argb8888_mul4_sym(color, scolor);
@@ -552,8 +552,8 @@ static void _path_opengl_fill_renderer_setup(Enesim_Renderer *r,
 {
 	Enesim_Color fcolor;
 
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
-	enesim_renderer_shape_fill_renderer_get(r, orend);
+	fcolor = enesim_renderer_shape_fill_color_get(r);
+	*orend = enesim_renderer_shape_fill_renderer_get(r);
 	/* multiply the color */
 	if (fcolor != ENESIM_COLOR_FULL)
 		*final_color = argb8888_mul4_sym(color, fcolor);
@@ -583,7 +583,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
-	enesim_renderer_shape_draw_mode_get(r, &dm);
+	dm = enesim_renderer_shape_draw_mode_get(r);
 	color = enesim_renderer_color_get(r);
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{

@@ -1561,16 +1561,16 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	}
 
 	/* this is needed to know what span function to use */
-	enesim_renderer_shape_fill_rule_get(r, &rule);
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
-	enesim_renderer_shape_stroke_weight_get(r, &sw);
+	rule = enesim_renderer_shape_fill_rule_get(r);
+	draw_mode = enesim_renderer_shape_draw_mode_get(r);
+	sw = enesim_renderer_shape_stroke_weight_get(r);
 	/* this is for our own state */
 	enesim_renderer_origin_get(r, &state->ox, &state->oy);
 	state->color = enesim_renderer_color_get(r);
-	enesim_renderer_shape_stroke_color_get(r, &state->stroke.color);
-	enesim_renderer_shape_stroke_renderer_get(r, &state->stroke.r);
-	enesim_renderer_shape_fill_color_get(r, &state->fill.color);
-	enesim_renderer_shape_fill_renderer_get(r, &state->fill.r);
+	state->stroke.color = enesim_renderer_shape_stroke_color_get(r);
+	state->stroke.r = enesim_renderer_shape_stroke_renderer_get(r);
+	state->fill.color = enesim_renderer_shape_fill_color_get(r);
+	state->fill.r = enesim_renderer_shape_fill_renderer_get(r);
 
 	if (thiz->changed)
 	{

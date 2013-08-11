@@ -348,7 +348,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	y -= oy;
 	x -= ox;
 
-	enesim_renderer_shape_fill_renderer_get(r, &fpaint);
+	fpaint = enesim_renderer_shape_fill_renderer_get(r);
 	if (fpaint)
 	{
 		buf = alloca(sizeof(unsigned int) * len);
@@ -357,7 +357,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 		enesim_renderer_unref(fpaint);
 	}
 
-	enesim_renderer_shape_fill_color_get(r, &fcolor);
+	fcolor = enesim_renderer_shape_fill_color_get(r);
 	color = enesim_renderer_color_get(r);
 	if (color != ENESIM_COLOR_FULL)
 		fcolor = argb8888_mul4_sym(color, fcolor);

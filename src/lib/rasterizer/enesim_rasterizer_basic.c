@@ -1161,7 +1161,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	draw_mode = enesim_renderer_shape_draw_mode_get(r);
 	if ((state->draw_mode != draw_mode) &&
 			((state->draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) ||
 			(draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)))
@@ -1389,12 +1389,12 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			&thiz->matrix);
 
 	state->color = enesim_renderer_color_get(r);
-	enesim_renderer_shape_stroke_color_get(r, &state->stroke.color);
-	enesim_renderer_shape_stroke_weight_get(r, &state->stroke.weight);
-	enesim_renderer_shape_stroke_renderer_get(r, &state->stroke.r);
-	enesim_renderer_shape_fill_color_get(r, &state->fill.color);
-	enesim_renderer_shape_fill_renderer_get(r, &state->fill.r);
-	enesim_renderer_shape_fill_rule_get(r, &fill_rule);
+	state->stroke.color = enesim_renderer_shape_stroke_color_get(r);
+	state->stroke.weight = enesim_renderer_shape_stroke_weight_get(r);
+	state->stroke.r = enesim_renderer_shape_stroke_renderer_get(r);
+	state->fill.color = enesim_renderer_shape_fill_color_get(r);
+	state->fill.r = enesim_renderer_shape_fill_renderer_get(r);
+	fill_rule = enesim_renderer_shape_fill_rule_get(r);
 	state->draw_mode = draw_mode;
 
 	if (fill_rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)

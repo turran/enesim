@@ -96,14 +96,14 @@ static void _ellipse_get_real(Enesim_Renderer_Ellipse *thiz,
 	*x = thiz->current.x;
 	*y = thiz->current.y;
 
-	enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+	draw_mode = enesim_renderer_shape_draw_mode_get(r);
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		Enesim_Renderer_Shape_Stroke_Location location;
 		double sw;
 
-		enesim_renderer_shape_stroke_weight_get(r, &sw);
-		enesim_renderer_shape_stroke_location_get(r, &location);
+		sw = enesim_renderer_shape_stroke_weight_get(r);
+		location = enesim_renderer_shape_stroke_location_get(r);
 		switch (location)
 		{
 			case ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE:

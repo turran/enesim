@@ -186,15 +186,15 @@ static Eina_Bool _rectangle_setup(Enesim_Renderer *r, Enesim_Path *path)
 		if (ry > (h / 2.0))
 			ry = h / 2.0;
 
-		enesim_renderer_shape_draw_mode_get(r, &draw_mode);
+		draw_mode = enesim_renderer_shape_draw_mode_get(r);
 
 		if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 		{
 			Enesim_Renderer_Shape_Stroke_Location location;
 			double sw;
 
-			enesim_renderer_shape_stroke_location_get(r, &location);
-			enesim_renderer_shape_stroke_weight_get(r, &sw);
+			location = enesim_renderer_shape_stroke_location_get(r);
+			sw = enesim_renderer_shape_stroke_weight_get(r);
 			switch (location)
 			{
 				case ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE:
