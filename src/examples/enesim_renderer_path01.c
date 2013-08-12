@@ -5,6 +5,8 @@
 static Enesim_Renderer * enesim_renderer_path01(void)
 {
 	Enesim_Renderer *r;
+	Enesim_Renderer *r2;
+	Enesim_Renderer_Gradient_Stop stop;
 	Enesim_Path *p;
 
 	p = enesim_path_new();
@@ -20,11 +22,20 @@ static Enesim_Renderer * enesim_renderer_path01(void)
 	enesim_path_scubic_to(p, 2*43, 2*17, 2*35, 2*22);
 	enesim_path_scubic_to(p, 2*17, 2*17, 2*12, 2*27);
 
+	r2 = enesim_renderer_gradient_linear_new();
+	enesim_renderer_gradient_linear_pos_set(r2, 0, 0, 256, 256);
+	stop.argb = 0xffff0000;
+	stop.pos = 0;
+	enesim_renderer_gradient_stop_add(r2, &stop);
+	stop.argb = 0xff00ff00;
+	stop.pos = 1;
+	enesim_renderer_gradient_stop_add(r2, &stop);
+
 	r = enesim_renderer_path_new();
 	enesim_renderer_path_path_set(r, p);
 	enesim_renderer_shape_stroke_weight_set(r, 18);
 	enesim_renderer_shape_stroke_color_set(r, 0xffffff00);
-	enesim_renderer_shape_fill_color_set(r, 0xffff0000);
+	enesim_renderer_shape_fill_renderer_set(r, r2);
 	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL);
 	enesim_renderer_shape_stroke_dash_add_simple(r, 50, 20);
 	enesim_renderer_shape_stroke_cap_set(r, ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND);

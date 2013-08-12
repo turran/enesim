@@ -1668,17 +1668,17 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 					if (rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)
 					{
 						*draw = _bifig_stroke_paint_fill_paint_nz;
-						if (!enesim_renderer_ref(state->stroke.r))
+						if (!state->stroke.r)
 							*draw = _bifig_stroke_fill_paint_nz;
-						else if (!enesim_renderer_ref(state->fill.r))
+						else if (!state->fill.r)
 							*draw = _bifig_stroke_paint_fill_nz;
 					}
 					else
 					{
 						*draw= _bifig_stroke_paint_fill_paint_eo_u;
-						if (!enesim_renderer_ref(state->stroke.r))
+						if (!state->stroke.r)
 							*draw = _bifig_stroke_fill_paint_eo_u;
-						else if (!enesim_renderer_ref(state->fill.r))
+						else if (!state->fill.r)
 							*draw = _bifig_stroke_paint_fill_eo_u;
 					}
 				}

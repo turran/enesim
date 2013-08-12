@@ -929,9 +929,9 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, css->current.stroke.weight);
 	enesim_renderer_shape_stroke_color_set(thiz->bifigure, css->current.stroke.color);
-	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, css->current.stroke.r);
+	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, enesim_renderer_ref(css->current.stroke.r));
 	enesim_renderer_shape_fill_color_set(thiz->bifigure, css->current.fill.color);
-	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, css->current.fill.r);
+	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, enesim_renderer_ref(css->current.fill.r));
 	enesim_renderer_shape_fill_rule_set(thiz->bifigure, css->current.fill.rule);
 
 	enesim_renderer_color_set(thiz->bifigure, cs->current.color);
