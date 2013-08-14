@@ -186,6 +186,7 @@ Enesim_Pool * enesim_pool_new(Enesim_Pool_Descriptor *descriptor, void *data)
 	p = calloc(1, sizeof(Enesim_Pool));
 	p->descriptor = descriptor;
 	p->data = data;
+	p->ref = 1;
 
 	return p;
 }
