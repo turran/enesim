@@ -28,23 +28,14 @@
 static void _2d_rgb888_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
 		Enesim_Buffer_Sw_Data *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED)
 {
-	uint8_t *dst = data->rgb888.plane0;
+	uint8_t *dst = (uint8_t *)data->xrgb8888.plane0;
 	uint8_t *src = (uint8_t *)sdata->argb8888_pre.plane0;
 	size_t dstride = data->rgb888.plane0_stride;
 	size_t sstride = sdata->argb8888_pre.plane0_stride;
 
 	while (dh--)
 	{
-		uint8_t *ddst = dst;
-		uint32_t *ssrc = (uint32_t *)src;
-		uint32_t ddw = dw;
-		while (ddw--)
-		{
-			*ddst++ = (*ssrc >> 16) & 0xff;
-			*ddst++ = (*ssrc >> 8) & 0xff;
-			*ddst++ = *ssrc & 0xff;
-			ssrc++;
-		}
+		memcpy(dst, src, dw * 4);
 		dst += dstride;
 		src += sstride;
 	}
@@ -52,12 +43,13 @@ static void _2d_rgb888_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t d
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-void enesim_converter_rgb888_init(void)
+void enesim_converter_xrgb8888_init(void)
 {
 	enesim_converter_surface_register(
 			ENESIM_CONVERTER_2D(_2d_rgb888_none_argb8888_pre),
-			ENESIM_BUFFER_FORMAT_RGB888,
+			ENESIM_BUFFER_FORMAT_XRGB8888,
 			ENESIM_ANGLE_0,
 			ENESIM_BUFFER_FORMAT_ARGB8888_PRE);
 }
+
 

@@ -27,6 +27,7 @@ void enesim_converter_init(void);
 void enesim_converter_shutdown(void);
 
 void enesim_converter_argb8888_init(void);
+void enesim_converter_xrgb8888_init(void);
 void enesim_converter_rgb888_init(void);
 void enesim_converter_bgr888_init(void);
 void enesim_converter_rgb565_init(void);

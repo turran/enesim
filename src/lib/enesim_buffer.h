@@ -47,6 +47,7 @@ typedef enum _Enesim_Buffer_Format
 	ENESIM_BUFFER_FORMAT_RGB565,
 	ENESIM_BUFFER_FORMAT_ARGB8888,
 	ENESIM_BUFFER_FORMAT_ARGB8888_PRE,
+	ENESIM_BUFFER_FORMAT_XRGB8888,
 	ENESIM_BUFFER_FORMAT_RGB888,
 	ENESIM_BUFFER_FORMAT_BGR888,
 	ENESIM_BUFFER_FORMAT_A8,
@@ -56,11 +57,17 @@ typedef enum _Enesim_Buffer_Format
 	ENESIM_BUFFER_FORMATS
 } Enesim_Buffer_Format;
 
-typedef struct _Enesim_Buffer_Argb8888
+struct _Enesim_Buffer_24bpp
+{
+	uint8_t *plane0;
+	int plane0_stride;
+};
+
+struct _Enesim_Buffer_32bpp
 {
 	uint32_t *plane0;
 	int plane0_stride;
-} Enesim_Buffer_Argb8888;
+};
 
 typedef struct _Enesim_Buffer_Rgb565
 {
@@ -74,11 +81,9 @@ typedef struct _Enesim_Buffer_A8
 	int plane0_stride;
 } Enesim_Buffer_A8;
 
-struct _Enesim_Buffer_24bpp
-{
-	uint8_t *plane0;
-	int plane0_stride;
-};
+typedef struct _Enesim_Buffer_32bpp Enesim_Buffer_Argb8888;
+typedef struct _Enesim_Buffer_32bpp Enesim_Buffer_Argb8888_Pre;
+typedef struct _Enesim_Buffer_32bpp Enesim_Buffer_Xrgb8888;
 
 typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Rgb888;
 typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Bgr888;
@@ -87,7 +92,8 @@ typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Cmyk;
 typedef union _Enesim_Buffer_Sw_Data
 {
 	Enesim_Buffer_Argb8888 argb8888;
-	Enesim_Buffer_Argb8888 argb8888_pre;
+	Enesim_Buffer_Argb8888_Pre argb8888_pre;
+	Enesim_Buffer_Xrgb8888 xrgb8888;
 	Enesim_Buffer_Rgb565 rgb565;
 	Enesim_Buffer_A8 a8;
 	Enesim_Buffer_Rgb888 rgb888;

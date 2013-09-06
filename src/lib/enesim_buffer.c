@@ -399,6 +399,12 @@ EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
 		*boffset = 0; *blen = 8;
 		break;
 
+		case ENESIM_BUFFER_FORMAT_XRGB8888:
+		*roffset = 16; *rlen = 8;
+		*goffset = 8; *glen = 8;
+		*boffset = 0; *blen = 8;
+		break;
+
 		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		*aoffset = 24; *alen = 8;
 		*roffset = 16; *rlen = 8;
@@ -494,6 +500,7 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt)
 
 		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_XRGB8888:
 		return 32;
 
 		case ENESIM_BUFFER_FORMAT_A8:
