@@ -1772,7 +1772,22 @@ static void _bifigure_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static void _bifigure_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
+	Enesim_Rasterizer_BiFigure *thiz;
+	Enesim_Renderer_Shape_Draw_Mode draw_mode;
+	double sw;
+
+	thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+	/* given that we use another renderer for drawing in some cases
+	 * set the hints for rop and mask in case the other renderer is the one
+	 * who will draw, otherwise, just the colorize
+	 */
+	draw_mode = enesim_renderer_shape_draw_mode_get(r);
+	sw = enesim_renderer_shape_stroke_weight_get(r);
+	if (!(thiz->under && thiz->over && sw > 1 && draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL))
+	{
+		*hints |= ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK;
+	}
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *

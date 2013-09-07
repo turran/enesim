@@ -1005,7 +1005,7 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
  *----------------------------------------------------------------------------*/
 static const char * _path_name(Enesim_Renderer *r EINA_UNUSED)
 {
-	return "path";
+	return "enesim_path";
 }
 
 static void _path_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -1019,7 +1019,10 @@ static void _path_features_get(Enesim_Renderer *r EINA_UNUSED,
 static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+	/* we always use another renderer for drawing so
+	 * mark every hint
+	 */
+	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK | ENESIM_RENDERER_HINT_COLORIZE;
 }
 
 static void _path_bounds_get(Enesim_Renderer *r,

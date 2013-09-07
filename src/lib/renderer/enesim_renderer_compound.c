@@ -109,7 +109,7 @@ static inline void _compound_layer_sw_hints_merge(Enesim_Renderer_Compound_Layer
 	*f &= tmp;
 }
 
-static inline void _compound_layer_span_blend(Enesim_Renderer_Compound_Layer *l, Eina_Rectangle *span, void *ddata)
+static inline void _compound_layer_span_draw(Enesim_Renderer_Compound_Layer *l, Eina_Rectangle *span, void *ddata)
 {
 	Eina_Rectangle lbounds;
 	uint32_t *dst = ddata;
@@ -292,7 +292,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 }
 #endif
 
-static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, int x, int y, int len, void *ddata)
+static inline void _compound_span_layer_draw(Enesim_Renderer_Compound *thiz, int x, int y, int len, void *ddata)
 {
 	Eina_List *ll;
 	Eina_Rectangle span;
@@ -301,7 +301,7 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 	/* first the background */
 	if (thiz->background_enabled)
 	{
-		_compound_layer_span_blend(&thiz->background, &span, ddata);
+		_compound_layer_span_draw(&thiz->background, &span, ddata);
 	}
 	/* now the layers */
 	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
@@ -309,7 +309,7 @@ static inline void _compound_span_layer_blend(Enesim_Renderer_Compound *thiz, in
 		Enesim_Renderer_Compound_Layer *l;
 
 		l = eina_list_data_get(ll);
-		_compound_layer_span_blend(l, &span, ddata);
+		_compound_layer_span_draw(l, &span, ddata);
 	}
 }
 
@@ -321,9 +321,11 @@ static void _compound_fill_span_blend_layer(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 
-	/* we might need to add this memset in case the layers for this span dont fill the whole area */
+	/* we might need to add this memset in case the layers for this span dont fill the whole area
+	 * TODO we can do this smarter and just fill the areas that the renderers did not draw
+	 */
 	memset(ddata, 0, len * sizeof(uint32_t));
-	_compound_span_layer_blend(thiz, x, y, len, ddata);
+	_compound_span_layer_draw(thiz, x, y, len, ddata);
 }
 
 /* whenever the compound needs to blend, we only need to draw the area of each layer */
@@ -335,7 +337,7 @@ static void _compound_blend_span_blend_layer(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 
 	/* we should only do one memset, here instead of per each layer */
-	_compound_span_layer_blend(thiz, x, y, len, ddata);
+	_compound_span_layer_draw(thiz, x, y, len, ddata);
 }
 
 /*----------------------------------------------------------------------------*

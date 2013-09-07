@@ -185,7 +185,7 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop,
 	/* check if we can to colorize */
 	if (proxied_state->current.color == state->current.color)
 		*hints |= ENESIM_RENDERER_HINT_COLORIZE;
-	/*  we can rop */
+	/*  we can rop because we use another renderer to draw */
 	*hints |= ENESIM_RENDERER_HINT_ROP;
 }
 

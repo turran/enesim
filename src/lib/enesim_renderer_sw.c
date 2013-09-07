@@ -178,26 +178,11 @@ static inline void _sw_clear(uint8_t *ddata, size_t stride, int bpp,
 		ddata += stride;
 	}
 }
-
-#if 0
-static inline void _sw_clear2(uint8_t *ddata, size_t stride, int bpp,
-		Eina_Rectangle *area)
-{
-	ddata = ddata + (area->y * stride) + (area->x * bpp);
-	printf("clearing2 %" EINA_EXTRA_RECTANGLE_FORMAT "\n", EINA_EXTRA_RECTANGLE_ARGS(area));
-	while (area->h--)
-	{
-		memset(ddata, 0x33, area->w * bpp);
-		ddata += stride;
-	}
-	printf("done\n");
-}
-#endif
 /*----------------------------------------------------------------------------*
  *                            Threaded rendering                              *
  *----------------------------------------------------------------------------*/
 #ifdef BUILD_THREAD
-static inline void _sw_surface_draw_rop_threaded(Enesim_Renderer *r,
+static inline void _sw_surface_draw_full_threaded(Enesim_Renderer *r,
 		unsigned int thread,
 		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
 		uint8_t *ddata, size_t stride,
@@ -271,7 +256,7 @@ static void * _thread_run(void *data)
 			 * or alloca everytime
 			 */
 			tmp = malloc(len);
-			_sw_surface_draw_rop_threaded(op->renderer,
+			_sw_surface_draw_full_threaded(op->renderer,
 					thiz->cpuidx,
 					sw_data->fill,
 					op->span,
@@ -620,8 +605,9 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 		color = enesim_renderer_color_get(r);
 		bytes = rbounds.w * sizeof(uint32_t);
 		tmp = alloca(bytes);
-		/* FIXME if we remove this there is a problem in the compound renderer */
-		memset(tmp, 0, bytes);
+		/* We dont need to zero the buffer given that a fill will
+		 * draw every pixel in case the span is inside the bounds
+		 */
 		sw_data->fill(r, rbounds.x, rbounds.y, rbounds.w, tmp);
 		/* compose the filled and the destination spans */
 		sw_data->span(data + left, rbounds.w, tmp, color, NULL);

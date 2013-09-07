@@ -312,6 +312,11 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	state = &thiz->state;
 	enesim_renderer_shape_features_get(r, &features);
+	/* TODO check the sw hints so we can optimize the case
+	 * where the fill and/or the stroke renderers support
+	 * the rop operation and thus we can set the hints
+	 * to rop too, otherwise use fill as the rop
+	 */
 	if (features & ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER)
 	{
 		if (state->current.fill.r &&

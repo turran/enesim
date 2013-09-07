@@ -203,13 +203,13 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	return enesim_renderer_has_changed(current);
 }
 
-static void _path_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
-		Enesim_Renderer_Sw_Hint *hints)
+static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED, Enesim_Rop rop
+		EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
-	Enesim_Renderer *current;
-
-	current = _path_implementation_get(r);
-	enesim_renderer_sw_hints_get(current, rop, hints);
+	/* we always use the implementation renderer for drawing
+	 * so mark every hint
+	 */
+	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK | ENESIM_RENDERER_HINT_COLORIZE;
 }
 
 
