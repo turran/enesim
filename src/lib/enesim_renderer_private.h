@@ -57,7 +57,6 @@ typedef struct _Enesim_Renderer_State
 		double ox;
 		double oy;
 	} current, past;
-	char *name;
 	Eina_Bool changed;
 } Enesim_Renderer_State;
 
@@ -202,6 +201,8 @@ struct _Enesim_Renderer
 	Enesim_Rectangle past_bounds;
 	Eina_Rectangle current_destination_bounds;
 	Eina_Rectangle past_destination_bounds;
+	Enesim_Rop current_rop;
+	char *name;
 	Enesim_Renderer_State state;
 	/* backend data */
 	/* given that we can use the same renderer to draw into a software

@@ -176,13 +176,6 @@ static void _state_clear(Enesim_Renderer_State *thiz)
 		enesim_renderer_unref(thiz->current.mask);
 		thiz->current.mask = NULL;
 	}
-
-	if (thiz->name)
-	{
-		free(thiz->name);
-		thiz->name = NULL;
-	}
-
 }
 
 static void _state_init(Enesim_Renderer_State *thiz)
@@ -399,6 +392,12 @@ static void _enesim_renderer_instance_deinit(void *o)
 #endif
 	/* finally */
 	_state_clear(&thiz->state);
+
+	if (thiz->name)
+	{
+		free(thiz->name);
+		thiz->name = NULL;
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -495,10 +494,10 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	Eina_Bool ret = EINA_TRUE;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	DBG("Setting up the renderer '%s' with rop %d", r->state.name, rop);
+	DBG("Setting up the renderer '%s' with rop %d", r->name, rop);
 	if (r->in_setup)
 	{
-		INF("Renderer '%s' already in the setup process", r->state.name);
+		INF("Renderer '%s' already in the setup process", r->name);
 		return EINA_TRUE;
 	}
 	enesim_renderer_lock(r);
@@ -509,7 +508,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		case ENESIM_BACKEND_SOFTWARE:
 		if (!enesim_renderer_sw_setup(r, s, rop, error))
 		{
-			ENESIM_RENDERER_LOG(r, error, "Software setup failed on '%s'", r->state.name);
+			ENESIM_RENDERER_LOG(r, error, "Software setup failed on '%s'", r->name);
 			ret = EINA_FALSE;
 			break;
 		}
@@ -547,6 +546,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		_enesim_renderer_bounds_get(r, &r->current_bounds);
 		_enesim_renderer_destination_bounds_get(r, &r->current_destination_bounds);
 		r->current_features_get = enesim_renderer_features_get(r);
+		r->current_rop = rop;
 	}
 
 	return ret;
@@ -557,10 +557,10 @@ void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Backend b;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	DBG("Cleaning up the renderer '%s'", r->state.name);
+	DBG("Cleaning up the renderer '%s'", r->name);
 	if (!r->in_setup)
 	{
-		WRN("Renderer '%s' has not done the setup first", r->state.name);
+		WRN("Renderer '%s' has not done the setup first", r->name);
 		return;
 	}
 
@@ -725,14 +725,14 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (r->state.name)
+	if (r->name)
 	{
-		free(r->state.name);
-		r->state.name = NULL;
+		free(r->name);
+		r->name = NULL;
 	}
 	if (name)
 	{
-		r->state.name = strdup(name);
+		r->name = strdup(name);
 	}
 }
 
@@ -744,7 +744,7 @@ EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 EAPI const char * enesim_renderer_name_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	return r->state.name;
+	return r->name;
 }
 
 /**
@@ -1203,12 +1203,12 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 	}
 	else
 	{
-		WRN("The renderer '%s' does not implement the change callback", r->state.name);
+		WRN("The renderer '%s' does not implement the change callback", r->name);
 	}
 done:
 	if (ret)
 	{
-		INF("The renderer '%s' has changed", r->state.name);
+		INF("The renderer '%s' has changed", r->name);
 	}
 	return ret;
 }

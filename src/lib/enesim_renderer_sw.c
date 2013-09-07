@@ -593,9 +593,6 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	Eina_Rectangle rbounds;
 	Eina_Bool visible;
 	unsigned int left;
-#if 0
-	unsigned int right;
-#endif
 
 	visible = enesim_renderer_visibility_get(r);
 	if (!visible) return;
@@ -609,13 +606,11 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 				EINA_EXTRA_RECTANGLE_FORMAT " do not intersect on "
 				"'%s'", EINA_EXTRA_RECTANGLE_ARGS (&span),
 				EINA_EXTRA_RECTANGLE_ARGS (&rbounds),
-				r->state.name);
+				r->name);
 		return;
 	}
 	left = rbounds.x - span.x;
-#if 0
-	right = (span.x + span.w) - (rbounds.x + rbounds.w);
-#endif
+
 	if (sw_data->span)
 	{
 		Enesim_Color color;
@@ -625,7 +620,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 		color = enesim_renderer_color_get(r);
 		bytes = rbounds.w * sizeof(uint32_t);
 		tmp = alloca(bytes);
-		/* FIXME for now */
+		/* FIXME if we remove this there is a problem in the compound renderer */
 		memset(tmp, 0, bytes);
 		sw_data->fill(r, rbounds.x, rbounds.y, rbounds.w, tmp);
 		/* compose the filled and the destination spans */
@@ -635,31 +630,18 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	{
 		sw_data->fill(r, rbounds.x, rbounds.y, rbounds.w, data + left);
 	}
-#if 0
-	if (left > 0)
-		memset(data, 0, left * sizeof(uint32_t));
-	if (right > 0)
-		memset(data + len - right, 0, right * sizeof(uint32_t));
-#endif
-#if 0
-	if (sw_data->span)
-	{
-		uint32_t *tmp;
-		size_t bytes;
 
-		bytes = len * sizeof(uint32_t);
-		tmp = alloca(bytes);
-		/* FIXME for now */
-		memset(tmp, 0, bytes);
-		sw_data->fill(r, &r->current, x, y, len, tmp);
-		/* compose the filled and the destination spans */
-		sw_data->span(data, len, tmp, r->current.color, NULL);
-	}
-	else
+	if (r->current_rop == ENESIM_ROP_FILL)
 	{
-		sw_data->fill(r, &r->current, x, y, len, data);
+		unsigned int right;
+
+		if (left > 0)
+			memset(data, 0, left * sizeof(uint32_t));
+
+		right = (span.x + span.w) - (rbounds.x + rbounds.w);
+		if (right > 0)
+			memset(data + len - right, 0, right * sizeof(uint32_t));
 	}
-#endif
 }
 /*============================================================================*
  *                                   API                                      *
