@@ -20,7 +20,7 @@
  * flag, so basically we cant use CPU_ZERO, CPU_SET, etc
  */
 #include "enesim_private.h"
-#include "enesim_barrier_private.h" 
+#include "enesim_barrier_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
