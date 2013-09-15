@@ -29,14 +29,12 @@
  *============================================================================*/
 #ifdef BUILD_THREAD
 #ifdef _WIN32
-static Eina_Bool enesim_thread_win32_new(HANDLE *thread, LPTHREAD_START_ROUTINE callback, void *data)
+Eina_Bool enesim_thread_win32_new(HANDLE *thread, LPTHREAD_START_ROUTINE callback, void *data)
 {
 	*thread = CreateThread(NULL, 0, callback, data, 0, NULL);
 	return *thread != NULL;
 }
-#endif
-
-#ifndef _WIN32
+#else /* _WIN32 */
 Eina_Bool enesim_thread_posix_new(pthread_t *thread, void *(*callback)(void *d), void *data)
 {
 	pthread_attr_t attr;
