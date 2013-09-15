@@ -302,7 +302,7 @@ static void _shape_cleanup(Enesim_Renderer *r,
 }
 
 static Eina_Bool _shape_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Enesim_Log **l)
+		Enesim_Rop rop EINA_UNUSED, Enesim_Log **l)
 {
 	Enesim_Renderer_Shape *thiz;
 	Enesim_Renderer_Shape_State *state;
@@ -323,7 +323,7 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r, Enesim_Surface *s,
 				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL))
 		{
 			fill_renderer = EINA_TRUE;
-			if (!enesim_renderer_setup(state->current.fill.r, s, rop, l))
+			if (!enesim_renderer_setup(state->current.fill.r, s, ENESIM_ROP_FILL, l))
 			{
 				ENESIM_RENDERER_LOG(r, l, "Fill renderer failed");
 				return EINA_FALSE;
@@ -335,7 +335,7 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		if (state->current.stroke.r &&
 				(state->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
 		{
-			if (!enesim_renderer_setup(state->current.stroke.r, s, rop, l))
+			if (!enesim_renderer_setup(state->current.stroke.r, s, ENESIM_ROP_FILL, l))
 			{
 				ENESIM_RENDERER_LOG(r, l, "Stroke renderer failed");
 				/* clean up the fill renderer setup */
