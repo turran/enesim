@@ -319,10 +319,6 @@ EAPI Enesim_Renderer * enesim_renderer_proxy_new(void)
 	return r;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 		Enesim_Renderer *proxied)
 {
@@ -334,10 +330,6 @@ EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 	thiz->proxied = proxied;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_proxy_proxied_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Proxy *thiz;

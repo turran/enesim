@@ -317,10 +317,6 @@ static void _enesim_renderer_path_instance_deinit(void *o)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 {
 	Enesim_Renderer *r;
@@ -329,10 +325,6 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 	return r;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Path *thiz;
@@ -349,10 +341,6 @@ EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path)
 	}
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_path_path_get(Enesim_Renderer *r, Enesim_Path **path)
 {
 	Enesim_Renderer_Path *thiz;

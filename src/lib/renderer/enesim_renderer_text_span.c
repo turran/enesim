@@ -617,10 +617,6 @@ static void _enesim_renderer_text_span_instance_deinit(void *o)
  *                                   API                                      *
  *============================================================================*/
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_text_span_new(void)
 {
 	Enesim_Renderer *r;
@@ -629,10 +625,6 @@ EAPI Enesim_Renderer * enesim_renderer_text_span_new(void)
 	return r;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_text_set(Enesim_Renderer *r, const char *str)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -644,10 +636,6 @@ EAPI void enesim_renderer_text_span_text_set(Enesim_Renderer *r, const char *str
 	enesim_text_buffer_string_set(thiz->state.buffer, str, -1);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_text_get(Enesim_Renderer *r, const char **str)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -659,10 +647,6 @@ EAPI void enesim_renderer_text_span_text_get(Enesim_Renderer *r, const char **st
 	*str = enesim_text_buffer_string_get(thiz->state.buffer);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_direction_get(Enesim_Renderer *r, Enesim_Text_Direction *direction)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -672,10 +656,6 @@ EAPI void enesim_renderer_text_span_direction_get(Enesim_Renderer *r, Enesim_Tex
 	*direction = thiz->direction;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_direction_set(Enesim_Renderer *r, Enesim_Text_Direction direction)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -685,10 +665,6 @@ EAPI void enesim_renderer_text_span_direction_set(Enesim_Renderer *r, Enesim_Tex
 	thiz->direction = direction;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -699,10 +675,6 @@ EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_B
 	*b = enesim_text_buffer_ref(thiz->state.buffer);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -713,10 +685,6 @@ EAPI void enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r, Enesim_T
 	enesim_text_buffer_smart_real_get(thiz->state.buffer, b);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_Text_Buffer *b)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -727,10 +695,6 @@ EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_T
 	enesim_text_buffer_smart_real_set(thiz->state.buffer, b);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -742,10 +706,6 @@ EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r)
 		return NULL;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Font *font)
 {
 	Enesim_Renderer_Text_Span *thiz;

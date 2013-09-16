@@ -342,10 +342,6 @@ int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -398,10 +394,6 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_
 	thiz->stops_changed = EINA_TRUE;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -418,10 +410,6 @@ EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 	thiz->stops_changed = EINA_TRUE;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 		Enesim_Repeat_Mode mode)
 {
@@ -432,10 +420,6 @@ EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mode *mode)
 {
 	Enesim_Renderer_Gradient *thiz;

@@ -131,10 +131,6 @@ static Enesim_Text_Buffer_Descriptor _enesim_text_buffer_simple = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length)
 {
 	Enesim_Text_Buffer_Simple *thiz;

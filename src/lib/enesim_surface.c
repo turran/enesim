@@ -102,10 +102,6 @@ void * enesim_surface_backend_data_get(Enesim_Surface *s)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
 {
 	Enesim_Surface *s;
@@ -139,10 +135,6 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
 	return s;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 		uint32_t w, uint32_t h, Eina_Bool copy, void *data,
 		size_t stride, Enesim_Buffer_Free free_func, void *user_data)
@@ -190,10 +182,6 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 
 	return s;
 }
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p)
 {
@@ -217,10 +205,6 @@ EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 	return s;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h)
 {
 	Enesim_Surface *s;
@@ -231,10 +215,6 @@ EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h
 }
 
 #if BUILD_OPENGL
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format fmt,
 		uint32_t w, uint32_t h,
 		GLuint texture)
@@ -336,10 +316,6 @@ EAPI void enesim_surface_unref(Enesim_Surface *s)
 	}
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *stride)
 {
 	Enesim_Buffer_Sw_Data sw_data;

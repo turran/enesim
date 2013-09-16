@@ -247,6 +247,7 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_perlin);
 	return r;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed
@@ -258,6 +259,7 @@ EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int oc
 	thiz = ENESIM_RENDERER_PERLIN(r);
 	thiz->octaves = octaves;
 }
+
 /**
  * To be documented
  * FIXME: To be fixed

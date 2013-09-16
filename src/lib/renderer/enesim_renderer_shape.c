@@ -644,10 +644,6 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -659,10 +655,6 @@ EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double wei
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI double enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -671,10 +663,6 @@ EAPI double enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r)
 	return thiz->state.current.stroke.weight;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Location location)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -686,10 +674,6 @@ EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_R
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer_Shape_Stroke_Location enesim_renderer_shape_stroke_location_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -699,10 +683,6 @@ EAPI Enesim_Renderer_Shape_Stroke_Location enesim_renderer_shape_stroke_location
 }
 
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -714,10 +694,6 @@ EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Colo
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Color enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -726,10 +702,6 @@ EAPI Enesim_Color enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r)
 	return thiz->state.current.stroke.color;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Cap cap)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -741,10 +713,6 @@ EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Render
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer_Shape_Stroke_Cap enesim_renderer_shape_stroke_cap_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -753,10 +721,6 @@ EAPI Enesim_Renderer_Shape_Stroke_Cap enesim_renderer_shape_stroke_cap_get(Enesi
 	return thiz->state.current.stroke.cap;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Join join)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -768,10 +732,6 @@ EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Rende
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer_Shape_Stroke_Join enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -780,10 +740,6 @@ EAPI Enesim_Renderer_Shape_Stroke_Join enesim_renderer_shape_stroke_join_get(Ene
 	return thiz->state.current.stroke.join;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *stroke)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -801,10 +757,6 @@ EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_R
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -813,10 +765,6 @@ EAPI Enesim_Renderer * enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer
 	return enesim_renderer_ref(thiz->state.current.stroke.r);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -828,10 +776,6 @@ EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color 
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Color enesim_renderer_shape_fill_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -840,10 +784,6 @@ EAPI Enesim_Color enesim_renderer_shape_fill_color_get(Enesim_Renderer *r)
 	return thiz->state.current.fill.color;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *fill)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -860,10 +800,6 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -872,10 +808,6 @@ EAPI Enesim_Renderer * enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *
 	return enesim_renderer_ref(thiz->state.current.fill.r);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Fill_Rule rule)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -887,10 +819,6 @@ EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Rendere
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer_Shape_Fill_Rule enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -899,10 +827,6 @@ EAPI Enesim_Renderer_Shape_Fill_Rule enesim_renderer_shape_fill_rule_get(Enesim_
 	return thiz->state.current.fill.rule;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Draw_Mode draw_mode)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -914,10 +838,6 @@ EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Rendere
 	thiz->state.changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer_Shape_Draw_Mode enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -926,10 +846,6 @@ EAPI Enesim_Renderer_Shape_Draw_Mode enesim_renderer_shape_draw_mode_get(Enesim_
 	return thiz->state.current.draw_mode;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_features_get(Enesim_Renderer *r, Enesim_Renderer_Shape_Feature *features)
 {
 	Enesim_Renderer_Shape_Class *klass;
@@ -940,10 +856,6 @@ EAPI void enesim_renderer_shape_features_get(Enesim_Renderer *r, Enesim_Renderer
 		klass->features_get(r, features);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_dash_add_simple(Enesim_Renderer *r,
 		double length, double gap)
 {
@@ -954,10 +866,6 @@ EAPI void enesim_renderer_shape_stroke_dash_add_simple(Enesim_Renderer *r,
 	enesim_renderer_shape_stroke_dash_add(r, &dash);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r,
 		const Enesim_Renderer_Shape_Stroke_Dash *dash)
 {
@@ -970,10 +878,6 @@ EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r,
 	enesim_list_append(thiz->state.dashes, d);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -982,10 +886,6 @@ EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 	enesim_list_clear(thiz->state.dashes);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_shape_geometry_get(Enesim_Renderer *r, Enesim_Rectangle *geometry)
 {
 	Enesim_Renderer_Shape_Class *klass;
@@ -996,10 +896,6 @@ EAPI Eina_Bool enesim_renderer_shape_geometry_get(Enesim_Renderer *r, Enesim_Rec
 	return EINA_FALSE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_shape_destination_geometry_get(
 		Enesim_Renderer *r, Enesim_Rectangle *geometry)
 {

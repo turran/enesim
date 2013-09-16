@@ -189,10 +189,6 @@ static void _enesim_renderer_figure_instance_deinit(void *o EINA_UNUSED)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 {
 	Enesim_Renderer *r;
@@ -201,10 +197,6 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 	return r;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
@@ -220,10 +212,6 @@ EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *r)
 	thiz->generated = EINA_FALSE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 		double x, double y)
 {
@@ -239,10 +227,6 @@ EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
 	thiz->generated = EINA_FALSE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
@@ -258,10 +242,6 @@ EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r)
 	thiz->generated = EINA_FALSE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;

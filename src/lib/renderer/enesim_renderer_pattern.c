@@ -561,10 +561,6 @@ EAPI void enesim_renderer_pattern_y_get(Enesim_Renderer *r, double *y)
 	if (y) *y = thiz->current.y;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_position_set(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -573,10 +569,6 @@ EAPI void enesim_renderer_pattern_position_set(Enesim_Renderer *r, double x, dou
 	thiz->current.y = y;
 	thiz->changed = EINA_TRUE;
 }
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_position_get(Enesim_Renderer *r, double *x, double *y)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -586,10 +578,6 @@ EAPI void enesim_renderer_pattern_position_get(Enesim_Renderer *r, double *x, do
 	if (y) *y = thiz->current.y;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_size_set(Enesim_Renderer *r, double width, double height)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -600,10 +588,6 @@ EAPI void enesim_renderer_pattern_size_set(Enesim_Renderer *r, double width, dou
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_size_get(Enesim_Renderer *r, double *width, double *height)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -613,10 +597,6 @@ EAPI void enesim_renderer_pattern_size_get(Enesim_Renderer *r, double *width, do
 	if (height) *height = thiz->current.height;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_source_set(Enesim_Renderer *r, Enesim_Renderer *source)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -630,10 +610,6 @@ EAPI void enesim_renderer_pattern_source_set(Enesim_Renderer *r, Enesim_Renderer
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_source_get(Enesim_Renderer *r, Enesim_Renderer **source)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -644,10 +620,6 @@ EAPI void enesim_renderer_pattern_source_get(Enesim_Renderer *r, Enesim_Renderer
 		thiz->current.source = enesim_renderer_ref(thiz->current.source);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -657,10 +629,6 @@ EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Rep
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_pattern_repeat_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mode *mode)
 {
 	Enesim_Renderer_Pattern *thiz;

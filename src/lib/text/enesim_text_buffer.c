@@ -58,10 +58,6 @@ void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Text_Buffer * enesim_text_buffer_ref(Enesim_Text_Buffer *thiz)
 {
 	if (!thiz) return thiz;
@@ -70,10 +66,6 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_ref(Enesim_Text_Buffer *thiz)
 	return thiz;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz)
 {
 	if (!thiz) return;
@@ -87,10 +79,6 @@ EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz)
 	}
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *string, int length)
 {
 	if (!length) return;
@@ -100,10 +88,6 @@ EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *st
 		thiz->descriptor->string_set(thiz->data, string, length);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *string, int length, ssize_t offset)
 {
 	if (!length) return length;
@@ -113,10 +97,6 @@ EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *
 	return 0;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz)
 {
 	if (thiz->descriptor->string_get)
@@ -124,10 +104,6 @@ EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz)
 	return NULL;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, ssize_t offset)
 {
 	if (!length) return length;
@@ -137,10 +113,6 @@ EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, 
 	return 0;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz)
 {
 	if (!thiz) return 0;

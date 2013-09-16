@@ -107,10 +107,6 @@ static Enesim_Text_Buffer_Descriptor _enesim_text_buffer_smart = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Text_Buffer * enesim_text_buffer_smart_new(Enesim_Text_Buffer *real)
 {
 	Enesim_Text_Buffer_Smart *thiz;

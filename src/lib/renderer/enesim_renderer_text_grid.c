@@ -220,28 +220,16 @@ renderer_err:
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_text_grid_new(void)
 {
 	return _enesim_text_grid_new(enesim_text_engine_default_get());
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_text_grid_new_from_engine(Enesim_Text_Engine *e)
 {
 	return _enesim_text_grid_new(e);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_text_grid_columns_set(Enesim_Renderer *r, unsigned int columns)
 {
 	Enesim_Text_Grid *thiz;
@@ -250,10 +238,6 @@ EAPI void enesim_text_grid_columns_set(Enesim_Renderer *r, unsigned int columns)
 	thiz->columns = columns;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_text_grid_rows_set(Enesim_Renderer *r, unsigned int rows)
 {
 	Enesim_Text_Grid *thiz;
@@ -262,10 +246,6 @@ EAPI void enesim_text_grid_rows_set(Enesim_Renderer *r, unsigned int rows)
 	thiz->rows = rows;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_text_grid_text_set(Enesim_Renderer *r, Enesim_Text_Grid_String *string)
 {
 	Enesim_Text_Grid *thiz;
@@ -273,10 +253,6 @@ EAPI void enesim_text_grid_text_set(Enesim_Renderer *r, Enesim_Text_Grid_String 
 	thiz = _enesim_text_grid_get(r);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_text_grid_char_set(Enesim_Renderer *r, Enesim_Text_Grid_Char *ch)
 {
 	Enesim_Text_Grid *thiz;

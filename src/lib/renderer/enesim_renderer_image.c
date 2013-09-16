@@ -1628,10 +1628,6 @@ static void _enesim_renderer_image_instance_deinit(void *o)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 {
 	Enesim_Renderer *r;
@@ -1640,10 +1636,6 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 	return r;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1654,10 +1646,6 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI double enesim_renderer_image_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1666,10 +1654,6 @@ EAPI double enesim_renderer_image_x_get(Enesim_Renderer *r)
 	return thiz->current.x;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1680,10 +1664,6 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI double enesim_renderer_image_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1691,10 +1671,6 @@ EAPI double enesim_renderer_image_y_get(Enesim_Renderer *r)
 	thiz = ENESIM_RENDERER_IMAGE(r);
 	return thiz->current.y;
 }
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_position_set(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1706,10 +1682,6 @@ EAPI void enesim_renderer_image_position_set(Enesim_Renderer *r, double x, doubl
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_position_get(Enesim_Renderer *r, double *x, double *y)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1720,10 +1692,6 @@ EAPI void enesim_renderer_image_position_get(Enesim_Renderer *r, double *x, doub
 	if (y) *y = thiz->current.y;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1734,10 +1702,6 @@ EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI double enesim_renderer_image_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1746,10 +1710,6 @@ EAPI double enesim_renderer_image_width_get(Enesim_Renderer *r)
 	return thiz->current.w;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1760,10 +1720,6 @@ EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI double enesim_renderer_image_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1772,10 +1728,6 @@ EAPI double enesim_renderer_image_height_get(Enesim_Renderer *r)
 	return thiz->current.h;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_size_set(Enesim_Renderer *r, double w, double h)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1787,10 +1739,6 @@ EAPI void enesim_renderer_image_size_set(Enesim_Renderer *r, double w, double h)
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *h)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1801,10 +1749,6 @@ EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *
 	if (h) *h = thiz->current.h;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1816,10 +1760,6 @@ EAPI void enesim_renderer_image_source_surface_set(Enesim_Renderer *r, Enesim_Su
 	thiz->src_changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Surface * enesim_renderer_image_source_surface_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1828,10 +1768,6 @@ EAPI Enesim_Surface * enesim_renderer_image_source_surface_get(Enesim_Renderer *
 	return enesim_surface_ref(thiz->current.s);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, Eina_Rectangle *area)
 {
 	Enesim_Renderer_Image *thiz;

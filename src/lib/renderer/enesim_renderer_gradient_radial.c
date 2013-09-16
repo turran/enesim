@@ -276,10 +276,6 @@ static void _enesim_renderer_gradient_radial_instance_deinit(void *o EINA_UNUSED
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-/**
- * FIXME
- * To be documented
- */
 EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 {
 	Enesim_Renderer *r;
@@ -288,10 +284,6 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 	return r;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_center_set(Enesim_Renderer *r, double center_x, double center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -302,10 +294,6 @@ EAPI void enesim_renderer_gradient_radial_center_set(Enesim_Renderer *r, double 
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_center_get(Enesim_Renderer *r, 
 							double *center_x, double *center_y)
 {
@@ -317,10 +305,6 @@ EAPI void enesim_renderer_gradient_radial_center_get(Enesim_Renderer *r,
 	if (center_y)
 		*center_y = thiz->center.y;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, double center_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -329,10 +313,6 @@ EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, doubl
 	thiz->center.x = center_x;
 	thiz->changed = EINA_TRUE;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, double center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -341,10 +321,6 @@ EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, doubl
 	thiz->center.y = center_y;
 	thiz->changed = EINA_TRUE;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_center_x_get(Enesim_Renderer *r, double *center_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -353,10 +329,6 @@ EAPI void enesim_renderer_gradient_radial_center_x_get(Enesim_Renderer *r, doubl
 	if (center_x)
 		*center_x = thiz->center.x;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_center_y_get(Enesim_Renderer *r, double *center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -366,10 +338,6 @@ EAPI void enesim_renderer_gradient_radial_center_y_get(Enesim_Renderer *r, doubl
 		*center_y = thiz->center.y;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_focus_set(Enesim_Renderer *r, double focus_x, double focus_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -380,10 +348,6 @@ EAPI void enesim_renderer_gradient_radial_focus_set(Enesim_Renderer *r, double f
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_focus_get(Enesim_Renderer *r, 
 							double *focus_x, double *focus_y)
 {
@@ -395,10 +359,6 @@ EAPI void enesim_renderer_gradient_radial_focus_get(Enesim_Renderer *r,
 	if (focus_y)
 		*focus_y = thiz->focus.y;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_focus_x_set(Enesim_Renderer *r, double focus_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -407,10 +367,6 @@ EAPI void enesim_renderer_gradient_radial_focus_x_set(Enesim_Renderer *r, double
 	thiz->focus.x = focus_x;
 	thiz->changed = EINA_TRUE;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double focus_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -419,10 +375,6 @@ EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double
 	thiz->focus.y = focus_y;
 	thiz->changed = EINA_TRUE;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_focus_x_get(Enesim_Renderer *r, double *focus_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -431,10 +383,6 @@ EAPI void enesim_renderer_gradient_radial_focus_x_get(Enesim_Renderer *r, double
 	if (focus_x)
 		*focus_x = thiz->focus.x;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_focus_y_get(Enesim_Renderer *r, double *focus_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -444,10 +392,6 @@ EAPI void enesim_renderer_gradient_radial_focus_y_get(Enesim_Renderer *r, double
 		*focus_y = thiz->focus.y;
 }
 
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_radius_set(Enesim_Renderer *r, double radius)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -456,10 +400,6 @@ EAPI void enesim_renderer_gradient_radial_radius_set(Enesim_Renderer *r, double 
 	thiz->radius = radius;
 	thiz->changed = EINA_TRUE;
 }
-/**
- * FIXME
- * To be documented
- */
 EAPI void enesim_renderer_gradient_radial_radius_get(Enesim_Renderer *r, double *radius)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;

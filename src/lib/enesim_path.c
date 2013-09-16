@@ -175,10 +175,6 @@ void enesim_path_command_get(Enesim_Path *thiz,
  *                                   API                                      *
  *============================================================================*/
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Path * enesim_path_new(void)
 {
 	Enesim_Path *thiz;
@@ -188,10 +184,6 @@ EAPI Enesim_Path * enesim_path_new(void)
 	return thiz;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Path * enesim_path_ref(Enesim_Path *thiz)
 {
 	if (!thiz) return NULL;
@@ -199,10 +191,6 @@ EAPI Enesim_Path * enesim_path_ref(Enesim_Path *thiz)
 	return thiz;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_unref(Enesim_Path *thiz)
 {
 	thiz->ref--;
@@ -214,10 +202,6 @@ EAPI void enesim_path_unref(Enesim_Path *thiz)
 }
 
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_command_clear(Enesim_Path *thiz)
 {
 	Enesim_Path_Command *c;
@@ -229,10 +213,6 @@ EAPI void enesim_path_command_clear(Enesim_Path *thiz)
 	thiz->commands = eina_list_free(thiz->commands);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 {
 	Enesim_Path_Command *new_command;
@@ -259,10 +239,6 @@ EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 	thiz->changed = EINA_TRUE;
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y)
 {
 	Enesim_Path_Command cmd;
@@ -273,10 +249,6 @@ EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y)
 	enesim_path_command_add(thiz, &cmd);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y)
 {
 	Enesim_Path_Command cmd;
@@ -287,10 +259,6 @@ EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y)
 	enesim_path_command_add(thiz, &cmd);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x,
 		double y)
 {
@@ -302,10 +270,6 @@ EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x,
 	enesim_path_command_add(thiz, &cmd);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
 		double ctrl_y, double x, double y)
 {
@@ -319,10 +283,6 @@ EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
 	enesim_path_command_add(thiz, &cmd);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
 		double ctrl_y0, double ctrl_x, double ctrl_y, double x, double y)
 {
@@ -338,10 +298,6 @@ EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
 	enesim_path_command_add(thiz, &cmd);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x,
 		double ctrl_y, double x, double y)
 {
@@ -355,10 +311,6 @@ EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x,
 	enesim_path_command_add(thiz, &cmd);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double angle,
                    unsigned char large, unsigned char sweep, double x, double y)
 {
@@ -375,10 +327,6 @@ EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double ang
 	enesim_path_command_add(thiz, &cmd);
 }
 
-/**
- * To be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_path_close(Enesim_Path *thiz)
 {
 	Enesim_Path_Command cmd;
