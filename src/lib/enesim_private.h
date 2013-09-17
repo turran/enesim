@@ -77,7 +77,6 @@
 
 /* dependencies */
 #include <Eina.h>
-#include <Eina_Extra.h>
 
 #ifdef BUILD_OPENGL
 #include "GL/glew.h"
