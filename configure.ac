@@ -369,7 +369,7 @@ glGenFramebuffersEXT(0, NULL);
          [have_opengl="no"])
       LIBS=${LIBS_save}
 
-      AC_MSG_CHECKING([whether glGenFramebffersEXT is in libopengl32.a])
+      AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libopengl32.a])
       AC_MSG_RESULT([${have_opengl}])
    fi
 fi
