@@ -110,8 +110,8 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 		per = enesim_perlin_get(xx, yy, thiz->octaves, thiz->xfreq.coeff,
 				thiz->yfreq.coeff, thiz->ampl.coeff);
 		/* the perlin noise is on the -1,1 range, so we need to get it back to 0-255 */
-		per = eina_f16p16_mul(per, eina_extra_f16p16_double_from(255));
-		per = eina_f16p16_add(per, eina_extra_f16p16_double_from(255));
+		per = eina_f16p16_mul(per, eina_f16p16_double_from(255));
+		per = eina_f16p16_add(per, eina_f16p16_double_from(255));
 		per = eina_f16p16_div(per, eina_f16p16_int_from(2));
 		/* it is still possible to be outside the range? */
 		i = eina_f16p16_int_to(per);

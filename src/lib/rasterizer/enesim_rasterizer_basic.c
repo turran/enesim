@@ -304,8 +304,8 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -468,8 +468,8 @@ static void _stroke_paint_fill_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -577,8 +577,8 @@ static void _stroke_paint_fill_paint_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -750,8 +750,8 @@ static void _stroke_fill_paint_eo(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -915,8 +915,8 @@ static void _stroke_paint_fill_eo(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -1025,8 +1025,8 @@ static void _stroke_paint_fill_paint_eo(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -1252,10 +1252,10 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		/* in theory we should add 1 here, like the path renderer
 		 * but the span functions handle that for us
 		 */
-		thiz->tyy = eina_extra_f16p16_double_from(ty);
-		thiz->byy = eina_extra_f16p16_double_from(by);
-		thiz->lxx = eina_extra_f16p16_double_from(lx);
-		thiz->rxx = eina_extra_f16p16_double_from(rx);
+		thiz->tyy = eina_f16p16_double_from(ty);
+		thiz->byy = eina_f16p16_double_from(by);
+		thiz->lxx = eina_f16p16_double_from(lx);
+		thiz->rxx = eina_f16p16_double_from(rx);
 
 		/* FIXME why this loop can't be done on the upper one? */
 		EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)

@@ -147,7 +147,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 next:										\
 		*dst++ = p0;							\
 		map++;								\
-		xx += EINA_EXTRA_F16P16_ONE;					\
+		xx += EINA_F16P16_ONE;					\
 	}									\
 }
 
@@ -250,7 +250,7 @@ static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
 	*fill = _spans[thiz->x_channel][thiz->y_channel][type];
 	if (!*fill) return EINA_FALSE;
 
-	thiz->s_scale = eina_extra_f16p16_double_from(thiz->scale);
+	thiz->s_scale = eina_f16p16_double_from(thiz->scale);
 
 	return EINA_TRUE;
 }

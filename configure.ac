@@ -147,7 +147,7 @@ esac
 
 ## Eina
 
-requirements_pc="eina-extra eina >= ${efl_version} ${requirements_pc}"
+requirements_pc="eina >= ${efl_version} ${requirements_pc}"
 
 ## Fontconfig
 PKG_CHECK_EXISTS([fontconfig >= 2.4.2],

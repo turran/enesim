@@ -261,7 +261,7 @@ static void _span_identity(Enesim_Renderer *r,
 			p0 = color[1];
 		}
 		*dst++ = p0;
-		xx += EINA_EXTRA_F16P16_ONE;
+		xx += EINA_F16P16_ONE;
 	}
 }
 

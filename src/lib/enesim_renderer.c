@@ -218,8 +218,8 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_surface_lock(s, EINA_TRUE);
 	b = enesim_surface_backend_get(s);
-	DBG("Drawing area %" EINA_EXTRA_RECTANGLE_FORMAT,
-			EINA_EXTRA_RECTANGLE_ARGS (area));
+	DBG("Drawing area %" EINA_RECTANGLE_FORMAT,
+			EINA_RECTANGLE_ARGS (area));
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:

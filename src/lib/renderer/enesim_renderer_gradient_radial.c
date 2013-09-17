@@ -82,14 +82,14 @@ static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz
 		return ret;
 	}
 
-	a = thiz->scale * (eina_extra_f16p16_double_to(x) - (fx + thiz->center.x));
-	b = thiz->scale * (eina_extra_f16p16_double_to(y) - (fy + thiz->center.y));
+	a = thiz->scale * (eina_f16p16_double_to(x) - (fx + thiz->center.x));
+	b = thiz->scale * (eina_f16p16_double_to(y) - (fy + thiz->center.y));
 
 	d1 = (a * fy) - (b * fx);
 	d2 = fabs(((r * r) * ((a * a) + (b * b))) - (d1 * d1));
 	r = ((a * fx) + (b * fy) + sqrt(d2)) * thiz->zf;
 
-	ret = eina_extra_f16p16_double_from(r);
+	ret = eina_f16p16_double_from(r);
 	return ret;
 }
 

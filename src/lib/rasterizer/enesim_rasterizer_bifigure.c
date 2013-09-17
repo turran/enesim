@@ -399,8 +399,8 @@ static void _bifig_stroke_fill_paint_nz(Enesim_Renderer *r, int x, int y,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -576,8 +576,8 @@ static void _bifig_stroke_paint_fill_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -728,8 +728,8 @@ static void _bifig_stroke_paint_fill_paint_nz(Enesim_Renderer *r,
 
 	ox = state->ox;
 	oy = state->oy;
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -1021,8 +1021,8 @@ static void _bifig_stroke_fill_paint_eo_u(Enesim_Renderer *r, int x, int y,
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
 
 	enesim_renderer_origin_get(r, &ox, &oy);
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -1198,8 +1198,8 @@ static void _bifig_stroke_paint_fill_eo_u(Enesim_Renderer *r,
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
 
 	enesim_renderer_origin_get(r, &ox, &oy);
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -1350,8 +1350,8 @@ static void _bifig_stroke_paint_fill_paint_eo_u(Enesim_Renderer *r,
 	enesim_rasterizer_basic_vectors_get(thiz->over, &novectors, &ov);
 
 	enesim_renderer_origin_get(r, &ox, &oy);
-	xx -= eina_extra_f16p16_double_from(ox);
-	yy -= eina_extra_f16p16_double_from(oy);
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
 
 	if ((((yy >> 16) + 1) < (thiz->tyy >> 16)) ||
 			((yy >> 16) > (1 + (thiz->byy >> 16))))
@@ -1731,8 +1731,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 		if (uymax > ymax)
 			ymax = uymax;
 
-		thiz->tyy = eina_extra_f16p16_double_from(ymin);
-		thiz->byy = eina_extra_f16p16_double_from(ymax);
+		thiz->tyy = eina_f16p16_double_from(ymin);
+		thiz->byy = eina_f16p16_double_from(ymax);
 	}
 
 	return EINA_TRUE;

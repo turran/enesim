@@ -232,7 +232,7 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 
 	/* TODO to minimize the impact of the lock, split this function into a setup/cleanup/map */
 	eina_lock_take(&thiz->tlock);
-	//printf("requesting %" EINA_EXTRA_RECTANGLE_FORMAT "\n", EINA_EXTRA_RECTANGLE_ARGS(area));
+	//printf("requesting %" EINA_RECTANGLE_FORMAT "\n", EINA_RECTANGLE_ARGS(area));
 
 	/* create our own requested area tiler, so we can know what areas
 	 * should be redrawn and what areas should not
@@ -265,7 +265,7 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		add.x -= real_area.x;
 		add.y -= real_area.y;
 		eina_tiler_rect_add(area_tiler, &add);
-		//printf("adding %" EINA_EXTRA_RECTANGLE_FORMAT "\n", EINA_EXTRA_RECTANGLE_ARGS(&add));
+		//printf("adding %" EINA_RECTANGLE_FORMAT "\n", EINA_RECTANGLE_ARGS(&add));
 	}
 	eina_iterator_free(it);
 

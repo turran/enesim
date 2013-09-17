@@ -240,7 +240,7 @@ static void _argb8888_image_scale_identity_fast(Enesim_Renderer *r,
 			if (p0 && color)
 				p0 = argb8888_mul4_sym(p0, color);
         	}
-		*dst++ = p0;  xx += EINA_EXTRA_F16P16_ONE;  ixx += mxx;
+		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
 }
 
@@ -423,7 +423,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 	xx = eina_f16p16_int_from(x) - thiz->ixx;
 	yy = eina_f16p16_int_from(y) - thiz->iyy;
 
-	if ((yy <= -EINA_EXTRA_F16P16_ONE) || (yy >= ihh))
+	if ((yy <= -EINA_F16P16_ONE) || (yy >= ihh))
 	{
 		memset(dst, 0, sizeof(unsigned int) * len);
 		return;
@@ -435,7 +435,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 	ay = 1 + ((iyy & 0xffff) >> 8);
 	if (yy < 0)
 		ay = 1 + ((yy & 0xffff) >> 8);
-	if ((ihh - yy) < EINA_EXTRA_F16P16_ONE)
+	if ((ihh - yy) < EINA_F16P16_ONE)
 		ay = 256 - ((ihh - yy) >> 8);
 	ixx = (mxx * (long long int)xx) >> 16;
 
@@ -443,7 +443,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ((xx > -EINA_EXTRA_F16P16_ONE) & (xx < iww))
+		if ((xx > -EINA_F16P16_ONE) & (xx < iww))
 		{
 			int ix = eina_f16p16_int_to(ixx);
 			uint32_t *p = src + ix;
@@ -466,7 +466,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 
 				if (xx < 0)
 					ax = 1 + ((xx & 0xffff) >> 8);
-				if ((iww - xx) < EINA_EXTRA_F16P16_ONE)
+				if ((iww - xx) < EINA_F16P16_ONE)
 					ax = 256 - ((iww - xx) >> 8);
 				p0 = argb8888_interp_256(ax, p1, p0);
 				p2 = argb8888_interp_256(ax, p3, p2);
@@ -475,7 +475,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 					p0 = argb8888_mul4_sym(p0, color);
 			}
         	}
-		*dst++ = p0;  xx += EINA_EXTRA_F16P16_ONE;  ixx += mxx;
+		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
 }
 
@@ -510,8 +510,8 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ( (((unsigned) (xx + EINA_EXTRA_F16P16_ONE)) < (iww + EINA_EXTRA_F16P16_ONE)) &
-			(((unsigned) (yy + EINA_EXTRA_F16P16_ONE)) < (ihh + EINA_EXTRA_F16P16_ONE)) )
+		if ( (((unsigned) (xx + EINA_F16P16_ONE)) < (iww + EINA_F16P16_ONE)) &
+			(((unsigned) (yy + EINA_F16P16_ONE)) < (ihh + EINA_F16P16_ONE)) )
 		{
 			Eina_F16p16 ixx, iyy;
 			int ix, iy;
@@ -543,11 +543,11 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 				ay = 1 + ((iyy & 0xffff) >> 8);
 				if (xx < 0)
 					ax = 1 + ((xx & 0xffff) >> 8);
-				if ((iww - xx) < EINA_EXTRA_F16P16_ONE)
+				if ((iww - xx) < EINA_F16P16_ONE)
 					ax = 256 - ((iww - xx) >> 8);
 				if (yy < 0)
 					ay = 1 + ((yy & 0xffff) >> 8);
-				if ((ihh - yy) < EINA_EXTRA_F16P16_ONE)
+				if ((ihh - yy) < EINA_F16P16_ONE)
 					ay = 256 - ((ihh - yy) >> 8);
 
 				p0 = argb8888_interp_256(ax, p1, p0);
@@ -588,7 +588,7 @@ static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
 	xx = eina_f16p16_int_from(x) - thiz->ixx;
 	yy = eina_f16p16_int_from(y) - thiz->iyy;
 
-	if ((yy <= -EINA_EXTRA_F16P16_ONE) || (yy >= ihh))
+	if ((yy <= -EINA_F16P16_ONE) || (yy >= ihh))
 	{
 		memset(dst, 0, sizeof(unsigned int) * len);
 		return;
@@ -599,7 +599,7 @@ static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
 	ay = 1 + ((iyy & 0xffff) >> 8);
 	if (yy < 0)
 		ay = 1 + ((yy & 0xffff) >> 8);
-	if ((ihh - yy) < EINA_EXTRA_F16P16_ONE)
+	if ((ihh - yy) < EINA_F16P16_ONE)
 		ay = 256 - ((ihh - yy) >> 8);
 
 	iy = iyy >> 16;
@@ -608,7 +608,7 @@ static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ((xx > -EINA_EXTRA_F16P16_ONE) & (xx < iww))
+		if ((xx > -EINA_F16P16_ONE) & (xx < iww))
 		{
 			uint32_t ag0 = 0, rb0 = 0;
 			int ix, tx, ntx;
@@ -666,7 +666,7 @@ static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
 			if (color && p0)
 				p0 = argb8888_mul4_sym(p0, color);
 		}
-		*dst++ = p0;  xx += EINA_EXTRA_F16P16_ONE;  ixx += mxx;
+		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
 }
 
@@ -696,7 +696,7 @@ static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 	xx = eina_f16p16_int_from(x) - thiz->ixx;
 	yy = eina_f16p16_int_from(y) - thiz->iyy;
 
-	if ((yy <= -EINA_EXTRA_F16P16_ONE) || (yy >= ihh))
+	if ((yy <= -EINA_F16P16_ONE) || (yy >= ihh))
 	{
 		memset(dst, 0, sizeof(unsigned int) * len);
 		return;
@@ -713,7 +713,7 @@ static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 	while (dst < end)
 	{
 		uint32_t p0 = 0;
-		if ((xx > -EINA_EXTRA_F16P16_ONE) & (xx < iww))
+		if ((xx > -EINA_F16P16_ONE) & (xx < iww))
 		{
 			uint32_t ag0 = 0, rb0 = 0;
 			int ix, iy = iy0;
@@ -726,7 +726,7 @@ static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 			ax = 1 + ((ixx >> 8) & 0xff);
 			if (xx < 0)
 				ax = 1 + ((xx & 0xffff) >> 8);
-			if ((iww - xx) < EINA_EXTRA_F16P16_ONE)
+			if ((iww - xx) < EINA_F16P16_ONE)
 				ax = 256 - ((iww - xx) >> 8);
 			p = q + ix;
 			while (iy < sh)
@@ -778,7 +778,7 @@ static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 			if (color && p0)
 				p0 = argb8888_mul4_sym(p0, color);
 		}
-	*dst++ = p0;  xx += EINA_EXTRA_F16P16_ONE;  ixx += mxx;
+	*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
 }
 
@@ -808,7 +808,7 @@ static void _argb8888_image_scale_d_d_identity(Enesim_Renderer *r,
 	xx = eina_f16p16_int_from(x) - thiz->ixx;
 	yy = eina_f16p16_int_from(y) - thiz->iyy;
 
-	if ((yy <= -EINA_EXTRA_F16P16_ONE) || (yy >= ihh))
+	if ((yy <= -EINA_F16P16_ONE) || (yy >= ihh))
 	{
 		memset(dst, 0, sizeof(unsigned int) * len);
 		return;
@@ -825,7 +825,7 @@ static void _argb8888_image_scale_d_d_identity(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ((xx > -EINA_EXTRA_F16P16_ONE) & (xx < iww))
+		if ((xx > -EINA_F16P16_ONE) & (xx < iww))
 		{
 			uint32_t ag0 = 0, rb0 = 0;
 			int ix0 = (ixx >> 16), iy = iy0;
@@ -917,7 +917,7 @@ static void _argb8888_image_scale_d_d_identity(Enesim_Renderer *r,
 			if (color && p0)
 				p0 = argb8888_mul4_sym(p0, color);
 		}
-		*dst++ = p0;  xx += EINA_EXTRA_F16P16_ONE;  ixx += mxx;
+		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
 }
 
@@ -953,7 +953,7 @@ static void _argb8888_image_scale_d_u_affine(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ( (xx > -EINA_EXTRA_F16P16_ONE) & (yy > -EINA_EXTRA_F16P16_ONE) & (xx < iww) & (yy < ihh) )
+		if ( (xx > -EINA_F16P16_ONE) & (yy > -EINA_F16P16_ONE) & (xx < iww) & (yy < ihh) )
 		{
 			uint32_t ag0 = 0, rb0 = 0;
 			Eina_F16p16 ixx, iyy, txx, ntxx;
@@ -970,7 +970,7 @@ static void _argb8888_image_scale_d_u_affine(Enesim_Renderer *r,
 
 			if (yy < 0)
 				ay = 1 + ((yy & 0xffff) >> 8);
-			if ((ihh - yy) < EINA_EXTRA_F16P16_ONE)
+			if ((ihh - yy) < EINA_F16P16_ONE)
 				ay = 256 - ((ihh - yy) >> 8);
 			p = src + (iy * sw) + ix;
 
@@ -1057,7 +1057,7 @@ static void _argb8888_image_scale_u_d_affine(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ( (xx > -EINA_EXTRA_F16P16_ONE) & (yy > -EINA_EXTRA_F16P16_ONE) & (xx < iww) & (yy < ihh) )
+		if ( (xx > -EINA_F16P16_ONE) & (yy > -EINA_F16P16_ONE) & (xx < iww) & (yy < ihh) )
 		{
 			uint32_t ag0 = 0, rb0 = 0;
 			int ix, iy, ty, nty;
@@ -1073,7 +1073,7 @@ static void _argb8888_image_scale_u_d_affine(Enesim_Renderer *r,
 			ax = 1 + ((ixx & 0xff) >> 8);
 			if (xx < 0)
 				ax = 1 + ((xx & 0xffff) >> 8);
-			if ((iww - xx) < EINA_EXTRA_F16P16_ONE)
+			if ((iww - xx) < EINA_F16P16_ONE)
 				ax = 256 - ((iww - xx) >> 8);
 			p = src + (iy * sw) + ix;
 
@@ -1162,7 +1162,7 @@ static void _argb8888_image_scale_d_d_affine(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ( (xx > -EINA_EXTRA_F16P16_ONE) & (yy > -EINA_EXTRA_F16P16_ONE) & (xx < iww) & (yy < ihh) )
+		if ( (xx > -EINA_F16P16_ONE) & (yy > -EINA_F16P16_ONE) & (xx < iww) & (yy < ihh) )
 		{
 			uint32_t ag0 = 0, rb0 = 0;
 			int ix0, iy, tx0, ntx0, ty, nty;

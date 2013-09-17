@@ -400,10 +400,10 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 			Eina_Rectangle subs[4];
 			int i;
 
-			eina_extra_rectangle_substract(area, &final, subs);
+			eina_rectangle_subtract(area, &final, subs);
 			for (i = 0; i < 4; i++)
 			{
-				if (!eina_extra_rectangle_is_valid(&subs[i]))
+				if (!eina_rectangle_is_valid(&subs[i]))
 					continue;
 				_sw_clear(ddata, stride, bpp, &subs[i]);
 			}
@@ -413,7 +413,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	visible = enesim_renderer_visibility_get(r);
 	if (!visible)
 		return;
-	if (!intersect || !eina_extra_rectangle_is_valid(&final))
+	if (!intersect || !eina_rectangle_is_valid(&final))
 		return;
 
 	ddata = ddata + (final.y * stride) + (final.x * bpp);
@@ -587,10 +587,10 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	rbounds = r->current_destination_bounds;
 	if (!eina_rectangle_intersection(&rbounds, &span))
 	{
-		DBG("Drawing span %" EINA_EXTRA_RECTANGLE_FORMAT " and bounds %"
-				EINA_EXTRA_RECTANGLE_FORMAT " do not intersect on "
-				"'%s'", EINA_EXTRA_RECTANGLE_ARGS (&span),
-				EINA_EXTRA_RECTANGLE_ARGS (&rbounds),
+		DBG("Drawing span %" EINA_RECTANGLE_FORMAT " and bounds %"
+				EINA_RECTANGLE_FORMAT " do not intersect on "
+				"'%s'", EINA_RECTANGLE_ARGS (&span),
+				EINA_RECTANGLE_ARGS (&rbounds),
 				r->name);
 		return;
 	}

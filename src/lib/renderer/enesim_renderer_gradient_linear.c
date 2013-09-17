@@ -184,15 +184,15 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	type = enesim_matrix_type_get(&om);
 
 	/* we need to translate by the x0 and y0 */
-	thiz->yy = eina_extra_f16p16_double_from(y0);
-	thiz->xx = eina_extra_f16p16_double_from(x0);
+	thiz->yy = eina_f16p16_double_from(y0);
+	thiz->xx = eina_f16p16_double_from(x0);
 
 	/* calculate the increment on x and y */
 	xx0 = x1 - x0;
 	yy0 = y1 - y0;
 	orig_len = hypot(xx0, yy0);
-	thiz->ayx = eina_extra_f16p16_double_from(xx0 / orig_len);
-	thiz->ayy = eina_extra_f16p16_double_from(yy0 / orig_len);
+	thiz->ayx = eina_f16p16_double_from(xx0 / orig_len);
+	thiz->ayy = eina_f16p16_double_from(yy0 / orig_len);
 
 	/* handle the geometry transformation */
 	if (type != ENESIM_MATRIX_IDENTITY)
@@ -214,7 +214,7 @@ static Eina_Bool _linear_state_setup(Enesim_Renderer *r,
 	/* the scale factor, this is useful to know the original length and transformed
 	 * length scale
 	 */
-	thiz->scale = eina_extra_f16p16_double_from(dst_len / orig_len);
+	thiz->scale = eina_f16p16_double_from(dst_len / orig_len);
 #if 0
 	/* just override the identity case */
 	if (type == ENESIM_MATRIX_IDENTITY)

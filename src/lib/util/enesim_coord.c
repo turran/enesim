@@ -31,8 +31,8 @@ void enesim_coord_identity_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 {
 	Eina_F16p16 ox, oy;
 
-	ox = eina_extra_f16p16_double_from(pre_x);
-	oy = eina_extra_f16p16_double_from(pre_y);
+	ox = eina_f16p16_double_from(pre_x);
+	oy = eina_f16p16_double_from(pre_y);
 
 	*fpx = eina_f16p16_int_from(x);
 	*fpy = eina_f16p16_int_from(y);
@@ -52,8 +52,8 @@ void enesim_coord_affine_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
-	ox = eina_extra_f16p16_double_from(pre_x);
-	oy = eina_extra_f16p16_double_from(pre_y);
+	ox = eina_f16p16_double_from(pre_x);
+	oy = eina_f16p16_double_from(pre_y);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);
@@ -79,8 +79,8 @@ void enesim_coord_projective_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 	Eina_F16p16 xx, yy;
 	Eina_F16p16 ox, oy;
 
-	ox = eina_extra_f16p16_double_from(pre_x);
-	oy = eina_extra_f16p16_double_from(pre_y);
+	ox = eina_f16p16_double_from(pre_x);
+	oy = eina_f16p16_double_from(pre_y);
 
 	xx = eina_f16p16_int_from(x);
 	yy = eina_f16p16_int_from(y);

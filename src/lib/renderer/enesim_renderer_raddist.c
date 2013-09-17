@@ -106,8 +106,8 @@ static void _span_identity(Enesim_Renderer *r,
 		double rad = hypot(x, y);
 
 		rad = (((thiz->current.scale * (thiz->current.radius - rad)) + rad) * r_inv);
-		sxx = eina_extra_f16p16_double_from((rad * x) + thiz->current.orx);
-		syy = eina_extra_f16p16_double_from((rad * y) + thiz->current.ory);
+		sxx = eina_f16p16_double_from((rad * x) + thiz->current.orx);
+		syy = eina_f16p16_double_from((rad * y) + thiz->current.ory);
 
 		sy = (syy >> 16);
 		sx = (sxx >> 16);
