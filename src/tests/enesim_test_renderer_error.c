@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 
 	s = enesim_surface_new(ENESIM_FORMAT_ARGB8888, 320, 240);
 
-	if (!enesim_renderer_draw(r, s, NULL, 0, 0, &error))
+	if (!enesim_renderer_draw(r, s, ENESIM_ROP_FILL, NULL, 0, 0, &error))
 	{
 		enesim_log_dump(error);
 		enesim_log_delete(error);

@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 		return 3;
 	}
 	enesim_surface_unref(surface);
-	enesim_pool_delete(pool);
+	enesim_pool_unref(pool);
 
 	enesim_shutdown();
 

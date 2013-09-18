@@ -55,6 +55,7 @@ src/lib/enesim_rectangle.c \
 src/lib/enesim_renderer.c \
 src/lib/enesim_renderer_private.h \
 src/lib/enesim_renderer_sw.c \
+src/lib/enesim_renderer_sw_private.h \
 src/lib/enesim_stream_private.h \
 src/lib/enesim_stream.c \
 src/lib/enesim_surface.c \
