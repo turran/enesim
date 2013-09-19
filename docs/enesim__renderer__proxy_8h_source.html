@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Enesim: Enesim</title>
+<title>Enesim: src/lib/renderer/enesim_renderer_proxy.h Source File</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -46,11 +46,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
+      <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -69,31 +69,45 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="files.html"><span>File&#160;List</span></a></li>
+    </ul>
+  </div>
 </div>
 <div class="header">
   <div class="headertitle">
-<div class="title">Enesim </div>  </div>
+<div class="title">src/lib/renderer/enesim_renderer_proxy.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div class="image">
-<img src="enesim.png" alt="enesim.png"/>
-</div>
- <h2><a class="anchor" id="intro"></a>
-Introduction</h2>
-<p>The Enesim library provides a complete solution for drawing, allocating, compositing and converting pixels. All of the systems of the library are flexible enough to support drawing capabilities on any scenario</p>
-<h2><a class="anchor" id="backends"></a>
-Backends</h2>
-<ul>
-<li>Software based</li>
-<li><a class="el" href="Enesim_OpenGL_Page.html">OpenGL Backend</a> (alpha)</li>
-<li>OpenCL (experimental)</li>
-</ul>
-<h2><a class="anchor" id="dependencies"></a>
-Dependencies</h2>
-<ul>
-<li>Eina </li>
-</ul>
-</div></div><!-- contents -->
+<div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/* ENESIM - Drawing Library</span>
+<a name="l00002"></a>00002 <span class="comment"> * Copyright (C) 2007-2013 Jorge Luis Zapata</span>
+<a name="l00003"></a>00003 <span class="comment"> *</span>
+<a name="l00004"></a>00004 <span class="comment"> * This library is free software; you can redistribute it and/or</span>
+<a name="l00005"></a>00005 <span class="comment"> * modify it under the terms of the GNU Lesser General Public</span>
+<a name="l00006"></a>00006 <span class="comment"> * License as published by the Free Software Foundation; either</span>
+<a name="l00007"></a>00007 <span class="comment"> * version 2.1 of the License, or (at your option) any later version.</span>
+<a name="l00008"></a>00008 <span class="comment"> *</span>
+<a name="l00009"></a>00009 <span class="comment"> * This library is distributed in the hope that it will be useful,</span>
+<a name="l00010"></a>00010 <span class="comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<a name="l00011"></a>00011 <span class="comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<a name="l00012"></a>00012 <span class="comment"> * Lesser General Public License for more details.</span>
+<a name="l00013"></a>00013 <span class="comment"> *</span>
+<a name="l00014"></a>00014 <span class="comment"> * You should have received a copy of the GNU Lesser General Public</span>
+<a name="l00015"></a>00015 <span class="comment"> * License along with this library.</span>
+<a name="l00016"></a>00016 <span class="comment"> * If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<a name="l00017"></a>00017 <span class="comment"> */</span>
+<a name="l00018"></a>00018 <span class="preprocessor">#ifndef ENESIM_RENDERER_PROXY_H_</span>
+<a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor">#define ENESIM_RENDERER_PROXY_H_</span>
+<a name="l00020"></a>00020 <span class="preprocessor"></span>
+<a name="l00028"></a>00028 EAPI <a class="code" href="struct__Enesim__Renderer.html">Enesim_Renderer</a> * <a class="code" href="group__Enesim__Renderer__Proxy__Group.html#ga31df96de9314ea6b6438452c15228628">enesim_renderer_proxy_new</a>(<span class="keywordtype">void</span>);
+<a name="l00029"></a>00029 EAPI <span class="keywordtype">void</span> enesim_renderer_proxy_proxied_set(<a class="code" href="struct__Enesim__Renderer.html">Enesim_Renderer</a> *r,
+<a name="l00030"></a>00030         <a class="code" href="struct__Enesim__Renderer.html">Enesim_Renderer</a> *proxied);
+<a name="l00031"></a>00031 EAPI <a class="code" href="struct__Enesim__Renderer.html">Enesim_Renderer</a> * enesim_renderer_proxy_proxied_get(<a class="code" href="struct__Enesim__Renderer.html">Enesim_Renderer</a> *r);
+<a name="l00032"></a>00032 
+<a name="l00037"></a>00037 <span class="preprocessor">#endif</span>
+<a name="l00038"></a>00038 <span class="preprocessor"></span>
+</pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -111,7 +125,7 @@ Dependencies</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 19 2013 22:38:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Sep 19 2013 22:38:43 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

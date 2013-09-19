@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Enesim: Enesim</title>
+<title>Enesim: _Enesim_Text_Grid Struct Reference</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -46,10 +46,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,31 +69,43 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
+    </ul>
+  </div>
 </div>
 <div class="header">
+  <div class="summary">
+<a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">Enesim </div>  </div>
+<div class="title">_Enesim_Text_Grid Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div class="image">
-<img src="enesim.png" alt="enesim.png"/>
-</div>
- <h2><a class="anchor" id="intro"></a>
-Introduction</h2>
-<p>The Enesim library provides a complete solution for drawing, allocating, compositing and converting pixels. All of the systems of the library are flexible enough to support drawing capabilities on any scenario</p>
-<h2><a class="anchor" id="backends"></a>
-Backends</h2>
-<ul>
-<li>Software based</li>
-<li><a class="el" href="Enesim_OpenGL_Page.html">OpenGL Backend</a> (alpha)</li>
-<li>OpenCL (experimental)</li>
+<!-- doxytag: class="_Enesim_Text_Grid" --><table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-attribs"></a>
+Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7411f6f8af0e14ebe6f4234c2d1d247b"></a><!-- doxytag: member="_Enesim_Text_Grid::engine" ref="a7411f6f8af0e14ebe6f4234c2d1d247b" args="" -->
+<a class="el" href="struct__Enesim__Text__Engine.html">Enesim_Text_Engine</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>engine</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2d6a2866e3fcf2e3e672f447320308c1"></a><!-- doxytag: member="_Enesim_Text_Grid::font" ref="a2d6a2866e3fcf2e3e672f447320308c1" args="" -->
+<a class="el" href="struct__Enesim__Text__Font.html">Enesim_Text_Font</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>font</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a395c39be5ad95ae87fe8aa66c2390e"></a><!-- doxytag: member="_Enesim_Text_Grid::cell_width" ref="a0a395c39be5ad95ae87fe8aa66c2390e" args="" -->
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>cell_width</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a71054f263f5292a8b916fc0d2c3de4d6"></a><!-- doxytag: member="_Enesim_Text_Grid::cell_height" ref="a71054f263f5292a8b916fc0d2c3de4d6" args="" -->
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>cell_height</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae86c609d499a373d1e40bfdad9f108b2"></a><!-- doxytag: member="_Enesim_Text_Grid::rows" ref="ae86c609d499a373d1e40bfdad9f108b2" args="" -->
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>rows</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb78ed70e0bc745386336b04d78db3c1"></a><!-- doxytag: member="_Enesim_Text_Grid::columns" ref="abb78ed70e0bc745386336b04d78db3c1" args="" -->
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>columns</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac5a94521d008a8cb2cf7e5c49a47b97c"></a><!-- doxytag: member="_Enesim_Text_Grid::cells" ref="ac5a94521d008a8cb2cf7e5c49a47b97c" args="" -->
+<a class="el" href="struct__Enesim__Text__Grid__Cell.html">Enesim_Text_Grid_Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>cells</b></td></tr>
+</table>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>src/lib/renderer/enesim_renderer_text_grid.c</li>
 </ul>
-<h2><a class="anchor" id="dependencies"></a>
-Dependencies</h2>
-<ul>
-<li>Eina </li>
-</ul>
-</div></div><!-- contents -->
+</div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -111,7 +123,7 @@ Dependencies</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 19 2013 22:38:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Sep 19 2013 22:38:43 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Enesim: Enesim</title>
+<title>Enesim: Finder</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -46,7 +46,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
@@ -71,29 +71,39 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Enesim </div>  </div>
-</div><!--header-->
+<div class="title">Finder</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Image__Group.html">Image</a></div></div><!--header-->
 <div class="contents">
-<div class="textblock"><div class="image">
-<img src="enesim.png" alt="enesim.png"/>
-</div>
- <h2><a class="anchor" id="intro"></a>
-Introduction</h2>
-<p>The Enesim library provides a complete solution for drawing, allocating, compositing and converting pixels. All of the systems of the library are flexible enough to support drawing capabilities on any scenario</p>
-<h2><a class="anchor" id="backends"></a>
-Backends</h2>
-<ul>
-<li>Software based</li>
-<li><a class="el" href="Enesim_OpenGL_Page.html">OpenGL Backend</a> (alpha)</li>
-<li>OpenCL (experimental)</li>
-</ul>
-<h2><a class="anchor" id="dependencies"></a>
-Dependencies</h2>
-<ul>
-<li>Eina </li>
-</ul>
-</div></div><!-- contents -->
+
+<p>Image identification.  
+<a href="#details">More...</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__Enesim__Image__Finder.html">_Enesim_Image_Finder</a></td></tr>
+<tr><td colspan="2"><h2><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gab3a929e9eaaeed015fe7076d2dc7f9ba"></a><!-- doxytag: member="Enesim_Image_Finder_Group::Enesim_Image_Finder_Data_From_Cb" ref="gab3a929e9eaaeed015fe7076d2dc7f9ba" args=")(Enesim_Stream *data)" -->
+typedef const char *(*&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_Data_From_Cb</b> )(<a class="el" href="struct__Enesim__Stream.html">Enesim_Stream</a> *data)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga4739c5bcec7144691abb883f4f5a5dd5"></a><!-- doxytag: member="Enesim_Image_Finder_Group::Enesim_Image_Finder_Extension_From_Cb" ref="ga4739c5bcec7144691abb883f4f5a5dd5" args=")(const char *ext)" -->
+typedef const char *(*&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_Extension_From_Cb</b> )(const char *ext)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gafbf4498f11a16bd5cba05276af809f15"></a><!-- doxytag: member="Enesim_Image_Finder_Group::Enesim_Image_Finder" ref="gafbf4498f11a16bd5cba05276af809f15" args="" -->
+typedef struct <a class="el" href="struct__Enesim__Image__Finder.html">_Enesim_Image_Finder</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder</b></td></tr>
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga6b138833548ab31a74660fc35932c7cf"></a><!-- doxytag: member="Enesim_Image_Finder_Group::enesim_image_finder_register" ref="ga6b138833548ab31a74660fc35932c7cf" args="(Enesim_Image_Finder *f)" -->
+EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_finder_register</b> (<a class="el" href="struct__Enesim__Image__Finder.html">Enesim_Image_Finder</a> *f)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga372ac00b6f9b460862d9629b1772a1cd"></a><!-- doxytag: member="Enesim_Image_Finder_Group::enesim_image_finder_unregister" ref="ga372ac00b6f9b460862d9629b1772a1cd" args="(Enesim_Image_Finder *f)" -->
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_finder_unregister</b> (<a class="el" href="struct__Enesim__Image__Finder.html">Enesim_Image_Finder</a> *f)</td></tr>
+</table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<p>Image identification. </p>
+</div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -111,7 +121,7 @@ Dependencies</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 19 2013 22:38:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Sep 19 2013 22:38:43 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

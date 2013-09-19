@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Enesim: Enesim</title>
+<title>Enesim: Proxy</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -46,7 +46,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
@@ -71,29 +71,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Enesim </div>  </div>
-</div><!--header-->
+<div class="title">Proxy</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Renderer__Group.html">Renderer</a></div></div><!--header-->
 <div class="contents">
-<div class="textblock"><div class="image">
-<img src="enesim.png" alt="enesim.png"/>
+
+<p>Renderer that renders another renderer.  
+<a href="#details">More...</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Proxy__Group.html#ga31df96de9314ea6b6438452c15228628">enesim_renderer_proxy_new</a> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga523faf4af8d36e64267b21776f561e96"></a><!-- doxytag: member="Enesim_Renderer_Proxy_Group::enesim_renderer_proxy_proxied_set" ref="ga523faf4af8d36e64267b21776f561e96" args="(Enesim_Renderer *r, Enesim_Renderer *proxied)" -->
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_proxy_proxied_set</b> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *proxied)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga66add8f1c990973d01c14ea2fbad7663"></a><!-- doxytag: member="Enesim_Renderer_Proxy_Group::enesim_renderer_proxy_proxied_get" ref="ga66add8f1c990973d01c14ea2fbad7663" args="(Enesim_Renderer *r)" -->
+EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_proxy_proxied_get</b> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
+</table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<p>Renderer that renders another renderer. </p>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="ga31df96de9314ea6b6438452c15228628"></a><!-- doxytag: member="enesim_renderer_proxy.h::enesim_renderer_proxy_new" ref="ga31df96de9314ea6b6438452c15228628" args="(void)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a>* <a class="el" href="group__Enesim__Renderer__Proxy__Group.html#ga31df96de9314ea6b6438452c15228628">enesim_renderer_proxy_new</a> </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
 </div>
- <h2><a class="anchor" id="intro"></a>
-Introduction</h2>
-<p>The Enesim library provides a complete solution for drawing, allocating, compositing and converting pixels. All of the systems of the library are flexible enough to support drawing capabilities on any scenario</p>
-<h2><a class="anchor" id="backends"></a>
-Backends</h2>
-<ul>
-<li>Software based</li>
-<li><a class="el" href="Enesim_OpenGL_Page.html">OpenGL Backend</a> (alpha)</li>
-<li>OpenCL (experimental)</li>
-</ul>
-<h2><a class="anchor" id="dependencies"></a>
-Dependencies</h2>
-<ul>
-<li>Eina </li>
-</ul>
-</div></div><!-- contents -->
+<div class="memdoc">
+<p>Creates a proxy renderer </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The new renderer </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -111,7 +129,7 @@ Dependencies</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 19 2013 22:38:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Sep 19 2013 22:38:43 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
