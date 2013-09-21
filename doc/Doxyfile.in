@@ -327,7 +327,7 @@ INLINE_SIMPLE_STRUCTS  = NO
 # be useful for C code in case the coding convention dictates that all compound
 # types are typedef'ed and only the typedef is referenced, never the tag name.
 
-TYPEDEF_HIDES_STRUCT   = NO
+TYPEDEF_HIDES_STRUCT   = YES
 
 # The SYMBOL_CACHE_SIZE determines the size of the internal cache use to
 # determine which symbols to keep in memory and which to flush to disk.
@@ -386,7 +386,7 @@ EXTRACT_STATIC         = NO
 # defined locally in source files will be included in the documentation.
 # If set to NO only classes defined in header files are included.
 
-EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_CLASSES  = NO
 
 # This flag is only useful for Objective-C code. When set to YES local
 # methods, which are defined in the implementation section but not in
@@ -714,7 +714,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       =
+EXCLUDE_PATTERNS       = *_private.h
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
