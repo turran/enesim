@@ -97,23 +97,20 @@ typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Obje
 typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Object_Descriptor_Instance_Init</b> )(void *i)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga2339d892864122f7190f0da5f0d9df13"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::Enesim_Object_Descriptor_Instance_Deinit" ref="ga2339d892864122f7190f0da5f0d9df13" args=")(void *i)" -->
 typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Object_Descriptor_Instance_Deinit</b> )(void *i)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga5f550761a9c30624e5e81da7b6c9e4a6"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::Enesim_Object_Descriptor" ref="ga5f550761a9c30624e5e81da7b6c9e4a6" args="" -->
-typedef struct <br class="typebreak"/>
-<a class="el" href="struct__Enesim__Object__Descriptor.html">_Enesim_Object_Descriptor</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Object_Descriptor</b></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga707689146a2343919b6bed188fbd7f74"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::enesim_object_descriptor_new" ref="ga707689146a2343919b6bed188fbd7f74" args="(Enesim_Object_Descriptor *parent, size_t class_size, Enesim_Object_Descriptor_Class_Init class_init, size_t instance_size, Enesim_Object_Descriptor_Instance_Init instance_init, Enesim_Object_Descriptor_Instance_Deinit instance_deinit, const char *name)" -->
-EAPI <a class="el" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_new</b> (<a class="el" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *parent, size_t class_size, Enesim_Object_Descriptor_Class_Init class_init, size_t instance_size, Enesim_Object_Descriptor_Instance_Init instance_init, Enesim_Object_Descriptor_Instance_Deinit instance_deinit, const char *name)</td></tr>
+EAPI Enesim_Object_Descriptor *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_new</b> (Enesim_Object_Descriptor *parent, size_t class_size, Enesim_Object_Descriptor_Class_Init class_init, size_t instance_size, Enesim_Object_Descriptor_Instance_Init instance_init, Enesim_Object_Descriptor_Instance_Deinit instance_deinit, const char *name)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaa1b6cc5c928caca3f65c71ce0b7952df"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::enesim_object_descriptor_instance_new" ref="gaa1b6cc5c928caca3f65c71ce0b7952df" args="(Enesim_Object_Descriptor *thiz, void *k)" -->
-EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_instance_new</b> (<a class="el" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *thiz, void *k)</td></tr>
+EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_instance_new</b> (Enesim_Object_Descriptor *thiz, void *k)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga9b1452c79f3ff6033ad2810a2c9ec2aa"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::enesim_object_descriptor_get" ref="ga9b1452c79f3ff6033ad2810a2c9ec2aa" args="(void)" -->
-EAPI <a class="el" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_get</b> (void)</td></tr>
+EAPI Enesim_Object_Descriptor *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_get</b> (void)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga3635a594fa47d62043bdeb97002a6620"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::enesim_object_descriptor_name_get" ref="ga3635a594fa47d62043bdeb97002a6620" args="(Enesim_Object_Descriptor *thiz)" -->
-EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_name_get</b> (<a class="el" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *thiz)</td></tr>
+EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_name_get</b> (Enesim_Object_Descriptor *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga6ef9f6b99900b4818d237c93a010bff0"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::enesim_object_descriptor_private_get" ref="ga6ef9f6b99900b4818d237c93a010bff0" args="(Enesim_Object_Descriptor *thiz)" -->
-EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_private_get</b> (<a class="el" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *thiz)</td></tr>
+EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_private_get</b> (Enesim_Object_Descriptor *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1a911588340b0e33fa404eb951b23a56"></a><!-- doxytag: member="Enesim_Object_Descriptor_Group::enesim_object_descriptor_private_set" ref="ga1a911588340b0e33fa404eb951b23a56" args="(Enesim_Object_Descriptor *thiz, void *prv)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_private_set</b> (<a class="el" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *thiz, void *prv)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_descriptor_private_set</b> (Enesim_Object_Descriptor *thiz, void *prv)</td></tr>
 </table>
 <hr/><h2>Define Documentation</h2>
 <a class="anchor" id="ga61b3dba44a46778ae6b2d2d6a83ad6ed"></a><!-- doxytag: member="enesim_object_descriptor.h::ENESIM_OBJECT_BOILERPLATE" ref="ga61b3dba44a46778ae6b2d2d6a83ad6ed" args="(parent, type, class_type, prefix)" -->
@@ -157,7 +154,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_de
     static <span class="keywordtype">void</span> _##prefix##_instance_deinit(<span class="keywordtype">void</span> *o);           \
     Enesim_Object_Descriptor * prefix##_descriptor_get(<span class="keywordtype">void</span>)        \
     {                                   \
-        static <a class="code" href="struct__Enesim__Object__Descriptor.html">Enesim_Object_Descriptor</a> *d = NULL;          \
+        static Enesim_Object_Descriptor *d = NULL;          \
         if (!d) d = enesim_object_descriptor_new(parent,        \
                 sizeof(class_type), _<span class="preprocessor">##prefix##_class_init, \</span>
 <span class="preprocessor">                sizeof(type), _##prefix##_instance_init,    \</span>
@@ -233,7 +230,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_de
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -245,7 +242,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_object_de
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Sep 20 2013 10:15:59 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Sep 21 2013 11:47:04 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

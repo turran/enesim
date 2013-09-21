@@ -79,7 +79,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Defines</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">src/lib/Enesim_OpenGL.h File Reference</div>  </div>
@@ -96,18 +95,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct__Enesim__Buffer__OpenGL__Data.html">_Enesim_Buffer_OpenGL_Data</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Buffer__OpenGL__Data.html">Enesim_Buffer_OpenGL_Data</a></td></tr>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9006ce3424712385878abf744f39d8a"></a><!-- doxytag: member="Enesim_OpenGL.h::ENESIM_OPENGL_SHADER" ref="ab9006ce3424712385878abf744f39d8a" args="(k)" -->
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_OPENGL_SHADER</b>(k)&#160;&#160;&#160;#k</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a120fb070bddb21f0bd899f50252c4cb5"></a><!-- doxytag: member="Enesim_OpenGL.h::GL_GLEXT_PROTOTYPES" ref="a120fb070bddb21f0bd899f50252c4cb5" args="" -->
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>GL_GLEXT_PROTOTYPES</b></td></tr>
-<tr><td colspan="2"><h2><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae413ee6106cdbcb145921296508c54b4"></a><!-- doxytag: member="Enesim_OpenGL.h::Enesim_Buffer_OpenGL_Data" ref="ae413ee6106cdbcb145921296508c54b4" args="" -->
-typedef struct <br class="typebreak"/>
-<a class="el" href="struct__Enesim__Buffer__OpenGL__Data.html">_Enesim_Buffer_OpenGL_Data</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Buffer_OpenGL_Data</b></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa747a08f3f8d1fd1ca00d4679263b123"></a><!-- doxytag: member="Enesim_OpenGL.h::enesim_pool_opengl_new" ref="aa747a08f3f8d1fd1ca00d4679263b123" args="(void)" -->
@@ -115,7 +109,7 @@ EAPI <a class="el" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c50
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab7d6ea2b52cf4d47c86259bb4c7f4a55"></a><!-- doxytag: member="Enesim_OpenGL.h::enesim_buffer_new_opengl_data_from" ref="ab7d6ea2b52cf4d47c86259bb4c7f4a55" args="(Enesim_Buffer_Format f, uint32_t w, uint32_t h, GLuint *texture, unsigned int num_textures)" -->
 EAPI <a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_buffer_new_opengl_data_from</b> (Enesim_Buffer_Format f, uint32_t w, uint32_t h, GLuint *texture, unsigned int num_textures)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66e69f632af17fd6c0632a256a08bbbf"></a><!-- doxytag: member="Enesim_OpenGL.h::enesim_surface_new_opengl_data_from" ref="a66e69f632af17fd6c0632a256a08bbbf" args="(Enesim_Format f, uint32_t w, uint32_t h, GLuint texture)" -->
-EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_surface_new_opengl_data_from</b> (<a class="el" href="group__Enesim__Main__Group.html#ga3df09c632d9a345b8960700f202698ec">Enesim_Format</a> f, uint32_t w, uint32_t h, GLuint texture)</td></tr>
+EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_surface_new_opengl_data_from</b> (<a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> f, uint32_t w, uint32_t h, GLuint texture)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Enesim OpenGL API. </p>
@@ -125,7 +119,7 @@ EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -137,7 +131,7 @@ EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Sep 20 2013 10:15:59 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Sep 21 2013 11:47:04 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
