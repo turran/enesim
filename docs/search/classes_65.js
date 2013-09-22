@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['enesim_5fbuffer_5f24bpp',['Enesim_Buffer_24bpp',['../structEnesim__Buffer__24bpp.html',1,'']]],
+  ['enesim_5fbuffer_5f32bpp',['Enesim_Buffer_32bpp',['../structEnesim__Buffer__32bpp.html',1,'']]],
   ['enesim_5fbuffer_5fa8',['Enesim_Buffer_A8',['../structEnesim__Buffer__A8.html',1,'']]],
   ['enesim_5fbuffer_5fopencl_5fdata',['Enesim_Buffer_OpenCL_Data',['../structEnesim__Buffer__OpenCL__Data.html',1,'']]],
   ['enesim_5fbuffer_5fopengl_5fdata',['Enesim_Buffer_OpenGL_Data',['../structEnesim__Buffer__OpenGL__Data.html',1,'']]],
