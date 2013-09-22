@@ -503,6 +503,7 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt)
 /**
  * @brief Locks a buffer
  * @param[in] b The buffer to lock
+ * @param[in] write Lock for writing
  */
 EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write)
 {

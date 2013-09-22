@@ -379,6 +379,7 @@ EAPI void * enesim_surface_private_get(Enesim_Surface *s)
 /**
  * @brief Locks a surface
  * @param[in] s The surface to lock
+ * @param[in] write Lock for writing
  */
 EAPI void enesim_surface_lock(Enesim_Surface *s, Eina_Bool write)
 {

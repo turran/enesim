@@ -963,7 +963,7 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 /**
  * @brief Enables or disables the background on the compound renderer
  * @param[in] r The compound renderer
- * @param[in] TRUE to enable, FALSE to disable
+ * @param[in] enable @c EINA_TRUE to enable, @c EINA_FALSE to disable
  */
 EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Eina_Bool enable)
 {
@@ -977,7 +977,7 @@ EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Ein
 /**
  * @brief Gets the enable flag on the background
  * @param[in] r The compound renderer
- * @return TRUE if the background is enabled, FALSE otherwise
+ * @return @c EINA_TRUE if the background is enabled, @c EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_renderer_compound_background_enable_get(Enesim_Renderer *r)
 {

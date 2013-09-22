@@ -24,37 +24,52 @@
  * @{
  */
 
+/**
+ * Enumaration of the different command types
+ */
 typedef enum _Enesim_Path_Command_Type
 {
-	ENESIM_PATH_COMMAND_MOVE_TO,
-	ENESIM_PATH_COMMAND_LINE_TO,
-	ENESIM_PATH_COMMAND_QUADRATIC_TO,
-	ENESIM_PATH_COMMAND_SQUADRATIC_TO,
-	ENESIM_PATH_COMMAND_CUBIC_TO,
-	ENESIM_PATH_COMMAND_SCUBIC_TO,
-	ENESIM_PATH_COMMAND_ARC_TO,
-	ENESIM_PATH_COMMAND_CLOSE,
-	ENESIM_PATH_COMMAND_TYPES,
+	ENESIM_PATH_COMMAND_MOVE_TO, /**< A move command type */
+	ENESIM_PATH_COMMAND_LINE_TO, /**< A line command type */
+	ENESIM_PATH_COMMAND_QUADRATIC_TO, /**< A quadratic command type */
+	ENESIM_PATH_COMMAND_SQUADRATIC_TO, /**< A smooth quadratic command type */
+	ENESIM_PATH_COMMAND_CUBIC_TO, /**< A cubic command type */
+	ENESIM_PATH_COMMAND_SCUBIC_TO, /**< A smooth cubic command type */
+	ENESIM_PATH_COMMAND_ARC_TO, /**< An arc command type */
+	ENESIM_PATH_COMMAND_CLOSE, /**< A close command type */
+	ENESIM_PATH_COMMAND_TYPES, /**< The number command types */
 } Enesim_Path_Command_Type;
 
+/**
+ * Definition of a move command
+ */
 typedef struct _Enesim_Path_Command_Move_To
 {
 	double x;
 	double y;
 } Enesim_Path_Command_Move_To;
 
+/**
+ * Definition of a line command
+ */
 typedef struct _Enesim_Path_Command_Line_To
 {
 	double x;
 	double y;
 } Enesim_Path_Command_Line_To;
 
+/**
+ * Definition of a smooth quadratic command
+ */
 typedef struct _Enesim_Path_Command_Squadratic_To
 {
 	double x;
 	double y;
 } Enesim_Path_Command_Squadratic_To;
 
+/**
+ * Definition of a quadratic command
+ */
 typedef struct _Enesim_Path_Command_Quadratic_To
 {
 	double x;
@@ -63,6 +78,9 @@ typedef struct _Enesim_Path_Command_Quadratic_To
 	double ctrl_y;
 } Enesim_Path_Command_Quadratic_To;
 
+/**
+ * Definition of a cubic command
+ */
 typedef struct _Enesim_Path_Command_Cubic_To
 {
 	double x;
@@ -73,6 +91,9 @@ typedef struct _Enesim_Path_Command_Cubic_To
 	double ctrl_y1;
 } Enesim_Path_Command_Cubic_To;
 
+/**
+ * Definition of a smooth cubic command
+ */
 typedef struct _Enesim_Path_Command_Scubic_To
 {
 	double x;
@@ -81,6 +102,9 @@ typedef struct _Enesim_Path_Command_Scubic_To
 	double ctrl_y;
 } Enesim_Path_Command_Scubic_To;
 
+/**
+ * Definition of an arc command
+ */
 typedef struct _Enesim_Path_Command_Arc_To
 {
 	double rx;
@@ -92,11 +116,17 @@ typedef struct _Enesim_Path_Command_Arc_To
 	Eina_Bool sweep;
 } Enesim_Path_Command_Arc_To;
 
+/**
+ * Definition of close command
+ */
 typedef struct _Enesim_Path_Command_Close
 {
 	Eina_Bool close;
 } Enesim_Path_Command_Close;
 
+/**
+ * Definition of a path command
+ */
 typedef struct _Enesim_Path_Command
 {
 	Enesim_Path_Command_Type type;

@@ -42,6 +42,9 @@ typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
  * <------P0------>.<------P1------>.
  */
 
+/**
+ * Enumeration of the different buffer formats
+ */ 
 typedef enum _Enesim_Buffer_Format
 {
 	ENESIM_BUFFER_FORMAT_RGB565,
@@ -57,17 +60,23 @@ typedef enum _Enesim_Buffer_Format
 	ENESIM_BUFFER_FORMATS
 } Enesim_Buffer_Format;
 
-struct _Enesim_Buffer_24bpp
+/**
+ * Definition of a 24 bits per pixel format
+ */
+typedef struct _Enesim_Buffer_24bpp
 {
 	uint8_t *plane0;
 	int plane0_stride;
-};
+} Enesim_Buffer_24bpp;
 
-struct _Enesim_Buffer_32bpp
+/**
+ * Definition of a 32 bits per pixel format
+ */
+typedef struct _Enesim_Buffer_32bpp
 {
 	uint32_t *plane0;
 	int plane0_stride;
-};
+} Enesim_Buffer_32bpp;
 
 typedef struct _Enesim_Buffer_Rgb565
 {
@@ -75,19 +84,22 @@ typedef struct _Enesim_Buffer_Rgb565
 	int plane0_stride;
 } Enesim_Buffer_Rgb565;
 
+/**
+ * Definition of a 8 bits alpha only format
+ */
 typedef struct _Enesim_Buffer_A8
 {
 	uint8_t *plane0;
 	int plane0_stride;
 } Enesim_Buffer_A8;
 
-typedef struct _Enesim_Buffer_32bpp Enesim_Buffer_Argb8888;
-typedef struct _Enesim_Buffer_32bpp Enesim_Buffer_Argb8888_Pre;
-typedef struct _Enesim_Buffer_32bpp Enesim_Buffer_Xrgb8888;
+typedef Enesim_Buffer_32bpp Enesim_Buffer_Argb8888;
+typedef Enesim_Buffer_32bpp Enesim_Buffer_Argb8888_Pre;
+typedef Enesim_Buffer_32bpp Enesim_Buffer_Xrgb8888;
 
-typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Rgb888;
-typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Bgr888;
-typedef struct _Enesim_Buffer_24bpp Enesim_Buffer_Cmyk;
+typedef Enesim_Buffer_24bpp Enesim_Buffer_Rgb888;
+typedef Enesim_Buffer_24bpp Enesim_Buffer_Bgr888;
+typedef Enesim_Buffer_24bpp Enesim_Buffer_Cmyk;
 
 typedef union _Enesim_Buffer_Sw_Data
 {
