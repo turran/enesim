@@ -4,9 +4,11 @@
 *.la
 .libs
 .deps
+.dirstamp
 *.pc
 Makefile
 Makefile.in
+compile
 *.so
 .*.sw[po]
 *.gcov
