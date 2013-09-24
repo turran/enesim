@@ -70,7 +70,7 @@ Enesim_Text_Font * enesim_text_engine_font_new(
 
 	if (!file) return NULL;
 
-	key = eina_str_dup_printf("%s-%d-%d", file, index, size);
+	key = eina_str_printf_dup("%s-%d-%d", file, index, size);
 	f = eina_hash_find(thiz->fonts, key);
 	if (f)
 	{
