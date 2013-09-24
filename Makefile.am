@@ -71,15 +71,15 @@ doc/img/enesim.png \
 doc/img/enesim_text.svg \
 doc/img/renderer_checker.png \
 doc/img/renderer_template.svg \
-m4/ens_attribute.m4 \
-m4/ens_benchmark.m4 \
-m4/ens_compiler.m4 \
-m4/ens_coverage.m4 \
-m4/ens_cpu.m4 \
-m4/ens_doxygen.m4 \
-m4/ens_format.m4 \
-m4/ens_modules.m4 \
-m4/ens_tests.m4
+common/m4/ens_attribute.m4 \
+common/m4/ens_benchmark.m4 \
+common/m4/ens_compiler.m4 \
+common/m4/ens_coverage.m4 \
+common/m4/ens_cpu.m4 \
+common/m4/ens_doxygen.m4 \
+common/m4/ens_format.m4 \
+common/m4/ens_modules.m4 \
+common/m4/ens_tests.m4
 
 sed_process = \
 $(SED) \
