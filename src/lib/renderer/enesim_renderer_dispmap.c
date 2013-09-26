@@ -392,7 +392,7 @@ EAPI void enesim_renderer_dispmap_map_surface_set(Enesim_Renderer *r, Enesim_Sur
 /**
  * @brief Sets the map surface to use for displacing the source surface
  * @param[in] r The displacement map renderer
- * @param[in] map The surface map [transfer full]
+ * @return The surface map [transfer full]
  */
 EAPI Enesim_Surface * enesim_renderer_dispmap_map_surface_get(Enesim_Renderer *r)
 {
@@ -433,7 +433,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_source_surface_get(Enesim_Renderer
 /**
  * @brief Sets the factor of displacement for the displacement renderer
  * @param[in] r The displacement map renderer
- * @param[factor] The factor to use
+ * @param[in] factor The factor to use
  */
 EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor)
 {

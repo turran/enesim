@@ -92,9 +92,9 @@ EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data);
 
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **error);
+		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **log);
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_List *clips, int x, int y, Enesim_Log **error);
+		Enesim_Rop rop, Eina_List *clips, int x, int y, Enesim_Log **log);
 
 /**
  * @}

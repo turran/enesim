@@ -250,7 +250,7 @@ EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
  * @param mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
  * @param cb The function that will get called once the load is done
- * @param data User provided data
+ * @param user_data User provided data
  * @param options Any option the provider might require
  */
 EAPI void enesim_image_load_async(Enesim_Stream *data, const char *mime,
@@ -285,7 +285,7 @@ EAPI Eina_Bool enesim_image_save(Enesim_Stream *data, const char *mime,
  * @param mime The image mime
  * @param b The buffer to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
- * @param data User provided data
+ * @param user_data User provided data
  * @param options Any option the provider might require
  */
 EAPI void enesim_image_save_async(Enesim_Stream *data, const char *mime,

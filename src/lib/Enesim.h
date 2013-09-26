@@ -75,6 +75,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /* core headers */
 #include "enesim_log.h"
 #include "enesim_main.h"

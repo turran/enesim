@@ -71,6 +71,7 @@ EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string)
  * @param function The function where the log occurs.
  * @param line The line of the file where the log occurs.
  * @param fmt Formatted string passed to vsnprintf().
+ * @param args The list of arguments for the format
  * @return The new list of logs.
  *
  * This function formats the description of the log with @p file,

@@ -99,7 +99,7 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, con
  *                                   API                                      *
  *============================================================================*/
 /**
- * Loads information about an image file
+ * Load information about an image file
  *
  * @param file The image file to load
  * @param w The image width
@@ -122,7 +122,7 @@ EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Ene
  * Load an image synchronously
  *
  * @param file The image file to load
- * @param s The surface to write the image pixels to. It must not be NULL.
+ * @param b The buffer to write the image pixels to. It must not be NULL.
  * @param mpool The mempool that will create the surface in case the surface
  * reference is NULL
  * @param options Any option the emage provider might require
@@ -145,11 +145,11 @@ EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
  * Load an image file asynchronously
  *
  * @param file The image file to load
- * @param s The surface to write the image pixels to. It must not be NULL.
+ * @param b The buffer to write the image pixels to. It must not be NULL.
  * @param mpool The mempool that will create the surface in case the surface
  * reference is NULL
  * @param cb The function that will get called once the load is done
- * @param data User provided data
+ * @param user_data User provided data
  * @param options Any option the emage provider might require
  */
 EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
@@ -197,7 +197,7 @@ EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const 
  * @param file The image file to save
  * @param b The surface to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
- * @param data User provided data
+ * @param user_data User provided data
  * @param options Any option the emage provider might require
  *
  */

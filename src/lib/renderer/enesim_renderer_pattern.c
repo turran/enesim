@@ -526,7 +526,7 @@ EAPI void enesim_renderer_pattern_x_set(Enesim_Renderer *r, double x)
 /**
  * Gets the x of the pattern
  * @param[in] r The pattern renderer
- * @param[out] w The pattern x coordinate
+ * @param[out] x The pattern x coordinate
  */
 EAPI void enesim_renderer_pattern_x_get(Enesim_Renderer *r, double *x)
 {

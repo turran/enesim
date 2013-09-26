@@ -361,7 +361,7 @@ EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
  * @brief Get the X coordinate of the center of a ellipse renderer.
  *
  * @param[in] r The ellipse renderer.
- * @param[in] x The X coordinate.
+ * @return The X coordinate.
  */
 EAPI double enesim_renderer_ellipse_x_get(Enesim_Renderer *r)
 {
@@ -392,7 +392,7 @@ EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
  * @brief Get the Y coordinate of the center of a ellipse renderer.
  *
  * @param[in] r The ellipse renderer.
- * @param[in] y The Y coordinate.
+ * @return The Y coordinate.
  */
 EAPI double enesim_renderer_ellipse_y_get(Enesim_Renderer *r)
 {
