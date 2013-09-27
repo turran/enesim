@@ -85,9 +85,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File__Group.html#ga5933b3dd1ffc8c9ba08c57396abebded">enesim_image_file_info_load</a> (const char *file, int *w, int *h, <a class="el" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *sfmt)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File__Group.html#ga0dcff30bab99214b8878c8a396f8556b">enesim_image_file_load</a> (const char *file, <a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> **b, <a class="el" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *mpool, const char *options)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File__Group.html#ga642403c0c25de7104172f9d21ec7e4cc">enesim_image_file_load_async</a> (const char *file, <a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *mpool, <a class="el" href="group__Enesim__Image__Context.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a> cb, void *user_data, const char *options)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File__Group.html#ga642403c0c25de7104172f9d21ec7e4cc">enesim_image_file_load_async</a> (const char *file, <a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *mpool, <a class="el" href="group__Enesim__Image__Context__Group.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a> cb, void *user_data, const char *options)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File__Group.html#ga78493198dc52e44a92098c18a207611d">enesim_image_file_save</a> (const char *file, <a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, const char *options)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File__Group.html#ga80fc5b06ae51901b00a7c1ced6a9b397">enesim_image_file_save_async</a> (const char *file, <a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="group__Enesim__Image__Context.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a> cb, void *user_data, const char *options)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File__Group.html#ga80fc5b06ae51901b00a7c1ced6a9b397">enesim_image_file_save_async</a> (const char *file, <a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="group__Enesim__Image__Context__Group.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a> cb, void *user_data, const char *options)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Generic file loading and saving using the main context. </p>
@@ -128,7 +128,7 @@ Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Loads information about an image file</p>
+<p>Load information about an image file</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">file</td><td>The image file to load </td></tr>
@@ -181,7 +181,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">file</td><td>The image file to load </td></tr>
-    <tr><td class="paramname">s</td><td>The surface to write the image pixels to. It must not be NULL. </td></tr>
+    <tr><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
     <tr><td class="paramname">mpool</td><td>The mempool that will create the surface in case the surface reference is NULL </td></tr>
     <tr><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
   </table>
@@ -216,7 +216,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Image__Context.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Image__Context__Group.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a>&#160;</td>
           <td class="paramname"><em>cb</em>, </td>
         </tr>
         <tr>
@@ -243,10 +243,10 @@ Functions</h2></td></tr>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">file</td><td>The image file to load </td></tr>
-    <tr><td class="paramname">s</td><td>The surface to write the image pixels to. It must not be NULL. </td></tr>
+    <tr><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
     <tr><td class="paramname">mpool</td><td>The mempool that will create the surface in case the surface reference is NULL </td></tr>
     <tr><td class="paramname">cb</td><td>The function that will get called once the load is done </td></tr>
-    <tr><td class="paramname">data</td><td>User provided data </td></tr>
+    <tr><td class="paramname">user_data</td><td>User provided data </td></tr>
     <tr><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
   </table>
   </dd>
@@ -316,7 +316,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Image__Context.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Image__Context__Group.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a>&#160;</td>
           <td class="paramname"><em>cb</em>, </td>
         </tr>
         <tr>
@@ -345,7 +345,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">file</td><td>The image file to save </td></tr>
     <tr><td class="paramname">b</td><td>The surface to read the image pixels from. It must not be NULL. </td></tr>
     <tr><td class="paramname">cb</td><td>The function that will get called once the save is done </td></tr>
-    <tr><td class="paramname">data</td><td>User provided data </td></tr>
+    <tr><td class="paramname">user_data</td><td>User provided data </td></tr>
     <tr><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
   </table>
   </dd>
@@ -371,7 +371,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 22 2013 11:04:00 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 27 2013 14:36:49 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

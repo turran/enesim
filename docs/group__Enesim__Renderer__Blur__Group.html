@@ -100,8 +100,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the surface to use as the src data.  <a href="#ga2fb3ec1f9e0b8b97768ba8bbca4b60b2"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Blur__Group.html#gab15e8843004abb32bfecdbf223e42621">enesim_renderer_blur_source_surface_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the surface to blur.  <a href="#gab15e8843004abb32bfecdbf223e42621"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Blur__Group.html#gabe63248763c1f16ff69793006406b93c">enesim_renderer_blur_source_renderer_set</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *ren)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the renderer to blur.  <a href="#gabe63248763c1f16ff69793006406b93c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Blur__Group.html#gad8f426f5649c8bf1c42bfd723493e1dc">enesim_renderer_blur_source_renderer_set</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *sr)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the renderer to blur.  <a href="#gad8f426f5649c8bf1c42bfd723493e1dc"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1170a0ffadc6aceab59c63066755b5d7"></a><!-- doxytag: member="Enesim_Renderer_Blur_Group::enesim_renderer_blur_source_renderer_get" ref="ga1170a0ffadc6aceab59c63066755b5d7" args="(Enesim_Renderer *r)" -->
 EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_blur_source_renderer_get</b> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Blur__Group.html#ga6988d06fd17091dd7375e478a28406e5">enesim_renderer_blur_channel_set</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Enesim_Blur_Channel channel)</td></tr>
@@ -169,7 +169,7 @@ EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The blur filter renderer </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">source</td><td>The surface to use [transfer full] </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">src</td><td>The surface to use [transfer full] </td></tr>
   </table>
   </dd>
 </dl>
@@ -202,12 +202,12 @@ EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d
 
 </div>
 </div>
-<a class="anchor" id="gabe63248763c1f16ff69793006406b93c"></a><!-- doxytag: member="enesim_renderer_blur.h::enesim_renderer_blur_source_renderer_set" ref="gabe63248763c1f16ff69793006406b93c" args="(Enesim_Renderer *r, Enesim_Renderer *ren)" -->
+<a class="anchor" id="gad8f426f5649c8bf1c42bfd723493e1dc"></a><!-- doxytag: member="enesim_renderer_blur.h::enesim_renderer_blur_source_renderer_set" ref="gad8f426f5649c8bf1c42bfd723493e1dc" args="(Enesim_Renderer *r, Enesim_Renderer *sr)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Blur__Group.html#gabe63248763c1f16ff69793006406b93c">enesim_renderer_blur_source_renderer_set</a> </td>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Blur__Group.html#gad8f426f5649c8bf1c42bfd723493e1dc">enesim_renderer_blur_source_renderer_set</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -216,7 +216,7 @@ EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
-          <td class="paramname"><em>ren</em>&#160;</td>
+          <td class="paramname"><em>sr</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -231,7 +231,7 @@ EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The blur filter renderer </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to use [trasnfer full] </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sr</td><td>The renderer to use [transfer full] </td></tr>
   </table>
   </dd>
 </dl>
@@ -441,7 +441,7 @@ EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 22 2013 11:04:01 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 27 2013 14:36:49 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

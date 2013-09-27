@@ -119,14 +119,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00044"></a>00044 
 <a name="l00048"></a><a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">00048</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Buffer_Format
 <a name="l00049"></a>00049 {
-<a name="l00050"></a>00050     ENESIM_BUFFER_FORMAT_RGB565,
-<a name="l00051"></a>00051     ENESIM_BUFFER_FORMAT_ARGB8888,
-<a name="l00052"></a>00052     ENESIM_BUFFER_FORMAT_ARGB8888_PRE,
-<a name="l00053"></a>00053     ENESIM_BUFFER_FORMAT_XRGB8888,
-<a name="l00054"></a>00054     ENESIM_BUFFER_FORMAT_RGB888,
-<a name="l00055"></a>00055     ENESIM_BUFFER_FORMAT_BGR888,
-<a name="l00056"></a>00056     ENESIM_BUFFER_FORMAT_A8,
-<a name="l00057"></a>00057     ENESIM_BUFFER_FORMAT_GRAY,
+<a name="l00050"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfaf93f67c1c102b2381b25fb0e1010b8ef">00050</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfaf93f67c1c102b2381b25fb0e1010b8ef">ENESIM_BUFFER_FORMAT_RGB565</a>, 
+<a name="l00051"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa99a366d80a9f194e5a99f7272715e544">00051</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa99a366d80a9f194e5a99f7272715e544">ENESIM_BUFFER_FORMAT_ARGB8888</a>, 
+<a name="l00052"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfaacb63ea752abb917ad9a705f30f08049">00052</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfaacb63ea752abb917ad9a705f30f08049">ENESIM_BUFFER_FORMAT_ARGB8888_PRE</a>, 
+<a name="l00053"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa83f67c48876e5b57be61b317163ea8b5">00053</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa83f67c48876e5b57be61b317163ea8b5">ENESIM_BUFFER_FORMAT_XRGB8888</a>, 
+<a name="l00054"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfac16a8da865304b610b5e9f3f840a39c7">00054</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfac16a8da865304b610b5e9f3f840a39c7">ENESIM_BUFFER_FORMAT_RGB888</a>, 
+<a name="l00055"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfab007d8715710d063b9d0be062d91d686">00055</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfab007d8715710d063b9d0be062d91d686">ENESIM_BUFFER_FORMAT_BGR888</a>, 
+<a name="l00056"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa338a85b201d3e9d756750623fe0243d0">00056</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa338a85b201d3e9d756750623fe0243d0">ENESIM_BUFFER_FORMAT_A8</a>, 
+<a name="l00057"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa7ba4f72bcbe9342a1bd9d646898f825f">00057</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa7ba4f72bcbe9342a1bd9d646898f825f">ENESIM_BUFFER_FORMAT_GRAY</a>, 
 <a name="l00058"></a>00058     ENESIM_BUFFER_FORMAT_CMYK,
 <a name="l00059"></a>00059     ENESIM_BUFFER_FORMAT_CMYK_ADOBE,
 <a name="l00060"></a>00060     ENESIM_BUFFER_FORMATS
@@ -184,7 +184,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00121"></a>00121         <a class="code" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data, Enesim_Buffer_Free free_func,
 <a name="l00122"></a>00122         <span class="keywordtype">void</span> *free_func_data);
 <a name="l00123"></a>00123 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * enesim_buffer_new_pool_from(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, <a class="code" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p);
-<a name="l00124"></a>00124 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * <a class="code" href="group__Enesim__Buffer__Group.html#gab76747e867ec0426e346c91b8a72955a" title="Create a new buffer using a pool and data.">enesim_buffer_new_pool_and_data_from</a>(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f,
+<a name="l00124"></a>00124 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * <a class="code" href="group__Enesim__Buffer__Group.html#gab76747e867ec0426e346c91b8a72955a" title="Create a new buffer using a pool and an user provided data.">enesim_buffer_new_pool_and_data_from</a>(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f,
 <a name="l00125"></a>00125         uint32_t w, uint32_t h, <a class="code" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p, Eina_Bool copy,
 <a name="l00126"></a>00126         <a class="code" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data, Enesim_Buffer_Free free_func,
 <a name="l00127"></a>00127         <span class="keywordtype">void</span> *free_func_data);
@@ -240,7 +240,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 22 2013 11:04:00 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 27 2013 14:36:49 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
