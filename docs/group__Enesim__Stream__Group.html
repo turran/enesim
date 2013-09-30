@@ -72,6 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Stream</div>  </div>
@@ -81,44 +82,62 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Stream sources.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef struct _Enesim_Stream&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Stream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga6eb2320449f6bc3a7421a6fd50d850f4">enesim_stream_ref</a> (Enesim_Stream *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga6eb2320449f6bc3a7421a6fd50d850f4">enesim_stream_ref</a> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the reference counter of a stream.  <a href="#ga6eb2320449f6bc3a7421a6fd50d850f4"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga4e15f7d684a7bb14225a74236b5db1b9">enesim_stream_unref</a> (Enesim_Stream *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga4e15f7d684a7bb14225a74236b5db1b9">enesim_stream_unref</a> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease the reference counter of a stream.  <a href="#ga4e15f7d684a7bb14225a74236b5db1b9"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga7ebec0dd26e661f8511d7df52315e4a8"></a><!-- doxytag: member="Enesim_Stream_Group::enesim_stream_read" ref="ga7ebec0dd26e661f8511d7df52315e4a8" args="(Enesim_Stream *thiz, void *buffer, size_t len)" -->
-EAPI ssize_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_read</b> (Enesim_Stream *thiz, void *buffer, size_t len)</td></tr>
+EAPI ssize_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_read</b> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, void *buffer, size_t len)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gae6fb63a86b5856bf21ba9d0d90cefcd6"></a><!-- doxytag: member="Enesim_Stream_Group::enesim_stream_write" ref="gae6fb63a86b5856bf21ba9d0d90cefcd6" args="(Enesim_Stream *thiz, void *buffer, size_t len)" -->
-EAPI ssize_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_write</b> (Enesim_Stream *thiz, void *buffer, size_t len)</td></tr>
+EAPI ssize_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_write</b> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, void *buffer, size_t len)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf5280e959ed276b8ba375c8bffff8239"></a><!-- doxytag: member="Enesim_Stream_Group::enesim_stream_length" ref="gaf5280e959ed276b8ba375c8bffff8239" args="(Enesim_Stream *thiz)" -->
-EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_length</b> (Enesim_Stream *thiz)</td></tr>
+EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_length</b> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga0fbae1a65e32417da69706d92973a314"></a><!-- doxytag: member="Enesim_Stream_Group::enesim_stream_mmap" ref="ga0fbae1a65e32417da69706d92973a314" args="(Enesim_Stream *thiz, size_t *size)" -->
-EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_mmap</b> (Enesim_Stream *thiz, size_t *size)</td></tr>
+EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_mmap</b> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, size_t *size)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga62ca33754cfc70ac0201c20609b88d9d"></a><!-- doxytag: member="Enesim_Stream_Group::enesim_stream_munmap" ref="ga62ca33754cfc70ac0201c20609b88d9d" args="(Enesim_Stream *thiz, void *ptr)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_munmap</b> (Enesim_Stream *thiz, void *ptr)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_munmap</b> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, void *ptr)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga9807abfff0b20b18b1e49c195410efaa"></a><!-- doxytag: member="Enesim_Stream_Group::enesim_stream_reset" ref="ga9807abfff0b20b18b1e49c195410efaa" args="(Enesim_Stream *thiz)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_reset</b> (Enesim_Stream *thiz)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_reset</b> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga81cea7a133572347d9faac1993e19189"></a><!-- doxytag: member="Enesim_Stream_Group::enesim_stream_location" ref="ga81cea7a133572347d9faac1993e19189" args="(Enesim_Stream *thiz)" -->
-EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_location</b> (Enesim_Stream *thiz)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Stream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga6a5bf6f96601a7a91df64c9fdd859761">enesim_stream_file_new</a> (const char *file, const char *mode)</td></tr>
+EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_location</b> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga6a5bf6f96601a7a91df64c9fdd859761">enesim_stream_file_new</a> (const char *file, const char *mode)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new file based stream.  <a href="#ga6a5bf6f96601a7a91df64c9fdd859761"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Stream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga1e89a17dcbd4b337277f4a1dc9ee3730">enesim_stream_buffer_new</a> (void *buffer, size_t len)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga1e89a17dcbd4b337277f4a1dc9ee3730">enesim_stream_buffer_new</a> (void *buffer, size_t len)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new memory based stream.  <a href="#ga1e89a17dcbd4b337277f4a1dc9ee3730"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Stream *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga417eba7c682cb2729b66f36431316111">enesim_stream_base64_new</a> (Enesim_Stream *d)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Group.html#ga417eba7c682cb2729b66f36431316111">enesim_stream_base64_new</a> (<a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *d)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new base64 based stream.  <a href="#ga417eba7c682cb2729b66f36431316111"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Stream sources. </p>
+<hr/><h2>Typedef Documentation</h2>
+<a class="anchor" id="ga5d073a3d33bd29d0a05b9e09867e7308"></a><!-- doxytag: member="enesim_stream.h::Enesim_Stream" ref="ga5d073a3d33bd29d0a05b9e09867e7308" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct _Enesim_Stream <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Stream handle </p>
+
+</div>
+</div>
 <hr/><h2>Function Documentation</h2>
 <a class="anchor" id="ga6eb2320449f6bc3a7421a6fd50d850f4"></a><!-- doxytag: member="enesim_stream.h::enesim_stream_ref" ref="ga6eb2320449f6bc3a7421a6fd50d850f4" args="(Enesim_Stream *thiz)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Enesim_Stream* <a class="el" href="group__Enesim__Stream__Group.html#ga6eb2320449f6bc3a7421a6fd50d850f4">enesim_stream_ref</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__Group.html#ga6eb2320449f6bc3a7421a6fd50d850f4">enesim_stream_ref</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Stream *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td>
           <td class="paramname"><em>thiz</em></td><td>)</td>
           <td></td>
         </tr>
@@ -144,7 +163,7 @@ EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_
         <tr>
           <td class="memname">EAPI void <a class="el" href="group__Enesim__Stream__Group.html#ga4e15f7d684a7bb14225a74236b5db1b9">enesim_stream_unref</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Stream *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td>
           <td class="paramname"><em>thiz</em></td><td>)</td>
           <td></td>
         </tr>
@@ -167,7 +186,7 @@ EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Enesim_Stream* <a class="el" href="group__Enesim__Stream__Group.html#ga6a5bf6f96601a7a91df64c9fdd859761">enesim_stream_file_new</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__Group.html#ga6a5bf6f96601a7a91df64c9fdd859761">enesim_stream_file_new</a> </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>file</em>, </td>
@@ -204,7 +223,7 @@ EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Enesim_Stream* <a class="el" href="group__Enesim__Stream__Group.html#ga1e89a17dcbd4b337277f4a1dc9ee3730">enesim_stream_buffer_new</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__Group.html#ga1e89a17dcbd4b337277f4a1dc9ee3730">enesim_stream_buffer_new</a> </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>buffer</em>, </td>
@@ -241,9 +260,9 @@ EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Enesim_Stream* <a class="el" href="group__Enesim__Stream__Group.html#ga417eba7c682cb2729b66f36431316111">enesim_stream_base64_new</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__Group.html#ga417eba7c682cb2729b66f36431316111">enesim_stream_base64_new</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Stream *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Stream__Group.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td>
           <td class="paramname"><em>d</em></td><td>)</td>
           <td></td>
         </tr>
@@ -280,7 +299,7 @@ EAPI char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Sep 30 2013 18:01:21 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 30 2013 19:12:43 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
