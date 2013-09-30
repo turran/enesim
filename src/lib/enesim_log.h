@@ -33,7 +33,7 @@
  */
 #define ENESIM_LOG(log, fmt, ...) (enesim_log_add_parametric(log, __FILE__, __FUNCTION__, __LINE__, fmt, ## __VA_ARGS__)
 
-typedef struct _Enesim_Log Enesim_Log; /** Log Handle */
+typedef struct _Enesim_Log Enesim_Log; /**< Log Handle */
 
 EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string);
 EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *log, const char *file, const char *function, int line, char *fmt, va_list args);

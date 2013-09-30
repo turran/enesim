@@ -23,7 +23,8 @@
  * @brief Stream sources
  * @{
  */
-typedef struct _Enesim_Stream Enesim_Stream;
+
+typedef struct _Enesim_Stream Enesim_Stream; /**< Stream handle */
 
 EAPI Enesim_Stream * enesim_stream_ref(Enesim_Stream *thiz);
 EAPI void enesim_stream_unref(Enesim_Stream *thiz);

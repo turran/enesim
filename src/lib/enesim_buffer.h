@@ -24,7 +24,7 @@
  * @{
  */
 
-typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
+typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
 
 /*
  * ENESIM_BUFFER_FORMAT_A8

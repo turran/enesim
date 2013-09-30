@@ -24,7 +24,7 @@
  * @{
  */
 
-typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handler */
+typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handle */
 
 /** Flags that specify what a renderer supports */
 typedef enum _Enesim_Renderer_Feature
