@@ -1,14 +1,12 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-m4_define([v_maj], [0])
-m4_define([v_min], [0])
-m4_define([v_mic], [20])
-m4_define([v_ver], [v_maj.v_min.v_mic])
+# ENS_VERSION(maj, min, mic, nan, release)
+# when doing a release:
+# set 'release' to 1 and update maj, min or mic (and nan is ignored),
+# otherwise, set 'release' to 0
 
-m4_define([lt_cur], m4_eval(v_maj + v_min))
-m4_define([lt_rev], v_mic)
-m4_define([lt_age], v_min)
+ENS_VERSION([0], [0], [20], [1], [0])
 
 AC_INIT([enesim], [v_ver], [enesim-devel@googlegroups.com])
 AC_PREREQ([2.60])
