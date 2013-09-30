@@ -192,7 +192,7 @@ static void _enesim_stream_base64_free(void *data)
 	Enesim_Stream_Base64 *thiz = data;
 
 	enesim_stream_munmap(thiz->data, thiz->buf);
-	enesim_stream_free(thiz->data);
+	enesim_stream_unref(thiz->data);
 	free(thiz);
 }
 
@@ -209,6 +209,11 @@ static Enesim_Stream_Descriptor _enesim_stream_base64_descriptor = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Create a new base64 based stream
+ * @param[in] d The stream that holds the base64 data [transfer full]
+ * @return A new base64 enesim stream
+ */
 EAPI Enesim_Stream * enesim_stream_base64_new(Enesim_Stream *d)
 {
 	Enesim_Stream_Base64 *thiz;

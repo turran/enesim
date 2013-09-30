@@ -39,7 +39,7 @@ static void _enesim_image_file_cb(Enesim_Buffer *b, void *user_data, int error)
 	Enesim_Image_File_Data *fdata = user_data;
 
 	fdata->cb(b, fdata->user_data, error);
-	enesim_stream_free(fdata->data);
+	enesim_stream_unref(fdata->data);
 }
 
 static const char * _enesim_image_file_get_extension(const char *file)
@@ -66,7 +66,7 @@ static Eina_Bool _file_save_data_get(const char *file, Enesim_Stream **data, con
 	m = enesim_image_mime_extension_from(ext);
 	if (!m)
 	{
-		enesim_stream_free(d);
+		enesim_stream_unref(d);
 		return EINA_FALSE;
 	}
 	*mime = m;
@@ -86,7 +86,7 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, con
 	m = enesim_image_mime_data_from(d);
 	if (!m)
 	{
-		enesim_stream_free(d);
+		enesim_stream_unref(d);
 		return EINA_FALSE;
 	}
 	enesim_stream_reset(d);
@@ -115,7 +115,7 @@ EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Ene
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = enesim_image_info_load(data, mime, w, h, sfmt);
-	enesim_stream_free(data);
+	enesim_stream_unref(data);
 	return ret;
 }
 /**
@@ -138,7 +138,7 @@ EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = enesim_image_load(data, mime, b, mpool, options);
-	enesim_stream_free(data);
+	enesim_stream_unref(data);
 	return ret;
 }
 /**
@@ -188,7 +188,7 @@ EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const 
 	if (!_file_save_data_get(file, &data, &mime))
 		return EINA_FALSE;
 	ret = enesim_image_save(data, mime, b, options);
-	enesim_stream_free(data);
+	enesim_stream_unref(data);
 	return ret;
 }
 /**

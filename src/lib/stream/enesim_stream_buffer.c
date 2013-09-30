@@ -102,6 +102,12 @@ static Enesim_Stream_Descriptor _enesim_stream_buffer_descriptor = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Create a new memory based stream
+ * @param[in] buffer The buffer that holds the data
+ * @param[in] len The length of the buffer
+ * @return A new memory based enesim stream
+ */
 EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len)
 {
 	Enesim_Stream_Buffer *thiz;
