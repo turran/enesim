@@ -160,10 +160,11 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *da
  *============================================================================*/
 /**
  * @brief Loads the info of an image
+ * @param[in] thiz The image provider to use
  * @param[in] data The image data to load the info from
  * @param[out] w The width of the image
  * @param[out] h The height of the image
- * @param[out] sftm The format of the image
+ * @param[out] sfmt The format of the image
  */
 EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
 	Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt)

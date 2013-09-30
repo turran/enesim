@@ -36,7 +36,7 @@
  * 
  * @{
  */
-typedef struct _Enesim_Surface Enesim_Surface; /**< Surface Handler */
+typedef struct _Enesim_Surface Enesim_Surface; /**< Surface Handle */
 
 EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w,
 		uint32_t h);

@@ -680,7 +680,7 @@ EAPI Enesim_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r)
 /**
  * @brief Sets the surface to use as the src data
  * @param[in] r The blur filter renderer
- * @param[in] source The surface to use [transfer full]
+ * @param[in] src The surface to use [transfer full]
  */
 EAPI void enesim_renderer_blur_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
@@ -712,9 +712,9 @@ EAPI Enesim_Surface * enesim_renderer_blur_source_surface_get(Enesim_Renderer *r
 /**
  * @brief Sets the renderer to blur
  * @param[in] r The blur filter renderer
- * @param[in] r The renderer to use [trasnfer full]
+ * @param[in] sr The renderer to use [transfer full]
  */
-EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Renderer *ren)
+EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Renderer *sr)
 {
 	Enesim_Renderer_Blur *thiz;
 
@@ -724,14 +724,14 @@ EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Re
 		enesim_renderer_unref(thiz->src_r);
 		thiz->src_r = NULL;
 	}
-	thiz->src_r = ren;
+	thiz->src_r = sr;
 	thiz->changed = EINA_TRUE;
 }
 
 /**
  * @brief Gets the renderer to blur
  * @param[in] r The blur filter renderer
- * @return The renderer to blut [transfer none]
+ * @return The renderer to blur [transfer none]
  */
 EAPI Enesim_Renderer * enesim_renderer_blur_renderer_get(Enesim_Renderer *r)
 {

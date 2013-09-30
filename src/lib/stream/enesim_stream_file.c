@@ -154,6 +154,12 @@ static Enesim_Stream_Descriptor _enesim_stream_file_descriptor = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Create a new file based stream
+ * @param[in] file The location of the file
+ * @param[in] mode The read/write mode
+ * @return A new file based enesim stream
+ */
 EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode)
 {
 	Enesim_Stream_File *thiz;

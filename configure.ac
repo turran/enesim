@@ -32,6 +32,8 @@ AC_DEFINE_UNQUOTED([VERSION_MICRO], [v_mic], [Micro version])
 VMAJ=v_maj
 AC_SUBST([VMAJ])
 
+## Add parameters for aclocal (keep in sync with Makefile.am)
+AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 
 ### Additional options to configure
 

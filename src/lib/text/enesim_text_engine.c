@@ -67,10 +67,13 @@ Enesim_Text_Font * enesim_text_engine_font_new(
 	Enesim_Text_Font *f;
 	void *data;
 	char *key;
+	int len;
 
 	if (!file) return NULL;
 
-	key = eina_str_dup_printf("%s-%d-%d", file, index, size);
+	len = asprintf (&key, "%s-%d-%d", file, index, size);
+	if (len <= 0 || !key) return NULL;
+
 	f = eina_hash_find(thiz->fonts, key);
 	if (f)
 	{

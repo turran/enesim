@@ -17,14 +17,21 @@
  */
 #include "enesim_private.h"
 
+#include "enesim_main.h"
 #include "enesim_log.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/**
+ * @cond internal
+ */
 struct _Enesim_Log
 {
 	Eina_List *trace;
 };
+/**
+ * @endcond
+ */
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -71,6 +78,7 @@ EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string)
  * @param function The function where the log occurs.
  * @param line The line of the file where the log occurs.
  * @param fmt Formatted string passed to vsnprintf().
+ * @param args The list of arguments for the format
  * @return The new list of logs.
  *
  * This function formats the description of the log with @p file,

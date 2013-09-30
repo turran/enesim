@@ -488,7 +488,7 @@ Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
 }
 
 Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Enesim_Log **error)
+		Enesim_Rop rop, Enesim_Log **log)
 {
 	Enesim_Backend b;
 	Eina_Bool ret = EINA_TRUE;
@@ -506,9 +506,9 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	switch (b)
 	{
 		case ENESIM_BACKEND_SOFTWARE:
-		if (!enesim_renderer_sw_setup(r, s, rop, error))
+		if (!enesim_renderer_sw_setup(r, s, rop, log))
 		{
-			ENESIM_RENDERER_LOG(r, error, "Software setup failed on '%s'", r->name);
+			ENESIM_RENDERER_LOG(r, log, "Software setup failed on '%s'", r->name);
 			ret = EINA_FALSE;
 			break;
 		}
@@ -516,9 +516,9 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 		case ENESIM_BACKEND_OPENCL:
 #if BUILD_OPENCL
-		if (!enesim_renderer_opencl_setup(r, s, rop, error))
+		if (!enesim_renderer_opencl_setup(r, s, rop, log))
 		{
-			ENESIM_RENDERER_LOG(r, error, "OpenCL setup failed");
+			ENESIM_RENDERER_LOG(r, log, "OpenCL setup failed");
 			ret = EINA_FALSE;
 		}
 #endif
@@ -526,9 +526,9 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 		case ENESIM_BACKEND_OPENGL:
 #if BUILD_OPENGL
-		if (!enesim_renderer_opengl_setup(r, s, rop, error))
+		if (!enesim_renderer_opengl_setup(r, s, rop, log))
 		{
-			ENESIM_RENDERER_LOG(r, error, "OpenGL setup failed");
+			ENESIM_RENDERER_LOG(r, log, "OpenGL setup failed");
 			ret = EINA_FALSE;
 		}
 #endif
@@ -594,7 +594,7 @@ void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 /**
  * @brief Increase the reference counter of a renderer
  * @param[in] r The renderer
- * @return The input parameter @a r for programming conveniencer 
+ * @return The input parameter @a r for programming convenience
  */
 EAPI Enesim_Renderer * enesim_renderer_ref(Enesim_Renderer *r)
 {
@@ -1053,10 +1053,10 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  * @param[in] clip The area on the destination surface to limit the drawing
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
- * TODO What about the mask?
+ * @param[in] log In case the drawing fails, the log to put messages on
  */
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **error)
+		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **log)
 {
 	Eina_Rectangle final;
 	Eina_Bool ret = EINA_FALSE;
@@ -1064,7 +1064,7 @@ EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
-	if (!enesim_renderer_setup(r, s, rop, error))
+	if (!enesim_renderer_setup(r, s, rop, log))
 		goto end;
 
 	if (!clip)
@@ -1104,17 +1104,18 @@ end:
  * @param[in] clips A list of clipping areas on the destination surface to limit the drawing
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
+ * @param[in] log In case the drawing fails, the log to put messages on
  */
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_List *clips, int x, int y,
-		Enesim_Log **error)
+		Enesim_Log **log)
 {
 	Eina_Rectangle surface_size;
 	Eina_Bool ret = EINA_FALSE;
 
 	if (!clips)
 	{
-		enesim_renderer_draw(r, s, rop, NULL, x, y, error);
+		enesim_renderer_draw(r, s, rop, NULL, x, y, log);
 		return EINA_TRUE;
 	}
 
@@ -1122,7 +1123,7 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 	ENESIM_MAGIC_CHECK_SURFACE(s);
 
 	/* setup the common parameters */
-	if (!enesim_renderer_setup(r, s, rop, error))
+	if (!enesim_renderer_setup(r, s, rop, log))
 		goto end;
 
 	_surface_bounds(s, &surface_size);

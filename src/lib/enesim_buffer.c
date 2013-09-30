@@ -93,7 +93,7 @@ void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
  *                                   API                                      *
  *============================================================================*/
 /**
- * @brief Create a new buffer using a pool and data
+ * @brief Create a new buffer using a pool and an user provided data
  * @param[in] f The format of the buffer
  * @param[in] w The width of the buffer
  * @param[in] h The height of the buffer
@@ -104,6 +104,7 @@ void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
  * @param[in] free_func The function to be called whenever the data of the buffer
  * needs to be freed
  * @param[in] free_func_data The private data for the @a free_func callback
+ * @return The newly created buffer
  */
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,

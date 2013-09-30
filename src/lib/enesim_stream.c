@@ -23,11 +23,18 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/**
+ * @cond internal
+ */
 struct _Enesim_Stream
 {
+	int ref;
 	Enesim_Stream_Descriptor *descriptor;
 	void *data;
 };
+/**
+ * @endcond
+ */
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -49,6 +56,35 @@ Enesim_Stream * enesim_stream_new(
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Increase the reference counter of a stream
+ * @param[in] thiz The stream
+ * @return The input parameter @a thiz for programming convenience
+ */
+EAPI Enesim_Stream * enesim_stream_ref(Enesim_Stream *thiz)
+{
+	if (!thiz) return thiz;
+	thiz->ref++;
+	return thiz;
+}
+
+/**
+ * @brief Decrease the reference counter of a stream
+ * @param[in] thiz The stream
+ */
+EAPI void enesim_stream_unref(Enesim_Stream *thiz)
+{
+	if (!thiz) return;
+
+	thiz->ref--;
+	if (!thiz->ref)
+	{
+		if (thiz->descriptor->free)
+			thiz->descriptor->free(thiz->data);
+		free(thiz);
+	}
+}
+
 EAPI ssize_t enesim_stream_read(Enesim_Stream *thiz, void *buffer, size_t len)
 {
 	if (thiz->descriptor->read)
@@ -96,12 +132,3 @@ EAPI char * enesim_stream_location(Enesim_Stream *thiz)
 		return thiz->descriptor->location(thiz->data);
 	return NULL;
 }
-
-EAPI void enesim_stream_free(Enesim_Stream *thiz)
-{
-	if (thiz->descriptor->free)
-		thiz->descriptor->free(thiz->data);
-	free(thiz);
-}
-
-

@@ -36,7 +36,7 @@ EAPI void enesim_image_dispatch(void);
 
 /**
  * @}
- * @defgroup Enesim_Image_Context Context
+ * @defgroup Enesim_Image_Context_Group Context
  * @brief Asynchronous context
  * @ingroup Enesim_Image_Group
  * @{

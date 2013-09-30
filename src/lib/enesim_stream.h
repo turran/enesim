@@ -23,7 +23,11 @@
  * @brief Stream sources
  * @{
  */
-typedef struct _Enesim_Stream Enesim_Stream;
+
+typedef struct _Enesim_Stream Enesim_Stream; /**< Stream handle */
+
+EAPI Enesim_Stream * enesim_stream_ref(Enesim_Stream *thiz);
+EAPI void enesim_stream_unref(Enesim_Stream *thiz);
 EAPI ssize_t enesim_stream_read(Enesim_Stream *thiz, void *buffer, size_t len);
 EAPI ssize_t enesim_stream_write(Enesim_Stream *thiz, void *buffer, size_t len);
 EAPI size_t enesim_stream_length(Enesim_Stream *thiz);
@@ -31,7 +35,6 @@ EAPI void * enesim_stream_mmap(Enesim_Stream *thiz, size_t *size);
 EAPI void enesim_stream_munmap(Enesim_Stream *thiz, void *ptr);
 EAPI void enesim_stream_reset(Enesim_Stream *thiz);
 EAPI char * enesim_stream_location(Enesim_Stream *thiz);
-EAPI void enesim_stream_free(Enesim_Stream *thiz);
 
 EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode);
 EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len);

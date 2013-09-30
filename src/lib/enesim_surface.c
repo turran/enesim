@@ -102,6 +102,15 @@ void * enesim_surface_backend_data_get(Enesim_Surface *s)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Create a new surface from a buffer
+ * @param[in] buffer The buffer to create a surface from
+ * @return The newly created surface
+ *
+ * This function creates a surface only if the buffer format
+ * is of type @ref ENESIM_BUFFER_FORMAT_ARGB8888_PRE or
+ * @ref ENESIM_FORMAT_ARGB8888
+ */
 EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
 {
 	Enesim_Surface *s;
@@ -135,9 +144,24 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
 	return s;
 }
 
+/**
+ * @brief Create a new surface using an user provided data
+ * @param[in] fmt The format of the surface
+ * @param[in] w The width of the surface
+ * @param[in] h The height of the surface
+ * @param[in] copy In case the data needs to be copied to create the surface
+ * or used directly
+ * @param[in] stride The stride of the surface
+ * @param[in] data The data of the surface pixels
+ * @param[in] free_func The function to be called whenever the data of the surface
+ * needs to be freed
+ * @param[in] free_func_data The private data for the @a free_func callback
+ * @return The newly created surface
+ */
 EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 		uint32_t w, uint32_t h, Eina_Bool copy, void *data,
-		size_t stride, Enesim_Buffer_Free free_func, void *user_data)
+		size_t stride, Enesim_Buffer_Free free_func,
+		void *free_func_data)
 {
 	Enesim_Surface *s;
 	Enesim_Buffer *b;
@@ -169,7 +193,7 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 	EINA_MAGIC_SET(s, ENESIM_MAGIC_SURFACE);
 	s->format = fmt;
 	s->free_func = free_func;
-	s->free_func_data = user_data;
+	s->free_func_data = free_func_data;
 	s = enesim_surface_ref(s);
 
 	b = enesim_buffer_new_data_from(buf_fmt, w, h, copy, &sw_data, _surface_sw_free_func, s);
@@ -182,6 +206,15 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 
 	return s;
 }
+
+/**
+ * @brief Create a new surface using a pool
+ * @param[in] f The format of the surface
+ * @param[in] w The width of the surface
+ * @param[in] h The height of the surface
+ * @param[in] p The pool to use
+ * @return The newly created surface
+ */
 EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p)
 {
@@ -205,6 +238,15 @@ EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 	return s;
 }
 
+/**
+ * @brief Create a new surface using the default memory pool
+ * @param[in] f The format of the surface
+ * @param[in] w The width of the surface
+ * @param[in] h The height of the surface
+ * @return The newly created surface
+ * @see enesim_pool_default_get()
+ * @see enesim_pool_default_set()
+ */
 EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h)
 {
 	Enesim_Surface *s;
@@ -215,6 +257,14 @@ EAPI Enesim_Surface * enesim_surface_new(Enesim_Format f, uint32_t w, uint32_t h
 }
 
 #if BUILD_OPENGL
+/**
+ * @brief Create a new OpenGL based surface from a texture
+ * @param[in] fmt The format of the surface
+ * @param[in] w The width of the surface
+ * @param[in] h The height of the surface
+ * @param[in] texture The texture id to use
+ * @return The newly created surface
+ */
 EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format fmt,
 		uint32_t w, uint32_t h,
 		GLuint texture)

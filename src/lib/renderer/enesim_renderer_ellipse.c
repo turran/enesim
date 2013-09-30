@@ -283,7 +283,7 @@ EAPI void enesim_renderer_ellipse_center_set(Enesim_Renderer *r, double x, doubl
  * @param[out] y The Y coordinate of the center.
  *
  * This function stores the coordinates value of the center of
- * the ellipse renderer @p r in the buffers @p x and @p y. These buffers
+ * the ellipse renderer @p r in the pointers @p x and @p y. These pointers
  * can be @c NULL.
  */
 EAPI void enesim_renderer_ellipse_center_get(Enesim_Renderer *r, double *x, double *y)
@@ -327,8 +327,8 @@ EAPI void enesim_renderer_ellipse_radii_set(Enesim_Renderer *r, double radius_x,
  * @param[out] radius_y The radius along the Y axis.
  *
  * This function stores the radiis of the ellipse renderer @p r in the
- * buffers @p radius_x for the radius along the X axis and @p radius_y
- * for the radius along the Y axis. These buffers can be @c NULL.
+ * pointers @p radius_x for the radius along the X axis and @p radius_y
+ * for the radius along the Y axis. These pointers can be @c NULL.
  */
 EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *r, double *radius_x, double *radius_y)
 {
@@ -361,7 +361,7 @@ EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
  * @brief Get the X coordinate of the center of a ellipse renderer.
  *
  * @param[in] r The ellipse renderer.
- * @param[in] x The X coordinate.
+ * @return The X coordinate.
  */
 EAPI double enesim_renderer_ellipse_x_get(Enesim_Renderer *r)
 {
@@ -392,7 +392,7 @@ EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
  * @brief Get the Y coordinate of the center of a ellipse renderer.
  *
  * @param[in] r The ellipse renderer.
- * @param[in] y The Y coordinate.
+ * @return The Y coordinate.
  */
 EAPI double enesim_renderer_ellipse_y_get(Enesim_Renderer *r)
 {

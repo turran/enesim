@@ -36,7 +36,7 @@ EAPI Enesim_Renderer * enesim_renderer_blur_new(void);
 EAPI void enesim_renderer_blur_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI Enesim_Surface * enesim_renderer_blur_source_surface_get(Enesim_Renderer *r);
 
-EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Renderer *ren);
+EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Renderer *sr);
 EAPI Enesim_Renderer * enesim_renderer_blur_source_renderer_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r, Enesim_Blur_Channel channel);

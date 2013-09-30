@@ -691,6 +691,7 @@ EAPI Enesim_Color enesim_renderer_checker_odd_color_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the width of the checker rectangles
+ * @param[in] r The checker renderer
  * @param[in] width The width
  */
 EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
@@ -705,6 +706,7 @@ EAPI void enesim_renderer_checker_width_set(Enesim_Renderer *r, int width)
 
 /**
  * @brief Gets the width of the checker rectangles
+ * @param[in] r The checker renderer
  * @returns The width
  */
 EAPI int enesim_renderer_checker_width_get(Enesim_Renderer *r)
@@ -717,6 +719,7 @@ EAPI int enesim_renderer_checker_width_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the height of the checker rectangles
+ * @param[in] r The checker renderer
  * @param[in] height The height
  */
 EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
@@ -731,6 +734,7 @@ EAPI void enesim_renderer_checker_height_set(Enesim_Renderer *r, int height)
 
 /**
  * @brief Gets the height of the checker rectangles
+ * @param[in] r The checker renderer
  * @return The height
  */
 EAPI int enesim_renderer_checker_height_get(Enesim_Renderer *r)

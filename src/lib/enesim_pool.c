@@ -262,11 +262,19 @@ void enesim_pool_shutdown(void)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Get the default memory pool
+ * @return The default memory pool [transfer none]
+ */
 EAPI Enesim_Pool * enesim_pool_default_get(void)
 {
 	return enesim_pool_ref(_current_default_pool);
 }
 
+/**
+ * @brief Set the default memory pool
+ * @param[in] thiz The newly default memory pool [transfer full]
+ */
 EAPI void enesim_pool_default_set(Enesim_Pool *thiz)
 {
 	if (_current_default_pool)
@@ -274,6 +282,11 @@ EAPI void enesim_pool_default_set(Enesim_Pool *thiz)
 	_current_default_pool = thiz;
 }
 
+/**
+ * @brief Increase the reference counter of a pool
+ * @param[in] thiz The pool
+ * @return The input parameter @a thiz for programming convenience
+ */
 EAPI Enesim_Pool * enesim_pool_ref(Enesim_Pool *thiz)
 {
 	if (!thiz) return NULL;
@@ -281,6 +294,10 @@ EAPI Enesim_Pool * enesim_pool_ref(Enesim_Pool *thiz)
 	return thiz;
 }
 
+/**
+ * @brief Decrease the reference counter of a pool
+ * @param[in] thiz The pool
+ */
 EAPI void enesim_pool_unref(Enesim_Pool *thiz)
 {
 	if (!thiz) return;

@@ -23,7 +23,7 @@
  * @brief Buffer and surface pixel data allocator
  * @{
  */
-typedef struct _Enesim_Pool Enesim_Pool; /**< Pool Handler */
+typedef struct _Enesim_Pool Enesim_Pool; /**< Pool Handle */
 
 EAPI Enesim_Pool * enesim_pool_default_get(void);
 EAPI void enesim_pool_default_set(Enesim_Pool *thiz);

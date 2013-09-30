@@ -24,7 +24,7 @@
  * @{
  */
 
-typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
+typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
 
 /*
  * ENESIM_BUFFER_FORMAT_A8
@@ -47,14 +47,14 @@ typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handler */
  */ 
 typedef enum _Enesim_Buffer_Format
 {
-	ENESIM_BUFFER_FORMAT_RGB565,
-	ENESIM_BUFFER_FORMAT_ARGB8888,
-	ENESIM_BUFFER_FORMAT_ARGB8888_PRE,
-	ENESIM_BUFFER_FORMAT_XRGB8888,
-	ENESIM_BUFFER_FORMAT_RGB888,
-	ENESIM_BUFFER_FORMAT_BGR888,
-	ENESIM_BUFFER_FORMAT_A8,
-	ENESIM_BUFFER_FORMAT_GRAY,
+	ENESIM_BUFFER_FORMAT_RGB565, /**< 16bpp RGB 565 */
+	ENESIM_BUFFER_FORMAT_ARGB8888, /**< 32bpp ARGB 8888 */
+	ENESIM_BUFFER_FORMAT_ARGB8888_PRE, /**< 32bpp ARGB premultiplied 8888*/
+	ENESIM_BUFFER_FORMAT_XRGB8888, /**< 32bpp RGB 888 */
+	ENESIM_BUFFER_FORMAT_RGB888, /**< 24bpp RGB 888 */
+	ENESIM_BUFFER_FORMAT_BGR888, /**< 24bpp BGR 888 */
+	ENESIM_BUFFER_FORMAT_A8, /**< 8bpp A 8 */
+	ENESIM_BUFFER_FORMAT_GRAY, /**< 8bpp Grayscale */
 	ENESIM_BUFFER_FORMAT_CMYK,
 	ENESIM_BUFFER_FORMAT_CMYK_ADOBE,
 	ENESIM_BUFFER_FORMATS
@@ -65,8 +65,8 @@ typedef enum _Enesim_Buffer_Format
  */
 typedef struct _Enesim_Buffer_24bpp
 {
-	uint8_t *plane0;
-	int plane0_stride;
+	uint8_t *plane0; /**< The buffer data */
+	int plane0_stride; /**< The stride of the buffer */
 } Enesim_Buffer_24bpp;
 
 /**
@@ -74,14 +74,14 @@ typedef struct _Enesim_Buffer_24bpp
  */
 typedef struct _Enesim_Buffer_32bpp
 {
-	uint32_t *plane0;
-	int plane0_stride;
+	uint32_t *plane0; /**< The buffer data */
+	int plane0_stride; /**< The stride of the buffer */
 } Enesim_Buffer_32bpp;
 
 typedef struct _Enesim_Buffer_Rgb565
 {
-	uint16_t *plane0;
-	int plane0_stride;
+	uint16_t *plane0; /**< The buffer data */
+	int plane0_stride; /**< The stride of the buffer */
 } Enesim_Buffer_Rgb565;
 
 /**
@@ -89,8 +89,8 @@ typedef struct _Enesim_Buffer_Rgb565
  */
 typedef struct _Enesim_Buffer_A8
 {
-	uint8_t *plane0;
-	int plane0_stride;
+	uint8_t *plane0; /**< The buffer data */
+	int plane0_stride; /**< The stride of the buffer */
 } Enesim_Buffer_A8;
 
 typedef Enesim_Buffer_32bpp Enesim_Buffer_Argb8888;

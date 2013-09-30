@@ -57,7 +57,7 @@ typedef struct _Enesim_Renderer_Clipper_Damage_Data
 
 typedef struct _Enesim_Renderer_Clipper_State
 {
-	Enesim_Renderer *content;
+	Enesim_Renderer *clipped;
 	double width;
 	double height;
 } Enesim_Renderer_Clipper_State;
@@ -83,7 +83,7 @@ static void _clipper_span(Enesim_Renderer *r,
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = ENESIM_RENDERER_CLIPPER(r);
-	enesim_renderer_sw_draw(thiz->current.content, x, y, len, dst);
+	enesim_renderer_sw_draw(thiz->current.clipped, x, y, len, dst);
 }
 
 #if BUILD_OPENGL
@@ -93,7 +93,7 @@ static void _clipper_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = ENESIM_RENDERER_CLIPPER(r);
-	enesim_renderer_opengl_draw(thiz->current.content, s, area, w, h);
+	enesim_renderer_opengl_draw(thiz->current.clipped, s, area, w, h);
 }
 #endif
 
@@ -123,7 +123,7 @@ static Eina_Bool _clipper_changed_basic(Enesim_Renderer_Clipper *thiz)
 	if (thiz->current.height != thiz->past.height)
 		return EINA_TRUE;
 
-	if (thiz->current.content != thiz->past.content)
+	if (thiz->current.clipped != thiz->past.clipped)
 		return EINA_TRUE;
 	return EINA_FALSE;
 }
@@ -131,15 +131,15 @@ static Eina_Bool _clipper_changed_basic(Enesim_Renderer_Clipper *thiz)
 static Eina_Bool _clipper_state_setup(Enesim_Renderer_Clipper *thiz,
 		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **l)
 {
-	if (!thiz->current.content)
+	if (!thiz->current.clipped)
 	{
-		ENESIM_RENDERER_LOG(r, l, "No content");
+		ENESIM_RENDERER_LOG(r, l, "No clipped");
 		return EINA_FALSE;
 	}
-	if (!enesim_renderer_setup(thiz->current.content, s, rop, l))
+	if (!enesim_renderer_setup(thiz->current.clipped, s, rop, l))
 	{
 		ENESIM_RENDERER_LOG(r, l, "Content renderer %s can not setup",
-				enesim_renderer_name_get(thiz->current.content));
+				enesim_renderer_name_get(thiz->current.clipped));
 		return EINA_FALSE;
 	}
 
@@ -152,8 +152,8 @@ static void _clipper_state_cleanup(Enesim_Renderer_Clipper *thiz,
 	thiz->changed = EINA_FALSE;
 	thiz->past = thiz->current;
 
-	if (!thiz->current.content) return;
-	enesim_renderer_cleanup(thiz->current.content, s);
+	if (!thiz->current.clipped) return;
+	enesim_renderer_cleanup(thiz->current.clipped, s);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -197,16 +197,16 @@ static void _clipper_sw_hints_get(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
 	*hints = 0;
-	if (thiz->current.content)
+	if (thiz->current.clipped)
 	{
 		Enesim_Renderer_Sw_Hint content_hints;
 		Enesim_Color color, own_color;
 
-		enesim_renderer_sw_hints_get(thiz->current.content, rop, &content_hints);
+		enesim_renderer_sw_hints_get(thiz->current.clipped, rop, &content_hints);
 
 		if (content_hints & ENESIM_RENDERER_HINT_ROP)
 			*hints |= ENESIM_RENDERER_HINT_ROP;
-		color = enesim_renderer_color_get(thiz->current.content);
+		color = enesim_renderer_color_get(thiz->current.clipped);
 		own_color = enesim_renderer_color_get(r);
 		if ((own_color == color) && (content_hints & ENESIM_RENDERER_HINT_COLORIZE))
 			*hints |= ENESIM_RENDERER_HINT_COLORIZE;
@@ -230,9 +230,9 @@ static Eina_Bool _clipper_has_changed(Enesim_Renderer *r)
 	Eina_Bool ret = EINA_FALSE;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	if (thiz->current.content)
+	if (thiz->current.clipped)
 	{
-		ret = enesim_renderer_has_changed(thiz->current.content);
+		ret = enesim_renderer_has_changed(thiz->current.clipped);
 		if (ret) goto end;
 	}
 
@@ -260,17 +260,17 @@ static Eina_Bool _clipper_damage(Enesim_Renderer *r,
 		cb(r, &current_bounds, EINA_FALSE, data);
 		return EINA_TRUE;
 	}
-	/* if not, send the content only */
+	/* if not, send the clipped only */
 	else
 	{
 		Enesim_Renderer_Clipper_Damage_Data ddata;
 
-		if (!thiz->current.content) return EINA_FALSE;
+		if (!thiz->current.clipped) return EINA_FALSE;
 		ddata.real_cb = cb;
 		ddata.real_data = data;
 		ddata.bounds = &current_bounds;
 
-		return enesim_renderer_damages_get(thiz->current.content, _clipper_damage_cb, &ddata);
+		return enesim_renderer_damages_get(thiz->current.clipped, _clipper_damage_cb, &ddata);
 	}
 }
 
@@ -331,8 +331,8 @@ static void _enesim_renderer_clipper_instance_init(void *o EINA_UNUSED)
 static void _enesim_renderer_clipper_instance_deinit(void *o)
 {
 	Enesim_Renderer_Clipper *thiz = ENESIM_RENDERER_CLIPPER(o);
-	if (thiz->current.content)
-		enesim_renderer_unref(thiz->current.content);
+	if (thiz->current.clipped)
+		enesim_renderer_unref(thiz->current.clipped);
 }
 /*============================================================================*
  *                                   API                                      *
@@ -355,15 +355,15 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
  * @param[in] clipped The renderer to clip [transfer full]
  */
 EAPI void enesim_renderer_clipper_clipped_set(Enesim_Renderer *r,
-		Enesim_Renderer *content)
+		Enesim_Renderer *clipped)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	if (thiz->current.content) enesim_renderer_unref(thiz->current.content);
-	thiz->current.content = content;
-	if (thiz->current.content)
-		thiz->current.content = enesim_renderer_ref(thiz->current.content);
+	if (thiz->current.clipped) enesim_renderer_unref(thiz->current.clipped);
+	thiz->current.clipped = clipped;
+	if (thiz->current.clipped)
+		thiz->current.clipped = enesim_renderer_ref(thiz->current.clipped);
 	thiz->changed = EINA_TRUE;
 }
 
@@ -377,7 +377,7 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_clipped_get(Enesim_Renderer *r)
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	return enesim_renderer_ref(thiz->current.content);
+	return enesim_renderer_ref(thiz->current.clipped);
 }
 
 /**
