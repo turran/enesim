@@ -440,7 +440,7 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 	if (!_enesim_renderer_text_span_generate(thiz))
 		return EINA_FALSE;
 
-	enesim_renderer_transformation_type_get(r, &type);
+	type = enesim_renderer_transformation_type_get(r);
 	switch (type)
 	{
 		case ENESIM_MATRIX_IDENTITY:
@@ -534,7 +534,7 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 	Enesim_Matrix_Type type;
 
 	_enesim_renderer_text_span_geometry_get(r, rect);
-	enesim_renderer_transformation_type_get(r, &type);
+	type = enesim_renderer_transformation_type_get(r);
 	/* transform the geometry */
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{

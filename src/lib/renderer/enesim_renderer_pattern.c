@@ -323,7 +323,7 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
  	thiz = ENESIM_RENDERER_PATTERN(r);
 
 	/* do the common setup */
-	enesim_renderer_transformation_type_get(r, &type);
+	type = enesim_renderer_transformation_type_get(r);
 	if (!_pattern_state_setup(thiz, r, s, rop, l)) return EINA_FALSE;
 	*fill = _spans[thiz->current.repeat_mode][type];
 

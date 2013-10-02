@@ -916,11 +916,10 @@ EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r)
  * To  be documented
  * FIXME: To be fixed
  */
-EAPI void enesim_renderer_transformation_type_get(Enesim_Renderer *r,
-		Enesim_Matrix_Type *type)
+EAPI Enesim_Matrix_Type enesim_renderer_transformation_type_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	*type = r->state.current.transformation_type;
+	return r->state.current.transformation_type;
 }
 
 

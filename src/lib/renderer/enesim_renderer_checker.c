@@ -474,7 +474,7 @@ static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 	thiz->hh = eina_f16p16_int_from(thiz->current.sh);
 	thiz->hh2 = thiz->hh * 2;
 
-	enesim_renderer_transformation_type_get(r, &type);
+	type = enesim_renderer_transformation_type_get(r);
 	enesim_renderer_transformation_get(r, &matrix);
 	switch (type)
 	{
