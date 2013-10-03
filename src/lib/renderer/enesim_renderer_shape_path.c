@@ -248,7 +248,7 @@ void enesim_renderer_shape_path_shape_features_get_default(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	enesim_renderer_shape_features_get(thiz->r_path, features);
+	*features = enesim_renderer_shape_features_get(thiz->r_path);
 }
 
 void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,

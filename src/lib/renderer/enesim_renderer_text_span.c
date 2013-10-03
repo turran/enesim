@@ -617,6 +617,10 @@ static void _enesim_renderer_text_span_instance_deinit(void *o)
  *                                   API                                      *
  *============================================================================*/
 
+/**
+ * Creates a text span renderer
+ * @return The new renderer
+ */
 EAPI Enesim_Renderer * enesim_renderer_text_span_new(void)
 {
 	Enesim_Renderer *r;
@@ -625,35 +629,25 @@ EAPI Enesim_Renderer * enesim_renderer_text_span_new(void)
 	return r;
 }
 
+/**
+ * @brief Sets the text of the text span
+ * @param[in] r The text span renderer to set the text to
+ * @param[in] str The text span text
+ */
 EAPI void enesim_renderer_text_span_text_set(Enesim_Renderer *r, const char *str)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	if (!str) return;
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-
 	enesim_text_buffer_string_set(thiz->state.buffer, str, -1);
 }
 
-EAPI void enesim_renderer_text_span_text_get(Enesim_Renderer *r, const char **str)
-{
-	Enesim_Renderer_Text_Span *thiz;
-
-	if (!str) return;
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-
-	*str = enesim_text_buffer_string_get(thiz->state.buffer);
-}
-
-EAPI void enesim_renderer_text_span_direction_get(Enesim_Renderer *r, Enesim_Text_Direction *direction)
+EAPI const char * enesim_renderer_text_span_text_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-	*direction = thiz->direction;
+	return enesim_text_buffer_string_get(thiz->state.buffer);
 }
 
 EAPI void enesim_renderer_text_span_direction_set(Enesim_Renderer *r, Enesim_Text_Direction direction)
@@ -665,33 +659,35 @@ EAPI void enesim_renderer_text_span_direction_set(Enesim_Renderer *r, Enesim_Tex
 	thiz->direction = direction;
 }
 
-EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b)
+EAPI Enesim_Text_Direction enesim_renderer_text_span_direction_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	if (!b) return;
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-	*b = enesim_text_buffer_ref(thiz->state.buffer);
+	return thiz->direction;
 }
 
-EAPI void enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b)
+EAPI Enesim_Text_Buffer * enesim_renderer_text_span_buffer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	if (!b) return;
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
-	enesim_text_buffer_smart_real_get(thiz->state.buffer, b);
+	return enesim_text_buffer_ref(thiz->state.buffer);
+}
+
+EAPI Enesim_Text_Buffer * enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	return enesim_text_buffer_smart_real_get(thiz->state.buffer);
 }
 
 EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_Text_Buffer *b)
 {
 	Enesim_Renderer_Text_Span *thiz;
 
-	if (!b) return;
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return;
 	enesim_text_buffer_smart_real_set(thiz->state.buffer, b);
 }
 

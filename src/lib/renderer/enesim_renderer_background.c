@@ -358,6 +358,7 @@ EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_background);
 	return r;
 }
+
 /**
  * @brief Sets the color of the background
  * @param[in] r The background renderer to set the color to

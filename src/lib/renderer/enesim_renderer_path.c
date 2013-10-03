@@ -156,7 +156,7 @@ static void _path_shape_features_get(Enesim_Renderer *r,
 	Enesim_Renderer *current;
 
 	current = _path_implementation_get(r);
-	enesim_renderer_shape_features_get(current, features);
+	*features = enesim_renderer_shape_features_get(current);
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *

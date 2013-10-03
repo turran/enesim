@@ -420,10 +420,10 @@ EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 	thiz->changed = EINA_TRUE;
 }
 
-EAPI void enesim_renderer_gradient_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mode *mode)
+EAPI Enesim_Repeat_Mode enesim_renderer_gradient_mode_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient *thiz;
 
 	thiz = ENESIM_RENDERER_GRADIENT(r);
-	*mode = thiz->state.mode;
+	return thiz->state.mode;
 }

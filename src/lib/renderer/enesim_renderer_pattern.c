@@ -475,14 +475,14 @@ EAPI void enesim_renderer_pattern_width_set(Enesim_Renderer *r, double width)
 /**
  * Gets the width of the pattern
  * @param[in] r The pattern renderer
- * @param[out] width The pattern width
+ * @return The pattern width
  */
-EAPI void enesim_renderer_pattern_width_get(Enesim_Renderer *r, double *width)
+EAPI double enesim_renderer_pattern_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = ENESIM_RENDERER_PATTERN(r);
-	if (width) *width = thiz->current.width;
+	return thiz->current.width;
 }
 /**
  * Sets the height of the pattern
@@ -500,14 +500,14 @@ EAPI void enesim_renderer_pattern_height_set(Enesim_Renderer *r, double height)
 /**
  * Gets the height of the pattern
  * @param[in] r The pattern renderer
- * @param[out] height The pattern height
+ * @return The pattern height
  */
-EAPI void enesim_renderer_pattern_height_get(Enesim_Renderer *r, double *height)
+EAPI double enesim_renderer_pattern_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = ENESIM_RENDERER_PATTERN(r);
-	if (height) *height = thiz->current.height;
+	return thiz->current.height;
 }
 
 /**
@@ -526,14 +526,14 @@ EAPI void enesim_renderer_pattern_x_set(Enesim_Renderer *r, double x)
 /**
  * Gets the x of the pattern
  * @param[in] r The pattern renderer
- * @param[out] x The pattern x coordinate
+ * @return The pattern x coordinate
  */
-EAPI void enesim_renderer_pattern_x_get(Enesim_Renderer *r, double *x)
+EAPI double enesim_renderer_pattern_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = ENESIM_RENDERER_PATTERN(r);
-	if (x) *x = thiz->current.x;
+	return thiz->current.x;
 }
 /**
  * Sets the y of the pattern
@@ -551,14 +551,14 @@ EAPI void enesim_renderer_pattern_y_set(Enesim_Renderer *r, double y)
 /**
  * Gets the y of the pattern
  * @param[in] r The pattern renderer
- * @param[out] y The pattern y coordinate
+ * @return The pattern y coordinate
  */
-EAPI void enesim_renderer_pattern_y_get(Enesim_Renderer *r, double *y)
+EAPI double enesim_renderer_pattern_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = ENESIM_RENDERER_PATTERN(r);
-	if (y) *y = thiz->current.y;
+	return thiz->current.y;
 }
 
 EAPI void enesim_renderer_pattern_position_set(Enesim_Renderer *r, double x, double y)
@@ -610,14 +610,12 @@ EAPI void enesim_renderer_pattern_source_set(Enesim_Renderer *r, Enesim_Renderer
 	thiz->changed = EINA_TRUE;
 }
 
-EAPI void enesim_renderer_pattern_source_get(Enesim_Renderer *r, Enesim_Renderer **source)
+EAPI Enesim_Renderer * enesim_renderer_pattern_source_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = ENESIM_RENDERER_PATTERN(r);
-	*source = thiz->current.source;
-	if (thiz->current.source)
-		thiz->current.source = enesim_renderer_ref(thiz->current.source);
+	return enesim_renderer_ref(thiz->current.source);
 }
 
 EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode)
@@ -629,11 +627,11 @@ EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Rep
 	thiz->changed = EINA_TRUE;
 }
 
-EAPI void enesim_renderer_pattern_repeat_mode_get(Enesim_Renderer *r, Enesim_Repeat_Mode *mode)
+EAPI Enesim_Repeat_Mode enesim_renderer_pattern_repeat_mode_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
 
 	thiz = ENESIM_RENDERER_PATTERN(r);
-	*mode = thiz->current.repeat_mode;
+	return thiz->current.repeat_mode;
 }
 

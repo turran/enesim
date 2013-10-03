@@ -676,6 +676,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_stripes);
 	return r;
 }
+
 /**
  * Sets the color of the even stripes
  * @param[in] r The stripes renderer
@@ -690,17 +691,18 @@ EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
 	thiz->current.even.color = color;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
  * Gets the color of the even stripes
  * @param[in] r The stripes renderer
- * @param[out] color The even stripes color
+ * @return The even stripes color
  */
-EAPI void enesim_renderer_stripes_even_color_get(Enesim_Renderer *r, Enesim_Color *color)
+EAPI Enesim_Color enesim_renderer_stripes_even_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (color) *color = thiz->current.even.color;
+	return thiz->current.even.color;
 }
 /**
  * Sets the renderer of the even stripes
@@ -713,27 +715,25 @@ EAPI void enesim_renderer_stripes_even_renderer_set(Enesim_Renderer *r,
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (thiz->current.even.paint == paint)
-		return;
 	if (thiz->current.even.paint)
 		enesim_renderer_unref(thiz->current.even.paint);
 	thiz->current.even.paint = paint;
-	if (paint)
-		thiz->current.even.paint = enesim_renderer_ref(paint);
 	thiz->changed = EINA_TRUE;
 }
+
 /**
  * Gets the renderer of the even stripes
  * @param[in] r The stripes renderer
- * @param[out] paint The even stripes renderer
+ * @return The even stripes renderer [transfer none]
  */
-EAPI void enesim_renderer_stripes_even_renderer_get(Enesim_Renderer *r, Enesim_Renderer **paint)
+EAPI Enesim_Renderer * enesim_renderer_stripes_even_renderer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (paint) *paint = thiz->current.even.paint;
+	return enesim_renderer_ref(thiz->current.even.paint);
 }
+
 /**
  * Sets the thickness of the even stripes
  * @param[in] r The stripes renderer
@@ -750,18 +750,20 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
 	thiz->current.even.thickness = thickness;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
  * Gets the thickness of the even stripes
  * @param[in] r The stripes renderer
- * @param[out] thickness The even stripes thickness
+ * @return The even stripes thickness
  */
-EAPI void enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r, double *thickness)
+EAPI double enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (thickness) *thickness = thiz->current.even.thickness;
+	return thiz->current.even.thickness;
 }
+
 /**
  * Sets the color of the odd stripes
  * @param[in] r The stripes renderer
@@ -776,22 +778,24 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 	thiz->current.odd.color = color;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
  * Gets the color of the odd stripes
  * @param[in] r The stripes renderer
- * @param[out] color The odd stripes color
+ * @return The odd stripes color
  */
-EAPI void enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r, Enesim_Color *color)
+EAPI Enesim_Color enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (color) *color = thiz->current.odd.color;
+	return thiz->current.odd.color;
 }
+
 /**
  * Sets the renderer of the odd stripes
  * @param[in] r The stripes renderer
- * @param[in] paint The odd stripes renderer
+ * @param[in] paint The odd stripes renderer [transfer full]
  */
 EAPI void enesim_renderer_stripes_odd_renderer_set(Enesim_Renderer *r,
 		Enesim_Renderer *paint)
@@ -799,27 +803,25 @@ EAPI void enesim_renderer_stripes_odd_renderer_set(Enesim_Renderer *r,
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (thiz->current.odd.paint == paint)
-		return;
 	if (thiz->current.odd.paint)
 		enesim_renderer_unref(thiz->current.odd.paint);
 	thiz->current.odd.paint = paint;
-	if (paint)
-		thiz->current.odd.paint = enesim_renderer_ref(paint);
 	thiz->changed = EINA_TRUE;
 }
+
 /**
  * Gets the renderer of the odd stripes
  * @param[in] r The stripes renderer
- * @param[out] paint The odd stripes renderer
+ * @return The odd stripes renderer [transfer none]
  */
-EAPI void enesim_renderer_stripes_odd_renderer_get(Enesim_Renderer *r, Enesim_Renderer **paint)
+EAPI Enesim_Renderer * enesim_renderer_stripes_odd_renderer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (paint) *paint = thiz->current.odd.paint;
+	return enesim_renderer_ref(thiz->current.odd.paint);
 }
+
 /**
  * Sets the thickness of the odd stripes
  * @param[in] r The stripes renderer
@@ -836,16 +838,17 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
 	thiz->current.odd.thickness = thickness;
 	thiz->changed = EINA_TRUE;
 }
+
 /**
  * Gets the thickness of the odd stripes
  * @param[in] r The stripes renderer
- * @param[out] thickness The odd stripes thickness
+ * @return The odd stripes thickness
  */
-EAPI void enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r, double *thickness)
+EAPI double enesim_renderer_stripes_odd_thickness_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Stripes *thiz;
 
 	thiz = ENESIM_RENDERER_STRIPES(r);
-	if (thickness) *thickness = thiz->current.odd.thickness;
+	return thiz->current.odd.thickness;
 }
 

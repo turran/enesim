@@ -26,15 +26,15 @@
  */
 EAPI Enesim_Renderer * enesim_renderer_text_span_new(void);
 EAPI void enesim_renderer_text_span_text_set(Enesim_Renderer *r, const char *str);
-EAPI void enesim_renderer_text_span_text_get(Enesim_Renderer *r, const char **str);
-EAPI void enesim_renderer_text_span_direction_get(Enesim_Renderer *r, Enesim_Text_Direction *direction);
+EAPI const char * enesim_renderer_text_span_text_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_text_span_direction_set(Enesim_Renderer *r, Enesim_Text_Direction direction);
-EAPI void enesim_renderer_text_span_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b);
-EAPI void enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r, Enesim_Text_Buffer **b);
+EAPI Enesim_Text_Direction enesim_renderer_text_span_direction_get(Enesim_Renderer *r);
+EAPI Enesim_Text_Buffer * enesim_renderer_text_span_buffer_get(Enesim_Renderer *r);
+EAPI Enesim_Text_Buffer * enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_Text_Buffer *b);
 
-EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Font *font);
+EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r);
 
 /**
  * @}
