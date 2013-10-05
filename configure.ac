@@ -392,7 +392,7 @@ ENS_MODULE([Raw], [static], [yes])
 
 ENS_CHECK_TESTS([enable_tests="yes"], [enable_tests="no"])
 
-ENS_CHECK_COVERAGE([${enable_tests}], [enable_coverage="yes"], [enable_coverage="no"])
+ENS_CHECK_COVERAGE(yes, [enable_coverage="yes"], [enable_coverage="no"])
 
 ENS_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
 
