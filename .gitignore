@@ -5,6 +5,7 @@
 .libs
 .deps
 .dirstamp
+*.exe
 *.pc
 Makefile
 Makefile.in
