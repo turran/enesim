@@ -195,13 +195,79 @@ AM_CONDITIONAL([BUILD_CAIRO], [test "x${build_cairo}" = "xyes"])
 
 ## Glew
 
-PKG_CHECK_EXISTS([glew],
-   [
-    have_glew="yes"
-    requirements_pc="${requirements_pc} glew"
-    AC_DEFINE([HAVE_GLEW], [1], [Have support for glew])
-   ],
-   [have_glew="no"])
+have_glew="no"
+if test "x${want_opengl}" = "xyes" ; then
+   PKG_CHECK_EXISTS([glew],
+      [
+       have_glew="yes"
+       AC_DEFINE([HAVE_GLEW], [1], [Have support for glew])
+      ],
+      [have_glew="no"])
+fi
+
+## OpenGL
+have_opengl="no"
+if test "x${have_glew}" = "xyes" ; then
+# in libGL ?
+   LIBS_save=${LIBS}
+   LIBS="${LIBS} -lGL -lGLU"
+   AC_LINK_IFELSE(
+      [
+       AC_LANG_PROGRAM(
+          [[
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+          ]],
+          [[
+glGenFramebuffersEXT(0, NULL);
+          ]])
+      ],
+      [
+       have_opengl="yes"
+       OPENGL_LIBS="-lGL -lGLU"
+      ],
+      [have_opengl="no"])
+   LIBS=${LIBS_save}
+
+   AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
+   AC_MSG_RESULT([${have_opengl}])
+
+# in libopengl32 ?
+   if test "x${have_opengl}" = "xno" ; then
+      LIBS_save=${LIBS}
+      LIBS="${LIBS} -lopengl32"
+      AC_LINK_IFELSE(
+         [
+          AC_LANG_PROGRAM(
+             [[
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+             ]],
+             [[
+glGenFramebuffersEXT(0, NULL);
+             ]])
+         ],
+         [
+          have_opengl="yes"
+          OPENGL_LIBS="-lopengl32 -lGLU"
+         ],
+         [have_opengl="no"])
+      LIBS=${LIBS_save}
+
+      AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libopengl32.a])
+      AC_MSG_RESULT([${have_opengl}])
+   fi
+fi
+
+build_opengl="no"
+if test "x${want_opengl}" = "xyes" -a "x${have_opengl}" = "xyes"; then
+  build_opengl="yes"
+  requirements_pc="${requirements_pc} glew"
+  requirements_libs="${OPENGL_LIBS} ${requirements_libs}"
+  AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
+fi
+
+AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
 
 PKG_CHECK_MODULES([ENESIM], [${requirements_pc}])
 
@@ -234,6 +300,8 @@ AC_CHECK_HEADER([jpeglib.h],
     JPG_CFLAGS=""
    ],
    [have_jpg="no"])
+
+
 ### Checks for types
 
 
@@ -314,69 +382,6 @@ build_opencl="no"
 #fi
 
 AM_CONDITIONAL([HAVE_OPENCL], [test "x${build_opencl}" = "xyes"])
-
-## OpenGL
-have_opengl="no"
-if test "x${have_glew}" = "xyes" ; then
-# in libGL ?
-   LIBS_save=${LIBS}
-   LIBS="${LIBS} -lGL -lGLU"
-   AC_LINK_IFELSE(
-      [
-       AC_LANG_PROGRAM(
-          [[
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-          ]],
-          [[
-glGenFramebuffersEXT(0, NULL);
-          ]])
-      ],
-      [
-       have_opengl="yes"
-       OPENGL_LIBS="-lGL -lGLU"
-      ],
-      [have_opengl="no"])
-   LIBS=${LIBS_save}
-
-   AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
-   AC_MSG_RESULT([${have_opengl}])
-
-# in libopengl32 ?
-   if test "x${have_opengl}" = "xno" ; then
-      LIBS_save=${LIBS}
-      LIBS="${LIBS} -lopengl32"
-      AC_LINK_IFELSE(
-         [
-          AC_LANG_PROGRAM(
-             [[
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-             ]],
-             [[
-glGenFramebuffersEXT(0, NULL);
-             ]])
-         ],
-         [
-          have_opengl="yes"
-          OPENGL_LIBS="-lopengl32 -lGLU"
-         ],
-         [have_opengl="no"])
-      LIBS=${LIBS_save}
-
-      AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libopengl32.a])
-      AC_MSG_RESULT([${have_opengl}])
-   fi
-fi
-
-build_opengl="no"
-if test "x${want_opengl}" = "xyes" -a "x${have_opengl}" = "xyes"; then
-  build_opengl="yes"
-  requirements_libs="${OPENGL_LIBS} ${requirements_libs}"
-  AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
-fi
-
-AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
 
 ENS_MODULE([Png], [yes], [${have_png}])
 ENS_MODULE([Jpg], [yes], [${have_jpg}])
