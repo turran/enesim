@@ -103,10 +103,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     enesim_path_scubic_to(p, 2*43, 2*17, 2*35, 2*22);
     enesim_path_scubic_to(p, 2*17, 2*17, 2*12, 2*27);
 
-    r2 = enesim_renderer_gradient_linear_new();
-    enesim_renderer_gradient_linear_pos_set(r2, 0, 0, 256, 256);
-    stop.<a name="a1"></a>argb = 0xffff0000;
-    stop.<a name="a2"></a>pos = 0;
+    r2 = <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Gradient__Linear__Group.html#ga5fb5a5877e8cf362993cf8b730b1f4ca" title="Create a new linear gradient renderer.">enesim_renderer_gradient_linear_new</a>();
+    <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Gradient__Linear__Group.html#ga9d5e695a6347cd52b129c9e0bc134a2e" title="Set the position of the linear gradient renderer.">enesim_renderer_gradient_linear_position_set</a>(r2, 0, 0, 256, 256);
+    stop.<a name="a3"></a>argb = 0xffff0000;
+    stop.<a name="a4"></a>pos = 0;
     enesim_renderer_gradient_stop_add(r2, &amp;stop);
     stop.argb = 0xff00ff00;
     stop.pos = 1;
@@ -144,7 +144,7 @@ EXAMPLE(enesim_renderer_path01)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 13:38:40 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 15:02:21 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
