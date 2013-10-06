@@ -3,7 +3,6 @@
 
 #define _GNU_SOURCE 1
 #include <stdio.h>
-#include <getopt.h>
 
 #include "Enesim.h"
 
@@ -27,11 +26,7 @@
 
 static void help(const char *name)
 {
-	printf("Usage: %s OPTIONS\n", name);
-	printf("Where OPTIONS can be:\n");
-	printf("-r, The rop to use (fill, blend). By default fill\n");
-	printf("-o, The output dir to use. By default './'\n");
-	printf("-h, This help message\n");
+	printf("Usage: %s [(blend|fill) output dir]\n", name);
 }
 
 static void run(Enesim_Renderer *r, const char *file, int argc, char **argv)
@@ -44,43 +39,31 @@ static void run(Enesim_Renderer *r, const char *file, int argc, char **argv)
 	Eina_Rectangle bounds;
 	const char *output_dir = "./";
 	const char *exec_name;
-	char *short_options = "hr:o:";
-	int co;
 	int ret;
 	char *real_file;
 
 	exec_name = argv[0];
 
 	/* handle the parameters */
-	opterr = 0;
-	while ((co = getopt(argc, argv, short_options)) != -1)
+	if (argc > 1)
 	{
-		switch (co)
+		if (argc < 3)
 		{
-			case 'h':
-			help(exec_name);
-			return;
-
-			case 'r':
-			if (!strcmp(optarg, "fill"))
-				rop = ENESIM_ROP_FILL;
-			else if (!strcmp(optarg, "blend"))
-				rop = ENESIM_ROP_BLEND;
-			else
-			{
-				help(exec_name);
-				return;
-			}
-			break;
-
-			case 'o':
-			output_dir = optarg;
-			break;
-
-			default:
 			help(exec_name);
 			return;
 		}
+		/* the rop */
+		if (!strcmp(argv[1], "fill"))
+			rop = ENESIM_ROP_FILL;
+		else if (!strcmp(argv[1], "blend"))
+			rop = ENESIM_ROP_BLEND;
+		else
+		{
+			help(exec_name);
+			return;
+		}
+		/* the output dir */
+		output_dir = argv[2];
 	}
 
 	enesim_renderer_destination_bounds_get(r, &bounds, 0, 0);
