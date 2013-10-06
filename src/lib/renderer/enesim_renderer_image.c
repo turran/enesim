@@ -1761,7 +1761,7 @@ EAPI void enesim_renderer_image_position_get(Enesim_Renderer *r, double *x, doub
  * @brief Set the width of a image renderer.
  *
  * @param[in] r The image renderer.
- * @param[in] width The image width.
+ * @param[in] w The image width.
  *
  * This function sets the width of the image renderer @p r to the
  * value @p width.
@@ -1796,7 +1796,7 @@ EAPI double enesim_renderer_image_width_get(Enesim_Renderer *r)
  * @brief Set the height of a image renderer.
  *
  * @param[in] r The image renderer.
- * @param[in] height The image height.
+ * @param[in] h The image height.
  *
  * This function sets the height of the image renderer @p r to the
  * value @p height.
@@ -1831,8 +1831,8 @@ EAPI double enesim_renderer_image_height_get(Enesim_Renderer *r)
  * @brief Set the size of a image renderer.
  *
  * @param[in] r The image renderer.
- * @param[in] width The width.
- * @param[in] height The height.
+ * @param[in] w The width.
+ * @param[in] h The height.
  *
  * This function sets the size of the image renderer @p r to the
  * values @p width and @p height.
@@ -1852,8 +1852,8 @@ EAPI void enesim_renderer_image_size_set(Enesim_Renderer *r, double w, double h)
  * @brief Retrieve the size of a image renderer.
  *
  * @param[in] r The image renderer.
- * @param[out] width The width.
- * @param[out] height The height.
+ * @param[out] w The width.
+ * @param[out] h The height.
  *
  * This function stores the size of the image renderer @p r in the
  * pointers @p width and @p height. These pointers can be @c NULL.
