@@ -101,104 +101,104 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00018"></a>00018 <span class="preprocessor">#ifndef ENESIM_RENDERER_SHAPE_H_</span>
 <a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor">#define ENESIM_RENDERER_SHAPE_H_</span>
 <a name="l00020"></a>00020 <span class="preprocessor"></span>
-<a name="l00028"></a>00028 <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Feature
-<a name="l00029"></a>00029 {
-<a name="l00030"></a>00030     ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER     = (1 &lt;&lt; 0),
-<a name="l00031"></a>00031     ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER   = (1 &lt;&lt; 1),
-<a name="l00032"></a>00032     ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION   = (1 &lt;&lt; 2),
-<a name="l00033"></a>00033     ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH   = (1 &lt;&lt; 3),
-<a name="l00034"></a>00034 } Enesim_Renderer_Shape_Feature;
-<a name="l00035"></a>00035 
-<a name="l00036"></a>00036 <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Draw_Mode
-<a name="l00037"></a>00037 {
-<a name="l00038"></a>00038     ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL    = (1 &lt;&lt; 0),
-<a name="l00039"></a>00039     ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE  = (1 &lt;&lt; 1),
-<a name="l00040"></a>00040 } Enesim_Renderer_Shape_Draw_Mode;
-<a name="l00041"></a>00041 
-<a name="l00042"></a>00042 <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Stroke_Location
+<a name="l00029"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga98513c18ea5d706aefd3fab40ba610fe">00029</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Feature
+<a name="l00030"></a>00030 {
+<a name="l00032"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga98513c18ea5d706aefd3fab40ba610feae97e8c0d8927eee9c74de3282bc7af16">00032</a>     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga98513c18ea5d706aefd3fab40ba610feae97e8c0d8927eee9c74de3282bc7af16">ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER</a>     = (1 &lt;&lt; 0),
+<a name="l00034"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga98513c18ea5d706aefd3fab40ba610fea96f87b6c4a1abe1128ddd2f5c78659a2">00034</a>     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga98513c18ea5d706aefd3fab40ba610fea96f87b6c4a1abe1128ddd2f5c78659a2">ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER</a>   = (1 &lt;&lt; 1),
+<a name="l00036"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga98513c18ea5d706aefd3fab40ba610feaf84e0d6a0be44779892c5d2a6f58d9a6">00036</a>     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga98513c18ea5d706aefd3fab40ba610feaf84e0d6a0be44779892c5d2a6f58d9a6">ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION</a>   = (1 &lt;&lt; 2),
+<a name="l00038"></a>00038     ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH   = (1 &lt;&lt; 3),
+<a name="l00039"></a>00039 } <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga98513c18ea5d706aefd3fab40ba610fe">Enesim_Renderer_Shape_Feature</a>;
+<a name="l00040"></a>00040 
+<a name="l00042"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gac3b181bec3c0638941c7612efb0665d4">00042</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Draw_Mode
 <a name="l00043"></a>00043 {
-<a name="l00044"></a>00044     ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE,
-<a name="l00045"></a>00045     ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE,
-<a name="l00046"></a>00046     ENESIM_RENDERER_SHAPE_STROKE_LOCATION_CENTER,
-<a name="l00047"></a>00047 } Enesim_Renderer_Shape_Stroke_Location;
-<a name="l00048"></a>00048 
-<a name="l00049"></a><a class="code" href="structEnesim__Renderer__Shape__Stroke__Dash.html">00049</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Renderer_Shape_Stroke_Dash
-<a name="l00050"></a>00050 {
-<a name="l00051"></a>00051     <span class="keywordtype">double</span> length;
-<a name="l00052"></a>00052     <span class="keywordtype">double</span> gap;
-<a name="l00053"></a>00053 } <a class="code" href="structEnesim__Renderer__Shape__Stroke__Dash.html">Enesim_Renderer_Shape_Stroke_Dash</a>;
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055 <span class="preprocessor">#define ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL (ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL | ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)</span>
-<a name="l00056"></a>00056 <span class="preprocessor"></span>
-<a name="l00057"></a>00057 <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Stroke_Cap
-<a name="l00058"></a>00058 {
-<a name="l00059"></a>00059     ENESIM_RENDERER_SHAPE_STROKE_CAP_BUTT,
-<a name="l00060"></a>00060     ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND,
-<a name="l00061"></a>00061     ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE,
-<a name="l00062"></a>00062     ENESIM_RENDERER_SHAPE_STROKE_CAPS,
-<a name="l00063"></a>00063 } Enesim_Renderer_Shape_Stroke_Cap;
-<a name="l00064"></a>00064 
-<a name="l00065"></a>00065 <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Stroke_Join
-<a name="l00066"></a>00066 {
-<a name="l00067"></a>00067     ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER,
-<a name="l00068"></a>00068     ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND,
-<a name="l00069"></a>00069     ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL,
-<a name="l00070"></a>00070     ENESIM_RENDERER_SHAPE_STROKE_JOINS,
-<a name="l00071"></a>00071 } Enesim_Renderer_Shape_Stroke_Join;
-<a name="l00072"></a>00072 
-<a name="l00073"></a>00073 <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Fill_Rule
-<a name="l00074"></a>00074 {
-<a name="l00075"></a>00075     ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO,
-<a name="l00076"></a>00076     ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD,
-<a name="l00077"></a>00077     ENESIM_RENDERER_SHAPE_FILL_RULES,
-<a name="l00078"></a>00078 } Enesim_Renderer_Shape_Fill_Rule;
+<a name="l00045"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a020d229e686de235f864e21ff8f71f1d">00045</a>     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a020d229e686de235f864e21ff8f71f1d">ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL</a>    = (1 &lt;&lt; 0),
+<a name="l00047"></a>00047     ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE  = (1 &lt;&lt; 1),
+<a name="l00048"></a>00048 } <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gac3b181bec3c0638941c7612efb0665d4">Enesim_Renderer_Shape_Draw_Mode</a>;
+<a name="l00049"></a>00049 
+<a name="l00051"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gad49d43381154f47319f3c6cd73242b77">00051</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Stroke_Location
+<a name="l00052"></a>00052 {
+<a name="l00054"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggad49d43381154f47319f3c6cd73242b77ac0222c78ffef074b6690be7cd0410fcc">00054</a>     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggad49d43381154f47319f3c6cd73242b77ac0222c78ffef074b6690be7cd0410fcc">ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE</a>,
+<a name="l00056"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggad49d43381154f47319f3c6cd73242b77aa9655dd9a5e940f55bab45499737b6b7">00056</a>     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggad49d43381154f47319f3c6cd73242b77aa9655dd9a5e940f55bab45499737b6b7">ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE</a>,
+<a name="l00058"></a>00058     ENESIM_RENDERER_SHAPE_STROKE_LOCATION_CENTER,
+<a name="l00059"></a>00059 } <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gad49d43381154f47319f3c6cd73242b77">Enesim_Renderer_Shape_Stroke_Location</a>;
+<a name="l00060"></a>00060 
+<a name="l00062"></a><a class="code" href="structEnesim__Renderer__Shape__Stroke__Dash.html">00062</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Renderer_Shape_Stroke_Dash
+<a name="l00063"></a>00063 {
+<a name="l00064"></a>00064     <span class="keywordtype">double</span> length;
+<a name="l00065"></a>00065     <span class="keywordtype">double</span> gap;
+<a name="l00066"></a>00066 } <a class="code" href="structEnesim__Renderer__Shape__Stroke__Dash.html">Enesim_Renderer_Shape_Stroke_Dash</a>;
+<a name="l00067"></a>00067 
+<a name="l00069"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">00069</a> <span class="preprocessor">#define ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL (ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL | ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)</span>
+<a name="l00070"></a>00070 <span class="preprocessor"></span>
+<a name="l00072"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga03f3612c897c9353b4bd9881c408156c">00072</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Stroke_Cap
+<a name="l00073"></a>00073 {
+<a name="l00074"></a>00074     ENESIM_RENDERER_SHAPE_STROKE_CAP_BUTT,
+<a name="l00075"></a>00075     ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND,
+<a name="l00076"></a>00076     ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE,
+<a name="l00077"></a>00077     ENESIM_RENDERER_SHAPE_STROKE_CAPS,
+<a name="l00078"></a>00078 } <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga03f3612c897c9353b4bd9881c408156c">Enesim_Renderer_Shape_Stroke_Cap</a>;
 <a name="l00079"></a>00079 
-<a name="l00080"></a>00080 EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_features_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00081"></a>00081 
-<a name="l00082"></a>00082 <span class="comment">/* stroke properties */</span>
-<a name="l00083"></a>00083 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_color_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> stroke_color);
-<a name="l00084"></a>00084 EAPI <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> enesim_renderer_shape_stroke_color_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_renderer_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *o);
-<a name="l00087"></a>00087 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_shape_stroke_renderer_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00081"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gabe70a7a4727579260c1b5a097a5ad6cf">00081</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Stroke_Join
+<a name="l00082"></a>00082 {
+<a name="l00083"></a>00083     ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER,
+<a name="l00084"></a>00084     ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND,
+<a name="l00085"></a>00085     ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL,
+<a name="l00086"></a>00086     ENESIM_RENDERER_SHAPE_STROKE_JOINS,
+<a name="l00087"></a>00087 } <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gabe70a7a4727579260c1b5a097a5ad6cf">Enesim_Renderer_Shape_Stroke_Join</a>;
 <a name="l00088"></a>00088 
-<a name="l00089"></a>00089 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_weight_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> weight);
-<a name="l00090"></a>00090 EAPI <span class="keywordtype">double</span> enesim_renderer_shape_stroke_weight_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00091"></a>00091 
-<a name="l00092"></a>00092 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_location_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Enesim_Renderer_Shape_Stroke_Location location);
-<a name="l00093"></a>00093 EAPI Enesim_Renderer_Shape_Stroke_Location enesim_renderer_shape_stroke_location_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00094"></a>00094 
-<a name="l00095"></a>00095 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_cap_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Enesim_Renderer_Shape_Stroke_Cap cap);
-<a name="l00096"></a>00096 EAPI Enesim_Renderer_Shape_Stroke_Cap enesim_renderer_shape_stroke_cap_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00097"></a>00097 
-<a name="l00098"></a>00098 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_join_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Enesim_Renderer_Shape_Stroke_Join join);
-<a name="l00099"></a>00099 EAPI Enesim_Renderer_Shape_Stroke_Join enesim_renderer_shape_stroke_join_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00100"></a>00100 
-<a name="l00101"></a>00101 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_renderer_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *o);
-<a name="l00102"></a>00102 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_shape_stroke_renderer_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00103"></a>00103 
-<a name="l00104"></a>00104 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_dash_add_simple(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> length, <span class="keywordtype">double</span> gap);
-<a name="l00105"></a>00105 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_dash_add(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keyword">const</span> <a class="code" href="structEnesim__Renderer__Shape__Stroke__Dash.html">Enesim_Renderer_Shape_Stroke_Dash</a> *dash);
-<a name="l00106"></a>00106 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_dash_clear(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00107"></a>00107 <span class="comment">/* fill properties */</span>
-<a name="l00108"></a>00108 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_fill_color_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> fill_color);
-<a name="l00109"></a>00109 EAPI <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> enesim_renderer_shape_fill_color_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00110"></a>00110 
-<a name="l00111"></a>00111 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_fill_renderer_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *f);
-<a name="l00112"></a>00112 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_shape_fill_renderer_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00113"></a>00113 
-<a name="l00114"></a>00114 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_fill_rule_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Enesim_Renderer_Shape_Fill_Rule rule);
-<a name="l00115"></a>00115 EAPI Enesim_Renderer_Shape_Fill_Rule enesim_renderer_shape_fill_rule_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
-<a name="l00116"></a>00116 
-<a name="l00117"></a>00117 <span class="comment">/* stroke and/or fill */</span>
-<a name="l00118"></a>00118 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_draw_mode_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Enesim_Renderer_Shape_Draw_Mode draw_mode);
-<a name="l00119"></a>00119 EAPI Enesim_Renderer_Shape_Draw_Mode enesim_renderer_shape_draw_mode_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00090"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gaeb4fc569aea393c34eaef499cb8965fc">00090</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Renderer_Shape_Fill_Rule
+<a name="l00091"></a>00091 {
+<a name="l00092"></a>00092     ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO,
+<a name="l00093"></a>00093     ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD,
+<a name="l00094"></a>00094     ENESIM_RENDERER_SHAPE_FILL_RULES,
+<a name="l00095"></a>00095 } <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gaeb4fc569aea393c34eaef499cb8965fc">Enesim_Renderer_Shape_Fill_Rule</a>;
+<a name="l00096"></a>00096 
+<a name="l00097"></a>00097 EAPI <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga98513c18ea5d706aefd3fab40ba610fe">Enesim_Renderer_Shape_Feature</a> enesim_renderer_shape_features_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099 <span class="comment">/* stroke properties */</span>
+<a name="l00100"></a>00100 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_color_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> stroke_color);
+<a name="l00101"></a>00101 EAPI <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> enesim_renderer_shape_stroke_color_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00102"></a>00102 
+<a name="l00103"></a>00103 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_renderer_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *o);
+<a name="l00104"></a>00104 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_shape_stroke_renderer_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00105"></a>00105 
+<a name="l00106"></a>00106 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_weight_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> weight);
+<a name="l00107"></a>00107 EAPI <span class="keywordtype">double</span> enesim_renderer_shape_stroke_weight_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00108"></a>00108 
+<a name="l00109"></a>00109 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_location_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gad49d43381154f47319f3c6cd73242b77">Enesim_Renderer_Shape_Stroke_Location</a> location);
+<a name="l00110"></a>00110 EAPI <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gad49d43381154f47319f3c6cd73242b77">Enesim_Renderer_Shape_Stroke_Location</a> enesim_renderer_shape_stroke_location_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00111"></a>00111 
+<a name="l00112"></a>00112 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_cap_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga03f3612c897c9353b4bd9881c408156c">Enesim_Renderer_Shape_Stroke_Cap</a> cap);
+<a name="l00113"></a>00113 EAPI <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga03f3612c897c9353b4bd9881c408156c">Enesim_Renderer_Shape_Stroke_Cap</a> enesim_renderer_shape_stroke_cap_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_join_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gabe70a7a4727579260c1b5a097a5ad6cf">Enesim_Renderer_Shape_Stroke_Join</a> join);
+<a name="l00116"></a>00116 EAPI <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gabe70a7a4727579260c1b5a097a5ad6cf">Enesim_Renderer_Shape_Stroke_Join</a> enesim_renderer_shape_stroke_join_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00117"></a>00117 
+<a name="l00118"></a>00118 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_renderer_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *o);
+<a name="l00119"></a>00119 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_shape_stroke_renderer_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
 <a name="l00120"></a>00120 
-<a name="l00121"></a>00121 EAPI Eina_Bool enesim_renderer_shape_geometry_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *geometry);
-<a name="l00122"></a>00122 EAPI Eina_Bool enesim_renderer_shape_destination_geometry_get(
-<a name="l00123"></a>00123         <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *geometry);
-<a name="l00124"></a>00124 
-<a name="l00129"></a>00129 <span class="preprocessor">#endif</span>
+<a name="l00121"></a>00121 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_dash_add_simple(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> length, <span class="keywordtype">double</span> gap);
+<a name="l00122"></a>00122 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_dash_add(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keyword">const</span> <a class="code" href="structEnesim__Renderer__Shape__Stroke__Dash.html">Enesim_Renderer_Shape_Stroke_Dash</a> *dash);
+<a name="l00123"></a>00123 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_stroke_dash_clear(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00124"></a>00124 <span class="comment">/* fill properties */</span>
+<a name="l00125"></a>00125 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_fill_color_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> fill_color);
+<a name="l00126"></a>00126 EAPI <a class="code" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> enesim_renderer_shape_fill_color_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00127"></a>00127 
+<a name="l00128"></a>00128 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_fill_renderer_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *f);
+<a name="l00129"></a>00129 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_shape_fill_renderer_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00130"></a>00130 
+<a name="l00131"></a>00131 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_fill_rule_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gaeb4fc569aea393c34eaef499cb8965fc">Enesim_Renderer_Shape_Fill_Rule</a> rule);
+<a name="l00132"></a>00132 EAPI <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gaeb4fc569aea393c34eaef499cb8965fc">Enesim_Renderer_Shape_Fill_Rule</a> enesim_renderer_shape_fill_rule_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00133"></a>00133 
+<a name="l00134"></a>00134 <span class="comment">/* stroke and/or fill */</span>
+<a name="l00135"></a>00135 EAPI <span class="keywordtype">void</span> enesim_renderer_shape_draw_mode_set(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gac3b181bec3c0638941c7612efb0665d4">Enesim_Renderer_Shape_Draw_Mode</a> draw_mode);
+<a name="l00136"></a>00136 EAPI <a class="code" href="group__Enesim__Renderer__Shape__Group.html#gac3b181bec3c0638941c7612efb0665d4">Enesim_Renderer_Shape_Draw_Mode</a> enesim_renderer_shape_draw_mode_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r);
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138 EAPI Eina_Bool enesim_renderer_shape_geometry_get(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *geometry);
+<a name="l00139"></a>00139 EAPI Eina_Bool enesim_renderer_shape_destination_geometry_get(
+<a name="l00140"></a>00140         <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *geometry);
+<a name="l00141"></a>00141 
+<a name="l00146"></a>00146 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -217,7 +217,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 21:24:00 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 22:24:28 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
