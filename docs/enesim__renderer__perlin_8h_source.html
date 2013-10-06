@@ -100,14 +100,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00018"></a>00018 <span class="preprocessor">#ifndef ENESIM_RENDERER_PERLIN_H_</span>
 <a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor">#define ENESIM_RENDERER_PERLIN_H_</span>
 <a name="l00020"></a>00020 <span class="preprocessor"></span>
-<a name="l00026"></a>00026 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga25f1fb8cb1fbe125bbe67d2ec7eb7bfc">enesim_renderer_perlin_new</a>(<span class="keywordtype">void</span>);
-<a name="l00027"></a>00027 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga42f680acfa6af244564d05136a77f3e0">enesim_renderer_perlin_octaves_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> octaves);
-<a name="l00028"></a>00028 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga2c44926fa57f132608032fa98015e909">enesim_renderer_perlin_persistence_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> persistence);
-<a name="l00029"></a>00029 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga35c57e3b4502ce38dac8ca4126f301c6">enesim_renderer_perlin_amplitude_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> ampl);
-<a name="l00030"></a>00030 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga65677bd278e208cc839ccda86abeca7b">enesim_renderer_perlin_xfrequency_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> freq);
-<a name="l00031"></a>00031 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#gad9b500d049c08c9e7bb9d4a174b99370">enesim_renderer_perlin_yfrequency_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> freq);
-<a name="l00032"></a>00032 
-<a name="l00037"></a>00037 <span class="preprocessor">#endif</span>
+<a name="l00027"></a>00027 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga25f1fb8cb1fbe125bbe67d2ec7eb7bfc">enesim_renderer_perlin_new</a>(<span class="keywordtype">void</span>);
+<a name="l00028"></a>00028 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga42f680acfa6af244564d05136a77f3e0" title="Set the number of octaves used on the perlin noise renderer.">enesim_renderer_perlin_octaves_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> octaves);
+<a name="l00029"></a>00029 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga2c44926fa57f132608032fa98015e909" title="Set the persistence multiplier on the perlin noise renderer.">enesim_renderer_perlin_persistence_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> persistence);
+<a name="l00030"></a>00030 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga35c57e3b4502ce38dac8ca4126f301c6" title="Set the amplitude on the perlin noise renderer.">enesim_renderer_perlin_amplitude_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> ampl);
+<a name="l00031"></a>00031 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga65677bd278e208cc839ccda86abeca7b" title="Set the initial X frequency on the perlin noise renderer.">enesim_renderer_perlin_xfrequency_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> freq);
+<a name="l00032"></a>00032 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Perlin__Group.html#gad9b500d049c08c9e7bb9d4a174b99370" title="Set the initial Y frequency on the perlin noise renderer.">enesim_renderer_perlin_yfrequency_set</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keywordtype">double</span> freq);
+<a name="l00033"></a>00033 
+<a name="l00038"></a>00038 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -126,7 +126,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 5 2013 19:08:16 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 12:06:41 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
