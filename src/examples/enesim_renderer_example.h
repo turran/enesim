@@ -29,9 +29,9 @@ static void help(const char *name)
 {
 	printf("Usage: %s OPTIONS\n", name);
 	printf("Where OPTIONS can be:\n");
-	printf("-r, --rop The rop to use (fill, blend). By default fill\n");
-	printf("-o, --output The output dir to use. By default './'\n");
-	printf("-h, --help This help message\n");
+	printf("-r, The rop to use (fill, blend). By default fill\n");
+	printf("-o, The output dir to use. By default './'\n");
+	printf("-h, This help message\n");
 }
 
 static void run(Enesim_Renderer *r, const char *file, int argc, char **argv)
@@ -45,23 +45,15 @@ static void run(Enesim_Renderer *r, const char *file, int argc, char **argv)
 	const char *output_dir = "./";
 	const char *exec_name;
 	char *short_options = "hr:o:";
-	struct option long_options[] = {
-		{"rop", 1, 0, 'r'},
-		{"output", 1, 0, 'o'},
-		{"help", 0, 0, 'h'},
-		{0, 0, 0, 0}
-	};
 	int co;
-	int option;
 	int ret;
 	char *real_file;
 
 	exec_name = argv[0];
 
-	/* TODO get the output dir */
 	/* handle the parameters */
-	while ((co = getopt_long(argc, argv, short_options, long_options,
-			&option)) != -1)
+	opterr = 0;
+	while ((co = getopt(argc, argv, short_options)) != -1)
 	{
 		switch (co)
 		{
