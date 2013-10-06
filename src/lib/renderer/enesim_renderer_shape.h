@@ -61,8 +61,8 @@ typedef enum _Enesim_Renderer_Shape_Stroke_Location
 /** Dash defintion */
 typedef struct _Enesim_Renderer_Shape_Stroke_Dash
 {
-	double length;
-	double gap;
+	double length; /**< The length of the dash */
+	double gap; /**< The length of the gap */
 } Enesim_Renderer_Shape_Stroke_Dash;
 
 /** Helper macro to define fill and stroke drawing mode */
@@ -71,27 +71,27 @@ typedef struct _Enesim_Renderer_Shape_Stroke_Dash
 /** Stroke cap type */
 typedef enum _Enesim_Renderer_Shape_Stroke_Cap
 {
-	ENESIM_RENDERER_SHAPE_STROKE_CAP_BUTT,
-	ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND,
-	ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE,
-	ENESIM_RENDERER_SHAPE_STROKE_CAPS,
+	ENESIM_RENDERER_SHAPE_STROKE_CAP_BUTT, /**< The butt cap */
+	ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND, /**< The round cap */
+	ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE, /**< The square cap */
+	ENESIM_RENDERER_SHAPE_STROKE_CAPS, /**< The number of caps */
 } Enesim_Renderer_Shape_Stroke_Cap;
 
 /** Stroke join type */
 typedef enum _Enesim_Renderer_Shape_Stroke_Join
 {
-	ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER,
-	ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND,
-	ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL,
-	ENESIM_RENDERER_SHAPE_STROKE_JOINS,
+	ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER, /**< The miter join */
+	ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND, /**< The round join */
+	ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL, /**< The bevel join */
+	ENESIM_RENDERER_SHAPE_STROKE_JOINS, /**< The number of joins */
 } Enesim_Renderer_Shape_Stroke_Join;
 
 /** Fill rule mode */
 typedef enum _Enesim_Renderer_Shape_Fill_Rule
 {
-	ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO,
-	ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD,
-	ENESIM_RENDERER_SHAPE_FILL_RULES,
+	ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO, /**< The non zero fill rule */
+	ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD, /**< The even odd fill rule */
+	ENESIM_RENDERER_SHAPE_FILL_RULES, /**< The number of fill rules */
 } Enesim_Renderer_Shape_Fill_Rule;
 
 EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_features_get(Enesim_Renderer *r);

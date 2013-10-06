@@ -25,10 +25,11 @@
  * @{
  */
 
+/** A gradient stop definition */
 typedef struct _Enesim_Renderer_Gradient_Stop
 {
-	Enesim_Argb argb;
-	double pos;
+	Enesim_Argb argb; /**< The argb color of the stop */
+	double pos; /**< The position of the stop in the 0..1 range */
 } Enesim_Renderer_Gradient_Stop;
 
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop);

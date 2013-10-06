@@ -174,7 +174,10 @@ void enesim_path_command_get(Enesim_Path *thiz,
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-
+/**
+ * @brief Creates a new path
+ * @return The newly created path
+ */
 EAPI Enesim_Path * enesim_path_new(void)
 {
 	Enesim_Path *thiz;
@@ -184,6 +187,11 @@ EAPI Enesim_Path * enesim_path_new(void)
 	return thiz;
 }
 
+/**
+ * @brief Increase the reference counter of a path
+ * @param[in] thiz The path
+ * @return The input parameter @a thiz for programming convenience
+ */
 EAPI Enesim_Path * enesim_path_ref(Enesim_Path *thiz)
 {
 	if (!thiz) return NULL;
@@ -191,6 +199,10 @@ EAPI Enesim_Path * enesim_path_ref(Enesim_Path *thiz)
 	return thiz;
 }
 
+/**
+ * @brief Decrease the reference counter of a path
+ * @param[in] thiz The path
+ */
 EAPI void enesim_path_unref(Enesim_Path *thiz)
 {
 	thiz->ref--;
@@ -201,7 +213,10 @@ EAPI void enesim_path_unref(Enesim_Path *thiz)
 	}
 }
 
-
+/**
+ * Clear the command list of a path
+ * @param[in] thiz The path to clear
+ */
 EAPI void enesim_path_command_clear(Enesim_Path *thiz)
 {
 	Enesim_Path_Command *c;
@@ -213,6 +228,11 @@ EAPI void enesim_path_command_clear(Enesim_Path *thiz)
 	thiz->commands = eina_list_free(thiz->commands);
 }
 
+/**
+ * Add a command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] cmd The command to add
+ */
 EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 {
 	Enesim_Path_Command *new_command;
@@ -239,6 +259,12 @@ EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * Add a move to command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] x The X coordinate of the move to command
+ * @param[in] y The Y coordinate of the move to command
+ */
 EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y)
 {
 	Enesim_Path_Command cmd;
@@ -249,6 +275,12 @@ EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y)
 	enesim_path_command_add(thiz, &cmd);
 }
 
+/**
+ * Add a line to command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] x The X coordinate of the line to command
+ * @param[in] y The Y coordinate of the line to command
+ */
 EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y)
 {
 	Enesim_Path_Command cmd;
@@ -327,6 +359,10 @@ EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double ang
 	enesim_path_command_add(thiz, &cmd);
 }
 
+/**
+ * Close a path
+ * @param[in] thiz The path to close
+ */
 EAPI void enesim_path_close(Enesim_Path *thiz)
 {
 	Enesim_Path_Command cmd;
