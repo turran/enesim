@@ -19,6 +19,7 @@ src/examples/enesim_renderer_path04 \
 src/examples/enesim_renderer_path05 \
 src/examples/enesim_renderer_blur01 \
 src/examples/enesim_renderer_circle01 \
+src/examples/enesim_renderer_circle02 \
 src/examples/enesim_renderer_hints01 \
 src/examples/enesim_renderer_perlin01 \
 src/examples/enesim_renderer_rectangle01
@@ -66,6 +67,12 @@ src/examples/enesim_renderer_circle01.c \
 src/examples/enesim_renderer_example.h
 src_examples_enesim_renderer_circle01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_circle01_LDADD = $(examples_LDADD)
+
+src_examples_enesim_renderer_circle02_SOURCES = \
+src/examples/enesim_renderer_circle02.c \
+src/examples/enesim_renderer_example.h
+src_examples_enesim_renderer_circle02_CPPFLAGS = $(examples_CPPFLAGS)
+src_examples_enesim_renderer_circle02_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_blur01_SOURCES = \
 src/examples/enesim_renderer_blur01.c \

@@ -76,6 +76,7 @@ doc/img/enesim.png \
 doc/img/renderer_template.svg \
 doc/img/enesim_renderer_blur01.png \
 doc/img/enesim_renderer_circle01.png \
+doc/img/enesim_renderer_circle02.png \
 doc/img/enesim_renderer_hints01.png \
 doc/img/enesim_renderer_path01.png \
 doc/img/enesim_renderer_path02.png \
