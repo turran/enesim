@@ -25,35 +25,50 @@
  * @{
  */
 
+/** Flags that specify the shape features */
 typedef enum _Enesim_Renderer_Shape_Feature
 {
+	/**< The shape renderer can use another renderer for filling */
 	ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER 	= (1 << 0),
+	/**< The shape renderer can use another renderer for stroking */
 	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER	= (1 << 1),
+	/**< The shape renderer can locate the stroke */
 	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION	= (1 << 2),
+	/**< The shape renderer can have a dashed stroke */
 	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH	= (1 << 3),
 } Enesim_Renderer_Shape_Feature;
 
+/** Flag that specifiy the drawing mode of the shape renderer */
 typedef enum _Enesim_Renderer_Shape_Draw_Mode
 {
+	/**< The shape renderer will fill */
 	ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL 	= (1 << 0),
+	/**< The shape renderer will stroke */
 	ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE	= (1 << 1),
 } Enesim_Renderer_Shape_Draw_Mode;
 
+/** Location of the stroke */
 typedef enum _Enesim_Renderer_Shape_Stroke_Location
 {
+	/**< The stroke is growed from the border of the shape to the inside */
 	ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE,
+	/**< The stroke is growed from the border of the shape to the outside */
 	ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE,
+	/**< The stroke is centered on the border of the shape */
 	ENESIM_RENDERER_SHAPE_STROKE_LOCATION_CENTER,
 } Enesim_Renderer_Shape_Stroke_Location;
 
+/** Dash defintion */
 typedef struct _Enesim_Renderer_Shape_Stroke_Dash
 {
 	double length;
 	double gap;
 } Enesim_Renderer_Shape_Stroke_Dash;
 
+/** Helper macro to define fill and stroke drawing mode */
 #define ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL (ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL | ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 
+/** Stroke cap type */
 typedef enum _Enesim_Renderer_Shape_Stroke_Cap
 {
 	ENESIM_RENDERER_SHAPE_STROKE_CAP_BUTT,
@@ -62,6 +77,7 @@ typedef enum _Enesim_Renderer_Shape_Stroke_Cap
 	ENESIM_RENDERER_SHAPE_STROKE_CAPS,
 } Enesim_Renderer_Shape_Stroke_Cap;
 
+/** Stroke join type */
 typedef enum _Enesim_Renderer_Shape_Stroke_Join
 {
 	ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER,
@@ -70,6 +86,7 @@ typedef enum _Enesim_Renderer_Shape_Stroke_Join
 	ENESIM_RENDERER_SHAPE_STROKE_JOINS,
 } Enesim_Renderer_Shape_Stroke_Join;
 
+/** Fill rule mode */
 typedef enum _Enesim_Renderer_Shape_Fill_Rule
 {
 	ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO,
