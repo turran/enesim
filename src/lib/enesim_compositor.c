@@ -87,7 +87,7 @@ static Enesim_Compositor_Point _point_pixel_mask_get(Enesim_Rop rop,
 
 /* Span functions */
 
-/**
+/*
  * Returns a function that will draw a span of pixels using the raster
  * operation rop for a surface format dfmt with color color
  */
@@ -101,7 +101,8 @@ static Enesim_Compositor_Span _span_color_get(Enesim_Rop rop,
 	}
 	return _comps.sp_color[rop][*dfmt];
 }
-/**
+
+/*
  * Returns a function that will draw a span of pixels using the raster
  * operation rop for a surface format dfmt with alpha values from the mask
  * and multiplying with color color
@@ -111,7 +112,8 @@ static Enesim_Compositor_Span _span_mask_color_get(Enesim_Rop rop,
 {
 	return _comps.sp_mask_color[rop][*dfmt][mfmt];
 }
-/**
+
+/*
  * Returns a function that will draw a span of pixels using the raster
  * operation rop for a surface format dfmt with pixels of format sfmt
  * multypling with color color
@@ -124,12 +126,11 @@ static Enesim_Compositor_Span _span_pixel_color_get(Enesim_Rop rop,
 	else
 		return _comps.sp_pixel_color[rop][*dfmt][sfmt];
 }
-/**
+
+/*
  * Returns a function that will draw a span of pixels using the raster
  * operation rop for a surface format dfmt with alpha values from the mask
  * and multiplying with the pixel values from sfmt
- * @param
- * @param
  */
 static Enesim_Compositor_Span _span_pixel_mask_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Format mfmt)
