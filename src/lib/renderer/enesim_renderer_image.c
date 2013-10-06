@@ -1628,6 +1628,13 @@ static void _enesim_renderer_image_instance_deinit(void *o)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Create a new image renderer.
+ *
+ * @return A new image renderer.
+ *
+ * This function returns a newly allocated image renderer.
+ */
 EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 {
 	Enesim_Renderer *r;
@@ -1636,6 +1643,15 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 	return r;
 }
 
+/**
+ * @brief Set the top left X coordinate of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[in] x The top left X coordinate.
+ *
+ * This function sets the top left X coordinate of the image
+ * renderer @p r to the value @p x.
+ */
 EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1646,6 +1662,15 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the top left X coordinate of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @return The top left X coordinate.
+ *
+ * This function gets the top left X coordinate of the image
+ * renderer @p r
+ */
 EAPI double enesim_renderer_image_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1654,6 +1679,15 @@ EAPI double enesim_renderer_image_x_get(Enesim_Renderer *r)
 	return thiz->current.x;
 }
 
+/**
+ * @brief Set the top left Y coordinate of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left Y coordinate of the image
+ * renderer @p r to the value @p y.
+ */
 EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1664,6 +1698,15 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the top left Y coordinate of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @return The top left Y coordinate.
+ *
+ * This function gets the top left Y coordinate of the image
+ * renderer @p r
+ */
 EAPI double enesim_renderer_image_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1671,6 +1714,17 @@ EAPI double enesim_renderer_image_y_get(Enesim_Renderer *r)
 	thiz = ENESIM_RENDERER_IMAGE(r);
 	return thiz->current.y;
 }
+
+/**
+ * @brief Set the top left coordinates of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[in] x The top left X coordinate.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left coordinates of the image
+ * renderer @p r to the values @p x and @p y.
+ */
 EAPI void enesim_renderer_image_position_set(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1682,6 +1736,17 @@ EAPI void enesim_renderer_image_position_set(Enesim_Renderer *r, double x, doubl
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the top left coordinates of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[out] x The top left X coordinate.
+ * @param[out] y The top left Y coordinate.
+ *
+ * This function stores the top left coordinates value of the
+ * image renderer @p r in the pointers @p x and @p y. These pointers
+ * can be @c NULL.
+ */
 EAPI void enesim_renderer_image_position_get(Enesim_Renderer *r, double *x, double *y)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1692,6 +1757,15 @@ EAPI void enesim_renderer_image_position_get(Enesim_Renderer *r, double *x, doub
 	if (y) *y = thiz->current.y;
 }
 
+/**
+ * @brief Set the width of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[in] width The image width.
+ *
+ * This function sets the width of the image renderer @p r to the
+ * value @p width.
+ */
 EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1702,6 +1776,14 @@ EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the width of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @return The image width.
+ *
+ * This function gets the width of the image renderer @p r
+ */
 EAPI double enesim_renderer_image_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1710,6 +1792,15 @@ EAPI double enesim_renderer_image_width_get(Enesim_Renderer *r)
 	return thiz->current.w;
 }
 
+/**
+ * @brief Set the height of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[in] height The image height.
+ *
+ * This function sets the height of the image renderer @p r to the
+ * value @p height.
+ */
 EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1720,6 +1811,14 @@ EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the height of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @return The image height.
+ *
+ * This function gets the height of the image renderer @p r
+ */
 EAPI double enesim_renderer_image_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1728,6 +1827,16 @@ EAPI double enesim_renderer_image_height_get(Enesim_Renderer *r)
 	return thiz->current.h;
 }
 
+/**
+ * @brief Set the size of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[in] width The width.
+ * @param[in] height The height.
+ *
+ * This function sets the size of the image renderer @p r to the
+ * values @p width and @p height.
+ */
 EAPI void enesim_renderer_image_size_set(Enesim_Renderer *r, double w, double h)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1739,6 +1848,16 @@ EAPI void enesim_renderer_image_size_set(Enesim_Renderer *r, double w, double h)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the size of a image renderer.
+ *
+ * @param[in] r The image renderer.
+ * @param[out] width The width.
+ * @param[out] height The height.
+ *
+ * This function stores the size of the image renderer @p r in the
+ * pointers @p width and @p height. These pointers can be @c NULL.
+ */
 EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *h)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1749,6 +1868,14 @@ EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *
 	if (h) *h = thiz->current.h;
 }
 
+/**
+ * @brief Set the surface used as pixel source for the image renderer
+ *
+ * @param[in] r The image renderer.
+ * @param[in] src The surface to use [transfer full]
+ *
+ * This function sets the source pixels to use for the image renderer.
+ */
 EAPI void enesim_renderer_image_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1760,6 +1887,14 @@ EAPI void enesim_renderer_image_source_surface_set(Enesim_Renderer *r, Enesim_Su
 	thiz->src_changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the surface used as the pixel source for the image renderer
+ *
+ * @param[in] r The image renderer.
+ * @return src The source surface [transfer none]
+ *
+ * This function returns the surface used as the pixel source
+ */
 EAPI Enesim_Surface * enesim_renderer_image_source_surface_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Image *thiz;
@@ -1768,6 +1903,17 @@ EAPI Enesim_Surface * enesim_renderer_image_source_surface_get(Enesim_Renderer *
 	return enesim_surface_ref(thiz->current.s);
 }
 
+
+/**
+ * @brief Add an area to repaint on the renderer
+ *
+ * @param[in] r The image renderer.
+ * @param[in] area The area to repaint
+ *
+ * This function adds a repaint area (damage) using the source surface coordinate
+ * space. Next time a @ref enesim_renderer_damages_get is called, this new area will
+ * be taken into account too.
+ */
 EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, Eina_Rectangle *area)
 {
 	Enesim_Renderer_Image *thiz;
