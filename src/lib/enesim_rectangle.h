@@ -24,18 +24,18 @@
  * @defgroup Enesim_Rectangle_Group Rectangle
  * @brief Rectangle definition and operations
  * @{
- * @todo
  */
 
 #define ENESIM_RECTANGLE_FORMAT "g %g - %gx%g"
 #define ENESIM_RECTANGLE_ARGS(r) (r)->x, (r)->y, (r)->w, (r)->h
 
+/** Floating point rectangle */
 typedef struct _Enesim_Rectangle
 {
-	double x;
-	double y;
-	double w;
-	double h;
+	double x; /**< The top left X coordinate */
+	double y; /**< The top left Y coordinate */
+	double w; /**< The width */
+	double h; /**< The height */
 } Enesim_Rectangle;
 
 static inline void enesim_rectangle_normalize(Enesim_Rectangle *r, Eina_Rectangle *dst)
