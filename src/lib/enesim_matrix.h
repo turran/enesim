@@ -44,9 +44,17 @@ typedef enum
  */
 typedef struct _Enesim_Matrix
 {
-	double xx, xy, xz;
-	double yx, yy, yz;
-	double zx, zy, zz;
+	double xx; /**< xx in x' = (x * xx) + (y * xy) + xz */
+	double xy; /**< xy in x' = (x * xx) + (y * xy) + xz */
+	double xz; /**< xz in x' = (x * xx) + (y * xy) + xz */
+
+	double yx; /**< yx in y' = (x * yx) + (y * yy) + yz */
+	double yy; /**< yy in y' = (x * yx) + (y * yy) + yz */
+	double yz; /**< yz in y' = (x * yx) + (y * yy) + yz */
+
+	double zx; /**< zx in z' = (x * zx) + (y * zy) + zz */
+	double zy; /**< zy in z' = (x * zx) + (y * zy) + zz */
+	double zz; /**< zz in z' = (x * zx) + (y * zy) + zz */
 } Enesim_Matrix;
 
 /**
@@ -55,9 +63,17 @@ typedef struct _Enesim_Matrix
  */
 typedef struct _Enesim_F16p16_Matrix
 {
-	Eina_F16p16 xx, xy, xz;
-	Eina_F16p16 yx, yy, yz;
-	Eina_F16p16 zx, zy, zz;
+	Eina_F16p16 xx; /**< xx in x' = (x * xx) + (y * xy) + xz */
+	Eina_F16p16 xy; /**< xy in x' = (x * xx) + (y * xy) + xz */
+	Eina_F16p16 xz; /**< xz in x' = (x * xx) + (y * xy) + xz */
+
+	Eina_F16p16 yx; /**< yx in y' = (x * yx) + (y * yy) + yz */
+	Eina_F16p16 yy; /**< yy in y' = (x * yx) + (y * yy) + yz */
+	Eina_F16p16 yz; /**< yz in y' = (x * yx) + (y * yy) + yz */
+
+	Eina_F16p16 zx; /**< zx in z' = (x * zx) + (y * zy) + zz */
+	Eina_F16p16 zy; /**< zy in z' = (x * zx) + (y * zy) + zz */
+	Eina_F16p16 zz; /**< zz in z' = (x * zx) + (y * zy) + zz */
 } Enesim_F16p16_Matrix;
 
 /**
@@ -66,10 +82,14 @@ typedef struct _Enesim_F16p16_Matrix
  */
 typedef struct _Enesim_Quad
 {
-	double x0, y0;
-	double x1, y1;
-	double x2, y2;
-	double x3, y3;
+	double x0; /**< Top left x coordinate */
+	double y0; /**< Top left y coordinate */
+	double x1; /**< Top right x coordinate */
+	double y1; /**< Top right y coordinate */
+	double x2; /**< Bottom right x coordinate */
+	double y2; /**< Bottom right y coordinate */
+	double x3; /**< Bottom left x coordinate */
+	double y3; /**< Bottom left y coordinate */
 } Enesim_Quad;
 
 /**
