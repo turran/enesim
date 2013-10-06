@@ -89,8 +89,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <a name="_a0"></a><a class="code" href="structEnesim__Renderer__Gradient__Stop.html">Enesim_Renderer_Gradient_Stop</a> stop;
     Enesim_Path *p;
 
-    p = enesim_path_new();
-    enesim_path_move_to(p, 2*12, 2*27);
+    p = <a name="a1"></a><a class="code" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32" title="Creates a new path.">enesim_path_new</a>();
+    <a name="a2"></a><a class="code" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, 2*12, 2*27);
     enesim_path_cubic_to(p, 2*7, 2*37, 2*18, 2*50, 2*18, 2*60);
     enesim_path_scubic_to(p, 2*0, 2*80, 2*10, 2*94);
     enesim_path_scubic_to(p, 2*40, 2*74, 2*50, 2*78);
@@ -102,13 +102,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     enesim_path_scubic_to(p, 2*43, 2*17, 2*35, 2*22);
     enesim_path_scubic_to(p, 2*17, 2*17, 2*12, 2*27);
 
-    r2 = <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Gradient__Linear__Group.html#ga5fb5a5877e8cf362993cf8b730b1f4ca" title="Create a new linear gradient renderer.">enesim_renderer_gradient_linear_new</a>();
-    <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Gradient__Linear__Group.html#ga9d5e695a6347cd52b129c9e0bc134a2e" title="Set the position of the linear gradient renderer.">enesim_renderer_gradient_linear_position_set</a>(r2, 0, 0, 256, 256);
-    stop.<a name="a3"></a>argb = 0xffff0000;
-    stop.<a name="a4"></a>pos = 0;
+    r2 = <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Gradient__Linear__Group.html#ga5fb5a5877e8cf362993cf8b730b1f4ca" title="Create a new linear gradient renderer.">enesim_renderer_gradient_linear_new</a>();
+    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Gradient__Linear__Group.html#ga9d5e695a6347cd52b129c9e0bc134a2e" title="Set the position of the linear gradient renderer.">enesim_renderer_gradient_linear_position_set</a>(r2, 0, 0, 256, 256);
+    stop.<a name="a5"></a><a class="code" href="structEnesim__Renderer__Gradient__Stop.html#aaf7636b84457d11c5180a9e53ea032c6">argb</a> = 0xffff0000;
+    stop.<a name="a6"></a><a class="code" href="structEnesim__Renderer__Gradient__Stop.html#a9ee0188608751f7a390fa209b1c824f8">pos</a> = 0;
     enesim_renderer_gradient_stop_add(r2, &amp;stop);
-    stop.argb = 0xff00ff00;
-    stop.pos = 1;
+    stop.<a class="code" href="structEnesim__Renderer__Gradient__Stop.html#aaf7636b84457d11c5180a9e53ea032c6">argb</a> = 0xff00ff00;
+    stop.<a class="code" href="structEnesim__Renderer__Gradient__Stop.html#a9ee0188608751f7a390fa209b1c824f8">pos</a> = 1;
     enesim_renderer_gradient_stop_add(r2, &amp;stop);
 
     r = enesim_renderer_path_new();
@@ -116,9 +116,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     enesim_renderer_shape_stroke_weight_set(r, 18);
     enesim_renderer_shape_stroke_color_set(r, 0xffffff00);
     enesim_renderer_shape_fill_renderer_set(r, r2);
-    enesim_renderer_shape_draw_mode_set(r, <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
+    enesim_renderer_shape_draw_mode_set(r, <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
     enesim_renderer_shape_stroke_dash_add_simple(r, 50, 20);
-    enesim_renderer_shape_stroke_cap_set(r, ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND);
+    enesim_renderer_shape_stroke_cap_set(r, <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga03f3612c897c9353b4bd9881c408156ca9c40b9bd57d2fe89334a9269054cfafd">ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND</a>);
 
     <span class="keywordflow">return</span> r;
 }
@@ -143,7 +143,7 @@ EXAMPLE(enesim_renderer_path01)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 22:24:28 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 23:00:18 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

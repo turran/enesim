@@ -129,8 +129,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(r1, l);
 
-    p = enesim_path_new();
-    enesim_path_move_to(p, x, y - h);
+    p = <a name="a13"></a><a class="code" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32" title="Creates a new path.">enesim_path_new</a>();
+    <a name="a14"></a><a class="code" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, x, y - h);
     enesim_path_arc_to(p, w, h, 0, EINA_FALSE, EINA_FALSE, x + w, y);
 
     r2 = enesim_renderer_path_new();
@@ -168,7 +168,7 @@ EXAMPLE(enesim_renderer_path04)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 22:24:28 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 23:00:18 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
