@@ -102,9 +102,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 {
     printf(<span class="stringliteral">&quot;Usage: %s OPTIONS\n&quot;</span>, name);
     printf(<span class="stringliteral">&quot;Where OPTIONS can be:\n&quot;</span>);
-    printf(<span class="stringliteral">&quot;-r, --rop The rop to use (fill, blend). By default fill\n&quot;</span>);
-    printf(<span class="stringliteral">&quot;-o, --output The output dir to use. By default &#39;./&#39;\n&quot;</span>);
-    printf(<span class="stringliteral">&quot;-h, --help This help message\n&quot;</span>);
+    printf(<span class="stringliteral">&quot;-r, The rop to use (fill, blend). By default fill\n&quot;</span>);
+    printf(<span class="stringliteral">&quot;-o, The output dir to use. By default &#39;./&#39;\n&quot;</span>);
+    printf(<span class="stringliteral">&quot;-h, This help message\n&quot;</span>);
 }
 
 <span class="keyword">static</span> <span class="keywordtype">void</span> run(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv)
@@ -118,23 +118,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <span class="keyword">const</span> <span class="keywordtype">char</span> *output_dir = <span class="stringliteral">&quot;./&quot;</span>;
     <span class="keyword">const</span> <span class="keywordtype">char</span> *exec_name;
     <span class="keywordtype">char</span> *short_options = <span class="stringliteral">&quot;hr:o:&quot;</span>;
-    <span class="keyword">struct </span>option long_options[] = {
-        {<span class="stringliteral">&quot;rop&quot;</span>, 1, 0, <span class="charliteral">&#39;r&#39;</span>},
-        {<span class="stringliteral">&quot;output&quot;</span>, 1, 0, <span class="charliteral">&#39;o&#39;</span>},
-        {<span class="stringliteral">&quot;help&quot;</span>, 0, 0, <span class="charliteral">&#39;h&#39;</span>},
-        {0, 0, 0, 0}
-    };
     <span class="keywordtype">int</span> co;
-    <span class="keywordtype">int</span> option;
     <span class="keywordtype">int</span> ret;
     <span class="keywordtype">char</span> *real_file;
 
     exec_name = argv[0];
 
-    <span class="comment">/* TODO get the output dir */</span>
     <span class="comment">/* handle the parameters */</span>
-    <span class="keywordflow">while</span> ((co = getopt_long(argc, argv, short_options, long_options,
-            &amp;option)) != -1)
+    opterr = 0;
+    <span class="keywordflow">while</span> ((co = getopt(argc, argv, short_options)) != -1)
     {
         <span class="keywordflow">switch</span> (co)
         {
@@ -220,7 +212,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 20:56:10 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 21:07:31 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
