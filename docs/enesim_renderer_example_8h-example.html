@@ -82,7 +82,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <span class="preprocessor"></span>
 <span class="preprocessor">#define _GNU_SOURCE 1</span>
 <span class="preprocessor"></span><span class="preprocessor">#include &lt;stdio.h&gt;</span>
-<span class="preprocessor">#include &lt;getopt.h&gt;</span>
 
 <span class="preprocessor">#include &quot;<a class="code" href="Enesim_8h.html" title="Enesim API.">Enesim.h</a>&quot;</span>
 
@@ -100,11 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <span class="preprocessor"></span>
 <span class="keyword">static</span> <span class="keywordtype">void</span> help(<span class="keyword">const</span> <span class="keywordtype">char</span> *name)
 {
-    printf(<span class="stringliteral">&quot;Usage: %s OPTIONS\n&quot;</span>, name);
-    printf(<span class="stringliteral">&quot;Where OPTIONS can be:\n&quot;</span>);
-    printf(<span class="stringliteral">&quot;-r, The rop to use (fill, blend). By default fill\n&quot;</span>);
-    printf(<span class="stringliteral">&quot;-o, The output dir to use. By default &#39;./&#39;\n&quot;</span>);
-    printf(<span class="stringliteral">&quot;-h, This help message\n&quot;</span>);
+    printf(<span class="stringliteral">&quot;Usage: %s [(blend|fill) output dir]\n&quot;</span>, name);
 }
 
 <span class="keyword">static</span> <span class="keywordtype">void</span> run(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv)
@@ -117,43 +112,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     Eina_Rectangle bounds;
     <span class="keyword">const</span> <span class="keywordtype">char</span> *output_dir = <span class="stringliteral">&quot;./&quot;</span>;
     <span class="keyword">const</span> <span class="keywordtype">char</span> *exec_name;
-    <span class="keywordtype">char</span> *short_options = <span class="stringliteral">&quot;hr:o:&quot;</span>;
-    <span class="keywordtype">int</span> co;
     <span class="keywordtype">int</span> ret;
     <span class="keywordtype">char</span> *real_file;
 
     exec_name = argv[0];
 
     <span class="comment">/* handle the parameters */</span>
-    opterr = 0;
-    <span class="keywordflow">while</span> ((co = getopt(argc, argv, short_options)) != -1)
+    <span class="keywordflow">if</span> (argc &gt; 1)
     {
-        <span class="keywordflow">switch</span> (co)
+        <span class="keywordflow">if</span> (argc &lt; 3)
         {
-            <span class="keywordflow">case</span> <span class="charliteral">&#39;h&#39;</span>:
-            help(exec_name);
-            <span class="keywordflow">return</span>;
-
-            <span class="keywordflow">case</span> <span class="charliteral">&#39;r&#39;</span>:
-            <span class="keywordflow">if</span> (!strcmp(optarg, <span class="stringliteral">&quot;fill&quot;</span>))
-                rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>;
-            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!strcmp(optarg, <span class="stringliteral">&quot;blend&quot;</span>))
-                rop = <a name="a1"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>;
-            <span class="keywordflow">else</span>
-            {
-                help(exec_name);
-                <span class="keywordflow">return</span>;
-            }
-            <span class="keywordflow">break</span>;
-
-            <span class="keywordflow">case</span> <span class="charliteral">&#39;o&#39;</span>:
-            output_dir = optarg;
-            <span class="keywordflow">break</span>;
-
-            <span class="keywordflow">default</span>:
             help(exec_name);
             <span class="keywordflow">return</span>;
         }
+        <span class="comment">/* the rop */</span>
+        <span class="keywordflow">if</span> (!strcmp(argv[1], <span class="stringliteral">&quot;fill&quot;</span>))
+            rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>;
+        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!strcmp(argv[1], <span class="stringliteral">&quot;blend&quot;</span>))
+            rop = <a name="a1"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>;
+        <span class="keywordflow">else</span>
+        {
+            help(exec_name);
+            <span class="keywordflow">return</span>;
+        }
+        <span class="comment">/* the output dir */</span>
+        output_dir = argv[2];
     }
 
     enesim_renderer_destination_bounds_get(r, &amp;bounds, 0, 0);
@@ -212,7 +195,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 21:07:31 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 21:18:37 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

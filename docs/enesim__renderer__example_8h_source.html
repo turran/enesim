@@ -86,117 +86,100 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00003"></a>00003 <span class="preprocessor"></span>
 <a name="l00004"></a>00004 <span class="preprocessor">#define _GNU_SOURCE 1</span>
 <a name="l00005"></a>00005 <span class="preprocessor"></span><span class="preprocessor">#include &lt;stdio.h&gt;</span>
-<a name="l00006"></a>00006 <span class="preprocessor">#include &lt;getopt.h&gt;</span>
-<a name="l00007"></a>00007 
-<a name="l00008"></a>00008 <span class="preprocessor">#include &quot;<a class="code" href="Enesim_8h.html" title="Enesim API.">Enesim.h</a>&quot;</span>
-<a name="l00009"></a>00009 
-<a name="l00016"></a>00016 <span class="preprocessor">#define EXAMPLE(name)                               \</span>
-<a name="l00017"></a>00017 <span class="preprocessor">    static Enesim_Renderer * name(void);                    \</span>
-<a name="l00018"></a>00018 <span class="preprocessor">    int main(int argc, char **argv)                     \</span>
-<a name="l00019"></a>00019 <span class="preprocessor">    {                                   \</span>
-<a name="l00020"></a>00020 <span class="preprocessor">        Enesim_Renderer *r;                     \</span>
-<a name="l00021"></a>00021 <span class="preprocessor">        enesim_init();                          \</span>
-<a name="l00022"></a>00022 <span class="preprocessor">        r = name();                         \</span>
-<a name="l00023"></a>00023 <span class="preprocessor">        run(r, #name &quot;.png&quot;, argc, argv);               \</span>
-<a name="l00024"></a>00024 <span class="preprocessor">        enesim_shutdown();                      \</span>
-<a name="l00025"></a>00025 <span class="preprocessor">        return 0;                           \</span>
-<a name="l00026"></a>00026 <span class="preprocessor">    }</span>
-<a name="l00027"></a>00027 <span class="preprocessor"></span>
-<a name="l00028"></a>00028 <span class="keyword">static</span> <span class="keywordtype">void</span> help(<span class="keyword">const</span> <span class="keywordtype">char</span> *name)
-<a name="l00029"></a>00029 {
-<a name="l00030"></a>00030     printf(<span class="stringliteral">&quot;Usage: %s OPTIONS\n&quot;</span>, name);
-<a name="l00031"></a>00031     printf(<span class="stringliteral">&quot;Where OPTIONS can be:\n&quot;</span>);
-<a name="l00032"></a>00032     printf(<span class="stringliteral">&quot;-r, The rop to use (fill, blend). By default fill\n&quot;</span>);
-<a name="l00033"></a>00033     printf(<span class="stringliteral">&quot;-o, The output dir to use. By default &#39;./&#39;\n&quot;</span>);
-<a name="l00034"></a>00034     printf(<span class="stringliteral">&quot;-h, This help message\n&quot;</span>);
-<a name="l00035"></a>00035 }
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037 <span class="keyword">static</span> <span class="keywordtype">void</span> run(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv)
-<a name="l00038"></a>00038 {
-<a name="l00039"></a>00039     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *c;
-<a name="l00040"></a>00040     <a class="code" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s;
-<a name="l00041"></a>00041     <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b;
-<a name="l00042"></a>00042     <a class="code" href="group__Enesim__Log__Group.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *error = NULL;
-<a name="l00043"></a>00043     <a class="code" href="group__Enesim__Main__Group.html#ga3824db2d3d2f4239a0ffd5eaf18de331">Enesim_Rop</a> rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>;
-<a name="l00044"></a>00044     Eina_Rectangle bounds;
-<a name="l00045"></a>00045     <span class="keyword">const</span> <span class="keywordtype">char</span> *output_dir = <span class="stringliteral">&quot;./&quot;</span>;
-<a name="l00046"></a>00046     <span class="keyword">const</span> <span class="keywordtype">char</span> *exec_name;
-<a name="l00047"></a>00047     <span class="keywordtype">char</span> *short_options = <span class="stringliteral">&quot;hr:o:&quot;</span>;
-<a name="l00048"></a>00048     <span class="keywordtype">int</span> co;
-<a name="l00049"></a>00049     <span class="keywordtype">int</span> ret;
-<a name="l00050"></a>00050     <span class="keywordtype">char</span> *real_file;
-<a name="l00051"></a>00051 
-<a name="l00052"></a>00052     exec_name = argv[0];
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054     <span class="comment">/* handle the parameters */</span>
-<a name="l00055"></a>00055     opterr = 0;
-<a name="l00056"></a>00056     <span class="keywordflow">while</span> ((co = getopt(argc, argv, short_options)) != -1)
-<a name="l00057"></a>00057     {
-<a name="l00058"></a>00058         <span class="keywordflow">switch</span> (co)
-<a name="l00059"></a>00059         {
-<a name="l00060"></a>00060             <span class="keywordflow">case</span> <span class="charliteral">&#39;h&#39;</span>:
-<a name="l00061"></a>00061             help(exec_name);
-<a name="l00062"></a>00062             <span class="keywordflow">return</span>;
-<a name="l00063"></a>00063 
-<a name="l00064"></a>00064             <span class="keywordflow">case</span> <span class="charliteral">&#39;r&#39;</span>:
-<a name="l00065"></a>00065             <span class="keywordflow">if</span> (!strcmp(optarg, <span class="stringliteral">&quot;fill&quot;</span>))
-<a name="l00066"></a>00066                 rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>;
-<a name="l00067"></a>00067             <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!strcmp(optarg, <span class="stringliteral">&quot;blend&quot;</span>))
-<a name="l00068"></a>00068                 rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>;
-<a name="l00069"></a>00069             <span class="keywordflow">else</span>
-<a name="l00070"></a>00070             {
-<a name="l00071"></a>00071                 help(exec_name);
-<a name="l00072"></a>00072                 <span class="keywordflow">return</span>;
-<a name="l00073"></a>00073             }
-<a name="l00074"></a>00074             <span class="keywordflow">break</span>;
-<a name="l00075"></a>00075 
-<a name="l00076"></a>00076             <span class="keywordflow">case</span> <span class="charliteral">&#39;o&#39;</span>:
-<a name="l00077"></a>00077             output_dir = optarg;
-<a name="l00078"></a>00078             <span class="keywordflow">break</span>;
-<a name="l00079"></a>00079 
-<a name="l00080"></a>00080             <span class="keywordflow">default</span>:
-<a name="l00081"></a>00081             help(exec_name);
-<a name="l00082"></a>00082             <span class="keywordflow">return</span>;
-<a name="l00083"></a>00083         }
+<a name="l00006"></a>00006 
+<a name="l00007"></a>00007 <span class="preprocessor">#include &quot;<a class="code" href="Enesim_8h.html" title="Enesim API.">Enesim.h</a>&quot;</span>
+<a name="l00008"></a>00008 
+<a name="l00015"></a>00015 <span class="preprocessor">#define EXAMPLE(name)                               \</span>
+<a name="l00016"></a>00016 <span class="preprocessor">    static Enesim_Renderer * name(void);                    \</span>
+<a name="l00017"></a>00017 <span class="preprocessor">    int main(int argc, char **argv)                     \</span>
+<a name="l00018"></a>00018 <span class="preprocessor">    {                                   \</span>
+<a name="l00019"></a>00019 <span class="preprocessor">        Enesim_Renderer *r;                     \</span>
+<a name="l00020"></a>00020 <span class="preprocessor">        enesim_init();                          \</span>
+<a name="l00021"></a>00021 <span class="preprocessor">        r = name();                         \</span>
+<a name="l00022"></a>00022 <span class="preprocessor">        run(r, #name &quot;.png&quot;, argc, argv);               \</span>
+<a name="l00023"></a>00023 <span class="preprocessor">        enesim_shutdown();                      \</span>
+<a name="l00024"></a>00024 <span class="preprocessor">        return 0;                           \</span>
+<a name="l00025"></a>00025 <span class="preprocessor">    }</span>
+<a name="l00026"></a>00026 <span class="preprocessor"></span>
+<a name="l00027"></a>00027 <span class="keyword">static</span> <span class="keywordtype">void</span> help(<span class="keyword">const</span> <span class="keywordtype">char</span> *name)
+<a name="l00028"></a>00028 {
+<a name="l00029"></a>00029     printf(<span class="stringliteral">&quot;Usage: %s [(blend|fill) output dir]\n&quot;</span>, name);
+<a name="l00030"></a>00030 }
+<a name="l00031"></a>00031 
+<a name="l00032"></a>00032 <span class="keyword">static</span> <span class="keywordtype">void</span> run(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv)
+<a name="l00033"></a>00033 {
+<a name="l00034"></a>00034     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *c;
+<a name="l00035"></a>00035     <a class="code" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s;
+<a name="l00036"></a>00036     <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b;
+<a name="l00037"></a>00037     <a class="code" href="group__Enesim__Log__Group.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *error = NULL;
+<a name="l00038"></a>00038     <a class="code" href="group__Enesim__Main__Group.html#ga3824db2d3d2f4239a0ffd5eaf18de331">Enesim_Rop</a> rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>;
+<a name="l00039"></a>00039     Eina_Rectangle bounds;
+<a name="l00040"></a>00040     <span class="keyword">const</span> <span class="keywordtype">char</span> *output_dir = <span class="stringliteral">&quot;./&quot;</span>;
+<a name="l00041"></a>00041     <span class="keyword">const</span> <span class="keywordtype">char</span> *exec_name;
+<a name="l00042"></a>00042     <span class="keywordtype">int</span> ret;
+<a name="l00043"></a>00043     <span class="keywordtype">char</span> *real_file;
+<a name="l00044"></a>00044 
+<a name="l00045"></a>00045     exec_name = argv[0];
+<a name="l00046"></a>00046 
+<a name="l00047"></a>00047     <span class="comment">/* handle the parameters */</span>
+<a name="l00048"></a>00048     <span class="keywordflow">if</span> (argc &gt; 1)
+<a name="l00049"></a>00049     {
+<a name="l00050"></a>00050         <span class="keywordflow">if</span> (argc &lt; 3)
+<a name="l00051"></a>00051         {
+<a name="l00052"></a>00052             help(exec_name);
+<a name="l00053"></a>00053             <span class="keywordflow">return</span>;
+<a name="l00054"></a>00054         }
+<a name="l00055"></a>00055         <span class="comment">/* the rop */</span>
+<a name="l00056"></a>00056         <span class="keywordflow">if</span> (!strcmp(argv[1], <span class="stringliteral">&quot;fill&quot;</span>))
+<a name="l00057"></a>00057             rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>;
+<a name="l00058"></a>00058         <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!strcmp(argv[1], <span class="stringliteral">&quot;blend&quot;</span>))
+<a name="l00059"></a>00059             rop = <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>;
+<a name="l00060"></a>00060         <span class="keywordflow">else</span>
+<a name="l00061"></a>00061         {
+<a name="l00062"></a>00062             help(exec_name);
+<a name="l00063"></a>00063             <span class="keywordflow">return</span>;
+<a name="l00064"></a>00064         }
+<a name="l00065"></a>00065         <span class="comment">/* the output dir */</span>
+<a name="l00066"></a>00066         output_dir = argv[2];
+<a name="l00067"></a>00067     }
+<a name="l00068"></a>00068 
+<a name="l00069"></a>00069     enesim_renderer_destination_bounds_get(r, &amp;bounds, 0, 0);
+<a name="l00070"></a>00070     printf(<span class="stringliteral">&quot;bounds %&quot;</span> EINA_RECTANGLE_FORMAT <span class="stringliteral">&quot;\n&quot;</span>,   
+<a name="l00071"></a>00071             EINA_RECTANGLE_ARGS(&amp;bounds));
+<a name="l00072"></a>00072     s = <a class="code" href="group__Enesim__Surface__Group.html#gabf378c0a24d5c0007a40f5ec2be47c24" title="Create a new surface using the default memory pool.">enesim_surface_new</a>(<a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea62ddd4bf3b6575c963b073e20a0579b8">ENESIM_FORMAT_ARGB8888</a>,
+<a name="l00073"></a>00073             256, 256);
+<a name="l00074"></a>00074     c = <a class="code" href="group__Enesim__Renderer__Checker__Group.html#gae65fb4b0031e691d8b0187e1cf7f6749">enesim_renderer_checker_new</a>();
+<a name="l00075"></a>00075     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga9bd7387f7e086ee0750fbbf8633ba68d" title="Sets the color of the odd squares.">enesim_renderer_checker_odd_color_set</a>(c, 0xff444444);
+<a name="l00076"></a>00076     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga60090ea483068f6cbab93ddff50cac53" title="Sets the color of the even squares.">enesim_renderer_checker_even_color_set</a>(c, 0xff222222);
+<a name="l00077"></a>00077     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga45567292038eeeaf9b07dd8f569d0819" title="Sets the width of the checker rectangles.">enesim_renderer_checker_width_set</a>(c, 20);
+<a name="l00078"></a>00078     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#gaa75fae1829a59dd0679b5830272a890f" title="Sets the height of the checker rectangles.">enesim_renderer_checker_height_set</a>(c, 20);
+<a name="l00079"></a>00079     <span class="comment">/* first draw the background */</span> 
+<a name="l00080"></a>00080     <span class="keywordflow">if</span> (!<a class="code" href="group__Enesim__Renderer__Group.html#gabdb1abb879459a56970feec5b93d0e6d">enesim_renderer_draw</a>(c, s, <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>, NULL, 0, 0,
+<a name="l00081"></a>00081             &amp;error))
+<a name="l00082"></a>00082     {
+<a name="l00083"></a>00083         <a class="code" href="group__Enesim__Log__Group.html#ga7f5f14016a269ef7eabf6df7508e054b" title="Display in the standard output the given logs.">enesim_log_dump</a>(error);
 <a name="l00084"></a>00084     }
-<a name="l00085"></a>00085 
-<a name="l00086"></a>00086     enesim_renderer_destination_bounds_get(r, &amp;bounds, 0, 0);
-<a name="l00087"></a>00087     printf(<span class="stringliteral">&quot;bounds %&quot;</span> EINA_RECTANGLE_FORMAT <span class="stringliteral">&quot;\n&quot;</span>,   
-<a name="l00088"></a>00088             EINA_RECTANGLE_ARGS(&amp;bounds));
-<a name="l00089"></a>00089     s = <a class="code" href="group__Enesim__Surface__Group.html#gabf378c0a24d5c0007a40f5ec2be47c24" title="Create a new surface using the default memory pool.">enesim_surface_new</a>(<a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea62ddd4bf3b6575c963b073e20a0579b8">ENESIM_FORMAT_ARGB8888</a>,
-<a name="l00090"></a>00090             256, 256);
-<a name="l00091"></a>00091     c = <a class="code" href="group__Enesim__Renderer__Checker__Group.html#gae65fb4b0031e691d8b0187e1cf7f6749">enesim_renderer_checker_new</a>();
-<a name="l00092"></a>00092     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga9bd7387f7e086ee0750fbbf8633ba68d" title="Sets the color of the odd squares.">enesim_renderer_checker_odd_color_set</a>(c, 0xff444444);
-<a name="l00093"></a>00093     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga60090ea483068f6cbab93ddff50cac53" title="Sets the color of the even squares.">enesim_renderer_checker_even_color_set</a>(c, 0xff222222);
-<a name="l00094"></a>00094     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga45567292038eeeaf9b07dd8f569d0819" title="Sets the width of the checker rectangles.">enesim_renderer_checker_width_set</a>(c, 20);
-<a name="l00095"></a>00095     <a class="code" href="group__Enesim__Renderer__Checker__Group.html#gaa75fae1829a59dd0679b5830272a890f" title="Sets the height of the checker rectangles.">enesim_renderer_checker_height_set</a>(c, 20);
-<a name="l00096"></a>00096     <span class="comment">/* first draw the background */</span> 
-<a name="l00097"></a>00097     <span class="keywordflow">if</span> (!<a class="code" href="group__Enesim__Renderer__Group.html#gabdb1abb879459a56970feec5b93d0e6d">enesim_renderer_draw</a>(c, s, <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>, NULL, 0, 0,
-<a name="l00098"></a>00098             &amp;error))
-<a name="l00099"></a>00099     {
-<a name="l00100"></a>00100         <a class="code" href="group__Enesim__Log__Group.html#ga7f5f14016a269ef7eabf6df7508e054b" title="Display in the standard output the given logs.">enesim_log_dump</a>(error);
-<a name="l00101"></a>00101     }
-<a name="l00102"></a>00102     <span class="comment">/* now the real renderer */</span>
-<a name="l00103"></a>00103     <span class="keywordflow">if</span> (!<a class="code" href="group__Enesim__Renderer__Group.html#gabdb1abb879459a56970feec5b93d0e6d">enesim_renderer_draw</a>(r, s, rop, NULL, 0, 0,
-<a name="l00104"></a>00104             &amp;error))
-<a name="l00105"></a>00105     {
-<a name="l00106"></a>00106         <a class="code" href="group__Enesim__Log__Group.html#ga7f5f14016a269ef7eabf6df7508e054b" title="Display in the standard output the given logs.">enesim_log_dump</a>(error);
-<a name="l00107"></a>00107     }
-<a name="l00108"></a>00108     b = <a class="code" href="group__Enesim__Surface__Group.html#ga4c6e6642f03b5709d0746c3829910c9c" title="Gets the buffer associated with a surface.">enesim_surface_buffer_get</a>(s);
-<a name="l00109"></a>00109     ret = asprintf(&amp;real_file, <span class="stringliteral">&quot;%s/%s&quot;</span>, output_dir, file);
-<a name="l00110"></a>00110     <span class="keywordflow">if</span> (ret &amp;&amp; real_file)
-<a name="l00111"></a>00111     {
-<a name="l00112"></a>00112         <a class="code" href="group__Enesim__Image__File__Group.html#ga78493198dc52e44a92098c18a207611d">enesim_image_file_save</a>(real_file, b, NULL);
-<a name="l00113"></a>00113         free(real_file);
-<a name="l00114"></a>00114     }
-<a name="l00115"></a>00115 
-<a name="l00116"></a>00116     <a class="code" href="group__Enesim__Buffer__Group.html#ga022fa9463035f6018d1477066cd2a5ac" title="Decrease the reference counter of a buffer.">enesim_buffer_unref</a>(b);
-<a name="l00117"></a>00117     <a class="code" href="group__Enesim__Surface__Group.html#gab8c19fbddc4998826dff9d1ccdf392ab" title="Decrease the reference counter of a surface.">enesim_surface_unref</a>(s);
-<a name="l00118"></a>00118     <a class="code" href="group__Enesim__Renderer__Group.html#ga621fe69006e4e2503e991992d0c3be24" title="Decrease the reference counter of a renderer.">enesim_renderer_unref</a>(r);
-<a name="l00119"></a>00119     <a class="code" href="group__Enesim__Renderer__Group.html#ga621fe69006e4e2503e991992d0c3be24" title="Decrease the reference counter of a renderer.">enesim_renderer_unref</a>(c);
-<a name="l00120"></a>00120 }
-<a name="l00121"></a>00121 
-<a name="l00122"></a>00122 <span class="preprocessor">#endif</span>
+<a name="l00085"></a>00085     <span class="comment">/* now the real renderer */</span>
+<a name="l00086"></a>00086     <span class="keywordflow">if</span> (!<a class="code" href="group__Enesim__Renderer__Group.html#gabdb1abb879459a56970feec5b93d0e6d">enesim_renderer_draw</a>(r, s, rop, NULL, 0, 0,
+<a name="l00087"></a>00087             &amp;error))
+<a name="l00088"></a>00088     {
+<a name="l00089"></a>00089         <a class="code" href="group__Enesim__Log__Group.html#ga7f5f14016a269ef7eabf6df7508e054b" title="Display in the standard output the given logs.">enesim_log_dump</a>(error);
+<a name="l00090"></a>00090     }
+<a name="l00091"></a>00091     b = <a class="code" href="group__Enesim__Surface__Group.html#ga4c6e6642f03b5709d0746c3829910c9c" title="Gets the buffer associated with a surface.">enesim_surface_buffer_get</a>(s);
+<a name="l00092"></a>00092     ret = asprintf(&amp;real_file, <span class="stringliteral">&quot;%s/%s&quot;</span>, output_dir, file);
+<a name="l00093"></a>00093     <span class="keywordflow">if</span> (ret &amp;&amp; real_file)
+<a name="l00094"></a>00094     {
+<a name="l00095"></a>00095         <a class="code" href="group__Enesim__Image__File__Group.html#ga78493198dc52e44a92098c18a207611d">enesim_image_file_save</a>(real_file, b, NULL);
+<a name="l00096"></a>00096         free(real_file);
+<a name="l00097"></a>00097     }
+<a name="l00098"></a>00098 
+<a name="l00099"></a>00099     <a class="code" href="group__Enesim__Buffer__Group.html#ga022fa9463035f6018d1477066cd2a5ac" title="Decrease the reference counter of a buffer.">enesim_buffer_unref</a>(b);
+<a name="l00100"></a>00100     <a class="code" href="group__Enesim__Surface__Group.html#gab8c19fbddc4998826dff9d1ccdf392ab" title="Decrease the reference counter of a surface.">enesim_surface_unref</a>(s);
+<a name="l00101"></a>00101     <a class="code" href="group__Enesim__Renderer__Group.html#ga621fe69006e4e2503e991992d0c3be24" title="Decrease the reference counter of a renderer.">enesim_renderer_unref</a>(r);
+<a name="l00102"></a>00102     <a class="code" href="group__Enesim__Renderer__Group.html#ga621fe69006e4e2503e991992d0c3be24" title="Decrease the reference counter of a renderer.">enesim_renderer_unref</a>(c);
+<a name="l00103"></a>00103 }
+<a name="l00104"></a>00104 
+<a name="l00105"></a>00105 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -215,7 +198,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 21:07:31 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 21:18:37 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
