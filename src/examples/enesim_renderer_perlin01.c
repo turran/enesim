@@ -1,6 +1,11 @@
 #include "Enesim.h"
 #include "enesim_renderer_example.h"
 
+/**
+ * @example enesim_renderer_perlin01.c
+ * Example usage of a perlin renderer
+ * @image html enesim_renderer_perlin01.png
+ */
 static Enesim_Renderer * enesim_renderer_perlin01(void)
 {
 	Enesim_Renderer *r;

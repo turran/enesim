@@ -1,6 +1,11 @@
 #include "Enesim.h"
 #include "enesim_renderer_example.h"
 
+/**
+ * @example enesim_renderer_circle01.c
+ * Example usage of a circle renderer
+ * @image html enesim_renderer_circle01.png
+ */
 static Enesim_Renderer * enesim_renderer_circle01(void)
 {
 	Enesim_Renderer *r;

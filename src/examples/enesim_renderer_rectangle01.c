@@ -1,6 +1,11 @@
 #include "Enesim.h"
 #include "enesim_renderer_example.h"
 
+/**
+ * @example enesim_renderer_rectangle01.c
+ * Example usage of a rectangle renderer
+ * @image html enesim_renderer_rectangle01.png
+ */
 static Enesim_Renderer * enesim_renderer_rectangle01(void)
 {
 	Enesim_Renderer *r;

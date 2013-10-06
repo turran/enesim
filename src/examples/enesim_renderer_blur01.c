@@ -1,6 +1,11 @@
 #include "Enesim.h"
 #include "enesim_renderer_example.h"
 
+/**
+ * @example enesim_renderer_blur01.c
+ * Example usage of a blur renderer
+ * @image html enesim_renderer_blur01.png
+ */
 static Enesim_Renderer * enesim_renderer_blur01(void)
 {
 	Enesim_Renderer *r1, *r2;
