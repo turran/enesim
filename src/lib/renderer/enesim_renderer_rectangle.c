@@ -318,8 +318,7 @@ static void _enesim_renderer_rectangle_instance_deinit(void *o EINA_UNUSED)
  *
  * @return A new rectangle renderer.
  *
- * This function returns a newly allocated rectangle renderer. On memory
- * l, this function returns @c NULL.
+ * This function returns a newly allocated rectangle renderer.
  */
 EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 {
