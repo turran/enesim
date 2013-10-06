@@ -1,6 +1,12 @@
 #ifndef _EXAMPLE_H
 #define _EXAMPLE_H
 
+#define _GNU_SOURCE 1
+#include <stdio.h>
+#include <getopt.h>
+
+#include "Enesim.h"
+
 /**
  * @example enesim_renderer_example.h
  * Example usage of a renderer shared among every enesim_renderer_*.c
@@ -12,22 +18,79 @@
 	int main(int argc, char **argv)						\
 	{									\
 		Enesim_Renderer *r;						\
+		enesim_init();							\
 		r = name();							\
 		run(r, #name ".png", argc, argv);				\
+		enesim_shutdown();						\
 		return 0;							\
 	}
 
-static void run(Enesim_Renderer *r, const char *file, int argc EINA_UNUSED, char **argv EINA_UNUSED)
+static void help(const char *name)
+{
+	printf("Usage: %s OPTIONS\n", name);
+	printf("Where OPTIONS can be:\n");
+	printf("-r, --rop The rop to use (fill, blend). By default fill\n");
+	printf("-o, --output The output dir to use. By default './'\n");
+	printf("-h, --help This help message\n");
+}
+
+static void run(Enesim_Renderer *r, const char *file, int argc, char **argv)
 {
 	Enesim_Renderer *c;
 	Enesim_Surface *s;
 	Enesim_Buffer *b;
 	Enesim_Log *error = NULL;
+	Enesim_Rop rop = ENESIM_ROP_FILL;
 	Eina_Rectangle bounds;
+	const char *output_dir = "./";
+	const char *exec_name;
+	char *short_options = "hr:o:";
+	struct option long_options[] = {
+		{"rop", 1, 0, 'r'},
+		{"output", 1, 0, 'o'},
+		{"help", 0, 0, 'h'},
+		{0, 0, 0, 0}
+	};
+	int co;
+	int option;
+	int ret;
+	char *real_file;
 
-	enesim_init();
+	exec_name = argv[0];
 
 	/* TODO get the output dir */
+	/* handle the parameters */
+	while ((co = getopt_long(argc, argv, short_options, long_options,
+			&option)) != -1)
+	{
+		switch (co)
+		{
+			case 'h':
+			help(exec_name);
+			return;
+
+			case 'r':
+			if (!strcmp(optarg, "fill"))
+				rop = ENESIM_ROP_FILL;
+			else if (!strcmp(optarg, "blend"))
+				rop = ENESIM_ROP_BLEND;
+			else
+			{
+				help(exec_name);
+				return;
+			}
+			break;
+
+			case 'o':
+			output_dir = optarg;
+			break;
+
+			default:
+			help(exec_name);
+			return;
+		}
+	}
+
 	enesim_renderer_destination_bounds_get(r, &bounds, 0, 0);
 	printf("bounds %" EINA_RECTANGLE_FORMAT "\n", 	
 			EINA_RECTANGLE_ARGS(&bounds));
@@ -45,20 +108,23 @@ static void run(Enesim_Renderer *r, const char *file, int argc EINA_UNUSED, char
 		enesim_log_dump(error);
 	}
 	/* now the real renderer */
-	if (!enesim_renderer_draw(r, s, ENESIM_ROP_FILL, NULL, 0, 0,
+	if (!enesim_renderer_draw(r, s, rop, NULL, 0, 0,
 			&error))
 	{
 		enesim_log_dump(error);
 	}
 	b = enesim_surface_buffer_get(s);
-	enesim_image_file_save(file, b, NULL);
+	ret = asprintf(&real_file, "%s/%s", output_dir, file);
+	if (ret && real_file)
+	{
+		enesim_image_file_save(real_file, b, NULL);
+		free(real_file);
+	}
+
 	enesim_buffer_unref(b);
 	enesim_surface_unref(s);
 	enesim_renderer_unref(r);
 	enesim_renderer_unref(c);
-
-	enesim_shutdown();
 }
 
 #endif
-

@@ -1,4 +1,3 @@
-#include "Enesim.h"
 #include "enesim_renderer_example.h"
 
 /**
