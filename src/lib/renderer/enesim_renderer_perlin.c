@@ -237,8 +237,8 @@ static void _enesim_renderer_perlin_instance_deinit(void *o EINA_UNUSED)
  *                                   API                                      *
  *============================================================================*/
 /**
- * Creates a new perlin renderer
- * @return The renderer
+ * Creates a new perlin noise renderer
+ * @return The newly created perlin renderer
  */
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 {
@@ -249,8 +249,13 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the number of octaves used on the perlin noise renderer
+ * @param[in] r The perlin noise renderer
+ * @param[in] octaves The number of octaves
+ * 
+ * The number of octaves control the amount of detail of perlin noise renderer.
+ * Adding more octaves increases the detail with the added drawback of increasing the
+ * calculation time.
  */
 EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int octaves)
 {
@@ -261,8 +266,12 @@ EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int oc
 }
 
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the persistence multiplier on the perlin noise renderer
+ * @param[in] r The perlin noise renderer
+ * @param[in] persistence The persistence multiplier
+ *
+ * The persistence is the multiplier that determines how quickly the amplitude decreases
+ * for each successive octave.
  */
 EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, double persistence)
 {
@@ -271,9 +280,13 @@ EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, double pers
 	thiz = ENESIM_RENDERER_PERLIN(r);
 	thiz->persistence = persistence;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the amplitude on the perlin noise renderer
+ * @param[in] r The perlin noise renderer
+ * @param[in] ampl The amplitude
+ *
+ * The amplitude on each octave will be defined by persistence^octave * amplitude
  */
 EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, double ampl)
 {
@@ -282,9 +295,13 @@ EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, double ampl)
 	thiz = ENESIM_RENDERER_PERLIN(r);
 	thiz->ampl.val = ampl;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the initial X frequency on the perlin noise renderer
+ * @param[in] r The perlin noise renderer
+ * @param[in] freq The initial X frequency
+ *
+ * On each octave the frequency will be 2^octave * frequency
  */
 EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq)
 {
@@ -293,9 +310,13 @@ EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq)
 	thiz = ENESIM_RENDERER_PERLIN(r);
 	thiz->xfreq.val = freq;
 }
+
 /**
- * To be documented
- * FIXME: To be fixed
+ * @brief Set the initial Y frequency on the perlin noise renderer
+ * @param[in] r The perlin noise renderer
+ * @param[in] freq The initial Y frequency
+ *
+ * On each octave the frequency will be 2^octave * frequency
  */
 EAPI void enesim_renderer_perlin_yfrequency_set(Enesim_Renderer *r, double freq)
 {

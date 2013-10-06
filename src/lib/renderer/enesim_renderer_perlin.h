@@ -20,6 +20,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Perlin_Group Perlin
+ * @brief Perlin noise renderer
  * @ingroup Enesim_Renderer_Group
  * @{
  */
