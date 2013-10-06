@@ -298,6 +298,13 @@ static void _enesim_renderer_gradient_linear_instance_deinit(void *o EINA_UNUSED
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * @brief Create a new linear gradient renderer.
+ *
+ * @return A new linear gradient renderer.
+ *
+ * This function returns a newly allocated linear gradient renderer.
+ */
 EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
 {
 	Enesim_Renderer *r;
@@ -306,7 +313,19 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void)
 	return r;
 }
 
-EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
+/**
+ * @brief Set the position of the linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @param[in] x0 The initial X coordinate
+ * @param[in] y0 The initial Y coordinate
+ * @param[in] x1 The final X coordinate
+ * @param[in] y1 The final Y coordinate
+ *
+ * This function sets the position of the linear gradient renderer
+ * @p r with the values @p x0, @p y0, @p x1, @p y1.
+ */
+EAPI void enesim_renderer_gradient_linear_position_set(Enesim_Renderer *r, double x0,
 		double y0, double x1, double y1)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -320,7 +339,19 @@ EAPI void enesim_renderer_gradient_linear_pos_set(Enesim_Renderer *r, double x0,
 	thiz->changed = EINA_TRUE;
 }
 
-EAPI void enesim_renderer_gradient_linear_pos_get(Enesim_Renderer *r, double *x0,
+/**
+ * @brief Retrieve the position of the linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @param[out] x0 The initial X coordinate
+ * @param[out] y0 The initial Y coordinate
+ * @param[out] x1 The final X coordinate
+ * @param[out] y1 The final Y coordinate
+ *
+ * This function gets the position of the linear gradient renderer
+ * @p r in the pointers @p x0, @p y0, @p x1, @p y1.
+ */
+EAPI void enesim_renderer_gradient_linear_position_get(Enesim_Renderer *r, double *x0,
 		double *y0, double *x1, double *y1)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -337,6 +368,15 @@ EAPI void enesim_renderer_gradient_linear_pos_get(Enesim_Renderer *r, double *x0
 		*y1 = thiz->current.y1;
 }
 
+/**
+ * @brief Set the initial X coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @param[in] x0 The initial X coordinate
+ *
+ * This function sets the initial X coordinate of a the linear gradient
+ * renderer @p r to the value @p x0.
+ */
 EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -346,6 +386,15 @@ EAPI void enesim_renderer_gradient_linear_x0_set(Enesim_Renderer *r, double x0)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the initial X coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @return The initial X coordinate
+ *
+ * This function gets the initial X coordinate of a the linear gradient
+ * renderer @p r.
+ */
 EAPI double enesim_renderer_gradient_linear_x0_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -354,6 +403,15 @@ EAPI double enesim_renderer_gradient_linear_x0_get(Enesim_Renderer *r)
 	return thiz->current.x0;
 }
 
+/**
+ * @brief Set the initial Y coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @param[in] y0 The initial Y coordinate
+ *
+ * This function sets the initial Y coordinate of a the linear gradient
+ * renderer @p r to the value @p y0.
+ */
 EAPI void enesim_renderer_gradient_linear_y0_set(Enesim_Renderer *r, double y0)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -363,6 +421,15 @@ EAPI void enesim_renderer_gradient_linear_y0_set(Enesim_Renderer *r, double y0)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the initial Y coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @return The initial Y coordinate
+ *
+ * This function gets the initial Y coordinate of a the linear gradient
+ * renderer @p r.
+ */
 EAPI double enesim_renderer_gradient_linear_y0_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -371,6 +438,15 @@ EAPI double enesim_renderer_gradient_linear_y0_get(Enesim_Renderer *r)
 	return thiz->current.y0;
 }
 
+/**
+ * @brief Set the final X coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @param[in] x1 The final X coordinate
+ *
+ * This function sets the final X coordinate of a the linear gradient
+ * renderer @p r to the value @p x1.
+ */
 EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -380,6 +456,15 @@ EAPI void enesim_renderer_gradient_linear_x1_set(Enesim_Renderer *r, double x1)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the final X coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @return The final X coordinate
+ *
+ * This function gets the final X coordinate of a the linear gradient
+ * renderer @p r.
+ */
 EAPI double enesim_renderer_gradient_linear_x1_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -388,6 +473,15 @@ EAPI double enesim_renderer_gradient_linear_x1_get(Enesim_Renderer *r)
 	return thiz->current.x1;
 }
 
+/**
+ * @brief Set the final Y coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @param[in] y1 The final Y coordinate
+ *
+ * This function sets the final Y coordinate of a the linear gradient
+ * renderer @p r to the value @p y1.
+ */
 EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;
@@ -397,6 +491,15 @@ EAPI void enesim_renderer_gradient_linear_y1_set(Enesim_Renderer *r, double y1)
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Retrieve the final Y coordinate of a linear gradient renderer.
+ *
+ * @param[in] r The linear gradient renderer.
+ * @return The final Y coordinate
+ *
+ * This function gets the final Y coordinate of a the linear gradient
+ * renderer @p r.
+ */
 EAPI double enesim_renderer_gradient_linear_y1_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Linear *thiz;

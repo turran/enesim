@@ -27,7 +27,7 @@ static Enesim_Renderer * enesim_renderer_path01(void)
 	enesim_path_scubic_to(p, 2*17, 2*17, 2*12, 2*27);
 
 	r2 = enesim_renderer_gradient_linear_new();
-	enesim_renderer_gradient_linear_pos_set(r2, 0, 0, 256, 256);
+	enesim_renderer_gradient_linear_position_set(r2, 0, 0, 256, 256);
 	stop.argb = 0xffff0000;
 	stop.pos = 0;
 	enesim_renderer_gradient_stop_add(r2, &stop);

@@ -319,6 +319,11 @@ EAPI Enesim_Renderer * enesim_renderer_proxy_new(void)
 	return r;
 }
 
+/**
+ * Sets the renderer that is going to be proxied on the proxy renderer
+ * @param[in] r The proxy renderer
+ * @param[in] proxied The renderer to proxy [transfer full]
+ */
 EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 		Enesim_Renderer *proxied)
 {
@@ -330,6 +335,11 @@ EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 	thiz->proxied = proxied;
 }
 
+/**
+ * Gets the renderer that is going to be proxied on the proxy renderer
+ * @param[in] r The proxy renderer
+ * @return The renderer to proxy [transfer none]
+ */
 EAPI Enesim_Renderer * enesim_renderer_proxy_proxied_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Proxy *thiz;

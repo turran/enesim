@@ -623,6 +623,7 @@ EAPI void enesim_renderer_unref(Enesim_Renderer *r)
 /**
  * @brief Gets the reference counter value of a renderer
  * @param[in] r The renedrer to get the reference counter from
+ * @return The reference counter value
  */
 EAPI int enesim_renderer_ref_count(Enesim_Renderer *r)
 {
@@ -775,10 +776,6 @@ EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y)
 	if (y) *y = enesim_renderer_y_origin_get(r);
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -786,20 +783,12 @@ EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x)
 	r->state.changed = EINA_TRUE;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI double enesim_renderer_x_origin_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	return r->state.current.ox;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -807,10 +796,6 @@ EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y)
 	r->state.changed = EINA_TRUE;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI double enesim_renderer_y_origin_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -844,10 +829,6 @@ EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
 	return r->state.current.color;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -855,20 +836,12 @@ EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
 	r->state.changed = EINA_TRUE;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_visibility_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	return r->state.current.visibility;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask)
 {
 	Enesim_Renderer *old_mask;
@@ -881,20 +854,12 @@ EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask)
 	r->state.changed = EINA_TRUE;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Renderer * enesim_renderer_mask_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	return enesim_renderer_ref(r->state.current.mask);
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -902,20 +867,12 @@ EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality
 	r->state.changed = EINA_TRUE;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	return r->state.current.quality;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Enesim_Matrix_Type enesim_renderer_transformation_type_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
@@ -960,10 +917,6 @@ EAPI void enesim_renderer_bounds_get_extended_get(Enesim_Renderer *r, Enesim_Rec
 		*prev = r->past_bounds;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectangle *rect,
 		int x, int y)
 {
@@ -985,10 +938,6 @@ EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectan
 		rect->y -= y;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI void enesim_renderer_destination_bounds_get_extended_get(Enesim_Renderer *r,
 		Eina_Rectangle *prev, Eina_Rectangle *curr,
 		int x, int y)
@@ -1009,10 +958,6 @@ EAPI void enesim_renderer_destination_bounds_get_extended_get(Enesim_Renderer *r
 	}
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 {
 	Enesim_Renderer_Class *klass;
@@ -1025,8 +970,10 @@ EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
 }
 
 /**
- * To  be documented
- * FIXME: To be fixed
+ * Set a user defined private data on a renderer
+ * @param[in] r The enesim renderer to set the private data in
+ * @param[in] name The string identifier of the private data
+ * @param[in] data The user defined private data
  */
 EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data)
 {
@@ -1035,8 +982,11 @@ EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void
 }
 
 /**
- * To  be documented
- * FIXME: To be fixed
+ * Get the user defined private data from a renderer
+ * @param[in] r The enesim renderer to get the private data from
+ * @param[in] name The name that identifies the private data
+ * @return The user defined private data or @c NULL if the private
+ * data is not found for the @p name
  */
 EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
 {
@@ -1053,6 +1003,8 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  * @param[in] log In case the drawing fails, the log to put messages on
+ * @return Eina_True if the the drawing was successfull, Eina_False otherwise.
+ * In case the drawing fails the @p log is filled with the failed message
  */
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **log)
@@ -1104,6 +1056,8 @@ end:
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  * @param[in] log In case the drawing fails, the log to put messages on
+ * @return Eina_True if the the drawing was successfull, Eina_False otherwise.
+ * In case the drawing fails the @p log is filled with the failed message
  */
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_List *clips, int x, int y,
@@ -1173,10 +1127,6 @@ EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
 
 #endif
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Class *klass;
@@ -1213,10 +1163,6 @@ done:
 	return ret;
 }
 
-/**
- * To  be documented
- * FIXME: To be fixed
- */
 EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
 {
 	Enesim_Renderer_Class *klass;
