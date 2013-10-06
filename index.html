@@ -33,31 +33,25 @@
 
 <p>Enesim is a rendering library and provides a complete solution for drawing, allocating, compositing and converting pixels. All of the systems of the library are flexible enough to support drawing capabilities on any scenario.</p>
 
-<p>The most useful system is the the Renderer system, which allows you to draw different graphics primitives (in Enesim it is called a Renderer) into a target drawable (in Enesim a Surface). Given that a Renderer can draw anything, it has its own state that is modified through the renderer's specific properties setters and getters. A simple example would be:</p>
-
-<pre><code>Enesim_Surface *s;
-Enesim_Renderer *r;
-
-s = enesim_surface_new(ENESIM_BACKEND_SOFTWARE, ENESIM_FORMAT_ARGB8888, 256, 256);
-r = enesim_renderer_rectangle_new();
-enesim_renderer_y_origin_set(r, 0);
-enesim_renderer_x_origin_set(r, 0);
-enesim_renderer_rectangle_width_set(r, 320);
-enesim_renderer_rectangle_height_set(r, 240);
-enesim_renderer_shape_stroke_weight_set(r, 1);
-enesim_renderer_shape_draw_mode_set(r, ENESIM_SHAPE_DRAW_MODE_STROKE);
-enesim_renderer_rop_set(r, ENESIM_BLEND);
-enesim_renderer_shape_outline_color_set(r, 0xff000000);
-enesim_renderer_surface_draw(r, s, NULL, 0, 0, NULL);
-</code></pre>
+<p>The most useful system is the the Renderer system, which allows you to draw different graphics primitives (in Enesim it is called a Renderer) into a target drawable (in Enesim a Surface). Given that a Renderer can draw anything, it has its own state that is modified through the renderer's specific properties setters and getters.</p>
 
 <h3>
 <a name="backends" class="anchor" href="#backends"><span class="octicon octicon-link"></span></a>Backends</h3>
 
 <ul>
 <li>Software based</li>
-<li>OpenGL</li>
+<li>OppenGL</li>
 </ul><h3>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h3>
+
+<p>For the API reference check the <a href="http://enesim.org/docs/">doxygen</a> generated documentation</p>
+
+<h3>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h3>
+
+<p>For some examples on how to use the library and the generated images check the <a href="http://enesim.org/docs/examples.html">examples</a> page at the documentation.</p>
+
+<h3>
 <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h3>
 
 <ul>
