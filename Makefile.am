@@ -71,7 +71,6 @@ enesim.pc.in \
 enesim_opencl.pc.in \
 doc/Doxyfile.in \
 doc/img/enesim_images.svg \
-doc/img/enesim.png \
 doc/img/enesim_text.svg \
 doc/img/renderer_checker.png \
 doc/img/renderer_template.svg \
