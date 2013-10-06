@@ -30,9 +30,9 @@ static Enesim_Renderer * enesim_renderer_path04(void)
 	enesim_renderer_ellipse_x_set(r2, x);
 	enesim_renderer_ellipse_y_set(r2, y);
 	enesim_renderer_ellipse_radii_set(r2, w, h);
-        enesim_renderer_shape_stroke_weight_set(r2, 2);
-        enesim_renderer_shape_stroke_color_set(r2, 0xff000000);
-        enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
+	enesim_renderer_shape_stroke_weight_set(r2, 2);
+	enesim_renderer_shape_stroke_color_set(r2, 0xff000000);
+	enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 
 	l = enesim_renderer_compound_layer_new();
 	enesim_renderer_compound_layer_renderer_set(l, r2);
@@ -43,9 +43,9 @@ static Enesim_Renderer * enesim_renderer_path04(void)
 	enesim_renderer_ellipse_x_set(r2, x + w);
 	enesim_renderer_ellipse_y_set(r2, y - h);
 	enesim_renderer_ellipse_radii_set(r2, w, h);
-        enesim_renderer_shape_stroke_weight_set(r2, 2);
-        enesim_renderer_shape_stroke_color_set(r2, 0xff000000);
-        enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
+	enesim_renderer_shape_stroke_weight_set(r2, 2);
+	enesim_renderer_shape_stroke_color_set(r2, 0xff000000);
+	enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 
 	l = enesim_renderer_compound_layer_new();
 	enesim_renderer_compound_layer_renderer_set(l, r2);
@@ -58,9 +58,9 @@ static Enesim_Renderer * enesim_renderer_path04(void)
 
 	r2 = enesim_renderer_path_new();
 	enesim_renderer_path_path_set(r2, p);
-        enesim_renderer_shape_stroke_weight_set(r2, 2);
-        enesim_renderer_shape_stroke_color_set(r2, 0xffff0000);
-        enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
+	enesim_renderer_shape_stroke_weight_set(r2, 2);
+	enesim_renderer_shape_stroke_color_set(r2, 0xffff0000);
+	enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 
 	l = enesim_renderer_compound_layer_new();
 	enesim_renderer_compound_layer_renderer_set(l, r2);
