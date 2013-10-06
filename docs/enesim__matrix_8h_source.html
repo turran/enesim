@@ -116,76 +116,92 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00040"></a>00040 
 <a name="l00045"></a><a class="code" href="structEnesim__Matrix.html">00045</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Matrix
 <a name="l00046"></a>00046 {
-<a name="l00047"></a>00047     <span class="keywordtype">double</span> xx, xy, xz;
-<a name="l00048"></a>00048     <span class="keywordtype">double</span> yx, yy, yz;
-<a name="l00049"></a>00049     <span class="keywordtype">double</span> zx, zy, zz;
-<a name="l00050"></a>00050 } <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a>;
-<a name="l00051"></a>00051 
-<a name="l00056"></a><a class="code" href="structEnesim__F16p16__Matrix.html">00056</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_F16p16_Matrix
-<a name="l00057"></a>00057 {
-<a name="l00058"></a>00058     Eina_F16p16 xx, xy, xz;
-<a name="l00059"></a>00059     Eina_F16p16 yx, yy, yz;
-<a name="l00060"></a>00060     Eina_F16p16 zx, zy, zz;
-<a name="l00061"></a>00061 } <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a>;
-<a name="l00062"></a>00062 
-<a name="l00067"></a><a class="code" href="structEnesim__Quad.html">00067</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Quad
-<a name="l00068"></a>00068 {
-<a name="l00069"></a>00069     <span class="keywordtype">double</span> x0, y0;
-<a name="l00070"></a>00070     <span class="keywordtype">double</span> x1, y1;
-<a name="l00071"></a>00071     <span class="keywordtype">double</span> x2, y2;
-<a name="l00072"></a>00072     <span class="keywordtype">double</span> x3, y3;
-<a name="l00073"></a>00073 } <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a>;
-<a name="l00074"></a>00074 
-<a name="l00083"></a>00083 EAPI Enesim_Matrix_Type <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga67a51ec7d76180d2d7f825cf63f3cce4" title="Return the type of the given floating point matrix.">enesim_matrix_type_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m);
-<a name="l00084"></a>00084 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gaf9312159a133151d4cdb908deab0f135" title="Set the values of the coefficients of the given floating point matrix.">enesim_matrix_values_set</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> a, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> c,
-<a name="l00085"></a>00085         <span class="keywordtype">double</span> d, <span class="keywordtype">double</span> e, <span class="keywordtype">double</span> f, <span class="keywordtype">double</span> g, <span class="keywordtype">double</span> h, <span class="keywordtype">double</span> i);
-<a name="l00086"></a>00086 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga565608b01eab4ee4ba81a9bdb5305cf7" title="Get the values of the coefficients of the given floating point matrix.">enesim_matrix_values_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> *a, <span class="keywordtype">double</span> *b,
-<a name="l00087"></a>00087         <span class="keywordtype">double</span> *c, <span class="keywordtype">double</span> *d, <span class="keywordtype">double</span> *e, <span class="keywordtype">double</span> *f, <span class="keywordtype">double</span> *g, <span class="keywordtype">double</span> *h,
-<a name="l00088"></a>00088         <span class="keywordtype">double</span> *i);
-<a name="l00089"></a>00089 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga36d343dfebf8b933027b1df7589a9e26" title="Get the values of the coefficients of the given fixed point matrix.">enesim_matrix_fixed_values_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, Eina_F16p16 *a,
-<a name="l00090"></a>00090         Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
-<a name="l00091"></a>00091         Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i);
-<a name="l00092"></a>00092 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gae2a9d0cf19f381b0d4bacfb387331dbf" title="Transform the given floating point matrix to the given fixed point matrix.">enesim_matrix_f16p16_matrix_to</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m,
-<a name="l00093"></a>00093         <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *fm);
+<a name="l00047"></a><a class="code" href="structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827">00047</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827">xx</a>; 
+<a name="l00048"></a><a class="code" href="structEnesim__Matrix.html#a0fae54e9f07895031745082991723459">00048</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#a0fae54e9f07895031745082991723459">xy</a>; 
+<a name="l00049"></a><a class="code" href="structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab">00049</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab">xz</a>; 
+<a name="l00051"></a><a class="code" href="structEnesim__Matrix.html#a947076331c2f1d3d6a80c8329ad99dd9">00051</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#a947076331c2f1d3d6a80c8329ad99dd9">yx</a>; 
+<a name="l00052"></a><a class="code" href="structEnesim__Matrix.html#af3bb04eda65029c999cf8d8e7b67d52c">00052</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#af3bb04eda65029c999cf8d8e7b67d52c">yy</a>; 
+<a name="l00053"></a><a class="code" href="structEnesim__Matrix.html#a48dc514bae2a07e567ecb4eac4477c86">00053</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#a48dc514bae2a07e567ecb4eac4477c86">yz</a>; 
+<a name="l00055"></a><a class="code" href="structEnesim__Matrix.html#a4bba6564ff64d5ce9e2ca20e95994c98">00055</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#a4bba6564ff64d5ce9e2ca20e95994c98">zx</a>; 
+<a name="l00056"></a><a class="code" href="structEnesim__Matrix.html#ad3f954fd277dfc6a65564ff80acfea58">00056</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#ad3f954fd277dfc6a65564ff80acfea58">zy</a>; 
+<a name="l00057"></a><a class="code" href="structEnesim__Matrix.html#a86f8b7895398923790aedea040b88660">00057</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Matrix.html#a86f8b7895398923790aedea040b88660">zz</a>; 
+<a name="l00058"></a>00058 } <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a>;
+<a name="l00059"></a>00059 
+<a name="l00064"></a><a class="code" href="structEnesim__F16p16__Matrix.html">00064</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_F16p16_Matrix
+<a name="l00065"></a>00065 {
+<a name="l00066"></a><a class="code" href="structEnesim__F16p16__Matrix.html#add7037a258d0b3d642645f8f78d2a1fa">00066</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#add7037a258d0b3d642645f8f78d2a1fa">xx</a>; 
+<a name="l00067"></a><a class="code" href="structEnesim__F16p16__Matrix.html#af2de9084a439820ded2b7fc0cbfc662e">00067</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#af2de9084a439820ded2b7fc0cbfc662e">xy</a>; 
+<a name="l00068"></a><a class="code" href="structEnesim__F16p16__Matrix.html#a2ffb11977dc781d6f35d5a2849bf5084">00068</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#a2ffb11977dc781d6f35d5a2849bf5084">xz</a>; 
+<a name="l00070"></a><a class="code" href="structEnesim__F16p16__Matrix.html#a911934f8040318d9d11cca2d1e2b5457">00070</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#a911934f8040318d9d11cca2d1e2b5457">yx</a>; 
+<a name="l00071"></a><a class="code" href="structEnesim__F16p16__Matrix.html#a33e45f9f2adea4e295a60d863874718d">00071</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#a33e45f9f2adea4e295a60d863874718d">yy</a>; 
+<a name="l00072"></a><a class="code" href="structEnesim__F16p16__Matrix.html#ad298bfd42c556e567c486c4fb7c2ac74">00072</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#ad298bfd42c556e567c486c4fb7c2ac74">yz</a>; 
+<a name="l00074"></a><a class="code" href="structEnesim__F16p16__Matrix.html#ab2919eb51cb8c2582573afddb5ba4f56">00074</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#ab2919eb51cb8c2582573afddb5ba4f56">zx</a>; 
+<a name="l00075"></a><a class="code" href="structEnesim__F16p16__Matrix.html#a0442e960c2cda3062401e8b846feef9d">00075</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#a0442e960c2cda3062401e8b846feef9d">zy</a>; 
+<a name="l00076"></a><a class="code" href="structEnesim__F16p16__Matrix.html#a0352ef210b3e92c34f9605df6f0f207a">00076</a>     Eina_F16p16 <a class="code" href="structEnesim__F16p16__Matrix.html#a0352ef210b3e92c34f9605df6f0f207a">zz</a>; 
+<a name="l00077"></a>00077 } <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a>;
+<a name="l00078"></a>00078 
+<a name="l00083"></a><a class="code" href="structEnesim__Quad.html">00083</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Quad
+<a name="l00084"></a>00084 {
+<a name="l00085"></a><a class="code" href="structEnesim__Quad.html#adf8e3e9db62f45d761b7817b8a2954e8">00085</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#adf8e3e9db62f45d761b7817b8a2954e8">x0</a>; 
+<a name="l00086"></a><a class="code" href="structEnesim__Quad.html#abed54ed37cf842eed89bdb58308ee99f">00086</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#abed54ed37cf842eed89bdb58308ee99f">y0</a>; 
+<a name="l00087"></a><a class="code" href="structEnesim__Quad.html#a9581afae6100941b1bdb74e58989791d">00087</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#a9581afae6100941b1bdb74e58989791d">x1</a>; 
+<a name="l00088"></a><a class="code" href="structEnesim__Quad.html#ace416d89f0458a0180cbc60a510304f9">00088</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#ace416d89f0458a0180cbc60a510304f9">y1</a>; 
+<a name="l00089"></a><a class="code" href="structEnesim__Quad.html#a64d688f8ee9882b891c39235348af3c1">00089</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#a64d688f8ee9882b891c39235348af3c1">x2</a>; 
+<a name="l00090"></a><a class="code" href="structEnesim__Quad.html#ad08d66336426b836d91708a537d05a92">00090</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#ad08d66336426b836d91708a537d05a92">y2</a>; 
+<a name="l00091"></a><a class="code" href="structEnesim__Quad.html#a1caa12956c96cab6024dc2bf33660361">00091</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#a1caa12956c96cab6024dc2bf33660361">x3</a>; 
+<a name="l00092"></a><a class="code" href="structEnesim__Quad.html#a776438e7d050fe63cdb1b66e15a143c0">00092</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Quad.html#a776438e7d050fe63cdb1b66e15a143c0">y3</a>; 
+<a name="l00093"></a>00093 } <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a>;
 <a name="l00094"></a>00094 
-<a name="l00095"></a>00095 EAPI Eina_Bool <a class="code" href="group__Enesim__Matrix__Float__Group.html#gae2af5f1f64b934a69782f4ddfe8172ad" title="Check whether the two given matrices are equal or not.">enesim_matrix_is_equal</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m1, <span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m2);
-<a name="l00096"></a>00096 EAPI <span class="keywordtype">void</span> enesim_matrix_compose(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m1, <span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m2,
-<a name="l00097"></a>00097         <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *dst);
-<a name="l00098"></a>00098 EAPI <span class="keywordtype">void</span> enesim_matrix_translate(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t, <span class="keywordtype">double</span> tx, <span class="keywordtype">double</span> ty);
-<a name="l00099"></a>00099 EAPI <span class="keywordtype">void</span> enesim_matrix_scale(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t, <span class="keywordtype">double</span> sx, <span class="keywordtype">double</span> sy);
-<a name="l00100"></a>00100 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga353b0534ef72f184ffcdefdf424d3d01">enesim_matrix_rotate</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t, <span class="keywordtype">double</span> rad);
-<a name="l00101"></a>00101 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gaa7c27474b67ac97a5cae0b87396d894b" title="Set the given floating point matrix to the identity matrix.">enesim_matrix_identity</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t);
-<a name="l00102"></a>00102 
-<a name="l00103"></a>00103 EAPI <span class="keywordtype">double</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga872a562b53ae7a3568525a7ff27b7d1c" title="Return the determinant of the given matrix.">enesim_matrix_determinant</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m);
-<a name="l00104"></a>00104 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga84760a51bf494725ffdcc82c47cbdaa2" title="Divide the given matrix by the given scalar.">enesim_matrix_divide</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> scalar);
-<a name="l00105"></a>00105 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gaea2c03c0d16ca8071bea348ccce30856" title="Compute the inverse of the given matrix.">enesim_matrix_inverse</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m2);
-<a name="l00106"></a>00106 EAPI <span class="keywordtype">void</span> enesim_matrix_adjoint(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *a);
-<a name="l00107"></a>00107 
-<a name="l00108"></a>00108 EAPI <span class="keywordtype">void</span> enesim_matrix_point_transform(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y, <span class="keywordtype">double</span> *xr, <span class="keywordtype">double</span> *yr);
-<a name="l00109"></a>00109 EAPI <span class="keywordtype">void</span> enesim_matrix_eina_rectangle_transform(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> Eina_Rectangle *r, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
-<a name="l00110"></a>00110 EAPI <span class="keywordtype">void</span> enesim_matrix_rectangle_transform(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
-<a name="l00111"></a>00111 
-<a name="l00112"></a>00112 EAPI Eina_Bool <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga233d91e620b1e9039b09e4232308c0cb">enesim_matrix_quad_quad_to</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *src, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *dst);
-<a name="l00113"></a>00113 EAPI Eina_Bool enesim_matrix_square_quad_to(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
-<a name="l00114"></a>00114 EAPI Eina_Bool enesim_matrix_quad_square_to(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
-<a name="l00115"></a>00115 
-<a name="l00124"></a>00124 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Fixed__Group.html#gac4fbbc3c5eca4dd37cb13913c73b049d" title="Set the given fixed point matrix to the identity matrix.">enesim_f16p16_matrix_identity</a>(<a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m);
-<a name="l00125"></a>00125 EAPI <span class="keywordtype">void</span> enesim_f16p16_matrix_compose(<span class="keyword">const</span> <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m1,
-<a name="l00126"></a>00126         <span class="keyword">const</span> <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m2, <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *dst);
-<a name="l00127"></a>00127 EAPI Enesim_Matrix_Type <a class="code" href="group__Enesim__Matrix__Fixed__Group.html#ga45ef85516fc766b99c5a5e63e10db306" title="Return the type of the given fixed point matrix.">enesim_f16p16_matrix_type_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m);
-<a name="l00128"></a>00128 
-<a name="l00137"></a>00137 EAPI <span class="keywordtype">void</span> enesim_quad_rectangle_to(<span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q,
-<a name="l00138"></a>00138         <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r);
-<a name="l00139"></a>00139 EAPI <span class="keywordtype">void</span> enesim_quad_eina_rectangle_to(<span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q,
-<a name="l00140"></a>00140         Eina_Rectangle *r);
-<a name="l00141"></a>00141 EAPI <span class="keywordtype">void</span> enesim_quad_rectangle_from(<a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q,
-<a name="l00142"></a>00142         <span class="keyword">const</span> Eina_Rectangle *r);
-<a name="l00143"></a>00143 EAPI <span class="keywordtype">void</span> enesim_quad_coords_set(<a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q, <span class="keywordtype">double</span> x1, <span class="keywordtype">double</span> y1, <span class="keywordtype">double</span> x2,
-<a name="l00144"></a>00144         <span class="keywordtype">double</span> y2, <span class="keywordtype">double</span> x3, <span class="keywordtype">double</span> y3, <span class="keywordtype">double</span> x4, <span class="keywordtype">double</span> y4);
-<a name="l00145"></a>00145 EAPI <span class="keywordtype">void</span> enesim_quad_coords_get(<span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q, <span class="keywordtype">double</span> *x1, <span class="keywordtype">double</span> *y1,
-<a name="l00146"></a>00146         <span class="keywordtype">double</span> *x2, <span class="keywordtype">double</span> *y2, <span class="keywordtype">double</span> *x3, <span class="keywordtype">double</span> *y3, <span class="keywordtype">double</span> *x4,
-<a name="l00147"></a>00147         <span class="keywordtype">double</span> *y4);
-<a name="l00151"></a>00151 <span class="preprocessor">#endif </span><span class="comment">/*ENESIM_MATRIX_H_*/</span>
+<a name="l00103"></a>00103 EAPI Enesim_Matrix_Type <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga67a51ec7d76180d2d7f825cf63f3cce4" title="Return the type of the given floating point matrix.">enesim_matrix_type_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m);
+<a name="l00104"></a>00104 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gaf9312159a133151d4cdb908deab0f135" title="Set the values of the coefficients of the given floating point matrix.">enesim_matrix_values_set</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> a, <span class="keywordtype">double</span> b, <span class="keywordtype">double</span> c,
+<a name="l00105"></a>00105         <span class="keywordtype">double</span> d, <span class="keywordtype">double</span> e, <span class="keywordtype">double</span> f, <span class="keywordtype">double</span> g, <span class="keywordtype">double</span> h, <span class="keywordtype">double</span> i);
+<a name="l00106"></a>00106 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga565608b01eab4ee4ba81a9bdb5305cf7" title="Get the values of the coefficients of the given floating point matrix.">enesim_matrix_values_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> *a, <span class="keywordtype">double</span> *b,
+<a name="l00107"></a>00107         <span class="keywordtype">double</span> *c, <span class="keywordtype">double</span> *d, <span class="keywordtype">double</span> *e, <span class="keywordtype">double</span> *f, <span class="keywordtype">double</span> *g, <span class="keywordtype">double</span> *h,
+<a name="l00108"></a>00108         <span class="keywordtype">double</span> *i);
+<a name="l00109"></a>00109 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga36d343dfebf8b933027b1df7589a9e26" title="Get the values of the coefficients of the given fixed point matrix.">enesim_matrix_fixed_values_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, Eina_F16p16 *a,
+<a name="l00110"></a>00110         Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
+<a name="l00111"></a>00111         Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i);
+<a name="l00112"></a>00112 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gae2a9d0cf19f381b0d4bacfb387331dbf" title="Transform the given floating point matrix to the given fixed point matrix.">enesim_matrix_f16p16_matrix_to</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m,
+<a name="l00113"></a>00113         <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *fm);
+<a name="l00114"></a>00114 
+<a name="l00115"></a>00115 EAPI Eina_Bool <a class="code" href="group__Enesim__Matrix__Float__Group.html#gae2af5f1f64b934a69782f4ddfe8172ad" title="Check whether the two given matrices are equal or not.">enesim_matrix_is_equal</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m1, <span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m2);
+<a name="l00116"></a>00116 EAPI <span class="keywordtype">void</span> enesim_matrix_compose(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m1, <span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m2,
+<a name="l00117"></a>00117         <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *dst);
+<a name="l00118"></a>00118 EAPI <span class="keywordtype">void</span> enesim_matrix_translate(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t, <span class="keywordtype">double</span> tx, <span class="keywordtype">double</span> ty);
+<a name="l00119"></a>00119 EAPI <span class="keywordtype">void</span> enesim_matrix_scale(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t, <span class="keywordtype">double</span> sx, <span class="keywordtype">double</span> sy);
+<a name="l00120"></a>00120 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga353b0534ef72f184ffcdefdf424d3d01">enesim_matrix_rotate</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t, <span class="keywordtype">double</span> rad);
+<a name="l00121"></a>00121 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gaa7c27474b67ac97a5cae0b87396d894b" title="Set the given floating point matrix to the identity matrix.">enesim_matrix_identity</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *t);
+<a name="l00122"></a>00122 
+<a name="l00123"></a>00123 EAPI <span class="keywordtype">double</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga872a562b53ae7a3568525a7ff27b7d1c" title="Return the determinant of the given matrix.">enesim_matrix_determinant</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m);
+<a name="l00124"></a>00124 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga84760a51bf494725ffdcc82c47cbdaa2" title="Divide the given matrix by the given scalar.">enesim_matrix_divide</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> scalar);
+<a name="l00125"></a>00125 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Float__Group.html#gaea2c03c0d16ca8071bea348ccce30856" title="Compute the inverse of the given matrix.">enesim_matrix_inverse</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m2);
+<a name="l00126"></a>00126 EAPI <span class="keywordtype">void</span> enesim_matrix_adjoint(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *a);
+<a name="l00127"></a>00127 
+<a name="l00128"></a>00128 EAPI <span class="keywordtype">void</span> enesim_matrix_point_transform(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y, <span class="keywordtype">double</span> *xr, <span class="keywordtype">double</span> *yr);
+<a name="l00129"></a>00129 EAPI <span class="keywordtype">void</span> enesim_matrix_eina_rectangle_transform(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> Eina_Rectangle *r, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
+<a name="l00130"></a>00130 EAPI <span class="keywordtype">void</span> enesim_matrix_rectangle_transform(<span class="keyword">const</span> <a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
+<a name="l00131"></a>00131 
+<a name="l00132"></a>00132 EAPI Eina_Bool <a class="code" href="group__Enesim__Matrix__Float__Group.html#ga233d91e620b1e9039b09e4232308c0cb">enesim_matrix_quad_quad_to</a>(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *src, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *dst);
+<a name="l00133"></a>00133 EAPI Eina_Bool enesim_matrix_square_quad_to(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
+<a name="l00134"></a>00134 EAPI Eina_Bool enesim_matrix_quad_square_to(<a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q);
+<a name="l00135"></a>00135 
+<a name="l00144"></a>00144 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Matrix__Fixed__Group.html#gac4fbbc3c5eca4dd37cb13913c73b049d" title="Set the given fixed point matrix to the identity matrix.">enesim_f16p16_matrix_identity</a>(<a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m);
+<a name="l00145"></a>00145 EAPI <span class="keywordtype">void</span> enesim_f16p16_matrix_compose(<span class="keyword">const</span> <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m1,
+<a name="l00146"></a>00146         <span class="keyword">const</span> <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m2, <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *dst);
+<a name="l00147"></a>00147 EAPI Enesim_Matrix_Type <a class="code" href="group__Enesim__Matrix__Fixed__Group.html#ga45ef85516fc766b99c5a5e63e10db306" title="Return the type of the given fixed point matrix.">enesim_f16p16_matrix_type_get</a>(<span class="keyword">const</span> <a class="code" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *m);
+<a name="l00148"></a>00148 
+<a name="l00157"></a>00157 EAPI <span class="keywordtype">void</span> enesim_quad_rectangle_to(<span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q,
+<a name="l00158"></a>00158         <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r);
+<a name="l00159"></a>00159 EAPI <span class="keywordtype">void</span> enesim_quad_eina_rectangle_to(<span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q,
+<a name="l00160"></a>00160         Eina_Rectangle *r);
+<a name="l00161"></a>00161 EAPI <span class="keywordtype">void</span> enesim_quad_rectangle_from(<a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q,
+<a name="l00162"></a>00162         <span class="keyword">const</span> Eina_Rectangle *r);
+<a name="l00163"></a>00163 EAPI <span class="keywordtype">void</span> enesim_quad_coords_set(<a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q, <span class="keywordtype">double</span> x1, <span class="keywordtype">double</span> y1, <span class="keywordtype">double</span> x2,
+<a name="l00164"></a>00164         <span class="keywordtype">double</span> y2, <span class="keywordtype">double</span> x3, <span class="keywordtype">double</span> y3, <span class="keywordtype">double</span> x4, <span class="keywordtype">double</span> y4);
+<a name="l00165"></a>00165 EAPI <span class="keywordtype">void</span> enesim_quad_coords_get(<span class="keyword">const</span> <a class="code" href="structEnesim__Quad.html">Enesim_Quad</a> *q, <span class="keywordtype">double</span> *x1, <span class="keywordtype">double</span> *y1,
+<a name="l00166"></a>00166         <span class="keywordtype">double</span> *x2, <span class="keywordtype">double</span> *y2, <span class="keywordtype">double</span> *x3, <span class="keywordtype">double</span> *y3, <span class="keywordtype">double</span> *x4,
+<a name="l00167"></a>00167         <span class="keywordtype">double</span> *y4);
+<a name="l00171"></a>00171 <span class="preprocessor">#endif </span><span class="comment">/*ENESIM_MATRIX_H_*/</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -204,7 +220,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 15:02:21 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Oct 6 2013 15:23:24 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
