@@ -8,17 +8,19 @@
 static Enesim_Renderer * enesim_renderer_circle01(void)
 {
 	Enesim_Renderer *r;
-	Enesim_Matrix m;
 
 	r = enesim_renderer_circle_new();
-	enesim_renderer_circle_center_set(r, 0.5, 0.5);
-	enesim_renderer_circle_radius_set(r, 0.1);
+	/* TODO we have a bug on the rasterizer election. If the stroke weight
+	 * is <= 1 but we have a transformation, the simple rasterizer should
+	 * not be used
+	 */
+	enesim_renderer_circle_center_set(r, 128, 128);
+	enesim_renderer_circle_radius_set(r, 64);
 
-	enesim_renderer_shape_fill_color_set(r, 0xffff0000);
-	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL);
-
-	enesim_matrix_scale(&m, 128, 128);
-	enesim_renderer_transformation_set(r, &m);
+	enesim_renderer_shape_stroke_color_set(r, 0xffff0000);
+	enesim_renderer_shape_stroke_weight_set(r, 5);
+	enesim_renderer_shape_fill_color_set(r, 0x55550000);
+	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL);
 
 	return r;
 }
