@@ -25,12 +25,15 @@
  * @{
  */
 
+/**
+ * Angle enumeration
+ */
 typedef enum _Enesim_Angle
 {
-	ENESIM_ANGLE_0,
-	ENESIM_ANGLE_90,
-	ENESIM_ANGLE_180,
-	ENESIM_ANGLE_270,
+	ENESIM_ANGLE_0, /**< 0 degrees angle */
+	ENESIM_ANGLE_90, /**< 90 degrees angle CW */
+	ENESIM_ANGLE_180, /**< 180 degrees angle CW */
+	ENESIM_ANGLE_270, /**< 270 degrees angle CW */
 	ENESIM_ANGLES,
 } Enesim_Angle;
 
@@ -66,13 +69,16 @@ typedef enum _Enesim_Priority
 	ENESIM_PRIORITY_PRIMARY = 256,
 } Enesim_Priority;
 
+/**
+ * RGBA Channels
+ */
 typedef enum _Enesim_Channel
 {
-	ENESIM_CHANNEL_RED,
-	ENESIM_CHANNEL_GREEN,
-	ENESIM_CHANNEL_BLUE,
-	ENESIM_CHANNEL_ALPHA,
-	ENESIM_CHANNELS,
+	ENESIM_CHANNEL_RED, /**< Red channel */
+	ENESIM_CHANNEL_GREEN, /**< Green channel */
+	ENESIM_CHANNEL_BLUE, /**< Blue channel */
+	ENESIM_CHANNEL_ALPHA, /**< Alpha channel */
+	ENESIM_CHANNELS, /**< The number of channels */
 } Enesim_Channel;
 
 /**
@@ -83,26 +89,23 @@ typedef enum _Enesim_Format
 	ENESIM_FORMAT_NONE,
 	ENESIM_FORMAT_ARGB8888,  /**< argb32 */
 	ENESIM_FORMAT_A8, /**< a8 */
-	ENESIM_FORMATS
+	ENESIM_FORMATS /**< The number of formats */
 } Enesim_Format;
 
+/**
+ * Alpha hints
+ */
 typedef enum _Enesim_Alpha_Hint
 {
-	ENESIM_ALPHA_HINT_NORMAL,
-	ENESIM_ALPHA_HINT_SPARSE,
-	ENESIM_ALPHA_HINT_OPAQUE,
-	ENESIM_ALPHA_HINTS
+	ENESIM_ALPHA_HINT_NORMAL, /**< Alpha can be in the whole range */
+	ENESIM_ALPHA_HINT_SPARSE, /**< Alpha is sparsed only, that is or 0 or 255 */
+	ENESIM_ALPHA_HINT_OPAQUE, /**< Alpha is always 0 */
+	ENESIM_ALPHA_HINTS /**< The number of alpha hints */
 } Enesim_Alpha_Hint;
 
-typedef enum _Enesim_Direction
-{
-	ENESIM_DIRECTION_NONE,
-	ENESIM_DIRECTION_X,
-	ENESIM_DIRECTION_Y,
-	ENESIM_DIRECTION_XY,
-	ENESIM_DIRECTIONS
-} Enesim_Direction;
-
+/**
+ * Repeat modes
+ */
 typedef enum _Enesim_Repeat_Mode
 {
 	ENESIM_RESTRICT,
@@ -112,12 +115,15 @@ typedef enum _Enesim_Repeat_Mode
 	ENESIM_REPEAT_MODES,
 } Enesim_Repeat_Mode;
 
+/**
+ * The backend used for drawing
+ */
 typedef enum _Enesim_Backend
 {
-	ENESIM_BACKEND_INVALID,
-	ENESIM_BACKEND_SOFTWARE,
-	ENESIM_BACKEND_OPENCL,
-	ENESIM_BACKEND_OPENGL,
+	ENESIM_BACKEND_INVALID, /**< Invalid backend */
+	ENESIM_BACKEND_SOFTWARE, /**< Software based backend */
+	ENESIM_BACKEND_OPENCL, /**< OpenCL based backend (not working) */
+	ENESIM_BACKEND_OPENGL, /**< OpenGL based backend (experimental) */
 	ENESIM_BACKENDS
 } Enesim_Backend;
 

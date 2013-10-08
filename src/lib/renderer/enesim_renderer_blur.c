@@ -666,7 +666,7 @@ EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r,
 /**
  * @brief Gets the channel used in the src data
  * @param[in] r The blur filter renderer
- * returns the channel used
+ * @return the channel used
  */
 EAPI Enesim_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r)
 {
@@ -733,7 +733,7 @@ EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Re
  * @param[in] r The blur filter renderer
  * @return The renderer to blur [transfer none]
  */
-EAPI Enesim_Renderer * enesim_renderer_blur_renderer_get(Enesim_Renderer *r)
+EAPI Enesim_Renderer * enesim_renderer_blur_source_renderer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Blur *thiz;
 

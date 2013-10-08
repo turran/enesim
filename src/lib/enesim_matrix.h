@@ -21,21 +21,23 @@
  * @defgroup Enesim_Matrix_Group Matrix
  * @brief Matrix definition and operations
  * @{
- * @todo
- * - Create all this Macros
  */
 
+/** Helper macro for printf formatting */
 #define ENESIM_MATRIX_FORMAT "g %g %g | %g %g %g | %g %g %g"
+/** Helper macro for printf formatting arg */
 #define ENESIM_MATRIX_ARGS(m) (m)->xx, (m)->xy, (m)->xz, 	\
 		(m)->yx, (m)->yy, (m)->yz,			\
 		(m)->zx, (m)->zy, (m)->zz
 
-typedef enum
+
+/** Matrix types */
+typedef enum _Enesim_Matrix_Type
 {
-	ENESIM_MATRIX_IDENTITY,
-	ENESIM_MATRIX_AFFINE,
-	ENESIM_MATRIX_PROJECTIVE,
-	ENESIM_MATRIX_TYPES
+	ENESIM_MATRIX_IDENTITY, /**< Identity matrix type */
+	ENESIM_MATRIX_AFFINE, /**< Affine matrix type */
+	ENESIM_MATRIX_PROJECTIVE, /**< Projective matrix type */
+	ENESIM_MATRIX_TYPES /**< The total number of matrix types */
 } Enesim_Matrix_Type;
 
 /**

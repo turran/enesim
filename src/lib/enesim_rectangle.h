@@ -26,7 +26,9 @@
  * @{
  */
 
+/** Helper macro for printf formatting */
 #define ENESIM_RECTANGLE_FORMAT "g %g - %gx%g"
+/** Helper macro for printf formatting arg */
 #define ENESIM_RECTANGLE_ARGS(r) (r)->x, (r)->y, (r)->w, (r)->h
 
 /** Floating point rectangle */

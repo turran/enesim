@@ -25,15 +25,17 @@
  * @{
  */
 
+/** A polygon definition */
 typedef struct _Enesim_Renderer_Figure_Polygon
 {
-	Eina_List *vertices;
+	Eina_List *vertices; /**< The list of vertices */
 } Enesim_Renderer_Figure_Polygon;
 
+/** A vertex definition */
 typedef struct _Enesim_Renderer_Figure_Vertex
 {
-	double x;
-	double y;
+	double x; /**< The X coordinate */
+	double y; /**< The Y coordinate */
 } Enesim_Renderer_Figure_Vertex;
 
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void);

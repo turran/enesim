@@ -25,11 +25,12 @@
  * @{
  */
 
+/** The blur channel enumeration */
 typedef enum _Enesim_Blur_Channel
 {
-	ENESIM_BLUR_CHANNEL_COLOR,
-	ENESIM_BLUR_CHANNEL_ALPHA,
-	ENESIM_BLUR_CHANNELS,
+	ENESIM_BLUR_CHANNEL_COLOR, /**< Use the color */
+	ENESIM_BLUR_CHANNEL_ALPHA, /**< Use the alpha channel */
+	ENESIM_BLUR_CHANNELS, /**< Total number of channels */
 } Enesim_Blur_Channel;
 
 EAPI Enesim_Renderer * enesim_renderer_blur_new(void);

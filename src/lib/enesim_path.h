@@ -45,8 +45,8 @@ typedef enum _Enesim_Path_Command_Type
  */
 typedef struct _Enesim_Path_Command_Move_To
 {
-	double x;
-	double y;
+	double x; /**< The X destination coordinate */
+	double y; /**< The Y destination coordinate */
 } Enesim_Path_Command_Move_To;
 
 /**
@@ -54,8 +54,8 @@ typedef struct _Enesim_Path_Command_Move_To
  */
 typedef struct _Enesim_Path_Command_Line_To
 {
-	double x;
-	double y;
+	double x; /**< The X destination coordinate */
+	double y; /**< The Y destination coordinate */
 } Enesim_Path_Command_Line_To;
 
 /**
@@ -63,8 +63,8 @@ typedef struct _Enesim_Path_Command_Line_To
  */
 typedef struct _Enesim_Path_Command_Squadratic_To
 {
-	double x;
-	double y;
+	double x; /**< The X destination coordinate */
+	double y; /**< The Y destination coordinate */
 } Enesim_Path_Command_Squadratic_To;
 
 /**
@@ -72,10 +72,10 @@ typedef struct _Enesim_Path_Command_Squadratic_To
  */
 typedef struct _Enesim_Path_Command_Quadratic_To
 {
-	double x;
-	double y;
-	double ctrl_x;
-	double ctrl_y;
+	double x; /**< The X destination coordinate */
+	double y; /**< The Y destination coordinate */
+	double ctrl_x; /**< The control point X coordinate */
+	double ctrl_y; /**< The control point Y coordinate */
 } Enesim_Path_Command_Quadratic_To;
 
 /**
@@ -83,12 +83,12 @@ typedef struct _Enesim_Path_Command_Quadratic_To
  */
 typedef struct _Enesim_Path_Command_Cubic_To
 {
-	double x;
-	double y;
-	double ctrl_x0;
-	double ctrl_y0;
-	double ctrl_x1;
-	double ctrl_y1;
+	double x; /**< The X destination coordinate */
+	double y; /**< The Y destination coordinate */
+	double ctrl_x0; /**< The first control point X coordinate */
+	double ctrl_y0; /**< The first control point Y coordinate */
+	double ctrl_x1; /**< The second control point X coordinate */
+	double ctrl_y1; /**< The second control point Y coordinate */
 } Enesim_Path_Command_Cubic_To;
 
 /**
@@ -96,10 +96,10 @@ typedef struct _Enesim_Path_Command_Cubic_To
  */
 typedef struct _Enesim_Path_Command_Scubic_To
 {
-	double x;
-	double y;
-	double ctrl_x;
-	double ctrl_y;
+	double x; /**< The X destination coordinate */
+	double y; /**< The Y destination coordinate */
+	double ctrl_x; /**< The second control point X coordinate */
+	double ctrl_y; /**< The second control point Y coordinate */
 } Enesim_Path_Command_Scubic_To;
 
 /**
@@ -107,13 +107,13 @@ typedef struct _Enesim_Path_Command_Scubic_To
  */
 typedef struct _Enesim_Path_Command_Arc_To
 {
-	double rx;
-	double ry;
-	double angle;
-	double x;
-	double y;
-	Eina_Bool large;
-	Eina_Bool sweep;
+	double rx; /**< The radius in X */
+	double ry; /**< The radius in Y */
+	double angle; /**< The rotation on the X coordinate */
+	double x; /**< The X destination coordinate */
+	double y; /**< The Y destination coordinate */
+	Eina_Bool large; /**< If Eina_True the large arc will be chosen */
+	Eina_Bool sweep; /**< If Eina_True the arc in positive-angle will be chosen */
 } Enesim_Path_Command_Arc_To;
 
 /**
@@ -121,7 +121,7 @@ typedef struct _Enesim_Path_Command_Arc_To
  */
 typedef struct _Enesim_Path_Command_Close
 {
-	Eina_Bool close;
+	Eina_Bool close; /**< Set to Eina_True for an actual close */
 } Enesim_Path_Command_Close;
 
 /**
@@ -129,20 +129,20 @@ typedef struct _Enesim_Path_Command_Close
  */
 typedef struct _Enesim_Path_Command
 {
-	Enesim_Path_Command_Type type;
+	Enesim_Path_Command_Type type; /**< The type of the command */
 	union {
-		Enesim_Path_Command_Move_To move_to;
-		Enesim_Path_Command_Line_To line_to;
-		Enesim_Path_Command_Squadratic_To squadratic_to;
-		Enesim_Path_Command_Quadratic_To quadratic_to;
-		Enesim_Path_Command_Scubic_To scubic_to;
-		Enesim_Path_Command_Cubic_To cubic_to;
-		Enesim_Path_Command_Arc_To arc_to;
-		Enesim_Path_Command_Close close;
-	} definition;
+		Enesim_Path_Command_Move_To move_to; /**< The move to values */
+		Enesim_Path_Command_Line_To line_to; /**< The line to values */
+		Enesim_Path_Command_Squadratic_To squadratic_to; /**< The smooth quadratic to values */
+		Enesim_Path_Command_Quadratic_To quadratic_to; /**< The quadratic to values */
+		Enesim_Path_Command_Scubic_To scubic_to; /**< The smooth cubic to values */
+		Enesim_Path_Command_Cubic_To cubic_to; /**< The cubic to values */
+		Enesim_Path_Command_Arc_To arc_to; /**< The arc to values */
+		Enesim_Path_Command_Close close; /**< The close value */
+	} definition; /**< The values of the definition */
 } Enesim_Path_Command;
 
-typedef struct _Enesim_Path Enesim_Path;
+typedef struct _Enesim_Path Enesim_Path; /**< A path handle */
 
 EAPI Enesim_Path * enesim_path_new(void);
 EAPI Enesim_Path * enesim_path_ref(Enesim_Path *thiz);

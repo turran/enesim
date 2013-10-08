@@ -592,6 +592,10 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 				"'%s'", EINA_RECTANGLE_ARGS (&span),
 				EINA_RECTANGLE_ARGS (&rbounds),
 				r->name);
+		if (r->current_rop == ENESIM_ROP_FILL)
+		{
+			memset(data, 0, len * sizeof(uint32_t));
+		}
 		return;
 	}
 	left = rbounds.x - span.x;
@@ -605,6 +609,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 		color = enesim_renderer_color_get(r);
 		bytes = rbounds.w * sizeof(uint32_t);
 		tmp = alloca(bytes);
+
 		/* We dont need to zero the buffer given that a fill will
 		 * draw every pixel in case the span is inside the bounds
 		 */

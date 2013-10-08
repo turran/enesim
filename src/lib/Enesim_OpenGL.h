@@ -18,6 +18,9 @@
 #ifndef ENESIM_OPENGL_H_
 #define ENESIM_OPENGL_H_
 
+/**
+ * Helper macro to stringify a shader code
+ */
 #define ENESIM_OPENGL_SHADER(k) #k
 
 #define GL_GLEXT_PROTOTYPES
@@ -37,10 +40,14 @@ EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f, 
 EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format f, uint32_t w, uint32_t h,
 		GLuint texture);
 
+/**
+ * The data associated with an OpenGL buffer
+ */
 typedef struct _Enesim_Buffer_OpenGL_Data
 {
-	GLuint texture;
-	unsigned int num_textures;
+	/** TODO make this a pointer of textures */
+	GLuint texture; /**< The texture id */
+	unsigned int num_textures; /**< The number of textures */
 } Enesim_Buffer_OpenGL_Data;
 
 #endif

@@ -71,6 +71,7 @@ Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
  * @param[in] clip A clipping area on the source surface
  * @param[in] x The destination x coordinate to put the surface
  * @param[in] y The destination y coordinate to put the surface
+ * @return Eina_True if the conversion was correct, Eina_False otherwise
  */
 EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
 		Enesim_Angle angle,
@@ -95,6 +96,7 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
  * @param[in] clip A clipping area on the source buffer
  * @param[in] x The destination x coordinate to put the buffer
  * @param[in] y The destination y coordinate to put the buffer
+ * @return Eina_True if the conversion was correct, Eina_False otherwise
  */
 EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst,
 		Enesim_Angle angle,
