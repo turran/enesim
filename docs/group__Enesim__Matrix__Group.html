@@ -103,35 +103,44 @@ Modules</h2></td></tr>
 <br/></td></tr>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga2d4ade778f5060c75393edc06f407638"></a><!-- doxytag: member="Enesim_Matrix_Group::ENESIM_MATRIX_FORMAT" ref="ga2d4ade778f5060c75393edc06f407638" args="" -->
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_MATRIX_FORMAT</b>&#160;&#160;&#160;&quot;g %g %g | %g %g %g | %g %g %g&quot;</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_MATRIX_ARGS</b>(m)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Group.html#ga2d4ade778f5060c75393edc06f407638">ENESIM_MATRIX_FORMAT</a>&#160;&#160;&#160;&quot;g %g %g | %g %g %g | %g %g %g&quot;</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Group.html#gad783dd8a21dc983623036dbfd7674f6b">ENESIM_MATRIX_ARGS</a>(m)</td></tr>
 <tr><td colspan="2"><h2><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Matrix_Type</b> { <br/>
-&#160;&#160;<b>ENESIM_MATRIX_IDENTITY</b>, 
+<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Group.html#ga9490982e0f102e9a4d4461b87b87dba8">Enesim_Matrix_Type</a> { <br/>
+&#160;&#160;<a class="el" href="group__Enesim__Matrix__Group.html#gga9490982e0f102e9a4d4461b87b87dba8a9312d77fb160e52cce75502798fd3473">ENESIM_MATRIX_IDENTITY</a>, 
 <br/>
-&#160;&#160;<b>ENESIM_MATRIX_AFFINE</b>, 
+&#160;&#160;<a class="el" href="group__Enesim__Matrix__Group.html#gga9490982e0f102e9a4d4461b87b87dba8a8eff19fe03c24229b1ebb3785ccc4f7f">ENESIM_MATRIX_AFFINE</a>, 
 <br/>
-&#160;&#160;<b>ENESIM_MATRIX_PROJECTIVE</b>, 
+&#160;&#160;<a class="el" href="group__Enesim__Matrix__Group.html#gga9490982e0f102e9a4d4461b87b87dba8a2d6377890d49d540f29d52620baf57f0">ENESIM_MATRIX_PROJECTIVE</a>, 
 <br/>
-&#160;&#160;<b>ENESIM_MATRIX_TYPES</b>
+&#160;&#160;<a class="el" href="group__Enesim__Matrix__Group.html#gga9490982e0f102e9a4d4461b87b87dba8a67eeab4725c711d122c4f827ac1a1ff1">ENESIM_MATRIX_TYPES</a>
 <br/>
  }</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Matrix definition and operations. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd><ul>
-<li>Create all this Macros </li>
-</ul>
-</dd></dl>
 <hr/><h2>Define Documentation</h2>
+<a class="anchor" id="ga2d4ade778f5060c75393edc06f407638"></a><!-- doxytag: member="enesim_matrix.h::ENESIM_MATRIX_FORMAT" ref="ga2d4ade778f5060c75393edc06f407638" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define <a class="el" href="group__Enesim__Matrix__Group.html#ga2d4ade778f5060c75393edc06f407638">ENESIM_MATRIX_FORMAT</a>&#160;&#160;&#160;&quot;g %g %g | %g %g %g | %g %g %g&quot;</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Helper macro for printf formatting </p>
+
+</div>
+</div>
 <a class="anchor" id="gad783dd8a21dc983623036dbfd7674f6b"></a><!-- doxytag: member="enesim_matrix.h::ENESIM_MATRIX_ARGS" ref="gad783dd8a21dc983623036dbfd7674f6b" args="(m)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ENESIM_MATRIX_ARGS</td>
+          <td class="memname">#define <a class="el" href="group__Enesim__Matrix__Group.html#gad783dd8a21dc983623036dbfd7674f6b">ENESIM_MATRIX_ARGS</a></td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">m</td><td>)</td>
@@ -143,7 +152,39 @@ Enumerations</h2></td></tr>
 <b>Value:</b><div class="fragment"><pre class="fragment">(m)-&gt;xx, (m)-&gt;xy, (m)-&gt;xz,  \
         (m)-&gt;yx, (m)-&gt;yy, (m)-&gt;yz,          \
         (m)-&gt;zx, (m)-&gt;zy, (m)-&gt;zz
-</pre></div>
+</pre></div><p>Helper macro for printf formatting arg </p>
+
+</div>
+</div>
+<hr/><h2>Enumeration Type Documentation</h2>
+<a class="anchor" id="ga9490982e0f102e9a4d4461b87b87dba8"></a><!-- doxytag: member="enesim_matrix.h::Enesim_Matrix_Type" ref="ga9490982e0f102e9a4d4461b87b87dba8" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__Enesim__Matrix__Group.html#ga9490982e0f102e9a4d4461b87b87dba8">Enesim_Matrix_Type</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Matrix types </p>
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="gga9490982e0f102e9a4d4461b87b87dba8a9312d77fb160e52cce75502798fd3473"></a><!-- doxytag: member="ENESIM_MATRIX_IDENTITY" ref="gga9490982e0f102e9a4d4461b87b87dba8a9312d77fb160e52cce75502798fd3473" args="" -->ENESIM_MATRIX_IDENTITY</em>&nbsp;</td><td>
+<p>Identity matrix type </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga9490982e0f102e9a4d4461b87b87dba8a8eff19fe03c24229b1ebb3785ccc4f7f"></a><!-- doxytag: member="ENESIM_MATRIX_AFFINE" ref="gga9490982e0f102e9a4d4461b87b87dba8a8eff19fe03c24229b1ebb3785ccc4f7f" args="" -->ENESIM_MATRIX_AFFINE</em>&nbsp;</td><td>
+<p>Affine matrix type </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga9490982e0f102e9a4d4461b87b87dba8a2d6377890d49d540f29d52620baf57f0"></a><!-- doxytag: member="ENESIM_MATRIX_PROJECTIVE" ref="gga9490982e0f102e9a4d4461b87b87dba8a2d6377890d49d540f29d52620baf57f0" args="" -->ENESIM_MATRIX_PROJECTIVE</em>&nbsp;</td><td>
+<p>Projective matrix type </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga9490982e0f102e9a4d4461b87b87dba8a67eeab4725c711d122c4f827ac1a1ff1"></a><!-- doxytag: member="ENESIM_MATRIX_TYPES" ref="gga9490982e0f102e9a4d4461b87b87dba8a67eeab4725c711d122c4f827ac1a1ff1" args="" -->ENESIM_MATRIX_TYPES</em>&nbsp;</td><td>
+<p>The total number of matrix types </p>
+</td></tr>
+</table>
+</dd>
+</dl>
+
 </div>
 </div>
 </div><!-- contents -->
@@ -152,7 +193,7 @@ Enumerations</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -164,7 +205,7 @@ Enumerations</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 23:43:48 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 8 2013 08:00:02 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

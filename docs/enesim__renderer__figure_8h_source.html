@@ -73,6 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div>
@@ -101,30 +102,30 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00018"></a>00018 <span class="preprocessor">#ifndef ENESIM_RENDERER_FIGURE_H_</span>
 <a name="l00019"></a>00019 <span class="preprocessor"></span><span class="preprocessor">#define ENESIM_RENDERER_FIGURE_H_</span>
 <a name="l00020"></a>00020 <span class="preprocessor"></span>
-<a name="l00028"></a><a class="code" href="structEnesim__Renderer__Figure__Polygon.html">00028</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Renderer_Figure_Polygon
-<a name="l00029"></a>00029 {
-<a name="l00030"></a>00030     Eina_List *vertices;
-<a name="l00031"></a>00031 } <a class="code" href="structEnesim__Renderer__Figure__Polygon.html">Enesim_Renderer_Figure_Polygon</a>;
-<a name="l00032"></a>00032 
-<a name="l00033"></a><a class="code" href="structEnesim__Renderer__Figure__Vertex.html">00033</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Renderer_Figure_Vertex
-<a name="l00034"></a>00034 {
-<a name="l00035"></a>00035     <span class="keywordtype">double</span> x;
-<a name="l00036"></a>00036     <span class="keywordtype">double</span> y;
-<a name="l00037"></a>00037 } <a class="code" href="structEnesim__Renderer__Figure__Vertex.html">Enesim_Renderer_Figure_Vertex</a>;
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_figure_new(<span class="keywordtype">void</span>);
-<a name="l00040"></a>00040 EAPI <span class="keywordtype">void</span> enesim_renderer_figure_polygon_add(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p);
-<a name="l00041"></a>00041 EAPI <span class="keywordtype">void</span> enesim_renderer_figure_polygon_vertex_add(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);
-<a name="l00042"></a>00042 EAPI <span class="keywordtype">void</span> enesim_renderer_figure_polygon_close(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p);
-<a name="l00043"></a>00043 EAPI <span class="keywordtype">void</span> enesim_renderer_figure_clear(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p);
-<a name="l00048"></a>00048 <span class="preprocessor">#endif</span>
+<a name="l00029"></a><a class="code" href="structEnesim__Renderer__Figure__Polygon.html">00029</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Renderer_Figure_Polygon
+<a name="l00030"></a>00030 {
+<a name="l00031"></a><a class="code" href="structEnesim__Renderer__Figure__Polygon.html#ad5d963f06e7c74679dd6dc5f6ca54f09">00031</a>     Eina_List *<a class="code" href="structEnesim__Renderer__Figure__Polygon.html#ad5d963f06e7c74679dd6dc5f6ca54f09">vertices</a>; 
+<a name="l00032"></a>00032 } <a class="code" href="structEnesim__Renderer__Figure__Polygon.html">Enesim_Renderer_Figure_Polygon</a>;
+<a name="l00033"></a>00033 
+<a name="l00035"></a><a class="code" href="structEnesim__Renderer__Figure__Vertex.html">00035</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Renderer_Figure_Vertex
+<a name="l00036"></a>00036 {
+<a name="l00037"></a><a class="code" href="structEnesim__Renderer__Figure__Vertex.html#a0feaebc0384e27dd91d4bb425c27ef33">00037</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Renderer__Figure__Vertex.html#a0feaebc0384e27dd91d4bb425c27ef33">x</a>; 
+<a name="l00038"></a><a class="code" href="structEnesim__Renderer__Figure__Vertex.html#a41580c92aef396a8017d5cd543410306">00038</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Renderer__Figure__Vertex.html#a41580c92aef396a8017d5cd543410306">y</a>; 
+<a name="l00039"></a>00039 } <a class="code" href="structEnesim__Renderer__Figure__Vertex.html">Enesim_Renderer_Figure_Vertex</a>;
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041 EAPI <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * <a class="code" href="group__Enesim__Renderer__Figure__Group.html#ga5e503a6fa6aaca5bb96d1ef6f4414f3a">enesim_renderer_figure_new</a>(<span class="keywordtype">void</span>);
+<a name="l00042"></a>00042 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Figure__Group.html#ga87c8bc57df726ad033b6df29c6f34014" title="Add a new polygon for the figure.">enesim_renderer_figure_polygon_add</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p);
+<a name="l00043"></a>00043 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Figure__Group.html#gaab6da4a73f38985c6cc4b146e108e4a6" title="Add a vertex on the current polygon created on a figure renderer.">enesim_renderer_figure_polygon_vertex_add</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y);
+<a name="l00044"></a>00044 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Figure__Group.html#ga1908559bf690bb6d63459185e0415b07" title="Close the last polygon of a figure renderer.">enesim_renderer_figure_polygon_close</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p);
+<a name="l00045"></a>00045 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Renderer__Figure__Group.html#ga74999867f30fef34fd3764bb177a5e8d" title="Clear the list of polygons on a figure renderer.">enesim_renderer_figure_clear</a>(<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p);
+<a name="l00050"></a>00050 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -136,7 +137,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 23:43:48 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 8 2013 08:00:02 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

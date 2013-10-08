@@ -73,6 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div>
@@ -128,9 +129,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00055"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfab007d8715710d063b9d0be062d91d686">00055</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfab007d8715710d063b9d0be062d91d686">ENESIM_BUFFER_FORMAT_BGR888</a>, 
 <a name="l00056"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa338a85b201d3e9d756750623fe0243d0">00056</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa338a85b201d3e9d756750623fe0243d0">ENESIM_BUFFER_FORMAT_A8</a>, 
 <a name="l00057"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa7ba4f72bcbe9342a1bd9d646898f825f">00057</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa7ba4f72bcbe9342a1bd9d646898f825f">ENESIM_BUFFER_FORMAT_GRAY</a>, 
-<a name="l00058"></a>00058     ENESIM_BUFFER_FORMAT_CMYK,
-<a name="l00059"></a>00059     ENESIM_BUFFER_FORMAT_CMYK_ADOBE,
-<a name="l00060"></a>00060     ENESIM_BUFFER_FORMATS
+<a name="l00058"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfad61c610f09f0ca145a20970fd456d4ac">00058</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfad61c610f09f0ca145a20970fd456d4ac">ENESIM_BUFFER_FORMAT_CMYK</a>, 
+<a name="l00059"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfac1d47d4b7f2ebe2e57045d0204fc5d3e">00059</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfac1d47d4b7f2ebe2e57045d0204fc5d3e">ENESIM_BUFFER_FORMAT_CMYK_ADOBE</a>, 
+<a name="l00060"></a><a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa0128c3e8fffdd311033107573f4abb5a">00060</a>     <a class="code" href="group__Enesim__Buffer__Group.html#ggad8659518df07487cca288d68e52216cfa0128c3e8fffdd311033107573f4abb5a">ENESIM_BUFFER_FORMATS</a> 
 <a name="l00061"></a>00061 } <a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a>;
 <a name="l00062"></a>00062 
 <a name="l00066"></a><a class="code" href="structEnesim__Buffer__24bpp.html">00066</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Buffer_24bpp
@@ -157,24 +158,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00093"></a><a class="code" href="structEnesim__Buffer__A8.html#a01d49f7278cf5c1fbc9d9d4b1ba0b1ec">00093</a>     <span class="keywordtype">int</span> <a class="code" href="structEnesim__Buffer__A8.html#a01d49f7278cf5c1fbc9d9d4b1ba0b1ec">plane0_stride</a>; 
 <a name="l00094"></a>00094 } <a class="code" href="structEnesim__Buffer__A8.html">Enesim_Buffer_A8</a>;
 <a name="l00095"></a>00095 
-<a name="l00096"></a>00096 <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_32bpp</a> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Argb8888</a>;
-<a name="l00097"></a>00097 <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_32bpp</a> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Argb8888_Pre</a>;
-<a name="l00098"></a>00098 <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_32bpp</a> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Xrgb8888</a>;
-<a name="l00099"></a>00099 
-<a name="l00100"></a>00100 <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_24bpp</a> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Rgb888</a>;
-<a name="l00101"></a>00101 <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_24bpp</a> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Bgr888</a>;
-<a name="l00102"></a>00102 <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_24bpp</a> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Cmyk</a>;
-<a name="l00103"></a>00103 
+<a name="l00096"></a><a class="code" href="group__Enesim__Buffer__Group.html#ga3088c7c2658b020bb582bfb0759412e9">00096</a> <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_32bpp</a> <a class="code" href="group__Enesim__Buffer__Group.html#ga3088c7c2658b020bb582bfb0759412e9">Enesim_Buffer_Argb8888</a>; 
+<a name="l00097"></a><a class="code" href="group__Enesim__Buffer__Group.html#ga862a1c408c0c792708f5f40dde232c73">00097</a> <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_32bpp</a> <a class="code" href="group__Enesim__Buffer__Group.html#ga862a1c408c0c792708f5f40dde232c73">Enesim_Buffer_Argb8888_Pre</a>; 
+<a name="l00098"></a><a class="code" href="group__Enesim__Buffer__Group.html#ga0a9542145ac2aa448d3f0261478cba95">00098</a> <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_32bpp</a> <a class="code" href="group__Enesim__Buffer__Group.html#ga0a9542145ac2aa448d3f0261478cba95">Enesim_Buffer_Xrgb8888</a>; 
+<a name="l00099"></a><a class="code" href="group__Enesim__Buffer__Group.html#gaf06484acc0d295703140e1a9afd45c08">00099</a> <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_24bpp</a> <a class="code" href="group__Enesim__Buffer__Group.html#gaf06484acc0d295703140e1a9afd45c08">Enesim_Buffer_Rgb888</a>; 
+<a name="l00100"></a><a class="code" href="group__Enesim__Buffer__Group.html#ga99f69747eb85ed060e570e3613b4011d">00100</a> <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_24bpp</a> <a class="code" href="group__Enesim__Buffer__Group.html#ga99f69747eb85ed060e570e3613b4011d">Enesim_Buffer_Bgr888</a>; 
+<a name="l00101"></a><a class="code" href="group__Enesim__Buffer__Group.html#ga8036468fe4c0f9006e23d344c0ebade6">00101</a> <span class="keyword">typedef</span> <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_24bpp</a> <a class="code" href="group__Enesim__Buffer__Group.html#ga8036468fe4c0f9006e23d344c0ebade6">Enesim_Buffer_Cmyk</a>; 
 <a name="l00104"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html">00104</a> <span class="keyword">typedef</span> <span class="keyword">union </span>_Enesim_Buffer_Sw_Data
 <a name="l00105"></a>00105 {
-<a name="l00106"></a>00106     <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Argb8888</a> argb8888;
-<a name="l00107"></a>00107     <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Argb8888_Pre</a> argb8888_pre;
-<a name="l00108"></a>00108     <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Xrgb8888</a> xrgb8888;
-<a name="l00109"></a>00109     <a class="code" href="structEnesim__Buffer__Rgb565.html">Enesim_Buffer_Rgb565</a> rgb565;
-<a name="l00110"></a>00110     <a class="code" href="structEnesim__Buffer__A8.html">Enesim_Buffer_A8</a> a8;
-<a name="l00111"></a>00111     <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Rgb888</a> rgb888;
-<a name="l00112"></a>00112     <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Bgr888</a> bgr888;
-<a name="l00113"></a>00113     <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Cmyk</a> cmyk;
+<a name="l00106"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#a6d7569517326d825bf6d475f38d566cc">00106</a>     <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Argb8888</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#a6d7569517326d825bf6d475f38d566cc">argb8888</a>; 
+<a name="l00107"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#a89afeb447a903d81f2b13ebffa433d93">00107</a>     <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Argb8888_Pre</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#a89afeb447a903d81f2b13ebffa433d93">argb8888_pre</a>; 
+<a name="l00108"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#a22b4c96c7cb980c5fd677ed339685742">00108</a>     <a class="code" href="structEnesim__Buffer__32bpp.html">Enesim_Buffer_Xrgb8888</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#a22b4c96c7cb980c5fd677ed339685742">xrgb8888</a>; 
+<a name="l00109"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#a43cda3d2927ec14d351eb9c937c4b920">00109</a>     <a class="code" href="structEnesim__Buffer__Rgb565.html">Enesim_Buffer_Rgb565</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#a43cda3d2927ec14d351eb9c937c4b920">rgb565</a>; 
+<a name="l00110"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#a622d5d56a8a41fb3621a0989729a2830">00110</a>     <a class="code" href="structEnesim__Buffer__A8.html">Enesim_Buffer_A8</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#a622d5d56a8a41fb3621a0989729a2830">a8</a>; 
+<a name="l00111"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#a34429c625a688cdd367b37e8d92350e2">00111</a>     <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Rgb888</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#a34429c625a688cdd367b37e8d92350e2">rgb888</a>; 
+<a name="l00112"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#ad2c4267bd5abb74cdd97accb8406eb4e">00112</a>     <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Bgr888</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#ad2c4267bd5abb74cdd97accb8406eb4e">bgr888</a>; 
+<a name="l00113"></a><a class="code" href="unionEnesim__Buffer__Sw__Data.html#a1aa0b6a3b1d3249174362eb05676916b">00113</a>     <a class="code" href="structEnesim__Buffer__24bpp.html">Enesim_Buffer_Cmyk</a> <a class="code" href="unionEnesim__Buffer__Sw__Data.html#a1aa0b6a3b1d3249174362eb05676916b">cmyk</a>; 
 <a name="l00114"></a>00114 } <a class="code" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a>;
 <a name="l00115"></a>00115 
 <a name="l00116"></a>00116 <span class="keyword">typedef</span> void (*Enesim_Buffer_Free)(<span class="keywordtype">void</span> *data, <span class="keywordtype">void</span> *user_data);
@@ -195,7 +194,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00131"></a>00131 
 <a name="l00132"></a>00132 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Buffer__Group.html#ga252109a1cd39774098c4d7741477bf80" title="Gets the size of a buffer.">enesim_buffer_size_get</a>(<span class="keyword">const</span> <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <span class="keywordtype">int</span> *w, <span class="keywordtype">int</span> *h);
 <a name="l00133"></a>00133 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> <a class="code" href="group__Enesim__Buffer__Group.html#gaccb3d46596c6445fe7f88b275ce2c1bc" title="Gets the format of a buffer.">enesim_buffer_format_get</a>(<span class="keyword">const</span> <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b);
-<a name="l00134"></a>00134 EAPI Enesim_Backend <a class="code" href="group__Enesim__Buffer__Group.html#gabacb90ae48cbecb73b34aa06738b9494" title="Gets the backend of a buffer.">enesim_buffer_backend_get</a>(<span class="keyword">const</span> <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b);
+<a name="l00134"></a>00134 EAPI <a class="code" href="group__Enesim__Main__Group.html#ga8b46f9a1561797ac00184359561df5c3">Enesim_Backend</a> <a class="code" href="group__Enesim__Buffer__Group.html#gabacb90ae48cbecb73b34aa06738b9494" title="Gets the backend of a buffer.">enesim_buffer_backend_get</a>(<span class="keyword">const</span> <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b);
 <a name="l00135"></a>00135 EAPI <a class="code" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> * <a class="code" href="group__Enesim__Buffer__Group.html#ga8d4395aea19ee79dca37f047e64033db" title="Gets the pool of a buffer.">enesim_buffer_pool_get</a>(<a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b);
 <a name="l00136"></a>00136 
 <a name="l00137"></a>00137 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Buffer__Group.html#ga4d8f180d18ab6dae8baebf454b006cd4" title="Store a private data pointer into the buffer.">enesim_buffer_private_set</a>(<a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <span class="keywordtype">void</span> *data);
@@ -229,7 +228,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -241,7 +240,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 23:43:48 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 8 2013 08:00:01 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

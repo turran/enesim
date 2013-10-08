@@ -98,8 +98,7 @@ Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Path__Command.html">Enesim_Path_Command</a></td></tr>
 <tr><td colspan="2"><h2><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga47a84f0eb4968c5af3a814d95dc22066"></a><!-- doxytag: member="Enesim_Path_Group::Enesim_Path" ref="ga47a84f0eb4968c5af3a814d95dc22066" args="" -->
-typedef struct _Enesim_Path&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Path</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef struct _Enesim_Path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a></td></tr>
 <tr><td colspan="2"><h2><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga9d32ce6a4508faa8a500b9b25b4c3f02">Enesim_Path_Command_Type</a> { <br/>
@@ -124,30 +123,45 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Path *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32">enesim_path_new</a> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32">enesim_path_new</a> (void)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new path.  <a href="#gada15a36dd2f634ed79ebf2c20626ee32"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Path *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#gae1511a07cc6323bab444eb123e8e20cf">enesim_path_ref</a> (Enesim_Path *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#gae1511a07cc6323bab444eb123e8e20cf">enesim_path_ref</a> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the reference counter of a path.  <a href="#gae1511a07cc6323bab444eb123e8e20cf"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga57dfafc344be49aa32c4ba7483bbfdb9">enesim_path_unref</a> (Enesim_Path *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga57dfafc344be49aa32c4ba7483bbfdb9">enesim_path_unref</a> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease the reference counter of a path.  <a href="#ga57dfafc344be49aa32c4ba7483bbfdb9"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga497c5ea95d6a2b6f5f6343c72c45e47d">enesim_path_command_clear</a> (Enesim_Path *thiz)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#gae87dba574e4e46c965151577bb7481b6">enesim_path_command_add</a> (Enesim_Path *thiz, <a class="el" href="structEnesim__Path__Command.html">Enesim_Path_Command</a> *cmd)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a> (Enesim_Path *thiz, double x, double y)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a> (Enesim_Path *thiz, double x, double y)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga497c5ea95d6a2b6f5f6343c72c45e47d">enesim_path_command_clear</a> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#gae87dba574e4e46c965151577bb7481b6">enesim_path_command_add</a> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, <a class="el" href="structEnesim__Path__Command.html">Enesim_Path_Command</a> *cmd)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double x, double y)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga6b6c453c5f489e8e637193ddcb8151f0"></a><!-- doxytag: member="Enesim_Path_Group::enesim_path_squadratic_to" ref="ga6b6c453c5f489e8e637193ddcb8151f0" args="(Enesim_Path *thiz, double x, double y)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_squadratic_to</b> (Enesim_Path *thiz, double x, double y)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_squadratic_to</b> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga31691b3a5f0d0d7e26d7354573fed59c"></a><!-- doxytag: member="Enesim_Path_Group::enesim_path_quadratic_to" ref="ga31691b3a5f0d0d7e26d7354573fed59c" args="(Enesim_Path *thiz, double ctrl_x, double ctrl_y, double x, double y)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_quadratic_to</b> (Enesim_Path *thiz, double ctrl_x, double ctrl_y, double x, double y)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_quadratic_to</b> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double ctrl_x, double ctrl_y, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga86bbd057893e1f03b6017a0ede8561e8"></a><!-- doxytag: member="Enesim_Path_Group::enesim_path_cubic_to" ref="ga86bbd057893e1f03b6017a0ede8561e8" args="(Enesim_Path *thiz, double ctrl_x0, double ctrl_y0, double ctrl_x, double ctrl_y, double x, double y)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_cubic_to</b> (Enesim_Path *thiz, double ctrl_x0, double ctrl_y0, double ctrl_x, double ctrl_y, double x, double y)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_cubic_to</b> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double ctrl_x0, double ctrl_y0, double ctrl_x, double ctrl_y, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga89385d2af22fccdc7c7faed8701d8036"></a><!-- doxytag: member="Enesim_Path_Group::enesim_path_scubic_to" ref="ga89385d2af22fccdc7c7faed8701d8036" args="(Enesim_Path *thiz, double ctrl_x, double ctrl_y, double x, double y)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_scubic_to</b> (Enesim_Path *thiz, double ctrl_x, double ctrl_y, double x, double y)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_scubic_to</b> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double ctrl_x, double ctrl_y, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga08566d891c92289a5f788ca06fe4327e"></a><!-- doxytag: member="Enesim_Path_Group::enesim_path_arc_to" ref="ga08566d891c92289a5f788ca06fe4327e" args="(Enesim_Path *thiz, double rx, double ry, double angle, unsigned char large, unsigned char sweep, double x, double y)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_to</b> (Enesim_Path *thiz, double rx, double ry, double angle, unsigned char large, unsigned char sweep, double x, double y)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga0dba3db3192d70798cca767e2375205d">enesim_path_close</a> (Enesim_Path *thiz)</td></tr>
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_to</b> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double rx, double ry, double angle, unsigned char large, unsigned char sweep, double x, double y)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path__Group.html#ga0dba3db3192d70798cca767e2375205d">enesim_path_close</a> (<a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Path definition. </p>
+<hr/><h2>Typedef Documentation</h2>
+<a class="anchor" id="ga47a84f0eb4968c5af3a814d95dc22066"></a><!-- doxytag: member="enesim_path.h::Enesim_Path" ref="ga47a84f0eb4968c5af3a814d95dc22066" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct _Enesim_Path <a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>A path handle </p>
+
+</div>
+</div>
 <hr/><h2>Enumeration Type Documentation</h2>
 <a class="anchor" id="ga9d32ce6a4508faa8a500b9b25b4c3f02"></a><!-- doxytag: member="enesim_path.h::Enesim_Path_Command_Type" ref="ga9d32ce6a4508faa8a500b9b25b4c3f02" args="" -->
 <div class="memitem">
@@ -200,7 +214,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Enesim_Path* <a class="el" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32">enesim_path_new</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a>* <a class="el" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32">enesim_path_new</a> </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -220,9 +234,9 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Enesim_Path* <a class="el" href="group__Enesim__Path__Group.html#gae1511a07cc6323bab444eb123e8e20cf">enesim_path_ref</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a>* <a class="el" href="group__Enesim__Path__Group.html#gae1511a07cc6323bab444eb123e8e20cf">enesim_path_ref</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Path *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
           <td class="paramname"><em>thiz</em></td><td>)</td>
           <td></td>
         </tr>
@@ -248,7 +262,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
         <tr>
           <td class="memname">EAPI void <a class="el" href="group__Enesim__Path__Group.html#ga57dfafc344be49aa32c4ba7483bbfdb9">enesim_path_unref</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Path *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
           <td class="paramname"><em>thiz</em></td><td>)</td>
           <td></td>
         </tr>
@@ -273,7 +287,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
         <tr>
           <td class="memname">EAPI void <a class="el" href="group__Enesim__Path__Group.html#ga497c5ea95d6a2b6f5f6343c72c45e47d">enesim_path_command_clear</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Path *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
           <td class="paramname"><em>thiz</em></td><td>)</td>
           <td></td>
         </tr>
@@ -297,7 +311,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
         <tr>
           <td class="memname">EAPI void <a class="el" href="group__Enesim__Path__Group.html#gae87dba574e4e46c965151577bb7481b6">enesim_path_command_add</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Path *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
           <td class="paramname"><em>thiz</em>, </td>
         </tr>
         <tr>
@@ -332,7 +346,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
         <tr>
           <td class="memname">EAPI void <a class="el" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Path *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
           <td class="paramname"><em>thiz</em>, </td>
         </tr>
         <tr>
@@ -374,7 +388,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
         <tr>
           <td class="memname">EAPI void <a class="el" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Path *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
           <td class="paramname"><em>thiz</em>, </td>
         </tr>
         <tr>
@@ -416,7 +430,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
         <tr>
           <td class="memname">EAPI void <a class="el" href="group__Enesim__Path__Group.html#ga0dba3db3192d70798cca767e2375205d">enesim_path_close</a> </td>
           <td>(</td>
-          <td class="paramtype">Enesim_Path *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
           <td class="paramname"><em>thiz</em></td><td>)</td>
           <td></td>
         </tr>
@@ -439,7 +453,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -451,7 +465,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_path_arc_
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 23:43:48 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 8 2013 08:00:02 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

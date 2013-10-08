@@ -73,6 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>Globals</span></a></li>
     </ul>
   </div>
 </div>
@@ -103,52 +104,53 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00020"></a>00020 <span class="preprocessor"></span>
 <a name="l00021"></a>00021 <span class="preprocessor">#include &lt;math.h&gt;</span>
 <a name="l00022"></a>00022 
-<a name="l00029"></a>00029 <span class="preprocessor">#define ENESIM_RECTANGLE_FORMAT &quot;g %g - %gx%g&quot;</span>
-<a name="l00030"></a>00030 <span class="preprocessor"></span><span class="preprocessor">#define ENESIM_RECTANGLE_ARGS(r) (r)-&gt;x, (r)-&gt;y, (r)-&gt;w, (r)-&gt;h</span>
+<a name="l00030"></a><a class="code" href="group__Enesim__Rectangle__Group.html#ga3b5f39c302f0cab9e0c0e6368bd0d943">00030</a> <span class="preprocessor">#define ENESIM_RECTANGLE_FORMAT &quot;g %g - %gx%g&quot;</span>
 <a name="l00031"></a>00031 <span class="preprocessor"></span>
-<a name="l00033"></a><a class="code" href="structEnesim__Rectangle.html">00033</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Rectangle
-<a name="l00034"></a>00034 {
-<a name="l00035"></a><a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">00035</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a>; 
-<a name="l00036"></a><a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">00036</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a>; 
-<a name="l00037"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">00037</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>; 
-<a name="l00038"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">00038</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>; 
-<a name="l00039"></a>00039 } <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a>;
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 <span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> enesim_rectangle_normalize(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, Eina_Rectangle *dst)
-<a name="l00042"></a>00042 {
-<a name="l00043"></a>00043     dst-&gt;x = floor(r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a>);
-<a name="l00044"></a>00044     dst-&gt;y = floor(r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a>);
-<a name="l00045"></a>00045     dst-&gt;w = ceil(r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> - dst-&gt;x + r-&gt;<a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>);
-<a name="l00046"></a>00046     dst-&gt;h = ceil(r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> - dst-&gt;y + r-&gt;<a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>);
-<a name="l00047"></a>00047 }
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049 <span class="keyword">static</span> <span class="keyword">inline</span> Eina_Bool enesim_rectangle_is_inside(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y)
-<a name="l00050"></a>00050 {
-<a name="l00051"></a>00051     <span class="keywordflow">if</span> ((x - r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> &gt;= 0) &amp;&amp; (y - r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> &gt;= 0) &amp;&amp; (r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> + r-&gt;<a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a> - x &gt;= 0) &amp;&amp; (r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> + r-&gt;<a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a> - y &gt;= 0))
-<a name="l00052"></a>00052         <span class="keywordflow">return</span> EINA_TRUE;
-<a name="l00053"></a>00053     <span class="keywordflow">else</span>
-<a name="l00054"></a>00054         <span class="keywordflow">return</span> EINA_FALSE;
-<a name="l00055"></a>00055 }
-<a name="l00056"></a>00056 
-<a name="l00057"></a>00057 <span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> enesim_rectangle_coords_from(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y, <span class="keywordtype">double</span> w, <span class="keywordtype">double</span> h)
-<a name="l00058"></a>00058 {
-<a name="l00059"></a>00059     r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> = x;
-<a name="l00060"></a>00060     r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> = y;
-<a name="l00061"></a>00061     r-&gt;<a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a> = w;
-<a name="l00062"></a>00062     r-&gt;<a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a> = h;
-<a name="l00063"></a>00063 }
-<a name="l00064"></a>00064 
-<a name="l00065"></a>00065 EAPI <span class="keywordtype">void</span> enesim_rectangle_union(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rr1, <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rr2,
-<a name="l00066"></a>00066         <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *dst);
-<a name="l00067"></a>00067 
-<a name="l00071"></a>00071 <span class="preprocessor">#endif</span>
+<a name="l00032"></a><a class="code" href="group__Enesim__Rectangle__Group.html#ga84b80f0a3d2e34bf6c275a8749e95c2e">00032</a> <span class="preprocessor">#define ENESIM_RECTANGLE_ARGS(r) (r)-&gt;x, (r)-&gt;y, (r)-&gt;w, (r)-&gt;h</span>
+<a name="l00033"></a>00033 <span class="preprocessor"></span>
+<a name="l00035"></a><a class="code" href="structEnesim__Rectangle.html">00035</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Enesim_Rectangle
+<a name="l00036"></a>00036 {
+<a name="l00037"></a><a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">00037</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a>; 
+<a name="l00038"></a><a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">00038</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a>; 
+<a name="l00039"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">00039</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>; 
+<a name="l00040"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">00040</a>     <span class="keywordtype">double</span> <a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>; 
+<a name="l00041"></a>00041 } <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a>;
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043 <span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> enesim_rectangle_normalize(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, Eina_Rectangle *dst)
+<a name="l00044"></a>00044 {
+<a name="l00045"></a>00045     dst-&gt;x = floor(r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a>);
+<a name="l00046"></a>00046     dst-&gt;y = floor(r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a>);
+<a name="l00047"></a>00047     dst-&gt;w = ceil(r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> - dst-&gt;x + r-&gt;<a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>);
+<a name="l00048"></a>00048     dst-&gt;h = ceil(r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> - dst-&gt;y + r-&gt;<a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>);
+<a name="l00049"></a>00049 }
+<a name="l00050"></a>00050 
+<a name="l00051"></a>00051 <span class="keyword">static</span> <span class="keyword">inline</span> Eina_Bool enesim_rectangle_is_inside(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y)
+<a name="l00052"></a>00052 {
+<a name="l00053"></a>00053     <span class="keywordflow">if</span> ((x - r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> &gt;= 0) &amp;&amp; (y - r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> &gt;= 0) &amp;&amp; (r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> + r-&gt;<a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a> - x &gt;= 0) &amp;&amp; (r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> + r-&gt;<a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a> - y &gt;= 0))
+<a name="l00054"></a>00054         <span class="keywordflow">return</span> EINA_TRUE;
+<a name="l00055"></a>00055     <span class="keywordflow">else</span>
+<a name="l00056"></a>00056         <span class="keywordflow">return</span> EINA_FALSE;
+<a name="l00057"></a>00057 }
+<a name="l00058"></a>00058 
+<a name="l00059"></a>00059 <span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> enesim_rectangle_coords_from(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *r, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y, <span class="keywordtype">double</span> w, <span class="keywordtype">double</span> h)
+<a name="l00060"></a>00060 {
+<a name="l00061"></a>00061     r-&gt;<a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a> = x;
+<a name="l00062"></a>00062     r-&gt;<a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a> = y;
+<a name="l00063"></a>00063     r-&gt;<a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a> = w;
+<a name="l00064"></a>00064     r-&gt;<a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a> = h;
+<a name="l00065"></a>00065 }
+<a name="l00066"></a>00066 
+<a name="l00067"></a>00067 EAPI <span class="keywordtype">void</span> enesim_rectangle_union(<a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rr1, <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rr2,
+<a name="l00068"></a>00068         <a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *dst);
+<a name="l00069"></a>00069 
+<a name="l00073"></a>00073 <span class="preprocessor">#endif</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -160,7 +162,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Oct 6 2013 23:43:48 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Oct 8 2013 08:00:01 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
