@@ -42,6 +42,12 @@ static void run(Enesim_Renderer *r, const char *file, int argc, char **argv)
 	int ret;
 	char *real_file;
 
+	if (!r)
+	{
+		printf("No such renderer, nothing to do");
+		return;
+	}
+
 	exec_name = argv[0];
 
 	/* handle the parameters */
