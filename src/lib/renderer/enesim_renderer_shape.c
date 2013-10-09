@@ -644,6 +644,11 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Sets the stroke weight of a shape renderer
+ * @param[in] r The shape renderer to set the stroke weight on
+ * @param[in] weight The stroke weight to set
+ */
 EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -655,6 +660,11 @@ EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double wei
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the stroke weight of a shape renderer
+ * @param[in] r The shape renderer to get the stroke weight from
+ * @return The stroke weight
+ */
 EAPI double enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
