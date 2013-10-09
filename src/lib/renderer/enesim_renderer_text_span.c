@@ -380,35 +380,61 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	for (c = text + position.index; c && *c && dst < end; c++)
 	{
 		Enesim_Text_Glyph *g;
-		int w, h;
-		int ry;
-		unsigned int rlen;
-		uint32_t *mask;
-		size_t stride;
 
 		/* FIXME decide what to use, get() / load()? */
 		g = enesim_text_font_glyph_load(font, *c);
 		if (!g) continue;
 		if (!g->surface)
-			goto advance;
-
-		enesim_surface_size_get(g->surface, &w, &h);
-		enesim_surface_data_get(g->surface, (void **)&mask, &stride);
-		ry = y - (thiz->top - g->origin);
-		if (ry < 0 || ry >= h) goto advance;
-
-		mask = argb8888_at(mask, stride, rx, ry);
-		rlen = len < w - rx ? len : w - rx;
-		if (fpaint)
 		{
-			if (fcolor != 0xffffffff)
-				argb8888_sp_argb8888_color_argb8888_fill(dst, rlen, fbuf, fcolor, mask);
-			else
-				argb8888_sp_argb8888_none_argb8888_fill(dst, rlen, fbuf, 0, mask);
+			int rlen;
+
+			rlen = g->x_advance - rx < len ? g->x_advance - rx : len;
+			memset(dst, 0, rlen * sizeof(uint32_t));
+			goto advance;
 		}
 		else
-			argb8888_sp_none_color_argb8888_fill(dst, rlen, NULL, fcolor, mask);
+		{
+			int w, h;
+			int ry;
+			int rlen;
+			uint32_t *mask;
+			size_t stride;
+
+			enesim_surface_size_get(g->surface, &w, &h);
+			enesim_surface_data_get(g->surface, (void **)&mask, &stride);
+
+			ry = y - (thiz->top - g->origin);
+			rlen = len < w - rx ? len : w - rx;
+
+			/* clear the in case we are out of the image vertical bounds */
+			if (ry < 0 || ry >= h)
+			{
+				memset(dst, 4, rlen * sizeof(uint32_t));
+				goto after;
+			}
+
+			mask = argb8888_at(mask, stride, rx, ry);
+			if (fpaint)
+			{
+				if (fcolor != 0xffffffff)
+					argb8888_sp_argb8888_color_argb8888_fill(dst, rlen, fbuf, fcolor, mask);
+				else
+					argb8888_sp_argb8888_none_argb8888_fill(dst, rlen, fbuf, 0, mask);
+			}
+			else
+				argb8888_sp_none_color_argb8888_fill(dst, rlen, NULL, fcolor, mask);
+			/* clear the area that we have not drawn on the horizontal bounds */
+after:
+			if (w < g->x_advance)
+			{
+				int rend;
+
+				rend = rlen + (g->x_advance - w) < len ? g->x_advance - w : len;
+				memset(dst + rlen, 0, rend * sizeof(uint32_t));
+			}
+		}
 advance:
+		/* finally advance */
 		dst += g->x_advance - rx;
 		len -= g->x_advance - rx;
 		fbuf += g->x_advance - rx;
