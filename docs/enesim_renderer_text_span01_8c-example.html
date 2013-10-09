@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Enesim: Enesim_Path_Command_Close Struct Reference</title>
+<title>Enesim: enesim_renderer_text_span01.c</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -49,7 +49,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
@@ -70,48 +70,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
-      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
-      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
-    </ul>
-  </div>
 </div>
 <div class="header">
-  <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">Enesim_Path_Command_Close Struct Reference<div class="ingroups"><a class="el" href="group__Enesim__Path__Group.html">Paths</a></div></div>  </div>
+<div class="title">enesim_renderer_text_span01.c</div>  </div>
 </div><!--header-->
 <div class="contents">
-<!-- doxytag: class="Enesim_Path_Command_Close" -->
-<p><code>#include &lt;<a class="el" href="enesim__path_8h_source.html">enesim_path.h</a>&gt;</code></p>
-<table class="memberdecls">
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Path__Command__Close.html#af4bf0a482b2d2b9b4a32865a9cfe66a3">close</a></td></tr>
-</table>
-<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>Definition of close command </p>
-</div><hr/><h2>Field Documentation</h2>
-<a class="anchor" id="af4bf0a482b2d2b9b4a32865a9cfe66a3"></a><!-- doxytag: member="Enesim_Path_Command_Close::close" ref="af4bf0a482b2d2b9b4a32865a9cfe66a3" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Eina_Bool <a class="el" href="structEnesim__Path__Command__Close.html#af4bf0a482b2d2b9b4a32865a9cfe66a3">Enesim_Path_Command_Close::close</a></td>
-        </tr>
-      </table>
+<p>Example usage of a text span renderer </p>
+<div class="image">
+<img src="enesim_renderer_text_span01.png" alt="enesim_renderer_text_span01.png"/>
 </div>
-<div class="memdoc">
-<p>Set to Eina_True for an actual close </p>
+<div class="fragment"><pre class="fragment"><span class="preprocessor">#include &quot;enesim_renderer_example.h&quot;</span>
 
-</div>
-</div>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li>src/lib/<a class="el" href="enesim__path_8h_source.html">enesim_path.h</a></li>
-</ul>
+<span class="keyword">static</span> <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_text_span01(<span class="keywordtype">void</span>)
+{
+    <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r;
+    Enesim_Text_Font *f;
+    Enesim_Text_Engine *e;
+    <a name="_a0"></a><a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> geom;
+
+    <span class="comment">/* Create an arial font */</span>
+    e = enesim_text_engine_default_get();
+    <span class="keywordflow">if</span> (!e) <span class="keywordflow">return</span> NULL;
+
+    f = enesim_text_font_new_description_from(
+            e, <span class="stringliteral">&quot;arial&quot;</span>, 16);
+    enesim_text_engine_unref(e);
+
+    <span class="keywordflow">if</span> (!f) <span class="keywordflow">return</span> NULL;
+
+    r = <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Text__Span__Renderer__Group.html#gadc323841568feb08d3860a7db4e7e865">enesim_renderer_text_span_new</a>();
+    <span class="comment">/* Draw black */</span>
+    <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaa0f915708559f3b12bafb4193b6da0ef" title="Sets the color of a renderer.">enesim_renderer_color_set</a>(r, 0xff000000);
+    <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Text__Span__Renderer__Group.html#gaedf229432628581c40d0381e351283de" title="Sets the text of the text span.">enesim_renderer_text_span_text_set</a>(r, <span class="stringliteral">&quot;Hello World!&quot;</span>);
+    enesim_renderer_text_span_font_set(r, f);
+    <span class="comment">/* Center the text. For that we use the destination geometry</span>
+<span class="comment">     * We could use the enesim_renderer_shape_geometry_get instead</span>
+<span class="comment">     * given that we dont use any transformation matrix</span>
+<span class="comment">     */</span>
+    enesim_renderer_shape_destination_geometry_get(r, &amp;geom);
+    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaf31b5fce129e3f5e4f3b7f7b8f66b1fe" title="Sets the origin of a renderer.">enesim_renderer_origin_set</a>(r, (256 - geom.<a name="a5"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>) / 2, (256 - geom.<a name="a6"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>) / 2);
+
+    <span class="keywordflow">return</span> r;
+}
+EXAMPLE(enesim_renderer_text_span01)
+
+</pre></div> </div><!-- contents -->
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -130,7 +134,7 @@ Data Fields</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 9 2013 18:00:29 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 9 2013 18:00:28 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

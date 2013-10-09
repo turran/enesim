@@ -102,33 +102,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
     r1 = enesim_renderer_path_new();
     enesim_renderer_path_path_set(r1, p);
-    enesim_renderer_shape_stroke_weight_set(r1, 18);
+    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r1, 18);
     enesim_renderer_shape_stroke_color_set(r1, 0xffffff00);
     enesim_renderer_shape_fill_color_set(r1, 0xffff0000);
-    enesim_renderer_shape_draw_mode_set(r1, <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
-    enesim_renderer_shape_stroke_join_set(r1, <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggabe70a7a4727579260c1b5a097a5ad6cfa06702908bd829a6d5935953cf661b173">ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND</a>);
-    enesim_renderer_shape_stroke_cap_set(r1, <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga03f3612c897c9353b4bd9881c408156ca9c40b9bd57d2fe89334a9269054cfafd">ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND</a>);
+    enesim_renderer_shape_draw_mode_set(r1, <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
+    enesim_renderer_shape_stroke_join_set(r1, <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggabe70a7a4727579260c1b5a097a5ad6cfa06702908bd829a6d5935953cf661b173">ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND</a>);
+    enesim_renderer_shape_stroke_cap_set(r1, <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gga03f3612c897c9353b4bd9881c408156ca9c40b9bd57d2fe89334a9269054cfafd">ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND</a>);
 
-    <a name="a8"></a><a class="code" href="group__Enesim__Matrix__Float__Group.html#gaa7c27474b67ac97a5cae0b87396d894b" title="Set the given floating point matrix to the identity matrix.">enesim_matrix_identity</a>(&amp;m);
+    <a name="a9"></a><a class="code" href="group__Enesim__Matrix__Float__Group.html#gaa7c27474b67ac97a5cae0b87396d894b" title="Set the given floating point matrix to the identity matrix.">enesim_matrix_identity</a>(&amp;m);
     enesim_matrix_scale(&amp;m, 0.5, 0.5);
-    <a name="a9"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer.">enesim_renderer_transformation_set</a>(r1, &amp;m);
+    <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer.">enesim_renderer_transformation_set</a>(r1, &amp;m);
     enesim_renderer_destination_bounds_get(r1, &amp;bounds, 0, 0);
 
-    r2 = <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#ga7b299933d14a0918f07460ee21226abf" title="Create a new rectangle renderer.">enesim_renderer_rectangle_new</a>();
+    r2 = <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#ga7b299933d14a0918f07460ee21226abf" title="Create a new rectangle renderer.">enesim_renderer_rectangle_new</a>();
     enesim_renderer_shape_fill_color_set(r2, 0xff000000);
-    <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#ga46fc2c039a42a94ace4693c47825bfcf" title="Set the top left X coordinate of a rectangle renderer.">enesim_renderer_rectangle_x_set</a>(r2, bounds.x);
-    <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#gac4c7973f05719e39e5662592315a9dae" title="Set the top left Y coordinate of a rectangle renderer.">enesim_renderer_rectangle_y_set</a>(r2, bounds.y);
-    <a name="a13"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#ga36d0dda0d593fa0ae4db5696ddd1b434" title="Set the size of a rectangle renderer.">enesim_renderer_rectangle_size_set</a>(r2, bounds.w, bounds.h);
+    <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#ga46fc2c039a42a94ace4693c47825bfcf" title="Set the top left X coordinate of a rectangle renderer.">enesim_renderer_rectangle_x_set</a>(r2, bounds.x);
+    <a name="a13"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#gac4c7973f05719e39e5662592315a9dae" title="Set the top left Y coordinate of a rectangle renderer.">enesim_renderer_rectangle_y_set</a>(r2, bounds.y);
+    <a name="a14"></a><a class="code" href="group__Enesim__Renderer__Rectangle__Group.html#ga36d0dda0d593fa0ae4db5696ddd1b434" title="Set the size of a rectangle renderer.">enesim_renderer_rectangle_size_set</a>(r2, bounds.w, bounds.h);
     printf(<span class="stringliteral">&quot;%d %d %d %d\n&quot;</span>, bounds.x, bounds.y, bounds.w, bounds.h);
 
-    l = <a name="a14"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
-    <a name="a15"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, r2);
-    <a name="a16"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a17"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>);
-    <a name="a18"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(c, l);
+    l = <a name="a15"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
+    <a name="a16"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, r2);
+    <a name="a17"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a18"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>);
+    <a name="a19"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(c, l);
 
     l = <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, r1);
-    <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a19"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
+    <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a20"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(c, l);
 
     <span class="keywordflow">return</span> c;
@@ -154,7 +154,7 @@ EXAMPLE(enesim_renderer_path02)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 8 2013 08:00:01 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 9 2013 18:00:28 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

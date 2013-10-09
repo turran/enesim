@@ -156,10 +156,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <span class="comment">/* this is the object we&#39;ll draw. */</span>
     r = <a class="code" href="group__Enesim__Renderer__Circle__Group.html#ga7a1a18d1cca208f46876ea8a3d39d8c1" title="Create a new circle renderer.">enesim_renderer_circle_new</a>();
 
-    enesim_renderer_shape_stroke_weight_set(r, 1);
+    <a name="a17"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r, 1);
     enesim_renderer_shape_stroke_color_set(r, 0xff777777);
     enesim_renderer_shape_fill_renderer_set(r, shape_compound);
-    enesim_renderer_shape_draw_mode_set(r, <a name="a17"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
+    enesim_renderer_shape_draw_mode_set(r, <a name="a18"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
     <a class="code" href="group__Enesim__Renderer__Circle__Group.html#gacb1787c13f8fdb2f900221098e019365" title="Set the coordinates of the center of a circle renderer.">enesim_renderer_circle_center_set</a>(r, radius, radius);
     <a class="code" href="group__Enesim__Renderer__Circle__Group.html#gad922db2b21d47e6463d3d0fdf05ea256" title="Set the radius of a circle renderer.">enesim_renderer_circle_radius_set</a>(r, radius);
     shape_circle = r;
@@ -167,11 +167,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     r = shape_background;
     sa = sin(-30 * M_PI / 180.0);
     ca = cos(-30 * M_PI / 180.0);
-    t.<a name="a18"></a><a class="code" href="structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827">xx</a> = ca;               t.<a name="a19"></a><a class="code" href="structEnesim__Matrix.html#a0fae54e9f07895031745082991723459">xy</a> = sa;               t.<a name="a20"></a><a class="code" href="structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab">xz</a> = 0;
-    t.<a name="a21"></a><a class="code" href="structEnesim__Matrix.html#a947076331c2f1d3d6a80c8329ad99dd9">yx</a> = -sa / (2 * radius);    t.<a name="a22"></a><a class="code" href="structEnesim__Matrix.html#af3bb04eda65029c999cf8d8e7b67d52c">yy</a> = ca / (2 * radius);     t.<a name="a23"></a><a class="code" href="structEnesim__Matrix.html#a48dc514bae2a07e567ecb4eac4477c86">yz</a> = 0;
-    t.<a name="a24"></a><a class="code" href="structEnesim__Matrix.html#a4bba6564ff64d5ce9e2ca20e95994c98">zx</a> = 0;                t.<a name="a25"></a><a class="code" href="structEnesim__Matrix.html#ad3f954fd277dfc6a65564ff80acfea58">zy</a> = 0;                t.<a name="a26"></a><a class="code" href="structEnesim__Matrix.html#a86f8b7895398923790aedea040b88660">zz</a> = 1;
-    <a name="a27"></a><a class="code" href="group__Enesim__Matrix__Float__Group.html#gaea2c03c0d16ca8071bea348ccce30856" title="Compute the inverse of the given matrix.">enesim_matrix_inverse</a>(&amp;t, &amp;t);
-    <a name="a28"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer.">enesim_renderer_transformation_set</a>(r, &amp;t);
+    t.<a name="a19"></a><a class="code" href="structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827">xx</a> = ca;               t.<a name="a20"></a><a class="code" href="structEnesim__Matrix.html#a0fae54e9f07895031745082991723459">xy</a> = sa;               t.<a name="a21"></a><a class="code" href="structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab">xz</a> = 0;
+    t.<a name="a22"></a><a class="code" href="structEnesim__Matrix.html#a947076331c2f1d3d6a80c8329ad99dd9">yx</a> = -sa / (2 * radius);    t.<a name="a23"></a><a class="code" href="structEnesim__Matrix.html#af3bb04eda65029c999cf8d8e7b67d52c">yy</a> = ca / (2 * radius);     t.<a name="a24"></a><a class="code" href="structEnesim__Matrix.html#a48dc514bae2a07e567ecb4eac4477c86">yz</a> = 0;
+    t.<a name="a25"></a><a class="code" href="structEnesim__Matrix.html#a4bba6564ff64d5ce9e2ca20e95994c98">zx</a> = 0;                t.<a name="a26"></a><a class="code" href="structEnesim__Matrix.html#ad3f954fd277dfc6a65564ff80acfea58">zy</a> = 0;                t.<a name="a27"></a><a class="code" href="structEnesim__Matrix.html#a86f8b7895398923790aedea040b88660">zz</a> = 1;
+    <a name="a28"></a><a class="code" href="group__Enesim__Matrix__Float__Group.html#gaea2c03c0d16ca8071bea348ccce30856" title="Compute the inverse of the given matrix.">enesim_matrix_inverse</a>(&amp;t, &amp;t);
+    <a name="a29"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer.">enesim_renderer_transformation_set</a>(r, &amp;t);
 
     r = highlight_background;
     sa = sin(120 * M_PI / 180.0);
@@ -204,7 +204,7 @@ EXAMPLE(enesim_renderer_circle02)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 8 2013 08:00:01 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 9 2013 18:00:28 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
