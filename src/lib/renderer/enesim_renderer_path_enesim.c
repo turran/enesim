@@ -793,7 +793,7 @@ static void _path_generate_figures(Enesim_Renderer_Path_Enesim *thiz,
 	 * rasterizer directly, so we dont need to generate the
 	 * stroke path
 	 */
-	if ((dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) && (sw > 1.0))
+	if ((dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) && (dashes || sw > 1.0))
 	{
 		if (!dashes)
 			generator = thiz->stroke_path;
