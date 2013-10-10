@@ -409,7 +409,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 			/* clear the in case we are out of the image vertical bounds */
 			if (ry < 0 || ry >= h)
 			{
-				memset(dst, 4, rlen * sizeof(uint32_t));
+				memset(dst, 0, rlen * sizeof(uint32_t));
 				goto after;
 			}
 
@@ -429,7 +429,8 @@ after:
 			{
 				int rend;
 
-				rend = rlen + (g->x_advance - w) < len ? g->x_advance - w : len;
+				rend = g->x_advance - w;
+				rend = rlen + rend < len ? rend : len - rlen;
 				memset(dst + rlen, 0, rend * sizeof(uint32_t));
 			}
 		}
