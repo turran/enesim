@@ -904,6 +904,7 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
+	Enesim_Renderer_Shape *bifigure_shape;
 	const Enesim_Renderer_State *cs;
 	const Enesim_Renderer_Shape_State *css;
 
@@ -936,7 +937,15 @@ static Eina_Bool _path_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_renderer_color_set(thiz->bifigure, cs->current.color);
 	enesim_renderer_origin_set(thiz->bifigure, cs->current.ox, cs->current.oy);
+	/* pass the dashes */
+	bifigure_shape = ENESIM_RENDERER_SHAPE(thiz->bifigure);
+	if (bifigure_shape->state.dashes)
+	{
+		enesim_list_unref(bifigure_shape->state.dashes);
+	}
+	bifigure_shape->state.dashes = enesim_list_ref(css->dashes);
 
+	/* finally do the setup */
 	if (!enesim_renderer_setup(thiz->bifigure, s, rop, l))
 	{
 		return EINA_FALSE;

@@ -1541,9 +1541,11 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	Enesim_Rasterizer_BiFigure_State *state;
+	const Enesim_Renderer_Shape_State *ss;
 	Enesim_Renderer_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer_Shape_Fill_Rule rule;
 	Enesim_Matrix matrix;
+	Eina_List *dashes;
 	double sw;
 
 	thiz = ENESIM_RASTERIZER_BIFIGURE(r);
@@ -1564,6 +1566,8 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	rule = enesim_renderer_shape_fill_rule_get(r);
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
 	sw = enesim_renderer_shape_stroke_weight_get(r);
+	ss = enesim_renderer_shape_state_get(r);
+	dashes = ss->dashes->l;
 	/* this is for our own state */
 	enesim_renderer_origin_get(r, &state->ox, &state->oy);
 	state->color = enesim_renderer_color_get(r);
@@ -1617,7 +1621,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	}
 	else
 	{
-		if ( (sw <= 1) || (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) )
+		if ( (sw <= 1 && !dashes) || (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) )
 		{
 			enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
 			enesim_renderer_transformation_set(thiz->under, &matrix);
