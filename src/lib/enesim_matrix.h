@@ -17,6 +17,9 @@
  */
 #ifndef ENESIM_MATRIX_H_
 #define ENESIM_MATRIX_H_
+
+#include "enesim_quad.h"
+
 /**
  * @defgroup Enesim_Matrix_Group Matrix
  * @brief Matrix definition and operations
@@ -79,22 +82,6 @@ typedef struct _Enesim_F16p16_Matrix
 } Enesim_F16p16_Matrix;
 
 /**
- * @ingroup Enesim_Matrix_Quad_Group
- * Quadrangle handler
- */
-typedef struct _Enesim_Quad
-{
-	double x0; /**< Top left x coordinate */
-	double y0; /**< Top left y coordinate */
-	double x1; /**< Top right x coordinate */
-	double y1; /**< Top right y coordinate */
-	double x2; /**< Bottom right x coordinate */
-	double y2; /**< Bottom right y coordinate */
-	double x3; /**< Bottom left x coordinate */
-	double y3; /**< Bottom left y coordinate */
-} Enesim_Quad;
-
-/**
  * @}
  * @defgroup Enesim_Matrix_Float_Group Floating point matrices
  * @brief Floating point matrices operations
@@ -131,9 +118,10 @@ EAPI void enesim_matrix_point_transform(const Enesim_Matrix *m, double x, double
 EAPI void enesim_matrix_eina_rectangle_transform(const Enesim_Matrix *m, const Eina_Rectangle *r, const Enesim_Quad *q);
 EAPI void enesim_matrix_rectangle_transform(const Enesim_Matrix *m, const Enesim_Rectangle *r, const Enesim_Quad *q);
 
-EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m, const Enesim_Quad *src, const Enesim_Quad *dst);
-EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m, const Enesim_Quad *q);
-EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m, const Enesim_Quad *q);
+EAPI Eina_Bool enesim_matrix_quad_quad_map(Enesim_Matrix *m, const Enesim_Quad *src, const Enesim_Quad *dst);
+EAPI Eina_Bool enesim_matrix_square_quad_map(Enesim_Matrix *m, const Enesim_Quad *q);
+EAPI Eina_Bool enesim_matrix_quad_square_map(Enesim_Matrix *m, const Enesim_Quad *q);
+
 
 /**
  * @}
@@ -148,25 +136,6 @@ EAPI void enesim_f16p16_matrix_compose(const Enesim_F16p16_Matrix *m1,
 		const Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
 EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix *m);
 
-/**
- * @}
- * @defgroup Enesim_Matrix_Quad_Group Quadrangles
- * @brief Quadrangles operations
- * @ingroup Enesim_Matrix_Group
- * @{
- */
-
-EAPI void enesim_quad_rectangle_to(const Enesim_Quad *q,
-		Enesim_Rectangle *r);
-EAPI void enesim_quad_eina_rectangle_to(const Enesim_Quad *q,
-		Eina_Rectangle *r);
-EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
-		const Eina_Rectangle *r);
-EAPI void enesim_quad_coords_set(Enesim_Quad *q, double x1, double y1, double x2,
-		double y2, double x3, double y3, double x4, double y4);
-EAPI void enesim_quad_coords_get(const Enesim_Quad *q, double *x1, double *y1,
-		double *x2, double *y2, double *x3, double *y3, double *x4,
-		double *y4);
 /**
  * @}
  */

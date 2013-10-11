@@ -18,19 +18,14 @@
 #include "enesim_private.h"
 
 #include "enesim_rectangle.h"
+#include "enesim_quad.h"
 #include "enesim_matrix.h"
 
 #include "enesim_matrix_private.h"
-/* TODO add a fixed point matrix too, to speed up the matrix_rotate sin/cos */
+#include "enesim_quad_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-/* FIXME make this function on API */
-static inline void _quad_dump(Enesim_Quad *q)
-{
-	printf("Q = %f %f, %f %f, %f %f, %f %f\n", QUAD_X0(q), QUAD_Y0(q), QUAD_X1(q), QUAD_Y1(q), QUAD_X2(q), QUAD_Y2(q), QUAD_X3(q), QUAD_Y3(q));
-}
-
 /*
  * In the range [-pi pi]
  * (4/pi)*x - ((4/(pi*pi))*x*abs(x))
@@ -473,6 +468,12 @@ EAPI void enesim_f16p16_matrix_compose(const Enesim_F16p16_Matrix *m1,
 	MATRIX_ZZ(dst) = a33;
 }
 
+/**
+ * Set the matrix values for a translation
+ * @param[in] m The matrix to set the translation values
+ * @param[in] tx The X coordinate translate
+ * @param[in] ty The Y coordinate translate
+ */
 EAPI void enesim_matrix_translate(Enesim_Matrix *m, double tx, double ty)
 {
 	MATRIX_XX(m) = 1;
@@ -486,6 +487,12 @@ EAPI void enesim_matrix_translate(Enesim_Matrix *m, double tx, double ty)
 	MATRIX_ZZ(m) = 1;
 }
 
+/**
+ * Set the matrix values for a scale
+ * @param[in] m The matrix to set the scale values
+ * @param[in] sx The X coordinate scale
+ * @param[in] sy The Y coordinate scale
+ */
 EAPI void enesim_matrix_scale(Enesim_Matrix *m, double sx, double sy)
 {
 	MATRIX_XX(m) = sx;
@@ -500,7 +507,9 @@ EAPI void enesim_matrix_scale(Enesim_Matrix *m, double sx, double sy)
 }
 
 /**
- * FIXME fix this, is incredible slow.
+ * Set the matrix values for a rotation
+ * @param[in] m The matrix to set the rotation values
+ * @param[in] rad The radius to rotate the matrix
  */
 EAPI void enesim_matrix_rotate(Enesim_Matrix *m, double rad)
 {
@@ -568,104 +577,7 @@ EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m)
 	MATRIX_ZZ(m) = 65536;
 }
 
-EAPI void enesim_quad_eina_rectangle_to(const Enesim_Quad *q,
-		Eina_Rectangle *r)
-{
-	double xmin, ymin, xmax, ymax;
-	/* FIXME this code is very ugly, for sure there must be a better
-	 * implementation */
-	xmin = QUAD_X0(q) < QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
-	xmin = xmin < QUAD_X2(q) ? xmin : QUAD_X2(q);
-	xmin = xmin < QUAD_X3(q) ? xmin : QUAD_X3(q);
-
-	ymin = QUAD_Y0(q) < QUAD_Y1(q) ? QUAD_Y0(q) : QUAD_Y1(q);
-	ymin = ymin < QUAD_Y2(q) ? ymin : QUAD_Y2(q);
-	ymin = ymin < QUAD_Y3(q) ? ymin : QUAD_Y3(q);
-
-	xmax = QUAD_X0(q) > QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
-	xmax = xmax > QUAD_X2(q) ? xmax : QUAD_X2(q);
-	xmax = xmax > QUAD_X3(q) ? xmax : QUAD_X3(q);
-
-	ymax = QUAD_Y0(q) > QUAD_Y1(q) ? QUAD_Y0(q) : QUAD_Y1(q);
-	ymax = ymax > QUAD_Y2(q) ? ymax : QUAD_Y2(q);
-	ymax = ymax > QUAD_Y3(q) ? ymax : QUAD_Y3(q);
-
-	r->x = lround(xmin);
-	r->w = lround(xmax) - r->x;
-	r->y = lround(ymin);
-	r->h = lround(ymax) - r->y;
-}
-
-EAPI void enesim_quad_rectangle_to(const Enesim_Quad *q,
-		Enesim_Rectangle *r)
-{
-	double xmin, ymin, xmax, ymax;
-	/* FIXME this code is very ugly, for sure there must be a better
-	 * implementation */
-	xmin = QUAD_X0(q) < QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
-	xmin = xmin < QUAD_X2(q) ? xmin : QUAD_X2(q);
-	xmin = xmin < QUAD_X3(q) ? xmin : QUAD_X3(q);
-
-	ymin = QUAD_Y0(q) < QUAD_Y1(q) ? QUAD_Y0(q) : QUAD_Y1(q);
-	ymin = ymin < QUAD_Y2(q) ? ymin : QUAD_Y2(q);
-	ymin = ymin < QUAD_Y3(q) ? ymin : QUAD_Y3(q);
-
-	xmax = QUAD_X0(q) > QUAD_X1(q) ? QUAD_X0(q) : QUAD_X1(q);
-	xmax = xmax > QUAD_X2(q) ? xmax : QUAD_X2(q);
-	xmax = xmax > QUAD_X3(q) ? xmax : QUAD_X3(q);
-
-	ymax = QUAD_Y0(q) > QUAD_Y1(q) ? QUAD_Y0(q) : QUAD_Y1(q);
-	ymax = ymax > QUAD_Y2(q) ? ymax : QUAD_Y2(q);
-	ymax = ymax > QUAD_Y3(q) ? ymax : QUAD_Y3(q);
-
-	r->x = xmin;
-	r->w = xmax - r->x;
-	r->y = ymin;
-	r->h = ymax - r->y;
-}
-
-EAPI void enesim_quad_rectangle_from(Enesim_Quad *q,
-		const Eina_Rectangle *r)
-{
-	QUAD_X0(q) = r->x;
-	QUAD_Y0(q) = r->y;
-	QUAD_X1(q) = r->x + r->w;
-	QUAD_Y1(q) = r->y;
-	QUAD_X2(q) = r->x + r->w;
-	QUAD_Y2(q) = r->y + r->h;
-	QUAD_X3(q) = r->x;
-	QUAD_Y3(q) = r->y + r->h;
-}
-
-EAPI void enesim_quad_coords_get(const Enesim_Quad *q, double *qx0, double *qy0,
-		double *qx1, double *qy1, double *qx2, double *qy2, double *qx3,
-		double *qy3)
-{
-	if (qx0) *qx0 = q->x0;
-	if (qy0) *qy0 = q->y0;
-	if (qx1) *qx1 = q->x1;
-	if (qy1) *qy1 = q->y1;
-	if (qx2) *qx2 = q->x2;
-	if (qy2) *qy2 = q->y2;
-	if (qx3) *qx3 = q->x3;
-	if (qy3) *qy3 = q->y3;
-}
-
-EAPI void enesim_quad_coords_set(Enesim_Quad *q, double qx0, double qy0,
-		double qx1, double qy1, double qx2, double qy2, double qx3,
-		double qy3)
-{
-	QUAD_X0(q) = qx0;
-	QUAD_Y0(q) = qy0;
-	QUAD_X1(q) = qx1;
-	QUAD_Y1(q) = qy1;
-	QUAD_X2(q) = qx2;
-	QUAD_Y2(q) = qy2;
-	QUAD_X3(q) = qx3;
-	QUAD_Y3(q) = qy3;
-}
-
-EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m,
+EAPI Eina_Bool enesim_matrix_square_quad_map(Enesim_Matrix *m,
 		const Enesim_Quad *q)
 {
 	double ex = QUAD_X0(q) - QUAD_X1(q) + QUAD_X2(q) - QUAD_X3(q); // x0 - x1 + x2 - x3
@@ -714,13 +626,13 @@ EAPI Eina_Bool enesim_matrix_square_quad_to(Enesim_Matrix *m,
 	}
 }
 
-EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m,
+EAPI Eina_Bool enesim_matrix_quad_square_map(Enesim_Matrix *m,
 		const Enesim_Quad *q)
 {
 	Enesim_Matrix tmp;
 
 	/* compute square to quad */
-	if (!enesim_matrix_square_quad_to(&tmp, q))
+	if (!enesim_matrix_square_quad_map(&tmp, q))
 		return EINA_FALSE;
 
 	enesim_matrix_inverse(&tmp, m);
@@ -736,15 +648,15 @@ EAPI Eina_Bool enesim_matrix_quad_square_to(Enesim_Matrix *m,
 /**
  * Creates a projective matrix that maps a quadrangle to a quadrangle
  */
-EAPI Eina_Bool enesim_matrix_quad_quad_to(Enesim_Matrix *m,
+EAPI Eina_Bool enesim_matrix_quad_quad_map(Enesim_Matrix *m,
 		const Enesim_Quad *src, const Enesim_Quad *dst)
 {
 	Enesim_Matrix tmp;
 
 	/* TODO check that both are actually quadrangles */
-	if (!enesim_matrix_quad_square_to(m, src))
+	if (!enesim_matrix_quad_square_map(m, src))
 		return EINA_FALSE;
-	if (!enesim_matrix_square_quad_to(&tmp, dst))
+	if (!enesim_matrix_square_quad_map(&tmp, dst))
 		return EINA_FALSE;
 	enesim_matrix_compose(&tmp, m, m);
 

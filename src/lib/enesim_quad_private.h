@@ -15,18 +15,17 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_MATRIX_PRIVATE_H_
-#define ENESIM_MATRIX_PRIVATE_H_
+#ifndef ENESIM_QUAD_PRIVATE_H_
+#define ENESIM_QUAD_PRIVATE_H_
 
-#define MATRIX_XX(m) m->xx
-#define MATRIX_XY(m) m->xy
-#define MATRIX_XZ(m) m->xz
-#define MATRIX_YX(m) m->yx
-#define MATRIX_YY(m) m->yy
-#define MATRIX_YZ(m) m->yz
-#define MATRIX_ZX(m) m->zx
-#define MATRIX_ZY(m) m->zy
-#define MATRIX_ZZ(m) m->zz
-#define MATRIX_SIZE 9
+#define QUAD_X0(q) q->x0
+#define QUAD_Y0(q) q->y0
+#define QUAD_X1(q) q->x1
+#define QUAD_Y1(q) q->y1
+#define QUAD_X2(q) q->x2
+#define QUAD_Y2(q) q->y2
+#define QUAD_X3(q) q->x3
+#define QUAD_Y3(q) q->y3
 
-#endif /*ENESIM_MATRIX_PRIVATE_H_*/
+#endif /*ENESIM_QUAD_PRIVATE_H_*/
+

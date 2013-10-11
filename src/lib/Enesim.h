@@ -87,6 +87,7 @@ extern "C" {
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 /* util headers */
+#include "enesim_quad.h"
 #include "enesim_matrix.h"
 #include "enesim_path.h"
 /* main subsystems */

@@ -13,6 +13,7 @@ src/lib/enesim_main.h \
 src/lib/enesim_matrix.h \
 src/lib/enesim_path.h \
 src/lib/enesim_pool.h \
+src/lib/enesim_quad.h \
 src/lib/enesim_rectangle.h \
 src/lib/enesim_renderer.h \
 src/lib/enesim_stream.h \
@@ -49,6 +50,8 @@ src/lib/enesim_path_private.h \
 src/lib/enesim_pool.c \
 src/lib/enesim_pool_private.h \
 src/lib/enesim_private.h \
+src/lib/enesim_quad.c \
+src/lib/enesim_quad_private.h \
 src/lib/enesim_rasterizer.c \
 src/lib/enesim_rasterizer_private.h \
 src/lib/enesim_rectangle.c \
