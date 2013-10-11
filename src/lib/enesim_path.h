@@ -98,8 +98,8 @@ typedef struct _Enesim_Path_Command_Scubic_To
 {
 	double x; /**< The X destination coordinate */
 	double y; /**< The Y destination coordinate */
-	double ctrl_x; /**< The second control point X coordinate */
-	double ctrl_y; /**< The second control point Y coordinate */
+	double ctrl_x; /**< The control point X coordinate */
+	double ctrl_y; /**< The control point Y coordinate */
 } Enesim_Path_Command_Scubic_To;
 
 /**

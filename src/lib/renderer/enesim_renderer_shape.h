@@ -28,33 +28,33 @@
 /** Flags that specify the shape features */
 typedef enum _Enesim_Renderer_Shape_Feature
 {
-	/**< The shape renderer can use another renderer for filling */
+	/** The shape renderer can use another renderer for filling */
 	ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER 	= (1 << 0),
-	/**< The shape renderer can use another renderer for stroking */
+	/** The shape renderer can use another renderer for stroking */
 	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER	= (1 << 1),
-	/**< The shape renderer can locate the stroke */
+	/** The shape renderer can locate the stroke */
 	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION	= (1 << 2),
-	/**< The shape renderer can have a dashed stroke */
+	/** The shape renderer can have a dashed stroke */
 	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH	= (1 << 3),
 } Enesim_Renderer_Shape_Feature;
 
 /** Flag that specifiy the drawing mode of the shape renderer */
 typedef enum _Enesim_Renderer_Shape_Draw_Mode
 {
-	/**< The shape renderer will fill */
+	/** The shape renderer will fill */
 	ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL 	= (1 << 0),
-	/**< The shape renderer will stroke */
+	/** The shape renderer will stroke */
 	ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE	= (1 << 1),
 } Enesim_Renderer_Shape_Draw_Mode;
 
 /** Location of the stroke */
 typedef enum _Enesim_Renderer_Shape_Stroke_Location
 {
-	/**< The stroke is growed from the border of the shape to the inside */
+	/** The stroke is growed from the border of the shape to the inside */
 	ENESIM_RENDERER_SHAPE_STROKE_LOCATION_INSIDE,
-	/**< The stroke is growed from the border of the shape to the outside */
+	/** The stroke is growed from the border of the shape to the outside */
 	ENESIM_RENDERER_SHAPE_STROKE_LOCATION_OUTSIDE,
-	/**< The stroke is centered on the border of the shape */
+	/** The stroke is centered on the border of the shape */
 	ENESIM_RENDERER_SHAPE_STROKE_LOCATION_CENTER,
 } Enesim_Renderer_Shape_Stroke_Location;
 
@@ -100,7 +100,7 @@ EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_features_get(Enesim_Ren
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
 EAPI Enesim_Color enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r);
 
-EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
+EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *stroke);
 EAPI Enesim_Renderer * enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double weight);
@@ -115,9 +115,6 @@ EAPI Enesim_Renderer_Shape_Stroke_Cap enesim_renderer_shape_stroke_cap_get(Enesi
 EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Join join);
 EAPI Enesim_Renderer_Shape_Stroke_Join enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r);
 
-EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *o);
-EAPI Enesim_Renderer * enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r);
-
 EAPI void enesim_renderer_shape_stroke_dash_add_simple(Enesim_Renderer *r, double length, double gap);
 EAPI void enesim_renderer_shape_stroke_dash_add(Enesim_Renderer *r, const Enesim_Renderer_Shape_Stroke_Dash *dash);
 EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r);
@@ -125,7 +122,7 @@ EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r);
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color fill_color);
 EAPI Enesim_Color enesim_renderer_shape_fill_color_get(Enesim_Renderer *r);
 
-EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *f);
+EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *fill);
 EAPI Enesim_Renderer * enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Fill_Rule rule);

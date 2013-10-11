@@ -134,6 +134,19 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 	return buf;
 }
 
+/**
+ * @brief Create a new buffer using an user provided data
+ * @param[in] f The format of the buffer
+ * @param[in] w The width of the buffer
+ * @param[in] h The height of the buffer
+ * @param[in] copy In case the data needs to be copied to create the buffer
+ * or used directly
+ * @param[in] data The data of the buffer pixels
+ * @param[in] free_func The function to be called whenever the data of the buffer
+ * needs to be freed
+ * @param[in] user_data The private data for the @a free_func callback
+ * @return The newly created buffer
+ */
 EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
@@ -147,6 +160,14 @@ EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 	return buf;
 }
 
+/**
+ * @brief Create a new buffer using a pool
+ * @param[in] f The format of the buffer
+ * @param[in] w The width of the buffer
+ * @param[in] h The height of the buffer
+ * @param[in] p The pool to use
+ * @return The newly created buffer
+ */
 EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p)
 {
@@ -172,6 +193,15 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f,
 	return buf;
 }
 
+/**
+ * @brief Create a new buffer using the default memory pool
+ * @param[in] f The format of the buffer
+ * @param[in] w The width of the buffer
+ * @param[in] h The height of the buffer
+ * @return The newly created buffer
+ * @see enesim_pool_default_get()
+ * @see enesim_pool_default_set()
+ */
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f,
 			uint32_t w, uint32_t h)
 {
@@ -280,6 +310,7 @@ EAPI void enesim_buffer_unref(Enesim_Buffer *b)
  * @brief Gets the data of a buffer
  * @param[in] b The buffer to get the data from
  * @param[out] data The data of the buffer
+ * @return Eina_True if it is possible to get the data, Eina_False otherwise
  */
 EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
 {

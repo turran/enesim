@@ -673,6 +673,11 @@ EAPI double enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r)
 	return thiz->state.current.stroke.weight;
 }
 
+/**
+ * Sets the stroke location of a shape renderer
+ * @param[in] r The shape renderer to set the stroke location on
+ * @param[in] location The stroke location to set
+ */
 EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Location location)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -684,6 +689,11 @@ EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_R
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the stroke location of a shape renderer
+ * @param[in] r The shape renderer to get the stroke location from
+ * @return The stroke location
+ */
 EAPI Enesim_Renderer_Shape_Stroke_Location enesim_renderer_shape_stroke_location_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -692,7 +702,11 @@ EAPI Enesim_Renderer_Shape_Stroke_Location enesim_renderer_shape_stroke_location
 	return thiz->state.current.stroke.location;
 }
 
-
+/**
+ * Sets the stroke color of a shape renderer
+ * @param[in] r The shape renderer to set the stroke color on
+ * @param[in] color The stroke color to set
+ */
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -704,6 +718,11 @@ EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Colo
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the stroke color of a shape renderer
+ * @param[in] r The shape renderer to get the stroke color from
+ * @return The stroke color
+ */
 EAPI Enesim_Color enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -712,6 +731,11 @@ EAPI Enesim_Color enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r)
 	return thiz->state.current.stroke.color;
 }
 
+/**
+ * Sets the stroke cap of a shape renderer
+ * @param[in] r The shape renderer to set the stroke cap on
+ * @param[in] cap The stroke cap to set
+ */
 EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Cap cap)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -723,6 +747,11 @@ EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Render
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the stroke cap of a shape renderer
+ * @param[in] r The shape renderer to get the stroke cap from
+ * @return The stroke cap
+ */
 EAPI Enesim_Renderer_Shape_Stroke_Cap enesim_renderer_shape_stroke_cap_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -731,6 +760,11 @@ EAPI Enesim_Renderer_Shape_Stroke_Cap enesim_renderer_shape_stroke_cap_get(Enesi
 	return thiz->state.current.stroke.cap;
 }
 
+/**
+ * Sets the stroke join of a shape renderer
+ * @param[in] r The shape renderer to set the stroke join on
+ * @param[in] join The stroke join to set
+ */
 EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Stroke_Join join)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -742,6 +776,11 @@ EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Rende
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the stroke join of a shape renderer
+ * @param[in] r The shape renderer to get the stroke join from
+ * @return The stroke join
+ */
 EAPI Enesim_Renderer_Shape_Stroke_Join enesim_renderer_shape_stroke_join_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -750,6 +789,11 @@ EAPI Enesim_Renderer_Shape_Stroke_Join enesim_renderer_shape_stroke_join_get(Ene
 	return thiz->state.current.stroke.join;
 }
 
+/**
+ * Sets the stroke renderer of a shape renderer
+ * @param[in] r The shape renderer to set the stroke renderer on
+ * @param[in] stroke The stroke renderer to set
+ */
 EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_Renderer *stroke)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -767,6 +811,11 @@ EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_R
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the stroke renderer of a shape renderer
+ * @param[in] r The shape renderer to get the stroke renderer from
+ * @return The stroke renderer
+ */
 EAPI Enesim_Renderer * enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -775,6 +824,11 @@ EAPI Enesim_Renderer * enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer
 	return enesim_renderer_ref(thiz->state.current.stroke.r);
 }
 
+/**
+ * Sets the fill color of a shape renderer
+ * @param[in] r The shape renderer to set the fill color on
+ * @param[in] color The fill color to set
+ */
 EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color color)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -786,6 +840,11 @@ EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color 
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the fill color of a shape renderer
+ * @param[in] r The shape renderer to get the fill color from
+ * @return The fill color
+ */
 EAPI Enesim_Color enesim_renderer_shape_fill_color_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -794,6 +853,11 @@ EAPI Enesim_Color enesim_renderer_shape_fill_color_get(Enesim_Renderer *r)
 	return thiz->state.current.fill.color;
 }
 
+/**
+ * Sets the fill renderer of a shape renderer
+ * @param[in] r The shape renderer to set the fill renderer on
+ * @param[in] fill The fill renderer to set
+ */
 EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Renderer *fill)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -810,6 +874,11 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the fill renderer of a shape renderer
+ * @param[in] r The shape renderer to get the fill renderer from
+ * @return The fill renderer
+ */
 EAPI Enesim_Renderer * enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -818,6 +887,11 @@ EAPI Enesim_Renderer * enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *
 	return enesim_renderer_ref(thiz->state.current.fill.r);
 }
 
+/**
+ * Sets the fill rule of a shape renderer
+ * @param[in] r The shape renderer to set the fill rule on
+ * @param[in] rule The fill rule to set
+ */
 EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Fill_Rule rule)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -829,6 +903,11 @@ EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Rendere
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the fill rule of a shape renderer
+ * @param[in] r The shape renderer to get the fill rule from
+ * @return The fill rule
+ */
 EAPI Enesim_Renderer_Shape_Fill_Rule enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -837,6 +916,11 @@ EAPI Enesim_Renderer_Shape_Fill_Rule enesim_renderer_shape_fill_rule_get(Enesim_
 	return thiz->state.current.fill.rule;
 }
 
+/**
+ * Sets the draw mode of a shape renderer
+ * @param[in] r The shape renderer to set the draw mode on
+ * @param[in] draw_mode The draw mode to set
+ */
 EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Draw_Mode draw_mode)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -848,6 +932,11 @@ EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Rendere
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * Gets the draw mode of a shape renderer
+ * @param[in] r The shape renderer to get the draw mode from
+ * @return The draw mode
+ */
 EAPI Enesim_Renderer_Shape_Draw_Mode enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape *thiz;
@@ -856,6 +945,11 @@ EAPI Enesim_Renderer_Shape_Draw_Mode enesim_renderer_shape_draw_mode_get(Enesim_
 	return thiz->state.current.draw_mode;
 }
 
+/**
+ * @brief Get the features a shape renderer support
+ * @param[in] r The renderer to get the features from
+ * @return The renderer features
+ */
 EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_features_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape_Class *klass;
@@ -897,6 +991,19 @@ EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 	enesim_list_clear(thiz->state.dashes);
 }
 
+/**
+ * @brief Get the geometry of a renderer shape
+ * @param[in] r The shape renderer to get the geometry from
+ * @param[out] geometry The rectangle pointer to write the geometry in
+ * @return Eina_True if the functions success on the getting geometry,
+ * Eina_False otherwise
+ *
+ * This function gets the geometry of a shape renderer which is defined
+ * only by it's shape and not by the pixels drawn. That is, the stroking
+ * of the shape is not taking into account.
+ * To know the area of the pixels drawn by the shape renderer use @ref
+ * enesim_renderer_bounds_get
+ */
 EAPI Eina_Bool enesim_renderer_shape_geometry_get(Enesim_Renderer *r, Enesim_Rectangle *geometry)
 {
 	Enesim_Renderer_Shape_Class *klass;
@@ -907,6 +1014,17 @@ EAPI Eina_Bool enesim_renderer_shape_geometry_get(Enesim_Renderer *r, Enesim_Rec
 	return EINA_FALSE;
 }
 
+/**
+ * @brief Get the destination geometry of a renderer shape
+ * @param[in] r The shape renderer to get the destination geometry from
+ * @param[out] geometry The rectangle pointer to write the destination geometry in
+ * @return Eina_True if the functions success on the getting geometry,
+ * Eina_False otherwise
+ *
+ * This function is similar to @ref enesim_renderer_shape_geometry_get but the
+ * geometry is also transformed by the transformation matrix set using @ref
+ * enesim_renderer_transformation_set
+ */
 EAPI Eina_Bool enesim_renderer_shape_destination_geometry_get(
 		Enesim_Renderer *r, Enesim_Rectangle *geometry)
 {

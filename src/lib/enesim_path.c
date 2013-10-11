@@ -291,6 +291,12 @@ EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y)
 	enesim_path_command_add(thiz, &cmd);
 }
 
+/**
+ * Add a smooth quadratic to command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] x The X destination coordinate
+ * @param[in] y The Y destination coordinate
+ */
 EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x,
 		double y)
 {
@@ -302,6 +308,14 @@ EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x,
 	enesim_path_command_add(thiz, &cmd);
 }
 
+/**
+ * Add a quadratic to command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] ctrl_x The control point X coordinate
+ * @param[in] ctrl_y The control point Y coordinate 
+ * @param[in] x The X destination coordinate
+ * @param[in] y The Y destination coordinate
+ */
 EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
 		double ctrl_y, double x, double y)
 {
@@ -315,6 +329,16 @@ EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
 	enesim_path_command_add(thiz, &cmd);
 }
 
+/**
+ * Add a cubic to command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] ctrl_x0 The first control point X coordinate
+ * @param[in] ctrl_y0 The first control point Y coordinate 
+ * @param[in] ctrl_x The second control point X coordinate
+ * @param[in] ctrl_y The second control point Y coordinate 
+ * @param[in] x The X destination coordinate
+ * @param[in] y The Y destination coordinate
+ */
 EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
 		double ctrl_y0, double ctrl_x, double ctrl_y, double x, double y)
 {
@@ -330,6 +354,14 @@ EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
 	enesim_path_command_add(thiz, &cmd);
 }
 
+/**
+ * Add a smooth cubic to command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] ctrl_x The control point X coordinate
+ * @param[in] ctrl_y The control point Y coordinate 
+ * @param[in] x The X destination coordinate
+ * @param[in] y The Y destination coordinate
+ */
 EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x,
 		double ctrl_y, double x, double y)
 {
@@ -343,6 +375,18 @@ EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x,
 	enesim_path_command_add(thiz, &cmd);
 }
 
+
+/**
+ * Add a an arc to command to a path
+ * @param[in] thiz The path to add the command to
+ * @param[in] rx The radius in X
+ * @param[in] ry The radius in Y
+ * @param[in] angle The rotation on the X coordinate
+ * @param[in] large If Eina_True the large arc will be chosen
+ * @param[in] sweep If Eina_True the arc in positive-angle will be chosen
+ * @param[in] x The X destination coordinate
+ * @param[in] y The Y destination coordinate
+ */
 EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double angle,
                    unsigned char large, unsigned char sweep, double x, double y)
 {
