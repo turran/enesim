@@ -178,12 +178,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00115"></a>00115 
 <a name="l00116"></a>00116 <span class="keyword">typedef</span> void (*Enesim_Buffer_Free)(<span class="keywordtype">void</span> *data, <span class="keywordtype">void</span> *user_data);
 <a name="l00117"></a>00117 
-<a name="l00118"></a>00118 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * enesim_buffer_new(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h);
-<a name="l00119"></a>00119 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * enesim_buffer_new_data_from(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f,
+<a name="l00118"></a>00118 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * <a class="code" href="group__Enesim__Buffer__Group.html#ga67c63dae57726fb1e9ac8b5606620de8" title="Create a new buffer using the default memory pool.">enesim_buffer_new</a>(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h);
+<a name="l00119"></a>00119 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * <a class="code" href="group__Enesim__Buffer__Group.html#ga2ece4e20625915711c3b7a0c0288fe50" title="Create a new buffer using an user provided data.">enesim_buffer_new_data_from</a>(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f,
 <a name="l00120"></a>00120         uint32_t w, uint32_t h, Eina_Bool copy,
 <a name="l00121"></a>00121         <a class="code" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data, Enesim_Buffer_Free free_func,
 <a name="l00122"></a>00122         <span class="keywordtype">void</span> *free_func_data);
-<a name="l00123"></a>00123 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * enesim_buffer_new_pool_from(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, <a class="code" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p);
+<a name="l00123"></a>00123 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * <a class="code" href="group__Enesim__Buffer__Group.html#gad26dd424add56cc61fcfec5fbc8b2a7d" title="Create a new buffer using a pool.">enesim_buffer_new_pool_from</a>(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, <a class="code" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p);
 <a name="l00124"></a>00124 EAPI <a class="code" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> * <a class="code" href="group__Enesim__Buffer__Group.html#gab76747e867ec0426e346c91b8a72955a" title="Create a new buffer using a pool and an user provided data.">enesim_buffer_new_pool_and_data_from</a>(<a class="code" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f,
 <a name="l00125"></a>00125         uint32_t w, uint32_t h, <a class="code" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p, Eina_Bool copy,
 <a name="l00126"></a>00126         <a class="code" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data, Enesim_Buffer_Free free_func,
@@ -240,7 +240,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 10 2013 22:39:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 11 2013 19:22:51 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

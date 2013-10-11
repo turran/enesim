@@ -90,15 +90,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#gacb1787c13f8fdb2f900221098e019365" title="Set the coordinates of the center of a circle renderer.">enesim_renderer_circle_center_set</a>(r1, 128, 128);
     <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#gad922db2b21d47e6463d3d0fdf05ea256" title="Set the radius of a circle renderer.">enesim_renderer_circle_radius_set</a>(r1, 64);
     <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r1, 5);
-    enesim_renderer_shape_stroke_color_set(r1, 0xff0000ff);
-    enesim_renderer_shape_fill_color_set(r1, 0xffff0000);
-    enesim_renderer_shape_draw_mode_set(r1, <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
+    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r1, 0xff0000ff);
+    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c">enesim_renderer_shape_fill_color_set</a>(r1, 0xffff0000);
+    <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r1, <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
 
-    r2 = <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#ga33a07a14fbb62ea2cfa59b81427bb869" title="Creates a new blur filter renderer.">enesim_renderer_blur_new</a>();
-    <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaf31b5fce129e3f5e4f3b7f7b8f66b1fe" title="Sets the origin of a renderer.">enesim_renderer_origin_set</a>(r2, 68, 68);
-    <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#gad8f426f5649c8bf1c42bfd723493e1dc" title="Sets the renderer to blur.">enesim_renderer_blur_source_renderer_set</a>(r2, r1);
-    <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#ga7408fecb4755b37a63ba432f9c4a6326" title="Sets the blur radius in the x direction.">enesim_renderer_blur_radius_x_set</a>(r2, 4.5);
-    <a name="a9"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#gac8d5aa23d04c8aee2b4ce1dde4ab3926" title="Sets the blur radius in the y direction.">enesim_renderer_blur_radius_y_set</a>(r2, 4.5);
+    r2 = <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#ga33a07a14fbb62ea2cfa59b81427bb869" title="Creates a new blur filter renderer.">enesim_renderer_blur_new</a>();
+    <a name="a9"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaf31b5fce129e3f5e4f3b7f7b8f66b1fe" title="Sets the origin of a renderer.">enesim_renderer_origin_set</a>(r2, 68, 68);
+    <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#gad8f426f5649c8bf1c42bfd723493e1dc" title="Sets the renderer to blur.">enesim_renderer_blur_source_renderer_set</a>(r2, r1);
+    <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#ga7408fecb4755b37a63ba432f9c4a6326" title="Sets the blur radius in the x direction.">enesim_renderer_blur_radius_x_set</a>(r2, 4.5);
+    <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Blur__Group.html#gac8d5aa23d04c8aee2b4ce1dde4ab3926" title="Sets the blur radius in the y direction.">enesim_renderer_blur_radius_y_set</a>(r2, 4.5);
 
     <span class="keywordflow">return</span> r2;
 }
@@ -123,7 +123,7 @@ EXAMPLE(enesim_renderer_blur01)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 10 2013 22:39:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 11 2013 19:22:51 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

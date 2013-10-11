@@ -108,12 +108,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Ellipse__Group.html#ga8cb9ee9afd8111b9c046b83848c49434" title="Set the Y coordinate of the center of a ellipse renderer.">enesim_renderer_ellipse_y_set</a>(r2, y);
     <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Ellipse__Group.html#gaac123fc6a0f0d51dfa84e906e759de7d" title="Set the radii of a ellipse renderer.">enesim_renderer_ellipse_radii_set</a>(r2, w, h);
     <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r2, 2);
-    enesim_renderer_shape_stroke_color_set(r2, 0xff000000);
-    enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
+    <a name="a13"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r2, 0xff000000);
+    <a name="a14"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r2, <a name="a15"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a45b6c61ebec44c94f311f9265a63bb4d">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE</a>);
 
     l = <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, r2);
-    <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a13"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
+    <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a16"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(r1, l);
 
     r2 = <a class="code" href="group__Enesim__Renderer__Ellipse__Group.html#ga599b53d72f75af34d5ccc633395ec094" title="Create a new ellipse renderer.">enesim_renderer_ellipse_new</a>();
@@ -121,23 +121,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <a class="code" href="group__Enesim__Renderer__Ellipse__Group.html#ga8cb9ee9afd8111b9c046b83848c49434" title="Set the Y coordinate of the center of a ellipse renderer.">enesim_renderer_ellipse_y_set</a>(r2, y - h);
     <a class="code" href="group__Enesim__Renderer__Ellipse__Group.html#gaac123fc6a0f0d51dfa84e906e759de7d" title="Set the radii of a ellipse renderer.">enesim_renderer_ellipse_radii_set</a>(r2, w, h);
     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r2, 2);
-    enesim_renderer_shape_stroke_color_set(r2, 0xff000000);
-    enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
+    <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r2, 0xff000000);
+    <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r2, <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a45b6c61ebec44c94f311f9265a63bb4d">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE</a>);
 
     l = <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, r2);
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(r1, l);
 
-    p = <a name="a14"></a><a class="code" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32" title="Creates a new path.">enesim_path_new</a>();
-    <a name="a15"></a><a class="code" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, x, y - h);
-    enesim_path_arc_to(p, w, h, 0, EINA_FALSE, EINA_FALSE, x + w, y);
+    p = <a name="a17"></a><a class="code" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32" title="Creates a new path.">enesim_path_new</a>();
+    <a name="a18"></a><a class="code" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, x, y - h);
+    <a name="a19"></a><a class="code" href="group__Enesim__Path__Group.html#ga08566d891c92289a5f788ca06fe4327e">enesim_path_arc_to</a>(p, w, h, 0, EINA_FALSE, EINA_FALSE, x + w, y);
 
-    r2 = enesim_renderer_path_new();
-    enesim_renderer_path_path_set(r2, p);
+    r2 = <a name="a20"></a><a class="code" href="group__Enesim__Renderer__Path__Group.html#gad777913fb8fafe712e2a29238b1fac96">enesim_renderer_path_new</a>();
+    <a name="a21"></a><a class="code" href="group__Enesim__Renderer__Path__Group.html#ga1692d3640652960ccb9a3f1e21005573">enesim_renderer_path_path_set</a>(r2, p);
     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r2, 2);
-    enesim_renderer_shape_stroke_color_set(r2, 0xffff0000);
-    enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
+    <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r2, 0xffff0000);
+    <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r2, <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a45b6c61ebec44c94f311f9265a63bb4d">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE</a>);
 
     l = <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, r2);
@@ -168,7 +168,7 @@ EXAMPLE(enesim_renderer_path04)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 10 2013 22:39:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 11 2013 19:22:51 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

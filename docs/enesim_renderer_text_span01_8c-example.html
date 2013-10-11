@@ -108,8 +108,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <span class="comment">     * We could use the enesim_renderer_shape_geometry_get instead</span>
 <span class="comment">     * given that we dont use any transformation matrix</span>
 <span class="comment">     */</span>
-    enesim_renderer_shape_destination_geometry_get(r, &amp;geom);
-    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaf31b5fce129e3f5e4f3b7f7b8f66b1fe" title="Sets the origin of a renderer.">enesim_renderer_origin_set</a>(r, (256 - geom.<a name="a5"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>) / 2, (256 - geom.<a name="a6"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>) / 2);
+    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gaa18fd1438071079b3b7b7217b15078ee" title="Get the destination geometry of a renderer shape.">enesim_renderer_shape_destination_geometry_get</a>(r, &amp;geom);
+    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaf31b5fce129e3f5e4f3b7f7b8f66b1fe" title="Sets the origin of a renderer.">enesim_renderer_origin_set</a>(r, (256 - geom.<a name="a6"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>) / 2, (256 - geom.<a name="a7"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>) / 2);
 
     <span class="keywordflow">return</span> r;
 }
@@ -134,7 +134,7 @@ EXAMPLE(enesim_renderer_text_span01)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 10 2013 22:39:44 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 11 2013 19:22:51 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
