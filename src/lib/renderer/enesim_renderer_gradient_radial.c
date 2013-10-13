@@ -276,6 +276,10 @@ static void _enesim_renderer_gradient_radial_instance_deinit(void *o EINA_UNUSED
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Creates radial gradient renderer
+ * @return The new renderer
+ */
 EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 {
 	Enesim_Renderer *r;
@@ -284,7 +288,14 @@ EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void)
 	return r;
 }
 
-EAPI void enesim_renderer_gradient_radial_center_set(Enesim_Renderer *r, double center_x, double center_y)
+/**
+ * Set the center of a radial gradient renderer
+ * @param[in] r The gradient renderer to set the center on
+ * @param[in] center_x The X coordinate of the center
+ * @param[in] center_y The Y coordinate of the center
+ */
+EAPI void enesim_renderer_gradient_radial_center_set(Enesim_Renderer *r,
+		double center_x, double center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
@@ -294,8 +305,14 @@ EAPI void enesim_renderer_gradient_radial_center_set(Enesim_Renderer *r, double 
 	thiz->changed = EINA_TRUE;
 }
 
-EAPI void enesim_renderer_gradient_radial_center_get(Enesim_Renderer *r, 
-							double *center_x, double *center_y)
+/**
+ * Get the center of a radial gradient renderer
+ * @param[in] r The gradient renderer to get the center from
+ * @param[out] center_x The pointer to store the X coordinate center
+ * @param[out] center_y The pointer to store the Y coordinate center
+ */
+EAPI void enesim_renderer_gradient_radial_center_get(Enesim_Renderer *r,
+		double *center_x, double *center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
