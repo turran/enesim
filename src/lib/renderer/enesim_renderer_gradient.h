@@ -34,8 +34,8 @@ typedef struct _Enesim_Renderer_Gradient_Stop
 
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop);
 EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r);
-EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode);
-EAPI Enesim_Repeat_Mode enesim_renderer_gradient_mode_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_gradient_repeat_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode);
+EAPI Enesim_Repeat_Mode enesim_renderer_gradient_repeat_mode_get(Enesim_Renderer *r);
 
 /**
  * @}

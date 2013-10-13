@@ -342,6 +342,11 @@ int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+/**
+ * Add a stop on a gradient renderer
+ * @param[in] r The gradient renderer to add the stop in
+ * @param[in] stop The gradient stop to add
+ */
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -394,6 +399,10 @@ EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_
 	thiz->stops_changed = EINA_TRUE;
 }
 
+/**
+ * Clear every stop added on a gradient renderer
+ * @param[in] r The gradient renderer to clear the stops on
+ */
 EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -410,7 +419,12 @@ EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 	thiz->stops_changed = EINA_TRUE;
 }
 
-EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
+/**
+ * Set the repeat mode of a gradient renderer
+ * @param[in] r The gradient renderer to set the repeat mode on
+ * @param[in] mode The repeat mode
+ */
+EAPI void enesim_renderer_gradient_repeat_mode_set(Enesim_Renderer *r,
 		Enesim_Repeat_Mode mode)
 {
 	Enesim_Renderer_Gradient *thiz;
@@ -420,7 +434,12 @@ EAPI void enesim_renderer_gradient_mode_set(Enesim_Renderer *r,
 	thiz->changed = EINA_TRUE;
 }
 
-EAPI Enesim_Repeat_Mode enesim_renderer_gradient_mode_get(Enesim_Renderer *r)
+/**
+ * Get the repeat mode of a gradient renderer
+ * @param[in] r The gradient renderer to get the repeat mode from
+ * @return The repeat mode
+ */
+EAPI Enesim_Repeat_Mode enesim_renderer_gradient_repeat_mode_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient *thiz;
 
