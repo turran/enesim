@@ -122,9 +122,9 @@ ENS_CHECK_DOXYGEN([build_doc="yes"], [build_doc="no"])
 
 efl_version="1.7.0"
 
-requirements_cflags=""
-requirements_libs=""
-requirements_pc=""
+requirements_enesim_cflags=""
+requirements_enesim_libs=""
+requirements_enesim_pc=""
 
 ## Windows
 
@@ -132,23 +132,23 @@ case "$host_os" in
    mingw*)
       PKG_CHECK_EXISTS([evil >= ${efl_version}],
          [
-          requirements_pc="${requirements_pc} evil >= ${efl_version}"
+          requirements_enesim_pc="${requirements_enesim_pc} evil >= ${efl_version}"
           AC_DEFINE([HAVE_EVIL], [1], [Define to 1 if you have Evil library.])
          ],
          [AC_MSG_ERROR([Evil is required. Be sure to have it installed.])])
-      requirements_libs="${requirements_libs} -lws2_32"
+      requirements_enesim_libs="${requirements_enesim_libs} -lws2_32"
    ;;
 esac
 
 ## Eina
 
-requirements_pc="eina >= ${efl_version} ${requirements_pc}"
+requirements_enesim_pc="eina >= ${efl_version} ${requirements_enesim_pc}"
 
 ## Fontconfig
 PKG_CHECK_EXISTS([fontconfig >= 2.4.2],
    [
     have_fontconfig="yes"
-    requirements_pc="${requirements_pc} fontconfig >= 2.4.2"
+    requirements_enesim_pc="${requirements_enesim_pc} fontconfig >= 2.4.2"
     AC_DEFINE([HAVE_FONTCONFIG], [1], [Have support for fontconfig])
    ],
    [have_fontconfig="no"])
@@ -160,7 +160,7 @@ AM_CONDITIONAL([HAVE_FONTCONFIG], [test "x${have_fontconfig}" = "xyes"])
 PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
    [
     have_freetype="yes"
-    requirements_pc="${requirements_pc} freetype2 >= 9.3.0"
+    requirements_enesim_pc="${requirements_enesim_pc} freetype2 >= 9.3.0"
     AC_DEFINE([HAVE_FREETYPE], [1], [Have support for freetype])
    ],
    [have_freetype="no"])
@@ -185,7 +185,7 @@ PKG_CHECK_EXISTS([cairo >= 1.10.0], [have_cairo="yes"],[have_cairo="no"])
 build_cairo="no"
 if test "x${have_cairo}" = "xyes" -a "x${want_cairo}" = "xyes"; then
   build_cairo="yes"
-  requirements_pc="${requirements_pc} cairo >= 1.10.0"
+  requirements_enesim_pc="${requirements_enesim_pc} cairo >= 1.10.0"
 fi
 
 if test "x${build_cairo}" = "xyes"; then
@@ -262,19 +262,18 @@ fi
 build_opengl="no"
 if test "x${want_opengl}" = "xyes" -a "x${have_opengl}" = "xyes"; then
   build_opengl="yes"
-  requirements_pc="${requirements_pc} glew"
-  requirements_libs="${OPENGL_LIBS} ${requirements_libs}"
+  requirements_enesim_pc="${requirements_enesim_pc} glew"
+  requirements_enesim_libs="${OPENGL_LIBS} ${requirements_enesim_libs}"
   AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
 fi
 
 AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
 
-PKG_CHECK_MODULES([ENESIM], [${requirements_pc}])
+ENS_MODULE([Png], [yes])
+ENS_MODULE([Jpg], [yes])
+ENS_MODULE([Raw], [static])
 
-# libpng
-PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
-   [have_png="yes"],
-   [have_png="no"])
+PKG_CHECK_MODULES([ENESIM], [${requirements_enesim_pc}])
 
 
 ### Checks for header files
@@ -289,17 +288,6 @@ fi
 #if test "x${want_opencl}" = "xyes" ; then
 #   AC_CHECK_HEADERS([CL/cl.h], [have_opencl="yes"], [have_opencl="no"])
 #fi
-
-## libjpeg
-JPG_LIBS=""
-JPG_CFLAGS=""
-AC_CHECK_HEADER([jpeglib.h],
-   [
-    have_jpg="yes"
-    JPG_LIBS="-ljpeg"
-    JPG_CFLAGS=""
-   ],
-   [have_jpg="no"])
 
 
 ### Checks for types
@@ -335,8 +323,8 @@ if test "x${want_pthreads}" = "xyes" ; then
           [
            build_pthreads="yes"
            AC_DEFINE([BUILD_THREAD], [1], [Build Threaded Rendering])
-           requirements_cflags="${requirements_cflags} -pthread"
-           requirements_libs="${requirements_libs} -pthread"
+           requirements_enesim_cflags="${requirements_enesim_cflags} -pthread"
+           requirements_enesim_libs="${requirements_enesim_libs} -pthread"
           ],
           [build_pthreads="no"])
       ],
@@ -375,17 +363,13 @@ build_opencl="no"
 #   AC_CHECK_LIB([OpenCL], [clGetPlatformIDs],
 #      [
 #       build_opencl="yes"
-#       requirements_libs="-lOpenCL ${requirements_libs}"
+#       requirements_enesim_libs="-lOpenCL ${requirements_enesim_libs}"
 #       AC_DEFINE([BUILD_OPENCL], [1], [Build OpenCL Backend])
 #      ],
 #      [build_opencl="no"])
 #fi
 
 AM_CONDITIONAL([HAVE_OPENCL], [test "x${build_opencl}" = "xyes"])
-
-ENS_MODULE([Png], [yes], [${have_png}])
-ENS_MODULE([Jpg], [yes], [${have_jpg}])
-ENS_MODULE([Raw], [static], [yes])
 
 
 # Unit tests, coverage and benchmarking
@@ -400,13 +384,13 @@ ENS_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
 
 AC_SUBST([build_opencl])
 AC_SUBST([build_opengl])
-AC_SUBST([requirements_cflags])
-AC_SUBST([requirements_libs])
-AC_SUBST([requirements_pc])
+AC_SUBST([requirements_enesim_cflags])
+AC_SUBST([requirements_enesim_libs])
+AC_SUBST([requirements_enesim_pc])
 AC_SUBST([JPG_CFLAGS])
 AC_SUBST([JPG_LIBS])
-ENESIM_CFLAGS="${ENESIM_CFLAGS} ${requirements_cflags} -DENESIM_EXTENSION ${ENS_SIMD_FLAGS} ${ENS_COVERAGE_CFLAGS}"
-ENESIM_LIBS="${ENESIM_LIBS} ${requirements_libs} ${ENS_COVERAGE_LIBS}"
+ENESIM_CFLAGS="${ENESIM_CFLAGS} ${requirements_enesim_cflags} -DENESIM_EXTENSION ${ENS_SIMD_FLAGS} ${ENS_COVERAGE_CFLAGS}"
+ENESIM_LIBS="${ENESIM_LIBS} ${requirements_enesim_libs} ${ENS_COVERAGE_LIBS}"
 
 
 ## Make the debug preprocessor configurable

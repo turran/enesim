@@ -106,9 +106,9 @@ $(SED) \
 -e 's,@includedir\@,$(includedir),g' \
 -e 's,@pkgincludedir\@,$(pkgincludedir),g' \
 -e 's,@pkglibdir\@,$(pkglibdir),g' \
--e 's,@requirements_pc\@,$(requirements_pc),g' \
--e 's,@requirements_libs\@,$(requirements_libs),g' \
--e 's,@requirements_cflags\@,$(requirements_cflags),g' \
+-e 's,@requirements_enesim_pc\@,$(requirements_enesim_pc),g' \
+-e 's,@requirements_enesim_libs\@,$(requirements_enesim_libs),g' \
+-e 's,@requirements_enesim_cflags\@,$(requirements_enesim_cflags),g' \
 -e 's,@build_opencl\@,$(build_opencl),g' \
 -e 's,@build_opengl\@,$(build_opengl),g' \
 < $< > $@ || rm $@
