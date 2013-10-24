@@ -24,13 +24,7 @@
  * @{
  */
 
-EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst,
-		Enesim_Angle angle,
-		Eina_Rectangle *clip,
-		int x, int y);
-EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
-		Enesim_Angle angle,
-		Eina_Rectangle *clip,
-		int x, int y);
+EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst);
+EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst);
 /** @} */
 #endif /*ENESIM_CONVERTER_H_*/

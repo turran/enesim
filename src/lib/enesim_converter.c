@@ -25,6 +25,15 @@
 
 #include "enesim_buffer.h"
 #include "enesim_converter_private.h"
+
+/*
+ * TODO
+ * Add the following parameters to the conversion:
+ * angle The rotation angle
+ * clip A clipping area on the source buffer
+ * x The destination x coordinate to put the buffer
+ * y The destination y coordinate to put the buffer
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -67,22 +76,15 @@ Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
  * conversion.
  * @param[in] s The surface to convert
  * @param[in] dst The destination buffer
- * @param[in] angle The rotation angle
- * @param[in] clip A clipping area on the source surface
- * @param[in] x The destination x coordinate to put the surface
- * @param[in] y The destination y coordinate to put the surface
  * @return Eina_True if the conversion was correct, Eina_False otherwise
  */
-EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
-		Enesim_Angle angle,
-		Eina_Rectangle *clip,
-		int x, int y)
+EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst)
 {
 	Enesim_Buffer *src;
 	Eina_Bool ret;
 
 	src = enesim_surface_buffer_get(s);
-	ret = enesim_converter_buffer(src, dst, angle, clip, x, y);
+	ret = enesim_converter_buffer(src, dst);
 	enesim_buffer_unref(src);
 	return ret;
 }
@@ -92,29 +94,27 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst,
  * conversion.
  * @param[in] b The buffer to convert
  * @param[in] dst The destination buffer
- * @param[in] angle The rotation angle
- * @param[in] clip A clipping area on the source buffer
- * @param[in] x The destination x coordinate to put the buffer
- * @param[in] y The destination y coordinate to put the buffer
  * @return Eina_True if the conversion was correct, Eina_False otherwise
  */
-EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst,
-		Enesim_Angle angle,
-		Eina_Rectangle *clip,
-		int x EINA_UNUSED, int y EINA_UNUSED)
+EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst)
 {
 	Enesim_Converter_2D converter;
 	Enesim_Buffer_Format dfmt;
 	Enesim_Buffer_Format sfmt;
 	Enesim_Buffer_Sw_Data ddata;
 	Enesim_Buffer_Sw_Data sdata;
+	int w, h, dstw, dsth;
 
 	sfmt = enesim_buffer_format_get(b);
 	dfmt = enesim_buffer_format_get(dst);
 
 	if (sfmt == dfmt) return EINA_FALSE;
+	enesim_buffer_size_get(b, &w, &h);
+	enesim_buffer_size_get(dst, &dstw, &dsth);
 
-	converter = enesim_converter_surface_get(dfmt, angle, sfmt);
+	if (dstw != w || dsth != h) return EINA_FALSE;
+
+	converter = enesim_converter_surface_get(dfmt, ENESIM_ANGLE_0, sfmt);
 	if (!converter) return EINA_FALSE;
 
 	enesim_buffer_data_get(dst, &ddata);
@@ -122,7 +122,7 @@ EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst,
 
 	/* FIXME check the stride too */
 	/* TODO check the clip and x, y */
-	converter(&ddata, clip->w, clip->h, &sdata, clip->w, clip->h);
+	converter(&ddata, w, h, &sdata, w, h);
 
 	return EINA_TRUE;
 }

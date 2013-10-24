@@ -314,9 +314,7 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b, void *options 
 	/* fill the buffer data */
 	if (convert)
 	{
-		Eina_Rectangle rect;
-		eina_rectangle_coords_from(&rect, 0, 0, w, h);
-		enesim_converter_buffer(b, buffer, ENESIM_ANGLE_0, &rect, 0, 0);
+		enesim_converter_buffer(b, buffer);
 	}
 	enesim_buffer_data_get(buffer, &cdata);
 	row_ptr = (png_bytep) cdata.argb8888.plane0;
