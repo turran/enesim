@@ -272,7 +272,8 @@ AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
 PKG_CHECK_MODULES([ENESIM], [${requirements_pc}])
 
 # libpng
-PKG_CHECK_MODULES([PNG], [libpng >= 0.22],
+png_requirements="libpng >= 0.22"
+PKG_CHECK_MODULES([PNG], [${png_requirements}],
    [have_png="yes"],
    [have_png="no"])
 
@@ -387,6 +388,13 @@ ENS_MODULE([Png], [yes], [${have_png}])
 ENS_MODULE([Jpg], [yes], [${have_jpg}])
 ENS_MODULE([Raw], [static], [yes])
 
+if test "x${build_module_png}" = "xstatic" ; then
+  requirements_pc="${png_requirements} ${requirements_pc}"
+fi
+
+if test "x${build_module_jpg}" = "xstatic" ; then
+  requirements_libs="${JPG_LIBS} ${requirements_libs}"
+fi
 
 # Unit tests, coverage and benchmarking
 
