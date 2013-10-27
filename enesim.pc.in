@@ -11,7 +11,7 @@ opengl=@build_opengl@
 Name: enesim
 Version: @VERSION@
 Description: Enesim
-Requires.private: @requirements_enesim_pc@
-Libs.private: @requirements_enesim_libs@
+Requires.private: @requirements_pc@
+Libs.private: @requirements_libs@
 Libs: -L${libdir} -lenesim
-Cflags: -I${pkgincludedir} @requirements_enesim_cflags@
+Cflags: -I${pkgincludedir} @requirements_cflags@
