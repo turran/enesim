@@ -974,7 +974,7 @@ EAPI void enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect)
  * @param[out] prev The rectangle to store the previous bounds
  * @param[out] curr The rectangle to store the current bounds
  */
-EAPI void enesim_renderer_bounds_get_extended_get(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)
+EAPI void enesim_renderer_bounds_get_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
@@ -1005,7 +1005,7 @@ EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectan
 		rect->y -= y;
 }
 
-EAPI void enesim_renderer_destination_bounds_get_extended_get(Enesim_Renderer *r,
+EAPI void enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *r,
 		Eina_Rectangle *prev, Eina_Rectangle *curr,
 		int x, int y)
 {

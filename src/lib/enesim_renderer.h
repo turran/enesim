@@ -37,6 +37,7 @@ typedef enum _Enesim_Renderer_Feature
 	ENESIM_RENDERER_FEATURE_QUALITY 	= (1 << 5), /**< Supports the quality property */
 } Enesim_Renderer_Feature;
 
+/** Helper macro to define an affine and proective transformation support */
 #define ENESIM_RENDERER_FEATURE_TRANSFORMATION (ENESIM_RENDERER_FEATURE_AFFINE | ENESIM_RENDERER_FEATURE_PROJECTIVE)
 
 /**
@@ -80,10 +81,10 @@ EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality
 EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect);
-EAPI void enesim_renderer_bounds_get_extended_get(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);
+EAPI void enesim_renderer_bounds_get_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);
 
 EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
-EAPI void enesim_renderer_destination_bounds_get_extended_get(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
+EAPI void enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
 
 EAPI Enesim_Renderer_Feature enesim_renderer_features_get(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
