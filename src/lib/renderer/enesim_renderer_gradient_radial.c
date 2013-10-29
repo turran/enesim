@@ -323,6 +323,11 @@ EAPI void enesim_renderer_gradient_radial_center_get(Enesim_Renderer *r,
 		*center_y = thiz->center.y;
 }
 
+/**
+ * Set the X coordinate center of a radial gradient renderer
+ * @param[in] r The gradient renderer to set the center on
+ * @param[in] center_x The X coordinate of the center
+ */
 EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, double center_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -332,6 +337,11 @@ EAPI void enesim_renderer_gradient_radial_center_x_set(Enesim_Renderer *r, doubl
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * Set the Y coordinate center of a radial gradient renderer
+ * @param[in] r The gradient renderer to set the center on
+ * @param[in] center_y The Y coordinate of the center
+ */
 EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, double center_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -341,6 +351,11 @@ EAPI void enesim_renderer_gradient_radial_center_y_set(Enesim_Renderer *r, doubl
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * Get the X coordinate center of a radial gradient renderer
+ * @param[in] r The gradient renderer to get the center from
+ * @return The X coordinate of the center
+ */
 EAPI double enesim_renderer_gradient_radial_center_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -349,6 +364,11 @@ EAPI double enesim_renderer_gradient_radial_center_x_get(Enesim_Renderer *r)
 	return thiz->center.x;
 }
 
+/**
+ * Get the Y coordinate center of a radial gradient renderer
+ * @param[in] r The gradient renderer to get the center from
+ * @return The Y coordinate of the center
+ */
 EAPI double enesim_renderer_gradient_radial_center_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -357,6 +377,12 @@ EAPI double enesim_renderer_gradient_radial_center_y_get(Enesim_Renderer *r)
 	return thiz->center.y;
 }
 
+/**
+ * Set the focus position of a radial gradient renderer
+ * @param[in] r The gradient renderer to set the focus position on
+ * @param[in] focus_x The X coordinate of the focus
+ * @param[in] focus_y The Y coordinate of the focus
+ */
 EAPI void enesim_renderer_gradient_radial_focus_set(Enesim_Renderer *r, double focus_x, double focus_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -367,6 +393,12 @@ EAPI void enesim_renderer_gradient_radial_focus_set(Enesim_Renderer *r, double f
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * Get the focus position of a radial gradient renderer
+ * @param[in] r The gradient renderer to get the center from
+ * @param[out] focus_x The pointer to store the X coordinate of the focus
+ * @param[out] focus_y The pointer to store the Y coordinate of the focus
+ */
 EAPI void enesim_renderer_gradient_radial_focus_get(Enesim_Renderer *r, 
 							double *focus_x, double *focus_y)
 {
@@ -378,6 +410,12 @@ EAPI void enesim_renderer_gradient_radial_focus_get(Enesim_Renderer *r,
 	if (focus_y)
 		*focus_y = thiz->focus.y;
 }
+
+/**
+ * Set the focus X coordinate of a radial gradient renderer
+ * @param[in] r The gradient renderer to set the focus X coordinate on
+ * @param[in] focus_x The X coordinate of the focus
+ */
 EAPI void enesim_renderer_gradient_radial_focus_x_set(Enesim_Renderer *r, double focus_x)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -386,6 +424,12 @@ EAPI void enesim_renderer_gradient_radial_focus_x_set(Enesim_Renderer *r, double
 	thiz->focus.x = focus_x;
 	thiz->changed = EINA_TRUE;
 }
+
+/**
+ * Set the focus Y coordinate of a radial gradient renderer
+ * @param[in] r The gradient renderer to set the focus Y coordinate on
+ * @param[in] focus_y The Y coordinate of the focus
+ */
 EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double focus_y)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -394,6 +438,12 @@ EAPI void enesim_renderer_gradient_radial_focus_y_set(Enesim_Renderer *r, double
 	thiz->focus.y = focus_y;
 	thiz->changed = EINA_TRUE;
 }
+
+/**
+ * Get the focus X coordinate of a radial gradient renderer
+ * @param[in] r The gradient renderer to get the X coordinate of the focus from
+ * @return The Y coordinate of the focus
+ */
 EAPI double enesim_renderer_gradient_radial_focus_x_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -401,6 +451,12 @@ EAPI double enesim_renderer_gradient_radial_focus_x_get(Enesim_Renderer *r)
 	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	return thiz->focus.x;
 }
+
+/**
+ * Get the focus Y coordinate of a radial gradient renderer
+ * @param[in] r The gradient renderer to get the Y coordinate of the focus from
+ * @return The Y coordinate of the focus
+ */
 EAPI double enesim_renderer_gradient_radial_focus_y_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -409,6 +465,15 @@ EAPI double enesim_renderer_gradient_radial_focus_y_get(Enesim_Renderer *r)
 	return thiz->focus.y;
 }
 
+/**
+ * @brief Set the radius of a radial gradient renderer.
+ *
+ * @param[in] r The radial gradient renderer.
+ * @param[in] radius The radius.
+ *
+ * This function sets the radius of the radial gradient renderer @p r to the
+ * value @p radius.
+ */
 EAPI void enesim_renderer_gradient_radial_radius_set(Enesim_Renderer *r, double radius)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
@@ -417,6 +482,13 @@ EAPI void enesim_renderer_gradient_radial_radius_set(Enesim_Renderer *r, double 
 	thiz->radius = radius;
 	thiz->changed = EINA_TRUE;
 }
+
+/**
+ * @brief Retrieve the radius of a radial gradient renderer.
+ *
+ * @param[in] r The radial gradient renderer.
+ * @return The radius
+ */
 EAPI double enesim_renderer_gradient_radial_radius_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
