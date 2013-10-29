@@ -113,6 +113,15 @@ typedef union _Enesim_Buffer_Sw_Data
 	Enesim_Buffer_Cmyk cmyk; /**< The @ref ENESIM_BUFFER_FORMAT_CMYK values */
 } Enesim_Buffer_Sw_Data;
 
+/**
+ * @brief Free function callback
+ * @param data The buffer data provided by the user
+ * @param user_data The user private data
+ * This function is used to free the data provided for the creation 
+ * @see enesim_buffer_new_pool_and_data_from()
+ * @see enesim_buffer_new_data_from()
+ * @see enesim_surface_new_data_from()
+ */
 typedef void (*Enesim_Buffer_Free)(void *data, void *user_data);
 
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f, uint32_t w, uint32_t h);

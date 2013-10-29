@@ -18,9 +18,11 @@ src/examples/enesim_renderer_path03 \
 src/examples/enesim_renderer_path04 \
 src/examples/enesim_renderer_path05 \
 src/examples/enesim_renderer_blur01 \
+src/examples/enesim_renderer_checker01 \
 src/examples/enesim_renderer_circle01 \
 src/examples/enesim_renderer_circle02 \
 src/examples/enesim_renderer_hints01 \
+src/examples/enesim_renderer_image01 \
 src/examples/enesim_renderer_perlin01 \
 src/examples/enesim_renderer_rectangle01 \
 src/examples/enesim_renderer_text_span01
@@ -63,6 +65,12 @@ src/examples/enesim_renderer_example.h
 src_examples_enesim_renderer_path05_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_path05_LDADD = $(examples_LDADD)
 
+src_examples_enesim_renderer_checker01_SOURCES = \
+src/examples/enesim_renderer_checker01.c \
+src/examples/enesim_renderer_example.h
+src_examples_enesim_renderer_checker01_CPPFLAGS = $(examples_CPPFLAGS)
+src_examples_enesim_renderer_checker01_LDADD = $(examples_LDADD)
+
 src_examples_enesim_renderer_circle01_SOURCES = \
 src/examples/enesim_renderer_circle01.c \
 src/examples/enesim_renderer_example.h
@@ -86,6 +94,12 @@ src/examples/enesim_renderer_hints01.c \
 src/examples/enesim_renderer_example.h
 src_examples_enesim_renderer_hints01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_hints01_LDADD = $(examples_LDADD)
+
+src_examples_enesim_renderer_image01_SOURCES = \
+src/examples/enesim_renderer_image01.c \
+src/examples/enesim_renderer_example.h
+src_examples_enesim_renderer_image01_CPPFLAGS = $(examples_CPPFLAGS)
+src_examples_enesim_renderer_image01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_perlin01_SOURCES = \
 src/examples/enesim_renderer_perlin01.c \
