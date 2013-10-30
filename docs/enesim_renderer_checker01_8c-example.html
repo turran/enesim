@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Enesim: enesim_renderer_perlin01.c</title>
+<title>Enesim: enesim_renderer_checker01.c</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -73,29 +73,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="headertitle">
-<div class="title">enesim_renderer_perlin01.c</div>  </div>
+<div class="title">enesim_renderer_checker01.c</div>  </div>
 </div><!--header-->
 <div class="contents">
-<p>Example usage of a perlin renderer </p>
+<p>Example usage of a checker renderer </p>
 <div class="image">
-<img src="enesim_renderer_perlin01.png" alt="enesim_renderer_perlin01.png"/>
+<img src="enesim_renderer_checker01.png" alt="enesim_renderer_checker01.png"/>
 </div>
 <div class="fragment"><pre class="fragment"><span class="preprocessor">#include &quot;enesim_renderer_example.h&quot;</span>
 
-<span class="keyword">static</span> <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_perlin01(<span class="keywordtype">void</span>)
+<span class="keyword">static</span> <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_checker01(<span class="keywordtype">void</span>)
 {
     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r;
 
-    r = <a name="a0"></a><a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga25f1fb8cb1fbe125bbe67d2ec7eb7bfc">enesim_renderer_perlin_new</a>();
-    <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaa0f915708559f3b12bafb4193b6da0ef" title="Sets the color of a renderer.">enesim_renderer_color_set</a>(r, 0xffff0000);
-    <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga42f680acfa6af244564d05136a77f3e0" title="Set the number of octaves used on the perlin noise renderer.">enesim_renderer_perlin_octaves_set</a>(r, 6);
-    <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga2c44926fa57f132608032fa98015e909" title="Set the persistence multiplier on the perlin noise renderer.">enesim_renderer_perlin_persistence_set</a>(r, 1);
-    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Perlin__Group.html#ga65677bd278e208cc839ccda86abeca7b" title="Set the initial X frequency on the perlin noise renderer.">enesim_renderer_perlin_xfrequency_set</a>(r, 0.05);
-    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Perlin__Group.html#gad9b500d049c08c9e7bb9d4a174b99370" title="Set the initial Y frequency on the perlin noise renderer.">enesim_renderer_perlin_yfrequency_set</a>(r, 0.05);
+    r = <a name="a0"></a><a class="code" href="group__Enesim__Renderer__Checker__Group.html#gae65fb4b0031e691d8b0187e1cf7f6749">enesim_renderer_checker_new</a>();
+    <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga9bd7387f7e086ee0750fbbf8633ba68d" title="Sets the color of the odd squares.">enesim_renderer_checker_odd_color_set</a>(r, 0xffff0000);
+    <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga60090ea483068f6cbab93ddff50cac53" title="Sets the color of the even squares.">enesim_renderer_checker_even_color_set</a>(r, 0xffaa0000);
+    <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Checker__Group.html#ga45567292038eeeaf9b07dd8f569d0819" title="Sets the width of the checker rectangles.">enesim_renderer_checker_width_set</a>(r, 5);
+    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Checker__Group.html#gaa75fae1829a59dd0679b5830272a890f" title="Sets the height of the checker rectangles.">enesim_renderer_checker_height_set</a>(r, 5);
 
     <span class="keywordflow">return</span> r;
 }
-EXAMPLE(enesim_renderer_perlin01)
+EXAMPLE(enesim_renderer_checker01)
 
 </pre></div> </div><!-- contents -->
 </div><!-- contents -->
