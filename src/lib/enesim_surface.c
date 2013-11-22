@@ -290,6 +290,18 @@ EAPI Enesim_Surface * enesim_surface_new_opengl_data_from(Enesim_Format fmt,
 
 	return s;
 }
+
+/**
+ * @brief Gets the OpenGL data associated with a surface
+ * @param[in] thiz The surface to get the data from
+ * @return The OpenGL data associated with a surface
+ */
+EAPI const Enesim_Buffer_OpenGL_Data * enesim_surface_opengl_data_get(Enesim_Surface *thiz)
+{
+	if (!thiz) return NULL;
+	return enesim_buffer_backend_data_get(thiz->buffer);
+}
+
 #endif
 
 /**

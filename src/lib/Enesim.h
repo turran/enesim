@@ -28,7 +28,7 @@
  *
  * @section backends Backends
  * - Software based
- * - @ref Enesim_OpenGL_Page (alpha)
+ * - @ref Enesim_OpenGL_Group (alpha)
  * - OpenCL (experimental)
  *
  * @section dependencies Dependencies
