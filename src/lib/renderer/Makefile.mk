@@ -67,6 +67,11 @@ src_lib_libenesim_la_SOURCES += \
 src/lib/renderer/enesim_renderer_path_cairo.c
 endif
 
+if BUILD_OPENGL
+src_lib_libenesim_la_SOURCES += \
+src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator.c
+endif
+
 EXTRA_DIST += \
 src/lib/renderer/enesim_renderer_checker.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_ambient.glsl \
@@ -76,4 +81,7 @@ src/lib/renderer/enesim_renderer_opengl_common_vertex.glsl \
 src/lib/renderer/enesim_renderer_path_silhoutte_ambient.glsl \
 src/lib/renderer/enesim_renderer_path_silhoutte_vertex.glsl \
 src/lib/renderer/enesim_renderer_rectangle.glsl \
-src/lib/renderer/enesim_renderer_stripes.glsl
+src/lib/renderer/enesim_renderer_stripes.glsl \
+src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator_private.h \
+src/lib/renderer/enesim_renderer_path_enesim_private.h
+
