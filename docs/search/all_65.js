@@ -13,8 +13,6 @@ var searchData=
   ['enesim_5fmatrix',['Enesim_Matrix',['../structEnesim__Matrix.html',1,'']]],
   ['enesim_5fobject_5fclass',['Enesim_Object_Class',['../structEnesim__Object__Class.html',1,'']]],
   ['enesim_5fobject_5finstance',['Enesim_Object_Instance',['../structEnesim__Object__Instance.html',1,'']]],
-  ['enesim_5fopengl_2eh',['Enesim_OpenGL.h',['../Enesim__OpenGL_8h.html',1,'']]],
-  ['enesim_5fopengl_5fshader',['ENESIM_OPENGL_SHADER',['../Enesim__OpenGL_8h.html#ab9006ce3424712385878abf744f39d8a',1,'Enesim_OpenGL.h']]],
   ['enesim_5fpath_5fcommand',['Enesim_Path_Command',['../structEnesim__Path__Command.html',1,'']]],
   ['enesim_5fpath_5fcommand_5farc_5fto',['Enesim_Path_Command_Arc_To',['../structEnesim__Path__Command__Arc__To.html',1,'']]],
   ['enesim_5fpath_5fcommand_5fclose',['Enesim_Path_Command_Close',['../structEnesim__Path__Command__Close.html',1,'']]],
