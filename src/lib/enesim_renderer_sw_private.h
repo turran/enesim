@@ -21,6 +21,16 @@
 #include "enesim_thread_private.h"
 #include "enesim_barrier_private.h"
 
+/**
+ * The fill function that every software based renderer should implement
+ * @param r The renderer to draw
+ * @param x The x coordinate of the span to fill. This is the coordinate the
+ * destination buffer is at
+ * @param y The y coordinate of the span to fill. This is the coordinate the
+ * destination buffer is at
+ * @param len The length of the span to fill
+ * @param dst The destination buffer to draw at
+ */
 typedef void (*Enesim_Renderer_Sw_Fill)(Enesim_Renderer *r,
 		int x, int y, int len, void *dst);
 typedef struct _Enesim_Renderer_Sw_Data Enesim_Renderer_Sw_Data;

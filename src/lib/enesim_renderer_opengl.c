@@ -381,8 +381,6 @@ void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	klass->opengl_cleanup(r, s);
 }
 
-/* FIXME this should be exported and normalize in the same way as the one on the enesim_renderer_sw.c
- */
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Eina_Rectangle *area,
 		int x EINA_UNUSED, int y EINA_UNUSED)
 {
@@ -429,15 +427,3 @@ void enesim_renderer_opengl_free(Enesim_Renderer *r)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-#if 0
-EAPI void enesim_renderer_opengl_target_set(Enesim_Renderer *r, Enesim_Surface *s)
-{
-
-}
-
-EAPI void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s)
-{
-
-}
-
-#endif

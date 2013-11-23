@@ -18,13 +18,14 @@
 #ifndef ENESIM_RENDERER_PRIVATE_H_
 #define ENESIM_RENDERER_PRIVATE_H_
 
-#include "enesim_compositor_private.h"
-#include "enesim_renderer_sw_private.h"
-
 #if BUILD_OPENGL
 #include "Enesim_OpenGL.h"
 #include "enesim_opengl_private.h"
 #endif
+
+#include "enesim_compositor_private.h"
+#include "enesim_renderer_sw_private.h"
+#include "enesim_renderer_opengl_private.h"
 
 Enesim_Object_Descriptor * enesim_renderer_descriptor_get(void);
 #define ENESIM_RENDERER_DESCRIPTOR enesim_renderer_descriptor_get()
@@ -39,9 +40,6 @@ Enesim_Object_Descriptor * enesim_renderer_descriptor_get(void);
 /** Renderer API/ABI version */
 #define ENESIM_RENDERER_API 0
 
-/*----------------------------------------------------------------------------*
- *                         Software related functions                         *
- *----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*
  *                          State related functions                           *
  *----------------------------------------------------------------------------*/
@@ -60,59 +58,6 @@ typedef struct _Enesim_Renderer_State
 	Eina_Bool changed;
 } Enesim_Renderer_State;
 
-/*----------------------------------------------------------------------------*
- *                     OpenGL renderer related functions                      *
- *----------------------------------------------------------------------------*/
-typedef struct _Enesim_Renderer_OpenGL_Shader Enesim_Renderer_OpenGL_Shader;
-typedef struct _Enesim_Renderer_OpenGL_Program Enesim_Renderer_OpenGL_Program;
-
-typedef void (*Enesim_Renderer_OpenGL_Draw)(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int dw, int dh);
-
-typedef enum _Enesim_Renderer_OpenGL_Shader_Type
-{
-	ENESIM_SHADER_VERTEX,
-	ENESIM_SHADER_GEOMETRY,
-	ENESIM_SHADER_FRAGMENT,
-	ENESIM_SHADERS,
-} Enesim_Renderer_OpenGL_Shader_Type;
-
-struct _Enesim_Renderer_OpenGL_Shader
-{
-	Enesim_Renderer_OpenGL_Shader_Type type;
-	const char *name;
-	const char *source;
-};
-
-struct _Enesim_Renderer_OpenGL_Program
-{
-	const char *name;
-	Enesim_Renderer_OpenGL_Shader **shaders;
-	int num_shaders;
-};
-
-#if BUILD_OPENGL
-typedef struct _Enesim_Renderer_OpenGL_Program_Data
-{
-	Enesim_Renderer_OpenGL_Program **programs;
-	int num_programs;
-	/* generated */
-	Enesim_OpenGL_Compiled_Program *compiled;
-} Enesim_Renderer_OpenGL_Program_Data;
-
-typedef struct _Enesim_Renderer_OpenGL_Data
-{
-	/* data fetch on the initialize */
-	Enesim_Renderer_OpenGL_Program_Data *program;
-	/* data fetch on the setup */
-	Enesim_Renderer_OpenGL_Draw draw;
-	GLuint fbo;
-	/* FIXME remove this */
-	Eina_Bool has_geometry; /* has a geometry shader */
-	Eina_Bool has_vertex; /* has a vertex shader */
-	Eina_Bool does_geometry; /* the renderer defines the geometry */
-} Enesim_Renderer_OpenGL_Data;
-#endif
 /*----------------------------------------------------------------------------*
  *                        Descriptor related functions                        *
  *----------------------------------------------------------------------------*/
