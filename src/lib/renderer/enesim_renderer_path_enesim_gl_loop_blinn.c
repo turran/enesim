@@ -27,5 +27,67 @@
  *                                  Local                                     *
  *============================================================================*/
 #if BUILD_OPENGL
+static void _path_opengl_figure_draw(GLenum fbo,
+		GLenum texture,
+		Enesim_Renderer_Path_Enesim_OpenGL_Figure *gf,
+		Enesim_Figure *f,
+		Enesim_Color color,
+		Enesim_Renderer *rel EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Data *rdata,
+		Eina_Bool silhoutte,
+		const Eina_Rectangle *area)
+{
+
+}
+
+static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
+		int x, int y)
+{
+
+}
+
+static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
+		int x, int y)
+{
+
+}
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Eina_Bool enesim_renderer_path_enesim_gl_loop_blinn_initialize(
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs)
+{
+	*programs = NULL;
+	*num_programs = 0;
+	return EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_path_enesim_gl_loop_blinn_setup(
+		Enesim_Renderer *r,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Log **l EINA_UNUSED)
+{
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	const Enesim_Renderer_Shape_State *css;
+
+	css = enesim_renderer_shape_state_get(r);
+
+	/* check what to draw, stroke, fill or stroke + fill */
+	dm = css->current.draw_mode;
+	/* fill + stroke */
+	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
+	{
+		*draw = _path_opengl_fill_and_stroke_draw;
+	}
+	else
+	{
+		*draw = _path_opengl_fill_or_stroke_draw;
+	}
+
+	return EINA_TRUE;
+}
 #endif
 

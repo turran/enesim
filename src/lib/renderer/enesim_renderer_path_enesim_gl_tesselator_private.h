@@ -20,25 +20,25 @@
 
 #if BUILD_OPENGL
 
-typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Polygon
+typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon
 {
 	GLenum type;
 	Enesim_Polygon *polygon;
-} Enesim_Renderer_Path_Enesim_OpenGL_Polygon;
+} Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon;
 
-typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Figure
+typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure
 {
 	Eina_List *polygons;
 	Enesim_Surface *tmp;
 	Enesim_Surface *renderer_s;
 	Eina_Bool needs_tesselate : 1;
-} Enesim_Renderer_Path_Enesim_OpenGL_Figure;
+} Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure;
 
-typedef struct _Enesim_Renderer_Path_Enesim_OpenGL
+typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Tesselator
 {
-	Enesim_Renderer_Path_Enesim_OpenGL_Figure stroke;
-	Enesim_Renderer_Path_Enesim_OpenGL_Figure fill;
-} Enesim_Renderer_Path_Enesim_OpenGL;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure stroke;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure fill;
+} Enesim_Renderer_Path_Enesim_OpenGL_Tesselator;
 
 Eina_Bool enesim_renderer_path_enesim_gl_tesselator_initialize(
 		int *num_programs,

@@ -28,6 +28,24 @@
         printf("Error %x\n", err); \
         }
 
+static void _path_opengl_figure_clear(
+		Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *f)
+{
+	if (f->polygons)
+	{
+		Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon *p;
+
+		EINA_LIST_FREE(f->polygons, p)
+		{
+			enesim_polygon_delete(p->polygon);
+			free(p);
+		}
+		f->polygons = NULL;
+	}
+}
+/*----------------------------------------------------------------------------*
+ *                                Shaders                                     *
+ *----------------------------------------------------------------------------*/
 static Eina_Bool _path_opengl_ambient_shader_setup(GLenum pid,
 		Enesim_Color color)
 {
@@ -144,27 +162,13 @@ static Enesim_Renderer_OpenGL_Program *_path_programs[] = {
 	NULL,
 };
 
-static void _path_opengl_figure_clear(Enesim_Renderer_Path_Enesim_OpenGL_Figure *f)
-{
-	if (f->polygons)
-	{
-		Enesim_Renderer_Path_Enesim_OpenGL_Polygon *p;
-
-		EINA_LIST_FREE(f->polygons, p)
-		{
-			enesim_polygon_delete(p->polygon);
-			free(p);
-		}
-		f->polygons = NULL;
-	}
-}
 /*----------------------------------------------------------------------------*
  *                            Tesselator callbacks                            *
  *----------------------------------------------------------------------------*/
 static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
 {
-	Enesim_Renderer_Path_Enesim_OpenGL_Figure *f = data;
-	Enesim_Renderer_Path_Enesim_OpenGL_Polygon *p;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *f = data;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon *p;
 	Enesim_Point *pt = vertex;
 	Eina_List *l;
 
@@ -196,11 +200,11 @@ static void _path_opengl_combine_cb(GLdouble coords[3],
 
 static void _path_opengl_begin_cb(GLenum which, void *data)
 {
-	Enesim_Renderer_Path_Enesim_OpenGL_Polygon *p;
-	Enesim_Renderer_Path_Enesim_OpenGL_Figure *f = data;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon *p;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *f = data;
 
 	/* add another polygon */
-	p = calloc(1, sizeof(Enesim_Renderer_Path_Enesim_OpenGL_Polygon));
+	p = calloc(1, sizeof(Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon));
 	p->type = which;
 	p->polygon = enesim_polygon_new();
 	f->polygons = eina_list_append(f->polygons, p);
@@ -217,7 +221,8 @@ static void _path_opengl_error_cb(GLenum err_no EINA_UNUSED, void *data EINA_UNU
 {
 }
 
-static void _path_opengl_tesselate(Enesim_Renderer_Path_Enesim_OpenGL_Figure *glf,
+static void _path_opengl_tesselate(
+		Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *glf,
 		Enesim_Figure *f)
 {
 	Enesim_Polygon *p;
@@ -263,10 +268,11 @@ static void _path_opengl_tesselate(Enesim_Renderer_Path_Enesim_OpenGL_Figure *gl
 	gluDeleteTess(t);
 }
 
-static void _path_opengl_notesselate(Enesim_Renderer_Path_Enesim_OpenGL_Figure *glf)
+static void _path_opengl_notesselate(
+		Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *glf)
 {
 	Eina_List *l1;
-	Enesim_Renderer_Path_Enesim_OpenGL_Polygon *p;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon *p;
 
 	EINA_LIST_FOREACH(glf->polygons, l1, p)
 	{
@@ -282,7 +288,8 @@ static void _path_opengl_notesselate(Enesim_Renderer_Path_Enesim_OpenGL_Figure *
 	}
 }
 
-static void _path_opengl_silhoutte_draw(Enesim_Figure *f, const Eina_Rectangle *area)
+static void _path_opengl_silhoutte_draw(Enesim_Figure *f,
+		const Eina_Rectangle *area)
 {
 	Eina_List *l;
 	Enesim_Polygon *p;
@@ -350,7 +357,7 @@ static void _path_opengl_blit(GLenum fbo, GLenum dst,
 
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
-		Enesim_Renderer_Path_Enesim_OpenGL_Figure *gf,
+		Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *gf,
 		Enesim_Figure *f,
 		Enesim_Color color,
 		Enesim_Renderer *rel EINA_UNUSED,
@@ -448,8 +455,8 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		int x, int y)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Renderer_Path_Enesim_OpenGL *gl;
-	Enesim_Renderer_Path_Enesim_OpenGL_Figure *gf;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator *gl;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *gf;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer *rel;
 	Enesim_Buffer_OpenGL_Data *sdata;
@@ -532,7 +539,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 		int x, int y)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Renderer_Path_Enesim_OpenGL *gl;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator *gl;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_OpenGL_Compiled_Program *cp;

@@ -73,7 +73,7 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	Enesim_Path_Generator *strokeless_path;
 	Enesim_Path_Generator *dashed_path;
 #if BUILD_OPENGL
-	Enesim_Renderer_Path_Enesim_OpenGL gl;
+	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator gl;
 #endif
 	/* TODO put the below data into a path_sw struct */
 	Enesim_Figure *fill_figure;

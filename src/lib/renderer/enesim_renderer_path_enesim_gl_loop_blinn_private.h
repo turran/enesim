@@ -20,6 +20,26 @@
 
 #if BUILD_OPENGL
 
+typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon
+{
+	GLenum type;
+	Enesim_Polygon *polygon;
+} Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon;
+
+typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure
+{
+	Eina_List *polygons;
+	Enesim_Surface *tmp;
+	Enesim_Surface *renderer_s;
+	Eina_Bool needs_tesselate : 1;
+} Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure;
+
+typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn
+{
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure stroke;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure fill;
+} Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn;
+
 Eina_Bool enesim_renderer_path_enesim_gl_loop_blinn_initialize(
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs);
