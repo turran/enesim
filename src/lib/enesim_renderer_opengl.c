@@ -351,12 +351,12 @@ setup:
 	 * again or not .... */
 
 	/* create the fbos */
-	if (!rdata->fbo)
+	if (!sdata->fbo)
 	{
-		glGenFramebuffersEXT(1, &rdata->fbo);
+		glGenFramebuffersEXT(1, &sdata->fbo);
 	}
 	/* attach the texture to the first color attachment */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, sdata->textures[0], 0);
 
@@ -385,11 +385,13 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Buffer_OpenGL_Data *sdata;
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	sdata = enesim_surface_backend_data_get(s);
 
 	/* run it on the renderer fbo */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glEnable(GL_BLEND);
 
@@ -414,11 +416,11 @@ void enesim_renderer_opengl_shutdown(void)
 /* we need a way to destroy the renderer data */
 void enesim_renderer_opengl_free(Enesim_Renderer *r)
 {
-	Enesim_Renderer_OpenGL_Data *rdata;
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	if (!rdata) return;
+	Enesim_Renderer_OpenGL_Data *gl_data;
 
-	glDeleteFramebuffersEXT(1, &rdata->fbo);
+	gl_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	if (!gl_data) return;
+	free(gl_data);
 }
 /*============================================================================*
  *                                   API                                      *

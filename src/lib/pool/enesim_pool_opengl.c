@@ -75,6 +75,7 @@ static Eina_Bool _data_alloc(void *prv EINA_UNUSED, Enesim_Backend *backend,
 		case ENESIM_BUFFER_FORMAT_A8:
 		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
+		free(data->textures);
 		free(data);
 		return EINA_FALSE;
 		break;
@@ -118,6 +119,8 @@ static Eina_Bool _data_from(void *prv EINA_UNUSED,
 		case ENESIM_BUFFER_FORMAT_A8:
 		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
+		free(data->textures);
+		free(data);
 		return EINA_FALSE;
 		break;
 	}
@@ -130,10 +133,7 @@ static void _data_free(void *prv EINA_UNUSED, void *backend_data,
 		Eina_Bool external_allocated EINA_UNUSED)
 {
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
-
-	glDeleteTextures(data->num_textures, data->textures);
-	free(data->textures);
-	free(data);
+	enesim_opengl_buffer_data_free(data);
 }
 
 static Eina_Bool _data_get(void *prv EINA_UNUSED, void *backend_data,

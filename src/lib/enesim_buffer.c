@@ -42,11 +42,7 @@
 static void _buffer_opengl_backend_free(void *data, void *user_data EINA_UNUSED)
 {
 	Enesim_Buffer_OpenGL_Data *backend_data = data;
-	if (backend_data->textures)
-	{
-		free(backend_data->textures);
-	}
-	free(backend_data);
+	enesim_opengl_buffer_data_free(backend_data);
 }
 
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,

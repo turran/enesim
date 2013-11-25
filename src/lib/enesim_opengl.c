@@ -139,6 +139,26 @@ void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
+void enesim_opengl_target_set(Enesim_Surface *s, int x, int y)
+{
+	/* sets the texture as projection matrix */
+	/* sets the fbo as the destination buffer */
+}
+
+void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data)
+{
+	if (data->textures)
+	{
+		glDeleteTextures(data->num_textures, data->textures);
+		free(data->textures);
+	}
+	if (data->fbo)
+	{
+		glDeleteFramebuffersEXT(1, &data->fbo);
+	}
+	free(data);
+}
+
 void enesim_opengl_init(void)
 {
 	static int _init = 0;

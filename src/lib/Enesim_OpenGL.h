@@ -39,6 +39,7 @@
  */
 typedef struct _Enesim_Buffer_OpenGL_Data
 {
+	GLuint fbo; /**< The associated fbo, this is used when rendering here */
 	GLuint *textures; /**< The textures id */
 	unsigned int num_textures; /**< The number of textures */
 } Enesim_Buffer_OpenGL_Data;

@@ -486,9 +486,9 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	texture = enesim_opengl_texture_new(area->w, area->h);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	/* render there */
-	_path_opengl_figure_draw(rdata->fbo, texture, gf, f, final_color, rel, rdata, EINA_TRUE, area);
+	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color, rel, rdata, EINA_TRUE, area);
 	/* finally compose such texture with the destination texture */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, sdata->textures[0], 0);
 	glViewport(0, 0, w, h);
@@ -561,15 +561,15 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 
 	/* draw the fill into the newly created buffer */
 	_path_opengl_fill_renderer_setup(r, color, &final_color, &rel);
-	_path_opengl_figure_draw(rdata->fbo, textures[0], &gl->fill,
+	_path_opengl_figure_draw(sdata->fbo, textures[0], &gl->fill,
 			thiz->fill_figure, final_color, rel, rdata, EINA_FALSE, area);
 	/* draw the stroke into the newly created buffer */
 	_path_opengl_stroke_renderer_setup(r, color, &final_color, &rel);
 	/* FIXME this one is slow but only after the other */
-	_path_opengl_figure_draw(rdata->fbo, textures[1], &gl->stroke,
+	_path_opengl_figure_draw(sdata->fbo, textures[1], &gl->stroke,
 			thiz->stroke_figure, final_color, rel, rdata, EINA_TRUE, area);
 	/* now use the real destination surface to draw the merge fragment */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, sdata->textures[0], 0);
 	cp = &rdata->program->compiled[1];

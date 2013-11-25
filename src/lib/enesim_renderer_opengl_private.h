@@ -74,11 +74,6 @@ typedef struct _Enesim_Renderer_OpenGL_Data
 	Enesim_Renderer_OpenGL_Program_Data *program;
 	/* data fetch on the setup */
 	Enesim_Renderer_OpenGL_Draw draw;
-	GLuint fbo;
-	/* FIXME remove this */
-	Eina_Bool has_geometry; /* has a geometry shader */
-	Eina_Bool has_vertex; /* has a vertex shader */
-	Eina_Bool does_geometry; /* the renderer defines the geometry */
 } Enesim_Renderer_OpenGL_Data;
 #endif
 
