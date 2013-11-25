@@ -29,6 +29,8 @@
 
 #include "Enesim_OpenGL.h"
 #include "enesim_opengl_private.h"
+
+#include "enesim_surface_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -107,22 +109,8 @@ void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww EINA_UNUSED, int 
 }
 
 /* area is the destination of area of a viewport of size WxH */
-void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
-		int w, int h, int tx EINA_UNUSED, int ty EINA_UNUSED)
+void enesim_opengl_draw_area(const Eina_Rectangle *area)
 {
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, t, 0);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, 0, h, -1, 1);
-
-	glMatrixMode(GL_TEXTURE);
-	glLoadIdentity();
-	glOrtho(-w, w, -h, h, -1, 1);
-
-	/* trigger the area */
 	glBegin(GL_QUADS);
 		glTexCoord2d(area->x, area->y);
 		glVertex2d(area->x, area->y);
@@ -136,13 +124,49 @@ void enesim_opengl_draw_area(GLenum fb, GLenum t, Eina_Rectangle *area,
 		glTexCoord2d(area->x, area->y + area->h);
 		glVertex2d(area->x, area->y + area->h);
 	glEnd();
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
-void enesim_opengl_target_set(Enesim_Surface *s, int x, int y)
+Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y)
 {
-	/* sets the texture as projection matrix */
-	/* sets the fbo as the destination buffer */
+	if (s)
+	{
+		Enesim_Buffer_OpenGL_Data *backend_data;
+		Enesim_Backend backend;
+		int w, h;
+
+		backend = enesim_surface_backend_get(s);
+		if (backend != ENESIM_BACKEND_OPENGL)
+			return EINA_FALSE;
+ 
+		enesim_surface_size_get(s, &w, &h);
+		backend_data = enesim_surface_backend_data_get(s);
+
+		/* sets the texture and projection matrix */
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-x, w + x, -y, h + y, -1, 1);
+
+		/* sets the fbo as the destination buffer */
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, backend_data->fbo);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_2D, backend_data->textures[0], 0);
+	}
+	else
+	{
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	}
+	return EINA_TRUE;
+}
+
+Eina_Bool enesim_opengl_source_surface_set(Enesim_Surface *s)
+{
+	int w, h;
+
+	enesim_surface_size_get(s, &w, &h);
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glOrtho(-w, w, -h, h, -1, 1);
+	return EINA_TRUE;
 }
 
 void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data)

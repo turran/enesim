@@ -32,6 +32,9 @@ void enesim_opengl_compiled_program_set(Enesim_OpenGL_Compiled_Program *cp);
 void enesim_opengl_rop_set(Enesim_Rop rop);
 void enesim_opengl_clip_unset(void);
 void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww, int hh);
+
+void enesim_opengl_draw_area(const Eina_Rectangle *area);
+Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y);
 void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data);
 
 #endif

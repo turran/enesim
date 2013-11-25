@@ -142,8 +142,8 @@ static Eina_Bool _checker_opengl_shader_setup(GLenum pid,
 	return EINA_TRUE;
 }
 
-static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
-		const Eina_Rectangle *area, int w, int h)
+static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_Checker *thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
@@ -157,26 +157,13 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUS
 			thiz->final_color2, thiz->final_color1,
 			thiz->current.sw, thiz->current.sh);
 
-	glMatrixMode(GL_TEXTURE);
-	glLoadIdentity();
+	enesim_opengl_target_surface_set(s, x, y);
+	enesim_opengl_rop_set(rop);
+	enesim_opengl_draw_area(area);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, 0, h, -1, 1);
-
-	glBegin(GL_QUADS);
-		glTexCoord2d(area->x, area->y);
-		glVertex2d(area->x, area->y);
-
-		glTexCoord2d(area->x + area->w, area->y);
-		glVertex2d(area->x + area->w, area->y);
-
-		glTexCoord2d(area->x + area->w, area->y + area->h);
-		glVertex2d(area->x + area->w, area->y + area->h);
-
-		glTexCoord2d(area->x, area->y + area->h);
-		glVertex2d(area->x, area->y + area->h);
-	glEnd();
+	/* don't use any program */
+	glUseProgramObjectARB(0);
+	enesim_opengl_target_surface_set(NULL, 0, 0);
 }
 #endif
 
