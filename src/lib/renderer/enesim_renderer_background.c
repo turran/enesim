@@ -117,8 +117,8 @@ static Eina_Bool _background_opengl_shader_setup(GLenum pid,
 }
 
 
-static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED,
-		const Eina_Rectangle *area, int w, int h)
+static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int w, int h)
 {
 	Enesim_Renderer_Background * thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;

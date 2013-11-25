@@ -35,7 +35,7 @@ typedef struct _Enesim_Renderer_OpenGL_Program Enesim_Renderer_OpenGL_Program;
  * @param dh ??
  */
 typedef void (*Enesim_Renderer_OpenGL_Draw)(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int dw, int dh);
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y);
 
 typedef enum _Enesim_Renderer_OpenGL_Shader_Type
 {

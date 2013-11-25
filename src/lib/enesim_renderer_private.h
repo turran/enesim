@@ -187,7 +187,7 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **error);
 void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int x, int y);
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y);
 
 void enesim_renderer_opengl_init(void);
 void enesim_renderer_opengl_shutdown(void);

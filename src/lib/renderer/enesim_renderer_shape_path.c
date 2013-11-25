@@ -112,12 +112,12 @@ static void _shape_path_path_span(Enesim_Renderer *r,
 
 #if BUILD_OPENGL
 static void _shape_path_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int w, int h)
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
-	enesim_renderer_opengl_draw(thiz->r_path, s, area, w, h);
+	enesim_renderer_opengl_draw(thiz->r_path, s, rop, area, x, y);
 }
 #endif
 /*----------------------------------------------------------------------------*

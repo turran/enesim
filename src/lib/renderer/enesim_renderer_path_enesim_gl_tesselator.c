@@ -444,8 +444,8 @@ static void _path_opengl_fill_renderer_setup(Enesim_Renderer *r,
 }
 
 static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
-		Enesim_Surface *s,
-		const Eina_Rectangle *area, int w, int h)
+		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
+		int x, int y)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	Enesim_Renderer_Path_Enesim_OpenGL *gl;
@@ -459,10 +459,12 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Color final_color;
 	GLint viewport[4];
 	GLenum texture;
+	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	gl = &thiz->gl;
 
+	enesim_surface_size_get(s, &w, &h);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 	dm = enesim_renderer_shape_draw_mode_get(r);
@@ -526,7 +528,8 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
  * then multiply that color with the current color
  */
 static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
-		Enesim_Surface *s, const Eina_Rectangle *area, int w, int h)
+		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
+		int x, int y)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	Enesim_Renderer_Path_Enesim_OpenGL *gl;
@@ -538,10 +541,12 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	Enesim_Color final_color;
 	GLenum textures[2];
 	GLint viewport[4];
+	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	gl = &thiz->gl;
 
+	enesim_surface_size_get(s, &w, &h);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 

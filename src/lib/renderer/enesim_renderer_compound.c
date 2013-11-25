@@ -210,7 +210,7 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 
 #if BUILD_OPENGL
 static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int w, int h)
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Pool *pool;
@@ -245,7 +245,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* render each layer */
 	EINA_LIST_FOREACH(thiz->layers, l, layer)
 	{
-		enesim_renderer_opengl_draw(layer->r, s, area, w, h);
+		enesim_renderer_opengl_draw(layer->r, s, layer->rop, area, x, y);
 	}
 #if 0
 	EINA_LIST_FOREACH(thiz->layers, l, layer)

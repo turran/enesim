@@ -381,12 +381,10 @@ void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	klass->opengl_cleanup(r, s);
 }
 
-void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Eina_Rectangle *area,
-		int x EINA_UNUSED, int y EINA_UNUSED)
+void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
-	int width;
-	int height;
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
@@ -395,12 +393,10 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s, const Ei
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glEnable(GL_BLEND);
 
-	/* create the geometry to render to */
-	enesim_surface_size_get(s, &width, &height);
 	/* now draw */
 	if (rdata->draw)
 	{
-		rdata->draw(r, s, area, width, height);
+		rdata->draw(r, s, rop, area, x, y);
 	}
 	glUseProgramObjectARB(0);
 }

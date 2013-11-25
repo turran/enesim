@@ -88,12 +88,12 @@ static void _clipper_span(Enesim_Renderer *r,
 
 #if BUILD_OPENGL
 static void _clipper_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		const Eina_Rectangle *area, int w, int h)
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_Clipper *thiz;
 
  	thiz = ENESIM_RENDERER_CLIPPER(r);
-	enesim_renderer_opengl_draw(thiz->current.clipped, s, area, w, h);
+	enesim_renderer_opengl_draw(thiz->current.clipped, s, rop, area, x, y);
 }
 #endif
 

@@ -234,7 +234,7 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 
 		case ENESIM_BACKEND_OPENGL:
 #if BUILD_OPENGL
-		enesim_renderer_opengl_draw(r, s, area, x, y);
+		enesim_renderer_opengl_draw(r, s, rop, area, x, y);
 #endif
 		break;
 
@@ -278,7 +278,7 @@ static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 			final = *clip;
 			if (!eina_rectangle_intersection(&final, area))
 				continue;
-			enesim_renderer_opengl_draw(r, s, &final, x, y);
+			enesim_renderer_opengl_draw(r, s, rop, &final, x, y);
 		}
 #endif
 		break;
