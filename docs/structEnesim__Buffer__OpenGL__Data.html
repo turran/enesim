@@ -90,23 +90,38 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">GLuint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Buffer__OpenGL__Data.html#adcb41739bad5f53eab62b513fe0d7682">texture</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">GLuint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Buffer__OpenGL__Data.html#af2e2e3103839603208d11e7110436e4a">fbo</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">GLuint *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Buffer__OpenGL__Data.html#abbb6367bb5f2703bf4d9c8bf9f9c677e">textures</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Buffer__OpenGL__Data.html#af263b4dcc7a0034aa90624568b30f1ca">num_textures</a></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>The data associated with an OpenGL buffer </p>
 </div><hr/><h2>Field Documentation</h2>
-<a class="anchor" id="adcb41739bad5f53eab62b513fe0d7682"></a><!-- doxytag: member="Enesim_Buffer_OpenGL_Data::texture" ref="adcb41739bad5f53eab62b513fe0d7682" args="" -->
+<a class="anchor" id="af2e2e3103839603208d11e7110436e4a"></a><!-- doxytag: member="Enesim_Buffer_OpenGL_Data::fbo" ref="af2e2e3103839603208d11e7110436e4a" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">GLuint <a class="el" href="structEnesim__Buffer__OpenGL__Data.html#adcb41739bad5f53eab62b513fe0d7682">Enesim_Buffer_OpenGL_Data::texture</a></td>
+          <td class="memname">GLuint <a class="el" href="structEnesim__Buffer__OpenGL__Data.html#af2e2e3103839603208d11e7110436e4a">Enesim_Buffer_OpenGL_Data::fbo</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>TODO make this a pointer of textures The texture id </p>
+<p>The associated fbo, this is used when rendering here </p>
+
+</div>
+</div>
+<a class="anchor" id="abbb6367bb5f2703bf4d9c8bf9f9c677e"></a><!-- doxytag: member="Enesim_Buffer_OpenGL_Data::textures" ref="abbb6367bb5f2703bf4d9c8bf9f9c677e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GLuint* <a class="el" href="structEnesim__Buffer__OpenGL__Data.html#abbb6367bb5f2703bf4d9c8bf9f9c677e">Enesim_Buffer_OpenGL_Data::textures</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>The textures id </p>
 
 </div>
 </div>
@@ -145,7 +160,7 @@ Data Fields</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 23 2013 15:22:06 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Nov 25 2013 19:31:07 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
