@@ -39,8 +39,7 @@
  */
 typedef struct _Enesim_Buffer_OpenGL_Data
 {
-	/** TODO make this a pointer of textures */
-	GLuint texture; /**< The texture id */
+	GLuint *textures; /**< The textures id */
 	unsigned int num_textures; /**< The number of textures */
 } Enesim_Buffer_OpenGL_Data;
 

@@ -358,7 +358,7 @@ setup:
 	/* attach the texture to the first color attachment */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, sdata->texture, 0);
+			GL_TEXTURE_2D, sdata->textures[0], 0);
 
         status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
         if (status != GL_FRAMEBUFFER_COMPLETE_EXT)

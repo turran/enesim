@@ -39,6 +39,16 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_buffer
 
+static void _buffer_opengl_backend_free(void *data, void *user_data EINA_UNUSED)
+{
+	Enesim_Buffer_OpenGL_Data *backend_data = data;
+	if (backend_data->textures)
+	{
+		free(backend_data->textures);
+	}
+	free(backend_data);
+}
+
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
 		void *backend_data, Enesim_Format f, Enesim_Pool *p,
 		Eina_Bool external, Enesim_Buffer_Free free_func, void *free_func_data)
@@ -222,12 +232,12 @@ EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,
 
 	if (!w || !h) return NULL;
 	backend_data = calloc(1, sizeof(Enesim_Buffer_OpenGL_Data));
-	/* FIXME for now */
-	backend_data->texture = textures[0];
+	backend_data->textures = calloc(sizeof(GLuint), num_textures);
+	memcpy(backend_data->textures, textures, sizeof(GLuint) * num_textures);
 	backend_data->num_textures = num_textures;
 
 	b = _buffer_new(w, h, ENESIM_BACKEND_OPENGL, backend_data, f, NULL,
-			EINA_TRUE, NULL, NULL);
+			EINA_TRUE, _buffer_opengl_backend_free, NULL);
 	return b;
 }
 #endif

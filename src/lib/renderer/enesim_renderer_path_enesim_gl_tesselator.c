@@ -490,7 +490,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	/* finally compose such texture with the destination texture */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, sdata->texture, 0);
+			GL_TEXTURE_2D, sdata->textures[0], 0);
 	glViewport(0, 0, w, h);
 
 	glMatrixMode(GL_PROJECTION);
@@ -571,7 +571,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	/* now use the real destination surface to draw the merge fragment */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, sdata->texture, 0);
+			GL_TEXTURE_2D, sdata->textures[0], 0);
 	cp = &rdata->program->compiled[1];
 	_path_opengl_merge_shader_setup(cp->id, textures[1], textures[0]);
 	glViewport(0, 0, w, h);
