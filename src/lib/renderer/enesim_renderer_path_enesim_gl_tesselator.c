@@ -418,38 +418,6 @@ static void _path_opengl_figure_draw(GLenum fbo,
 #endif
 }
 
-static void _path_opengl_stroke_renderer_setup(Enesim_Renderer *r,
-	Enesim_Color color,
-	Enesim_Color *final_color,
-	Enesim_Renderer **orend)
-{
-	Enesim_Color scolor;
-
-	scolor = enesim_renderer_shape_stroke_color_get(r);
-	*orend = enesim_renderer_shape_stroke_renderer_get(r);
-	/* multiply the color */
-	if (scolor != ENESIM_COLOR_FULL)
-		*final_color = argb8888_mul4_sym(color, scolor);
-	else
-		*final_color = color;
-}
-
-static void _path_opengl_fill_renderer_setup(Enesim_Renderer *r,
-	Enesim_Color color,
-	Enesim_Color *final_color,
-	Enesim_Renderer **orend)
-{
-	Enesim_Color fcolor;
-
-	fcolor = enesim_renderer_shape_fill_color_get(r);
-	*orend = enesim_renderer_shape_fill_renderer_get(r);
-	/* multiply the color */
-	if (fcolor != ENESIM_COLOR_FULL)
-		*final_color = argb8888_mul4_sym(color, fcolor);
-	else
-		*final_color = color;
-}
-
 static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
 		int x, int y)
@@ -480,13 +448,13 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	{
 		gf = &gl->stroke;
 		f = thiz->stroke_figure;
-		_path_opengl_stroke_renderer_setup(r, color, &final_color, &rel);
+		enesim_renderer_shape_stroke_setup(r, color, &final_color, &rel);
 	}
 	else
 	{
 		gf = &gl->fill;
 		f = thiz->fill_figure;
-		_path_opengl_fill_renderer_setup(r, color, &final_color, &rel);
+		enesim_renderer_shape_fill_setup(r, color, &final_color, &rel);
 	}
 
 	/* create the texture */
@@ -526,6 +494,9 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	enesim_opengl_texture_free(texture);
 	enesim_opengl_rop_set(ENESIM_ROP_FILL);
+
+	if (rel)
+		enesim_renderer_unref(rel);
 }
 
 /* for fill and stroke we need to draw the stroke first on a
@@ -567,14 +538,18 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	glViewport(0, 0, area->w, area->h);
 
 	/* draw the fill into the newly created buffer */
-	_path_opengl_fill_renderer_setup(r, color, &final_color, &rel);
+	enesim_renderer_shape_fill_setup(r, color, &final_color, &rel);
 	_path_opengl_figure_draw(sdata->fbo, textures[0], &gl->fill,
 			thiz->fill_figure, final_color, rel, rdata, EINA_FALSE, area);
+	if (rel) enesim_renderer_unref(rel);
+
 	/* draw the stroke into the newly created buffer */
-	_path_opengl_stroke_renderer_setup(r, color, &final_color, &rel);
+	enesim_renderer_shape_stroke_setup(r, color, &final_color, &rel);
 	/* FIXME this one is slow but only after the other */
 	_path_opengl_figure_draw(sdata->fbo, textures[1], &gl->stroke,
 			thiz->stroke_figure, final_color, rel, rdata, EINA_TRUE, area);
+	if (rel) enesim_renderer_unref(rel);
+
 	/* now use the real destination surface to draw the merge fragment */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,

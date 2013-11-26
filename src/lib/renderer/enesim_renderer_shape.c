@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
+#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -641,6 +642,39 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 	}
 	other->state.dashes = enesim_list_ref(thiz->state.dashes);
 }
+
+void enesim_renderer_shape_stroke_setup(Enesim_Renderer *r,
+	Enesim_Color color,
+	Enesim_Color *final_color,
+	Enesim_Renderer **orend)
+{
+	Enesim_Color scolor;
+
+	scolor = enesim_renderer_shape_stroke_color_get(r);
+	*orend = enesim_renderer_shape_stroke_renderer_get(r);
+	/* multiply the color */
+	if (scolor != ENESIM_COLOR_FULL)
+		*final_color = argb8888_mul4_sym(color, scolor);
+	else
+		*final_color = color;
+}
+
+void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
+	Enesim_Color color,
+	Enesim_Color *final_color,
+	Enesim_Renderer **orend)
+{
+	Enesim_Color fcolor;
+
+	fcolor = enesim_renderer_shape_fill_color_get(r);
+	*orend = enesim_renderer_shape_fill_renderer_get(r);
+	/* multiply the color */
+	if (fcolor != ENESIM_COLOR_FULL)
+		*final_color = argb8888_mul4_sym(color, fcolor);
+	else
+		*final_color = color;
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
