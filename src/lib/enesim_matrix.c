@@ -268,11 +268,10 @@ EAPI void enesim_matrix_rectangle_transform(const Enesim_Matrix *m, const Enesim
 	enesim_matrix_point_transform(m, r->x, r->y + r->h, &((Enesim_Quad *)q)->x3, &((Enesim_Quad *)q)->y3);
 }
 
-EAPI void enesim_matrix_adjoint(const Enesim_Matrix *m, Enesim_Matrix *a)
+EAPI void enesim_matrix_cofactor(const Enesim_Matrix *m, Enesim_Matrix *a)
 {
 	double a11, a12, a13, a21, a22, a23, a31, a32, a33;
 
-	/* cofactor */
 	a11 = (MATRIX_YY(m) * MATRIX_ZZ(m)) - (MATRIX_YZ(m) * MATRIX_ZY(m));
 	a12 = -1 * ((MATRIX_YX(m) * MATRIX_ZZ(m)) - (MATRIX_YZ(m) * MATRIX_ZX(m)));
 	a13 = (MATRIX_YX(m) * MATRIX_ZY(m)) - (MATRIX_YY(m) * MATRIX_ZX(m));
@@ -284,19 +283,43 @@ EAPI void enesim_matrix_adjoint(const Enesim_Matrix *m, Enesim_Matrix *a)
 	a31 = (MATRIX_XY(m) * MATRIX_YZ(m)) - (MATRIX_XZ(m) * MATRIX_YY(m));
 	a32 = -1 * ((MATRIX_XX(m) * MATRIX_YZ(m)) - (MATRIX_XZ(m) * MATRIX_YX(m)));
 	a33 = (MATRIX_XX(m) * MATRIX_YY(m)) - (MATRIX_XY(m) * MATRIX_YX(m));
-	/* transpose */
+	
 	MATRIX_XX(a) = a11;
-	MATRIX_XY(a) = a21;
-	MATRIX_XZ(a) = a31;
+	MATRIX_XY(a) = a12;
+	MATRIX_XZ(a) = a13;
 
-	MATRIX_YX(a) = a12;
+	MATRIX_YX(a) = a21;
 	MATRIX_YY(a) = a22;
-	MATRIX_YZ(a) = a32;
+	MATRIX_YZ(a) = a23;
 
-	MATRIX_ZX(a) = a13;
-	MATRIX_ZY(a) = a23;
+	MATRIX_ZX(a) = a31;
+	MATRIX_ZY(a) = a32;
 	MATRIX_ZZ(a) = a33;
+}
 
+EAPI void enesim_matrix_transpose(const Enesim_Matrix *m, Enesim_Matrix *a)
+{
+	MATRIX_XX(a) = MATRIX_XX(m);
+	MATRIX_XY(a) = MATRIX_YX(m);
+	MATRIX_XZ(a) = MATRIX_ZX(m);
+
+	MATRIX_YX(a) = MATRIX_XY(m);
+	MATRIX_YY(a) = MATRIX_YY(m);
+	MATRIX_YZ(a) = MATRIX_ZY(m);
+
+	MATRIX_ZX(a) = MATRIX_XZ(m);
+	MATRIX_ZY(a) = MATRIX_YZ(m);
+	MATRIX_ZZ(a) = MATRIX_ZZ(m);
+}
+
+EAPI void enesim_matrix_adjoint(const Enesim_Matrix *m, Enesim_Matrix *a)
+{
+	Enesim_Matrix cofactor;
+
+	/* cofactor */
+	enesim_matrix_cofactor(m, &cofactor);
+	/* transpose */
+	enesim_matrix_transpose(&cofactor, a);
 }
 
 /**

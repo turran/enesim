@@ -32,6 +32,7 @@ include src/lib/Makefile.mk
 include src/lib/argb/Makefile.mk
 include src/lib/compositor/Makefile.mk
 include src/lib/converter/Makefile.mk
+include src/lib/curve/Makefile.mk
 include src/lib/image/Makefile.mk
 include src/lib/object/Makefile.mk
 include src/lib/path/Makefile.mk

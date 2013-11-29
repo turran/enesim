@@ -18,15 +18,15 @@
 #ifndef ENESIM_MATRIX_PRIVATE_H_
 #define ENESIM_MATRIX_PRIVATE_H_
 
-#define MATRIX_XX(m) m->xx
-#define MATRIX_XY(m) m->xy
-#define MATRIX_XZ(m) m->xz
-#define MATRIX_YX(m) m->yx
-#define MATRIX_YY(m) m->yy
-#define MATRIX_YZ(m) m->yz
-#define MATRIX_ZX(m) m->zx
-#define MATRIX_ZY(m) m->zy
-#define MATRIX_ZZ(m) m->zz
+#define MATRIX_XX(m) (m)->xx
+#define MATRIX_XY(m) (m)->xy
+#define MATRIX_XZ(m) (m)->xz
+#define MATRIX_YX(m) (m)->yx
+#define MATRIX_YY(m) (m)->yy
+#define MATRIX_YZ(m) (m)->yz
+#define MATRIX_ZX(m) (m)->zx
+#define MATRIX_ZY(m) (m)->zy
+#define MATRIX_ZZ(m) (m)->zz
 #define MATRIX_SIZE 9
 
 #endif /*ENESIM_MATRIX_PRIVATE_H_*/

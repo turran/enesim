@@ -112,6 +112,8 @@ EAPI void enesim_matrix_identity(Enesim_Matrix *t);
 EAPI double enesim_matrix_determinant(const Enesim_Matrix *m);
 EAPI void enesim_matrix_divide(Enesim_Matrix *m, double scalar);
 EAPI void enesim_matrix_inverse(const Enesim_Matrix *m, Enesim_Matrix *m2);
+EAPI void enesim_matrix_transpose(const Enesim_Matrix *m, Enesim_Matrix *a);
+EAPI void enesim_matrix_cofactor(const Enesim_Matrix *m, Enesim_Matrix *a);
 EAPI void enesim_matrix_adjoint(const Enesim_Matrix *m, Enesim_Matrix *a);
 
 EAPI void enesim_matrix_point_transform(const Enesim_Matrix *m, double x, double y, double *xr, double *yr);
