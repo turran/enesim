@@ -36,6 +36,8 @@ src/lib/enesim_compositor.c \
 src/lib/enesim_compositor_private.h \
 src/lib/enesim_converter.c \
 src/lib/enesim_converter_private.h \
+src/lib/enesim_curve.c \
+src/lib/enesim_curve_private.h \
 src/lib/enesim_draw_cache.c \
 src/lib/enesim_draw_cache_private.h \
 src/lib/enesim_log.c \
