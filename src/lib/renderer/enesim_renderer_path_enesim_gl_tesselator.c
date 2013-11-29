@@ -427,8 +427,8 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *gf;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer *rel;
-	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Figure *f;
 	Enesim_Color color;
 	Enesim_Color final_color;

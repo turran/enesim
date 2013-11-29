@@ -28,7 +28,8 @@ typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon
 
 typedef struct _Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure
 {
-	Eina_List *polygons;
+	Eina_List *flat_polygons;
+	Eina_List *curve_polygons;
 	Enesim_Surface *tmp;
 	Enesim_Surface *renderer_s;
 	Eina_Bool needs_tesselate : 1;

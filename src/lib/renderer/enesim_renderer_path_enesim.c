@@ -311,9 +311,12 @@ static Eina_Bool _path_opengl_setup(Enesim_Renderer *r,
 				&cs->current.transformation, 1, 1,
 				css->current.stroke.join, css->current.stroke.cap, css->dashes->l);
 	}
-
+#if 0
 	/* call the implementation setup */
 	if (!enesim_renderer_path_enesim_gl_tesselator_setup(r, draw, l))
+		return EINA_FALSE;
+#endif
+	if (!enesim_renderer_path_enesim_gl_loop_blinn_setup(r, draw, l))
 		return EINA_FALSE;
 
 	return EINA_TRUE;
@@ -433,7 +436,10 @@ static Eina_Bool _path_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
+#if 0
 	return enesim_renderer_path_enesim_gl_tesselator_initialize(num_programs, programs);
+#endif
+	return enesim_renderer_path_enesim_gl_loop_blinn_initialize(num_programs, programs);
 }
 #endif
 /*----------------------------------------------------------------------------*

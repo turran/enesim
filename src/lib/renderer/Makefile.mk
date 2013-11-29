@@ -69,7 +69,8 @@ endif
 
 if BUILD_OPENGL
 src_lib_libenesim_la_SOURCES += \
-src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator.c
+src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator.c \
+src/lib/renderer/enesim_renderer_path_enesim_gl_loop_blinn.c
 endif
 
 EXTRA_DIST += \
@@ -83,5 +84,6 @@ src/lib/renderer/enesim_renderer_path_silhoutte_vertex.glsl \
 src/lib/renderer/enesim_renderer_rectangle.glsl \
 src/lib/renderer/enesim_renderer_stripes.glsl \
 src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator_private.h \
+src/lib/renderer/enesim_renderer_path_enesim_gl_loop_blinn_private.h \
 src/lib/renderer/enesim_renderer_path_enesim_private.h
 

@@ -33,8 +33,8 @@
 #if 0
 static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
 {
-	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *f = data;
-	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon *p;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *f = data;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon *p;
 	Enesim_Point *pt = vertex;
 	Eina_List *l;
 
@@ -66,11 +66,11 @@ static void _path_opengl_combine_cb(GLdouble coords[3],
 
 static void _path_opengl_begin_cb(GLenum which, void *data)
 {
-	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon *p;
-	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *f = data;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon *p;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *f = data;
 
 	/* add another polygon */
-	p = calloc(1, sizeof(Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon));
+	p = calloc(1, sizeof(Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon));
 	p->type = which;
 	p->polygon = enesim_polygon_new();
 	f->polygons = eina_list_append(f->polygons, p);
@@ -88,7 +88,7 @@ static void _path_opengl_error_cb(GLenum err_no EINA_UNUSED, void *data EINA_UNU
 }
 
 static void _path_opengl_tesselate(
-		Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *glf,
+		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *glf,
 		Enesim_Figure *f)
 {
 	Enesim_Polygon *p;
@@ -135,10 +135,10 @@ static void _path_opengl_tesselate(
 }
 
 static void _path_opengl_notesselate(
-		Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Figure *glf)
+		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *glf)
 {
 	Eina_List *l1;
-	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator_Polygon *p;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon *p;
 
 	EINA_LIST_FOREACH(glf->polygons, l1, p)
 	{
@@ -157,7 +157,7 @@ static void _path_opengl_notesselate(
 
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
-		Enesim_Renderer_Path_Enesim_OpenGL_Figure *gf,
+		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *gf,
 		Enesim_Figure *f,
 		Enesim_Color color,
 		Enesim_Renderer *rel EINA_UNUSED,
@@ -165,7 +165,19 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		Eina_Bool silhoutte,
 		const Eina_Rectangle *area)
 {
-
+	/* check if we need to tesselate again */
+	if (gf->needs_tesselate)
+	{
+		/* we first draw the non-curves shape */
+		_path_opengl_tesselate(gf, f);
+		/* now the curvy shape */
+	}
+	/* if not, just use the cached vertices */
+	else
+	{
+		_path_opengl_notesselate(gf);
+	}
+	/* finally merge */
 }
 
 static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
@@ -178,7 +190,38 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
 		int x, int y)
 {
+	Enesim_Renderer_Path_Enesim *thiz;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn *gl;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *gf;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Renderer *rel;
+	Enesim_Buffer_OpenGL_Data *sdata;
+	Enesim_Color final_color;
 
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
+	gl = &thiz->gl;
+
+#if 0
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	{
+		gf = &gl->stroke;
+		f = thiz->stroke_figure;
+		enesim_renderer_shape_stroke_setup(r, color, &final_color, &rel);
+	}
+	else
+	{
+		gf = &gl->fill;
+		f = thiz->fill_figure;
+		enesim_renderer_shape_fill_setup(r, color, &final_color, &rel);
+	}
+
+	/* render there */
+	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color, rel, rdata, EINA_TRUE, area);
+
+	if (rel)
+		enesim_renderer_unref(rel);
+#endif
 }
 /*============================================================================*
  *                                 Global                                     *

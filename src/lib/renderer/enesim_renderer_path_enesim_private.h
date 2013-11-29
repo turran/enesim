@@ -57,6 +57,7 @@
 /* the gl implementations */
 #ifdef BUILD_OPENGL
 #include "enesim_renderer_path_enesim_gl_tesselator_private.h"
+#include "enesim_renderer_path_enesim_gl_loop_blinn_private.h"
 #endif
 
 #define ENESIM_RENDERER_PATH_ENESIM(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
@@ -74,6 +75,7 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	Enesim_Path_Generator *dashed_path;
 #if BUILD_OPENGL
 	Enesim_Renderer_Path_Enesim_OpenGL_Tesselator gl;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn loop_blinn;
 #endif
 	/* TODO put the below data into a path_sw struct */
 	Enesim_Figure *fill_figure;
