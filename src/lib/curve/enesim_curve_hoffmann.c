@@ -22,6 +22,7 @@
 
 #include "enesim_path_private.h"
 #include "enesim_curve_private.h"
+#include "enesim_curve_hoffmann_private.h"
 #include "enesim_matrix_private.h"
 #include "enesim_cramer_private.h"
 /*============================================================================*
@@ -31,7 +32,7 @@
  *                                 Global                                     *
  *============================================================================*/
 /* algorithm taken from http://www.fho-emden.de/~hoffmann/bezier18122002.pdf */
-void enesim_curve_offset_hoffman(Enesim_Path_Cubic *c, Enesim_Path_Cubic *res,
+void enesim_curve_hoffman_offset(Enesim_Path_Cubic *c, Enesim_Path_Cubic *res,
 		double offset, double err)
 {
 	Enesim_Matrix m;
