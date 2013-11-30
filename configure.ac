@@ -280,6 +280,16 @@ PKG_CHECK_MODULES([PNG], [${png_requirements}],
 
 ### Checks for header files
 
+# GLX
+want_glx="yes"
+AC_CHECK_HEADERS([GL/glx.h], [have_glx="yes"], [have_glx="no"])
+if test "x${have_glx}" = "xyes" && test "x${want_glx}" = "xyes"; then
+  build_glx="yes"
+  AC_DEFINE([BUILD_GLX], [1], [Build with GLX support])
+else
+  build_glx="no"
+fi
+
 # Pthreads
 if test "x${want_pthreads}" = "xyes" ; then
    AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])

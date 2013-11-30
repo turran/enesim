@@ -1,11 +1,11 @@
-#include "enesim_renderer_example.h"
+#include "enesim_example_renderer.h"
 
 /**
  * @example enesim_renderer_circle02.c
  * Example usage of a circle renderer
  * @image html enesim_renderer_circle02.png
  */
-static Enesim_Renderer * enesim_renderer_circle02(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(void)
 {
 	Enesim_Renderer *r;
 	Enesim_Renderer *shape_background;
@@ -107,4 +107,3 @@ static Enesim_Renderer * enesim_renderer_circle02(void)
 
 	return shape_circle;
 }
-EXAMPLE(enesim_renderer_circle02)

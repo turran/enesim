@@ -1,11 +1,11 @@
-#include "enesim_renderer_example.h"
+#include "enesim_example_renderer.h"
 
 /**
  * @example enesim_renderer_image01.c
  * Example usage of a image renderer
  * @image html enesim_renderer_image01.png
  */
-static Enesim_Renderer * enesim_renderer_image01(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(void)
 {
 	Enesim_Renderer *is;
 	Enesim_Renderer *r;
@@ -41,5 +41,3 @@ static Enesim_Renderer * enesim_renderer_image01(void)
 
 	return r;
 }
-EXAMPLE(enesim_renderer_image01)
-

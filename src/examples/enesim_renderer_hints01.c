@@ -1,4 +1,4 @@
-#include "enesim_renderer_example.h"
+#include "enesim_example_renderer.h"
 
 static Enesim_Renderer * _create_circle(double x, double y,
 		Enesim_Color color)
@@ -18,7 +18,7 @@ static Enesim_Renderer * _create_circle(double x, double y,
 	return proxy;
 }
 
-static Enesim_Renderer * enesim_renderer_hints01(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(void)
 {
 	Enesim_Renderer *compound;
 	Enesim_Renderer *background;
@@ -52,5 +52,3 @@ static Enesim_Renderer * enesim_renderer_hints01(void)
 	}
 	return compound;
 }
-
-EXAMPLE(enesim_renderer_hints01)

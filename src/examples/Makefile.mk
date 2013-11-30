@@ -9,6 +9,12 @@ examples_LDADD = \
 $(top_builddir)/src/lib/libenesim.la \
 @ENESIM_LIBS@
 
+examples_renderer_sources = \
+src/examples/enesim_example_renderer_backend_glx.c \
+src/examples/enesim_example_renderer_backend_image.c \
+src/examples/enesim_example_renderer.c \
+src/examples/enesim_example_renderer.h
+
 bin_PROGRAMS = \
 src/examples/enesim_image_example01 \
 src/examples/enesim_image_example02 \
@@ -37,84 +43,85 @@ src_examples_enesim_image_example02_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_path01_SOURCES = \
 src/examples/enesim_renderer_path01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
+
 src_examples_enesim_renderer_path01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_path01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_path02_SOURCES = \
 src/examples/enesim_renderer_path02.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_path02_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_path02_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_path03_SOURCES = \
 src/examples/enesim_renderer_path03.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_path03_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_path03_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_path04_SOURCES = \
 src/examples/enesim_renderer_path04.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_path04_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_path04_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_path05_SOURCES = \
 src/examples/enesim_renderer_path05.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_path05_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_path05_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_checker01_SOURCES = \
 src/examples/enesim_renderer_checker01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_checker01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_checker01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_circle01_SOURCES = \
 src/examples/enesim_renderer_circle01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_circle01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_circle01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_circle02_SOURCES = \
 src/examples/enesim_renderer_circle02.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_circle02_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_circle02_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_blur01_SOURCES = \
 src/examples/enesim_renderer_blur01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_blur01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_blur01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_hints01_SOURCES = \
 src/examples/enesim_renderer_hints01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_hints01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_hints01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_image01_SOURCES = \
 src/examples/enesim_renderer_image01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_image01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_image01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_perlin01_SOURCES = \
 src/examples/enesim_renderer_perlin01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_perlin01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_perlin01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_rectangle01_SOURCES = \
 src/examples/enesim_renderer_rectangle01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_rectangle01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_rectangle01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_text_span01_SOURCES = \
 src/examples/enesim_renderer_text_span01.c \
-src/examples/enesim_renderer_example.h
+$(examples_renderer_sources)
 src_examples_enesim_renderer_text_span01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_text_span01_LDADD = $(examples_LDADD)

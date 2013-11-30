@@ -1,11 +1,11 @@
-#include "enesim_renderer_example.h"
+#include "enesim_example_renderer.h"
 
 /**
  * @example enesim_renderer_rectangle01.c
  * Example usage of a rectangle renderer
  * @image html enesim_renderer_rectangle01.png
  */
-static Enesim_Renderer * enesim_renderer_rectangle01(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(void)
 {
 	Enesim_Renderer *r;
 
@@ -21,5 +21,3 @@ static Enesim_Renderer * enesim_renderer_rectangle01(void)
 	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL);
 	return r;
 }
-EXAMPLE(enesim_renderer_rectangle01)
-

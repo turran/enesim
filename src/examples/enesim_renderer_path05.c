@@ -1,11 +1,11 @@
-#include "enesim_renderer_example.h"
+#include "enesim_example_renderer.h"
 
 /**
  * @example enesim_renderer_path05.c
  * Example usage of a path renderer
  * @image html enesim_renderer_path05.png
  */
-static Enesim_Renderer * enesim_renderer_path05(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(void)
 {
 	Enesim_Renderer *r;
 	Enesim_Path *p;
@@ -24,6 +24,3 @@ static Enesim_Renderer * enesim_renderer_path05(void)
 
 	return r;
 }
-
-EXAMPLE(enesim_renderer_path05)
-
