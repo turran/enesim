@@ -25,6 +25,7 @@
 
 #include "enesim_path_private.h"
 #include "enesim_curve_private.h"
+#include "enesim_curve_decasteljau_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
