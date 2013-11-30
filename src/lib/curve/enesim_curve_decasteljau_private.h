@@ -15,8 +15,8 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_CURVE_DECASTELJAU_H
-#define ENESIM_CURVE_DECASTELJAU_H
+#ifndef ENESIM_CURVE_DECASTELJAU_PRIVATE_H
+#define ENESIM_CURVE_DECASTELJAU_PRIVATE_H
 
 void enesim_curve_decasteljau_cubic_at(const Enesim_Path_Cubic *c, double t,
 		Enesim_Path_Cubic *left, Enesim_Path_Cubic *right);

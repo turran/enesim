@@ -15,8 +15,8 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef ENESIM_CURVE_HOFFMANN_H
-#define ENESIM_CURVE_HOFFMANN_H
+#ifndef ENESIM_CURVE_HOFFMANN_PRIVATE_H
+#define ENESIM_CURVE_HOFFMANN_PRIVATE_H
 
 void enesim_curve_hoffmann_offset(Enesim_Path_Cubic *c, Enesim_Path_Cubic *res,
 		double offset, double err);
