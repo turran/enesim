@@ -66,21 +66,14 @@ Enesim_Point * enesim_point_new(void)
 	return thiz;
 }
 
-Enesim_Point * enesim_point_new_from_coords(double x, double y)
+Enesim_Point * enesim_point_new_from_coords(double x, double y, double z)
 {
 	Enesim_Point *thiz;
 
 	thiz = enesim_point_new();
-	thiz->x = x;
-	thiz->y = y;
-	thiz->z = 0;
+	enesim_point_coords_set(thiz, x, y, z);
 
 	return thiz;
-}
-
-double enesim_point_distance(Enesim_Point *p0, Enesim_Point *p1)
-{
-	return hypot(p1->x - p0->x, p1->y - p0->y);
 }
 
 Enesim_Polygon * enesim_polygon_new(void)
@@ -116,7 +109,7 @@ void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, dou
 		if (_points_equal(&tmp, p, thiz->threshold))
 			return;
 	}
-	p = enesim_point_new_from_coords(x, y);
+	p = enesim_point_new_from_coords(x, y, 0);
 	_polygon_point_append(thiz, p);
 }
 
@@ -135,7 +128,7 @@ void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, do
 		if (_points_equal(&tmp, p, thiz->threshold))
 			return;
 	}
-	p = enesim_point_new_from_coords(x, y);
+	p = enesim_point_new_from_coords(x, y, 0);
 	_polygon_point_prepend(thiz, p);
 }
 

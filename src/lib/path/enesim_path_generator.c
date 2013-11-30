@@ -724,7 +724,7 @@ static void _dashed_path_vertex_add(double x, double y, void *data)
 	p.y = y;
 	p.z = 0;
 	//printf("new vertex %g %g -> %g %g\n", x, y, thiz->prev_point.x, thiz->prev_point.y);
-	d = enesim_point_distance(&thiz->prev_point, &p);
+	d = enesim_point_2d_distance(&thiz->prev_point, &p);
 
 	while (d)
 	{

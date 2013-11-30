@@ -108,9 +108,137 @@ static inline Eina_F16p16 enesim_f16p16_line_affine_setup(Enesim_F16p16_Line *l,
 	return ret;
 }
 
+/*----------------------------------------------------------------------------*
+ *                                 Points                                     *
+ *----------------------------------------------------------------------------*/
 Enesim_Point * enesim_point_new(void);
-Enesim_Point * enesim_point_new_from_coords(double x, double y);
-double enesim_point_distance(Enesim_Point *p0, Enesim_Point *p1);
+Enesim_Point * enesim_point_new_from_coords(double x, double y, double z);
+
+static inline void enesim_point_3d_cross(Enesim_Point *p0, Enesim_Point *p1,
+		Enesim_Point *r)
+{
+	r->x = (p0->y * p1->z) - (p1->y * p0->z);
+	r->y = (p0->z * p1->x) - (p1->z * p0->x);
+	r->z = (p0->x * p1->y) - (p1->x * p0->y);
+}
+
+static inline double enesim_point_3d_dot(Enesim_Point *p0, Enesim_Point *p1)
+{
+	return ((p0->x * p1->x) + (p0->y * p1->y) + (p0->z * p1->z));
+}
+
+static inline double enesim_point_2d_distance(Enesim_Point *p0, Enesim_Point *p1)
+{
+	return hypot(p1->x - p0->x, p1->y - p0->y);
+}
+
+static inline double enesim_point_3d_distance(Enesim_Point *p0, Enesim_Point *p1)
+{
+	double x = p1->x - p0->x;
+	double y = p1->y - p0->y;
+	double z = p1->z - p0->z;
+	return sqrt(x*x + y*y + z*z);
+}
+
+static inline double enesim_point_2d_length(Enesim_Point *p0)
+{
+	return hypot(p0->x, p0->y);
+}
+
+static inline double enesim_point_3d_length(Enesim_Point *p0)
+{
+	return sqrt((p0->x* p0->x) + (p0->y * p0->y) + (p0->z * p0->z));
+}
+
+static inline double enesim_point_2d_length_squared(Enesim_Point *p0)
+{
+	return ((p0->x * p0->x) + (p0->y * p0->y));
+}
+
+static inline double enesim_point_3d_length_squared(Enesim_Point *p0)
+{
+	return ((p0->x* p0->x) + (p0->y * p0->y) + (p0->z * p0->z));
+}
+
+static inline void enesim_point_3d_normalize(Enesim_Point *p, Enesim_Point *r)
+{
+	double len;
+
+	len = enesim_point_3d_length(p);
+	r->x = p->x / len;
+	r->y = p->y / len;
+	r->z = p->z / len;
+}
+
+static inline void enesim_point_2d_normalize(Enesim_Point *p, Enesim_Point *r)
+{
+	double len;
+
+	len = enesim_point_2d_length(p);
+	r->x = p->x / len;
+	r->y = p->y / len;
+}
+
+static inline void enesim_point_2d_sub(Enesim_Point *p0, Enesim_Point *p1,
+		Enesim_Point *sub)
+{
+	sub->x = p0->x - p1->x;
+	sub->y = p0->y - p1->y;
+}
+
+static inline void enesim_point_3d_sub(Enesim_Point *p0, Enesim_Point *p1,
+		Enesim_Point *sub)
+{
+	sub->x = p0->x - p1->x;
+	sub->y = p0->y - p1->y;
+	sub->z = p0->z - p1->z;
+}
+
+static inline Eina_Bool enesim_point_2d_is_equal(Enesim_Point *p0,
+		Enesim_Point *p1, double err)
+{
+	Enesim_Point sub;
+	double d;
+	double err2 = err * err;
+
+	enesim_point_2d_sub(p0, p1, &sub);
+ 	d = enesim_point_2d_length_squared(&sub);
+	if (d < err2) return EINA_TRUE;
+	else return EINA_FALSE;
+}
+
+static inline Eina_Bool enesim_point_3d_is_equal(Enesim_Point *p0,
+		Enesim_Point *p1, double err)
+{
+	Enesim_Point sub;
+	double d;
+	double err2 = err * err;
+
+	enesim_point_3d_sub(p0, p1, &sub);
+ 	d = enesim_point_3d_length_squared(&sub);
+	if (d < err2) return EINA_TRUE;
+	else return EINA_FALSE;
+}
+
+static inline void enesim_point_coords_set(Enesim_Point *p, double x, double y,
+		double z)
+{
+	p->x = x;
+	p->y = y;
+	p->z = z;
+}
+
+static inline void enesim_point_coords_get(Enesim_Point *p, double *x, double *y,
+		double *z)
+{
+	*x = p->x;
+	*y = p->y;
+	*z = p->z;
+}
+
+/*----------------------------------------------------------------------------*
+ *                                 Polygon                                    *
+ *----------------------------------------------------------------------------*/
 
 Enesim_Polygon * enesim_polygon_new(void);
 void enesim_polygon_delete(Enesim_Polygon *thiz);
@@ -123,6 +251,9 @@ void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge);
 Eina_Bool enesim_polygon_bounds(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
 void enesim_polygon_threshold_set(Enesim_Polygon *p, double threshold);
 
+/*----------------------------------------------------------------------------*
+ *                                  Figure                                    *
+ *----------------------------------------------------------------------------*/
 Enesim_Figure * enesim_figure_new(void);
 void enesim_figure_delete(Enesim_Figure *thiz);
 int enesim_figure_polygon_count(Enesim_Figure *thiz);
