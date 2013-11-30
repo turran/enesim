@@ -10,8 +10,8 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(void)
 	Enesim_Renderer *r;
 
 	r = enesim_renderer_checker_new();
-	enesim_renderer_checker_odd_color_set(r, 0xffff0000);
-	enesim_renderer_checker_even_color_set(r, 0xffaa0000);
+	enesim_renderer_checker_odd_color_set(r, 0x00000000);
+	enesim_renderer_checker_even_color_set(r, 0xffff0000);
 	enesim_renderer_checker_width_set(r, 5);
 	enesim_renderer_checker_height_set(r, 5);
 
