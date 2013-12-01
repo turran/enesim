@@ -5,7 +5,7 @@
  * Example usage of a path renderer
  * @image html enesim_renderer_path04.png
  */
-Enesim_Renderer * enesim_example_renderer_renderer_get(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_Options *options EINA_UNUSED)
 {
 	Enesim_Renderer *r1, *r2;
 	Enesim_Renderer_Compound_Layer *l;

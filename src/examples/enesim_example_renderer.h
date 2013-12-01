@@ -41,7 +41,7 @@ typedef struct _Enesim_Example_Renderer_Backend_Interface
 } Enesim_Example_Renderer_Backend_Interface;
 
 /* function every example must implement */
-Enesim_Renderer * enesim_example_renderer_renderer_get(void);
+Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_Options *options);
 void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Example_Renderer_Options *options);
 

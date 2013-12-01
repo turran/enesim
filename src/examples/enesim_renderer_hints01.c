@@ -18,7 +18,7 @@ static Enesim_Renderer * _create_circle(double x, double y,
 	return proxy;
 }
 
-Enesim_Renderer * enesim_example_renderer_renderer_get(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_Options *options EINA_UNUSED)
 {
 	Enesim_Renderer *compound;
 	Enesim_Renderer *background;

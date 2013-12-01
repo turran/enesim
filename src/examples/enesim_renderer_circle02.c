@@ -5,7 +5,7 @@
  * Example usage of a circle renderer
  * @image html enesim_renderer_circle02.png
  */
-Enesim_Renderer * enesim_example_renderer_renderer_get(void)
+Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_Options *options EINA_UNUSED)
 {
 	Enesim_Renderer *r;
 	Enesim_Renderer *shape_background;

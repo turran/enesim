@@ -35,7 +35,7 @@ static Eina_Bool parse_options(Enesim_Example_Renderer_Options *options,
 		int argc, char **argv)
 {
 	/* default options */
-	options->name = argv[0];
+	options->name = basename(argv[0]);
 	options->rop = ENESIM_ROP_FILL;
 	options->width = 256;
 	options->height = 256;
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 		enesim_shutdown();
 		return 1;
 	}
-	r = enesim_example_renderer_renderer_get();
+	r = enesim_example_renderer_renderer_get(&options);
 	backend->iface->run(r, &options);
 	backend->iface->cleanup();
 
