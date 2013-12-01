@@ -1546,7 +1546,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Fill_Rule rule;
 	Enesim_Matrix matrix;
 	Eina_List *dashes;
-	double sw;
+	double swx, swy;
 
 	thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	state = &thiz->state;
@@ -1565,9 +1565,9 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	/* this is needed to know what span function to use */
 	rule = enesim_renderer_shape_fill_rule_get(r);
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
-	sw = enesim_renderer_shape_stroke_weight_get(r);
 	ss = enesim_renderer_shape_state_get(r);
 	dashes = ss->dashes->l;
+	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
 	/* this is for our own state */
 	enesim_renderer_origin_get(r, &state->ox, &state->oy);
 	state->color = enesim_renderer_color_get(r);
@@ -1621,7 +1621,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	}
 	else
 	{
-		if ( (sw <= 1 && !dashes) || (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) )
+		if ( (swx <= 1 && swy <= 1 && !dashes) || (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) )
 		{
 			enesim_renderer_origin_set(thiz->under, state->ox, state->oy);
 			enesim_renderer_transformation_set(thiz->under, &matrix);
@@ -1778,7 +1778,7 @@ static void _bifigure_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 {
 	Enesim_Rasterizer_BiFigure *thiz;
 	Enesim_Renderer_Shape_Draw_Mode draw_mode;
-	double sw;
+	double swx, swy;
 
 	thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	*hints = ENESIM_RENDERER_HINT_COLORIZE;
@@ -1787,8 +1787,8 @@ static void _bifigure_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 	 * who will draw, otherwise, just the colorize
 	 */
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
-	sw = enesim_renderer_shape_stroke_weight_get(r);
-	if (!(thiz->under && thiz->over && sw > 1 && draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL))
+	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
+	if (!(thiz->under && thiz->over && swx > 1 && swy > 1 && draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL))
 	{
 		*hints |= ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK;
 	}

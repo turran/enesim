@@ -644,9 +644,9 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 }
 
 void enesim_renderer_shape_stroke_setup(Enesim_Renderer *r,
-	Enesim_Color color,
-	Enesim_Color *final_color,
-	Enesim_Renderer **orend)
+		Enesim_Color color,
+		Enesim_Color *final_color,
+		Enesim_Renderer **orend)
 {
 	Enesim_Color scolor;
 
@@ -659,10 +659,25 @@ void enesim_renderer_shape_stroke_setup(Enesim_Renderer *r,
 		*final_color = color;
 }
 
+void enesim_renderer_shape_stroke_weight_setup(Enesim_Renderer *r,
+		double *swx, double *swy)
+{
+	Enesim_Matrix m;
+	double sw;
+
+	enesim_renderer_transformation_get(r, &m);
+	sw = enesim_renderer_shape_stroke_weight_get(r);
+	/* TODO later we can add flags to know how to scale the stroke
+	 * path
+	 */
+	*swx = sw / 2 * hypot(m.xx, m.yx);
+	*swy = sw / 2 * hypot(m.xy, m.yy);
+}
+
 void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
-	Enesim_Color color,
-	Enesim_Color *final_color,
-	Enesim_Renderer **orend)
+		Enesim_Color color,
+		Enesim_Color *final_color,
+		Enesim_Renderer **orend)
 {
 	Enesim_Color fcolor;
 

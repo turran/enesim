@@ -533,8 +533,8 @@ static void _stroke_path_begin(void *data)
 
 	/* initialize our state */
 	thiz->count = 0;
-	thiz->rx = path->sw / 2 * hypot(path->gm->xx, path->gm->yx);
-	thiz->ry = path->sw / 2 * hypot(path->gm->xy, path->gm->yy);
+	thiz->rx = path->swx;
+	thiz->ry = path->swy;
 	thiz->inset_polygon = NULL;
 	thiz->offset_polygon = NULL;
 }
@@ -629,7 +629,8 @@ static void _stroke_dashless_path_begin(void *data)
 		enesim_path_generator_stroke_figure_set(p, path->stroke_figure);
 		enesim_path_generator_stroke_cap_set(p, path->cap);
 		enesim_path_generator_stroke_join_set(p, path->join);
-		enesim_path_generator_stroke_weight_set(p, path->sw);
+		enesim_path_generator_stroke_weight_x_set(p, path->swx);
+		enesim_path_generator_stroke_weight_y_set(p, path->swy);
 		enesim_path_generator_stroke_dash_set(p, path->dashes);
 		enesim_path_generator_scale_set(p, path->scale_x, path->scale_y);
 		enesim_path_generator_transformation_set(p, path->gm);
@@ -847,7 +848,8 @@ static void _dashed_path_begin(void *data)
 		enesim_path_generator_stroke_figure_set(p, path->stroke_figure);
 		enesim_path_generator_stroke_cap_set(p, path->cap);
 		enesim_path_generator_stroke_join_set(p, path->join);
-		enesim_path_generator_stroke_weight_set(p, path->sw);
+		enesim_path_generator_stroke_weight_x_set(p, path->swx);
+		enesim_path_generator_stroke_weight_y_set(p, path->swy);
 		enesim_path_generator_stroke_dash_set(p, path->dashes);
 		enesim_path_generator_scale_set(p, path->scale_x, path->scale_y);
 		enesim_path_generator_transformation_set(p, path->gm);
@@ -936,9 +938,14 @@ void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_R
 	thiz->join = join;
 }
 
-void enesim_path_generator_stroke_weight_set(Enesim_Path_Generator *thiz, double sw)
+void enesim_path_generator_stroke_weight_x_set(Enesim_Path_Generator *thiz, double sw)
 {
-	thiz->sw = sw;
+	thiz->swx = sw;
+}
+
+void enesim_path_generator_stroke_weight_y_set(Enesim_Path_Generator *thiz, double sw)
+{
+	thiz->swy = sw;
 }
 
 void enesim_path_generator_stroke_dash_set(Enesim_Path_Generator *thiz, const Eina_List *dashes)
