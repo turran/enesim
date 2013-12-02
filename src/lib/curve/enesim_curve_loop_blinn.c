@@ -49,6 +49,12 @@ static Eina_Bool enesim_curve_loop_blinn_compute_texcoords(
 	}
 }
 #endif
+static inline double _round_to_zero(double v, double err)
+{
+	if (v < err && v > -err)
+		return 0;
+	return v;
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -99,12 +105,10 @@ void enesim_curve_loop_blinn_classify(Enesim_Path_Cubic *c, double err,
 	/* when the values are near zero, round to zero to avoid
 	 * numerical errors
 	 */
-#if 0
-	d1 = roundToZero(d1);
-	d2 = roundToZero(d2);
-	d3 = roundToZero(d3);
-	discriminant = roundToZero(discriminant);
-#endif
+	d1 = _round_to_zero(d1, err);
+	d2 = _round_to_zero(d2, err);
+	d3 = _round_to_zero(d3, err);
+	discriminant = _round_to_zero(discriminant, err);
 
 	/* finally do the classification */
 	clas->d1 = d1;
