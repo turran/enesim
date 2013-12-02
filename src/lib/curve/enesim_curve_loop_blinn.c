@@ -30,25 +30,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#if 0
-static Eina_Bool enesim_curve_loop_blinn_compute_texcoords(
-		Enesim_Curve_Loop_Blinn_Classification *clas)
-{
-	switch (clas->type)
-	{
-		case ENESIM_CURVE_LOOP_BLINN_POINT:
-		case ENESIM_CURVE_LOOP_BLINN_LINE:
-		case ENESIM_CURVE_LOOP_BLINN_UNKNOWN:
-		return EINA_FALSE;
-
-		case ENESIM_CURVE_LOOP_BLINN_QUADRATIC:
-		case ENESIM_CURVE_LOOP_BLINN_CUSP:
-		case ENESIM_CURVE_LOOP_BLINN_LOOP:
-		case ENESIM_CURVE_LOOP_BLINN_SERPENTINE:
-		return EINA_TRUE;
-	}
-}
-#endif
 static inline double _round_to_zero(double v, double err)
 {
 	if (v < err && v > -err)
@@ -147,4 +128,120 @@ void enesim_curve_loop_blinn_classify(Enesim_Path_Cubic *c, double err,
 	{
 		clas->type = ENESIM_CURVE_LOOP_BLINN_LOOP;
 	}
+}
+
+Eina_Bool enesim_curve_loop_blinn_compute_texcoords(
+		Enesim_Curve_Loop_Blinn_Classification *clas)
+{
+	Enesim_Point k, l, m, n;
+	/* check for reverse orientation */
+	Eina_Bool reverse = EINA_FALSE;
+	Eina_Bool has_artifact = EINA_FALSE;
+	double divide_at;
+	const double one_third = 1.0 / 3.0;
+	const double two_thirds = 2.0 / 3.0;
+
+	switch (clas->type)
+	{
+		case ENESIM_CURVE_LOOP_BLINN_POINT:
+		case ENESIM_CURVE_LOOP_BLINN_LINE:
+		return EINA_FALSE;
+
+		case ENESIM_CURVE_LOOP_BLINN_QUADRATIC:
+		enesim_point_coords_set(&k, 0, 0, 0);
+		enesim_point_coords_set(&l, one_third, 0, one_third);
+		enesim_point_coords_set(&m, two_thirds, one_third, two_thirds);
+		enesim_point_coords_set(&n, 1, 1, 1);
+		if (clas->d3 < 0)
+			reverse = EINA_TRUE;
+		break;
+
+		case ENESIM_CURVE_LOOP_BLINN_CUSP:{
+		double ls = clas->d3;
+		double lt = 3.0 * clas->d2;
+		double lsMinusLt = ls - lt;
+		enesim_point_coords_set(&k, ls, ls * ls * ls, 1.0);
+		enesim_point_coords_set(&l, ls - one_third * lt, ls * ls * lsMinusLt, 1.0);
+		enesim_point_coords_set(&m, ls - two_thirds * lt, lsMinusLt * lsMinusLt * ls, 1.0);
+		enesim_point_coords_set(&n, lsMinusLt, lsMinusLt * lsMinusLt * lsMinusLt, 1.0);
+		}break;
+
+		case ENESIM_CURVE_LOOP_BLINN_LOOP:{
+		double t1 = sqrt(4.0 * clas->d1 * clas->d3 - 3.0 * clas->d2 * clas->d2);
+		double ls = clas->d2 - t1;
+		double lt = 2.0 * clas->d1;
+		double ms = clas->d2 + t1;
+		double mt = lt;
+
+		/* check for subdivision */
+		double ql = ls / lt;
+		double qm = ms / mt;
+		if (0.0 < ql && ql < 1.0) {
+		    has_artifact = EINA_TRUE;
+		    divide_at = ql;
+		    return EINA_TRUE;
+		}
+
+		if (0.0 < qm && qm < 1.0) {
+		    has_artifact = EINA_TRUE;
+		    divide_at = qm;
+		    return EINA_TRUE;
+		}
+
+		double ltMinusLs = lt - ls;
+		double mtMinusMs = mt - ms;
+		enesim_point_coords_set(&k, ls * ms, ls * ls * ms, ls * ms * ms);
+		enesim_point_coords_set(&l, one_third * (-ls * mt - lt * ms + 3.0 * ls * ms),
+				-one_third * ls * (ls * (mt - 3.0 * ms) + 2.0 * lt * ms),
+				-one_third * ms * (ls * (2.0 * mt - 3.0 * ms) + lt * ms));
+		enesim_point_coords_set(&m, one_third * (lt * (mt - 2.0 * ms) + ls * (3.0 * ms - 2.0 * mt)),
+				one_third * (lt - ls) * (ls * (2.0 * mt - 3.0 * ms) + lt * ms),
+				one_third * (mt - ms) * (ls * (mt - 3.0 * ms) + 2.0 * lt * ms));
+		enesim_point_coords_set(&n, ltMinusLs * mtMinusMs,
+				-(ltMinusLs * ltMinusLs) * mtMinusMs,
+				-ltMinusLs * mtMinusMs * mtMinusMs);
+		reverse = ((clas->d1 > 0.0 && k.x < 0.0)
+				   || (clas->d1 < 0.0 && k.x > 0.0));
+		}break;
+
+		case ENESIM_CURVE_LOOP_BLINN_SERPENTINE:{
+		double t1 = sqrtf(9.0 * clas->d2 * clas->d2 - 12 * clas->d1 * clas->d3);
+		double ls = 3.0 * clas->d2 - t1;
+		double lt = 6.0 * clas->d1;
+		double ms = 3.0 * clas->d2 + t1;
+		double mt = lt;
+		double ltMinusLs = lt - ls;
+		double mtMinusMs = mt - ms;
+		enesim_point_coords_set(&k, ls * ms, ls * ls * ls, ms * ms * ms);
+		enesim_point_coords_set(&l, one_third * (3.0 * ls * ms - ls * mt - lt * ms),
+			     	ls * ls * (ls - lt),
+			     	ms * ms * (ms - mt));
+		enesim_point_coords_set(&m, one_third * (lt * (mt - 2.0 * ms) + ls * (3.0 * ms - 2.0 * mt)),
+			     	ltMinusLs * ltMinusLs * ls,
+			     	mtMinusMs * mtMinusMs * ms);
+		enesim_point_coords_set(&n, ltMinusLs * mtMinusMs,
+				-(ltMinusLs * ltMinusLs * ltMinusLs),
+				-(mtMinusMs * mtMinusMs * mtMinusMs));
+		if (clas->d1 < 0.0)
+		    reverse = EINA_TRUE;
+		}break;
+
+		default:
+		return EINA_FALSE;
+		break;
+
+	}
+#if 0
+	if (sideToFill == LoopBlinnConstants::RightSide)
+		reverse = !reverse;
+
+	if (reverse) {
+		for (int i = 0; i < 4; ++i) {
+			result.klmCoordinates[i].setX(-result.klmCoordinates[i].x());
+			result.klmCoordinates[i].setY(-result.klmCoordinates[i].y());
+		}
+	}
+#endif
+
+    return EINA_TRUE;
 }
