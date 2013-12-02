@@ -22,20 +22,6 @@ Cubic tests[] = {
 		0.9, 0.1,
 		0.5, 0.1,
 	},
-	/* loop */
-	{
-		0.1, 0.52,
-		0.8, 0.0,
-		0.3, 1.0,
-		0.1, 0.48,
-	},
-	/* strictly linear */
-	{
-		0.1, 0.1,
-		0.3, 0.3,
-		0.7, 0.7,
-		0.9, 0.9,
-	},
 	/* almost linear */
 	{
 		0.1, 0.1,
@@ -113,8 +99,21 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(
 	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 
 	p = enesim_renderer_path_path_get(r);
+#if 0
 	enesim_path_move_to(p, 0.1, 0.1);
 	enesim_path_cubic_to(p, 0.1, 0.9, 0.5, 0.9, 0.9, 0.8);
+#endif
+#if 0
+	/* loop */
+	enesim_path_move_to(p, 0.1, 0.52);
+	enesim_path_cubic_to(p, 0.8, 0.0, 0.3, 1.0, 0.1, 0.48);
+#endif
+#if 1
+	/* strictly linear */
+	enesim_path_move_to(p, 0.1, 0.1);
+	enesim_path_cubic_to(p, 0.3, 0.3, 0.7, 0.7, 0.9, 0.9);
+#endif
+
 	enesim_path_unref(p);
 
 	enesim_matrix_scale(&m, options->width, options->height);
