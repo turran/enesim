@@ -160,23 +160,35 @@ static inline double enesim_point_3d_length_squared(Enesim_Point *p0)
 	return ((p0->x* p0->x) + (p0->y * p0->y) + (p0->z * p0->z));
 }
 
-static inline void enesim_point_3d_normalize(Enesim_Point *p, Enesim_Point *r)
+static inline Eina_Bool enesim_point_3d_normalize(Enesim_Point *p,
+		Enesim_Point *r)
 {
 	double len;
 
 	len = enesim_point_3d_length(p);
-	r->x = p->x / len;
-	r->y = p->y / len;
-	r->z = p->z / len;
+	if (len)
+	{
+		r->x = p->x / len;
+		r->y = p->y / len;
+		r->z = p->z / len;
+		return EINA_TRUE;
+	}
+	return EINA_FALSE;
 }
 
-static inline void enesim_point_2d_normalize(Enesim_Point *p, Enesim_Point *r)
+static inline Eina_Bool enesim_point_2d_normalize(Enesim_Point *p,
+		Enesim_Point *r)
 {
 	double len;
 
 	len = enesim_point_2d_length(p);
-	r->x = p->x / len;
-	r->y = p->y / len;
+	if (len)
+	{
+		r->x = p->x / len;
+		r->y = p->y / len;
+		return EINA_TRUE;
+	}
+	return EINA_FALSE;
 }
 
 static inline void enesim_point_2d_sub(Enesim_Point *p0, Enesim_Point *p1,
