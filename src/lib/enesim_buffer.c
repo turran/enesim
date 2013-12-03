@@ -39,11 +39,13 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_buffer
 
+#if BUILD_OPENGL
 static void _buffer_opengl_backend_free(void *data, void *user_data EINA_UNUSED)
 {
 	Enesim_Buffer_OpenGL_Data *backend_data = data;
 	enesim_opengl_buffer_data_free(backend_data);
 }
+#endif
 
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
 		void *backend_data, Enesim_Format f, Enesim_Pool *p,
