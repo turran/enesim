@@ -45,12 +45,39 @@
  *============================================================================*/
 typedef struct _Enesim_OpenGL_Pool
 {
+	/* we use our internal fbo to zero the buffers */
+	GLuint fbo;
 } Enesim_OpenGL_Pool;
 
-static Eina_Bool _data_alloc(void *prv EINA_UNUSED, Enesim_Backend *backend,
+static void _zero_buffer(Enesim_OpenGL_Pool *thiz, Enesim_Buffer_OpenGL_Data *data)
+{
+	GLenum status;
+	unsigned int i;
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, thiz->fbo);
+	for (i = 0; i < data->num_textures; i++)
+	{
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+			GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,
+			data->textures[0], 0);
+
+	        status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+		{
+			/* FIXME add a message in the pool log */
+			continue;
+		}
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+}
+
+static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
+	Enesim_OpenGL_Pool *thiz = prv;
 	Enesim_Buffer_OpenGL_Data *data;
 
 	data = calloc(1, sizeof(Enesim_Buffer_OpenGL_Data));
@@ -82,7 +109,7 @@ static Eina_Bool _data_alloc(void *prv EINA_UNUSED, Enesim_Backend *backend,
 
 
 	}
-
+	_zero_buffer(thiz, data);
 	return EINA_TRUE;
 }
 
@@ -169,6 +196,7 @@ static void _free(void *prv)
 {
 	Enesim_OpenGL_Pool *thiz = prv;
 
+	glDeleteFramebuffersEXT(1, &thiz->fbo);
 	free(thiz);
 }
 
@@ -192,14 +220,15 @@ EAPI Enesim_Pool * enesim_pool_opengl_new(void)
 
 	/* initialize the opengl system */
 	enesim_opengl_init();
+	glEnable(GL_TEXTURE_2D);
+
 	thiz = calloc(1, sizeof(Enesim_OpenGL_Pool));
+	glGenFramebuffersEXT(1, &thiz->fbo);
 
 	p = enesim_pool_new(&_descriptor, thiz);
-	/* FIXME we should put a simple initializer */
-	glEnable(GL_TEXTURE_2D);
 	if (!p)
 	{
-		free(thiz);
+		_free(thiz);
 		return NULL;
 	}
 
