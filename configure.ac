@@ -126,19 +126,35 @@ requirements_cflags=""
 requirements_libs=""
 requirements_pc=""
 
-## Windows
-
+have_wince="no"
+have_windows="no"
+have_win32="no"
+have_linux="no"
 case "$host_os" in
-   mingw*)
-      PKG_CHECK_EXISTS([evil >= ${efl_version}],
-         [
-          requirements_pc="${requirements_pc} evil >= ${efl_version}"
-          AC_DEFINE([HAVE_EVIL], [1], [Define to 1 if you have Evil library.])
-         ],
-         [AC_MSG_ERROR([Evil is required. Be sure to have it installed.])])
-      requirements_libs="${requirements_libs} -lws2_32"
+   mingw32ce*)
+      have_wince="yes"
+      have_windows="yes"
+   ;;
+   mingw*|cygwin*)
+      # TODO: check cygwin* here
+      have_win32="yes"
+      have_windows="yes"
+   ;;
+   linux*)
+      have_linux="yes"
    ;;
 esac
+
+## Windows
+if test "x${have_windows}" = "xyes"; then
+  PKG_CHECK_EXISTS([evil >= ${efl_version}],
+     [
+      requirements_pc="${requirements_pc} evil >= ${efl_version}"
+      AC_DEFINE([HAVE_EVIL], [1], [Define to 1 if you have Evil library.])
+     ],
+     [AC_MSG_ERROR([Evil is required. Be sure to have it installed.])])
+  requirements_libs="${requirements_libs} -lws2_32"
+fi
 
 ## Eina
 
@@ -193,77 +209,34 @@ if test "x${build_cairo}" = "xyes"; then
 fi
 AM_CONDITIONAL([BUILD_CAIRO], [test "x${build_cairo}" = "xyes"])
 
-## Glew
+## Glew && Glu
+GL_LIB="GL"
+GLU_LIB="GLU"
+GLEW_LIB="GLEW"
+if test "x${have_windows}" = "xyes"; then
+  GL_LIB="opengl32"
+  GLU_LIB="glu32"
+  GLEW_LIB="glew32"
+fi
 
 have_glew="no"
-if test "x${want_opengl}" = "xyes" ; then
-   PKG_CHECK_EXISTS([glew],
-      [
-       have_glew="yes"
-       AC_DEFINE([HAVE_GLEW], [1], [Have support for glew])
-      ],
-      [have_glew="no"])
-fi
+PKG_CHECK_MODULES([glew], [glew], [have_glew="yes"],
+  [
+    AC_CHECK_LIB([$GLEW_LIB], [glewInit], [have_glew="yes"], [have_glew="no"], ["-l$GL_LIB"])
+  ]
+)
 
-## OpenGL
-have_opengl="no"
-if test "x${have_glew}" = "xyes" ; then
-# in libGL ?
-   LIBS_save=${LIBS}
-   LIBS="${LIBS} -lGL -lGLU"
-   AC_LINK_IFELSE(
-      [
-       AC_LANG_PROGRAM(
-          [[
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-          ]],
-          [[
-glGenFramebuffersEXT(0, NULL);
-          ]])
-      ],
-      [
-       have_opengl="yes"
-       OPENGL_LIBS="-lGL -lGLU"
-      ],
-      [have_opengl="no"])
-   LIBS=${LIBS_save}
-
-   AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libGL.a])
-   AC_MSG_RESULT([${have_opengl}])
-
-# in libopengl32 ?
-   if test "x${have_opengl}" = "xno" ; then
-      LIBS_save=${LIBS}
-      LIBS="${LIBS} -lopengl32"
-      AC_LINK_IFELSE(
-         [
-          AC_LANG_PROGRAM(
-             [[
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-             ]],
-             [[
-glGenFramebuffersEXT(0, NULL);
-             ]])
-         ],
-         [
-          have_opengl="yes"
-          OPENGL_LIBS="-lopengl32 -lGLU"
-         ],
-         [have_opengl="no"])
-      LIBS=${LIBS_save}
-
-      AC_MSG_CHECKING([whether glGenFramebuffersEXT is in libopengl32.a])
-      AC_MSG_RESULT([${have_opengl}])
-   fi
-fi
+PKG_CHECK_MODULES([glu], [glu], [have_glu="yes"],
+  [
+    AC_CHECK_LIB([$GLU_LIB], [gluTessVertex], [have_glu="yes"], [have_glu="no"], ["-l$GL_LIB"])
+  ]
+)
 
 build_opengl="no"
-if test "x${want_opengl}" = "xyes" -a "x${have_opengl}" = "xyes"; then
+if test "x${want_opengl}" = "xyes" && test "x${have_glew}" = "xyes" && 
+    test "x${have_glu}" = "xyes"; then
   build_opengl="yes"
-  requirements_pc="${requirements_pc} glew"
-  requirements_libs="${OPENGL_LIBS} ${requirements_libs}"
+  requirements_libs="${requirements_libs} -l${GL_LIB} -l${GLEW_LIB} -l${GLU_LIB}"
   AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
 fi
 
