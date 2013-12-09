@@ -222,13 +222,25 @@ fi
 have_glew="no"
 PKG_CHECK_MODULES([glew], [glew], [have_glew="yes"],
   [
-    AC_CHECK_LIB([$GLEW_LIB], [glewInit], [have_glew="yes"], [have_glew="no"], ["-l$GL_LIB"])
+    # We try to compile instead of AC_CHECK_LIB because
+    # of mingw/vc stdcall, cdecl
+    LDFLAGS_save="${LDFLAGS}"
+    LDFLAGS="${LDFLAGS} ${GLEW_LIB}"
+    AC_TRY_COMPILE([#include "GL/glew.h"], [glewInit();],
+        [have_glew="yes"], [have_glew="no"], ["-l$GL_LIB"])
+    LDFLAGS="${LDFLAGS_save}"
   ]
 )
 
 PKG_CHECK_MODULES([glu], [glu], [have_glu="yes"],
   [
-    AC_CHECK_LIB([$GLU_LIB], [gluTessVertex], [have_glu="yes"], [have_glu="no"], ["-l$GL_LIB"])
+    # We try to compile instead of AC_CHECK_LIB because
+    # of mingw/vc stdcall, cdecl
+    LDFLAGS_save="${LDFLAGS}"
+    LDFLAGS="${LDFLAGS} ${GLU_LIB}"
+    AC_TRY_COMPILE([#include "GL/glu.h"], [gluNewTess();],
+        [have_glu="yes"], [have_glu="no"], ["-l$GL_LIB"])
+    LDFLAGS="${LDFLAGS_save}"
   ]
 )
 
