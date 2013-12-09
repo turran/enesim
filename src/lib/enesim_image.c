@@ -180,9 +180,6 @@ int enesim_image_shutdown(void)
 	enesim_image_context_free(_main_context);
 	_main_context = NULL;
 
-	/* unload every module */
-	eina_module_list_free(_modules);
-	eina_array_free(_modules);
 #if BUILD_STATIC_MODULE_PNG
 	enesim_image_png_provider_shutdown();
 #endif
@@ -192,6 +189,9 @@ int enesim_image_shutdown(void)
 #if BUILD_STATIC_MODULE_RAW
 	enesim_image_raw_provider_shutdown();
 #endif
+	/* unload every module */
+	eina_module_list_free(_modules);
+	eina_array_free(_modules);
 	/* remove the finders */
 	eina_list_free(_finders);
 	/* remove the providers */
