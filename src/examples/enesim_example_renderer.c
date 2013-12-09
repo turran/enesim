@@ -11,8 +11,10 @@ typedef struct _Enesim_Example_Renderer_Backend
 
 static Enesim_Example_Renderer_Backend backends[] = {
 	{ "image", &enesim_example_renderer_backend_image },
+#if BUILD_OPENGL
 #if BUILD_GLX
 	{ "glx", &enesim_example_renderer_backend_glx },
+#endif
 #endif
 };
 

@@ -11,13 +11,12 @@
 #include "Enesim.h"
 #if BUILD_OPENGL
 #include "Enesim_OpenGL.h"
-#endif
 
 #if BUILD_GLX
 #include <X11/Xlib.h>
 #include <GL/glx.h>
 #endif
-
+#endif
 
 #define WIDTH 256
 #define HEIGHT 256
@@ -49,9 +48,11 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 Enesim_Example_Renderer_Backend_Interface
 enesim_example_renderer_backend_image;
 
+#if BUILD_OPENGL
 #if BUILD_GLX
 Enesim_Example_Renderer_Backend_Interface
 enesim_example_renderer_backend_glx;
+#endif
 #endif
 
 #endif

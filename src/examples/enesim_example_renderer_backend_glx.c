@@ -1,5 +1,6 @@
 #include "enesim_example_renderer.h"
 
+#if BUILD_OPENGL
 #if BUILD_GLX
 
 static Display *display;
@@ -157,4 +158,5 @@ enesim_example_renderer_backend_glx = {
 	/* .run 	= */ glx_run,
 };
 
+#endif
 #endif
