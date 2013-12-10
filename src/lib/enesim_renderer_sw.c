@@ -47,7 +47,7 @@
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
-#ifdef BUILD_THREAD
+#ifdef BUILD_MULTI_CORE
 static unsigned int _num_cpus;
 #endif
 
@@ -181,7 +181,7 @@ static inline void _sw_clear(uint8_t *ddata, size_t stride, int bpp,
 /*----------------------------------------------------------------------------*
  *                            Threaded rendering                              *
  *----------------------------------------------------------------------------*/
-#ifdef BUILD_THREAD
+#ifdef BUILD_MULTI_CORE
 static inline void _sw_surface_draw_full_threaded(Enesim_Renderer *r,
 		unsigned int thread,
 		Enesim_Renderer_Sw_Fill fill, Enesim_Compositor_Span span,
@@ -339,14 +339,14 @@ static void _sw_draw_no_threaded(Enesim_Renderer *r,
  *============================================================================*/
 void enesim_renderer_sw_init(void)
 {
-#ifdef BUILD_THREAD
+#ifdef BUILD_MULTI_CORE
 	_num_cpus = eina_cpu_count();
 #endif
 }
 
 void enesim_renderer_sw_shutdown(void)
 {
-#ifdef BUILD_THREAD
+#ifdef BUILD_MULTI_CORE
 #endif
 }
 
@@ -372,7 +372,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	uint8_t *ddata;
 	size_t stride;
 	size_t bpp;
-#ifdef BUILD_THREAD
+#ifdef BUILD_MULTI_CORE
 	Enesim_Renderer_Sw_Data *sw_data;
 #endif
 
@@ -423,7 +423,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	 */
 	final.x += x;
 	final.y += y;
-#ifdef BUILD_THREAD
+#ifdef BUILD_MULTI_CORE
 	/* create the threads in case those are not created yet */
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 	if (!sw_data->threads)
@@ -544,13 +544,13 @@ void enesim_renderer_sw_free(Enesim_Renderer *r)
 {
 
 	Enesim_Renderer_Sw_Data *sw_data;
-#if BUILD_THREAD
+#if BUILD_MULTI_CORE
 	unsigned int i;
 #endif
 
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
 	if (!sw_data) return;
-#if BUILD_THREAD
+#if BUILD_MULTI_CORE
 	if (sw_data->threads)
 	{
 		/* first mark all the threads to leave */

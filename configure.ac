@@ -32,23 +32,17 @@ AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 
 ### Additional options to configure
 
-## Pthreads
-AC_ARG_ENABLE([pthreads],
-   [AS_HELP_STRING([--enable-pthreads], [enable threaded rendering])],
+## Threaded software rendering
+AC_ARG_ENABLE([multi-core],
+   [AS_HELP_STRING([--disable-multi-core], [Disable multi core operations])],
    [
     if test "x$enableval" = "xyes" ; then
-       want_pthreads="yes"
+       want_multi_core="yes"
     else
-       want_pthreads="no"
+       want_multi_core="no"
     fi
    ],
-   [want_pthreads="yes"])
-
-## Equanime
-AC_ARG_WITH([equanime],
-   [AS_HELP_STRING([--with-equanime], [enable Equanime pool support])],
-   [want_equanime="yes"],
-   [want_equanime="no"])
+   [want_multi_core="yes"])
 
 ## OpenCL (disabled)
 #AC_ARG_ENABLE([opencl],
@@ -91,16 +85,6 @@ ENS_SURFACE_FORMAT([rgb888_a8], [no])
 ENS_SURFACE_FORMAT([rgb565_xa5], [no])
 ENS_SURFACE_FORMAT([rgb565_b1a3], [yes])
 ENS_SURFACE_FORMAT([rgb888], [yes])
-
-build_win32threads="no"
-case "$host_os" in
-   mingw*)
-      want_pthreads="no"
-      build_win32threads="yes"
-      AC_DEFINE([BUILD_THREAD], [1], [Build Threaded Rendering])
-   ;;
-esac
-
 
 ### Checks for programs
 
@@ -146,6 +130,8 @@ case "$host_os" in
 esac
 
 ## Windows
+have_win32threads="no"
+want_wgl="no"
 if test "x${have_windows}" = "xyes"; then
   PKG_CHECK_EXISTS([evil >= ${efl_version}],
      [
@@ -154,6 +140,8 @@ if test "x${have_windows}" = "xyes"; then
      ],
      [AC_MSG_ERROR([Evil is required. Be sure to have it installed.])])
   requirements_libs="${requirements_libs} -lws2_32"
+  have_win32threads="yes"
+  want_wgl="yes"
 fi
 
 ## Eina
@@ -275,10 +263,16 @@ else
   build_glx="no"
 fi
 
-# Pthreads
-if test "x${want_pthreads}" = "xyes" ; then
-   AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])
+# WGL
+if test "x${want_wgl}" = "xyes"; then
+  build_wgl="yes"
+  AC_DEFINE([BUILD_WGL], [1], [Build with WGL support])
+else
+  build_wgl="no"
 fi
+
+# Pthreads
+AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])
 
 ## openCL
 #have_opencl="no"
@@ -323,23 +317,20 @@ AC_CHECK_FUNCS(posix_memalign, [
 ### Checks for library functions
 
 ## Pthreads
-build_pthreads="no"
-if test "x${want_pthreads}" = "xyes" ; then
-   AC_CHECK_LIB([pthread], [pthread_attr_setaffinity_np],
-      [
-       AC_CHECK_LIB([pthread], [pthread_barrier_wait],
-          [
-           build_pthreads="yes"
-           AC_DEFINE([BUILD_THREAD], [1], [Build Threaded Rendering])
-           requirements_cflags="${requirements_cflags} -pthread"
-           requirements_libs="${requirements_libs} -pthread"
-          ],
-          [build_pthreads="no"])
-      ],
-      [build_pthreads="no"])
-fi
+have_pthreads="no"
+AC_CHECK_LIB([pthread], [pthread_attr_setaffinity_np],
+   [
+    AC_CHECK_LIB([pthread], [pthread_barrier_wait],
+       [
+        have_pthreads="yes"
+        requirements_cflags="${requirements_cflags} -pthread"
+        requirements_libs="${requirements_libs} -pthread"
+       ],
+       [have_pthreads="no"])
+   ],
+   [have_pthreads="no"])
 
-if test "x${build_pthreads}" = "xyes" ; then
+if test "x${have_pthreads}" = "xyes" ; then
    AC_CHECK_TYPE([cpu_set_t],
       [AC_DEFINE([enesim_cpu_set_t], [cpu_set_t], [cpu_set_t type])],
       [],
@@ -358,11 +349,18 @@ if test "x${build_pthreads}" = "xyes" ; then
 fi
 
 AC_MSG_CHECKING([whether to build pthread code])
-AC_MSG_RESULT([${build_pthreads}])
+AC_MSG_RESULT([${have_pthreads}])
 
 build_threads="no"
-if test "x${build_pthreads}" = "xyes" && test "x${build_win32threads}" = "xyes" ; then
+if test "x${have_pthreads}" = "xyes" || test "x${have_win32threads}" = "xyes" ; then
+   AC_DEFINE([BUILD_THREAD], [1], [Build Thread Support])
    build_threads="yes"
+fi
+
+build_multi_core="no"
+if test "x${build_threads}" = "xyes" && test "x${want_multi_core}" = "xyes"; then
+   AC_DEFINE([BUILD_MULTI_CORE], [1], [Build Multi Core Support])
+   build_multi_core="yes"
 fi
 
 ## OpenCL
@@ -447,7 +445,7 @@ echo "  Build RGB565_b1A3 format support..........: ${format_rgb565_b1a3}"
 echo
 echo "CPU Specific Extensions:"
 echo
-echo "  Multi Core ...............................: ${build_threads}"
+echo "  Multi Core ...............................: ${build_multi_core}"
 echo "  MMX.......................................: ${have_mmx}"
 echo "  SSE.......................................: ${have_sse}"
 echo "  SSE2......................................: ${have_sse2}"
