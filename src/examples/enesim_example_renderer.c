@@ -15,6 +15,9 @@ static Enesim_Example_Renderer_Backend backends[] = {
 #if BUILD_GLX
 	{ "glx", &enesim_example_renderer_backend_glx },
 #endif
+#if BUILD_WGL
+	{ "wgl", &enesim_example_renderer_backend_wgl },
+#endif
 #endif
 };
 

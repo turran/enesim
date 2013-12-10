@@ -12,6 +12,7 @@ $(top_builddir)/src/lib/libenesim.la \
 examples_renderer_sources = \
 src/examples/enesim_example_renderer_backend_glx.c \
 src/examples/enesim_example_renderer_backend_image.c \
+src/examples/enesim_example_renderer_backend_wgl.c \
 src/examples/enesim_example_renderer.c \
 src/examples/enesim_example_renderer.h
 

@@ -53,6 +53,11 @@ enesim_example_renderer_backend_image;
 Enesim_Example_Renderer_Backend_Interface
 enesim_example_renderer_backend_glx;
 #endif
+
+#if BUILD_WGL
+Enesim_Example_Renderer_Backend_Interface
+enesim_example_renderer_backend_wgl;
+#endif
 #endif
 
 #endif
