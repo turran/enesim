@@ -220,6 +220,12 @@ EAPI Enesim_Pool * enesim_pool_opengl_new(void)
 
 	/* initialize the opengl system */
 	enesim_opengl_init();
+	if (!GLEW_ARB_framebuffer_object)
+	{
+		//printf("no extension found\n");
+		return NULL;
+	}
+
 	glEnable(GL_TEXTURE_2D);
 
 	thiz = calloc(1, sizeof(Enesim_OpenGL_Pool));
