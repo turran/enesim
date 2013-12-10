@@ -186,6 +186,7 @@ void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data)
 void enesim_opengl_init(void)
 {
 	static int _init = 0;
+	glewExperimental = GL_TRUE;
 
 	if (++_init != 1) return;
 	glewInit();
