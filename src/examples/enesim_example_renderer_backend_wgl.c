@@ -58,6 +58,71 @@ static void wgl_display_surface(Enesim_Surface *s, Enesim_Example_Renderer_Optio
         glEnd();
 }
 
+static Eina_Bool wgl_create(HWND hwnd)
+{
+	PIXELFORMATDESCRIPTOR pfd = {};
+	int pf;
+
+	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+	pfd.nVersion = 1;
+	pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+	pfd.iPixelType = PFD_TYPE_RGBA;
+	pfd.cColorBits = 24;
+	pfd.cAlphaBits = 8;
+	pfd.cDepthBits = 32;
+	pfd.iLayerType = PFD_MAIN_PLANE;
+
+	/* get the device context for window */
+	hDC = GetDC(hwnd);
+
+	pf = ChoosePixelFormat(hDC, &pfd);
+	if (!pf)
+	{
+		return EINA_FALSE;
+	}
+
+	if (!SetPixelFormat(hDC, pf, &pfd))
+	{
+		return EINA_FALSE;
+	}
+
+	printf("hdc %p \n", hDC);
+	/* create rendering context */
+	hRC = wglCreateContext(hDC);
+	if (!hRC)
+	{
+		CHECK();
+	}
+	printf("hrc %p \n", hRC);
+	/* make rendering context current */
+	wglMakeCurrent(hDC, hRC);
+	return EINA_TRUE;
+}
+
+static void wgl_destroy(void)
+{
+	printf("destroy \n");
+	wglMakeCurrent(hDC, NULL);	//deselect rendering context
+	wglDeleteContext(hRC);		//delete rendering context
+	PostQuitMessage(0);		//send wm_quit
+}
+
+static void wgl_paint(HWND hwnd)
+{
+	Enesim_Example_Renderer_Options *options;
+	Enesim_Surface *s;
+
+	printf("paint\n");
+	options = (Enesim_Example_Renderer_Options *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
+			options->width, options->height, pool);
+	enesim_example_renderer_draw(hR, s, options);
+	wgl_display_surface(s, options);
+	wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
+	enesim_surface_unref(s);
+	enesim_pool_unref(pool);
+}
+
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
@@ -65,31 +130,15 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 		case WM_CREATE:
-		printf("creating \n");
-		hDC = GetDC(hwnd);	//get the device context for window
-		hRC = wglCreateContext(hDC);	//create rendering context
-		wglMakeCurrent(hDC,hRC);	//make rendering context current
+		wgl_create(hwnd);
 		break;
 
-		case WM_PAINT:{
-		Enesim_Example_Renderer_Options *options;
-		Enesim_Surface *s;
-
-		options = (Enesim_Example_Renderer_Options *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-		s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
-				options->width, options->height, pool);
-		enesim_example_renderer_draw(hR, s, options);
-		wgl_display_surface(s, options);
-		wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
-		enesim_surface_unref(s);
-		enesim_pool_unref(pool);
-		}break;
+		case WM_PAINT:
+		wgl_paint(hwnd);
+		break;
 		
 		case WM_DESTROY:
-		printf("destroy \n");
-		wglMakeCurrent(hDC,NULL);	//deselect rendering context
-		wglDeleteContext(hRC);		//delete rendering context
-		PostQuitMessage(0);		//send wm_quit
+		wgl_destroy();
 		break;
 
 		default:
@@ -153,8 +202,9 @@ static void wgl_run(Enesim_Renderer *r,
 	printf("running ...\n");
 
 	pool = enesim_pool_opengl_new();
-	if (!pool)
+	if (!pool) return;
 
+	printf("we have the pool\n");
 	/* set our renderer */
 	hR = r;
 
