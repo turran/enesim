@@ -35,6 +35,8 @@
 #include "enesim_pool_private.h"
 #include "enesim_buffer_private.h"
 
+#define ENESIM_LOG_DEFAULT enesim_log_pool
+
 /**
  * @todo
  * - Create as many textures as we need to create the desired surface
@@ -222,7 +224,7 @@ EAPI Enesim_Pool * enesim_pool_opengl_new(void)
 	enesim_opengl_init();
 	if (!GLEW_ARB_framebuffer_object)
 	{
-		//printf("no extension found\n");
+		ERR("No ARB_framebuffer_object extension found");
 		return NULL;
 	}
 
