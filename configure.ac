@@ -262,6 +262,7 @@ if test "x${have_glx}" = "xyes" && test "x${want_glx}" = "xyes"; then
 else
   build_glx="no"
 fi
+AM_CONDITIONAL([BUILD_GLX], [test "x${build_glx}" = "xyes"])
 
 # WGL
 if test "x${want_wgl}" = "xyes"; then
@@ -270,6 +271,7 @@ if test "x${want_wgl}" = "xyes"; then
 else
   build_wgl="no"
 fi
+AM_CONDITIONAL([BUILD_WGL], [test "x${build_wgl}" = "xyes"])
 
 # Pthreads
 AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])

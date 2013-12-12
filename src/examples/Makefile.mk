@@ -9,6 +9,10 @@ examples_LDADD = \
 $(top_builddir)/src/lib/libenesim.la \
 @ENESIM_LIBS@
 
+if BUILD_WGL
+examples_LDADD += -lgdi32
+endif
+
 examples_renderer_sources = \
 src/examples/enesim_example_renderer_backend_glx.c \
 src/examples/enesim_example_renderer_backend_image.c \
