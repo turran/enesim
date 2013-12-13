@@ -337,19 +337,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		}
 	}
 setup:
-	/* do the setup */
-	if (!klass->opengl_setup) return EINA_FALSE;
-	if (!klass->opengl_setup(r, s, rop, &draw, error))
-		return EINA_FALSE;
-
-	if (!draw)
-	{
-		return EINA_FALSE;
-	}
-
-	/* FIXME we need to know if we should create, compile and link the programs
-	 * again or not .... */
-
 	/* create the fbos */
 	if (!sdata->fbo)
 	{
@@ -364,7 +351,21 @@ setup:
         if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
         {
 		ENESIM_RENDERER_LOG(r, error, "Impossible too setup the framebuffer %d", status);
+		return EINA_FALSE;
         }
+
+	/* do the setup */
+	if (!klass->opengl_setup) return EINA_FALSE;
+	if (!klass->opengl_setup(r, s, rop, &draw, error))
+		return EINA_FALSE;
+
+	if (!draw)
+	{
+		return EINA_FALSE;
+	}
+
+	/* FIXME we need to know if we should create, compile and link the programs
+	 * again or not .... */
 
 	/* store the data returned by the setup */
 	rdata->draw = draw;
