@@ -692,6 +692,14 @@ void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
 		*final_color = color;
 }
 
+Enesim_List * enesim_renderer_shape_dashes_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = ENESIM_RENDERER_SHAPE(r);
+	return enesim_list_ref(thiz->state.dashes);
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

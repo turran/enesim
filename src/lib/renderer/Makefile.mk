@@ -47,7 +47,7 @@ src/lib/renderer/enesim_renderer_line.c \
 src/lib/renderer/enesim_renderer_path.c \
 src/lib/renderer/enesim_renderer_path_abstract.c \
 src/lib/renderer/enesim_renderer_path_abstract_private.h \
-src/lib/renderer/enesim_renderer_path_enesim.c \
+src/lib/renderer/enesim_renderer_path_rasterizer.c \
 src/lib/renderer/enesim_renderer_pattern.c \
 src/lib/renderer/enesim_renderer_perlin.c \
 src/lib/renderer/enesim_renderer_proxy.c \
@@ -70,8 +70,7 @@ endif
 if BUILD_OPENGL
 src_lib_libenesim_la_SOURCES += \
 src/lib/renderer/enesim_renderer_path_nv.c \
-src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator.c \
-src/lib/renderer/enesim_renderer_path_enesim_gl_loop_blinn.c
+src/lib/renderer/enesim_renderer_path_tesselator.c
 endif
 
 EXTRA_DIST += \
@@ -83,8 +82,5 @@ src/lib/renderer/enesim_renderer_opengl_common_vertex.glsl \
 src/lib/renderer/enesim_renderer_path_silhoutte_ambient.glsl \
 src/lib/renderer/enesim_renderer_path_silhoutte_vertex.glsl \
 src/lib/renderer/enesim_renderer_rectangle.glsl \
-src/lib/renderer/enesim_renderer_stripes.glsl \
-src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator_private.h \
-src/lib/renderer/enesim_renderer_path_enesim_gl_loop_blinn_private.h \
-src/lib/renderer/enesim_renderer_path_enesim_private.h
+src/lib/renderer/enesim_renderer_stripes.glsl
 

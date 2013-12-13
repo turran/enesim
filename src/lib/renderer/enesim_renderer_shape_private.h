@@ -102,6 +102,6 @@ void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
 		Enesim_Renderer **orend);
 void enesim_renderer_shape_stroke_weight_setup(Enesim_Renderer *r,
 		double *swx, double *swy);
-
+Enesim_List * enesim_renderer_shape_dashes_get(Enesim_Renderer *r);
 #endif
 

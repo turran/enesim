@@ -15,8 +15,36 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include "enesim_renderer_path_enesim_private.h"
-#include "enesim_curve_loop_blinn_private.h"
+#include "enesim_private.h"
+#include "libargb.h"
+
+#include "enesim_main.h"
+#include "enesim_log.h"
+#include "enesim_color.h"
+#include "enesim_rectangle.h"
+#include "enesim_matrix.h"
+#include "enesim_path.h"
+#include "enesim_pool.h"
+#include "enesim_buffer.h"
+#include "enesim_surface.h"
+#include "enesim_renderer.h"
+#include "enesim_renderer_shape.h"
+#include "enesim_renderer_path.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
+
+#include "enesim_path_private.h"
+#include "enesim_list_private.h"
+#include "enesim_renderer_private.h"
+#include "enesim_renderer_shape_private.h"
+#include "enesim_renderer_path_abstract_private.h"
+#include "enesim_path_normalizer_private.h"
+
+#if BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
+#endif
 
 /* The idea is to tesselate the whole path without taking into account the
  * curves, just normalize theme to quadratic/cubic (i.e remove the arc).
@@ -24,18 +52,45 @@
  * vertex data, thus provide a simple in/out check to define the real curve
  * http://www.mdk.org.pl/2007/10/27/curvy-blues
  */
+#if BUILD_OPENGL
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#if BUILD_OPENGL
+#define ENESIM_RENDERER_PATH_LOOP_BLINN(o) ENESIM_OBJECT_INSTANCE_CHECK(o,	\
+		Enesim_Renderer_Path_Loop_Blinn,				\
+		enesim_renderer_path_loop_blinn_descriptor_get())
+
+typedef struct _Enesim_Renderer_Path_OpenGL_Loop_Blinn_Polygon
+{
+	GLenum type;
+	Enesim_Polygon *polygon;
+} Enesim_Renderer_Path_OpenGL_Loop_Blinn_Polygon;
+
+typedef struct _Enesim_Renderer_Path_OpenGL_Loop_Blinn_Path
+{
+	Eina_List *flat_polygons;
+	Eina_List *curve_polygons;
+} Enesim_Renderer_Path_OpenGL_Loop_Blinn_Path;
+
+typedef struct _Enesim_Renderer_Path_OpenGL_Loop_Blinn
+{
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Path stroke;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Path fill;
+} Enesim_Renderer_Path_OpenGL_Loop_Blinn;
+
+typedef struct _Enesim_Renderer_Path_Loop_Blinn_Class
+{
+	Enesim_Renderer_Path_Abstract_Class parent;
+} Enesim_Renderer_Path_Loop_Blinn_Class;
+
 /*----------------------------------------------------------------------------*
  *                            Tesselator callbacks                            *
  *----------------------------------------------------------------------------*/
 #if 0
 static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
 {
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *f = data;
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon *p;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Figure *f = data;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Polygon *p;
 	Enesim_Point *pt = vertex;
 	Eina_List *l;
 
@@ -67,11 +122,11 @@ static void _path_opengl_combine_cb(GLdouble coords[3],
 
 static void _path_opengl_begin_cb(GLenum which, void *data)
 {
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon *p;
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *f = data;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Polygon *p;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Figure *f = data;
 
 	/* add another polygon */
-	p = calloc(1, sizeof(Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon));
+	p = calloc(1, sizeof(Enesim_Renderer_Path_OpenGL_Loop_Blinn_Polygon));
 	p->type = which;
 	p->polygon = enesim_polygon_new();
 	f->polygons = eina_list_append(f->polygons, p);
@@ -89,7 +144,7 @@ static void _path_opengl_error_cb(GLenum err_no EINA_UNUSED, void *data EINA_UNU
 }
 
 static void _path_opengl_tesselate(
-		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *glf,
+		Enesim_Renderer_Path_OpenGL_Loop_Blinn_Figure *glf,
 		Enesim_Figure *f)
 {
 	Enesim_Polygon *p;
@@ -136,10 +191,10 @@ static void _path_opengl_tesselate(
 }
 
 static void _path_opengl_notesselate(
-		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *glf)
+		Enesim_Renderer_Path_OpenGL_Loop_Blinn_Figure *glf)
 {
 	Eina_List *l1;
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Polygon *p;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Polygon *p;
 
 	EINA_LIST_FOREACH(glf->polygons, l1, p)
 	{
@@ -158,7 +213,7 @@ static void _path_opengl_notesselate(
 
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
-		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Path *gl_path,
+		Enesim_Renderer_Path_OpenGL_Loop_Blinn_Path *gl_path,
 		Enesim_Path *path,
 		Enesim_Color color,
 		Enesim_Matrix *gm,
@@ -307,9 +362,9 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
 		int x, int y)
 {
-	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn *gl;
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Path *gl_path;
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn *gl;
+	Enesim_Renderer_Path_OpenGL_Loop_Blinn_Path *gl_path;
 	Enesim_Path *path;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_Shape_Draw_Mode dm;
@@ -347,19 +402,53 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	if (rel)
 		enesim_renderer_unref(rel);
 }
-/*============================================================================*
- *                                 Global                                     *
- *============================================================================*/
-Eina_Bool enesim_renderer_path_enesim_gl_loop_blinn_initialize(
-		int *num_programs,
-		Enesim_Renderer_OpenGL_Program ***programs)
+
+/*----------------------------------------------------------------------------*
+ *                          Path Abstract interface                           *
+ *----------------------------------------------------------------------------*/
+static void _enesim_renderer_path_loop_blinn_path_set(Enesim_Renderer *r,
+		Enesim_Path *path)
 {
-	*programs = NULL;
-	*num_programs = 0;
-	return EINA_TRUE;
+	Enesim_Renderer_Path_Loop_Blinn *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_LOOP_BLINN(r);
+	if (thiz->path != path)
+	{
+		if (thiz->path) enesim_path_unref(thiz->path);
+		thiz->path = path;
+		thiz->new_path = EINA_TRUE;
+		thiz->path_changed = EINA_TRUE;
+		thiz->generated = EINA_FALSE;
+	}
+	else
+	{
+		enesim_path_unref(path);
+	}
 }
 
-Eina_Bool enesim_renderer_path_enesim_gl_loop_blinn_setup(
+/*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static void _enesim_renderer_path_loop_blinn_shape_features_get(
+		Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Shape_Feature *features)
+{
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
+}
+
+static Eina_Bool _enesim_renderer_path_loop_blinn_has_changed(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Path_Loop_Blinn *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_LOOP_BLINN(r);
+	if (thiz->new_path || thiz->path_changed || (thiz->path && thiz->path->changed) || (thiz->dashes_changed))
+		return EINA_TRUE;
+	else
+		return EINA_FALSE;
+}
+
+static Eina_Bool _enesim_renderer_path_loop_blinn_opengl_setup(
 		Enesim_Renderer *r,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l EINA_UNUSED)
@@ -383,5 +472,90 @@ Eina_Bool enesim_renderer_path_enesim_gl_loop_blinn_setup(
 
 	return EINA_TRUE;
 }
-#endif
 
+static void _enesim_renderer_path_loop_blinn_opengl_cleanup(Enesim_Renderer *r,
+		Enesim_Surface *s EINA_UNUSED)
+{
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static const char * _enesim_renderer_path_loop_blinn_name(
+		Enesim_Renderer *r EINA_UNUSED)
+{
+	return "enesim_path_loop_blinn";
+}
+
+static void _enesim_renderer_path_loop_blinn_features_get(
+		Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
+{
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
+}
+
+static Eina_Bool _enesim_renderer_path_loop_blinn_opengl_initialize(
+		Enesim_Renderer *r EINA_UNUSED,
+		int *num_programs EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Program ***programs EINA_UNUSED)
+{
+	return EINA_TRUE;
+}
+
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR,
+		Enesim_Renderer_Path_Loop_Blinn, Enesim_Renderer_Path_Loop_Blinn_Class,
+		enesim_renderer_path_loop_blinn);
+
+static void _enesim_renderer_path_loop_blinn_class_init(void *k)
+{
+	Enesim_Renderer_Path_Abstract_Class *klass;
+	Enesim_Renderer_Shape_Class *s_klass;
+	Enesim_Renderer_Class *r_klass;
+
+	r_klass = ENESIM_RENDERER_CLASS(k);
+	r_klass->base_name_get = _enesim_renderer_path_loop_blinn_name;
+	r_klass->bounds_get = _enesim_renderer_path_loop_blinn_bounds_get;
+	r_klass->features_get = _enesim_renderer_path_loop_blinn_features_get;
+	r_klass->opengl_initialize = _enesim_renderer_path_loop_blinn_opengl_initialize;
+
+	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	s_klass->features_get = _enesim_renderer_path_loop_blinn_shape_features_get;
+	s_klass->has_changed = _enesim_renderer_path_loop_blinn_has_changed;
+	s_klass->opengl_setup = _enesim_renderer_path_loop_blinn_opengl_setup;
+	s_klass->opengl_cleanup = _enesim_renderer_path_loop_blinn_opengl_cleanup;
+
+	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
+	klass->path_set = _enesim_renderer_path_loop_blinn_path_set;
+	klass->is_available = _enesim_renderer_path_is_available;
+}
+
+static void _enesim_renderer_path_loop_blinn_instance_init(void *o EINA_UNUSED)
+{
+}
+
+static void _enesim_renderer_path_loop_blinn_instance_deinit(void *o)
+{
+	Enesim_Renderer_Path_Loop_Blinn *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_LOOP_BLINN(o);
+}
+#endif
+/*============================================================================*
+ *                                 Global                                     *
+ *============================================================================*/
+Enesim_Renderer * enesim_renderer_path_loop_blinn_new(void)
+{
+#if BUILD_OPENGL
+	Enesim_Renderer *r;
+
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_path_loop_blinn);
+	return r;
+#else
+	return NULL;
+#endif
+}

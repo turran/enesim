@@ -18,6 +18,11 @@
 #ifndef ENESIM_RENDERER_PATH_ABSTRACT_H
 #define ENESIM_RENDERER_PATH_ABSTRACT_H
 
+#include "enesim_path_private.h"
+#include "enesim_vector_private.h"
+#include "enesim_curve_private.h"
+#include "enesim_path_generator_private.h"
+
 #define ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR 				\
 		enesim_renderer_path_abstract_descriptor_get()
 #define ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k,	\
@@ -34,6 +39,23 @@
 typedef struct _Enesim_Renderer_Path_Abstract
 {
 	Enesim_Renderer_Shape parent;
+	/* some common helpers */
+	Enesim_Path *path;
+	Enesim_Path_Generator *stroke_path;
+	Enesim_Path_Generator *strokeless_path;
+	Enesim_Path_Generator *dashed_path;
+	Enesim_Figure *fill_figure;
+	Enesim_Figure *stroke_figure;
+	/* external properties that require a path generation */
+	Enesim_Matrix last_matrix;
+	Enesim_Renderer_Shape_Stroke_Join last_join;
+	Enesim_Renderer_Shape_Stroke_Cap last_cap;
+	double last_stroke_weight;
+	Eina_Bool changed : 1;
+	Eina_Bool path_changed : 1;
+	Eina_Bool dashes_changed : 1;
+	Eina_Bool generated : 1;
+	Eina_Bool stroke_figure_used : 1;
 } Enesim_Renderer_Path_Abstract;
 
 typedef void (*Enesim_Renderer_Path_Abstract_Path_Set_Cb)(Enesim_Renderer *r, Enesim_Path *path);
@@ -48,6 +70,9 @@ typedef struct _Enesim_Renderer_Path_Abstract_Class {
 Enesim_Object_Descriptor * enesim_renderer_path_abstract_descriptor_get(void);
 void enesim_renderer_path_abstract_path_set(Enesim_Renderer *r, Enesim_Path *path);
 Eina_Bool enesim_renderer_path_abstract_is_available(Enesim_Renderer *r);
+void enesim_renderer_path_abstract_generate(Enesim_Renderer *r);
+Eina_Bool enesim_renderer_path_abstract_needs_generate(Enesim_Renderer *r);
+void enesim_renderer_path_abstract_cleanup(Enesim_Renderer *r);
 
 /* abstract implementations */
 Enesim_Renderer * enesim_renderer_path_enesim_new(void);

@@ -1,5 +1,8 @@
 Enesim
 ======
++ Make the opengl_init return TRUE/FALSE
++ Pass the surface when checking for bounds, this allows to know what renderer to use
+  on the destination surface
 + Add a BOOL return on the bounds get
 + Use the decasteljau algo on the path normalizer
 + Split the path generator into their own functions/files
