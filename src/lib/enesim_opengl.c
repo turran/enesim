@@ -142,9 +142,11 @@ Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y)
 		backend_data = enesim_surface_backend_data_get(s);
 
 		/* sets the texture and projection matrix */
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(-x, w + x, -y, h + y, -1, 1);
+		glOrtho(-x, w + x, h + y, -y, -1, 1);
 
 		/* sets the fbo as the destination buffer */
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, backend_data->fbo);

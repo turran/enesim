@@ -72,24 +72,15 @@ void enesim_renderer_path_abstract_path_set(Enesim_Renderer *r,
 	klass->path_set(r, path);
 }
 
-#if 0
-void enesim_renderer_path_abstract_state_set(Enesim_Renderer *r, const Enesim_Renderer_State *state)
+Eina_Bool enesim_renderer_path_abstract_is_available(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Path_Abstract *thiz;
+	Enesim_Renderer_Path_Abstract_Class *klass;
 
-	thiz = _path_abstract_get(r);
-	thiz->state_set(r, state);
+	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS_GET(r);
+	if (klass->is_available)
+		return klass->is_available(r);
+	else return EINA_TRUE;
 }
-
-void enesim_renderer_path_abstract_shape_state_set(Enesim_Renderer *r,
-		const Enesim_Renderer_Shape_State *state)
-{
-	Enesim_Renderer_Path_Abstract *thiz;
-
-	thiz = _path_abstract_get(r);
-	thiz->shape_state_set(r, state);
-}
-#endif
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

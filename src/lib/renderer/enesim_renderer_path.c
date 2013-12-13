@@ -44,8 +44,6 @@
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_path_abstract_private.h"
 
-/* TODO later we need to use the priority system to choose the backend */
-#define CHOOSE_CAIRO 0
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -61,10 +59,7 @@ typedef struct _Enesim_Renderer_Path
 	/* properties */
 	Enesim_Path *path;
 	/* private */
-	Enesim_Renderer *enesim;
-#if BUILD_CAIRO
-	Enesim_Renderer *cairo;
-#endif
+	Eina_List *abstracts;
 	Enesim_Renderer *current;
 } Enesim_Renderer_Path;
 
@@ -72,26 +67,24 @@ typedef struct _Enesim_Renderer_Path_Class {
 	Enesim_Renderer_Shape_Class parent;
 } Enesim_Renderer_Path_Class;
 
-static Enesim_Renderer * _path_implementation_get(Enesim_Renderer *r)
+static Eina_Bool _enesim_renderer_path_is_valid(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+{
+	if (!enesim_renderer_path_abstract_is_available(r))
+		return EINA_FALSE;
+	return EINA_TRUE;
+}
+
+static void _enesim_renderer_path_propagate(Enesim_Renderer *r, Enesim_Renderer *abstract)
 {
 	Enesim_Renderer_Path *thiz;
-	Enesim_Renderer *ret;
 
 	thiz = ENESIM_RENDERER_PATH(r);
-	/* TODO get the best implementation for such properties and features */
-#if CHOOSE_CAIRO
-	ret = thiz->cairo;
-#else
-	ret = thiz->enesim;
-#endif
-
 	/* propagate all the shape properties */
-	enesim_renderer_shape_propagate(r, ret);
+	enesim_renderer_shape_propagate(r, abstract);
 	/* propagate all the renderer properties */
-	enesim_renderer_propagate(r, ret);
+	enesim_renderer_propagate(r, abstract);
 	/* set the commands */
-	enesim_renderer_path_abstract_path_set(ret, enesim_path_ref(thiz->path));
-	return ret;
+	enesim_renderer_path_abstract_path_set(abstract, enesim_path_ref(thiz->path));
 }
 
 static void _path_span(Enesim_Renderer *r, int x, int y, int len, void *ddata)
@@ -114,19 +107,26 @@ static void _path_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Enesim_Log **l)
+		Enesim_Rop rop, Enesim_Log **log)
 {
 	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer *abstract;
+	Eina_List *l;
 
 	thiz = ENESIM_RENDERER_PATH(r);
-	thiz->current = _path_implementation_get(r);
+	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
+	{
+		if (!_enesim_renderer_path_is_valid(abstract, s))
+			continue;
+		_enesim_renderer_path_propagate(r, abstract);
+		if (!enesim_renderer_setup(abstract, s, rop, log))
+			continue;
+		thiz->current = abstract;
+		break;
+	}
 	if (!thiz->current)
 	{
-		ENESIM_RENDERER_LOG(r, l, "No path implementation found");
-		return EINA_FALSE;
-	}
-	if (!enesim_renderer_setup(thiz->current, s, rop, l))
-	{
+		ENESIM_RENDERER_LOG(r, log, "No path implementation found");
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
@@ -153,10 +153,15 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static void _path_shape_features_get(Enesim_Renderer *r,
 		Enesim_Renderer_Shape_Feature *features)
 {
-	Enesim_Renderer *current;
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer *abstract;
+	Eina_List *l;
 
-	current = _path_implementation_get(r);
-	*features = enesim_renderer_shape_features_get(current);
+	thiz = ENESIM_RENDERER_PATH(r);
+	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
+	{
+		*features |= enesim_renderer_shape_features_get(abstract);
+	}
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -169,38 +174,41 @@ static const char * _path_name_get(Enesim_Renderer *r EINA_UNUSED)
 static void _path_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
-	Enesim_Renderer *current;
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer *abstract;
+	Eina_List *l;
 
-	current = _path_implementation_get(r);
-	enesim_renderer_bounds_get(current, bounds);
+	thiz = ENESIM_RENDERER_PATH(r);
+	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
+	{
+		if (!_enesim_renderer_path_is_valid(abstract, NULL))
+			continue;
+		_enesim_renderer_path_propagate(r, abstract);
+		enesim_renderer_bounds_get(abstract, bounds);
+	}
 }
 
 static void _path_features_get(Enesim_Renderer *r,
 		Enesim_Renderer_Feature *features)
 {
-	Enesim_Renderer *current;
+	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer *abstract;
+	Eina_List *l;
 
-	current = _path_implementation_get(r);
-	*features = enesim_renderer_features_get(current);
-}
-
-
-static Eina_Bool _path_damages_get(Enesim_Renderer *r,
-		const Eina_Rectangle *old_bounds EINA_UNUSED,
-		Enesim_Renderer_Damage_Cb cb, void *data)
-{
-	Enesim_Renderer *current;
-
-	current = _path_implementation_get(r);
-	return enesim_renderer_damages_get(current, cb, data);
+	thiz = ENESIM_RENDERER_PATH(r);
+	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
+	{
+		*features |= enesim_renderer_features_get(abstract);
+	}
 }
 
 static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 {
-	Enesim_Renderer *current;
+	Enesim_Renderer_Path *thiz;
 
-	current = _path_implementation_get(r);
-	return enesim_renderer_has_changed(current);
+	thiz = ENESIM_RENDERER_PATH(r);
+	/* only check if our path has changed, there is no other property */
+	return thiz->path->changed;
 }
 
 static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED, Enesim_Rop rop
@@ -209,7 +217,8 @@ static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED, Enesim_Rop rop
 	/* we always use the implementation renderer for drawing
 	 * so mark every hint
 	 */
-	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK | ENESIM_RENDERER_HINT_COLORIZE;
+	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK |
+			ENESIM_RENDERER_HINT_COLORIZE;
 }
 
 
@@ -272,7 +281,6 @@ static void _enesim_renderer_path_class_init(void *k)
 	klass->base_name_get = _path_name_get;
 	klass->bounds_get = _path_bounds_get;
 	klass->features_get = _path_features_get;
-	klass->damages_get = _path_damages_get;
 	klass->has_changed = _path_has_changed;
 
 	klass->sw_hints_get = _path_sw_hints;
@@ -287,28 +295,27 @@ static void _enesim_renderer_path_class_init(void *k)
 static void _enesim_renderer_path_instance_init(void *o)
 {
 	Enesim_Renderer_Path *thiz;
-	Enesim_Renderer *r;
 
 	thiz = ENESIM_RENDERER_PATH(o);
-	r = enesim_renderer_path_enesim_new();
-	thiz->enesim = r;
-#if BUILD_CAIRO
-	r = enesim_renderer_path_cairo_new();
-	thiz->cairo = r;
-#endif
-
 	thiz->path = enesim_path_new();
+	/* create the abstracts */
+#if BUILD_OPENGL
+	thiz->abstracts = eina_list_append(thiz->abstracts, enesim_renderer_path_nv_new());
+#endif
+	thiz->abstracts = eina_list_append(thiz->abstracts, enesim_renderer_path_enesim_new());
+#if BUILD_CAIRO
+	thiz->abstracts = eina_list_append(thiz->abstracts, enesim_renderer_path_cairo_new());
+#endif
 }
 
 static void _enesim_renderer_path_instance_deinit(void *o)
 {
 	Enesim_Renderer_Path *thiz;
+	Enesim_Renderer *abstract;
 
 	thiz = ENESIM_RENDERER_PATH(o);
-	enesim_renderer_unref(thiz->enesim);
-#if BUILD_CAIRO
-	enesim_renderer_unref(thiz->cairo);
-#endif
+	EINA_LIST_FREE(thiz->abstracts, abstract)
+		enesim_renderer_unref(abstract);
 	enesim_path_unref(thiz->path);
 }
 /*============================================================================*

@@ -644,12 +644,13 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 }
 
 void enesim_renderer_shape_stroke_setup(Enesim_Renderer *r,
-		Enesim_Color color,
 		Enesim_Color *final_color,
 		Enesim_Renderer **orend)
 {
 	Enesim_Color scolor;
+	Enesim_Color color;
 
+	color = enesim_renderer_color_get(r);
 	scolor = enesim_renderer_shape_stroke_color_get(r);
 	*orend = enesim_renderer_shape_stroke_renderer_get(r);
 	/* multiply the color */
@@ -675,12 +676,13 @@ void enesim_renderer_shape_stroke_weight_setup(Enesim_Renderer *r,
 }
 
 void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
-		Enesim_Color color,
 		Enesim_Color *final_color,
 		Enesim_Renderer **orend)
 {
 	Enesim_Color fcolor;
+	Enesim_Color color;
 
+	color = enesim_renderer_color_get(r);
 	fcolor = enesim_renderer_shape_fill_color_get(r);
 	*orend = enesim_renderer_shape_fill_renderer_get(r);
 	/* multiply the color */

@@ -1,5 +1,6 @@
 Enesim
 ======
++ Add a BOOL return on the bounds get
 + Use the decasteljau algo on the path normalizer
 + Split the path generator into their own functions/files
 + Fix the pattern setup functions, the draw part

@@ -69,6 +69,7 @@ endif
 
 if BUILD_OPENGL
 src_lib_libenesim_la_SOURCES += \
+src/lib/renderer/enesim_renderer_path_nv.c \
 src/lib/renderer/enesim_renderer_path_enesim_gl_tesselator.c \
 src/lib/renderer/enesim_renderer_path_enesim_gl_loop_blinn.c
 endif

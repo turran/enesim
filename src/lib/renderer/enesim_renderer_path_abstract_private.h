@@ -36,23 +36,24 @@ typedef struct _Enesim_Renderer_Path_Abstract
 	Enesim_Renderer_Shape parent;
 } Enesim_Renderer_Path_Abstract;
 
-/* TODO Rename the commands and pass the path directly, so we can track a change */
 typedef void (*Enesim_Renderer_Path_Abstract_Path_Set_Cb)(Enesim_Renderer *r, Enesim_Path *path);
-typedef void (*Enesim_Renderer_Path_Abstract_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_State *state);
-typedef void (*Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb)(Enesim_Renderer *r, const Enesim_Renderer_Shape_State *state);
+typedef Eina_Bool (*Enesim_Renderer_Path_Abstract_Is_Available_Cb)(Enesim_Renderer *r);
 
 typedef struct _Enesim_Renderer_Path_Abstract_Class {
 	Enesim_Renderer_Shape_Class parent;
 	Enesim_Renderer_Path_Abstract_Path_Set_Cb path_set;
-	Enesim_Renderer_Path_Abstract_Shape_State_Set_Cb shape_state_set;
-	Enesim_Renderer_Path_Abstract_State_Set_Cb state_set;
+	Enesim_Renderer_Path_Abstract_Is_Available_Cb is_available;
 } Enesim_Renderer_Path_Abstract_Class;
 
 Enesim_Object_Descriptor * enesim_renderer_path_abstract_descriptor_get(void);
 void enesim_renderer_path_abstract_path_set(Enesim_Renderer *r, Enesim_Path *path);
+Eina_Bool enesim_renderer_path_abstract_is_available(Enesim_Renderer *r);
 
 /* abstract implementations */
 Enesim_Renderer * enesim_renderer_path_enesim_new(void);
+#if BUILD_OPENGL
+Enesim_Renderer * enesim_renderer_path_nv_new(void);
+#endif
 #if BUILD_CAIRO
 Enesim_Renderer * enesim_renderer_path_cairo_new(void);
 #endif

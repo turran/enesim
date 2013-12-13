@@ -430,7 +430,6 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Figure *f;
-	Enesim_Color color;
 	Enesim_Color final_color;
 	GLint viewport[4];
 	GLenum texture;
@@ -443,18 +442,17 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
 	dm = enesim_renderer_shape_draw_mode_get(r);
-	color = enesim_renderer_color_get(r);
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		gf = &gl->stroke;
 		f = thiz->stroke_figure;
-		enesim_renderer_shape_stroke_setup(r, color, &final_color, &rel);
+		enesim_renderer_shape_stroke_setup(r, &final_color, &rel);
 	}
 	else
 	{
 		gf = &gl->fill;
 		f = thiz->fill_figure;
-		enesim_renderer_shape_fill_setup(r, color, &final_color, &rel);
+		enesim_renderer_shape_fill_setup(r, &final_color, &rel);
 	}
 
 	/* create the texture */
@@ -515,7 +513,6 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_OpenGL_Compiled_Program *cp;
 	Enesim_Renderer *rel;
-	Enesim_Color color;
 	Enesim_Color final_color;
 	GLenum textures[2];
 	GLint viewport[4];
@@ -533,18 +530,17 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	/* create the stroke texture */
 	textures[1] = enesim_opengl_texture_new(area->w, area->h);
 
-	color = enesim_renderer_color_get(r);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glViewport(0, 0, area->w, area->h);
 
 	/* draw the fill into the newly created buffer */
-	enesim_renderer_shape_fill_setup(r, color, &final_color, &rel);
+	enesim_renderer_shape_fill_setup(r, &final_color, &rel);
 	_path_opengl_figure_draw(sdata->fbo, textures[0], &gl->fill,
 			thiz->fill_figure, final_color, rel, rdata, EINA_FALSE, area);
 	if (rel) enesim_renderer_unref(rel);
 
 	/* draw the stroke into the newly created buffer */
-	enesim_renderer_shape_stroke_setup(r, color, &final_color, &rel);
+	enesim_renderer_shape_stroke_setup(r, &final_color, &rel);
 	/* FIXME this one is slow but only after the other */
 	_path_opengl_figure_draw(sdata->fbo, textures[1], &gl->stroke,
 			thiz->stroke_figure, final_color, rel, rdata, EINA_TRUE, area);

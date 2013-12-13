@@ -95,11 +95,9 @@ const Enesim_Renderer_Shape_State * enesim_renderer_shape_state_get(
 void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *to);
 
 void enesim_renderer_shape_stroke_setup(Enesim_Renderer *r,
-		Enesim_Color color,
 		Enesim_Color *final_color,
 		Enesim_Renderer **orend);
 void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
-		Enesim_Color color,
 		Enesim_Color *final_color,
 		Enesim_Renderer **orend);
 void enesim_renderer_shape_stroke_weight_setup(Enesim_Renderer *r,
