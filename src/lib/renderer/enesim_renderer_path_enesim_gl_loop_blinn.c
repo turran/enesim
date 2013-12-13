@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_renderer_path_enesim_private.h"
+#include "enesim_curve_loop_blinn_private.h"
 
 /* The idea is to tesselate the whole path without taking into account the
  * curves, just normalize theme to quadratic/cubic (i.e remove the arc).
@@ -157,27 +158,143 @@ static void _path_opengl_notesselate(
 
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLenum texture,
-		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *gf,
-		Enesim_Figure *f,
+		Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Path *gl_path,
+		Enesim_Path *path,
 		Enesim_Color color,
+		Enesim_Matrix *gm,
 		Enesim_Renderer *rel EINA_UNUSED,
 		Enesim_Renderer_OpenGL_Data *rdata,
-		Eina_Bool silhoutte,
 		const Eina_Rectangle *area)
 {
-	/* check if we need to tesselate again */
-	if (gf->needs_tesselate)
+	Enesim_Path_Command *cmd;
+	Enesim_Path_Command_Line_To line_to;
+	Enesim_Path_Command_Move_To move_to;
+	Enesim_Path_Command_Cubic_To cubic_to;
+	Enesim_Path_Command_Scubic_To scubic_to;
+	Enesim_Path_Command_Quadratic_To quadratic_to;
+	Enesim_Path_Command_Squadratic_To squadratic_to;
+	Enesim_Path_Command_Arc_To arc_to;
+	Enesim_Path_Command_Close close;
+	Enesim_Path_Cubic cubic;
+	Enesim_Curve_Loop_Blinn_Classification classification;
+	Eina_List *l;
+	double last_x = 0, last_y = 0;
+
+	/* normalize the path using loop&blinn functions */
+	EINA_LIST_FOREACH(path->commands, l, cmd)
 	{
-		/* we first draw the non-curves shape */
-		_path_opengl_tesselate(gf, f);
-		/* now the curvy shape */
+		double x, y;
+		double rx;
+		double ry;
+		double ctrl_x0;
+		double ctrl_y0;
+		double ctrl_x1;
+		double ctrl_y1;
+	
+		switch (cmd->type)
+		{
+			case ENESIM_PATH_COMMAND_MOVE_TO:
+			x = cmd->definition.move_to.x;
+			y = cmd->definition.move_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			last_x = x;
+			last_y = y;
+			break;
+
+			case ENESIM_PATH_COMMAND_LINE_TO:
+			x = cmd->definition.line_to.x;
+			y = cmd->definition.line_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			last_x = x;
+			last_y = y;
+			break;
+
+#if 0
+			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
+			x = cmd->definition.quadratic_to.x;
+			y = cmd->definition.quadratic_to.y;
+			ctrl_x0 = cmd->definition.quadratic_to.ctrl_x;
+			ctrl_y0 = cmd->definition.quadratic_to.ctrl_y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+			break;
+
+			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
+			x = scale_x * cmd->definition.squadratic_to.x;
+			y = scale_y * cmd->definition.squadratic_to.y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_path_command_squadratic_to_values_from(&squadratic_to, x, y);
+			enesim_path_normalizer_squadratic_to(normalizer, &squadratic_to);
+			break;
+#endif
+			case ENESIM_PATH_COMMAND_CUBIC_TO:
+			x = cmd->definition.cubic_to.x;
+			y = cmd->definition.cubic_to.y;
+			ctrl_x0 = cmd->definition.cubic_to.ctrl_x0;
+			ctrl_y0 = cmd->definition.cubic_to.ctrl_y0;
+			ctrl_x1 = cmd->definition.cubic_to.ctrl_x1;
+			ctrl_y1 = cmd->definition.cubic_to.ctrl_y1;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+			enesim_matrix_point_transform(gm, ctrl_x1, ctrl_y1, &ctrl_x1, &ctrl_y1);
+			cubic.start_x = last_x; cubic.start_y = last_y;
+			cubic.ctrl_x0 = ctrl_x0; cubic.ctrl_y0 = ctrl_y0;
+			cubic.ctrl_x1 = ctrl_x1; cubic.ctrl_y1 = ctrl_y1;
+			cubic.end_x = x; cubic.end_y = y;
+			enesim_curve_loop_blinn_classify(&cubic, 0.0000001, &classification);
+			printf("curve of type %d\n", classification.type);
+			break;
+
+#if 0
+			case ENESIM_PATH_COMMAND_SCUBIC_TO:
+			x = scale_x * cmd->definition.scubic_to.x;
+			y = scale_y * cmd->definition.scubic_to.y;
+			ctrl_x0 = scale_x * cmd->definition.scubic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->definition.scubic_to.ctrl_y;
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_path_command_scubic_to_values_from(&scubic_to, x, y, ctrl_x0, ctrl_y0);
+			enesim_path_normalizer_scubic_to(normalizer, &scubic_to);
+			break;
+
+			case ENESIM_PATH_COMMAND_ARC_TO:
+			x = scale_x * cmd->definition.arc_to.x;
+			y = scale_y * cmd->definition.arc_to.y;
+			rx = scale_x * cmd->definition.arc_to.rx;
+			ry = scale_y * cmd->definition.arc_to.ry;
+			ca = cos(cmd->definition.arc_to.angle * M_PI / 180.0);
+			sa = sin(cmd->definition.arc_to.angle * M_PI / 180.0);
+
+			enesim_matrix_point_transform(gm, x, y, &x, &y);
+			rx = rx * hypot((ca * gm->xx) + (sa * gm->xy), (ca * gm->yx) + (sa * gm->yy));
+			ry = ry * hypot((ca * gm->xy) - (sa * gm->xx), (ca * gm->yy) - (sa * gm->yx));
+			ca = atan2((ca * gm->yx) + (sa * gm->yy), (ca * gm->xx) + (sa * gm->xy));
+
+			x = ((int) (2*x + 0.5)) / 2.0;
+			y = ((int) (2*y + 0.5)) / 2.0;
+			enesim_path_command_arc_to_values_from(&arc_to, rx, ry, ca * 180.0 / M_PI,
+					x, y, cmd->definition.arc_to.large,
+					cmd->definition.arc_to.sweep);
+			enesim_path_normalizer_arc_to(normalizer, &arc_to);
+			break;
+
+			case ENESIM_PATH_COMMAND_CLOSE:
+			close.close = cmd->definition.close.close;
+			enesim_path_normalizer_close(normalizer, &close);
+			break;
+#endif
+			default:
+			break;
+		}
 	}
-	/* if not, just use the cached vertices */
-	else
-	{
-		_path_opengl_notesselate(gf);
-	}
-	/* finally merge */
 }
 
 static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
@@ -192,36 +309,43 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn *gl;
-	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Figure *gf;
+	Enesim_Renderer_Path_Enesim_OpenGL_Loop_Blinn_Path *gl_path;
+	Enesim_Path *path;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	Enesim_Renderer *rel;
 	Enesim_Buffer_OpenGL_Data *sdata;
-	Enesim_Color final_color;
+	Enesim_Color final_color, color;
+	Enesim_Matrix m;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-	gl = &thiz->gl;
+	gl = &thiz->loop_blinn;
 
-#if 0
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	sdata = enesim_surface_backend_data_get(s);
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	enesim_renderer_transformation_get(r, &m);
+
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
-		gf = &gl->stroke;
-		f = thiz->stroke_figure;
-		enesim_renderer_shape_stroke_setup(r, color, &final_color, &rel);
+		printf("stroke\n");
+		gl_path = &gl->stroke;
+		path = thiz->path;
+		enesim_renderer_shape_stroke_setup(r, &final_color, &rel);
 	}
 	else
 	{
-		gf = &gl->fill;
-		f = thiz->fill_figure;
-		enesim_renderer_shape_fill_setup(r, color, &final_color, &rel);
+		printf("fill\n");
+		gl_path = &gl->fill;
+		path = thiz->path;
+		enesim_renderer_shape_fill_setup(r, &final_color, &rel);
 	}
 
 	/* render there */
-	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color, rel, rdata, EINA_TRUE, area);
+	_path_opengl_figure_draw(sdata->fbo, sdata->textures[0], gl_path, path, final_color, &m, rel, rdata, area);
 
 	if (rel)
 		enesim_renderer_unref(rel);
-#endif
 }
 /*============================================================================*
  *                                 Global                                     *
