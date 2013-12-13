@@ -484,6 +484,8 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
 	Enesim_Renderer_Path_Nv *thiz;
+	Enesim_Matrix m;
+	Enesim_Matrix_Type type;
 	GLenum err;
 	float fbounds[4];
 	
@@ -510,6 +512,21 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 	bounds->y = fbounds[1];
 	bounds->w = fbounds[2] - bounds->x;
 	bounds->h = fbounds[3] - bounds->y;
+
+	/* now transform */
+	enesim_renderer_transformation_get(r, &m);
+	type = enesim_renderer_transformation_type_get(r);
+
+#if 0
+	/* transform the bounds */
+	if (type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Quad q;
+
+		enesim_matrix_rectangle_transform(&m, bounds, &q);
+		enesim_quad_rectangle_to(&q, bounds);
+	}
+#endif
 	return;
 
 failed:
