@@ -86,6 +86,7 @@ typedef struct _Enesim_Renderer_Path_Tesselator_Figure
 
 typedef struct _Enesim_Renderer_Path_Tesselator
 {
+	Enesim_Renderer_Path_Abstract parent;
 	Enesim_Renderer_Path_Tesselator_Figure stroke;
 	Enesim_Renderer_Path_Tesselator_Figure fill;
 } Enesim_Renderer_Path_Tesselator;

@@ -78,6 +78,7 @@ void enesim_renderer_path_abstract_cleanup(Enesim_Renderer *r);
 Enesim_Renderer * enesim_renderer_path_enesim_new(void);
 #if BUILD_OPENGL
 Enesim_Renderer * enesim_renderer_path_nv_new(void);
+Enesim_Renderer * enesim_renderer_path_tesselator_new(void);
 #endif
 #if BUILD_CAIRO
 Enesim_Renderer * enesim_renderer_path_cairo_new(void);
