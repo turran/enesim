@@ -114,13 +114,20 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	Eina_List *l;
 
 	thiz = ENESIM_RENDERER_PATH(r);
+	thiz->current = NULL;
 	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
 	{
 		if (!_enesim_renderer_path_is_valid(abstract, s))
+		{
+			INF("Abstract '%s' is not valid", enesim_renderer_name_get(abstract));
 			continue;
+		}
 		_enesim_renderer_path_propagate(r, abstract);
 		if (!enesim_renderer_setup(abstract, s, rop, log))
+		{
+			INF("Abstract '%s' failed on the setup", enesim_renderer_name_get(abstract));
 			continue;
+		}
 		thiz->current = abstract;
 		break;
 	}
