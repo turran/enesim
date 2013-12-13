@@ -66,13 +66,14 @@
 typedef struct _Enesim_Renderer_Path_Nv
 {
 	Enesim_Renderer_Path_Abstract parent;
-	GLuint path_id;
 	Enesim_Path *path;
+	GLuint path_id;
+	GLuint sb;
+	int last_w, last_h;
 	Eina_Bool dashes_changed;
 	Eina_Bool path_changed;
 	Eina_Bool new_path;
 	Eina_Bool generated;
-	
 } Enesim_Renderer_Path_Nv;
 
 typedef struct _Enesim_Renderer_Path_Nv_Class
@@ -85,13 +86,28 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		int x, int y)
 {
 	Enesim_Renderer_Path_Nv *thiz;
+	Enesim_Renderer_Shape_Draw_Mode draw_mode;
 	Enesim_Matrix m;
 	GLfloat fm[16];
+	GLenum status;
 
 	thiz = ENESIM_RENDERER_PATH_NV(r);
 
+	/* attach the stencil buffer on the framebuffer */
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, thiz->sb);
+	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+	{
+		ERR("The framebuffer failed %d", status);
+		return;
+	}
+
 	enesim_opengl_target_surface_set(s, x, y);
 	enesim_opengl_rop_set(rop);
+
+	glClearStencil(0);
+	glStencilMask(~0);
+	glClear(GL_STENCIL_BUFFER_BIT);
 
 	/* add our own transformation matrix */
 	enesim_renderer_transformation_get(r, &m);
@@ -102,16 +118,14 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	glMatrixMode(GL_PROJECTION);
 	glMultMatrixf(fm);
 
+	draw_mode = enesim_renderer_shape_draw_mode_get(r);
+
 	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
+	glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
-	glClearStencil(0);
-	glStencilMask(~0);
-	glClear(GL_STENCIL_BUFFER_BIT);
-
 	/* fill */
-	if (enesim_renderer_shape_draw_mode_get(r) & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
 		Enesim_Color final_color;
 		Enesim_Renderer *ren;
@@ -120,7 +134,8 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		/* TODO use the renderer */
 		if (ren) enesim_renderer_unref(ren);
 
-		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0x1F); 
+		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
+
 		glColor4f(argb8888_red_get(final_color) / 255.0,
 			argb8888_green_get(final_color) / 255.0,
 			argb8888_blue_get(final_color) / 255.0,
@@ -129,7 +144,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	}
 
 	/* stroke */
-	if (enesim_renderer_shape_draw_mode_get(r) & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		Enesim_Color final_color;
 		Enesim_Renderer *ren;
@@ -145,7 +160,12 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			argb8888_alpha_get(final_color) / 255.0);
 		glCoverStrokePathNV(thiz->path_id, GL_CONVEX_HULL_NV);
 	}
+	/* restore the state */
+	glClearStencil(0);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glColor4f(1, 1, 1, 1);
 	glDisable(GL_STENCIL_TEST);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
 }
 
 static void _enesim_renderer_path_nv_setup_stroke(
@@ -154,6 +174,7 @@ static void _enesim_renderer_path_nv_setup_stroke(
 	Enesim_Renderer *r = ENESIM_RENDERER(thiz);
 	GLenum join_style = GL_BEVEL_NV;
 	GLenum cap_style = GL_ROUND_NV;
+	GLenum err;
 
 	switch (enesim_renderer_shape_stroke_cap_get(r))
 	{
@@ -194,6 +215,11 @@ static void _enesim_renderer_path_nv_setup_stroke(
 	glPathParameterfNV(thiz->path_id, GL_PATH_STROKE_WIDTH_NV,
 			enesim_renderer_shape_stroke_weight_get(r));
 	/* TODO add the dashes */
+	err = glGetError();
+	if (err)
+	{
+		ERR("Setting up the stroke failed 0x%08x\n", err);
+	}
 }
 
 static void _enesim_renderer_path_nv_setup_fill(
@@ -243,67 +269,67 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 		switch (pcmd->type)
 		{
 			case ENESIM_PATH_COMMAND_MOVE_TO:
-			*cmd = 'M';
+			*cmd++ = 'M';
 			*coord++ = pcmd->definition.move_to.x;
 			*coord++ = pcmd->definition.move_to.y;
 			num_coords += 2;
 			break;
 			
 			case ENESIM_PATH_COMMAND_LINE_TO:
-			*cmd = 'L';
+			*cmd++ = 'L';
 			*coord++ = pcmd->definition.line_to.x;
 			*coord++ = pcmd->definition.line_to.y;
 			num_coords += 2;
 			break;
 
 			case ENESIM_PATH_COMMAND_ARC_TO:
-			*cmd = 'A';
+			*cmd++ = 'A';
 			num_coords += 7;
-			*coord++ = pcmd->definition.arc_to.x;
-			*coord++ = pcmd->definition.arc_to.y;
 			*coord++ = pcmd->definition.arc_to.rx;
 			*coord++ = pcmd->definition.arc_to.ry;
 			*coord++ = pcmd->definition.arc_to.angle;
 			*coord++ = pcmd->definition.arc_to.large;
 			*coord++ = pcmd->definition.arc_to.sweep;
+			*coord++ = pcmd->definition.arc_to.x;
+			*coord++ = pcmd->definition.arc_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_CLOSE:
-			*cmd = 'Z';
+			*cmd++ = 'Z';
 			break;
 
 			case ENESIM_PATH_COMMAND_CUBIC_TO:
 			num_coords += 6;
-			*cmd = 'C';
-			*coord++ = pcmd->definition.cubic_to.x;
-			*coord++ = pcmd->definition.cubic_to.y;
+			*cmd++ = 'C';
 			*coord++ = pcmd->definition.cubic_to.ctrl_x0;
 			*coord++ = pcmd->definition.cubic_to.ctrl_y0;
 			*coord++ = pcmd->definition.cubic_to.ctrl_x1;
 			*coord++ = pcmd->definition.cubic_to.ctrl_y1;
+			*coord++ = pcmd->definition.cubic_to.x;
+			*coord++ = pcmd->definition.cubic_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_SCUBIC_TO:
 			num_coords += 4;
-			*cmd = 'S';
-			*coord++ = pcmd->definition.scubic_to.x;
-			*coord++ = pcmd->definition.scubic_to.y;
+			*cmd++ = 'S';
 			*coord++ = pcmd->definition.scubic_to.ctrl_x;
 			*coord++ = pcmd->definition.scubic_to.ctrl_y;
+			*coord++ = pcmd->definition.scubic_to.x;
+			*coord++ = pcmd->definition.scubic_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
 			num_coords += 4;
-			*cmd = 'Q';
-			*coord++ = pcmd->definition.quadratic_to.x;
-			*coord++ = pcmd->definition.quadratic_to.y;
+			*cmd++ = 'Q';
 			*coord++ = pcmd->definition.quadratic_to.ctrl_x;
 			*coord++ = pcmd->definition.quadratic_to.ctrl_y;
+			*coord++ = pcmd->definition.quadratic_to.x;
+			*coord++ = pcmd->definition.quadratic_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
 			num_coords += 2;
-			*cmd = 'T';
+			*cmd++ = 'T';
 			*coord++ = pcmd->definition.squadratic_to.x;
 			*coord++ = pcmd->definition.squadratic_to.y;
 			break;
@@ -311,7 +337,6 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 			default:
 			break;
 		}
-		cmd++;
 	}
 
 	glPathCommandsNV(path_id, num_cmds, cmds, num_coords, GL_FLOAT, coords);
@@ -364,7 +389,7 @@ static Eina_Bool _enesim_renderer_path_is_available(
 	enesim_opengl_init();
 	if (!GLEW_NV_path_rendering)
 	{
-		INF("No ARB_framebuffer_object extension found");
+		INF("No NV_path_rendering extension found");
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;
@@ -397,11 +422,37 @@ static Eina_Bool _enesim_renderer_path_nv_opengl_setup(Enesim_Renderer *r,
 		Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Nv *thiz;
+	int w, h;
+
 	thiz = ENESIM_RENDERER_PATH_NV(r);
+	/* TODO later we might need that every surface also owns a stencil buffer? */
+	/* create our stencil buffer */
+	enesim_surface_size_get(s, &w, &h);
+	if (thiz->sb)
+	{
+		if (w != thiz->last_w || h != thiz->last_h)
+		{
+			glDeleteRenderbuffers(1, &thiz->sb);
+			thiz->sb = 0;
+		}
+	}
+
+	if (!thiz->sb)
+	{
+		GLuint sb;
+
+		glGenRenderbuffers(1, &sb);
+		glBindRenderbuffer(GL_RENDERBUFFER, sb);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+		thiz->last_w = w;
+		thiz->last_h = h;
+		thiz->sb = sb;
+	}
 
 	/* upload the commands */
 	if (!_enesim_renderer_path_nv_upload_path(thiz))
 		return EINA_FALSE;
+
 	*draw = _enesim_renderer_path_nv_draw;
 	return EINA_TRUE;
 }
@@ -440,7 +491,6 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 	if (!_enesim_renderer_path_nv_upload_path(thiz))
 		goto failed;
 
-	/* TODO check if the path is filled/stroked */
 	if (enesim_renderer_shape_draw_mode_get(r) &
 			ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -522,6 +572,8 @@ static void _enesim_renderer_path_nv_instance_deinit(void *o)
 	}
 	if (thiz->path)
 		enesim_path_unref(thiz->path);
+	if (thiz->sb)
+		glDeleteRenderbuffers(1, &thiz->sb);
 }
 #endif
 /*============================================================================*
