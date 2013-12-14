@@ -42,7 +42,7 @@
 #include "enesim_renderer_path_abstract_private.h"
 #include "enesim_path_normalizer_private.h"
 
-#if BUILD_OPENGL
+#if BUILD_OPENGL_NV_PATH
 #include "Enesim_OpenGL.h"
 #include "enesim_opengl_private.h"
 #endif
@@ -55,7 +55,7 @@
 
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
-#if BUILD_OPENGL
+#if BUILD_OPENGL_NV_PATH
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -598,7 +598,7 @@ static void _enesim_renderer_path_nv_instance_deinit(void *o)
  *============================================================================*/
 Enesim_Renderer * enesim_renderer_path_nv_new(void)
 {
-#if BUILD_OPENGL
+#if BUILD_OPENGL_NV_PATH
 	Enesim_Renderer *r;
 
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_path_nv);
