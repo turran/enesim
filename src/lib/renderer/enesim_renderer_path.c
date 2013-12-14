@@ -117,6 +117,7 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	thiz->current = NULL;
 	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
 	{
+		if (!abstract) continue;
 		if (!_enesim_renderer_path_is_valid(abstract, s))
 		{
 			INF("Abstract '%s' is not valid", enesim_renderer_name_get(abstract));
@@ -167,6 +168,7 @@ static void _path_shape_features_get(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_PATH(r);
 	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
 	{
+		if (!abstract) continue;
 		*features |= enesim_renderer_shape_features_get(abstract);
 	}
 }
@@ -188,6 +190,7 @@ static void _path_bounds_get(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_PATH(r);
 	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
 	{
+		if (!abstract) continue;
 		if (!_enesim_renderer_path_is_valid(abstract, NULL))
 			continue;
 		_enesim_renderer_path_propagate(r, abstract);
@@ -205,6 +208,7 @@ static void _path_features_get(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_PATH(r);
 	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
 	{
+		if (!abstract) continue;
 		*features |= enesim_renderer_features_get(abstract);
 	}
 }
