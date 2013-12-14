@@ -213,9 +213,9 @@ PKG_CHECK_MODULES([glew], [glew], [have_glew="yes"],
     # We try to compile instead of AC_CHECK_LIB because
     # of mingw/vc stdcall, cdecl
     LDFLAGS_save="${LDFLAGS}"
-    LDFLAGS="${LDFLAGS} ${GLEW_LIB}"
-    AC_TRY_COMPILE([#include "GL/glew.h"], [glewInit();],
-        [have_glew="yes"], [have_glew="no"], ["-l$GL_LIB"])
+    LDFLAGS="${LDFLAGS} -l${GLEW_LIB} -l${GL_LIB}"
+    AC_TRY_LINK([#include "GL/glew.h"], [glewInit();],
+        [have_glew="yes"], [have_glew="no"])
     LDFLAGS="${LDFLAGS_save}"
   ]
 )
@@ -225,9 +225,9 @@ PKG_CHECK_MODULES([glu], [glu], [have_glu="yes"],
     # We try to compile instead of AC_CHECK_LIB because
     # of mingw/vc stdcall, cdecl
     LDFLAGS_save="${LDFLAGS}"
-    LDFLAGS="${LDFLAGS} ${GLU_LIB}"
-    AC_TRY_COMPILE([#include "GL/glu.h"], [gluNewTess();],
-        [have_glu="yes"], [have_glu="no"], ["-l$GL_LIB"])
+    LDFLAGS="${LDFLAGS} ${GLU_LIB} -l${GL_LIB}"
+    AC_TRY_LINK([#include "GL/glu.h"], [gluNewTess();],
+        [have_glu="yes"], [have_glu="no"])
     LDFLAGS="${LDFLAGS_save}"
   ]
 )
@@ -239,8 +239,24 @@ if test "x${want_opengl}" = "xyes" && test "x${have_glew}" = "xyes" &&
   requirements_libs="${requirements_libs} -l${GL_LIB} -l${GLEW_LIB} -l${GLU_LIB}"
   AC_DEFINE([BUILD_OPENGL], [1], [Build OpenGL Backend])
 fi
-
 AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
+
+# check for NV_path extension, it is found on glew > 1.8
+build_opengl_nv_path="no"
+if test "x${build_opengl}" = "xyes"; then
+  LDFLAGS_save="${LDFLAGS}"
+  LDFLAGS="${LDFLAGS} -l${GLEW_LIB}"
+  AC_MSG_CHECKING([whether to build NV path rendering])
+  AC_TRY_LINK([#include "GL/glew.h"], [GLuint path_id = glGenPathsNV(1);],
+      [build_opengl_nv_path="yes"], [build_opengl_nv_path="no"])
+  AC_MSG_RESULT([${build_opengl_nv_path}])
+  LDFLAGS="${LDFLAGS_save}"
+fi
+
+if test "x${build_opengl_nv_path}" = "xyes"; then
+  AC_DEFINE([BUILD_OPENGL_NV_PATH], [1], [Build OpenGL NV Path Backend])
+fi
+AM_CONDITIONAL([BUILD_OPENGL_NV_PATH], [test "x${build_opengl_nv_path}" = "xyes"])
 
 PKG_CHECK_MODULES([ENESIM], [${requirements_pc}])
 
@@ -473,7 +489,9 @@ echo
 echo "Fontconfig..................................: ${have_fontconfig}"
 echo
 echo "Path Backends:"
-echo "  Enesim....................................: yes"
+echo "  Rasterizer................................: yes"
+echo "  GL Tesselator.............................: ${build_opengl}"
+echo "  GL NV Path................................: ${build_opengl_nv_path}"
 echo "  Cairo.....................................: ${build_cairo}"
 echo
 echo "Compilation.................................: make (or gmake)"
