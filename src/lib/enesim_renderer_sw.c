@@ -480,7 +480,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 			return EINA_FALSE;
 		}
 	}
-	if (!klass->sw_setup) return EINA_TRUE;
+	if (!klass->sw_setup) return EINA_FALSE;
 	if (!klass->sw_setup(r, s, rop, &fill, error))
 	{
 		WRN("Setup callback on '%s' failed", name);
