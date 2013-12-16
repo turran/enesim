@@ -30,6 +30,9 @@ AC_SUBST([VMAJ])
 ## Add parameters for aclocal (keep in sync with Makefile.am)
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
 
+### Set the language
+AC_LANG([C])
+
 ### Additional options to configure
 
 ## Threaded software rendering
@@ -212,11 +215,11 @@ PKG_CHECK_MODULES([glew], [glew], [have_glew="yes"],
   [
     # We try to compile instead of AC_CHECK_LIB because
     # of mingw/vc stdcall, cdecl
-    LDFLAGS_save="${LDFLAGS}"
-    LDFLAGS="${LDFLAGS} -l${GLEW_LIB} -l${GL_LIB}"
-    AC_TRY_LINK([#include "GL/glew.h"], [glewInit();],
+    LIBS_save="${LIBS}"
+    LIBS="${LIBS} -l${GLEW_LIB} -l${GL_LIB}"
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "GL/glew.h"]], [[glewInit();]])],
         [have_glew="yes"], [have_glew="no"])
-    LDFLAGS="${LDFLAGS_save}"
+    LIBS="${LIBS_save}"
   ]
 )
 
@@ -224,11 +227,11 @@ PKG_CHECK_MODULES([glu], [glu], [have_glu="yes"],
   [
     # We try to compile instead of AC_CHECK_LIB because
     # of mingw/vc stdcall, cdecl
-    LDFLAGS_save="${LDFLAGS}"
-    LDFLAGS="${LDFLAGS} ${GLU_LIB} -l${GL_LIB}"
-    AC_TRY_LINK([#include "GL/glu.h"], [gluNewTess();],
+    LIBS_save="${LIBS}"
+    LIBS="${LIBS} ${GLU_LIB} -l${GL_LIB}"
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "GL/glu.h"]], [[gluNewTess();]])],
         [have_glu="yes"], [have_glu="no"])
-    LDFLAGS="${LDFLAGS_save}"
+    LIBS="${LIBS_save}"
   ]
 )
 
@@ -244,13 +247,13 @@ AM_CONDITIONAL([BUILD_OPENGL], [test "x${build_opengl}" = "xyes"])
 # check for NV_path extension, it is found on glew > 1.8
 build_opengl_nv_path="no"
 if test "x${build_opengl}" = "xyes"; then
-  LDFLAGS_save="${LDFLAGS}"
-  LDFLAGS="${LDFLAGS} -l${GLEW_LIB}"
+  LIBS_save="${LIBS}"
+  LIBS="${LIBS} -l${GLEW_LIB}"
   AC_MSG_CHECKING([whether to build NV path rendering])
-  AC_TRY_LINK([#include "GL/glew.h"], [GLuint path_id = glGenPathsNV(1);],
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include "GL/glew.h"]], [[GLuint path_id = glGenPathsNV(1);]])],
       [build_opengl_nv_path="yes"], [build_opengl_nv_path="no"])
   AC_MSG_RESULT([${build_opengl_nv_path}])
-  LDFLAGS="${LDFLAGS_save}"
+  LIBS="${LIBS_save}"
 fi
 
 if test "x${build_opengl_nv_path}" = "xyes"; then
