@@ -141,6 +141,10 @@ Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y)
 		enesim_surface_size_get(s, &w, &h);
 		backend_data = enesim_surface_backend_data_get(s);
 
+		/* The viewport of the whole framebuffer should be
+		 * of size of the surface
+		 */
+		glViewport(0, 0, w, h);
 		/* sets the texture and projection matrix */
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
