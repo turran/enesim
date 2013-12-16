@@ -61,6 +61,7 @@ typedef struct _Enesim_Renderer_Path
 	/* private */
 	Eina_List *abstracts;
 	Enesim_Renderer *current;
+	int last_path_change;
 } Enesim_Renderer_Path;
 
 typedef struct _Enesim_Renderer_Path_Class {
@@ -127,6 +128,7 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		if (!enesim_renderer_setup(abstract, s, rop, log))
 		{
 			INF("Abstract '%s' failed on the setup", enesim_renderer_name_get(abstract));
+			enesim_renderer_cleanup(abstract, s);
 			continue;
 		}
 		thiz->current = abstract;
@@ -137,6 +139,7 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		ENESIM_RENDERER_LOG(r, log, "No path implementation found");
 		return EINA_FALSE;
 	}
+
 	return EINA_TRUE;
 }
 
@@ -153,7 +156,8 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_shape_state_commit(r);
 	enesim_renderer_cleanup(thiz->current, s);
 	thiz->current = NULL;
-	thiz->path->changed = EINA_FALSE;
+	/* reset the change count */
+	thiz->last_path_change = thiz->path->changed;
 }
 /*----------------------------------------------------------------------------*
  *                             Shape interface                                *
@@ -188,13 +192,21 @@ static void _path_bounds_get(Enesim_Renderer *r,
 	Eina_List *l;
 
 	thiz = ENESIM_RENDERER_PATH(r);
-	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
+	if (thiz->current)
 	{
-		if (!abstract) continue;
-		if (!_enesim_renderer_path_is_valid(abstract, NULL))
-			continue;
-		_enesim_renderer_path_propagate(r, abstract);
-		enesim_renderer_bounds_get(abstract, bounds);
+		enesim_renderer_bounds_get(thiz->current, bounds);
+	}
+	else
+	{
+		EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
+		{
+			if (!abstract) continue;
+			if (!_enesim_renderer_path_is_valid(abstract, NULL))
+				continue;
+			_enesim_renderer_path_propagate(r, abstract);
+			enesim_renderer_bounds_get(abstract, bounds);
+			break;
+		}
 	}
 }
 
@@ -218,8 +230,12 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Path *thiz;
 
 	thiz = ENESIM_RENDERER_PATH(r);
+	if (enesim_renderer_shape_state_has_changed(r))
+		return EINA_TRUE;
 	/* only check if our path has changed, there is no other property */
-	return thiz->path->changed;
+	if (thiz->last_path_change != thiz->path->changed)
+		return EINA_TRUE;
+	return EINA_FALSE;
 }
 
 static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED, Enesim_Rop rop
@@ -279,6 +295,7 @@ static void _enesim_renderer_path_class_init(void *k)
 
 	shape_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	shape_klass->features_get = _path_shape_features_get;
+	shape_klass->has_changed = _path_has_changed;
 
 	/* we need to override the default implementation on every renderer
 	 * virtual function. That is because we need to propagate the properties
@@ -292,7 +309,6 @@ static void _enesim_renderer_path_class_init(void *k)
 	klass->base_name_get = _path_name_get;
 	klass->bounds_get = _path_bounds_get;
 	klass->features_get = _path_features_get;
-	klass->has_changed = _path_has_changed;
 
 	klass->sw_hints_get = _path_sw_hints;
 	klass->sw_setup = _path_sw_setup;

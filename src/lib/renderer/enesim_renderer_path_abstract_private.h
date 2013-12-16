@@ -51,9 +51,9 @@ typedef struct _Enesim_Renderer_Path_Abstract
 	Enesim_Renderer_Shape_Stroke_Join last_join;
 	Enesim_Renderer_Shape_Stroke_Cap last_cap;
 	double last_stroke_weight;
-	Eina_Bool changed : 1;
-	Eina_Bool path_changed : 1;
-	Eina_Bool dashes_changed : 1;
+	/* to keep track of the changes */
+	int last_path_change;
+	int last_dash_change;
 	Eina_Bool generated : 1;
 	Eina_Bool stroke_figure_used : 1;
 } Enesim_Renderer_Path_Abstract;

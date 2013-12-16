@@ -226,6 +226,7 @@ EAPI void enesim_path_command_clear(Enesim_Path *thiz)
 		free(c);
 	}
 	thiz->commands = eina_list_free(thiz->commands);
+	thiz->changed++;
 }
 
 /**
@@ -256,7 +257,7 @@ EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 	new_command = malloc(sizeof(Enesim_Path_Command));
 	*new_command = *cmd;
 	thiz->commands = eina_list_append(thiz->commands, new_command);
-	thiz->changed = EINA_TRUE;
+	thiz->changed++;
 }
 
 /**

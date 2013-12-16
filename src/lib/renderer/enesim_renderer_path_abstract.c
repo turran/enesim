@@ -98,10 +98,8 @@ Eina_Bool enesim_renderer_path_abstract_needs_generate(Enesim_Renderer *r)
 	/* in case some command has been changed be sure to cleanup
 	 * the path and keep the changed flag of the path to true
 	 */
-	if (thiz->path && thiz->path->changed)
+	if (thiz->path && thiz->path->changed != thiz->last_path_change)
 	{
-		thiz->path_changed = EINA_TRUE;
-		thiz->path->changed = EINA_FALSE;
 		thiz->generated = EINA_FALSE;
 	}
 
@@ -109,14 +107,14 @@ Eina_Bool enesim_renderer_path_abstract_needs_generate(Enesim_Renderer *r)
 	dashes = enesim_renderer_shape_dashes_get(r);
 	if (enesim_list_has_changed(dashes))
 	{
-		thiz->dashes_changed = EINA_TRUE;
 		thiz->generated = EINA_FALSE;
+		/* TODO use the same scheme as the path */
 		enesim_list_clear_changed(dashes);
 	}
 	enesim_list_unref(dashes);
 
-	/* a new path has been set or some command has been added */
-	if ((thiz->changed || thiz->path_changed || thiz->dashes_changed) && !thiz->generated)
+	/* is it generated already? */
+	if (!thiz->generated)
 		return EINA_TRUE;
 
 	/* the stroke join is different */
@@ -224,6 +222,7 @@ void enesim_renderer_path_abstract_generate(Enesim_Renderer *r)
 #endif
 
 	thiz->generated = EINA_TRUE;
+	thiz->last_path_change = thiz->path->changed;
 	/* update the last values */
 	thiz->last_join = join;
 	thiz->last_cap = cap;
@@ -243,8 +242,8 @@ void enesim_renderer_path_abstract_path_set(Enesim_Renderer *r,
 		if (thiz->path)
 			enesim_path_unref(thiz->path);
 		thiz->path = enesim_path_ref(path);
-		thiz->changed = EINA_TRUE;
 		thiz->generated = EINA_FALSE;
+		thiz->last_path_change = -1;
 	}
 
 	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS_GET(r);
@@ -259,8 +258,6 @@ void enesim_renderer_path_abstract_cleanup(Enesim_Renderer *r)
 	Enesim_Renderer_Path_Abstract *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_ABSTRACT(r);
-	thiz->changed = EINA_FALSE;
-	thiz->path_changed = EINA_FALSE;
 }
 
 Eina_Bool enesim_renderer_path_abstract_is_available(Enesim_Renderer *r)

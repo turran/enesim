@@ -70,9 +70,8 @@ typedef struct _Enesim_Renderer_Path_Nv
 	GLuint path_id;
 	GLuint sb;
 	int last_w, last_h;
+	int last_path_change;
 	Eina_Bool dashes_changed;
-	Eina_Bool path_changed;
-	Eina_Bool new_path;
 	Eina_Bool generated;
 } Enesim_Renderer_Path_Nv;
 
@@ -115,6 +114,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	fm[1] = m.yx; fm[5] = m.yy; fm[9] = m.yz; fm[13] = 0;
 	fm[2] = m.zx; fm[6] = m.zy; fm[10] = m.zz; fm[14] = 0;
 	fm[3] = 0; fm[7] = 0; fm[11] = 0; fm[15] = 1;
+
 	glMatrixMode(GL_PROJECTION);
 	glMultMatrixf(fm);
 
@@ -233,7 +233,6 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 {
 	Enesim_Path_Command *pcmd;
 	Eina_List *l;
-	Eina_Bool changed = EINA_TRUE;
 	GLuint path_id;
 	GLenum err;
 	GLubyte *cmd, *cmds;
@@ -242,8 +241,17 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 	int num_coords = 0;
 
 	/* TODO check if the path has changed or not */
-	if (thiz->generated)
-		return EINA_TRUE;
+	if (thiz->last_path_change != thiz->path->changed)
+		thiz->generated = EINA_FALSE;
+	/* TODO we are having some cases where the path is invalid? */
+	if (thiz->path_id && !glIsPathNV(thiz->path_id))
+		thiz->generated = EINA_FALSE;
+
+	/* FIXME looks like we can not cache the path
+	 * the bounds are invalid
+	 */
+	//if (thiz->generated)
+	//	goto propagate;
 
 	if (thiz->path_id)
 	{
@@ -258,7 +266,7 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 		ERR("glGetPathsNV failed 0x%08x", err);
 		return EINA_FALSE;
 	}
-	
+
 	/* generate our path coords */ 
 	num_cmds = eina_list_count(thiz->path->commands);
 	cmd = cmds = malloc(sizeof(GLubyte) * num_cmds);
@@ -352,10 +360,12 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 
 	/* set the properties */
 	thiz->path_id = path_id;
+	thiz->generated = EINA_TRUE;
+	thiz->last_path_change = thiz->path->changed;
+
+propagate:
 	_enesim_renderer_path_nv_setup_stroke(thiz);
 	_enesim_renderer_path_nv_setup_fill(thiz);
-
-	thiz->generated = EINA_TRUE;
 
 	return EINA_TRUE;
 }
@@ -372,8 +382,6 @@ static void _enesim_renderer_path_nv_path_set(Enesim_Renderer *r,
 	{
 		if (thiz->path) enesim_path_unref(thiz->path);
 		thiz->path = path;
-		thiz->new_path = EINA_TRUE;
-		thiz->path_changed = EINA_TRUE;
 		thiz->generated = EINA_FALSE;
 	}
 	else
@@ -403,17 +411,6 @@ static void _enesim_renderer_path_nv_shape_features_get(
 {
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
 			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
-}
-
-static Eina_Bool _enesim_renderer_path_nv_has_changed(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Path_Nv *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_NV(r);
-	if (thiz->new_path || thiz->path_changed || (thiz->path && thiz->path->changed) || (thiz->dashes_changed))
-		return EINA_TRUE;
-	else
-		return EINA_FALSE;
 }
 
 static Eina_Bool _enesim_renderer_path_nv_opengl_setup(Enesim_Renderer *r,
@@ -517,7 +514,6 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &m);
 	type = enesim_renderer_transformation_type_get(r);
 
-#if 0
 	/* transform the bounds */
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
@@ -526,7 +522,7 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 		enesim_matrix_rectangle_transform(&m, bounds, &q);
 		enesim_quad_rectangle_to(&q, bounds);
 	}
-#endif
+
 	return;
 
 failed:
@@ -564,7 +560,6 @@ static void _enesim_renderer_path_nv_class_init(void *k)
 
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	s_klass->features_get = _enesim_renderer_path_nv_shape_features_get;
-	s_klass->has_changed = _enesim_renderer_path_nv_has_changed;
 	s_klass->opengl_setup = _enesim_renderer_path_nv_opengl_setup;
 	s_klass->opengl_cleanup = _enesim_renderer_path_nv_opengl_cleanup;
 
