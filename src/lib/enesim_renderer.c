@@ -537,17 +537,15 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		default:
 		break;
 	}
+
 	r->in_setup = EINA_TRUE;
-	if (ret)
-	{
-		/* given that we already did the setup, the current and previous should be equal
-		 * when calculating the bounds
-		 */
-		_enesim_renderer_bounds_get(r, &r->current_bounds);
-		_enesim_renderer_destination_bounds_get(r, &r->current_destination_bounds);
-		r->current_features_get = enesim_renderer_features_get(r);
-		r->current_rop = rop;
-	}
+	/* given that we already did the setup, the current and previous should be equal
+	 * when calculating the bounds
+	 */
+	_enesim_renderer_bounds_get(r, &r->current_bounds);
+	_enesim_renderer_destination_bounds_get(r, &r->current_destination_bounds);
+	r->current_features_get = enesim_renderer_features_get(r);
+	r->current_rop = rop;
 
 	return ret;
 }
