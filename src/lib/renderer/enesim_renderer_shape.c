@@ -444,6 +444,7 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 	Eina_Bool ret = EINA_TRUE;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
+	/* TODO put the common code here to check if the shape status has changed */
 	/* call the has_changed on the descriptor */
 	if (klass->has_changed)
 		ret = klass->has_changed(r);
@@ -494,8 +495,9 @@ send_old:
 	{
 		/* get the current bounds */
 		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
-		DBG("Sending old bounds");
+		DBG("Sending old bounds %" EINA_RECTANGLE_FORMAT, EINA_RECTANGLE_ARGS(old_bounds));
 		cb(r, old_bounds, EINA_TRUE, data);
+		DBG("And new bounds %" EINA_RECTANGLE_FORMAT, EINA_RECTANGLE_ARGS(&current_bounds));
 		cb(r, &current_bounds, EINA_FALSE, data);
 		return EINA_TRUE;
 	}

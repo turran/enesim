@@ -26,12 +26,6 @@
 #define ENESIM_RENDERER_SHAPE(o) ENESIM_OBJECT_INSTANCE_CHECK(o, 		\
 		Enesim_Renderer_Shape, ENESIM_RENDERER_SHAPE_DESCRIPTOR)
 
-typedef struct _Enesim_Renderer_Shape_Dash
-{
-	Eina_List *l;
-	Eina_Bool changed;
-} Enesim_Renderer_Shape_Dash;
-
 typedef struct _Enesim_Renderer_Shape_State
 {
 	struct {
