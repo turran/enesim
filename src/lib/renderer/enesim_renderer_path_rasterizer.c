@@ -208,6 +208,7 @@ static void _enesim_renderer_path_rasterizer_features_get(Enesim_Renderer *r EIN
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE |
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
