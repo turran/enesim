@@ -80,6 +80,56 @@ typedef struct _Enesim_Renderer_Path_Nv_Class
 	Enesim_Renderer_Path_Abstract_Class parent;
 } Enesim_Renderer_Path_Nv_Class;
 
+/* future code to draw using more samples */
+#if 0
+void _fill_sample(Enesim_Renderer_Path_Nv *thiz, Enesim_Color final_color)
+{
+	const int coveragePassesToAccumulate = 5;
+	int i;
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 0x80, 0x7F);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // tricky: zero 0x7F mask stencil on covers, but set 0x80
+
+	//glClearColor(0, 0, 0, 0);
+	//glClear(GL_COLOR_BUFFER_BIT);
+
+	glColorMask(0,0,0,1);  // just update alpha
+	// M STENCIL+COVER PASSES to accumulate jittered path coverage into framebuffer's alpha channel 
+	glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0x7F);
+	glCoverFillPathNV(thiz->path_id, GL_PATH_FILL_COVER_MODE_NV);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE); // sum up alpha
+	glColor4f(0, 0, 0, 1.0/coveragePassesToAccumulate);
+
+	static const GLfloat jitters[5][2] = { {0,0}, {5,0},  {-5, 0}, {0, 5}, {0, -5} /* various small subpixel jitter X & Y values */ };
+	for (i=0; i<coveragePassesToAccumulate ; i++) {
+		glMatrixPushEXT(GL_PROJECTION);
+		{
+			glMatrixTranslatefEXT(GL_PROJECTION, jitters[i][0], jitters[i][1], 0);
+			glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0x7F);
+			glCoverFillPathNV(thiz->path_id, GL_PATH_FILL_COVER_MODE_NV);
+		}
+		glMatrixPopEXT(GL_PROJECTION);
+	}
+	// FINAL COVER PASS uses accumulated coverage stashed in destination alpha
+	glColorMask(1,1,1,1);
+	// modulate RGB with destination alpha and then zero destination alpha
+	glBlendFuncSeparate(GL_DST_ALPHA, GL_ZERO, GL_DST_ALPHA, GL_ZERO);
+	glColor4f(argb8888_red_get(final_color) / 255.0,
+		argb8888_green_get(final_color) / 255.0,
+		argb8888_blue_get(final_color) / 255.0,
+		argb8888_alpha_get(final_color) / 255.0);
+	glStencilFunc(GL_EQUAL, 0x80, 0xFF);  // update any sample touched in earlier passes
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);  // now set stencil back to zero (clearing 0x80)
+	glCoverFillPathInstancedNV(coveragePassesToAccumulate, 
+			GL_UNSIGNED_BYTE, "\0\0\0\0\0",  // tricky: draw path objects path+0,path+0,path+0,path+0
+			thiz->path_id,  // this is that path object that is added to zero four times
+			GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_2D_NV, jitters);
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
+}
+#endif
+
 static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
 		int x, int y)
@@ -110,19 +160,15 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 
 	/* add our own transformation matrix */
 	enesim_renderer_transformation_get(r, &m);
-	fm[0] = m.xx; fm[4] = m.xy; fm[8] = m.xz; fm[12] = 0;
-	fm[1] = m.yx; fm[5] = m.yy; fm[9] = m.yz; fm[13] = 0;
-	fm[2] = m.zx; fm[6] = m.zy; fm[10] = m.zz; fm[14] = 0;
+	fm[0] = m.xx; fm[4] = m.xy; fm[8] = 0; fm[12] = m.xz;
+	fm[1] = m.yx; fm[5] = m.yy; fm[9] = 0; fm[13] = m.yz;
+	fm[2] = m.zx; fm[6] = m.zy; fm[10] = 1; fm[14] = m.zz;
 	fm[3] = 0; fm[7] = 0; fm[11] = 0; fm[15] = 1;
 
 	glMatrixMode(GL_PROJECTION);
 	glMultMatrixf(fm);
 
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
-
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 	/* fill */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
@@ -133,6 +179,10 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		enesim_renderer_shape_fill_setup(r, &final_color, &ren);
 		/* TODO use the renderer */
 		if (ren) enesim_renderer_unref(ren);
+
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
 
@@ -152,6 +202,10 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		enesim_renderer_shape_stroke_setup(r, &final_color, &ren);
 		/* TODO use the renderer */
 		if (ren) enesim_renderer_unref(ren);
+
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
 		glColor4f(argb8888_red_get(final_color) / 255.0,
@@ -474,6 +528,7 @@ static void _enesim_renderer_path_nv_features_get(
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |
 			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_BACKEND_OPENGL |
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
