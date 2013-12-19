@@ -352,6 +352,32 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	return EINA_TRUE;
 }
 
+static Eina_Bool _enesim_renderer_shape_is_supported(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Shape *thiz;
+	Enesim_Renderer_Shape_Feature features;
+	Enesim_Renderer_Shape_Class *klass;
+
+	features = enesim_renderer_shape_features_get(r);
+	thiz = ENESIM_RENDERER_SHAPE(r);
+	if (thiz->state.current.fill.r &&
+			!(features & ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER))
+	{
+		WRN("Fill renderer not supported");
+		return EINA_FALSE;
+	}
+	if (thiz->state.current.stroke.r &&
+			!(features & ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER))
+	{
+		WRN("Stroke renderer not supported");
+		return EINA_FALSE;
+	}
+	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
+	if (klass->is_supported)
+		return klass->is_supported(r, s);
+	return EINA_TRUE;
+}
+
 static Eina_Bool _enesim_renderer_shape_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill,
@@ -556,6 +582,7 @@ static void _enesim_renderer_shape_class_init(void *k)
 	Enesim_Renderer_Class *klass;
 
 	klass = ENESIM_RENDERER_CLASS(k);
+	klass->is_supported = _enesim_renderer_shape_is_supported;
 	klass->damages_get = _enesim_renderer_shape_damage;
 	klass->has_changed = _enesim_renderer_shape_has_changed;
 	klass->sw_setup = _enesim_renderer_shape_sw_setup;

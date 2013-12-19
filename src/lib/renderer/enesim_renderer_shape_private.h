@@ -65,6 +65,7 @@ typedef Eina_Bool (*Enesim_Renderer_Shape_Geometry_Get_Cb)(Enesim_Renderer *r, E
 typedef struct _Enesim_Renderer_Shape_Class {
 	Enesim_Renderer_Class parent;
 
+	Enesim_Renderer_Is_Supported_Cb is_supported;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
