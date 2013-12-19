@@ -68,9 +68,11 @@ typedef struct _Enesim_Renderer_Path_Class {
 	Enesim_Renderer_Shape_Class parent;
 } Enesim_Renderer_Path_Class;
 
-static Eina_Bool _enesim_renderer_path_is_valid(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+static Eina_Bool _enesim_renderer_path_is_valid(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	if (!enesim_renderer_path_abstract_is_available(r))
+		return EINA_FALSE;
+	if (!enesim_renderer_is_supported(r, s))
 		return EINA_FALSE;
 	return EINA_TRUE;
 }
