@@ -362,6 +362,11 @@ static void _path_opengl_notesselate(
 	}
 }
 
+/* To draw the silhoutte we pass the edge coords along
+ * with the vertex itself, so at fragment step we also have
+ * the vertex information. With the vertex position for each
+ * fragment we calculat ethe possible anti alias value
+ */
 static void _path_opengl_silhoutte_draw(Enesim_Figure *f,
 		const Eina_Rectangle *area)
 {
@@ -370,6 +375,10 @@ static void _path_opengl_silhoutte_draw(Enesim_Figure *f,
 
 	glLineWidth(2);
 	glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
+	/* We change the shade model because we dont want to make
+	 * the textcoords to be interpolated, that way we keep
+	 * the edge values on the fragment shader
+	 */
 	glShadeModel(GL_FLAT);
 	EINA_LIST_FOREACH(f->polygons, l, p)
 	{
@@ -738,6 +747,7 @@ static void _enesim_renderer_path_tesselator_features_get(
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |
 			ENESIM_RENDERER_FEATURE_PROJECTIVE |
+			ENESIM_RENDERER_FEATURE_BACKEND_OPENGL |
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
