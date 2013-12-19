@@ -29,12 +29,14 @@ typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handle */
 /** Flags that specify what a renderer supports */
 typedef enum _Enesim_Renderer_Feature
 {
-	ENESIM_RENDERER_FEATURE_TRANSLATE	= (1 << 0), /**< The renderer can be translated using the origin property */
-	ENESIM_RENDERER_FEATURE_AFFINE 		= (1 << 1), /**< Affine transformation */
-	ENESIM_RENDERER_FEATURE_PROJECTIVE 	= (1 << 2), /**< Perspective transformations */
-	ENESIM_RENDERER_FEATURE_A8 		= (1 << 3), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FEATURE_ARGB8888 	= (1 << 4), /**< Supports ARGB8888 surfaces */
-	ENESIM_RENDERER_FEATURE_QUALITY 	= (1 << 5), /**< Supports the quality property */
+	ENESIM_RENDERER_FEATURE_TRANSLATE		= (1 << 0), /**< The renderer can be translated using the origin property */
+	ENESIM_RENDERER_FEATURE_AFFINE 			= (1 << 1), /**< Affine transformation */
+	ENESIM_RENDERER_FEATURE_PROJECTIVE 		= (1 << 2), /**< Perspective transformations */
+	ENESIM_RENDERER_FEATURE_A8 			= (1 << 3), /**< Supports A8 surfaces */
+	ENESIM_RENDERER_FEATURE_ARGB8888 		= (1 << 4), /**< Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FEATURE_QUALITY 		= (1 << 5), /**< Supports the quality property */
+	ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE 	= (1 << 6), /**< Supports Sw based surfaces */
+	ENESIM_RENDERER_FEATURE_BACKEND_OPENGL 		= (1 << 7), /**< Supports OpenGL based surfaces */
 } Enesim_Renderer_Feature;
 
 /** Helper macro to define an affine and proective transformation support */
@@ -79,6 +81,8 @@ EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI Enesim_Renderer * enesim_renderer_mask_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality);
 EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r);
+
+EAPI Eina_Bool enesim_renderer_is_supported(Enesim_Renderer *r, Enesim_Surface *s);
 
 EAPI void enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect);
 EAPI void enesim_renderer_bounds_get_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);

@@ -313,14 +313,12 @@ static const char * _base_name_get(Enesim_Renderer *r)
 
 static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Class *k;
 	Enesim_Renderer_Factory *f;
 	char renderer_name[PATH_MAX];
 	const char *descriptor_name = NULL;
 
 	if (!_factories) return;
 
-	k = ENESIM_RENDERER_CLASS(k);
 	descriptor_name = _base_name_get(r);
 	f = eina_hash_find(_factories, descriptor_name);
 	if (!f)
@@ -944,6 +942,61 @@ EAPI Enesim_Matrix_Type enesim_renderer_transformation_type_get(Enesim_Renderer 
 	return r->state.current.transformation_type;
 }
 
+/**
+ * @brief Checks if a renderer supports the current state of properties
+ * @param[in] r The renderer to check
+ * @param[in] s The possible destination surface of the drawing operation
+ * @return EINA_TRUE if the renderer supports the current state of properties
+ * EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_renderer_is_supported(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Feature features;
+	Enesim_Renderer_Class *klass;
+	Enesim_Backend backend;
+	Enesim_Format fmt;
+
+	/* check common features */
+	features = enesim_renderer_features_get(r);
+
+	/* the supported backend */
+	if (!s) goto no_surface;
+
+	backend = enesim_surface_backend_get(s);
+	if ((backend == ENESIM_BACKEND_SOFTWARE) &&
+			!(features & ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE))
+	{
+		WRN("Software backend not supported");
+		return EINA_FALSE;
+	}
+	if ((backend == ENESIM_BACKEND_OPENGL) &&
+			!(features & ENESIM_RENDERER_FEATURE_BACKEND_OPENGL))
+	{
+		WRN("OpenGL backend not supported");
+		return EINA_FALSE;
+	}
+	/* the supported format */
+	fmt = enesim_surface_format_get(s);
+	if ((fmt == ENESIM_FORMAT_A8) &&
+			!(features & ENESIM_RENDERER_FEATURE_A8))
+	{
+		WRN("A8 surfaces not supported");
+		return EINA_FALSE;
+	}
+	if ((fmt == ENESIM_FORMAT_ARGB8888) &&
+			!(features & ENESIM_RENDERER_FEATURE_ARGB8888))
+	{
+		WRN("ARGB8888 surfaces not supported");
+		return EINA_FALSE;
+	}
+
+no_surface:
+	/* call the specific implementation */
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (klass->is_supported)
+		return klass->is_supported(r, s);
+	return EINA_TRUE;
+}
 
 /**
  * Gets the bounding box of the renderer on its own coordinate space without

@@ -63,6 +63,7 @@ typedef struct _Enesim_Renderer_State
  *----------------------------------------------------------------------------*/
 /* common descriptor functions */
 typedef const char * (*Enesim_Renderer_Base_Name_Get_Cb)(Enesim_Renderer *r);
+typedef Eina_Bool (*Enesim_Renderer_Is_Supported_Cb)(Enesim_Renderer *r, Enesim_Surface *s);
 typedef Eina_Bool (*Enesim_Renderer_Is_Inside_Cb)(Enesim_Renderer *r, double x, double y);
 typedef void (*Enesim_Renderer_Alpha_Hints_Get_Cb)(Enesim_Renderer *r, Enesim_Alpha_Hint *hints);
 typedef void (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
@@ -108,6 +109,7 @@ typedef struct _Enesim_Renderer_Class
 {
 	Enesim_Object_Class base;
 	Enesim_Renderer_Base_Name_Get_Cb base_name_get;
+	Enesim_Renderer_Is_Supported_Cb is_supported;
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Features_Get features_get;
 	Enesim_Renderer_Is_Inside_Cb is_inside;
