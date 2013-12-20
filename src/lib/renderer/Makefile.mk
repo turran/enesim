@@ -75,6 +75,7 @@ endif
 
 EXTRA_DIST += \
 src/lib/renderer/enesim_renderer_checker.glsl \
+src/lib/renderer/enesim_renderer_gradient_linear.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_ambient.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_blit.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_merge.glsl \

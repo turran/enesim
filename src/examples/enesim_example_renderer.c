@@ -118,6 +118,11 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_renderer_checker_even_color_set(c, 0xffaaaaaa);
 	enesim_renderer_checker_width_set(c, 10);
 	enesim_renderer_checker_height_set(c, 10);
+	{
+		Enesim_Matrix m;
+		enesim_matrix_rotate(&m, 20);
+		enesim_renderer_transformation_set(c, &m);
+	}
 	/* first draw the background */	
 	if (!enesim_renderer_draw(c, s, ENESIM_ROP_FILL, NULL, 0, 0,
 			&error))

@@ -31,8 +31,14 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#ifdef BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
+#endif
+
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_gradient_private.h"
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -135,6 +141,7 @@ static Eina_Bool _gradient_changed(Enesim_Renderer_Gradient *thiz)
 	return EINA_FALSE;
 }
 
+#if 0
 static void _gradient_draw(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
@@ -149,21 +156,66 @@ static void _gradient_draw(Enesim_Renderer *r,
 
 	thiz->draw(r, &data, x, y, len, ddata);
 }
-/*----------------------------------------------------------------------------*
- *                      The Enesim's renderer interface                       *
- *----------------------------------------------------------------------------*/
-static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+#endif
+
+/* common setup process */
+static Eina_Bool _gradient_setup(Enesim_Renderer *r, Enesim_Log **l)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Class *klass;
+	int len;
 
 	thiz = ENESIM_RENDERER_GRADIENT(r);
-	thiz->sw.len = 0;
+	/* check that we have at least two stops */
+	if (eina_list_count(thiz->state.stops) < 2)
+	{
+		ENESIM_RENDERER_LOG(r, l, "Less than two stops");
+		return EINA_FALSE;
+	}
+
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	len = klass->length(r);
+	if (len <= 0)
+	{
+		ENESIM_RENDERER_LOG(r, l, "Gradient length %d <= 0", len);
+		return EINA_FALSE;
+	}
+
+	if (!thiz->sw.src || len != thiz->sw.len)
+	{
+		thiz->sw.len = len;
+		if (thiz->sw.src)
+			free(thiz->sw.src);
+		thiz->sw.src = malloc(sizeof(uint32_t) * thiz->sw.len);
+	}
+
+	if (!_gradient_generate_1d_span(thiz, r, l))
+	{
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+static void _gradient_cleanup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient *thiz;
+
+	thiz = ENESIM_RENDERER_GRADIENT(r);
 	thiz->changed = EINA_FALSE;
 	thiz->stops_changed = EINA_FALSE;
 	thiz->past_mode = thiz->state.mode;
-	thiz->rstate = NULL;
+}
+/*----------------------------------------------------------------------------*
+ *                      The Enesim's renderer interface                       *
+ *----------------------------------------------------------------------------*/
+static void _gradient_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Gradient_Class *klass;
 
+	/* the common clean up */
+	_gradient_cleanup(r);
+
+	/* the implementation clean up */
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
 	if (klass->sw_cleanup)
 	{
@@ -171,61 +223,31 @@ static void _gradient_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	}
 }
 
-static Eina_Bool _gradient_state_setup(Enesim_Renderer *r,
+static Eina_Bool _gradient_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Class *klass;
-	const Enesim_Renderer_State *rstate;
-	int slen;
 
 	thiz = ENESIM_RENDERER_GRADIENT(r);
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
 
-	/* check that we have at least two stops */
-	if (eina_list_count(thiz->state.stops) < 2)
-	{
-		ENESIM_RENDERER_LOG(r, l, "Less than two stops");
-		return EINA_FALSE;
-	}
-	/* always call our own fill */
-	*fill = _gradient_draw;
-	/* setup the implementation */
-	if (!klass->sw_setup(r, &thiz->state, s, rop, &thiz->draw, l))
+	/* first do the implementation setup */
+	if (!klass->sw_setup(r, s, rop, fill, l))
 	{
 		ENESIM_RENDERER_LOG(r, l, "Gradient implementation failed");
 		return EINA_FALSE;
 	}
-	if (!thiz->draw)
-	{
-		ENESIM_RENDERER_LOG(r, l, "Gradient implementation didnt return a draw function");
-		return EINA_FALSE;
-	}
-	/* setup the matrix. TODO this should be done on every sw based renderer */
-	rstate = enesim_renderer_state_get(r);
-	thiz->rstate = rstate;
-	enesim_matrix_f16p16_matrix_to(&rstate->current.transformation,
-			&thiz->sw.matrix);
-	/* get the length */
-	slen = klass->length(r);
-	if (slen <= 0)
-	{
-		ENESIM_RENDERER_LOG(r, l, "Gradient length %d <= 0", slen);
-		return EINA_FALSE;
-	}
-	if (!thiz->sw.src || slen != thiz->sw.len)
-	{
-		thiz->sw.len = slen;
-		if (thiz->sw.src)
-			free(thiz->sw.src);
-		thiz->sw.src = malloc(sizeof(uint32_t) * thiz->sw.len);
-	}
-	if (!_gradient_generate_1d_span(thiz, r, l))
-	{
-		return EINA_FALSE;
-	}
 
+	/* now the common setup */
+	if (!_gradient_setup(r, l))
+	{
+		if (klass->sw_cleanup)
+			klass->sw_cleanup(r, s);
+		return EINA_FALSE;
+	}
+	
 	return EINA_TRUE;
 }
 
@@ -275,6 +297,58 @@ static Eina_Bool _gradient_has_changed(Enesim_Renderer *r)
 done:
 	return ret;
 }
+
+#if BUILD_OPENGL
+static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Log **l EINA_UNUSED)
+{
+	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Class *klass;
+
+	/* first do the implementation setup */
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	if (!klass->opengl_setup(r, s, rop, draw, l))
+	{
+		ENESIM_RENDERER_LOG(r, l, "Gradient implementation failed");
+		return EINA_FALSE;
+	}
+	/* now the common setup */
+	if (!_gradient_setup(r, l))
+	{
+		if (klass->opengl_cleanup)
+			klass->opengl_cleanup(r, s);
+		return EINA_FALSE;
+	}
+	/* upload the spans to a texture */
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+	if (thiz->gl.len != thiz->sw.len)
+	{
+		thiz->gl.len = thiz->sw.len;
+		if (thiz->gl.gen_stops)
+			enesim_opengl_span_free(thiz->gl.gen_stops);
+		thiz->gl.gen_stops = enesim_opengl_span_new(thiz->gl.len, thiz->sw.src);
+	}
+
+	return EINA_TRUE;
+}
+
+static void _gradient_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+{
+	Enesim_Renderer_Gradient_Class *klass;
+
+	/* the common clean up */
+	_gradient_cleanup(r);
+
+	/* the implementation clean up */
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	if (klass->opengl_cleanup)
+	{
+		klass->opengl_cleanup(r, s);
+	}
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -290,8 +364,12 @@ static void _enesim_renderer_gradient_class_init(void *k)
 	klass->bounds_get = _gradient_bounds_get;
 	klass->features_get = _gradient_features_get;
 	klass->has_changed = _gradient_has_changed;
-	klass->sw_setup = _gradient_state_setup;
-	klass->sw_cleanup = _gradient_state_cleanup;
+	klass->sw_setup = _gradient_sw_setup;
+	klass->sw_cleanup = _gradient_sw_cleanup;
+#if BUILD_OPENGL
+	klass->opengl_setup = _gradient_opengl_setup;
+	klass->opengl_cleanup = _gradient_opengl_cleanup;
+#endif
 }
 
 static void _enesim_renderer_gradient_instance_init(void *o EINA_UNUSED)

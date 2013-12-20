@@ -26,6 +26,7 @@
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
+#include "enesim_renderer_gradient.h"
 #include "enesim_renderer_gradient_radial.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -44,7 +45,7 @@
 		Enesim_Renderer_Gradient_Radial,				\
 		enesim_renderer_gradient_radial_descriptor_get())
 
-static Enesim_Renderer_Gradient_Sw_Draw _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
 
 typedef struct _Enesim_Renderer_Gradient_Radial
 {
@@ -55,6 +56,9 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	} center, focus;
 	double radius;
 	/* state generated */
+	struct {
+		Enesim_F16p16_Matrix matrix;
+	} sw;
 	double r, zf;
 	double fx, fy;
 	double scale;
@@ -131,12 +135,11 @@ static void _radial_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED
 }
 
 static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_Gradient_State *gstate,
 		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
-		Enesim_Renderer_Gradient_Sw_Draw *draw, Enesim_Log **l EINA_UNUSED)
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
-	Enesim_Matrix om;
+	Enesim_Repeat_Mode mode;
 	Enesim_Matrix m;
 	Enesim_Matrix_Type type;
 	double cx, cy;
@@ -156,13 +159,13 @@ static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 	scale = 1;
 	glen = ceil(rad) + 1;
 
-	enesim_matrix_identity(&m);
-	enesim_renderer_transformation_get(r, &om);
-	type = enesim_matrix_type_get(&om);
+	type = enesim_renderer_transformation_type_get(r);
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
+		Enesim_Matrix om;
 		double mx, my;
 
+		enesim_renderer_transformation_get(r, &om);
 		mx = hypot(om.xx, om.yx);
 		my = hypot(om.xy, om.yy);
 		scale = hypot(mx, my) / sqrt(2);
@@ -170,9 +173,11 @@ static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 
 		enesim_matrix_inverse(&om, &m);
 	}
-	enesim_renderer_transformation_set(r, &m);
-	DBG("Using a transformation matrix of %" ENESIM_MATRIX_FORMAT,
-			ENESIM_MATRIX_ARGS (&m));
+	else
+	{
+		enesim_matrix_identity(&m);
+	}
+	enesim_matrix_f16p16_matrix_to(&m, &thiz->sw.matrix);
 
 	if (glen < 4)
 	{
@@ -202,7 +207,8 @@ static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 	if ((fabs(fx) < small) && (fabs(fy) < small))
 		thiz->simple = 1;
 
-	*draw = _spans[gstate->mode][type];
+	mode = enesim_renderer_gradient_repeat_mode_get(r);
+	*fill = _spans[mode][type];
 	return EINA_TRUE;
 }
 
@@ -247,8 +253,8 @@ static void _enesim_renderer_gradient_radial_class_init(void *k)
 
 	klass = ENESIM_RENDERER_GRADIENT_CLASS(k);
 	klass->length = _radial_length;
-	klass->sw_setup = _radial_sw_setup;
 	klass->has_changed = _radial_has_changed;
+	klass->sw_setup = _radial_sw_setup;
 	klass->sw_cleanup = _radial_sw_cleanup;
 	klass->bounds_get = _radial_bounds_get;
 

@@ -37,6 +37,14 @@
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
+void enesim_opengl_matrix_convert(Enesim_Matrix *m, float fm[16])
+{
+	fm[0] = m->xx; fm[4] = m->xy; fm[8] = 0; fm[12] = m->xz;
+	fm[1] = m->yx; fm[5] = m->yy; fm[9] = 0; fm[13] = m->yz;
+	fm[2] = m->zx; fm[6] = m->zy; fm[10] = 1; fm[14] = m->zz;
+	fm[3] = 0; fm[7] = 0; fm[11] = 0; fm[15] = 1;
+}
+
 GLenum enesim_opengl_texture_new(int width, int height)
 {
 	GLenum id;
@@ -53,6 +61,26 @@ GLenum enesim_opengl_texture_new(int width, int height)
 }
 
 void enesim_opengl_texture_free(GLenum id)
+{
+	glDeleteTextures(1, &id);
+}
+
+GLenum enesim_opengl_span_new(int len, void *data)
+{
+	GLenum id;
+
+	glGenTextures(1, &id);
+	glEnable(GL_TEXTURE_1D);
+	glBindTexture(GL_TEXTURE_1D, id);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, len, 0, GL_BGRA, GL_UNSIGNED_BYTE, data);
+	glBindTexture(GL_TEXTURE_1D, 0);
+
+	return id;
+}
+
+void enesim_opengl_span_free(GLenum id)
 {
 	glDeleteTextures(1, &id);
 }

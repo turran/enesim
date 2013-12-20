@@ -140,22 +140,21 @@ static inline uint32_t enesim_renderer_gradient_repeat_color_get(Enesim_Color *s
 /* helper macros to draw gradients */
 #define GRADIENT_PROJECTIVE(type, type_get, distance, mode) \
 static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
-		const Enesim_Renderer_Gradient_Sw_Draw_Data *data,	\
 		int x, int y, int len, void *ddata)			\
 {									\
 	type *thiz;							\
-	const Enesim_Renderer_Gradient_Sw_State 			\
-			*gstate = data->sw_state;			\
-	const Enesim_Renderer_State 					\
-			*state = data->state;				\
+	Enesim_Renderer_Gradient *g;					\
+	Eina_F16p16 xx, yy, zz;						\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
-	Eina_F16p16 xx, yy, zz;						\
+	double ox, oy;							\
 									\
 	thiz = type_get(r);						\
-	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, 		\
-			state->current.ox, state->current.oy,		\
-			&gstate->matrix);				\
+	g = ENESIM_RENDERER_GRADIENT(r);				\
+	ox = r->state.current.ox;					\
+	oy = r->state.current.oy;					\
+	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, ox, oy,	\
+			&thiz->sw.matrix);				\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 syy, sxx;					\
@@ -166,69 +165,65 @@ static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
 									\
 		d = distance(thiz, sxx, syy);				\
 		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
-				gstate->src,				\
-				gstate->len, d);			\
-		yy += gstate->matrix.yx;				\
-		xx += gstate->matrix.xx;				\
-		zz += gstate->matrix.zx;				\
+				g->sw.src, g->sw.len, d);		\
+		yy += thiz->sw.matrix.yx;				\
+		xx += thiz->sw.matrix.xx;				\
+		zz += thiz->sw.matrix.zx;				\
 	}								\
 }
 
 #define GRADIENT_IDENTITY(type, type_get, distance, mode) \
 static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
-		const Enesim_Renderer_Gradient_Sw_Draw_Data *data,	\
 		int x, int y, int len, void *ddata)			\
 {									\
 	type *thiz;							\
-	const Enesim_Renderer_Gradient_Sw_State 			\
-			*gstate = data->sw_state;			\
-	const Enesim_Renderer_State 					\
-			*state = data->state;				\
+	Enesim_Renderer_Gradient *g;					\
+	Eina_F16p16 xx, yy;						\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
-	Eina_F16p16 xx, yy;						\
+	double ox, oy;							\
 									\
 	thiz = type_get(r);						\
-	enesim_coord_identity_setup(&xx, &yy, x, y, state->current.ox,	\
-			state->current.oy);				\
+	g = ENESIM_RENDERER_GRADIENT(r);				\
+	ox = r->state.current.ox;					\
+	oy = r->state.current.oy;					\
+	enesim_coord_identity_setup(&xx, &yy, x, y, ox, oy);		\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
 		d = distance(thiz, xx, yy);				\
 		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
-				gstate->src,				\
-				gstate->len, d);			\
-		xx += EINA_F16P16_ONE;				\
+				g->sw.src, g->sw.len, d);		\
+		xx += EINA_F16P16_ONE;					\
 	}								\
 }
 
 #define GRADIENT_AFFINE(type, type_get, distance, mode) \
 static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
-		const Enesim_Renderer_Gradient_Sw_Draw_Data *data,	\
  		int x, int y, int len, void *ddata)			\
 {									\
 	type *thiz;							\
-	const Enesim_Renderer_Gradient_Sw_State 			\
-			*gstate = data->sw_state;			\
-	const Enesim_Renderer_State					\
-			*state = data->state;				\
+	Enesim_Renderer_Gradient *g;					\
+	Eina_F16p16 xx, yy;						\
 	uint32_t *dst = ddata;						\
 	uint32_t *end = dst + len;					\
-	Eina_F16p16 xx, yy;						\
+	double ox, oy;							\
 									\
 	thiz = type_get(r);						\
-	enesim_coord_affine_setup(&xx, &yy, x, y, state->current.ox, 	\
-			state->current.oy, &gstate->matrix);		\
+	g = ENESIM_RENDERER_GRADIENT(r);				\
+	ox = r->state.current.ox;					\
+	oy = r->state.current.oy;					\
+	enesim_coord_affine_setup(&xx, &yy, x, y, ox, oy, 		\
+			&thiz->sw.matrix);				\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
 									\
 		d = distance(thiz, xx, yy);				\
 		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
-				gstate->src,				\
-				gstate->len, d);			\
-		yy += gstate->matrix.yx;				\
-		xx += gstate->matrix.xx;				\
+				g->sw.src, g->sw.len, d);		\
+		yy += thiz->sw.matrix.yx;				\
+		xx += thiz->sw.matrix.xx;				\
 	}								\
 }
 
@@ -243,19 +238,7 @@ typedef struct _Enesim_Renderer_Gradient_Sw_State
 {
 	Enesim_Color *src;
 	int len;
-	Enesim_F16p16_Matrix matrix;
 } Enesim_Renderer_Gradient_Sw_State;
-
-typedef struct _Enesim_Renderer_Gradient_Sw_Draw_Data
-{
-	const Enesim_Renderer_State *state;
-	const Enesim_Renderer_Gradient_State *gstate;
-	const Enesim_Renderer_Gradient_Sw_State *sw_state;
-} Enesim_Renderer_Gradient_Sw_Draw_Data;
-
-typedef void (*Enesim_Renderer_Gradient_Sw_Draw)(Enesim_Renderer *r,
-		const Enesim_Renderer_Gradient_Sw_Draw_Data *gdata,
-		int x, int y, int len, void *data);
 
 typedef struct _Enesim_Renderer_Gradient
 {
@@ -264,10 +247,12 @@ typedef struct _Enesim_Renderer_Gradient
 	Enesim_Renderer_Gradient_State state;
 	/* generated at state setup */
 	Enesim_Renderer_Gradient_Sw_State sw;
-	Enesim_Renderer_Gradient_Sw_Draw draw;
-	uint32_t *src;
-	int slen;
-	const Enesim_Renderer_State *rstate;
+#if BUILD_OPENGL
+	struct {
+		int len;
+		GLenum gen_stops;
+	} gl;
+#endif
 	/* private */
 	Enesim_Repeat_Mode past_mode;
 	Eina_Bool changed : 1;
@@ -275,21 +260,21 @@ typedef struct _Enesim_Renderer_Gradient
 } Enesim_Renderer_Gradient;
 
 typedef int (*Enesim_Renderer_Gradient_Length)(Enesim_Renderer *r);
-typedef Eina_Bool (*Enesim_Renderer_Gradient_Sw_Setup)(Enesim_Renderer *r,
-		const Enesim_Renderer_Gradient_State *gstate,
-		Enesim_Surface *s, Enesim_Rop rop,
-		Enesim_Renderer_Gradient_Sw_Draw *draw,
-		Enesim_Log **l);
 
 typedef struct _Enesim_Renderer_Gradient_Class
 {
 	Enesim_Renderer_Class parent;
-	/* gradient based functions */
-	Enesim_Renderer_Gradient_Length length;
-	Enesim_Renderer_Gradient_Sw_Setup sw_setup;
-	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+
 	Enesim_Renderer_Bounds_Get_Cb bounds_get;
 	Enesim_Renderer_Has_Changed_Cb has_changed;
+	/* software based functions */
+	Enesim_Renderer_Sw_Setup sw_setup;
+	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* opengl based functions */
+	Enesim_Renderer_OpenGL_Setup opengl_setup;
+	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
+	/* gradient based functions */
+	Enesim_Renderer_Gradient_Length length;
 } Enesim_Renderer_Gradient_Class;
 
 Enesim_Object_Descriptor * enesim_renderer_gradient_descriptor_get(void);
