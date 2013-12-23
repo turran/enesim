@@ -67,6 +67,8 @@ typedef struct _Enesim_Renderer_Path_Nv
 {
 	Enesim_Renderer_Path_Abstract parent;
 	Enesim_Path *path;
+	Enesim_Surface *fsrc;
+	Enesim_Surface *ssrc;
 	GLuint path_id;
 	GLuint sb;
 	int last_w, last_h;
@@ -130,18 +132,67 @@ void _fill_sample(Enesim_Renderer_Path_Nv *thiz, Enesim_Color final_color)
 }
 #endif
 
+static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
+		Enesim_Color color, Enesim_Surface **s, Enesim_Pool *p,
+		const Eina_Rectangle *area)
+{
+	int w, h;
+
+	if (!r) return;
+
+	if (*s)
+	{
+		enesim_surface_size_get(*s, &w, &h);
+		if (w != area->w || h != area->h)
+		{
+			enesim_surface_unref(*s);
+			*s = NULL;
+		}
+	}
+
+	if (!*s)
+	{
+		*s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
+				area->w, area->h, p);
+	}
+	enesim_renderer_opengl_draw(r, *s, ENESIM_ROP_FILL, area, 0, 0);
+}
+
 static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
 		int x, int y)
 {
 	Enesim_Renderer_Path_Nv *thiz;
 	Enesim_Renderer_Shape_Draw_Mode draw_mode;
+	Enesim_Renderer *fren = NULL;
+	Enesim_Renderer *sren = NULL;
+	Enesim_Color scolor;
+	Enesim_Color fcolor;
 	Enesim_Matrix m;
+	Enesim_Pool *pool;
 	GLfloat fm[16];
 	GLenum status;
 
 	thiz = ENESIM_RENDERER_PATH_NV(r);
 
+	draw_mode = enesim_renderer_shape_draw_mode_get(r);
+	pool = enesim_surface_pool_get(s);
+	/* draw the temporary fill/stroke renderers */
+	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	{
+		enesim_renderer_shape_fill_setup(r, &fcolor, &fren);
+		 _enesim_renderer_path_nv_sub_draw(fren, fcolor, &thiz->fsrc,
+				pool, area);
+	}
+	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	{
+		enesim_renderer_shape_stroke_setup(r, &scolor, &sren);
+		 _enesim_renderer_path_nv_sub_draw(sren, scolor, &thiz->ssrc,
+				pool, area);
+	}
+
+	/* finally draw */
+	enesim_opengl_target_surface_set(s, x, y);
 	/* attach the stencil buffer on the framebuffer */
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, thiz->sb);
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -150,8 +201,6 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		ERR("The framebuffer failed %d", status);
 		return;
 	}
-
-	enesim_opengl_target_surface_set(s, x, y);
 	enesim_opengl_rop_set(rop);
 
 	glClearStencil(0);
@@ -160,60 +209,47 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 
 	/* add our own transformation matrix */
 	enesim_renderer_transformation_get(r, &m);
-	fm[0] = m.xx; fm[4] = m.xy; fm[8] = 0; fm[12] = m.xz;
-	fm[1] = m.yx; fm[5] = m.yy; fm[9] = 0; fm[13] = m.yz;
-	fm[2] = m.zx; fm[6] = m.zy; fm[10] = 1; fm[14] = m.zz;
-	fm[3] = 0; fm[7] = 0; fm[11] = 0; fm[15] = 1;
+	enesim_opengl_matrix_convert(&m, fm);
 
 	glMatrixMode(GL_PROJECTION);
 	glMultMatrixf(fm);
 
-	draw_mode = enesim_renderer_shape_draw_mode_get(r);
-
 	/* fill */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
-		Enesim_Color final_color;
-		Enesim_Renderer *ren;
-
-		enesim_renderer_shape_fill_setup(r, &final_color, &ren);
-		/* TODO use the renderer */
-		if (ren) enesim_renderer_unref(ren);
-
 		glEnable(GL_STENCIL_TEST);
 		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
 
-		glColor4f(argb8888_red_get(final_color) / 255.0,
-			argb8888_green_get(final_color) / 255.0,
-			argb8888_blue_get(final_color) / 255.0,
-			argb8888_alpha_get(final_color) / 255.0);
+		glColor4f(argb8888_red_get(fcolor) / 255.0,
+			argb8888_green_get(fcolor) / 255.0,
+			argb8888_blue_get(fcolor) / 255.0,
+			argb8888_alpha_get(fcolor) / 255.0);
 		glCoverFillPathNV(thiz->path_id, GL_BOUNDING_BOX_NV);
 	}
 
 	/* stroke */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
-		Enesim_Color final_color;
-		Enesim_Renderer *ren;
-
-		enesim_renderer_shape_stroke_setup(r, &final_color, &ren);
-		/* TODO use the renderer */
-		if (ren) enesim_renderer_unref(ren);
-
 		glEnable(GL_STENCIL_TEST);
 		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
-		glColor4f(argb8888_red_get(final_color) / 255.0,
-			argb8888_green_get(final_color) / 255.0,
-			argb8888_blue_get(final_color) / 255.0,
-			argb8888_alpha_get(final_color) / 255.0);
+		glColor4f(argb8888_red_get(scolor) / 255.0,
+			argb8888_green_get(scolor) / 255.0,
+			argb8888_blue_get(scolor) / 255.0,
+			argb8888_alpha_get(scolor) / 255.0);
 		glCoverStrokePathNV(thiz->path_id, GL_CONVEX_HULL_NV);
 	}
+
+	/* unref the renderers */
+	enesim_renderer_unref(fren);
+	enesim_renderer_unref(sren);
+	enesim_pool_unref(pool);
+
 	/* restore the state */
 	glClearStencil(0);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -272,7 +308,7 @@ static void _enesim_renderer_path_nv_setup_stroke(
 	err = glGetError();
 	if (err)
 	{
-		ERR("Setting up the stroke failed 0x%08x\n", err);
+		ERR("Setting up the stroke failed 0x%08x", err);
 	}
 }
 
@@ -417,6 +453,13 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 	thiz->generated = EINA_TRUE;
 	thiz->last_path_change = thiz->path->changed;
 
+	/* set the coordinate textures */
+	glPathTexGenNV(GL_TEXTURE0, GL_PATH_OBJECT_BOUNDING_BOX_NV, 0, NULL);
+	err = glGetError();
+	if (err)
+	{
+		ERR("glPathTexGenNV failed 0x%08x", err);
+	}
 propagate:
 	_enesim_renderer_path_nv_setup_stroke(thiz);
 	_enesim_renderer_path_nv_setup_fill(thiz);
@@ -641,6 +684,11 @@ static void _enesim_renderer_path_nv_instance_deinit(void *o)
 		enesim_path_unref(thiz->path);
 	if (thiz->sb)
 		glDeleteRenderbuffers(1, &thiz->sb);
+
+	if (thiz->fsrc)
+		enesim_surface_unref(thiz->fsrc);
+	if (thiz->ssrc)
+		enesim_surface_unref(thiz->ssrc);
 }
 #endif
 /*============================================================================*
