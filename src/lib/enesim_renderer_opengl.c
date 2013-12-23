@@ -274,7 +274,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Draw draw;
 	Enesim_Buffer_OpenGL_Data *sdata;
-	GLenum status;
 	int i;
 
 	klass = ENESIM_RENDERER_CLASS_GET(r);
@@ -342,17 +341,6 @@ setup:
 	{
 		glGenFramebuffersEXT(1, &sdata->fbo);
 	}
-	/* attach the texture to the first color attachment */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, sdata->textures[0], 0);
-
-        status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
-        {
-		ENESIM_RENDERER_LOG(r, error, "Impossible too setup the framebuffer %d", status);
-		return EINA_FALSE;
-        }
 
 	/* do the setup */
 	if (!klass->opengl_setup) return EINA_FALSE;
