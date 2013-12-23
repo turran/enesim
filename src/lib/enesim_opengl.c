@@ -31,6 +31,8 @@
 #include "enesim_opengl_private.h"
 
 #include "enesim_surface_private.h"
+
+#define ENESIM_LOG_DEFAULT enesim_log_global
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -160,6 +162,7 @@ Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y)
 	{
 		Enesim_Buffer_OpenGL_Data *backend_data;
 		Enesim_Backend backend;
+		GLenum status;
 		int w, h;
 
 		backend = enesim_surface_backend_get(s);
@@ -181,9 +184,16 @@ Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y)
 		glOrtho(-x, w + x, h + y, -y, -1, 1);
 
 		/* sets the fbo as the destination buffer */
+		/* attach the texture to the first color attachment */
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, backend_data->fbo);
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, backend_data->textures[0], 0);
+		status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+		{
+			WRN("Impossible to setup the framebuffer %08x", status);
+			return EINA_FALSE;
+		}
 	}
 	else
 	{
