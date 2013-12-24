@@ -79,6 +79,7 @@ src/lib/renderer/enesim_renderer_gradient_linear.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_ambient.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_blit.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_merge.glsl \
+src/lib/renderer/enesim_renderer_opengl_common_texture.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_vertex.glsl \
 src/lib/renderer/enesim_renderer_path_silhoutte_ambient.glsl \
 src/lib/renderer/enesim_renderer_path_silhoutte_vertex.glsl \

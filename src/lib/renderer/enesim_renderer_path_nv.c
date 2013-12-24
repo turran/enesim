@@ -47,6 +47,8 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_surface_private.h"
+
 #define GLERR {\
         GLenum err; \
         err = glGetError(); \
@@ -81,6 +83,58 @@ typedef struct _Enesim_Renderer_Path_Nv_Class
 {
 	Enesim_Renderer_Path_Abstract_Class parent;
 } Enesim_Renderer_Path_Nv_Class;
+
+/* the only shader */
+static Enesim_Renderer_OpenGL_Shader _enesim_renderer_path_nv_shader = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "enesim_renderer_path_nv",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_texture.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_enesim_renderer_path_nv_shaders[] = {
+	&_enesim_renderer_path_nv_shader,
+	NULL,
+};
+
+/* the only program */
+static Enesim_Renderer_OpenGL_Program _enesim_renderer_path_nv_program = {
+	/* .name 		= */ "enesim_renderer_path_nv",
+	/* .shaders 		= */ _enesim_renderer_path_nv_shaders,
+	/* .num_shaders		= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program *_enesim_renderer_path_nv_programs[] = {
+	&_enesim_renderer_path_nv_program,
+	NULL,
+};
+
+static Eina_Bool _enesim_renderer_path_nv_common_texture_setup(GLenum pid,
+		Enesim_Surface *s, Enesim_Color color)
+{
+	Enesim_Buffer_OpenGL_Data *backend_data;
+	int texture_u;
+	int color_u;
+
+	glUseProgramObjectARB(pid);
+	color_u = glGetUniformLocationARB(pid, "color");
+	texture_u = glGetUniformLocationARB(pid, "texture");
+
+	glUniform4fARB(color_u,
+			argb8888_red_get(color) / 255.0,
+			argb8888_green_get(color) / 255.0,
+			argb8888_blue_get(color) / 255.0,
+			argb8888_alpha_get(color) / 255.0);
+
+
+	backend_data = enesim_surface_backend_data_get(s);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, backend_data->textures[0]);
+	glUniform1i(texture_u, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return EINA_TRUE;
+}
 
 /* future code to draw using more samples */
 #if 0
@@ -166,6 +220,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *fren = NULL;
 	Enesim_Renderer *sren = NULL;
+	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Color scolor;
 	Enesim_Color fcolor;
 	Enesim_Matrix m;
@@ -175,6 +230,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_PATH_NV(r);
 
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
 	pool = enesim_surface_pool_get(s);
 	/* draw the temporary fill/stroke renderers */
@@ -221,13 +277,19 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
+		if (fren)
+		{
+			Enesim_OpenGL_Compiled_Program *cp;
+			cp = &rdata->program->compiled[0];
+			_enesim_renderer_path_nv_common_texture_setup(cp->id, thiz->fsrc, fcolor);
+		}
 		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
-
 		glColor4f(argb8888_red_get(fcolor) / 255.0,
 			argb8888_green_get(fcolor) / 255.0,
 			argb8888_blue_get(fcolor) / 255.0,
 			argb8888_alpha_get(fcolor) / 255.0);
 		glCoverFillPathNV(thiz->path_id, GL_BOUNDING_BOX_NV);
+		glUseProgramObjectARB(0);
 	}
 
 	/* stroke */
@@ -237,6 +299,12 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
 		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
+		if (sren)
+		{
+			Enesim_OpenGL_Compiled_Program *cp;
+			cp = &rdata->program->compiled[0];
+			_enesim_renderer_path_nv_common_texture_setup(cp->id, thiz->ssrc, scolor);
+		}
 		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
 		glColor4f(argb8888_red_get(scolor) / 255.0,
 			argb8888_green_get(scolor) / 255.0,
@@ -327,6 +395,7 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 	GLenum err;
 	GLubyte *cmd, *cmds;
 	GLfloat *coord, *coords;
+	GLfloat coeffs[6] = { 1, 0, 0, 0, 1, 0};
 	int num_cmds;
 	int num_coords = 0;
 
@@ -454,7 +523,8 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 	thiz->last_path_change = thiz->path->changed;
 
 	/* set the coordinate textures */
-	glPathTexGenNV(GL_TEXTURE0, GL_PATH_OBJECT_BOUNDING_BOX_NV, 0, NULL);
+	/* we pass x on s and y on t */
+	glPathTexGenNV(GL_TEXTURE0, GL_OBJECT_LINEAR, 2, coeffs);
 	err = glGetError();
 	if (err)
 	{
@@ -632,9 +702,11 @@ failed:
 
 static Eina_Bool _enesim_renderer_path_nv_opengl_initialize(
 		Enesim_Renderer *r EINA_UNUSED,
-		int *num_programs EINA_UNUSED,
-		Enesim_Renderer_OpenGL_Program ***programs EINA_UNUSED)
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs)
 {
+	*num_programs = 1;
+	*programs = _enesim_renderer_path_nv_programs;
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
