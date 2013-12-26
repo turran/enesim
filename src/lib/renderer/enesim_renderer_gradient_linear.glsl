@@ -20,17 +20,17 @@ void main()
 	d = ((linear_ay.x * x) + (linear_ay.y * y)) * linear_scale;
 	
 	/* TODO get the texcoord of the stops based on the repeat mode */
-	if (d < 0)
+	if (d < 0.0)
 	{
 		gl_FragColor = vec4(0, 0, 0, 0);
 	}
-	else if (d >= (linear_length - 1))
+	else if (d >= float(linear_length - 1))
 	{
 		gl_FragColor = vec4(0, 0, 0, 0);
 	}
 	else
 	{
-		texel = texture1D(linear_stops, d/(linear_length - 1));
+		texel = texture1D(linear_stops, d/float(linear_length - 1));
 		gl_FragColor = texel;
 	}
 }
