@@ -148,6 +148,8 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_Checker *thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_OpenGL_Compiled_Program *cp;
+	Enesim_Matrix m1, m2;
+	float matrix[16];
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -159,6 +161,16 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_opengl_target_surface_set(s, x, y);
 	enesim_opengl_rop_set(rop);
+
+	/* set our transformation matrix */
+	enesim_renderer_transformation_get(r, &m2);
+	enesim_matrix_inverse(&m2, &m1);
+	enesim_opengl_matrix_convert(&m1, matrix);
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glMultMatrixf(matrix);
+
+	/* draw the specified area */
 	enesim_opengl_draw_area(area);
 
 	/* don't use any program */
