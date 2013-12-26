@@ -85,15 +85,8 @@ typedef struct _Enesim_Renderer_Path_Nv_Class
 } Enesim_Renderer_Path_Nv_Class;
 
 /* the only shader */
-static Enesim_Renderer_OpenGL_Shader _enesim_renderer_path_nv_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
-	/* .name 	= */ "enesim_renderer_path_nv",
-	/* .source	= */
-#include "enesim_renderer_opengl_common_texture.glsl"
-};
-
 static Enesim_Renderer_OpenGL_Shader *_enesim_renderer_path_nv_shaders[] = {
-	&_enesim_renderer_path_nv_shader,
+	&enesim_renderer_opengl_shader_texture,
 	NULL,
 };
 
@@ -108,33 +101,6 @@ static Enesim_Renderer_OpenGL_Program *_enesim_renderer_path_nv_programs[] = {
 	&_enesim_renderer_path_nv_program,
 	NULL,
 };
-
-static Eina_Bool _enesim_renderer_path_nv_common_texture_setup(GLenum pid,
-		Enesim_Surface *s, Enesim_Color color)
-{
-	Enesim_Buffer_OpenGL_Data *backend_data;
-	int texture_u;
-	int color_u;
-
-	glUseProgramObjectARB(pid);
-	color_u = glGetUniformLocationARB(pid, "color");
-	texture_u = glGetUniformLocationARB(pid, "texture");
-
-	glUniform4fARB(color_u,
-			argb8888_red_get(color) / 255.0,
-			argb8888_green_get(color) / 255.0,
-			argb8888_blue_get(color) / 255.0,
-			argb8888_alpha_get(color) / 255.0);
-
-
-	backend_data = enesim_surface_backend_data_get(s);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, backend_data->textures[0]);
-	glUniform1i(texture_u, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	return EINA_TRUE;
-}
 
 /* future code to draw using more samples */
 #if 0
@@ -281,7 +247,8 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		{
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
-			_enesim_renderer_path_nv_common_texture_setup(cp->id, thiz->fsrc, fcolor);
+			enesim_renderer_opengl_shader_texture_setup(cp->id,
+					GL_TEXTURE0, thiz->fsrc, fcolor);
 		}
 		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
 		glColor4f(argb8888_red_get(fcolor) / 255.0,
@@ -303,7 +270,8 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		{
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
-			_enesim_renderer_path_nv_common_texture_setup(cp->id, thiz->ssrc, scolor);
+			enesim_renderer_opengl_shader_texture_setup(cp->id,
+					GL_TEXTURE0, thiz->ssrc, scolor);
 		}
 		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
 		glColor4f(argb8888_red_get(scolor) / 255.0,

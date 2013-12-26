@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
+#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -39,7 +40,6 @@
 #include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
 /*
- * Shall we use only one framebuffer? One framebuffer per renderer?
  * Add a program cache
  */
 /*============================================================================*
@@ -411,6 +411,67 @@ void enesim_renderer_opengl_free(Enesim_Renderer *r)
 	if (!gl_data) return;
 	free(gl_data);
 }
+
+/*----------------------------------------------------------------------------*
+ *                                Shaders                                     *
+ *----------------------------------------------------------------------------*/
+Eina_Bool enesim_renderer_opengl_shader_ambient_setup(GLenum pid,
+		Enesim_Color color)
+{
+	int final_color_u;
+
+	glUseProgramObjectARB(pid);
+	final_color_u = glGetUniformLocationARB(pid, "ambient_color");
+	glUniform4fARB(final_color_u,
+			argb8888_red_get(color) / 255.0,
+			argb8888_green_get(color) / 255.0,
+			argb8888_blue_get(color) / 255.0,
+			argb8888_alpha_get(color) / 255.0);
+
+	return EINA_TRUE;
+}
+
+Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
+		GLenum texture_unit, Enesim_Surface *s, Enesim_Color color)
+{
+	Enesim_Buffer_OpenGL_Data *backend_data;
+	int texture_u;
+	int color_u;
+
+	glUseProgramObjectARB(pid);
+	color_u = glGetUniformLocationARB(pid, "texture_color");
+	texture_u = glGetUniformLocationARB(pid, "texture_texture");
+
+	glUniform4fARB(color_u,
+			argb8888_red_get(color) / 255.0,
+			argb8888_green_get(color) / 255.0,
+			argb8888_blue_get(color) / 255.0,
+			argb8888_alpha_get(color) / 255.0);
+
+
+	backend_data = enesim_surface_backend_data_get(s);
+	glActiveTexture(texture_unit);
+	glBindTexture(GL_TEXTURE_2D, backend_data->textures[0]);
+	glUniform1i(texture_u, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return EINA_TRUE;
+}
+
+Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_texture = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "enesim_renderer_opengl_shader_texture",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_texture.glsl"
+};
+
+Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_ambient = {
+	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name	= */ "enesim_renderer_opengl_shader_ambient",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_ambient.glsl"
+};
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

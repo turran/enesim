@@ -1,5 +1,5 @@
 ENESIM_OPENGL_SHADER(
-uniform vec4 ambient_final_color;
+uniform vec4 ambient_color;
 
 void main()
 {
@@ -23,7 +23,7 @@ void main()
 	if (distance.x < 0.0 || distance.y < 0.0)
 		discard;
 	float d = min(distance.x, distance.y);
-	gl_FragColor = ambient_final_color;
+	gl_FragColor = ambient_color;
 	gl_FragColor.a = d;
 }
 )

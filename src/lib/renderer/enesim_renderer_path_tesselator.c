@@ -120,22 +120,6 @@ static void _enesim_renderer_path_tesselator_generate_figures(Enesim_Renderer *r
 /*----------------------------------------------------------------------------*
  *                                Shaders                                     *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _path_opengl_ambient_shader_setup(GLenum pid,
-		Enesim_Color color)
-{
-	int final_color_u;
-
-	glUseProgramObjectARB(pid);
-	final_color_u = glGetUniformLocationARB(pid, "ambient_final_color");
-	glUniform4fARB(final_color_u,
-			argb8888_red_get(color) / 255.0,
-			argb8888_green_get(color) / 255.0,
-			argb8888_blue_get(color) / 255.0,
-			argb8888_alpha_get(color) / 255.0);
-
-	return EINA_TRUE;
-}
-
 static Eina_Bool _path_opengl_merge_shader_setup(GLenum pid,
 		GLenum texture0, GLenum texture1)
 {
@@ -158,12 +142,20 @@ static Eina_Bool _path_opengl_merge_shader_setup(GLenum pid,
 	return EINA_TRUE;
 }
 
-static Enesim_Renderer_OpenGL_Shader _path_shader_ambient = {
-	/* .type	= */ ENESIM_SHADER_FRAGMENT,
-	/* .name	= */ "ambient",
-	/* .source	= */
-#include "enesim_renderer_opengl_common_ambient.glsl"
-};
+static Eina_Bool _path_opengl_silhoutte_ambient_shader_setup(GLenum pid,
+		Enesim_Color color)
+{
+	/* we can use the generic ambient setup here */
+	return enesim_renderer_opengl_shader_ambient_setup(pid, color);
+}
+
+static Eina_Bool _path_opengl_silhoutte_texture_shader_setup(GLenum pid,
+		Enesim_Surface *s, Enesim_Color color)
+{
+	/* we can use the generic texture setup here */
+	return enesim_renderer_opengl_shader_texture_setup(pid, GL_TEXTURE0, s,
+			color);
+}
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_coordinates = {
 	/* .type	= */ ENESIM_SHADER_VERTEX,
@@ -194,7 +186,7 @@ static Enesim_Renderer_OpenGL_Shader _path_shader_silhoutte_ambient = {
 };
 
 static Enesim_Renderer_OpenGL_Shader *_path_simple_shaders[] = {
-	&_path_shader_ambient,
+	&enesim_renderer_opengl_shader_ambient,
 	NULL,
 };
 
@@ -472,14 +464,14 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	{
 		/* first fill the silhoutte (the anti alias border) */
 		cp = &rdata->program->compiled[2];
-		_path_opengl_ambient_shader_setup(cp->id, color);
+		_path_opengl_silhoutte_ambient_shader_setup(cp->id, color);
 		glUseProgramObjectARB(cp->id);
 		_path_opengl_silhoutte_draw(f, area);
 	}
 
 	/* now fill the aliased figure on top */
 	cp = &rdata->program->compiled[0];
-	_path_opengl_ambient_shader_setup(cp->id, color);
+	enesim_renderer_opengl_shader_ambient_setup(cp->id, color);
 	glUseProgramObjectARB(cp->id);
 
 #if DEBUG

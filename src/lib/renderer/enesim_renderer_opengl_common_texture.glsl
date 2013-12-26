@@ -1,11 +1,11 @@
 ENESIM_OPENGL_SHADER(
-uniform sampler2D texture;
-uniform vec4 color;
+uniform sampler2D texture_texture;
+uniform vec4 texture_color;
 
 void main()
 {
-	vec4 texel = texture2D(texture, gl_TexCoord[0].xy);
-	gl_FragColor = texel * color;
+	vec4 texel = texture2D(texture_texture, gl_TexCoord[0].xy);
+	gl_FragColor = texel * texture_color;
 }
 )
 
