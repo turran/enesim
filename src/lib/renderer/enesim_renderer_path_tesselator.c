@@ -79,8 +79,7 @@ typedef struct _Enesim_Renderer_Path_Tesselator_Polygon
 typedef struct _Enesim_Renderer_Path_Tesselator_Figure
 {
 	Eina_List *polygons;
-	Enesim_Surface *tmp;
-	Enesim_Surface *renderer_s;
+	Enesim_Surface *src;
 	Eina_Bool needs_tesselate : 1;
 } Enesim_Renderer_Path_Tesselator_Figure;
 
@@ -153,8 +152,7 @@ static Eina_Bool _path_opengl_silhoutte_texture_shader_setup(GLenum pid,
 		Enesim_Surface *s, Enesim_Color color)
 {
 	/* we can use the generic texture setup here */
-	return enesim_renderer_opengl_shader_texture_setup(pid, GL_TEXTURE0, s,
-			color);
+	return enesim_renderer_opengl_shader_texture_setup(pid, 0, s, color);
 }
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_coordinates = {
@@ -185,49 +183,81 @@ static Enesim_Renderer_OpenGL_Shader _path_shader_silhoutte_ambient = {
 #include "enesim_renderer_path_silhoutte_ambient.glsl"
 };
 
-static Enesim_Renderer_OpenGL_Shader *_path_simple_shaders[] = {
+static Enesim_Renderer_OpenGL_Shader *_path_simple_ambient_shaders[] = {
 	&enesim_renderer_opengl_shader_ambient,
 	NULL,
 };
 
-static Enesim_Renderer_OpenGL_Shader *_path_complex_shaders[] = {
+static Enesim_Renderer_OpenGL_Shader *_path_simple_texture_shaders[] = {
+	&enesim_renderer_opengl_shader_texture,
+	NULL,
+};
+
+static Enesim_Renderer_OpenGL_Shader *_path_merge_shaders[] = {
 	&_path_shader_merge,
 	&_path_shader_coordinates,
 	NULL,
 };
 
-static Enesim_Renderer_OpenGL_Shader *_path_silhoutte_shaders[] = {
+static Enesim_Renderer_OpenGL_Shader *_path_silhoutte_ambient_shaders[] = {
 	&_path_shader_silhoutte_ambient,
 	&_path_shader_silhoutte_vertex,
 	NULL,
 };
 
-static Enesim_Renderer_OpenGL_Program _path_simple_program = {
-	/* .name		= */ "path_simple",
-	/* .shaders		= */ _path_simple_shaders,
-	/* .num_shaders		= */ 1,
-};
-
-static Enesim_Renderer_OpenGL_Program _path_complex_program = {
-	/* .name		= */ "path_complex",
-	/* .shaders		= */ _path_complex_shaders,
-	/* .num_shaders		= */ 2,
-};
-
-static Enesim_Renderer_OpenGL_Program _path_silhoutte_program = {
-	/* .name		= */ "path_silhoutte",
-	/* .shaders		= */ _path_silhoutte_shaders,
-	/* .num_shaders		= */ 2,
-};
-
-
-static Enesim_Renderer_OpenGL_Program *_path_programs[] = {
-	&_path_simple_program,
-	&_path_complex_program,
-	&_path_silhoutte_program,
+static Enesim_Renderer_OpenGL_Shader *_path_silhoutte_texture_shaders[] = {
+	&_path_shader_silhoutte_ambient,
+	&_path_shader_silhoutte_vertex,
 	NULL,
 };
 
+static Enesim_Renderer_OpenGL_Program _path_simple_ambient_program = {
+	/* .name		= */ "path_simple_ambient",
+	/* .shaders		= */ _path_simple_ambient_shaders,
+	/* .num_shaders		= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program _path_simple_texture_program = {
+	/* .name		= */ "path_simple_texture",
+	/* .shaders		= */ _path_simple_texture_shaders,
+	/* .num_shaders		= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program _path_merge_program = {
+	/* .name		= */ "path_merge",
+	/* .shaders		= */ _path_merge_shaders,
+	/* .num_shaders		= */ 2,
+};
+
+static Enesim_Renderer_OpenGL_Program _path_silhoutte_ambient_program = {
+	/* .name		= */ "path_silhoutte_ambient",
+	/* .shaders		= */ _path_silhoutte_ambient_shaders,
+	/* .num_shaders		= */ 2,
+};
+
+static Enesim_Renderer_OpenGL_Program _path_silhoutte_texture_program = {
+	/* .name		= */ "path_silhoutte_texture",
+	/* .shaders		= */ _path_silhoutte_texture_shaders,
+	/* .num_shaders		= */ 2,
+};
+
+static Enesim_Renderer_OpenGL_Program *_path_programs[] = {
+	&_path_simple_ambient_program,
+	&_path_simple_texture_program,
+	&_path_silhoutte_ambient_program,
+	&_path_silhoutte_texture_program,
+	&_path_merge_program,
+	NULL,
+};
+
+enum {
+	PATH_TESSELATOR_SIMPLE_AMBIENT,
+	PATH_TESSELATOR_SIMPLE_TEXTURE,
+	PATH_TESSELATOR_SILHOUTTE_AMBIENT,
+	PATH_TESSELATOR_SILHOUTTE_TEXTURE,
+	PATH_TESSELATOR_MERGE,
+	PATH_TESSELATOR_PROGRAMS,
+};
 /*----------------------------------------------------------------------------*
  *                            Tesselator callbacks                            *
  *----------------------------------------------------------------------------*/
@@ -246,6 +276,7 @@ static void _path_opengl_vertex_cb(GLvoid *vertex, void *data)
 
 	/* add another vertex */
 	enesim_polygon_point_append_from_coords(p->polygon, pt->x, pt->y);
+	glTexCoord2f(pt->x, pt->y);
 	glVertex3f(pt->x, pt->y, 0.0);
 }
 
@@ -435,15 +466,37 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		Enesim_Renderer_Path_Tesselator_Figure *gf,
 		Enesim_Figure *f,
 		Enesim_Color color,
-		Enesim_Renderer *rel EINA_UNUSED,
+		Enesim_Pool *pool,
+		Enesim_Renderer *rel,
 		Enesim_Renderer_OpenGL_Data *rdata,
 		Eina_Bool silhoutte,
 		const Eina_Rectangle *area)
 {
 	Enesim_OpenGL_Compiled_Program *cp;
-	/* TODO we still miss to render the relative renderer in case we have one */
-	/* if so, render the inner renderer first into a temporary texture */
-	/* else use the ambient shader */
+
+	/* draw the relative renderer */
+	if (rel)
+	{
+		if (gf->src)
+		{
+			int w, h;
+
+			enesim_surface_size_get(gf->src, &w, &h);
+			if (w != area->w || h != area->h)
+			{
+				enesim_surface_unref(gf->src);
+				gf->src = NULL;
+			}
+
+		}
+		if (!gf->src)
+		{
+			gf->src = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
+				area->w, area->h, pool);
+
+		}
+		enesim_renderer_opengl_draw(rel, gf->src, ENESIM_ROP_FILL, area, 0, 0);
+	}
 
 	glViewport(0, 0, area->w, area->h);
 
@@ -463,15 +516,23 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	if (silhoutte)
 	{
 		/* first fill the silhoutte (the anti alias border) */
-		cp = &rdata->program->compiled[2];
+		cp = &rdata->program->compiled[PATH_TESSELATOR_SILHOUTTE_AMBIENT];
 		_path_opengl_silhoutte_ambient_shader_setup(cp->id, color);
 		glUseProgramObjectARB(cp->id);
 		_path_opengl_silhoutte_draw(f, area);
 	}
 
 	/* now fill the aliased figure on top */
-	cp = &rdata->program->compiled[0];
-	enesim_renderer_opengl_shader_ambient_setup(cp->id, color);
+	if (rel)
+	{
+		cp = &rdata->program->compiled[PATH_TESSELATOR_SIMPLE_TEXTURE];
+		enesim_renderer_opengl_shader_texture_setup(cp->id, 0, gf->src, color);
+	}
+	else
+	{
+		cp = &rdata->program->compiled[PATH_TESSELATOR_SIMPLE_AMBIENT];
+		enesim_renderer_opengl_shader_ambient_setup(cp->id, color);
+	}
 	glUseProgramObjectARB(cp->id);
 
 #if DEBUG
@@ -505,6 +566,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_Figure *f;
+	Enesim_Pool *pool;
 	Enesim_Color final_color;
 	GLint viewport[4];
 	GLenum texture;
@@ -516,6 +578,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	enesim_surface_size_get(s, &w, &h);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
+	pool = enesim_surface_pool_get(s);
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
@@ -534,7 +597,11 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	texture = enesim_opengl_texture_new(area->w, area->h);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	/* render there */
-	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color, rel, rdata, EINA_TRUE, area);
+	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color,
+			pool, rel, rdata, EINA_TRUE, area);
+	/* we no longer need the pool */
+	enesim_pool_unref(pool);
+
 	/* finally compose such texture with the destination texture */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
@@ -588,6 +655,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_OpenGL_Compiled_Program *cp;
 	Enesim_Renderer *rel;
+	Enesim_Pool *pool;
 	Enesim_Color final_color;
 	GLenum textures[2];
 	GLint viewport[4];
@@ -599,6 +667,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	enesim_surface_size_get(s, &w, &h);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
+	pool = enesim_surface_pool_get(s);
 
 	/* create the fill texture */
 	textures[0] = enesim_opengl_texture_new(area->w, area->h);
@@ -611,21 +680,26 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	/* draw the fill into the newly created buffer */
 	enesim_renderer_shape_fill_setup(r, &final_color, &rel);
 	_path_opengl_figure_draw(sdata->fbo, textures[0], &thiz->fill,
-			parent->fill_figure, final_color, rel, rdata, EINA_FALSE, area);
+			parent->fill_figure, final_color, pool, rel, rdata,
+			EINA_FALSE, area);
 	if (rel) enesim_renderer_unref(rel);
 
 	/* draw the stroke into the newly created buffer */
 	enesim_renderer_shape_stroke_setup(r, &final_color, &rel);
 	/* FIXME this one is slow but only after the other */
 	_path_opengl_figure_draw(sdata->fbo, textures[1], &thiz->stroke,
-			parent->stroke_figure, final_color, rel, rdata, EINA_TRUE, area);
+			parent->stroke_figure, final_color, pool, rel, rdata,
+			EINA_TRUE, area);
 	if (rel) enesim_renderer_unref(rel);
+
+	/* we no longer need the pool */
+	enesim_pool_unref(pool);
 
 	/* now use the real destination surface to draw the merge fragment */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 			GL_TEXTURE_2D, sdata->textures[0], 0);
-	cp = &rdata->program->compiled[1];
+	cp = &rdata->program->compiled[PATH_TESSELATOR_MERGE];
 	_path_opengl_merge_shader_setup(cp->id, textures[1], textures[0]);
 	glViewport(0, 0, w, h);
 
@@ -823,7 +897,7 @@ static Eina_Bool _enesim_renderer_path_tesselator_opengl_initialize(
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
 	*programs = _path_programs;
-	*num_programs = 3;
+	*num_programs = PATH_TESSELATOR_PROGRAMS;
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
@@ -863,6 +937,10 @@ static void _enesim_renderer_path_tesselator_instance_deinit(void *o)
 	Enesim_Renderer_Path_Tesselator *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_TESSELATOR(o);
+	if (thiz->fill.src)
+		enesim_surface_unref(thiz->fill.src);
+	if (thiz->stroke.src)
+		enesim_surface_unref(thiz->stroke.src);
 }
 #endif
 /*============================================================================*

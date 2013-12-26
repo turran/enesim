@@ -248,7 +248,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
 			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					GL_TEXTURE0, thiz->fsrc, fcolor);
+					0, thiz->fsrc, fcolor);
 		}
 		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
 		glColor4f(argb8888_red_get(fcolor) / 255.0,
@@ -271,7 +271,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
 			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					GL_TEXTURE0, thiz->ssrc, scolor);
+					0, thiz->ssrc, scolor);
 		}
 		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
 		glColor4f(argb8888_red_get(scolor) / 255.0,

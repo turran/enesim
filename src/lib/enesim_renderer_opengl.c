@@ -39,7 +39,10 @@
 #include "enesim_buffer_private.h"
 #include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
+
+#define ENESIM_LOG_DEFAULT enesim_log_renderer
 /*
+ * TODO
  * Add a program cache
  */
 /*============================================================================*
@@ -273,11 +276,9 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_OpenGL_Draw draw;
-	Enesim_Buffer_OpenGL_Data *sdata;
 	int i;
 
 	klass = ENESIM_RENDERER_CLASS_GET(r);
-	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
 	/* create the data in case does not exist */
@@ -336,12 +337,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 		}
 	}
 setup:
-	/* create the fbos */
-	if (!sdata->fbo)
-	{
-		glGenFramebuffersEXT(1, &sdata->fbo);
-	}
-
 	/* do the setup */
 	if (!klass->opengl_setup) return EINA_FALSE;
 	if (!klass->opengl_setup(r, s, rop, &draw, error))
@@ -387,7 +382,14 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* now draw */
 	if (rdata->draw)
 	{
+		GLenum error;
+
 		rdata->draw(r, s, rop, area, x, y);
+		error = glGetError();
+		if (error)
+		{
+			WRN("Rendering '%s' gave error 0x%08x", r->name, error);
+		}
 	}
 	glUseProgramObjectARB(0);
 }
@@ -432,15 +434,18 @@ Eina_Bool enesim_renderer_opengl_shader_ambient_setup(GLenum pid,
 }
 
 Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
-		GLenum texture_unit, Enesim_Surface *s, Enesim_Color color)
+		GLint texture_unit, Enesim_Surface *s, Enesim_Color color)
 {
 	Enesim_Buffer_OpenGL_Data *backend_data;
+	int w, h;
 	int texture_u;
+	int size_u;
 	int color_u;
 
 	glUseProgramObjectARB(pid);
 	color_u = glGetUniformLocationARB(pid, "texture_color");
 	texture_u = glGetUniformLocationARB(pid, "texture_texture");
+	size_u = glGetUniformLocationARB(pid, "texture_size");
 
 	glUniform4fARB(color_u,
 			argb8888_red_get(color) / 255.0,
@@ -449,11 +454,13 @@ Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
 			argb8888_alpha_get(color) / 255.0);
 
 
+	enesim_surface_size_get(s, &w, &h);
+	glUniform2i(size_u, w, h);
+
 	backend_data = enesim_surface_backend_data_get(s);
-	glActiveTexture(texture_unit);
+	glActiveTexture(GL_TEXTURE0 + texture_unit);
 	glBindTexture(GL_TEXTURE_2D, backend_data->textures[0]);
-	glUniform1i(texture_u, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glUniform1i(texture_u, texture_unit);
 
 	return EINA_TRUE;
 }
