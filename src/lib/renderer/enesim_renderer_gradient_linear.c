@@ -154,6 +154,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	enesim_opengl_target_surface_set(s, x, y);
 	enesim_opengl_rop_set(rop);
+
 	/* set our transformation matrix */
 	enesim_matrix_translate(&m1, -1, -1);
 	enesim_matrix_compose(&m1, &thiz->gl.matrix, &m1);
@@ -164,6 +165,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	glLoadIdentity();
 	glMultMatrixf(matrix);
 	
+	/* draw the specified area */
 	enesim_opengl_draw_area(area);
 
 	/* don't use any program */
