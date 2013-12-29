@@ -55,12 +55,6 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-#define GLERR {\
-        GLenum err; \
-        err = glGetError(); \
-        printf("Error %x\n", err); \
-        }
-
 #define ENESIM_RENDERER_PATH_TESSELATOR(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Path_Tesselator,					\
 		enesim_renderer_path_tesselator_descriptor_get())

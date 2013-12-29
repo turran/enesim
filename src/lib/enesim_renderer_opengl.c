@@ -50,13 +50,6 @@
  *============================================================================*/
 static Eina_Hash *_program_lut = NULL;
 
-/* FIXME for debugging purposes */
-#define GLERR {\
-        GLenum err; \
-        err = glGetError(); \
-        printf("Error %d\n", err); \
-        }
-
 #if 0
 static Eina_Bool _fragment_shader_support = EINA_FALSE;
 static Eina_Bool _geometry_shader_support = EINA_FALSE;
@@ -365,33 +358,47 @@ void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	klass->opengl_cleanup(r, s);
 }
 
+/* TODO later we need to decide what to do with the area that we dont draw */
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
-	Enesim_Buffer_OpenGL_Data *sdata;
+#if 0
+	Eina_Rectangle final;
+	Eina_Bool intersect;
+	Eina_Bool visible;
+#endif
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-	sdata = enesim_surface_backend_data_get(s);
+#if 0
+	final = r->current_destination_bounds;
+	intersect = eina_rectangle_intersection(&final, area);
 
-	/* run it on the renderer fbo */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glEnable(GL_BLEND);
-
+	visible = enesim_renderer_visibility_get(r);
+	if (!visible)
+		return;
+	if (!intersect || !eina_rectangle_is_valid(&final))
+		return;
+#endif
 	/* now draw */
 	if (rdata->draw)
 	{
 		GLenum error;
-
+#if 0
+		rdata->draw(r, s, rop, &final, x, y);
+#else
 		rdata->draw(r, s, rop, area, x, y);
+#endif
 		error = glGetError();
 		if (error)
 		{
 			WRN("Rendering '%s' gave error 0x%08x", r->name, error);
 		}
 	}
+	/* don't use any program */
 	glUseProgramObjectARB(0);
+	/* set the draw rop back to fill */
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
 }
 
 void enesim_renderer_opengl_init(void)

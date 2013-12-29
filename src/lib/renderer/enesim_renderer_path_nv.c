@@ -49,12 +49,6 @@
 
 #include "enesim_surface_private.h"
 
-#define GLERR {\
-        GLenum err; \
-        err = glGetError(); \
-        printf("Error %x\n", err); \
-        }
-
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
 #if BUILD_OPENGL_NV_PATH
