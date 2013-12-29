@@ -183,6 +183,13 @@ static Enesim_Renderer_OpenGL_Shader _path_shader_silhoutte_ambient = {
 #include "enesim_renderer_path_silhoutte_ambient.glsl"
 };
 
+static Enesim_Renderer_OpenGL_Shader _path_shader_silhoutte_texture = {
+	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name	= */ "silhoutte_texture",
+	/* .source	= */
+#include "enesim_renderer_path_silhoutte_texture.glsl"
+};
+
 static Enesim_Renderer_OpenGL_Shader *_path_simple_ambient_shaders[] = {
 	&enesim_renderer_opengl_shader_ambient,
 	NULL,
@@ -206,7 +213,7 @@ static Enesim_Renderer_OpenGL_Shader *_path_silhoutte_ambient_shaders[] = {
 };
 
 static Enesim_Renderer_OpenGL_Shader *_path_silhoutte_texture_shaders[] = {
-	&_path_shader_silhoutte_ambient,
+	&_path_shader_silhoutte_texture,
 	&_path_shader_silhoutte_vertex,
 	NULL,
 };
@@ -516,8 +523,16 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	if (silhoutte)
 	{
 		/* first fill the silhoutte (the anti alias border) */
-		cp = &rdata->program->compiled[PATH_TESSELATOR_SILHOUTTE_AMBIENT];
-		_path_opengl_silhoutte_ambient_shader_setup(cp->id, color);
+		if (rel)
+		{
+			cp = &rdata->program->compiled[PATH_TESSELATOR_SILHOUTTE_TEXTURE];
+			_path_opengl_silhoutte_texture_shader_setup(cp->id, gf->src, color);
+		}
+		else
+		{
+			cp = &rdata->program->compiled[PATH_TESSELATOR_SILHOUTTE_AMBIENT];
+			_path_opengl_silhoutte_ambient_shader_setup(cp->id, color);
+		}
 		glUseProgramObjectARB(cp->id);
 		_path_opengl_silhoutte_draw(f, area);
 	}
