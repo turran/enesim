@@ -49,7 +49,6 @@
  *                                  Local                                     *
  *============================================================================*/
 static Eina_Hash *_program_lut = NULL;
-static GLuint _fbo = 0;
 
 #if 0
 static Eina_Bool _fragment_shader_support = EINA_FALSE;
