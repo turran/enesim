@@ -386,6 +386,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	final.y -= y;
 
 	intersect = eina_rectangle_intersection(&final, area);
+	/* when filling be sure to clear the the area that we dont draw */
 	if (rop == ENESIM_ROP_FILL)
 	{
 		/* just memset the whole area */

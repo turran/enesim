@@ -245,6 +245,12 @@ static void _draw_internal(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_surface_unlock(s);
 }
 
+/* When drawing we check if the clip rectangle intersects with the surface
+ * area, if it doesnt we dont draw anything. The backend is responsible
+ * to renderer the final area and clip it agains the renderer area.
+ * If it doesnt and the rop is FILL we should draw with a full transparent
+ * color
+ */
 static void _draw_list_internal(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *area, Eina_List *clips, int x,
 		int y)
