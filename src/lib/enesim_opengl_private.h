@@ -18,6 +18,13 @@
 #ifndef ENESIM_OPENGL_PRIVATE_H_
 #define ENESIM_OPENGL_PRIVATE_H_
 
+#define ENESIM_OPENGL_ERROR() 			\
+{						\
+	GLenum _err;				\
+	_err = glGetError(); 			\
+	ERR("OpenGL error 0x%08x", _err);	\
+}
+
 typedef struct _Enesim_OpenGL_Compiled_Program
 {
 	GLenum id;
