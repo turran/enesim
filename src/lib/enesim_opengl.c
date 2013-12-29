@@ -96,6 +96,7 @@ void enesim_opengl_compiled_program_set(Enesim_OpenGL_Compiled_Program *cp)
 
 void enesim_opengl_rop_set(Enesim_Rop rop)
 {
+	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
 	switch (rop)
 	{
