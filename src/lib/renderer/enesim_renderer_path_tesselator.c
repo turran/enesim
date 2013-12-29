@@ -469,7 +469,7 @@ static void _path_opengl_blit(GLenum fbo, GLenum dst,
 #endif
 
 static void _path_opengl_figure_draw(GLenum fbo,
-		GLenum texture,
+		GLuint texture,
 		Enesim_Renderer_Path_Tesselator_Figure *gf,
 		Enesim_Figure *f,
 		Enesim_Color color,
@@ -584,7 +584,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	Enesim_Pool *pool;
 	Enesim_Color final_color;
 	GLint viewport[4];
-	GLenum texture;
+	GLuint texture;
 	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
@@ -609,7 +609,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	}
 
 	/* create the texture */
-	texture = enesim_opengl_texture_new(area->w, area->h);
+	texture = enesim_opengl_texture_new(area->w, area->h, NULL);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	/* render there */
 	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color,
@@ -672,7 +672,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	Enesim_Renderer *rel;
 	Enesim_Pool *pool;
 	Enesim_Color final_color;
-	GLenum textures[2];
+	GLuint textures[2];
 	GLint viewport[4];
 	int w, h;
 
@@ -685,9 +685,9 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	pool = enesim_surface_pool_get(s);
 
 	/* create the fill texture */
-	textures[0] = enesim_opengl_texture_new(area->w, area->h);
+	textures[0] = enesim_opengl_texture_new(area->w, area->h, NULL);
 	/* create the stroke texture */
-	textures[1] = enesim_opengl_texture_new(area->w, area->h);
+	textures[1] = enesim_opengl_texture_new(area->w, area->h, NULL);
 
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glViewport(0, 0, area->w, area->h);

@@ -250,7 +250,7 @@ typedef struct _Enesim_Renderer_Gradient
 #if BUILD_OPENGL
 	struct {
 		int len;
-		GLenum gen_stops;
+		GLuint gen_stops;
 	} gl;
 #endif
 	/* private */

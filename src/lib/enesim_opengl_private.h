@@ -29,11 +29,11 @@ void enesim_opengl_init(void);
 
 void enesim_opengl_matrix_convert(Enesim_Matrix *m, float fm[16]);
 
-GLenum enesim_opengl_texture_new(int width, int height);
-void enesim_opengl_texture_free(GLenum id);
+GLuint enesim_opengl_texture_new(int width, int height, void *data);
+void enesim_opengl_texture_free(GLuint id);
 
-GLenum enesim_opengl_span_new(int len, void *data);
-void enesim_opengl_span_free(GLenum id);
+GLuint enesim_opengl_span_new(int len, void *data);
+void enesim_opengl_span_free(GLuint id);
 
 void enesim_opengl_compiled_program_set(Enesim_OpenGL_Compiled_Program *cp);
 void enesim_opengl_rop_set(Enesim_Rop rop);
