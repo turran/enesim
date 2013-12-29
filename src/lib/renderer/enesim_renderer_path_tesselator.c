@@ -631,7 +631,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glLoadIdentity();
 
 	glBindTexture(GL_TEXTURE_2D, texture);
-	enesim_opengl_rop_set(ENESIM_ROP_BLEND);
+	enesim_opengl_rop_set(rop);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);
 		glVertex2d(area->x, area->y);
@@ -725,7 +725,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 
-	enesim_opengl_rop_set(ENESIM_ROP_BLEND);
+	enesim_opengl_rop_set(rop);
 	//glBindTexture(GL_TEXTURE_2D, textures[0]);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0, 1);
