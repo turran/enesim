@@ -100,7 +100,7 @@ void enesim_opengl_rop_set(Enesim_Rop rop)
 	switch (rop)
 	{
 		case ENESIM_ROP_BLEND:
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		break;
 
 		case ENESIM_ROP_FILL:
