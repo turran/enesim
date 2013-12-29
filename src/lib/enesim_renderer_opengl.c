@@ -49,6 +49,7 @@
  *                                  Local                                     *
  *============================================================================*/
 static Eina_Hash *_program_lut = NULL;
+static GLuint _fbo = 0;
 
 #if 0
 static Eina_Bool _fragment_shader_support = EINA_FALSE;
@@ -363,6 +364,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Buffer_OpenGL_Data *sdata;
 #if 0
 	Eina_Rectangle final;
 	Eina_Bool intersect;
@@ -370,6 +372,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	sdata = enesim_surface_backend_data_get(s);
 #if 0
 	final = r->current_destination_bounds;
 	intersect = eina_rectangle_intersection(&final, area);
@@ -380,6 +383,16 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	if (!intersect || !eina_rectangle_is_valid(&final))
 		return;
 #endif
+	/* check that we have a valid fbo */
+	if (!sdata->fbo)
+	{
+		glGenFramebuffersEXT(1, &sdata->fbo);
+		if (!sdata->fbo)
+		{
+			WRN("Impossible to create the fbo");
+			return;
+		}
+	}
 	/* now draw */
 	if (rdata->draw)
 	{

@@ -97,8 +97,6 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		/* create the fbo */
-		glGenFramebuffersEXT(1, &data->fbo);
 		break;
 
 		case ENESIM_BUFFER_FORMAT_RGB565:
@@ -142,7 +140,6 @@ static Eina_Bool _data_from(void *prv EINA_UNUSED,
         	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	        glPixelStorei(GL_UNPACK_ROW_LENGTH, w);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, src->argb8888.plane0);
-		glGenFramebuffersEXT(1, &data->fbo);
 		break;
 
 		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:

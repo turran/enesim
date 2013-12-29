@@ -234,8 +234,6 @@ EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,
 	backend_data->textures = calloc(sizeof(GLuint), num_textures);
 	memcpy(backend_data->textures, textures, sizeof(GLuint) * num_textures);
 	backend_data->num_textures = num_textures;
-	/* create the fbo in case it is used for drawing */
-	glGenFramebuffersEXT(1, &backend_data->fbo);
 
 	b = _buffer_new(w, h, ENESIM_BACKEND_OPENGL, backend_data, f, NULL,
 			EINA_TRUE, _buffer_opengl_backend_free, NULL);
