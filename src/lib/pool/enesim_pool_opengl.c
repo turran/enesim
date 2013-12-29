@@ -69,7 +69,7 @@ static void _zero_buffer(Enesim_OpenGL_Pool *thiz, Enesim_Buffer_OpenGL_Data *da
 			/* FIXME add a message in the pool log */
 			continue;
 		}
-		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
