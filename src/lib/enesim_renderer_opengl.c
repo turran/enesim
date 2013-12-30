@@ -369,6 +369,12 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Eina_Bool intersect;
 	Eina_Bool visible;
 #endif
+	/* sanity checks */
+	if (enesim_surface_backend_get(s) != ENESIM_BACKEND_OPENGL)
+	{
+		CRI("Surface backend is not ENESIM_BACKEND_OPENGL");
+		return;
+	}
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
@@ -475,6 +481,13 @@ Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
 
 	enesim_surface_size_get(s, &w, &h);
 	glUniform2i(size_u, w, h);
+
+	/* sanity checks */
+	if (enesim_surface_backend_get(s) != ENESIM_BACKEND_OPENGL)
+	{
+		CRI("Surface backend is not ENESIM_BACKEND_OPENGL");
+		return EINA_FALSE;
+	}
 
 	backend_data = enesim_surface_backend_data_get(s);
 	glActiveTexture(GL_TEXTURE0 + texture_unit);
