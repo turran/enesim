@@ -382,8 +382,8 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	/* be sure to clip the area to the renderer bounds */
 	final = r->current_destination_bounds;
 	/* final translation */
-	final.x -= x;
-	final.y -= y;
+	final.x += x;
+	final.y += y;
 
 	intersect = eina_rectangle_intersection(&final, area);
 	/* when filling be sure to clear the the area that we dont draw */
@@ -422,8 +422,8 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 	 * add again the offset because the draw functions use
 	 * the area on the renderer coordinate space
 	 */
-	final.x += x;
-	final.y += y;
+	final.x -= x;
+	final.y -= y;
 #ifdef BUILD_MULTI_CORE
 	/* create the threads in case those are not created yet */
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
