@@ -152,7 +152,11 @@ static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
 {
 	int w, h;
 
-	if (!r) return;
+	if (!r)
+	{
+		enesim_pool_unref(p);
+		return;
+	}
 
 	if (*s)
 	{
@@ -198,13 +202,13 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	{
 		enesim_renderer_shape_fill_setup(r, &fcolor, &fren);
 		 _enesim_renderer_path_nv_sub_draw(fren, fcolor, &thiz->fsrc,
-				pool, area);
+				enesim_pool_ref(pool), area);
 	}
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		enesim_renderer_shape_stroke_setup(r, &scolor, &sren);
 		 _enesim_renderer_path_nv_sub_draw(sren, scolor, &thiz->ssrc,
-				pool, area);
+				enesim_pool_ref(pool), area);
 	}
 
 	/* finally draw */
