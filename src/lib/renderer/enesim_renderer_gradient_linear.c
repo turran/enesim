@@ -123,6 +123,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_OpenGL_Compiled_Program *cp;
 	Enesim_Matrix m1, m2;
+	Enesim_Matrix tx;
 	float matrix[16];
 	int ay_u;
 	int o_u;
@@ -152,7 +153,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	glBindTexture(GL_TEXTURE_1D, g->gl.gen_stops);
 	glUniform1i(stops_u, 0);
 
-	enesim_opengl_target_surface_set(s, x, y);
+	enesim_opengl_target_surface_set(s);
 	enesim_opengl_rop_set(rop);
 
 	/* set our transformation matrix */
@@ -160,6 +161,8 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_matrix_compose(&m1, &thiz->gl.matrix, &m1);
 	enesim_matrix_translate(&m2, 1, 1);
 	enesim_matrix_compose(&m1, &m2, &m1);
+	enesim_matrix_translate(&tx, -x, -y);
+	enesim_matrix_compose(&m1, &tx, &m1);
 	enesim_opengl_matrix_convert(&m1, matrix);
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
@@ -170,7 +173,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	/* don't use any program */
 	glUseProgramObjectARB(0);
-	enesim_opengl_target_surface_set(NULL, 0, 0);
+	enesim_opengl_target_surface_set(NULL);
 }
 #endif
 
@@ -401,7 +404,8 @@ static Eina_Bool _linear_opengl_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _linear_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+static void _linear_opengl_cleanup(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED)
 {
 }
 #endif

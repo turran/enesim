@@ -158,7 +158,7 @@ void enesim_opengl_draw_area(const Eina_Rectangle *area)
 	glEnd();
 }
 
-Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y)
+Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s)
 {
 	if (s)
 	{
@@ -183,7 +183,7 @@ Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s, int x, int y)
 		glLoadIdentity();
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(-x, w + x, h + y, -y, -1, 1);
+		glOrtho(0, w, h, 0, -1, 1);
 
 		/* sets the fbo as the destination buffer */
 		/* attach the texture to the first color attachment */

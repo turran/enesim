@@ -118,7 +118,8 @@ static Eina_Bool _background_opengl_shader_setup(GLenum pid,
 
 
 static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+		Enesim_Rop rop, const Eina_Rectangle *area, int x EINA_UNUSED,
+		int y EINA_UNUSED)
 {
 	Enesim_Renderer_Background * thiz;
 	Enesim_Renderer_OpenGL_Data *rdata;
@@ -130,13 +131,13 @@ static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	cp = &rdata->program->compiled[0];
 	_background_opengl_shader_setup(cp->id, thiz->final_color);
 
-	enesim_opengl_target_surface_set(s, x, y);
+	enesim_opengl_target_surface_set(s);
 	enesim_opengl_rop_set(rop);
 	enesim_opengl_draw_area(area);
 
 	/* don't use any program */
 	glUseProgramObjectARB(0);
-	enesim_opengl_target_surface_set(NULL, 0, 0);
+	enesim_opengl_target_surface_set(NULL);
 }
 #endif
 

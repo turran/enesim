@@ -212,7 +212,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	}
 
 	/* finally draw */
-	enesim_opengl_target_surface_set(s, x, y);
+	enesim_opengl_target_surface_set(s);
 	/* attach the stencil buffer on the framebuffer */
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, thiz->sb);
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);

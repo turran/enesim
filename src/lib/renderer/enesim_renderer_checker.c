@@ -149,6 +149,7 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_OpenGL_Compiled_Program *cp;
 	Enesim_Matrix m1, m2;
+	Enesim_Matrix tx;
 	float matrix[16];
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
@@ -159,12 +160,14 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 			thiz->final_color2, thiz->final_color1,
 			thiz->current.sw, thiz->current.sh);
 
-	enesim_opengl_target_surface_set(s, x, y);
+	enesim_opengl_target_surface_set(s);
 	enesim_opengl_rop_set(rop);
 
 	/* set our transformation matrix */
 	enesim_renderer_transformation_get(r, &m2);
 	enesim_matrix_inverse(&m2, &m1);
+	enesim_matrix_translate(&tx, x, y);
+	enesim_matrix_compose(&m1, &tx, &m1);
 	enesim_opengl_matrix_convert(&m1, matrix);
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
@@ -175,7 +178,7 @@ static void _checker_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	/* don't use any program */
 	glUseProgramObjectARB(0);
-	enesim_opengl_target_surface_set(NULL, 0, 0);
+	enesim_opengl_target_surface_set(NULL);
 }
 #endif
 
