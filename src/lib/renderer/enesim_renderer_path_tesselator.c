@@ -493,7 +493,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		if (!gf->src)
 		{
 			gf->src = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
-				area->w, area->h, pool);
+				area->w, area->h, enesim_pool_ref(pool));
 
 		}
 		enesim_renderer_opengl_draw(rel, gf->src, ENESIM_ROP_FILL, area, 0, 0);
