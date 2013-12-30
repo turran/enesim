@@ -26,7 +26,7 @@ static Enesim_Example_Renderer_Backend *backend = &backends[0];
 static void help(const char *name)
 {
 	unsigned int i;
-	printf("Usage: %s [BACKEND ROP]]\n", name);
+	printf("Usage: %s [BACKEND ROP X Y]]\n", name);
 	printf("Where BACKEND can be one of the following:\n");
 	
 	for (i = 0; i < sizeof(backends)/sizeof(Enesim_Example_Renderer_Backend); i++)
@@ -34,6 +34,8 @@ static void help(const char *name)
 		printf("- %s\n", backends[i].name);
 	}
 	printf("Where ROP can be \"blend\" or \"fill\"\n");
+	printf("X is the X coordinate to place the drawing\n");
+	printf("Y is the Y coordinate to place the drawing\n");
 }
 
 static Eina_Bool parse_options(Enesim_Example_Renderer_Options *options,
@@ -48,7 +50,7 @@ static Eina_Bool parse_options(Enesim_Example_Renderer_Options *options,
 	/* handle the parameters */
 	if (argc > 1)
 	{
-		if (argc < 3)
+		if (argc < 5)
 		{
 			help(options->name);
 			return EINA_FALSE;
@@ -83,6 +85,9 @@ static Eina_Bool parse_options(Enesim_Example_Renderer_Options *options,
 			help(options->name);
 			return EINA_FALSE;
 		}
+		/* the x,y */
+		options->x = atoi(argv[3]);
+		options->y = atoi(argv[4]);
 	}
 	return EINA_TRUE;
 }
@@ -130,7 +135,7 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		enesim_log_dump(error);
 	}
 	/* now the real renderer */
-	if (!enesim_renderer_draw(r, s, options->rop, NULL, 0, 0,
+	if (!enesim_renderer_draw(r, s, options->rop, NULL, options->x, options->y,
 			&error))
 	{
 		enesim_log_dump(error);

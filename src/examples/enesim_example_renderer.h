@@ -28,6 +28,8 @@ typedef struct _Enesim_Example_Renderer_Options
 	int height;
 	const char *name;
 	const char *backend_name;
+	int x;
+	int y;
 } Enesim_Example_Renderer_Options;
 
 /* for later help() */
