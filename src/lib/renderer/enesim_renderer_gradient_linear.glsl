@@ -12,6 +12,37 @@ uniform sampler1D linear_stops;
  */
 uniform int gradient_repeat_mode;
 
+vec4 gradient_restrict(float d)
+{
+	if (d < 0.0)
+	{
+		return vec4(0, 0, 0, 0);
+	}
+	else if (d >= float(linear_length - 1))
+	{
+		return vec4(0, 0, 0, 0);
+	}
+	else
+	{
+		return texture1D(linear_stops, d/float(linear_length - 1));
+	}
+}
+
+vec4 gradient_pad(float d)
+{
+	if (d < 0.0)
+	{
+		return texture1D(linear_stops, 0.0);
+	}
+	else if (d >= float(linear_length - 1))
+	{
+		return texture1D(linear_stops, 0.99);
+	}
+	else
+	{
+		return texture1D(linear_stops, d/float(linear_length - 1));
+	}
+}
 
 void main()
 {
@@ -27,18 +58,9 @@ void main()
 	d = ((linear_ay.x * x) + (linear_ay.y * y)) * linear_scale;
 	
 	/* TODO get the texcoord of the stops based on the repeat mode */
-	if (d < 0.0)
-	{
-		gl_FragColor = vec4(0, 0, 0, 0);
-	}
-	else if (d >= float(linear_length - 1))
-	{
-		gl_FragColor = vec4(0, 0, 0, 0);
-	}
+	if (gradient_repeat_mode == 0)
+		gl_FragColor = gradient_restrict(d);
 	else
-	{
-		texel = texture1D(linear_stops, d/float(linear_length - 1));
-		gl_FragColor = texel;
-	}
+		gl_FragColor = gradient_pad(d);
 }
 )
