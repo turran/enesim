@@ -333,7 +333,10 @@ setup:
 	/* do the setup */
 	if (!klass->opengl_setup) return EINA_FALSE;
 	if (!klass->opengl_setup(r, s, rop, &draw, error))
+	{
+		WRN("Setup callback on '%s' failed", r->name);
 		return EINA_FALSE;
+	}
 
 	if (!draw)
 	{
