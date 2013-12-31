@@ -459,18 +459,21 @@ Eina_Bool enesim_renderer_opengl_shader_ambient_setup(GLenum pid,
 }
 
 Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
-		GLint texture_unit, Enesim_Surface *s, Enesim_Color color)
+		GLint texture_unit, Enesim_Surface *s, Enesim_Color color,
+		int off_x, int off_y)
 {
 	Enesim_Buffer_OpenGL_Data *backend_data;
 	int w, h;
 	int texture_u;
 	int size_u;
 	int color_u;
+	int offset_u;
 
 	glUseProgramObjectARB(pid);
 	color_u = glGetUniformLocationARB(pid, "texture_color");
 	texture_u = glGetUniformLocationARB(pid, "texture_texture");
 	size_u = glGetUniformLocationARB(pid, "texture_size");
+	offset_u = glGetUniformLocationARB(pid, "texture_offset");
 
 	glUniform4fARB(color_u,
 			argb8888_red_get(color) / 255.0,
@@ -481,6 +484,8 @@ Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
 
 	enesim_surface_size_get(s, &w, &h);
 	glUniform2i(size_u, w, h);
+
+	glUniform2i(offset_u, off_x, off_y);
 
 	/* sanity checks */
 	if (enesim_surface_backend_get(s) != ENESIM_BACKEND_OPENGL)

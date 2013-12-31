@@ -143,10 +143,10 @@ static Eina_Bool _path_opengl_silhoutte_ambient_shader_setup(GLenum pid,
 }
 
 static Eina_Bool _path_opengl_silhoutte_texture_shader_setup(GLenum pid,
-		Enesim_Surface *s, Enesim_Color color)
+		Enesim_Surface *s, Enesim_Color color, int off_x, int off_y)
 {
 	/* we can use the generic texture setup here */
-	return enesim_renderer_opengl_shader_texture_setup(pid, 0, s, color);
+	return enesim_renderer_opengl_shader_texture_setup(pid, 0, s, color, off_x, off_y);
 }
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_coordinates = {
@@ -478,6 +478,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	/* draw the relative renderer */
 	if (rel)
 	{
+		Eina_Rectangle drawing;
 		if (gf->src)
 		{
 			int w, h;
@@ -496,7 +497,8 @@ static void _path_opengl_figure_draw(GLenum fbo,
 				area->w, area->h, enesim_pool_ref(pool));
 
 		}
-		enesim_renderer_opengl_draw(rel, gf->src, ENESIM_ROP_FILL, area, 0, 0);
+		eina_rectangle_coords_from(&drawing, 0, 0, area->w, area->h);
+		enesim_renderer_opengl_draw(rel, gf->src, ENESIM_ROP_FILL, &drawing, -area->x, -area->y);
 	}
 
 	glViewport(0, 0, area->w, area->h);
@@ -520,7 +522,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		if (rel)
 		{
 			cp = &rdata->program->compiled[PATH_TESSELATOR_SILHOUTTE_TEXTURE];
-			_path_opengl_silhoutte_texture_shader_setup(cp->id, gf->src, color);
+			_path_opengl_silhoutte_texture_shader_setup(cp->id, gf->src, color, area->x, area->y);
 		}
 		else
 		{
@@ -535,7 +537,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	if (rel)
 	{
 		cp = &rdata->program->compiled[PATH_TESSELATOR_SIMPLE_TEXTURE];
-		enesim_renderer_opengl_shader_texture_setup(cp->id, 0, gf->src, color);
+		enesim_renderer_opengl_shader_texture_setup(cp->id, 0, gf->src, color, area->x, area->y);
 	}
 	else
 	{

@@ -2,6 +2,7 @@ ENESIM_OPENGL_SHADER(
 uniform sampler2D texture_texture;
 uniform vec4 texture_color;
 uniform ivec2 texture_size;
+uniform ivec2 texture_offset;
 
 void main()
 {

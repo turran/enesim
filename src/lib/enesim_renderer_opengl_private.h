@@ -80,7 +80,8 @@ typedef struct _Enesim_Renderer_OpenGL_Data
 Eina_Bool enesim_renderer_opengl_shader_ambient_setup(GLenum pid,
 		Enesim_Color color);
 Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
-		GLint texture_unit, Enesim_Surface *s, Enesim_Color color);
+		GLint texture_unit, Enesim_Surface *s, Enesim_Color color,
+		int off_x, int off_y);
 
 extern Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_texture;
 extern Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_ambient;

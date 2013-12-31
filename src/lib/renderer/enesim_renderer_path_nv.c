@@ -150,6 +150,7 @@ static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
 		Enesim_Color color, Enesim_Surface **s, Enesim_Pool *p,
 		const Eina_Rectangle *area)
 {
+	Eina_Rectangle drawing;
 	int w, h;
 
 	if (!r)
@@ -173,7 +174,8 @@ static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
 		*s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
 				area->w, area->h, p);
 	}
-	enesim_renderer_opengl_draw(r, *s, ENESIM_ROP_FILL, area, 0, 0);
+	eina_rectangle_coords_from(&drawing, 0, 0, area->w, area->h);
+	enesim_renderer_opengl_draw(r, *s, ENESIM_ROP_FILL, &drawing, -area->x, -area->y);
 }
 
 static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
@@ -246,7 +248,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
 			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					0, thiz->fsrc, fcolor);
+					0, thiz->fsrc, fcolor, area->x, area->y);
 		}
 		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
 		glColor4f(argb8888_red_get(fcolor) / 255.0,
@@ -269,7 +271,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
 			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					0, thiz->ssrc, scolor);
+					0, thiz->ssrc, scolor, area->x, area->y);
 		}
 		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
 		glColor4f(argb8888_red_get(scolor) / 255.0,
