@@ -130,6 +130,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	int scale_u;
 	int length_u;
 	int stops_u;
+	int repeat_u;
 
 	thiz = ENESIM_RENDERER_GRADIENT_LINEAR(r);
 	g = ENESIM_RENDERER_GRADIENT(r);
@@ -143,11 +144,13 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	o_u = glGetUniformLocationARB(cp->id, "linear_o");
 	length_u = glGetUniformLocationARB(cp->id, "linear_length");
 	stops_u = glGetUniformLocationARB(cp->id, "linear_stops");
+	repeat_u = glGetUniformLocationARB(cp->id, "gradient_repeat_mode");
 
 	glUniform2f(ay_u, thiz->gl.ayx, thiz->gl.ayy);
 	glUniform2f(o_u, thiz->gl.xx, thiz->gl.yy);
 	glUniform1i(length_u, thiz->length);
 	glUniform1f(scale_u, thiz->gl.scale);
+	glUniform1i(repeat_u, g->state.mode);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_1D, g->gl.gen_stops);

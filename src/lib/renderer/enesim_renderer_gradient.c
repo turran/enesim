@@ -141,23 +141,6 @@ static Eina_Bool _gradient_changed(Enesim_Renderer_Gradient *thiz)
 	return EINA_FALSE;
 }
 
-#if 0
-static void _gradient_draw(Enesim_Renderer *r,
-		int x, int y, int len, void *ddata)
-{
-	Enesim_Renderer_Gradient *thiz;
-	Enesim_Renderer_Gradient_Sw_Draw_Data data;
-
-	thiz = ENESIM_RENDERER_GRADIENT(r);
-
-	data.gstate = &thiz->state;
-	data.state = thiz->rstate;
-	data.sw_state = &thiz->sw;
-
-	thiz->draw(r, &data, x, y, len, ddata);
-}
-#endif
-
 /* common setup process */
 static Eina_Bool _gradient_setup(Enesim_Renderer *r, Enesim_Log **l)
 {

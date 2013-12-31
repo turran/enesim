@@ -5,6 +5,13 @@ uniform float linear_scale;
 uniform float linear_matrix;
 uniform int linear_length;
 uniform sampler1D linear_stops;
+/* 0 = restrict
+ * 1 = pad
+ * 2 = reflect
+ * 3 = repeat
+ */
+uniform int gradient_repeat_mode;
+
 
 void main()
 {
