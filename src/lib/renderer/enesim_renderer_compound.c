@@ -213,82 +213,26 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_Compound *thiz;
-	Enesim_Pool *pool;
-	Enesim_Format format;
-	Enesim_Surface *tmp;
-#if 0
-	Enesim_Buffer_OpenGL_Data *sdata;
-	Enesim_Renderer_OpenGL_Data *rdata;
-#endif
-	Eina_List *l;
-#if 0
-	Enesim_Buffer_OpenGL_Data *tmp_sdata;
-	Enesim_Rop rop;
-	GLint viewport[4];
-#endif
-	Enesim_Renderer_Compound_Layer *layer;
-	int sw;
-	int sh;
+	Eina_List *ll;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 
-#if 0
-	sdata = enesim_surface_backend_data_get(s);
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
-#endif
-	/* create a temporary texture */
-	enesim_surface_size_get(s, &sw, &sh);
-	pool = enesim_surface_pool_get(s);
-	format = enesim_surface_format_get(s);
-	tmp = enesim_surface_new_pool_from(format, sw, sh, pool);
-
-	/* render each layer */
-	EINA_LIST_FOREACH(thiz->layers, l, layer)
+	/* TODO clip again to avoid zeroed areas */
+	/* TODO handle the rop correctly */
+	/* first the background */
+	if (thiz->background_enabled)
 	{
-		enesim_renderer_opengl_draw(layer->r, s, layer->rop, area, x, y);
+		Enesim_Renderer_Compound_Layer *l = &thiz->background;
+		enesim_renderer_opengl_draw(l->r, s, l->rop, area, x, y);
 	}
-#if 0
-	EINA_LIST_FOREACH(thiz->layers, l, layer)
+	/* now the layers */
+	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
 	{
-		enesim_renderer_opengl_draw(layer->r, tmp, area, w, h);
+		Enesim_Renderer_Compound_Layer *l;
+
+		l = eina_list_data_get(ll);
+		enesim_renderer_opengl_draw(l->r, s, l->rop, area, x, y);
 	}
-	tmp_sdata = enesim_surface_backend_data_get(tmp);
-	/* finally just rop the resulting texture into the real texture */
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	enesim_renderer_rop_get(r, &rop);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rdata->fbo);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, sdata->texture, 0);
-	glViewport(0, 0, w, h);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, h, 0, -1, 1);
-
-	glMatrixMode(GL_TEXTURE);
-	glLoadIdentity();
-
-	glBindTexture(GL_TEXTURE_2D, tmp_sdata->texture);
-	enesim_opengl_rop_set(rop);
-	glBegin(GL_QUADS);
-		glTexCoord2d(0, 1);
-		glVertex2d(area->x, area->y);
-
-		glTexCoord2d(1, 1);
-		glVertex2d(area->x + area->w, area->y);
-
-		glTexCoord2d(1, 0);
-		glVertex2d(area->x + area->w, area->y + area->h);
-
-		glTexCoord2d(0, 0);
-		glVertex2d(area->x, area->y + area->h);
-	glEnd();
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-	enesim_opengl_rop_set(ENESIM_ROP_FILL);
-#endif
-	enesim_surface_unref(tmp);
-
 }
 #endif
 
