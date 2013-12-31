@@ -46,6 +46,8 @@ static Eina_Bool parse_options(Enesim_Example_Renderer_Options *options,
 	options->rop = ENESIM_ROP_FILL;
 	options->width = 256;
 	options->height = 256;
+	options->x = 0;
+	options->y = 0;
 
 	/* handle the parameters */
 	if (argc > 1)
