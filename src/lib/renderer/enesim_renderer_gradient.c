@@ -292,6 +292,12 @@ static Eina_Bool _gradient_opengl_setup(Enesim_Renderer *r,
 
 	/* first do the implementation setup */
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	if (!klass->opengl_setup)
+	{
+		ENESIM_RENDERER_LOG(r, l, "Gradient implementation not found");
+		return EINA_FALSE;
+	}
+
 	if (!klass->opengl_setup(r, s, rop, draw, l))
 	{
 		ENESIM_RENDERER_LOG(r, l, "Gradient implementation failed");
