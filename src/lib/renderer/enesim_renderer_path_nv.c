@@ -96,6 +96,36 @@ static Enesim_Renderer_OpenGL_Program *_enesim_renderer_path_nv_programs[] = {
 	NULL,
 };
 
+
+static void _enesim_renderer_path_nv_stencil_create(Enesim_Renderer_Path_Nv *thiz,
+		Enesim_Surface *s)
+{
+	int w, h;
+
+	/* create our stencil buffer */
+	enesim_surface_size_get(s, &w, &h);
+	if (thiz->sb)
+	{
+		if (w != thiz->last_w || h != thiz->last_h)
+		{
+			glDeleteRenderbuffers(1, &thiz->sb);
+			thiz->sb = 0;
+		}
+	}
+
+	if (!thiz->sb)
+	{
+		GLuint sb;
+
+		glGenRenderbuffers(1, &sb);
+		glBindRenderbuffer(GL_RENDERBUFFER, sb);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
+		thiz->last_w = w;
+		thiz->last_h = h;
+		thiz->sb = sb;
+	}
+}
+
 /* future code to draw using more samples */
 #if 0
 void _fill_sample(Enesim_Renderer_Path_Nv *thiz, Enesim_Color final_color)
@@ -213,6 +243,10 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 				enesim_pool_ref(pool), area);
 	}
 
+	/* create our stencil buffer here given that the surface used for the setup
+	 * might be different that the one for the drawing (a temporary one for example)
+	 */
+	_enesim_renderer_path_nv_stencil_create(thiz, s);
 	/* finally draw */
 	enesim_opengl_target_surface_set(s);
 	/* attach the stencil buffer on the framebuffer */
@@ -220,7 +254,12 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
 	{
-		ERR("The framebuffer failed %d", status);
+		ERR("The framebuffer setup failed 0x%08x", status);
+		{
+			int w, h;
+			enesim_surface_size_get(s, &w, &h);
+			printf("%d %d %d %d\n", w, h, thiz->last_w, thiz->last_h);
+		}
 		return;
 	}
 	enesim_opengl_rop_set(rop);
@@ -554,32 +593,8 @@ static Eina_Bool _enesim_renderer_path_nv_opengl_setup(Enesim_Renderer *r,
 		Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Nv *thiz;
-	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_NV(r);
-	/* TODO later we might need that every surface also owns a stencil buffer? */
-	/* create our stencil buffer */
-	enesim_surface_size_get(s, &w, &h);
-	if (thiz->sb)
-	{
-		if (w != thiz->last_w || h != thiz->last_h)
-		{
-			glDeleteRenderbuffers(1, &thiz->sb);
-			thiz->sb = 0;
-		}
-	}
-
-	if (!thiz->sb)
-	{
-		GLuint sb;
-
-		glGenRenderbuffers(1, &sb);
-		glBindRenderbuffer(GL_RENDERBUFFER, sb);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h);
-		thiz->last_w = w;
-		thiz->last_h = h;
-		thiz->sb = sb;
-	}
 
 	/* upload the commands */
 	if (!_enesim_renderer_path_nv_upload_path(thiz))
