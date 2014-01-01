@@ -100,23 +100,6 @@ static Enesim_Renderer_OpenGL_Program *_background_programs[] = {
 	NULL,
 };
 
-static Eina_Bool _background_opengl_shader_setup(GLenum pid,
-		Enesim_Color final_color)
-{
-	int final_color_u;
-
-	glUseProgramObjectARB(pid);
-	final_color_u = glGetUniformLocationARB(pid, "ambient_final_color");
-	glUniform4fARB(final_color_u,
-			argb8888_red_get(final_color) / 255.0,
-			argb8888_green_get(final_color) / 255.0,
-			argb8888_blue_get(final_color) / 255.0,
-			argb8888_alpha_get(final_color) / 255.0);
-
-	return EINA_TRUE;
-}
-
-
 static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x EINA_UNUSED,
 		int y EINA_UNUSED)
@@ -129,8 +112,7 @@ static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
 	cp = &rdata->program->compiled[0];
-	_background_opengl_shader_setup(cp->id, thiz->final_color);
-
+	enesim_renderer_opengl_shader_ambient_setup(cp->id, thiz->final_color);
 	enesim_opengl_target_surface_set(s);
 	enesim_opengl_rop_set(rop);
 	enesim_opengl_draw_area(area);
