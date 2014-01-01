@@ -83,6 +83,16 @@ Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
 		GLint texture_unit, Enesim_Surface *s, Enesim_Color color,
 		int off_x, int off_y);
 
+Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Log **error);
+void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
+void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y);
+
+void enesim_renderer_opengl_init(void);
+void enesim_renderer_opengl_shutdown(void);
+void enesim_renderer_opengl_free(Enesim_Renderer *r);
+
 extern Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_texture;
 extern Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_ambient;
 
