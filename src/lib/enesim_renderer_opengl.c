@@ -410,8 +410,8 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	final = r->current_destination_bounds;
 	/* final translation */
 	sarea = *area;
-	sarea.x += x;
-	sarea.y += y;
+	sarea.x -= x;
+	sarea.y -= y;
 
 	intersect = eina_rectangle_intersection(&sarea, &final);
 	/* when filling be sure to clear the the area that we dont draw */
@@ -454,8 +454,8 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	 * add again the offset because the draw functions use
 	 * the area on the renderer coordinate space
 	 */
-	sarea.x -= x;
-	sarea.y -= y;
+	sarea.x += x;
+	sarea.y += y;
 
 	/* now draw */
 	if (rdata->draw)
