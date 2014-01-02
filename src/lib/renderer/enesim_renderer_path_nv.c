@@ -219,10 +219,11 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Color scolor;
 	Enesim_Color fcolor;
-	Enesim_Matrix m;
+	Enesim_Matrix m, tx;
 	Enesim_Pool *pool;
 	GLfloat fm[16];
 	GLenum status;
+	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_NV(r);
 
@@ -255,21 +256,23 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
 	{
 		ERR("The framebuffer setup failed 0x%08x", status);
-		{
-			int w, h;
-			enesim_surface_size_get(s, &w, &h);
 			printf("%d %d %d %d\n", w, h, thiz->last_w, thiz->last_h);
-		}
 		return;
 	}
 	enesim_opengl_rop_set(rop);
+	/* set the clipping area */
+	enesim_surface_size_get(s, &w, &h);
+	enesim_opengl_clip_set(area, w, h);
 
 	glClearStencil(0);
 	glStencilMask(~0);
 	glClear(GL_STENCIL_BUFFER_BIT);
 
+
 	/* add our own transformation matrix */
 	enesim_renderer_transformation_get(r, &m);
+	enesim_matrix_translate(&tx, x, y);
+	enesim_matrix_compose(&m, &tx, &m);
 	enesim_opengl_matrix_convert(&m, fm);
 
 	glMatrixMode(GL_PROJECTION);
@@ -331,6 +334,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	glColor4f(1, 1, 1, 1);
 	glDisable(GL_STENCIL_TEST);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
+	enesim_opengl_clip_unset();
 }
 
 static void _enesim_renderer_path_nv_setup_stroke(
