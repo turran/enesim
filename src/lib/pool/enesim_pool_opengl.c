@@ -178,8 +178,9 @@ static Eina_Bool _data_get(void *prv EINA_UNUSED, void *backend_data,
 		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
         	glPixelStorei(GL_PACK_ALIGNMENT, 4);
 	        glPixelStorei(GL_PACK_ROW_LENGTH, w);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, dst->argb8888.plane0);
+		dst->argb8888.plane0 = malloc(w * h * 4);
 		dst->argb8888.plane0_stride = w * 4;
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, dst->argb8888.plane0);
 		break;
 
 		case ENESIM_BUFFER_FORMAT_RGB565:
