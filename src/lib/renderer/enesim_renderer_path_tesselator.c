@@ -471,9 +471,12 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		Enesim_Renderer *rel,
 		Enesim_Renderer_OpenGL_Data *rdata,
 		Eina_Bool silhoutte,
-		const Eina_Rectangle *area)
+		const Eina_Rectangle *area,
+		int x, int y)
 {
 	Enesim_OpenGL_Compiled_Program *cp;
+	GLfloat fm[16];
+	Enesim_Matrix tx;
 
 	/* draw the relative renderer */
 	if (rel)
@@ -498,7 +501,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 
 		}
 		eina_rectangle_coords_from(&drawing, 0, 0, area->w, area->h);
-		enesim_renderer_opengl_draw(rel, gf->src, ENESIM_ROP_FILL, &drawing, -area->x, -area->y);
+		enesim_renderer_opengl_draw(rel, gf->src, ENESIM_ROP_FILL, &drawing, -(area->x - x), -(area->y - y));
 	}
 
 	glViewport(0, 0, area->w, area->h);
@@ -506,10 +509,13 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(area->x, area->x + area->w, area->y + area->h, area->y, -1, 1);
+	/* translate the origin */
+	enesim_matrix_translate(&tx, x, y);
+	enesim_opengl_matrix_convert(&tx, fm);
+	glMultMatrixf(fm);
 
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
-	//glOrtho(area->x - area->w, area->x + area->w, area->y - area->h, area->y + area->h, -1, 1);
 
 	enesim_opengl_rop_set(ENESIM_ROP_FILL);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
@@ -537,7 +543,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	if (rel)
 	{
 		cp = &rdata->program->compiled[PATH_TESSELATOR_SIMPLE_TEXTURE];
-		enesim_renderer_opengl_shader_texture_setup(cp->id, 0, gf->src, color, area->x, area->y);
+		enesim_renderer_opengl_shader_texture_setup(cp->id, 0, gf->src, color, area->x - x, area->y - y);
 	}
 	else
 	{
@@ -609,19 +615,12 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	/* render there */
 	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color,
-			pool, rel, rdata, EINA_TRUE, area);
+			pool, rel, rdata, EINA_TRUE, area, x, y);
 	/* we no longer need the pool */
 	enesim_pool_unref(pool);
 
 	/* finally compose such texture with the destination texture */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sdata->fbo);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
-			GL_TEXTURE_2D, sdata->textures[0], 0);
-	glViewport(0, 0, w, h);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, w, h, 0, -1, 1);
+	enesim_opengl_target_surface_set(s);
 
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
@@ -648,6 +647,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 
 	if (rel)
 		enesim_renderer_unref(rel);
+	enesim_opengl_target_surface_set(NULL);
 }
 
 /* for fill and stroke we need to draw the stroke first on a
@@ -692,7 +692,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	enesim_renderer_shape_fill_setup(r, &final_color, &rel);
 	_path_opengl_figure_draw(sdata->fbo, textures[0], &thiz->fill,
 			parent->fill_figure, final_color, pool, rel, rdata,
-			EINA_FALSE, area);
+			EINA_FALSE, area, x, y);
 	if (rel) enesim_renderer_unref(rel);
 
 	/* draw the stroke into the newly created buffer */
@@ -700,7 +700,7 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	/* FIXME this one is slow but only after the other */
 	_path_opengl_figure_draw(sdata->fbo, textures[1], &thiz->stroke,
 			parent->stroke_figure, final_color, pool, rel, rdata,
-			EINA_TRUE, area);
+			EINA_TRUE, area, x, y);
 	if (rel) enesim_renderer_unref(rel);
 
 	/* we no longer need the pool */
