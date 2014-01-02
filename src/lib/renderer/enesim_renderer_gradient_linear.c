@@ -177,6 +177,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* don't use any program */
 	glUseProgramObjectARB(0);
 	enesim_opengl_target_surface_set(NULL);
+	glBindTexture(GL_TEXTURE_1D, 0);
 }
 #endif
 
