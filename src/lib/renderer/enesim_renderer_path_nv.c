@@ -230,18 +230,21 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
 	pool = enesim_surface_pool_get(s);
+
 	/* draw the temporary fill/stroke renderers */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
 		enesim_renderer_shape_fill_setup(r, &fcolor, &fren);
 		 _enesim_renderer_path_nv_sub_draw(fren, fcolor, &thiz->fsrc,
 				enesim_pool_ref(pool), area, x, y);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		enesim_renderer_shape_stroke_setup(r, &scolor, &sren);
 		 _enesim_renderer_path_nv_sub_draw(sren, scolor, &thiz->ssrc,
 				enesim_pool_ref(pool), area, x, y);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	/* create our stencil buffer here given that the surface used for the setup
@@ -256,7 +259,6 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
 	{
 		ERR("The framebuffer setup failed 0x%08x", status);
-			printf("%d %d %d %d\n", w, h, thiz->last_w, thiz->last_h);
 		return;
 	}
 	enesim_opengl_rop_set(rop);
@@ -268,15 +270,17 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	glStencilMask(~0);
 	glClear(GL_STENCIL_BUFFER_BIT);
 
-
 	/* add our own transformation matrix */
 	enesim_renderer_transformation_get(r, &m);
 	enesim_matrix_translate(&tx, x, y);
-	enesim_matrix_compose(&m, &tx, &m);
+	enesim_matrix_compose(&tx, &m, &m);
 	enesim_opengl_matrix_convert(&m, fm);
 
 	glMatrixMode(GL_PROJECTION);
 	glMultMatrixf(fm);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
 
 	/* fill */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
@@ -299,6 +303,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			argb8888_alpha_get(fcolor) / 255.0);
 		glCoverFillPathNV(thiz->path_id, GL_BOUNDING_BOX_NV);
 		glUseProgramObjectARB(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	/* stroke */
@@ -321,6 +326,8 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			argb8888_blue_get(scolor) / 255.0,
 			argb8888_alpha_get(scolor) / 255.0);
 		glCoverStrokePathNV(thiz->path_id, GL_CONVEX_HULL_NV);
+		glUseProgramObjectARB(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	/* unref the renderers */
@@ -334,7 +341,9 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	glColor4f(1, 1, 1, 1);
 	glDisable(GL_STENCIL_TEST);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
+	glUseProgramObjectARB(0);
 	enesim_opengl_clip_unset();
+	enesim_opengl_target_surface_set(NULL);
 }
 
 static void _enesim_renderer_path_nv_setup_stroke(
@@ -401,12 +410,13 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 		Enesim_Renderer_Path_Nv *thiz)
 {
 	Enesim_Path_Command *pcmd;
+	Enesim_Matrix m;
 	Eina_List *l;
 	GLuint path_id;
 	GLenum err;
 	GLubyte *cmd, *cmds;
 	GLfloat *coord, *coords;
-	GLfloat coeffs[6] = { 1, 0, 0, 0, 1, 0};
+	GLfloat coeffs[6] = { 1, 0, 0, 0, 1, 0 };
 	int num_cmds;
 	int num_coords = 0;
 
@@ -534,7 +544,12 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 	thiz->last_path_change = thiz->path->changed;
 
 	/* set the coordinate textures */
-	/* we pass x on s and y on t */
+	/* we need to transform the object linear with the transformation
+	 * matrix of the renderer
+	 */
+	enesim_renderer_transformation_get(ENESIM_RENDERER(thiz), &m);
+	coeffs[0] = m.xx; coeffs[1] = m.xy; coeffs[2] = 0;
+	coeffs[3] = m.yx; coeffs[4] = m.yy; coeffs[5] = 0;
 	glPathTexGenNV(GL_TEXTURE0, GL_OBJECT_LINEAR, 2, coeffs);
 	err = glGetError();
 	if (err)
