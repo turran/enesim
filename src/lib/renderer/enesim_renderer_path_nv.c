@@ -178,7 +178,7 @@ void _fill_sample(Enesim_Renderer_Path_Nv *thiz, Enesim_Color final_color)
 
 static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
 		Enesim_Color color, Enesim_Surface **s, Enesim_Pool *p,
-		const Eina_Rectangle *area)
+		const Eina_Rectangle *area, int x, int y)
 {
 	Eina_Rectangle drawing;
 	int w, h;
@@ -205,7 +205,7 @@ static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
 				area->w, area->h, p);
 	}
 	eina_rectangle_coords_from(&drawing, 0, 0, area->w, area->h);
-	enesim_renderer_opengl_draw(r, *s, ENESIM_ROP_FILL, &drawing, -area->x, -area->y);
+	enesim_renderer_opengl_draw(r, *s, ENESIM_ROP_FILL, &drawing, -(area->x - x), -(area->y - y));
 }
 
 static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
@@ -235,13 +235,13 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	{
 		enesim_renderer_shape_fill_setup(r, &fcolor, &fren);
 		 _enesim_renderer_path_nv_sub_draw(fren, fcolor, &thiz->fsrc,
-				enesim_pool_ref(pool), area);
+				enesim_pool_ref(pool), area, x, y);
 	}
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		enesim_renderer_shape_stroke_setup(r, &scolor, &sren);
 		 _enesim_renderer_path_nv_sub_draw(sren, scolor, &thiz->ssrc,
-				enesim_pool_ref(pool), area);
+				enesim_pool_ref(pool), area, x, y);
 	}
 
 	/* create our stencil buffer here given that the surface used for the setup
@@ -290,7 +290,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
 			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					0, thiz->fsrc, fcolor, area->x, area->y);
+					0, thiz->fsrc, fcolor, area->x - x, area->y - y);
 		}
 		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
 		glColor4f(argb8888_red_get(fcolor) / 255.0,
@@ -313,7 +313,7 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 			Enesim_OpenGL_Compiled_Program *cp;
 			cp = &rdata->program->compiled[0];
 			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					0, thiz->ssrc, scolor, area->x, area->y);
+					0, thiz->ssrc, scolor, area->x - x, area->y - y);
 		}
 		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
 		glColor4f(argb8888_red_get(scolor) / 255.0,
