@@ -201,6 +201,20 @@ static void _opengl_compiled_program_free(
 	free(cp->shaders);
 }
 
+static void _opengl_clear(Enesim_Surface *s, const Eina_Rectangle *area)
+{
+	/* we can not use a shader here given that the shader compilation/linkage
+	 * is done per renderer. Or we either use a background renderer here
+	 * or we actually use our shader cache mechanism
+	 */
+	glUseProgramObjectARB(0);
+	enesim_opengl_target_surface_set(s);
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
+	glColor4f(0.0, 0.0, 0.0, 0.0);
+	enesim_opengl_draw_area(area);
+	glColor4f(1.0, 1.0, 1.0, 1.0);
+}
+
 #if 0
 static void _opengl_draw_own_geometry(Enesim_Renderer_OpenGL_Data *rdata,
 		const Eina_Rectangle *area,
@@ -361,17 +375,16 @@ void enesim_renderer_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	klass->opengl_cleanup(r, s);
 }
 
-/* TODO later we need to decide what to do with the area that we dont draw */
 void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
-#if 0
 	Eina_Rectangle final;
+	Eina_Rectangle sarea;
 	Eina_Bool intersect;
 	Eina_Bool visible;
-#endif
+
 	/* sanity checks */
 	if (enesim_surface_backend_get(s) != ENESIM_BACKEND_OPENGL)
 	{
@@ -381,16 +394,7 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	sdata = enesim_surface_backend_data_get(s);
-#if 0
-	final = r->current_destination_bounds;
-	intersect = eina_rectangle_intersection(&final, area);
 
-	visible = enesim_renderer_visibility_get(r);
-	if (!visible)
-		return;
-	if (!intersect || !eina_rectangle_is_valid(&final))
-		return;
-#endif
 	/* check that we have a valid fbo */
 	if (!sdata->fbo)
 	{
@@ -401,15 +405,64 @@ void enesim_renderer_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 			return;
 		}
 	}
+
+	/* be sure to clip the area to the renderer bounds */
+	final = r->current_destination_bounds;
+	/* final translation */
+	sarea = *area;
+	sarea.x += x;
+	sarea.y += y;
+
+	intersect = eina_rectangle_intersection(&sarea, &final);
+	/* when filling be sure to clear the the area that we dont draw */
+	if (rop == ENESIM_ROP_FILL)
+	{
+		/* just clear the whole area */
+		if (!intersect)
+		{
+			_opengl_clear(s, area);
+			return;
+		}
+		/* clear the difference rectangle */
+		else
+		{
+			Eina_Rectangle subs[4];
+			int i;
+
+			/* FIXME we need to fix eina here, we dont need the first
+			 * parameter to be non-const
+			 */
+			eina_rectangle_subtract(&sarea, &final, subs);
+			for (i = 0; i < 4; i++)
+			{
+				if (!eina_rectangle_is_valid(&subs[i]))
+					continue;
+				subs[i].x -= x;
+				subs[i].y -= y;
+				_opengl_clear(s, &subs[i]);
+			}
+		}
+	}
+
+	visible = enesim_renderer_visibility_get(r);
+	if (!visible)
+		return;
+	if (!intersect || !eina_rectangle_is_valid(&sarea))
+		return;
+
+	/* we know have the final area on surface coordinates
+	 * add again the offset because the draw functions use
+	 * the area on the renderer coordinate space
+	 */
+	sarea.x -= x;
+	sarea.y -= y;
+
 	/* now draw */
 	if (rdata->draw)
 	{
 		GLenum error;
-#if 0
-		rdata->draw(r, s, rop, &final, x, y);
-#else
-		rdata->draw(r, s, rop, area, x, y);
-#endif
+
+		rdata->draw(r, s, rop, &sarea, x, y);
 		error = glGetError();
 		if (error)
 		{
