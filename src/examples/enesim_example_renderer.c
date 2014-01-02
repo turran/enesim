@@ -103,6 +103,7 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer *c;
 	Enesim_Log *error = NULL;
 	Eina_Rectangle bounds;
+	Eina_Rectangle area;
 
 	if (!r)
 	{
@@ -136,8 +137,9 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	{
 		enesim_log_dump(error);
 	}
+	eina_rectangle_coords_from(&area, 0, 0, options->width, options->height);
 	/* now the real renderer */
-	if (!enesim_renderer_draw(r, s, options->rop, NULL, options->x, options->y,
+	if (!enesim_renderer_draw(r, s, options->rop, &area, options->x, options->y,
 			&error))
 	{
 		enesim_log_dump(error);
