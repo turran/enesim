@@ -244,14 +244,15 @@ static inline void _compound_layer_opengl_draw(
 
 	/* transform the surface area to renderer coordinates */
 	final = *area;
-	final.x += x;
-	final.y += y;
+	final.x -= x;
+	final.y -= y;
 
 	if (!eina_rectangle_intersection(&final, &l->destination_bounds))
 		return;
 	/* only draw the layer clipped to the renderer bounds */
-	final.x -= x;
-	final.y -= y;
+	final.x += x;
+	final.y += y;
+
 	enesim_renderer_opengl_draw(l->r, s, l->rop, &final, x, y);
 }
 
@@ -319,7 +320,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	if (thiz->background_enabled)
 	{
 		Enesim_Renderer_Compound_Layer *l = &thiz->background;
-		_compound_layer_opengl_draw(l, thiz->s, &larea, -area->x - x, -area->y - y);
+		_compound_layer_opengl_draw(l, thiz->s, &larea, -(area->x - x), -(area->y - y));
 	}
 	/* now the layers */
 	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
@@ -327,10 +328,13 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Compound_Layer *l;
 
 		l = eina_list_data_get(ll);
-		_compound_layer_opengl_draw(l, thiz->s, &larea, -area->x - x, -area->y - y);
+		_compound_layer_opengl_draw(l, thiz->s, &larea, -(area->x - x), -(area->y - y));
 	}
 
 	/* draw the temporary surface */
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+
 	cp = &rdata->program->compiled[0];
 	enesim_renderer_opengl_shader_texture_setup(cp->id,
 				0, thiz->s, ENESIM_COLOR_FULL, area->x, area->y);
@@ -341,6 +345,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* don't use any program */
 	glUseProgramObjectARB(0);
 	enesim_opengl_target_surface_set(NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 #endif
 
@@ -679,7 +684,7 @@ static Eina_Bool _compound_opengl_setup(Enesim_Renderer *r,
  	thiz = ENESIM_RENDERER_COMPOUND(r);
 	if (!_compound_state_setup(thiz, r, s, rop, l)) return EINA_FALSE;
 
-	*draw = _compound_opengl_draw_simple;
+	*draw = _compound_opengl_draw;
 	return EINA_TRUE;
 }
 
