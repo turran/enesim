@@ -145,10 +145,11 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
 }
 
 /**
- * @brief Create a new surface using an user provided data
+ * @brief Create a new surface using a pool an user provided data
  * @param[in] fmt The format of the surface
  * @param[in] w The width of the surface
  * @param[in] h The height of the surface
+ * @param[in] p The pool to use
  * @param[in] copy In case the data needs to be copied to create the surface
  * or used directly
  * @param[in] stride The stride of the surface
@@ -158,9 +159,9 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
  * @param[in] free_func_data The private data for the @a free_func callback
  * @return The newly created surface
  */
-EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
-		uint32_t w, uint32_t h, Eina_Bool copy, void *data,
-		size_t stride, Enesim_Buffer_Free free_func,
+EAPI Enesim_Surface * enesim_surface_new_pool_and_data_from(Enesim_Format fmt,
+		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
+		void *data, size_t stride, Enesim_Buffer_Free free_func,
 		void *free_func_data)
 {
 	Enesim_Surface *s;
@@ -196,7 +197,7 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 	s->free_func_data = free_func_data;
 	s = enesim_surface_ref(s);
 
-	b = enesim_buffer_new_data_from(buf_fmt, w, h, copy, &sw_data, _surface_sw_free_func, s);
+	b = enesim_buffer_new_pool_and_data_from(buf_fmt, w, h, p, copy, &sw_data, _surface_sw_free_func, s);
 	if (!b)
 	{
 		free(s);
@@ -205,6 +206,30 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
 	s->buffer = b;
 
 	return s;
+}
+
+
+/**
+ * @brief Create a new surface using an user provided data
+ * @param[in] fmt The format of the surface
+ * @param[in] w The width of the surface
+ * @param[in] h The height of the surface
+ * @param[in] copy In case the data needs to be copied to create the surface
+ * or used directly
+ * @param[in] stride The stride of the surface
+ * @param[in] data The data of the surface pixels
+ * @param[in] free_func The function to be called whenever the data of the surface
+ * needs to be freed
+ * @param[in] free_func_data The private data for the @a free_func callback
+ * @return The newly created surface
+ */
+EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
+		uint32_t w, uint32_t h, Eina_Bool copy, void *data,
+		size_t stride, Enesim_Buffer_Free free_func,
+		void *free_func_data)
+{
+	return enesim_surface_new_pool_and_data_from(fmt, w, h, NULL, copy,
+			data, stride, free_func, free_func_data);
 }
 
 /**

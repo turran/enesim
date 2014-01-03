@@ -45,6 +45,10 @@ EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format f,
 		size_t stride, Enesim_Buffer_Free free_func, void *free_func_data);
 EAPI Enesim_Surface * enesim_surface_new_pool_from(Enesim_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p);
+EAPI Enesim_Surface * enesim_surface_new_pool_and_data_from(Enesim_Format fmt,
+		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
+		void *data, size_t stride, Enesim_Buffer_Free free_func,
+		void *free_func_data);
 EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer);
 EAPI Enesim_Surface * enesim_surface_ref(Enesim_Surface *s);
 EAPI void enesim_surface_unref(Enesim_Surface *s);
