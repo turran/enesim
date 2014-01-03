@@ -38,6 +38,7 @@
 
 #ifdef BUILD_OPENGL
 #include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
 #endif
 
 #include "enesim_renderer_private.h"
@@ -81,6 +82,11 @@ typedef struct _Enesim_Renderer_Image
 	Eina_F16p16 nxx, nyy;
 	Enesim_F16p16_Matrix matrix;
 	Enesim_Compositor_Span span;
+#if BUILD_OPENGL
+	struct {
+		Enesim_Surface *s;
+	} gl;
+#endif
 	Eina_List *surface_damages;
 	Eina_Bool simple : 1;
 	Eina_Bool changed : 1;
@@ -92,28 +98,19 @@ typedef struct _Enesim_Renderer_Image_Class {
 } Enesim_Renderer_Image_Class;
 
 static void _image_transform_bounds(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Matrix *tx,
+		Enesim_Matrix *m,
 		Enesim_Matrix_Type type,
 		Enesim_Rectangle *obounds,
 		Enesim_Rectangle *bounds)
 {
 	*bounds = *obounds;
-	/* apply the inverse matrix */
 	if (type != ENESIM_MATRIX_IDENTITY)
 	{
 		Enesim_Quad q;
-		Enesim_Matrix m;
 
-		enesim_matrix_inverse(tx, &m);
-		enesim_matrix_rectangle_transform(&m, bounds, &q);
+		enesim_matrix_rectangle_transform(m, bounds, &q);
 		enesim_quad_rectangle_to(&q, bounds);
-		/* fix the antialias scaling */
-		bounds->x -= m.xx;
-		bounds->y -= m.yy;
-		bounds->w += m.xx;
-		bounds->h += m.yy;
 	}
-
 }
 
 static void _image_transform_destination_bounds(Enesim_Renderer *r EINA_UNUSED,
@@ -124,6 +121,125 @@ static void _image_transform_destination_bounds(Enesim_Renderer *r EINA_UNUSED,
 {
 	enesim_rectangle_normalize(obounds, bounds);
 }
+
+static Eina_Bool _image_state_setup(Enesim_Renderer *r, Enesim_Log **l)
+{
+	Enesim_Renderer_Image *thiz;
+
+	thiz = ENESIM_RENDERER_IMAGE(r);
+	if (!thiz->current.s)
+	{
+		ENESIM_RENDERER_LOG(r, l, "No surface set");
+		return EINA_FALSE;
+	}
+
+	enesim_surface_lock(thiz->current.s, EINA_FALSE);
+	thiz->color = enesim_renderer_color_get(r);
+	return EINA_TRUE;
+}
+
+static void _image_state_cleanup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Image *thiz;
+	Eina_Rectangle *sd;
+
+	thiz = ENESIM_RENDERER_IMAGE(r);
+	thiz->changed = EINA_FALSE;
+	thiz->src_changed = EINA_FALSE;
+	if (thiz->current.s)
+		enesim_surface_unlock(thiz->current.s);
+	/* swap the states */
+	if (thiz->past.s)
+	{
+		enesim_surface_unref(thiz->past.s);
+		thiz->past.s = NULL;
+	}
+	thiz->past.s = enesim_surface_ref(thiz->current.s);
+	thiz->past.x = thiz->current.x;
+	thiz->past.y = thiz->current.y;
+	thiz->past.w = thiz->current.w;
+	thiz->past.h = thiz->current.h;
+
+	EINA_LIST_FREE(thiz->surface_damages, sd)
+		free(sd);
+}
+
+#if BUILD_OPENGL
+/* the only shader */
+static Enesim_Renderer_OpenGL_Shader _image_shader = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "image",
+	/* .source	= */
+#include "enesim_renderer_opengl_common_texture.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_image_shaders[] = {
+	&_image_shader,
+	NULL,
+};
+
+/* the only program */
+static Enesim_Renderer_OpenGL_Program _image_program = {
+	/* .name 		= */ "image",
+	/* .shaders 		= */ _image_shaders,
+	/* .num_shaders		= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program *_image_programs[] = {
+	&_image_program,
+	NULL,
+};
+
+static void _image_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x EINA_UNUSED,
+		int y EINA_UNUSED)
+{
+	Enesim_Renderer_Image * thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_OpenGL_Compiled_Program *cp;
+	Enesim_Surface *src;
+	Enesim_Matrix sc, tx, m;
+	GLfloat fm[16];
+	int w, h;
+
+	thiz = ENESIM_RENDERER_IMAGE(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+
+	/* choose the source surface, either the uploaded or the original */
+	if (thiz->gl.s)
+		src = thiz->gl.s;
+	else
+		src = thiz->current.s;
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+
+	/* the initial size/position */
+	enesim_surface_size_get(src, &w, &h);
+	enesim_matrix_translate(&tx, thiz->current.x, thiz->current.y);
+	enesim_matrix_scale(&sc, thiz->current.w / (float)w, thiz->current.h / (float)h);
+	/* our renderer transformation */
+	enesim_renderer_transformation_get(r, &m);
+	enesim_matrix_compose(&m, &tx, &m);
+	enesim_matrix_compose(&m, &sc, &m);
+	enesim_matrix_inverse(&m, &m);
+
+	enesim_opengl_matrix_convert(&m, fm);
+	glMultMatrixf(fm);
+
+	cp = &rdata->program->compiled[0];
+	enesim_renderer_opengl_shader_texture_setup(cp->id,
+				0, src, thiz->color, 0, 0);
+	enesim_opengl_target_surface_set(s);
+	enesim_opengl_rop_set(rop);
+	enesim_opengl_draw_area(area);
+
+	/* don't use any program */
+	glUseProgramObjectARB(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	enesim_opengl_target_surface_set(NULL);
+}
+#endif
 
 /* blend simple */
 static void _argb8888_blend_span(Enesim_Renderer *r,
@@ -1318,28 +1434,11 @@ static void _image_bounds_get(Enesim_Renderer *r,
 static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz;
-	Eina_Rectangle *sd;
+
+	_image_state_cleanup(r);
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
 	thiz->span = NULL;
-	thiz->changed = EINA_FALSE;
-	thiz->src_changed = EINA_FALSE;
-	if (thiz->current.s)
-		enesim_surface_unlock(thiz->current.s);
-	/* swap the states */
-	if (thiz->past.s)
-	{
-		enesim_surface_unref(thiz->past.s);
-		thiz->past.s = NULL;
-	}
-	thiz->past.s = enesim_surface_ref(thiz->current.s);
-	thiz->past.x = thiz->current.x;
-	thiz->past.y = thiz->current.y;
-	thiz->past.w = thiz->current.w;
-	thiz->past.h = thiz->current.h;
-
-	EINA_LIST_FREE(thiz->surface_damages, sd)
-		free(sd);
 }
 
 static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
@@ -1354,23 +1453,18 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 	double x, y, w, h;
 	double ox, oy;
 
-	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (!thiz->current.s)
-	{
-		WRN("No surface set");
+	if (!_image_state_setup(r, l))
 		return EINA_FALSE;
-	}
 
-	enesim_surface_lock(thiz->current.s, EINA_FALSE);
-
-	thiz->color = enesim_renderer_color_get(r);
-
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	enesim_surface_size_get(thiz->current.s, &thiz->sw, &thiz->sh);
 	enesim_surface_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
 	x = thiz->current.x;  y = thiz->current.y;
 	w = thiz->current.w;  h = thiz->current.h;
 
 	enesim_renderer_transformation_get(r, &m);
+	/* use the inverse matrix */
+	enesim_matrix_inverse(&m, &m);
 	enesim_matrix_f16p16_matrix_to(&m, &thiz->matrix);
 	mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
 	if (mtype != ENESIM_MATRIX_IDENTITY)
@@ -1504,7 +1598,11 @@ static Eina_Bool _image_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Image *thiz;
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
-	if (thiz->src_changed) return EINA_TRUE;
+	if (thiz->src_changed)
+	{
+		if (thiz->current.s != thiz->past.s)
+			return EINA_TRUE;
+	}
 	if (!thiz->changed) return EINA_FALSE;
 
 	if (thiz->current.x != thiz->past.x)
@@ -1569,6 +1667,63 @@ static Eina_Bool _image_damages(Enesim_Renderer *r,
 		return ret;
 	}
 }
+
+#if BUILD_OPENGL
+static Eina_Bool _image_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs)
+{
+	*num_programs = 1;
+	*programs = _image_programs;
+	return EINA_TRUE;
+}
+
+static Eina_Bool _image_opengl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Log **l)
+{
+	Enesim_Renderer_Image *thiz;
+
+	if (!_image_state_setup(r, l)) return EINA_FALSE;
+
+	thiz = ENESIM_RENDERER_IMAGE(r);
+	/* create our own gl texture */
+	if (thiz->current.s != thiz->past.s)
+	{
+		if (thiz->gl.s)
+		{
+			enesim_surface_unref(thiz->gl.s);
+			thiz->gl.s = NULL;
+		}
+		/* upload the texture if we need to */
+		if (enesim_surface_backend_get(thiz->current.s) !=
+				ENESIM_BACKEND_OPENGL)
+		{
+			Enesim_Pool *pool;
+			size_t sstride;
+			void *sdata;
+			int w, h;
+
+			enesim_surface_size_get(thiz->current.s, &w, &h);
+			enesim_surface_data_get(thiz->current.s, &sdata,
+					&sstride);
+			pool = enesim_surface_pool_get(s);
+			thiz->gl.s = enesim_surface_new_pool_and_data_from(
+					ENESIM_FORMAT_ARGB8888, w, h, pool,
+					EINA_TRUE, sdata, sstride, NULL, NULL);
+		}
+	}
+
+	*draw = _image_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _image_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+{
+	_image_state_cleanup(r);
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -1589,6 +1744,11 @@ static void _enesim_renderer_image_class_init(void *k)
 	klass->sw_hints_get = _image_sw_image_hints;
 	klass->sw_setup = _image_sw_state_setup;
 	klass->sw_cleanup = _image_sw_state_cleanup;
+#if BUILD_OPENGL
+	klass->opengl_initialize = _image_opengl_initialize;
+	klass->opengl_setup = _image_opengl_setup;
+	klass->opengl_cleanup = _image_opengl_cleanup;
+#endif
 	_spans_best[0][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
 	_spans_best[0][0][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
 	_spans_best[1][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_d_u_identity;
