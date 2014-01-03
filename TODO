@@ -1,5 +1,8 @@
 Enesim
 ======
++ To implement a nine-patch renderer we need to implement the sub surface
+  concept. For that we need to modify the pool interface given that a sub
+  surface is backend dependent
 + Make the opengl_init return TRUE/FALSE
 + Pass the surface when checking for bounds, this allows to know what renderer to use
   on the destination surface
