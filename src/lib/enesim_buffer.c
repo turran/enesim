@@ -220,6 +220,25 @@ EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f,
 	return buf;
 }
 
+
+/**
+ * @brief Creates a sub buffer
+ * @param[in] b The buffer to create the sub buffer from
+ * @return The newly created sub buffer
+ */
+EAPI Enesim_Buffer * enesim_buffer_new_buffer_from(Enesim_Buffer *thiz,
+		const Eina_Rectangle *area)
+{
+	Enesim_Buffer *ret = NULL;
+
+	if (!thiz) return NULL;
+	/* TODO call the pool to create a new buffer based on this one */
+	/* TODO chain it, so whenever a lock/unlock or ref/unref happens
+	 * do the same on the other
+	 */
+	return ret;
+}
+
 #if BUILD_OPENGL
 EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h,
@@ -562,3 +581,4 @@ EAPI void enesim_buffer_unlock(Enesim_Buffer *b)
 {
 	eina_rwlock_release(&b->lock);
 }
+

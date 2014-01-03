@@ -36,6 +36,12 @@ typedef Eina_Bool (*Enesim_Pool_Data_From)(void *prv,
 		Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *src);
 
+typedef Eina_Bool (*Enesim_Pool_Data_Sub)(void *prv,
+		void **backend_data,
+		void *original_data,
+		Enesim_Buffer_Format fmt,
+		const Eina_Rectangle *area);
+
 typedef Eina_Bool (*Enesim_Pool_Data_Get)(void *prv,
 		void *backend_data,
 		Enesim_Buffer_Format fmt,

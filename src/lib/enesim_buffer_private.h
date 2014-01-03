@@ -47,6 +47,8 @@ struct _Enesim_Buffer
 	Eina_Bool external_allocated;
 	/* FIXME make this conditional for windows */
 	Eina_RWLock lock;
+	/* in case this is a subbuffer */
+	Enesim_Buffer *owner;
 	void *user; /* user provided data */
 };
 
