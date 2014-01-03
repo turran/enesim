@@ -32,7 +32,7 @@ typedef struct _Enesim_OpenGL_Compiled_Program
 	int num_shaders;
 } Enesim_OpenGL_Compiled_Program;
 
-void enesim_opengl_init(void);
+Eina_Bool enesim_opengl_init(void);
 
 void enesim_opengl_matrix_convert(Enesim_Matrix *m, float fm[16]);
 

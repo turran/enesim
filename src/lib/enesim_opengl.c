@@ -229,13 +229,23 @@ void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data)
 	free(data);
 }
 
-void enesim_opengl_init(void)
+Eina_Bool enesim_opengl_init(void)
 {
+	GLenum err;
 	static int _init = 0;
-	glewExperimental = GL_TRUE;
 
-	if (++_init != 1) return;
-	glewInit();
+	if (++_init != 1) return EINA_TRUE;
+
+	/* be sure to also initialize the experimental extensions */
+	glewExperimental = GL_TRUE;
+	err = glewInit();
+	if (err != GLEW_OK)
+	{
+		ERR("glewInit failed %s", glewGetErrorString(err));
+		_init--;
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
 }
 /*============================================================================*
  *                                   API                                      *
