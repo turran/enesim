@@ -10,6 +10,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	Enesim_Renderer *is;
 	Enesim_Renderer *r;
 	Enesim_Surface *s;
+	Enesim_Matrix m;
 	Enesim_Log *error = NULL;
 
 	/* Create a temporary surface to use as a source
@@ -37,7 +38,11 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	 */
 	r = enesim_renderer_image_new();
 	enesim_renderer_image_source_surface_set(r, s);
-	enesim_renderer_image_size_set(r, 64, 64);
+	/* apply a scale and a translate */
+	enesim_renderer_image_position_set(r, 64, 64);
+	enesim_renderer_image_size_set(r, 128, 128);
+	enesim_matrix_rotate(&m, 0.2);
+	enesim_renderer_transformation_set(r, &m);
 
 	return r;
 }
