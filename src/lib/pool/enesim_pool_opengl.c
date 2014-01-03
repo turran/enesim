@@ -81,6 +81,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 {
 	Enesim_OpenGL_Pool *thiz = prv;
 	Enesim_Buffer_OpenGL_Data *data;
+	GLfloat border[4] = { 0, 0, 0, 0};
 
 	data = calloc(1, sizeof(Enesim_Buffer_OpenGL_Data));
 	data->textures = calloc(1, sizeof(GLuint));
@@ -96,7 +97,11 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		break;
 
 		case ENESIM_BUFFER_FORMAT_RGB565:
@@ -124,6 +129,7 @@ static Eina_Bool _data_from(void *prv EINA_UNUSED,
 		Enesim_Buffer_Sw_Data *src)
 {
 	Enesim_Buffer_OpenGL_Data *data;
+	GLfloat border[4] = { 0, 0, 0, 0};
 
 	if (!copy) return EINA_FALSE;
 
@@ -136,13 +142,19 @@ static Eina_Bool _data_from(void *prv EINA_UNUSED,
 	switch (fmt)
 	{
 		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
         	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	        glPixelStorei(GL_UNPACK_ROW_LENGTH, w);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, src->argb8888.plane0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, src->argb8888.plane0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		break;
 
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
 		case ENESIM_BUFFER_FORMAT_RGB565:
 		case ENESIM_BUFFER_FORMAT_RGB888:
 		case ENESIM_BUFFER_FORMAT_A8:
@@ -181,6 +193,7 @@ static Eina_Bool _data_get(void *prv EINA_UNUSED, void *backend_data,
 		dst->argb8888.plane0 = malloc(w * h * 4);
 		dst->argb8888.plane0_stride = w * 4;
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, dst->argb8888.plane0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		break;
 
 		case ENESIM_BUFFER_FORMAT_RGB565:
