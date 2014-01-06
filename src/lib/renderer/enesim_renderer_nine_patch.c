@@ -56,10 +56,27 @@
 		Enesim_Renderer_Nine_Patch,					\
 		enesim_renderer_nine_patch_descriptor_get())
 
+typedef enum _Enesim_Renderer_Nine_Patch_Position
+{
+	ENESIM_RENDERER_NINE_PATCH_POSITION_TL,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_TC,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_TR,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_ML,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_MC,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_MR,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_BL,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_BC,
+	ENESIM_RENDERER_NINE_PATCH_POSITION_BR,
+} Enesim_Renderer_Nine_Patch_Position;
+
 typedef struct _Enesim_Renderer_Nine_Patch_State
 {
 	Enesim_Surface *s;
+	/* the borders */
+	int l, t, r, b;
+	/* the position */
 	double x, y;
+	/* the size */
 	double w, h;
 } Enesim_Renderer_Nine_Patch_State;
 
@@ -69,8 +86,20 @@ typedef struct _Enesim_Renderer_Nine_Patch
 	Enesim_Renderer_Nine_Patch_State current;
 	Enesim_Renderer_Nine_Patch_State past;
 	/* private */
+	/* our nine renderers */
+	Enesim_Renderer *renderers[9];
+	/* our nine surfaces */
+	Enesim_Surface *stl, *stc, *str;
+	Enesim_Surface *sml, *smc, *smr;
+	Enesim_Surface *sbl, *sbc, *sbr;
+#if BUILD_OPENGL
+	struct {
+		Enesim_Surface *s;
+	} gl;
+#endif
 	Eina_Bool changed : 1;
 	Eina_Bool src_changed : 1;
+	Eina_Bool borders_changed : 1;
 } Enesim_Renderer_Nine_Patch;
 
 typedef struct _Enesim_Renderer_Nine_Patch_Class {
@@ -102,7 +131,8 @@ static void _nine_patch_transform_destination_bounds(Enesim_Renderer *r EINA_UNU
 	enesim_rectangle_normalize(obounds, bounds);
 }
 
-static Eina_Bool _nine_patch_state_setup(Enesim_Renderer *r, Enesim_Log **l)
+static Eina_Bool _nine_patch_state_setup(Enesim_Renderer *r,
+		Enesim_Surface *src, Enesim_Log **l)
 {
 	Enesim_Renderer_Nine_Patch *thiz;
 
@@ -112,9 +142,14 @@ static Eina_Bool _nine_patch_state_setup(Enesim_Renderer *r, Enesim_Log **l)
 		ENESIM_RENDERER_LOG(r, l, "No surface set");
 		return EINA_FALSE;
 	}
-
+	/* create the 9 sub surfaces if we need to */
+	if (thiz->borders_changed || thiz->src_changed)
+	{
+		
+	}
+	/* set the new size and position */
+	
 	enesim_surface_lock(thiz->current.s, EINA_FALSE);
-	thiz->color = enesim_renderer_color_get(r);
 	return EINA_TRUE;
 }
 
@@ -139,27 +174,40 @@ static void _nine_patch_state_cleanup(Enesim_Renderer *r)
 	thiz->past.y = thiz->current.y;
 	thiz->past.w = thiz->current.w;
 	thiz->past.h = thiz->current.h;
-
-	EINA_LIST_FREE(thiz->surface_damages, sd)
-		free(sd);
+	thiz->past.l = thiz->current.l;
+	thiz->past.t = thiz->current.t;
+	thiz->past.r = thiz->current.r;
+	thiz->past.b = thiz->current.b;
 }
 
 #if BUILD_OPENGL
 static void _nine_patch_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, const Eina_Rectangle *area, int x EINA_UNUSED,
-		int y EINA_UNUSED)
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_Nine_Patch * thiz;
+	int i;
 
 	thiz = ENESIM_RENDERER_NINE_PATCH(r);
+	for (i = 0; i < 9; i++)
+	{
+		enesim_renderer_opengl_draw(thiz->renderers[i], s, rop, area,
+				x, y);
+	}
 }
-
 #endif
 
 static void _nine_patch_sw_span(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
-	Enesim_Renderer_Nine_Patch *thiz = ENESIM_RENDERER_NINE_PATCH(r);
+	Enesim_Renderer_Nine_Patch * thiz;
+	int i;
+
+	thiz = ENESIM_RENDERER_NINE_PATCH(r);
+	for (i = 0; i < 9; i++)
+	{
+		enesim_renderer_sw_draw(thiz->renderers[i], s, rop, area,
+				x, y);
+	}
 }
 
 /*----------------------------------------------------------------------------*
@@ -207,12 +255,7 @@ static void _nine_patch_bounds_get(Enesim_Renderer *r,
 
 static void _nine_patch_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
-	Enesim_Renderer_Nine_Patch *thiz;
-
 	_nine_patch_state_cleanup(r);
-
-	thiz = ENESIM_RENDERER_NINE_PATCH(r);
-	thiz->span = NULL;
 }
 
 static Eina_Bool _nine_patch_sw_state_setup(Enesim_Renderer *r,
@@ -220,22 +263,9 @@ static Eina_Bool _nine_patch_sw_state_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Nine_Patch *thiz;
-	Enesim_Format fmt;
-	Enesim_Matrix m;
-	Enesim_Matrix_Type mtype;
-	Enesim_Quality quality;
-	double x, y, w, h;
-	double ox, oy;
 
 	if (!_nine_patch_state_setup(r, l))
 		return EINA_FALSE;
-
-	thiz = ENESIM_RENDERER_NINE_PATCH(r);
-
-	enesim_surface_size_get(thiz->current.s, &thiz->sw, &thiz->sh);
-	x = thiz->current.x;  y = thiz->current.y;
-	w = thiz->current.w;  h = thiz->current.h;
-
 	return EINA_TRUE;
 }
 
@@ -251,15 +281,9 @@ static void _nine_patch_features_get(Enesim_Renderer *r EINA_UNUSED,
 static void _nine_patch_sw_nine_patch_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
-	if (rop != ENESIM_ROP_FILL)
-	{
-		Enesim_Renderer_Nine_Patch *thiz = ENESIM_RENDERER_NINE_PATCH(r);
-
-		if (thiz->span)
-			*hints |= ENESIM_RENDERER_HINT_ROP;
-	}
-
+	/* given that we wrap another renderer always set the hints */
+	/* TODO check againts the nine renderers */
+	*hints = ENESIM_RENDERER_HINT_COLORIZE | ENESIM_RENDERER_HINT_ROP;
 }
 
 static Eina_Bool _nine_patch_has_changed(Enesim_Renderer *r)
@@ -272,69 +296,29 @@ static Eina_Bool _nine_patch_has_changed(Enesim_Renderer *r)
 		if (thiz->current.s != thiz->past.s)
 			return EINA_TRUE;
 	}
-	if (!thiz->changed) return EINA_FALSE;
-
-	if (thiz->current.x != thiz->past.x)
-		return EINA_TRUE;
-	if (thiz->current.y != thiz->past.y)
-		return EINA_TRUE;
-	if (thiz->current.w != thiz->past.w)
-		return EINA_TRUE;
-	if (thiz->current.h != thiz->past.h)
-		return EINA_TRUE;
+	if (thiz->changed)
+	{
+		if (thiz->current.x != thiz->past.x)
+			return EINA_TRUE;
+		if (thiz->current.y != thiz->past.y)
+			return EINA_TRUE;
+		if (thiz->current.w != thiz->past.w)
+			return EINA_TRUE;
+		if (thiz->current.h != thiz->past.h)
+			return EINA_TRUE;
+	}
+	if (thiz->borders_changed)
+	{
+		if (thiz->current.l != thiz->past.l)
+			return EINA_TRUE;
+		if (thiz->current.t != thiz->past.t)
+			return EINA_TRUE;
+		if (thiz->current.r != thiz->past.r)
+			return EINA_TRUE;
+		if (thiz->current.b != thiz->past.b)
+			return EINA_TRUE;
+	}
 	return EINA_FALSE;
-}
-
-static Eina_Bool _nine_patch_damages(Enesim_Renderer *r,
-		const Eina_Rectangle *old_bounds,
-		Enesim_Renderer_Damage_Cb cb, void *data)
-{
-	Enesim_Renderer_Nine_Patch *thiz;
-	Eina_Rectangle *sd;
-	Eina_Rectangle bounds;
-
-
-	thiz = ENESIM_RENDERER_NINE_PATCH(r);
-	/* if we have changed just send the previous bounds
-	 * and the current one
-	 */
-	if (enesim_renderer_has_changed(r))
-	{
-		Enesim_Rectangle curr_bounds;
-
-		cb(r, old_bounds, EINA_TRUE, data);
-		_nine_patch_bounds_get(r, &curr_bounds);
-		enesim_rectangle_normalize(&curr_bounds, &bounds);
-		cb(r, &bounds, EINA_FALSE, data);
-		return EINA_TRUE;
-	}
-	/* in other case, send the surface damages tansformed
-	 * to destination coordinates
-	 */
-	else
-	{
-		Enesim_Matrix m;
-		Enesim_Matrix_Type type;
-		Eina_List *l;
-		Eina_Bool ret = EINA_FALSE;
-
-		enesim_renderer_transformation_get(r, &m);
-		type = enesim_renderer_transformation_type_get(r);
-		EINA_LIST_FOREACH(thiz->surface_damages, l, sd)
-		{
-			Enesim_Rectangle sdd;
-
-			enesim_rectangle_coords_from(&sdd, sd->x, sd->y, sd->w, sd->h);
-			/* the coordinates are relative to the nine patch */
-			sdd.x += thiz->current.x;
-			sdd.y += thiz->current.y;
-			/* TODO clip it to the source bounds */
-			_nine_patch_transform_destination_bounds(r, &m, type, &sdd, &bounds);
-			cb(r, &bounds, EINA_FALSE, data);
-			ret = EINA_TRUE;
-		}
-		return ret;
-	}
 }
 
 #if BUILD_OPENGL
@@ -342,8 +326,6 @@ static Eina_Bool _nine_patch_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
 		int *num_programs,
 		Enesim_Renderer_OpenGL_Program ***programs)
 {
-	*num_programs = 1;
-	*programs = _nine_patch_programs;
 	return EINA_TRUE;
 }
 
@@ -408,7 +390,6 @@ static void _enesim_renderer_nine_patch_class_init(void *k)
 	klass->base_name_get = _nine_patch_name;
 	klass->bounds_get = _nine_patch_bounds_get;
 	klass->features_get = _nine_patch_features_get;
-	klass->damages_get = _nine_patch_damages;
 	klass->has_changed = _nine_patch_has_changed;
 	klass->sw_hints_get = _nine_patch_sw_nine_patch_hints;
 	klass->sw_setup = _nine_patch_sw_state_setup;
@@ -422,15 +403,28 @@ static void _enesim_renderer_nine_patch_class_init(void *k)
 
 static void _enesim_renderer_nine_patch_instance_init(void *o EINA_UNUSED)
 {
+	Enesim_Renderer_Nine_Patch *thiz;
+	int i;
+
+	thiz = ENESIM_RENDERER_NINE_PATCH(o);
+	for (i = 0; i < 9; i++)
+	{
+		thiz->renderers[i] = enesim_renderer_image_new();
+	}
 }
 
 static void _enesim_renderer_nine_patch_instance_deinit(void *o)
 {
 	Enesim_Renderer_Nine_Patch *thiz;
+	int i;
 
 	thiz = ENESIM_RENDERER_NINE_PATCH(o);
 	if (thiz->current.s)
 		enesim_surface_unref(thiz->current.s);
+	for (i = 0; i < 9; i++)
+	{
+		enesim_renderer_unref(thiz->renderers[i]);
+	}
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -454,7 +448,7 @@ EAPI Enesim_Renderer * enesim_renderer_nine_patch_new(void)
 }
 
 /**
- * @brief Set the top left X coordinate of a nine_patch renderer.
+ * @brief Set the top left X coordinate of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[in] x The top left X coordinate.
@@ -473,7 +467,7 @@ EAPI void enesim_renderer_nine_patch_x_set(Enesim_Renderer *r, double x)
 }
 
 /**
- * @brief Retrieve the top left X coordinate of a nine_patch renderer.
+ * @brief Retrieve the top left X coordinate of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @return The top left X coordinate.
@@ -490,7 +484,7 @@ EAPI double enesim_renderer_nine_patch_x_get(Enesim_Renderer *r)
 }
 
 /**
- * @brief Set the top left Y coordinate of a nine_patch renderer.
+ * @brief Set the top left Y coordinate of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[in] y The top left Y coordinate.
@@ -509,7 +503,7 @@ EAPI void enesim_renderer_nine_patch_y_set(Enesim_Renderer *r, double y)
 }
 
 /**
- * @brief Retrieve the top left Y coordinate of a nine_patch renderer.
+ * @brief Retrieve the top left Y coordinate of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @return The top left Y coordinate.
@@ -526,7 +520,7 @@ EAPI double enesim_renderer_nine_patch_y_get(Enesim_Renderer *r)
 }
 
 /**
- * @brief Set the top left coordinates of a nine_patch renderer.
+ * @brief Set the top left coordinates of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[in] x The top left X coordinate.
@@ -547,7 +541,7 @@ EAPI void enesim_renderer_nine_patch_position_set(Enesim_Renderer *r, double x, 
 }
 
 /**
- * @brief Retrieve the top left coordinates of a nine_patch renderer.
+ * @brief Retrieve the top left coordinates of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[out] x The top left X coordinate.
@@ -568,7 +562,7 @@ EAPI void enesim_renderer_nine_patch_position_get(Enesim_Renderer *r, double *x,
 }
 
 /**
- * @brief Set the width of a nine_patch renderer.
+ * @brief Set the width of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[in] w The nine patch width.
@@ -587,7 +581,7 @@ EAPI void enesim_renderer_nine_patch_width_set(Enesim_Renderer *r, double w)
 }
 
 /**
- * @brief Retrieve the width of a nine_patch renderer.
+ * @brief Retrieve the width of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @return The nine patch width.
@@ -603,7 +597,7 @@ EAPI double enesim_renderer_nine_patch_width_get(Enesim_Renderer *r)
 }
 
 /**
- * @brief Set the height of a nine_patch renderer.
+ * @brief Set the height of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[in] h The nine patch height.
@@ -622,7 +616,7 @@ EAPI void enesim_renderer_nine_patch_height_set(Enesim_Renderer *r, double h)
 }
 
 /**
- * @brief Retrieve the height of a nine_patch renderer.
+ * @brief Retrieve the height of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @return The nine patch height.
@@ -638,7 +632,7 @@ EAPI double enesim_renderer_nine_patch_height_get(Enesim_Renderer *r)
 }
 
 /**
- * @brief Set the size of a nine_patch renderer.
+ * @brief Set the size of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[in] w The width.
@@ -659,7 +653,7 @@ EAPI void enesim_renderer_nine_patch_size_set(Enesim_Renderer *r, double w, doub
 }
 
 /**
- * @brief Retrieve the size of a nine_patch renderer.
+ * @brief Retrieve the size of a nine patch renderer.
  *
  * @param[in] r The nine patch renderer.
  * @param[out] w The width.
@@ -711,4 +705,47 @@ EAPI Enesim_Surface * enesim_renderer_nine_patch_source_surface_get(Enesim_Rende
 
 	thiz = ENESIM_RENDERER_NINE_PATCH(r);
 	return enesim_surface_ref(thiz->current.s);
+}
+
+/**
+ * @brief Set the border coordinates of a nine patch renderer.
+ *
+ * @param[in] re The nine patch renderer.
+ * @param[in] l The left border
+ * @param[in] t The top border
+ * @param[in] r The right border
+ * @param[in] b The bottom border
+ */
+EAPI void enesim_renderer_nine_patch_border_set(Enesim_Renderer *re, int l, int t, int r, int b)
+{
+	Enesim_Renderer_Nine_Patch *thiz;
+
+	thiz = ENESIM_RENDERER_NINE_PATCH(r);
+	if (!thiz) return;
+	thiz->current.l = l;
+	thiz->current.t = t;
+	thiz->current.r = r;
+	thiz->current.b = b;
+	thiz->borders_changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the border coordinates of a nine patch renderer.
+ *
+ * @param[in] re The nine patch renderer.
+ * @param[out] l The left border
+ * @param[out] t The top border
+ * @param[out] r The right border
+ * @param[out] b The bottom border
+ */
+EAPI void enesim_renderer_nine_patch_border_get(Enesim_Renderer *re, int *l, int *t, int *r, int *b)
+{
+	Enesim_Renderer_Nine_Patch *thiz;
+
+	thiz = ENESIM_RENDERER_NINE_PATCH(re);
+	if (!thiz) return;
+	if (l) *l = thiz->current.l;
+	if (t) *t = thiz->current.t;
+	if (r) *r = thiz->current.r;
+	if (b) *b = thiz->current.b;
 }

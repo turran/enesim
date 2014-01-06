@@ -46,6 +46,9 @@ EAPI void enesim_renderer_nine_patch_size_get(Enesim_Renderer *r, double *w, dou
 EAPI void enesim_renderer_nine_patch_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI Enesim_Surface * enesim_renderer_nine_patch_source_surface_get(Enesim_Renderer *r);
 
+EAPI void enesim_renderer_nine_patch_border_set(Enesim_Renderer *re, int l, int t, int r, int b);
+EAPI void enesim_renderer_nine_patch_border_get(Enesim_Renderer *re, int *l, int *t, int *r, int *b);
+
 /**
  * @}
  */
