@@ -165,6 +165,46 @@ static void _image_state_cleanup(Enesim_Renderer *r)
 }
 
 #if BUILD_OPENGL
+static Eina_Bool * _image_gl_create(Enesim_Renderer_Image *thiz,
+		Enesim_Surface *s)
+{
+	/* create our own gl texture */
+	if (thiz->current.s != thiz->past.s)
+	{
+		if (thiz->gl.s)
+		{
+			enesim_surface_unref(thiz->gl.s);
+			thiz->gl.s = NULL;
+		}
+		/* upload the texture if we need to */
+		if (enesim_surface_backend_get(thiz->current.s) !=
+				ENESIM_BACKEND_OPENGL)
+		{
+			Enesim_Pool *pool;
+			size_t sstride;
+			void *sdata;
+			int w, h;
+
+			enesim_surface_size_get(thiz->current.s, &w, &h);
+			if (!w || !h)
+				return EINA_FALSE;
+
+			enesim_surface_data_get(thiz->current.s, &sdata,
+					&sstride);
+			pool = enesim_surface_pool_get(s);
+			thiz->gl.s = enesim_surface_new_pool_and_data_from(
+					ENESIM_FORMAT_ARGB8888, w, h, pool,
+					EINA_TRUE, sdata, sstride, NULL, NULL);
+			if (!thiz->gl.s)
+			{
+				WRN("Impossible to create the gl surface");
+				return EINA_FALSE;
+			}
+		}
+	}
+	return EINA_TRUE;
+}
+
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _image_shader = {
 	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
@@ -1686,35 +1726,13 @@ static Eina_Bool _image_opengl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Image *thiz;
 
 	if (!_image_state_setup(r, l)) return EINA_FALSE;
-
-	thiz = ENESIM_RENDERER_IMAGE(r);
-	/* create our own gl texture */
-	if (thiz->current.s != thiz->past.s)
+	if (!_image_gl_create(thiz, s))
 	{
-		if (thiz->gl.s)
-		{
-			enesim_surface_unref(thiz->gl.s);
-			thiz->gl.s = NULL;
-		}
-		/* upload the texture if we need to */
-		if (enesim_surface_backend_get(thiz->current.s) !=
-				ENESIM_BACKEND_OPENGL)
-		{
-			Enesim_Pool *pool;
-			size_t sstride;
-			void *sdata;
-			int w, h;
-
-			enesim_surface_size_get(thiz->current.s, &w, &h);
-			enesim_surface_data_get(thiz->current.s, &sdata,
-					&sstride);
-			pool = enesim_surface_pool_get(s);
-			thiz->gl.s = enesim_surface_new_pool_and_data_from(
-					ENESIM_FORMAT_ARGB8888, w, h, pool,
-					EINA_TRUE, sdata, sstride, NULL, NULL);
-		}
+		ENESIM_RENDERER_LOG(r, l, "Failed to create the gl surface");
+		return EINA_FALSE;
 	}
 
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	*draw = _image_opengl_draw;
 	return EINA_TRUE;
 }
