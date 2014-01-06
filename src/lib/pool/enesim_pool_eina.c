@@ -134,6 +134,7 @@ static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ NULL,
+	/* .data_sub =   */ NULL,
 	/* .data_get =   */ _data_get,
 	/* .free =       */ _free,
 };
