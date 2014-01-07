@@ -122,7 +122,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_Gradient *g;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_OpenGL_Compiled_Program *cp;
-	Enesim_Matrix m1, m2;
+	Enesim_Matrix m1;
 	Enesim_Matrix tx;
 	float matrix[16];
 	int ay_u;
@@ -160,13 +160,10 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_opengl_rop_set(rop);
 
 	/* set our transformation matrix */
-	enesim_matrix_translate(&m1, -1, -1);
-	enesim_matrix_compose(&m1, &thiz->gl.matrix, &m1);
-	enesim_matrix_translate(&m2, 1, 1);
-	enesim_matrix_compose(&m1, &m2, &m1);
 	enesim_matrix_translate(&tx, -x, -y);
-	enesim_matrix_compose(&m1, &tx, &m1);
+	enesim_matrix_compose(&thiz->gl.matrix, &tx, &m1);
 	enesim_opengl_matrix_convert(&m1, matrix);
+
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glMultMatrixf(matrix);
@@ -404,6 +401,10 @@ static Eina_Bool _linear_opengl_setup(Enesim_Renderer *r,
 	if (!_linear_setup(r, &thiz->gl.matrix, &thiz->gl.ayx, &thiz->gl.ayy,
 				&thiz->gl.scale))
 		return EINA_FALSE;
+	/* we need to translate by the x0 and y0 */
+	thiz->gl.xx = thiz->current.x0;
+	thiz->gl.yy = thiz->current.y0;
+
 	*draw = _linear_opengl_draw;
 	return EINA_TRUE;
 }
