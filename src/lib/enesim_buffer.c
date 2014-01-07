@@ -97,6 +97,175 @@ void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
 {
 	return b->backend_data;
 }
+
+void enesim_buffer_sw_data_sub(Enesim_Buffer_Sw_Data *src,
+		Enesim_Buffer_Sw_Data *dst,
+		Enesim_Buffer_Format fmt, const Eina_Rectangle *area)
+{
+	switch (fmt)
+	{
+		/* 32 bpp */
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		dst->argb8888.plane0 = (uint32_t *)((uint8_t *)src->argb8888.plane0 +
+				(area->y * src->argb8888.plane0_stride) +
+				(area->x * 4));
+		dst->argb8888.plane0_stride = src->argb8888.plane0_stride;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		dst->argb8888_pre.plane0 = (uint32_t *)(
+				(uint8_t *)src->argb8888_pre.plane0 +
+				(area->y * src->argb8888_pre.plane0_stride) +
+				(area->x * 4));
+		dst->argb8888_pre.plane0_stride = src->argb8888_pre.plane0_stride;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		dst->cmyk.plane0 = (uint8_t *)src->cmyk.plane0 +
+				(area->y * src->cmyk.plane0_stride) +
+				(area->x * 4);
+		dst->cmyk.plane0_stride = src->cmyk.plane0_stride;
+		break;
+
+		/* 24 bpp */
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		dst->bgr888.plane0 = src->bgr888.plane0 +
+				(area->y * src->bgr888.plane0_stride) +
+				(area->x * 3);
+		dst->bgr888.plane0_stride = src->bgr888.plane0_stride;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		dst->rgb888.plane0 = src->rgb888.plane0 +
+				(area->y * src->rgb888.plane0_stride) +
+				(area->x * 3);
+		dst->rgb888.plane0_stride = src->rgb888.plane0_stride;
+		break;
+
+		/* 16 bpp */
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		dst->rgb565.plane0 = (uint16_t *)(
+				(uint8_t *)src->rgb565.plane0 +
+				(area->y * src->rgb565.plane0_stride) +
+				(area->x * 2));
+		dst->rgb565.plane0_stride = src->rgb565.plane0_stride;
+		break;
+
+		/* 8 bpp */
+		case ENESIM_BUFFER_FORMAT_A8:
+		dst->a8.plane0 = src->a8.plane0 +
+				(area->y * src->a8.plane0_stride) +
+				(area->x * 2);
+		dst->a8.plane0_stride = src->a8.plane0_stride;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_GRAY:
+		default:
+		ERR("Unsupported format %d", fmt);
+		break;
+	}
+}
+
+void enesim_buffer_sw_data_set(Enesim_Buffer_Sw_Data *data,
+		Enesim_Buffer_Format fmt, void *content0, int stride0)
+{
+	switch (fmt)
+	{
+		/* 32 bpp */
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		data->argb8888.plane0 = content0;
+		data->argb8888.plane0_stride = stride0;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		data->argb8888_pre.plane0 = content0;
+		data->argb8888_pre.plane0_stride = stride0;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		data->cmyk.plane0 = content0;
+		data->cmyk.plane0_stride = stride0;
+		break;
+
+		/* 24 bpp */
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		data->bgr888.plane0 = content0;
+		data->bgr888.plane0_stride = stride0;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		data->rgb888.plane0 = content0;
+		data->rgb888.plane0_stride = stride0;
+		break;
+
+		/* 16 bpp */
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		data->rgb565.plane0 = content0;
+		data->rgb565.plane0_stride = stride0;
+		break;
+
+		/* 8 bpp */
+		case ENESIM_BUFFER_FORMAT_A8:
+		data->a8.plane0 = content0;
+		data->a8.plane0_stride = stride0;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_GRAY:
+		default:
+		ERR("Unsupported format %d", fmt);
+		break;
+	}
+}
+
+void enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
+		Enesim_Buffer_Format fmt,
+		Enesim_Buffer_Free free_func,
+		void *free_func_data)
+{
+	switch (fmt)
+	{
+		/* 32 bpp */
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		free_func(data->argb8888.plane0, free_func_data);
+		break;
+
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		free_func(data->argb8888_pre.plane0, free_func_data);
+		break;
+
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		free_func(data->cmyk.plane0, free_func_data);
+		break;
+
+		/* 24 bpp */
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		free_func(data->bgr888.plane0, free_func_data);
+		break;
+
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		free_func(data->rgb888.plane0, free_func_data);
+		break;
+
+		/* 16 bpp */
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		free_func(data->rgb565.plane0, free_func_data);
+		break;
+
+		/* 8 bpp */
+		case ENESIM_BUFFER_FORMAT_A8:
+		free_func(data->a8.plane0, free_func_data);
+		break;
+
+		case ENESIM_BUFFER_FORMAT_GRAY:
+		default:
+		ERR("Unsupported format %d", fmt);
+		break;
+	}
+
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -230,12 +399,29 @@ EAPI Enesim_Buffer * enesim_buffer_new_buffer_from(Enesim_Buffer *thiz,
 		const Eina_Rectangle *area)
 {
 	Enesim_Buffer *ret = NULL;
+	Enesim_Pool *pool;
+	Eina_Rectangle size;
+	void *backend_data;
 
 	if (!thiz) return NULL;
-	/* TODO call the pool to create a new buffer based on this one */
-	/* TODO chain it, so whenever a lock/unlock or ref/unref happens
-	 * do the same on the other
-	 */
+
+	eina_rectangle_coords_from(&size, 0, 0, thiz->w, thiz->h);
+	if (!eina_rectangle_intersection(&size, area))
+		return NULL;
+
+	pool = enesim_buffer_pool_get(thiz);
+	if (!enesim_pool_data_sub(pool, thiz->backend,
+		&backend_data,
+		thiz->backend_data,
+		thiz->format, &size))
+	{
+		enesim_pool_unref(pool);
+		return NULL;
+	}
+
+	ret = _buffer_new(size.w, size.h, thiz->backend, backend_data,
+			thiz->format, pool, EINA_FALSE, NULL, NULL);
+	/* TODO whenever we lock/ref/whatever keep track of the owner buffer */
 	return ret;
 }
 

@@ -34,6 +34,14 @@ typedef struct _Enesim_Eina_Pool
 	Eina_Mempool *mp;
 } Enesim_Eina_Pool;
 
+static void _data_free_cb(void *data, void *user_data)
+{
+	Enesim_Eina_Pool *thiz = user_data;
+	eina_mempool_free(thiz->mp, data);
+}
+/*----------------------------------------------------------------------------*
+ *                        The Enesim's pool interface                         *
+ *----------------------------------------------------------------------------*/
 static Eina_Bool _data_alloc(void *prv,
 		Enesim_Backend *backend,
 		void **backend_data,
@@ -41,42 +49,36 @@ static Eina_Bool _data_alloc(void *prv,
 {
 	Enesim_Buffer_Sw_Data *data;
 	Enesim_Eina_Pool *thiz = prv;
-	void *alloc_data;
 	size_t bytes;
+	int stride;
+	void *alloc_data;
 
 	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
 	*backend = ENESIM_BACKEND_SOFTWARE;
 	*backend_data = data;
+
 	bytes = enesim_buffer_format_size_get(fmt, w, h);
+	stride = enesim_buffer_format_size_get(fmt, w, 1);
 	alloc_data = eina_mempool_malloc(thiz->mp, bytes);
-	switch (fmt)
-	{
-		case ENESIM_BUFFER_FORMAT_ARGB8888:
-		data->argb8888.plane0 = alloc_data;
-		data->argb8888.plane0_stride = w * 4;
-		break;
 
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		data->argb8888_pre.plane0 = alloc_data;
-		data->argb8888_pre.plane0_stride = w * 4;
-		break;
+	enesim_buffer_sw_data_set(&data, fmt, alloc_data, stride);
+	return EINA_TRUE;
+}
 
-		case ENESIM_BUFFER_FORMAT_RGB565:
-		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w * 2;
-		break;
+static Eina_Bool _data_sub(void *prv EINA_UNUSED,
+		Enesim_Backend backend,
+		void **backend_data,
+		void *original_data,
+		Enesim_Buffer_Format original_fmt,
+		const Eina_Rectangle *area)
+{
+	Enesim_Buffer_Sw_Data *orig_data = original_data;
+	Enesim_Buffer_Sw_Data *data;
 
-		case ENESIM_BUFFER_FORMAT_RGB888:
-		data->rgb888.plane0 = alloc_data;
-		data->rgb888.plane0_stride = w * 3;
-		break;
+	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
+	*backend_data = data;
 
-		case ENESIM_BUFFER_FORMAT_A8:
-		case ENESIM_BUFFER_FORMAT_GRAY:
-		default:
-		ERR("Unsupported format %d", fmt);
-		break;
-	}
+	enesim_buffer_sw_data_sub(orig_data, data, original_fmt, area);
 	return EINA_TRUE;
 }
 
@@ -88,24 +90,8 @@ static void _data_free(void *prv,
 	Enesim_Eina_Pool *thiz = prv;
 	Enesim_Buffer_Sw_Data *data = backend_data;
 
-	switch (fmt)
-	{
-		case ENESIM_BUFFER_FORMAT_ARGB8888:
-		eina_mempool_free(thiz->mp, data->argb8888_pre.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		eina_mempool_free(thiz->mp, data->argb8888_pre.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_RGB565:
-		case ENESIM_BUFFER_FORMAT_RGB888:
-		case ENESIM_BUFFER_FORMAT_A8:
-		case ENESIM_BUFFER_FORMAT_GRAY:
-		default:
-		printf("TODO\n");
-		break;
-	}
+	if (!external_allocated)
+		enesim_buffer_sw_data_free(data, fmt, _data_free_cb, thiz);
 	free(data);
 }
 
@@ -134,7 +120,7 @@ static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ NULL,
-	/* .data_sub =   */ NULL,
+	/* .data_sub =   */ _data_sub,
 	/* .data_get =   */ _data_get,
 	/* .free =       */ _free,
 };

@@ -53,5 +53,14 @@ struct _Enesim_Buffer
 };
 
 void * enesim_buffer_backend_data_get(Enesim_Buffer *b);
+void enesim_buffer_sw_data_sub(Enesim_Buffer_Sw_Data *src,
+		Enesim_Buffer_Sw_Data *dst,
+		Enesim_Buffer_Format fmt, const Eina_Rectangle *area);
+void enesim_buffer_sw_data_set(Enesim_Buffer_Sw_Data *data,
+		Enesim_Buffer_Format fmt, void *content0, int stride0);
+void enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
+		Enesim_Buffer_Format fmt,
+		Enesim_Buffer_Free free_func,
+		void *free_func_data);
 
 #endif

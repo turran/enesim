@@ -22,12 +22,18 @@
 #include "enesim_buffer.h"
 
 #include "enesim_pool_private.h"
+#include "enesim_buffer_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_pool
 
 static Enesim_Pool *_current_default_pool = NULL;
+
+static void _data_free_cb(void *data, void *user_data EINA_UNUSED)
+{
+	free(data);
+}
 /*----------------------------------------------------------------------------*
  *                        The Enesim's pool interface                         *
  *----------------------------------------------------------------------------*/
@@ -38,56 +44,18 @@ static Eina_Bool _data_alloc(void *prv EINA_UNUSED,
 {
 	Enesim_Buffer_Sw_Data *data;
 	size_t bytes;
+	int stride;
 	void *alloc_data;
 
-	*backend = ENESIM_BACKEND_SOFTWARE;
 	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
+	*backend = ENESIM_BACKEND_SOFTWARE;
 	*backend_data = data;
+
 	bytes = enesim_buffer_format_size_get(fmt, w, h);
+	stride = enesim_buffer_format_size_get(fmt, w, 1);
 	alloc_data = calloc(bytes, sizeof(char));
-	switch (fmt)
-	{
-		case ENESIM_BUFFER_FORMAT_ARGB8888:
-		data->argb8888.plane0 = alloc_data;
-		data->argb8888.plane0_stride = w * 4;
-		break;
 
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		data->argb8888_pre.plane0 = alloc_data;
-		data->argb8888_pre.plane0_stride = w * 4;
-		break;
-
-		case ENESIM_BUFFER_FORMAT_RGB565:
-		data->rgb565.plane0 = alloc_data;
-		data->rgb565.plane0_stride = w * 2;
-		break;
-
-		case ENESIM_BUFFER_FORMAT_BGR888:
-		data->bgr888.plane0 = alloc_data;
-		data->bgr888.plane0_stride = w * 3;
-		break;
-
-		case ENESIM_BUFFER_FORMAT_RGB888:
-		data->rgb888.plane0 = alloc_data;
-		data->rgb888.plane0_stride = w * 3;
-		break;
-
-		case ENESIM_BUFFER_FORMAT_A8:
-		data->a8.plane0 = alloc_data;
-		data->a8.plane0_stride = w;
-		break;
-
-		case ENESIM_BUFFER_FORMAT_CMYK:
-		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
-		data->cmyk.plane0 = alloc_data;
-		data->cmyk.plane0_stride = w * 4;
-		break;
-
-		case ENESIM_BUFFER_FORMAT_GRAY:
-		default:
-		ERR("Unsupported format %d", fmt);
-		break;
-	}
+	enesim_buffer_sw_data_set(data, fmt, alloc_data, stride);
 	return EINA_TRUE;
 }
 
@@ -103,8 +71,9 @@ static Eina_Bool _data_sub(void *prv EINA_UNUSED,
 
 	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
 	*backend_data = data;
-	/* set the offset */
-	return EINA_FALSE;
+
+	enesim_buffer_sw_data_sub(orig_data, data, original_fmt, area);
+	return EINA_TRUE;
 }
 
 static Eina_Bool _data_from(void *prv EINA_UNUSED,
@@ -138,39 +107,8 @@ static void _data_free(void *prv EINA_UNUSED, void *backend_data,
 		Eina_Bool external_allocated)
 {
 	Enesim_Buffer_Sw_Data *data = backend_data;
-	if (external_allocated) goto end;
-	switch (fmt)
-	{
-		case ENESIM_BUFFER_FORMAT_ARGB8888:
-		free(data->argb8888.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		free(data->argb8888_pre.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_RGB565:
-		free(data->rgb565.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_RGB888:
-		free(data->rgb888.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_BGR888:
-		free(data->bgr888.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_A8:
-		free(data->a8.plane0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_GRAY:
-		default:
-		ERR("Unsupported format %d", fmt);
-		break;
-	}
-end:
+	if (!external_allocated)
+		enesim_buffer_sw_data_free(data, fmt, _data_free_cb, NULL);
 	free(data);
 }
 
