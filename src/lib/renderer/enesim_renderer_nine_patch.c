@@ -86,14 +86,17 @@ typedef struct _Enesim_Renderer_Nine_Patch
 	Enesim_Renderer_Nine_Patch_State current;
 	Enesim_Renderer_Nine_Patch_State past;
 	/* private */
-	/* our nine renderers */
-	Enesim_Renderer *renderers[9];
-	/* our nine surfaces */
-	Enesim_Surface *stl, *stc, *str;
-	Enesim_Surface *sml, *smc, *smr;
-	Enesim_Surface *sbl, *sbc, *sbr;
+	struct {
+		/* our nine renderers */
+		Enesim_Renderer *renderers[9];
+		/* our nine surfaces */
+		Enesim_Surface *stl, *stc, *str;
+		Enesim_Surface *sml, *smc, *smr;
+		Enesim_Surface *sbl, *sbc, *sbr;
+	} sw;
 #if BUILD_OPENGL
 	struct {
+		/* in case we need to upload the texture */
 		Enesim_Surface *s;
 	} gl;
 #endif
@@ -145,7 +148,13 @@ static Eina_Bool _nine_patch_state_setup(Enesim_Renderer *r,
 	/* create the 9 sub surfaces if we need to */
 	if (thiz->borders_changed || thiz->src_changed)
 	{
-		
+#if 0
+		if (!thiz->current.l && !thiz->current.t && !thiz->current.r &&
+				!thiz->current.b)
+		{
+
+		}
+#endif
 	}
 	/* set the new size and position */
 	
@@ -185,14 +194,9 @@ static void _nine_patch_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer_Nine_Patch * thiz;
-	int i;
 
 	thiz = ENESIM_RENDERER_NINE_PATCH(r);
-	for (i = 0; i < 9; i++)
-	{
-		enesim_renderer_opengl_draw(thiz->renderers[i], s, rop, area,
-				x, y);
-	}
+	/* draw a mesh with the correct tex coordinates */
 }
 #endif
 
