@@ -165,7 +165,7 @@ static void _image_state_cleanup(Enesim_Renderer *r)
 }
 
 #if BUILD_OPENGL
-static Eina_Bool * _image_gl_create(Enesim_Renderer_Image *thiz,
+static Eina_Bool _image_gl_create(Enesim_Renderer_Image *thiz,
 		Enesim_Surface *s)
 {
 	/* create our own gl texture */
@@ -1726,13 +1726,14 @@ static Eina_Bool _image_opengl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Image *thiz;
 
 	if (!_image_state_setup(r, l)) return EINA_FALSE;
+
+	thiz = ENESIM_RENDERER_IMAGE(r);
 	if (!_image_gl_create(thiz, s))
 	{
 		ENESIM_RENDERER_LOG(r, l, "Failed to create the gl surface");
 		return EINA_FALSE;
 	}
 
-	thiz = ENESIM_RENDERER_IMAGE(r);
 	*draw = _image_opengl_draw;
 	return EINA_TRUE;
 }
