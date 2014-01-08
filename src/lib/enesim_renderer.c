@@ -1005,15 +1005,17 @@ no_surface:
 }
 
 /**
- * Gets the bounding box of the renderer on its own coordinate space without
- * adding the origin translation
+ * Gets the bounding box of the renderer on its own coordinate space
  * @param[in] r The renderer to get the bounds from
  * @param[out] rect The rectangle to store the bounds
+ * @return EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE
+ * otherwise
  */
-EAPI void enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect)
+EAPI Eina_Bool enesim_renderer_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
-	if (!rect) return;
+	if (!rect) return EINA_FALSE;
 	if (r->in_setup)
 	{
 		*rect = r->current_bounds;
@@ -1022,16 +1024,22 @@ EAPI void enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect)
 	{
 		_enesim_renderer_bounds_get(r, rect);
 	}
+	return EINA_TRUE;
 }
 
 /**
- * Gets the bounding box of the renderer on its own coordinate space without
- * adding the origin translation
+ * @brief Gets the bounding box of the renderer on its own coordinate space
  * @param[in] r The renderer to get the bounds from
  * @param[out] prev The rectangle to store the previous bounds
  * @param[out] curr The rectangle to store the current bounds
+ * @return EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE
+ * otherwise
+ *
+ * This function is similar to @a enesim_renderer_bounds_get but it also
+ * returns the bounds used for the previous drawing.
  */
-EAPI void enesim_renderer_bounds_get_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)
+EAPI Eina_Bool enesim_renderer_bounds_get_extended(Enesim_Renderer *r,
+		Enesim_Rectangle *prev, Enesim_Rectangle *curr)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
@@ -1039,18 +1047,29 @@ EAPI void enesim_renderer_bounds_get_extended(Enesim_Renderer *r, Enesim_Rectang
 		_enesim_renderer_bounds_get(r, curr);
 	if (prev)
 		*prev = r->past_bounds;
+	return EINA_TRUE;
 }
 
-EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectangle *rect,
+/**
+ * Gets the bounding box of the renderer on the destination
+ * coordinate space
+ * @param[in] r The renderer to get the bounds from
+ * @param[out] rect The rectangle to store the bounds
+ * @param[in] x The x destination origin
+ * @param[in] y The y destination origin
+ * @return EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE
+ * otherwise
+ */
+EAPI Eina_Bool enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectangle *rect,
 		int x, int y)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 
-	if (!rect) return;
+	if (!rect) return EINA_FALSE;
 	if (r->in_setup || !enesim_renderer_has_changed(r))
 	{
 		*rect = r->current_destination_bounds;
-		return;
+		return EINA_TRUE;
 	}
 	else
 	{
@@ -1060,9 +1079,24 @@ EAPI void enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectan
 		rect->x -= x;
 	if (rect->y != INT_MIN / 2)
 		rect->y -= y;
+	return EINA_TRUE;
 }
 
-EAPI void enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *r,
+/**
+ * @brief Gets the bounding box of the renderer on the destination
+ * coordinate space
+ * @param[in] r The renderer to get the bounds from
+ * @param[out] prev The rectangle to store the previous bounds
+ * @param[out] curr The rectangle to store the current bounds
+ * @param[in] x The x destination origin
+ * @param[in] y The y destination origin
+ * @return EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE
+ * otherwise
+ *
+ * This function is similar to @a enesim_renderer_destination_bounds_get but it
+ * also returns the bounds used for the previous drawing.
+ */
+EAPI Eina_Bool enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *r,
 		Eina_Rectangle *prev, Eina_Rectangle *curr,
 		int x, int y)
 {
@@ -1080,6 +1114,7 @@ EAPI void enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *r,
 		if (prev->y != INT_MIN / 2)
 			prev->y -= y;
 	}
+	return EINA_TRUE;
 }
 
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y)
