@@ -61,7 +61,7 @@ static Eina_Bool _data_alloc(void *prv,
 	stride = enesim_buffer_format_size_get(fmt, w, 1);
 	alloc_data = eina_mempool_malloc(thiz->mp, bytes);
 
-	enesim_buffer_sw_data_set(&data, fmt, alloc_data, stride);
+	enesim_buffer_sw_data_set(data, fmt, alloc_data, stride);
 	return EINA_TRUE;
 }
 
