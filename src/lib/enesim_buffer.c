@@ -266,6 +266,42 @@ void enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
 	}
 
 }
+
+/**
+ * @brief Creates a sub buffer
+ * @param[in] b The buffer to create the sub buffer from
+ * @return The newly created sub buffer
+ */
+Enesim_Buffer * enesim_buffer_new_buffer_from(Enesim_Buffer *thiz,
+		const Eina_Rectangle *area)
+{
+	Enesim_Buffer *ret = NULL;
+	Enesim_Pool *pool;
+	Eina_Rectangle size;
+	void *backend_data;
+
+	if (!thiz) return NULL;
+
+	eina_rectangle_coords_from(&size, 0, 0, thiz->w, thiz->h);
+	if (!eina_rectangle_intersection(&size, area))
+		return NULL;
+
+	pool = enesim_buffer_pool_get(thiz);
+	if (!enesim_pool_data_sub(pool, thiz->backend,
+		&backend_data,
+		thiz->backend_data,
+		thiz->format, &size))
+	{
+		enesim_pool_unref(pool);
+		return NULL;
+	}
+
+	ret = _buffer_new(size.w, size.h, thiz->backend, backend_data,
+			thiz->format, pool, EINA_FALSE, NULL, NULL);
+	/* TODO whenever we lock/ref/whatever keep track of the owner buffer */
+	return ret;
+}
+
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
@@ -389,41 +425,6 @@ EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f,
 	return buf;
 }
 
-
-/**
- * @brief Creates a sub buffer
- * @param[in] b The buffer to create the sub buffer from
- * @return The newly created sub buffer
- */
-EAPI Enesim_Buffer * enesim_buffer_new_buffer_from(Enesim_Buffer *thiz,
-		const Eina_Rectangle *area)
-{
-	Enesim_Buffer *ret = NULL;
-	Enesim_Pool *pool;
-	Eina_Rectangle size;
-	void *backend_data;
-
-	if (!thiz) return NULL;
-
-	eina_rectangle_coords_from(&size, 0, 0, thiz->w, thiz->h);
-	if (!eina_rectangle_intersection(&size, area))
-		return NULL;
-
-	pool = enesim_buffer_pool_get(thiz);
-	if (!enesim_pool_data_sub(pool, thiz->backend,
-		&backend_data,
-		thiz->backend_data,
-		thiz->format, &size))
-	{
-		enesim_pool_unref(pool);
-		return NULL;
-	}
-
-	ret = _buffer_new(size.w, size.h, thiz->backend, backend_data,
-			thiz->format, pool, EINA_FALSE, NULL, NULL);
-	/* TODO whenever we lock/ref/whatever keep track of the owner buffer */
-	return ret;
-}
 
 #if BUILD_OPENGL
 EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,

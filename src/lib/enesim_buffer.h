@@ -134,9 +134,6 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
 		void *free_func_data);
-EAPI Enesim_Buffer * enesim_buffer_new_buffer_from(Enesim_Buffer *thiz,
-		const Eina_Rectangle *area);
-
 EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b);
 EAPI void enesim_buffer_unref(Enesim_Buffer *b);
 
