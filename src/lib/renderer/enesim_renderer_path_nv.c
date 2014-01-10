@@ -63,6 +63,7 @@ typedef struct _Enesim_Renderer_Path_Nv
 {
 	Enesim_Renderer_Path_Abstract parent;
 	Enesim_Path *path;
+	Enesim_Surface *s;
 	Enesim_Surface *fsrc;
 	Enesim_Surface *ssrc;
 	GLuint path_id;
@@ -96,7 +97,6 @@ static Enesim_Renderer_OpenGL_Program *_enesim_renderer_path_nv_programs[] = {
 	NULL,
 };
 
-
 static void _enesim_renderer_path_nv_stencil_create(Enesim_Renderer_Path_Nv *thiz,
 		Enesim_Surface *s)
 {
@@ -123,76 +123,194 @@ static void _enesim_renderer_path_nv_stencil_create(Enesim_Renderer_Path_Nv *thi
 		thiz->last_w = w;
 		thiz->last_h = h;
 		thiz->sb = sb;
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}
 }
 
-/* future code to draw using more samples */
-#if 0
-void _fill_sample(Enesim_Renderer_Path_Nv *thiz, Enesim_Color final_color)
+static void _enesim_renderer_path_nv_fill_shader_setup(
+		Enesim_Renderer_OpenGL_Data *rdata, Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Color color, int x, int y)
 {
-	const int coveragePassesToAccumulate = 5;
+	if (r)
+	{
+		Enesim_OpenGL_Compiled_Program *cp;
+
+		cp = &rdata->program->compiled[0];
+		enesim_renderer_opengl_shader_texture_setup(cp->id,
+				0, s, color, x, y);
+	}
+}
+
+static void _enesim_renderer_path_nv_fill_good_cover(GLenum path_id,
+	GLfloat jitters[][2], int num_jitters)
+{
 	int i;
 
 	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 0x80, 0x7F);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // tricky: zero 0x7F mask stencil on covers, but set 0x80
+	glStencilFunc(GL_NOTEQUAL, 0x80, 0x7f);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glUseProgramObjectARB(0);
 
-	//glClearColor(0, 0, 0, 0);
-	//glClear(GL_COLOR_BUFFER_BIT);
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
+	/* just update alpha */
+	glColorMask(0, 0, 0, 1);
+	glColor4f(0, 0, 0, 1.0);
+	/* first draw the whole figure */
+	glStencilFillPathNV(path_id, GL_COUNT_UP_NV, 0x7F);
+	glCoverFillPathNV(path_id, GL_BOUNDING_BOX_NV);
 
-	glColorMask(0,0,0,1);  // just update alpha
-	// M STENCIL+COVER PASSES to accumulate jittered path coverage into framebuffer's alpha channel 
-	glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0x7F);
-	glCoverFillPathNV(thiz->path_id, GL_PATH_FILL_COVER_MODE_NV);
+	/* accumulate jittered path coverage into fbo alpha channel */
+	/* sum up alpha */
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE); // sum up alpha
-	glColor4f(0, 0, 0, 1.0/coveragePassesToAccumulate);
-
-	static const GLfloat jitters[5][2] = { {0,0}, {5,0},  {-5, 0}, {0, 5}, {0, -5} /* various small subpixel jitter X & Y values */ };
-	for (i=0; i<coveragePassesToAccumulate ; i++) {
+	glBlendFunc(GL_ONE, GL_ONE);
+	glColor4f(0, 0, 0, 1.0 / num_jitters);
+	for (i = 1; i < num_jitters; i++)
+	{
 		glMatrixPushEXT(GL_PROJECTION);
 		{
 			glMatrixTranslatefEXT(GL_PROJECTION, jitters[i][0], jitters[i][1], 0);
-			glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0x7F);
-			glCoverFillPathNV(thiz->path_id, GL_PATH_FILL_COVER_MODE_NV);
+			glStencilFillPathNV(path_id, GL_COUNT_UP_NV, 0x7F);
+			glCoverFillPathNV(path_id, GL_BOUNDING_BOX_NV);
 		}
 		glMatrixPopEXT(GL_PROJECTION);
 	}
-	// FINAL COVER PASS uses accumulated coverage stashed in destination alpha
-	glColorMask(1,1,1,1);
+}
+
+static void _enesim_renderer_path_nv_fill_good_draw(GLenum path_id,
+		Enesim_Color fcolor, GLfloat jitters[][2], int num_jitters)
+{
+	int i;
+
+	/* now draw */
+	glColorMask(1, 1, 1, 1);
+	glColor4f(1, 1, 1, 1);
+
 	// modulate RGB with destination alpha and then zero destination alpha
 	glBlendFuncSeparate(GL_DST_ALPHA, GL_ZERO, GL_DST_ALPHA, GL_ZERO);
-	glColor4f(argb8888_red_get(final_color) / 255.0,
-		argb8888_green_get(final_color) / 255.0,
-		argb8888_blue_get(final_color) / 255.0,
-		argb8888_alpha_get(final_color) / 255.0);
-	glStencilFunc(GL_EQUAL, 0x80, 0xFF);  // update any sample touched in earlier passes
-	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);  // now set stencil back to zero (clearing 0x80)
-	glCoverFillPathInstancedNV(coveragePassesToAccumulate, 
-			GL_UNSIGNED_BYTE, "\0\0\0\0\0",  // tricky: draw path objects path+0,path+0,path+0,path+0
-			thiz->path_id,  // this is that path object that is added to zero four times
-			GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_2D_NV, jitters);
-	enesim_opengl_rop_set(ENESIM_ROP_FILL);
-}
-#endif
-
-static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
-		Enesim_Color color, Enesim_Surface **s, Enesim_Pool *p,
-		const Eina_Rectangle *area, int x, int y)
-{
-	Eina_Rectangle drawing;
-	int w, h;
-
-	if (!r)
+	glColor4f(argb8888_red_get(fcolor) / 255.0,
+		argb8888_green_get(fcolor) / 255.0,
+		argb8888_blue_get(fcolor) / 255.0,
+		argb8888_alpha_get(fcolor) / 255.0);
+	glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+	for (i = 0; i < num_jitters; i++)
 	{
-		enesim_pool_unref(p);
-		return;
+		glMatrixPushEXT(GL_PROJECTION);
+		{
+			glMatrixTranslatefEXT(GL_PROJECTION, jitters[i][0], jitters[i][1], 0);
+			glCoverFillPathNV(path_id, GL_BOUNDING_BOX_NV);
+		}
+		glMatrixPopEXT(GL_PROJECTION);
 	}
+	glUseProgramObjectARB(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
+}
+
+static void _enesim_renderer_path_nv_stroke_good_cover(GLenum path_id,
+		GLfloat jitters[][2], int num_jitters)
+{
+	int i;
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 0x80, 0x7f);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glUseProgramObjectARB(0);
+
+	enesim_opengl_rop_set(ENESIM_ROP_FILL);
+	/* just update alpha */
+	glColorMask(0, 0, 0, 1);
+	glColor4f(0, 0, 0, 1.0);
+	/* first draw the whole figure */
+	glStencilStrokePathNV(path_id, GL_COUNT_UP_NV, 0x7F);
+	glCoverStrokePathNV(path_id, GL_BOUNDING_BOX_NV);
+
+	/* accumulate jittered path coverage into fbo alpha channel */
+	/* sum up alpha */
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+	glColor4f(0, 0, 0, 1.0 / num_jitters);
+	for (i = 1; i < num_jitters; i++)
+	{
+		glMatrixPushEXT(GL_PROJECTION);
+		{
+			glMatrixTranslatefEXT(GL_PROJECTION, jitters[i][0], jitters[i][1], 0);
+			glStencilStrokePathNV(path_id, GL_COUNT_UP_NV, 0x7F);
+			glCoverStrokePathNV(path_id, GL_BOUNDING_BOX_NV);
+		}
+		glMatrixPopEXT(GL_PROJECTION);
+	}
+}
+
+static void _enesim_renderer_path_nv_stroke_good_draw(GLenum path_id, Enesim_Color fcolor,
+		GLfloat jitters[][2], int num_jitters)
+{
+	int i;
+
+	/* now draw */
+	glColorMask(1, 1, 1, 1);
+	glColor4f(1, 1, 1, 1);
+
+	glBlendFuncSeparate(GL_DST_ALPHA, GL_ZERO, GL_DST_ALPHA, GL_ZERO);
+	glColor4f(argb8888_red_get(fcolor) / 255.0,
+		argb8888_green_get(fcolor) / 255.0,
+		argb8888_blue_get(fcolor) / 255.0,
+		argb8888_alpha_get(fcolor) / 255.0);
+	glStencilFunc(GL_EQUAL, 0x80, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+	for (i = 0; i < num_jitters; i++)
+	{
+		glMatrixPushEXT(GL_PROJECTION);
+		{
+			glMatrixTranslatefEXT(GL_PROJECTION, jitters[i][0], jitters[i][1], 0);
+			glCoverStrokePathNV(path_id, GL_BOUNDING_BOX_NV);
+		}
+		glMatrixPopEXT(GL_PROJECTION);
+	}
+	glUseProgramObjectARB(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+static void _enesim_renderer_path_nv_fill_fast(GLenum path_id, Enesim_Color fcolor)
+{
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+
+	glStencilFillPathNV(path_id, GL_COUNT_UP_NV, 0xFF); 
+	glColor4f(argb8888_red_get(fcolor) / 255.0,
+		argb8888_green_get(fcolor) / 255.0,
+		argb8888_blue_get(fcolor) / 255.0,
+		argb8888_alpha_get(fcolor) / 255.0);
+	glCoverFillPathNV(path_id, GL_BOUNDING_BOX_NV);
+	glUseProgramObjectARB(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+static void _enesim_renderer_path_nv_stroke_fast(GLenum path_id, Enesim_Color scolor)
+{
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+
+	glStencilStrokePathNV(path_id, 0x1, ~0);
+	glColor4f(argb8888_red_get(scolor) / 255.0,
+		argb8888_green_get(scolor) / 255.0,
+		argb8888_blue_get(scolor) / 255.0,
+		argb8888_alpha_get(scolor) / 255.0);
+	glCoverStrokePathNV(path_id, GL_CONVEX_HULL_NV);
+	glUseProgramObjectARB(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+static inline void _enesim_renderer_path_nv_create_surface(Enesim_Surface **s,
+		Enesim_Pool *p, int w, int h)
+{
+	int sw, sh;
 	if (*s)
 	{
-		enesim_surface_size_get(*s, &w, &h);
-		if (w != area->w || h != area->h)
+		enesim_surface_size_get(*s, &sw, &sh);
+		if (sw != w || sh != h)
 		{
 			enesim_surface_unref(*s);
 			*s = NULL;
@@ -202,8 +320,23 @@ static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
 	if (!*s)
 	{
 		*s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
-				area->w, area->h, p);
+				w, h, p);
 	}
+}
+
+static inline void _enesim_renderer_path_nv_sub_draw(Enesim_Renderer *r,
+		Enesim_Surface **s, Enesim_Pool *p,
+		const Eina_Rectangle *area, int x, int y)
+{
+	Eina_Rectangle drawing;
+
+	if (!r)
+	{
+		enesim_pool_unref(p);
+		return;
+	}
+
+	_enesim_renderer_path_nv_create_surface(s, p, area->w, area->h);
 	eina_rectangle_coords_from(&drawing, 0, 0, area->w, area->h);
 	enesim_renderer_opengl_draw(r, *s, ENESIM_ROP_FILL, &drawing, -(area->x - x), -(area->y - y));
 }
@@ -213,46 +346,74 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 		int x, int y)
 {
 	Enesim_Renderer_Path_Nv *thiz;
+	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer *fren = NULL;
 	Enesim_Renderer *sren = NULL;
-	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_Surface *rs;
 	Enesim_Color scolor;
 	Enesim_Color fcolor;
-	Enesim_Matrix m, tx;
 	Enesim_Pool *pool;
-	GLfloat fm[16];
+	Enesim_Quality quality;
+	Enesim_Matrix m, tx;
+	Eina_Rectangle rarea;
 	GLenum status;
+	GLfloat fm[16];
+	GLfloat jitters[5][2] = { {0, 0} , {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+	int passes = 5;
 	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_NV(r);
 
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
+	quality = enesim_renderer_quality_get(r);
 	pool = enesim_surface_pool_get(s);
+
+	/* for good rendering we need to use a temporary surface for
+	 * correct blending
+	 */
+	if (quality == ENESIM_QUALITY_FAST)
+	{
+		rs = s;
+		rarea = *area;
+		enesim_matrix_translate(&tx, x, y);
+	}
+	else
+	{
+		Enesim_Buffer_OpenGL_Data *sdata;
+
+		_enesim_renderer_path_nv_create_surface(&thiz->s,
+				enesim_pool_ref(pool), area->w, area->h);
+		sdata = enesim_surface_backend_data_get(thiz->s);
+		glGenFramebuffersEXT(1, &sdata->fbo);
+		rs = thiz->s;
+		enesim_matrix_translate(&tx, -(area->x - x), -(area->y - y));
+		eina_rectangle_coords_from(&rarea, 0, 0, area->w, area->h);
+	}
 
 	/* draw the temporary fill/stroke renderers */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
 		enesim_renderer_shape_fill_setup(r, &fcolor, &fren);
-		 _enesim_renderer_path_nv_sub_draw(fren, fcolor, &thiz->fsrc,
+		 _enesim_renderer_path_nv_sub_draw(fren, &thiz->fsrc,
 				enesim_pool_ref(pool), area, x, y);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		enesim_renderer_shape_stroke_setup(r, &scolor, &sren);
-		 _enesim_renderer_path_nv_sub_draw(sren, scolor, &thiz->ssrc,
+		 _enesim_renderer_path_nv_sub_draw(sren, &thiz->ssrc,
 				enesim_pool_ref(pool), area, x, y);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+	/* finally draw */
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 	/* create our stencil buffer here given that the surface used for the setup
 	 * might be different that the one for the drawing (a temporary one for example)
 	 */
-	_enesim_renderer_path_nv_stencil_create(thiz, s);
-	/* finally draw */
-	enesim_opengl_target_surface_set(s);
+	_enesim_renderer_path_nv_stencil_create(thiz, rs);
+	enesim_opengl_target_surface_set(rs);
 	/* attach the stencil buffer on the framebuffer */
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, thiz->sb);
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -263,8 +424,8 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	}
 	enesim_opengl_rop_set(rop);
 	/* set the clipping area */
-	enesim_surface_size_get(s, &w, &h);
-	enesim_opengl_clip_set(area, w, h);
+	enesim_surface_size_get(rs, &w, &h);
+	enesim_opengl_clip_set(&rarea, w, h);
 
 	glClearStencil(0);
 	glStencilMask(~0);
@@ -272,7 +433,6 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 
 	/* add our own transformation matrix */
 	enesim_renderer_transformation_get(r, &m);
-	enesim_matrix_translate(&tx, x, y);
 	enesim_matrix_compose(&tx, &m, &m);
 	enesim_opengl_matrix_convert(&m, fm);
 
@@ -285,54 +445,67 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	/* fill */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
-		glEnable(GL_STENCIL_TEST);
-		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
-
-		if (fren)
+		if (quality == ENESIM_QUALITY_FAST)
 		{
-			Enesim_OpenGL_Compiled_Program *cp;
-			cp = &rdata->program->compiled[0];
-			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					0, thiz->fsrc, fcolor, area->x - x, area->y - y);
+			_enesim_renderer_path_nv_fill_shader_setup(rdata,
+					fren, thiz->fsrc, fcolor, area->x - x,
+					area->y - y);
+			_enesim_renderer_path_nv_fill_fast(thiz->path_id, fcolor);
 		}
-		glStencilFillPathNV(thiz->path_id, GL_COUNT_UP_NV, 0xFF); 
-		glColor4f(argb8888_red_get(fcolor) / 255.0,
-			argb8888_green_get(fcolor) / 255.0,
-			argb8888_blue_get(fcolor) / 255.0,
-			argb8888_alpha_get(fcolor) / 255.0);
-		glCoverFillPathNV(thiz->path_id, GL_BOUNDING_BOX_NV);
-		glUseProgramObjectARB(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		else
+		{
+			_enesim_renderer_path_nv_fill_good_cover(thiz->path_id,
+					jitters, passes);
+			_enesim_renderer_path_nv_fill_shader_setup(rdata,
+					fren, thiz->fsrc, fcolor, area->x - x,
+					area->y - y);
+			_enesim_renderer_path_nv_fill_good_draw(thiz->path_id,
+					fcolor, jitters, passes);
+		}
 	}
 
 	/* stroke */
 	if (draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
-		glEnable(GL_STENCIL_TEST);
-		glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
-
-		if (sren)
+		if (quality == ENESIM_QUALITY_FAST)
 		{
-			Enesim_OpenGL_Compiled_Program *cp;
-			cp = &rdata->program->compiled[0];
-			enesim_renderer_opengl_shader_texture_setup(cp->id,
-					0, thiz->ssrc, scolor, area->x - x, area->y - y);
+			_enesim_renderer_path_nv_fill_shader_setup(rdata,
+					sren, thiz->ssrc, scolor, area->x - x,
+					area->y - y);
+			_enesim_renderer_path_nv_stroke_fast(thiz->path_id, scolor);
 		}
-		glStencilStrokePathNV(thiz->path_id, 0x1, ~0);
-		glColor4f(argb8888_red_get(scolor) / 255.0,
-			argb8888_green_get(scolor) / 255.0,
-			argb8888_blue_get(scolor) / 255.0,
-			argb8888_alpha_get(scolor) / 255.0);
-		glCoverStrokePathNV(thiz->path_id, GL_CONVEX_HULL_NV);
-		glUseProgramObjectARB(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		else
+		{
+			_enesim_renderer_path_nv_stroke_good_cover(thiz->path_id,
+					jitters, passes);
+			_enesim_renderer_path_nv_fill_shader_setup(rdata,
+					sren, thiz->ssrc, scolor, area->x - x,
+					area->y - y);
+			_enesim_renderer_path_nv_stroke_good_draw(thiz->path_id, scolor,
+					jitters, passes);
+		}
+	}
+
+	/* we no longer need to clip */
+	enesim_opengl_clip_unset();
+
+	/* compose in case we used another surface */
+	if (quality != ENESIM_QUALITY_FAST)
+	{
+		Enesim_OpenGL_Compiled_Program *cp;
+
+		cp = &rdata->program->compiled[0];
+		enesim_renderer_opengl_shader_texture_setup(cp->id,
+				0, thiz->s, ENESIM_COLOR_FULL, area->x, area->y);
+		enesim_opengl_target_surface_set(s);
+		enesim_opengl_rop_set(rop);
+		enesim_opengl_draw_area(area);
 	}
 
 	/* unref the renderers */
 	enesim_renderer_unref(fren);
 	enesim_renderer_unref(sren);
+	/* unref the pool */
 	enesim_pool_unref(pool);
 
 	/* restore the state */
@@ -342,7 +515,6 @@ static void _enesim_renderer_path_nv_draw(Enesim_Renderer *r,
 	glDisable(GL_STENCIL_TEST);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
 	glUseProgramObjectARB(0);
-	enesim_opengl_clip_unset();
 	enesim_opengl_target_surface_set(NULL);
 }
 
@@ -623,8 +795,8 @@ static Eina_Bool _enesim_renderer_path_nv_opengl_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _enesim_renderer_path_nv_opengl_cleanup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED)
+static void _enesim_renderer_path_nv_opengl_cleanup(
+		Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
 }
 /*----------------------------------------------------------------------------*
@@ -693,6 +865,12 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 		enesim_quad_rectangle_to(&q, bounds);
 	}
 
+	/* add one pixel for the antialias */
+	bounds->x -= 1;
+	bounds->y -= 1;
+	bounds->w += 2;
+	bounds->h += 2;
+
 	return;
 
 failed:
@@ -742,6 +920,8 @@ static void _enesim_renderer_path_nv_class_init(void *k)
 
 static void _enesim_renderer_path_nv_instance_init(void *o EINA_UNUSED)
 {
+	Enesim_Renderer *r = o;
+	enesim_renderer_quality_set(r, ENESIM_QUALITY_FAST);
 }
 
 static void _enesim_renderer_path_nv_instance_deinit(void *o)
