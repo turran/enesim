@@ -76,7 +76,7 @@ Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
  * conversion.
  * @param[in] s The surface to convert
  * @param[in] dst The destination buffer
- * @return Eina_True if the conversion was correct, Eina_False otherwise
+ * @return EINA_TRUE if the conversion was correct, EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst)
 {
@@ -94,7 +94,7 @@ EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst)
  * conversion.
  * @param[in] b The buffer to convert
  * @param[in] dst The destination buffer
- * @return Eina_True if the conversion was correct, Eina_False otherwise
+ * @return EINA_TRUE if the conversion was correct, EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst)
 {
