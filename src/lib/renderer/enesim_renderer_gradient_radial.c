@@ -63,6 +63,11 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	double fx, fy;
 	double scale;
 	int glen;
+#if BUILD_OPENGL
+	struct {
+
+	} gl;
+#endif
 	Eina_Bool simple : 1;
 	Eina_Bool changed : 1;
 } Enesim_Renderer_Gradient_Radial;
@@ -81,7 +86,8 @@ static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz
 
 	if (thiz->simple)
 	{
-		a = x - 65536 * thiz->center.x;  b = y - 65536 * thiz->center.y;
+		a = x - 65536 * thiz->center.x;
+		b = y - 65536 * thiz->center.y;
 		ret = thiz->scale * sqrt(a*a + b*b);
 		return ret;
 	}
@@ -95,6 +101,82 @@ static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz
 
 	ret = eina_f16p16_double_from(r);
 	return ret;
+}
+
+#if BUILD_OPENGL
+/* the only shader */
+static Enesim_Renderer_OpenGL_Shader _radial_shader = {
+	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .name 	= */ "radial",
+	/* .source	= */
+#include "enesim_renderer_gradient_radial.glsl"
+};
+
+static Enesim_Renderer_OpenGL_Shader *_radial_shaders[] = {
+	&_radial_shader,
+	NULL,
+};
+
+/* the only program */
+static Enesim_Renderer_OpenGL_Program _radial_program = {
+	/* .name 		= */ "radial",
+	/* .shaders 		= */ _radial_shaders,
+	/* .num_shaders		= */ 1,
+};
+
+static Enesim_Renderer_OpenGL_Program *_radial_programs[] = {
+	&_radial_program,
+	NULL,
+};
+
+static void _radial_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+	Enesim_Renderer_Gradient *g;
+	Enesim_Renderer_OpenGL_Data *rdata;
+	Enesim_OpenGL_Compiled_Program *cp;
+	Enesim_Matrix m1;
+	Enesim_Matrix tx;
+	float matrix[16];
+
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
+	g = ENESIM_RENDERER_GRADIENT(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
+	cp = &rdata->program->compiled[0];
+	glUseProgramObjectARB(cp->id);
+
+	/* upload the parameters */
+
+
+	/* draw */
+	enesim_opengl_target_surface_set(s);
+	enesim_opengl_rop_set(rop);
+
+	/* set our transformation matrix */
+	enesim_matrix_translate(&tx, -x, -y);
+#if 0
+	enesim_matrix_compose(&thiz->gl.matrix, &tx, &m1);
+#endif
+	enesim_opengl_matrix_convert(&m1, matrix);
+
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	glMultMatrixf(matrix);
+	
+	/* draw the specified area */
+	enesim_opengl_draw_area(area);
+
+	/* don't use any program */
+	glUseProgramObjectARB(0);
+	enesim_opengl_target_surface_set(NULL);
+	glBindTexture(GL_TEXTURE_1D, 0);
+}
+#endif
+
+static Eina_Bool _radial_setup(Enesim_Renderer *r, Enesim_Matrix *m)
+{
+
 }
 
 GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, restrict);
@@ -235,6 +317,35 @@ static Eina_Bool _radial_has_changed(Enesim_Renderer *r)
 	/* TODO check if we have really changed */
 	return EINA_TRUE;
 }
+
+#if BUILD_OPENGL
+static Eina_Bool _radial_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
+		int *num_programs,
+		Enesim_Renderer_OpenGL_Program ***programs)
+{
+	*num_programs = 1;
+	*programs = _radial_programs;
+	return EINA_TRUE;
+}
+
+static Eina_Bool _radial_opengl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Draw *draw,
+		Enesim_Log **l EINA_UNUSED)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
+
+	*draw = _radial_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _radial_opengl_cleanup(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Surface *s EINA_UNUSED)
+{
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -250,12 +361,19 @@ static void _enesim_renderer_gradient_radial_class_init(void *k)
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _radial_name;
+#if BUILD_OPENGL
+	r_klass->opengl_initialize = _radial_opengl_initialize;
+#endif
 
 	klass = ENESIM_RENDERER_GRADIENT_CLASS(k);
 	klass->length = _radial_length;
 	klass->has_changed = _radial_has_changed;
 	klass->sw_setup = _radial_sw_setup;
 	klass->sw_cleanup = _radial_sw_cleanup;
+#if BUILD_OPENGL
+	klass->opengl_setup = _radial_opengl_setup;
+	klass->opengl_cleanup = _radial_opengl_cleanup;
+#endif
 	klass->bounds_get = _radial_bounds_get;
 
 	_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
