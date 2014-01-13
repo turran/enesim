@@ -648,6 +648,7 @@ EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
 		*roffset = 16; *rlen = 8;
 		*goffset = 8; *glen = 8;
 		*boffset = 0; *blen = 8;
+		break;
 
 		case ENESIM_BUFFER_FORMAT_BGR888:
 		*aoffset = 0; *alen = 0;
