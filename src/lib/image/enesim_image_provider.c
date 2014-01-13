@@ -41,9 +41,10 @@ static Eina_Error _provider_info_load(Enesim_Image_Provider *p, Enesim_Stream *d
 	Enesim_Buffer_Format pfmt;
 
 	/* sanitize the values */
-	*w = 0;
-	*h = 0;
-	*sfmt = ENESIM_BUFFER_FORMATS;
+	if (w) *w = 0;
+	if (h) *h = 0;
+	if (sfmt) *sfmt = ENESIM_BUFFER_FORMATS;
+
 	/* get the info from the image */
 	if (!p->d->info_get) return ret;
 
