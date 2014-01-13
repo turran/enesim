@@ -48,7 +48,7 @@ static void _buffer_opengl_backend_free(void *data, void *user_data EINA_UNUSED)
 #endif
 
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
-		void *backend_data, Enesim_Format f, Enesim_Pool *p,
+		void *backend_data, Enesim_Buffer_Format f, Enesim_Pool *p,
 		Eina_Bool external, Enesim_Buffer_Free free_func, void *free_func_data)
 {
 	Enesim_Buffer *thiz;
