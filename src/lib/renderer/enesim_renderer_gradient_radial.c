@@ -65,7 +65,7 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	int glen;
 #if BUILD_OPENGL
 	struct {
-
+		Enesim_Matrix matrix;
 	} gl;
 #endif
 	Eina_Bool simple : 1;
@@ -79,8 +79,8 @@ typedef struct _Enesim_Renderer_Gradient_Radial_Class {
 static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz,
 		Eina_F16p16 x, Eina_F16p16 y)
 {
-	double r = thiz->r, fx = thiz->fx, fy = thiz->fy;
 	Eina_F16p16 ret;
+	double r = thiz->r, fx = thiz->fx, fy = thiz->fy;
 	double a, b;
 	double d1, d2;
 
@@ -139,6 +139,16 @@ static void _radial_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Matrix m1;
 	Enesim_Matrix tx;
 	float matrix[16];
+	int simple_u;
+	int c_u;
+	int f_u;
+	int scale_u;
+	int rad2_u;
+	int zf_u;
+	/* common gradient */
+	int length_u;
+	int stops_u;
+	int repeat_u;
 
 	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 	g = ENESIM_RENDERER_GRADIENT(r);
@@ -147,7 +157,30 @@ static void _radial_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	glUseProgramObjectARB(cp->id);
 
 	/* upload the parameters */
+	simple_u = glGetUniformLocationARB(cp->id, "radial_simple");
+	c_u = glGetUniformLocationARB(cp->id, "radial_c");
+	f_u = glGetUniformLocationARB(cp->id, "radial_f");
+	scale_u = glGetUniformLocationARB(cp->id, "radial_scale");
+	rad2_u = glGetUniformLocationARB(cp->id, "radial_rad2");
+	zf_u = glGetUniformLocationARB(cp->id, "radial_zf");
+	length_u = glGetUniformLocationARB(cp->id, "gradient_length");
+	stops_u = glGetUniformLocationARB(cp->id, "gradient_stops");
+	repeat_u = glGetUniformLocationARB(cp->id, "gradient_repeat_mode");
 
+	glUniform1i(simple_u, thiz->simple);
+	glUniform2f(c_u, thiz->center.x, thiz->center.y);
+	glUniform2f(f_u, thiz->fx, thiz->fy);
+	glUniform1f(scale_u, thiz->scale);
+	glUniform1f(rad2_u, thiz->r * thiz->r);
+	glUniform1f(zf_u, thiz->zf);
+
+	/* common gradient */
+	glUniform1i(length_u, thiz->glen);
+	glUniform1i(repeat_u, g->state.mode);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_1D, g->gl.gen_stops);
+	glUniform1i(stops_u, 0);
 
 	/* draw */
 	enesim_opengl_target_surface_set(s);
@@ -155,9 +188,7 @@ static void _radial_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	/* set our transformation matrix */
 	enesim_matrix_translate(&tx, -x, -y);
-#if 0
 	enesim_matrix_compose(&thiz->gl.matrix, &tx, &m1);
-#endif
 	enesim_opengl_matrix_convert(&m1, matrix);
 
 	glMatrixMode(GL_TEXTURE);
@@ -176,8 +207,74 @@ static void _radial_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 static Eina_Bool _radial_setup(Enesim_Renderer *r, Enesim_Matrix *m)
 {
+	Enesim_Renderer_Gradient_Radial *thiz;
+	Enesim_Matrix_Type type;
+	double cx, cy;
+	double fx, fy;
+	double rad, scale, small = (1 / 8192.0);
+	int glen;
 
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
+	cx = thiz->center.x;
+	cy = thiz->center.y;
+	rad = fabs(thiz->radius);
+
+	if (rad < small)
+		return EINA_FALSE;
+	thiz->r = rad;
+
+	scale = 1;
+	glen = ceil(rad) + 1;
+
+	type = enesim_renderer_transformation_type_get(r);
+	if (type != ENESIM_MATRIX_IDENTITY)
+	{
+		Enesim_Matrix om;
+		double mx, my;
+
+		enesim_renderer_transformation_get(r, &om);
+		mx = hypot(om.xx, om.yx);
+		my = hypot(om.xy, om.yy);
+		scale = hypot(mx, my) / sqrt(2);
+		glen = ceil(rad * scale) + 1;
+
+		enesim_matrix_inverse(&om, m);
+	}
+	else
+	{
+		enesim_matrix_identity(m);
+	}
+
+	if (glen < 4)
+	{
+		scale = 3 / rad;
+		glen = 4;
+	}
+
+	thiz->scale = scale;
+	thiz->glen = glen;
+
+	fx = thiz->focus.x;
+	fy = thiz->focus.y;
+	scale = hypot(fx - cx, fy - cy);
+	if (scale + small >= rad)
+	{
+		double t = rad / (scale + small);
+
+		fx = cx + t * (fx - cx);
+		fy = cy + t * (fy - cy);
+	}
+
+	fx -= cx;  fy -= cy;
+	thiz->fx = fx;  thiz->fy = fy;
+	thiz->zf = rad / (rad*rad - (fx*fx + fy*fy));
+
+	thiz->simple = 0;
+	if ((fabs(fx) < small) && (fabs(fy) < small))
+		thiz->simple = 1;
+	return EINA_TRUE;
 }
+
 
 GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, restrict);
 GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, repeat);
@@ -220,77 +317,21 @@ static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
-	Enesim_Renderer_Gradient_Radial *thiz;
+	Enesim_Matrix_Type type;
 	Enesim_Repeat_Mode mode;
 	Enesim_Matrix m;
-	Enesim_Matrix_Type type;
-	double cx, cy;
-	double fx, fy;
-	double rad, scale, small = (1 / 8192.0);
-	int glen;
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	if (!_radial_setup(r, &m))
+		return EINA_FALSE;
 
 	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
-	cx = thiz->center.x;
-	cy = thiz->center.y;
-	rad = fabs(thiz->radius);
 
-	if (rad < small)
-		return EINA_FALSE;
-	thiz->r = rad;
-
-	scale = 1;
-	glen = ceil(rad) + 1;
-
-	type = enesim_renderer_transformation_type_get(r);
-	if (type != ENESIM_MATRIX_IDENTITY)
-	{
-		Enesim_Matrix om;
-		double mx, my;
-
-		enesim_renderer_transformation_get(r, &om);
-		mx = hypot(om.xx, om.yx);
-		my = hypot(om.xy, om.yy);
-		scale = hypot(mx, my) / sqrt(2);
-		glen = ceil(rad * scale) + 1;
-
-		enesim_matrix_inverse(&om, &m);
-	}
-	else
-	{
-		enesim_matrix_identity(&m);
-	}
+	type = enesim_matrix_type_get(&m);
 	enesim_matrix_f16p16_matrix_to(&m, &thiz->sw.matrix);
-
-	if (glen < 4)
-	{
-		scale = 3 / rad;
-		glen = 4;
-	}
-
-	thiz->scale = scale;
-	thiz->glen = glen;
-
-	fx = thiz->focus.x;
-	fy = thiz->focus.y;
-	scale = hypot(fx - cx, fy - cy);
-	if (scale + small >= rad)
-	{
-		double t = rad / (scale + small);
-
-		fx = cx + t * (fx - cx);
-		fy = cy + t * (fy - cy);
-	}
-
-	fx -= cx;  fy -= cy;
-	thiz->fx = fx;  thiz->fy = fy;
-	thiz->zf = rad / (rad*rad - (fx*fx + fy*fy));
-
-	thiz->simple = 0;
-	if ((fabs(fx) < small) && (fabs(fy) < small))
-		thiz->simple = 1;
-
 	mode = enesim_renderer_gradient_repeat_mode_get(r);
 	*fill = _spans[mode][type];
+
 	return EINA_TRUE;
 }
 
@@ -334,9 +375,11 @@ static Eina_Bool _radial_opengl_setup(Enesim_Renderer *r,
 		Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
-
 	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 
+	if (!_radial_setup(r, &thiz->gl.matrix))
+		return EINA_FALSE;
+	
 	*draw = _radial_opengl_draw;
 	return EINA_TRUE;
 }
