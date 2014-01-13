@@ -128,6 +128,7 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	int ay_u;
 	int o_u;
 	int scale_u;
+	/* common gradient */
 	int length_u;
 	int stops_u;
 	int repeat_u;
@@ -142,20 +143,23 @@ static void _linear_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	scale_u = glGetUniformLocationARB(cp->id, "linear_scale");
 	ay_u = glGetUniformLocationARB(cp->id, "linear_ay");
 	o_u = glGetUniformLocationARB(cp->id, "linear_o");
-	length_u = glGetUniformLocationARB(cp->id, "linear_length");
-	stops_u = glGetUniformLocationARB(cp->id, "linear_stops");
+	length_u = glGetUniformLocationARB(cp->id, "gradient_length");
+	stops_u = glGetUniformLocationARB(cp->id, "gradient_stops");
 	repeat_u = glGetUniformLocationARB(cp->id, "gradient_repeat_mode");
 
 	glUniform2f(ay_u, thiz->gl.ayx, thiz->gl.ayy);
 	glUniform2f(o_u, thiz->gl.xx, thiz->gl.yy);
-	glUniform1i(length_u, thiz->length);
 	glUniform1f(scale_u, thiz->gl.scale);
+
+	/* common gradient */
+	glUniform1i(length_u, thiz->length);
 	glUniform1i(repeat_u, g->state.mode);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_1D, g->gl.gen_stops);
 	glUniform1i(stops_u, 0);
 
+	/* draw */
 	enesim_opengl_target_surface_set(s);
 	enesim_opengl_rop_set(rop);
 
