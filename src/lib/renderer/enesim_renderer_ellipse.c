@@ -132,7 +132,7 @@ static Eina_Bool _ellipse_setup(Enesim_Renderer *r, Enesim_Path *path)
 
 	thiz = ENESIM_RENDERER_ELLIPSE(r);
 	_ellipse_get_real(thiz, r, &x, &y, &rx, &ry);
-	if (!thiz || (thiz->current.rx <= 0) || (thiz->current.ry <= 0))
+	if ((thiz->current.rx <= 0) || (thiz->current.ry <= 0))
 	{
 		return EINA_FALSE;
 	}
