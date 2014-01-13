@@ -316,11 +316,14 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 				rdata->program = pdata;
 				goto setup;
 			}
-			pdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Program_Data));
+
 			if (!klass->opengl_initialize(r, &num, &programs))
 				return EINA_FALSE;
+
+			pdata = calloc(1, sizeof(Enesim_Renderer_OpenGL_Program_Data));
 			pdata->programs = programs;
 			pdata->num_programs = num;
+			rdata->program = pdata;
 
 			eina_hash_add(_program_lut, name, pdata);
 
@@ -340,7 +343,6 @@ Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r,
 				/* TODO check return value */
 				_opengl_compiled_program_new(cp, r, s, rdata, p);
 			}
-			rdata->program = pdata;
 		}
 	}
 setup:
