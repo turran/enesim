@@ -100,7 +100,7 @@ static inline void _compound_layer_remove(Enesim_Renderer_Compound *thiz,
 }
 
 static inline void _compound_layer_sw_hints_merge(Enesim_Renderer_Compound_Layer *l, Enesim_Rop rop,
-		Eina_Bool *same_rop, Enesim_Renderer_Feature *f)
+		Eina_Bool *same_rop, Enesim_Renderer_Sw_Hint *h)
 {
 	Enesim_Renderer_Sw_Hint tmp;
 
@@ -108,7 +108,7 @@ static inline void _compound_layer_sw_hints_merge(Enesim_Renderer_Compound_Layer
 	enesim_renderer_sw_hints_get(l->r, l->rop, &tmp);
 	if (l->rop != rop)
 		*same_rop = EINA_FALSE;
-	*f &= tmp;
+	*h &= tmp;
 }
 
 static inline void _compound_layer_span_draw(Enesim_Renderer_Compound_Layer *l, Eina_Rectangle *span, void *ddata)
@@ -409,7 +409,7 @@ static void _compound_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
 	Enesim_Renderer_Compound *thiz;
-	Enesim_Renderer_Feature f = 0xffffffff;
+	Enesim_Renderer_Sw_Hint h = 0xffffffff;
 	Eina_Bool same_rop = EINA_TRUE;
 	Eina_List *ll;
 
@@ -423,7 +423,7 @@ static void _compound_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
 	/* the background too */
 	if (thiz->background_enabled)
 	{
-		_compound_layer_sw_hints_merge(&thiz->background, rop, &same_rop, &f);
+		_compound_layer_sw_hints_merge(&thiz->background, rop, &same_rop, &h);
 	}
 
 	/* TODO we need to find an heuristic to set the colorize/rop flag
@@ -436,13 +436,13 @@ static void _compound_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
 	for (ll = thiz->layers; ll; ll = eina_list_next(ll))
 	{
 		Enesim_Renderer_Compound_Layer *l = eina_list_data_get(ll);
-		_compound_layer_sw_hints_merge(l, rop, &same_rop, &f);
+		_compound_layer_sw_hints_merge(l, rop, &same_rop, &h);
 	}
 	if (same_rop)
-		f |= ENESIM_RENDERER_HINT_ROP;
+		h |= ENESIM_RENDERER_HINT_ROP;
 	else
-		f &= ~ENESIM_RENDERER_HINT_ROP;
-	*hints = f;
+		h &= ~ENESIM_RENDERER_HINT_ROP;
+	*hints = h;
 }
 
 
