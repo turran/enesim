@@ -360,10 +360,9 @@ EAPI void enesim_renderer_clipper_clipped_set(Enesim_Renderer *r,
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	if (thiz->current.clipped) enesim_renderer_unref(thiz->current.clipped);
-	thiz->current.clipped = clipped;
 	if (thiz->current.clipped)
-		thiz->current.clipped = enesim_renderer_ref(thiz->current.clipped);
+		enesim_renderer_unref(thiz->current.clipped);
+	thiz->current.clipped = clipped;
 	thiz->changed = EINA_TRUE;
 }
 
