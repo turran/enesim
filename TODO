@@ -1,6 +1,5 @@
 Enesim
 ======
-+ Add a function to set the global quality for the renderers
 + To implement a nine-patch renderer we need to implement the sub surface
   concept. For that we need to modify the pool interface given that a sub
   surface is backend dependent
@@ -17,10 +16,7 @@ Enesim
   every _get function of a reffed object or basic type (int, char *, etc) return directly
   instead of an out pointer. For other types (structs, unions) keep as it is right now
   Missing ones:
-  + stripes
   + pattern
-  + gradient radial
-  + gradient linear
 + Add the luminance format
 + We have a performance problem when some renderer has changed. Basically on the practice
   we end having a full tree of renderers, several levels, proxies, whatever. When we need

@@ -67,6 +67,7 @@ typedef struct _Enesim_Renderer_Factory
 } Enesim_Renderer_Factory;
 
 static Eina_Hash *_factories = NULL;
+static Enesim_Quality _default_quality = ENESIM_QUALITY_BEST;
 
 static void _enesim_renderer_factory_free(void *data)
 {
@@ -182,6 +183,7 @@ static void _state_init(Enesim_Renderer_State *thiz)
 {
 	thiz->current.visibility = thiz->past.visibility = EINA_TRUE;
 	thiz->current.color = thiz->past.color = ENESIM_COLOR_FULL;
+	thiz->current.quality = thiz->past.quality = _default_quality;
 	/* common properties */
 	thiz->current.ox = thiz->past.ox = 0;
 	thiz->current.oy = thiz->past.oy = 0;
@@ -1367,4 +1369,13 @@ EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_D
 		cb(r, &r->past_destination_bounds, EINA_TRUE, data);
 		return EINA_TRUE;
 	}
+}
+
+/**
+ * Sets the default quality used whenever a renderer is created
+ * @param[in] quality The new default quality
+ */
+EAPI void enesim_renderer_default_quality_set(Enesim_Quality quality)
+{
+	_default_quality = quality;
 }
