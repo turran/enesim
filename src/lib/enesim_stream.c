@@ -49,6 +49,7 @@ Enesim_Stream * enesim_stream_new(
 	thiz = calloc(1, sizeof(Enesim_Stream));
 	thiz->descriptor = descriptor;
 	thiz->data = data;
+	thiz->ref = 1;
 
 	return thiz;
 }
