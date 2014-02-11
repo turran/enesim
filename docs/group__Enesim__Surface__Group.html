@@ -94,6 +94,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new surface using an user provided data.  <a href="#ga2def1320c6fcc1ec50e9a5d0792df883"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface__Group.html#ga4adc171bcc666dbc03e73680ed3b54ec">enesim_surface_new_pool_from</a> (<a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> f, uint32_t w, uint32_t h, <a class="el" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new surface using a pool.  <a href="#ga4adc171bcc666dbc03e73680ed3b54ec"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface__Group.html#gaf453715488752564cb1ca24837b0b6d9">enesim_surface_new_pool_and_data_from</a> (<a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> fmt, uint32_t w, uint32_t h, <a class="el" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p, Eina_Bool copy, void *data, size_t stride, <a class="el" href="group__Enesim__Buffer__Group.html#gada468cea4b1625e593df4735b179fbc7">Enesim_Buffer_Free</a> free_func, void *free_func_data)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new surface using a pool an user provided data.  <a href="#gaf453715488752564cb1ca24837b0b6d9"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface__Group.html#ga191dbfeabbcbd3b6c91c96a9bc3b61d4">enesim_surface_new_buffer_from</a> (<a class="el" href="group__Enesim__Buffer__Group.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *buffer)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new surface from a buffer.  <a href="#ga191dbfeabbcbd3b6c91c96a9bc3b61d4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface__Group.html#ga68ecbbc4e875f7dfb3df9a80c40fa368">enesim_surface_ref</a> (<a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
@@ -309,6 +311,92 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_surf
     <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>The width of the surface </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>The height of the surface </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>The pool to use </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The newly created surface </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaf453715488752564cb1ca24837b0b6d9"></a><!-- doxytag: member="enesim_surface.h::enesim_surface_new_pool_and_data_from" ref="gaf453715488752564cb1ca24837b0b6d9" args="(Enesim_Format fmt, uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy, void *data, size_t stride, Enesim_Buffer_Free free_func, void *free_func_data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a>* <a class="el" href="group__Enesim__Surface__Group.html#gaf453715488752564cb1ca24837b0b6d9">enesim_surface_new_pool_and_data_from</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a>&#160;</td>
+          <td class="paramname"><em>fmt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>w</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Pool__Group.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *&#160;</td>
+          <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_Bool&#160;</td>
+          <td class="paramname"><em>copy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>stride</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer__Group.html#gada468cea4b1625e593df4735b179fbc7">Enesim_Buffer_Free</a>&#160;</td>
+          <td class="paramname"><em>free_func</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>free_func_data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create a new surface using a pool an user provided data. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fmt</td><td>The format of the surface </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>The width of the surface </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>The height of the surface </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>The pool to use </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">copy</td><td>In case the data needs to be copied to create the surface or used directly </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">stride</td><td>The stride of the surface </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data of the surface pixels </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">free_func</td><td>The function to be called whenever the data of the surface needs to be freed </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">free_func_data</td><td>The private data for the <em>free_func</em> callback </td></tr>
   </table>
   </dd>
 </dl>
@@ -666,7 +754,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_surf
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 13 2014 12:54:18 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 11 2014 19:49:57 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

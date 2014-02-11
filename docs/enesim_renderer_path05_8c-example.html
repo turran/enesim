@@ -80,30 +80,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="image">
 <img src="enesim_renderer_path05.png" alt="enesim_renderer_path05.png"/>
 </div>
-<div class="fragment"><pre class="fragment"><span class="preprocessor">#include &quot;enesim_renderer_example.h&quot;</span>
+<div class="fragment"><pre class="fragment"><span class="preprocessor">#include &quot;enesim_example_renderer.h&quot;</span>
 
-<span class="keyword">static</span> <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_path05(<span class="keywordtype">void</span>)
+<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_example_renderer_renderer_get(<a name="_a0"></a><a class="code" href="structEnesim__Example__Renderer__Options.html">Enesim_Example_Renderer_Options</a> *options EINA_UNUSED)
 {
     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r;
     <a class="code" href="group__Enesim__Path__Group.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *p;
 
-    p = <a name="a0"></a><a class="code" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32" title="Creates a new path.">enesim_path_new</a>();
-    <a name="a1"></a><a class="code" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, 20, 20);
-    <a name="a2"></a><a class="code" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 220, 20);
+    p = <a name="a1"></a><a class="code" href="group__Enesim__Path__Group.html#gada15a36dd2f634ed79ebf2c20626ee32" title="Creates a new path.">enesim_path_new</a>();
+    <a name="a2"></a><a class="code" href="group__Enesim__Path__Group.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, 20, 20);
+    <a name="a3"></a><a class="code" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 220, 20);
     <a class="code" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 220, 40);
     <a class="code" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 20, 40);
     <a class="code" href="group__Enesim__Path__Group.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 20, 20);
 
-    r = <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Path__Group.html#gad777913fb8fafe712e2a29238b1fac96">enesim_renderer_path_new</a>();
-    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Path__Group.html#ga1692d3640652960ccb9a3f1e21005573">enesim_renderer_path_path_set</a>(r, p);
-    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c">enesim_renderer_shape_fill_color_set</a>(r, 0xffff0000);
-    <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a020d229e686de235f864e21ff8f71f1d">ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL</a>);
+    r = <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Path__Group.html#gad777913fb8fafe712e2a29238b1fac96">enesim_renderer_path_new</a>();
+    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Path__Group.html#ga1692d3640652960ccb9a3f1e21005573">enesim_renderer_path_path_set</a>(r, p);
+    <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c">enesim_renderer_shape_fill_color_set</a>(r, 0xffff0000);
+    <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a020d229e686de235f864e21ff8f71f1d">ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL</a>);
 
     <span class="keywordflow">return</span> r;
 }
-
-EXAMPLE(enesim_renderer_path05)
-
 </pre></div> </div><!-- contents -->
 </div><!-- contents -->
 <!-- window showing the filter options -->
@@ -123,7 +120,7 @@ EXAMPLE(enesim_renderer_path05)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 13 2014 12:54:18 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 11 2014 19:49:56 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

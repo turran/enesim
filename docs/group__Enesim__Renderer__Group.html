@@ -162,7 +162,11 @@ Enumerations</h2></td></tr>
 <br/>
 &#160;&#160;<a class="el" href="group__Enesim__Renderer__Group.html#gga49b2ba2375156c5695917da497d8eed3af64be731cdceb9f2955a6010a42b562f">ENESIM_RENDERER_FEATURE_ARGB8888</a> =  (1 &lt;&lt; 4), 
 <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Renderer__Group.html#gga49b2ba2375156c5695917da497d8eed3a84ac2d689ea4e9ef0333c66d81040c7c">ENESIM_RENDERER_FEATURE_QUALITY</a> =  (1 &lt;&lt; 5)
+&#160;&#160;<a class="el" href="group__Enesim__Renderer__Group.html#gga49b2ba2375156c5695917da497d8eed3a84ac2d689ea4e9ef0333c66d81040c7c">ENESIM_RENDERER_FEATURE_QUALITY</a> =  (1 &lt;&lt; 5), 
+<br/>
+&#160;&#160;<a class="el" href="group__Enesim__Renderer__Group.html#gga49b2ba2375156c5695917da497d8eed3a6fe589cc33f80221f4977bd10e2ab6ca">ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE</a> =  (1 &lt;&lt; 6), 
+<br/>
+&#160;&#160;<a class="el" href="group__Enesim__Renderer__Group.html#gga49b2ba2375156c5695917da497d8eed3abf65a9c710860f110fb340aaa8932c92">ENESIM_RENDERER_FEATURE_BACKEND_OPENGL</a> =  (1 &lt;&lt; 7)
 <br/>
  }</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
@@ -217,12 +221,14 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the quality of a renderer.  <a href="#gae4a522eeccc8976dd33b98bf3f9e5001"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Main__Group.html#ga7253c799b06f355899b57b6eb51051af">Enesim_Quality</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#ga9f4f2ea6c425dc576d85620930940f67">enesim_renderer_quality_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the quality of a renderer.  <a href="#ga9f4f2ea6c425dc576d85620930940f67"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#gac8677fcdf431d214eb05ebb92657071a">enesim_renderer_bounds_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rect)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#gad96b75deceb7d3327781e575775d1291">enesim_renderer_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *prev, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *curr)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga92cf7fc6dd423a6ddf3d937433e202c7"></a><!-- doxytag: member="Enesim_Renderer_Group::enesim_renderer_destination_bounds_get" ref="ga92cf7fc6dd423a6ddf3d937433e202c7" args="(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_destination_bounds_get</b> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *rect, int x, int y)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf227ec57465c9e85d3db58a0a56e87be"></a><!-- doxytag: member="Enesim_Renderer_Group::enesim_renderer_destination_bounds_get_extended" ref="gaf227ec57465c9e85d3db58a0a56e87be" args="(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_destination_bounds_get_extended</b> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#ga1a12b9a982ba23f84bbb9c4e2a1a22b8">enesim_renderer_is_supported</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a renderer supports the current state of properties.  <a href="#ga1a12b9a982ba23f84bbb9c4e2a1a22b8"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#ga2a3e8b3f470b76228fcc64f5494a37d5">enesim_renderer_bounds_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rect)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#ga367c5a44bf866cc1c505bf156a825f91">enesim_renderer_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *prev, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *curr)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounding box of the renderer on its own coordinate space.  <a href="#ga367c5a44bf866cc1c505bf156a825f91"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#ga81475f5eb66d4b442e9e93a4e3095201">enesim_renderer_destination_bounds_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *rect, int x, int y)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#ga5be0202b4003c367fb6a62e214bdcb7c">enesim_renderer_destination_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounding box of the renderer on the destination coordinate space.  <a href="#ga5be0202b4003c367fb6a62e214bdcb7c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Renderer__Group.html#ga49b2ba2375156c5695917da497d8eed3">Enesim_Renderer_Feature</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#ga388cda5da2d123c83dcb5956ab7abcce">enesim_renderer_features_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the features a renderer support.  <a href="#ga388cda5da2d123c83dcb5956ab7abcce"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga5d370d589455dd8f4990c8a4dcebe819"></a><!-- doxytag: member="Enesim_Renderer_Group::enesim_renderer_is_inside" ref="ga5d370d589455dd8f4990c8a4dcebe819" args="(Enesim_Renderer *r, double x, double y)" -->
@@ -233,6 +239,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the damaged areas of a renderer.  <a href="#gab9a932bf51b9a792b6e8c466293cbf1a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#gabdb1abb879459a56970feec5b93d0e6d">enesim_renderer_draw</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, <a class="el" href="group__Enesim__Main__Group.html#ga3824db2d3d2f4239a0ffd5eaf18de331">Enesim_Rop</a> rop, Eina_Rectangle *clip, int x, int y, <a class="el" href="group__Enesim__Log__Group.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#gae39608c420cc0c4ad2fb5ae3290bfb42">enesim_renderer_draw_list</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, <a class="el" href="group__Enesim__Main__Group.html#ga3824db2d3d2f4239a0ffd5eaf18de331">Enesim_Rop</a> rop, Eina_List *clips, int x, int y, <a class="el" href="group__Enesim__Log__Group.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Group.html#gaba83455a3c77a836de1f2ada5613ce4e">enesim_renderer_default_quality_set</a> (<a class="el" href="group__Enesim__Main__Group.html#ga7253c799b06f355899b57b6eb51051af">Enesim_Quality</a> quality)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Vector and raster drawing primitives. </p>
@@ -319,6 +326,12 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="gga49b2ba2375156c5695917da497d8eed3a84ac2d689ea4e9ef0333c66d81040c7c"></a><!-- doxytag: member="ENESIM_RENDERER_FEATURE_QUALITY" ref="gga49b2ba2375156c5695917da497d8eed3a84ac2d689ea4e9ef0333c66d81040c7c" args="" -->ENESIM_RENDERER_FEATURE_QUALITY</em>&nbsp;</td><td>
 <p>Supports the quality property </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga49b2ba2375156c5695917da497d8eed3a6fe589cc33f80221f4977bd10e2ab6ca"></a><!-- doxytag: member="ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE" ref="gga49b2ba2375156c5695917da497d8eed3a6fe589cc33f80221f4977bd10e2ab6ca" args="" -->ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE</em>&nbsp;</td><td>
+<p>Supports Sw based surfaces </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="gga49b2ba2375156c5695917da497d8eed3abf65a9c710860f110fb340aaa8932c92"></a><!-- doxytag: member="ENESIM_RENDERER_FEATURE_BACKEND_OPENGL" ref="gga49b2ba2375156c5695917da497d8eed3abf65a9c710860f110fb340aaa8932c92" args="" -->ENESIM_RENDERER_FEATURE_BACKEND_OPENGL</em>&nbsp;</td><td>
+<p>Supports OpenGL based surfaces </p>
 </td></tr>
 </table>
 </dd>
@@ -1159,12 +1172,49 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
-<a class="anchor" id="gac8677fcdf431d214eb05ebb92657071a"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get" ref="gac8677fcdf431d214eb05ebb92657071a" args="(Enesim_Renderer *r, Enesim_Rectangle *rect)" -->
+<a class="anchor" id="ga1a12b9a982ba23f84bbb9c4e2a1a22b8"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_is_supported" ref="ga1a12b9a982ba23f84bbb9c4e2a1a22b8" args="(Enesim_Renderer *r, Enesim_Surface *s)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Group.html#gac8677fcdf431d214eb05ebb92657071a">enesim_renderer_bounds_get</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer__Group.html#ga1a12b9a982ba23f84bbb9c4e2a1a22b8">enesim_renderer_is_supported</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Surface__Group.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td>
+          <td class="paramname"><em>s</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Checks if a renderer supports the current state of properties. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to check </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The possible destination surface of the drawing operation </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the renderer supports the current state of properties EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga2a3e8b3f470b76228fcc64f5494a37d5"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get" ref="ga2a3e8b3f470b76228fcc64f5494a37d5" args="(Enesim_Renderer *r, Enesim_Rectangle *rect)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer__Group.html#ga2a3e8b3f470b76228fcc64f5494a37d5">enesim_renderer_bounds_get</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -1183,7 +1233,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
       </table>
 </div>
 <div class="memdoc">
-<p>Gets the bounding box of the renderer on its own coordinate space without adding the origin translation </p>
+<p>Gets the bounding box of the renderer on its own coordinate space </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the bounds from </td></tr>
@@ -1191,15 +1241,16 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   </table>
   </dd>
 </dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE otherwise </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="gad96b75deceb7d3327781e575775d1291"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get_extended" ref="gad96b75deceb7d3327781e575775d1291" args="(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)" -->
+<a class="anchor" id="ga367c5a44bf866cc1c505bf156a825f91"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get_extended" ref="ga367c5a44bf866cc1c505bf156a825f91" args="(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Group.html#gad96b75deceb7d3327781e575775d1291">enesim_renderer_bounds_get_extended</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer__Group.html#ga367c5a44bf866cc1c505bf156a825f91">enesim_renderer_bounds_get_extended</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -1224,7 +1275,8 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
       </table>
 </div>
 <div class="memdoc">
-<p>Gets the bounding box of the renderer on its own coordinate space without adding the origin translation </p>
+
+<p>Gets the bounding box of the renderer on its own coordinate space. </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the bounds from </td></tr>
@@ -1233,6 +1285,117 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   </table>
   </dd>
 </dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE otherwise</dd></dl>
+<p>This function is similar to <em>enesim_renderer_bounds_get</em> but it also returns the bounds used for the previous drawing. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga81475f5eb66d4b442e9e93a4e3095201"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_destination_bounds_get" ref="ga81475f5eb66d4b442e9e93a4e3095201" args="(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer__Group.html#ga81475f5eb66d4b442e9e93a4e3095201">enesim_renderer_destination_bounds_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_Rectangle *&#160;</td>
+          <td class="paramname"><em>rect</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Gets the bounding box of the renderer on the destination coordinate space </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the bounds from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">rect</td><td>The rectangle to store the bounds </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The x destination origin </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The y destination origin </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga5be0202b4003c367fb6a62e214bdcb7c"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_destination_bounds_get_extended" ref="ga5be0202b4003c367fb6a62e214bdcb7c" args="(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer__Group.html#ga5be0202b4003c367fb6a62e214bdcb7c">enesim_renderer_destination_bounds_get_extended</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_Rectangle *&#160;</td>
+          <td class="paramname"><em>prev</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_Rectangle *&#160;</td>
+          <td class="paramname"><em>curr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Gets the bounding box of the renderer on the destination coordinate space. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the bounds from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">prev</td><td>The rectangle to store the previous bounds </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">curr</td><td>The rectangle to store the current bounds </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The x destination origin </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The y destination origin </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the renderer defines a valid bounds, EINA_FALSE otherwise</dd></dl>
+<p>This function is similar to <em>enesim_renderer_destination_bounds_get</em> but it also returns the bounds used for the previous drawing. </p>
 
 </div>
 </div>
@@ -1475,6 +1638,30 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
+<a class="anchor" id="gaba83455a3c77a836de1f2ada5613ce4e"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_default_quality_set" ref="gaba83455a3c77a836de1f2ada5613ce4e" args="(Enesim_Quality quality)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Group.html#gaba83455a3c77a836de1f2ada5613ce4e">enesim_renderer_default_quality_set</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Main__Group.html#ga7253c799b06f355899b57b6eb51051af">Enesim_Quality</a>&#160;</td>
+          <td class="paramname"><em>quality</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Sets the default quality used whenever a renderer is created </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">quality</td><td>The new default quality </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -1493,7 +1680,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 13 2014 12:54:18 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 11 2014 19:49:57 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

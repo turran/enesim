@@ -80,9 +80,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="image">
 <img src="enesim_renderer_circle02.png" alt="enesim_renderer_circle02.png"/>
 </div>
-<div class="fragment"><pre class="fragment"><span class="preprocessor">#include &quot;enesim_renderer_example.h&quot;</span>
+<div class="fragment"><pre class="fragment"><span class="preprocessor">#include &quot;enesim_example_renderer.h&quot;</span>
 
-<span class="keyword">static</span> <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_renderer_circle02(<span class="keywordtype">void</span>)
+<a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_example_renderer_renderer_get(<a name="_a0"></a><a class="code" href="structEnesim__Example__Renderer__Options.html">Enesim_Example_Renderer_Options</a> *options EINA_UNUSED)
 {
     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r;
     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *shape_background;
@@ -92,7 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *highlight_shape;
     <a class="code" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *highlight_clip;
     Enesim_Renderer_Compound_Layer *l;
-    <a name="_a0"></a><a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> t;
+    <a name="_a1"></a><a class="code" href="structEnesim__Matrix.html">Enesim_Matrix</a> t;
     <span class="keywordtype">double</span> radius;
     <span class="keywordtype">double</span> sa, ca;
 
@@ -101,11 +101,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
     <span class="comment">/* a two-color stripe pattern */</span>
     <span class="comment">/* we&#39;ll use it as a simple gradient background via a transform */</span>
-    r = <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gab696dc2a5789f408bb0f094ebd7dcee1">enesim_renderer_stripes_new</a>();
-    <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#ga900b57324ba37f61de97c42631904b93">enesim_renderer_stripes_even_color_set</a>(r, 0xff0077ff);
-    <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gad26af603c8ce953ed0407fbc0a271b71">enesim_renderer_stripes_odd_color_set</a>(r, 0xff00ffff);
-    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gaeecf8ec33f07fd5e399931b05c809082">enesim_renderer_stripes_even_thickness_set</a>(r, 1);
-    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gac348c276ee8f59ece2cd02ab71e4047a">enesim_renderer_stripes_odd_thickness_set</a>(r, 1);
+    r = <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gab696dc2a5789f408bb0f094ebd7dcee1">enesim_renderer_stripes_new</a>();
+    <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#ga900b57324ba37f61de97c42631904b93">enesim_renderer_stripes_even_color_set</a>(r, 0xff0077ff);
+    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gad26af603c8ce953ed0407fbc0a271b71">enesim_renderer_stripes_odd_color_set</a>(r, 0xff00ffff);
+    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gaeecf8ec33f07fd5e399931b05c809082">enesim_renderer_stripes_even_thickness_set</a>(r, 1);
+    <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Stripes__Group.html#gac348c276ee8f59ece2cd02ab71e4047a">enesim_renderer_stripes_odd_thickness_set</a>(r, 1);
     shape_background = r;
 
     <span class="comment">/* another two-color stripe pattern */</span>
@@ -118,11 +118,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     highlight_background = r;
 
     <span class="comment">/* a circle we&#39;ll fill with the highlight */</span>
-    r = <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#ga7a1a18d1cca208f46876ea8a3d39d8c1" title="Create a new circle renderer.">enesim_renderer_circle_new</a>();
-    <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#gacb1787c13f8fdb2f900221098e019365" title="Set the coordinates of the center of a circle renderer.">enesim_renderer_circle_center_set</a>(r, 0, 0);
-    <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga7cf40eb875d1e22383a1c8f1d885c57b">enesim_renderer_shape_fill_renderer_set</a>(r, highlight_background);
-    <a name="a9"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a020d229e686de235f864e21ff8f71f1d">ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL</a>);
-    <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#gad922db2b21d47e6463d3d0fdf05ea256" title="Set the radius of a circle renderer.">enesim_renderer_circle_radius_set</a>(r, 1.2 * radius);
+    r = <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#ga7a1a18d1cca208f46876ea8a3d39d8c1" title="Create a new circle renderer.">enesim_renderer_circle_new</a>();
+    <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#gacb1787c13f8fdb2f900221098e019365" title="Set the coordinates of the center of a circle renderer.">enesim_renderer_circle_center_set</a>(r, 0, 0);
+    <a name="a9"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga7cf40eb875d1e22383a1c8f1d885c57b">enesim_renderer_shape_fill_renderer_set</a>(r, highlight_background);
+    <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ggac3b181bec3c0638941c7612efb0665d4a020d229e686de235f864e21ff8f71f1d">ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL</a>);
+    <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Circle__Group.html#gad922db2b21d47e6463d3d0fdf05ea256" title="Set the radius of a circle renderer.">enesim_renderer_circle_radius_set</a>(r, 1.2 * radius);
     highlight_shape = r;
 
     <span class="comment">/* a circle we&#39;ll fill with above highlight shape */</span>
@@ -138,16 +138,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <span class="comment">/* a composite paint consisting of two layers: */</span>
     <span class="comment">/* the base layer is the background gradient, */</span>
     <span class="comment">/* and on top of that is the highlight real shape */</span>
-    r = <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gaae5e98078583b61e932fd9d3980ef174" title="Creates a compound renderer.">enesim_renderer_compound_new</a>();
+    r = <a name="a13"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gaae5e98078583b61e932fd9d3980ef174" title="Creates a compound renderer.">enesim_renderer_compound_new</a>();
 
-    l = <a name="a13"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
-    <a name="a14"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, shape_background);
-    <a name="a15"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a16"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>);
-    <a name="a17"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(r, l);
+    l = <a name="a14"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
+    <a name="a15"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, shape_background);
+    <a name="a16"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a17"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a>);
+    <a name="a18"></a><a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(r, l);
 
     l = <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga5476eb2cebaf12dc6b4f1e471e4be998" title="Creates a compound renderer layer.">enesim_renderer_compound_layer_new</a>();
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gab495d781e50656c6ba90a8f76291ebb9" title="Sets the renderer of a layer.">enesim_renderer_compound_layer_renderer_set</a>(l, highlight_clip);
-    <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a18"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
+    <a class="code" href="group__Enesim__Renderer__Compound__Group.html#ga77b377f9e362730c6e04c0257318566a" title="Sets the raster operation of a layer.">enesim_renderer_compound_layer_rop_set</a>(l, <a name="a19"></a><a class="code" href="group__Enesim__Main__Group.html#gga3824db2d3d2f4239a0ffd5eaf18de331a434f1c40e5722b07db5ac958f39b739a">ENESIM_ROP_BLEND</a>);
     <a class="code" href="group__Enesim__Renderer__Compound__Group.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a>(r, l);
 
     shape_compound = r;
@@ -156,10 +156,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <span class="comment">/* this is the object we&#39;ll draw. */</span>
     r = <a class="code" href="group__Enesim__Renderer__Circle__Group.html#ga7a1a18d1cca208f46876ea8a3d39d8c1" title="Create a new circle renderer.">enesim_renderer_circle_new</a>();
 
-    <a name="a19"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r, 1);
-    <a name="a20"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r, 0xff777777);
+    <a name="a20"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r, 1);
+    <a name="a21"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r, 0xff777777);
     <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga7cf40eb875d1e22383a1c8f1d885c57b">enesim_renderer_shape_fill_renderer_set</a>(r, shape_compound);
-    <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a21"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
+    <a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a22"></a><a class="code" href="group__Enesim__Renderer__Shape__Group.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
     <a class="code" href="group__Enesim__Renderer__Circle__Group.html#gacb1787c13f8fdb2f900221098e019365" title="Set the coordinates of the center of a circle renderer.">enesim_renderer_circle_center_set</a>(r, radius, radius);
     <a class="code" href="group__Enesim__Renderer__Circle__Group.html#gad922db2b21d47e6463d3d0fdf05ea256" title="Set the radius of a circle renderer.">enesim_renderer_circle_radius_set</a>(r, radius);
     shape_circle = r;
@@ -167,11 +167,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     r = shape_background;
     sa = sin(-30 * M_PI / 180.0);
     ca = cos(-30 * M_PI / 180.0);
-    t.<a name="a22"></a><a class="code" href="structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827">xx</a> = ca;               t.<a name="a23"></a><a class="code" href="structEnesim__Matrix.html#a0fae54e9f07895031745082991723459">xy</a> = sa;               t.<a name="a24"></a><a class="code" href="structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab">xz</a> = 0;
-    t.<a name="a25"></a><a class="code" href="structEnesim__Matrix.html#a947076331c2f1d3d6a80c8329ad99dd9">yx</a> = -sa / (2 * radius);    t.<a name="a26"></a><a class="code" href="structEnesim__Matrix.html#af3bb04eda65029c999cf8d8e7b67d52c">yy</a> = ca / (2 * radius);     t.<a name="a27"></a><a class="code" href="structEnesim__Matrix.html#a48dc514bae2a07e567ecb4eac4477c86">yz</a> = 0;
-    t.<a name="a28"></a><a class="code" href="structEnesim__Matrix.html#a4bba6564ff64d5ce9e2ca20e95994c98">zx</a> = 0;                t.<a name="a29"></a><a class="code" href="structEnesim__Matrix.html#ad3f954fd277dfc6a65564ff80acfea58">zy</a> = 0;                t.<a name="a30"></a><a class="code" href="structEnesim__Matrix.html#a86f8b7895398923790aedea040b88660">zz</a> = 1;
-    <a name="a31"></a><a class="code" href="group__Enesim__Matrix__Float__Group.html#gaea2c03c0d16ca8071bea348ccce30856" title="Compute the inverse of the given matrix.">enesim_matrix_inverse</a>(&amp;t, &amp;t);
-    <a name="a32"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer.">enesim_renderer_transformation_set</a>(r, &amp;t);
+    t.<a name="a23"></a><a class="code" href="structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827">xx</a> = ca;               t.<a name="a24"></a><a class="code" href="structEnesim__Matrix.html#a0fae54e9f07895031745082991723459">xy</a> = sa;               t.<a name="a25"></a><a class="code" href="structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab">xz</a> = 0;
+    t.<a name="a26"></a><a class="code" href="structEnesim__Matrix.html#a947076331c2f1d3d6a80c8329ad99dd9">yx</a> = -sa / (2 * radius);    t.<a name="a27"></a><a class="code" href="structEnesim__Matrix.html#af3bb04eda65029c999cf8d8e7b67d52c">yy</a> = ca / (2 * radius);     t.<a name="a28"></a><a class="code" href="structEnesim__Matrix.html#a48dc514bae2a07e567ecb4eac4477c86">yz</a> = 0;
+    t.<a name="a29"></a><a class="code" href="structEnesim__Matrix.html#a4bba6564ff64d5ce9e2ca20e95994c98">zx</a> = 0;                t.<a name="a30"></a><a class="code" href="structEnesim__Matrix.html#ad3f954fd277dfc6a65564ff80acfea58">zy</a> = 0;                t.<a name="a31"></a><a class="code" href="structEnesim__Matrix.html#a86f8b7895398923790aedea040b88660">zz</a> = 1;
+    <a name="a32"></a><a class="code" href="group__Enesim__Matrix__Float__Group.html#gaea2c03c0d16ca8071bea348ccce30856" title="Compute the inverse of the given matrix.">enesim_matrix_inverse</a>(&amp;t, &amp;t);
+    <a name="a33"></a><a class="code" href="group__Enesim__Renderer__Group.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer.">enesim_renderer_transformation_set</a>(r, &amp;t);
 
     r = highlight_background;
     sa = sin(120 * M_PI / 180.0);
@@ -184,7 +184,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
     <span class="keywordflow">return</span> shape_circle;
 }
-EXAMPLE(enesim_renderer_circle02)
 </pre></div> </div><!-- contents -->
 </div><!-- contents -->
 <!-- window showing the filter options -->
@@ -204,7 +203,7 @@ EXAMPLE(enesim_renderer_circle02)
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jan 13 2014 12:54:18 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 11 2014 19:49:56 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
