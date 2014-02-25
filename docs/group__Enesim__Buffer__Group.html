@@ -159,8 +159,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the data of a buffer.  <a href="#ga76d6e371ba896c8926f04ec2ca866a7a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer__Group.html#gaf2c51c785720d2fe37f96608d5a8a174">enesim_buffer_format_size_get</a> (<a class="el" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> fmt, uint32_t w, uint32_t h)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the size in bytes given a format and a size.  <a href="#gaf2c51c785720d2fe37f96608d5a8a174"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer__Group.html#ga91dfb76a640fd1890bb0dbf6131eed2d">enesim_buffer_format_rgb_components_from</a> (<a class="el" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *fmt, uint8_t aoffset, uint8_t alen, uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen, uint8_t boffset, uint8_t blen, Eina_Bool premul)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the format based on the components description.  <a href="#ga91dfb76a640fd1890bb0dbf6131eed2d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer__Group.html#gad6175e9cd5c8c330f1d279998d243e94">enesim_buffer_format_rgb_components_from</a> (<a class="el" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *fmt, int depth, uint8_t aoffset, uint8_t alen, uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen, uint8_t boffset, uint8_t blen, Eina_Bool premul)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the format based on the components description.  <a href="#gad6175e9cd5c8c330f1d279998d243e94"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer__Group.html#ga6bda92d215f9750d9dfba0a8081f828a">enesim_buffer_format_rgb_components_to</a> (<a class="el" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> fmt, uint8_t *aoffset, uint8_t *alen, uint8_t *roffset, uint8_t *rlen, uint8_t *goffset, uint8_t *glen, uint8_t *boffset, uint8_t *blen, Eina_Bool *premul)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the color components offsets and lengths given a format.  <a href="#ga6bda92d215f9750d9dfba0a8081f828a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer__Group.html#gaba199e9375364223eb6cde2da6420f0f">enesim_buffer_format_rgb_depth_get</a> (<a class="el" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> fmt)</td></tr>
@@ -913,15 +913,21 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga91dfb76a640fd1890bb0dbf6131eed2d"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_format_rgb_components_from" ref="ga91dfb76a640fd1890bb0dbf6131eed2d" args="(Enesim_Buffer_Format *fmt, uint8_t aoffset, uint8_t alen, uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen, uint8_t boffset, uint8_t blen, Eina_Bool premul)" -->
+<a class="anchor" id="gad6175e9cd5c8c330f1d279998d243e94"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_format_rgb_components_from" ref="gad6175e9cd5c8c330f1d279998d243e94" args="(Enesim_Buffer_Format *fmt, int depth, uint8_t aoffset, uint8_t alen, uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen, uint8_t boffset, uint8_t blen, Eina_Bool premul)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer__Group.html#ga91dfb76a640fd1890bb0dbf6131eed2d">enesim_buffer_format_rgb_components_from</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer__Group.html#gad6175e9cd5c8c330f1d279998d243e94">enesim_buffer_format_rgb_components_from</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Buffer__Group.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *&#160;</td>
           <td class="paramname"><em>fmt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>depth</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -990,6 +996,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">fmt</td><td>The format associated with the components </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">depth</td><td>The pixel depth </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">aoffset</td><td>Alpha offset </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alen</td><td>Alpha length </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">roffset</td><td>Red offset </td></tr>
@@ -1203,7 +1210,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Feb 11 2014 19:49:57 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 25 2014 22:55:19 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
