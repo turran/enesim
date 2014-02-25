@@ -671,6 +671,7 @@ EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
 /**
  * @brief Get the format based on the components description
  * @param[out] fmt The format associated with the components
+ * @param[in] depth The pixel depth
  * @param[in] aoffset Alpha offset
  * @param[in] alen Alpha length
  * @param[in] roffset Red offset
@@ -683,7 +684,8 @@ EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
  * @return EINA_TRUE if the format can be described by the provided ARGB
  * components, EINA_FALSE otherwise
  */
-EAPI Eina_Bool enesim_buffer_format_rgb_components_from(Enesim_Buffer_Format *fmt,
+EAPI Eina_Bool enesim_buffer_format_rgb_components_from(
+		Enesim_Buffer_Format *fmt, int depth,
 		uint8_t aoffset, uint8_t alen,
 		uint8_t roffset, uint8_t rlen,
 		uint8_t goffset, uint8_t glen,
@@ -691,25 +693,52 @@ EAPI Eina_Bool enesim_buffer_format_rgb_components_from(Enesim_Buffer_Format *fm
 {
 	Eina_Bool ret = EINA_FALSE;
 
-	if ((boffset == 0) && (blen == 5) && (goffset == 5) && (glen == 6) &&
-			(roffset == 11) && (rlen == 5) && (aoffset == 0) && (alen == 0))
+	if (blen == 5 && glen == 6 && rlen == 5 && alen == 0 && depth == 16)
 	{
-		ret = EINA_TRUE;
-		*fmt = ENESIM_BUFFER_FORMAT_RGB565;
+		if (boffset == 0 && goffset == 5 && roffset == 11 && aoffset == 0)
+		{
+			ret = EINA_TRUE;
+			*fmt = ENESIM_BUFFER_FORMAT_RGB565;
+		}
 	}
-
-	if ((boffset == 0) && (blen == 8) && (goffset == 8) && (glen == 8) &&
-			(roffset == 16) && (rlen == 8) && (aoffset == 24) && (alen == 8))
+	else if (blen == 8 && glen == 8 && rlen == 8)
 	{
-		ret = EINA_TRUE;
-		if (premul)
-			*fmt = ENESIM_BUFFER_FORMAT_ARGB8888_PRE;
-		else
-			*fmt = ENESIM_BUFFER_FORMAT_ARGB8888;
+		if (alen == 8 && depth == 32)
+		{
+			if (boffset == 0 && goffset == 8 && roffset == 16 && aoffset == 24)
+			{
+				ret = EINA_TRUE;
+				if (premul)
+					*fmt = ENESIM_BUFFER_FORMAT_ARGB8888_PRE;
+				else
+					*fmt = ENESIM_BUFFER_FORMAT_ARGB8888;
+			}
+		}
+		else if (alen == 0)
+		{
+			if (boffset == 0 && goffset == 8 && roffset == 16)
+			{
+				if (depth == 24)
+				{
+					ret = EINA_TRUE;
+					*fmt = ENESIM_BUFFER_FORMAT_RGB888;
+				}
+				else if (depth == 32)
+				{
+					ret = EINA_TRUE;
+					*fmt = ENESIM_BUFFER_FORMAT_XRGB8888;
+				}
+			}
+			else if (boffset == 16 && goffset == 8 && roffset == 0)
+			{
+				ret = EINA_TRUE;
+				*fmt = ENESIM_BUFFER_FORMAT_BGR888;
+			}
+		}
 	}
-
-	if ((boffset == 0) && (blen == 0) && (goffset == 0) && (glen == 0) &&
-			(roffset == 0) && (rlen == 0) && (aoffset == 0) && (alen == 8))
+	else if ((boffset == 0) && (blen == 0) && (goffset == 0) && (glen == 0) &&
+			(roffset == 0) && (rlen == 0) && (aoffset == 0) &&
+			(alen == 8) && (depth == 8))
 	{
 		ret = EINA_TRUE;
 		*fmt = ENESIM_BUFFER_FORMAT_A8;
