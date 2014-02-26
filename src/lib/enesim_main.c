@@ -57,6 +57,8 @@
  *                                  Local                                     *
  *============================================================================*/
 static int _enesim_init_count = 0;
+static Eina_Bool _initializing = EINA_FALSE;;
+static Eina_Bool _deinitializing = EINA_FALSE;
 
 /* simple struct to initialize all the domains easily */
 struct log
@@ -156,14 +158,21 @@ int enesim_log_renderer_gradient_radial = -1;
  */
 EAPI int enesim_init(void)
 {
-	if (++_enesim_init_count != 1)
+	if (_initializing)
 		return _enesim_init_count;
+
+	_initializing = EINA_TRUE;
+	if (_enesim_init_count != 0)
+	{
+		_enesim_init_count++;
+		goto done;
+	}
 
 #ifdef HAVE_EVIL
 	if (!evil_init())
 	{
 		fprintf(stderr, "Enesim: Evil init failed");
-		return --_enesim_init_count;
+		goto done;
 	}
 #endif
 	if (!eina_init())
@@ -184,6 +193,7 @@ EAPI int enesim_init(void)
 	/* TODO Dump the information about SIMD extensions
 	 * get the cpuid for this
 	 */
+	_enesim_init_count++;
 	enesim_mempool_aligned_init();
 	enesim_mempool_buddy_init();
 	enesim_pool_init();
@@ -204,7 +214,7 @@ EAPI int enesim_init(void)
 	 */
 	feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #endif
-	return _enesim_init_count;
+	goto done;
 
 shutdown_eina_threads:
 	eina_threads_shutdown();
@@ -214,7 +224,9 @@ shutdown_evil:
 #ifdef HAVE_EVIL
 	evil_shutdown();
 #endif
-	return --_enesim_init_count;
+done:
+	_initializing = EINA_FALSE;
+	return _enesim_init_count;
 }
 
 /**
@@ -232,8 +244,12 @@ shutdown_evil:
  */
 EAPI int enesim_shutdown(void)
 {
-	if (--_enesim_init_count != 0)
+	if (_deinitializing)
 		return _enesim_init_count;
+
+	_deinitializing = EINA_TRUE;
+	if (--_enesim_init_count != 0)
+		goto done;
 
 	enesim_text_shutdown();
 	enesim_image_shutdown();
@@ -248,7 +264,8 @@ EAPI int enesim_shutdown(void)
 #ifdef HAVE_EVIL
 	evil_shutdown();
 #endif
-
+done:
+	_deinitializing = EINA_FALSE;
 	return _enesim_init_count;
 }
 
