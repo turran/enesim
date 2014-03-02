@@ -121,19 +121,23 @@ EAPI Enesim_Text_Font * enesim_text_font_new_description_from(
 	Enesim_Text_Font *font = NULL;
 
 	pattern = FcNameParse((FcChar8 *)description);
+	if (!pattern)
+		goto no_pattern;
+	FcDefaultSubstitute(pattern);
 	match = FcFontMatch(NULL, pattern, &result);
 	if (result != FcResultMatch)
 		goto no_match;
-	if (FcPatternGetString (match, FC_FILE, 0, (FcChar8 **)&file) != FcResultMatch)
+	if (FcPatternGetString(match, FC_FILE, 0, (FcChar8 **)&file) != FcResultMatch)
 		goto no_prop;
-	if (FcPatternGetInteger (match, FC_INDEX, 0, &index) != FcResultMatch)
+	if (FcPatternGetInteger(match, FC_INDEX, 0, &index) != FcResultMatch)
 		goto no_prop;
 
 	font = enesim_text_engine_font_new(e, file, index, size);
 no_prop:
-	FcPatternDestroy (match);
+	FcPatternDestroy(match);
 no_match:
-	FcPatternDestroy (pattern);
+	FcPatternDestroy(pattern);
+no_pattern:
 	return font;
 #else
 	return NULL;
