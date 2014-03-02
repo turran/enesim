@@ -115,7 +115,7 @@ EAPI Enesim_Text_Font * enesim_text_font_new_description_from(
 #ifdef HAVE_FONTCONFIG
 	FcPattern *pattern;
 	FcPattern *match;
-	FcResult result;
+	FcResult result = FcResultMatch;
 	const char *file;
 	int index;
 	Enesim_Text_Font *font = NULL;
