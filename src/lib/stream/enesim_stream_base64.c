@@ -181,10 +181,10 @@ static void _enesim_stream_base64_reset(void *data)
 	thiz->last_offset = 0;
 }
 
-static char * _enesim_stream_base64_location(void *data)
+static const char * _enesim_stream_base64_uri_get(void *data)
 {
 	Enesim_Stream_Base64 *thiz = data;
-	return enesim_stream_location(thiz->data);
+	return enesim_stream_uri_get(thiz->data);
 }
 
 static void _enesim_stream_base64_free(void *data)
@@ -203,7 +203,7 @@ static Enesim_Stream_Descriptor _enesim_stream_base64_descriptor = {
 	/* .munmap	= */ NULL,
 	/* .reset	= */ _enesim_stream_base64_reset,
 	/* .length	= */ NULL, /* impossible to do */
-	/* .location	= */ _enesim_stream_base64_location,
+	/* .uri_get	= */ _enesim_stream_base64_uri_get,
 	/* .free	= */ _enesim_stream_base64_free,
 };
 /*============================================================================*

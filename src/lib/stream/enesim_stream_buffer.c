@@ -96,7 +96,7 @@ static Enesim_Stream_Descriptor _enesim_stream_buffer_descriptor = {
 	/* .munmap	= */ NULL,
 	/* .reset	= */ _enesim_stream_buffer_reset,
 	/* .length	= */ _enesim_stream_buffer_length,
-	/* .location 	= */ NULL,
+	/* .uri_get 	= */ NULL,
 	/* .free	= */ _enesim_stream_buffer_free,
 };
 /*============================================================================*

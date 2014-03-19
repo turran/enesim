@@ -37,7 +37,7 @@ typedef struct _Enesim_Stream_File
 	int fd;
 	Eina_Bool mmapped;
 	Enesim_Stream_File_Flag flags;
-	const char *location;
+	char *uri;
 } Enesim_Stream_File;
 
 static  Enesim_Stream_File_Flag _mode_to_flag(const char *mode)
@@ -127,14 +127,11 @@ static void _enesim_stream_file_reset(void *data)
 	rewind(thiz->f);
 }
 
-static char * _enesim_stream_file_location(void *data)
+static const char * _enesim_stream_file_uri_get(void *data)
 {
 	Enesim_Stream_File *thiz = data;
-	char *ret = NULL;
 
-	if (asprintf(&ret, "file://%s", thiz->location) < 0)
-		return NULL;
-	return ret;
+	return thiz->uri;
 }
 
 static void _enesim_stream_file_free(void *data)
@@ -142,6 +139,7 @@ static void _enesim_stream_file_free(void *data)
 	Enesim_Stream_File *thiz = data;
 
 	fclose(thiz->f);
+	free(thiz->uri);
 	free(thiz);
 }
 
@@ -152,7 +150,7 @@ static Enesim_Stream_Descriptor _enesim_stream_file_descriptor = {
 	/* .munmap	= */ _enesim_stream_file_munmap,
 	/* .reset	= */ _enesim_stream_file_reset,
 	/* .length	= */ _enesim_stream_file_length,
-	/* .location	= */ _enesim_stream_file_location,
+	/* .uri_get	= */ _enesim_stream_file_uri_get,
 	/* .free	= */ _enesim_stream_file_free,
 };
 /*============================================================================*
@@ -160,7 +158,7 @@ static Enesim_Stream_Descriptor _enesim_stream_file_descriptor = {
  *============================================================================*/
 /**
  * @brief Create a new file based stream
- * @param[in] file The location of the file
+ * @param[in] file The file path to open
  * @param[in] mode The read/write mode
  * @return A new file based enesim stream
  */
@@ -175,7 +173,12 @@ EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode)
 	thiz = calloc(1, sizeof(Enesim_Stream_File));
 	thiz->f = f;
 	thiz->fd = fileno(thiz->f);
-	thiz->location = file;
+	if (asprintf(&thiz->uri, "file://%s", file) < 0)
+	{
+		fclose(thiz->f);
+		free(thiz);
+		return NULL;
+	}
 	thiz->flags = _mode_to_flag(mode);
 
 	return enesim_stream_new(&_enesim_stream_file_descriptor, thiz);

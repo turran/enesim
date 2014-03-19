@@ -127,9 +127,9 @@ EAPI size_t enesim_stream_length(Enesim_Stream *thiz)
 	return 0;
 }
 
-EAPI char * enesim_stream_location(Enesim_Stream *thiz)
+EAPI const char * enesim_stream_uri_get(Enesim_Stream *thiz)
 {
-	if (thiz->descriptor->location)
-		return thiz->descriptor->location(thiz->data);
+	if (thiz->descriptor->uri_get)
+		return thiz->descriptor->uri_get(thiz->data);
 	return NULL;
 }

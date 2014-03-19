@@ -25,7 +25,7 @@ typedef void * (*Enesim_Stream_Mmap)(void *data, size_t *size);
 typedef void (*Enesim_Stream_Munmap)(void *data, void *ptr);
 typedef void (*Enesim_Stream_Reset)(void *data);
 typedef size_t (*Enesim_Stream_Length)(void *data);
-typedef char * (*Enesim_Stream_Location)(void *data);
+typedef const char * (*Enesim_Stream_Uri_Get)(void *data);
 typedef void (*Enesim_Stream_Free)(void *data);
 
 typedef struct _Enesim_Stream_Descriptor
@@ -36,7 +36,7 @@ typedef struct _Enesim_Stream_Descriptor
 	Enesim_Stream_Munmap munmap;
 	Enesim_Stream_Reset reset;
 	Enesim_Stream_Length length;
-	Enesim_Stream_Location location;
+	Enesim_Stream_Uri_Get uri_get;
 	Enesim_Stream_Free free;
 } Enesim_Stream_Descriptor;
 

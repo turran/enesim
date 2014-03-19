@@ -34,7 +34,7 @@ EAPI size_t enesim_stream_length(Enesim_Stream *thiz);
 EAPI void * enesim_stream_mmap(Enesim_Stream *thiz, size_t *size);
 EAPI void enesim_stream_munmap(Enesim_Stream *thiz, void *ptr);
 EAPI void enesim_stream_reset(Enesim_Stream *thiz);
-EAPI char * enesim_stream_location(Enesim_Stream *thiz);
+EAPI const char * enesim_stream_uri_get(Enesim_Stream *thiz);
 
 EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode);
 EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len);
