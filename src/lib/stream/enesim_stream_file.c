@@ -130,7 +130,11 @@ static void _enesim_stream_file_reset(void *data)
 static char * _enesim_stream_file_location(void *data)
 {
 	Enesim_Stream_File *thiz = data;
-	return strdup(thiz->location);
+	char *ret = NULL;
+
+	if (asprintf(&ret, "file://%s", thiz->location) < 0)
+		return NULL;
+	return ret;
 }
 
 static void _enesim_stream_file_free(void *data)
