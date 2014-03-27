@@ -42,7 +42,7 @@ static ssize_t _enesim_stream_buffer_read(void *data, void *buffer, size_t len)
 	if (thiz->off + len > thiz->len)
 		len = thiz->len - thiz->off;
 
-	memcpy(thiz->curr, buffer, len);
+	memcpy(buffer, thiz->curr, len);
 	thiz->off += len;
 	thiz->curr = ((char *)thiz->curr) + len;
 
@@ -56,7 +56,7 @@ static ssize_t _enesim_stream_buffer_write(void *data, void *buffer, size_t len)
 	if (thiz->off + len > thiz->len)
 		len = thiz->len - thiz->off;
 
-	memcpy(buffer, thiz->curr, len);
+	memcpy(thiz->curr, buffer, len);
 	thiz->off += len;
 	thiz->curr = ((char *)thiz->curr) + len;
 
