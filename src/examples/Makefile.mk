@@ -13,6 +13,10 @@ if BUILD_WGL
 examples_LDADD += -lgdi32
 endif
 
+if BUILD_GLX
+examples_LDADD += -lX11
+endif
+
 examples_renderer_sources = \
 src/examples/enesim_example_renderer_backend_glx.c \
 src/examples/enesim_example_renderer_backend_image.c \
