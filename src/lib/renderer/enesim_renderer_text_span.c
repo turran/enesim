@@ -131,7 +131,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		text = enesim_text_buffer_string_get(thiz->state.buffer);
 		len = enesim_text_buffer_string_length(thiz->state.buffer);
 
-		for (c = text; *c; c++)
+		for (c = text; c && *c; c++)
 		{
 			Enesim_Text_Glyph *g;
 
