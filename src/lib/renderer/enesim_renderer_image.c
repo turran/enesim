@@ -2093,7 +2093,7 @@ EAPI Enesim_Surface * enesim_renderer_image_source_surface_get(Enesim_Renderer *
  * space. Next time a @ref enesim_renderer_damages_get is called, this new area will
  * be taken into account too.
  */
-EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, Eina_Rectangle *area)
+EAPI void enesim_renderer_image_damage_add(Enesim_Renderer *r, const Eina_Rectangle *area)
 {
 	Enesim_Renderer_Image *thiz;
 	Eina_Rectangle *d;
