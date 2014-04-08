@@ -29,14 +29,22 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void);
 EAPI void enesim_renderer_clipper_clipped_set(Enesim_Renderer *r,
 		Enesim_Renderer *clipped);
 EAPI Enesim_Renderer * enesim_renderer_clipper_clipped_get(Enesim_Renderer *r);
-
+EAPI void enesim_renderer_clipper_x_set(Enesim_Renderer *r, int x);
+EAPI int enesim_renderer_clipper_x_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_clipper_y_set(Enesim_Renderer *r, int y);
+EAPI int enesim_renderer_clipper_y_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_clipper_position_set(Enesim_Renderer *r, int x, int y);
+EAPI void enesim_renderer_clipper_position_get(Enesim_Renderer *r, int *x, int *y);
 EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
-		double width);
-EAPI double enesim_renderer_clipper_width_get(Enesim_Renderer *r);
+		int width);
+EAPI int enesim_renderer_clipper_width_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
-		double height);
-EAPI double enesim_renderer_clipper_height_get(Enesim_Renderer *r);
+		int height);
+EAPI int enesim_renderer_clipper_height_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_clipper_size_set(Enesim_Renderer *r, int w, int h);
+EAPI void enesim_renderer_clipper_size_get(Enesim_Renderer *r, int *w, int *h);
+
 /**
  * @}
  */

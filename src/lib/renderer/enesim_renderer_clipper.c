@@ -58,8 +58,10 @@ typedef struct _Enesim_Renderer_Clipper_Damage_Data
 typedef struct _Enesim_Renderer_Clipper_State
 {
 	Enesim_Renderer *clipped;
-	double width;
-	double height;
+	int x;
+	int y;
+	int w;
+	int h;
 } Enesim_Renderer_Clipper_State;
 
 typedef struct _Enesim_Renderer_Clipper {
@@ -117,10 +119,16 @@ static Eina_Bool _clipper_changed_basic(Enesim_Renderer_Clipper *thiz)
 {
 	if (!thiz->changed) return EINA_FALSE;
 
-	if (thiz->current.width != thiz->past.width)
+	if (thiz->current.x != thiz->past.x)
 		return EINA_TRUE;
 
-	if (thiz->current.height != thiz->past.height)
+	if (thiz->current.y != thiz->past.y)
+		return EINA_TRUE;
+
+	if (thiz->current.w != thiz->past.w)
+		return EINA_TRUE;
+
+	if (thiz->current.h != thiz->past.h)
 		return EINA_TRUE;
 
 	if (thiz->current.clipped != thiz->past.clipped)
@@ -187,7 +195,7 @@ static void _clipper_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 static void _clipper_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Feature *features)
 {
-	*features = ENESIM_RENDERER_FEATURE_TRANSLATE;
+	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
 static void _clipper_sw_hints_get(Enesim_Renderer *r,
@@ -219,9 +227,10 @@ static void _clipper_bounds_get(Enesim_Renderer *r,
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	enesim_renderer_origin_get(r, &rect->x, &rect->y);
-	rect->w = thiz->current.width;
-	rect->h = thiz->current.height;
+	rect->x = thiz->current.x;
+	rect->y = thiz->current.y;
+	rect->w = thiz->current.w;
+	rect->h = thiz->current.h;
 }
 
 static Eina_Bool _clipper_has_changed(Enesim_Renderer *r)
@@ -253,7 +262,6 @@ static Eina_Bool _clipper_damage(Enesim_Renderer *r,
 	/* get the current bounds */
 	enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
 	/* if we have changed then send the old and the current */
-	/* FIXME we use the origin but dont take care of the origin property here */
 	if (_clipper_changed_basic(thiz))
 	{
 		cb(r, old_bounds, EINA_TRUE, data);
@@ -380,17 +388,132 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_clipped_get(Enesim_Renderer *r)
 }
 
 /**
+ * @brief Set the top left X coordinate of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @param[in] x The top left X coordinate.
+ *
+ * This function sets the top left X coordinate of the clipper
+ * renderer @p r to the value @p x.
+ */
+EAPI void enesim_renderer_clipper_x_set(Enesim_Renderer *r, int x)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	if (!thiz) return;
+	thiz->current.x = x;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the top left X coordinate of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @return The top left X coordinate.
+ *
+ * This function gets the top left X coordinate of the clipper
+ * renderer @p r
+ */
+EAPI int enesim_renderer_clipper_x_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	return thiz->current.x;
+}
+
+/**
+ * @brief Set the top left Y coordinate of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left Y coordinate of the clipper
+ * renderer @p r to the value @p y.
+ */
+EAPI void enesim_renderer_clipper_y_set(Enesim_Renderer *r, int y)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	if (!thiz) return;
+	thiz->current.y = y;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the top left Y coordinate of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @return The top left Y coordinate.
+ *
+ * This function gets the top left Y coordinate of the clipper
+ * renderer @p r
+ */
+EAPI int enesim_renderer_clipper_y_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	return thiz->current.y;
+}
+
+/**
+ * @brief Set the top left coordinates of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @param[in] x The top left X coordinate.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left coordinates of the clipper
+ * renderer @p r to the values @p x and @p y.
+ */
+EAPI void enesim_renderer_clipper_position_set(Enesim_Renderer *r, int x, int y)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	if (!thiz) return;
+	thiz->current.x = x;
+	thiz->current.y = y;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the top left coordinates of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @param[out] x The top left X coordinate.
+ * @param[out] y The top left Y coordinate.
+ *
+ * This function stores the top left coordinates value of the
+ * clipper renderer @p r in the pointers @p x and @p y. These pointers
+ * can be @c NULL.
+ */
+EAPI void enesim_renderer_clipper_position_get(Enesim_Renderer *r, int *x, int *y)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	if (!thiz) return;
+	if (x) *x = thiz->current.x;
+	if (y) *y = thiz->current.y;
+}
+
+
+/**
  * @brief Sets the width of the clipper
  * @param[in] r The clipper renderer to set width to
  * @param[in] width The width
  */
 EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
-		double width)
+		int width)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	thiz->current.width = width;
+	thiz->current.w = width;
 	thiz->changed = EINA_TRUE;
 }
 
@@ -399,12 +522,12 @@ EAPI void enesim_renderer_clipper_width_set(Enesim_Renderer *r,
  * @param[in] r The clipper renderer to set width to
  * @return width The width
  */
-EAPI double enesim_renderer_clipper_width_get(Enesim_Renderer *r)
+EAPI int enesim_renderer_clipper_width_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	return thiz->current.width;
+	return thiz->current.w;
 }
 
 /**
@@ -413,12 +536,12 @@ EAPI double enesim_renderer_clipper_width_get(Enesim_Renderer *r)
  * @param[in] height The height
  */
 EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
-		double height)
+		int height)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	thiz->current.height = height;
+	thiz->current.h = height;
 	thiz->changed = EINA_TRUE;
 }
 
@@ -427,11 +550,51 @@ EAPI void enesim_renderer_clipper_height_set(Enesim_Renderer *r,
  * @param[in] r The clipper renderer to set height to
  * @return height The height
  */
-EAPI double enesim_renderer_clipper_height_get(Enesim_Renderer *r)
+EAPI int enesim_renderer_clipper_height_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Clipper *thiz;
 
 	thiz = ENESIM_RENDERER_CLIPPER(r);
-	return thiz->current.height;
+	return thiz->current.h;
 }
 
+/**
+ * @brief Set the size of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @param[in] w The width.
+ * @param[in] h The height.
+ *
+ * This function sets the size of the clipper renderer @p r to the
+ * values @p width and @p height.
+ */
+EAPI void enesim_renderer_clipper_size_set(Enesim_Renderer *r, int w, int h)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	if (!thiz) return;
+	thiz->current.w = w;
+	thiz->current.h = h;
+	thiz->changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the size of a clipper renderer.
+ *
+ * @param[in] r The clipper renderer.
+ * @param[out] w The width.
+ * @param[out] h The height.
+ *
+ * This function stores the size of the clipper renderer @p r in the
+ * pointers @p width and @p height. These pointers can be @c NULL.
+ */
+EAPI void enesim_renderer_clipper_size_get(Enesim_Renderer *r, int *w, int *h)
+{
+	Enesim_Renderer_Clipper *thiz;
+
+	thiz = ENESIM_RENDERER_CLIPPER(r);
+	if (!thiz) return;
+	if (w) *w = thiz->current.w;
+	if (h) *h = thiz->current.h;
+}
