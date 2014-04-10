@@ -86,6 +86,8 @@ static void _enesim_stream_buffer_reset(void *data)
 static void _enesim_stream_buffer_free(void *data)
 {
 	Enesim_Stream_Buffer *thiz = data;
+	if (thiz->buffer)
+		free(thiz->buffer);
 	free(thiz);
 }
 
