@@ -72,7 +72,7 @@ typedef struct _Enesim_Renderer_Checker
 	Enesim_Renderer_Checker_State past;
 	/* private */
 	Eina_Bool changed : 1;
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 	Enesim_Color final_color1;
 	Enesim_Color final_color2;
 	double ox;

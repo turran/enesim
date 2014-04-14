@@ -69,7 +69,7 @@ typedef struct _Enesim_Renderer_Gradient_Linear
 	Eina_Bool changed : 1;
 	/* generated at state setup */
 	struct {
-		Enesim_F16p16_Matrix matrix;
+		Enesim_Matrix_F16p16 matrix;
 		Eina_F16p16 xx, yy;
 		Eina_F16p16 scale;
 		Eina_F16p16 ayx, ayy;

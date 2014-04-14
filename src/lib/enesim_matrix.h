@@ -66,7 +66,7 @@ typedef struct _Enesim_Matrix
  * @ingroup Enesim_Matrix_Fixed_Group
  * Fixed point matrix handler
  */
-typedef struct _Enesim_F16p16_Matrix
+typedef struct _Enesim_Matrix_F16p16
 {
 	Eina_F16p16 xx; /**< xx in x' = (x * xx) + (y * xy) + xz */
 	Eina_F16p16 xy; /**< xy in x' = (x * xx) + (y * xy) + xz */
@@ -79,7 +79,7 @@ typedef struct _Enesim_F16p16_Matrix
 	Eina_F16p16 zx; /**< zx in z' = (x * zx) + (y * zy) + zz */
 	Eina_F16p16 zy; /**< zy in z' = (x * zx) + (y * zy) + zz */
 	Eina_F16p16 zz; /**< zz in z' = (x * zx) + (y * zy) + zz */
-} Enesim_F16p16_Matrix;
+} Enesim_Matrix_F16p16;
 
 /**
  * @}
@@ -99,7 +99,7 @@ EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
 		Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i);
 EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
-		Enesim_F16p16_Matrix *fm);
+		Enesim_Matrix_F16p16 *fm);
 
 EAPI Eina_Bool enesim_matrix_is_equal(const Enesim_Matrix *m1, const Enesim_Matrix *m2);
 EAPI void enesim_matrix_compose(const Enesim_Matrix *m1, const Enesim_Matrix *m2,
@@ -133,10 +133,10 @@ EAPI Eina_Bool enesim_matrix_quad_square_map(Enesim_Matrix *m, const Enesim_Quad
  * @{
  */
 
-EAPI void enesim_f16p16_matrix_identity(Enesim_F16p16_Matrix *m);
-EAPI void enesim_f16p16_matrix_compose(const Enesim_F16p16_Matrix *m1,
-		const Enesim_F16p16_Matrix *m2, Enesim_F16p16_Matrix *dst);
-EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_F16p16_Matrix *m);
+EAPI void enesim_f16p16_matrix_identity(Enesim_Matrix_F16p16 *m);
+EAPI void enesim_f16p16_matrix_compose(const Enesim_Matrix_F16p16 *m1,
+		const Enesim_Matrix_F16p16 *m2, Enesim_Matrix_F16p16 *dst);
+EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_Matrix_F16p16 *m);
 
 /**
  * @}

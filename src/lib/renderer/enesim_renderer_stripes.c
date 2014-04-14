@@ -64,7 +64,7 @@ typedef struct _Enesim_Renderer_Stripes {
 	Enesim_Color final_color1;
 	Enesim_Color final_color2;
 	int hh0, hh;
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 	double ox;
 	double oy;
 } Enesim_Renderer_Stripes;

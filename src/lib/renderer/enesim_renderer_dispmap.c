@@ -55,7 +55,7 @@ typedef struct _Enesim_Renderer_Dispmap
 	/* The state variables */
 	double ox;
 	double oy;
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 	Eina_F16p16 s_scale;
 } Enesim_Renderer_Dispmap;
 

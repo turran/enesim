@@ -52,7 +52,7 @@ typedef struct _Enesim_Renderer_Grid
 	/* the state */
 	double ox;
 	double oy;
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 	int wt;
 	int ht;
 	Eina_F16p16 wi;

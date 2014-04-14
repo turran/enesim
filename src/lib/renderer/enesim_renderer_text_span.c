@@ -66,7 +66,7 @@ typedef struct _Enesim_Renderer_Text_Span
 	Enesim_Renderer_Text_Span_State state;
 	Enesim_Text_Direction direction;
 	/* sw drawing */
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 	/* span geometry */
 	unsigned int width;
 	unsigned int height;

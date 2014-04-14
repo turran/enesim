@@ -98,7 +98,7 @@ typedef struct _Enesim_Rasterizer_BiFigure
 
 	int tyy, byy;
 
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 	Eina_Bool over_used;
 	Eina_Bool under_used;
 	Eina_Bool changed :1;

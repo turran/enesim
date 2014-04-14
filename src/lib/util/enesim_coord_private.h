@@ -43,9 +43,9 @@ void enesim_coord_identity_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 		int x, int y, double pre_x, double pre_y);
 void enesim_coord_affine_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 		int x, int y, double pre_x, double pre_y, 
-		const Enesim_F16p16_Matrix *matrix);
+		const Enesim_Matrix_F16p16 *matrix);
 void enesim_coord_projective_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 		Eina_F16p16 *fpz, int x, int y, double pre_x, double pre_y,
-		const Enesim_F16p16_Matrix *matrix);
+		const Enesim_Matrix_F16p16 *matrix);
 
 #endif

@@ -57,7 +57,7 @@ typedef struct _Enesim_Renderer_Gradient_Radial
 	double radius;
 	/* state generated */
 	struct {
-		Enesim_F16p16_Matrix matrix;
+		Enesim_Matrix_F16p16 matrix;
 	} sw;
 	double r, zf;
 	double fx, fy;

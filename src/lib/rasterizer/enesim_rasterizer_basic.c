@@ -116,7 +116,7 @@ typedef struct _Enesim_Rasterizer_Basic
 	 * or something like that
 	 */
 	int lxx, rxx, tyy, byy;
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 } Enesim_Rasterizer_Basic;
 
 typedef struct _Enesim_Rasterizer_Basic_Class {

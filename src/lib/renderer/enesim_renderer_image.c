@@ -80,7 +80,7 @@ typedef struct _Enesim_Renderer_Image
 	Eina_F16p16 iww, ihh;
 	Eina_F16p16 mxx, myy;
 	Eina_F16p16 nxx, nyy;
-	Enesim_F16p16_Matrix matrix;
+	Enesim_Matrix_F16p16 matrix;
 	Enesim_Compositor_Span span;
 #if BUILD_OPENGL
 	struct {
