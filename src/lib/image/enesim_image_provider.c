@@ -181,18 +181,24 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *da
  */
 EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
 	Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt,
-	Eina_Error *err)
+	const char *options, Eina_Error *err)
 {
 	Eina_Error e = 0;
-	Eina_Bool ret;
+	Eina_Bool ret = EINA_TRUE;
+	void *op = NULL;
 
 	if (!thiz)
 	{
 		if (err) *err = ENESIM_IMAGE_ERROR_PROVIDER;
 		return EINA_FALSE;
 	}
-	ret = _provider_info_load(thiz, data, w, h, sfmt, NULL, &e);
-	if (err) *err = e;
+	_provider_options_parse(thiz, options, &op);
+	if (!_provider_info_load(thiz, data, w, h, sfmt, op, &e))
+	{
+		if (err) *err = e;
+		ret = EINA_FALSE;
+	}
+	_provider_options_free(thiz, op);
 	return ret;
 }
 

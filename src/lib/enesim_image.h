@@ -64,7 +64,8 @@ EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz);
  */
 
 EAPI Eina_Bool enesim_image_info_load(Enesim_Stream *data, const char *mime,
-		int *w, int *h, Enesim_Buffer_Format *sfmt, Eina_Error *err);
+		int *w, int *h, Enesim_Buffer_Format *sfmt,
+		const char *options, Eina_Error *err);
 EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
 		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options,
 		Eina_Error *err);
@@ -85,7 +86,8 @@ EAPI void enesim_image_save_async(Enesim_Stream *data, const char *mime,
  * @{
  */
 EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h,
-		Enesim_Buffer_Format *sfmt, Eina_Error *err);
+		Enesim_Buffer_Format *sfmt, const char *options,
+		Eina_Error *err);
 EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
 		Enesim_Pool *mpool, const char *options, Eina_Error *err);
 EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
@@ -109,6 +111,7 @@ typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
 
 typedef void * (*Enesim_Image_Provider_Options_Parse_Cb)(const char *options);
 typedef void (*Enesim_Image_Provider_Options_Free_Cb)(void *options);
+/* FIXME do we need the pool here? */
 typedef Eina_Bool (*Enesim_Image_Provider_Loadable_Cb)(Enesim_Stream *data, Enesim_Pool *p);
 typedef Eina_Bool (*Enesim_Image_Provider_Saveable_Cb)(Enesim_Buffer *b);
 typedef Eina_Bool (*Enesim_Image_Provider_Info_Get_Cb)(Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options, Eina_Error *err);
@@ -134,8 +137,8 @@ EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
 		Enesim_Priority priority);
 
 EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
-	Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt,
-	Eina_Error *err);
+		Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt,
+		const char *options, Eina_Error *err);
 EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
 		Enesim_Stream *data, Enesim_Buffer **b,
 		Enesim_Pool *mpool, const char *options, Eina_Error *err);

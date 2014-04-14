@@ -211,15 +211,17 @@ int enesim_image_shutdown(void)
  * @param w The image width
  * @param h The image height
  * @param sfmt The image original format
+ * @param options Any option the provider might require
  * @param[out] err The error in case the info loading fails
  */
 EAPI Eina_Bool enesim_image_info_load(Enesim_Stream *data, const char *mime,
-		int *w, int *h, Enesim_Buffer_Format *sfmt, Eina_Error *err)
+		int *w, int *h, Enesim_Buffer_Format *sfmt, const char *options,
+		Eina_Error *err)
 {
 	Enesim_Image_Provider *prov;
 
 	prov = enesim_image_load_info_provider_get(data, mime);
-	return enesim_image_provider_info_load(prov, data, w, h, sfmt, err);
+	return enesim_image_provider_info_load(prov, data, w, h, sfmt, options, err);
 }
 /**
  * Load an image synchronously
