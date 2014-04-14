@@ -100,9 +100,8 @@ static void * _thread_load(void *data)
 {
 	Enesim_Image_Job *j = data;
 
-	if (!enesim_image_provider_load(j->prov, j->data, &j->op.load.b,
-		j->op.load.pool, j->options))
-		j->err = eina_error_get();
+	enesim_image_provider_load(j->prov, j->data, &j->op.load.b,
+		j->op.load.pool, j->options, &j->err);
 	_thread_finish(j);
 
 #ifdef _WIN32
@@ -120,8 +119,8 @@ static void * _thread_save(void *data)
 {
 	Enesim_Image_Job *j = data;
 
-	if (!enesim_image_provider_save(j->prov, j->data, j->op.save.b, j->options))
-		j->err = eina_error_get();
+	enesim_image_provider_save(j->prov, j->data, j->op.save.b, j->options,
+		&j->err);
 	_thread_finish(j);
 
 #ifdef _WIN32

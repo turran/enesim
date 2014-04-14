@@ -31,7 +31,7 @@ static void image_run(Enesim_Renderer *r,
 	free(output_dir);
 	if (ret && real_file)
 	{
-		enesim_image_file_save(real_file, b, NULL);
+		enesim_image_file_save(real_file, b, NULL, NULL);
 		free(real_file);
 	}
 	enesim_buffer_unref(b);

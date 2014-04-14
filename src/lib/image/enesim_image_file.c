@@ -105,8 +105,10 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, con
  * @param w The image width
  * @param h The image height
  * @param sfmt The image original format
+ * @param[out] err The error in case the file info load fails
  */
-EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Enesim_Buffer_Format *sfmt)
+EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h,
+		Enesim_Buffer_Format *sfmt, Eina_Error *err)
 {
 	Enesim_Stream *data;
 	Eina_Bool ret;
@@ -114,7 +116,7 @@ EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Ene
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = enesim_image_info_load(data, mime, w, h, sfmt);
+	ret = enesim_image_info_load(data, mime, w, h, sfmt, err);
 	enesim_stream_unref(data);
 	return ret;
 }
@@ -126,10 +128,11 @@ EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h, Ene
  * @param mpool The mempool that will create the surface in case the surface
  * reference is NULL
  * @param options Any option the emage provider might require
+ * @param[out] err The error in case the file load fails
  * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
  */
 EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
-		Enesim_Pool *mpool, const char *options)
+		Enesim_Pool *mpool, const char *options, Eina_Error *err)
 {
 	Enesim_Stream *data;
 	Eina_Bool ret;
@@ -137,7 +140,7 @@ EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = enesim_image_load(data, mime, b, mpool, options);
+	ret = enesim_image_load(data, mime, b, mpool, options, err);
 	enesim_stream_unref(data);
 	return ret;
 }
@@ -177,17 +180,21 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
  * @param file The image file to save
  * @param b The surface to read the image pixels from. It must not be NULL.
  * @param options Any option the emage provider might require
+ * @param[out] err The error in case the file save fails
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const char *options)
+EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const char *options, Eina_Error *err)
 {
 	Enesim_Stream *data;
 	Eina_Bool ret;
 	const char *mime;
 
 	if (!_file_save_data_get(file, &data, &mime))
+	{
+		if (err) *err = ENESIM_IMAGE_ERROR_PROVIDER;
 		return EINA_FALSE;
-	ret = enesim_image_save(data, mime, b, options);
+	}
+	ret = enesim_image_save(data, mime, b, options, err);
 	enesim_stream_unref(data);
 	return ret;
 }

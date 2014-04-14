@@ -211,14 +211,15 @@ int enesim_image_shutdown(void)
  * @param w The image width
  * @param h The image height
  * @param sfmt The image original format
+ * @param[out] err The error in case the info loading fails
  */
 EAPI Eina_Bool enesim_image_info_load(Enesim_Stream *data, const char *mime,
-		int *w, int *h, Enesim_Buffer_Format *sfmt)
+		int *w, int *h, Enesim_Buffer_Format *sfmt, Eina_Error *err)
 {
 	Enesim_Image_Provider *prov;
 
 	prov = enesim_image_load_info_provider_get(data, mime);
-	return enesim_image_provider_info_load(prov, data, w, h, sfmt);
+	return enesim_image_provider_info_load(prov, data, w, h, sfmt, err);
 }
 /**
  * Load an image synchronously
@@ -231,14 +232,15 @@ EAPI Eina_Bool enesim_image_info_load(Enesim_Stream *data, const char *mime,
  * reference is NULL
  * @param options Any option the provider might require
  * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
+ * @param[out] err The error in case the info loading fails
  */
 EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
-		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options)
+		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options, Eina_Error *err)
 {
 	Enesim_Image_Provider *prov;
 
 	prov = enesim_image_load_provider_get(data, mime, mpool);
-	return enesim_image_provider_load(prov, data, b, mpool, options);
+	return enesim_image_provider_load(prov, data, b, mpool, options, err);
 }
 /**
  * Load an image asynchronously
@@ -267,15 +269,16 @@ EAPI void enesim_image_load_async(Enesim_Stream *data, const char *mime,
  * @param mime The image mime
  * @param b The buffer to read the image pixels from. It must not be NULL.
  * @param options Any option the provider might require
+ * @param[out] err The error in case the save fails
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
 EAPI Eina_Bool enesim_image_save(Enesim_Stream *data, const char *mime,
-		Enesim_Buffer *b, const char *options)
+		Enesim_Buffer *b, const char *options, Eina_Error *err)
 {
 	Enesim_Image_Provider *prov;
 
 	prov = enesim_image_save_provider_get(b, mime);
-	return enesim_image_provider_save(prov, data, b, options);
+	return enesim_image_provider_save(prov, data, b, options, err);
 }
 
 /**

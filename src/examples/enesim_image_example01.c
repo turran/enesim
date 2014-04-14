@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			if (enesim_image_file_save(file, b, NULL))
+			if (enesim_image_file_save(file, b, NULL, NULL))
 				printf("Image %s saved sync successfully\n", file);
 			else
 			{
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			if (enesim_image_file_load(file, &b, NULL, NULL))
+			if (enesim_image_file_load(file, &b, NULL, NULL, NULL))
 				printf("Image %s loaded sync successfully\n", file);
 			else
 			{

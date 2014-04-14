@@ -45,7 +45,7 @@ static Eina_Bool _dump(const Eina_Hash *hash EINA_UNUSED, const void *key, void 
 
 	b = enesim_surface_buffer_get(g->surface);
 	snprintf(fout, PATH_MAX, "%s/%c.png", path, c);
-	enesim_image_file_save(fout, b, NULL);
+	enesim_image_file_save(fout, b, NULL, NULL);
 	enesim_buffer_unref(b);
 
 	return EINA_TRUE;

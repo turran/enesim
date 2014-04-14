@@ -134,7 +134,9 @@ static void _jpg_enesim_image_src(struct jpeg_decompress_struct *cinfo, Enesim_S
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
-static Eina_Error _jpg_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
+static Eina_Bool _jpg_info_load(Enesim_Stream *data, int *w, int *h,
+		Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED,
+		Eina_Error *error)
 {
 	Jpg_Error_Mgr err;
 	struct jpeg_decompress_struct cinfo;
@@ -148,7 +150,8 @@ static Eina_Error _jpg_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buf
 	if (setjmp(err.setjmp_buffer))
 	{
 		jpeg_destroy_decompress(&cinfo);
-		return ENESIM_IMAGE_ERROR_ALLOCATOR;
+		*error = ENESIM_IMAGE_ERROR_ALLOCATOR;
+		return EINA_FALSE;
 	}
 
 	jpeg_create_decompress(&cinfo);
@@ -198,7 +201,8 @@ static Eina_Error _jpg_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buf
 	else
 	{
 		jpeg_destroy_decompress(&cinfo);
-		return ENESIM_IMAGE_ERROR_FORMAT;
+		*error = ENESIM_IMAGE_ERROR_FORMAT;
+		return EINA_FALSE;
 	}
 
 	if (w) *w = ww;
@@ -206,10 +210,11 @@ static Eina_Error _jpg_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buf
 	if (sfmt) *sfmt = fmt;
 
 	jpeg_destroy_decompress(&cinfo);
-	return 0;
+	return EINA_TRUE;
 }
 
-static Eina_Error _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
+static Eina_Bool _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer,
+		void *options EINA_UNUSED, Eina_Error *error)
 {
 	Jpg_Error_Mgr err;
 	Enesim_Buffer_Sw_Data sw_data;
@@ -225,7 +230,8 @@ static Eina_Error _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *op
 	if (setjmp(err.setjmp_buffer))
 	{
 		jpeg_destroy_decompress(&cinfo);
-		return ENESIM_IMAGE_ERROR_ALLOCATOR;
+		*error = ENESIM_IMAGE_ERROR_ALLOCATOR;
+		return EINA_FALSE;
 	}
 
 	jpeg_create_decompress(&cinfo);
@@ -277,7 +283,8 @@ static Eina_Error _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *op
 
 		default:
 		jpeg_destroy_decompress(&cinfo);
-		return ENESIM_IMAGE_ERROR_FORMAT;
+		*error = ENESIM_IMAGE_ERROR_FORMAT;
+		return EINA_FALSE;
 	}
 
 	line = sdata;
@@ -288,7 +295,7 @@ static Eina_Error _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *op
 		line += stride;
 	}
 	jpeg_destroy_decompress(&cinfo);
-	return 0;
+	return EINA_TRUE;
 }
 
 static Enesim_Image_Provider_Descriptor _provider = {

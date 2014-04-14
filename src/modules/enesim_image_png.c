@@ -99,7 +99,9 @@ static void _png_flush(png_structp png_ptr EINA_UNUSED)
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
-static Eina_Error _png_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED)
+static Eina_Bool _png_info_load(Enesim_Stream *data, int *w, int *h,
+		Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED,
+		Eina_Error *err)
 {
 	png_uint_32 w32, h32;
 	png_structp png_ptr = NULL;
@@ -135,17 +137,19 @@ static Eina_Error _png_info_load(Enesim_Stream *data, int *w, int *h, Enesim_Buf
 	}
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-	return 0;
+	return EINA_TRUE;
 
 error_jmp:
 	png_destroy_info_struct(png_ptr, (png_infopp)&info_ptr);
 error_info_struct:
 	png_destroy_read_struct(&png_ptr, NULL, NULL);
 error_read_struct:
-	return ENESIM_IMAGE_ERROR_LOADING;
+	*err = ENESIM_IMAGE_ERROR_LOADING;
+	return EINA_FALSE;
 }
 
-static Eina_Error _png_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *options EINA_UNUSED)
+static Eina_Bool _png_load(Enesim_Stream *data, Enesim_Buffer *buffer,
+		void *options EINA_UNUSED, Eina_Error *err)
 {
 	Enesim_Buffer_Sw_Data sw_data;
 	Enesim_Buffer_Format fmt;
@@ -242,17 +246,19 @@ static Eina_Error _png_load(Enesim_Stream *data, Enesim_Buffer *buffer, void *op
 	png_read_end(png_ptr, info_ptr);
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-	return 0;
+	return EINA_TRUE;
 
 error_jmp:
 	png_destroy_info_struct(png_ptr, (png_infopp)&info_ptr);
 error_info_struct:
 	png_destroy_read_struct(&png_ptr, NULL, NULL);
 error_read_struct:
-	return ENESIM_IMAGE_ERROR_LOADING;
+	*err = ENESIM_IMAGE_ERROR_LOADING;
+	return EINA_FALSE;
 }
 
-static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b, void *options EINA_UNUSED)
+static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
+		void *options EINA_UNUSED, Eina_Error *err)
 {
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
@@ -336,6 +342,7 @@ error_jmp:
 error_info_struct:
 	png_destroy_write_struct(&png_ptr, NULL);
 error_write_struct:
+	*err = ENESIM_IMAGE_ERROR_SAVING;
 	return EINA_FALSE;
 }
 

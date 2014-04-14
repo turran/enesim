@@ -39,7 +39,7 @@ static Eina_Bool _raw_saveable(Enesim_Buffer *b)
 	return EINA_TRUE;
 }
 static Eina_Bool _raw_save(Enesim_Stream *data, Enesim_Buffer *buffer,
-		void *options EINA_UNUSED)
+		void *options EINA_UNUSED, Eina_Error *error EINA_UNUSED)
 {
 	Enesim_Buffer_Sw_Data sdata;
 	uint32_t *src;
