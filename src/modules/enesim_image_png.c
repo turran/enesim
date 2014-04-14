@@ -99,7 +99,7 @@ static void _png_flush(png_structp png_ptr EINA_UNUSED)
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _png_info_load(Enesim_Stream *data, int *w, int *h,
+static Eina_Bool _png_info_get(Enesim_Stream *data, int *w, int *h,
 		Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED,
 		Eina_Error *err)
 {
@@ -352,7 +352,8 @@ static Enesim_Image_Provider_Descriptor _provider = {
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,
 	/* .saveable = 		*/ NULL,
-	/* .info_get = 		*/ _png_info_load,
+	/* .info_get = 		*/ _png_info_get,
+	/* .formats_get =	*/ NULL,
 	/* .load = 		*/ _png_load,
 	/* .save = 		*/ _png_save,
 };

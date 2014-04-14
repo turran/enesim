@@ -99,7 +99,7 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, con
  *                                   API                                      *
  *============================================================================*/
 /**
- * Load information about an image file
+ * Gets the information about an image file
  *
  * @param file The image file to load
  * @param w The image width
@@ -107,7 +107,7 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, con
  * @param sfmt The image original format
  * @param[out] err The error in case the file info load fails
  */
-EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h,
+EAPI Eina_Bool enesim_image_file_info_get(const char *file, int *w, int *h,
 		Enesim_Buffer_Format *sfmt, const char *options,
 		Eina_Error *err)
 {
@@ -117,7 +117,7 @@ EAPI Eina_Bool enesim_image_file_info_load(const char *file, int *w, int *h,
 
 	if (!_file_load_data_get(file, &data, &mime))
 		return EINA_FALSE;
-	ret = enesim_image_info_load(data, mime, w, h, sfmt, options, err);
+	ret = enesim_image_info_get(data, mime, w, h, sfmt, options, err);
 	enesim_stream_unref(data);
 	return ret;
 }

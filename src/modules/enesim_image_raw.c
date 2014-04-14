@@ -103,6 +103,7 @@ static Enesim_Image_Provider_Descriptor _provider = {
 	/* .loadable = 		*/ NULL,
 	/* .saveable = 		*/ _raw_saveable,
 	/* .info_get = 		*/ NULL,
+	/* .formats_get = 	*/ NULL,
 	/* .load = 		*/ NULL,
 	/* .save = 		*/ _raw_save,
 };

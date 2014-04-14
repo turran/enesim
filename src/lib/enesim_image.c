@@ -73,7 +73,7 @@ Enesim_Image_Provider * enesim_image_load_info_provider_get(
 }
 
 Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Stream *data,
-		const char *mime, Enesim_Pool *pool)
+		const char *mime)
 {
 	Enesim_Image_Provider *p;
 	Eina_List *providers;
@@ -99,7 +99,7 @@ Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Stream *data,
 			return p;
 
 		enesim_stream_reset(data);
-		if (p->d->loadable(data, pool) == EINA_TRUE)
+		if (p->d->loadable(data) == EINA_TRUE)
 		{
 			enesim_stream_reset(data);
 			return p;
@@ -204,7 +204,7 @@ int enesim_image_shutdown(void)
  *============================================================================*/
 
 /**
- * Loads information about an image
+ * Gets information about an image
  *
  * @param data The image data
  * @param mime The image mime
@@ -214,14 +214,14 @@ int enesim_image_shutdown(void)
  * @param options Any option the provider might require
  * @param[out] err The error in case the info loading fails
  */
-EAPI Eina_Bool enesim_image_info_load(Enesim_Stream *data, const char *mime,
+EAPI Eina_Bool enesim_image_info_get(Enesim_Stream *data, const char *mime,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, const char *options,
 		Eina_Error *err)
 {
 	Enesim_Image_Provider *prov;
 
 	prov = enesim_image_load_info_provider_get(data, mime);
-	return enesim_image_provider_info_load(prov, data, w, h, sfmt, options, err);
+	return enesim_image_provider_info_get(prov, data, w, h, sfmt, options, err);
 }
 /**
  * Load an image synchronously
@@ -241,7 +241,7 @@ EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
 {
 	Enesim_Image_Provider *prov;
 
-	prov = enesim_image_load_provider_get(data, mime, mpool);
+	prov = enesim_image_load_provider_get(data, mime);
 	return enesim_image_provider_load(prov, data, b, mpool, options, err);
 }
 /**

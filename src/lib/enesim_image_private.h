@@ -52,7 +52,7 @@ struct _Enesim_Image_Provider
 	Enesim_Image_Provider_Descriptor *d;
 };
 
-Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Stream *data, const char *mime, Enesim_Pool *p);
+Enesim_Image_Provider * enesim_image_load_provider_get(Enesim_Stream *data, const char *mime);
 Enesim_Image_Provider * enesim_image_load_info_provider_get(Enesim_Stream *data, const char *mime);
 Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Buffer *b, const char *mime);
 Enesim_Image_Provider * enesim_image_save_provider_get(Enesim_Buffer *b, const char *mime);

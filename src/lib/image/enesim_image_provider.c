@@ -33,7 +33,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-static Eina_Bool _provider_info_load(Enesim_Image_Provider *p, Enesim_Stream *data,
+static Eina_Bool _provider_info_get(Enesim_Image_Provider *p, Enesim_Stream *data,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options,
 		Eina_Error *err)
 {
@@ -93,7 +93,7 @@ static Eina_Bool _provider_data_load(Enesim_Image_Provider *p,
 	Eina_Error error;
 	int w, h;
 
-	if (!_provider_info_load(p, data, &w, &h, &cfmt, options, &error))
+	if (!_provider_info_get(p, data, &w, &h, &cfmt, options, &error))
 	{
 		goto info_err;
 	}
@@ -170,7 +170,7 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *da
  *                                   API                                      *
  *============================================================================*/
 /**
- * @brief Loads the info of an image
+ * @brief Gets the information of an image
  * @param[in] thiz The image provider to use
  * @param[in] data The image data to load the info from
  * @param[out] w The width of the image
@@ -179,7 +179,7 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *da
  * @param[out] err The error in case the info loading fails
  * @return EINA_TRUE if succeeded, EINA_FALSE otherwise.
  */
-EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
+EAPI Eina_Bool enesim_image_provider_info_get(Enesim_Image_Provider *thiz,
 	Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt,
 	const char *options, Eina_Error *err)
 {
@@ -193,7 +193,7 @@ EAPI Eina_Bool enesim_image_provider_info_load(Enesim_Image_Provider *thiz,
 		return EINA_FALSE;
 	}
 	_provider_options_parse(thiz, options, &op);
-	if (!_provider_info_load(thiz, data, w, h, sfmt, op, &e))
+	if (!_provider_info_get(thiz, data, w, h, sfmt, op, &e))
 	{
 		if (err) *err = e;
 		ret = EINA_FALSE;
