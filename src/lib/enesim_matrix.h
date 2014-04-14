@@ -98,7 +98,7 @@ EAPI void enesim_matrix_values_get(const Enesim_Matrix *m, double *a, double *b,
 EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
 		Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e,
 		Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i);
-EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
+EAPI void enesim_matrix_matrix_f16p16_to(const Enesim_Matrix *m,
 		Enesim_Matrix_F16p16 *fm);
 
 EAPI Eina_Bool enesim_matrix_is_equal(const Enesim_Matrix *m1, const Enesim_Matrix *m2);
@@ -133,10 +133,10 @@ EAPI Eina_Bool enesim_matrix_quad_square_map(Enesim_Matrix *m, const Enesim_Quad
  * @{
  */
 
-EAPI void enesim_f16p16_matrix_identity(Enesim_Matrix_F16p16 *m);
-EAPI void enesim_f16p16_matrix_compose(const Enesim_Matrix_F16p16 *m1,
+EAPI void enesim_matrix_f16p16_identity(Enesim_Matrix_F16p16 *m);
+EAPI void enesim_matrix_f16p16_compose(const Enesim_Matrix_F16p16 *m1,
 		const Enesim_Matrix_F16p16 *m2, Enesim_Matrix_F16p16 *dst);
-EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_Matrix_F16p16 *m);
+EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16 *m);
 
 /**
  * @}

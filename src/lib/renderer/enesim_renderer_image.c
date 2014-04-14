@@ -1505,8 +1505,8 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &m);
 	/* use the inverse matrix */
 	enesim_matrix_inverse(&m, &m);
-	enesim_matrix_f16p16_matrix_to(&m, &thiz->matrix);
-	mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
+	enesim_matrix_matrix_f16p16_to(&m, &thiz->matrix);
+	mtype = enesim_matrix_f16p16_type_get(&thiz->matrix);
 	if (mtype != ENESIM_MATRIX_IDENTITY)
 	{
 		double sx, sy;
@@ -1522,7 +1522,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 			w *= sx;  h *= sy;  x *= sx;  y *= sy;
 			thiz->matrix.xx *= sx; thiz->matrix.xy *= sx; thiz->matrix.xz *= sx;
 			thiz->matrix.yx *= sy; thiz->matrix.yy *= sy; thiz->matrix.yz *= sy;
-			mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
+			mtype = enesim_matrix_f16p16_type_get(&thiz->matrix);
 		}
 	}
 
@@ -1572,7 +1572,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 		{
 			thiz->ixx -= thiz->matrix.xz;  thiz->matrix.xz = 0;
 			thiz->iyy -= thiz->matrix.yz;  thiz->matrix.yz = 0;
-			mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
+			mtype = enesim_matrix_f16p16_type_get(&thiz->matrix);
 		}
 
 		if (quality == ENESIM_QUALITY_BEST)
@@ -1589,7 +1589,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 		{
 			thiz->matrix.xz -= thiz->ixx;  thiz->ixx = 0;
 			thiz->matrix.yz -= thiz->iyy;  thiz->iyy = 0;
-			mtype = enesim_f16p16_matrix_type_get(&thiz->matrix);
+			mtype = enesim_matrix_f16p16_type_get(&thiz->matrix);
 			if (mtype != ENESIM_MATRIX_IDENTITY)
 				thiz->simple = EINA_FALSE;
 		}

@@ -343,7 +343,7 @@ static Eina_Bool _linear_sw_setup(Enesim_Renderer *r,
 	thiz->sw.scale = eina_f16p16_double_from(scale);
 	thiz->sw.ayx = eina_f16p16_double_from(ayx);
 	thiz->sw.ayy = eina_f16p16_double_from(ayy);
-	enesim_matrix_f16p16_matrix_to(&m, &thiz->sw.matrix);
+	enesim_matrix_matrix_f16p16_to(&m, &thiz->sw.matrix);
 #if 0
 	/* just override the identity case */
 	if (type == ENESIM_MATRIX_IDENTITY)

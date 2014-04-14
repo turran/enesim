@@ -287,12 +287,12 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 		break;
 
 		case ENESIM_MATRIX_AFFINE:
-		enesim_matrix_f16p16_matrix_to(&inv, &thiz->matrix);
+		enesim_matrix_matrix_f16p16_to(&inv, &thiz->matrix);
 		*fill = _span_affine;
 		break;
 
 		case ENESIM_MATRIX_PROJECTIVE:
-		enesim_matrix_f16p16_matrix_to(&inv, &thiz->matrix);
+		enesim_matrix_matrix_f16p16_to(&inv, &thiz->matrix);
 		*fill = _span_projective;
 		break;
 

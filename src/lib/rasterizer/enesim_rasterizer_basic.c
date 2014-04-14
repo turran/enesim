@@ -1385,7 +1385,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	}
 
 	enesim_renderer_transformation_get(r, &matrix);
-	enesim_matrix_f16p16_matrix_to(&matrix,
+	enesim_matrix_matrix_f16p16_to(&matrix,
 			&thiz->matrix);
 
 	state->color = enesim_renderer_color_get(r);

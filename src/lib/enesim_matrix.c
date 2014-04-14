@@ -95,7 +95,7 @@ EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m)
  * This function returns the type of the matrix @p m. No check is done
  * on @p m.
  */
-EAPI Enesim_Matrix_Type enesim_f16p16_matrix_type_get(const Enesim_Matrix_F16p16 *m)
+EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16 *m)
 {
 	if ((MATRIX_ZX(m) != 0) || (MATRIX_ZY(m) != 0) || (MATRIX_ZZ(m) != 65536))
 		return ENESIM_MATRIX_PROJECTIVE;
@@ -223,7 +223,7 @@ EAPI void enesim_matrix_fixed_values_get(const Enesim_Matrix *m, Eina_F16p16 *a,
  * point matrix and store the coefficients into the fixed point matrix
  * @p fm.
  */
-EAPI void enesim_matrix_f16p16_matrix_to(const Enesim_Matrix *m,
+EAPI void enesim_matrix_matrix_f16p16_to(const Enesim_Matrix *m,
 		Enesim_Matrix_F16p16 *fm)
 {
 	enesim_matrix_fixed_values_get(m, &fm->xx, &fm->xy, &fm->xz,
@@ -445,7 +445,7 @@ EAPI Eina_Bool enesim_matrix_is_equal(const Enesim_Matrix *m1, const Enesim_Matr
 	return EINA_TRUE;
 }
 
-EAPI void enesim_f16p16_matrix_compose(const Enesim_Matrix_F16p16 *m1,
+EAPI void enesim_matrix_f16p16_compose(const Enesim_Matrix_F16p16 *m1,
 		const Enesim_Matrix_F16p16 *m2, Enesim_Matrix_F16p16 *dst)
 {
 	Eina_F16p16 a11, a12, a13, a21, a22, a23, a31, a32, a33;
@@ -587,7 +587,7 @@ EAPI void enesim_matrix_identity(Enesim_Matrix *m)
  * This function sets @p m to the identity matrix. No check is done on
  * @p m.
  */
-EAPI void enesim_f16p16_matrix_identity(Enesim_Matrix_F16p16 *m)
+EAPI void enesim_matrix_f16p16_identity(Enesim_Matrix_F16p16 *m)
 {
 	MATRIX_XX(m) = 65536;
 	MATRIX_XY(m) = 0;

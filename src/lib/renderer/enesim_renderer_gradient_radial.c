@@ -328,7 +328,7 @@ static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
 
 	type = enesim_matrix_type_get(&m);
-	enesim_matrix_f16p16_matrix_to(&m, &thiz->sw.matrix);
+	enesim_matrix_matrix_f16p16_to(&m, &thiz->sw.matrix);
 	mode = enesim_renderer_gradient_repeat_mode_get(r);
 	*fill = _spans[mode][type];
 

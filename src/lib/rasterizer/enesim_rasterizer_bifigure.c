@@ -1602,7 +1602,7 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	}
 
 	enesim_renderer_transformation_get(r, &matrix);
-	enesim_matrix_f16p16_matrix_to(&matrix,
+	enesim_matrix_matrix_f16p16_to(&matrix,
 			&thiz->matrix);
 	/* setup the figures and get span funcs */
 	if (!thiz->under)
