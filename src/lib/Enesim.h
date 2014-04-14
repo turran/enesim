@@ -119,7 +119,6 @@ extern "C" {
 #include "enesim_renderer_compound.h"
 #include "enesim_renderer_importer.h"
 #include "enesim_renderer_line.h"
-#include "enesim_renderer_pattern.h"
 #include "enesim_renderer_perlin.h"
 #include "enesim_renderer_proxy.h"
 #include "enesim_renderer_clipper.h"
