@@ -6,7 +6,7 @@ var searchData=
   ['x2',['x2',['../structEnesim__Quad.html#a64d688f8ee9882b891c39235348af3c1',1,'Enesim_Quad']]],
   ['x3',['x3',['../structEnesim__Quad.html#a1caa12956c96cab6024dc2bf33660361',1,'Enesim_Quad']]],
   ['xrgb8888',['xrgb8888',['../unionEnesim__Buffer__Sw__Data.html#a22b4c96c7cb980c5fd677ed339685742',1,'Enesim_Buffer_Sw_Data']]],
-  ['xx',['xx',['../structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827',1,'Enesim_Matrix::xx()'],['../structEnesim__F16p16__Matrix.html#add7037a258d0b3d642645f8f78d2a1fa',1,'Enesim_F16p16_Matrix::xx()']]],
-  ['xy',['xy',['../structEnesim__Matrix.html#a0fae54e9f07895031745082991723459',1,'Enesim_Matrix::xy()'],['../structEnesim__F16p16__Matrix.html#af2de9084a439820ded2b7fc0cbfc662e',1,'Enesim_F16p16_Matrix::xy()']]],
-  ['xz',['xz',['../structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab',1,'Enesim_Matrix::xz()'],['../structEnesim__F16p16__Matrix.html#a2ffb11977dc781d6f35d5a2849bf5084',1,'Enesim_F16p16_Matrix::xz()']]]
+  ['xx',['xx',['../structEnesim__Matrix.html#aa61b22a29225e9d7c2ee916e3f1e2827',1,'Enesim_Matrix::xx()'],['../structEnesim__Matrix__F16p16.html#a2e16b95ad501bf6c0fcfa91cc51cd77b',1,'Enesim_Matrix_F16p16::xx()']]],
+  ['xy',['xy',['../structEnesim__Matrix.html#a0fae54e9f07895031745082991723459',1,'Enesim_Matrix::xy()'],['../structEnesim__Matrix__F16p16.html#a803fc7eeb8745103a048436d6c7e0f4a',1,'Enesim_Matrix_F16p16::xy()']]],
+  ['xz',['xz',['../structEnesim__Matrix.html#ab738e700102609aa9d423d1ffffdeaab',1,'Enesim_Matrix::xz()'],['../structEnesim__Matrix__F16p16.html#a5a1cf5dd208e204c32ec5edb6140f432',1,'Enesim_Matrix_F16p16::xz()']]]
 ];

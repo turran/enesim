@@ -96,8 +96,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the values of the coefficients of the given floating point matrix.  <a href="#ga565608b01eab4ee4ba81a9bdb5305cf7"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Float__Group.html#ga36d343dfebf8b933027b1df7589a9e26">enesim_matrix_fixed_values_get</a> (const <a class="el" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, Eina_F16p16 *a, Eina_F16p16 *b, Eina_F16p16 *c, Eina_F16p16 *d, Eina_F16p16 *e, Eina_F16p16 *f, Eina_F16p16 *g, Eina_F16p16 *h, Eina_F16p16 *i)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the values of the coefficients of the given fixed point matrix.  <a href="#ga36d343dfebf8b933027b1df7589a9e26"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Float__Group.html#gae2a9d0cf19f381b0d4bacfb387331dbf">enesim_matrix_f16p16_matrix_to</a> (const <a class="el" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <a class="el" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *fm)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform the given floating point matrix to the given fixed point matrix.  <a href="#gae2a9d0cf19f381b0d4bacfb387331dbf"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Float__Group.html#ga8dd0d800fcd26158dc707cbeaa7b654d">enesim_matrix_matrix_f16p16_to</a> (const <a class="el" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m, <a class="el" href="structEnesim__Matrix__F16p16.html">Enesim_Matrix_F16p16</a> *fm)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform the given floating point matrix to the given fixed point matrix.  <a href="#ga8dd0d800fcd26158dc707cbeaa7b654d"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Float__Group.html#gae2af5f1f64b934a69782f4ddfe8172ad">enesim_matrix_is_equal</a> (const <a class="el" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m1, const <a class="el" href="structEnesim__Matrix.html">Enesim_Matrix</a> *m2)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether the two given matrices are equal or not.  <a href="#gae2af5f1f64b934a69782f4ddfe8172ad"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga76eb07a7e420eb6cbf27e6f81be0bcf2"></a><!-- doxytag: member="Enesim_Matrix_Float_Group::enesim_matrix_compose" ref="ga76eb07a7e420eb6cbf27e6f81be0bcf2" args="(const Enesim_Matrix *m1, const Enesim_Matrix *m2, Enesim_Matrix *dst)" -->
@@ -443,12 +443,12 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_matr
 
 </div>
 </div>
-<a class="anchor" id="gae2a9d0cf19f381b0d4bacfb387331dbf"></a><!-- doxytag: member="enesim_matrix.h::enesim_matrix_f16p16_matrix_to" ref="gae2a9d0cf19f381b0d4bacfb387331dbf" args="(const Enesim_Matrix *m, Enesim_F16p16_Matrix *fm)" -->
+<a class="anchor" id="ga8dd0d800fcd26158dc707cbeaa7b654d"></a><!-- doxytag: member="enesim_matrix.h::enesim_matrix_matrix_f16p16_to" ref="ga8dd0d800fcd26158dc707cbeaa7b654d" args="(const Enesim_Matrix *m, Enesim_Matrix_F16p16 *fm)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Matrix__Float__Group.html#gae2a9d0cf19f381b0d4bacfb387331dbf">enesim_matrix_f16p16_matrix_to</a> </td>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Matrix__Float__Group.html#ga8dd0d800fcd26158dc707cbeaa7b654d">enesim_matrix_matrix_f16p16_to</a> </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structEnesim__Matrix.html">Enesim_Matrix</a> *&#160;</td>
           <td class="paramname"><em>m</em>, </td>
@@ -456,7 +456,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_matr
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structEnesim__F16p16__Matrix.html">Enesim_F16p16_Matrix</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="structEnesim__Matrix__F16p16.html">Enesim_Matrix_F16p16</a> *&#160;</td>
           <td class="paramname"><em>fm</em>&#160;</td>
         </tr>
         <tr>
@@ -816,7 +816,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_matr
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 10 2014 19:28:12 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 14 2014 18:21:14 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
