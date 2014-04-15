@@ -397,10 +397,10 @@ static void _enesim_renderer_pattern_class_init(void *k)
 	klass->sw_setup = _pattern_sw_setup;
 	klass->sw_cleanup = _pattern_sw_cleanup;
 	memset(_spans, 0, sizeof(_spans));
-	_spans[ENESIM_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
-	_spans[ENESIM_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
-	_spans[ENESIM_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
-	_spans[ENESIM_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
+	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
 }
 
 static void _enesim_renderer_pattern_instance_init(void *o EINA_UNUSED)

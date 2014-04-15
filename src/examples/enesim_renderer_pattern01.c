@@ -20,7 +20,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	r2 = enesim_renderer_pattern_new();
 	enesim_renderer_pattern_source_renderer_set(r2, r1);
 	enesim_renderer_pattern_size_set(r2, 256, 256);
-	enesim_renderer_pattern_repeat_mode_set(r2, ENESIM_REPEAT);
+	enesim_renderer_pattern_repeat_mode_set(r2, ENESIM_REPEAT_MODE_REPEAT);
 
 	return r2;
 }

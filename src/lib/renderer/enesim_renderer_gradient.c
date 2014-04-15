@@ -242,7 +242,7 @@ static void _gradient_bounds_get(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_GRADIENT(r);
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
-	if (thiz->state.mode == ENESIM_RESTRICT && klass->bounds_get)
+	if (thiz->state.mode == ENESIM_REPEAT_MODE_RESTRICT && klass->bounds_get)
 	{
 		klass->bounds_get(r, bounds);
 	}
