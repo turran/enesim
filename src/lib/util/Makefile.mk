@@ -5,6 +5,7 @@ src/lib/util/enesim_barrier_private.h \
 src/lib/util/enesim_coord.c \
 src/lib/util/enesim_coord_private.h \
 src/lib/util/enesim_cramer.c \
+src/lib/util/enesim_cramer_private.h \
 src/lib/util/enesim_list.c \
 src/lib/util/enesim_list_private.h \
 src/lib/util/enesim_mempool_aligned.c \
