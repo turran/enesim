@@ -95,10 +95,7 @@ static Eina_Bool _blur_state_setup(Enesim_Renderer_Blur *thiz,
 {
 	if (!thiz->src && !thiz->src_r)
 	{
-		if (!thiz->src)
-			ENESIM_RENDERER_LOG(r, l, "No surface set");
-		if (!thiz->src_r)
-			ENESIM_RENDERER_LOG(r, l, "No renderer set");
+		ENESIM_RENDERER_LOG(r, l, "No surface or renderer set");
 		return EINA_FALSE;
 	}
 
