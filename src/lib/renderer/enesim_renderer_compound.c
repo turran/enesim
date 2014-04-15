@@ -213,7 +213,7 @@ static void _compound_state_cleanup(Enesim_Renderer_Compound *thiz, Enesim_Surfa
 #if BUILD_OPENGL
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _compound_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "compound",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_texture.glsl"

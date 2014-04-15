@@ -92,7 +92,7 @@ typedef struct _Enesim_Renderer_Gradient_Linear_Class {
 #if BUILD_OPENGL
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _linear_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "linear",
 	/* .source	= */
 #include "enesim_renderer_gradient_linear.glsl"

@@ -88,7 +88,7 @@ typedef struct _Enesim_Renderer_Checker_Class {
 #if BUILD_OPENGL
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _checker_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "checker",
 	/* .source	= */
 #include "enesim_renderer_checker.glsl"

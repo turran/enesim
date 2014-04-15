@@ -150,35 +150,35 @@ static Eina_Bool _path_opengl_silhoutte_texture_shader_setup(GLenum pid,
 }
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_coordinates = {
-	/* .type	= */ ENESIM_SHADER_VERTEX,
+	/* .type	= */ ENESIM_RENDERER_OPENGL_SHADER_VERTEX,
 	/* .name	= */ "coordinates",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_vertex.glsl"
 };
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_merge = {
-	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name	= */ "merge",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_merge.glsl"
 };
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_silhoutte_vertex = {
-	/* .type	= */ ENESIM_SHADER_VERTEX,
+	/* .type	= */ ENESIM_RENDERER_OPENGL_SHADER_VERTEX,
 	/* .name	= */ "silhoutte_vertex",
 	/* .source	= */
 #include "enesim_renderer_path_silhoutte_vertex.glsl"
 };
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_silhoutte_ambient = {
-	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name	= */ "silhoutte_ambient",
 	/* .source	= */
 #include "enesim_renderer_path_silhoutte_ambient.glsl"
 };
 
 static Enesim_Renderer_OpenGL_Shader _path_shader_silhoutte_texture = {
-	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name	= */ "silhoutte_texture",
 	/* .source	= */
 #include "enesim_renderer_path_silhoutte_texture.glsl"

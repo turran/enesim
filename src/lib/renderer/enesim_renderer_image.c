@@ -207,7 +207,7 @@ static Eina_Bool _image_gl_create(Enesim_Renderer_Image *thiz,
 
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _image_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "image",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_texture.glsl"

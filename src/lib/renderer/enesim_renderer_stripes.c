@@ -77,7 +77,7 @@ typedef struct _Enesim_Renderer_Stripes_Class {
 
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _stripes_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "stripes",
 	/* .source	= */
 #include "enesim_renderer_stripes.glsl"

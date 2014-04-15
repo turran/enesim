@@ -106,7 +106,7 @@ static inline Eina_F16p16 _radial_distance(Enesim_Renderer_Gradient_Radial *thiz
 #if BUILD_OPENGL
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _radial_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "radial",
 	/* .source	= */
 #include "enesim_renderer_gradient_radial.glsl"

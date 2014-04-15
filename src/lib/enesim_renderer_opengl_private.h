@@ -39,10 +39,10 @@ typedef void (*Enesim_Renderer_OpenGL_Draw)(Enesim_Renderer *r, Enesim_Surface *
 
 typedef enum _Enesim_Renderer_OpenGL_Shader_Type
 {
-	ENESIM_SHADER_VERTEX,
-	ENESIM_SHADER_GEOMETRY,
-	ENESIM_SHADER_FRAGMENT,
-	ENESIM_SHADERS,
+	ENESIM_RENDERER_OPENGL_SHADER_VERTEX,
+	ENESIM_RENDERER_OPENGL_SHADER_GEOMETRY,
+	ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
+	ENESIM_RENDERER_OPENGL_SHADERS,
 } Enesim_Renderer_OpenGL_Shader_Type;
 
 struct _Enesim_Renderer_OpenGL_Shader

@@ -77,7 +77,7 @@ static void _background_span(Enesim_Renderer *r,
 
 /* the only shader */
 static Enesim_Renderer_OpenGL_Shader _background_shader = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "background",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_ambient.glsl"

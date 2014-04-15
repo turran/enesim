@@ -93,11 +93,11 @@ static Eina_Bool _opengl_shader_compile(GLenum pid,
 	/* FIXME for now we only support fragment shaders */
 	switch (shader->type)
 	{
-		case ENESIM_SHADER_FRAGMENT:
+		case ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT:
 		st = GL_FRAGMENT_SHADER_ARB;
 		break;
 
-		case ENESIM_SHADER_VERTEX:
+		case ENESIM_RENDERER_OPENGL_SHADER_VERTEX:
 		st = GL_VERTEX_SHADER_ARB;
 		break;
 
@@ -561,14 +561,14 @@ Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
 }
 
 Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_texture = {
-	/* .type 	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type 	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name 	= */ "enesim_renderer_opengl_shader_texture",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_texture.glsl"
 };
 
 Enesim_Renderer_OpenGL_Shader enesim_renderer_opengl_shader_ambient = {
-	/* .type	= */ ENESIM_SHADER_FRAGMENT,
+	/* .type	= */ ENESIM_RENDERER_OPENGL_SHADER_FRAGMENT,
 	/* .name	= */ "enesim_renderer_opengl_shader_ambient",
 	/* .source	= */
 #include "enesim_renderer_opengl_common_ambient.glsl"
