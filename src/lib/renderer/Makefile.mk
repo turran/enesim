@@ -17,6 +17,7 @@ src/lib/renderer/enesim_renderer_image.h \
 src/lib/renderer/enesim_renderer_line.h \
 src/lib/renderer/enesim_renderer_importer.h \
 src/lib/renderer/enesim_renderer_path.h \
+src/lib/renderer/enesim_renderer_pattern.h \
 src/lib/renderer/enesim_renderer_perlin.h \
 src/lib/renderer/enesim_renderer_proxy.h \
 src/lib/renderer/enesim_renderer_raddist.h \
@@ -47,6 +48,7 @@ src/lib/renderer/enesim_renderer_path.c \
 src/lib/renderer/enesim_renderer_path_abstract.c \
 src/lib/renderer/enesim_renderer_path_abstract_private.h \
 src/lib/renderer/enesim_renderer_path_rasterizer.c \
+src/lib/renderer/enesim_renderer_pattern.c \
 src/lib/renderer/enesim_renderer_perlin.c \
 src/lib/renderer/enesim_renderer_proxy.c \
 src/lib/renderer/enesim_renderer_gradient_radial.c \

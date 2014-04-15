@@ -37,8 +37,10 @@ EAPI void enesim_renderer_pattern_position_set(Enesim_Renderer *r, double x, dou
 EAPI void enesim_renderer_pattern_position_get(Enesim_Renderer *r, double *x, double *y);
 EAPI void enesim_renderer_pattern_size_set(Enesim_Renderer *r, double width, double height);
 EAPI void enesim_renderer_pattern_size_get(Enesim_Renderer *r, double *width, double *height);
-EAPI void enesim_renderer_pattern_source_set(Enesim_Renderer *r, Enesim_Renderer *source);
-EAPI Enesim_Renderer * enesim_renderer_pattern_source_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_pattern_source_renderer_set(Enesim_Renderer *r, Enesim_Renderer *source);
+EAPI Enesim_Renderer * enesim_renderer_pattern_source_renderer_get(Enesim_Renderer *r);
+EAPI void enesim_surface_pattern_source_surface_set(Enesim_Renderer *r, Enesim_Surface *source);
+EAPI Enesim_Surface * enesim_surface_pattern_source_surface_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode);
 EAPI Enesim_Repeat_Mode enesim_renderer_pattern_repeat_mode_get(Enesim_Renderer *r);
 
