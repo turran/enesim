@@ -37,6 +37,9 @@
 #include "enesim_path_generator_private.h"
 #include "enesim_path_normalizer_private.h"
 
+/* To round the input coordinates to pixel values (integers) */
+#define PIXEL_ALIGN 0
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -1069,8 +1072,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			y = scale_y * cmd->definition.move_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
+#if PIXEL_ALIGN
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
+#endif
 			enesim_path_command_move_to_values_from(&move_to, x, y);
 			enesim_path_normalizer_move_to(normalizer, &move_to);
 			break;
@@ -1080,8 +1085,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			y = scale_y * cmd->definition.line_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
+#if PIXEL_ALIGN
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
+#endif
 			enesim_path_command_line_to_values_from(&line_to, x, y);
 			enesim_path_normalizer_line_to(normalizer, &line_to);
 			break;
@@ -1094,8 +1101,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+#if PIXEL_ALIGN
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
+#endif
 			enesim_path_command_quadratic_to_values_from(&quadratic_to, x, y, ctrl_x0, ctrl_y0);
 			enesim_path_normalizer_quadratic_to(normalizer, &quadratic_to);
 			break;
@@ -1105,8 +1114,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			y = scale_y * cmd->definition.squadratic_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
-			x = ((int) (2*x + 0.5)) / 2.0;
-			y = ((int) (2*y + 0.5)) / 2.0;
+			//x = ((int) (2*x + 0.5)) / 2.0;
+			//y = ((int) (2*y + 0.5)) / 2.0;
 			enesim_path_command_squadratic_to_values_from(&squadratic_to, x, y);
 			enesim_path_normalizer_squadratic_to(normalizer, &squadratic_to);
 			break;
@@ -1122,8 +1131,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			enesim_matrix_point_transform(gm, ctrl_x1, ctrl_y1, &ctrl_x1, &ctrl_y1);
+#if PIXEL_ALIGN
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
+#endif
 			enesim_path_command_cubic_to_values_from(&cubic_to, x, y, ctrl_x0, ctrl_y0, ctrl_x1, ctrl_y1);
 			enesim_path_normalizer_cubic_to(normalizer, &cubic_to);
 			break;
@@ -1136,8 +1147,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
+#if PIXEL_ALIGN
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
+#endif
 			enesim_path_command_scubic_to_values_from(&scubic_to, x, y, ctrl_x0, ctrl_y0);
 			enesim_path_normalizer_scubic_to(normalizer, &scubic_to);
 			break;
@@ -1154,9 +1167,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			rx = rx * hypot((ca * gm->xx) + (sa * gm->xy), (ca * gm->yx) + (sa * gm->yy));
 			ry = ry * hypot((ca * gm->xy) - (sa * gm->xx), (ca * gm->yy) - (sa * gm->yx));
 			ca = atan2((ca * gm->yx) + (sa * gm->yy), (ca * gm->xx) + (sa * gm->xy));
-
+#if PIXEL_ALIGN
 			x = ((int) (2*x + 0.5)) / 2.0;
 			y = ((int) (2*y + 0.5)) / 2.0;
+#endif
 			enesim_path_command_arc_to_values_from(&arc_to, rx, ry, ca * 180.0 / M_PI,
 					x, y, cmd->definition.arc_to.large,
 					cmd->definition.arc_to.sweep);
