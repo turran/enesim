@@ -184,9 +184,9 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop,
 	enesim_renderer_sw_hints_get(thiz->proxied, rop, &proxied_hints);
 	/* check if we can to colorize */
 	if (proxied_state->current.color == state->current.color)
-		*hints |= ENESIM_RENDERER_HINT_COLORIZE;
+		*hints |= ENESIM_RENDERER_SW_HINT_COLORIZE;
 	/*  we can rop because we use another renderer to draw */
-	*hints |= ENESIM_RENDERER_HINT_ROP;
+	*hints |= ENESIM_RENDERER_SW_HINT_ROP;
 }
 
 static void _proxy_bounds_get(Enesim_Renderer *r,

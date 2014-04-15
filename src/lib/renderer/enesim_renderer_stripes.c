@@ -538,7 +538,7 @@ static void _stripes_features_get(Enesim_Renderer *r EINA_UNUSED,
 static void _stripes_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
 
 static Eina_Bool _stripes_has_changed(Enesim_Renderer *r)

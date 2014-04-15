@@ -439,9 +439,9 @@ static void _compound_sw_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		_compound_layer_sw_hints_merge(l, rop, &same_rop, &h);
 	}
 	if (same_rop)
-		h |= ENESIM_RENDERER_HINT_ROP;
+		h |= ENESIM_RENDERER_SW_HINT_ROP;
 	else
-		h &= ~ENESIM_RENDERER_HINT_ROP;
+		h &= ~ENESIM_RENDERER_SW_HINT_ROP;
 	*hints = h;
 }
 

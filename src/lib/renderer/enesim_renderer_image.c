@@ -1622,13 +1622,13 @@ static void _image_features_get(Enesim_Renderer *r EINA_UNUSED,
 static void _image_sw_image_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Hint *hints)
 {
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
 	if (rop != ENESIM_ROP_FILL)
 	{
 		Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 
 		if (thiz->span)
-			*hints |= ENESIM_RENDERER_HINT_ROP;
+			*hints |= ENESIM_RENDERER_SW_HINT_ROP;
 	}
 
 }

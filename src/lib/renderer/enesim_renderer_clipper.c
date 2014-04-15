@@ -212,12 +212,12 @@ static void _clipper_sw_hints_get(Enesim_Renderer *r,
 
 		enesim_renderer_sw_hints_get(thiz->current.clipped, rop, &content_hints);
 
-		if (content_hints & ENESIM_RENDERER_HINT_ROP)
-			*hints |= ENESIM_RENDERER_HINT_ROP;
+		if (content_hints & ENESIM_RENDERER_SW_HINT_ROP)
+			*hints |= ENESIM_RENDERER_SW_HINT_ROP;
 		color = enesim_renderer_color_get(thiz->current.clipped);
 		own_color = enesim_renderer_color_get(r);
-		if ((own_color == color) && (content_hints & ENESIM_RENDERER_HINT_COLORIZE))
-			*hints |= ENESIM_RENDERER_HINT_COLORIZE;
+		if ((own_color == color) && (content_hints & ENESIM_RENDERER_SW_HINT_COLORIZE))
+			*hints |= ENESIM_RENDERER_SW_HINT_COLORIZE;
 	}
 }
 

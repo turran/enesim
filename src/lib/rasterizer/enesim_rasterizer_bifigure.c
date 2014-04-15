@@ -1781,7 +1781,7 @@ static void _bifigure_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 	double swx, swy;
 
 	thiz = ENESIM_RASTERIZER_BIFIGURE(r);
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
 	/* given that we use another renderer for drawing in some cases
 	 * set the hints for rop and mask in case the other renderer is the one
 	 * who will draw, otherwise, just the colorize
@@ -1790,7 +1790,7 @@ static void _bifigure_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
 	if (!(thiz->under && thiz->over && swx > 1 && swy > 1 && draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL))
 	{
-		*hints |= ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK;
+		*hints |= ENESIM_RENDERER_SW_HINT_ROP | ENESIM_RENDERER_SW_HINT_MASK;
 	}
 }
 /*----------------------------------------------------------------------------*

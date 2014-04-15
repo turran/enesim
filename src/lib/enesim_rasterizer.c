@@ -54,7 +54,7 @@ static void _rasterizer_features_get(Enesim_Renderer *r EINA_UNUSED,
 static void _rasterizer_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Sw_Hint *hints)
 {
-	*hints = ENESIM_RENDERER_HINT_COLORIZE;
+	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
 
 static void _rasterizer_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Renderer_Shape_Feature *features)

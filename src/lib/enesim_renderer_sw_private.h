@@ -60,9 +60,9 @@ typedef struct _Enesim_Renderer_Thread
 
 typedef enum _Enesim_Renderer_Sw_Hint
 {
-	ENESIM_RENDERER_HINT_COLORIZE 		= (1 << 0), /* Can draw directly using the color property */
-	ENESIM_RENDERER_HINT_ROP 		= (1 << 1), /* Can draw directly using the raster operation */
-	ENESIM_RENDERER_HINT_MASK 		= (1 << 2), /* Can draw directly using the mask renderer */
+	ENESIM_RENDERER_SW_HINT_COLORIZE 		= (1 << 0), /* Can draw directly using the color property */
+	ENESIM_RENDERER_SW_HINT_ROP 		= (1 << 1), /* Can draw directly using the raster operation */
+	ENESIM_RENDERER_SW_HINT_MASK 		= (1 << 2), /* Can draw directly using the mask renderer */
 } Enesim_Renderer_Sw_Hint;
 
 struct _Enesim_Renderer_Sw_Data

@@ -246,8 +246,8 @@ static void _path_sw_hints(Enesim_Renderer *r EINA_UNUSED, Enesim_Rop rop
 	/* we always use the implementation renderer for drawing
 	 * so mark every hint
 	 */
-	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK |
-			ENESIM_RENDERER_HINT_COLORIZE;
+	*hints = ENESIM_RENDERER_SW_HINT_ROP | ENESIM_RENDERER_SW_HINT_MASK |
+			ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
 
 

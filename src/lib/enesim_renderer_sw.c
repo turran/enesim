@@ -54,9 +54,9 @@ static unsigned int _num_cpus;
 static inline Eina_Bool _is_sw_draw_composed(Enesim_Color *color,
 		Enesim_Rop *rop, Enesim_Renderer_Sw_Hint hints)
 {
-	if (hints & ENESIM_RENDERER_HINT_COLORIZE)
+	if (hints & ENESIM_RENDERER_SW_HINT_COLORIZE)
 		*color = ENESIM_COLOR_FULL;
-	if (hints & ENESIM_RENDERER_HINT_ROP)
+	if (hints & ENESIM_RENDERER_SW_HINT_ROP)
 		*rop = ENESIM_ROP_FILL;
 
 	/* fill rop and color is full, we use the simple draw function */

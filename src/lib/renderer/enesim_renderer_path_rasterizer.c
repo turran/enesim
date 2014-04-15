@@ -218,7 +218,7 @@ static void _enesim_renderer_path_rasterizer_sw_hints(Enesim_Renderer *r EINA_UN
 	/* we always use another renderer for drawing so
 	 * mark every hint
 	 */
-	*hints = ENESIM_RENDERER_HINT_ROP | ENESIM_RENDERER_HINT_MASK | ENESIM_RENDERER_HINT_COLORIZE;
+	*hints = ENESIM_RENDERER_SW_HINT_ROP | ENESIM_RENDERER_SW_HINT_MASK | ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
 
 static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
