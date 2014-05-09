@@ -39,6 +39,38 @@ static inline Eina_F16p16 enesim_point_f16p16_transform(Eina_F16p16 x, Eina_F16p
 	return eina_f16p16_mul(cx, x) + eina_f16p16_mul(cy, y) + cz;
 }
 
+static inline Eina_F16p16 enesim_coord_repeat(Eina_F16p16 c, Eina_F16p16 len)
+{
+	if (c < 0 || c >= len)
+	{
+		c = c % len;
+		if (c < 0)
+			c += len;
+	}
+	return c;
+}
+
+static inline Eina_F16p16 enesim_coord_reflect(Eina_F16p16 c, Eina_F16p16 len)
+{
+	Eina_F16p16 len2;
+
+	len2 = eina_f16p16_mul(len, eina_f16p16_int_from(2));
+	c = c % len2;
+	if (c < 0) c += len2;
+	if (c >= len) c = len2 - c - 1;
+
+	return c;
+}
+
+static inline Eina_F16p16 enesim_coord_pad(Eina_F16p16 c, Eina_F16p16 len)
+{
+	if (c < 0)
+		c = 0;
+	else if (c >= len)
+		c = len - 1;
+	return c;
+}
+
 void enesim_coord_identity_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 		int x, int y, double pre_x, double pre_y);
 void enesim_coord_affine_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
