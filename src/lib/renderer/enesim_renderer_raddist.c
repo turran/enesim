@@ -171,8 +171,8 @@ static void _raddist_bounds_get(Enesim_Renderer *r,
 		int sw, sh;
 
 		enesim_surface_size_get(thiz->src, &sw, &sh);
-		rect->x = 0;
-		rect->y = 0;
+		/* translate by the origin */
+		enesim_renderer_origin_get(r, &rect->x, &rect->y);
 		rect->w = sw;
 		rect->h = sh;
 	}
