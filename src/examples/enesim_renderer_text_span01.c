@@ -11,6 +11,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	Enesim_Text_Font *f;
 	Enesim_Text_Engine *e;
 	Enesim_Rectangle geom;
+	Enesim_Matrix m;
 
 	/* Create an arial font */
 	e = enesim_text_engine_default_get();
@@ -33,6 +34,9 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	 */
 	enesim_renderer_shape_destination_geometry_get(r, &geom);
 	enesim_renderer_origin_set(r, (256 - geom.w) / 2, (256 - geom.h) / 2);
+
+	enesim_matrix_rotate(&m, 0.1);
+	enesim_renderer_transformation_set(r, &m);
 
 	return r;
 }
