@@ -105,16 +105,13 @@ static void _span_identity(Enesim_Renderer *r,
 	{
 		Eina_F16p16 sxx, syy;
 		uint32_t p0;
-		int sx, sy;
 		double rad = hypot(x, y);
 
 		rad = (((thiz->current.scale * (thiz->current.radius - rad)) + rad) * r_inv);
 		sxx = eina_f16p16_double_from((rad * x) + thiz->current.orx);
 		syy = eina_f16p16_double_from((rad * y) + thiz->current.ory);
 
-		sy = (syy >> 16);
-		sx = (sxx >> 16);
-		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy, sx, sy);
+		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy);
 
 		*dst++ = p0;
 		x++;

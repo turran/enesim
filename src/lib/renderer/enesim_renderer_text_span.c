@@ -292,19 +292,21 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 	}
 	enesim_renderer_origin_get(r, &ox, &oy);
 	enesim_coord_affine_setup(&xx, &yy, x, y, ox, oy, &thiz->matrix);
+
 	while (dst < end)
 	{
 		Enesim_Text_Glyph_Position position;
 		Enesim_Text_Glyph *g;
+		Eina_F16p16 gxx, gyy;
 		int w, h;
 		uint32_t p0 = 0;
 		int sx, sy;
 		uint32_t *src;
-		int gx, gy;
 		size_t stride;
 
-		sy = eina_f16p16_int_to(yy);
 		sx = eina_f16p16_int_to(xx);
+		sy = eina_f16p16_int_to(yy);
+
 		/* FIXME decide what to use, get() / load()? */
 		if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, sx, sy, &position))
 		{
@@ -315,10 +317,10 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 
 		enesim_surface_size_get(g->surface, &w, &h);
 		enesim_surface_data_get(g->surface, (void **)&src, &stride);
-		gx = sx - position.distance;
-		gy = sy - (thiz->top - g->origin);
+		gxx = xx - eina_f16p16_int_from(position.distance);
+		gyy = yy - eina_f16p16_int_from((thiz->top - g->origin));
 
-		p0 = argb8888_sample_good(src, stride, w, h, xx, yy, gx, gy);
+		p0 = argb8888_sample_good(src, stride, w, h, gxx, gyy);
 next:
 		yy += thiz->matrix.yx;
 		xx += thiz->matrix.xx;

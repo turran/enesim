@@ -124,7 +124,6 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	while (dst < end)							\
 	{									\
 		Eina_F16p16 sxx, syy;						\
-		int sx, sy;							\
 		uint32_t p0 = 0;						\
 		uint16_t m0;							\
 		uint16_t m1;							\
@@ -139,10 +138,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		sx = eina_f16p16_int_to(sxx);					\
-		sy = eina_f16p16_int_to(syy);					\
-		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy,	\
-				sx, sy);					\
+		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy);	\
 										\
 next:										\
 		*dst++ = p0;							\
@@ -180,7 +176,6 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	while (dst < end)							\
 	{									\
 		Eina_F16p16 sxx, syy;						\
-		int sx, sy;							\
 		uint32_t p0 = 0;						\
 		uint32_t *m;							\
 		uint16_t m0;							\
@@ -199,10 +194,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		sx = eina_f16p16_int_to(sxx);					\
-		sy = eina_f16p16_int_to(syy);					\
-		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy, sx,	\
-				sy);						\
+		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy);	\
 										\
 next:										\
 		*dst++ = p0;							\
