@@ -206,7 +206,7 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 		enesim_surface_size_get(g->surface, &w, &h);
 		w = g->x_advance < w ? g->x_advance : w;
 		//printf("%c %d %d -> %d %d %d\n", *c, x, y, g->x_advance, w, h);
-		if (x >= rcoord && x < rcoord + w)
+		if (x >= (rcoord - 1) && x < rcoord + w)
 		{
 			position->glyph = g;
 			position->index = idx;
