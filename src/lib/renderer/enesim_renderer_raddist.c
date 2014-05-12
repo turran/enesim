@@ -61,9 +61,12 @@ typedef struct _Enesim_Renderer_Raddist_State
 typedef struct _Enesim_Renderer_Raddist
 {
 	Enesim_Renderer parent;
+	/* properties */
 	Enesim_Surface *src;
 	Enesim_Renderer_Raddist_State current;
 	Enesim_Renderer_Raddist_State past;
+	/* private */
+	Eina_F16p16 r_inv;
 	Eina_Bool changed : 1;
 	Eina_Bool src_changed : 1;
 } Enesim_Renderer_Raddist;
@@ -338,7 +341,7 @@ EAPI Enesim_Surface * enesim_renderer_raddist_source_surface_get(Enesim_Renderer
  * @param[in] r The radial distortion renderer
  * @param[in] ox The center in X of the radial distortion
  */
-EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
+EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, double ox)
 {
 	Enesim_Renderer_Raddist *thiz;
 
@@ -352,7 +355,7 @@ EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, int ox)
  * @param[in] r The radial distortion renderer
  * @param[in] oy The center in Y of the radial distortion
  */
-EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, int oy)
+EAPI void enesim_renderer_raddist_y_set(Enesim_Renderer *r, double oy)
 {
 	Enesim_Renderer_Raddist *thiz;
 
