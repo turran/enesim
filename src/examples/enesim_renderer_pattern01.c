@@ -8,6 +8,7 @@
 Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_Options *options EINA_UNUSED)
 {
 	Enesim_Renderer *r1, *r2;
+	Enesim_Matrix m;
 
 	r1 = enesim_renderer_circle_new();
 	enesim_renderer_circle_center_set(r1, 128, 128);
@@ -19,8 +20,9 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 
 	r2 = enesim_renderer_pattern_new();
 	enesim_renderer_pattern_source_renderer_set(r2, r1);
-	enesim_renderer_pattern_size_set(r2, 256, 256);
 	enesim_renderer_pattern_repeat_mode_set(r2, ENESIM_REPEAT_MODE_REPEAT);
+	enesim_matrix_rotate(&m, 0.5);
+	enesim_renderer_transformation_set(r2, &m);
 
 	return r2;
 }
