@@ -191,6 +191,10 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_
 EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_shape_stroke_dash_add</b> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, const <a class="el" href="structEnesim__Renderer__Shape__Stroke__Dash.html">Enesim_Renderer_Shape_Stroke_Dash</a> *dash)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga4671f3b002ccff81baa845961a0bfb48"></a><!-- doxytag: member="Enesim_Renderer_Shape_Group::enesim_renderer_shape_stroke_dash_clear" ref="ga4671f3b002ccff81baa845961a0bfb48" args="(Enesim_Renderer *r)" -->
 EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_shape_stroke_dash_clear</b> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Group.html#ga5d9b61f2bd539d6d9f52b7d66ad17a15">enesim_renderer_shape_stroke_scalable_set</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Bool scalable)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets whenever a stroke should be scalable.  <a href="#ga5d9b61f2bd539d6d9f52b7d66ad17a15"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Group.html#ga993ded4e37d284f504163056c0f3fe04">enesim_renderer_shape_stroke_scalable_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets whenever a stroke should be scalable.  <a href="#ga993ded4e37d284f504163056c0f3fe04"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Group.html#gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c">enesim_renderer_shape_fill_color_set</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a> fill_color)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Color__Group.html#ga571ac08ece7a058bb3efbbc338f3e676">Enesim_Color</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Group.html#ga8a18410c5bdde22143ad380c5076f820">enesim_renderer_shape_fill_color_get</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Group.html#ga7cf40eb875d1e22383a1c8f1d885c57b">enesim_renderer_shape_fill_renderer_set</a> (<a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *fill)</td></tr>
@@ -780,6 +784,68 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_
 
 </div>
 </div>
+<a class="anchor" id="ga5d9b61f2bd539d6d9f52b7d66ad17a15"></a><!-- doxytag: member="enesim_renderer_shape.h::enesim_renderer_shape_stroke_scalable_set" ref="ga5d9b61f2bd539d6d9f52b7d66ad17a15" args="(Enesim_Renderer *r, Eina_Bool scalable)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Shape__Group.html#ga5d9b61f2bd539d6d9f52b7d66ad17a15">enesim_renderer_shape_stroke_scalable_set</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_Bool&#160;</td>
+          <td class="paramname"><em>scalable</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sets whenever a stroke should be scalable. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The shape renderer to set the stroke scalable to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scalable</td><td>EINA_TRUE to enable scaling the stroke, EINA_FALSE otherwise </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga993ded4e37d284f504163056c0f3fe04"></a><!-- doxytag: member="enesim_renderer_shape.h::enesim_renderer_shape_stroke_scalable_get" ref="ga993ded4e37d284f504163056c0f3fe04" args="(Enesim_Renderer *r)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer__Shape__Group.html#ga993ded4e37d284f504163056c0f3fe04">enesim_renderer_shape_stroke_scalable_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Group.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>r</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Gets whenever a stroke should be scalable. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The shape renderer to get the stroke scalable from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE is the stroke is scalable, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c"></a><!-- doxytag: member="enesim_renderer_shape.h::enesim_renderer_shape_fill_color_set" ref="gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c" args="(Enesim_Renderer *r, Enesim_Color fill_color)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1114,7 +1180,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 13 2014 22:11:03 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu May 15 2014 18:50:31 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
