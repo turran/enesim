@@ -56,7 +56,6 @@
  * rendered
  */
 #define WIREFRAME 0
-#define DUMP 0
 
 #define ENESIM_RENDERER_PATH_ENESIM(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Path_Enesim,					\
@@ -74,8 +73,6 @@ typedef struct _Enesim_Renderer_Path_Enesim_Class
 {
 	Enesim_Renderer_Path_Abstract_Class parent;
 } Enesim_Renderer_Path_Enesim_Class;
-
-
 
 static void _enesim_renderer_path_rasterizer_span(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
@@ -95,11 +92,14 @@ static void _enesim_renderer_path_rasterizer_generate_figures(Enesim_Renderer *r
  	parent = ENESIM_RENDERER_PATH_ABSTRACT(r);
 
 	enesim_renderer_path_abstract_generate(r);
+#if WIREFRAME
+	if (parent->stroke_figure_used)
+		enesim_rasterizer_figure_set(thiz->bifigure, parent->stroke_figure);
+	else
+		enesim_rasterizer_figure_set(thiz->bifigure, parent->fill_figure);
+#else
 	/* set the fill figure on the bifigure as its under polys */
 	enesim_rasterizer_figure_set(thiz->bifigure, parent->fill_figure);
-#if WIREFRAME
-	enesim_rasterizer_figure_set(thiz->bifigure, parent->stroke_figure_used ? thiz->stroke_figure : NULL);
-#else
 	/* set the stroke figure on the bifigure as its under polys */
 	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, parent->stroke_figure_used ? parent->stroke_figure : NULL);
 #endif
@@ -159,7 +159,7 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 	 * weight to avoid such case
 	 */
 	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
-	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, swx > swy ? swx : swy);
+	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, swx > swy ? swx * 2: swy * 2);
 	enesim_renderer_shape_stroke_color_set(thiz->bifigure, css->current.stroke.color);
 	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, enesim_renderer_ref(css->current.stroke.r));
 	enesim_renderer_shape_fill_color_set(thiz->bifigure, css->current.fill.color);

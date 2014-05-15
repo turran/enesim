@@ -152,6 +152,18 @@ void enesim_polygon_delete(Enesim_Polygon *thiz)
 	free(thiz);
 }
 
+void enesim_polygon_dump(Enesim_Polygon *thiz)
+{
+	Enesim_Point *pt;
+	Eina_List *l2;
+
+	printf("New %s polygon\n", thiz->closed ? "closed": "opened");
+	EINA_LIST_FOREACH(thiz->points, l2, pt)
+	{
+		printf("%g %g\n", pt->x, pt->y);
+	}
+}
+
 void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge)
 {
 	Enesim_Point *last, *first;
@@ -279,14 +291,7 @@ void enesim_figure_dump(Enesim_Figure *f)
 
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
-		Enesim_Point *pt;
-		Eina_List *l2;
-
-		printf("New %s polygon\n", p->closed ? "closed": "");
-		EINA_LIST_FOREACH(p->points, l2, pt)
-		{
-			printf("%g %g\n", pt->x, pt->y);
-		}
+		enesim_polygon_dump(p);
 	}
 }
 /*============================================================================*

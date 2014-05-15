@@ -113,6 +113,12 @@ static Eina_Bool _state_changed_basic(Enesim_Renderer_Shape_State *thiz,
 		DBG("Stroke cap changed");
 		return EINA_TRUE;
 	}
+	/* scalable */
+	if (thiz->current.stroke.scalable != thiz->past.stroke.scalable)
+	{
+		DBG("Stroke scalable changed");
+		return EINA_TRUE;
+	}
 	/* dashes */
 	if (support_dashes)
 	{
@@ -229,6 +235,7 @@ static void _state_init(Enesim_Renderer_Shape_State *thiz)
 	thiz->current.fill.color = thiz->past.fill.color = 0xffffffff;
 	thiz->current.stroke.color = thiz->past.stroke.color = 0xffffffff;
 	thiz->current.stroke.location = ENESIM_RENDERER_SHAPE_STROKE_LOCATION_CENTER;
+	thiz->current.stroke.scalable = EINA_TRUE;
 	thiz->current.draw_mode = ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL;
 	thiz->dashes = enesim_list_new(free);
 }
@@ -652,10 +659,13 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 
 	sstate = &thiz->state;
 
-	/* TODO we should compare agains the state of 'to' */
+	/* TODO we should compare against the state of 'to' */
 	enesim_renderer_shape_draw_mode_set(s, sstate->current.draw_mode);
 	enesim_renderer_shape_stroke_weight_set(s, sstate->current.stroke.weight);
 	enesim_renderer_shape_stroke_color_set(s, sstate->current.stroke.color);
+	enesim_renderer_shape_stroke_join_set(s, sstate->current.stroke.join);
+	enesim_renderer_shape_stroke_cap_set(s, sstate->current.stroke.cap);
+	enesim_renderer_shape_stroke_scalable_set(s, sstate->current.stroke.scalable);
 	stroke = enesim_renderer_shape_stroke_renderer_get(r);
 	enesim_renderer_shape_stroke_renderer_set(s, stroke);
 
@@ -693,15 +703,23 @@ void enesim_renderer_shape_stroke_weight_setup(Enesim_Renderer *r,
 		double *swx, double *swy)
 {
 	Enesim_Matrix m;
+	Eina_Bool scale;
 	double sw;
 
 	enesim_renderer_transformation_get(r, &m);
 	sw = enesim_renderer_shape_stroke_weight_get(r);
-	/* TODO later we can add flags to know how to scale the stroke
-	 * path
-	 */
-	*swx = sw / 2 * hypot(m.xx, m.yx);
-	*swy = sw / 2 * hypot(m.xy, m.yy);
+	scale = enesim_renderer_shape_stroke_scalable_get(r);
+
+	if (scale)
+	{
+		*swx = sw / 2 * hypot(m.xx, m.yx);
+		*swy = sw / 2 * hypot(m.xy, m.yy);
+	}
+	else
+	{
+		*swx = sw / 2;
+		*swy = sw / 2;
+	}
 }
 
 void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
@@ -1077,6 +1095,33 @@ EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	enesim_list_clear(thiz->state.dashes);
+}
+
+/**
+ * @brief Sets whenever a stroke should be scalable
+ * @param[in] r The shape renderer to set the stroke scalable to
+ * @param[in] scalable EINA_TRUE to enable scaling the stroke, EINA_FALSE otherwise
+ */
+EAPI void enesim_renderer_shape_stroke_scalable_set(Enesim_Renderer *r, Eina_Bool scalable)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = ENESIM_RENDERER_SHAPE(r);
+	thiz->state.current.stroke.scalable = scalable;
+	thiz->state.changed = EINA_TRUE;
+}
+
+/**
+ * @brief Gets whenever a stroke should be scalable
+ * @param[in] r The shape renderer to get the stroke scalable from
+ * @return EINA_TRUE is the stroke is scalable, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_renderer_shape_stroke_scalable_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Shape *thiz;
+
+	thiz = ENESIM_RENDERER_SHAPE(r);
+	return thiz->state.current.stroke.scalable;
 }
 
 /**

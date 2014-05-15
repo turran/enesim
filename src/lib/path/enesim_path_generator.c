@@ -85,8 +85,10 @@ typedef struct _Enesim_Path_Generator_Stroke
 	Enesim_Point last;
 	Enesim_Point p0, p1, p2;
 	Enesim_Point n01, n12;
+	Enesim_Matrix sw_m;
 	double rx;
 	double ry;
+	double angle;
 	int count;
 } Enesim_Path_Generator_Stroke;
 
@@ -218,6 +220,7 @@ static void _edge_join(Enesim_Path_Edge *e1,
 		double ry,
 		Eina_Bool large,
 		Eina_Bool sweep,
+		double angle,
 		Enesim_Curve_Vertex_Add vertex_add,
 		void *data)
 {
@@ -238,7 +241,7 @@ static void _edge_join(Enesim_Path_Edge *e1,
 		st.last_ctrl_x = e1->x1;
 		st.last_ctrl_y = e1->y1;
 		st.data = data;
-		enesim_curve_arc_to(&st, rx, ry, 0, large, sweep, e2->x0, e2->y0);
+		enesim_curve_arc_to(&st, rx, ry, angle, large, sweep, e2->x0, e2->y0);
 		break;
 
 		case ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL:
@@ -367,8 +370,15 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 			if (!_do_normal(&thiz->n01, &thiz->p0, &thiz->p1, 1/256.0))
 				return;
 
-			ox = thiz->rx  * thiz->n01.x;
-			oy = thiz->ry * thiz->n01.y;
+			if (thiz->p->sw_scalable)
+			{
+				enesim_matrix_point_transform(&thiz->sw_m, thiz->n01.x, thiz->n01.y, &ox, &oy);
+			}
+			else
+			{
+				ox = thiz->n01.x * thiz->p->sw;
+				oy = thiz->n01.y * thiz->p->sw;
+			}
 
 			o0.x = thiz->p0.x + ox;
 			o0.y = thiz->p0.y + oy;
@@ -400,8 +410,15 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 	/* FIXME use the threshold set by the quality prop or something like that */
 	if (!_do_normal(&thiz->n12, &thiz->p1, &thiz->p2, 1/256.0))
 		return;
-	ox = thiz->rx * thiz->n12.x;
-	oy = thiz->ry * thiz->n12.y;
+	if (thiz->p->sw_scalable)
+	{
+		enesim_matrix_point_transform(&thiz->sw_m, thiz->n12.x, thiz->n12.y, &ox, &oy);
+	}
+	else
+	{
+		ox = thiz->n12.x * thiz->p->sw;
+		oy = thiz->n12.y * thiz->p->sw;
+	}
 
 	o0.x = thiz->p1.x + ox;
 	o0.y = thiz->p1.y + oy;
@@ -453,7 +470,7 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 		e2.y1 = i1.y;
 
 		_edge_join(&e1, &e2, thiz->p->join, thiz->rx, thiz->ry, large, EINA_FALSE,
-				_stroke_curve_prepend, inset);
+				thiz->angle, _stroke_curve_prepend, inset);
 	}
 	/* left side */
 	else
@@ -477,7 +494,7 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 		e2.x1 = o1.x;
 		e2.y1 = o1.y;
 		_edge_join(&e1, &e2, thiz->p->join, thiz->rx, thiz->ry, large, EINA_TRUE,
-				_stroke_curve_append, offset);
+				thiz->angle, _stroke_curve_append, offset);
 	}
 
 	enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
@@ -536,10 +553,56 @@ static void _stroke_path_begin(void *data)
 
 	/* initialize our state */
 	thiz->count = 0;
-	thiz->rx = path->swx;
-	thiz->ry = path->swy;
 	thiz->inset_polygon = NULL;
 	thiz->offset_polygon = NULL;
+
+
+	/* In case we do scale the stroke weight bsaed on the transformation
+	 * matrix we need to calculate a new normal for the normal generated
+	 * on the transformed shape's vertices.
+	 */
+	if (thiz->p->sw_scalable)
+	{
+		Enesim_Matrix s, m, t;
+		double xx, xy, yx, yy;
+		double sx, sy;
+		double a, b;
+
+		sx = hypot(path->gm->xx, path->gm->yx);
+		sy = hypot(path->gm->xy, path->gm->yy);
+
+		thiz->rx = path->sw / 2 * sx;
+		thiz->ry = path->sw / 2 * sy;
+
+		xx = path->gm->xx / sx;
+		yx = path->gm->yx / sx;
+
+		xy = path->gm->xy / sy;
+		yy = path->gm->yy / sy;
+		/* set a normalized matrix */
+		enesim_matrix_values_set(&m, xx, xy, 0, yx, yy, 0, 0, 0, 1);
+		enesim_matrix_scale(&s, thiz->rx, thiz->ry);
+		enesim_matrix_transpose(&m, &t);
+		enesim_matrix_compose(&m, &s, &m);
+		enesim_matrix_compose(&m, &t, &thiz->sw_m);
+
+		/* for the angle, pick up the rotation from the initial matrix
+		 * ideally, we should decompose the matrix using the LU or QR methods
+		 */
+		a = atan(path->gm->xy / path->gm->yy);
+		b = atan(-path->gm->yx / path->gm->xx);
+		if (a == b)
+			thiz->angle = a * 180 / M_PI;
+		else
+			thiz->angle = 0;
+		thiz->angle = 48;
+	}
+	else
+	{
+		thiz->rx = path->sw / 2;
+		thiz->ry = path->sw / 2;
+		thiz->angle = 0;
+	}
 }
 
 static void _stroke_path_done(void *data)
@@ -560,9 +623,17 @@ static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 	{
 		/* also close the figure itself */
 		_stroke_path_vertex_process(thiz->first.x, thiz->first.y, thiz);
+
 		/* close the inset/off with the join cap */
-		_stroke_path_vertex_process(thiz->last.x,
-				thiz->last.y, thiz);
+		if (thiz->p->join == ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND)
+		{
+			_stroke_path_vertex_process(thiz->last.x,
+					thiz->last.y, thiz);
+		}
+		if (thiz->offset_polygon)
+			enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
+		if (thiz->inset_polygon)
+			enesim_polygon_close(thiz->inset_polygon, EINA_TRUE);
 
 		/* reset the inset/offset */
 		thiz->inset_polygon = NULL;
@@ -632,8 +703,8 @@ static void _stroke_dashless_path_begin(void *data)
 		enesim_path_generator_stroke_figure_set(p, path->stroke_figure);
 		enesim_path_generator_stroke_cap_set(p, path->cap);
 		enesim_path_generator_stroke_join_set(p, path->join);
-		enesim_path_generator_stroke_weight_x_set(p, path->swx);
-		enesim_path_generator_stroke_weight_y_set(p, path->swy);
+		enesim_path_generator_stroke_weight_set(p, path->sw);
+		enesim_path_generator_stroke_scalable_set(p, path->sw_scalable);
 		enesim_path_generator_stroke_dash_set(p, path->dashes);
 		enesim_path_generator_scale_set(p, path->scale_x, path->scale_y);
 		enesim_path_generator_transformation_set(p, path->gm);
@@ -851,8 +922,8 @@ static void _dashed_path_begin(void *data)
 		enesim_path_generator_stroke_figure_set(p, path->stroke_figure);
 		enesim_path_generator_stroke_cap_set(p, path->cap);
 		enesim_path_generator_stroke_join_set(p, path->join);
-		enesim_path_generator_stroke_weight_x_set(p, path->swx);
-		enesim_path_generator_stroke_weight_y_set(p, path->swy);
+		enesim_path_generator_stroke_weight_set(p, path->sw);
+		enesim_path_generator_stroke_scalable_set(p, path->sw_scalable);
 		enesim_path_generator_stroke_dash_set(p, path->dashes);
 		enesim_path_generator_scale_set(p, path->scale_x, path->scale_y);
 		enesim_path_generator_transformation_set(p, path->gm);
@@ -941,14 +1012,14 @@ void enesim_path_generator_stroke_join_set(Enesim_Path_Generator *thiz, Enesim_R
 	thiz->join = join;
 }
 
-void enesim_path_generator_stroke_weight_x_set(Enesim_Path_Generator *thiz, double sw)
+void enesim_path_generator_stroke_weight_set(Enesim_Path_Generator *thiz, double sw)
 {
-	thiz->swx = sw;
+	thiz->sw = sw;
 }
 
-void enesim_path_generator_stroke_weight_y_set(Enesim_Path_Generator *thiz, double sw)
+void enesim_path_generator_stroke_scalable_set(Enesim_Path_Generator *thiz, Eina_Bool scalable)
 {
-	thiz->swy = sw;
+	thiz->sw_scalable = scalable;
 }
 
 void enesim_path_generator_stroke_dash_set(Enesim_Path_Generator *thiz, const Eina_List *dashes)

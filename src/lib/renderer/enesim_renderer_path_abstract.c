@@ -41,6 +41,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define DUMP 0
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -149,6 +150,7 @@ void enesim_renderer_path_abstract_generate(Enesim_Renderer *r)
 	Enesim_Path_Generator *generator;
 	Enesim_List *dashes;
 	Eina_List *dashes_l;
+	Eina_Bool stroke_scalable;
 	double stroke_weight;
 	double swx;
 	double swy;
@@ -195,14 +197,15 @@ void enesim_renderer_path_abstract_generate(Enesim_Renderer *r)
 	join = enesim_renderer_shape_stroke_join_get(r);
 	cap = enesim_renderer_shape_stroke_cap_get(r);
 	stroke_weight = enesim_renderer_shape_stroke_weight_get(r);
+	stroke_scalable = enesim_renderer_shape_stroke_scalable_get(r);
 	enesim_renderer_transformation_get(r, &transformation);
 
 	enesim_path_generator_figure_set(generator, thiz->fill_figure);
 	enesim_path_generator_stroke_figure_set(generator, thiz->stroke_figure);
 	enesim_path_generator_stroke_cap_set(generator, cap);
 	enesim_path_generator_stroke_join_set(generator, join);
-	enesim_path_generator_stroke_weight_x_set(generator, swx);
-	enesim_path_generator_stroke_weight_y_set(generator, swy);
+	enesim_path_generator_stroke_weight_set(generator, stroke_weight);
+	enesim_path_generator_stroke_scalable_set(generator, stroke_scalable);
 	enesim_path_generator_stroke_dash_set(generator, dashes_l);
 	enesim_path_generator_scale_set(generator, 1, 1);
 	enesim_path_generator_transformation_set(generator, &transformation);
@@ -253,11 +256,8 @@ void enesim_renderer_path_abstract_path_set(Enesim_Renderer *r,
 		enesim_path_unref(path);
 }
 
-void enesim_renderer_path_abstract_cleanup(Enesim_Renderer *r)
+void enesim_renderer_path_abstract_cleanup(Enesim_Renderer *r EINA_UNUSED)
 {
-	Enesim_Renderer_Path_Abstract *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_ABSTRACT(r);
 }
 
 Eina_Bool enesim_renderer_path_abstract_is_available(Enesim_Renderer *r)

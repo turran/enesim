@@ -262,6 +262,7 @@ void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close);
 void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge);
 Eina_Bool enesim_polygon_bounds(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
 void enesim_polygon_threshold_set(Enesim_Polygon *p, double threshold);
+void enesim_polygon_dump(Enesim_Polygon *thiz);
 
 /*----------------------------------------------------------------------------*
  *                                  Figure                                    *

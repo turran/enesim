@@ -36,6 +36,7 @@ typedef struct _Enesim_Renderer_Shape_State
 			Enesim_Renderer_Shape_Stroke_Location location;
 			Enesim_Renderer_Shape_Stroke_Cap cap;
 			Enesim_Renderer_Shape_Stroke_Join join;
+			Eina_Bool scalable;
 		} stroke;
 
 		struct {
