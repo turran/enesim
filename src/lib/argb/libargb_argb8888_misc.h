@@ -119,8 +119,8 @@ static inline uint32_t argb8888_sample_good(uint32_t *data, size_t stride, int s
 	Eina_F16p16 shh;
 	Eina_F16p16 minone;
 
-	sww = eina_f16p16_int_from(sw);
-	shh = eina_f16p16_int_from(sh);
+	sww = eina_f16p16_int_from(sw) + EINA_F16P16_ONE;
+	shh = eina_f16p16_int_from(sh) + EINA_F16P16_ONE;
 	minone = eina_f16p16_int_from(-1);
 
 	if (xx < sww && yy < shh && xx >= minone && yy >= minone)
@@ -137,15 +137,15 @@ static inline uint32_t argb8888_sample_good(uint32_t *data, size_t stride, int s
 		/* pick the coord */
 		data = argb8888_at(data, stride, x, y);
 
-		if ((x > -1) && (y > - 1))
+		if ((x > -1) && (y > - 1) && (x < sw) && (y < sh))
 			p0 = *data;
 
-		if ((y > -1) && ((x + 1) < sw))
+		if ((y > -1) && (y < sh) && ((x + 1) < sw))
 			p1 = *(data + 1);
 
 		if ((y + 1) < sh)
 		{
-			if (x > -1)
+			if ((x > -1) && (x < sw))
 				p2 = *((uint32_t *)((uint8_t *)data + stride));
 			if ((x + 1) < sw)
 				p3 = *((uint32_t *)((uint8_t *)data + stride) + 1);
