@@ -320,7 +320,7 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 		gxx = xx - eina_f16p16_int_from(position.distance);
 		gyy = yy - eina_f16p16_int_from((thiz->top - g->origin));
 
-		p0 = argb8888_sample_good(src, stride, w, h, gxx, gyy);
+		p0 = enesim_coord_sample_good_clamp(src, stride, w, h, gxx, gyy);
 next:
 		yy += thiz->matrix.yx;
 		xx += thiz->matrix.xx;

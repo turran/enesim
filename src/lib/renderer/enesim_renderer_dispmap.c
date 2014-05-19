@@ -138,12 +138,13 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy);	\
+		p0 = enesim_coord_sample_good_clamp(src, sstride, sw, sh, sxx, 	\
+				syy);						\
 										\
 next:										\
 		*dst++ = p0;							\
 		map++;								\
-		xx += EINA_F16P16_ONE;					\
+		xx += EINA_F16P16_ONE;						\
 	}									\
 }
 
@@ -194,7 +195,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		p0 = argb8888_sample_good(src, sstride, sw, sh, sxx, syy);	\
+		p0 = enesim_coord_sample_good_clamp(src, sstride, sw, sh, sxx, 	\
+				syy);						\
 										\
 next:										\
 		*dst++ = p0;							\

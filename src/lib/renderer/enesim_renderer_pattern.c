@@ -206,8 +206,8 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_identity_span(		\
 		Eina_F16p16 xxx;						\
 										\
 		xxx = enesim_coord_##rmode(xx, thiz->src_ww);			\
-		*dst++ = argb8888_sample_good(src, sstride, thiz->src_w, 	\
-				thiz->src_h, xxx, yy);				\
+		*dst++ = enesim_coord_sample_good_clamp(src, sstride,		\
+				thiz->src_w, thiz->src_h, xxx, yy);		\
 		xx += EINA_F16P16_ONE;						\
 	}									\
 }
@@ -237,8 +237,8 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_affine_span(		\
 										\
 		xxx = enesim_coord_##rmode(xx, thiz->src_ww);			\
 		yyy = enesim_coord_##rmode(yy, thiz->src_hh);			\
-		*dst++ = argb8888_sample_good(src, sstride, thiz->src_w, 	\
-				thiz->src_h, xxx, yyy);				\
+		*dst++ = enesim_coord_sample_good_clamp(src, sstride,		\
+				thiz->src_w, thiz->src_h, xxx, yyy);		\
 		yy += thiz->matrix.yx;						\
 		xx += thiz->matrix.xx;						\
 	}									\

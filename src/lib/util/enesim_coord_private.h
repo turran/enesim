@@ -80,4 +80,11 @@ void enesim_coord_projective_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 		Eina_F16p16 *fpz, int x, int y, double pre_x, double pre_y,
 		const Enesim_Matrix_F16p16 *matrix);
 
+uint32_t enesim_coord_sample_good_clamp(uint32_t *data, size_t stride, int sw,
+		int sh, Eina_F16p16 xx, Eina_F16p16 yy);
+uint32_t enesim_coord_sample_good_repeat(uint32_t *data, size_t stride, int sw,
+		int sh, Eina_F16p16 xx, Eina_F16p16 yy);
+uint32_t enesim_coord_sample_fast(uint32_t *data, size_t stride, int sw,
+		int sh, Eina_F16p16 xx, Eina_F16p16 yy);
+
 #endif

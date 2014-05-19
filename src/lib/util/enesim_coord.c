@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
+#include "libargb.h"
 
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
@@ -93,4 +94,129 @@ void enesim_coord_projective_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
 
 	*fpx = eina_f16p16_sub(*fpx, ox);
 	*fpy = eina_f16p16_sub(*fpy, oy);
+}
+
+/**
+ * Sampling algorithms,
+ * A pixel goes from 0 to 1, with its center placed on the top-left corner,
+ * so a value of 0.9 is still inside the pixel
+ */
+/* A bilinear sampling */
+uint32_t enesim_coord_sample_good_clamp(uint32_t *data, size_t stride, int sw,
+		int sh, Eina_F16p16 xx, Eina_F16p16 yy)
+{
+	Eina_F16p16 sww;
+	Eina_F16p16 shh;
+	Eina_F16p16 minone;
+
+	sww = eina_f16p16_int_from(sw) + EINA_F16P16_ONE;
+	shh = eina_f16p16_int_from(sh) + EINA_F16P16_ONE;
+	minone = eina_f16p16_int_from(-1);
+
+	if (xx < sww && yy < shh && xx >= minone && yy >= minone)
+	{
+		int x, y;
+		uint32_t p0 = 0, p1 = 0, p2 = 0, p3 = 0;
+
+		/* we use the int_to given that it floors the value
+		 * floor(-0.8) = -1, so we always pick the left-top pixel first
+		 */
+		x = eina_f16p16_int_to(xx);
+		y = eina_f16p16_int_to(yy);
+
+		/* pick the coord */
+		data = argb8888_at(data, stride, x, y);
+
+		if ((x > -1) && (y > - 1) && (x < sw) && (y < sh))
+			p0 = *data;
+
+		if ((y > -1) && (y < sh) && ((x + 1) < sw))
+			p1 = *(data + 1);
+
+		if ((y + 1) < sh)
+		{
+			if ((x > -1) && (x < sw))
+				p2 = *((uint32_t *)((uint8_t *)data + stride));
+			if ((x + 1) < sw)
+				p3 = *((uint32_t *)((uint8_t *)data + stride) + 1);
+		}
+
+		if (p0 | p1 | p2 | p3)
+		{
+			uint16_t ax, ay;
+
+			/* to make it be in the 1 - 256 range , note that for
+			 * negative values, the fracc already does the two's complement
+			 * and thus the value is correct
+			 */
+			ax = 1 + (eina_f16p16_fracc_get(xx) >> 8);
+			ay = 1 + (eina_f16p16_fracc_get(yy) >> 8);
+
+			p0 = argb8888_interp_256(ax, p1, p0);
+			p2 = argb8888_interp_256(ax, p3, p2);
+			p0 = argb8888_interp_256(ay, p2, p0);
+		}
+		return p0;
+	}
+	else
+		return 0;
+}
+
+/* A bilinear sampling */
+uint32_t enesim_coord_sample_good_repeat(uint32_t *data, size_t stride, int sw,
+		int sh, Eina_F16p16 xx, Eina_F16p16 yy)
+{
+	Eina_F16p16 sww;
+	Eina_F16p16 shh;
+	Eina_F16p16 txx, tyy;
+	Eina_F16p16 x1, y1;
+	int x, y;
+	uint32_t p0 = 0, p1 = 0, p2 = 0, p3 = 0;
+	uint16_t ax, ay;
+
+	sww = eina_f16p16_int_from(sw);
+	shh = eina_f16p16_int_from(sh);
+
+	/* trunc it */
+	txx = eina_f16p16_int_from(eina_f16p16_int_to(xx));
+	tyy = eina_f16p16_int_from(eina_f16p16_int_to(yy));
+
+	x = eina_f16p16_int_to(enesim_coord_repeat(txx, sww));
+	y = eina_f16p16_int_to(enesim_coord_repeat(tyy, shh));
+	x1 = eina_f16p16_int_to(enesim_coord_repeat(txx + EINA_F16P16_ONE, sww));
+	y1 = eina_f16p16_int_to(enesim_coord_repeat(tyy + EINA_F16P16_ONE, shh));
+	p0 = *(argb8888_at(data, stride, x, y));
+	p1 = *(argb8888_at(data, stride, x1, y));
+	p2 = *(argb8888_at(data, stride, x, y1));
+	p3 = *(argb8888_at(data, stride, x1, y1));
+
+	ax = 1 + (eina_f16p16_fracc_get(xx) >> 8);
+	ay = 1 + (eina_f16p16_fracc_get(yy) >> 8);
+
+	p0 = argb8888_interp_256(ax, p1, p0);
+	p2 = argb8888_interp_256(ax, p3, p2);
+	p0 = argb8888_interp_256(ay, p2, p0);
+	return p0;
+}
+
+
+/*
+ * Just pick the nearest pixel based on x,y
+ */
+uint32_t enesim_coord_sample_fast(uint32_t *data, size_t stride, int sw,
+		int sh, Eina_F16p16 xx, Eina_F16p16 yy)
+{
+	int x, y;
+
+	x = eina_f16p16_int_to(xx);
+	y = eina_f16p16_int_to(yy);
+	if (x < sw && y < sh && x >= 0 && y >= 0)
+	{
+		uint32_t *ret;
+
+		ret = argb8888_at(data, stride, x, y);
+		return *ret;
+	}
+	else
+		return 0;
 }
