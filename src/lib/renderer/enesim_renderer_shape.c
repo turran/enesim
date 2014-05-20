@@ -250,6 +250,7 @@ static void _state_commit(Enesim_Renderer_Shape_State *thiz)
 	thiz->past.stroke.location = thiz->current.stroke.location;
 	thiz->past.stroke.join = thiz->current.stroke.join;
 	thiz->past.stroke.cap = thiz->current.stroke.cap;
+	thiz->past.stroke.scalable = thiz->current.stroke.scalable;
 	/* the fill */
 	thiz->past.fill.color = thiz->current.fill.color;
 	thiz->past.fill.rule = thiz->current.fill.rule;

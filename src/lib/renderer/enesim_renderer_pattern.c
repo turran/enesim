@@ -206,7 +206,7 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_identity_span(		\
 		Eina_F16p16 xxx;						\
 										\
 		xxx = enesim_coord_##rmode(xx, thiz->src_ww);			\
-		*dst++ = enesim_coord_sample_good_clamp(src, sstride,		\
+		*dst++ = enesim_coord_sample_good_restrict(src, sstride,	\
 				thiz->src_w, thiz->src_h, xxx, yy);		\
 		xx += EINA_F16P16_ONE;						\
 	}									\
@@ -233,12 +233,8 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_affine_span(		\
 	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
 	while (dst < end)							\
 	{									\
-		Eina_F16p16 xxx, yyy;						\
-										\
-		xxx = enesim_coord_##rmode(xx, thiz->src_ww);			\
-		yyy = enesim_coord_##rmode(yy, thiz->src_hh);			\
-		*dst++ = enesim_coord_sample_good_clamp(src, sstride,		\
-				thiz->src_w, thiz->src_h, xxx, yyy);		\
+		*dst++ = enesim_coord_sample_good_##rmode(src, sstride,		\
+				thiz->src_w, thiz->src_h, xx, yy);		\
 		yy += thiz->matrix.yx;						\
 		xx += thiz->matrix.xx;						\
 	}									\
@@ -246,11 +242,10 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_affine_span(		\
 
 PATTERN_IDENTITY(reflect)
 PATTERN_IDENTITY(repeat)
-PATTERN_IDENTITY(pad)
 
 PATTERN_AFFINE(reflect)
 PATTERN_AFFINE(repeat)
-PATTERN_AFFINE(pad)
+PATTERN_AFFINE(restrict)
 
 static Enesim_Renderer_Sw_Fill  _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
 /*----------------------------------------------------------------------------*
@@ -346,10 +341,9 @@ static void _enesim_renderer_pattern_class_init(void *k)
 	memset(_spans, 0, sizeof(_spans));
 	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_IDENTITY] = _enesim_renderer_pattern_argb8888_repeat_identity_span;
 	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_IDENTITY] = _enesim_renderer_pattern_argb8888_reflect_identity_span;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_IDENTITY] = _enesim_renderer_pattern_argb8888_pad_identity_span;
 	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_AFFINE] = _enesim_renderer_pattern_argb8888_repeat_affine_span;
 	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_AFFINE] = _enesim_renderer_pattern_argb8888_reflect_affine_span;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_AFFINE] = _enesim_renderer_pattern_argb8888_pad_affine_span;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_AFFINE] = _enesim_renderer_pattern_argb8888_restrict_affine_span;
 }
 
 static void _enesim_renderer_pattern_instance_init(void *o EINA_UNUSED)

@@ -138,7 +138,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		p0 = enesim_coord_sample_good_clamp(src, sstride, sw, sh, sxx, 	\
+		p0 = enesim_coord_sample_good_restrict(src, sstride, sw, sh, sxx, 	\
 				syy);						\
 										\
 next:										\
@@ -195,7 +195,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		p0 = enesim_coord_sample_good_clamp(src, sstride, sw, sh, sxx, 	\
+		p0 = enesim_coord_sample_good_restrict(src, sstride, sw, sh, sxx, 	\
 				syy);						\
 										\
 next:										\

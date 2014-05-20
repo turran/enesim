@@ -547,12 +547,6 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_no_scale_projective(Enesim_Renderer *r,
-		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED, void *ddata EINA_UNUSED)
-{
-	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
-}
-
 /* good - pre-scaling */
 static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
@@ -1779,7 +1773,6 @@ static void _enesim_renderer_image_class_init(void *k)
 
 	_spans_good[0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_no_scale_identity;
 	_spans_good[0][ENESIM_MATRIX_AFFINE] = _argb8888_image_no_scale_affine;
-	_spans_good[0][ENESIM_MATRIX_PROJECTIVE] = _argb8888_image_no_scale_projective;
 	_spans_good[1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
 	_spans_good[1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
 

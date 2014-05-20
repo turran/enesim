@@ -111,7 +111,7 @@ static void _span_identity(Enesim_Renderer *r,
 		sxx = eina_f16p16_double_from((rad * x) + thiz->current.orx);
 		syy = eina_f16p16_double_from((rad * y) + thiz->current.ory);
 
-		p0 = enesim_coord_sample_good_clamp(src, sstride, sw, sh, sxx, syy);
+		p0 = enesim_coord_sample_good_restrict(src, sstride, sw, sh, sxx, syy);
 
 		*dst++ = p0;
 		x++;

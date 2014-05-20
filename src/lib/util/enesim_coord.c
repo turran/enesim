@@ -102,7 +102,7 @@ void enesim_coord_projective_setup(Eina_F16p16 *fpx, Eina_F16p16 *fpy,
  * so a value of 0.9 is still inside the pixel
  */
 /* A bilinear sampling */
-uint32_t enesim_coord_sample_good_clamp(uint32_t *data, size_t stride, int sw,
+uint32_t enesim_coord_sample_good_restrict(uint32_t *data, size_t stride, int sw,
 		int sh, Eina_F16p16 xx, Eina_F16p16 yy)
 {
 	Eina_F16p16 sww;
@@ -162,7 +162,6 @@ uint32_t enesim_coord_sample_good_clamp(uint32_t *data, size_t stride, int sw,
 		return 0;
 }
 
-/* A bilinear sampling */
 uint32_t enesim_coord_sample_good_repeat(uint32_t *data, size_t stride, int sw,
 		int sh, Eina_F16p16 xx, Eina_F16p16 yy)
 {
@@ -181,6 +180,7 @@ uint32_t enesim_coord_sample_good_repeat(uint32_t *data, size_t stride, int sw,
 	txx = eina_f16p16_int_from(eina_f16p16_int_to(xx));
 	tyy = eina_f16p16_int_from(eina_f16p16_int_to(yy));
 
+	/* get the real coords */
 	x = eina_f16p16_int_to(enesim_coord_repeat(txx, sww));
 	y = eina_f16p16_int_to(enesim_coord_repeat(tyy, shh));
 	x1 = eina_f16p16_int_to(enesim_coord_repeat(txx + EINA_F16P16_ONE, sww));
@@ -190,6 +190,7 @@ uint32_t enesim_coord_sample_good_repeat(uint32_t *data, size_t stride, int sw,
 	p2 = *(argb8888_at(data, stride, x, y1));
 	p3 = *(argb8888_at(data, stride, x1, y1));
 
+	/* sample */
 	ax = 1 + (eina_f16p16_fracc_get(xx) >> 8);
 	ay = 1 + (eina_f16p16_fracc_get(yy) >> 8);
 
@@ -199,6 +200,43 @@ uint32_t enesim_coord_sample_good_repeat(uint32_t *data, size_t stride, int sw,
 	return p0;
 }
 
+uint32_t enesim_coord_sample_good_reflect(uint32_t *data, size_t stride, int sw,
+		int sh, Eina_F16p16 xx, Eina_F16p16 yy)
+{
+	Eina_F16p16 sww;
+	Eina_F16p16 shh;
+	Eina_F16p16 txx, tyy;
+	Eina_F16p16 x1, y1;
+	int x, y;
+	uint32_t p0 = 0, p1 = 0, p2 = 0, p3 = 0;
+	uint16_t ax, ay;
+
+	sww = eina_f16p16_int_from(sw);
+	shh = eina_f16p16_int_from(sh);
+
+	/* trunc it */
+	txx = eina_f16p16_int_from(eina_f16p16_int_to(xx));
+	tyy = eina_f16p16_int_from(eina_f16p16_int_to(yy));
+
+	/* get the real coords */
+	x = eina_f16p16_int_to(enesim_coord_reflect(txx, sww));
+	y = eina_f16p16_int_to(enesim_coord_reflect(tyy, shh));
+	x1 = eina_f16p16_int_to(enesim_coord_reflect(txx + EINA_F16P16_ONE, sww));
+	y1 = eina_f16p16_int_to(enesim_coord_reflect(tyy + EINA_F16P16_ONE, shh));
+	p0 = *(argb8888_at(data, stride, x, y));
+	p1 = *(argb8888_at(data, stride, x1, y));
+	p2 = *(argb8888_at(data, stride, x, y1));
+	p3 = *(argb8888_at(data, stride, x1, y1));
+
+	/* sample */
+	ax = 1 + (eina_f16p16_fracc_get(xx) >> 8);
+	ay = 1 + (eina_f16p16_fracc_get(yy) >> 8);
+
+	p0 = argb8888_interp_256(ax, p1, p0);
+	p2 = argb8888_interp_256(ax, p3, p2);
+	p0 = argb8888_interp_256(ay, p2, p0);
+	return p0;
+}
 
 /*
  * Just pick the nearest pixel based on x,y
