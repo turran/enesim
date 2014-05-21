@@ -97,6 +97,7 @@ static Eina_Bool _raw_save(Enesim_Stream *data, Enesim_Buffer *buffer,
 }
 
 static Enesim_Image_Provider_Descriptor _provider = {
+	/* .version 		= */ ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION,
 	/* .name = 		*/ "raw",
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
@@ -117,7 +118,8 @@ static const char * _raw_extension_from(const char *ext)
 	return NULL;
 }
 
-static Enesim_Image_Finder _finder = {
+static Enesim_Image_Finder_Descriptor _finder = {
+	/* .version 		= */ ENESIM_IMAGE_FINDER_DESCRIPTOR_VERSION,
 	/* .data_from 		= */ NULL,
 	/* .extension_from	= */ _raw_extension_from,
 };

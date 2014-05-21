@@ -347,6 +347,7 @@ error_write_struct:
 }
 
 static Enesim_Image_Provider_Descriptor _provider = {
+	/* .version 		= */ ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION,
 	/* .name = 		*/ "png",
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
@@ -377,7 +378,8 @@ static const char * _png_extension_from(const char *ext)
 	return NULL;
 }
 
-static Enesim_Image_Finder _finder = {
+static Enesim_Image_Finder_Descriptor _finder = {
+	/* .version 		= */ ENESIM_IMAGE_FINDER_DESCRIPTOR_VERSION,
 	/* .data_from 		= */ _png_data_from,
 	/* .extension_from	= */ _png_extension_from,
 };

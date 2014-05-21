@@ -420,7 +420,7 @@ EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd,
  */
 EAPI const char * enesim_image_mime_data_from(Enesim_Stream *data)
 {
-	Enesim_Image_Finder *f;
+	Enesim_Image_Finder_Descriptor *f;
 	Eina_List *l;
 	const char *ret = NULL;
 
@@ -442,7 +442,7 @@ EAPI const char * enesim_image_mime_data_from(Enesim_Stream *data)
  */
 EAPI const char * enesim_image_mime_extension_from(const char *ext)
 {
-	Enesim_Image_Finder *f;
+	Enesim_Image_Finder_Descriptor *f;
 	Eina_List *l;
 	const char *ret = NULL;
 
@@ -457,7 +457,7 @@ EAPI const char * enesim_image_mime_extension_from(const char *ext)
 /**
  *
  */
-EAPI Eina_Bool enesim_image_finder_register(Enesim_Image_Finder *f)
+EAPI Eina_Bool enesim_image_finder_register(Enesim_Image_Finder_Descriptor *f)
 {
 	if (!f) return EINA_FALSE;
 
@@ -474,7 +474,7 @@ EAPI Eina_Bool enesim_image_finder_register(Enesim_Image_Finder *f)
 	return EINA_TRUE;
 }
 
-EAPI void enesim_image_finder_unregister(Enesim_Image_Finder *f)
+EAPI void enesim_image_finder_unregister(Enesim_Image_Finder_Descriptor *f)
 {
 	if (!f) return;
 	_finders = eina_list_remove(_finders, f);
