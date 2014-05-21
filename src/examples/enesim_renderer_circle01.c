@@ -10,10 +10,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	Enesim_Renderer *r;
 
 	r = enesim_renderer_circle_new();
-	/* TODO we have a bug on the rasterizer election. If the stroke weight
-	 * is <= 1 but we have a transformation, the simple rasterizer should
-	 * not be used
-	 */
+
 	enesim_renderer_circle_center_set(r, 128, 128);
 	enesim_renderer_circle_radius_set(r, 64);
 
