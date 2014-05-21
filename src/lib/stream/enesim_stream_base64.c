@@ -24,6 +24,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+#define ENESIM_LOG_DEFAULT enesim_log_global
+
 typedef struct _Enesim_Stream_Base64
 {
 	/* passed in */
@@ -71,35 +73,36 @@ static void _base64_decode(unsigned char *in, unsigned char *out)
 }
 
 /* 4 bytes in base64 give 3 decoded bytes
- * so the input must be multiple of 4
- * and the output multiple of 3
+ * so the output mut be multiple of 3
  */
-static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t len)
+static void _base64_decode_stream(unsigned char *in, size_t ilen, int *iread,
+		unsigned char *out, size_t olen, int *owrite)
 {
-	size_t l = 0;
+	unsigned char dec[4];
+	unsigned char *i = in;
+	unsigned char *o = out;
+	int count = 0;
 
-	while (l < len)
+	while (ilen > 0 && olen > 0)
 	{
-		unsigned char dec[4];
-		int i;
-
+		if (!_base64_decode_digit(*i, &dec[count]))
+			goto next;
 		/* read the four input bytes */
-		for (i = 0; i < 4; i++)
+		count++;
+		if (count == 4)
 		{
-			if (!_base64_decode_digit(in[i], &dec[i]))
-				printf("error %c\n", in[i]);
-#if 0
-			printf("read %c %d\n", in[i], dec[i]);
-#endif
+			_base64_decode(dec, o);
+			count = 0;
+			/* increment the buffer */
+			o += 3;
+			olen -= 3;
 		}
-
-		_base64_decode(dec, out);
-		/* increment the source */
-		in += 4;
-		l += 4;
-		/* increment the buffer */
-		out += 3;
+next:
+		ilen--;
+		i++;
 	}
+	*iread = i - in;
+	*owrite = o - out;
 }
 /*----------------------------------------------------------------------------*
  *                      The Enesim Image Data interface                       *
@@ -110,13 +113,16 @@ static void _base64_decode_stream(unsigned char *in, unsigned char *out, size_t 
 static ssize_t _enesim_stream_base64_read(void *data, void *buffer, size_t len)
 {
 	Enesim_Stream_Base64 *thiz = data;
-	size_t extra = 0;
+	unsigned char *b = buffer;
 	int enclen;
 	int declen;
+	int decwrite;
+	int encread;
 	int rest;
-	unsigned char *b = buffer;
+	size_t extra = 0;
+	size_t ret = 0;
 
-	/* first read the missing bytes from the previous read */
+	/* first write the missing bytes from the previous read */
 	if (thiz->last_offset)
 	{
 		int offset;
@@ -134,44 +140,40 @@ static ssize_t _enesim_stream_base64_read(void *data, void *buffer, size_t len)
 			len--;
 		}
 		thiz->last_offset += extra;
+		if (!len) return len;
 	}
-	/* how many encoded blocks we need to read */
- 	enclen = ((len + 2) / 3) * 4;
-	if (thiz->curr + enclen > thiz->end)
-	{
-		/* if we pass the inner data, we need to adapt
-		 * to the new sizes
-		 */
-		enclen = thiz->end - thiz->curr;
-		len = (enclen / 4) * 3;
-	}
+
+	ret = extra;
 	declen = len;
-	rest = (declen % 3);
+	enclen = thiz->end - thiz->curr;
+
 	/* check if we need to not read complete, if so
 	 * only read all the data that fits on the buffer
 	 * padded to 3 bytes
 	 */
-	if (rest)
-	{
-		declen -= rest;
-		enclen -= 4;
-	}
-	_base64_decode_stream((unsigned char *)thiz->curr, b, enclen);
-	b += declen;
-	thiz->curr += enclen;
+	rest = (declen % 3);
+	declen -= rest;
+
+	_base64_decode_stream((unsigned char *)thiz->curr, enclen, &encread, b, declen, &decwrite);
+	b += decwrite;
+	thiz->curr += encread;
+	declen -= decwrite;
+	enclen -= encread;
+	ret += decwrite;
 
 	if (rest)
 	{
 		int i;
 
-		_base64_decode_stream((unsigned char *)thiz->curr, thiz->last, 4);
+		_base64_decode_stream((unsigned char *)thiz->curr, enclen, &encread, thiz->last, 3, &decwrite);
 		for (i = 0; i < rest; i++)
 			*b++ = thiz->last[i];
 		thiz->last_offset = rest;
-		thiz->curr += 4;
-		declen += rest;
+		thiz->curr += encread;
+		ret += rest;
 	}
-	return declen + extra;
+
+	return ret;
 }
 
 static void _enesim_stream_base64_reset(void *data)
@@ -228,7 +230,7 @@ EAPI Enesim_Stream * enesim_stream_base64_new(Enesim_Stream *d)
 	thiz->buf = thiz->curr = buf;
 	thiz->end = thiz->buf + size;
 	thiz->enclen = size;
-	thiz->declen = (size / 3) * 4;
+	thiz->declen = (size / 4) * 3;
 	thiz->offset = 0;
 
 	return enesim_stream_new(&_enesim_stream_base64_descriptor, thiz);
