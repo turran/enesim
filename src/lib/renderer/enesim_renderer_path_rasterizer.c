@@ -116,7 +116,7 @@ static void _enesim_renderer_path_rasterizer_shape_features_get(Enesim_Renderer 
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 
-static Eina_Bool _enesim_renderer_path_rasterizer_has_changed(Enesim_Renderer *r)
+static Eina_Bool _enesim_renderer_path_rasterizer_has_changed(Enesim_Renderer *r EINA_UNUSED)
 {
 #if 0
 	Enesim_Renderer_Path_Enesim *thiz;
@@ -126,7 +126,7 @@ static Eina_Bool _enesim_renderer_path_rasterizer_has_changed(Enesim_Renderer *r
 		return EINA_TRUE;
 	else
 #endif
-		return EINA_FALSE;
+	return EINA_FALSE;
 }
 
 static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s,

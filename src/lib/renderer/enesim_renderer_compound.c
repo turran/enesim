@@ -256,6 +256,7 @@ static inline void _compound_layer_opengl_draw(
 	enesim_renderer_opengl_draw(l->r, s, l->rop, &final, x, y);
 }
 
+#if 0
 /* the simple case just draws with the renderer rop instead of the layer rop */
 static void _compound_opengl_draw_simple(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop EINA_UNUSED, const Eina_Rectangle *area, int x, int y)
@@ -281,6 +282,7 @@ static void _compound_opengl_draw_simple(Enesim_Renderer *r, Enesim_Surface *s,
 		_compound_layer_opengl_draw(l, s, area, x, y);
 	}
 }
+#endif
 
 static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
