@@ -210,10 +210,8 @@ static Eina_Bool _gradient_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
-	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Class *klass;
 
-	thiz = ENESIM_RENDERER_GRADIENT(r);
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
 
 	/* first do the implementation setup */

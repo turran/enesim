@@ -66,7 +66,7 @@ static Eina_Bool _data_alloc(void *prv,
 }
 
 static Eina_Bool _data_sub(void *prv EINA_UNUSED,
-		Enesim_Backend backend,
+		Enesim_Backend backend EINA_UNUSED,
 		void **backend_data,
 		void *original_data,
 		Enesim_Buffer_Format original_fmt,

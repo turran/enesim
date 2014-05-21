@@ -338,7 +338,7 @@ static void _argb8888_image_no_scale_affine_fast(Enesim_Renderer *r,
 		x = eina_f16p16_int_to(xx);
 		y = eina_f16p16_int_to(yy);
 
-		if (((unsigned)x < sw) & ((unsigned)y < sh))
+		if (((unsigned)x < (unsigned)sw) & ((unsigned)y < (unsigned)sh))
 		{
 			p0 = *(src + (y * sw) + x);
 			if (color && p0)
@@ -355,7 +355,7 @@ static void _argb8888_image_scale_identity_fast(Enesim_Renderer *r,
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
-	int sw = thiz->sw, sh = thiz->sh;
+	int sw = thiz->sw;
 	Eina_F16p16 iww = thiz->iww, ihh = thiz->ihh;
 	Eina_F16p16 mxx = thiz->mxx, myy = thiz->myy;
 	Eina_F16p16 xx, yy, ixx, iyy;
@@ -406,7 +406,7 @@ static void _argb8888_image_scale_affine_fast(Enesim_Renderer *r,
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
 	uint32_t *dst = ddata, *end = dst + len;
 	uint32_t *src = thiz->src;
-	int sw = thiz->sw, sh = thiz->sh;
+	int sw = thiz->sw;
 	Eina_F16p16 iww = thiz->iww, ihh = thiz->ihh;
 	Eina_F16p16 mxx = thiz->mxx, myy = thiz->myy;
 	Eina_F16p16 xx, yy;
@@ -431,8 +431,8 @@ static void _argb8888_image_scale_affine_fast(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ( ((unsigned)xx < iww) &
-			((unsigned)yy < ihh) )
+		if ( ((unsigned)xx < (unsigned)iww) &
+			((unsigned)yy < (unsigned)ihh) )
 		{
 			Eina_F16p16 ixx, iyy;
 			int ix, iy;
@@ -515,7 +515,7 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 		x = eina_f16p16_int_to(xx);
 		y = eina_f16p16_int_to(yy);
 
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		if ( (((unsigned) (x + 1)) < ((unsigned) (sw + 1))) & (((unsigned) (y + 1)) < ((unsigned) (sh + 1))) )
 		{
 			uint32_t *p = src + (y * sw) + x;
 			uint32_t p1 = 0, p2 = 0, p3 = 0;
@@ -660,8 +660,8 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 	{
 		uint32_t p0 = 0;
 
-		if ( (((unsigned) (xx + EINA_F16P16_ONE)) < (iww + EINA_F16P16_ONE)) &
-			(((unsigned) (yy + EINA_F16P16_ONE)) < (ihh + EINA_F16P16_ONE)) )
+		if ( (((unsigned) (xx + EINA_F16P16_ONE)) < ((unsigned) (iww + EINA_F16P16_ONE))) &
+			(((unsigned) (yy + EINA_F16P16_ONE)) < ((unsigned) (ihh + EINA_F16P16_ONE))) )
 		{
 			Eina_F16p16 ixx, iyy;
 			int ix, iy;
