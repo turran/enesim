@@ -18,6 +18,7 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
+#include "enesim_format.h"
 #include "enesim_color.h"
 
 #include "enesim_compositor_private.h"

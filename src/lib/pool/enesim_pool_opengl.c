@@ -26,6 +26,7 @@
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
+#include "enesim_format.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
 

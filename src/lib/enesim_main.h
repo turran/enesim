@@ -82,17 +82,6 @@ typedef enum _Enesim_Channel
 } Enesim_Channel;
 
 /**
- * Surface formats
- */
-typedef enum _Enesim_Format
-{
-	ENESIM_FORMAT_NONE,
-	ENESIM_FORMAT_ARGB8888,  /**< argb32 */
-	ENESIM_FORMAT_A8, /**< a8 */
-	ENESIM_FORMATS /**< The number of formats */
-} Enesim_Format;
-
-/**
  * Alpha hints
  */
 typedef enum _Enesim_Alpha_Hint
@@ -130,10 +119,6 @@ typedef enum _Enesim_Backend
 EAPI int enesim_init(void);
 EAPI int enesim_shutdown(void);
 EAPI void enesim_version_get(unsigned int *major, unsigned int *minor, unsigned int *micro);
-
-EAPI const char * enesim_format_name_get(Enesim_Format f);
-EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h);
-EAPI size_t enesim_format_stride_get(Enesim_Format fmt, uint32_t w);
 
 /** @} */
 

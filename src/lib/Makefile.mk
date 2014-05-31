@@ -7,6 +7,7 @@ src/lib/Enesim.h \
 src/lib/enesim_buffer.h \
 src/lib/enesim_color.h \
 src/lib/enesim_converter.h \
+src/lib/enesim_format.h \
 src/lib/enesim_log.h \
 src/lib/enesim_image.h \
 src/lib/enesim_main.h \

@@ -29,6 +29,7 @@
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
 #include "enesim_pool.h"
+#include "enesim_format.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
@@ -284,76 +285,4 @@ EAPI void enesim_version_get(unsigned int *major, unsigned int *minor, unsigned 
 	if (major) *major = VERSION_MAJOR;
 	if (minor) *minor = VERSION_MINOR;
 	if (micro) *micro = VERSION_MICRO;
-}
-
-/**
- * @brief Get the string based name of a format.
- *
- * @param[in] f The format to get the name from.
- * @return The name of the format.
- *
- * This function returns a string associated to the format @p f, for
- * convenience display of the format. If @p f is not a valid format or
- * an unsupported one, @c NULL is returned.
- */
-EAPI const char * enesim_format_name_get(Enesim_Format f)
-{
-	switch (f)
-	{
-		case ENESIM_FORMAT_ARGB8888:
-		return "argb8888";
-
-		case ENESIM_FORMAT_A8:
-		return "a8";
-
-		default:
-		return NULL;
-
-	}
-}
-
-/**
- * @brief Get the total size of bytes for a given a format and a size.
- *
- * @param[in] f The format.
- * @param[in] w The width.
- * @param[in] h The height.
- * @return The size in bytes of a bitmap.
- *
- * This function returns the size in bytes of a bitmap of format @p f,
- * width @p w and @p height h. If the format is not valid or is not
- * supported, 0 is returned.
- */
-EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h)
-{
-	switch (f)
-	{
-		case ENESIM_FORMAT_ARGB8888:
-		return w * h * sizeof(uint32_t);
-
-		case ENESIM_FORMAT_A8:
-		return w * h * sizeof(uint8_t);
-
-		default:
-		return 0;
-
-	}
-}
-
-/**
- * @brief Return the stride for a given format and width.
- *
- * @param[in] fmt The format.
- * @param[in] w The width.
- * @return The stride in bytes.
- *
- * This function returns the stride in bytes of a bitmap of format @p fmt
- * and width @p w. If the format is not valid or is not supported, 0 is
- * returned.
- *
- * @note This function calls enesim_format_size_get() with 1 as height.
- */
-EAPI size_t enesim_format_stride_get(Enesim_Format fmt, uint32_t w)
-{
-	return enesim_format_size_get(fmt, w, 1);
 }

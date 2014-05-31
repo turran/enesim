@@ -79,6 +79,7 @@ extern "C" {
 /* core headers */
 #include "enesim_log.h"
 #include "enesim_main.h"
+#include "enesim_format.h"
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_pool.h"
