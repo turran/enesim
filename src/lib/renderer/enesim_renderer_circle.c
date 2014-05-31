@@ -229,8 +229,7 @@ static void _enesim_renderer_circle_instance_deinit(void *o EINA_UNUSED)
  *
  * @return A new circle renderer.
  *
- * This function returns a newly allocated circle renderer. On memory
- * l, this function returns @c NULL.
+ * This function returns a newly allocated circle renderer.
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 {

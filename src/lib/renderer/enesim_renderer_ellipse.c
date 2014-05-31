@@ -243,8 +243,7 @@ static void _enesim_renderer_ellipse_instance_deinit(void *o EINA_UNUSED)
  *
  * @return A new ellipse renderer.
  *
- * This function returns a newly allocated ellipse renderer. On memory
- * l, this function returns @c NULL.
+ * This function returns a newly allocated ellipse renderer.
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void)
 {

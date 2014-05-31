@@ -203,8 +203,7 @@ static void _enesim_renderer_line_instance_deinit(void *o EINA_UNUSED)
  *
  * @return A new line renderer.
  *
- * This function returns a newly allocated line renderer. On memory
- * l, this function returns @c NULL.
+ * This function returns a newly allocated line renderer.
  */
 EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 {
