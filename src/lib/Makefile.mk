@@ -41,6 +41,7 @@ src/lib/enesim_curve.c \
 src/lib/enesim_curve_private.h \
 src/lib/enesim_draw_cache.c \
 src/lib/enesim_draw_cache_private.h \
+src/lib/enesim_format.c \
 src/lib/enesim_log.c \
 src/lib/enesim_image.c \
 src/lib/enesim_image_private.h \
