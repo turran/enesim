@@ -137,16 +137,6 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="group__Enesim__Main__Group.html#gga5fab6aaae79878f65ad5d9d055d3d954a99e2f617d90dcfae58316bbb321aa3cf">ENESIM_CHANNELS</a>
 <br/>
  }</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> { <br/>
-&#160;&#160;<b>ENESIM_FORMAT_NONE</b>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea62ddd4bf3b6575c963b073e20a0579b8">ENESIM_FORMAT_ARGB8888</a>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aeabf65f27061f1be44bb673f10cf035fb3">ENESIM_FORMAT_A8</a>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea4f23183a74ced4b114547b115eb47bd5">ENESIM_FORMATS</a>
-<br/>
- }</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Main__Group.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a> { <br/>
 &#160;&#160;<a class="el" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a232b1531ddec18ad0e470c2545cf6333">ENESIM_ALPHA_HINT_NORMAL</a>, 
 <br/>
@@ -189,12 +179,6 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Shut down the Enesim library.  <a href="#ga271a8a51769b331b0ae0fd83a19298fa"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Main__Group.html#gaca97c310681291ad0dd460cd99dc0185">enesim_version_get</a> (unsigned int *major, unsigned int *minor, unsigned int *micro)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the Enesim version.  <a href="#gaca97c310681291ad0dd460cd99dc0185"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Main__Group.html#gaf6d71cef5dae99da4297b6ba082ccc83">enesim_format_name_get</a> (<a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> f)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the string based name of a format.  <a href="#gaf6d71cef5dae99da4297b6ba082ccc83"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Main__Group.html#ga57cd7adb46e55ec1c063ff3668366f00">enesim_format_size_get</a> (<a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> f, uint32_t w, uint32_t h)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the total size of bytes for a given a format and a size.  <a href="#ga57cd7adb46e55ec1c063ff3668366f00"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Main__Group.html#ga452807f6cb419bf6dae05849086a80a9">enesim_format_stride_get</a> (<a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> fmt, uint32_t w)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the stride for a given format and width.  <a href="#ga452807f6cb419bf6dae05849086a80a9"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Common definitions. </p>
@@ -320,33 +304,6 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="gga5fab6aaae79878f65ad5d9d055d3d954a99e2f617d90dcfae58316bbb321aa3cf"></a><!-- doxytag: member="ENESIM_CHANNELS" ref="gga5fab6aaae79878f65ad5d9d055d3d954a99e2f617d90dcfae58316bbb321aa3cf" args="" -->ENESIM_CHANNELS</em>&nbsp;</td><td>
 <p>The number of channels </p>
-</td></tr>
-</table>
-</dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ga14ba432fb1890b2229e117ee8b1230ae"></a><!-- doxytag: member="enesim_main.h::Enesim_Format" ref="ga14ba432fb1890b2229e117ee8b1230ae" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Surface formats </p>
-<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" id="gga14ba432fb1890b2229e117ee8b1230aea62ddd4bf3b6575c963b073e20a0579b8"></a><!-- doxytag: member="ENESIM_FORMAT_ARGB8888" ref="gga14ba432fb1890b2229e117ee8b1230aea62ddd4bf3b6575c963b073e20a0579b8" args="" -->ENESIM_FORMAT_ARGB8888</em>&nbsp;</td><td>
-<p>argb32 </p>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga14ba432fb1890b2229e117ee8b1230aeabf65f27061f1be44bb673f10cf035fb3"></a><!-- doxytag: member="ENESIM_FORMAT_A8" ref="gga14ba432fb1890b2229e117ee8b1230aeabf65f27061f1be44bb673f10cf035fb3" args="" -->ENESIM_FORMAT_A8</em>&nbsp;</td><td>
-<p>a8 </p>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga14ba432fb1890b2229e117ee8b1230aea4f23183a74ced4b114547b115eb47bd5"></a><!-- doxytag: member="ENESIM_FORMATS" ref="gga14ba432fb1890b2229e117ee8b1230aea4f23183a74ced4b114547b115eb47bd5" args="" -->ENESIM_FORMATS</em>&nbsp;</td><td>
-<p>The number of formats </p>
 </td></tr>
 </table>
 </dd>
@@ -517,117 +474,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gaf6d71cef5dae99da4297b6ba082ccc83"></a><!-- doxytag: member="enesim_main.h::enesim_format_name_get" ref="gaf6d71cef5dae99da4297b6ba082ccc83" args="(Enesim_Format f)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI const char* <a class="el" href="group__Enesim__Main__Group.html#gaf6d71cef5dae99da4297b6ba082ccc83">enesim_format_name_get</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a>&#160;</td>
-          <td class="paramname"><em>f</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Get the string based name of a format. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">f</td><td>The format to get the name from. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>The name of the format.</dd></dl>
-<p>This function returns a string associated to the format <code>f</code>, for convenience display of the format. If <code>f</code> is not a valid format or an unsupported one, <code>NULL</code> is returned. </p>
-
-</div>
-</div>
-<a class="anchor" id="ga57cd7adb46e55ec1c063ff3668366f00"></a><!-- doxytag: member="enesim_main.h::enesim_format_size_get" ref="ga57cd7adb46e55ec1c063ff3668366f00" args="(Enesim_Format f, uint32_t w, uint32_t h)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI size_t <a class="el" href="group__Enesim__Main__Group.html#ga57cd7adb46e55ec1c063ff3668366f00">enesim_format_size_get</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a>&#160;</td>
-          <td class="paramname"><em>f</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>w</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>h</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Get the total size of bytes for a given a format and a size. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">f</td><td>The format. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>The width. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>The height. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>The size in bytes of a bitmap.</dd></dl>
-<p>This function returns the size in bytes of a bitmap of format <code>f</code>, width <code>w</code> and <code>height</code> h. If the format is not valid or is not supported, 0 is returned. </p>
-
-</div>
-</div>
-<a class="anchor" id="ga452807f6cb419bf6dae05849086a80a9"></a><!-- doxytag: member="enesim_main.h::enesim_format_stride_get" ref="ga452807f6cb419bf6dae05849086a80a9" args="(Enesim_Format fmt, uint32_t w)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI size_t <a class="el" href="group__Enesim__Main__Group.html#ga452807f6cb419bf6dae05849086a80a9">enesim_format_stride_get</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a>&#160;</td>
-          <td class="paramname"><em>fmt</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>w</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Return the stride for a given format and width. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fmt</td><td>The format. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>The width. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>The stride in bytes.</dd></dl>
-<p>This function returns the stride in bytes of a bitmap of format <code>fmt</code> and width <code>w</code>. If the format is not valid or is not supported, 0 is returned.</p>
-<dl class="note"><dt><b>Note:</b></dt><dd>This function calls <a class="el" href="group__Enesim__Main__Group.html#ga57cd7adb46e55ec1c063ff3668366f00" title="Get the total size of bytes for a given a format and a size.">enesim_format_size_get()</a> with 1 as height. </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -646,7 +492,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 21 2014 19:51:02 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 31 2014 19:45:06 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

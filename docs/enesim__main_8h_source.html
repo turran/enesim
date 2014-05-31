@@ -143,49 +143,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00081"></a><a class="code" href="group__Enesim__Main__Group.html#gga5fab6aaae79878f65ad5d9d055d3d954a99e2f617d90dcfae58316bbb321aa3cf">00081</a>     <a class="code" href="group__Enesim__Main__Group.html#gga5fab6aaae79878f65ad5d9d055d3d954a99e2f617d90dcfae58316bbb321aa3cf">ENESIM_CHANNELS</a>, 
 <a name="l00082"></a>00082 } <a class="code" href="group__Enesim__Main__Group.html#ga5fab6aaae79878f65ad5d9d055d3d954">Enesim_Channel</a>;
 <a name="l00083"></a>00083 
-<a name="l00087"></a><a class="code" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">00087</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Format
+<a name="l00087"></a><a class="code" href="group__Enesim__Main__Group.html#gad2e0cf8a727b54714f6531edc5ec3e95">00087</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Alpha_Hint
 <a name="l00088"></a>00088 {
-<a name="l00089"></a>00089     ENESIM_FORMAT_NONE,
-<a name="l00090"></a><a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea62ddd4bf3b6575c963b073e20a0579b8">00090</a>     <a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea62ddd4bf3b6575c963b073e20a0579b8">ENESIM_FORMAT_ARGB8888</a>,  
-<a name="l00091"></a><a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aeabf65f27061f1be44bb673f10cf035fb3">00091</a>     <a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aeabf65f27061f1be44bb673f10cf035fb3">ENESIM_FORMAT_A8</a>, 
-<a name="l00092"></a><a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea4f23183a74ced4b114547b115eb47bd5">00092</a>     <a class="code" href="group__Enesim__Main__Group.html#gga14ba432fb1890b2229e117ee8b1230aea4f23183a74ced4b114547b115eb47bd5">ENESIM_FORMATS</a> 
-<a name="l00093"></a>00093 } <a class="code" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a>;
+<a name="l00089"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a232b1531ddec18ad0e470c2545cf6333">00089</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a232b1531ddec18ad0e470c2545cf6333">ENESIM_ALPHA_HINT_NORMAL</a>, 
+<a name="l00090"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a0d6de0964f1f38984e244eb5be3feee4">00090</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a0d6de0964f1f38984e244eb5be3feee4">ENESIM_ALPHA_HINT_SPARSE</a>, 
+<a name="l00091"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95ae27dc7060e14315f7715a31d62530a03">00091</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95ae27dc7060e14315f7715a31d62530a03">ENESIM_ALPHA_HINT_OPAQUE</a>, 
+<a name="l00092"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a78b2eafc97912700f71aeeab11d2fbf9">00092</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a78b2eafc97912700f71aeeab11d2fbf9">ENESIM_ALPHA_HINTS</a> 
+<a name="l00093"></a>00093 } <a class="code" href="group__Enesim__Main__Group.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>;
 <a name="l00094"></a>00094 
-<a name="l00098"></a><a class="code" href="group__Enesim__Main__Group.html#gad2e0cf8a727b54714f6531edc5ec3e95">00098</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Alpha_Hint
+<a name="l00098"></a><a class="code" href="group__Enesim__Main__Group.html#ga7acd05d840a999938d9c82d41f477aa6">00098</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Repeat_Mode
 <a name="l00099"></a>00099 {
-<a name="l00100"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a232b1531ddec18ad0e470c2545cf6333">00100</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a232b1531ddec18ad0e470c2545cf6333">ENESIM_ALPHA_HINT_NORMAL</a>, 
-<a name="l00101"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a0d6de0964f1f38984e244eb5be3feee4">00101</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a0d6de0964f1f38984e244eb5be3feee4">ENESIM_ALPHA_HINT_SPARSE</a>, 
-<a name="l00102"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95ae27dc7060e14315f7715a31d62530a03">00102</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95ae27dc7060e14315f7715a31d62530a03">ENESIM_ALPHA_HINT_OPAQUE</a>, 
-<a name="l00103"></a><a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a78b2eafc97912700f71aeeab11d2fbf9">00103</a>     <a class="code" href="group__Enesim__Main__Group.html#ggad2e0cf8a727b54714f6531edc5ec3e95a78b2eafc97912700f71aeeab11d2fbf9">ENESIM_ALPHA_HINTS</a> 
-<a name="l00104"></a>00104 } <a class="code" href="group__Enesim__Main__Group.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>;
-<a name="l00105"></a>00105 
-<a name="l00109"></a><a class="code" href="group__Enesim__Main__Group.html#ga7acd05d840a999938d9c82d41f477aa6">00109</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Repeat_Mode
-<a name="l00110"></a>00110 {
-<a name="l00111"></a>00111     ENESIM_REPEAT_MODE_RESTRICT,
-<a name="l00112"></a>00112     ENESIM_REPEAT_MODE_PAD,
-<a name="l00113"></a>00113     ENESIM_REPEAT_MODE_REFLECT,
-<a name="l00114"></a>00114     ENESIM_REPEAT_MODE_REPEAT,
-<a name="l00115"></a>00115     ENESIM_REPEAT_MODES,
-<a name="l00116"></a>00116 } <a class="code" href="group__Enesim__Main__Group.html#ga7acd05d840a999938d9c82d41f477aa6">Enesim_Repeat_Mode</a>;
-<a name="l00117"></a>00117 
-<a name="l00121"></a><a class="code" href="group__Enesim__Main__Group.html#ga8b46f9a1561797ac00184359561df5c3">00121</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Backend
-<a name="l00122"></a>00122 {
-<a name="l00123"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ab702118cb59f5fec8b262952bbe041ec">00123</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ab702118cb59f5fec8b262952bbe041ec">ENESIM_BACKEND_INVALID</a>, 
-<a name="l00124"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad9a03c3f115f8f0ca5f6bc0cf95b7766">00124</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad9a03c3f115f8f0ca5f6bc0cf95b7766">ENESIM_BACKEND_SOFTWARE</a>, 
-<a name="l00125"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad81e3f0a18fa5ebe98dc2a1c27e8bddd">00125</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad81e3f0a18fa5ebe98dc2a1c27e8bddd">ENESIM_BACKEND_OPENCL</a>, 
-<a name="l00126"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3a8c19ed69023221c71f4d48afd9efa016">00126</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3a8c19ed69023221c71f4d48afd9efa016">ENESIM_BACKEND_OPENGL</a>, 
-<a name="l00127"></a>00127     ENESIM_BACKENDS
-<a name="l00128"></a>00128 } <a class="code" href="group__Enesim__Main__Group.html#ga8b46f9a1561797ac00184359561df5c3">Enesim_Backend</a>;
-<a name="l00129"></a>00129 
-<a name="l00130"></a>00130 EAPI <span class="keywordtype">int</span> <a class="code" href="group__Enesim__Main__Group.html#gadc654345d543a549674151e54f9493a6" title="Initialize the Enesim library.">enesim_init</a>(<span class="keywordtype">void</span>);
-<a name="l00131"></a>00131 EAPI <span class="keywordtype">int</span> <a class="code" href="group__Enesim__Main__Group.html#ga271a8a51769b331b0ae0fd83a19298fa" title="Shut down the Enesim library.">enesim_shutdown</a>(<span class="keywordtype">void</span>);
-<a name="l00132"></a>00132 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Main__Group.html#gaca97c310681291ad0dd460cd99dc0185" title="Retrieve the Enesim version.">enesim_version_get</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *major, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *minor, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *micro);
-<a name="l00133"></a>00133 
-<a name="l00134"></a>00134 EAPI <span class="keyword">const</span> <span class="keywordtype">char</span> * <a class="code" href="group__Enesim__Main__Group.html#gaf6d71cef5dae99da4297b6ba082ccc83" title="Get the string based name of a format.">enesim_format_name_get</a>(<a class="code" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> f);
-<a name="l00135"></a>00135 EAPI <span class="keywordtype">size_t</span> <a class="code" href="group__Enesim__Main__Group.html#ga57cd7adb46e55ec1c063ff3668366f00" title="Get the total size of bytes for a given a format and a size.">enesim_format_size_get</a>(<a class="code" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> f, uint32_t w, uint32_t h);
-<a name="l00136"></a>00136 EAPI <span class="keywordtype">size_t</span> <a class="code" href="group__Enesim__Main__Group.html#ga452807f6cb419bf6dae05849086a80a9" title="Return the stride for a given format and width.">enesim_format_stride_get</a>(<a class="code" href="group__Enesim__Main__Group.html#ga14ba432fb1890b2229e117ee8b1230ae">Enesim_Format</a> fmt, uint32_t w);
-<a name="l00137"></a>00137 
-<a name="l00140"></a>00140 <span class="preprocessor">#endif </span><span class="comment">/*ENESIM_MAIN_H_*/</span>
+<a name="l00100"></a>00100     ENESIM_REPEAT_MODE_RESTRICT,
+<a name="l00101"></a>00101     ENESIM_REPEAT_MODE_PAD,
+<a name="l00102"></a>00102     ENESIM_REPEAT_MODE_REFLECT,
+<a name="l00103"></a>00103     ENESIM_REPEAT_MODE_REPEAT,
+<a name="l00104"></a>00104     ENESIM_REPEAT_MODES,
+<a name="l00105"></a>00105 } <a class="code" href="group__Enesim__Main__Group.html#ga7acd05d840a999938d9c82d41f477aa6">Enesim_Repeat_Mode</a>;
+<a name="l00106"></a>00106 
+<a name="l00110"></a><a class="code" href="group__Enesim__Main__Group.html#ga8b46f9a1561797ac00184359561df5c3">00110</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enesim_Backend
+<a name="l00111"></a>00111 {
+<a name="l00112"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ab702118cb59f5fec8b262952bbe041ec">00112</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ab702118cb59f5fec8b262952bbe041ec">ENESIM_BACKEND_INVALID</a>, 
+<a name="l00113"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad9a03c3f115f8f0ca5f6bc0cf95b7766">00113</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad9a03c3f115f8f0ca5f6bc0cf95b7766">ENESIM_BACKEND_SOFTWARE</a>, 
+<a name="l00114"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad81e3f0a18fa5ebe98dc2a1c27e8bddd">00114</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3ad81e3f0a18fa5ebe98dc2a1c27e8bddd">ENESIM_BACKEND_OPENCL</a>, 
+<a name="l00115"></a><a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3a8c19ed69023221c71f4d48afd9efa016">00115</a>     <a class="code" href="group__Enesim__Main__Group.html#gga8b46f9a1561797ac00184359561df5c3a8c19ed69023221c71f4d48afd9efa016">ENESIM_BACKEND_OPENGL</a>, 
+<a name="l00116"></a>00116     ENESIM_BACKENDS
+<a name="l00117"></a>00117 } <a class="code" href="group__Enesim__Main__Group.html#ga8b46f9a1561797ac00184359561df5c3">Enesim_Backend</a>;
+<a name="l00118"></a>00118 
+<a name="l00119"></a>00119 EAPI <span class="keywordtype">int</span> <a class="code" href="group__Enesim__Main__Group.html#gadc654345d543a549674151e54f9493a6" title="Initialize the Enesim library.">enesim_init</a>(<span class="keywordtype">void</span>);
+<a name="l00120"></a>00120 EAPI <span class="keywordtype">int</span> <a class="code" href="group__Enesim__Main__Group.html#ga271a8a51769b331b0ae0fd83a19298fa" title="Shut down the Enesim library.">enesim_shutdown</a>(<span class="keywordtype">void</span>);
+<a name="l00121"></a>00121 EAPI <span class="keywordtype">void</span> <a class="code" href="group__Enesim__Main__Group.html#gaca97c310681291ad0dd460cd99dc0185" title="Retrieve the Enesim version.">enesim_version_get</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *major, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *minor, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *micro);
+<a name="l00122"></a>00122 
+<a name="l00125"></a>00125 <span class="preprocessor">#endif </span><span class="comment">/*ENESIM_MAIN_H_*/</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -204,7 +192,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 21 2014 19:51:02 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat May 31 2014 19:45:06 for Enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
