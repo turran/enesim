@@ -42,6 +42,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RASTERIZER_BIFIGURE(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Rasterizer_BiFigure,					\
 		enesim_rasterizer_bifigure_descriptor_get())
@@ -1851,6 +1852,7 @@ void enesim_rasterizer_bifigure_over_figure_set(Enesim_Renderer *r, const Enesim
 		thiz->over = enesim_rasterizer_basic_new();
 	thiz->changed = EINA_TRUE;
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

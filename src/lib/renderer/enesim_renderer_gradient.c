@@ -43,6 +43,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_gradient
 
 static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enesim_Renderer *r,
@@ -404,7 +405,7 @@ int enesim_renderer_gradient_natural_length_get(Enesim_Renderer *r)
 
 	return 2 * ceil(1.0 / dp);
 }
-
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

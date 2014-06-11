@@ -32,6 +32,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT _buddy_log
 
 typedef struct _Block
@@ -303,3 +304,4 @@ int enesim_mempool_buddy_shutdown(void)
 
 	return _init;
 }
+/** @endcond */

@@ -28,6 +28,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/* @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_image
 
 static int _enesim_image_init_count = 0;
@@ -35,14 +36,6 @@ static Eina_Array *_modules = NULL;
 static Eina_Hash *_providers = NULL;
 static Eina_List *_finders = NULL;
 static Enesim_Image_Context *_main_context = NULL;
-
-Eina_Error ENESIM_IMAGE_ERROR_EXIST;
-Eina_Error ENESIM_IMAGE_ERROR_PROVIDER;
-Eina_Error ENESIM_IMAGE_ERROR_FORMAT;
-Eina_Error ENESIM_IMAGE_ERROR_SIZE;
-Eina_Error ENESIM_IMAGE_ERROR_ALLOCATOR;
-Eina_Error ENESIM_IMAGE_ERROR_LOADING;
-Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 
 /*============================================================================*
  *                                 Global                                     *
@@ -200,9 +193,17 @@ int enesim_image_shutdown(void)
 
 	return _enesim_image_init_count;
 }
+/* @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
+Eina_Error ENESIM_IMAGE_ERROR_EXIST;
+Eina_Error ENESIM_IMAGE_ERROR_PROVIDER;
+Eina_Error ENESIM_IMAGE_ERROR_FORMAT;
+Eina_Error ENESIM_IMAGE_ERROR_SIZE;
+Eina_Error ENESIM_IMAGE_ERROR_ALLOCATOR;
+Eina_Error ENESIM_IMAGE_ERROR_LOADING;
+Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 
 /**
  * Gets information about an image

@@ -57,6 +57,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 static int _enesim_init_count = 0;
 static Eina_Bool _initializing = EINA_FALSE;;
 static Eina_Bool _deinitializing = EINA_FALSE;
@@ -125,6 +126,7 @@ static void _unregister_domains(void)
 	}
 
 }
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -141,6 +143,8 @@ int enesim_log_renderer_pattern = -1;
 int enesim_log_renderer_shape = -1;
 int enesim_log_renderer_gradient = -1;
 int enesim_log_renderer_gradient_radial = -1;
+
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

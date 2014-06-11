@@ -24,6 +24,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_global
 
 typedef struct _Enesim_Stream_Base64
@@ -208,6 +209,7 @@ static Enesim_Stream_Descriptor _enesim_stream_base64_descriptor = {
 	/* .uri_get	= */ _enesim_stream_base64_uri_get,
 	/* .free	= */ _enesim_stream_base64_free,
 };
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

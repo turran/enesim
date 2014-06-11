@@ -43,6 +43,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_STRIPES(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Stripes,					\
 		enesim_renderer_stripes_descriptor_get())
@@ -663,6 +664,7 @@ static void _enesim_renderer_stripes_instance_deinit(void *o)
 	if (thiz->current.odd.paint)
 		enesim_renderer_unref(thiz->current.odd.paint);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

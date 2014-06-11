@@ -38,6 +38,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 typedef Enesim_Converter_2D Enesim_Converter_2D_Lut[ENESIM_BUFFER_FORMATS][ENESIM_ANGLES][ENESIM_BUFFER_FORMATS];
 
 Enesim_Converter_2D_Lut _converters_2d;
@@ -69,6 +70,7 @@ Enesim_Converter_2D enesim_converter_surface_get(Enesim_Buffer_Format dfmt,
 {
 	return _converters_2d[dfmt][angle][sfmt];
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

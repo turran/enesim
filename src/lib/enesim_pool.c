@@ -26,6 +26,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_pool
 
 static Enesim_Pool *_current_default_pool = NULL;
@@ -34,6 +35,7 @@ static void _data_free_cb(void *data, void *user_data EINA_UNUSED)
 {
 	free(data);
 }
+
 /*----------------------------------------------------------------------------*
  *                        The Enesim's pool interface                         *
  *----------------------------------------------------------------------------*/
@@ -231,6 +233,7 @@ void enesim_pool_shutdown(void)
 	/* destroy the default pool */
 	enesim_pool_unref(_current_default_pool);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

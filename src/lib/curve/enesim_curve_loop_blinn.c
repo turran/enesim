@@ -27,9 +27,11 @@
 #include "enesim_vector_private.h"
 #include "enesim_curve_private.h"
 #include "enesim_curve_loop_blinn_private.h"
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 static inline double _round_to_zero(double v, double err)
 {
 	if (v < err && v > -err)
@@ -245,3 +247,4 @@ Eina_Bool enesim_curve_loop_blinn_compute_texcoords(
 
     return EINA_TRUE;
 }
+/** @endcond */

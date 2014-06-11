@@ -56,6 +56,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_PATH_NV(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Path_Nv,					\
 		enesim_renderer_path_nv_descriptor_get())
@@ -960,6 +961,7 @@ Enesim_Renderer * enesim_renderer_path_nv_new(void)
 	return NULL;
 #endif
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

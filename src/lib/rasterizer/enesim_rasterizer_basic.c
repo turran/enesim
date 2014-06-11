@@ -42,6 +42,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RASTERIZER_BASIC(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Rasterizer_Basic,					\
 		enesim_rasterizer_basic_descriptor_get())
@@ -1494,6 +1495,7 @@ void enesim_rasterizer_basic_vectors_get(Enesim_Renderer *r, int *nvectors,
 	*nvectors = thiz->nvectors;
 	*vectors = thiz->vectors;
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

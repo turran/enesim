@@ -41,6 +41,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_DISPMAP(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Dispmap,					\
 		enesim_renderer_dispmap_descriptor_get())
@@ -323,6 +324,7 @@ static void _enesim_renderer_dispmap_instance_init(void *o)
 static void _enesim_renderer_dispmap_instance_deinit(void *o EINA_UNUSED)
 {
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

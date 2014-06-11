@@ -44,6 +44,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 typedef struct _Enesim_Path_Generator_Dashed
 {
 	Enesim_Path_Generator *p; /* ourselves */
@@ -1409,3 +1410,4 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 	_path_done(thiz);
 }
 #endif
+/** @endcond */

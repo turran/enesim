@@ -47,6 +47,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_shape
 
 typedef struct _Enesim_Renderer_Shape_Damage_Data
@@ -748,7 +749,7 @@ Enesim_List * enesim_renderer_shape_dashes_get(Enesim_Renderer *r)
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	return enesim_list_ref(thiz->state.dashes);
 }
-
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

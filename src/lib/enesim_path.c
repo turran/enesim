@@ -30,6 +30,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 static void _cubic_flatten(double x0, double y0, double ctrl_x0,
 		double ctrl_y0, double ctrl_x, double ctrl_y,
 		double x, double y, double tolerance,
@@ -171,6 +172,7 @@ void enesim_path_command_get(Enesim_Path *thiz,
 		*list = eina_list_append(*list, new_cmd);
 	}
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

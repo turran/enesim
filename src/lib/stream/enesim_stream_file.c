@@ -25,6 +25,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 typedef enum _Enesim_Stream_File_Flag
 {
 	ENESIM_IMAGE_DATA_FILE_READ = 1 << 1,
@@ -153,6 +154,7 @@ static Enesim_Stream_Descriptor _enesim_stream_file_descriptor = {
 	/* .uri_get	= */ _enesim_stream_file_uri_get,
 	/* .free	= */ _enesim_stream_file_free,
 };
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

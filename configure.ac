@@ -437,7 +437,7 @@ AC_CONFIG_FILES([
 Makefile
 enesim_opencl.pc
 enesim_opengl.pc
-doc/Doxyfile
+common/doc/Doxyfile_common
 ])
 
 AC_OUTPUT

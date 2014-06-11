@@ -50,6 +50,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_renderer
 
 ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Enesim_Renderer,
@@ -592,7 +593,7 @@ void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 
 	enesim_renderer_unlock(r);
 }
-
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -46,6 +46,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_BACKGROUND(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Background,					\
 		enesim_renderer_background_descriptor_get())
@@ -311,6 +312,7 @@ static void _enesim_renderer_background_instance_init(void *o EINA_UNUSED)
 static void _enesim_renderer_background_instance_deinit(void *o EINA_UNUSED)
 {
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -26,6 +26,11 @@
 #include "enesim_image.h"
 #include "enesim_image_private.h"
 
+/*============================================================================*
+ *                                  Local                                     *
+ *============================================================================*/
+/** @cond internal */
+
 #ifdef _WIN32
 # define pipe_write(fd, buffer, size) send((fd), (char *)(buffer), size, 0)
 # define pipe_read(fd, buffer, size)  recv((fd), (char *)(buffer), size, 0)
@@ -38,9 +43,6 @@
 # define ENESIM_IMAGE_THREAD_CREATE(x, f, d) pthread_create(&(x), NULL, (void *)f, d)
 #endif /* ! _WIN32 */
 
-/*============================================================================*
- *                                  Local                                     *
- *============================================================================*/
 #define ENESIM_LOG_DEFAULT enesim_log_image
 
 struct _Enesim_Image_Context
@@ -130,7 +132,7 @@ static void * _thread_save(void *data)
 	return NULL;
 #endif
 }
-
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -31,9 +31,11 @@
 #include "enesim_image.h"
 #include "enesim_renderer_importer.h"
 #include "enesim_image_private.h"
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 static Eina_Bool _provider_info_get(Enesim_Image_Provider *p, Enesim_Stream *data,
 		int *w, int *h, Enesim_Buffer_Format *sfmt, void *options,
 		Eina_Error *err)
@@ -167,6 +169,7 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *da
 
 	return EINA_TRUE;
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -52,6 +52,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_compound
 
 #define ENESIM_RENDERER_COMPOUND(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
@@ -780,6 +781,7 @@ static void _enesim_renderer_compound_instance_deinit(void *o)
 	}
 #endif
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

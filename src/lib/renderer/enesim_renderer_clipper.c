@@ -45,6 +45,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_CLIPPER(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Clipper,					\
 		enesim_renderer_clipper_descriptor_get())
@@ -343,6 +344,7 @@ static void _enesim_renderer_clipper_instance_deinit(void *o)
 	if (thiz->current.clipped)
 		enesim_renderer_unref(thiz->current.clipped);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

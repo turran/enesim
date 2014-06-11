@@ -1,0 +1,12 @@
+# Doxyfile 1.8.3.1
+
+@INCLUDE = common/doc/Doxyfile_common
+
+PROJECT_BRIEF          = Drawing library
+FILE_PATTERNS          = enesim_*.c enesim_*.h Enesim.h Enesim_OpenGL.h
+INPUT                  = src/lib
+EXCLUDE_PATTERNS       = *_private.h
+EXCLUDE_PATTERNS       += enesim_renderer_text_grid.*
+EXCLUDE_PATTERNS       += Enesim_OpenCL.h
+EXCLUDE_PATTERNS       += enesim_test*
+EXAMPLE_PATH           = src/examples

@@ -44,6 +44,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_surface
 
 static inline Eina_Bool _format_to_buffer_format(Enesim_Format fmt,
@@ -100,6 +101,7 @@ void * enesim_surface_backend_data_get(Enesim_Surface *s)
 {
 	return enesim_buffer_backend_data_get(s->buffer);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

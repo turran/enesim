@@ -52,6 +52,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_PATH_CAIRO(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Path_Cairo,					\
 		enesim_renderer_path_cairo_descriptor_get())
@@ -464,6 +465,7 @@ Enesim_Renderer * enesim_renderer_path_cairo_new(void)
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_path_cairo);
 	return r;
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

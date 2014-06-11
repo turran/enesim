@@ -44,6 +44,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_shape
 
 static Eina_Bool _shape_path_propagate(Enesim_Renderer *r)
@@ -261,6 +262,7 @@ void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
 	_shape_path_propagate(r);
 	enesim_renderer_bounds_get(thiz->r_path, bounds);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

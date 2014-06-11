@@ -47,6 +47,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_RADDIST(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Raddist,					\
 		enesim_renderer_raddist_descriptor_get())
@@ -233,6 +234,7 @@ static void _enesim_renderer_raddist_instance_init(void *o EINA_UNUSED)
 static void _enesim_renderer_raddist_instance_deinit(void *o EINA_UNUSED)
 {
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

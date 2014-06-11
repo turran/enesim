@@ -38,6 +38,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 typedef struct _Enesim_Mempool_Aligned
 {
 	size_t alignment;
@@ -206,3 +207,4 @@ Eina_Mempool * enesim_mempool_aligned_get(void)
 	}
 	return m;
 }
+/** @endcond */

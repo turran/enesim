@@ -34,6 +34,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_text
 
 static Eina_Bool _dump(const Eina_Hash *hash EINA_UNUSED, const void *key, void *data, void *fdata)
@@ -107,6 +108,7 @@ void enesim_text_font_dump(Enesim_Text_Font *thiz, const char *path)
 {
 	eina_hash_foreach(thiz->glyphs, _dump, path);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

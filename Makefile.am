@@ -58,7 +58,7 @@ include src/examples/Makefile.mk
 
 ### Documentation
 
-include doc/Makefile.mk
+include common/Makefile_doxygen.mk
 
 ### Coverage
 

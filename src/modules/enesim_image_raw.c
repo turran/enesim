@@ -8,6 +8,8 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
+
 #define MIME "image/embedded-raw"
 #define ENESIM_IMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
 
@@ -166,3 +168,5 @@ static void enesim_image_raw_provider_shutdown(void)
 EINA_MODULE_INIT(enesim_image_raw_provider_init);
 EINA_MODULE_SHUTDOWN(enesim_image_raw_provider_shutdown);
 #endif
+
+/** @endcond */

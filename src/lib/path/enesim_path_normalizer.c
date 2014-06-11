@@ -23,6 +23,10 @@
 #include "enesim_path_private.h"
 #include "enesim_path_normalizer_private.h"
 
+/*============================================================================*
+ *                                  Local                                     *
+ *============================================================================*/
+/** @cond internal */
 typedef struct _Enesim_Path_Normalizer_State
 {
 	double last_x;
@@ -68,9 +72,6 @@ typedef struct _Enesim_Path_Normalizer_Path
 	Enesim_Path_Normalizer_Path_Descriptor *descriptor;
 	void *data;
 } Enesim_Path_Normalizer_Path;
-/*============================================================================*
- *                                  Local                                     *
- *============================================================================*/
 /*----------------------------------------------------------------------------*
  *                            Figure normalizer                               *
  *----------------------------------------------------------------------------*/
@@ -570,3 +571,4 @@ void enesim_path_normalizer_reset(Enesim_Path_Normalizer *thiz)
 	thiz->state.last_x = 0;
 	thiz->state.last_y = 0;
 }
+/** @endcond */

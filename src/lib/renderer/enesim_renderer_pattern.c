@@ -46,6 +46,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_pattern
 
 #define ENESIM_RENDERER_PATTERN(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
@@ -365,6 +366,7 @@ static void _enesim_renderer_pattern_instance_deinit(void *o)
 	if (thiz->cache)
 		enesim_surface_unref(thiz->cache);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -25,6 +25,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_global
 
 struct _Enesim_Object_Descriptor
@@ -91,6 +92,7 @@ void enesim_object_descriptor_instance_free(Enesim_Object_Descriptor *thiz,
 	enesim_object_descriptor_instance_deinit(thiz, i);
 	free(i);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

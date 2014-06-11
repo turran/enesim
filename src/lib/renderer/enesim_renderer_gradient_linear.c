@@ -44,6 +44,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_renderer_gradient
 
 #define ENESIM_RENDERER_GRADIENT_LINEAR(o) ENESIM_OBJECT_INSTANCE_CHECK(o,	\
@@ -469,6 +470,7 @@ static void _enesim_renderer_gradient_linear_instance_init(void *o EINA_UNUSED)
 static void _enesim_renderer_gradient_linear_instance_deinit(void *o EINA_UNUSED)
 {
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

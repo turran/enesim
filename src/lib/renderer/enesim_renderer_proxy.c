@@ -45,6 +45,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_RENDERER_PROXY(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Proxy,						\
 		enesim_renderer_proxy_descriptor_get())
@@ -305,6 +306,7 @@ static void _enesim_renderer_proxy_instance_deinit(void *o)
 	if (thiz->proxied)
 		enesim_renderer_unref(thiz->proxied);
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

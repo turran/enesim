@@ -14,7 +14,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
-
+/** @cond internal */
 #define ENESIM_IMAGE_LOG_COLOR_DEFAULT EINA_COLOR_GREEN
 
 #ifdef ERR
@@ -405,3 +405,4 @@ static void enesim_image_jpg_provider_shutdown(void)
 EINA_MODULE_INIT(enesim_image_jpg_provider_init);
 EINA_MODULE_SHUTDOWN(enesim_image_jpg_provider_shutdown);
 #endif
+/** @endcond */

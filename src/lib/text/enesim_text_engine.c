@@ -30,6 +30,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_text
 
 static void * _enesim_text_engine_font_load(Enesim_Text_Engine *thiz,
@@ -108,7 +109,7 @@ void enesim_text_engine_font_delete(Enesim_Text_Engine *thiz,
 	enesim_text_engine_unref(thiz);
 	free(f);
 }
-
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/

@@ -25,6 +25,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 static void _2d_bgr888_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t dw, uint32_t dh,
 		Enesim_Buffer_Sw_Data *sdata, uint32_t sw EINA_UNUSED, uint32_t sh EINA_UNUSED)
 {
@@ -61,3 +62,4 @@ void enesim_converter_bgr888_init(void)
 			ENESIM_ANGLE_0,
 			ENESIM_BUFFER_FORMAT_ARGB8888_PRE);
 }
+/** @endcond */

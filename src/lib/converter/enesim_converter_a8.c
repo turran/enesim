@@ -25,6 +25,7 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/** @cond internal */
 #if 0
 static void _1d_a8_none_argb8888(Enesim_Buffer_Sw_Data *data,
 		uint32_t len, void *sdata)
@@ -47,3 +48,4 @@ static void _1d_a8_none_argb8888(Enesim_Buffer_Sw_Data *data,
 void enesim_converter_a8_init(void)
 {
 }
+/** @endcond */
