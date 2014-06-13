@@ -82,7 +82,21 @@ EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *
 EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, ssize_t offset);
 EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz);
 
+/**
+ * @}
+ * @defgroup Enesim_Text_Buffer_Simple_Group Simple Buffer
+ * @ingroup Enesim_Text_Buffer_Group
+ * @{
+ */
+
 EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length);
+
+/**
+ * @}
+ * @defgroup Enesim_Text_Buffer_Smart_Group Smart Buffer
+ * @ingroup Enesim_Text_Buffer_Group
+ * @{
+ */
 
 EAPI Enesim_Text_Buffer * enesim_text_buffer_smart_new(Enesim_Text_Buffer *thiz);
 EAPI Enesim_Text_Buffer * enesim_text_buffer_smart_real_get(Enesim_Text_Buffer *b);

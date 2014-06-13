@@ -25,6 +25,13 @@
  * @{
  */
 
+/**
+ * @defgroup Enesim_Renderer_Compound_Layer_Group Compound Layer
+ * @brief Compound layer
+ * @ingroup Enesim_Renderer_Compound_Group
+ * @{
+ */
+
 typedef struct _Enesim_Renderer_Compound_Layer Enesim_Renderer_Compound_Layer;
 
 EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_new(void);
@@ -38,6 +45,10 @@ EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l
 
 typedef Eina_Bool (*Enesim_Renderer_Compound_Cb)(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer, void *data);
+
+/**
+ * @}
+ */
 
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,

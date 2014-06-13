@@ -125,21 +125,27 @@ typedef struct _Enesim_Path_Command_Close
 } Enesim_Path_Command_Close;
 
 /**
+ * Union of the possible types of commands
+ */
+typedef union _Enesim_Path_Command_Definition
+{
+	Enesim_Path_Command_Move_To move_to; /**< The move to values */
+	Enesim_Path_Command_Line_To line_to; /**< The line to values */
+	Enesim_Path_Command_Squadratic_To squadratic_to; /**< The smooth quadratic to values */
+	Enesim_Path_Command_Quadratic_To quadratic_to; /**< The quadratic to values */
+	Enesim_Path_Command_Scubic_To scubic_to; /**< The smooth cubic to values */
+	Enesim_Path_Command_Cubic_To cubic_to; /**< The cubic to values */
+	Enesim_Path_Command_Arc_To arc_to; /**< The arc to values */
+	Enesim_Path_Command_Close close; /**< The close value */
+} Enesim_Path_Command_Definition;
+
+/**
  * Definition of a path command
  */
 typedef struct _Enesim_Path_Command
 {
 	Enesim_Path_Command_Type type; /**< The type of the command */
-	union {
-		Enesim_Path_Command_Move_To move_to; /**< The move to values */
-		Enesim_Path_Command_Line_To line_to; /**< The line to values */
-		Enesim_Path_Command_Squadratic_To squadratic_to; /**< The smooth quadratic to values */
-		Enesim_Path_Command_Quadratic_To quadratic_to; /**< The quadratic to values */
-		Enesim_Path_Command_Scubic_To scubic_to; /**< The smooth cubic to values */
-		Enesim_Path_Command_Cubic_To cubic_to; /**< The cubic to values */
-		Enesim_Path_Command_Arc_To arc_to; /**< The arc to values */
-		Enesim_Path_Command_Close close; /**< The close value */
-	} definition; /**< The values of the definition */
+	Enesim_Path_Command_Definition definition; /**< The values of the definition */
 } Enesim_Path_Command;
 
 typedef struct _Enesim_Path Enesim_Path; /**< A path handle */
