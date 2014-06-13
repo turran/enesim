@@ -20,7 +20,7 @@
 #define ENESIM_FORMAT_H_
 
 /**
- * @defgroup Enesim_Format_Group Format
+ * @defgroup Enesim_Format Format
  * @{
  */
 
@@ -40,6 +40,6 @@ EAPI size_t enesim_format_size_get(Enesim_Format f, uint32_t w, uint32_t h);
 EAPI size_t enesim_format_stride_get(Enesim_Format fmt, uint32_t w);
 
 
-/** @} */ //End of Enesim_Buffer_Group
+/** @} */ //End of Enesim_Buffer
 
 #endif

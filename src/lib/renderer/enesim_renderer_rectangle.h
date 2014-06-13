@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_RECTANGLE_H_
 
 /**
- * @defgroup Enesim_Renderer_Rectangle_Group Rectangle
+ * @defgroup Enesim_Renderer_Rectangle Rectangle
  * @brief Rectangle renderer
- * @ingroup Enesim_Renderer_Shape_Group
+ * @ingroup Enesim_Renderer_Shape
  * @{
  */
 

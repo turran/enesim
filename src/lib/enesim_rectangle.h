@@ -21,7 +21,7 @@
 #include <math.h>
 
 /**
- * @defgroup Enesim_Rectangle_Group Rectangle
+ * @defgroup Enesim_Rectangle Rectangle
  * @brief Rectangle definition and operations
  * @{
  */

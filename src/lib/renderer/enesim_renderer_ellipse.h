@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_ELLIPSE_H_
 
 /**
- * @defgroup Enesim_Renderer_Ellipse_Group Ellipse
+ * @defgroup Enesim_Renderer_Ellipse Ellipse
  * @brief Ellipse renderer
- * @ingroup Enesim_Renderer_Shape_Group
+ * @ingroup Enesim_Renderer_Shape
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_ellipse_new(void);

@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_LINE_H_
 
 /**
- * @defgroup Enesim_Renderer_Line_Group Line
+ * @defgroup Enesim_Renderer_Line Line
  * @brief Line renderer
- * @ingroup Enesim_Renderer_Shape_Group
+ * @ingroup Enesim_Renderer_Shape
  * @{
  */
 

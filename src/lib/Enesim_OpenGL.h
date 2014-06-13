@@ -23,7 +23,7 @@
 #include "GL/glu.h"
 
 /**
- * @defgroup Enesim_OpenGL_Group OpenGL
+ * @defgroup Enesim_OpenGL OpenGL
  * @brief OpenGL specific functions
  * @{
  */

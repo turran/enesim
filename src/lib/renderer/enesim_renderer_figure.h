@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_FIGURE_H_
 /**
  * @}
- * @defgroup Enesim_Renderer_Figure_Group Figure
+ * @defgroup Enesim_Renderer_Figure Figure
  * @brief A figure composed of polygons renderer
- * @ingroup Enesim_Renderer_Shape_Group
+ * @ingroup Enesim_Renderer_Shape
  * @{
  */
 

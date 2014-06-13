@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_PROXY_H_
 
 /**
- * @defgroup Enesim_Renderer_Proxy_Group Proxy
+ * @defgroup Enesim_Renderer_Proxy Proxy
  * @brief Renderer that renders another renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 

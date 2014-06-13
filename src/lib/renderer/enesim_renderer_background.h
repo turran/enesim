@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_BACKGROUND_H_
 
 /**
- * @defgroup Enesim_Renderer_Background_Group Background
+ * @defgroup Enesim_Renderer_Background Background
  * @brief Generic color renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_background_new(void);

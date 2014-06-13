@@ -19,7 +19,7 @@
 #define ENESIM_PATH_H_
 
 /**
- * @defgroup Enesim_Path_Group Paths
+ * @defgroup Enesim_Path Paths
  * @brief Path definition
  * @{
  */

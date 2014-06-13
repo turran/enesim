@@ -19,7 +19,7 @@
 #define ENESIM_SURFACE_H_
 
 /**
- * @defgroup Enesim_Surface_Group Surface
+ * @defgroup Enesim_Surface Surface
  * @brief Native pixel data holder
  * 
  * All the rendering process of an @ref Enesim_Renderer is done into a
@@ -68,6 +68,6 @@ EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *s
 EAPI void enesim_surface_lock(Enesim_Surface *s, Eina_Bool write);
 EAPI void enesim_surface_unlock(Enesim_Surface *s);
 
-/** @} */ //End of Enesim_Surface_Group
+/** @} */ //End of Enesim_Surface
 
 #endif /*ENESIM_SURFACE_H_*/

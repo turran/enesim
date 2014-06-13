@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_STRIPES_H_
 
 /**
- * @defgroup Enesim_Renderer_Stripes_Group Stripes
+ * @defgroup Enesim_Renderer_Stripes Stripes
  * @brief Stripe pattern renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_stripes_new(void);

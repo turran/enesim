@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_GRID_H_
 
 /**
- * @defgroup Enesim_Renderer_Grid_Group Grid
+ * @defgroup Enesim_Renderer_Grid Grid
  * @brief Grid pattern renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_grid_new(void);

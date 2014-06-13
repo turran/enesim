@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_CLIPPER_H_
 
 /**
- * @defgroup Enesim_Renderer_Clipper_Group Clipper
+ * @defgroup Enesim_Renderer_Clipper Clipper
  * @brief Renderer that clips a source renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 

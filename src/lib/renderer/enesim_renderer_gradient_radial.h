@@ -20,9 +20,9 @@
 
 /**
  * @}
- * @defgroup Enesim_Renderer_Gradient_Radial_Group Radial
+ * @defgroup Enesim_Renderer_Gradient_Radial Radial
  * @brief Radial gradient
- * @ingroup Enesim_Renderer_Gradient_Group
+ * @ingroup Enesim_Renderer_Gradient
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_gradient_radial_new(void);

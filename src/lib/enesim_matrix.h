@@ -21,7 +21,7 @@
 #include "enesim_quad.h"
 
 /**
- * @defgroup Enesim_Matrix_Group Matrix
+ * @defgroup Enesim_Matrix Matrix
  * @brief Matrix definition and operations
  * @{
  */
@@ -44,7 +44,7 @@ typedef enum _Enesim_Matrix_Type
 } Enesim_Matrix_Type;
 
 /**
- * @ingroup Enesim_Matrix_Float_Group
+ * @ingroup Enesim_Matrix_Float
  * Floating point matrix handler
  */
 typedef struct _Enesim_Matrix
@@ -63,7 +63,7 @@ typedef struct _Enesim_Matrix
 } Enesim_Matrix;
 
 /**
- * @ingroup Enesim_Matrix_Fixed_Group
+ * @ingroup Enesim_Matrix_Fixed
  * Fixed point matrix handler
  */
 typedef struct _Enesim_Matrix_F16p16
@@ -83,9 +83,9 @@ typedef struct _Enesim_Matrix_F16p16
 
 /**
  * @}
- * @defgroup Enesim_Matrix_Float_Group Floating point matrices
+ * @defgroup Enesim_Matrix_Float Floating point matrices
  * @brief Floating point matrices operations
- * @ingroup Enesim_Matrix_Group
+ * @ingroup Enesim_Matrix
  * @{
  */
 
@@ -127,9 +127,9 @@ EAPI Eina_Bool enesim_matrix_quad_square_map(Enesim_Matrix *m, const Enesim_Quad
 
 /**
  * @}
- * @defgroup Enesim_Matrix_Fixed_Group Fixed point matrices
+ * @defgroup Enesim_Matrix_Fixed Fixed point matrices
  * @brief Fixed point matrices operations
- * @ingroup Enesim_Matrix_Group
+ * @ingroup Enesim_Matrix
  * @{
  */
 

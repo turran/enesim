@@ -19,7 +19,7 @@
 #define ENESIM_LOG_H_
 
 /**
- * @defgroup Enesim_Log_Group Log
+ * @defgroup Enesim_Log Log
  * @brief Logging
  * @{
  */

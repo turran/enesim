@@ -20,7 +20,7 @@
 #define ENESIM_MAIN_H_
 
 /**
- * @defgroup Enesim_Main_Group Main
+ * @defgroup Enesim_Main Main
  * @brief Common definitions
  * @{
  */

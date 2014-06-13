@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_TEXT_SPAN_H_
 
 /**
- * @defgroup Enesim_Renderer_Text_Span_Renderer_Group Text Span
+ * @defgroup Enesim_Renderer_Text_Span Text Span
  * @brief Text span renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_text_span_new(void);

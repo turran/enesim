@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_CIRCLE_H_
 
 /**
- * @defgroup Enesim_Renderer_Circle_Group Circle
+ * @defgroup Enesim_Renderer_Circle Circle
  * @brief Circle renderer
- * @ingroup Enesim_Renderer_Shape_Group
+ * @ingroup Enesim_Renderer_Shape
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_circle_new(void);

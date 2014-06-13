@@ -20,7 +20,7 @@
 #define _ENESIM_TEXT_H
 
 /**
- * @defgroup Enesim_Text_Group Text
+ * @defgroup Enesim_Text Text
  * @brief Text and font definitions and operations
  * @todo
  * - Move the actual font/face loader into a submodule that should fill a common structure
@@ -48,8 +48,8 @@ typedef enum _Enesim_Text_Direction
 
 /**
  * @}
- * @defgroup Enesim_Text_Font_Group Font
- * @ingroup Enesim_Text_Group
+ * @defgroup Enesim_Text_Font Font
+ * @ingroup Enesim_Text
  * @{
  */
 
@@ -66,8 +66,8 @@ EAPI int enesim_text_font_max_descent_get(Enesim_Text_Font *thiz);
 
 /**
  * @}
- * @defgroup Enesim_Text_Buffer_Group Buffer
- * @ingroup Enesim_Text_Group
+ * @defgroup Enesim_Text_Buffer Buffer
+ * @ingroup Enesim_Text
  * @{
  */
 
@@ -84,8 +84,8 @@ EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz);
 
 /**
  * @}
- * @defgroup Enesim_Text_Buffer_Simple_Group Simple Buffer
- * @ingroup Enesim_Text_Buffer_Group
+ * @defgroup Enesim_Text_Buffer_Simple Simple Buffer
+ * @ingroup Enesim_Text_Buffer
  * @{
  */
 
@@ -93,8 +93,8 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length);
 
 /**
  * @}
- * @defgroup Enesim_Text_Buffer_Smart_Group Smart Buffer
- * @ingroup Enesim_Text_Buffer_Group
+ * @defgroup Enesim_Text_Buffer_Smart Smart Buffer
+ * @ingroup Enesim_Text_Buffer
  * @{
  */
 

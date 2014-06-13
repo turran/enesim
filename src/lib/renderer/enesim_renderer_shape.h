@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_SHAPE_H_
 
 /**
- * @defgroup Enesim_Renderer_Shape_Group Shapes
+ * @defgroup Enesim_Renderer_Shape Shapes
  * @brief Geometric shape renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 

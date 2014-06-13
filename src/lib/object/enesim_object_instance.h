@@ -19,8 +19,8 @@
 #define ENESIM_OBJECT_INSTANCE_H_
 
 /**
- * @defgroup Enesim_Object_Instance_Group Instance
- * @ingroup Enesim_Object_Group
+ * @defgroup Enesim_Object_Instance Instance
+ * @ingroup Enesim_Object
  * @brief Instance definition
  * @{
  */

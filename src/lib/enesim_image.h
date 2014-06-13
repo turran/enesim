@@ -19,7 +19,7 @@
 #define ENESIM_IMAGE_H
 
 /**
- * @defgroup Enesim_Image_Group Image
+ * @defgroup Enesim_Image Image
  * @brief Image loading and saving
  * @{
  */
@@ -36,9 +36,9 @@ EAPI void enesim_image_dispatch(void);
 
 /**
  * @}
- * @defgroup Enesim_Image_Context_Group Context
+ * @defgroup Enesim_Image_Context Context
  * @brief Asynchronous context
- * @ingroup Enesim_Image_Group
+ * @ingroup Enesim_Image
  * @{
  */
 typedef struct _Enesim_Image_Context Enesim_Image_Context;
@@ -57,9 +57,9 @@ EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz);
 
 /**
  * @}
- * @defgroup Enesim_Image_Load_Save_Group Loading and Saving
+ * @defgroup Enesim_Image_Load_Save Loading and Saving
  * @brief Generic loading and saving using the main context
- * @ingroup Enesim_Image_Group
+ * @ingroup Enesim_Image
  * @{
  */
 
@@ -80,9 +80,9 @@ EAPI void enesim_image_save_async(Enesim_Stream *data, const char *mime,
 
 /**
  * @}
- * @defgroup Enesim_Image_File_Group File based loading and saving
+ * @defgroup Enesim_Image_File File based loading and saving
  * @brief Generic file loading and saving using the main context
- * @ingroup Enesim_Image_Group
+ * @ingroup Enesim_Image
  * @{
  */
 EAPI Eina_Bool enesim_image_file_info_get(const char *file, int *w, int *h,
@@ -101,9 +101,9 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b,
 
 /**
  * @}
- * @defgroup Enesim_Image_Provider_Group Providers
+ * @defgroup Enesim_Image_Provider Providers
  * @brief Image format loader and saver provider
- * @ingroup Enesim_Image_Group
+ * @ingroup Enesim_Image
  * @{
  */
 
@@ -152,9 +152,9 @@ EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 
 /**
  * @}
- * @defgroup Enesim_Image_Finder_Group Finder
+ * @defgroup Enesim_Image_Finder Finder
  * @brief Image identification
- * @ingroup Enesim_Image_Group
+ * @ingroup Enesim_Image
  * @{
  */
 
@@ -175,9 +175,9 @@ EAPI void enesim_image_finder_unregister(Enesim_Image_Finder_Descriptor *f);
 
 /**
  * @}
- * @defgroup Enesim_Image_Misc_Group Misc
+ * @defgroup Enesim_Image_Misc Misc
  * @brief Helper functions related to images
- * @ingroup Enesim_Image_Group
+ * @ingroup Enesim_Image
  * @{
  */
 

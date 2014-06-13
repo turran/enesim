@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_IMPORTER_H_
 
 /**
- * @defgroup Enesim_Renderer_Importer_Group Importer
+ * @defgroup Enesim_Renderer_Importer Importer
  * @brief Renderer that imports pixels from a buffer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_importer_new(void);

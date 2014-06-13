@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_CHECKER_H_
 
 /**
- * @defgroup Enesim_Renderer_Checker_Group Checker
+ * @defgroup Enesim_Renderer_Checker Checker
  * @brief Checked pattern renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_checker_new(void);

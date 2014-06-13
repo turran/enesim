@@ -19,7 +19,7 @@
 #define ENESIM_COLOR_H_
 
 /**
- * @defgroup Enesim_Color_Group Color
+ * @defgroup Enesim_Color Color
  * @brief Color definition
  * @{
  */

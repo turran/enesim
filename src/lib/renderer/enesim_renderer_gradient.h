@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_GRADIENT_H_
 
 /**
- * @defgroup Enesim_Renderer_Gradient_Group Gradient
+ * @defgroup Enesim_Renderer_Gradient Gradient
  * @brief Gradient renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 

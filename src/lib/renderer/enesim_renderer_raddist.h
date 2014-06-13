@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_RADDIST_H_
 
 /**
- * @defgroup Enesim_Renderer_Raddist_Group Radial Distortion
+ * @defgroup Enesim_Renderer_Raddist Radial Distortion
  * @brief Filters a source image using a barrel distortion
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_raddist_new(void);

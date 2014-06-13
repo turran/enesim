@@ -19,16 +19,16 @@
 #define ENESIM_RENDERER_COMPOUND_H_
 
 /**
- * @defgroup Enesim_Renderer_Compound_Group Compound
+ * @defgroup Enesim_Renderer_Compound Compound
  * @brief Renderer that contains other renderers
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 
 /**
- * @defgroup Enesim_Renderer_Compound_Layer_Group Compound Layer
+ * @defgroup Enesim_Renderer_Compound_Layer Compound Layer
  * @brief Compound layer
- * @ingroup Enesim_Renderer_Compound_Group
+ * @ingroup Enesim_Renderer_Compound
  * @{
  */
 

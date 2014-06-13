@@ -19,7 +19,7 @@
 #define ENESIM_STREAM_H
 
 /**
- * @defgroup Enesim_Stream_Group Stream
+ * @defgroup Enesim_Stream Stream
  * @brief Stream sources
  * @{
  */

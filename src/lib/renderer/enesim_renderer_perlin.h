@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_PERLIN_H_
 
 /**
- * @defgroup Enesim_Renderer_Perlin_Group Perlin
+ * @defgroup Enesim_Renderer_Perlin Perlin
  * @brief Perlin noise renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_perlin_new(void);

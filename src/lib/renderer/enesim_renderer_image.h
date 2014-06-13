@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_IMAGE_H_
 
 /**
- * @defgroup Enesim_Renderer_Image_Group Image
+ * @defgroup Enesim_Renderer_Image Image
  * @brief Image based renderer
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_image_new(void);

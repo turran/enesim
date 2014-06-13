@@ -19,8 +19,8 @@
 #define ENESIM_OBJECT_CLASS_H_
 
 /**
- * @defgroup Enesim_Object_Class_Group Class
- * @ingroup Enesim_Object_Group
+ * @defgroup Enesim_Object_Class Class
+ * @ingroup Enesim_Object
  * @brief Class definition
  * @{
  */

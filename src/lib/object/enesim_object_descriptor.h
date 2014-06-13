@@ -23,11 +23,11 @@
 #include <string.h>
 
 /**
- * @defgroup Enesim_Object_Group Object
+ * @defgroup Enesim_Object Object
  * @brief Object abstraction
  *
- * @defgroup Enesim_Object_Descriptor_Group Descriptor
- * @ingroup Enesim_Object_Group
+ * @defgroup Enesim_Object_Descriptor Descriptor
+ * @ingroup Enesim_Object
  * @{
  */
 

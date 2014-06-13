@@ -19,7 +19,7 @@
 #define ENESIM_RENDERER_H_
 
 /**
- * @defgroup Enesim_Renderer_Group Renderer
+ * @defgroup Enesim_Renderer Renderer
  * @brief Vector and raster drawing primitives
  * @{
  */

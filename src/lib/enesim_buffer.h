@@ -19,7 +19,7 @@
 #define ENESIM_BUFFER_H_
 
 /**
- * @defgroup Enesim_Buffer_Group Buffer
+ * @defgroup Enesim_Buffer Buffer
  * @brief Target device pixel data holder
  * @{
  */
@@ -165,7 +165,7 @@ EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt);
 EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write);
 EAPI void enesim_buffer_unlock(Enesim_Buffer *b);
 
-/** @} */ //End of Enesim_Buffer_Group
+/** @} */ //End of Enesim_Buffer
 
 
 #endif /*ENESIM_BUFFER_H_*/

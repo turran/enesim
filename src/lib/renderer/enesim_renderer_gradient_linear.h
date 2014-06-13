@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_GRADIENT_LINEAR_H_
 
 /**
- * @defgroup Enesim_Renderer_Gradient_Linear_Group Linear
+ * @defgroup Enesim_Renderer_Gradient_Linear Linear
  * @brief Linear gradient
- * @ingroup Enesim_Renderer_Gradient_Group
+ * @ingroup Enesim_Renderer_Gradient
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_gradient_linear_new(void);

@@ -19,7 +19,7 @@
 #define ENESIM_QUAD_H_
 
 /**
- * @defgroup Enesim_Quad_Group Quadrangles
+ * @defgroup Enesim_Quad Quadrangles
  * @brief Quadrangles operations
  * @{
  */

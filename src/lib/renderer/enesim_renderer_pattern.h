@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_PATTERN_H_
 
 /**
- * @defgroup Enesim_Renderer_Pattern_Group Pattern
+ * @defgroup Enesim_Renderer_Pattern Pattern
  * @brief Renderer that repeats an area of another renderer to form a pattern
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_pattern_new(void);

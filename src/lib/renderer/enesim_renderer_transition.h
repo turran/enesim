@@ -19,9 +19,9 @@
 #define ENESIM_RENDERER_TRANSITION_H_
 
 /**
- * @defgroup Enesim_Renderer_Transition_Group Transition
+ * @defgroup Enesim_Renderer_Transition Transition
  * @brief Rederer that blends two renderers
- * @ingroup Enesim_Renderer_Group
+ * @ingroup Enesim_Renderer
  * @{
  */
 EAPI Enesim_Renderer * enesim_renderer_transition_new(void);
