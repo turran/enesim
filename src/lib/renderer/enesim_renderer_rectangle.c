@@ -775,6 +775,15 @@ EAPI void enesim_renderer_rectangle_corners_set(Enesim_Renderer *r,
 	thiz->generated = EINA_FALSE;
 }
 
+/**
+ * @brief Get whether the corners of a rectangle renderer are rounded.
+ *
+ * @param[in] r The rectangle renderer.
+ * @param[out] tl Whether the top left corner is rounded.
+ * @param[out] tr Whether the top right corner is rounded.
+ * @param[out] bl Whether the bottom left corner is rounded.
+ * @param[out] br Whether the bottom right corner is rounded.
+ */
 EAPI void enesim_renderer_rectangle_corners_get(Enesim_Renderer *r,
 		Eina_Bool *tl, Eina_Bool *tr, Eina_Bool *bl, Eina_Bool *br)
 {
