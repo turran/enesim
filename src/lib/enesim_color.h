@@ -19,8 +19,8 @@
 #define ENESIM_COLOR_H_
 
 /**
- * @defgroup Enesim_Color Color
- * @brief Color definition
+ * @defgroup Enesim_Argb Argb
+ * @brief Argb definition
  * @{
  */
 
@@ -30,6 +30,17 @@
  * ARGB color without premultiplication.
  */
 typedef uint32_t Enesim_Argb;
+
+
+EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
+EAPI void enesim_argb_components_to(Enesim_Argb argb, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
+
+/**
+ * @}
+ * @defgroup Enesim_Color Color
+ * @brief Color definition
+ * @{
+ */
 
 /**
  * @typedef Enesim_Color
@@ -57,9 +68,6 @@ EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb);
 
 EAPI void enesim_color_components_from(Enesim_Color *color, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
 EAPI void enesim_color_components_to(Enesim_Color color, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
-
-EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
-EAPI void enesim_argb_components_to(Enesim_Argb argb, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
 
 /**
  * @}

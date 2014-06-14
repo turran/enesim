@@ -21,20 +21,10 @@
 #include "enesim_quad.h"
 
 /**
- * @defgroup Enesim_Matrix Matrix
- * @brief Matrix definition and operations
+ * @defgroup Enesim_Matrix_Type Matrices type
+ * @brief Matrix types
  * @{
  */
-
-/** Helper macro for printf formatting */
-#define ENESIM_MATRIX_FORMAT "g %g %g | %g %g %g | %g %g %g"
-/** Helper macro for printf formatting arg */
-#define ENESIM_MATRIX_ARGS(m) (m)->xx, (m)->xy, (m)->xz, 	\
-		(m)->yx, (m)->yy, (m)->yz,			\
-		(m)->zx, (m)->zy, (m)->zz
-
-
-/** Matrix types */
 typedef enum _Enesim_Matrix_Type
 {
 	ENESIM_MATRIX_IDENTITY, /**< Identity matrix type */
@@ -44,26 +34,13 @@ typedef enum _Enesim_Matrix_Type
 } Enesim_Matrix_Type;
 
 /**
- * @ingroup Enesim_Matrix_Float
- * Floating point matrix handler
+ * @}
+ * @defgroup Enesim_Matrix_F16p16 Matrices in fixed point
+ * @brief Fixed point matrices operations
+ * @{
  */
-typedef struct _Enesim_Matrix
-{
-	double xx; /**< xx in x' = (x * xx) + (y * xy) + xz */
-	double xy; /**< xy in x' = (x * xx) + (y * xy) + xz */
-	double xz; /**< xz in x' = (x * xx) + (y * xy) + xz */
-
-	double yx; /**< yx in y' = (x * yx) + (y * yy) + yz */
-	double yy; /**< yy in y' = (x * yx) + (y * yy) + yz */
-	double yz; /**< yz in y' = (x * yx) + (y * yy) + yz */
-
-	double zx; /**< zx in z' = (x * zx) + (y * zy) + zz */
-	double zy; /**< zy in z' = (x * zx) + (y * zy) + zz */
-	double zz; /**< zz in z' = (x * zx) + (y * zy) + zz */
-} Enesim_Matrix;
 
 /**
- * @ingroup Enesim_Matrix_Fixed
  * Fixed point matrix handler
  */
 typedef struct _Enesim_Matrix_F16p16
@@ -81,13 +58,45 @@ typedef struct _Enesim_Matrix_F16p16
 	Eina_F16p16 zz; /**< zz in z' = (x * zx) + (y * zy) + zz */
 } Enesim_Matrix_F16p16;
 
+
+EAPI void enesim_matrix_f16p16_identity(Enesim_Matrix_F16p16 *m);
+EAPI void enesim_matrix_f16p16_compose(const Enesim_Matrix_F16p16 *m1,
+		const Enesim_Matrix_F16p16 *m2, Enesim_Matrix_F16p16 *dst);
+EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16 *m);
+
+
 /**
  * @}
- * @defgroup Enesim_Matrix_Float Floating point matrices
- * @brief Floating point matrices operations
- * @ingroup Enesim_Matrix
+ * @defgroup Enesim_Matrix Matrices
+ * @brief Matrix definition and operations
  * @{
  */
+
+/** Helper macro for printf formatting */
+#define ENESIM_MATRIX_FORMAT "g %g %g | %g %g %g | %g %g %g"
+/** Helper macro for printf formatting arg */
+#define ENESIM_MATRIX_ARGS(m) (m)->xx, (m)->xy, (m)->xz, 	\
+		(m)->yx, (m)->yy, (m)->yz,			\
+		(m)->zx, (m)->zy, (m)->zz
+
+
+/**
+ * Floating point matrix handler
+ */
+typedef struct _Enesim_Matrix
+{
+	double xx; /**< xx in x' = (x * xx) + (y * xy) + xz */
+	double xy; /**< xy in x' = (x * xx) + (y * xy) + xz */
+	double xz; /**< xz in x' = (x * xx) + (y * xy) + xz */
+
+	double yx; /**< yx in y' = (x * yx) + (y * yy) + yz */
+	double yy; /**< yy in y' = (x * yx) + (y * yy) + yz */
+	double yz; /**< yz in y' = (x * yx) + (y * yy) + yz */
+
+	double zx; /**< zx in z' = (x * zx) + (y * zy) + zz */
+	double zy; /**< zy in z' = (x * zx) + (y * zy) + zz */
+	double zz; /**< zz in z' = (x * zx) + (y * zy) + zz */
+} Enesim_Matrix;
 
 EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m);
 EAPI void enesim_matrix_values_set(Enesim_Matrix *m, double a, double b, double c,
@@ -124,19 +133,6 @@ EAPI Eina_Bool enesim_matrix_quad_quad_map(Enesim_Matrix *m, const Enesim_Quad *
 EAPI Eina_Bool enesim_matrix_square_quad_map(Enesim_Matrix *m, const Enesim_Quad *q);
 EAPI Eina_Bool enesim_matrix_quad_square_map(Enesim_Matrix *m, const Enesim_Quad *q);
 
-
-/**
- * @}
- * @defgroup Enesim_Matrix_Fixed Fixed point matrices
- * @brief Fixed point matrices operations
- * @ingroup Enesim_Matrix
- * @{
- */
-
-EAPI void enesim_matrix_f16p16_identity(Enesim_Matrix_F16p16 *m);
-EAPI void enesim_matrix_f16p16_compose(const Enesim_Matrix_F16p16 *m1,
-		const Enesim_Matrix_F16p16 *m2, Enesim_Matrix_F16p16 *dst);
-EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16 *m);
 
 /**
  * @}
