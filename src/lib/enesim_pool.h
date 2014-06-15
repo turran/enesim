@@ -19,6 +19,11 @@
 #define ENESIM_POOL_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Pool}
+ */
+
+/**
  * @defgroup Enesim_Pool Pool
  * @brief Buffer and surface pixel data allocator
  * @{

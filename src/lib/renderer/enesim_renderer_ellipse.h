@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_ELLIPSE_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Ellipse}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Ellipse Ellipse
- * @brief Ellipse renderer
+ * @brief Ellipse renderer @inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

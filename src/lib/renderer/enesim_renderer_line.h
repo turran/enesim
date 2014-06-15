@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_LINE_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Line}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Line Line
- * @brief Line renderer
+ * @brief Line renderer @inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

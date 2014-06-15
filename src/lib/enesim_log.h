@@ -19,6 +19,11 @@
 #define ENESIM_LOG_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Log}
+ */
+
+/**
  * @defgroup Enesim_Log Log
  * @brief Logging
  * @{

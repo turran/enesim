@@ -21,7 +21,15 @@
 #include "enesim_quad.h"
 
 /**
+ * @file
+ * @listgroup{Enesim_Matrix_Type}
+ * @listgroup{Enesim_Matrix_F16p16}
+ * @listgroup{Enesim_Matrix}
+ */
+
+/**
  * @defgroup Enesim_Matrix_Type Matrices type
+ * @ingroup Enesim_Basic
  * @brief Matrix types
  * @{
  */
@@ -36,6 +44,7 @@ typedef enum _Enesim_Matrix_Type
 /**
  * @}
  * @defgroup Enesim_Matrix_F16p16 Matrices in fixed point
+ * @ingroup Enesim_Basic
  * @brief Fixed point matrices operations
  * @{
  */
@@ -67,7 +76,8 @@ EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16
 
 /**
  * @}
- * @defgroup Enesim_Matrix Matrices
+ * @defgroup Enesim_Matrix_Floating Matrices in floating point
+ * @ingroup Enesim_Basic
  * @brief Matrix definition and operations
  * @{
  */

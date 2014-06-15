@@ -249,7 +249,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	
 		switch (cmd->type)
 		{
-			case ENESIM_PATH_COMMAND_MOVE_TO:
+			case ENESIM_PATH_COMMAND_TYPE_MOVE_TO:
 			x = cmd->definition.move_to.x;
 			y = cmd->definition.move_to.y;
 
@@ -258,7 +258,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			last_y = y;
 			break;
 
-			case ENESIM_PATH_COMMAND_LINE_TO:
+			case ENESIM_PATH_COMMAND_TYPE_LINE_TO:
 			x = cmd->definition.line_to.x;
 			y = cmd->definition.line_to.y;
 
@@ -268,7 +268,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			break;
 
 #if 0
-			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO:
 			x = cmd->definition.quadratic_to.x;
 			y = cmd->definition.quadratic_to.y;
 			ctrl_x0 = cmd->definition.quadratic_to.ctrl_x;
@@ -278,7 +278,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
 			break;
 
-			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO:
 			x = scale_x * cmd->definition.squadratic_to.x;
 			y = scale_y * cmd->definition.squadratic_to.y;
 
@@ -287,7 +287,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			enesim_path_normalizer_squadratic_to(normalizer, &squadratic_to);
 			break;
 #endif
-			case ENESIM_PATH_COMMAND_CUBIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_CUBIC_TO:
 			x = cmd->definition.cubic_to.x;
 			y = cmd->definition.cubic_to.y;
 			ctrl_x0 = cmd->definition.cubic_to.ctrl_x0;
@@ -307,7 +307,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			break;
 
 #if 0
-			case ENESIM_PATH_COMMAND_SCUBIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO:
 			x = scale_x * cmd->definition.scubic_to.x;
 			y = scale_y * cmd->definition.scubic_to.y;
 			ctrl_x0 = scale_x * cmd->definition.scubic_to.ctrl_x;
@@ -321,7 +321,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			enesim_path_normalizer_scubic_to(normalizer, &scubic_to);
 			break;
 
-			case ENESIM_PATH_COMMAND_ARC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_ARC_TO:
 			x = scale_x * cmd->definition.arc_to.x;
 			y = scale_y * cmd->definition.arc_to.y;
 			rx = scale_x * cmd->definition.arc_to.rx;
@@ -342,7 +342,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			enesim_path_normalizer_arc_to(normalizer, &arc_to);
 			break;
 
-			case ENESIM_PATH_COMMAND_CLOSE:
+			case ENESIM_PATH_COMMAND_TYPE_CLOSE:
 			close.close = cmd->definition.close.close;
 			enesim_path_normalizer_close(normalizer, &close);
 			break;

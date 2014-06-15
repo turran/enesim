@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_DISPMAP_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Dispmap}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Dispmap Displacement Map
- * @brief Renderer that displays source pixels using a map image
+ * @brief Renderer that displays source pixels using a map image @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

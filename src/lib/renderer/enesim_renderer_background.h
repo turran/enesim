@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_BACKGROUND_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Background}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Background Background
- * @brief Generic color renderer
+ * @brief Generic color renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

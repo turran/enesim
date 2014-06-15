@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_CHECKER_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Checker}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Checker Checker
- * @brief Checked pattern renderer
+ * @brief Checked pattern renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

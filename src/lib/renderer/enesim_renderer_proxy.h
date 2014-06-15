@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_PROXY_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Proxy}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Proxy Proxy
- * @brief Renderer that renders another renderer
+ * @brief Renderer that renders another renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

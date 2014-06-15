@@ -19,9 +19,13 @@
 #define ENESIM_RENDERER_PATH_H_
 
 /**
- * @}
+ * @file
+ * @listgroup{Enesim_Renderer_Path}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Path Path
- * @brief Path renderer
+ * @brief Path renderer @inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

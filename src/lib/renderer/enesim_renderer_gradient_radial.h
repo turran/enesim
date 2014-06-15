@@ -19,9 +19,13 @@
 #define ENESIM_RENDERER_GRADIENT_RADIAL_H_
 
 /**
- * @}
+ * @file
+ * @listgroup{Enesim_Renderer_Gradient_Radial}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Gradient_Radial Radial
- * @brief Radial gradient
+ * @brief Radial gradient @inherits{Enesim_Renderer_Gradient}
  * @ingroup Enesim_Renderer_Gradient
  * @{
  */

@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_STRIPES_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Stripes}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Stripes Stripes
- * @brief Stripe pattern renderer
+ * @brief Stripe pattern renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

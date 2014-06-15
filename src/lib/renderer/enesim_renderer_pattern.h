@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_PATTERN_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Pattern}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Pattern Pattern
- * @brief Renderer that repeats an area of another renderer to form a pattern
+ * @brief Renderer that repeats an area of another renderer to form a pattern @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

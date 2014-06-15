@@ -19,6 +19,15 @@
 #define ENESIM_IMAGE_H
 
 /**
+ * @file
+ * @listgroup{Enesim_Image}
+ * @listgroup{Enesim_Image_Context}
+ * @listgroup{Enesim_Image_File}
+ * @listgroup{Enesim_Image_Provider}
+ * @listgroup{Enesim_Image_Finder}
+ */
+
+/**
  * @defgroup Enesim_Image Image
  * @brief Image loading and saving
  * @{
@@ -32,36 +41,9 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_ALLOCATOR;
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_LOADING;
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 
-EAPI void enesim_image_dispatch(void);
-
-/**
- * @}
- * @defgroup Enesim_Image_Context Context
- * @brief Asynchronous context
- * @ingroup Enesim_Image
- * @{
- */
-typedef struct _Enesim_Image_Context Enesim_Image_Context;
 typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, int error); /**< Function prototype called whenever an image is loaded or saved */
 
-EAPI Enesim_Image_Context * enesim_image_context_new(void);
-EAPI void enesim_image_context_free(Enesim_Image_Context *thiz);
-EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz,
-		Enesim_Stream *data, const char *mime, Enesim_Buffer *b,
-		Enesim_Pool *mpool, Enesim_Image_Callback cb,
-		void *user_data, const char *options);
-EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Stream *data,
-		const char *mime, Enesim_Buffer *b, Enesim_Image_Callback cb,
-		void *user_data, const char *options);
-EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz);
-
-/**
- * @}
- * @defgroup Enesim_Image_Load_Save Loading and Saving
- * @brief Generic loading and saving using the main context
- * @ingroup Enesim_Image
- * @{
- */
+EAPI void enesim_image_dispatch(void);
 
 EAPI Eina_Bool enesim_image_info_get(Enesim_Stream *data, const char *mime,
 		int *w, int *h, Enesim_Buffer_Format *sfmt,
@@ -77,6 +59,26 @@ EAPI Eina_Bool enesim_image_save(Enesim_Stream *data, const char *mime,
 EAPI void enesim_image_save_async(Enesim_Stream *data, const char *mime,
 		Enesim_Buffer *b, Enesim_Image_Callback cb, void *user_data,
 		const char *options);
+
+/**
+ * @}
+ * @defgroup Enesim_Image_Context Context
+ * @brief Asynchronous context
+ * @ingroup Enesim_Image
+ * @{
+ */
+typedef struct _Enesim_Image_Context Enesim_Image_Context;
+
+EAPI Enesim_Image_Context * enesim_image_context_new(void);
+EAPI void enesim_image_context_free(Enesim_Image_Context *thiz);
+EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz,
+		Enesim_Stream *data, const char *mime, Enesim_Buffer *b,
+		Enesim_Pool *mpool, Enesim_Image_Callback cb,
+		void *user_data, const char *options);
+EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Stream *data,
+		const char *mime, Enesim_Buffer *b, Enesim_Image_Callback cb,
+		void *user_data, const char *options);
+EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz);
 
 /**
  * @}

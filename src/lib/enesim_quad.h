@@ -19,7 +19,13 @@
 #define ENESIM_QUAD_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Quad}
+ */
+
+/**
  * @defgroup Enesim_Quad Quadrangles
+ * @ingroup Enesim_Basic
  * @brief Quadrangles operations
  * @{
  */

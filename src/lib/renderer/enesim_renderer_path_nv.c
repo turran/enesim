@@ -630,21 +630,21 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 	{
 		switch (pcmd->type)
 		{
-			case ENESIM_PATH_COMMAND_MOVE_TO:
+			case ENESIM_PATH_COMMAND_TYPE_MOVE_TO:
 			*cmd++ = 'M';
 			*coord++ = pcmd->definition.move_to.x;
 			*coord++ = pcmd->definition.move_to.y;
 			num_coords += 2;
 			break;
 			
-			case ENESIM_PATH_COMMAND_LINE_TO:
+			case ENESIM_PATH_COMMAND_TYPE_LINE_TO:
 			*cmd++ = 'L';
 			*coord++ = pcmd->definition.line_to.x;
 			*coord++ = pcmd->definition.line_to.y;
 			num_coords += 2;
 			break;
 
-			case ENESIM_PATH_COMMAND_ARC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_ARC_TO:
 			*cmd++ = 'A';
 			num_coords += 7;
 			*coord++ = pcmd->definition.arc_to.rx;
@@ -656,11 +656,11 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 			*coord++ = pcmd->definition.arc_to.y;
 			break;
 
-			case ENESIM_PATH_COMMAND_CLOSE:
+			case ENESIM_PATH_COMMAND_TYPE_CLOSE:
 			*cmd++ = 'Z';
 			break;
 
-			case ENESIM_PATH_COMMAND_CUBIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_CUBIC_TO:
 			num_coords += 6;
 			*cmd++ = 'C';
 			*coord++ = pcmd->definition.cubic_to.ctrl_x0;
@@ -671,7 +671,7 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 			*coord++ = pcmd->definition.cubic_to.y;
 			break;
 
-			case ENESIM_PATH_COMMAND_SCUBIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO:
 			num_coords += 4;
 			*cmd++ = 'S';
 			*coord++ = pcmd->definition.scubic_to.ctrl_x;
@@ -680,7 +680,7 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 			*coord++ = pcmd->definition.scubic_to.y;
 			break;
 
-			case ENESIM_PATH_COMMAND_QUADRATIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO:
 			num_coords += 4;
 			*cmd++ = 'Q';
 			*coord++ = pcmd->definition.quadratic_to.ctrl_x;
@@ -689,7 +689,7 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 			*coord++ = pcmd->definition.quadratic_to.y;
 			break;
 
-			case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
+			case ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO:
 			num_coords += 2;
 			*cmd++ = 'T';
 			*coord++ = pcmd->definition.squadratic_to.x;

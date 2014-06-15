@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_IMPORTER_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Importer}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Importer Importer
- * @brief Renderer that imports pixels from a buffer
+ * @brief Renderer that imports pixels from a buffer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

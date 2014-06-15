@@ -19,7 +19,15 @@
 #define ENESIM_COLOR_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Argb}
+ * @listgroup{Enesim_Color}
+ * @listgroup{Enesim_Alpha}
+ */
+
+/**
  * @defgroup Enesim_Argb Argb
+ * @ingroup Enesim_Basic
  * @brief Argb definition
  * @{
  */
@@ -38,6 +46,7 @@ EAPI void enesim_argb_components_to(Enesim_Argb argb, uint8_t *a, uint8_t *r, ui
 /**
  * @}
  * @defgroup Enesim_Color Color
+ * @ingroup Enesim_Basic
  * @brief Color definition
  * @{
  */
@@ -56,18 +65,27 @@ typedef uint32_t Enesim_Color;
  */
 #define ENESIM_COLOR_FULL 0xffffffff
 
+EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c);
+EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb);
+
+EAPI void enesim_color_components_from(Enesim_Color *color, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
+EAPI void enesim_color_components_to(Enesim_Color color, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
+
+
+/**
+ * @}
+ * @defgroup Enesim_Alpha Alpha
+ * @ingroup Enesim_Basic
+ * @brief Alpha definition
+ * @{
+ */
+
 /**
  * @typedef Enesim_Alpha
  *
  * Internal representation of an alpha component of a color.
  */
 typedef uint8_t Enesim_Alpha;
-
-EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c);
-EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb);
-
-EAPI void enesim_color_components_from(Enesim_Color *color, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
-EAPI void enesim_color_components_to(Enesim_Color color, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
 
 /**
  * @}

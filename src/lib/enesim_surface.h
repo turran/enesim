@@ -19,6 +19,11 @@
 #define ENESIM_SURFACE_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Surface}
+ */
+
+/**
  * @defgroup Enesim_Surface Surface
  * @brief Native pixel data holder
  * 

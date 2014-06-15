@@ -35,6 +35,7 @@
  * - Eina
  *
  * @file
+ * @depends{eina}
  * @todo
  * - [1.1.0]
  *   - Implement OpenGL on every renderer with rop support

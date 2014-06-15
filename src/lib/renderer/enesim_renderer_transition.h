@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_TRANSITION_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Transition}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Transition Transition
- * @brief Rederer that blends two renderers
+ * @brief Rederer that blends two renderers @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

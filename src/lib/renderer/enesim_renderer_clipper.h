@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_CLIPPER_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Clipper}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Clipper Clipper
- * @brief Renderer that clips a source renderer
+ * @brief Renderer that clips a source renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

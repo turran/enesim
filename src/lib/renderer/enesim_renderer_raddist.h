@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_RADDIST_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Raddist}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Raddist Radial Distortion
- * @brief Filters a source image using a barrel distortion
+ * @brief Filters a source image using a barrel distortion @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

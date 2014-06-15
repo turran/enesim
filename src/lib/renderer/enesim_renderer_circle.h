@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_CIRCLE_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Circle}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Circle Circle
- * @brief Circle renderer
+ * @brief Circle renderer @inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

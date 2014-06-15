@@ -19,8 +19,21 @@
 #define ENESIM_PATH_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Path_Command}
+ * @listgroup{Enesim_Path}
+ */
+
+/**
  * @defgroup Enesim_Path Paths
+ * @ingroup Enesim_Basic
  * @brief Path definition
+ * @{
+ */
+
+/**
+ * @defgroup Enesim_Path_Command Path Commands
+ * @brief Path commands definition
  * @{
  */
 
@@ -29,15 +42,15 @@
  */
 typedef enum _Enesim_Path_Command_Type
 {
-	ENESIM_PATH_COMMAND_MOVE_TO, /**< A move command type */
-	ENESIM_PATH_COMMAND_LINE_TO, /**< A line command type */
-	ENESIM_PATH_COMMAND_QUADRATIC_TO, /**< A quadratic command type */
-	ENESIM_PATH_COMMAND_SQUADRATIC_TO, /**< A smooth quadratic command type */
-	ENESIM_PATH_COMMAND_CUBIC_TO, /**< A cubic command type */
-	ENESIM_PATH_COMMAND_SCUBIC_TO, /**< A smooth cubic command type */
-	ENESIM_PATH_COMMAND_ARC_TO, /**< An arc command type */
-	ENESIM_PATH_COMMAND_CLOSE, /**< A close command type */
-	ENESIM_PATH_COMMAND_TYPES, /**< The number command types */
+	ENESIM_PATH_COMMAND_TYPE_MOVE_TO, /**< A move command type */
+	ENESIM_PATH_COMMAND_TYPE_LINE_TO, /**< A line command type */
+	ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO, /**< A quadratic command type */
+	ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO, /**< A smooth quadratic command type */
+	ENESIM_PATH_COMMAND_TYPE_CUBIC_TO, /**< A cubic command type */
+	ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO, /**< A smooth cubic command type */
+	ENESIM_PATH_COMMAND_TYPE_ARC_TO, /**< An arc command type */
+	ENESIM_PATH_COMMAND_TYPE_CLOSE, /**< A close command type */
+	ENESIM_PATH_COMMAND_TYPE_TYPES, /**< The number command types */
 } Enesim_Path_Command_Type;
 
 /**
@@ -147,6 +160,10 @@ typedef struct _Enesim_Path_Command
 	Enesim_Path_Command_Type type; /**< The type of the command */
 	Enesim_Path_Command_Definition definition; /**< The values of the definition */
 } Enesim_Path_Command;
+
+/** @}
+ *
+ */
 
 typedef struct _Enesim_Path Enesim_Path; /**< A path handle */
 

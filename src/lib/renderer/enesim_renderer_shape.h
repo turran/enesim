@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_SHAPE_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Shape}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Shape Shapes
- * @brief Geometric shape renderer
+ * @brief Geometric shape renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

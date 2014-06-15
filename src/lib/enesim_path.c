@@ -241,14 +241,14 @@ EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 	Enesim_Path_Command *new_command;
 
 	/* do not allow a move to command after another move to, just simplfiy them */
-	if (cmd->type == ENESIM_PATH_COMMAND_MOVE_TO)
+	if (cmd->type == ENESIM_PATH_COMMAND_TYPE_MOVE_TO)
 	{
 		Enesim_Path_Command *last_command;
 		Eina_List *last;
 
 		last = eina_list_last(thiz->commands);
 		last_command = eina_list_data_get(last);
-		if (last_command && last_command->type == ENESIM_PATH_COMMAND_MOVE_TO)
+		if (last_command && last_command->type == ENESIM_PATH_COMMAND_TYPE_MOVE_TO)
 		{
 			last_command->definition.move_to.x = cmd->definition.move_to.x;
 			last_command->definition.move_to.y = cmd->definition.move_to.y;
@@ -272,7 +272,7 @@ EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y)
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_MOVE_TO;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_MOVE_TO;
 	cmd.definition.move_to.x = x;
 	cmd.definition.move_to.y = y;
 	enesim_path_command_add(thiz, &cmd);
@@ -288,7 +288,7 @@ EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y)
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_LINE_TO;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_LINE_TO;
 	cmd.definition.line_to.x = x;
 	cmd.definition.line_to.y = y;
 	enesim_path_command_add(thiz, &cmd);
@@ -305,7 +305,7 @@ EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x,
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_SQUADRATIC_TO;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO;
 	cmd.definition.squadratic_to.x = x;
 	cmd.definition.squadratic_to.y = y;
 	enesim_path_command_add(thiz, &cmd);
@@ -324,7 +324,7 @@ EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_QUADRATIC_TO;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO;
 	cmd.definition.quadratic_to.x = x;
 	cmd.definition.quadratic_to.y = y;
 	cmd.definition.quadratic_to.ctrl_x = ctrl_x;
@@ -347,7 +347,7 @@ EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_CUBIC_TO;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_CUBIC_TO;
 	cmd.definition.cubic_to.x = x;
 	cmd.definition.cubic_to.y = y;
 	cmd.definition.cubic_to.ctrl_x0 = ctrl_x0;
@@ -370,7 +370,7 @@ EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x,
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_SCUBIC_TO;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO;
 	cmd.definition.scubic_to.x = x;
 	cmd.definition.scubic_to.y = y;
 	cmd.definition.scubic_to.ctrl_x = ctrl_x;
@@ -395,7 +395,7 @@ EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double ang
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_ARC_TO;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_ARC_TO;
 	cmd.definition.arc_to.x = x;
 	cmd.definition.arc_to.y = y;
 	cmd.definition.arc_to.rx = rx;
@@ -414,7 +414,7 @@ EAPI void enesim_path_close(Enesim_Path *thiz)
 {
 	Enesim_Path_Command cmd;
 
-	cmd.type = ENESIM_PATH_COMMAND_CLOSE;
+	cmd.type = ENESIM_PATH_COMMAND_TYPE_CLOSE;
 	cmd.definition.close.close = EINA_TRUE;
 	enesim_path_command_add(thiz, &cmd);
 }

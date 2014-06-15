@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_GRADIENT_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Gradient}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Gradient Gradient
- * @brief Gradient renderer
+ * @brief Gradient renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

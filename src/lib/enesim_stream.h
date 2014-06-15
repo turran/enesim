@@ -19,6 +19,11 @@
 #define ENESIM_STREAM_H
 
 /**
+ * @file
+ * @listgroup{Enesim_Stream}
+ */
+
+/**
  * @defgroup Enesim_Stream Stream
  * @brief Stream sources
  * @{

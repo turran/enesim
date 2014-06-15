@@ -501,35 +501,35 @@ void enesim_path_normalizer_normalize(Enesim_Path_Normalizer *thiz,
 {
 	switch (cmd->type)
 	{
-		case ENESIM_PATH_COMMAND_MOVE_TO:
+		case ENESIM_PATH_COMMAND_TYPE_MOVE_TO:
 		enesim_path_normalizer_move_to(thiz, &cmd->definition.move_to);
 		break;
 
-		case ENESIM_PATH_COMMAND_LINE_TO:
+		case ENESIM_PATH_COMMAND_TYPE_LINE_TO:
 		enesim_path_normalizer_line_to(thiz, &cmd->definition.line_to);
 		break;
 
-		case ENESIM_PATH_COMMAND_QUADRATIC_TO:
+		case ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO:
 		enesim_path_normalizer_quadratic_to(thiz, &cmd->definition.quadratic_to);
 		break;
 
-		case ENESIM_PATH_COMMAND_SQUADRATIC_TO:
+		case ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO:
 		enesim_path_normalizer_squadratic_to(thiz, &cmd->definition.squadratic_to);
 		break;
 
-		case ENESIM_PATH_COMMAND_CUBIC_TO:
+		case ENESIM_PATH_COMMAND_TYPE_CUBIC_TO:
 		enesim_path_normalizer_cubic_to(thiz, &cmd->definition.cubic_to);
 		break;
 
-		case ENESIM_PATH_COMMAND_SCUBIC_TO:
+		case ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO:
 		enesim_path_normalizer_scubic_to(thiz, &cmd->definition.scubic_to);
 		break;
 
-		case ENESIM_PATH_COMMAND_ARC_TO:
+		case ENESIM_PATH_COMMAND_TYPE_ARC_TO:
 		enesim_path_normalizer_arc_to(thiz, &cmd->definition.arc_to);
 		break;
 
-		case ENESIM_PATH_COMMAND_CLOSE:
+		case ENESIM_PATH_COMMAND_TYPE_CLOSE:
 		enesim_path_normalizer_close(thiz, &cmd->definition.close);
 		break;
 

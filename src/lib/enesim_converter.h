@@ -19,6 +19,11 @@
 #define ENESIM_CONVERTER_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Converter}
+ */
+
+/**
  * @defgroup Enesim_Converter Converter
  * @brief Target to target and native to target pixel data converter
  * @{

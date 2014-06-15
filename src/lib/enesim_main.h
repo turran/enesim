@@ -20,8 +20,14 @@
 #define ENESIM_MAIN_H_
 
 /**
- * @defgroup Enesim_Main Main
- * @brief Common definitions
+ * @file
+ * @listgroup{Enesim_Basic}
+ * @listgroup{Enesim_Main}
+ */
+
+/**
+ * @defgroup Enesim_Basic Basic types
+ * @brief Basic types
  * @{
  */
 
@@ -115,6 +121,13 @@ typedef enum _Enesim_Backend
 	ENESIM_BACKEND_OPENGL, /**< OpenGL based backend (experimental) */
 	ENESIM_BACKENDS
 } Enesim_Backend;
+
+/**
+ * @}
+ * @defgroup Enesim_Main Main
+ * @brief Main functions
+ * @{
+ */
 
 EAPI int enesim_init(void);
 EAPI int enesim_shutdown(void);

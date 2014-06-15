@@ -19,12 +19,15 @@
 #define ENESIM_BUFFER_H_
 
 /**
- * @defgroup Enesim_Buffer Buffer
- * @brief Target device pixel data holder
- * @{
+ * @file
+ * @listgroup{Enesim_Buffer_Format}
+ * @listgroup{Enesim_Buffer}
  */
 
-typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
+/**
+ * @defgroup Enesim_Buffer_Format Buffer format
+ * @{
+ */
 
 /*
  * ENESIM_BUFFER_FORMAT_A8
@@ -112,6 +115,16 @@ typedef union _Enesim_Buffer_Sw_Data
 	Enesim_Buffer_Bgr888 bgr888; /**< The @ref ENESIM_BUFFER_FORMAT_BGR888 value */
 	Enesim_Buffer_Cmyk cmyk; /**< The @ref ENESIM_BUFFER_FORMAT_CMYK values */
 } Enesim_Buffer_Sw_Data;
+
+
+/**
+ * @}
+ * @defgroup Enesim_Buffer Buffer
+ * @brief Target device pixel data holder
+ * @{
+ */
+
+typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
 
 /**
  * @brief Free function callback

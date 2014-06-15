@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_TEXT_SPAN_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Text_Span}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Text_Span Text Span
- * @brief Text span renderer
+ * @brief Text span renderer @inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer
  * @{
  */

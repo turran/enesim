@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_BLUR_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Blur}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Blur Blur Filter
- * @brief Blur filter renderer
+ * @brief Blur filter renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

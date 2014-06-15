@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_RECTANGLE_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Rectangle}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Rectangle Rectangle
- * @brief Rectangle renderer
+ * @brief Rectangle renderer @inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

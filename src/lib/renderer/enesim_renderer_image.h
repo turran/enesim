@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_IMAGE_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Image}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Image Image
- * @brief Image based renderer
+ * @brief Image based renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_PERLIN_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Perlin}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Perlin Perlin
- * @brief Perlin noise renderer
+ * @brief Perlin noise renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

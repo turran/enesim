@@ -19,6 +19,12 @@
 #define ENESIM_RENDERER_COMPOUND_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Compound_Layer}
+ * @listgroup{Enesim_Renderer_Compound}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Compound Compound
  * @brief Renderer that contains other renderers
  * @ingroup Enesim_Renderer
@@ -27,7 +33,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Compound_Layer Compound Layer
- * @brief Compound layer
+ * @brief Compound layer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer_Compound
  * @{
  */

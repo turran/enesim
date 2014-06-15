@@ -20,6 +20,15 @@
 #define _ENESIM_TEXT_H
 
 /**
+ * @file
+ * @listgroup{Enesim_Text}
+ * @listgroup{Enesim_Text_Font}
+ * @listgroup{Enesim_Text_Buffer}
+ * @listgroup{Enesim_Text_Buffer_Simple}
+ * @listgroup{Enesim_Text_Buffer_Smart}
+ */
+
+/**
  * @defgroup Enesim_Text Text
  * @brief Text and font definitions and operations
  * @todo
@@ -85,6 +94,7 @@ EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz);
 /**
  * @}
  * @defgroup Enesim_Text_Buffer_Simple Simple Buffer
+ * @inherits{Enesim_Text_Buffer}
  * @ingroup Enesim_Text_Buffer
  * @{
  */
@@ -94,6 +104,7 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length);
 /**
  * @}
  * @defgroup Enesim_Text_Buffer_Smart Smart Buffer
+ * @inherits{Enesim_Text_Buffer}
  * @ingroup Enesim_Text_Buffer
  * @{
  */

@@ -20,6 +20,11 @@
 #define ENESIM_FORMAT_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Format}
+ */
+
+/**
  * @defgroup Enesim_Format Format
  * @{
  */

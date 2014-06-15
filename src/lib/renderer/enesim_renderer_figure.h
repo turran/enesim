@@ -17,10 +17,15 @@
  */
 #ifndef ENESIM_RENDERER_FIGURE_H_
 #define ENESIM_RENDERER_FIGURE_H_
+
 /**
- * @}
+ * @file
+ * @listgroup{Enesim_Renderer_Figure}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Figure Figure
- * @brief A figure composed of polygons renderer
+ * @brief A figure composed of polygons renderer @inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

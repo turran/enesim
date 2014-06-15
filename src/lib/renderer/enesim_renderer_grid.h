@@ -19,8 +19,13 @@
 #define ENESIM_RENDERER_GRID_H_
 
 /**
+ * @file
+ * @listgroup{Enesim_Renderer_Grid}
+ */
+
+/**
  * @defgroup Enesim_Renderer_Grid Grid
- * @brief Grid pattern renderer
+ * @brief Grid pattern renderer @inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

@@ -21,7 +21,13 @@
 #include <math.h>
 
 /**
+ * @file
+ * @listgroup{Enesim_Rectangle}
+ */
+
+/**
  * @defgroup Enesim_Rectangle Rectangle
+ * @ingroup Enesim_Basic
  * @brief Rectangle definition and operations
  * @{
  */
