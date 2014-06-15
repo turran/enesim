@@ -76,7 +76,7 @@ EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16
 
 /**
  * @}
- * @defgroup Enesim_Matrix_Floating Matrices in floating point
+ * @defgroup Enesim_Matrix Matrices in floating point
  * @ingroup Enesim_Basic
  * @brief Matrix definition and operations
  * @{
