@@ -20,6 +20,7 @@
 
 /**
  * @file
+ * @listgroup{Enesim_Image_Definitions}
  * @listgroup{Enesim_Image}
  * @listgroup{Enesim_Image_Context}
  * @listgroup{Enesim_Image_File}
@@ -28,8 +29,8 @@
  */
 
 /**
- * @defgroup Enesim_Image Image
- * @brief Image loading and saving
+ * @defgroup Enesim_Image_Definitions Definitions
+ * @ingroup Enesim_Image
  * @{
  */
 
@@ -42,6 +43,13 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_LOADING;
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 
 typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, int error); /**< Function prototype called whenever an image is loaded or saved */
+
+/**
+ * @}
+ * @defgroup Enesim_Image Image
+ * @brief Image loading and saving
+ * @{
+ */
 
 EAPI void enesim_image_dispatch(void);
 
