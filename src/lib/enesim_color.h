@@ -40,7 +40,7 @@
 typedef uint32_t Enesim_Argb;
 
 
-EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
+EAPI Enesim_Argb enesim_argb_components_from(uint8_t a, uint8_t r, uint8_t g, uint8_t b);
 EAPI void enesim_argb_components_to(Enesim_Argb argb, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
 
 /**
@@ -68,7 +68,7 @@ typedef uint32_t Enesim_Color;
 EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c);
 EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb);
 
-EAPI void enesim_color_components_from(Enesim_Color *color, uint8_t a, uint8_t r, uint8_t g, uint8_t b);
+EAPI Enesim_Color enesim_color_components_from(uint8_t a, uint8_t r, uint8_t g, uint8_t b);
 EAPI void enesim_color_components_to(Enesim_Color color, uint8_t *a, uint8_t *r, uint8_t *g, uint8_t *b);
 
 

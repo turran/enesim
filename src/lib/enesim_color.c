@@ -64,26 +64,26 @@ EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb)
 }
 
 /**
- * @brief Set the given premultiplied color with the given components.
+ * @brief Return a premultiplied color from the given components.
  *
- * @param[out] color The Enesim color to set.
  * @param[in] a The alpha component.
  * @param[in] r The red component.
  * @param[in] g The green component.
  * @param[in] b The blue component.
+ * @return The Enesim color.
  *
- * This function sets the premultiplied color @p color with the
- * components @p a,  @p r, @p g and @p b.
+ * This function returns the premultiplied color with the components @p a,
+ * @p r, @p g and @p b.
  *
  * @see enesim_color_components_to()
  */
-EAPI void enesim_color_components_from(Enesim_Color *color,
-		uint8_t a, uint8_t r, uint8_t g, uint8_t b)
+EAPI Enesim_Color enesim_color_components_from(uint8_t a, uint8_t r,
+		uint8_t g, uint8_t b)
 {
 	uint16_t alpha = a + 1;
-	*color = (a << 24) | (((r * alpha) >> 8) << 16)
+	return ((a << 24) | (((r * alpha) >> 8) << 16)
 					| (((g * alpha) >> 8) << 8)
-					| ((b * alpha) >> 8);
+					| ((b * alpha) >> 8));
 }
 
 /**
@@ -123,22 +123,22 @@ EAPI void enesim_color_components_to(Enesim_Color color,
 }
 
 /**
- * @brief Set the given ARGB color with the given components.
+ * @brief Return an ARGB color from the given components.
  *
- * @param[out] argb The ARGB color to set.
  * @param[in] a The alpha component.
  * @param[in] r The red component.
  * @param[in] g The green component.
  * @param[in] b The blue component.
+ * @return The ARGB color
  *
- * This function sets the @p argb color with the components @p a,
+ * This function returns the argb color with the components @p a,
  * @p r, @p g and @p b.
  *
  * @see enesim_argb_components_to()
  */
-EAPI void enesim_argb_components_from(Enesim_Argb *argb, uint8_t a, uint8_t r, uint8_t g, uint8_t b)
+EAPI Enesim_Argb enesim_argb_components_from(uint8_t a, uint8_t r, uint8_t g, uint8_t b)
 {
-	if (argb) *argb = a << 24 | r << 16 | g << 8 | b;
+	return (a << 24 | r << 16 | g << 8 | b);
 }
 
 /**
