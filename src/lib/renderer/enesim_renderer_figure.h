@@ -30,19 +30,6 @@
  * @{
  */
 
-/** A polygon definition */
-typedef struct _Enesim_Renderer_Figure_Polygon
-{
-	Eina_List *vertices; /**< The list of vertices */
-} Enesim_Renderer_Figure_Polygon;
-
-/** A vertex definition */
-typedef struct _Enesim_Renderer_Figure_Vertex
-{
-	double x; /**< The X coordinate */
-	double y; /**< The Y coordinate */
-} Enesim_Renderer_Figure_Vertex;
-
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void);
 EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p);
 EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p, double x, double y);
