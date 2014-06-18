@@ -22,6 +22,7 @@
 /**
  * @file
  * @listgroup{Enesim_Text}
+ * @listgroup{Enesim_Text_Engine}
  * @listgroup{Enesim_Text_Font}
  * @listgroup{Enesim_Text_Buffer}
  * @listgroup{Enesim_Text_Buffer_Simple}
@@ -43,17 +44,24 @@
  * @{
  */
 
-typedef struct _Enesim_Text_Engine Enesim_Text_Engine;
-EAPI Enesim_Text_Engine * enesim_text_engine_default_get(void);
-EAPI Enesim_Text_Engine * enesim_text_engine_freetype_get(void);
-EAPI Enesim_Text_Engine * enesim_text_engine_ref(Enesim_Text_Engine *thiz);
-EAPI void enesim_text_engine_unref(Enesim_Text_Engine *thiz);
-
 typedef enum _Enesim_Text_Direction
 {
 	ENESIM_TEXT_DIRECTION_LTR,
 	ENESIM_TEXT_DIRECTION_RTL,
 } Enesim_Text_Direction;
+
+/**
+ * @}
+ * @defgroup Enesim_Text_Engine Engine
+ * @ingroup Enesim_Text
+ * @{
+ */
+
+typedef struct _Enesim_Text_Engine Enesim_Text_Engine;
+EAPI Enesim_Text_Engine * enesim_text_engine_default_get(void);
+EAPI Enesim_Text_Engine * enesim_text_engine_freetype_get(void);
+EAPI Enesim_Text_Engine * enesim_text_engine_ref(Enesim_Text_Engine *thiz);
+EAPI void enesim_text_engine_unref(Enesim_Text_Engine *thiz);
 
 /**
  * @}

@@ -180,6 +180,7 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *da
  * @param[out] w The width of the image
  * @param[out] h The height of the image
  * @param[out] sfmt The format of the image
+ * @param[in] options Any option the provider might require
  * @param[out] err The error in case the info loading fails
  * @return EINA_TRUE if succeeded, EINA_FALSE otherwise.
  */

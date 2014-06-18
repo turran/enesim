@@ -20,13 +20,13 @@
 
 /**
  * @file
+ * @listgroup{Enesim_Renderer_Shape_Definitions}
  * @listgroup{Enesim_Renderer_Shape}
  */
 
 /**
- * @defgroup Enesim_Renderer_Shape Shapes
- * @brief Geometric shape renderer @inherits{Enesim_Renderer}
- * @ingroup Enesim_Renderer
+ * @defgroup Enesim_Renderer_Shape_Definitions Definitions
+ * @ingroup Enesim_Renderer_Shape
  * @{
  */
 
@@ -98,6 +98,14 @@ typedef enum _Enesim_Renderer_Shape_Fill_Rule
 	ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD, /**< The even odd fill rule */
 	ENESIM_RENDERER_SHAPE_FILL_RULES, /**< The number of fill rules */
 } Enesim_Renderer_Shape_Fill_Rule;
+
+/**
+ * @}
+ * @defgroup Enesim_Renderer_Shape Shapes
+ * @brief Geometric shape renderer @inherits{Enesim_Renderer}
+ * @ingroup Enesim_Renderer
+ * @{
+ */
 
 EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_features_get(Enesim_Renderer *r);
 
