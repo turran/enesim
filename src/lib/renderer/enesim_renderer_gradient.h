@@ -20,13 +20,13 @@
 
 /**
  * @file
+ * @listgroup{Enesim_Renderer_Gradient_Stop}
  * @listgroup{Enesim_Renderer_Gradient}
  */
 
 /**
- * @defgroup Enesim_Renderer_Gradient Gradient
- * @brief Gradient renderer @inherits{Enesim_Renderer}
- * @ingroup Enesim_Renderer
+ * @defgroup Enesim_Renderer_Gradient_Stop Gradient Stop
+ * @ingroup Enesim_Renderer_Gradient
  * @{
  */
 
@@ -36,6 +36,14 @@ typedef struct _Enesim_Renderer_Gradient_Stop
 	Enesim_Argb argb; /**< The argb color of the stop */
 	double pos; /**< The position of the stop in the 0..1 range */
 } Enesim_Renderer_Gradient_Stop;
+
+/**
+ * @}
+ * @defgroup Enesim_Renderer_Gradient Gradient
+ * @brief Gradient renderer @inherits{Enesim_Renderer}
+ * @ingroup Enesim_Renderer
+ * @{
+ */
 
 EAPI void enesim_renderer_gradient_stop_add(Enesim_Renderer *r, Enesim_Renderer_Gradient_Stop *stop);
 EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r);

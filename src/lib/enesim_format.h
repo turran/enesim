@@ -37,7 +37,7 @@ typedef enum _Enesim_Format
 	ENESIM_FORMAT_NONE,
 	ENESIM_FORMAT_ARGB8888,  /**< argb32 */
 	ENESIM_FORMAT_A8, /**< a8 */
-	ENESIM_FORMATS /**< The number of formats */
+	ENESIM_FORMAT_LAST /**< The number of formats */
 } Enesim_Format;
 
 EAPI const char * enesim_format_name_get(Enesim_Format f);

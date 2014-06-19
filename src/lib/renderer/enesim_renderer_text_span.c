@@ -474,11 +474,11 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 	type = enesim_renderer_transformation_type_get(r);
 	switch (type)
 	{
-		case ENESIM_MATRIX_IDENTITY:
+		case ENESIM_MATRIX_TYPE_IDENTITY:
 		*fill = _enesim_renderer_text_span_draw_ltr_identity;
 		break;
 
-		case ENESIM_MATRIX_AFFINE:
+		case ENESIM_MATRIX_TYPE_AFFINE:
 		enesim_renderer_transformation_get(r, &matrix);
 		enesim_matrix_inverse(&matrix, &inv);
 		enesim_matrix_matrix_f16p16_to(&inv,
@@ -567,7 +567,7 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 	_enesim_renderer_text_span_geometry_get(r, rect);
 	type = enesim_renderer_transformation_type_get(r);
 	/* transform the geometry */
-	if (type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 	{
 		Enesim_Quad q;
 		Enesim_Matrix m;

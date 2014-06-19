@@ -37,17 +37,17 @@
 typedef struct _Enesim_Compositor
 {
 	/* Scanlines */
-	Enesim_Compositor_Span sp_color[ENESIM_ROPS][ENESIM_FORMATS];
-	Enesim_Compositor_Span sp_mask_color[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS];
-	Enesim_Compositor_Span sp_pixel[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS];
-	Enesim_Compositor_Span sp_pixel_color[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS];
-	Enesim_Compositor_Span sp_pixel_mask[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS][ENESIM_FORMATS];
+	Enesim_Compositor_Span sp_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Span sp_mask_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Span sp_pixel[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Span sp_pixel_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Span sp_pixel_mask[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
 	/* Points */
-	Enesim_Compositor_Point pt_color[ENESIM_ROPS][ENESIM_FORMATS];
-	Enesim_Compositor_Point pt_mask_color[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS];
-	Enesim_Compositor_Point pt_pixel[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS];
-	Enesim_Compositor_Point pt_pixel_color[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS];
-	Enesim_Compositor_Point pt_pixel_mask[ENESIM_ROPS][ENESIM_FORMATS][ENESIM_FORMATS][ENESIM_FORMATS];
+	Enesim_Compositor_Point pt_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Point pt_mask_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Point pt_pixel[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Point pt_pixel_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Point pt_pixel_mask[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
 } Enesim_Compositor;
 
 static Enesim_Compositor _comps;
@@ -219,7 +219,7 @@ Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 {
 	if (!dfmt)
 		return NULL;
-	if (*dfmt <= ENESIM_FORMAT_NONE && *dfmt > ENESIM_FORMATS)
+	if (*dfmt <= ENESIM_FORMAT_NONE && *dfmt > ENESIM_FORMAT_LAST)
 		return NULL;
 
 	if (!sfmt && !mfmt)
@@ -248,7 +248,7 @@ Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
 {
 	if (!dfmt)
 		return NULL;
-	if (*dfmt <= ENESIM_FORMAT_NONE && *dfmt > ENESIM_FORMATS)
+	if (*dfmt <= ENESIM_FORMAT_NONE && *dfmt > ENESIM_FORMAT_LAST)
 		return NULL;
 
 	if (!sfmt && !mfmt)

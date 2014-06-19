@@ -76,14 +76,14 @@ static double _cos(double x)
 EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m)
 {
 	if ((MATRIX_ZX(m) != 0) || (MATRIX_ZY(m) != 0) || (MATRIX_ZZ(m) != 1))
-		return ENESIM_MATRIX_PROJECTIVE;
+		return ENESIM_MATRIX_TYPE_PROJECTIVE;
 	else
 	{
 		if ((MATRIX_XX(m) == 1) && (MATRIX_XY(m) == 0) && (MATRIX_XZ(m) == 0) &&
 				(MATRIX_YX(m) == 0) && (MATRIX_YY(m) == 1) && (MATRIX_YZ(m) == 0))
-			return ENESIM_MATRIX_IDENTITY;
+			return ENESIM_MATRIX_TYPE_IDENTITY;
 		else
-			return ENESIM_MATRIX_AFFINE;
+			return ENESIM_MATRIX_TYPE_AFFINE;
 	}
 }
 
@@ -99,14 +99,14 @@ EAPI Enesim_Matrix_Type enesim_matrix_type_get(const Enesim_Matrix *m)
 EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16 *m)
 {
 	if ((MATRIX_ZX(m) != 0) || (MATRIX_ZY(m) != 0) || (MATRIX_ZZ(m) != 65536))
-		return ENESIM_MATRIX_PROJECTIVE;
+		return ENESIM_MATRIX_TYPE_PROJECTIVE;
 	else
 	{
 		if ((MATRIX_XX(m) == 65536) && (MATRIX_XY(m) == 0) && (MATRIX_XZ(m) == 0) &&
 				(MATRIX_YX(m) == 0) && (MATRIX_YY(m) == 65536) && (MATRIX_YZ(m) == 0))
-			return ENESIM_MATRIX_IDENTITY;
+			return ENESIM_MATRIX_TYPE_IDENTITY;
 		else
-			return ENESIM_MATRIX_AFFINE;
+			return ENESIM_MATRIX_TYPE_AFFINE;
 	}
 }
 

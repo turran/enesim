@@ -191,8 +191,8 @@ static void _state_init(Enesim_Renderer_State *thiz)
 	thiz->current.oy = thiz->past.oy = 0;
 	enesim_matrix_identity(&thiz->current.transformation);
 	enesim_matrix_identity(&thiz->past.transformation);
-	thiz->current.transformation_type = ENESIM_MATRIX_IDENTITY;
-	thiz->past.transformation_type = ENESIM_MATRIX_IDENTITY;
+	thiz->current.transformation_type = ENESIM_MATRIX_TYPE_IDENTITY;
+	thiz->past.transformation_type = ENESIM_MATRIX_TYPE_IDENTITY;
 }
 
 static void _state_commit(Enesim_Renderer_State *thiz)
@@ -704,7 +704,7 @@ EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Ma
 	if (!m)
 	{
 		enesim_matrix_identity(&r->state.current.transformation);
-		r->state.current.transformation_type = ENESIM_MATRIX_IDENTITY;
+		r->state.current.transformation_type = ENESIM_MATRIX_TYPE_IDENTITY;
 		return;
 	}
 	r->state.current.transformation = *m;

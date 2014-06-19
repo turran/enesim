@@ -213,7 +213,7 @@ DISPMAP_AFFINE(a, b, _argb8888_alpha, _argb8888_blue);
 DISPMAP_IDENTITY(a, b, _argb8888_alpha, _argb8888_blue);
 DISPMAP_IDENTITY(r, g, _argb8888_red, _argb8888_green);
 
-static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNELS][ENESIM_CHANNELS][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNEL_LAST][ENESIM_CHANNEL_LAST][ENESIM_MATRIX_TYPE_LAST];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -303,13 +303,13 @@ static void _enesim_renderer_dispmap_class_init(void *k)
 	klass->sw_setup = _dispmap_sw_setup;
 	klass->sw_cleanup = _dispmap_sw_cleanup;
 
-	_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_IDENTITY]
+	_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_TYPE_IDENTITY]
 		= _argb8888_a_b_span_identity;
-	_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_AFFINE]
+	_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_TYPE_AFFINE]
 		= _argb8888_a_b_span_affine;
-	_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_IDENTITY]
+	_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_TYPE_IDENTITY]
 		= _argb8888_r_g_span_identity;
-	_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_AFFINE]
+	_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_TYPE_AFFINE]
 		= _argb8888_r_g_span_affine;
 }
 

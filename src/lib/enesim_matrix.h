@@ -35,10 +35,10 @@
  */
 typedef enum _Enesim_Matrix_Type
 {
-	ENESIM_MATRIX_IDENTITY, /**< Identity matrix type */
-	ENESIM_MATRIX_AFFINE, /**< Affine matrix type */
-	ENESIM_MATRIX_PROJECTIVE, /**< Projective matrix type */
-	ENESIM_MATRIX_TYPES /**< The total number of matrix types */
+	ENESIM_MATRIX_TYPE_IDENTITY, /**< Identity matrix type */
+	ENESIM_MATRIX_TYPE_AFFINE, /**< Affine matrix type */
+	ENESIM_MATRIX_TYPE_PROJECTIVE, /**< Projective matrix type */
+	ENESIM_MATRIX_TYPE_LAST /**< The total number of matrix types */
 } Enesim_Matrix_Type;
 
 /**

@@ -1169,7 +1169,7 @@ EAPI Eina_Bool enesim_renderer_shape_destination_geometry_get(
 	if (!enesim_renderer_shape_geometry_get(r, geometry))
 		return EINA_FALSE;
 	type = enesim_renderer_transformation_type_get(r);
-	if (type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 	{
 		Enesim_Matrix m;
 		Enesim_Quad q;

@@ -106,7 +106,7 @@ static void _image_transform_bounds(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Rectangle *bounds)
 {
 	*bounds = *obounds;
-	if (type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 	{
 		Enesim_Quad q;
 
@@ -1419,11 +1419,11 @@ static void _argb8888_image_scale_d_d_affine(Enesim_Renderer *r,
 }
 
 /* [downscaling|upscaling x][downscaling|upscaling y][matrix types] */
-static Enesim_Renderer_Sw_Fill  _spans_best[2][2][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill  _spans_best[2][2][ENESIM_MATRIX_TYPE_LAST];
 /* [scaling|noscaling][matrix types] */
-static Enesim_Renderer_Sw_Fill  _spans_good[2][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill  _spans_good[2][ENESIM_MATRIX_TYPE_LAST];
 /* [scaling|noscaling][matrix types] */
-static Enesim_Renderer_Sw_Fill  _spans_fast[2][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill  _spans_fast[2][ENESIM_MATRIX_TYPE_LAST];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -1503,7 +1503,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 	enesim_matrix_inverse(&m, &m);
 	enesim_matrix_matrix_f16p16_to(&m, &thiz->matrix);
 	mtype = enesim_matrix_f16p16_type_get(&thiz->matrix);
-	if (mtype != ENESIM_MATRIX_IDENTITY)
+	if (mtype != ENESIM_MATRIX_TYPE_IDENTITY)
 	{
 		double sx, sy;
 
@@ -1564,7 +1564,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 		thiz->nyy = (isy * 65536) / sy;
 
 		thiz->simple = EINA_FALSE;
-		if (mtype == ENESIM_MATRIX_AFFINE)  // in case it's just a translation
+		if (mtype == ENESIM_MATRIX_TYPE_AFFINE)  // in case it's just a translation
 		{
 			thiz->ixx -= thiz->matrix.xz;  thiz->matrix.xz = 0;
 			thiz->iyy -= thiz->matrix.yz;  thiz->matrix.yz = 0;
@@ -1586,7 +1586,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 			thiz->matrix.xz -= thiz->ixx;  thiz->ixx = 0;
 			thiz->matrix.yz -= thiz->iyy;  thiz->iyy = 0;
 			mtype = enesim_matrix_f16p16_type_get(&thiz->matrix);
-			if (mtype != ENESIM_MATRIX_IDENTITY)
+			if (mtype != ENESIM_MATRIX_TYPE_IDENTITY)
 				thiz->simple = EINA_FALSE;
 		}
 
@@ -1594,7 +1594,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 			*fill = _spans_fast[0][mtype];
 		else
 			*fill = _spans_good[0][mtype];
-		if (mtype == ENESIM_MATRIX_IDENTITY)
+		if (mtype == ENESIM_MATRIX_TYPE_IDENTITY)
 		{
 			thiz->span = enesim_compositor_span_get(rop, &fmt,
 				ENESIM_FORMAT_ARGB8888, thiz->color, ENESIM_FORMAT_NONE);
@@ -1764,24 +1764,24 @@ static void _enesim_renderer_image_class_init(void *k)
 	klass->opengl_setup = _image_opengl_setup;
 	klass->opengl_cleanup = _image_opengl_cleanup;
 #endif
-	_spans_best[0][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
-	_spans_best[0][0][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
-	_spans_best[1][0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_d_u_identity;
-	_spans_best[1][0][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_d_u_affine;
-	_spans_best[0][1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_u_d_identity;
-	_spans_best[0][1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_u_d_affine;
-	_spans_best[1][1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_d_d_identity;
-	_spans_best[1][1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_d_d_affine;
+	_spans_best[0][0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_identity;
+	_spans_best[0][0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_affine;
+	_spans_best[1][0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_d_u_identity;
+	_spans_best[1][0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_d_u_affine;
+	_spans_best[0][1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_u_d_identity;
+	_spans_best[0][1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_u_d_affine;
+	_spans_best[1][1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_d_d_identity;
+	_spans_best[1][1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_d_d_affine;
 
-	_spans_good[0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_no_scale_identity;
-	_spans_good[0][ENESIM_MATRIX_AFFINE] = _argb8888_image_no_scale_affine;
-	_spans_good[1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity;
-	_spans_good[1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine;
+	_spans_good[0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_no_scale_identity;
+	_spans_good[0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_no_scale_affine;
+	_spans_good[1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_identity;
+	_spans_good[1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_affine;
 
-	_spans_fast[0][ENESIM_MATRIX_IDENTITY] = _argb8888_image_no_scale_identity;
-	_spans_fast[0][ENESIM_MATRIX_AFFINE] = _argb8888_image_no_scale_affine_fast;
-	_spans_fast[1][ENESIM_MATRIX_IDENTITY] = _argb8888_image_scale_identity_fast;
-	_spans_fast[1][ENESIM_MATRIX_AFFINE] = _argb8888_image_scale_affine_fast;
+	_spans_fast[0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_no_scale_identity;
+	_spans_fast[0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_no_scale_affine_fast;
+	_spans_fast[1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_identity_fast;
+	_spans_fast[1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_affine_fast;
 }
 
 static void _enesim_renderer_image_instance_init(void *o EINA_UNUSED)

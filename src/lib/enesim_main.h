@@ -40,7 +40,7 @@ typedef enum _Enesim_Angle
 	ENESIM_ANGLE_90, /**< 90 degrees angle CW */
 	ENESIM_ANGLE_180, /**< 180 degrees angle CW */
 	ENESIM_ANGLE_270, /**< 270 degrees angle CW */
-	ENESIM_ANGLES,
+	ENESIM_ANGLE_LAST,
 } Enesim_Angle;
 
 /**
@@ -50,7 +50,7 @@ typedef enum _Enesim_Rop
 {
 	ENESIM_ROP_BLEND, /**< D = S + D(1 - Sa) */
 	ENESIM_ROP_FILL, /**< D = S */
-	ENESIM_ROPS
+	ENESIM_ROP_LAST
 } Enesim_Rop;
 
 /**
@@ -61,7 +61,7 @@ typedef enum _Enesim_Quality
 	ENESIM_QUALITY_BEST, /**< Best quality */
 	ENESIM_QUALITY_GOOD, /**< Good quality */
 	ENESIM_QUALITY_FAST, /**< Lower quality, fastest */
-	ENESIM_QUALITIES
+	ENESIM_QUALITY_LAST
 } Enesim_Quality;
 
 /**
@@ -84,7 +84,7 @@ typedef enum _Enesim_Channel
 	ENESIM_CHANNEL_GREEN, /**< Green channel */
 	ENESIM_CHANNEL_BLUE, /**< Blue channel */
 	ENESIM_CHANNEL_ALPHA, /**< Alpha channel */
-	ENESIM_CHANNELS, /**< The number of channels */
+	ENESIM_CHANNEL_LAST, /**< The number of channels */
 } Enesim_Channel;
 
 /**
@@ -95,7 +95,7 @@ typedef enum _Enesim_Alpha_Hint
 	ENESIM_ALPHA_HINT_NORMAL, /**< Alpha can be in the whole range */
 	ENESIM_ALPHA_HINT_SPARSE, /**< Alpha is sparsed only, that is or 0 or 255 */
 	ENESIM_ALPHA_HINT_OPAQUE, /**< Alpha is always 0 */
-	ENESIM_ALPHA_HINTS /**< The number of alpha hints */
+	ENESIM_ALPHA_HINT_LAST /**< The number of alpha hints */
 } Enesim_Alpha_Hint;
 
 /**
@@ -107,7 +107,7 @@ typedef enum _Enesim_Repeat_Mode
 	ENESIM_REPEAT_MODE_PAD,
 	ENESIM_REPEAT_MODE_REFLECT,
 	ENESIM_REPEAT_MODE_REPEAT,
-	ENESIM_REPEAT_MODES,
+	ENESIM_REPEAT_MODE_LAST,
 } Enesim_Repeat_Mode;
 
 /**
@@ -119,7 +119,7 @@ typedef enum _Enesim_Backend
 	ENESIM_BACKEND_SOFTWARE, /**< Software based backend */
 	ENESIM_BACKEND_OPENCL, /**< OpenCL based backend (not working) */
 	ENESIM_BACKEND_OPENGL, /**< OpenGL based backend (experimental) */
-	ENESIM_BACKENDS
+	ENESIM_BACKEND_LAST
 } Enesim_Backend;
 
 /**

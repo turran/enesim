@@ -249,7 +249,7 @@ PATTERN_AFFINE(reflect)
 PATTERN_AFFINE(repeat)
 PATTERN_AFFINE(restrict)
 
-static Enesim_Renderer_Sw_Fill  _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill  _spans[ENESIM_REPEAT_MODE_LAST][ENESIM_MATRIX_TYPE_LAST];
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -341,11 +341,11 @@ static void _enesim_renderer_pattern_class_init(void *k)
 	klass->sw_setup = _pattern_sw_setup;
 	klass->sw_cleanup = _pattern_sw_cleanup;
 	memset(_spans, 0, sizeof(_spans));
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_IDENTITY] = _enesim_renderer_pattern_argb8888_repeat_identity_span;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_IDENTITY] = _enesim_renderer_pattern_argb8888_reflect_identity_span;
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_AFFINE] = _enesim_renderer_pattern_argb8888_repeat_affine_span;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_AFFINE] = _enesim_renderer_pattern_argb8888_reflect_affine_span;
-	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_AFFINE] = _enesim_renderer_pattern_argb8888_restrict_affine_span;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_IDENTITY] = _enesim_renderer_pattern_argb8888_repeat_identity_span;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_IDENTITY] = _enesim_renderer_pattern_argb8888_reflect_identity_span;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_AFFINE] = _enesim_renderer_pattern_argb8888_repeat_affine_span;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_AFFINE] = _enesim_renderer_pattern_argb8888_reflect_affine_span;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_TYPE_AFFINE] = _enesim_renderer_pattern_argb8888_restrict_affine_span;
 }
 
 static void _enesim_renderer_pattern_instance_init(void *o EINA_UNUSED)

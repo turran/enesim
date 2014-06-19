@@ -859,7 +859,7 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 	type = enesim_renderer_transformation_type_get(r);
 
 	/* transform the bounds */
-	if (type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 	{
 		Enesim_Quad q;
 

@@ -157,7 +157,7 @@ static Eina_Bool _perlin_sw_setup(Enesim_Renderer *r,
 		thiz->ampl.coeff);
 
 	type = enesim_renderer_transformation_type_get(r);
-	if (type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 		return EINA_FALSE;
 
 	*fill = _argb8888_span_identity;

@@ -501,14 +501,14 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 			&thiz->matrix);
 	switch (type)
 	{
-		case ENESIM_MATRIX_IDENTITY:
-		case ENESIM_MATRIX_AFFINE:
+		case ENESIM_MATRIX_TYPE_IDENTITY:
+		case ENESIM_MATRIX_TYPE_AFFINE:
 		*fill = _span_affine;
 		if (thiz->current.even.paint || thiz->current.odd.paint)
 			*fill = _span_affine_paints;
 		break;
 
-		case ENESIM_MATRIX_PROJECTIVE:
+		case ENESIM_MATRIX_TYPE_PROJECTIVE:
 		*fill = _span_projective;
 		if (thiz->current.even.paint || thiz->current.odd.paint)
 			*fill = _span_projective_paints;

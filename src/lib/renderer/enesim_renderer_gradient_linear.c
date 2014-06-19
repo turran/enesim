@@ -51,7 +51,7 @@
 		Enesim_Renderer_Gradient_Linear,				\
 		enesim_renderer_gradient_linear_descriptor_get())
 
-static Enesim_Renderer_Sw_Fill _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_REPEAT_MODE_LAST][ENESIM_MATRIX_TYPE_LAST];
 
 typedef struct _Enesim_Renderer_Gradient_Linear_State
 {
@@ -273,7 +273,7 @@ static Eina_Bool _linear_setup(Enesim_Renderer *r, Enesim_Matrix *m,
 	/* TODO check that the difference between x0 - x1 and y0 - y1 is < tolerance */
 	/* handle the geometry transformation */
 	type = enesim_renderer_transformation_type_get(r);
-	if (type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 	{
 		Enesim_Matrix om;
 
@@ -348,7 +348,7 @@ static Eina_Bool _linear_sw_setup(Enesim_Renderer *r,
 	enesim_matrix_matrix_f16p16_to(&m, &thiz->sw.matrix);
 #if 0
 	/* just override the identity case */
-	if (type == ENESIM_MATRIX_IDENTITY)
+	if (type == ENESIM_MATRIX_TYPE_IDENTITY)
 		*fill = _argb8888_pad_span_identity;
 #endif
 	type = enesim_renderer_transformation_type_get(r);
@@ -449,18 +449,18 @@ static void _enesim_renderer_gradient_linear_class_init(void *k)
 	klass->opengl_cleanup = _linear_opengl_cleanup;
 #endif
 
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
-	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
-	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
-	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_repeat_span_identity;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_repeat_span_affine;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_repeat_span_projective;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_reflect_span_identity;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_reflect_span_affine;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_reflect_span_projective;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_restrict_span_identity;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_restrict_span_affine;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_restrict_span_projective;
+	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_pad_span_identity;
+	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_pad_span_affine;
+	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_pad_span_projective;
 }
 
 static void _enesim_renderer_gradient_linear_instance_init(void *o EINA_UNUSED)

@@ -155,7 +155,7 @@ struct _Enesim_Renderer
 	/* given that we can use the same renderer to draw into a software
 	 * surface or opencl surface, we need an array to keep *ALL* the
 	 * possible data */
-	void *backend_data[ENESIM_BACKENDS];
+	void *backend_data[ENESIM_BACKEND_LAST];
 	Eina_Bool in_setup : 1;
 };
 

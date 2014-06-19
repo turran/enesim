@@ -482,18 +482,18 @@ static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &matrix);
 	switch (type)
 	{
-		case ENESIM_MATRIX_IDENTITY:
+		case ENESIM_MATRIX_TYPE_IDENTITY:
 		*fill = _span_identity;
 		break;
 
-		case ENESIM_MATRIX_AFFINE:
+		case ENESIM_MATRIX_TYPE_AFFINE:
 		enesim_matrix_inverse(&matrix, &inv);
 		enesim_matrix_matrix_f16p16_to(&inv,
 				&thiz->matrix);
 		*fill = _span_affine;
 		break;
 
-		case ENESIM_MATRIX_PROJECTIVE:
+		case ENESIM_MATRIX_TYPE_PROJECTIVE:
 		enesim_matrix_inverse(&matrix, &inv);
 		enesim_matrix_matrix_f16p16_to(&inv,
 				&thiz->matrix);

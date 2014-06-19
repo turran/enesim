@@ -47,7 +47,7 @@
 		Enesim_Renderer_Gradient_Radial,				\
 		enesim_renderer_gradient_radial_descriptor_get())
 
-static Enesim_Renderer_Sw_Fill _spans[ENESIM_REPEAT_MODES][ENESIM_MATRIX_TYPES];
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_REPEAT_MODE_LAST][ENESIM_MATRIX_TYPE_LAST];
 
 typedef struct _Enesim_Renderer_Gradient_Radial
 {
@@ -229,7 +229,7 @@ static Eina_Bool _radial_setup(Enesim_Renderer *r, Enesim_Matrix *m)
 	glen = ceil(rad) + 1;
 
 	type = enesim_renderer_transformation_type_get(r);
-	if (type != ENESIM_MATRIX_IDENTITY)
+	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 	{
 		Enesim_Matrix om;
 		double mx, my;
@@ -421,18 +421,18 @@ static void _enesim_renderer_gradient_radial_class_init(void *k)
 #endif
 	klass->bounds_get = _radial_bounds_get;
 
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_IDENTITY] = _argb8888_repeat_span_identity;
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_AFFINE] = _argb8888_repeat_span_affine;
-	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_repeat_span_projective;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_IDENTITY] = _argb8888_reflect_span_identity;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_AFFINE] = _argb8888_reflect_span_affine;
-	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_reflect_span_projective;
-	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_IDENTITY] = _argb8888_restrict_span_identity;
-	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_AFFINE] = _argb8888_restrict_span_affine;
-	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_PROJECTIVE] = _argb8888_restrict_span_projective;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_IDENTITY] = _argb8888_pad_span_identity;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_AFFINE] = _argb8888_pad_span_affine;
-	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_PROJECTIVE] = _argb8888_pad_span_projective;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_repeat_span_identity;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_repeat_span_affine;
+	_spans[ENESIM_REPEAT_MODE_REPEAT][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_repeat_span_projective;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_reflect_span_identity;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_reflect_span_affine;
+	_spans[ENESIM_REPEAT_MODE_REFLECT][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_reflect_span_projective;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_restrict_span_identity;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_restrict_span_affine;
+	_spans[ENESIM_REPEAT_MODE_RESTRICT][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_restrict_span_projective;
+	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_pad_span_identity;
+	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_pad_span_affine;
+	_spans[ENESIM_REPEAT_MODE_PAD][ENESIM_MATRIX_TYPE_PROJECTIVE] = _argb8888_pad_span_projective;
 }
 
 static void _enesim_renderer_gradient_radial_instance_init(void *o EINA_UNUSED)
