@@ -20,13 +20,13 @@
 
 /**
  * @file
+ * @listgroup{Enesim_Renderer_Blur_Channel}
  * @listgroup{Enesim_Renderer_Blur}
  */
 
 /**
- * @defgroup Enesim_Renderer_Blur Blur Filter
- * @brief Blur filter renderer @inherits{Enesim_Renderer}
- * @ingroup Enesim_Renderer
+ * @defgroup Enesim_Renderer_Blur_Channel Blur Channel
+ * @ingroup Enesim_Renderer_Blur
  * @{
  */
 
@@ -37,6 +37,14 @@ typedef enum _Enesim_Blur_Channel
 	ENESIM_BLUR_CHANNEL_ALPHA, /**< Use the alpha channel */
 	ENESIM_BLUR_CHANNELS, /**< Total number of channels */
 } Enesim_Blur_Channel;
+
+/**
+ * @}
+ * @defgroup Enesim_Renderer_Blur Blur Filter
+ * @brief Blur filter renderer @inherits{Enesim_Renderer}
+ * @ingroup Enesim_Renderer
+ * @{
+ */
 
 EAPI Enesim_Renderer * enesim_renderer_blur_new(void);
 EAPI void enesim_renderer_blur_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src);
