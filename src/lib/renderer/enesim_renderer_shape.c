@@ -755,6 +755,7 @@ Enesim_List * enesim_renderer_shape_dashes_get(Enesim_Renderer *r)
  *============================================================================*/
 /**
  * Sets the stroke weight of a shape renderer
+ * @prop{stroke_weight}
  * @param[in] r The shape renderer to set the stroke weight on
  * @param[in] weight The stroke weight to set
  */
@@ -771,6 +772,7 @@ EAPI void enesim_renderer_shape_stroke_weight_set(Enesim_Renderer *r, double wei
 
 /**
  * Gets the stroke weight of a shape renderer
+ * @prop{stroke_weight}
  * @param[in] r The shape renderer to get the stroke weight from
  * @return The stroke weight
  */
@@ -784,6 +786,7 @@ EAPI double enesim_renderer_shape_stroke_weight_get(Enesim_Renderer *r)
 
 /**
  * Sets the stroke location of a shape renderer
+ * @prop{stroke_location}
  * @param[in] r The shape renderer to set the stroke location on
  * @param[in] location The stroke location to set
  */
@@ -800,6 +803,7 @@ EAPI void enesim_renderer_shape_stroke_location_set(Enesim_Renderer *r, Enesim_R
 
 /**
  * Gets the stroke location of a shape renderer
+ * @prop{stroke_location}
  * @param[in] r The shape renderer to get the stroke location from
  * @return The stroke location
  */
@@ -813,6 +817,7 @@ EAPI Enesim_Renderer_Shape_Stroke_Location enesim_renderer_shape_stroke_location
 
 /**
  * Sets the stroke color of a shape renderer
+ * @prop{stroke_color}
  * @param[in] r The shape renderer to set the stroke color on
  * @param[in] color The stroke color to set
  */
@@ -829,6 +834,7 @@ EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Colo
 
 /**
  * Gets the stroke color of a shape renderer
+ * @prop{stroke_color}
  * @param[in] r The shape renderer to get the stroke color from
  * @return The stroke color
  */
@@ -842,6 +848,7 @@ EAPI Enesim_Color enesim_renderer_shape_stroke_color_get(Enesim_Renderer *r)
 
 /**
  * Sets the stroke cap of a shape renderer
+ * @prop{stroke_cap}
  * @param[in] r The shape renderer to set the stroke cap on
  * @param[in] cap The stroke cap to set
  */
@@ -858,6 +865,7 @@ EAPI void enesim_renderer_shape_stroke_cap_set(Enesim_Renderer *r, Enesim_Render
 
 /**
  * Gets the stroke cap of a shape renderer
+ * @prop{stroke_cap}
  * @param[in] r The shape renderer to get the stroke cap from
  * @return The stroke cap
  */
@@ -871,6 +879,7 @@ EAPI Enesim_Renderer_Shape_Stroke_Cap enesim_renderer_shape_stroke_cap_get(Enesi
 
 /**
  * Sets the stroke join of a shape renderer
+ * @prop{stroke_join}
  * @param[in] r The shape renderer to set the stroke join on
  * @param[in] join The stroke join to set
  */
@@ -887,6 +896,7 @@ EAPI void enesim_renderer_shape_stroke_join_set(Enesim_Renderer *r, Enesim_Rende
 
 /**
  * Gets the stroke join of a shape renderer
+ * @prop{stroke_join}
  * @param[in] r The shape renderer to get the stroke join from
  * @return The stroke join
  */
@@ -900,6 +910,7 @@ EAPI Enesim_Renderer_Shape_Stroke_Join enesim_renderer_shape_stroke_join_get(Ene
 
 /**
  * Sets the stroke renderer of a shape renderer
+ * @prop{stroke_renderer}
  * @param[in] r The shape renderer to set the stroke renderer on
  * @param[in] stroke The stroke renderer to set
  */
@@ -922,6 +933,7 @@ EAPI void enesim_renderer_shape_stroke_renderer_set(Enesim_Renderer *r, Enesim_R
 
 /**
  * Gets the stroke renderer of a shape renderer
+ * @prop{stroke_renderer}
  * @param[in] r The shape renderer to get the stroke renderer from
  * @return The stroke renderer
  */
@@ -935,6 +947,7 @@ EAPI Enesim_Renderer * enesim_renderer_shape_stroke_renderer_get(Enesim_Renderer
 
 /**
  * Sets the fill color of a shape renderer
+ * @prop{fill_color}
  * @param[in] r The shape renderer to set the fill color on
  * @param[in] color The fill color to set
  */
@@ -951,6 +964,7 @@ EAPI void enesim_renderer_shape_fill_color_set(Enesim_Renderer *r, Enesim_Color 
 
 /**
  * Gets the fill color of a shape renderer
+ * @prop{fill_color}
  * @param[in] r The shape renderer to get the fill color from
  * @return The fill color
  */
@@ -964,6 +978,7 @@ EAPI Enesim_Color enesim_renderer_shape_fill_color_get(Enesim_Renderer *r)
 
 /**
  * Sets the fill renderer of a shape renderer
+ * @prop{fill_renderer}
  * @param[in] r The shape renderer to set the fill renderer on
  * @param[in] fill The fill renderer to set
  */
@@ -985,6 +1000,7 @@ EAPI void enesim_renderer_shape_fill_renderer_set(Enesim_Renderer *r, Enesim_Ren
 
 /**
  * Gets the fill renderer of a shape renderer
+ * @prop{fill_renderer}
  * @param[in] r The shape renderer to get the fill renderer from
  * @return The fill renderer
  */
@@ -998,6 +1014,7 @@ EAPI Enesim_Renderer * enesim_renderer_shape_fill_renderer_get(Enesim_Renderer *
 
 /**
  * Sets the fill rule of a shape renderer
+ * @prop{fill_rule}
  * @param[in] r The shape renderer to set the fill rule on
  * @param[in] rule The fill rule to set
  */
@@ -1014,6 +1031,7 @@ EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Rendere
 
 /**
  * Gets the fill rule of a shape renderer
+ * @prop{fill_rule}
  * @param[in] r The shape renderer to get the fill rule from
  * @return The fill rule
  */
@@ -1027,6 +1045,7 @@ EAPI Enesim_Renderer_Shape_Fill_Rule enesim_renderer_shape_fill_rule_get(Enesim_
 
 /**
  * Sets the draw mode of a shape renderer
+ * @prop{draw_mode}
  * @param[in] r The shape renderer to set the draw mode on
  * @param[in] draw_mode The draw mode to set
  */
@@ -1043,6 +1062,7 @@ EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Rendere
 
 /**
  * Gets the draw mode of a shape renderer
+ * @prop{draw_mode}
  * @param[in] r The shape renderer to get the draw mode from
  * @return The draw mode
  */
@@ -1102,6 +1122,7 @@ EAPI void enesim_renderer_shape_stroke_dash_clear(Enesim_Renderer *r)
 
 /**
  * @brief Sets whenever a stroke should be scalable
+ * @prop{stroke_scalable}
  * @param[in] r The shape renderer to set the stroke scalable to
  * @param[in] scalable EINA_TRUE to enable scaling the stroke, EINA_FALSE otherwise
  */
@@ -1116,6 +1137,7 @@ EAPI void enesim_renderer_shape_stroke_scalable_set(Enesim_Renderer *r, Eina_Boo
 
 /**
  * @brief Gets whenever a stroke should be scalable
+ * @prop{stroke_scalable}
  * @param[in] r The shape renderer to get the stroke scalable from
  * @return EINA_TRUE is the stroke is scalable, EINA_FALSE otherwise
  */

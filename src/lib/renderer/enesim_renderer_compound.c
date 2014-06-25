@@ -838,6 +838,7 @@ EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l
 
 /**
  * @brief Sets the renderer of a layer
+ * @prop{renderer}
  * @param[in] l The layer to set the renderer on
  * @param[in] r The renderer to set on the layer [transfer full]
  */
@@ -860,6 +861,7 @@ EAPI void enesim_renderer_compound_layer_renderer_set(
 
 /**
  * @brief Sets the raster operation of a layer
+ * @prop{rop}
  * @param[in] l The layer to set the raster operation on
  * @param[in] rop The raster operation to set on the layer
  */
@@ -1029,6 +1031,7 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 
 /**
  * @brief Enables or disables the background on the compound renderer
+ * @prop{background_enable}
  * @param[in] r The compound renderer
  * @param[in] enable @c EINA_TRUE to enable, @c EINA_FALSE to disable
  */
@@ -1043,6 +1046,7 @@ EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Ein
 
 /**
  * @brief Gets the enable flag on the background
+ * @prop{background_enable}
  * @param[in] r The compound renderer
  * @return @c EINA_TRUE if the background is enabled, @c EINA_FALSE otherwise
  */
@@ -1056,6 +1060,7 @@ EAPI Eina_Bool enesim_renderer_compound_background_enable_get(Enesim_Renderer *r
 
 /**
  * @brief Sets the background color of the compound renderer
+ * @prop{background_color}
  * @param[in] r The compound renderer
  * @param[in] c The color to set
  */
@@ -1069,6 +1074,7 @@ EAPI void enesim_renderer_compound_background_color_set(Enesim_Renderer *r, Enes
 
 /**
  * @brief Gets the background color of the compound renderer
+ * @prop{background_color}
  * @param[in] r The compound renderer
  * @return The color
  */

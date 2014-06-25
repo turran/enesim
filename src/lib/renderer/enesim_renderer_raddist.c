@@ -252,6 +252,7 @@ EAPI Enesim_Renderer * enesim_renderer_raddist_new(void)
 
 /**
  * @brief Sets the radius of the renderer
+ * @prop{radius}
  * @param[in] r The radial distortion renderer
  * @param[in] radius The radius to use
  */
@@ -268,6 +269,7 @@ EAPI void enesim_renderer_raddist_radius_set(Enesim_Renderer *r, double radius)
 
 /**
  * @brief Gets the radius of the renderer
+ * @prop{radius}
  * @param[in] r The radial distortion renderer
  * @return The radius to use
  */
@@ -281,6 +283,7 @@ EAPI double enesim_renderer_raddist_radius_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the factor of the renderer
+ * @prop{factor}
  * @param[in] r The radial distortion renderer
  * @param[in] factor The factor to use
  */
@@ -297,6 +300,7 @@ EAPI void enesim_renderer_raddist_factor_set(Enesim_Renderer *r, double factor)
 
 /**
  * @brief Gets the factor of the renderer
+ * @prop{factor}
  * @param[in] r The radial distortion renderer
  * @return The factor to use
  */
@@ -310,6 +314,7 @@ EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the source surface of the renderer
+ * @prop{source_surface}
  * @param[in] r The radial distortion renderer
  * @param[in] src The source surface [transfer full]
  */
@@ -326,6 +331,7 @@ EAPI void enesim_renderer_raddist_source_surface_set(Enesim_Renderer *r, Enesim_
 
 /**
  * @brief Gets the source surface of the renderer
+ * @prop{source_surface}
  * @param[in] r The radial distortion renderer
  * @return The source surface to use
  */
@@ -339,6 +345,7 @@ EAPI Enesim_Surface * enesim_renderer_raddist_source_surface_get(Enesim_Renderer
 
 /**
  * @brief Sets the center in X of the renderer
+ * @prop{x}
  * @param[in] r The radial distortion renderer
  * @param[in] ox The center in X of the radial distortion
  */
@@ -353,6 +360,7 @@ EAPI void enesim_renderer_raddist_x_set(Enesim_Renderer *r, double ox)
 
 /**
  * @brief Sets the center in Y of the renderer
+ * @prop{y}
  * @param[in] r The radial distortion renderer
  * @param[in] oy The center in Y of the radial distortion
  */

@@ -371,6 +371,7 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 
 /**
  * Set the path of a path renderer
+ * @prop{path}
  * @param[in] r The path renderer
  * @param[in] path The path to set [transfer full]
  */
@@ -392,6 +393,7 @@ EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path)
 
 /**
  * Get the path of a path renderer
+ * @prop{path}
  * @param[in] r The path renderer
  * @return The path of the path renderer [transfer none]
  *

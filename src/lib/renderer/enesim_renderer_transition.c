@@ -231,6 +231,7 @@ EAPI Enesim_Renderer * enesim_renderer_transition_new(void)
 
 /**
  * Sets the transition level
+ * @prop{level}
  * @param[in] r The transition renderer
  * @param[in] level The transition level. A value of 0 will render
  * the source renderer, a value of 1 will render the target renderer
@@ -246,6 +247,7 @@ EAPI void enesim_renderer_transition_level_set(Enesim_Renderer *r, double level)
 
 /**
  * Gets the transition level
+ * @prop{level}
  * @param[in] r The transition renderer
  * @return The level
  */
@@ -259,6 +261,7 @@ EAPI double enesim_renderer_transition_level_get(Enesim_Renderer *r)
 
 /**
  * Sets the source renderer
+ * @prop{source}
  * @param[in] r The transition renderer
  * @param[in] r0 The source renderer
  */
@@ -274,6 +277,7 @@ EAPI void enesim_renderer_transition_source_set(Enesim_Renderer *r, Enesim_Rende
 
 /**
  * Gets the source renderer
+ * @prop{source}
  * @param[in] r The transition renderer
  * @return The source renderer
  */
@@ -287,6 +291,7 @@ EAPI Enesim_Renderer * enesim_renderer_transition_source_get(Enesim_Renderer *r)
 
 /**
  * Sets the target renderer
+ * @prop{target}
  * @param[in] r The transition renderer
  * @param[in] r1 The target renderer
  */
@@ -302,6 +307,7 @@ EAPI void enesim_renderer_transition_target_set(Enesim_Renderer *r, Enesim_Rende
 
 /**
  * Gets the target renderer
+ * @prop{target}
  * @param[in] r The transition renderer
  * @return The target renderer
  */

@@ -383,7 +383,8 @@ EAPI Enesim_Renderer * enesim_renderer_pattern_new(void)
 }
 
 /**
- * @brief Sets the surface to use as the src data
+ * @brief Sets the surface to use as the pattern source
+ * @prop{source_surface}
  * @param[in] r The pattern renderer
  * @param[in] src The surface to use [transfer full]
  */
@@ -402,7 +403,8 @@ EAPI void enesim_renderer_pattern_source_surface_set(Enesim_Renderer *r, Enesim_
 }
 
 /**
- * @brief Gets the surface to pattern
+ * @brief Gets the surface used as pattern source
+ * @prop{source_surface}
  * @param[in] r The pattern renderer
  * @return The surface to pattern [transfer none]
  */
@@ -415,7 +417,8 @@ EAPI Enesim_Surface * enesim_renderer_pattern_source_surface_get(Enesim_Renderer
 }
 
 /**
- * @brief Sets the renderer to pattern
+ * @brief Sets the renderer to use as pattern source
+ * @prop{source_renderer}
  * @param[in] r The pattern renderer
  * @param[in] sr The renderer to use [transfer full]
  */
@@ -434,7 +437,8 @@ EAPI void enesim_renderer_pattern_source_renderer_set(Enesim_Renderer *r, Enesim
 }
 
 /**
- * @brief Gets the renderer to pattern
+ * @brief Gets the renderer used as pattern source
+ * @prop{source_renderer}
  * @param[in] r The pattern renderer
  * @return The renderer to pattern [transfer none]
  */
@@ -446,6 +450,12 @@ EAPI Enesim_Renderer * enesim_renderer_pattern_source_renderer_get(Enesim_Render
 	return enesim_renderer_ref(thiz->src_r);
 }
 
+/**
+ * @brief Sets the repeat mode of a pattern renderer
+ * @prop{repeat_mode}
+ * @param[in] r The pattern renderer
+ * @param[in] mode The repeat mode
+ */
 EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Repeat_Mode mode)
 {
 	Enesim_Renderer_Pattern *thiz;
@@ -455,6 +465,12 @@ EAPI void enesim_renderer_pattern_repeat_mode_set(Enesim_Renderer *r, Enesim_Rep
 	thiz->changed = EINA_TRUE;
 }
 
+/**
+ * @brief Gets the repeat mode of a pattern renderer
+ * @prop{repeat_mode}
+ * @param[in] r The pattern renderer
+ * @return mode The repeat mode
+ */
 EAPI Enesim_Repeat_Mode enesim_renderer_pattern_repeat_mode_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Pattern *thiz;
