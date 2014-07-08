@@ -70,7 +70,6 @@ COPYING \
 README \
 enesim.pc.in \
 enesim_opencl.pc.in \
-doc/Doxyfile.in \
 doc/img/enesim_images.svg \
 doc/img/enesim_text.svg \
 doc/img/enesim.png \
@@ -87,6 +86,7 @@ doc/img/enesim_renderer_path05.png \
 doc/img/enesim_renderer_perlin01.png \
 doc/img/enesim_renderer_rectangle01.png \
 doc/img/enesim_renderer_text_span01.png \
+common/doc/Doxyfile_common.in \
 common/m4/ens_attribute.m4 \
 common/m4/ens_benchmark.m4 \
 common/m4/ens_compiler.m4 \
