@@ -75,13 +75,13 @@ typedef struct _Enesim_Renderer_OpenGL_Data
 	/* data fetch on the setup */
 	Enesim_Renderer_OpenGL_Draw draw;
 } Enesim_Renderer_OpenGL_Data;
-#endif
 
 Eina_Bool enesim_renderer_opengl_shader_ambient_setup(GLenum pid,
 		Enesim_Color color);
 Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
 		GLint texture_unit, Enesim_Surface *s, Enesim_Color color,
 		int off_x, int off_y);
+#endif
 
 Eina_Bool enesim_renderer_opengl_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **error);
