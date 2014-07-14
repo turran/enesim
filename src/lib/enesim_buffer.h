@@ -20,8 +20,8 @@
 
 /**
  * @file
- * @listgroup{Enesim_Buffer_Format}
- * @listgroup{Enesim_Buffer}
+ * @ender_group{Enesim_Buffer_Format}
+ * @ender_group{Enesim_Buffer}
  */
 
 /**

@@ -22,7 +22,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Rectangle}
+ * @ender_group{Enesim_Rectangle}
  */
 
 /**

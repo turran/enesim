@@ -20,9 +20,9 @@
 
 /**
  * @file
- * @listgroup{Enesim_Argb}
- * @listgroup{Enesim_Color}
- * @listgroup{Enesim_Alpha}
+ * @ender_group{Enesim_Argb}
+ * @ender_group{Enesim_Color}
+ * @ender_group{Enesim_Alpha}
  */
 
 /**

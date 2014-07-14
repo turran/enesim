@@ -1820,7 +1820,7 @@ EAPI Enesim_Renderer * enesim_renderer_image_new(void)
 
 /**
  * @brief Set the top left X coordinate of a image renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The image renderer.
  * @param[in] x The top left X coordinate.
  *
@@ -1839,7 +1839,7 @@ EAPI void enesim_renderer_image_x_set(Enesim_Renderer *r, double x)
 
 /**
  * @brief Retrieve the top left X coordinate of a image renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The image renderer.
  * @return The top left X coordinate.
  *
@@ -1856,7 +1856,7 @@ EAPI double enesim_renderer_image_x_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the top left Y coordinate of a image renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The image renderer.
  * @param[in] y The top left Y coordinate.
  *
@@ -1875,7 +1875,7 @@ EAPI void enesim_renderer_image_y_set(Enesim_Renderer *r, double y)
 
 /**
  * @brief Retrieve the top left Y coordinate of a image renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The image renderer.
  * @return The top left Y coordinate.
  *
@@ -1934,7 +1934,7 @@ EAPI void enesim_renderer_image_position_get(Enesim_Renderer *r, double *x, doub
 
 /**
  * @brief Set the width of a image renderer.
- * @prop{width}
+ * @ender_prop{width}
  * @param[in] r The image renderer.
  * @param[in] w The image width.
  *
@@ -1953,7 +1953,7 @@ EAPI void enesim_renderer_image_width_set(Enesim_Renderer *r, double w)
 
 /**
  * @brief Retrieve the width of a image renderer.
- * @prop{width}
+ * @ender_prop{width}
  * @param[in] r The image renderer.
  * @return The image width.
  *
@@ -1969,7 +1969,7 @@ EAPI double enesim_renderer_image_width_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the height of a image renderer.
- * @prop{height}
+ * @ender_prop{height}
  * @param[in] r The image renderer.
  * @param[in] h The image height.
  *
@@ -1988,7 +1988,7 @@ EAPI void enesim_renderer_image_height_set(Enesim_Renderer *r, double h)
 
 /**
  * @brief Retrieve the height of a image renderer.
- * @prop{height}
+ * @ender_prop{height}
  * @param[in] r The image renderer.
  * @return The image height.
  *
@@ -2045,7 +2045,7 @@ EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *
 
 /**
  * @brief Set the surface used as pixel source for the image renderer
- * @prop{source_surface}
+ * @ender_prop{source_surface}
  * @param[in] r The image renderer.
  * @param[in] src The surface to use [transfer full]
  *
@@ -2064,7 +2064,7 @@ EAPI void enesim_renderer_image_source_surface_set(Enesim_Renderer *r, Enesim_Su
 
 /**
  * @brief Retrieve the surface used as the pixel source for the image renderer
- * @prop{source_surface}
+ * @ender_prop{source_surface}
  * @param[in] r The image renderer.
  * @return src The source surface [transfer none]
  *

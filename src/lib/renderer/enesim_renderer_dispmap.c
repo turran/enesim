@@ -343,7 +343,7 @@ EAPI Enesim_Renderer * enesim_renderer_dispmap_new(void)
 
 /**
  * @brief Sets the channel to use as the x coordinate displacement
- * @prop{x_channel}
+ * @ender_prop{x_channel}
  * @param[in] r The displacement map renderer
  * @param[in] channel The channel to use
  */
@@ -359,7 +359,7 @@ EAPI void enesim_renderer_dispmap_x_channel_set(Enesim_Renderer *r,
 
 /**
  * @brief Sets the channel to use as the y coordinate displacement
- * @prop{y_channel}
+ * @ender_prop{y_channel}
  * @param[in] r The displacement map renderer
  * @param[in] channel The channel to use
  */
@@ -375,7 +375,7 @@ EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r,
 
 /**
  * @brief Sets the map surface to use for displacing the source surface
- * @prop{map_surface}
+ * @ender_prop{map_surface}
  * @param[in] r The displacement map renderer
  * @param[in] map The surface map [transfer full]
  */
@@ -391,7 +391,7 @@ EAPI void enesim_renderer_dispmap_map_surface_set(Enesim_Renderer *r, Enesim_Sur
 
 /**
  * @brief Sets the map surface to use for displacing the source surface
- * @prop{map_surface}
+ * @ender_prop{map_surface}
  * @param[in] r The displacement map renderer
  * @return The surface map [transfer full]
  */
@@ -405,7 +405,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_map_surface_get(Enesim_Renderer *r
 
 /**
  * @brief Sets the source surface that will be displaced using the map surface
- * @prop{source_surface}
+ * @ender_prop{source_surface}
  * @param[in] r The displacement map renderer
  * @param[in] src The source surface to displace
  */
@@ -421,7 +421,7 @@ EAPI void enesim_renderer_dispmap_source_surface_set(Enesim_Renderer *r, Enesim_
 
 /**
  * @brief Gets the source surface that will be displaced using the map surface
- * @prop{source_surface}
+ * @ender_prop{source_surface}
  * @param[in] r The displacement map renderer
  * @return The source surface
  */
@@ -435,7 +435,7 @@ EAPI Enesim_Surface * enesim_renderer_dispmap_source_surface_get(Enesim_Renderer
 
 /**
  * @brief Sets the factor of displacement for the displacement renderer
- * @prop{factor}
+ * @ender_prop{factor}
  * @param[in] r The displacement map renderer
  * @param[in] factor The factor to use
  */
@@ -450,7 +450,7 @@ EAPI void enesim_renderer_dispmap_factor_set(Enesim_Renderer *r, double factor)
 
 /**
  * @brief Gets the factor of displacement for the displacement renderer
- * @prop{factor}
+ * @ender_prop{factor}
  * @param[in] r The displacement map renderer
  * @return The factor to use
  */

@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Grid}
+ * @ender_group{Enesim_Renderer_Grid}
  */
 
 /**
  * @defgroup Enesim_Renderer_Grid Grid
- * @brief Grid pattern renderer @inherits{Enesim_Renderer}
+ * @brief Grid pattern renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

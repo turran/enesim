@@ -343,7 +343,7 @@ EAPI void enesim_renderer_ellipse_radii_get(Enesim_Renderer *r, double *radius_x
 
 /**
  * @brief Set the X coordinate of the center of a ellipse renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The ellipse renderer.
  * @param[in] x The X coordinate.
  *
@@ -361,7 +361,7 @@ EAPI void enesim_renderer_ellipse_x_set(Enesim_Renderer *r, double x)
 
 /**
  * @brief Get the X coordinate of the center of a ellipse renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The ellipse renderer.
  * @return The X coordinate.
  */
@@ -374,7 +374,7 @@ EAPI double enesim_renderer_ellipse_x_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the Y coordinate of the center of a ellipse renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The ellipse renderer.
  * @param[in] y The Y coordinate.
  *
@@ -392,7 +392,7 @@ EAPI void enesim_renderer_ellipse_y_set(Enesim_Renderer *r, double y)
 
 /**
  * @brief Get the Y coordinate of the center of a ellipse renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The ellipse renderer.
  * @return The Y coordinate.
  */
@@ -405,7 +405,7 @@ EAPI double enesim_renderer_ellipse_y_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the radius along the X axis of a ellipse renderer.
- * @prop{radius_x}
+ * @ender_prop{radius_x}
  * @param[in] r The ellipse renderer.
  * @param[in] rx The radius along the X axis.
  *
@@ -423,7 +423,7 @@ EAPI void enesim_renderer_ellipse_radius_x_set(Enesim_Renderer *r, double rx)
 
 /**
  * @brief Get the radius along the X axis of a ellipse renderer.
- * @prop{radius_x}
+ * @ender_prop{radius_x}
  * @param[in] r The ellipse renderer.
  * @return The radius along the X axis.
  */
@@ -436,7 +436,7 @@ EAPI double enesim_renderer_ellipse_radius_x_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the radius along the Y axis of a ellipse renderer.
- * @prop{radius_y}
+ * @ender_prop{radius_y}
  * @param[in] r The ellipse renderer.
  * @param[in] ry The radius along the Y axis.
  *
@@ -454,7 +454,7 @@ EAPI void enesim_renderer_ellipse_radius_y_set(Enesim_Renderer *r, double ry)
 
 /**
  * @brief Get the radius along the Y axis of a ellipse renderer.
- * @prop{radius_y}
+ * @ender_prop{radius_y}
  * @param[in] r The ellipse renderer.
  * @return The radius along the Y axis.
  */

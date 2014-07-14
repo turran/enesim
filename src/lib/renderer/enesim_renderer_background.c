@@ -330,7 +330,7 @@ EAPI Enesim_Renderer * enesim_renderer_background_new(void)
 
 /**
  * @brief Sets the color of the background
- * @prop{color}
+ * @ender_prop{color}
  * @param[in] r The background renderer to set the color to
  * @param[in] color The background color
  */
@@ -346,7 +346,7 @@ EAPI void enesim_renderer_background_color_set(Enesim_Renderer *r,
 
 /**
  * @brief Gets the color of the background
- * @prop{color}
+ * @ender_prop{color}
  * @param[in] r The background renderer to get the color from
  * @return The color of the renderer
  */

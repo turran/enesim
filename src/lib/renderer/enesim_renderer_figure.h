@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Figure}
+ * @ender_group{Enesim_Renderer_Figure}
  */
 
 /**
  * @defgroup Enesim_Renderer_Figure Figure
- * @brief A figure composed of polygons renderer @inherits{Enesim_Renderer_Shape}
+ * @brief A figure composed of polygons renderer @ender_inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

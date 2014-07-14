@@ -20,8 +20,8 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Shape_Definitions}
- * @listgroup{Enesim_Renderer_Shape}
+ * @ender_group{Enesim_Renderer_Shape_Definitions}
+ * @ender_group{Enesim_Renderer_Shape}
  */
 
 /**
@@ -102,7 +102,7 @@ typedef enum _Enesim_Renderer_Shape_Fill_Rule
 /**
  * @}
  * @defgroup Enesim_Renderer_Shape Shapes
- * @brief Geometric shape renderer @inherits{Enesim_Renderer}
+ * @brief Geometric shape renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

@@ -20,7 +20,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Stream}
+ * @ender_group{Enesim_Stream}
  */
 
 /**

@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Ellipse}
+ * @ender_group{Enesim_Renderer_Ellipse}
  */
 
 /**
  * @defgroup Enesim_Renderer_Ellipse Ellipse
- * @brief Ellipse renderer @inherits{Enesim_Renderer_Shape}
+ * @brief Ellipse renderer @ender_inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

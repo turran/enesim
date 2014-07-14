@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Circle}
+ * @ender_group{Enesim_Renderer_Circle}
  */
 
 /**
  * @defgroup Enesim_Renderer_Circle Circle
- * @brief Circle renderer @inherits{Enesim_Renderer_Shape}
+ * @brief Circle renderer @ender_inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */

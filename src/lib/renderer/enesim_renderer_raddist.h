@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Raddist}
+ * @ender_group{Enesim_Renderer_Raddist}
  */
 
 /**
  * @defgroup Enesim_Renderer_Raddist Radial Distortion
- * @brief Filters a source image using a barrel distortion @inherits{Enesim_Renderer}
+ * @brief Filters a source image using a barrel distortion @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Proxy}
+ * @ender_group{Enesim_Renderer_Proxy}
  */
 
 /**
  * @defgroup Enesim_Renderer_Proxy Proxy
- * @brief Renderer that renders another renderer @inherits{Enesim_Renderer}
+ * @brief Renderer that renders another renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

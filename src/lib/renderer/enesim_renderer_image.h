@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Image}
+ * @ender_group{Enesim_Renderer_Image}
  */
 
 /**
  * @defgroup Enesim_Renderer_Image Image
- * @brief Image based renderer @inherits{Enesim_Renderer}
+ * @brief Image based renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

@@ -333,7 +333,7 @@ EAPI Enesim_Renderer * enesim_renderer_rectangle_new(void)
 
 /**
  * @brief Set the width of a rectangle renderer.
- * @prop{width}
+ * @ender_prop{width}
  * @param[in] r The rectangle renderer.
  * @param[in] width The rectangle width.
  *
@@ -352,7 +352,7 @@ EAPI void enesim_renderer_rectangle_width_set(Enesim_Renderer *r, double width)
 
 /**
  * @brief Retrieve the width of a rectangle renderer.
- * @prop{width}
+ * @ender_prop{width}
  * @param[in] r The rectangle renderer.
  * @return The rectangle width.
  *
@@ -368,7 +368,7 @@ EAPI double enesim_renderer_rectangle_width_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the height of a rectangle renderer.
- * @prop{height}
+ * @ender_prop{height}
  * @param[in] r The rectangle renderer.
  * @param[in] height The rectangle height.
  *
@@ -387,7 +387,7 @@ EAPI void enesim_renderer_rectangle_height_set(Enesim_Renderer *r, double height
 
 /**
  * @brief Retrieve the height of a rectangle renderer.
- * @prop{height}
+ * @ender_prop{height}
  * @param[in] r The rectangle renderer.
  * @return The rectangle height.
  *
@@ -403,7 +403,7 @@ EAPI double enesim_renderer_rectangle_height_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the top left X coordinate of a rectangle renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The rectangle renderer.
  * @param[in] x The top left X coordinate.
  *
@@ -422,7 +422,7 @@ EAPI void enesim_renderer_rectangle_x_set(Enesim_Renderer *r, double x)
 
 /**
  * @brief Retrieve the top left X coordinate of a rectangle renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The rectangle renderer.
  * @return The top left X coordinate.
  *
@@ -439,7 +439,7 @@ EAPI double enesim_renderer_rectangle_x_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the top left Y coordinate of a rectangle renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The rectangle renderer.
  * @param[in] y The top left Y coordinate.
  *
@@ -458,7 +458,7 @@ EAPI void enesim_renderer_rectangle_y_set(Enesim_Renderer *r, double y)
 
 /**
  * @brief Retrieve the top left Y coordinate of a rectangle renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The rectangle renderer.
  * @return The top left Y coordinate.
  *

@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Perlin}
+ * @ender_group{Enesim_Renderer_Perlin}
  */
 
 /**
  * @defgroup Enesim_Renderer_Perlin Perlin
- * @brief Perlin noise renderer @inherits{Enesim_Renderer}
+ * @brief Perlin noise renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

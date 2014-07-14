@@ -21,7 +21,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Format}
+ * @ender_group{Enesim_Format}
  */
 
 /**

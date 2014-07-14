@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Clipper}
+ * @ender_group{Enesim_Renderer_Clipper}
  */
 
 /**
  * @defgroup Enesim_Renderer_Clipper Clipper
- * @brief Renderer that clips a source renderer @inherits{Enesim_Renderer}
+ * @brief Renderer that clips a source renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

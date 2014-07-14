@@ -20,7 +20,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Surface}
+ * @ender_group{Enesim_Surface}
  */
 
 /**

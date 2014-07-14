@@ -243,7 +243,7 @@ EAPI Enesim_Renderer * enesim_renderer_circle_new(void)
 
 /**
  * @brief Set the X coordinate of the center of a circle renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The circle renderer.
  * @param[in] x The X coordinate.
  *
@@ -262,7 +262,7 @@ EAPI void enesim_renderer_circle_x_set(Enesim_Renderer *r, double x)
 
 /**
  * @brief Gets the X coordinate of the center of a circle renderer.
- * @prop{x}
+ * @ender_prop{x}
  * @param[in] r The circle renderer.
  * @return The X coordinate.
  */
@@ -276,7 +276,7 @@ EAPI double enesim_renderer_circle_x_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the Y coordinate of the center of a circle renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The circle renderer.
  * @param[in] y The Y coordinate.
  *
@@ -295,7 +295,7 @@ EAPI void enesim_renderer_circle_y_set(Enesim_Renderer *r, double y)
 
 /**
  * @brief Gets the Y coordinate of the center of a circle renderer.
- * @prop{y}
+ * @ender_prop{y}
  * @param[in] r The circle renderer.
  * @return The Y coordinate.
  */
@@ -350,7 +350,7 @@ EAPI void enesim_renderer_circle_center_get(Enesim_Renderer *r, double *x, doubl
 
 /**
  * @brief Set the radius of a circle renderer.
- * @prop{radius}
+ * @ender_prop{radius}
  * @param[in] r The circle renderer.
  * @param[in] radius The radius.
  *
@@ -369,7 +369,7 @@ EAPI void enesim_renderer_circle_radius_set(Enesim_Renderer *r, double radius)
 
 /**
  * @brief Retrieve the radius of a circle renderer.
- * @prop{radius}
+ * @ender_prop{radius}
  * @param[in] r The circle renderer.
  * @return The radius
  */

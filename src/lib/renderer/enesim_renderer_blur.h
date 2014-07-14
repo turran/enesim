@@ -20,8 +20,8 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Blur_Channel}
- * @listgroup{Enesim_Renderer_Blur}
+ * @ender_group{Enesim_Renderer_Blur_Channel}
+ * @ender_group{Enesim_Renderer_Blur}
  */
 
 /**
@@ -41,7 +41,7 @@ typedef enum _Enesim_Blur_Channel
 /**
  * @}
  * @defgroup Enesim_Renderer_Blur Blur Filter
- * @brief Blur filter renderer @inherits{Enesim_Renderer}
+ * @brief Blur filter renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

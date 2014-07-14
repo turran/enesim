@@ -488,7 +488,7 @@ EAPI void enesim_renderer_gradient_stop_clear(Enesim_Renderer *r)
 
 /**
  * Set the repeat mode of a gradient renderer
- * @prop{repeat_mode}
+ * @ender_prop{repeat_mode}
  * @param[in] r The gradient renderer to set the repeat mode on
  * @param[in] mode The repeat mode
  */
@@ -504,7 +504,7 @@ EAPI void enesim_renderer_gradient_repeat_mode_set(Enesim_Renderer *r,
 
 /**
  * Get the repeat mode of a gradient renderer
- * @prop{repeat_mode}
+ * @ender_prop{repeat_mode}
  * @param[in] r The gradient renderer to get the repeat mode from
  * @return The repeat mode
  */

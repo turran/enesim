@@ -217,7 +217,7 @@ EAPI Enesim_Renderer * enesim_renderer_line_new(void)
 
 /**
  * @brief Set the X coordinate of the first point of a line renderer.
- * @prop{x0}
+ * @ender_prop{x0}
  * @param[in] r The line renderer.
  * @param[in] x0 The X coordinate.
  *
@@ -236,7 +236,7 @@ EAPI void enesim_renderer_line_x0_set(Enesim_Renderer *r, double x0)
 
 /**
  * @brief Retrieve the X coordinate of the first point of a line renderer.
- * @prop{x0}
+ * @ender_prop{x0}
  * @param[in] r The line renderer.
  * @return The X coordinate.
  *
@@ -253,7 +253,7 @@ EAPI double enesim_renderer_line_x0_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the Y coordinate of the first point of a line renderer.
- * @prop{y0}
+ * @ender_prop{y0}
  * @param[in] r The line renderer.
  * @param[in] y The Y coordinate.
  *
@@ -272,7 +272,7 @@ EAPI void enesim_renderer_line_y0_set(Enesim_Renderer *r, double y)
 
 /**
  * @brief Get the Y coordinate of the first point of a line renderer.
- * @prop{y0}
+ * @ender_prop{y0}
  * @param[in] r The line renderer.
  * @return The first Y coordinate.
  *
@@ -289,7 +289,7 @@ EAPI double enesim_renderer_line_y0_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the X coordinate of the second point of a line renderer.
- * @prop{x1}
+ * @ender_prop{x1}
  * @param[in] r The line renderer.
  * @param[in] x The X coordinate.
  *
@@ -308,7 +308,7 @@ EAPI void enesim_renderer_line_x1_set(Enesim_Renderer *r, double x)
 
 /**
  * @brief Get the X coordinate of the second point of a line renderer.
- * @prop{x1}
+ * @ender_prop{x1}
  * @param[in] r The line renderer.
  * @return The X coordinate.
  *
@@ -325,7 +325,7 @@ EAPI double enesim_renderer_line_x1_get(Enesim_Renderer *r)
 
 /**
  * @brief Set the Y coordinate of the second point of a line renderer.
- * @prop{y1}
+ * @ender_prop{y1}
  * @param[in] r The line renderer.
  * @param[in] y The Y coordinate.
  *
@@ -344,7 +344,7 @@ EAPI void enesim_renderer_line_y1_set(Enesim_Renderer *r, double y)
 
 /**
  * @brief Get the Y coordinate of the second point of a line renderer.
- * @prop{y1}
+ * @ender_prop{y1}
  * @param[in] r The line renderer.
  * @return The second Y coordinate.
  *

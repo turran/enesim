@@ -20,8 +20,8 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Gradient_Stop}
- * @listgroup{Enesim_Renderer_Gradient}
+ * @ender_group{Enesim_Renderer_Gradient_Stop}
+ * @ender_group{Enesim_Renderer_Gradient}
  */
 
 /**
@@ -40,7 +40,7 @@ typedef struct _Enesim_Renderer_Gradient_Stop
 /**
  * @}
  * @defgroup Enesim_Renderer_Gradient Gradient
- * @brief Gradient renderer @inherits{Enesim_Renderer}
+ * @brief Gradient renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

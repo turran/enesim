@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Text_Span}
+ * @ender_group{Enesim_Renderer_Text_Span}
  */
 
 /**
  * @defgroup Enesim_Renderer_Text_Span Text Span
- * @brief Text span renderer @inherits{Enesim_Renderer_Shape}
+ * @brief Text span renderer @ender_inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer
  * @{
  */

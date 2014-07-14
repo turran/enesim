@@ -20,7 +20,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Quad}
+ * @ender_group{Enesim_Quad}
  */
 
 /**

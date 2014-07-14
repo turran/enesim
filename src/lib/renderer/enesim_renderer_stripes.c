@@ -682,7 +682,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_new(void)
 
 /**
  * Sets the color of the even stripes
- * @prop{even_color}
+ * @ender_prop{even_color}
  * @param[in] r The stripes renderer
  * @param[in] color The even stripes color
  */
@@ -698,7 +698,7 @@ EAPI void enesim_renderer_stripes_even_color_set(Enesim_Renderer *r,
 
 /**
  * Gets the color of the even stripes
- * @prop{even_color}
+ * @ender_prop{even_color}
  * @param[in] r The stripes renderer
  * @return The even stripes color
  */
@@ -711,7 +711,7 @@ EAPI Enesim_Color enesim_renderer_stripes_even_color_get(Enesim_Renderer *r)
 }
 /**
  * Sets the renderer of the even stripes
- * @prop{even_renderer}
+ * @ender_prop{even_renderer}
  * @param[in] r The stripes renderer
  * @param[in] paint The even stripes renderer
  */
@@ -729,7 +729,7 @@ EAPI void enesim_renderer_stripes_even_renderer_set(Enesim_Renderer *r,
 
 /**
  * Gets the renderer of the even stripes
- * @prop{even_renderer}
+ * @ender_prop{even_renderer}
  * @param[in] r The stripes renderer
  * @return The even stripes renderer [transfer none]
  */
@@ -743,7 +743,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_even_renderer_get(Enesim_Renderer
 
 /**
  * Sets the thickness of the even stripes
- * @prop{even_thickness}
+ * @ender_prop{even_thickness}
  * @param[in] r The stripes renderer
  * @param[in] thickness The even stripes thickness
  */
@@ -761,7 +761,7 @@ EAPI void enesim_renderer_stripes_even_thickness_set(Enesim_Renderer *r,
 
 /**
  * Gets the thickness of the even stripes
- * @prop{even_thickness}
+ * @ender_prop{even_thickness}
  * @param[in] r The stripes renderer
  * @return The even stripes thickness
  */
@@ -775,7 +775,7 @@ EAPI double enesim_renderer_stripes_even_thickness_get(Enesim_Renderer *r)
 
 /**
  * Sets the color of the odd stripes
- * @prop{odd_color}
+ * @ender_prop{odd_color}
  * @param[in] r The stripes renderer
  * @param[in] color The odd stripes color
  */
@@ -791,7 +791,7 @@ EAPI void enesim_renderer_stripes_odd_color_set(Enesim_Renderer *r,
 
 /**
  * Gets the color of the odd stripes
- * @prop{odd_color}
+ * @ender_prop{odd_color}
  * @param[in] r The stripes renderer
  * @return The odd stripes color
  */
@@ -805,7 +805,7 @@ EAPI Enesim_Color enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r)
 
 /**
  * Sets the renderer of the odd stripes
- * @prop{odd_renderer}
+ * @ender_prop{odd_renderer}
  * @param[in] r The stripes renderer
  * @param[in] paint The odd stripes renderer [transfer full]
  */
@@ -823,7 +823,7 @@ EAPI void enesim_renderer_stripes_odd_renderer_set(Enesim_Renderer *r,
 
 /**
  * Gets the renderer of the odd stripes
- * @prop{odd_renderer}
+ * @ender_prop{odd_renderer}
  * @param[in] r The stripes renderer
  * @return The odd stripes renderer [transfer none]
  */
@@ -837,7 +837,7 @@ EAPI Enesim_Renderer * enesim_renderer_stripes_odd_renderer_get(Enesim_Renderer 
 
 /**
  * Sets the thickness of the odd stripes
- * @prop{odd_thickness}
+ * @ender_prop{odd_thickness}
  * @param[in] r The stripes renderer
  * @param[in] thickness The odd stripes thickness
  */
@@ -855,7 +855,7 @@ EAPI void enesim_renderer_stripes_odd_thickness_set(Enesim_Renderer *r,
 
 /**
  * Gets the thickness of the odd stripes
- * @prop{odd_thickness}
+ * @ender_prop{odd_thickness}
  * @param[in] r The stripes renderer
  * @return The odd stripes thickness
  */

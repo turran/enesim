@@ -20,8 +20,8 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Compound_Layer}
- * @listgroup{Enesim_Renderer_Compound}
+ * @ender_group{Enesim_Renderer_Compound_Layer}
+ * @ender_group{Enesim_Renderer_Compound}
  */
 
 /**
@@ -33,7 +33,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Compound_Layer Compound Layer
- * @brief Compound layer @inherits{Enesim_Renderer}
+ * @brief Compound layer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer_Compound
  * @{
  */

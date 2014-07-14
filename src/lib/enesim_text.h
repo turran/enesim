@@ -21,12 +21,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Text}
- * @listgroup{Enesim_Text_Engine}
- * @listgroup{Enesim_Text_Font}
- * @listgroup{Enesim_Text_Buffer}
- * @listgroup{Enesim_Text_Buffer_Simple}
- * @listgroup{Enesim_Text_Buffer_Smart}
+ * @ender_group{Enesim_Text}
+ * @ender_group{Enesim_Text_Engine}
+ * @ender_group{Enesim_Text_Font}
+ * @ender_group{Enesim_Text_Buffer}
+ * @ender_group{Enesim_Text_Buffer_Simple}
+ * @ender_group{Enesim_Text_Buffer_Smart}
  */
 
 /**
@@ -102,7 +102,7 @@ EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz);
 /**
  * @}
  * @defgroup Enesim_Text_Buffer_Simple Simple Buffer
- * @inherits{Enesim_Text_Buffer}
+ * @ender_inherits{Enesim_Text_Buffer}
  * @ingroup Enesim_Text_Buffer
  * @{
  */
@@ -112,7 +112,7 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length);
 /**
  * @}
  * @defgroup Enesim_Text_Buffer_Smart Smart Buffer
- * @inherits{Enesim_Text_Buffer}
+ * @ender_inherits{Enesim_Text_Buffer}
  * @ingroup Enesim_Text_Buffer
  * @{
  */

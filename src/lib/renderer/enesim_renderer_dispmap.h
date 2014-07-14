@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Dispmap}
+ * @ender_group{Enesim_Renderer_Dispmap}
  */
 
 /**
  * @defgroup Enesim_Renderer_Dispmap Displacement Map
- * @brief Renderer that displays source pixels using a map image @inherits{Enesim_Renderer}
+ * @brief Renderer that displays source pixels using a map image @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

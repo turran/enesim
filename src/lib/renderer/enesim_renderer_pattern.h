@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Pattern}
+ * @ender_group{Enesim_Renderer_Pattern}
  */
 
 /**
  * @defgroup Enesim_Renderer_Pattern Pattern
- * @brief Renderer that repeats an area of another renderer to form a pattern @inherits{Enesim_Renderer}
+ * @brief Renderer that repeats an area of another renderer to form a pattern @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

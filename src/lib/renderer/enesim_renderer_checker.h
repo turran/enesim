@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Checker}
+ * @ender_group{Enesim_Renderer_Checker}
  */
 
 /**
  * @defgroup Enesim_Renderer_Checker Checker
- * @brief Checked pattern renderer @inherits{Enesim_Renderer}
+ * @brief Checked pattern renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

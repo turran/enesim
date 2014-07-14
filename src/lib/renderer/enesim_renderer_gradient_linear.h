@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Gradient_Linear}
+ * @ender_group{Enesim_Renderer_Gradient_Linear}
  */
 
 /**
  * @defgroup Enesim_Renderer_Gradient_Linear Linear
- * @brief Linear gradient @inherits{Enesim_Renderer_Gradient}
+ * @brief Linear gradient @ender_inherits{Enesim_Renderer_Gradient}
  * @ingroup Enesim_Renderer_Gradient
  * @{
  */

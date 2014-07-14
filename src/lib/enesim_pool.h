@@ -20,7 +20,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Pool}
+ * @ender_group{Enesim_Pool}
  */
 
 /**

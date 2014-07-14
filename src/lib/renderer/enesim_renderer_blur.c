@@ -649,7 +649,7 @@ EAPI Enesim_Renderer * enesim_renderer_blur_new(void)
 
 /**
  * @brief Sets the channel to use in the source data
- * @prop{channel}
+ * @ender_prop{channel}
  * @param[in] r The blur filter renderer
  * @param[in] channel The channel to use
  */
@@ -666,7 +666,7 @@ EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r,
 
 /**
  * @brief Gets the channel used in the source data
- * @prop{channel}
+ * @ender_prop{channel}
  * @param[in] r The blur filter renderer
  * @return the channel used
  */
@@ -681,7 +681,7 @@ EAPI Enesim_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the source surface to use as the source data
- * @prop{source_surface}
+ * @ender_prop{source_surface}
  * @param[in] r The blur filter renderer
  * @param[in] src The surface to use [transfer full]
  */
@@ -701,7 +701,7 @@ EAPI void enesim_renderer_blur_source_surface_set(Enesim_Renderer *r, Enesim_Sur
 
 /**
  * @brief Gets the source surface used as the source data
- * @prop{source_surface}
+ * @ender_prop{source_surface}
  * @param[in] r The blur filter renderer
  * @return The surface to blur [transfer none]
  */
@@ -715,7 +715,7 @@ EAPI Enesim_Surface * enesim_renderer_blur_source_surface_get(Enesim_Renderer *r
 
 /**
  * @brief Sets the source renderer to use as the source data
- * @prop{source_renderer}
+ * @ender_prop{source_renderer}
  * @param[in] r The blur filter renderer
  * @param[in] sr The renderer to use [transfer full]
  */
@@ -735,7 +735,7 @@ EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Re
 
 /**
  * @brief Gets the source renderer used as the source data
- * @prop{source_renderer}
+ * @ender_prop{source_renderer}
  * @param[in] r The blur filter renderer
  * @return The renderer to blur [transfer none]
  */
@@ -749,7 +749,7 @@ EAPI Enesim_Renderer * enesim_renderer_blur_source_renderer_get(Enesim_Renderer 
 
 /**
  * @brief Sets the blur radius in the x direction
- * @prop{radius_x}
+ * @ender_prop{radius_x}
  * @param[in] r The blur filter renderer
  * @param[in] rx The blur radius in the x direction
  */
@@ -765,7 +765,7 @@ EAPI void enesim_renderer_blur_radius_x_set(Enesim_Renderer *r, double rx)
 
 /**
  * @brief Gets the blur radius used in the x direction
- * @prop{radius_x}
+ * @ender_prop{radius_x}
  * @param[in] r The blur filter renderer
  * @return the blur x direction radius used
  */
@@ -780,7 +780,7 @@ EAPI double enesim_renderer_blur_radius_x_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the blur radius in the y direction
- * @prop{radius_y}
+ * @ender_prop{radius_y}
  * @param[in] r The blur filter renderer
  * @param[in] ry The blur radius in the y direction
  */
@@ -796,7 +796,7 @@ EAPI void enesim_renderer_blur_radius_y_set(Enesim_Renderer *r, double ry)
 
 /**
  * @brief Gets the blur radius used in the y direction
- * @prop{radius_y}
+ * @ender_prop{radius_y}
  * @param[in] r The blur filter renderer
  * @return the blur y direction radius used
  */

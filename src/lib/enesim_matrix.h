@@ -22,9 +22,9 @@
 
 /**
  * @file
- * @listgroup{Enesim_Matrix_Type}
- * @listgroup{Enesim_Matrix_F16p16}
- * @listgroup{Enesim_Matrix}
+ * @ender_group{Enesim_Matrix_Type}
+ * @ender_group{Enesim_Matrix_F16p16}
+ * @ender_group{Enesim_Matrix}
  */
 
 /**

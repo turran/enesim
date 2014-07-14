@@ -21,8 +21,8 @@
 
 /**
  * @file
- * @listgroup{Enesim_Basic}
- * @listgroup{Enesim_Main}
+ * @ender_group{Enesim_Basic}
+ * @ender_group{Enesim_Main}
  */
 
 /**

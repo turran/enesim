@@ -20,8 +20,8 @@
 
 /**
  * @file
- * @listgroup{Enesim_Path_Command}
- * @listgroup{Enesim_Path}
+ * @ender_group{Enesim_Path_Command}
+ * @ender_group{Enesim_Path}
  */
 
 /**

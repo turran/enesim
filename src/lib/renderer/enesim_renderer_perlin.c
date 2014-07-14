@@ -253,7 +253,7 @@ EAPI Enesim_Renderer * enesim_renderer_perlin_new(void)
 
 /**
  * @brief Set the number of octaves used on the perlin noise renderer
- * @prop{octaves}
+ * @ender_prop{octaves}
  * @param[in] r The perlin noise renderer
  * @param[in] octaves The number of octaves
  * 
@@ -271,7 +271,7 @@ EAPI void enesim_renderer_perlin_octaves_set(Enesim_Renderer *r, unsigned int oc
 
 /**
  * @brief Set the persistence multiplier on the perlin noise renderer
- * @prop{persistence}
+ * @ender_prop{persistence}
  * @param[in] r The perlin noise renderer
  * @param[in] persistence The persistence multiplier
  *
@@ -288,7 +288,7 @@ EAPI void enesim_renderer_perlin_persistence_set(Enesim_Renderer *r, double pers
 
 /**
  * @brief Set the amplitude on the perlin noise renderer
- * @prop{amplitude}
+ * @ender_prop{amplitude}
  * @param[in] r The perlin noise renderer
  * @param[in] ampl The amplitude
  *
@@ -304,7 +304,7 @@ EAPI void enesim_renderer_perlin_amplitude_set(Enesim_Renderer *r, double ampl)
 
 /**
  * @brief Set the initial X frequency on the perlin noise renderer
- * @prop{xfrequency}
+ * @ender_prop{xfrequency}
  * @param[in] r The perlin noise renderer
  * @param[in] freq The initial X frequency
  *
@@ -320,7 +320,7 @@ EAPI void enesim_renderer_perlin_xfrequency_set(Enesim_Renderer *r, double freq)
 
 /**
  * @brief Set the initial Y frequency on the perlin noise renderer
- * @prop{yfrequency}
+ * @ender_prop{yfrequency}
  * @param[in] r The perlin noise renderer
  * @param[in] freq The initial Y frequency
  *

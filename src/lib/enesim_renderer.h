@@ -20,7 +20,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer}
+ * @ender_group{Enesim_Renderer}
  */
 
 /**

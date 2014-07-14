@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Importer}
+ * @ender_group{Enesim_Renderer_Importer}
  */
 
 /**
  * @defgroup Enesim_Renderer_Importer Importer
- * @brief Renderer that imports pixels from a buffer @inherits{Enesim_Renderer}
+ * @brief Renderer that imports pixels from a buffer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

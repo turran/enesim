@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Background}
+ * @ender_group{Enesim_Renderer_Background}
  */
 
 /**
  * @defgroup Enesim_Renderer_Background Background
- * @brief Generic color renderer @inherits{Enesim_Renderer}
+ * @brief Generic color renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

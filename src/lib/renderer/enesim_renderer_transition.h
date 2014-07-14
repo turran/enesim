@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Transition}
+ * @ender_group{Enesim_Renderer_Transition}
  */
 
 /**
  * @defgroup Enesim_Renderer_Transition Transition
- * @brief Rederer that blends two renderers @inherits{Enesim_Renderer}
+ * @brief Rederer that blends two renderers @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Stripes}
+ * @ender_group{Enesim_Renderer_Stripes}
  */
 
 /**
  * @defgroup Enesim_Renderer_Stripes Stripes
- * @brief Stripe pattern renderer @inherits{Enesim_Renderer}
+ * @brief Stripe pattern renderer @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */

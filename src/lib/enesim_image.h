@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Image_Definitions}
- * @listgroup{Enesim_Image}
- * @listgroup{Enesim_Image_Context}
- * @listgroup{Enesim_Image_File}
- * @listgroup{Enesim_Image_Provider}
- * @listgroup{Enesim_Image_Finder}
+ * @ender_group{Enesim_Image_Definitions}
+ * @ender_group{Enesim_Image}
+ * @ender_group{Enesim_Image_Context}
+ * @ender_group{Enesim_Image_File}
+ * @ender_group{Enesim_Image_Provider}
+ * @ender_group{Enesim_Image_Finder}
  */
 
 /**

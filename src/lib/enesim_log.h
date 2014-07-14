@@ -20,7 +20,7 @@
 
 /**
  * @file
- * @listgroup{Enesim_Log}
+ * @ender_group{Enesim_Log}
  */
 
 /**

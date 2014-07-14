@@ -20,12 +20,12 @@
 
 /**
  * @file
- * @listgroup{Enesim_Renderer_Rectangle}
+ * @ender_group{Enesim_Renderer_Rectangle}
  */
 
 /**
  * @defgroup Enesim_Renderer_Rectangle Rectangle
- * @brief Rectangle renderer @inherits{Enesim_Renderer_Shape}
+ * @brief Rectangle renderer @ender_inherits{Enesim_Renderer_Shape}
  * @ingroup Enesim_Renderer_Shape
  * @{
  */
