@@ -112,8 +112,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Store a private data pointer into the buffer.  <a href="#ga4d8f180d18ab6dae8baebf454b006cd4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga3e4596ffd19fbb61a1a569016c5f5061">enesim_buffer_private_get</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the private data pointer from the buffer.  <a href="#ga3e4596ffd19fbb61a1a569016c5f5061"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga76d6e371ba896c8926f04ec2ca866a7a">enesim_buffer_data_get</a> (const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the data of a buffer.  <a href="#ga76d6e371ba896c8926f04ec2ca866a7a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gabfd0b7abce3a156f0f2284a5fa34970e">enesim_buffer_sw_data_get</a> (const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the data of a buffer.  <a href="#gabfd0b7abce3a156f0f2284a5fa34970e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gaf2c51c785720d2fe37f96608d5a8a174">enesim_buffer_format_size_get</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> fmt, uint32_t w, uint32_t h)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the size in bytes given a format and a size.  <a href="#gaf2c51c785720d2fe37f96608d5a8a174"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gad6175e9cd5c8c330f1d279998d243e94">enesim_buffer_format_rgb_components_from</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *fmt, int depth, uint8_t aoffset, uint8_t alen, uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen, uint8_t boffset, uint8_t blen, Eina_Bool premul)</td></tr>
@@ -653,12 +653,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga76d6e371ba896c8926f04ec2ca866a7a"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_data_get" ref="ga76d6e371ba896c8926f04ec2ca866a7a" args="(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)" -->
+<a class="anchor" id="gabfd0b7abce3a156f0f2284a5fa34970e"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_sw_data_get" ref="gabfd0b7abce3a156f0f2284a5fa34970e" args="(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer.html#ga76d6e371ba896c8926f04ec2ca866a7a">enesim_buffer_data_get</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer.html#gabfd0b7abce3a156f0f2284a5fa34970e">enesim_buffer_sw_data_get</a> </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
           <td class="paramname"><em>b</em>, </td>
@@ -1031,7 +1031,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 9 2014 10:13:24 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Jul 14 2014 18:56:13 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
