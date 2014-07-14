@@ -8,7 +8,7 @@ if [ ! -d common/m4 ]; then
 	echo "+ Setting up common submodule"
 	git submodule init
 fi
-git submodule update
+git submodule update --rebase
 
 autoreconf -f -i -v --warnings=all || exit 1
 
