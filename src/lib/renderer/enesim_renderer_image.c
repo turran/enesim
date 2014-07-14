@@ -191,7 +191,7 @@ static Eina_Bool _image_gl_create(Enesim_Renderer_Image *thiz,
 			if (!w || !h)
 				return EINA_FALSE;
 
-			enesim_surface_data_get(thiz->current.s, &sdata,
+			enesim_surface_sw_data_get(thiz->current.s, &sdata,
 					&sstride);
 			pool = enesim_surface_pool_get(s);
 			thiz->gl.s = enesim_surface_new_pool_and_data_from(
@@ -1494,7 +1494,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
 	enesim_surface_size_get(thiz->current.s, &thiz->sw, &thiz->sh);
-	enesim_surface_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
+	enesim_surface_sw_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
 	x = thiz->current.x;  y = thiz->current.y;
 	w = thiz->current.w;  h = thiz->current.h;
 

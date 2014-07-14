@@ -191,7 +191,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	else
 	{
 		enesim_surface_size_get(thiz->src, &sw, &sh);
-		enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
+		enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);
 	}
 
 	src = argb8888_at(src, sstride, ix, iy);
@@ -363,7 +363,7 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	else
 	{
 		enesim_surface_size_get(thiz->src, &sw, &sh);
-		enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
+		enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);
 	}
 
 	src = argb8888_at(src, sstride, ix, iy);

@@ -65,7 +65,7 @@ static Eina_Bool _raw_save(Enesim_Stream *data, Enesim_Buffer *buffer,
 	/* dump a c byte array with the data of the surface and also
 	 * a static function to get such surface
 	 */
-	enesim_buffer_data_get(buffer, &sdata);
+	enesim_buffer_sw_data_get(buffer, &sdata);
 	enesim_buffer_size_get(buffer, &w, &h);
 	src = sdata.argb8888_pre.plane0;
 	stride = sdata.argb8888_pre.plane0_stride;

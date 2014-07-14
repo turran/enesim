@@ -115,8 +115,8 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
-	enesim_surface_data_get(thiz->map, (void **)&map, &mstride);		\
-	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
+	enesim_surface_sw_data_get(thiz->map, (void **)&map, &mstride);		\
+	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
 	enesim_coord_identity_setup(&xx, &yy, x, y, thiz->ox, thiz->oy);	\
 	x = eina_f16p16_int_to(xx);						\
@@ -169,8 +169,8 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
-	enesim_surface_data_get(thiz->map, (void **)&map, &mstride);		\
-	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
+	enesim_surface_sw_data_get(thiz->map, (void **)&map, &mstride);		\
+	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
 	/* TODO move by the origin */						\
 	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy,		\

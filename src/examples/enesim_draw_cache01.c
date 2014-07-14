@@ -45,7 +45,7 @@ int main(void)
 	s = enesim_surface_new(ENESIM_FORMAT_ARGB8888,
 			geom.w, geom.h);
 
-	enesim_surface_data_get(s, (void **)&dst, &stride);
+	enesim_surface_sw_data_get(s, (void **)&dst, &stride);
 	for (i = 0; i < 128; i++)
 	{
 		memcpy(dst, src, stride);

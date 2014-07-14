@@ -263,7 +263,7 @@ static Eina_Bool _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer,
 	jpeg_calc_output_dimensions(&(cinfo));
 	jpeg_start_decompress(&cinfo);
 
-	enesim_buffer_data_get(buffer, &sw_data);
+	enesim_buffer_sw_data_get(buffer, &sw_data);
 	switch (cinfo.output_components)
 	{
 		case 4:

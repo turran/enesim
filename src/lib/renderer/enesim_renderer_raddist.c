@@ -93,7 +93,7 @@ static void _span_identity(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_RADDIST(r);
 	/* setup the parameters */
 	enesim_surface_size_get(thiz->src, &sw, &sh);
-	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);
+	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);
 	/* FIXME move this to the setup */
 	r_inv = 1.0f / thiz->current.radius;
 

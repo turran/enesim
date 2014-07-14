@@ -164,7 +164,7 @@ static Eina_Bool _png_load(Enesim_Stream *data, Enesim_Buffer *buffer,
 	unsigned int i;
 	int pixel_inc;
 
-	enesim_buffer_data_get(buffer, &sw_data);
+	enesim_buffer_sw_data_get(buffer, &sw_data);
 	sdata = sw_data.argb8888.plane0;
 
 	hasa = 0;
@@ -323,7 +323,7 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 	{
 		enesim_converter_buffer(b, buffer);
 	}
-	enesim_buffer_data_get(buffer, &cdata);
+	enesim_buffer_sw_data_get(buffer, &cdata);
 	row_ptr = (png_bytep) cdata.argb8888.plane0;
 	for (y = 0; y < h; y++)
 	{

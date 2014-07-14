@@ -318,7 +318,7 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 		if (!g->surface) goto next;
 
 		enesim_surface_size_get(g->surface, &w, &h);
-		enesim_surface_data_get(g->surface, (void **)&src, &stride);
+		enesim_surface_sw_data_get(g->surface, (void **)&src, &stride);
 		gxx = xx - eina_f16p16_int_from(position.distance);
 		gyy = yy - eina_f16p16_int_from((thiz->top - g->origin));
 
@@ -405,7 +405,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 			size_t stride;
 
 			enesim_surface_size_get(g->surface, &w, &h);
-			enesim_surface_data_get(g->surface, (void **)&mask, &stride);
+			enesim_surface_sw_data_get(g->surface, (void **)&mask, &stride);
 
 			ry = y - (thiz->top - g->origin);
 			rlen = len < w - rx ? len : w - rx;

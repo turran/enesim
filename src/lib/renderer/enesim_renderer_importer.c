@@ -239,7 +239,7 @@ static Eina_Bool _importer_sw_setup(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_IMPORTER(r);
 	if (!thiz->buffer) return EINA_FALSE;
 
-	enesim_buffer_data_get(thiz->buffer, &thiz->cdata);
+	enesim_buffer_sw_data_get(thiz->buffer, &thiz->cdata);
 	thiz->cfmt = enesim_buffer_format_get(thiz->buffer);
 	/* TODO use a LUT for this */
 	switch (thiz->cfmt)

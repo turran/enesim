@@ -406,13 +406,13 @@ EAPI void enesim_surface_unref(Enesim_Surface *s)
 	}
 }
 
-EAPI Eina_Bool enesim_surface_data_get(Enesim_Surface *s, void **data, size_t *stride)
+EAPI Eina_Bool enesim_surface_sw_data_get(Enesim_Surface *s, void **data, size_t *stride)
 {
 	Enesim_Buffer_Sw_Data sw_data;
 
 	if (!data) return EINA_FALSE;
 	ENESIM_MAGIC_CHECK_SURFACE(s);
-	if (!enesim_buffer_data_get(s->buffer, &sw_data))
+	if (!enesim_buffer_sw_data_get(s->buffer, &sw_data))
 	{
 		WRN("Impossible to get the buffer data");
 		return EINA_FALSE;

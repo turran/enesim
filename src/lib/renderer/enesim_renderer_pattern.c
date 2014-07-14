@@ -201,7 +201,7 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_identity_span(		\
 	/* translate the origin by the image origin */				\
 	xx = eina_f16p16_sub(xx, thiz->src_xx);					\
 	yy = eina_f16p16_sub(yy, thiz->src_yy);					\
-	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
+	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 	yy = enesim_coord_##rmode(yy, thiz->src_hh);				\
 	while (dst < end)							\
 	{									\
@@ -232,7 +232,7 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_affine_span(		\
 	/* translate the origin by the image origin */				\
 	xx = eina_f16p16_sub(xx, thiz->src_xx);					\
 	yy = eina_f16p16_sub(yy, thiz->src_yy);					\
-	enesim_surface_data_get(thiz->src, (void **)&src, &sstride);		\
+	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 	while (dst < end)							\
 	{									\
 		*dst++ = enesim_coord_sample_good_##rmode(src, sstride,		\

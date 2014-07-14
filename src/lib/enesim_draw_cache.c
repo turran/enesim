@@ -252,7 +252,7 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 
 	/* get the mapped pointer */	
 	buffer = enesim_surface_buffer_get(thiz->s);
-	ret = enesim_buffer_data_get(buffer, mapped);
+	ret = enesim_buffer_sw_data_get(buffer, mapped);
 	enesim_buffer_unref(buffer);
 
 	/* check if the requested area has been already cached or not, ie

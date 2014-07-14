@@ -530,7 +530,7 @@ EAPI void enesim_buffer_unref(Enesim_Buffer *b)
  * @param[out] data The data of the buffer
  * @return Eina_True if it is possible to get the data, Eina_False otherwise
  */
-EAPI Eina_Bool enesim_buffer_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
+EAPI Eina_Bool enesim_buffer_sw_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
 {
 	ENESIM_MAGIC_CHECK_BUFFER(b);
 	return enesim_pool_data_get(b->pool, b->backend_data, b->format, b->w, b->h, data);

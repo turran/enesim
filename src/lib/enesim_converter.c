@@ -120,8 +120,8 @@ EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst)
 	converter = enesim_converter_surface_get(dfmt, ENESIM_ANGLE_0, sfmt);
 	if (!converter) return EINA_FALSE;
 
-	enesim_buffer_data_get(dst, &ddata);
-	enesim_buffer_data_get(b, &sdata);
+	enesim_buffer_sw_data_get(dst, &ddata);
+	enesim_buffer_sw_data_get(b, &sdata);
 
 	/* FIXME check the stride too */
 	/* TODO check the clip and x, y */
