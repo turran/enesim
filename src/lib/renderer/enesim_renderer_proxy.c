@@ -326,7 +326,7 @@ EAPI Enesim_Renderer * enesim_renderer_proxy_new(void)
  * Sets the renderer that is going to be proxied on the proxy renderer
  * @ender_prop{proxied}
  * @param[in] r The proxy renderer
- * @param[in] proxied The renderer to proxy [transfer full]
+ * @param[in] proxied The renderer to proxy @ender_transfer{full}
  */
 EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
 		Enesim_Renderer *proxied)
@@ -343,7 +343,7 @@ EAPI void enesim_renderer_proxy_proxied_set(Enesim_Renderer *r,
  * Gets the renderer that is going to be proxied on the proxy renderer
  * @ender_prop{proxied}
  * @param[in] r The proxy renderer
- * @return The renderer to proxy [transfer none]
+ * @return The renderer to proxy @ender_transfer{none}
  */
 EAPI Enesim_Renderer * enesim_renderer_proxy_proxied_get(Enesim_Renderer *r)
 {

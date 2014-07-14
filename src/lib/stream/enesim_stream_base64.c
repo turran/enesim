@@ -215,7 +215,7 @@ static Enesim_Stream_Descriptor _enesim_stream_base64_descriptor = {
  *============================================================================*/
 /**
  * @brief Create a new base64 based stream
- * @param[in] d The stream that holds the base64 data [transfer full]
+ * @param[in] d The stream that holds the base64 data @ender_transfer{full}
  * @return A new base64 enesim stream
  */
 EAPI Enesim_Stream * enesim_stream_base64_new(Enesim_Stream *d)

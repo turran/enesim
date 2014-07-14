@@ -377,7 +377,7 @@ EAPI void enesim_renderer_dispmap_y_channel_set(Enesim_Renderer *r,
  * @brief Sets the map surface to use for displacing the source surface
  * @ender_prop{map_surface}
  * @param[in] r The displacement map renderer
- * @param[in] map The surface map [transfer full]
+ * @param[in] map The surface map @ender_transfer{full}
  */
 EAPI void enesim_renderer_dispmap_map_surface_set(Enesim_Renderer *r, Enesim_Surface *map)
 {
@@ -393,7 +393,7 @@ EAPI void enesim_renderer_dispmap_map_surface_set(Enesim_Renderer *r, Enesim_Sur
  * @brief Sets the map surface to use for displacing the source surface
  * @ender_prop{map_surface}
  * @param[in] r The displacement map renderer
- * @return The surface map [transfer full]
+ * @return The surface map @ender_transfer{full}
  */
 EAPI Enesim_Surface * enesim_renderer_dispmap_map_surface_get(Enesim_Renderer *r)
 {

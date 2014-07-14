@@ -2047,7 +2047,7 @@ EAPI void enesim_renderer_image_size_get(Enesim_Renderer *r, double *w, double *
  * @brief Set the surface used as pixel source for the image renderer
  * @ender_prop{source_surface}
  * @param[in] r The image renderer.
- * @param[in] src The surface to use [transfer full]
+ * @param[in] src The surface to use @ender_transfer{full}
  *
  * This function sets the source pixels to use for the image renderer.
  */
@@ -2066,7 +2066,7 @@ EAPI void enesim_renderer_image_source_surface_set(Enesim_Renderer *r, Enesim_Su
  * @brief Retrieve the surface used as the pixel source for the image renderer
  * @ender_prop{source_surface}
  * @param[in] r The image renderer.
- * @return src The source surface [transfer none]
+ * @return src The source surface @ender_transfer{none}
  *
  * This function returns the surface used as the pixel source
  */

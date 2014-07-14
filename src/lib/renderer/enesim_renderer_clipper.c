@@ -363,7 +363,7 @@ EAPI Enesim_Renderer * enesim_renderer_clipper_new(void)
 /**
  * @brief Sets the clipped renderer
  * @param[in] r The clipper renderer to set the clip to
- * @param[in] clipped The renderer to clip [transfer full]
+ * @param[in] clipped The renderer to clip @ender_transfer{full}
  */
 EAPI void enesim_renderer_clipper_clipped_set(Enesim_Renderer *r,
 		Enesim_Renderer *clipped)
@@ -380,7 +380,7 @@ EAPI void enesim_renderer_clipper_clipped_set(Enesim_Renderer *r,
 /**
  * @brief Gets the clipped renderer
  * @param[in] r The clipper renderer to set the clip to
- * @return The clipped renderer [transfer none]
+ * @return The clipped renderer @ender_transfer{none}
  */
 EAPI Enesim_Renderer * enesim_renderer_clipper_clipped_get(Enesim_Renderer *r)
 {

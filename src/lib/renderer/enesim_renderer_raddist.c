@@ -316,7 +316,7 @@ EAPI double enesim_renderer_raddist_factor_get(Enesim_Renderer *r)
  * @brief Sets the source surface of the renderer
  * @ender_prop{source_surface}
  * @param[in] r The radial distortion renderer
- * @param[in] src The source surface [transfer full]
+ * @param[in] src The source surface @ender_transfer{full}
  */
 EAPI void enesim_renderer_raddist_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {

@@ -386,7 +386,7 @@ EAPI Enesim_Renderer * enesim_renderer_pattern_new(void)
  * @brief Sets the surface to use as the pattern source
  * @ender_prop{source_surface}
  * @param[in] r The pattern renderer
- * @param[in] src The surface to use [transfer full]
+ * @param[in] src The surface to use @ender_transfer{full}
  */
 EAPI void enesim_renderer_pattern_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src)
 {
@@ -406,7 +406,7 @@ EAPI void enesim_renderer_pattern_source_surface_set(Enesim_Renderer *r, Enesim_
  * @brief Gets the surface used as pattern source
  * @ender_prop{source_surface}
  * @param[in] r The pattern renderer
- * @return The surface to pattern [transfer none]
+ * @return The surface to pattern @ender_transfer{none}
  */
 EAPI Enesim_Surface * enesim_renderer_pattern_source_surface_get(Enesim_Renderer *r)
 {
@@ -420,7 +420,7 @@ EAPI Enesim_Surface * enesim_renderer_pattern_source_surface_get(Enesim_Renderer
  * @brief Sets the renderer to use as pattern source
  * @ender_prop{source_renderer}
  * @param[in] r The pattern renderer
- * @param[in] sr The renderer to use [transfer full]
+ * @param[in] sr The renderer to use @ender_transfer{full}
  */
 EAPI void enesim_renderer_pattern_source_renderer_set(Enesim_Renderer *r, Enesim_Renderer *sr)
 {
@@ -440,7 +440,7 @@ EAPI void enesim_renderer_pattern_source_renderer_set(Enesim_Renderer *r, Enesim
  * @brief Gets the renderer used as pattern source
  * @ender_prop{source_renderer}
  * @param[in] r The pattern renderer
- * @return The renderer to pattern [transfer none]
+ * @return The renderer to pattern @ender_transfer{none}
  */
 EAPI Enesim_Renderer * enesim_renderer_pattern_source_renderer_get(Enesim_Renderer *r)
 {

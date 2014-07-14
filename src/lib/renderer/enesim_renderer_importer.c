@@ -373,7 +373,7 @@ EAPI void enesim_renderer_importer_buffer_set(Enesim_Renderer *r, Enesim_Buffer 
  * Gets the buffer to import pixels from
  * @ender_prop{buffer}
  * @param[in] r The importer renderer
- * @return The buffer [transfer none]
+ * @return The buffer @ender_transfer{none}
  */
 EAPI Enesim_Buffer * enesim_renderer_importer_buffer_get(Enesim_Renderer *r)
 {

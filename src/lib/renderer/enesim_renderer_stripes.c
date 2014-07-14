@@ -731,7 +731,7 @@ EAPI void enesim_renderer_stripes_even_renderer_set(Enesim_Renderer *r,
  * Gets the renderer of the even stripes
  * @ender_prop{even_renderer}
  * @param[in] r The stripes renderer
- * @return The even stripes renderer [transfer none]
+ * @return The even stripes renderer @ender_transfer{none}
  */
 EAPI Enesim_Renderer * enesim_renderer_stripes_even_renderer_get(Enesim_Renderer *r)
 {
@@ -807,7 +807,7 @@ EAPI Enesim_Color enesim_renderer_stripes_odd_color_get(Enesim_Renderer *r)
  * Sets the renderer of the odd stripes
  * @ender_prop{odd_renderer}
  * @param[in] r The stripes renderer
- * @param[in] paint The odd stripes renderer [transfer full]
+ * @param[in] paint The odd stripes renderer @ender_transfer{full}
  */
 EAPI void enesim_renderer_stripes_odd_renderer_set(Enesim_Renderer *r,
 		Enesim_Renderer *paint)
@@ -825,7 +825,7 @@ EAPI void enesim_renderer_stripes_odd_renderer_set(Enesim_Renderer *r,
  * Gets the renderer of the odd stripes
  * @ender_prop{odd_renderer}
  * @param[in] r The stripes renderer
- * @return The odd stripes renderer [transfer none]
+ * @return The odd stripes renderer @ender_transfer{none}
  */
 EAPI Enesim_Renderer * enesim_renderer_stripes_odd_renderer_get(Enesim_Renderer *r)
 {

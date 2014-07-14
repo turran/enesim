@@ -239,7 +239,7 @@ void enesim_pool_shutdown(void)
  *============================================================================*/
 /**
  * @brief Get the default memory pool
- * @return The default memory pool [transfer none]
+ * @return The default memory pool @ender_transfer{none}
  */
 EAPI Enesim_Pool * enesim_pool_default_get(void)
 {
@@ -248,7 +248,7 @@ EAPI Enesim_Pool * enesim_pool_default_get(void)
 
 /**
  * @brief Set the default memory pool
- * @param[in] thiz The newly default memory pool [transfer full]
+ * @param[in] thiz The newly default memory pool @ender_transfer{full}
  */
 EAPI void enesim_pool_default_set(Enesim_Pool *thiz)
 {

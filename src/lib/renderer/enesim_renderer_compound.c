@@ -840,7 +840,7 @@ EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l
  * @brief Sets the renderer of a layer
  * @ender_prop{renderer}
  * @param[in] l The layer to set the renderer on
- * @param[in] r The renderer to set on the layer [transfer full]
+ * @param[in] r The renderer to set on the layer @ender_transfer{full}
  */
 EAPI void enesim_renderer_compound_layer_renderer_set(
 		Enesim_Renderer_Compound_Layer *l, Enesim_Renderer *r)
@@ -892,7 +892,7 @@ EAPI Enesim_Renderer * enesim_renderer_compound_new(void)
 /**
  * Adds a layer
  * @param[in] r The compound renderer
- * @param[in] layer The layer to add [transfer full]
+ * @param[in] layer The layer to add @ender_transfer{full}
  */
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer)
@@ -914,7 +914,7 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 /**
  * @brief Removes a layer
  * @param[in] r The compound renderer
- * @param[in] layer The layer to remove [transfer full]
+ * @param[in] layer The layer to remove @ender_transfer{full}
  */
 EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer)
