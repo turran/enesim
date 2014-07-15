@@ -96,8 +96,7 @@ EAPI ssize_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream
 EAPI ssize_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_write</b> (<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, void *buffer, size_t len)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf5280e959ed276b8ba375c8bffff8239"></a><!-- doxytag: member="Enesim_Stream::enesim_stream_length" ref="gaf5280e959ed276b8ba375c8bffff8239" args="(Enesim_Stream *thiz)" -->
 EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_length</b> (<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga0fbae1a65e32417da69706d92973a314"></a><!-- doxytag: member="Enesim_Stream::enesim_stream_mmap" ref="ga0fbae1a65e32417da69706d92973a314" args="(Enesim_Stream *thiz, size_t *size)" -->
-EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_mmap</b> (<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, size_t *size)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream.html#ga0fbae1a65e32417da69706d92973a314">enesim_stream_mmap</a> (<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, size_t *size)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga62ca33754cfc70ac0201c20609b88d9d"></a><!-- doxytag: member="Enesim_Stream::enesim_stream_munmap" ref="ga62ca33754cfc70ac0201c20609b88d9d" args="(Enesim_Stream *thiz, void *ptr)" -->
 EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_stream_munmap</b> (<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *thiz, void *ptr)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga9807abfff0b20b18b1e49c195410efaa"></a><!-- doxytag: member="Enesim_Stream::enesim_stream_reset" ref="ga9807abfff0b20b18b1e49c195410efaa" args="(Enesim_Stream *thiz)" -->
@@ -177,6 +176,42 @@ EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_s
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="ga0fbae1a65e32417da69706d92973a314"></a><!-- doxytag: member="enesim_stream.h::enesim_stream_mmap" ref="ga0fbae1a65e32417da69706d92973a314" args="(Enesim_Stream *thiz, size_t *size)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void* <a class="el" href="group__Enesim__Stream.html#ga0fbae1a65e32417da69706d92973a314">enesim_stream_mmap</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Map the stream in memory </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The stream to map </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">size</td><td>The size of the mapped buffer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The memory mapped pointer </dd></dl>
 
 </div>
 </div>
@@ -298,7 +333,7 @@ EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_s
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 14 2014 18:56:13 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 15 2014 18:30:10 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

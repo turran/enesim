@@ -112,8 +112,7 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the pool of a surface.  <a href="#ga3b53db8d6fced8bf92c43b04debe99f3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga24be4379fecf3ea05edf650fbfab8339">enesim_surface_private_set</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, void *data)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga32bfd3b61678c416eca4f764ef5d40fd">enesim_surface_private_get</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga0bb41827159a3326dcf366107798925e"></a><!-- doxytag: member="Enesim_Surface::enesim_surface_sw_data_get" ref="ga0bb41827159a3326dcf366107798925e" args="(Enesim_Surface *s, void **data, size_t *stride)" -->
-EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_surface_sw_data_get</b> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, void **data, size_t *stride)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga0bb41827159a3326dcf366107798925e">enesim_surface_sw_data_get</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, void **data, size_t *stride)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#gadc84790a46bd4ed15d9a4db83da6b920">enesim_surface_lock</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, Eina_Bool write)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Locks a surface.  <a href="#gadc84790a46bd4ed15d9a4db83da6b920"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#gacb7bdd94a0c4dd925eafb0fa6c0891ec">enesim_surface_unlock</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
@@ -673,6 +672,49 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_surf
 
 </div>
 </div>
+<a class="anchor" id="ga0bb41827159a3326dcf366107798925e"></a><!-- doxytag: member="enesim_surface.h::enesim_surface_sw_data_get" ref="ga0bb41827159a3326dcf366107798925e" args="(Enesim_Surface *s, void **data, size_t *stride)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Surface.html#ga0bb41827159a3326dcf366107798925e">enesim_surface_sw_data_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void **&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramname"><em>stride</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Gets the data associated with a software based surface </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The surface to get the data from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The pointer to the surface data </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">stride</td><td>The stride of the surface </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if sucessfull, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="gadc84790a46bd4ed15d9a4db83da6b920"></a><!-- doxytag: member="enesim_surface.h::enesim_surface_lock" ref="gadc84790a46bd4ed15d9a4db83da6b920" args="(Enesim_Surface *s, Eina_Bool write)" -->
 <div class="memitem">
 <div class="memproto">
@@ -752,7 +794,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_surf
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Jul 14 2014 18:56:13 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jul 15 2014 18:30:10 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
