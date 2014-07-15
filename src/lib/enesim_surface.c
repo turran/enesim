@@ -406,6 +406,13 @@ EAPI void enesim_surface_unref(Enesim_Surface *s)
 	}
 }
 
+/**
+ * Gets the data associated with a software based surface
+ * @param[in] s The surface to get the data from
+ * @param[out] data The pointer to the surface data
+ * @param[out] stride The stride of the surface
+ * @return EINA_TRUE if sucessfull, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool enesim_surface_sw_data_get(Enesim_Surface *s, void **data, size_t *stride)
 {
 	Enesim_Buffer_Sw_Data sw_data;

@@ -96,6 +96,12 @@ EAPI ssize_t enesim_stream_write(Enesim_Stream *thiz, void *buffer, size_t len)
 	return 0;
 }
 
+/**
+ * Map the stream in memory
+ * @param[in] thiz The stream to map
+ * @param[out] size The size of the mapped buffer
+ * @return The memory mapped pointer
+ */
 EAPI void * enesim_stream_mmap(Enesim_Stream *thiz, size_t *size)
 {
 	if (thiz->descriptor->mmap)
