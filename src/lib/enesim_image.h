@@ -42,7 +42,13 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_ALLOCATOR;
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_LOADING;
 EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 
-typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, int error); /**< Function prototype called whenever an image is loaded or saved */
+/**
+ * Function prototype called whenever an image is loaded or saved
+ * @param b The buffer where the data loadad is or where the data to write is
+ * @param data The user provided data
+ * @param error The error in case something went wrong
+ */
+typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, int error);
 
 /**
  * @}
