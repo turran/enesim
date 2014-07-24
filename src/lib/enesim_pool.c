@@ -61,23 +61,6 @@ static Eina_Bool _data_alloc(void *prv EINA_UNUSED,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _data_sub(void *prv EINA_UNUSED,
-		Enesim_Backend backend EINA_UNUSED,
-		void **backend_data,
-		void *original_data,
-		Enesim_Buffer_Format original_fmt,
-		const Eina_Rectangle *area)
-{
-	Enesim_Buffer_Sw_Data *orig_data = original_data;
-	Enesim_Buffer_Sw_Data *data;
-
-	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
-	*backend_data = data;
-
-	enesim_buffer_sw_data_sub(orig_data, data, original_fmt, area);
-	return EINA_TRUE;
-}
-
 static Eina_Bool _data_from(void *prv EINA_UNUSED,
 		Enesim_Backend *backend,
 		void **backend_data,
@@ -129,7 +112,6 @@ static Enesim_Pool_Descriptor _default_descriptor = {
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ _data_from,
-	/* .data_sub =   */ _data_sub,
 	/* .data_get =   */ _data_get,
 	/* .free =       */ NULL
 };
@@ -175,23 +157,6 @@ Eina_Bool enesim_pool_data_from(Enesim_Pool *p, Enesim_Backend *backend, void **
 
 	return p->descriptor->data_from(p->data, backend, data, fmt, w, h, copy, from);
 }
-
-Eina_Bool enesim_pool_data_sub(Enesim_Pool *p, Enesim_Backend backend,
-		void **data,
-		void *original_data,
-		Enesim_Buffer_Format original_fmt,
-		const Eina_Rectangle *area)
-{
-	if (!p) return EINA_FALSE;
-	if (!p->descriptor) return EINA_FALSE;
-	if (!p->descriptor->data_sub)
-	{
-		WRN("No data_sub() impementation");
-		return EINA_FALSE;
-	}
-	return p->descriptor->data_sub(p->data, backend, data, original_data, original_fmt, area);
-}
-
 
 Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
 		Enesim_Buffer_Format fmt,

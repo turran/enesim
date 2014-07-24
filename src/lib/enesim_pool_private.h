@@ -36,13 +36,6 @@ typedef Eina_Bool (*Enesim_Pool_Data_From)(void *prv,
 		Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *src);
 
-typedef Eina_Bool (*Enesim_Pool_Data_Sub)(void *prv,
-		Enesim_Backend backend,
-		void **backend_data,
-		void *original_data,
-		Enesim_Buffer_Format fmt,
-		const Eina_Rectangle *area);
-
 typedef Eina_Bool (*Enesim_Pool_Data_Get)(void *prv,
 		void *backend_data,
 		Enesim_Buffer_Format fmt,
@@ -56,7 +49,6 @@ typedef struct _Enesim_Pool_Descriptor
 	Enesim_Pool_Data_Alloc data_alloc;
 	Enesim_Pool_Data_Free data_free;
 	Enesim_Pool_Data_From data_from;
-	Enesim_Pool_Data_Sub data_sub;
 	Enesim_Pool_Data_Get data_get;
 	Enesim_Pool_Free free;
 } Enesim_Pool_Descriptor;
@@ -78,11 +70,6 @@ Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Backend *backend, void *
 Eina_Bool enesim_pool_data_from(Enesim_Pool *p, Enesim_Backend *backend, void **data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h, Eina_Bool copy,
 		Enesim_Buffer_Sw_Data *from);
-Eina_Bool enesim_pool_data_sub(Enesim_Pool *p, Enesim_Backend backend,
-		void **data,
-		void *original_data,
-		Enesim_Buffer_Format original_fmt,
-		const Eina_Rectangle *area);
 Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
 		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h,
