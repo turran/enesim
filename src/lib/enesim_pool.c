@@ -113,6 +113,7 @@ static Enesim_Pool_Descriptor _default_descriptor = {
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ _data_from,
 	/* .data_get =   */ _data_get,
+	/* .data_put =   */ NULL,
 	/* .free =       */ NULL
 };
 /*============================================================================*
