@@ -1471,10 +1471,11 @@ static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 {
 	Enesim_Renderer_Image *thiz;
 
-	_image_state_cleanup(r);
-
 	thiz = ENESIM_RENDERER_IMAGE(r);
+	if (thiz->current.s)
+		enesim_surface_unmap(thiz->current.s, (void **)(&thiz->src), EINA_FALSE);
 	thiz->span = NULL;
+	_image_state_cleanup(r);
 }
 
 static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
@@ -1494,7 +1495,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_IMAGE(r);
 	enesim_surface_size_get(thiz->current.s, &thiz->sw, &thiz->sh);
-	enesim_surface_sw_data_get(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
+	enesim_surface_map(thiz->current.s, (void **)(&thiz->src), &thiz->sstride);
 	x = thiz->current.x;  y = thiz->current.y;
 	w = thiz->current.w;  h = thiz->current.h;
 

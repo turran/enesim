@@ -65,6 +65,7 @@ typedef struct _Enesim_Renderer_Pattern {
 	Enesim_Renderer_Pattern_State past;
 	Enesim_Renderer *src_r;
 	Enesim_Surface *src_s;
+	/* private */
 	/* generated at state setup */
 	Enesim_Surface *src;
 	Enesim_Surface *cache;
@@ -75,9 +76,11 @@ typedef struct _Enesim_Renderer_Pattern {
 	int src_w;
 	int src_h;
 	Enesim_Matrix_F16p16 matrix;
-	/* private */
 	Eina_Bool changed : 1;
 	Eina_Bool force_redraw : 1;
+	/* for sw */
+	size_t sstride;
+	uint32_t *ssrc;
 } Enesim_Renderer_Pattern;
 
 typedef struct _Enesim_Renderer_Pattern_Class {
@@ -189,8 +192,6 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_identity_span(		\
 {										\
 	Enesim_Renderer_Pattern *thiz;						\
 	Eina_F16p16 xx, yy;							\
-	size_t sstride;								\
-	uint32_t *src;								\
 	uint32_t *dst = ddata;							\
 	uint32_t *end = dst + len;						\
 	double ox, oy;								\
@@ -201,15 +202,15 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_identity_span(		\
 	/* translate the origin by the image origin */				\
 	xx = eina_f16p16_sub(xx, thiz->src_xx);					\
 	yy = eina_f16p16_sub(yy, thiz->src_yy);					\
-	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 	yy = enesim_coord_##rmode(yy, thiz->src_hh);				\
 	while (dst < end)							\
 	{									\
 		Eina_F16p16 xxx;						\
 										\
 		xxx = enesim_coord_##rmode(xx, thiz->src_ww);			\
-		*dst++ = enesim_coord_sample_good_restrict(src, sstride,	\
-				thiz->src_w, thiz->src_h, xxx, yy);		\
+		*dst++ = enesim_coord_sample_good_restrict(thiz->ssrc,		\
+				thiz->sstride, 	thiz->src_w, thiz->src_h, 	\
+				xxx, yy);					\
 		xx += EINA_F16P16_ONE;						\
 	}									\
 }
@@ -220,8 +221,6 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_affine_span(		\
 {										\
 	Enesim_Renderer_Pattern *thiz;						\
 	Eina_F16p16 xx, yy;							\
-	size_t sstride;								\
-	uint32_t *src;								\
 	uint32_t *dst = ddata;							\
 	uint32_t *end = dst + len;						\
 	double ox, oy;								\
@@ -232,11 +231,11 @@ static void _enesim_renderer_pattern_argb8888_##rmode##_affine_span(		\
 	/* translate the origin by the image origin */				\
 	xx = eina_f16p16_sub(xx, thiz->src_xx);					\
 	yy = eina_f16p16_sub(yy, thiz->src_yy);					\
-	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 	while (dst < end)							\
 	{									\
-		*dst++ = enesim_coord_sample_good_##rmode(src, sstride,		\
-				thiz->src_w, thiz->src_h, xx, yy);		\
+		*dst++ = enesim_coord_sample_good_##rmode(thiz->ssrc, 		\
+				thiz->sstride, 	thiz->src_w, thiz->src_h, 	\
+				xx, yy);					\
 		yy += thiz->matrix.yx;						\
 		xx += thiz->matrix.xx;						\
 	}									\
@@ -271,6 +270,11 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 	/* do the common setup */
 	if (!_pattern_state_setup(r, s, l))
 		return EINA_FALSE;
+	if (!enesim_surface_map(thiz->src, (void **)&thiz->ssrc, &thiz->sstride))
+	{
+		_pattern_state_cleanup(r, s);
+		return EINA_FALSE;
+	}
 	/* convert the matrix */
 	enesim_renderer_transformation_get(r, &m);
 	enesim_matrix_inverse(&m, &m);
@@ -283,6 +287,10 @@ static Eina_Bool _pattern_sw_setup(Enesim_Renderer *r,
 
 static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer_Pattern *thiz;
+
+	thiz = ENESIM_RENDERER_PATTERN(r);
+	enesim_surface_unmap(thiz->src, (void **)&thiz->ssrc, EINA_FALSE);
 	_pattern_state_cleanup(r, s);
 }
 

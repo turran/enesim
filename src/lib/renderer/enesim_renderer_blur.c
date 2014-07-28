@@ -83,6 +83,8 @@ typedef struct _Enesim_Renderer_Blur
 	int ibxx, ibyy;
 
 	/* private */
+	uint32_t *ssrc;
+	size_t sstride;
 	Enesim_Draw_Cache *cache;
 	Eina_Bool changed;
 } Enesim_Renderer_Blur;
@@ -191,7 +193,8 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	else
 	{
 		enesim_surface_size_get(thiz->src, &sw, &sh);
-		enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);
+		src = thiz->ssrc;
+		sstride = thiz->sstride;
 	}
 
 	src = argb8888_at(src, sstride, ix, iy);
@@ -363,7 +366,8 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	else
 	{
 		enesim_surface_size_get(thiz->src, &sw, &sh);
-		enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);
+		src = thiz->ssrc;
+		sstride = thiz->sstride;
 	}
 
 	src = argb8888_at(src, sstride, ix, iy);
@@ -486,6 +490,14 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	if (thiz->src_r)
 		enesim_draw_cache_setup_sw(thiz->cache, ENESIM_FORMAT_ARGB8888, NULL);
+	else
+	{
+		if (!enesim_surface_map(thiz->src, (void **)&thiz->ssrc, &thiz->sstride))
+		{
+			_blur_state_cleanup(thiz, r, s);
+			return EINA_FALSE;
+		}
+	}
 
 	rx = ((2 * thiz->rx) + 1.01) / 2.0;
 	if (rx <= 1) rx = 1.005;
@@ -511,6 +523,8 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer_Blur *thiz;
 
 	thiz = ENESIM_RENDERER_BLUR(r);
+	if (!thiz->src_r)
+		enesim_surface_unmap(thiz->src, thiz->ssrc, EINA_FALSE);
 	_blur_state_cleanup(thiz, r, s);
 }
 

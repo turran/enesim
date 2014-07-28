@@ -59,6 +59,11 @@ typedef struct _Enesim_Renderer_Dispmap
 	double oy;
 	Enesim_Matrix_F16p16 matrix;
 	Eina_F16p16 s_scale;
+	/* for sw */
+	uint32_t *ssrc;
+	size_t sstride;
+	uint32_t *msrc;
+	size_t mstride;
 } Enesim_Renderer_Dispmap;
 
 typedef struct _Enesim_Renderer_Dispmap_Class {
@@ -105,9 +110,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	Enesim_Renderer_Dispmap *thiz;						\
 	uint32_t *dst = ddata;							\
 	uint32_t *end = dst + len;						\
-	uint32_t *map, *src;							\
-	size_t mstride;								\
-	size_t sstride;								\
+	uint32_t *map;								\
 	int sw, sh, mw, mh;							\
 	Eina_F16p16 xx, yy;							\
 										\
@@ -115,13 +118,11 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
-	enesim_surface_sw_data_get(thiz->map, (void **)&map, &mstride);		\
-	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
 	enesim_coord_identity_setup(&xx, &yy, x, y, thiz->ox, thiz->oy);	\
 	x = eina_f16p16_int_to(xx);						\
 	y = eina_f16p16_int_to(yy);						\
-	map = argb8888_at(map, mstride, x, y);					\
+	map = argb8888_at(thiz->msrc, thiz->mstride, x, y);			\
 										\
 	while (dst < end)							\
 	{									\
@@ -140,8 +141,8 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		p0 = enesim_coord_sample_good_restrict(src, sstride, sw, sh, sxx, 	\
-				syy);						\
+		p0 = enesim_coord_sample_good_restrict(thiz->ssrc, 		\
+				thiz->sstride, sw, sh, sxx, syy);		\
 										\
 next:										\
 		*dst++ = p0;							\
@@ -158,10 +159,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	Enesim_Renderer_Dispmap *thiz;						\
 	uint32_t *dst = ddata;							\
 	uint32_t *end = dst + len;						\
-	uint32_t *src;								\
 	uint32_t *map;								\
-	size_t mstride;								\
-	size_t sstride;								\
 	int sw, sh, mw, mh;							\
 	Eina_F16p16 xx, yy;							\
 										\
@@ -169,8 +167,6 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
-	enesim_surface_sw_data_get(thiz->map, (void **)&map, &mstride);		\
-	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);		\
 										\
 	/* TODO move by the origin */						\
 	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy,		\
@@ -190,15 +186,15 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 		if (x < 0 || x >= mw || y < 0 || y >= mh)			\
 			goto next;						\
 										\
-		m = argb8888_at(map, mstride, x, y);				\
+		m = argb8888_at(thiz->msrc, thiz->mstride, x, y);		\
 		m1 = yfunction(*m);						\
 		m0 = xfunction(*m);						\
 										\
 		sxx = _displace(xx, m0, thiz->s_scale);				\
 		syy = _displace(yy, m1, thiz->s_scale);				\
 										\
-		p0 = enesim_coord_sample_good_restrict(src, sstride, sw, sh, sxx, 	\
-				syy);						\
+		p0 = enesim_coord_sample_good_restrict(thiz->ssrc, 		\
+				thiz->sstride, sw, sh, sxx, syy);		\
 										\
 next:										\
 		*dst++ = p0;							\
@@ -222,9 +218,15 @@ static const char * _dispmap_name(Enesim_Renderer *r EINA_UNUSED)
 	return "dispmap";
 }
 
-static void _dispmap_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
+static void _dispmap_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
+	Enesim_Renderer_Dispmap *thiz;
 
+	thiz = ENESIM_RENDERER_DISPMAP(r);
+	if (thiz->map)
+		enesim_surface_unmap(thiz->map, thiz->msrc, EINA_FALSE);
+	if (thiz->src)
+		enesim_surface_unmap(thiz->src, thiz->ssrc, EINA_FALSE);
 }
 
 static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
@@ -237,6 +239,9 @@ static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_DISPMAP(r);
 	if (!thiz->map || !thiz->src) return EINA_FALSE;
+
+	enesim_surface_map(thiz->map, (void **)&thiz->msrc, &thiz->mstride);
+	enesim_surface_map(thiz->src, (void **)&thiz->ssrc, &thiz->sstride);
 
 	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
 	enesim_renderer_transformation_get(r, &m);

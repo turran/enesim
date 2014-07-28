@@ -69,6 +69,9 @@ typedef struct _Enesim_Renderer_Raddist
 	Enesim_Renderer_Raddist_State current;
 	Enesim_Renderer_Raddist_State past;
 	/* private */
+	uint32_t *ssrc;
+	size_t sstride;
+
 	Eina_F16p16 r_inv;
 	Eina_Bool changed : 1;
 	Eina_Bool src_changed : 1;
@@ -85,15 +88,12 @@ static void _span_identity(Enesim_Renderer *r,
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	double r_inv;
-	uint32_t *src;
 	int sw, sh;
-	size_t sstride;
 	double ox, oy;
 
 	thiz = ENESIM_RENDERER_RADDIST(r);
 	/* setup the parameters */
 	enesim_surface_size_get(thiz->src, &sw, &sh);
-	enesim_surface_sw_data_get(thiz->src, (void **)&src, &sstride);
 	/* FIXME move this to the setup */
 	r_inv = 1.0f / thiz->current.radius;
 
@@ -114,7 +114,7 @@ static void _span_identity(Enesim_Renderer *r,
 		sxx = eina_f16p16_double_from((rad * x) + thiz->current.orx);
 		syy = eina_f16p16_double_from((rad * y) + thiz->current.ory);
 
-		p0 = enesim_coord_sample_good_restrict(src, sstride, sw, sh, sxx, syy);
+		p0 = enesim_coord_sample_good_restrict(thiz->ssrc, thiz->sstride, sw, sh, sxx, syy);
 
 		*dst++ = p0;
 		x++;
@@ -138,6 +138,9 @@ static Eina_Bool _raddist_sw_setup(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_RADDIST(r);
 	if (!thiz->src) return EINA_FALSE;
 
+	if (!enesim_surface_map(thiz->src, (void **)&thiz->ssrc, &thiz->sstride))
+		return EINA_FALSE;
+
 	type = enesim_renderer_transformation_type_get(r);
 	if (type == ENESIM_MATRIX_TYPE_IDENTITY)
 		*fill = _span_identity;
@@ -151,6 +154,11 @@ static void _raddist_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 	Enesim_Renderer_Raddist *thiz;
 
 	thiz = ENESIM_RENDERER_RADDIST(r);
+	if (thiz->src)
+	{
+		enesim_surface_unmap(thiz->src, (void **)&thiz->src, EINA_FALSE);
+		thiz->ssrc = NULL;
+	}
 	thiz->changed = EINA_FALSE;
 	thiz->src_changed = EINA_FALSE;
 	thiz->past = thiz->current;
