@@ -216,6 +216,39 @@ Eina_Bool enesim_opengl_source_surface_set(Enesim_Surface *s)
 	return EINA_TRUE;
 }
 
+Eina_Bool enesim_opengl_buffer_data_alloc(Enesim_Buffer_OpenGL_Data *data, Enesim_Buffer_Format fmt)
+{
+	Eina_Bool ret = EINA_TRUE;
+	int num_textures;
+
+	switch (fmt)
+	{
+		/* packed */
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
+		num_textures = 1;
+		break;
+
+		/* planar */
+		default:
+		WRN("Format %d not supported", fmt);
+		ret = EINA_FALSE;
+		break;
+
+	}
+
+	if (!ret) return ret;
+
+	data->textures = calloc(num_textures, sizeof(GLuint));
+	data->num_textures = num_textures;
+	glGenTextures(data->num_textures, data->textures);
+	return EINA_TRUE;
+}
+
 void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data)
 {
 	if (data->textures)
@@ -228,6 +261,64 @@ void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data)
 		glDeleteFramebuffersEXT(1, &data->fbo);
 	}
 	free(data);
+}
+
+Eina_Bool enesim_opengl_buffer_data_get(Enesim_Buffer_OpenGL_Data *data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
+		Enesim_Buffer_Sw_Data *sw_data)
+{
+	Eina_Bool ret;
+
+	switch (fmt)
+	{
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
+		glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	        glPixelStorei(GL_PACK_ROW_LENGTH, w);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, sw_data->argb8888.plane0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		ret = EINA_TRUE;
+		break;
+
+		default:
+		WRN("Format %d not supported", fmt);
+		ret = EINA_FALSE;
+		break;
+	}
+	return ret;
+}
+
+Eina_Bool enesim_opengl_buffer_data_put(Enesim_Buffer_OpenGL_Data *data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
+		Enesim_Buffer_Sw_Data *sw_data)
+{
+	Eina_Bool ret;
+	GLfloat border[4] = { 0, 0, 0, 0};
+
+	switch (fmt)
+	{
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	        glPixelStorei(GL_UNPACK_ROW_LENGTH, w);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, sw_data->argb8888.plane0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		ret = EINA_TRUE;
+		break;
+
+		default:
+		WRN("Format %d not supported", fmt);
+		ret = EINA_FALSE;
+		break;
+	}
+	return ret;
 }
 
 Eina_Bool enesim_opengl_init(void)

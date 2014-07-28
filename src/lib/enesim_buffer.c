@@ -49,6 +49,11 @@ static void _buffer_opengl_backend_free(void *data, void *user_data EINA_UNUSED)
 }
 #endif
 
+static void _buffer_data_free(void *data, void *user_data EINA_UNUSED)
+{
+	free(data);
+}
+
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
 		void *backend_data, Enesim_Buffer_Format f, Enesim_Pool *p,
 		Eina_Bool external, Enesim_Buffer_Free free_func, void *free_func_data)
@@ -100,9 +105,51 @@ void * enesim_buffer_backend_data_get(Enesim_Buffer *b)
 	return b->backend_data;
 }
 
-void enesim_buffer_sw_data_set(Enesim_Buffer_Sw_Data *data,
+Eina_Bool enesim_buffer_sw_data_alloc(Enesim_Buffer_Sw_Data *data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
+{
+	Eina_Bool ret;
+	switch (fmt)
+	{
+		/* packed case */
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		case ENESIM_BUFFER_FORMAT_A8:
+		case ENESIM_BUFFER_FORMAT_GRAY:
+		{
+			size_t bytes;
+			int stride;
+			void *alloc_data;
+
+			bytes = enesim_buffer_format_size_get(fmt, w, h);
+			stride = enesim_buffer_format_size_get(fmt, w, 1);
+			alloc_data = calloc(bytes, sizeof(char));
+			ret = enesim_buffer_sw_data_set(data, fmt, alloc_data, stride);
+			if (!ret)
+			{
+				free(alloc_data);
+			}
+		}
+		break;
+
+		/* planar case */
+		default:
+		ERR("Format not supported");
+		ret = EINA_FALSE;
+		break;
+	}
+	return ret;
+}
+
+Eina_Bool enesim_buffer_sw_data_set(Enesim_Buffer_Sw_Data *data,
 		Enesim_Buffer_Format fmt, void *content0, int stride0)
 {
+	Eina_Bool ret = EINA_TRUE;
 	switch (fmt)
 	{
 		/* 32 bpp */
@@ -148,15 +195,18 @@ void enesim_buffer_sw_data_set(Enesim_Buffer_Sw_Data *data,
 		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		ERR("Unsupported format %d", fmt);
+		ret = EINA_FALSE;
 		break;
 	}
+	return ret;
 }
 
-void enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
+Eina_Bool enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
 		Enesim_Buffer_Format fmt,
 		Enesim_Buffer_Free free_func,
 		void *free_func_data)
 {
+	Eina_Bool ret = EINA_TRUE;
 	switch (fmt)
 	{
 		/* 32 bpp */
@@ -195,9 +245,10 @@ void enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
 		case ENESIM_BUFFER_FORMAT_GRAY:
 		default:
 		ERR("Unsupported format %d", fmt);
+		ret = EINA_FALSE;
 		break;
 	}
-
+	return ret;
 }
 
 /** @endcond */
@@ -428,8 +479,117 @@ EAPI void enesim_buffer_unref(Enesim_Buffer *b)
  */
 EAPI Eina_Bool enesim_buffer_sw_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
 {
+	Enesim_Buffer_Sw_Data *sw_data;
+
 	ENESIM_MAGIC_CHECK_BUFFER(b);
-	return enesim_pool_data_get(b->pool, b->backend_data, b->format, b->w, b->h, data);
+	if (b->backend != ENESIM_BACKEND_SOFTWARE)
+	{
+		ERR("Backend is not of type software");
+		return EINA_FALSE;
+	}
+	sw_data = b->backend_data;
+	*data = *sw_data;
+	return EINA_TRUE;
+}
+
+/**
+ * Maps the buffer into user space memory
+ * @param[in] s The buffer to map
+ * @param[out] data The pointer to store the buffer data
+ * @param[out] stride The stride of the buffer
+ * @return EINA_TRUE if sucessfull, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_buffer_map(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
+{
+	Eina_Bool ret;
+
+	ENESIM_MAGIC_CHECK_BUFFER(b);
+	/* for software backend, just get the sw_data */
+	if (b->backend == ENESIM_BACKEND_SOFTWARE)
+	{
+		return enesim_buffer_sw_data_get(b, data);
+	}
+
+	enesim_buffer_sw_data_alloc(data, b->format, b->w, b->h);
+	if (b->external_allocated)
+	{
+		switch (b->backend)
+		{
+#if BUILD_OPENGL
+			case ENESIM_BACKEND_OPENGL:
+			{
+				Enesim_Buffer_OpenGL_Data *backend_data = b->backend_data;
+				ret = enesim_opengl_buffer_data_get(backend_data, b->format,
+						b->w, b->h, data);
+			}
+			break;
+#endif
+			default:
+			WRN("Unsupported backend");
+			ret = EINA_FALSE;
+			break;
+		}
+	}
+	else
+	{
+		ret = enesim_pool_data_get(b->pool, b->backend_data, b->format, b->w, b->h, data);
+	}
+
+	if (!ret)
+	{
+		/* free the buffer allocated data */
+		enesim_buffer_sw_data_free(data, b->format, _buffer_data_free, NULL);
+	}
+	return ret;
+}
+
+/**
+ * @brief Unmaps the buffer
+ * Call this function when the mapped data of a buffer is no longer
+ * needed.
+ * @param[in] s The buffer to unmap
+ * @param[in] data The pointer where the buffer data is mapped
+ * @param[in] written EINA_TRUE in case the mapped data has been written, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_buffer_unmap(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data, Eina_Bool written)
+{
+	Eina_Bool ret = EINA_TRUE;
+
+	ENESIM_MAGIC_CHECK_BUFFER(b);
+	if (!data) return EINA_FALSE;
+	/* for software backend, do nothing */
+	if (b->backend == ENESIM_BACKEND_SOFTWARE)
+	{
+		return EINA_TRUE;
+	}
+
+	if (written)
+	{
+		if (b->external_allocated)
+		{
+			switch (b->backend)
+			{
+#if BUILD_OPENGL
+				case ENESIM_BACKEND_OPENGL:
+				{
+				ret = EINA_FALSE;
+				}
+				break;
+#endif
+				default:
+				WRN("Unsupported backend");
+				ret = EINA_FALSE;
+				break;
+			}
+		}
+		else
+		{
+			ret = enesim_pool_data_put(b->pool, b->backend_data, b->format, b->w, b->h, data);
+		}
+	}
+	/* free the buffer allocated data */
+	enesim_buffer_sw_data_free(data, b->format, _buffer_data_free, NULL);
+	return ret;
 }
 
 /**

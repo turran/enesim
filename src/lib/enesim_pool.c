@@ -45,20 +45,17 @@ static Eina_Bool _data_alloc(void *prv EINA_UNUSED,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
 {
 	Enesim_Buffer_Sw_Data *data;
-	size_t bytes;
-	int stride;
-	void *alloc_data;
+	Eina_Bool ret;
 
 	data = malloc(sizeof(Enesim_Buffer_Sw_Data));
 	*backend = ENESIM_BACKEND_SOFTWARE;
 	*backend_data = data;
-
-	bytes = enesim_buffer_format_size_get(fmt, w, h);
-	stride = enesim_buffer_format_size_get(fmt, w, 1);
-	alloc_data = calloc(bytes, sizeof(char));
-
-	enesim_buffer_sw_data_set(data, fmt, alloc_data, stride);
-	return EINA_TRUE;
+	ret = enesim_buffer_sw_data_alloc(data, fmt, w, h);
+	if (!ret)
+	{
+		free(data);
+	}
+	return ret;
 }
 
 static Eina_Bool _data_from(void *prv EINA_UNUSED,
@@ -173,6 +170,22 @@ Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
 	}
 
 	return p->descriptor->data_get(p->data, data, fmt, w, h, dst);
+}
+
+Eina_Bool enesim_pool_data_put(Enesim_Pool *p, void *data,
+		Enesim_Buffer_Format fmt,
+		uint32_t w, uint32_t h,
+		Enesim_Buffer_Sw_Data *dst)
+{
+	if (!p) return EINA_FALSE;
+	if (!p->descriptor) return EINA_FALSE;
+	if (!p->descriptor->data_put)
+	{
+		WRN("No data_put() implementation");
+		return EINA_FALSE;
+	}
+
+	return p->descriptor->data_put(p->data, data, fmt, w, h, dst);
 }
 
 void enesim_pool_data_free(Enesim_Pool *p, void *data,

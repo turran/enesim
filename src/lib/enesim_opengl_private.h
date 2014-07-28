@@ -49,6 +49,13 @@ void enesim_opengl_clip_set(const Eina_Rectangle *area, int ww, int hh);
 
 void enesim_opengl_draw_area(const Eina_Rectangle *area);
 Eina_Bool enesim_opengl_target_surface_set(Enesim_Surface *s);
+Eina_Bool enesim_opengl_buffer_data_alloc(Enesim_Buffer_OpenGL_Data *data, Enesim_Buffer_Format fmt);
 void enesim_opengl_buffer_data_free(Enesim_Buffer_OpenGL_Data *data);
+Eina_Bool enesim_opengl_buffer_data_get(Enesim_Buffer_OpenGL_Data *data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
+		Enesim_Buffer_Sw_Data *sw_data);
+Eina_Bool enesim_opengl_buffer_data_put(Enesim_Buffer_OpenGL_Data *data,
+		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h,
+		Enesim_Buffer_Sw_Data *sw_data);
 
 #endif

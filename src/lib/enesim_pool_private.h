@@ -81,6 +81,10 @@ Eina_Bool enesim_pool_data_get(Enesim_Pool *p, void *data,
 		Enesim_Buffer_Format fmt,
 		uint32_t w, uint32_t h,
 		Enesim_Buffer_Sw_Data *dst);
+Eina_Bool enesim_pool_data_put(Enesim_Pool *p, void *data,
+		Enesim_Buffer_Format fmt,
+		uint32_t w, uint32_t h,
+		Enesim_Buffer_Sw_Data *dst);
 void enesim_pool_data_free(Enesim_Pool *p, void *data,
 		Enesim_Buffer_Format fmt,
 		Eina_Bool external_allocated);

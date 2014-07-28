@@ -69,8 +69,8 @@ EAPI void enesim_surface_private_set(Enesim_Surface *s, void *data);
 EAPI void * enesim_surface_private_get(Enesim_Surface *s);
 
 EAPI Eina_Bool enesim_surface_sw_data_get(Enesim_Surface *s, void **data, size_t *stride);
-EAPI Eina_Bool enesim_surface_map(Enesim_Surface *s, void **data, size_t *stride);
-EAPI Eina_Bool enesim_surface_unmap(Enesim_Surface *s, void **data, Eina_Bool written);
+EAPI Eina_Bool enesim_surface_map(const Enesim_Surface *s, void **data, size_t *stride);
+EAPI Eina_Bool enesim_surface_unmap(const Enesim_Surface *s, void *data, Eina_Bool written);
 
 EAPI void enesim_surface_lock(Enesim_Surface *s, Eina_Bool write);
 EAPI void enesim_surface_unlock(Enesim_Surface *s);

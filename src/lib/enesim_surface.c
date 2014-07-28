@@ -409,7 +409,7 @@ EAPI void enesim_surface_unref(Enesim_Surface *s)
 /**
  * Gets the data associated with a software based surface
  * @param[in] s The surface to get the data from
- * @param[out] data The pointer to the surface data
+ * @param[out] data The pointer to store the surface data
  * @param[out] stride The stride of the surface
  * @return EINA_TRUE if sucessfull, EINA_FALSE otherwise
  */
@@ -439,6 +439,79 @@ EAPI Eina_Bool enesim_surface_sw_data_get(Enesim_Surface *s, void **data, size_t
 
 		default:
 		WRN("Unsupported format %d", s->format);
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+/**
+ * Maps the surface into user space memory
+ * @param[in] s The surface to map
+ * @param[out] data The pointer to store the surface data
+ * @param[out] stride The stride of the surface
+ * @return EINA_TRUE if sucessfull, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_surface_map(const Enesim_Surface *s, void **data, size_t *stride)
+{
+	Enesim_Buffer_Sw_Data sw_data;
+
+	if (!data) return EINA_FALSE;
+	if (!enesim_buffer_map(s->buffer, &sw_data))
+	{
+		WRN("Impossible to map the buffer data");
+		return EINA_FALSE;
+	}
+
+	switch (s->format)
+	{
+		case ENESIM_FORMAT_ARGB8888:
+		*data = sw_data.argb8888_pre.plane0;
+		if (stride) *stride = sw_data.argb8888_pre.plane0_stride;
+		break;
+
+		case ENESIM_FORMAT_A8:
+		*data = sw_data.a8.plane0;
+		if (stride) *stride = sw_data.a8.plane0_stride;
+		break;
+
+		default:
+		WRN("Unsupported format %d", s->format);
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+/**
+ * @brief Unmaps the surface
+ * Call this function when the mapped data of a surface is no longer
+ * needed.
+ * @param[in] s The surface to unmap
+ * @param[in] data The pointer where the surface data is mapped
+ * @param[in] written EINA_TRUE in case the mapped data has been written, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_surface_unmap(const Enesim_Surface *s, void *data, Eina_Bool written)
+{
+	Enesim_Buffer_Sw_Data sw_data;
+
+	if (!data) return EINA_FALSE;
+
+	switch (s->format)
+	{
+		case ENESIM_FORMAT_ARGB8888:
+		sw_data.argb8888_pre.plane0 = data;
+		break;
+
+		case ENESIM_FORMAT_A8:
+		sw_data.a8.plane0 = data;
+		break;
+
+		default:
+		WRN("Unsupported format %d", s->format);
+		return EINA_FALSE;
+	}
+	if (!enesim_buffer_unmap(s->buffer, &sw_data, written))
+	{
+		WRN("Impossible to unmap the buffer data");
 		return EINA_FALSE;
 	}
 	return EINA_TRUE;

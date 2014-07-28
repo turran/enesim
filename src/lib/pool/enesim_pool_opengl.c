@@ -83,42 +83,23 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 {
 	Enesim_OpenGL_Pool *thiz = prv;
 	Enesim_Buffer_OpenGL_Data *data;
-	GLfloat border[4] = { 0, 0, 0, 0};
+	Enesim_Buffer_Sw_Data src = { { NULL } };
 
 	data = calloc(1, sizeof(Enesim_Buffer_OpenGL_Data));
-	data->textures = calloc(1, sizeof(GLuint));
-	data->num_textures = 1;
-
-	*backend = ENESIM_BACKEND_OPENGL;
-	*backend_data = data;
-	switch (fmt)
+	if (!enesim_opengl_buffer_data_alloc(data, fmt))
 	{
-		case ENESIM_BUFFER_FORMAT_ARGB8888:
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		glGenTextures(1, data->textures);
-		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_RGB565:
-		case ENESIM_BUFFER_FORMAT_RGB888:
-		case ENESIM_BUFFER_FORMAT_A8:
-		case ENESIM_BUFFER_FORMAT_GRAY:
-		default:
-		free(data->textures);
 		free(data);
 		return EINA_FALSE;
-		break;
-
-
 	}
+	if (!enesim_opengl_buffer_data_put(data, fmt, w, h, &src))
+	{
+		enesim_opengl_buffer_data_free(data);
+		return EINA_FALSE;
+	}
+
 	_zero_buffer(thiz, data);
+	*backend = ENESIM_BACKEND_OPENGL;
+	*backend_data = data;
 	return EINA_TRUE;
 }
 
@@ -131,43 +112,21 @@ static Eina_Bool _data_from(void *prv EINA_UNUSED,
 		Enesim_Buffer_Sw_Data *src)
 {
 	Enesim_Buffer_OpenGL_Data *data;
-	GLfloat border[4] = { 0, 0, 0, 0};
-
 	if (!copy) return EINA_FALSE;
-
+	
 	data = calloc(1, sizeof(Enesim_Buffer_OpenGL_Data));
-	data->textures = calloc(1, sizeof(GLuint));
-	data->num_textures = 1;
-	glGenTextures(1, data->textures);
-	*backend = ENESIM_BACKEND_OPENGL;
-	*backend_data = data;
-	switch (fmt)
+	if (!enesim_opengl_buffer_data_alloc(data, fmt))
 	{
-		case ENESIM_BUFFER_FORMAT_ARGB8888:
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
-        	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	        glPixelStorei(GL_UNPACK_ROW_LENGTH, w);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, src->argb8888.plane0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		break;
-
-		case ENESIM_BUFFER_FORMAT_RGB565:
-		case ENESIM_BUFFER_FORMAT_RGB888:
-		case ENESIM_BUFFER_FORMAT_A8:
-		case ENESIM_BUFFER_FORMAT_GRAY:
-		default:
-		free(data->textures);
 		free(data);
 		return EINA_FALSE;
-		break;
 	}
-
+	if (!enesim_opengl_buffer_data_put(data, fmt, w, h, src))
+	{
+		enesim_opengl_buffer_data_free(data);
+		return EINA_FALSE;
+	}
+	*backend = ENESIM_BACKEND_OPENGL;
+	*backend_data = data;
 	return EINA_TRUE;
 }
 
@@ -181,33 +140,20 @@ static void _data_free(void *prv EINA_UNUSED, void *backend_data,
 
 static Eina_Bool _data_get(void *prv EINA_UNUSED, void *backend_data,
 		Enesim_Buffer_Format fmt,
-		uint32_t w, uint32_t h EINA_UNUSED,
+		uint32_t w, uint32_t h,
 		Enesim_Buffer_Sw_Data *dst)
 {
 	Enesim_Buffer_OpenGL_Data *data = backend_data;
-	switch (fmt)
-	{
-		case ENESIM_BUFFER_FORMAT_ARGB8888:
-		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		glBindTexture(GL_TEXTURE_2D, data->textures[0]);
-        	glPixelStorei(GL_PACK_ALIGNMENT, 4);
-	        glPixelStorei(GL_PACK_ROW_LENGTH, w);
-		dst->argb8888.plane0 = malloc(w * h * 4);
-		dst->argb8888.plane0_stride = w * 4;
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, dst->argb8888.plane0);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		break;
+	return enesim_opengl_buffer_data_get(data, fmt, w, h, dst);
+}
 
-		case ENESIM_BUFFER_FORMAT_RGB565:
-		case ENESIM_BUFFER_FORMAT_RGB888:
-		case ENESIM_BUFFER_FORMAT_A8:
-		case ENESIM_BUFFER_FORMAT_GRAY:
-		default:
-		return EINA_FALSE;
-		break;
-	}
-
-	return EINA_FALSE;
+static Eina_Bool _data_put(void *prv EINA_UNUSED, void *backend_data,
+		Enesim_Buffer_Format fmt,
+		uint32_t w, uint32_t h,
+		Enesim_Buffer_Sw_Data *src)
+{
+	Enesim_Buffer_OpenGL_Data *data = backend_data;
+	return enesim_opengl_buffer_data_put(data, fmt, w, h, src);
 }
 
 static void _free(void *prv)
@@ -223,7 +169,7 @@ static Enesim_Pool_Descriptor _descriptor = {
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ _data_from,
 	/* .data_get =   */ _data_get,
-	/* .data_put =   */ NULL,
+	/* .data_put =   */ _data_put,
 	/* .free =       */ _free,
 };
 /*============================================================================*
