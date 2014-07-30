@@ -594,10 +594,12 @@ static void _stroke_path_begin(void *data)
 		a = atan(path->gm->xy / path->gm->yy);
 		b = atan(-path->gm->yx / path->gm->xx);
 		if (a == b)
-			thiz->angle = a * 180 / M_PI;
+			thiz->angle = -(a * 180 / M_PI);
 		else
+		{
+			/* TODO handle the skew case */
 			thiz->angle = 0;
-		thiz->angle = 48;
+		}
 	}
 	else
 	{
