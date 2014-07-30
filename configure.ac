@@ -175,7 +175,7 @@ PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
 AM_CONDITIONAL([HAVE_FREETYPE], [test "x${have_freetype}" = "xyes"])
 
 ## Cairo
-want_cairo="yes"
+want_cairo="no"
 AC_ARG_ENABLE([cairo],
    [AS_HELP_STRING([--enable-cairo], [enable cairo path backend])],
    [
