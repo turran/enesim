@@ -45,6 +45,14 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
+typedef struct _Enesim_Path_Edge
+{
+	double x0;
+	double y0;
+	double x1;
+	double y1;
+} Enesim_Path_Edge;
+
 typedef struct _Enesim_Path_Generator_Dashed
 {
 	Enesim_Path_Generator *p; /* ourselves */
@@ -83,8 +91,7 @@ typedef struct _Enesim_Path_Generator_Stroke
 	/* our own private data */
 	Enesim_Polygon *offset_polygon;
 	Enesim_Polygon *inset_polygon;
-	Enesim_Point first;
-	Enesim_Point last;
+	Enesim_Path_Edge first;
 	Enesim_Point p0, p1, p2;
 	Enesim_Point n01, n12;
 	Enesim_Matrix sw_m;
@@ -105,14 +112,6 @@ typedef struct _Enesim_Path_Generator_Strokeless
 {
 	Enesim_Path_Generator *p;
 } Enesim_Path_Generator_Strokeless;
-
-typedef struct _Enesim_Path_Edge
-{
-	double x0;
-	double y0;
-	double x1;
-	double y1;
-} Enesim_Path_Edge;
 /*----------------------------------------------------------------------------*
  *                         Descriptor interface                               *
  *----------------------------------------------------------------------------*/
@@ -215,35 +214,72 @@ static Enesim_Path_Descriptor _strokeless_descriptor = {
 /*----------------------------------------------------------------------------*
  *                                With stroke                                 *
  *----------------------------------------------------------------------------*/
+static Eina_Bool _edge_intersect(Enesim_Path_Edge *e1, Enesim_Path_Edge *e2,
+		double *x, double *y, double threshold)
+{
+	double a1, b1, c1;
+	double a2, b2, c2;
+	double determinant;
+
+	/* compute the normal form */
+	a1 = e1->y1 - e1->y0;
+	b1 = e1->x0 - e1->x1;
+	c1 = (a1 * e1->x1) + (b1 * e1->y1);
+
+	a2 = e2->y1 - e2->y0;
+	b2 = e2->x0 - e2->x1;
+	c2 = (a2 * e2->x1) + (b2 * e2->y1);
+
+	determinant = (a1*b2) - (a2*b1);
+	/* lines are parallel */
+	if (determinant < threshold)
+		return EINA_FALSE;
+
+	*x = ((b2 * c1) - (b1 * c2))/determinant;
+	*y = ((a1 * c2) - (a2 * c1))/determinant;
+	return EINA_TRUE;
+}
+
 static void _edge_join(Enesim_Path_Edge *e1,
 		Enesim_Path_Edge *e2,
 		Enesim_Renderer_Shape_Stroke_Join join,
-		double rx,
-		double ry,
-		Eina_Bool large,
-		Eina_Bool sweep,
-		double angle,
+		double threshold,
 		Enesim_Curve_Vertex_Add vertex_add,
 		void *data)
 {
 	Enesim_Curve_State st;
+	double ix, iy;
+
 	switch (join)
 	{
-		/* TODO here we should add the intersection of both edges */
-		/* we need a miter length variable too */
 		case ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER:
-		vertex_add(e2->x0, e2->y0, data);
+		if (_edge_intersect(e1, e2, &ix, &iy, threshold))
+		{
+			/* TODO we need a miter length variable too */
+			vertex_add(ix, iy, data);
+		}
+		else
+		{
+			vertex_add(e2->x0, e2->y0, data);
+		}
 		break;
 
 		/* join theme with an arc */
 		case ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND:
-		st.vertex_add = vertex_add;
-		st.last_x = e1->x1;
-		st.last_y = e1->y1;
-		st.last_ctrl_x = e1->x1;
-		st.last_ctrl_y = e1->y1;
-		st.data = data;
-		enesim_curve_arc_to(&st, rx, ry, angle, large, sweep, e2->x0, e2->y0);
+		if (_edge_intersect(e1, e2, &ix, &iy, threshold))
+		{
+			st.vertex_add = vertex_add;
+			st.last_x = e1->x1;
+			st.last_y = e1->y1;
+			st.last_ctrl_x = e1->x1;
+			st.last_ctrl_y = e1->y1;
+			st.data = data;
+			enesim_curve_quadratic_to(&st, ix, iy, e2->x0, e2->y0);
+		}
+		else
+		{
+			vertex_add(e2->x0, e2->y0, data);
+		}
 		break;
 
 		case ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL:
@@ -347,12 +383,10 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 	Enesim_Polygon *offset = thiz->offset_polygon;
 	Enesim_Point o0, o1;
 	Enesim_Point i0, i1;
-	Eina_Bool large;
 	Enesim_Path_Edge e1, e2;
 	double ox;
 	double oy;
-	int c1;
-	int c2;
+	double c1;
 
 	/* just store the first point */
 	if (thiz->count < 2)
@@ -360,14 +394,14 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 		switch (thiz->count)
 		{
 			case 0:
-			thiz->first.x = thiz->p0.x = x;
-			thiz->first.y = thiz->p0.y = y;
+			thiz->first.x0 = thiz->p0.x = x;
+			thiz->first.y0 = thiz->p0.y = y;
 			thiz->count++;
 			return;
 
 			case 1:
-			thiz->p1.x = x;
-			thiz->p1.y = y;
+			thiz->first.x1 = thiz->p1.x = x;
+			thiz->first.y1 = thiz->p1.y = y;
 			/* FIXME use the threshold set by the quality prop or something like that */
 			if (!_do_normal(&thiz->n01, &thiz->p0, &thiz->p1, 1/256.0))
 				return;
@@ -435,7 +469,6 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 	i1.y = thiz->p2.y - oy;
 
 	c1 = ((thiz->p2.x - thiz->p1.x) * thiz->n01.x) + ((thiz->p2.y - thiz->p1.y) * thiz->n01.y);
-	c2 = (thiz->n01.x * thiz->n12.x) + (thiz->n01.y * thiz->n12.y);
 	/* add the vertices of the new edge */
 	/* check if the previous edge and this one to see the concave/convex thing */
 	/* dot product
@@ -445,11 +478,6 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 	 * < 0 convex
 	 * = -1 pointing opposite direction
 	 */
-	if (c2 > 0)
-		large = EINA_TRUE;
-	else
-		large = EINA_FALSE;
-
 	/* right side */
 	if (c1 >= 0)
 	{
@@ -471,8 +499,7 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 		e2.x1 = i1.x;
 		e2.y1 = i1.y;
 
-		_edge_join(&e1, &e2, thiz->p->join, thiz->rx, thiz->ry, large, EINA_FALSE,
-				thiz->angle, _stroke_curve_prepend, inset);
+		_edge_join(&e1, &e2, thiz->p->join, 1/256.0, _stroke_curve_prepend, inset);
 	}
 	/* left side */
 	else
@@ -495,8 +522,7 @@ static void _stroke_path_vertex_process(double x, double y, Enesim_Path_Generato
 		e2.y0 = o0.y;
 		e2.x1 = o1.x;
 		e2.y1 = o1.y;
-		_edge_join(&e1, &e2, thiz->p->join, thiz->rx, thiz->ry, large, EINA_TRUE,
-				thiz->angle, _stroke_curve_append, offset);
+		_edge_join(&e1, &e2, thiz->p->join, 1/256.0, _stroke_curve_append, offset);
 	}
 
 	enesim_polygon_point_append_from_coords(offset, o1.x, o1.y);
@@ -518,8 +544,6 @@ static void _stroke_path_vertex_add(double x, double y, void *data)
 	Enesim_Path_Generator_Stroke *thiz = data;
 
 	_stroke_path_vertex_process(x, y, data);
-	thiz->last.x = x;
-	thiz->last.y = y;
 }
 
 static void _stroke_path_polygon_add(void *data)
@@ -625,15 +649,9 @@ static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 
 	if (close)
 	{
-		/* also close the figure itself */
-		_stroke_path_vertex_process(thiz->first.x, thiz->first.y, thiz);
-
-		/* close the inset/off with the join cap */
-		if (thiz->p->join == ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND)
-		{
-			_stroke_path_vertex_process(thiz->last.x,
-					thiz->last.y, thiz);
-		}
+		/* also close the figure itself with the first edge */
+		_stroke_path_vertex_process(thiz->first.x0, thiz->first.y0, thiz);
+		_stroke_path_vertex_process(thiz->first.x1, thiz->first.y1, thiz);
 		if (thiz->offset_polygon)
 			enesim_polygon_close(thiz->offset_polygon, EINA_TRUE);
 		if (thiz->inset_polygon)
