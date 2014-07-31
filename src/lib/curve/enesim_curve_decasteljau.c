@@ -16,10 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Approach to the Loop & Blinn algorithm found on
- * http://research.microsoft.com/en-us/um/people/cloop/LoopBlinn05.pdf
- * Also with some ideas taken from WebCore code
- */
 #include "enesim_private.h"
 #include "enesim_path.h"
 
