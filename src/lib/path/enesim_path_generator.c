@@ -97,7 +97,6 @@ typedef struct _Enesim_Path_Generator_Stroke
 	Enesim_Matrix sw_m;
 	double rx;
 	double ry;
-	double angle;
 	int count;
 } Enesim_Path_Generator_Stroke;
 
@@ -541,8 +540,6 @@ static void _stroke_path_free(void *data)
 
 static void _stroke_path_vertex_add(double x, double y, void *data)
 {
-	Enesim_Path_Generator_Stroke *thiz = data;
-
 	_stroke_path_vertex_process(x, y, data);
 }
 
@@ -592,7 +589,6 @@ static void _stroke_path_begin(void *data)
 		Enesim_Matrix s, m, t;
 		double xx, xy, yx, yy;
 		double sx, sy;
-		double a, b;
 
 		sx = hypot(path->gm->xx, path->gm->yx);
 		sy = hypot(path->gm->xy, path->gm->yy);
@@ -611,25 +607,11 @@ static void _stroke_path_begin(void *data)
 		enesim_matrix_transpose(&m, &t);
 		enesim_matrix_compose(&m, &s, &m);
 		enesim_matrix_compose(&m, &t, &thiz->sw_m);
-
-		/* for the angle, pick up the rotation from the initial matrix
-		 * ideally, we should decompose the matrix using the LU or QR methods
-		 */
-		a = atan(path->gm->xy / path->gm->yy);
-		b = atan(-path->gm->yx / path->gm->xx);
-		if (a == b)
-			thiz->angle = -(a * 180 / M_PI);
-		else
-		{
-			/* TODO handle the skew case */
-			thiz->angle = 0;
-		}
 	}
 	else
 	{
 		thiz->rx = path->sw / 2;
 		thiz->ry = path->sw / 2;
-		thiz->angle = 0;
 	}
 }
 
