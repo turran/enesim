@@ -101,7 +101,7 @@ static void _enesim_renderer_path_rasterizer_generate_figures(Enesim_Renderer *r
 #else
 	/* set the fill figure on the bifigure as its under polys */
 	enesim_rasterizer_figure_set(thiz->bifigure, parent->fill_figure);
-	/* set the stroke figure on the bifigure as its under polys */
+	/* set the stroke figure on the bifigure as its over polys */
 	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, parent->stroke_figure_used ? parent->stroke_figure : NULL);
 #endif
 }
