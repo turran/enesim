@@ -19,6 +19,7 @@
 #include "libargb.h"
 
 #include <math.h>
+#include <float.h>
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -1549,11 +1550,15 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	Enesim_Matrix matrix;
 	Eina_List *dashes;
 	double swx, swy;
+	double xmin = DBL_MAX;
+	double ymin = DBL_MAX;
+	double xmax = -1;
+	double ymax = -1;
 
 	thiz = ENESIM_RASTERIZER_BIFIGURE(r);
 	state = &thiz->state;
 
-	if (!thiz->under_figure && thiz->over_figure)
+	if (!thiz->under_figure && !thiz->over_figure)
 	{
 		ENESIM_RENDERER_LOG(r, error, "No figure to rasterize");
 		return EINA_FALSE;
@@ -1718,15 +1723,31 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 	 * bounds, why do we need a double check on the span function? rendering only on the bounding
 	 * box is something that is controlled on the path, i.e the renderer that *uses* this internal
 	 * renderer */
+	if (thiz->over_figure)
+	{
+		double uxmin;
+		double uymin;
+		double uxmax;
+		double uymax;
+
+		enesim_figure_bounds(thiz->over_figure, &uxmin, &uymin, &uxmax, &uymax);
+		if (uxmin < xmin)
+			xmin = uxmin;
+		if (uymin < ymin)
+			ymin = uymin;
+		if (uxmax > xmax)
+			xmax = uxmax;
+		if (uymax > ymax)
+			ymax = uymax;
+	}
 	if (thiz->under && thiz->over)
 	{
-		double uxmin, xmin;
-		double uymin, ymin;
-		double uxmax, xmax;
-		double uymax, ymax;
+		double uxmin;
+		double uymin;
+		double uxmax;
+		double uymax;
 
 		enesim_figure_bounds(thiz->under_figure, &uxmin, &uymin, &uxmax, &uymax);
-		enesim_figure_bounds(thiz->over_figure, &xmin, &ymin, &xmax, &ymax);
 
 		if (uxmin < xmin)
 			xmin = uxmin;
@@ -1736,10 +1757,9 @@ static Eina_Bool _bifigure_sw_setup(Enesim_Renderer *r,
 			xmax = uxmax;
 		if (uymax > ymax)
 			ymax = uymax;
-
-		thiz->tyy = eina_f16p16_double_from(ymin);
-		thiz->byy = eina_f16p16_double_from(ymax);
 	}
+	thiz->tyy = eina_f16p16_double_from(ymin);
+	thiz->byy = eina_f16p16_double_from(ymax);
 
 	return EINA_TRUE;
 }
