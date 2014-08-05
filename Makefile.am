@@ -140,5 +140,5 @@ endif
 check-local:
 	@echo "reconfigure with --enable-tests"
 
-clean-local: doc-clean
+clean-local: doxygen-clean
 	-rm -rf $(CLEAN_LOCAL)
