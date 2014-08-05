@@ -524,7 +524,11 @@ static Eina_Bool _enesim_renderer_shape_damage(Enesim_Renderer *r,
 
 	/* check if the shape implementation has changed */
 	if (klass->has_changed)
+	{
 		do_send_old = klass->has_changed(r);
+		if (do_send_old)
+			DBG("Implementation changed");
+	}
 
 send_old:
 	if (do_send_old)
@@ -559,6 +563,7 @@ send_old:
 		{
 			Enesim_Renderer_Shape_Damage_Data ddata;
 
+			DBG("Fill renderer changed, damaging fill area");
 			enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
 			ddata.real_cb = cb;
 			ddata.real_data = data;
