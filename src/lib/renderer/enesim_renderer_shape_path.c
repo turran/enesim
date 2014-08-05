@@ -127,13 +127,10 @@ static void _shape_path_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
  *----------------------------------------------------------------------------*/
 static Eina_Bool _shape_path_has_changed(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Shape_Path *thiz;
 	Enesim_Renderer_Shape_Path_Class *klass;
 
-	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	klass = ENESIM_RENDERER_SHAPE_PATH_CLASS_GET(r);
-	if (enesim_renderer_has_changed(thiz->r_path))
-		return EINA_TRUE;
+
 	if (klass->has_changed)
 		return klass->has_changed(r);
 	return EINA_FALSE;
