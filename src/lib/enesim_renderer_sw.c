@@ -582,6 +582,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	Eina_Bool visible;
 	unsigned int left;
 
+	if (!len) return;
 	visible = enesim_renderer_visibility_get(r);
 	if (!visible) return;
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
