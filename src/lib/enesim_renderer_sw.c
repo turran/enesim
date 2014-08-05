@@ -574,7 +574,7 @@ void enesim_renderer_sw_free(Enesim_Renderer *r)
 }
 
 void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
-		unsigned int len, uint32_t *data)
+		int len, uint32_t *data)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
 	Eina_Rectangle span;

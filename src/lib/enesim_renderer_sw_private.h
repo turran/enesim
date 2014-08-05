@@ -82,7 +82,7 @@ struct _Enesim_Renderer_Sw_Data
 };
 
 void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints);
-void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, unsigned int len, uint32_t *data);
+void enesim_renderer_sw_draw(Enesim_Renderer *r, int x, int y, int len, uint32_t *data);
 void enesim_renderer_sw_init(void);
 void enesim_renderer_sw_shutdown(void);
 void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
