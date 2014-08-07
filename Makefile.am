@@ -67,7 +67,7 @@ include common/Makefile_coverage.mk
 EXTRA_DIST += \
 AUTHORS \
 COPYING \
-README \
+README.md \
 enesim.pc.in \
 enesim_opencl.pc.in \
 doc/img/enesim_images.svg \
