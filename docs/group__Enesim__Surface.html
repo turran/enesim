@@ -113,6 +113,9 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga24be4379fecf3ea05edf650fbfab8339">enesim_surface_private_set</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, void *data)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga32bfd3b61678c416eca4f764ef5d40fd">enesim_surface_private_get</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga0bb41827159a3326dcf366107798925e">enesim_surface_sw_data_get</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, void **data, size_t *stride)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#gac6c1018170f852e71f8a55fb18c31ac0">enesim_surface_map</a> (const <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, void **data, size_t *stride)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#gaefe6935d4f42df4efeb8da1a91eeb14a">enesim_surface_unmap</a> (const <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, void *data, Eina_Bool written)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Unmaps the surface Call this function when the mapped data of a surface is no longer needed.  <a href="#gaefe6935d4f42df4efeb8da1a91eeb14a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#gadc84790a46bd4ed15d9a4db83da6b920">enesim_surface_lock</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, Eina_Bool write)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Locks a surface.  <a href="#gadc84790a46bd4ed15d9a4db83da6b920"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#gacb7bdd94a0c4dd925eafb0fa6c0891ec">enesim_surface_unlock</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
@@ -706,12 +709,98 @@ Functions</h2></td></tr>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The surface to get the data from </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The pointer to the surface data </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The pointer to store the surface data </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">stride</td><td>The stride of the surface </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if sucessfull, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac6c1018170f852e71f8a55fb18c31ac0"></a><!-- doxytag: member="enesim_surface.h::enesim_surface_map" ref="gac6c1018170f852e71f8a55fb18c31ac0" args="(const Enesim_Surface *s, void **data, size_t *stride)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Surface.html#gac6c1018170f852e71f8a55fb18c31ac0">enesim_surface_map</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void **&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramname"><em>stride</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Maps the surface into user space memory </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The surface to map </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The pointer to store the surface data </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">stride</td><td>The stride of the surface </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if sucessfull, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gaefe6935d4f42df4efeb8da1a91eeb14a"></a><!-- doxytag: member="enesim_surface.h::enesim_surface_unmap" ref="gaefe6935d4f42df4efeb8da1a91eeb14a" args="(const Enesim_Surface *s, void *data, Eina_Bool written)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Surface.html#gaefe6935d4f42df4efeb8da1a91eeb14a">enesim_surface_unmap</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_Bool&#160;</td>
+          <td class="paramname"><em>written</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Unmaps the surface Call this function when the mapped data of a surface is no longer needed. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The surface to unmap </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The pointer where the surface data is mapped </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">written</td><td>EINA_TRUE in case the mapped data has been written, EINA_FALSE otherwise </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -794,7 +883,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 15 2014 18:30:10 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 7 2014 23:05:12 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

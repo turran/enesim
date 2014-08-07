@@ -114,6 +114,9 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the private data pointer from the buffer.  <a href="#ga3e4596ffd19fbb61a1a569016c5f5061"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gabfd0b7abce3a156f0f2284a5fa34970e">enesim_buffer_sw_data_get</a> (const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the data of a buffer.  <a href="#gabfd0b7abce3a156f0f2284a5fa34970e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga47cc7fea55ac0c3b8fc9d08ad582b702">enesim_buffer_map</a> (const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga8a6f09f03448c068bf22324ed3b24dcd">enesim_buffer_unmap</a> (const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data, Eina_Bool written)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Unmaps the buffer Call this function when the mapped data of a buffer is no longer needed.  <a href="#ga8a6f09f03448c068bf22324ed3b24dcd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gaf2c51c785720d2fe37f96608d5a8a174">enesim_buffer_format_size_get</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> fmt, uint32_t w, uint32_t h)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the size in bytes given a format and a size.  <a href="#gaf2c51c785720d2fe37f96608d5a8a174"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gad6175e9cd5c8c330f1d279998d243e94">enesim_buffer_format_rgb_components_from</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *fmt, int depth, uint8_t aoffset, uint8_t alen, uint8_t roffset, uint8_t rlen, uint8_t goffset, uint8_t glen, uint8_t boffset, uint8_t blen, Eina_Bool premul)</td></tr>
@@ -690,6 +693,86 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga47cc7fea55ac0c3b8fc9d08ad582b702"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_map" ref="ga47cc7fea55ac0c3b8fc9d08ad582b702" args="(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer.html#ga47cc7fea55ac0c3b8fc9d08ad582b702">enesim_buffer_map</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Maps the buffer into user space memory </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The buffer to map </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The pointer to store the buffer data </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">stride</td><td>The stride of the buffer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if sucessfull, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga8a6f09f03448c068bf22324ed3b24dcd"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_unmap" ref="ga8a6f09f03448c068bf22324ed3b24dcd" args="(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data, Eina_Bool written)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer.html#ga8a6f09f03448c068bf22324ed3b24dcd">enesim_buffer_unmap</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_Bool&#160;</td>
+          <td class="paramname"><em>written</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Unmaps the buffer Call this function when the mapped data of a buffer is no longer needed. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The buffer to unmap </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The pointer where the buffer data is mapped </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">written</td><td>EINA_TRUE in case the mapped data has been written, EINA_FALSE otherwise </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="gaf2c51c785720d2fe37f96608d5a8a174"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_format_size_get" ref="gaf2c51c785720d2fe37f96608d5a8a174" args="(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1031,7 +1114,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jul 15 2014 18:30:10 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Aug 7 2014 23:05:12 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
