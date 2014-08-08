@@ -222,14 +222,23 @@ typedef struct _Enesim_Rasterizer_BiFigure_Class {
 	if (!noedges && !nuedges) \
 		goto get_out; \
  \
-	rx = (rx >> 16) + 2 - x; \
-	if (len > rx) \
-	{ \
-		len -= rx; \
-		memset(dst + rx, 0, sizeof(unsigned int) * len); \
-		e -= len; \
+	rx = (rx >> 16) + 2; \
+	if (rx < x) \
+	{\
+		memset(dst, 0, sizeof(unsigned int) * len); \
+		return; \
 	} \
-	else rx = len; \
+	else \
+	{ \
+		rx -= x; \
+		if (len > rx) \
+		{ \
+			len -= rx; \
+			memset(dst + rx, 0, sizeof(unsigned int) * len); \
+			e -= len; \
+		} \
+		else rx = len; \
+	} \
  \
 	lx = (lx >> 16) - 1 - x; \
 repeat: \
