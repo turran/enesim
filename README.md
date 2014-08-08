@@ -13,10 +13,14 @@ Dependencies
 + libpng (Optional: For PNG image support)
 + libjpeg (Optional: For JPEG image support)
 
+Documentation
+=============
+For API reference check out the automatically generated [doxygen](https://turran.github.io/enesim/docs/index.html) documentation
+
 Communication
 =============
 Use this project for any issue you might find. Or i you prefer you can go to #enesim on the freenode IRC server.
 
+Status
+======
 [![Build Status](https://drone.io/github.com/turran/enesim/status.png)](https://drone.io/github.com/turran/enesim/latest)
-
-For more information please visit [Enesim website](http://enesim.org)
