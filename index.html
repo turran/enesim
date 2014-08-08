@@ -1,70 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
     <title>Enesim by turran</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
-
-    <header>
-      <div class="container">
+    <div class="wrapper">
+      <header>
         <h1>Enesim</h1>
-        <h2>Drawing library</h2>
+        <p>Drawing library</p>
+        <p class="view"><a href="https://github.com/turran/enesim">View the Project on GitHub <small>turran/enesim</small></a></p>
+        <ul>
+          <li><a href="https://github.com/turran/enesim/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/turran/enesim/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/turran/enesim">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="what-is-it" class="anchor" href="#what-is-it"><span class="octicon octicon-link"></span></a>What is it?</h1>
 
-        <section id="downloads">
-          <a href="https://github.com/turran/enesim/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/turran/enesim/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/turran/enesim" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
+<p>Enesim is a library written C that provides a complete solution for drawing, allocating, compositing and converting pixels.
+All of the different systems of the library are flexible enough to support drawing capabilities on any scenario.</p>
 
-    <div class="container">
-      <section id="main_content">
-        <h3>
-<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h3>
-
-<p>Enesim is a rendering library that provides a complete solution for drawing, allocating, compositing and converting pixels. All of the abstractions of the library are flexible enough to support drawing capabilities on any scenario.</p>
-
-<p>The most useful abstraction is the the Renderer system, which allows you to draw different graphics primitives (in Enesim it is called a Renderer) into a target drawable (in Enesim a Surface). Given that a Renderer can draw anything, it has its own state that is modified through the renderer's specific properties setters and getters.</p>
-
-<h3>
-<a name="backends" class="anchor" href="#backends"><span class="octicon octicon-link"></span></a>Backends</h3>
+<h1>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h1>
 
 <ul>
-<li>Software based</li>
-<li>OppenGL</li>
-</ul><h3>
-<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h3>
-
-<p>For the API reference check the <a href="http://enesim.org/docs/">doxygen</a> generated documentation</p>
-
-<h3>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h3>
-
-<p>For some examples on how to use the library and the generated images check the <a href="http://enesim.org/docs/examples.html">examples</a> page at the documentation.</p>
-
-<h3>
-<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h3>
-
-<ul>
-<li>Eina</li>
+<li><a href="http://www.enlightenment.org">Eina</a></li>
 <li>Fontconfig</li>
 <li>Freetype</li>
-<li>GLew</li>
-<li>libpng</li>
-<li>libjpg</li>
-</ul>
+<li>GLEW (Optional: For OpenGL support)</li>
+<li>Cairo (Optional: In case of using the cairo path rasterizer instead of the enesim's)</li>
+<li>libpng (Optional: For PNG image support)</li>
+<li>libjpeg (Optional: For JPEG image support)</li>
+</ul><h1>
+<a name="communication" class="anchor" href="#communication"><span class="octicon octicon-link"></span></a>Communication</h1>
+
+<p>Use this project for any issue you might find. Or i you prefer you can go to #enesim on the freenode IRC server.</p>
+
+<p><a href="https://drone.io/github.com/turran/enesim/latest"><img src="https://drone.io/github.com/turran/enesim/status.png" alt="Build Status"></a></p>
+
+<p>For more information please visit <a href="http://enesim.org">Enesim website</a></p>
       </section>
     </div>
-
+    <footer>
+      <p>Project maintained by <a href="https://github.com/turran">turran</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
