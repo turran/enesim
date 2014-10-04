@@ -604,6 +604,10 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	}
 	left = rbounds.x - span.x;
 
+	DBG("Drawing span %" EINA_RECTANGLE_FORMAT " in '%s' with bounds %"
+			EINA_RECTANGLE_FORMAT, EINA_RECTANGLE_ARGS (&span),
+			r->name,  EINA_RECTANGLE_ARGS (&rbounds));
+
 	if (sw_data->span)
 	{
 		Enesim_Color color;

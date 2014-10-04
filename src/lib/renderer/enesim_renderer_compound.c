@@ -122,9 +122,17 @@ static inline void _compound_layer_span_draw(Enesim_Renderer_Compound_Layer *l, 
 	lbounds = l->destination_bounds;
 	if (!eina_rectangle_intersection(&lbounds, span))
 	{
+		DBG("Drawing span %" EINA_RECTANGLE_FORMAT " and bounds %"
+				EINA_RECTANGLE_FORMAT " do not intersect on "
+				"'%s'", EINA_RECTANGLE_ARGS (span),
+				EINA_RECTANGLE_ARGS (&lbounds),
+				l->r->name);
 		return;
 	}
 
+	DBG("Drawing span %" EINA_RECTANGLE_FORMAT " in '%s' with bounds %"
+			EINA_RECTANGLE_FORMAT, EINA_RECTANGLE_ARGS (span),
+			l->r->name,  EINA_RECTANGLE_ARGS (&lbounds));
 	offset = lbounds.x - span->x;
 	enesim_renderer_sw_draw(l->r, lbounds.x, lbounds.y, lbounds.w, dst + offset);
 }
@@ -164,8 +172,10 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 
 		if (!enesim_renderer_setup(layer->r, s, layer->rop, l))
 		{
-			ENESIM_RENDERER_LOG(r, l, "Child renderer %s can not setup",
+			ENESIM_RENDERER_LOG(r, l, "Layer '%s' can not setup",
 					enesim_renderer_name_get(layer->r));
+			DBG("Layer '%s' on '%s' failed to setup",
+					layer->r->name, r->name);
 			continue;
 		}
 		/* set the span given the color */
@@ -173,9 +183,15 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		/* FIXME what about the surface formats here? */
 		enesim_renderer_destination_bounds_get(layer->r, &layer->destination_bounds, 0, 0);
 		visible = enesim_renderer_visibility_get(layer->r);
-		if (!visible) continue;
+		if (!visible)
+		{
+			DBG("Layer '%s' on '%s' not visible, not adding it",
+					layer->r->name, r->name);
+			continue;
+		}
 
 		/* ok the layer pass the whole pre/post/setup process, add it to the visible layers */
+		DBG("Adding layer '%s' on '%s'", layer->r->name, r->name);
 		thiz->visible_layers = eina_list_append(thiz->visible_layers, layer);
 	}
 
