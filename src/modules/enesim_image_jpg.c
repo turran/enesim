@@ -80,7 +80,7 @@ static boolean _jpg_enesim_image_src_fill(j_decompress_ptr cinfo)
 	ssize_t ret;
 
 	ret = enesim_stream_read(thiz->data, thiz->buffer, JPG_BLOCK_SIZE);
-	if (ret < 0)
+	if (ret <= 0)
 	{
 		ERR("Reading failed");
 		ret = 0;
@@ -317,7 +317,7 @@ static const char * _jpg_data_from(Enesim_Stream *data)
 	int ret;
 
 	ret = enesim_stream_read(data, buf, 3);
-	if (ret < 0) return NULL;
+	if (ret <= 0) return NULL;
 	/*
 	 * Header "format"
 	 *
