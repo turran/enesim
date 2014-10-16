@@ -123,6 +123,11 @@ static ssize_t _enesim_stream_base64_read(void *data, void *buffer, size_t len)
 	size_t extra = 0;
 	size_t ret = 0;
 
+	/* early exit */
+	if (thiz->curr == thiz->end)
+	{
+		return 0;
+	}
 	/* first write the missing bytes from the previous read */
 	if (thiz->last_offset)
 	{
