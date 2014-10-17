@@ -1,8 +1,11 @@
 /* include glew before Enesim_OpenGL.h */
+#if BUILD_OPENGL
+#include <GL/glew.h>
+#endif
+
 #include "enesim_example_renderer.h"
 
 #if BUILD_OPENGL
-#include <GL/glew.h>
 #if BUILD_WGL
 
 #define CHECK() 	\
