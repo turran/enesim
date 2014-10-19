@@ -480,10 +480,12 @@ static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 	Eina_Bool ret = EINA_TRUE;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
-	/* TODO put the common code here to check if the shape status has changed */
 	/* call the has_changed on the descriptor */
 	if (klass->has_changed)
 		ret = klass->has_changed(r);
+	/* check that the common shape state has changed */
+	if (!ret)
+		ret = enesim_renderer_shape_state_has_changed(r);
 
 	return ret;
 }
