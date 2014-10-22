@@ -68,7 +68,7 @@ static inline Eina_Bool _is_sw_draw_composed(Enesim_Color *color,
 		*rop = ENESIM_ROP_FILL;
 
 	/* fill rop, color is full and no mask, we use the simple draw function */
-	if ((*rop == ENESIM_ROP_FILL) && (*color == ENESIM_COLOR_FULL) && (!mask))
+	if ((*rop == ENESIM_ROP_FILL) && (*color == ENESIM_COLOR_FULL) && (!*mask))
 		return EINA_FALSE;
 	return EINA_TRUE;
 }
