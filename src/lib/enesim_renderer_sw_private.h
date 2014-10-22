@@ -40,13 +40,9 @@ typedef struct _Enesim_Renderer_Thread_Operation
 {
 	/* common attributes */
 	Enesim_Renderer *renderer;
-	Enesim_Renderer *mask;
-	Enesim_Renderer_Sw_Fill mask_fill;
 	uint8_t * dst;
 	size_t stride;
 	Eina_Rectangle area;
-	/* in case the renderer needs to use a composer */
-	Enesim_Compositor_Span span;
 } Enesim_Renderer_Thread_Operation;
 
 typedef struct _Enesim_Renderer_Thread
@@ -79,6 +75,7 @@ struct _Enesim_Renderer_Sw_Data
 	 */
 	Enesim_Renderer_Sw_Fill fill;
 	Enesim_Compositor_Span span;
+	Eina_Bool use_mask;
 };
 
 void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop, Enesim_Renderer_Sw_Hint *hints);

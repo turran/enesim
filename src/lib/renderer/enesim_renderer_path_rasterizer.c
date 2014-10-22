@@ -135,6 +135,7 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	Enesim_Renderer_Shape *bifigure_shape;
+	Enesim_Renderer *m;
 	const Enesim_Renderer_State *cs;
 	const Enesim_Renderer_Shape_State *css;
 	double swx, swy;
@@ -167,8 +168,14 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, enesim_renderer_ref(css->current.fill.r));
 	enesim_renderer_shape_fill_rule_set(thiz->bifigure, css->current.fill.rule);
 
+	/* propagate the common renderer properties manually, because calling
+	 * enesim_renderer_propagate() will also set the transformation which
+	 * is something we dont want
+	 */
+	m = enesim_renderer_mask_get(r);
 	enesim_renderer_color_set(thiz->bifigure, cs->current.color);
 	enesim_renderer_origin_set(thiz->bifigure, cs->current.ox, cs->current.oy);
+	enesim_renderer_mask_set(thiz->bifigure, m);
 	/* pass the dashes */
 	bifigure_shape = ENESIM_RENDERER_SHAPE(thiz->bifigure);
 	if (bifigure_shape->state.dashes)
