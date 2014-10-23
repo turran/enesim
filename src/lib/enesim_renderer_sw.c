@@ -541,14 +541,26 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer *mask;
 	Enesim_Color color;
 	Eina_Bool use_mask = EINA_FALSE;
-	const char *name;
 
+	/* First the setup on the renderer itself */
 	klass = ENESIM_RENDERER_CLASS_GET(r);
-	name = enesim_renderer_name_get(r);
-	mask = enesim_renderer_mask_get(r);
-	color = enesim_renderer_color_get(r);
+	if (!klass->sw_setup)
+		return EINA_FALSE;
+
+	if (!klass->sw_setup(r, s, rop, &fill, error))
+	{
+		WRN("Setup callback on '%s' failed", r->name);
+		return EINA_FALSE;
+	}
+	if (!fill)
+	{
+		ENESIM_RENDERER_LOG(r, error, "Even if the setup did not failed, there's no fill function");
+		enesim_renderer_sw_cleanup(r, s);
+		return EINA_FALSE;
+	}
 
 	/* do the setup on the mask */
+	mask = enesim_renderer_mask_get(r);
 	/* FIXME later this should be merged on the common renderer code */
 	if (mask)
 	{
@@ -557,29 +569,10 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		ret = enesim_renderer_setup(mask, s, ENESIM_ROP_FILL, error);
 		if (!ret)
 		{
-			WRN("Mask setup callback on '%s' failed", name);
+			WRN("Mask setup callback on '%s' failed", r->name);
 			enesim_renderer_unref(mask);
 			return EINA_FALSE;
 		}
-	}
-	if (!klass->sw_setup)
-	{
-		enesim_renderer_unref(mask);
-		return EINA_FALSE;
-	}
-	if (!klass->sw_setup(r, s, rop, &fill, error))
-	{
-		WRN("Setup callback on '%s' failed", name);
-		enesim_renderer_unref(mask);
-		return EINA_FALSE;
-
-	}
-	if (!fill)
-	{
-		ENESIM_RENDERER_LOG(r, error, "Even if the setup did not failed, there's no fill function");
-		enesim_renderer_sw_cleanup(r, s);
-		enesim_renderer_unref(mask);
-		return EINA_FALSE;
 	}
 
 	sw_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_SOFTWARE);
@@ -589,7 +582,9 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);	
 	}
 
+	color = enesim_renderer_color_get(r);
 	enesim_renderer_sw_hints_get(r, rop, &hints);
+
 	if (_is_sw_draw_composed(&color, &rop, &mask, hints))
 	{
 		Enesim_Format dfmt;
@@ -627,16 +622,18 @@ void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	Enesim_Renderer *mask;
 	Enesim_Renderer_Class *klass;
 
+	/* First do the cleanup on the renderer */
 	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (klass->sw_cleanup) klass->sw_cleanup(r, s);
+
+	/* Now the cleanup on the mask */
 	mask = enesim_renderer_mask_get(r);
-	/* do the setup on the mask */
 	/* FIXME later this should be merged on the common renderer code */
 	if (mask)
 	{
 		enesim_renderer_cleanup(mask, s);
 		enesim_renderer_unref(mask);
 	}
-	if (klass->sw_cleanup) klass->sw_cleanup(r, s);
 }
 
 void enesim_renderer_sw_free(Enesim_Renderer *r)
