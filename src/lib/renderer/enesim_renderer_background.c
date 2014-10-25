@@ -68,24 +68,25 @@ typedef struct _Enesim_Renderer_Background_Class {
 	Enesim_Renderer_Class parent;
 } Enesim_Renderer_Background_Class;
 
-static void _background_span(Enesim_Renderer *r,
+static void _background_rop_mask_span(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Background *thiz = ENESIM_RENDERER_BACKGROUND(r);
+	uint32_t *dst = ddata;
+	uint32_t *buf;
+
+	buf = alloca(len * sizeof(uint32_t));
+	enesim_renderer_sw_draw(thiz->mask, x, y, len, buf);
+	thiz->span(dst, len, NULL, ENESIM_COLOR_FULL, buf);
+}
+
+static void _background_rop_span(Enesim_Renderer *r,
 		int x EINA_UNUSED, int y EINA_UNUSED, int len, void *ddata)
 {
 	Enesim_Renderer_Background *thiz = ENESIM_RENDERER_BACKGROUND(r);
 	uint32_t *dst = ddata;
 
-	if (thiz->mask)
-	{
-		uint32_t *buf;
-
-		buf = alloca(len * sizeof(uint32_t));
-		enesim_renderer_sw_draw(thiz->mask, x, y, len, buf);
-		thiz->span(dst, len, NULL, thiz->final_color, buf);
-	}
-	else
-	{
-		thiz->span(dst, len, NULL, thiz->final_color, NULL);
-	}
+	thiz->span(dst, len, NULL, thiz->final_color, NULL);
 }
 
 #if BUILD_OPENGL
@@ -201,10 +202,18 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 
 	if (!_background_state_setup(r)) return EINA_FALSE;
 
-	thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
-			thiz->final_color, thiz->mask ?
-			ENESIM_FORMAT_ARGB8888 : ENESIM_FORMAT_NONE);
-	*fill = _background_span;
+	if (thiz->mask)
+	{
+		*fill = _background_rop_mask_span;
+		thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
+				thiz->final_color, ENESIM_FORMAT_ARGB8888);
+	}
+	else
+	{
+		*fill = _background_rop_span;
+		thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
+				thiz->final_color, ENESIM_FORMAT_NONE);
+	}
 
 	return EINA_TRUE;
 }
