@@ -138,11 +138,14 @@ static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 }
 #endif
 
-static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesim_Renderer *r)
+static Eina_Bool _background_state_setup(Enesim_Renderer *r)
 {
 	Enesim_Color final_color, rend_color;
 	Enesim_Renderer *mask;
 
+	Enesim_Renderer_Background *thiz;
+
+	thiz = ENESIM_RENDERER_BACKGROUND(r);
 	final_color = thiz->color;
 	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
@@ -167,8 +170,16 @@ static Eina_Bool _background_state_setup(Enesim_Renderer_Background *thiz, Enesi
 	return EINA_TRUE;
 }
 
-static void _background_state_cleanup(Enesim_Renderer_Background *thiz)
+static void _background_state_cleanup(Enesim_Renderer *r)
 {
+	Enesim_Renderer_Background *thiz;
+	thiz = ENESIM_RENDERER_BACKGROUND(r);
+	if (thiz->mask)
+	{
+		enesim_renderer_color_set(thiz->mask, thiz->mask_color);
+		enesim_renderer_unref(thiz->mask);
+		thiz->mask = NULL;
+	}
 	thiz->changed = EINA_FALSE;
 }
 /*----------------------------------------------------------------------------*
@@ -188,10 +199,11 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 
  	thiz = ENESIM_RENDERER_BACKGROUND(r);
 
-	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
+	if (!_background_state_setup(r)) return EINA_FALSE;
 
 	thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
-		thiz->final_color, thiz->mask ? ENESIM_FORMAT_ARGB8888 : ENESIM_FORMAT_NONE);
+			thiz->final_color, thiz->mask ?
+			ENESIM_FORMAT_ARGB8888 : ENESIM_FORMAT_NONE);
 	*fill = _background_span;
 
 	return EINA_TRUE;
@@ -199,16 +211,7 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 
 static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
-	Enesim_Renderer_Background *thiz;
-
-	thiz = ENESIM_RENDERER_BACKGROUND(r);
-	if (thiz->mask)
-	{
-		enesim_renderer_color_set(thiz->mask, thiz->mask_color);
-		enesim_renderer_unref(thiz->mask);
-		thiz->mask = NULL;
-	}
-	thiz->changed = EINA_FALSE;
+	_background_state_cleanup(r);
 }
 
 #if BUILD_OPENCL
@@ -221,7 +224,7 @@ static Eina_Bool _background_opencl_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Background *thiz;
 
  	thiz = ENESIM_RENDERER_BACKGROUND(r);
-	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
+	if (!_background_state_setup(r)) return EINA_FALSE;
 
 	*program_name = "background";
 	*program_source =
@@ -245,10 +248,7 @@ static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surf
 
 static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
-	Enesim_Renderer_Background *thiz;
-
- 	thiz = ENESIM_RENDERER_BACKGROUND(r);
-	_background_state_cleanup(thiz);
+	_background_state_cleanup(r);
 }
 #endif
 
@@ -267,10 +267,7 @@ static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l EINA_UNUSED)
 {
-	Enesim_Renderer_Background *thiz;
-
- 	thiz = ENESIM_RENDERER_BACKGROUND(r);
-	if (!_background_state_setup(thiz, r)) return EINA_FALSE;
+	if (!_background_state_setup(r)) return EINA_FALSE;
 
 	*draw = _background_opengl_draw;
 	return EINA_TRUE;
@@ -278,10 +275,7 @@ static Eina_Bool _background_opengl_setup(Enesim_Renderer *r,
 
 static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
-	Enesim_Renderer_Background *thiz;
-
- 	thiz = ENESIM_RENDERER_BACKGROUND(r);
-	_background_state_cleanup(thiz);
+	_background_state_cleanup(r);
 }
 #endif
 
