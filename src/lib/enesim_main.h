@@ -84,8 +84,12 @@ typedef enum _Enesim_Channel
 	ENESIM_CHANNEL_GREEN, /**< Green channel */
 	ENESIM_CHANNEL_BLUE, /**< Blue channel */
 	ENESIM_CHANNEL_ALPHA, /**< Alpha channel */
-	ENESIM_CHANNEL_LAST, /**< The number of channels */
+	ENESIM_CHANNEL_LUMINANCE, /**< Luminance to alpha, with 0.2125, 0.7154 and 0.0721 coefficients */
 } Enesim_Channel;
+
+/**< The number of channels */
+#define ENESIM_CHANNEL_LAST (ENESIM_CHANNEL_LUMINANCE + 1)
+
 
 /**
  * Alpha hints
