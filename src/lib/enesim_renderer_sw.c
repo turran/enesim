@@ -589,6 +589,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	{
 		Enesim_Format dfmt;
 		Enesim_Format mfmt = ENESIM_FORMAT_NONE;
+		Enesim_Channel mchan;
 
 		if (mask)
 		{
@@ -596,9 +597,10 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 			use_mask = EINA_TRUE;
 		}
 
+		mchan = enesim_renderer_mask_channel_get(r);
 		dfmt = enesim_surface_format_get(s);
 		span = enesim_compositor_span_get(rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				color, mfmt, ENESIM_CHANNEL_ALPHA);
+				color, mfmt, mchan);
 		if (!span)
 		{
 			WRN("No suitable span compositor to render %p with rop "
