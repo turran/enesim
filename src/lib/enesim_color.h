@@ -65,6 +65,13 @@ typedef uint32_t Enesim_Color;
  */
 #define ENESIM_COLOR_FULL 0xffffffff
 
+/**
+ * @ref ENESIM_COLOR_NONE
+ *
+ * Simple definition of a no (transparent black) color
+ */
+#define ENESIM_COLOR_NONE 0x00000000
+
 EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c);
 EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb);
 
