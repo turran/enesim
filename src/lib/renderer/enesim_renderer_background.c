@@ -206,13 +206,15 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 	{
 		*fill = _background_rop_mask_span;
 		thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
-				thiz->final_color, ENESIM_FORMAT_ARGB8888);
+				thiz->final_color, ENESIM_FORMAT_ARGB8888,
+				ENESIM_CHANNEL_ALPHA);
 	}
 	else
 	{
 		*fill = _background_rop_span;
 		thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
-				thiz->final_color, ENESIM_FORMAT_NONE);
+				thiz->final_color, ENESIM_FORMAT_NONE,
+				ENESIM_CHANNEL_ALPHA);
 	}
 
 	return EINA_TRUE;

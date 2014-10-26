@@ -421,12 +421,12 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 			if (fpaint)
 			{
 				if (fcolor != 0xffffffff)
-					argb8888_sp_argb8888_color_argb8888_fill(dst, rlen, fbuf, fcolor, mask);
+					argb8888_sp_argb8888_color_argb8888_alpha_fill(dst, rlen, fbuf, fcolor, mask);
 				else
-					argb8888_sp_argb8888_none_argb8888_fill(dst, rlen, fbuf, 0, mask);
+					argb8888_sp_argb8888_none_argb8888_alpha_fill(dst, rlen, fbuf, 0, mask);
 			}
 			else
-				argb8888_sp_none_color_argb8888_fill(dst, rlen, NULL, fcolor, mask);
+				argb8888_sp_none_color_argb8888_alpha_fill(dst, rlen, NULL, fcolor, mask);
 			/* clear the area that we have not drawn on the horizontal bounds */
 after:
 			if (w < g->x_advance)

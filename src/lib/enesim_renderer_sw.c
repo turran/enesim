@@ -598,7 +598,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 
 		dfmt = enesim_surface_format_get(s);
 		span = enesim_compositor_span_get(rop, &dfmt, ENESIM_FORMAT_ARGB8888,
-				color, mfmt);
+				color, mfmt, ENESIM_CHANNEL_ALPHA);
 		if (!span)
 		{
 			WRN("No suitable span compositor to render %p with rop "

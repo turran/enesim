@@ -81,23 +81,23 @@ static void _argb8888_sp_argb8888_color_none_fill(uint32_t *d, uint32_t len,
 	argb8888_sp_argb8888_color_none_fill(d, len, s, color, m);
 }
 
-static void _argb8888_sp_none_color_argb8888_fill(uint32_t *d, uint32_t len,
+static void _argb8888_sp_none_color_argb8888_alpha_fill(uint32_t *d, uint32_t len,
 		uint32_t *s, uint32_t color, uint32_t *m)
 {
-	argb8888_sp_none_color_argb8888_fill(d, len, s, color, m);
+	argb8888_sp_none_color_argb8888_alpha_fill(d, len, s, color, m);
 }
 
-static void _argb8888_sp_none_color_a8_fill(uint32_t *d, uint32_t len,
+static void _argb8888_sp_none_color_a8_alpha_fill(uint32_t *d, uint32_t len,
 		uint32_t *s, uint32_t color, uint8_t *m)
 {
-	argb8888_sp_none_color_a8_fill(d, len, s, color, m);
+	argb8888_sp_none_color_a8_alpha_fill(d, len, s, color, m);
 }
 
-static inline void _argb8888_sp_argb8888_none_argb8888_fill(uint32_t *d,
+static inline void _argb8888_sp_argb8888_none_argb8888_alpha_fill(uint32_t *d,
 		uint32_t len, uint32_t *s, uint32_t color,
 		uint32_t *m)
 {
-	argb8888_sp_argb8888_none_argb8888_fill(d, len, s, color, m);
+	argb8888_sp_argb8888_none_argb8888_alpha_fill(d, len, s, color, m);
 }
 /*----------------------------------------------------------------------------*
  *                           Blend point funcitons                            *
@@ -143,25 +143,25 @@ static void _argb8888_sp_argb8888_color_none_blend(uint32_t *d,
 	argb8888_sp_argb8888_color_none_blend(d, len, s, color, m);
 }
 
-static void _argb8888_sp_none_color_argb8888_blend(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color,
+static void _argb8888_sp_none_color_argb8888_alpha_blend(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t color,
 		uint32_t *m)
 {
-	argb8888_sp_none_color_argb8888_blend(d, len, s, color, m);
+	argb8888_sp_none_color_argb8888_alpha_blend(d, len, s, color, m);
 }
 
-static void _argb8888_sp_none_color_a8_blend(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color,
+static void _argb8888_sp_none_color_a8_alpha_blend(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t color,
 		uint8_t *m)
 {
-	argb8888_sp_none_color_a8_blend(d, len, s, color, m);
+	argb8888_sp_none_color_a8_alpha_blend(d, len, s, color, m);
 }
 
-static void _argb8888_sp_argb8888_none_argb8888_blend(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color,
+static void _argb8888_sp_argb8888_none_argb8888_alpha_blend(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t color,
 		uint32_t *m)
 {
-	argb8888_sp_argb8888_none_argb8888_blend(d, len, s, color, m);
+	argb8888_sp_argb8888_none_argb8888_alpha_blend(d, len, s, color, m);
 }
 
 static void _span_register(void)
@@ -182,30 +182,32 @@ static void _span_register(void)
 			ENESIM_FORMAT_ARGB8888);
 	/* mask color */
 	enesim_compositor_span_mask_color_register(
-			_argb8888_sp_none_color_argb8888_fill,
+			_argb8888_sp_none_color_argb8888_alpha_fill,
 			ENESIM_ROP_FILL, ENESIM_FORMAT_ARGB8888,
-			ENESIM_FORMAT_ARGB8888);
+			ENESIM_FORMAT_ARGB8888, ENESIM_CHANNEL_ALPHA);
 	enesim_compositor_span_mask_color_register(
-			ENESIM_COMPOSITOR_SPAN(_argb8888_sp_none_color_a8_fill),
+			ENESIM_COMPOSITOR_SPAN(_argb8888_sp_none_color_a8_alpha_fill),
 			ENESIM_ROP_FILL, ENESIM_FORMAT_ARGB8888,
-			ENESIM_FORMAT_A8);
+			ENESIM_FORMAT_A8, ENESIM_CHANNEL_ALPHA);
 	enesim_compositor_span_mask_color_register(
-			_argb8888_sp_none_color_argb8888_blend,
+			_argb8888_sp_none_color_argb8888_alpha_blend,
 			ENESIM_ROP_BLEND, ENESIM_FORMAT_ARGB8888,
-			ENESIM_FORMAT_ARGB8888);
+			ENESIM_FORMAT_ARGB8888, ENESIM_CHANNEL_ALPHA);
 	enesim_compositor_span_mask_color_register(
-			ENESIM_COMPOSITOR_SPAN(_argb8888_sp_none_color_a8_blend),
+			ENESIM_COMPOSITOR_SPAN(_argb8888_sp_none_color_a8_alpha_blend),
 			ENESIM_ROP_BLEND, ENESIM_FORMAT_ARGB8888,
-			ENESIM_FORMAT_A8);
+			ENESIM_FORMAT_A8, ENESIM_CHANNEL_ALPHA);
 	/* pixel mask */
 	enesim_compositor_span_pixel_mask_register(
-			_argb8888_sp_argb8888_none_argb8888_fill,
+			_argb8888_sp_argb8888_none_argb8888_alpha_fill,
 			ENESIM_ROP_FILL, ENESIM_FORMAT_ARGB8888,
-			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888);
+			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888,
+			ENESIM_CHANNEL_ALPHA);
 	enesim_compositor_span_pixel_mask_register(
-			_argb8888_sp_argb8888_none_argb8888_blend,
+			_argb8888_sp_argb8888_none_argb8888_alpha_blend,
 			ENESIM_ROP_BLEND, ENESIM_FORMAT_ARGB8888,
-			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888);
+			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888,
+			ENESIM_CHANNEL_ALPHA);
 	/* pixel color */
 	enesim_compositor_span_pixel_color_register(
 			_argb8888_sp_argb8888_color_none_fill,

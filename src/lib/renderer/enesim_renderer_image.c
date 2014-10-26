@@ -1598,7 +1598,8 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 		if (mtype == ENESIM_MATRIX_TYPE_IDENTITY)
 		{
 			thiz->span = enesim_compositor_span_get(rop, &fmt,
-				ENESIM_FORMAT_ARGB8888, thiz->color, ENESIM_FORMAT_NONE);
+				ENESIM_FORMAT_ARGB8888, thiz->color, ENESIM_FORMAT_NONE,
+				ENESIM_CHANNEL_ALPHA);
 			if (rop == ENESIM_ROP_BLEND)
 				*fill = _argb8888_blend_span;
 		}

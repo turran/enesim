@@ -46,8 +46,9 @@ typedef void (*Enesim_Compositor_Span)(uint32_t *d, uint32_t len, uint32_t *s,
 
 Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
-		Enesim_Format mfmt);
+		Enesim_Format mfmt, Enesim_Channel mchan);
 
+/* TODO remove this */
 Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
 		Enesim_Format mfmt);
@@ -75,10 +76,11 @@ void enesim_compositor_span_color_register(Enesim_Compositor_Span sp,
 void enesim_compositor_span_pixel_register(Enesim_Compositor_Span sp,
 		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt);
 void enesim_compositor_span_mask_color_register(Enesim_Compositor_Span sp,
-		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format mfmt);
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format mfmt,
+		Enesim_Channel mchan);
 void enesim_compositor_span_pixel_mask_register(Enesim_Compositor_Span sp,
 		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt,
-		Enesim_Format mfmt);
+		Enesim_Format mfmt, Enesim_Channel mchan);
 void enesim_compositor_span_pixel_color_register(Enesim_Compositor_Span sp,
 		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt);
 

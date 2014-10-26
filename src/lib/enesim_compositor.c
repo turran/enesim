@@ -38,10 +38,11 @@ typedef struct _Enesim_Compositor
 {
 	/* Scanlines */
 	Enesim_Compositor_Span sp_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST];
-	Enesim_Compositor_Span sp_mask_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Span sp_mask_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST][ENESIM_CHANNEL_LAST];
 	Enesim_Compositor_Span sp_pixel[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
 	Enesim_Compositor_Span sp_pixel_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
-	Enesim_Compositor_Span sp_pixel_mask[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
+	Enesim_Compositor_Span sp_pixel_mask[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST][ENESIM_CHANNEL_LAST];
+	/* TODO remove this */
 	/* Points */
 	Enesim_Compositor_Point pt_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST];
 	Enesim_Compositor_Point pt_mask_color[ENESIM_ROP_LAST][ENESIM_FORMAT_LAST][ENESIM_FORMAT_LAST];
@@ -110,9 +111,10 @@ static Enesim_Compositor_Span _span_color_get(Enesim_Rop rop,
  * and multiplying with color color
  */
 static Enesim_Compositor_Span _span_mask_color_get(Enesim_Rop rop,
-		Enesim_Format *dfmt, Enesim_Format mfmt, Enesim_Color color EINA_UNUSED)
+		Enesim_Format *dfmt, Enesim_Format mfmt, Enesim_Channel mchan,
+		Enesim_Color color EINA_UNUSED)
 {
-	return _comps.sp_mask_color[rop][*dfmt][mfmt];
+	return _comps.sp_mask_color[rop][*dfmt][mfmt][mchan];
 }
 
 /*
@@ -135,9 +137,10 @@ static Enesim_Compositor_Span _span_pixel_color_get(Enesim_Rop rop,
  * and multiplying with the pixel values from sfmt
  */
 static Enesim_Compositor_Span _span_pixel_mask_get(Enesim_Rop rop,
-		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Format mfmt)
+		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Format mfmt,
+		Enesim_Channel mchan)
 {
-	return _comps.sp_pixel_mask[rop][*dfmt][sfmt][mfmt];
+	return _comps.sp_pixel_mask[rop][*dfmt][sfmt][mfmt][mchan];
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -195,16 +198,17 @@ void enesim_compositor_span_pixel_register(Enesim_Compositor_Span sp,
 }
 
 void enesim_compositor_span_mask_color_register(Enesim_Compositor_Span sp,
-		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format mfmt)
+		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format mfmt,
+		Enesim_Channel mchan)
 {
-	_comps.sp_mask_color[rop][dfmt][mfmt] = sp;
+	_comps.sp_mask_color[rop][dfmt][mfmt][mchan] = sp;
 }
 
 void enesim_compositor_span_pixel_mask_register(Enesim_Compositor_Span sp,
 		Enesim_Rop rop, Enesim_Format dfmt, Enesim_Format sfmt,
-		Enesim_Format mfmt)
+		Enesim_Format mfmt, Enesim_Channel mchan)
 {
-	_comps.sp_pixel_mask[rop][dfmt][sfmt][mfmt] = sp;
+	_comps.sp_pixel_mask[rop][dfmt][sfmt][mfmt][mchan] = sp;
 }
 
 void enesim_compositor_span_pixel_color_register(Enesim_Compositor_Span sp,
@@ -215,7 +219,7 @@ void enesim_compositor_span_pixel_color_register(Enesim_Compositor_Span sp,
 
 Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
-		Enesim_Format mfmt)
+		Enesim_Format mfmt, Enesim_Channel mchan)
 {
 	if (!dfmt)
 		return NULL;
@@ -228,7 +232,7 @@ Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 	}
 	if (sfmt && mfmt)
 	{
-		return _span_pixel_mask_get(rop, dfmt, sfmt, mfmt);
+		return _span_pixel_mask_get(rop, dfmt, sfmt, mfmt, mchan);
 	}
 	if (sfmt)
 	{
@@ -236,12 +240,13 @@ Enesim_Compositor_Span enesim_compositor_span_get(Enesim_Rop rop,
 	}
 	if (mfmt)
 	{
-		return _span_mask_color_get(rop, dfmt, mfmt, color);
+		return _span_mask_color_get(rop, dfmt, mfmt, mchan, color);
 	}
 
 	return NULL;
 }
 
+/* TODO remove this */
 Enesim_Compositor_Point enesim_compositor_point_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Format sfmt, Enesim_Color color,
 		Enesim_Format mfmt)
