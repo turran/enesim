@@ -84,6 +84,8 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color);
 EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask);
 EAPI Enesim_Renderer * enesim_renderer_mask_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_mask_channel_set(Enesim_Renderer *r, Enesim_Channel channel);
+EAPI Enesim_Channel enesim_renderer_mask_channel_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality);
 EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r);
 

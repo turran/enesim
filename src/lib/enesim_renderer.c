@@ -155,6 +155,8 @@ static Eina_Bool _state_changed(Enesim_Renderer_State *thiz,
 		return EINA_TRUE;
 	if (!thiz->current.mask && thiz->past.mask)
 		return EINA_TRUE;
+	if (!thiz->current.mchannel && thiz->past.mchannel)
+		return EINA_TRUE;
 	if (thiz->current.mask)
 	{
 		if (enesim_renderer_has_changed(thiz->current.mask))
@@ -183,6 +185,7 @@ static void _state_clear(Enesim_Renderer_State *thiz)
 
 static void _state_init(Enesim_Renderer_State *thiz)
 {
+	thiz->current.mchannel = thiz->past.mchannel = ENESIM_CHANNEL_ALPHA;
 	thiz->current.visibility = thiz->past.visibility = EINA_TRUE;
 	thiz->current.color = thiz->past.color = ENESIM_COLOR_FULL;
 	thiz->current.quality = thiz->past.quality = _default_quality;
@@ -913,6 +916,33 @@ EAPI Enesim_Renderer * enesim_renderer_mask_get(Enesim_Renderer *r)
 {
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	return enesim_renderer_ref(r->state.current.mask);
+}
+
+/**
+ * @brief Sets the channel to use for masking
+ * @param[in] r The renderer to set the mask channel to
+ * @param[in] channel The channel to use
+ *
+ * When using a mask renderer for masking a renderer the channel defines
+ * how to manage the mask pixels to mask
+ */
+EAPI void enesim_renderer_mask_channel_set(Enesim_Renderer *r, Enesim_Channel channel)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+
+	r->state.current.mchannel = channel;
+	r->state.changed = EINA_TRUE;
+}
+
+/**
+ * @brief Gets the mask channel from a renderer
+ * @param[in] r The renderer to get the mask channel from
+ * @return The mask channel
+ */
+EAPI Enesim_Channel enesim_renderer_mask_channel_get(Enesim_Renderer *r)
+{
+	ENESIM_MAGIC_CHECK_RENDERER(r);
+	return r->state.current.mchannel;
 }
 
 /**

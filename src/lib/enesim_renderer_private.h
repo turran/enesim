@@ -48,6 +48,7 @@ typedef struct _Enesim_Renderer_State
 	struct {
 		Enesim_Color color;
 		Enesim_Renderer *mask;
+		Enesim_Channel mchannel;
 		Eina_Bool visibility;
 		Enesim_Matrix transformation;
 		Enesim_Matrix_Type transformation_type;
