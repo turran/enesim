@@ -56,7 +56,7 @@ static inline uint32_t argb8888_interp_256(uint16_t a, uint32_t c0, uint32_t c1)
 }
 
 /*
- * r = (c0 - c1) * a + c1
+ * ret = (c0 - c1) * a + c1
  * a = 0 => r = c1
  * a = 1 => r = c0
  */
@@ -73,7 +73,8 @@ static inline uint32_t argb8888_interp_65536(uint32_t a, uint32_t c0, uint32_t c
 }
 
 /*
- *
+ * ret = [(c.a * a), (c.r * a), (c.g * a), (c.b * a)]
+ * Where a is on the 1 - 256 range
  */
 static inline uint32_t argb8888_mul_256(uint16_t a, uint32_t c)
 {
@@ -82,7 +83,8 @@ static inline uint32_t argb8888_mul_256(uint16_t a, uint32_t c)
 }
 
 /*
- *
+ * ret = [(c.a * a), (c.r * a), (c.g * a), (c.b * a)]
+ * Where a is on the 1 - 65536 range
  */
 static inline uint32_t argb8888_mul_65536(uint32_t a, uint32_t c)
 {
@@ -106,6 +108,10 @@ static inline uint32_t * argb8888_at(uint32_t *data, size_t stride, int x, int y
 	return (uint32_t *)((uint8_t *)data + (stride * y)) + x;
 }
 
+/*
+ * Get the luminance based on the function
+ * ret = (c.r * 0.2125) + (c.g * 0.7154) + (c.b * 0.0721)
+ */
 static inline uint8_t argb8888_lum_get(uint32_t c)
 {
 	uint16_t a;
