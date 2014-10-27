@@ -299,7 +299,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_luminance_blend(uint32_t *
 			{
 				uint16_t sa;
 
-				sa = argb8888_lum(p);
+				sa = 1 + argb8888_lum_get(p);
 				p = argb8888_mul_256(sa, *s);
 				sa = 256 - argb8888_alpha_get(p);
 				if (sa < 256)
@@ -352,7 +352,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_blend(uint32_t 
 				{
 					uint16_t sa;
 
-					sa = argb8888_lum(p);
+					sa = 1 + argb8888_lum_get(p);
 					sa = (ca * sa) >> 8;
 					p = argb8888_mul_256(sa, *s);
 					sa = 256 - argb8888_alpha_get(p);

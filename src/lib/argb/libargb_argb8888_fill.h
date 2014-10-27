@@ -289,7 +289,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_fill(uint32_t *
 			{
 				uint16_t ma;
 
-				ma = argb8888_lum(p);
+				ma = 1 + argb8888_lum_get(p);
 				ma = (ca * ma) >> 8;
 				*d = argb8888_mul_256(ma, *s);
 			}
@@ -322,7 +322,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_luminance_fill(uint32_t *d
 			{
 				uint16_t ma;
 
-				ma = argb8888_lum(p);
+				ma = 1 + argb8888_lum_get(p);
 				*d = argb8888_mul_256(ma, *s);
 			}
 			break;
@@ -497,7 +497,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_luminance_copy(uint32_t *d
 			{
 				uint16_t ma;
 
-				ma = argb8888_lum(p);
+				ma = 1 + argb8888_lum_get(p);
 				*d = argb8888_interp_256(ma, *s, *d);
 			}
 			break;
@@ -530,7 +530,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_copy(uint32_t *
 			{
 				uint16_t ma;
 
-				ma = argb8888_lum(p);
+				ma = 1 + argb8888_lum_get(p);
 				ma = (ca * ma) >> 8;
 				*d = argb8888_interp_256(ma, *s, *d);
 			}

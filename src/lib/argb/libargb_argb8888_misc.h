@@ -106,13 +106,12 @@ static inline uint32_t * argb8888_at(uint32_t *data, size_t stride, int x, int y
 	return (uint32_t *)((uint8_t *)data + (stride * y)) + x;
 }
 
-static inline uint16_t argb8888_lum(uint32_t c)
+static inline uint8_t argb8888_lum_get(uint32_t c)
 {
 	uint16_t a;
 
-	a = 1 + ((55 * (c & 0xff0000)) >> 24) +
-		((184 * (c & 0xff00)) >> 16) +
-		((19 * (c & 0xff)) >> 8);
+	a = ((55 * (c & 0xff0000)) >> 24) + ((184 * (c & 0xff00)) >> 16) +
+			((19 * (c & 0xff)) >> 8);
 	return a;
 }
 
