@@ -33,6 +33,7 @@
 #include "libargb_argb8888_misc.h"
 #include "libargb_argb8888_mul4_sym.h"
 #include "libargb_argb8888_fill.h"
+#include "libargb_argb8888_copy.h"
 #include "libargb_argb8888_blend.h"
 
 #endif
