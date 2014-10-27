@@ -99,6 +99,13 @@ static inline void _argb8888_sp_argb8888_none_argb8888_alpha_fill(uint32_t *d,
 {
 	argb8888_sp_argb8888_none_argb8888_alpha_fill(d, len, s, color, m);
 }
+
+static inline void _argb8888_sp_argb8888_none_argb8888_luminance_fill(uint32_t *d,
+		uint32_t len, uint32_t *s, uint32_t color,
+		uint32_t *m)
+{
+	argb8888_sp_argb8888_none_argb8888_luminance_fill(d, len, s, color, m);
+}
 /*----------------------------------------------------------------------------*
  *                           Blend point funcitons                            *
  *----------------------------------------------------------------------------*/
@@ -164,6 +171,13 @@ static void _argb8888_sp_argb8888_none_argb8888_alpha_blend(uint32_t *d,
 	argb8888_sp_argb8888_none_argb8888_alpha_blend(d, len, s, color, m);
 }
 
+static void _argb8888_sp_argb8888_none_argb8888_luminance_blend(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t color,
+		uint32_t *m)
+{
+	argb8888_sp_argb8888_none_argb8888_luminance_blend(d, len, s, color, m);
+}
+
 static void _span_register(void)
 {
 	/* color */
@@ -204,10 +218,20 @@ static void _span_register(void)
 			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888,
 			ENESIM_CHANNEL_ALPHA);
 	enesim_compositor_span_pixel_mask_register(
+			_argb8888_sp_argb8888_none_argb8888_luminance_fill,
+			ENESIM_ROP_FILL, ENESIM_FORMAT_ARGB8888,
+			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888,
+			ENESIM_CHANNEL_LUMINANCE);
+	enesim_compositor_span_pixel_mask_register(
 			_argb8888_sp_argb8888_none_argb8888_alpha_blend,
 			ENESIM_ROP_BLEND, ENESIM_FORMAT_ARGB8888,
 			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888,
 			ENESIM_CHANNEL_ALPHA);
+	enesim_compositor_span_pixel_mask_register(
+			_argb8888_sp_argb8888_none_argb8888_luminance_blend,
+			ENESIM_ROP_BLEND, ENESIM_FORMAT_ARGB8888,
+			ENESIM_FORMAT_ARGB8888, ENESIM_FORMAT_ARGB8888,
+			ENESIM_CHANNEL_LUMINANCE);
 	/* pixel color */
 	enesim_compositor_span_pixel_color_register(
 			_argb8888_sp_argb8888_color_none_fill,

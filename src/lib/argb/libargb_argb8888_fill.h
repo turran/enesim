@@ -257,7 +257,7 @@ static inline void argb8888_sp_none_color_a8_alpha_fill(uint32_t *d, uint32_t le
 	}
 }
 
-static inline void argb8888_sp_argb8888_color_argb_luminance_fill(uint32_t *d,
+static inline void argb8888_sp_argb8888_color_argb8888_luminance_fill(uint32_t *d,
 		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -292,7 +292,7 @@ static inline void argb8888_sp_argb8888_color_argb_luminance_fill(uint32_t *d,
 	}
 }
 
-static inline void argb8888_sp_argb8888_none_argb_luminance_fill(uint32_t *d,
+static inline void argb8888_sp_argb8888_none_argb8888_luminance_fill(uint32_t *d,
 		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -460,7 +460,7 @@ static inline void argb8888_sp_none_color_a8_alpha_copy(uint32_t *d, uint32_t le
 	}
 }
 
-static inline void argb8888_sp_argb8888_none_argb_luminance_copy(uint32_t *d,
+static inline void argb8888_sp_argb8888_none_argb8888_luminance_copy(uint32_t *d,
 		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -491,7 +491,7 @@ static inline void argb8888_sp_argb8888_none_argb_luminance_copy(uint32_t *d,
 	}
 }
 
-static inline void argb8888_sp_argb8888_color_argb_luminance_copy(uint32_t *d,
+static inline void argb8888_sp_argb8888_color_argb8888_luminance_copy(uint32_t *d,
 		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;

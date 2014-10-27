@@ -271,7 +271,7 @@ static inline void argb8888_sp_none_color_a8_alpha_blend(uint32_t *d, unsigned i
 }
 
 /* argb luminance-channel masking */
-static inline void argb8888_sp_argb8888_none_argb_luminance_blend(uint32_t *d, unsigned int len,
+static inline void argb8888_sp_argb8888_none_argb8888_luminance_blend(uint32_t *d, unsigned int len,
 		uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
 {
 	uint32_t *end = d + len;
@@ -313,7 +313,7 @@ static inline void argb8888_sp_argb8888_none_argb_luminance_blend(uint32_t *d, u
 	}
 }
 
-static inline void argb8888_sp_argb8888_color_argb_luminance_blend(uint32_t *d, unsigned int len,
+static inline void argb8888_sp_argb8888_color_argb8888_luminance_blend(uint32_t *d, unsigned int len,
 		uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
