@@ -22,48 +22,39 @@
  *                                   Core                                     *
  *============================================================================*/
 /* Functions needed by the other subsystems */
-static inline unsigned char argb8888_alpha_get(uint32_t plane0)
+static inline uint8_t argb8888_alpha_get(uint32_t plane0)
 {
 	return (plane0 >> 24);
 }
 
-static inline unsigned char argb8888_red_get(unsigned int plane0)
+static inline uint8_t argb8888_red_get(uint32_t plane0)
 {
 	return ((plane0 >> 16) & 0xff);
 }
 
-static inline unsigned char argb8888_green_get(unsigned int plane0)
+static inline uint8_t argb8888_green_get(uint32_t plane0)
 {
 	return ((plane0 >> 8) & 0xff);
 }
 
-static inline unsigned char argb8888_blue_get(unsigned int plane0)
+static inline uint8_t argb8888_blue_get(uint32_t plane0)
 {
 	return (plane0 & 0xff);
 }
 
-static inline void argb8888_from_components(unsigned int *plane0, unsigned char a, unsigned char r,
-		unsigned char g, unsigned char b)
+static inline void argb8888_from_components(uint32_t *plane0, uint8_t a, uint8_t r,
+		uint8_t g, uint8_t b)
 {
 	*plane0 = (a << 24) | (r << 16) | (g << 8) | b;
 }
 
-static inline void argb8888_to_components(unsigned int plane0, unsigned char *a, unsigned char *r,
-		unsigned char *g, unsigned char *b)
+static inline void argb8888_to_components(uint32_t plane0, uint8_t *a, uint8_t *r,
+		uint8_t *g, uint8_t *b)
 {
 	if (a) *a = argb8888_alpha_get(plane0);
 	if (r) *r = argb8888_red_get(plane0);
 	if (g) *g = argb8888_green_get(plane0);
 	if (b) *b = argb8888_blue_get(plane0);
-}
-
-static inline void argb8888_to_argb(unsigned int *argb, unsigned int plane0)
-{
-	*argb = plane0;
-}
-static inline void argb8888_from_argb(unsigned int argb, unsigned int *plane0)
-{
-	*plane0 = argb;
 }
 
 static inline void argb8888_fill(uint32_t *dplane0, uint32_t splane0)

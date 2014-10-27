@@ -56,7 +56,7 @@ static inline void blend_sse2(uint64_t *d, sse2_t alpha, sse2_t color)
 static inline void argb8888_pt_none_color_none_blend(uint32_t *d,
 		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m EINA_UNUSED)
 {
-	uint16_t a16 = 256 - (color >> 24);
+	uint16_t a16 = 256 - argb8888_alpha_get(color);
 #if LIBARGB_MMX
 	mmx_t r0 = a2v_mmx(a16);
 	mmx_t r1 = c2v_mmx(color);
@@ -73,8 +73,8 @@ static inline void argb8888_pt_none_color_none_blend(uint32_t *d,
 static inline void argb8888_pt_none_color_argb8888_blend(uint32_t *d,
 		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m)
 {
-	uint16_t ca = 256 - (color >> 24);
-	uint16_t ma = m >> 24;
+	uint16_t ca = 256 - argb8888_alpha_get(color);
+	uint16_t ma = argb8888_alpha_get(m);
 
 	switch (ma)
 	{
@@ -90,7 +90,7 @@ static inline void argb8888_pt_none_color_argb8888_blend(uint32_t *d,
 			uint32_t mc;
 
 			mc = argb8888_mul_sym(ma, color);
-			ma = 256 - (mc >> 24);
+			ma = 256 - argb8888_alpha_get(mc);
 			argb8888_blend(d, ma, mc);
 		}
 		break;
@@ -102,7 +102,7 @@ static inline void argb8888_pt_argb8888_none_none_blend(uint32_t *d,
 {
 	uint16_t a;
 
-	a = 256 - (s >> 24);
+	a = 256 - argb8888_alpha_get(s);
 	argb8888_blend(d, a, s);
 }
 /*============================================================================*
@@ -115,7 +115,7 @@ static inline void argb8888_sp_none_color_none_blend(uint32_t *d,
 		uint32_t color, uint32_t *m EINA_UNUSED)
 {
 	uint32_t *end = d + len;
-	uint16_t a16 = 256 - (color >> 24);
+	uint16_t a16 = 256 - argb8888_alpha_get(color);
 #if LIBARGB_MMX
 	mmx_t r0 = a2v_mmx(a16);
 	mmx_t r1 = c2v_mmx(color);
@@ -175,7 +175,7 @@ static inline void argb8888_sp_argb8888_none_none_blend(uint32_t *d,
 
 	while (d < end)
 	{
-		uint16_t a16 = 256 - ((*s) >> 24);
+		uint16_t a16 = 256 - argb8888_alpha_get(*s);
 
 		switch (a16)
 		{
@@ -217,7 +217,7 @@ static inline void argb8888_sp_argb8888_color_none_blend(uint32_t *d,
 	while (d < end)
 	{
 		uint32_t cs = argb8888_mul4_sym(color, *s);
-		uint16_t a16 = 256 - ((cs) >> 24);
+		uint16_t a16 = 256 - argb8888_alpha_get(cs);
 
 #if LIBARGB_MMX
 		r0 = a2v_mmx(a16);
@@ -240,7 +240,7 @@ static inline void argb8888_sp_argb8888_color_none_blend(uint32_t *d,
 static inline void argb8888_sp_none_color_a8_alpha_blend(uint32_t *d, unsigned int len,
 		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
 {
-	uint16_t ca = 256 - (color >> 24);
+	uint16_t ca = 256 - argb8888_alpha_get(color);
 	uint32_t *end = d + len;
 	while (d < end)
 	{
@@ -260,7 +260,7 @@ static inline void argb8888_sp_none_color_a8_alpha_blend(uint32_t *d, unsigned i
 				uint32_t mc;
 
 				mc = argb8888_mul_sym(ma, color);
-				ma = 256 - (mc >> 24);
+				ma = 256 - argb8888_alpha_get(mc);
 				argb8888_blend(d, ma, mc);
 			}
 			break;
@@ -289,7 +289,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_luminance_blend(uint32_t *
 			{
 				uint16_t sa;
 
-				sa = 256 - ((*s) >> 24);
+				sa = 256 - argb8888_alpha_get(*s);
 				if (sa < 256)
 					argb8888_blend(d, sa, *s);
 			}
@@ -301,7 +301,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_luminance_blend(uint32_t *
 
 				sa = argb8888_lum(p);
 				p = argb8888_mul_256(sa, *s);
-				sa = 256 - (p >> 24);
+				sa = 256 - argb8888_alpha_get(p);
 				if (sa < 256)
 					argb8888_blend(d, sa, p);
 			}
@@ -317,7 +317,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_blend(uint32_t 
 		uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
-	uint16_t ca = 1 + (color >> 24);
+	uint16_t ca = 1 + argb8888_alpha_get(color);
 /*
    We use only the color aplha since using the luminace
    channel for masks, as per svg, when used in conjunction
@@ -340,7 +340,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_blend(uint32_t 
 					uint16_t sa;
 
 					p = argb8888_mul_256(ca, p);
-					sa = 256 - (p >> 24);
+					sa = 256 - argb8888_alpha_get(p);
 					argb8888_blend(d, sa, p);
 				}
 			}
@@ -355,7 +355,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_blend(uint32_t 
 					sa = argb8888_lum(p);
 					sa = (ca * sa) >> 8;
 					p = argb8888_mul_256(sa, *s);
-					sa = 256 - (p >> 24);
+					sa = 256 - argb8888_alpha_get(p);
 					argb8888_blend(d, sa, p);
 				}
 			}
@@ -371,11 +371,11 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_blend(uint32_t 
 static inline void argb8888_sp_none_color_argb8888_alpha_blend(uint32_t *d, unsigned int len,
 		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
 {
-	uint16_t ca = 256 - (color >> 24);
+	uint16_t ca = 256 - argb8888_alpha_get(color);
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t ma = 1 + ((*m) >> 24);
+		uint16_t ma = 1 + argb8888_alpha_get(*m);
 
 		switch (ma)
 		{
@@ -391,7 +391,7 @@ static inline void argb8888_sp_none_color_argb8888_alpha_blend(uint32_t *d, unsi
 				uint32_t mc;
 
 				mc = argb8888_mul_256(ma, color);
-				ma = 256 - (mc >> 24);
+				ma = 256 - argb8888_alpha_get(mc);
 				argb8888_blend(d, ma, mc);
 			}
 			break;
@@ -408,7 +408,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_alpha_blend(uint32_t *d, u
 
 	while (d < end)
 	{
-		uint16_t ma = 1 + ((*m) >> 24);
+		uint16_t ma = 1 + argb8888_alpha_get(*m);
 
 		switch (ma)
 		{
@@ -419,7 +419,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_alpha_blend(uint32_t *d, u
 			{
 				uint16_t sa;
 
-				sa = 256 - ((*s) >> 24);
+				sa = 256 - argb8888_alpha_get(*s);
 				if (sa < 256)
 					argb8888_blend(d, sa, *s);
 			}
@@ -430,7 +430,7 @@ static inline void argb8888_sp_argb8888_none_argb8888_alpha_blend(uint32_t *d, u
 				uint32_t mc;
 
 				mc = argb8888_mul_256(ma, *s);
-				ma = 256 - (mc >> 24);
+				ma = 256 - argb8888_alpha_get(mc);
 				if (ma < 256)
 					argb8888_blend(d, ma, mc);
 			}
@@ -447,7 +447,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_alpha_blend(uint32_t *d, 
 		uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
-	uint16_t ca = 1 + (color >> 24);
+	uint16_t ca = 1 + argb8888_alpha_get(color);
 /*
    We probably should just use the color's alpha only,
    since that's somewhat faster and it's all that svg
@@ -456,7 +456,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_alpha_blend(uint32_t *d, 
 */
 	while (d < end)
 	{
-		uint16_t ma = 1 + ((*m) >> 24);
+		uint16_t ma = 1 + argb8888_alpha_get(color);
 
 		switch (ma)
 		{
@@ -468,7 +468,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_alpha_blend(uint32_t *d, 
 				uint32_t mc;
 
 				mc = argb8888_mul_256(ca, *s);
-				ma = 256 - (mc >> 24);
+				ma = 256 - argb8888_alpha_get(mc);
 				if (ma < 256)
 					argb8888_blend(d, ma, mc);
 			}
@@ -480,7 +480,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_alpha_blend(uint32_t *d, 
 
 				ma = (ma * ca) >> 8;
 				mc = argb8888_mul_256(ma, *s);
-				ma = 256 - (mc >> 24);
+				ma = 256 - argb8888_alpha_get(mc);
 				if (ma < 256)
 					argb8888_blend(d, ma, mc);
 			}

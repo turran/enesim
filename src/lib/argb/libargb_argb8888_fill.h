@@ -28,7 +28,9 @@ static inline void argb8888_pt_none_color_none_fill(uint32_t *d, uint32_t s EINA
 static inline void argb8888_pt_none_color_argb8888_fill(uint32_t *d,
 		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m)
 {
-	uint16_t a = m >> 24;
+	uint16_t a;
+
+	a = argb8888_alpha_get(m);
 	switch (a)
 	{
 		case 0:
@@ -47,7 +49,9 @@ static inline void argb8888_pt_none_color_argb8888_fill(uint32_t *d,
 static inline void argb8888_pt_argb8888_none_argb8888_fill(uint32_t *d,
 		uint32_t s, uint32_t color EINA_UNUSED, uint32_t m)
 {
-	uint16_t a = m >> 24;
+	uint16_t a;
+
+	a = argb8888_alpha_get(m);
 	switch (a)
 	{
 		case 0:
@@ -136,8 +140,9 @@ static inline void argb8888_sp_argb8888_color_argb8888_alpha_fill(uint32_t *d,
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
+		uint16_t a;
 
+		a = argb8888_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -169,7 +174,9 @@ static inline void argb8888_sp_argb8888_none_argb8888_alpha_fill(uint32_t *d,
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
+		uint16_t a;
+
+		a = argb8888_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -197,7 +204,9 @@ static inline void argb8888_sp_none_color_argb8888_alpha_fill(uint32_t *d, uint3
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
+		uint16_t a;
+
+		a = argb8888_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -261,7 +270,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_fill(uint32_t *
 		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
-	uint16_t ca = 1 + (color >> 24);
+	uint16_t ca = 1 + argb8888_alpha_get(color);
 	while (d < end)
 	{
 		uint32_t p = *m;
@@ -335,7 +344,9 @@ static inline void argb8888_sp_none_color_argb8888_copy(uint32_t *d, uint32_t le
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
+		uint16_t a;
+
+		a = argb8888_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -360,7 +371,9 @@ static inline void argb8888_sp_none_none_argb8888_alpha_copy(uint32_t *d, uint32
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
+		uint16_t a;
+
+		a = argb8888_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -385,7 +398,9 @@ static inline void argb8888_sp_argb8888_none_argb8888_alpha_copy(uint32_t *d,
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
+		uint16_t a;
+
+		a = argb8888_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -411,7 +426,9 @@ static inline void argb8888_sp_argb8888_color_argb8888_alpha_copy(uint32_t *d,
 	uint32_t *end = d + len;
 	while (d < end)
 	{
-		uint16_t a = *m >> 24;
+		uint16_t a;
+
+		a = argb8888_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -495,7 +512,7 @@ static inline void argb8888_sp_argb8888_color_argb8888_luminance_copy(uint32_t *
 		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
-	uint16_t ca = 1 + (color >> 24);
+	uint16_t ca = 1 + argb8888_alpha_get(color);
 	/* use color alpha only */
 	while (d < end)
 	{
