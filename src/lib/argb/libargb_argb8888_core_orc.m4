@@ -71,4 +71,11 @@ x4 mullw $1, $3, $4
 loadpq $2, 0x00ff00ff00ff00ffL
 x4 addw $1, $1, $2
 x4 shruw $1, $1, 8')dnl
-
+dnl
+dnl Blend (dst32, a64, argb64)
+dnl dst64[inout]: 0a,0r,0g,0b => argb8888_blend()
+dnl a64[in]: A,A,A,A
+dnl argb64[in]: 0a,0r,0g,0b
+define(`argb8888_blend',`
+argb8888_mul_256($1, $1, $2)
+x4 addw $1, $1, $3')dnl
