@@ -24,6 +24,7 @@ m4/ltsugar.m4 \
 m4/ltversion.m4
 
 EXTRA_DIST =
+BUILT_SOURCES =
 CLEAN_LOCAL = enesim.pc
 
 ### Library
@@ -96,6 +97,18 @@ common/m4/ens_doxygen.m4 \
 common/m4/ens_format.m4 \
 common/m4/ens_modules.m4 \
 common/m4/ens_tests.m4
+
+# Rule to generate from m4 to orc files
+# The filename must end with 'orc'
+%orc.orc: %orc.m4
+	$(M4) $< > $@
+
+# Rule to generate c/h files from orc files
+# The filename must end with 'orc'
+%orc.c: %orc.orc
+	${ORCC} $< -o $@
+%orc_private.h: %orc.orc
+	${ORCC} $< --header -o $@
 
 sed_process = \
 $(SED) \
