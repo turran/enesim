@@ -28,6 +28,7 @@ src/examples/enesim_example_renderer.h
 bin_PROGRAMS = \
 src/examples/enesim_image_example01 \
 src/examples/enesim_image_example02 \
+src/examples/enesim_renderer_background01 \
 src/examples/enesim_renderer_mask01 \
 src/examples/enesim_renderer_mask02 \
 src/examples/enesim_renderer_path01 \
@@ -62,6 +63,11 @@ src_examples_enesim_image_example01_LDADD =  $(examples_LDADD)
 src_examples_enesim_image_example02_SOURCES = src/examples/enesim_image_example02.c
 src_examples_enesim_image_example02_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_image_example02_LDADD = $(examples_LDADD)
+
+src_examples_enesim_renderer_background01_SOURCES = \
+src/examples/enesim_renderer_background01.c
+src_examples_enesim_renderer_background01_CPPFLAGS = $(examples_CPPFLAGS)
+src_examples_enesim_renderer_background01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_mask01_SOURCES = \
 src/examples/enesim_renderer_mask01.c
