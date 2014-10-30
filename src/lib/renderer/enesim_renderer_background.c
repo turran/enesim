@@ -58,7 +58,6 @@ typedef struct _Enesim_Renderer_Background {
 	/* generated at state setup */
 	Enesim_Color final_color;
 	Enesim_Renderer *mask;
-	Enesim_Color mask_color;
 	Enesim_Compositor_Span span;
 	/* private */
 	Eina_Bool changed : 1;
@@ -77,7 +76,7 @@ static void _background_rop_mask_span(Enesim_Renderer *r,
 
 	buf = alloca(len * sizeof(uint32_t));
 	enesim_renderer_sw_draw(thiz->mask, x, y, len, buf);
-	thiz->span(dst, len, NULL, ENESIM_COLOR_FULL, buf);
+	thiz->span(dst, len, NULL, thiz->final_color, buf);
 }
 
 static void _background_rop_span(Enesim_Renderer *r,
@@ -142,8 +141,6 @@ static void _background_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 static Eina_Bool _background_state_setup(Enesim_Renderer *r)
 {
 	Enesim_Color final_color, rend_color;
-	Enesim_Renderer *mask;
-
 	Enesim_Renderer_Background *thiz;
 
 	thiz = ENESIM_RENDERER_BACKGROUND(r);
@@ -151,23 +148,10 @@ static Eina_Bool _background_state_setup(Enesim_Renderer *r)
 	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
 		final_color = argb8888_mul4_sym(rend_color, final_color);
-	mask = enesim_renderer_mask_get(r);
-	if (mask)
-	{
-		Enesim_Color mask_color;
-
-		mask_color = enesim_renderer_color_get(mask);
-		/* we only want to mul once */
-		if (mask_color != ENESIM_COLOR_FULL)
-		{
-			enesim_renderer_color_set(mask, argb8888_mul4_sym(mask_color, final_color));
-			final_color = ENESIM_COLOR_FULL;
-		}
-		thiz->mask = mask;
-		/* keep the mask color for unsetting it later */
-		thiz->mask_color = mask_color;
-	}
 	thiz->final_color = final_color;
+
+	thiz->mask = enesim_renderer_mask_get(r);
+
 	return EINA_TRUE;
 }
 
@@ -177,7 +161,6 @@ static void _background_state_cleanup(Enesim_Renderer *r)
 	thiz = ENESIM_RENDERER_BACKGROUND(r);
 	if (thiz->mask)
 	{
-		enesim_renderer_color_set(thiz->mask, thiz->mask_color);
 		enesim_renderer_unref(thiz->mask);
 		thiz->mask = NULL;
 	}
@@ -198,24 +181,26 @@ static Eina_Bool _background_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Background *thiz;
 	Enesim_Format fmt = ENESIM_FORMAT_ARGB8888;
 
- 	thiz = ENESIM_RENDERER_BACKGROUND(r);
+	thiz = ENESIM_RENDERER_BACKGROUND(r);
 
 	if (!_background_state_setup(r)) return EINA_FALSE;
 
 	if (thiz->mask)
 	{
-		*fill = _background_rop_mask_span;
+		Enesim_Channel mchannel;
+
+		mchannel = enesim_renderer_mask_channel_get(r);
 		thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
-				thiz->final_color, ENESIM_FORMAT_ARGB8888,
-				ENESIM_CHANNEL_ALPHA);
+			thiz->final_color, ENESIM_FORMAT_ARGB8888, mchannel);
+		*fill = _background_rop_mask_span;
 	}
 	else
 	{
-		*fill = _background_rop_span;
 		thiz->span = enesim_compositor_span_get(rop, &fmt, ENESIM_FORMAT_NONE,
-				thiz->final_color, ENESIM_FORMAT_NONE,
-				ENESIM_CHANNEL_ALPHA);
+			thiz->final_color, ENESIM_FORMAT_NONE, ENESIM_CHANNEL_ALPHA);
+		*fill = _background_rop_span;
 	}
+
 
 	return EINA_TRUE;
 }
@@ -298,7 +283,7 @@ static void _background_features_get(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
-static void _background_sw_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _background_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
 	*hints = ENESIM_RENDERER_SW_HINT_ROP | ENESIM_RENDERER_SW_HINT_COLORIZE |
@@ -333,7 +318,7 @@ static void _enesim_renderer_background_class_init(void *k)
 	klass->damages_get = NULL;
 	klass->has_changed =  _background_has_changed;
 	klass->alpha_hints_get = NULL;
-	klass->sw_hints_get = _background_sw_hints;
+	klass->sw_hints_get = _background_sw_hints_get;
 	klass->sw_setup = _background_sw_setup;
 	klass->sw_cleanup = _background_sw_cleanup;
 #if BUILD_OPENCL
