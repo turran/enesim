@@ -36,4 +36,8 @@
 #include "libargb_argb8888_copy.h"
 #include "libargb_argb8888_blend.h"
 
+#if BUILD_ORC
+#include "libargb_argb8888_blend_orc_private.h"
+#endif
+
 #endif
