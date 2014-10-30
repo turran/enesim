@@ -1,8 +1,0 @@
-Macros that must be defined:
-LIBARGB_MMX
-LIBARGB_SSE
-LIBARGB_SSE2
-LIBARGB_DEBUG
-
-Configuration:
-

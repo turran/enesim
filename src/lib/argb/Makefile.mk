@@ -14,6 +14,4 @@ src/lib/argb/libargb_sse2.h \
 src/lib/argb/libargb_types.h
 
 EXTRA_DIST += \
-src/lib/argb/COPYING \
-src/lib/argb/README \
 src/lib/argb/libargb_test.c
