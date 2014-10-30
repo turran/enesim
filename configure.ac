@@ -174,6 +174,32 @@ PKG_CHECK_EXISTS([freetype2 >= 9.3.0],
 
 AM_CONDITIONAL([HAVE_FREETYPE], [test "x${have_freetype}" = "xyes"])
 
+## Orc
+want_orc="yes"
+AC_ARG_ENABLE([orc],
+   [AS_HELP_STRING([--enable-orc], [enable orc optimizations])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_orc="yes"
+    else
+       want_orc="no"
+    fi
+   ],[])
+
+have_orc="no"
+PKG_CHECK_EXISTS([orc-0.4], [have_orc="yes"],[have_orc="no"])
+
+build_orc="no"
+if test "x${have_orc}" = "xyes" -a "x${want_orc}" = "xyes"; then
+  build_orc="yes"
+  requirements_pc="${requirements_pc} orc-0.4"
+fi
+
+if test "x${build_orc}" = "xyes"; then
+  AC_DEFINE([BUILD_ORC], [1], [Have support for orc])
+fi
+AM_CONDITIONAL([BUILD_ORC], [test "x${build_orc}" = "xyes"])
+
 ## Cairo
 want_cairo="no"
 AC_ARG_ENABLE([cairo],
@@ -323,6 +349,7 @@ AC_CHECK_HEADER([jpeglib.h],
 
 AC_C_BIGENDIAN
 AM_PROG_CC_C_O
+AM_PROG_AS
 ENS_CHECK_COMPILER_FLAGS([ENESIM], [-Wall -Wextra -Wshadow -Wpointer-arith -Wno-missing-field-initializers -fvisibility=hidden -fdata-sections -ffunction-sections])
 
 ### Checks for linker characteristics
@@ -471,6 +498,7 @@ echo "  MMX.......................................: ${have_mmx}"
 echo "  SSE.......................................: ${have_sse}"
 echo "  SSE2......................................: ${have_sse2}"
 echo "  ALTIVEC...................................: ${have_altivec}"
+echo "  ORC.......................................: ${build_orc}"
 echo
 echo "Backends:"
 echo "  Software..................................: yes"
