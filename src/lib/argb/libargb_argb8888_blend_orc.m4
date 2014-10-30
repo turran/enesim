@@ -1,6 +1,6 @@
 include(src/lib/argb/libargb_argb8888_core_orc.m4)dnl
 dnl
-dnl Blend (dst32, tmp64, a64, argb64)
+dnl Blend (dst32, a64, argb64)
 dnl dst64[inout]: 0a,0r,0g,0b => argb8888_blend()
 dnl a64[in]: A,A,A,A
 dnl argb64[in]: 0a,0r,0g,0b
