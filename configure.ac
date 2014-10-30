@@ -92,6 +92,10 @@ ENS_SURFACE_FORMAT([rgb888], [yes])
 ### Checks for programs
 
 AC_PROG_CC
+AC_CHECK_PROG(M4, m4, m4, no)
+if "x$M4" = "xno" ; then
+  AC_MSG_ERROR([m4 is required. Be sure to have it installed.])
+fi
 
 # pkg-config
 PKG_PROG_PKG_CONFIG
@@ -193,13 +197,15 @@ build_orc="no"
 if test "x${have_orc}" = "xyes" -a "x${want_orc}" = "xyes"; then
   build_orc="yes"
   requirements_pc="${requirements_pc} orc-0.4"
+  # Get the compiler
+  ORCC=`${PKG_CONFIG} --variable=orcc orc-0.4`
+  AC_SUBST(ORCC)
 fi
 
 if test "x${build_orc}" = "xyes"; then
   AC_DEFINE([BUILD_ORC], [1], [Have support for orc])
 fi
 AM_CONDITIONAL([BUILD_ORC], [test "x${build_orc}" = "xyes"])
-
 ## Cairo
 want_cairo="no"
 AC_ARG_ENABLE([cairo],
