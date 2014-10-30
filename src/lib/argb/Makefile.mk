@@ -13,6 +13,3 @@ src/lib/argb/libargb_macros.h \
 src/lib/argb/libargb_mmx.h \
 src/lib/argb/libargb_sse2.h \
 src/lib/argb/libargb_types.h
-
-EXTRA_DIST += \
-src/lib/argb/libargb_test.c
