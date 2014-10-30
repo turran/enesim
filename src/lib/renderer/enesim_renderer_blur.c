@@ -43,9 +43,6 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-#define MUL_A_256(a, c) \
- ( (((((c) >> 8) & 0x00ff00ff) * (a)) & 0xff00ff00) + \
-   (((((c) & 0x00ff00ff) * (a)) >> 8) & 0x00ff00ff) )
 
 #define ENESIM_RENDERER_BLUR(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Blur,					\
@@ -78,9 +75,9 @@ typedef struct _Enesim_Renderer_Blur
 
 	/* The state variables */
 	Enesim_Color color;
-//	int irx, iry;
-//	int iaxx, iayy;
 	int ibxx, ibyy;
+	Enesim_Renderer *mask;
+	Eina_Bool do_mask;
 
 	/* private */
 	uint32_t *ssrc;
@@ -160,7 +157,12 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	int tyy0, ntyy0, ty0, nty0;
 
 	thiz = ENESIM_RENDERER_BLUR(r);
- 	color = thiz->color;
+	color = thiz->color;
+	if (color == 0xffffffff)
+		color = 0;
+
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
 
 	enesim_renderer_origin_get(r, &ox, &oy);
 	enesim_coord_identity_setup(&xx, &yy, x, y, ox, oy);
@@ -208,6 +210,11 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	while (dst < end)
 	{
 		unsigned int p0 = 0;
+		int ma = 255;
+
+		if (thiz->do_mask)
+			ma = (*dst) >> 24;
+		if (ma)
 		{
 			unsigned int ag0 = 0, rb0 = 0, ag3 = 0, rb3 = 0, dag = 0, drb = 0;
 			int tyy = tyy0, ty = ty0, ntyy = ntyy0, nty = nty0;
@@ -303,13 +310,14 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 					(((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 				// apply an alpha modifier to dampen alphas more smoothly
 				if ((a = (p0 >> 24)) && (a < 234))
-				{ a = _atable[a];  p0 = MUL_A_256(a, p0); }
+				{ a = _atable[a];  p0 = argb8888_mul_256(a, p0); }
 
-				if (color != 0xffffffff)
+				if (color)
 					p0 = argb8888_mul4_sym(p0, color);
+				if (ma < 255)
+					p0 = argb8888_mul_sym(ma, p0);
 			}
 		}
-
 		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);  ix++;
 		txx0 = xx & 0xffff0000;  tx0 = (txx0 >> 16);
 		ntxx0 = (txx0 + ibxx);  ntx0 = (ntxx0 >> 16);
@@ -335,6 +343,11 @@ static void _a8_span_identity(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_BLUR(r);
 	color = thiz->color;
+	if (color == 0xff000000)
+		color = 0;
+
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
 
 	enesim_renderer_origin_get(r, &ox, &oy);
 	enesim_coord_identity_setup(&xx, &yy, x, y, ox, oy);
@@ -381,6 +394,11 @@ static void _a8_span_identity(Enesim_Renderer *r,
 	while (dst < end)
 	{
 		unsigned int p0 = 0;
+		int ma = 255;
+
+		if (thiz->do_mask)
+			ma = (*dst) >> 24;
+		if (ma)
 		{
 			unsigned int a0 = 0, a3 = 0, da = 0;
 			int tyy = tyy0, ty = ty0, ntyy = ntyy0, nty = nty0;
@@ -456,13 +474,15 @@ static void _a8_span_identity(Enesim_Renderer *r,
 				p0 = ((a0 + 0xff0000) & 0xff000000);
 				// apply an alpha modifier to dampen alphas more smoothly
 				if ((da = (p0 >> 24)) && (da < 234))
-				{ da = _atable[da];  p0 = MUL_A_256(da, p0); }
+				{ da = _atable[da];  p0 = argb8888_mul_256(da, p0); }
 
-				if (color != 0xffffffff)
-					p0 = MUL_A_256(1 + (p0 >> 24), color);
+				if (color)
+					p0 = argb8888_mul_256(1 + (p0 >> 24), color);
+
+				if (ma < 255)
+					p0 = argb8888_mul_sym(ma, p0);
 			}
 		}
-
 		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);  ix++;
 		txx0 = xx & 0xffff0000;  tx0 = (txx0 >> 16);
 		ntxx0 = (txx0 + ibxx);  ntx0 = (ntxx0 >> 16);
@@ -499,6 +519,15 @@ static Eina_Bool _blur_sw_setup(Enesim_Renderer *r,
 		}
 	}
 
+	thiz->mask = enesim_renderer_mask_get(r);
+	if (thiz->mask)
+	{
+		Enesim_Channel mchannel;
+		mchannel = enesim_renderer_mask_channel_get(r);
+		if (mchannel == ENESIM_CHANNEL_ALPHA)
+			thiz->do_mask = EINA_TRUE;
+	}
+
 	rx = ((2 * thiz->rx) + 1.01) / 2.0;
 	if (rx <= 1) rx = 1.005;
 	if (rx > 16) rx = 16;
@@ -525,6 +554,12 @@ static void _blur_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	thiz = ENESIM_RENDERER_BLUR(r);
 	if (!thiz->src_r)
 		enesim_surface_unmap(thiz->src, thiz->ssrc, EINA_FALSE);
+	if (thiz->mask)
+	{
+		enesim_renderer_unref(thiz->mask);
+		thiz->mask = NULL;
+	}
+	thiz->do_mask = EINA_FALSE;
 	_blur_state_cleanup(thiz, r, s);
 }
 
@@ -534,10 +569,16 @@ static void _blur_features_get(Enesim_Renderer *r EINA_UNUSED,
 	*features = ENESIM_RENDERER_FEATURE_ARGB8888 | ENESIM_RENDERER_FEATURE_TRANSLATE;
 }
 
-static void _blur_sw_hints_get(Enesim_Renderer *r EINA_UNUSED,
+static void _blur_sw_hints_get(Enesim_Renderer *r,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
+	Enesim_Channel mchannel;
+
 	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
+
+	mchannel = enesim_renderer_mask_channel_get(r);
+	if (mchannel == ENESIM_CHANNEL_ALPHA)
+		*hints |= ENESIM_RENDERER_SW_HINT_MASK;
 }
 
 static Eina_Bool _blur_has_changed(Enesim_Renderer *r)
