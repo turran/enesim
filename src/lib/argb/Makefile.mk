@@ -1,5 +1,6 @@
 
 src_lib_libenesim_la_SOURCES += \
+src/lib/argb/libargb_main.c \
 src/lib/argb/libargb.h \
 src/lib/argb/libargb_argb8888.h \
 src/lib/argb/libargb_argb8888_blend.h \
