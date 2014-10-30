@@ -81,6 +81,8 @@ typedef struct _Enesim_Renderer_Checker
 	double oy;
 	Eina_F16p16 ww, hh;
 	Eina_F16p16 ww2, hh2;
+	Eina_Bool do_mask;
+	Enesim_Renderer *mask;
 } Enesim_Renderer_Checker;
 
 typedef struct _Enesim_Renderer_Checker_Class {
@@ -245,11 +247,25 @@ static void _span_identity(Enesim_Renderer *r,
 		color[0] = thiz->final_color2;
 		color[1] = thiz->final_color1;
 	}
+	/* do mask */
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
+
 	while (dst < end)
 	{
 		int sx;
 		uint32_t p0;
+		int ma = 255;
 
+		if (thiz->do_mask)
+		{
+			ma = (*dst) >> 24;
+			if (!ma)
+			{
+				dst++;
+				goto done;
+			}
+		}
 		sx = ((xx >> 16) % w2);
 		if (sx < 0)
 		{
@@ -264,7 +280,10 @@ static void _span_identity(Enesim_Renderer *r,
 		{
 			p0 = color[1];
 		}
+		if (ma < 255)
+			p0 = argb8888_mul_sym(ma, p0);
 		*dst++ = p0;
+done:
 		xx += EINA_F16P16_ONE;
 	}
 }
@@ -284,13 +303,27 @@ static void _span_affine(Enesim_Renderer *r,
 	hh = thiz->hh;
 	hh2 = thiz->hh2;
 
+	/* do mask */
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
+
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx;
 		uint32_t color[2] = {thiz->final_color1, thiz->final_color2};
 		uint32_t p0;
+		int ma = 255;
 		int sx, sy;
 
+		if (thiz->do_mask)
+		{
+			ma = (*dst) >> 24;
+			if (!ma)
+			{
+				dst++;
+				goto done;
+			}
+		}
 		/* normalize the modulo */
 		syy = (yy % hh2);
 		if (syy < 0)
@@ -349,9 +382,12 @@ static void _span_affine(Enesim_Renderer *r,
 				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 		}
+		if (ma < 255)
+			p0 = argb8888_mul_sym(ma, p0);
+		*dst++ = p0;
+done:
 		yy += thiz->matrix.yx;
 		xx += thiz->matrix.xx;
-		*dst++ = p0;
 	}
 }
 
@@ -371,13 +407,27 @@ static void _span_projective(Enesim_Renderer *r,
 	hh = thiz->hh;
 	hh2 = thiz->hh2;
 
+	/* do mask */
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
+
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx, syyy, sxxx;
 		uint32_t color[2] = {thiz->final_color1, thiz->final_color2};
 		uint32_t p0;
+		int ma = 255;
 		int sx, sy;
 
+		if (thiz->do_mask)
+		{
+			ma = (*dst) >> 24;
+			if (!ma)
+			{
+				dst++;
+				goto done;
+			}
+		}
 		syyy = ((((int64_t)yy) << 16) / zz);
 		sxxx = ((((int64_t)xx) << 16) / zz);
 		/* normalize the modulo */
@@ -438,10 +488,13 @@ static void _span_projective(Enesim_Renderer *r,
 				p0 = argb8888_interp_256(a, p0, color[0]);
 			}
 		}
+		if (ma < 255)
+			p0 = argb8888_mul_sym(ma, p0);
+		*dst++ = p0;
+done:
 		yy += thiz->matrix.yx;
 		xx += thiz->matrix.xx;
 		zz += thiz->matrix.zx;
-		*dst++ = p0;
 	}
 }
 
@@ -458,6 +511,13 @@ static void _checker_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 	Enesim_Renderer_Checker *thiz;
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
+
+	if (thiz->mask)
+	{
+		enesim_renderer_unref(thiz->mask);
+		thiz->mask = NULL;
+	}
+	thiz->do_mask = EINA_FALSE;
 	_checker_state_cleanup(thiz);
 }
 
@@ -477,6 +537,17 @@ static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 	thiz->ww2 = thiz->ww * 2;
 	thiz->hh = eina_f16p16_int_from(thiz->current.sh);
 	thiz->hh2 = thiz->hh * 2;
+
+	thiz->mask = enesim_renderer_mask_get(r);
+	if (thiz->mask)
+	{
+		Enesim_Channel mchannel;
+
+		mchannel = enesim_renderer_mask_channel_get(r);
+		if (mchannel == ENESIM_CHANNEL_ALPHA)
+			thiz->do_mask = EINA_TRUE;
+	}
+
 
 	type = enesim_renderer_transformation_type_get(r);
 	enesim_renderer_transformation_get(r, &matrix);
@@ -535,10 +606,16 @@ static void _checker_features_get(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
-static void _checker_sw_hints(Enesim_Renderer *r EINA_UNUSED,
+static void _checker_sw_hints_get(Enesim_Renderer *r,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
+	Enesim_Channel mchannel;
+
 	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
+
+	mchannel = enesim_renderer_mask_channel_get(r);
+	if (mchannel == ENESIM_CHANNEL_ALPHA)
+		*hints |= ENESIM_RENDERER_SW_HINT_MASK;
 }
 
 #if BUILD_OPENGL
@@ -594,7 +671,7 @@ static void _enesim_renderer_checker_class_init(void *k)
 	klass->damages_get = NULL;
 	klass->has_changed = _checker_has_changed;
 	klass->alpha_hints_get = NULL;
-	klass->sw_hints_get = _checker_sw_hints;
+	klass->sw_hints_get = _checker_sw_hints_get;
 	klass->sw_setup = _checker_sw_setup;
 	klass->sw_cleanup = _checker_sw_cleanup;
 	klass->opencl_setup = NULL;
