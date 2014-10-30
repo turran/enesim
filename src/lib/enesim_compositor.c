@@ -97,8 +97,8 @@ static Enesim_Compositor_Point _point_pixel_mask_get(Enesim_Rop rop,
 static Enesim_Compositor_Span _span_color_get(Enesim_Rop rop,
 		Enesim_Format *dfmt, Enesim_Color color)
 {
-	/* TODO check if the color is opaque */
-	if ((rop == ENESIM_ROP_BLEND) && (color & 0xff000000))
+	/* check if the color is opaque */
+	if ((rop == ENESIM_ROP_BLEND) && ((color & 0xff000000) == 0xff))
 	{
 		rop = ENESIM_ROP_FILL;
 	}
