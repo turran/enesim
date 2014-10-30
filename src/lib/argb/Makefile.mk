@@ -13,3 +13,13 @@ src/lib/argb/libargb_macros.h \
 src/lib/argb/libargb_mmx.h \
 src/lib/argb/libargb_sse2.h \
 src/lib/argb/libargb_types.h
+
+if BUILD_ORC
+ORC_SOURCES = \
+src/lib/argb/libargb_argb8888_blend_orc.c \
+src/lib/argb/libargb_argb8888_blend_orc_private.h
+
+BUILT_SOURCES += $(ORC_SOURCES)
+src_lib_libenesim_la_SOURCES += $(ORC_SOURCES)
+
+endif
