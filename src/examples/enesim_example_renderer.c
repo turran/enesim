@@ -26,7 +26,7 @@ static Enesim_Example_Renderer_Backend *backend = &backends[0];
 static void help(const char *name)
 {
 	unsigned int i;
-	printf("Usage: %s [BACKEND ROP X Y]]\n", name);
+	printf("Usage: %s [BACKEND ROP TIMES X Y]]\n", name);
 	printf("Where BACKEND can be one of the following:\n");
 	
 	for (i = 0; i < sizeof(backends)/sizeof(Enesim_Example_Renderer_Backend); i++)
@@ -34,6 +34,7 @@ static void help(const char *name)
 		printf("- %s\n", backends[i].name);
 	}
 	printf("Where ROP can be \"blend\" or \"fill\"\n");
+	printf("TIMES is the number of times to draw\n");
 	printf("X is the X coordinate to place the drawing\n");
 	printf("Y is the Y coordinate to place the drawing\n");
 }
@@ -48,11 +49,12 @@ static Eina_Bool parse_options(Enesim_Example_Renderer_Options *options,
 	options->height = 256;
 	options->x = 0;
 	options->y = 0;
+	options->times = 1;
 
 	/* handle the parameters */
 	if (argc > 1)
 	{
-		if (argc < 5)
+		if (argc < 6)
 		{
 			help(options->name);
 			return EINA_FALSE;
@@ -87,9 +89,11 @@ static Eina_Bool parse_options(Enesim_Example_Renderer_Options *options,
 			help(options->name);
 			return EINA_FALSE;
 		}
+		/* times */
+		options->times = atoi(argv[3]);
 		/* the x,y */
-		options->x = atoi(argv[3]);
-		options->y = atoi(argv[4]);
+		options->x = atoi(argv[4]);
+		options->y = atoi(argv[5]);
 	}
 	return EINA_TRUE;
 }
@@ -104,6 +108,7 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Log *error = NULL;
 	Eina_Rectangle bounds;
 	Eina_Rectangle area;
+	int times;
 
 	if (!r)
 	{
@@ -131,18 +136,23 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		enesim_matrix_rotate(&m, 20);
 		enesim_renderer_transformation_set(c, &m);
 	}
-	/* first draw the background */	
-	if (!enesim_renderer_draw(c, s, ENESIM_ROP_FILL, NULL, 0, 0,
-			&error))
+	for (times = 0; times < options->times; times++)
 	{
-		enesim_log_dump(error);
-	}
-	eina_rectangle_coords_from(&area, 0, 0, options->width, options->height);
-	/* now the real renderer */
-	if (!enesim_renderer_draw(r, s, options->rop, &area, options->x, options->y,
-			&error))
-	{
-		enesim_log_dump(error);
+		/* first draw the background */	
+		if (!enesim_renderer_draw(c, s, ENESIM_ROP_FILL, NULL, 0, 0,
+				&error))
+		{
+			enesim_log_dump(error);
+			break;
+		}
+		eina_rectangle_coords_from(&area, 0, 0, options->width, options->height);
+		/* now the real renderer */
+		if (!enesim_renderer_draw(r, s, options->rop, &area, options->x, options->y,
+				&error))
+		{
+			enesim_log_dump(error);
+			break;
+		}
 	}
 
 	enesim_renderer_unref(r);

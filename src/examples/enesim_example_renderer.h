@@ -30,6 +30,7 @@ typedef struct _Enesim_Example_Renderer_Options
 	const char *backend_name;
 	int x;
 	int y;
+	int times;
 } Enesim_Example_Renderer_Options;
 
 /* for later help() */
