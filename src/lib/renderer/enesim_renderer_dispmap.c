@@ -64,6 +64,9 @@ typedef struct _Enesim_Renderer_Dispmap
 	size_t sstride;
 	uint32_t *msrc;
 	size_t mstride;
+	Enesim_Color color;
+	Enesim_Renderer *mask;
+	Eina_Bool do_mask;
 } Enesim_Renderer_Dispmap;
 
 typedef struct _Enesim_Renderer_Dispmap_Class {
@@ -108,6 +111,7 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 		void *ddata)							\
 {										\
 	Enesim_Renderer_Dispmap *thiz;						\
+	Enesim_Color color;							\
 	uint32_t *dst = ddata;							\
 	uint32_t *end = dst + len;						\
 	uint32_t *map;								\
@@ -115,6 +119,9 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	Eina_F16p16 xx, yy;							\
 										\
 	thiz = ENESIM_RENDERER_DISPMAP(r);					\
+	color = thiz->color;							\
+	if (color == 0xffffffff)						\
+		color = 0;							\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
@@ -124,17 +131,29 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 	y = eina_f16p16_int_to(yy);						\
 	map = argb8888_at(thiz->msrc, thiz->mstride, x, y);			\
 										\
+	/* do mask */								\
+	if (thiz->do_mask) 							\
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);		\
+										\
 	while (dst < end)							\
 	{									\
 		Eina_F16p16 sxx, syy;						\
 		uint32_t p0 = 0;						\
+		int ma = 255;							\
 		uint16_t m0;							\
 		uint16_t m1;							\
 										\
 		/* TODO fix this, no need for it */				\
 		x = eina_f16p16_int_to(xx);					\
 		if (x < 0 || x >= mw || y < 0 || y >= mh)			\
-			goto next;						\
+			goto set;						\
+										\
+		if (thiz->do_mask)						\
+		{								\
+			ma = (*dst) >> 24;					\
+			if (!ma)						\
+				goto next;					\
+		}								\
 										\
 		m1 = yfunction(*map);						\
 		m0 = xfunction(*map);						\
@@ -144,8 +163,12 @@ static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
 		p0 = enesim_coord_sample_good_restrict(thiz->ssrc, 		\
 				thiz->sstride, sw, sh, sxx, syy);		\
 										\
+		if (ma < 255)							\
+			p0 = argb8888_mul_sym(ma, p0);				\
+set:										\
+		*dst = p0;							\
 next:										\
-		*dst++ = p0;							\
+		dst++;								\
 		map++;								\
 		xx += EINA_F16P16_ONE;						\
 	}									\
@@ -157,6 +180,7 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 		void *ddata)							\
 {										\
 	Enesim_Renderer_Dispmap *thiz;						\
+	Enesim_Color color;							\
 	uint32_t *dst = ddata;							\
 	uint32_t *end = dst + len;						\
 	uint32_t *map;								\
@@ -164,6 +188,9 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	Eina_F16p16 xx, yy;							\
 										\
 	thiz = ENESIM_RENDERER_DISPMAP(r);					\
+	color = thiz->color;							\
+	if (color == 0xffffffff)						\
+		color = 0;							\
 	/* setup the parameters */						\
 	enesim_surface_size_get(thiz->src, &sw, &sh);				\
 	enesim_surface_size_get(thiz->map, &mw, &mh);				\
@@ -172,10 +199,15 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy,		\
 			&thiz->matrix);						\
 										\
+	/* do mask */								\
+	if (thiz->do_mask)							\
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);		\
+										\
 	while (dst < end)							\
 	{									\
 		Eina_F16p16 sxx, syy;						\
 		uint32_t p0 = 0;						\
+		int ma = 255;							\
 		uint32_t *m;							\
 		uint16_t m0;							\
 		uint16_t m1;							\
@@ -184,7 +216,14 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 		y = eina_f16p16_int_to(yy);					\
 										\
 		if (x < 0 || x >= mw || y < 0 || y >= mh)			\
-			goto next;						\
+			goto set;						\
+										\
+		if (thiz->do_mask)						\
+		{								\
+			ma = (*dst) >> 24;					\
+			if (!ma)						\
+				goto next;					\
+		}								\
 										\
 		m = argb8888_at(thiz->msrc, thiz->mstride, x, y);		\
 		m1 = yfunction(*m);						\
@@ -196,8 +235,14 @@ static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
 		p0 = enesim_coord_sample_good_restrict(thiz->ssrc, 		\
 				thiz->sstride, sw, sh, sxx, syy);		\
 										\
+		if (color)							\
+			p0 = argb8888_mul4_sym(p0, color);			\
+		if (ma < 255)							\
+			p0 = argb8888_mul_sym(ma, p0);				\
+set:										\
+		*dst = p0;							\
 next:										\
-		*dst++ = p0;							\
+		dst++;								\
 		map++;								\
 		yy += thiz->matrix.yx;						\
 		xx += thiz->matrix.xx;						\
@@ -227,6 +272,12 @@ static void _dispmap_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 		enesim_surface_unmap(thiz->map, thiz->msrc, EINA_FALSE);
 	if (thiz->src)
 		enesim_surface_unmap(thiz->src, thiz->ssrc, EINA_FALSE);
+	if (thiz->mask)
+	{
+		enesim_renderer_unref(thiz->mask);
+		thiz->mask = NULL;
+	}
+	thiz->do_mask = EINA_FALSE;
 }
 
 static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
@@ -247,6 +298,16 @@ static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &m);
 	type = enesim_renderer_transformation_type_get(r);
 	enesim_matrix_matrix_f16p16_to(&m, &thiz->matrix);
+
+	thiz->color = enesim_renderer_color_get(r);
+	thiz->mask = enesim_renderer_mask_get(r);
+	if (thiz->mask)
+	{
+		Enesim_Channel mchannel;
+		mchannel = enesim_renderer_mask_channel_get(r);
+		if (mchannel == ENESIM_CHANNEL_ALPHA)
+			thiz->do_mask = EINA_TRUE;
+	}
 
 	*fill = _spans[thiz->x_channel][thiz->y_channel][type];
 	if (!*fill) return EINA_FALSE;
@@ -290,6 +351,19 @@ static void _dispmap_features_get(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FEATURE_AFFINE |
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
+
+static void _dispmap_sw_hints_get(Enesim_Renderer *r,
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
+{
+	Enesim_Channel mchannel;
+
+	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
+
+	mchannel = enesim_renderer_mask_channel_get(r);
+	if (mchannel == ENESIM_CHANNEL_ALPHA)
+		*hints |= ENESIM_RENDERER_SW_HINT_MASK;
+}
+
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -305,6 +379,7 @@ static void _enesim_renderer_dispmap_class_init(void *k)
 	klass->base_name_get = _dispmap_name;
 	klass->bounds_get = _dispmap_bounds_get;
 	klass->features_get = _dispmap_features_get;
+	klass->sw_hints_get = _dispmap_sw_hints_get;
 	klass->sw_setup = _dispmap_sw_setup;
 	klass->sw_cleanup = _dispmap_sw_cleanup;
 
