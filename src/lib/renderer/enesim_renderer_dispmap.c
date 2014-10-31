@@ -73,27 +73,6 @@ typedef struct _Enesim_Renderer_Dispmap_Class {
 	Enesim_Renderer_Class parent;
 } Enesim_Renderer_Dispmap_Class;
 
-/* TODO Move this to a common header */
-static inline uint8_t _argb8888_alpha(uint32_t argb8888)
-{
-	return (argb8888 >> 24);
-}
-
-static inline uint8_t _argb8888_red(uint32_t argb8888)
-{
-	return (argb8888 >> 16) & 0xff;
-}
-
-static inline uint8_t _argb8888_green(uint32_t argb8888)
-{
-	return (argb8888 >> 8) & 0xff;
-}
-
-static inline uint8_t _argb8888_blue(uint32_t argb8888)
-{
-	return argb8888 & 0xff;
-}
-
 static inline Eina_F16p16 _displace(Eina_F16p16 coord, uint8_t distance, Eina_F16p16 scale)
 {
 	Eina_F16p16 vx;
@@ -249,10 +228,10 @@ next:										\
 	}									\
 }
 
-DISPMAP_AFFINE(r, g, _argb8888_red, _argb8888_green);
-DISPMAP_AFFINE(a, b, _argb8888_alpha, _argb8888_blue);
-DISPMAP_IDENTITY(a, b, _argb8888_alpha, _argb8888_blue);
-DISPMAP_IDENTITY(r, g, _argb8888_red, _argb8888_green);
+DISPMAP_AFFINE(r, g, argb8888_red_get, argb8888_green_get);
+DISPMAP_AFFINE(a, b, argb8888_alpha_get, argb8888_blue_get);
+DISPMAP_IDENTITY(a, b, argb8888_alpha_get, argb8888_blue_get);
+DISPMAP_IDENTITY(r, g, argb8888_red_get, argb8888_green_get);
 
 static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNEL_LAST][ENESIM_CHANNEL_LAST][ENESIM_MATRIX_TYPE_LAST];
 /*----------------------------------------------------------------------------*
