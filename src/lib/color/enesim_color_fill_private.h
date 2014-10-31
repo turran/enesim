@@ -26,12 +26,13 @@ static inline void enesim_color_fill_pt_none_color_none(uint32_t *d, uint32_t s 
 {
 	*d = color;
 }
+
 static inline void enesim_color_fill_pt_none_color_argb8888(uint32_t *d,
 		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m)
 {
 	uint16_t a;
 
-	a = argb8888_alpha_get(m);
+	a = enesim_color_alpha_get(m);
 	switch (a)
 	{
 		case 0:
@@ -42,7 +43,7 @@ static inline void enesim_color_fill_pt_none_color_argb8888(uint32_t *d,
 		break;
 
 		default:
-		*d = argb8888_interp_256(a + 1, color, *d);
+		*d = enesim_color_interp_256(a + 1, color, *d);
 		break;
 	}
 }
@@ -52,7 +53,7 @@ static inline void enesim_color_fill_pt_argb8888_none_argb8888(uint32_t *d,
 {
 	uint16_t a;
 
-	a = argb8888_alpha_get(m);
+	a = enesim_color_alpha_get(m);
 	switch (a)
 	{
 		case 0:
@@ -63,7 +64,7 @@ static inline void enesim_color_fill_pt_argb8888_none_argb8888(uint32_t *d,
 		break;
 
 		default:
-		*d = argb8888_interp_256(a + 1, s, *d);
+		*d = enesim_color_interp_256(a + 1, s, *d);
 		break;
 	}
 }
@@ -77,7 +78,7 @@ static inline void enesim_color_fill_pt_argb8888_none_none(uint32_t *d,
 static inline void enesim_color_fill_pt_argb8888_color_none(uint32_t *d,
 		uint32_t s, uint32_t color, uint32_t m EINA_UNUSED)
 {
-	*d = argb8888_mul4_sym(color, s);
+	*d = enesim_color_mul4_sym(color, s);
 }
 
 /*============================================================================*
@@ -127,7 +128,7 @@ static inline void enesim_color_fill_sp_argb8888_color_none(uint32_t *d, uint32_
 			break;
 
 			default:
-			*d = argb8888_mul4_sym(color, c);
+			*d = enesim_color_mul4_sym(color, c);
 			break;
 		}
 		d++;
@@ -143,7 +144,7 @@ static inline void enesim_color_fill_sp_argb8888_color_argb8888_alpha(uint32_t *
 	{
 		uint16_t a;
 
-		a = argb8888_alpha_get(*m);
+		a = enesim_color_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -151,14 +152,14 @@ static inline void enesim_color_fill_sp_argb8888_color_argb8888_alpha(uint32_t *
 			break;
 
 			case 255:
-			*d = argb8888_mul4_sym(color, *s);
+			*d = enesim_color_mul4_sym(color, *s);
 			break;
 
 			default:
 			{
-				uint32_t _tmp_color = argb8888_mul4_sym(color, *s);
+				uint32_t _tmp_color = enesim_color_mul4_sym(color, *s);
 
-				*d = argb8888_mul_sym(a, _tmp_color);
+				*d = enesim_color_mul_sym(a, _tmp_color);
 			}
 			break;
 		}
@@ -177,7 +178,7 @@ static inline void enesim_color_fill_sp_argb8888_none_argb8888_alpha(uint32_t *d
 	{
 		uint16_t a;
 
-		a = argb8888_alpha_get(*m);
+		a = enesim_color_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -189,7 +190,7 @@ static inline void enesim_color_fill_sp_argb8888_none_argb8888_alpha(uint32_t *d
 			break;
 
 			default:
-			*d = argb8888_mul_sym(a, *s);
+			*d = enesim_color_mul_sym(a, *s);
 			break;
 		}
 		m++;
@@ -207,7 +208,7 @@ static inline void enesim_color_fill_sp_none_color_argb8888_alpha(uint32_t *d, u
 	{
 		uint16_t a;
 
-		a = argb8888_alpha_get(*m);
+		a = enesim_color_alpha_get(*m);
 		switch (a)
 		{
 			case 0:
@@ -219,7 +220,7 @@ static inline void enesim_color_fill_sp_none_color_argb8888_alpha(uint32_t *d, u
 			break;
 
 			default:
-			*d = argb8888_mul_sym(a, color);
+			*d = enesim_color_mul_sym(a, color);
 			break;
 		}
 		d++;
@@ -259,7 +260,7 @@ static inline void enesim_color_fill_sp_none_color_a8_alpha(uint32_t *d, uint32_
 			break;
 
 			default:
-			*d = argb8888_mul_256(a + 1, color);
+			*d = enesim_color_mul_256(a + 1, color);
 			break;
 		}
 		d++;
@@ -271,7 +272,7 @@ static inline void enesim_color_fill_sp_argb8888_color_argb8888_luminance(uint32
 		uint32_t len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
-	uint16_t ca = 1 + argb8888_alpha_get(color);
+	uint16_t ca = 1 + enesim_color_alpha_get(color);
 	while (d < end)
 	{
 		uint32_t p = *m;
@@ -283,16 +284,16 @@ static inline void enesim_color_fill_sp_argb8888_color_argb8888_luminance(uint32
 			break;
 
 			case 0xffffffff:
-			*d = argb8888_mul_256(ca, *s);
+			*d = enesim_color_mul_256(ca, *s);
 			break;
 
 			default:
 			{
 				uint16_t ma;
 
-				ma = 1 + argb8888_lum_get(p);
+				ma = 1 + enesim_color_lum_get(p);
 				ma = (ca * ma) >> 8;
-				*d = argb8888_mul_256(ma, *s);
+				*d = enesim_color_mul_256(ma, *s);
 			}
 			break;
 		}
@@ -323,8 +324,8 @@ static inline void enesim_color_fill_sp_argb8888_none_argb8888_luminance(uint32_
 			{
 				uint16_t ma;
 
-				ma = 1 + argb8888_lum_get(p);
-				*d = argb8888_mul_256(ma, *s);
+				ma = 1 + enesim_color_lum_get(p);
+				*d = enesim_color_mul_256(ma, *s);
 			}
 			break;
 		}
