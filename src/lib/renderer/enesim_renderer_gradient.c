@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
+#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -58,10 +59,14 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 	int end;
 	int i;
 	uint32_t *dst;
+	Enesim_Color color;
 
 	dst = thiz->sw.src;
 	slen = thiz->sw.len;
 
+	color = enesim_renderer_color_get(r);
+	if (color == 0xffffffff)
+		color = 0;
 	curr = eina_list_data_get(thiz->state.stops);
 	tmp = eina_list_next(thiz->state.stops);
 	next = eina_list_data_get(tmp);
@@ -122,12 +127,22 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 		}
 		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
 		p0 = argb8888_interp_256(off, next->argb, curr->argb);
-		*dst++ = enesim_color_argb_from(p0);
+		p0 = enesim_color_argb_from(p0);
+		if (color)
+			p0 = argb8888_mul4_sym(p0, color);
+		*dst++ = p0;
 		xx += inc;
 	}
 	/* in case we dont end at 1.0 */
 	for (i = end; i < thiz->sw.len; i++)
-		*dst++ = next->argb;
+	{
+		uint32_t p0;
+
+		p0 = enesim_color_argb_from(next->argb);
+		if (color)
+			p0 = argb8888_mul4_sym(p0, color);
+		*dst++ = p0;
+	}
 	return EINA_TRUE;
 }
 
@@ -195,7 +210,17 @@ static void _gradient_cleanup(Enesim_Renderer *r)
  *----------------------------------------------------------------------------*/
 static void _gradient_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Class *klass;
+
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+	/* the mask cleanup */
+	if (thiz->sw.mask)
+	{
+		enesim_renderer_unref(thiz->sw.mask);
+		thiz->sw.mask = NULL;
+	}
+	thiz->sw.do_mask = EINA_FALSE;
 
 	/* the common clean up */
 	_gradient_cleanup(r);
@@ -212,6 +237,7 @@ static Eina_Bool _gradient_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
+	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Class *klass;
 
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
@@ -229,6 +255,18 @@ static Eina_Bool _gradient_sw_setup(Enesim_Renderer *r,
 		if (klass->sw_cleanup)
 			klass->sw_cleanup(r, s);
 		return EINA_FALSE;
+	}
+
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+	/* do the mask setup */
+	thiz->sw.mask = enesim_renderer_mask_get(r);
+	if (thiz->sw.mask)
+	{
+		Enesim_Channel mchannel;
+
+		mchannel = enesim_renderer_mask_channel_get(r);
+		if (mchannel == ENESIM_CHANNEL_ALPHA)
+			thiz->sw.do_mask = EINA_TRUE;
 	}
 	
 	return EINA_TRUE;
@@ -279,6 +317,18 @@ static Eina_Bool _gradient_has_changed(Enesim_Renderer *r)
 		ret = klass->has_changed(r);
 done:
 	return ret;
+}
+
+static void _gradient_sw_hints_get(Enesim_Renderer *r,
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
+{
+	Enesim_Channel mchannel;
+
+	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
+
+	mchannel = enesim_renderer_mask_channel_get(r);
+	if (mchannel == ENESIM_CHANNEL_ALPHA)
+		*hints |= ENESIM_RENDERER_SW_HINT_MASK;
 }
 
 #if BUILD_OPENGL
@@ -353,6 +403,7 @@ static void _enesim_renderer_gradient_class_init(void *k)
 	klass->bounds_get = _gradient_bounds_get;
 	klass->features_get = _gradient_features_get;
 	klass->has_changed = _gradient_has_changed;
+	klass->sw_hints_get = _gradient_sw_hints_get;
 	klass->sw_setup = _gradient_sw_setup;
 	klass->sw_cleanup = _gradient_sw_cleanup;
 #if BUILD_OPENGL

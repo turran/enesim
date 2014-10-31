@@ -150,7 +150,10 @@ static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
 	double ox, oy;							\
 									\
 	thiz = type_get(r);						\
+									\
 	g = ENESIM_RENDERER_GRADIENT(r);				\
+	if (g->sw.do_mask)						\
+		enesim_renderer_sw_draw(g->sw.mask, x, y, len, dst);	\
 	ox = r->state.current.ox;					\
 	oy = r->state.current.oy;					\
 	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, ox, oy,	\
@@ -159,13 +162,26 @@ static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
 	{								\
 		Eina_F16p16 syy, sxx;					\
 		Eina_F16p16 d;						\
+		uint32_t p0;						\
+		int ma = 255;						\
 									\
+		if (g->sw.do_mask)					\
+		{							\
+			ma = (*dst) >> 24;				\
+			if (!ma)					\
+				goto next;				\
+		}							\
 		syy = ((((int64_t)yy) << 16) / zz);			\
 		sxx = ((((int64_t)xx) << 16) / zz);			\
 									\
 		d = distance(thiz, sxx, syy);				\
-		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
+		p0 = enesim_renderer_gradient_##mode##_color_get(	\
 				g->sw.src, g->sw.len, d);		\
+		if (ma < 255)						\
+			p0 = argb8888_mul_sym(ma, p0);			\
+		*dst = p0;						\
+next:									\
+		dst++;							\
 		yy += thiz->sw.matrix.yx;				\
 		xx += thiz->sw.matrix.xx;				\
 		zz += thiz->sw.matrix.zx;				\
@@ -184,16 +200,33 @@ static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
 	double ox, oy;							\
 									\
 	thiz = type_get(r);						\
+									\
 	g = ENESIM_RENDERER_GRADIENT(r);				\
+	if (g->sw.do_mask)						\
+		enesim_renderer_sw_draw(g->sw.mask, x, y, len, dst);	\
 	ox = r->state.current.ox;					\
 	oy = r->state.current.oy;					\
 	enesim_coord_identity_setup(&xx, &yy, x, y, ox, oy);		\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
+		uint32_t p0;						\
+		int ma = 255;						\
+									\
+		if (g->sw.do_mask)					\
+		{							\
+			ma = (*dst) >> 24;				\
+			if (!ma)					\
+				goto next;				\
+		}							\
 		d = distance(thiz, xx, yy);				\
-		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
+		p0 = enesim_renderer_gradient_##mode##_color_get(	\
 				g->sw.src, g->sw.len, d);		\
+		if (ma < 255)						\
+			p0 = argb8888_mul_sym(ma, p0);			\
+		*dst = p0;						\
+next:									\
+		dst++;							\
 		xx += EINA_F16P16_ONE;					\
 	}								\
 }
@@ -210,7 +243,10 @@ static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
 	double ox, oy;							\
 									\
 	thiz = type_get(r);						\
+									\
 	g = ENESIM_RENDERER_GRADIENT(r);				\
+	if (g->sw.do_mask)						\
+		enesim_renderer_sw_draw(g->sw.mask, x, y, len, dst);	\
 	ox = r->state.current.ox;					\
 	oy = r->state.current.oy;					\
 	enesim_coord_affine_setup(&xx, &yy, x, y, ox, oy, 		\
@@ -218,10 +254,24 @@ static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
 	while (dst < end)						\
 	{								\
 		Eina_F16p16 d;						\
+		uint32_t p0;						\
+		int ma = 255;						\
+									\
+		if (g->sw.do_mask)					\
+		{							\
+			ma = (*dst) >> 24;				\
+			if (!ma)					\
+				goto next;				\
+		}							\
 									\
 		d = distance(thiz, xx, yy);				\
-		*dst++ = enesim_renderer_gradient_##mode##_color_get(	\
+		p0 = enesim_renderer_gradient_##mode##_color_get(	\
 				g->sw.src, g->sw.len, d);		\
+		if (ma < 255)						\
+			p0 = argb8888_mul_sym(ma, p0);			\
+		*dst = p0;						\
+next:									\
+		dst++;							\
 		yy += thiz->sw.matrix.yx;				\
 		xx += thiz->sw.matrix.xx;				\
 	}								\
@@ -238,6 +288,8 @@ typedef struct _Enesim_Renderer_Gradient_Sw_State
 {
 	Enesim_Color *src;
 	int len;
+	Enesim_Renderer *mask;
+	Eina_Bool do_mask;
 } Enesim_Renderer_Gradient_Sw_State;
 
 typedef struct _Enesim_Renderer_Gradient
