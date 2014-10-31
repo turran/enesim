@@ -87,6 +87,7 @@ src_lib_libenesim_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib/curve \
 -I$(top_srcdir)/src/lib/path \
 -I$(top_srcdir)/src/lib/util \
+-I$(top_srcdir)/src/lib/color \
 -I$(top_srcdir)/src/lib/argb \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DENESIM_BUILD \
