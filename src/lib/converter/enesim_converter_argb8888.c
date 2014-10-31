@@ -22,6 +22,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 
+#include "enesim_color_private.h"
 #include "enesim_converter_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -48,9 +49,9 @@ static void _2d_argb8888_none_argb8888_pre(Enesim_Buffer_Sw_Data *data, uint32_t
 			if ((pa > 0) && (pa < 255))
 			{
 				*ddst = (pa << 24)|
-					(((argb8888_red_get(*ssrc) * 255) / pa) << 16) |
-					(((argb8888_green_get(*ssrc) * 255) / pa) << 8) |
-					((argb8888_blue_get(*ssrc) * 255) / pa);
+					(((enesim_color_red_get(*ssrc) * 255) / pa) << 16) |
+					(((enesim_color_green_get(*ssrc) * 255) / pa) << 8) |
+					((enesim_color_blue_get(*ssrc) * 255) / pa);
 			}
 			else
 			{

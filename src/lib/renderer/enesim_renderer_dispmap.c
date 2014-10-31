@@ -33,6 +33,7 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
 #include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
 /*
@@ -228,10 +229,10 @@ next:										\
 	}									\
 }
 
-DISPMAP_AFFINE(r, g, argb8888_red_get, argb8888_green_get);
-DISPMAP_AFFINE(a, b, argb8888_alpha_get, argb8888_blue_get);
-DISPMAP_IDENTITY(a, b, argb8888_alpha_get, argb8888_blue_get);
-DISPMAP_IDENTITY(r, g, argb8888_red_get, argb8888_green_get);
+DISPMAP_AFFINE(r, g, enesim_color_red_get, enesim_color_green_get);
+DISPMAP_AFFINE(a, b, enesim_color_alpha_get, enesim_color_blue_get);
+DISPMAP_IDENTITY(a, b, enesim_color_alpha_get, enesim_color_blue_get);
+DISPMAP_IDENTITY(r, g, enesim_color_red_get, enesim_color_green_get);
 
 static Enesim_Renderer_Sw_Fill _spans[ENESIM_CHANNEL_LAST][ENESIM_CHANNEL_LAST][ENESIM_MATRIX_TYPE_LAST];
 /*----------------------------------------------------------------------------*

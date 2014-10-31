@@ -84,10 +84,10 @@ typedef struct _Enesim_Renderer_Path_Cairo_Class
 static void _path_cairo_colors_get(Enesim_Color color,
 		double *a, double *r, double *g, double *b)
 {
-	*a = argb8888_alpha_get(color) / 255.0;
-	*r = argb8888_red_get(color) / 255.0;
-	*g = argb8888_green_get(color) / 255.0;
-	*b = argb8888_blue_get(color) / 255.0;
+	*a = enesim_color_alpha_get(color) / 255.0;
+	*r = enesim_color_red_get(color) / 255.0;
+	*g = enesim_color_green_get(color) / 255.0;
+	*b = enesim_color_blue_get(color) / 255.0;
 }
 
 static void _path_cairo_generate(Enesim_Renderer *rend,

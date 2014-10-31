@@ -36,6 +36,7 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
 #include "enesim_path_private.h"
 #include "enesim_list_private.h"
 #include "enesim_renderer_private.h"
@@ -189,10 +190,10 @@ static void _enesim_renderer_path_nv_fill_good_draw(GLenum path_id,
 
 	// modulate RGB with destination alpha and then zero destination alpha
 	glBlendFuncSeparate(GL_DST_ALPHA, GL_ZERO, GL_DST_ALPHA, GL_ZERO);
-	glColor4f(argb8888_red_get(fcolor) / 255.0,
-		argb8888_green_get(fcolor) / 255.0,
-		argb8888_blue_get(fcolor) / 255.0,
-		argb8888_alpha_get(fcolor) / 255.0);
+	glColor4f(enesim_color_red_get(fcolor) / 255.0,
+		enesim_color_green_get(fcolor) / 255.0,
+		enesim_color_blue_get(fcolor) / 255.0,
+		enesim_color_alpha_get(fcolor) / 255.0);
 	glStencilFunc(GL_EQUAL, 0x80, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 	for (i = 0; i < num_jitters; i++)
@@ -254,10 +255,10 @@ static void _enesim_renderer_path_nv_stroke_good_draw(GLenum path_id, Enesim_Col
 	glColor4f(1, 1, 1, 1);
 
 	glBlendFuncSeparate(GL_DST_ALPHA, GL_ZERO, GL_DST_ALPHA, GL_ZERO);
-	glColor4f(argb8888_red_get(fcolor) / 255.0,
-		argb8888_green_get(fcolor) / 255.0,
-		argb8888_blue_get(fcolor) / 255.0,
-		argb8888_alpha_get(fcolor) / 255.0);
+	glColor4f(enesim_color_red_get(fcolor) / 255.0,
+		enesim_color_green_get(fcolor) / 255.0,
+		enesim_color_blue_get(fcolor) / 255.0,
+		enesim_color_alpha_get(fcolor) / 255.0);
 	glStencilFunc(GL_EQUAL, 0x80, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 	for (i = 0; i < num_jitters; i++)
@@ -280,10 +281,10 @@ static void _enesim_renderer_path_nv_fill_fast(GLenum path_id, Enesim_Color fcol
 	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 	glStencilFillPathNV(path_id, GL_COUNT_UP_NV, 0xFF); 
-	glColor4f(argb8888_red_get(fcolor) / 255.0,
-		argb8888_green_get(fcolor) / 255.0,
-		argb8888_blue_get(fcolor) / 255.0,
-		argb8888_alpha_get(fcolor) / 255.0);
+	glColor4f(enesim_color_red_get(fcolor) / 255.0,
+		enesim_color_green_get(fcolor) / 255.0,
+		enesim_color_blue_get(fcolor) / 255.0,
+		enesim_color_alpha_get(fcolor) / 255.0);
 	glCoverFillPathNV(path_id, GL_BOUNDING_BOX_NV);
 	glUseProgramObjectARB(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -296,10 +297,10 @@ static void _enesim_renderer_path_nv_stroke_fast(GLenum path_id, Enesim_Color sc
 	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 
 	glStencilStrokePathNV(path_id, 0x1, ~0);
-	glColor4f(argb8888_red_get(scolor) / 255.0,
-		argb8888_green_get(scolor) / 255.0,
-		argb8888_blue_get(scolor) / 255.0,
-		argb8888_alpha_get(scolor) / 255.0);
+	glColor4f(enesim_color_red_get(scolor) / 255.0,
+		enesim_color_green_get(scolor) / 255.0,
+		enesim_color_blue_get(scolor) / 255.0,
+		enesim_color_alpha_get(scolor) / 255.0);
 	glCoverStrokePathNV(path_id, GL_CONVEX_HULL_NV);
 	glUseProgramObjectARB(0);
 	glBindTexture(GL_TEXTURE_2D, 0);

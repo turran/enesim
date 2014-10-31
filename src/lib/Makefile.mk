@@ -33,6 +33,7 @@ src_lib_libenesim_la_SOURCES = \
 src/lib/enesim_buffer.c \
 src/lib/enesim_buffer_private.h \
 src/lib/enesim_color.c \
+src/lib/enesim_color_private.h \
 src/lib/enesim_compositor.c \
 src/lib/enesim_compositor_private.h \
 src/lib/enesim_converter.c \

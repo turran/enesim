@@ -37,6 +37,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_buffer_private.h"
 #include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
@@ -510,10 +511,10 @@ Eina_Bool enesim_renderer_opengl_shader_ambient_setup(GLenum pid,
 	glUseProgramObjectARB(pid);
 	final_color_u = glGetUniformLocationARB(pid, "ambient_color");
 	glUniform4fARB(final_color_u,
-			argb8888_red_get(color) / 255.0,
-			argb8888_green_get(color) / 255.0,
-			argb8888_blue_get(color) / 255.0,
-			argb8888_alpha_get(color) / 255.0);
+			enesim_color_red_get(color) / 255.0,
+			enesim_color_green_get(color) / 255.0,
+			enesim_color_blue_get(color) / 255.0,
+			enesim_color_alpha_get(color) / 255.0);
 
 	return EINA_TRUE;
 }
@@ -536,10 +537,10 @@ Eina_Bool enesim_renderer_opengl_shader_texture_setup(GLenum pid,
 	offset_u = glGetUniformLocationARB(pid, "texture_offset");
 
 	glUniform4fARB(color_u,
-			argb8888_red_get(color) / 255.0,
-			argb8888_green_get(color) / 255.0,
-			argb8888_blue_get(color) / 255.0,
-			argb8888_alpha_get(color) / 255.0);
+			enesim_color_red_get(color) / 255.0,
+			enesim_color_green_get(color) / 255.0,
+			enesim_color_blue_get(color) / 255.0,
+			enesim_color_alpha_get(color) / 255.0);
 
 
 	enesim_surface_size_get(s, &w, &h);

@@ -19,6 +19,7 @@
 #include "libargb.h"
 
 #include "enesim_color.h"
+#include "enesim_color_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -109,16 +110,16 @@ EAPI void enesim_color_components_to(Enesim_Color color,
 	if ((pa > 0) && (pa < 255))
 	{
 		if (a) *a = pa;
-		if (r) *r = (argb8888_red_get(color) * 255) / pa;
-		if (g) *g = (argb8888_green_get(color) * 255) / pa;
-		if (b) *b = (argb8888_blue_get(color) * 255) / pa;
+		if (r) *r = (enesim_color_red_get(color) * 255) / pa;
+		if (g) *g = (enesim_color_green_get(color) * 255) / pa;
+		if (b) *b = (enesim_color_blue_get(color) * 255) / pa;
 	}
 	else
 	{
 		if (a) *a = pa;
-		if (r) *r = argb8888_red_get(color);
-		if (g) *g = argb8888_green_get(color);
-		if (b) *b = argb8888_blue_get(color);
+		if (r) *r = enesim_color_red_get(color);
+		if (g) *g = enesim_color_green_get(color);
+		if (b) *b = enesim_color_blue_get(color);
 	}
 }
 

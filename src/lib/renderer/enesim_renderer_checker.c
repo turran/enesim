@@ -42,6 +42,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
 
@@ -131,15 +132,15 @@ static Eina_Bool _checker_opengl_shader_setup(GLenum pid,
 	sh_u = glGetUniformLocationARB(pid, "checker_sh");
 
 	glUniform4fARB(even_color_u,
-			argb8888_red_get(even_color) / 255.0,
-			argb8888_green_get(even_color) / 255.0,
-			argb8888_blue_get(even_color) / 255.0,
-			argb8888_alpha_get(even_color) / 255.0);
+			enesim_color_red_get(even_color) / 255.0,
+			enesim_color_green_get(even_color) / 255.0,
+			enesim_color_blue_get(even_color) / 255.0,
+			enesim_color_alpha_get(even_color) / 255.0);
 	glUniform4fARB(odd_color_u,
-			argb8888_red_get(odd_color) / 255.0,
-			argb8888_green_get(odd_color) / 255.0,
-			argb8888_blue_get(odd_color) / 255.0,
-			argb8888_alpha_get(odd_color) / 255.0);
+			enesim_color_red_get(odd_color) / 255.0,
+			enesim_color_green_get(odd_color) / 255.0,
+			enesim_color_blue_get(odd_color) / 255.0,
+			enesim_color_alpha_get(odd_color) / 255.0);
 	glUniform1i(sw_u, sw);
 	glUniform1i(sh_u, sh);
 
