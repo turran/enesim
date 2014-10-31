@@ -134,36 +134,6 @@ static inline void argb8888_sp_none_color_none_blend(uint32_t *d,
 #endif
 }
 
-#if 0
-static inline void argb8888_sp_argb8888_none_none_blend(uint32_t *d,
-		unsigned int len, uint32_t *s,
-		uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
-{
-	uint32_t *end = d + len;
-#if LIBARGB_MMX
-	mmx_t r0, r1;
-#endif
-
-	while (d < end)
-	{
-		uint16_t a16 = 256 - ((*s) >> 24);
-#if LIBARGB_MMX
-		r0 = a2v_mmx(a16);
-		r1 = c2v_mmx(*s);
-
-		blend_mmx(d, r0, r1);
-#else
-		argb8888_blend(d, a16, *s);
-#endif
-		d++;
-		s++;
-	}
-#if LIBARGB_MMX
-	_mm_empty();
-#endif
-}
-#endif
-
 static inline void argb8888_sp_argb8888_none_none_blend(uint32_t *d,
 		unsigned int len, uint32_t *s,
 		uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
@@ -492,82 +462,4 @@ static inline void argb8888_sp_argb8888_color_argb8888_alpha_blend(uint32_t *d, 
 	}
 }
 
-#if 0
-static void argb8888_sp_color_blend_sse2(uint32_t *d,
-		unsigned int len, uint32_t *s,
-		uint32_t color, uint32_t *m)
-{
-	int r = (len % 2);
-	int l = len - r;
-
-	uint32_t *dtmp = d->plane0;
-	uint32_t *end = d->plane0 + l;
-	uint8_t a;
-
-#if 1
-	sse2_t r0, r1;
-
-	a = color->plane0 >> 24;
-	r0 = a2v_sse2(256 - a);
-	r1 = c2v_sse2(color->plane0);
-
-	while (dtmp < end)
-	{
-		blend_sse2((uint64_t *)dtmp, r0, r1);
-		dtmp += 2;
-	}
-#else
-	argb8888_sp_color_blend_mmx(d, l, s, color, m);
-#endif
-#if 0
-	if (r)
-	{
-		mmx_t m0, m1;
-
-		m0 = _mm_movepi64_pi64(r0);
-		m1 = _mm_movepi64_pi64(r1);
-		blend_mmx(++dtmp, m0, m1);
-	}
-#endif
-	_mm_empty();
-}
-
-static void argb8888_sp_argb8888_blend_argb8888_sse2(uint32_t *d,
-		unsigned int len, uint32_t *s,
-		uint32_t color, uint32_t *m)
-{
-	int r = (len % 2);
-	int l = len - r;
-	sse2_t r0, r1;
-	uint32_t *stmp = s->plane0;
-	uint32_t *dtmp = d->plane0;
-	uint32_t *end = d->plane0 + l;
-
-	while (dtmp < end)
-	{
-		r0 = aa2v_sse2(*(uint64_t *)stmp);
-		r1 = cc2v_sse2(*(uint64_t *)stmp);
-
-		blend_sse2((uint64_t *)dtmp, r0, r1);
-		dtmp += 2;
-		stmp += 2;
-	}
-#if 0
-	if (r)
-	{
-		mmx_t m0, m1;
-		uint8_t a;
-
-		stmp++;
-		dtmp++;
-
-		a = (*stmp) >> 24;
-		m0 = a2v_mmx(256 - a);
-		m1 = c2v_mmx(*stmp);
-		blend_mmx(dtmp, m0, m1);
-	}
-#endif
-	_mm_empty();
-}
-#endif
 #endif
