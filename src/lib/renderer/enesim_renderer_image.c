@@ -284,7 +284,7 @@ static void _image_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 #endif
 
 /* blend simple */
-static void _argb8888_blend_span(Enesim_Renderer *r,
+static void _image_blend_argb8888(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -308,7 +308,7 @@ static void _argb8888_blend_span(Enesim_Renderer *r,
 
 
 /* fast - no pre-scaling */
-static void _argb8888_image_no_scale_affine_fast(Enesim_Renderer *r,
+static void _image_fill_argb8888_no_scale_affine_fast(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -351,7 +351,7 @@ static void _argb8888_image_no_scale_affine_fast(Enesim_Renderer *r,
 }
 
 /* fast - pre-scaling */
-static void _argb8888_image_scale_identity_fast(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_identity_fast(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -402,7 +402,7 @@ static void _argb8888_image_scale_identity_fast(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_scale_affine_fast(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_affine_fast(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -454,7 +454,7 @@ static void _argb8888_image_scale_affine_fast(Enesim_Renderer *r,
 }
 
 /* good - no pre-scaling */
-static void _argb8888_image_no_scale_identity(Enesim_Renderer *r,
+static void _image_fill_argb8888_no_scale_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -485,7 +485,7 @@ static void _argb8888_image_no_scale_identity(Enesim_Renderer *r,
 	thiz->span(dst, len, src, thiz->color, NULL);
 }
 
-static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
+static void _image_fill_argb8888_no_scale_affine(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -550,7 +550,7 @@ static void _argb8888_image_no_scale_affine(Enesim_Renderer *r,
 }
 
 /* good - pre-scaling */
-static void _argb8888_image_scale_identity(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -631,7 +631,7 @@ static void _argb8888_image_scale_identity(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_scale_affine(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_affine(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -714,7 +714,7 @@ static void _argb8888_image_scale_affine(Enesim_Renderer *r,
 }
 
 /* best - always pre-scales */
-static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_d_u_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -822,7 +822,7 @@ static void _argb8888_image_scale_d_u_identity(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_u_d_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -934,7 +934,7 @@ static void _argb8888_image_scale_u_d_identity(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_scale_d_d_identity(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_d_d_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -1073,7 +1073,7 @@ static void _argb8888_image_scale_d_d_identity(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_scale_d_u_affine(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_d_u_affine(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -1177,7 +1177,7 @@ static void _argb8888_image_scale_d_u_affine(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_scale_u_d_affine(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_u_d_affine(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -1282,7 +1282,7 @@ static void _argb8888_image_scale_u_d_affine(Enesim_Renderer *r,
 	}
 }
 
-static void _argb8888_image_scale_d_d_affine(Enesim_Renderer *r,
+static void _image_fill_argb8888_scale_d_d_affine(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Image *thiz = ENESIM_RENDERER_IMAGE(r);
@@ -1601,7 +1601,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 				ENESIM_FORMAT_ARGB8888, thiz->color, ENESIM_FORMAT_NONE,
 				ENESIM_CHANNEL_ALPHA);
 			if (rop == ENESIM_ROP_BLEND)
-				*fill = _argb8888_blend_span;
+				*fill = _image_blend_argb8888;
 		}
 	}
 
@@ -1628,7 +1628,6 @@ static void _image_sw_image_hints(Enesim_Renderer *r, Enesim_Rop rop,
 		if (thiz->span)
 			*hints |= ENESIM_RENDERER_SW_HINT_ROP;
 	}
-
 }
 
 static Eina_Bool _image_has_changed(Enesim_Renderer *r)
@@ -1766,24 +1765,24 @@ static void _enesim_renderer_image_class_init(void *k)
 	klass->opengl_setup = _image_opengl_setup;
 	klass->opengl_cleanup = _image_opengl_cleanup;
 #endif
-	_spans_best[0][0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_identity;
-	_spans_best[0][0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_affine;
-	_spans_best[1][0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_d_u_identity;
-	_spans_best[1][0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_d_u_affine;
-	_spans_best[0][1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_u_d_identity;
-	_spans_best[0][1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_u_d_affine;
-	_spans_best[1][1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_d_d_identity;
-	_spans_best[1][1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_d_d_affine;
+	_spans_best[0][0][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_scale_identity;
+	_spans_best[0][0][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_scale_affine;
+	_spans_best[1][0][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_scale_d_u_identity;
+	_spans_best[1][0][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_scale_d_u_affine;
+	_spans_best[0][1][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_scale_u_d_identity;
+	_spans_best[0][1][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_scale_u_d_affine;
+	_spans_best[1][1][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_scale_d_d_identity;
+	_spans_best[1][1][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_scale_d_d_affine;
 
-	_spans_good[0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_no_scale_identity;
-	_spans_good[0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_no_scale_affine;
-	_spans_good[1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_identity;
-	_spans_good[1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_affine;
+	_spans_good[0][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_no_scale_identity;
+	_spans_good[0][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_no_scale_affine;
+	_spans_good[1][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_scale_identity;
+	_spans_good[1][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_scale_affine;
 
-	_spans_fast[0][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_no_scale_identity;
-	_spans_fast[0][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_no_scale_affine_fast;
-	_spans_fast[1][ENESIM_MATRIX_TYPE_IDENTITY] = _argb8888_image_scale_identity_fast;
-	_spans_fast[1][ENESIM_MATRIX_TYPE_AFFINE] = _argb8888_image_scale_affine_fast;
+	_spans_fast[0][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_no_scale_identity;
+	_spans_fast[0][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_no_scale_affine_fast;
+	_spans_fast[1][ENESIM_MATRIX_TYPE_IDENTITY] = _image_fill_argb8888_scale_identity_fast;
+	_spans_fast[1][ENESIM_MATRIX_TYPE_AFFINE] = _image_fill_argb8888_scale_affine_fast;
 }
 
 static void _enesim_renderer_image_instance_init(void *o EINA_UNUSED)

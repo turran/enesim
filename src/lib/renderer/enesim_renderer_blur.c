@@ -139,7 +139,7 @@ static Enesim_Renderer_Sw_Fill _spans[ENESIM_BLUR_CHANNELS];
 /*----------------------------------------------------------------------------*
  *                        The Software fill variants                          *
  *----------------------------------------------------------------------------*/
-static void _argb8888_span_identity(Enesim_Renderer *r,
+static void _blur_fill_argb8888_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Blur *thiz;
@@ -324,7 +324,7 @@ static void _argb8888_span_identity(Enesim_Renderer *r,
 	}
 }
 
-static void _a8_span_identity(Enesim_Renderer *r,
+static void _blur_fill_a8_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Blur *thiz;
@@ -649,9 +649,9 @@ static void _enesim_renderer_blur_class_init(void *k)
 	/* initialize the static information */
 	_init_atable();
 	_spans[ENESIM_BLUR_CHANNEL_COLOR]
-		= _argb8888_span_identity;
+		= _blur_fill_argb8888_identity;
 	_spans[ENESIM_BLUR_CHANNEL_ALPHA]
-		= _a8_span_identity;
+		= _blur_fill_a8_identity;
 }
 
 static void _enesim_renderer_blur_instance_init(void *o)

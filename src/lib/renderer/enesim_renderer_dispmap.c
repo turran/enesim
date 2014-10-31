@@ -85,7 +85,7 @@ static inline Eina_F16p16 _displace(Eina_F16p16 coord, uint8_t distance, Eina_F1
 }
 
 #define DISPMAP_IDENTITY(xch, ych, xfunction, yfunction) \
-static void _argb8888_##xch##_##ych##_span_identity(Enesim_Renderer *r,		\
+static void _dispmap_fill_argb8888_##xch##_##ych##_identity(Enesim_Renderer *r,	\
 		int x, int y, int len,						\
 		void *ddata)							\
 {										\
@@ -154,7 +154,7 @@ next:										\
 }
 
 #define DISPMAP_AFFINE(xch, ych, xfunction, yfunction) \
-static void _argb8888_##xch##_##ych##_span_affine(Enesim_Renderer *r,		\
+static void _dispmap_fill_argb8888_##xch##_##ych##_affine(Enesim_Renderer *r,	\
 		int x, int y, int len,						\
 		void *ddata)							\
 {										\
@@ -363,13 +363,13 @@ static void _enesim_renderer_dispmap_class_init(void *k)
 	klass->sw_cleanup = _dispmap_sw_cleanup;
 
 	_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_TYPE_IDENTITY]
-		= _argb8888_a_b_span_identity;
+		= _dispmap_fill_argb8888_a_b_identity;
 	_spans[ENESIM_CHANNEL_ALPHA][ENESIM_CHANNEL_BLUE][ENESIM_MATRIX_TYPE_AFFINE]
-		= _argb8888_a_b_span_affine;
+		= _dispmap_fill_argb8888_a_b_affine;
 	_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_TYPE_IDENTITY]
-		= _argb8888_r_g_span_identity;
+		= _dispmap_fill_argb8888_r_g_identity;
 	_spans[ENESIM_CHANNEL_RED][ENESIM_CHANNEL_GREEN][ENESIM_MATRIX_TYPE_AFFINE]
-		= _argb8888_r_g_span_affine;
+		= _dispmap_fill_argb8888_r_g_affine;
 }
 
 static void _enesim_renderer_dispmap_instance_init(void *o)

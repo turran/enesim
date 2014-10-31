@@ -142,7 +142,7 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 }
 
 
-static void _span_identity(Enesim_Renderer *r,
+static void _grid_fill_argb8888_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
@@ -251,7 +251,7 @@ static void _span_identity(Enesim_Renderer *r,
 #endif
 }
 
-static void _span_affine(Enesim_Renderer *r,
+static void _grid_fill_argb8888_affine(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
@@ -284,7 +284,7 @@ static void _span_affine(Enesim_Renderer *r,
 	}
 }
 
-static void _span_projective(Enesim_Renderer *r,
+static void _grid_fill_argb8888_projective(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Grid *thiz;
@@ -381,17 +381,17 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 	switch (type)
 	{
 		case ENESIM_MATRIX_TYPE_IDENTITY:
-		*fill = _span_identity;
+		*fill = _grid_fill_argb8888_identity;
 		break;
 
 		case ENESIM_MATRIX_TYPE_AFFINE:
 		enesim_matrix_matrix_f16p16_to(&inv, &thiz->matrix);
-		*fill = _span_affine;
+		*fill = _grid_fill_argb8888_affine;
 		break;
 
 		case ENESIM_MATRIX_TYPE_PROJECTIVE:
 		enesim_matrix_matrix_f16p16_to(&inv, &thiz->matrix);
-		*fill = _span_projective;
+		*fill = _grid_fill_argb8888_projective;
 		break;
 
 		default:

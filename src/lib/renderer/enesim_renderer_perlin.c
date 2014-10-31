@@ -60,7 +60,7 @@ typedef struct _Enesim_Renderer_Perlin_Class {
 } Enesim_Renderer_Perlin_Class;
 
 #if 0
-static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, int len, uint32_t *dst)
+static void _perlin_fill_argb8888_affine(Enesim_Renderer *r, int x, int y, int len, uint32_t *dst)
 {
 	Enesim_Renderer_Perlin *thiz;
 	uint32_t *end = dst + len;
@@ -89,7 +89,7 @@ static void _argb8888_span_affine(Enesim_Renderer *r, int x, int y, int len, uin
 }
 #endif
 
-static void _argb8888_span_identity(Enesim_Renderer *r,
+static void _perlin_fill_argb8888_identity(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Perlin *thiz;
@@ -160,7 +160,7 @@ static Eina_Bool _perlin_sw_setup(Enesim_Renderer *r,
 	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
 		return EINA_FALSE;
 
-	*fill = _argb8888_span_identity;
+	*fill = _perlin_fill_argb8888_identity;
 	return EINA_TRUE;
 }
 

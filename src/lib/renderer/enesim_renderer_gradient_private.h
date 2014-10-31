@@ -138,9 +138,9 @@ static inline uint32_t enesim_renderer_gradient_repeat_color_get(Enesim_Color *s
 }
 
 /* helper macros to draw gradients */
-#define GRADIENT_PROJECTIVE(type, type_get, distance, mode) \
-static void _argb8888_##mode##_span_projective(Enesim_Renderer *r,	\
-		int x, int y, int len, void *ddata)			\
+#define GRADIENT_PROJECTIVE(type, type_get, distance, mode) 		\
+static void _gradient_fill_argb8888_##mode##_projective(		\
+		Enesim_Renderer *r, int x, int y, int len, void *ddata)	\
 {									\
 	type *thiz;							\
 	Enesim_Renderer_Gradient *g;					\
@@ -188,9 +188,9 @@ next:									\
 	}								\
 }
 
-#define GRADIENT_IDENTITY(type, type_get, distance, mode) \
-static void _argb8888_##mode##_span_identity(Enesim_Renderer *r,	\
-		int x, int y, int len, void *ddata)			\
+#define GRADIENT_IDENTITY(type, type_get, distance, mode) 		\
+static void _gradient_fill_argb8888_##mode##_identity(			\
+		Enesim_Renderer *r, int x, int y, int len, void *ddata)	\
 {									\
 	type *thiz;							\
 	Enesim_Renderer_Gradient *g;					\
@@ -231,9 +231,9 @@ next:									\
 	}								\
 }
 
-#define GRADIENT_AFFINE(type, type_get, distance, mode) \
-static void _argb8888_##mode##_span_affine(Enesim_Renderer *r,		\
- 		int x, int y, int len, void *ddata)			\
+#define GRADIENT_AFFINE(type, type_get, distance, mode) 		\
+static void _gradient_fill_argb8888_##mode##_affine(			\
+		Enesim_Renderer *r, int x, int y, int len, void *ddata)	\
 {									\
 	type *thiz;							\
 	Enesim_Renderer_Gradient *g;					\
