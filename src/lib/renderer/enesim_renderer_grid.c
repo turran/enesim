@@ -61,6 +61,9 @@ typedef struct _Enesim_Renderer_Grid
 	Eina_F16p16 hi;
 	Eina_F16p16 wwt;
 	Eina_F16p16 hht;
+	Enesim_Color icolor, ocolor;
+	Enesim_Renderer *mask;
+	Eina_Bool do_mask;
 } Enesim_Renderer_Grid;
 
 typedef struct _Enesim_Renderer_Grid_Class {
@@ -82,7 +85,7 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 	sy = eina_f16p16_int_to(syy);
 	if (syy >= thiz->hi)
 	{
-		p0 = thiz->outside.color;
+		p0 = thiz->ocolor;
 	}
 	else
 	{
@@ -97,26 +100,26 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 		sx = eina_f16p16_int_to(sxx);
 		if (sxx >= thiz->wi)
 		{
-			p0 = thiz->outside.color;
+			p0 = thiz->ocolor;
 		}
 		/* totally inside */
 		else
 		{
-			p0 = thiz->inside.color;
+			p0 = thiz->icolor;
 			/* antialias the inner square */
 			if (sx == 0)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, thiz->outside.color);
+				p0 = argb8888_interp_256(a, p0, thiz->ocolor);
 			}
 			else if (sx == (thiz->inside.w - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, thiz->outside.color, p0);
+				p0 = argb8888_interp_256(a, thiz->ocolor, p0);
 
 			}
 			if (sy == 0)
@@ -124,14 +127,14 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, thiz->outside.color);
+				p0 = argb8888_interp_256(a, p0, thiz->ocolor);
 			}
 			else if (sy == (thiz->inside.h - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, thiz->outside.color, p0);
+				p0 = argb8888_interp_256(a, thiz->ocolor, p0);
 			}
 		}
 	}
@@ -151,6 +154,8 @@ static void _span_identity(Enesim_Renderer *r,
 #endif
 
 	thiz = ENESIM_RENDERER_GRID(r);
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
 #if 0
 	enesim_coord_identity_setup(r, x, y, &xx, &yy);
 	while (dst < end)
@@ -171,27 +176,76 @@ static void _span_identity(Enesim_Renderer *r,
 	/* simplest case, all the span is outside */
 	if (sy >= thiz->inside.h)
 	{
-		while (dst < end)
-			*dst++ = thiz->outside.color;
+		if (thiz->do_mask)
+		{
+			while (dst < end)
+			{
+				uint32_t color;
+				int ma = (*dst) >> 24;
+
+				if (ma)
+				{
+					color = thiz->ocolor;
+					if (ma < 255)
+						color = argb8888_mul_sym(ma, color);
+					*dst = color;
+				}
+				dst++;
+			}
+		}
+		else
+		{
+			while (dst < end)
+				*dst++ = thiz->ocolor;
+		}
 	}
 	/* we swap between the two */
 	else
 	{
-		while (dst < end)
+		if (thiz->do_mask)
 		{
-			int sx;
+			while (dst < end)
+			{
+				uint32_t color;
+				int ma = (*dst) >> 24;
 
-			sx = (x % thiz->wt);
-			if (sx < 0)
-				sx += thiz->wt;
+				if (ma)
+				{
+					int sx = (x % thiz->wt);
 
-			if (sx >= thiz->inside.w)
-				*dst = thiz->outside.color;
-			else
-				*dst = thiz->inside.color;
+					if (sx < 0)
+						sx += thiz->wt;
 
-			dst++;
-			x++;
+					if (sx >= thiz->inside.w)
+						color = thiz->ocolor;
+					else
+						color = thiz->icolor;
+					if (ma < 255)
+						color = argb8888_mul_sym(ma, color);
+					*dst = color;
+				}
+				dst++;
+				x++;
+			}
+		}
+		else
+		{
+			while (dst < end)
+			{
+				int sx;
+
+				sx = (x % thiz->wt);
+				if (sx < 0)
+					sx += thiz->wt;
+
+				if (sx >= thiz->inside.w)
+					*dst = thiz->ocolor;
+				else
+					*dst = thiz->icolor;
+
+				dst++;
+				x++;
+			}
 		}
 	}
 #endif
@@ -207,16 +261,26 @@ static void _span_affine(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_GRID(r);
 	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy, &thiz->matrix);
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
 
 	while (dst < end)
 	{
 		uint32_t p0;
+		int ma = 255;
 
-		p0 = _grid(thiz, yy, xx);
-
+		if (thiz->do_mask)
+			ma = (*dst) >> 24;
+		if (ma)
+		{
+			p0 = _grid(thiz, yy, xx);
+			if (ma < 255)
+				p0 = argb8888_mul_sym(ma, p0);
+			*dst = p0;
+		}
 		yy += thiz->matrix.yx;
 		xx += thiz->matrix.xx;
-		*dst++ = p0;
+		dst++;
 	}
 }
 
@@ -229,22 +293,33 @@ static void _span_projective(Enesim_Renderer *r,
 	Eina_F16p16 yy, xx, zz;
 
 	thiz = ENESIM_RENDERER_GRID(r);
+	if (thiz->do_mask)
+		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
+
 	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx;
 		uint32_t p0;
+		int ma = 255;
 
-		syy = ((((int64_t)yy) << 16) / zz);
-		sxx = ((((int64_t)xx) << 16) / zz);
+		if (thiz->do_mask)
+			ma = (*dst) >> 24;
+		if (ma)
+		{
+			syy = ((((int64_t)yy) << 16) / zz);
+			sxx = ((((int64_t)xx) << 16) / zz);
 
-		p0 = _grid(thiz, syy, sxx);
-
+			p0 = _grid(thiz, syy, sxx);
+			if (ma < 255)
+				p0 = argb8888_mul_sym(ma, p0);
+			*dst = p0;
+		}
 		yy += thiz->matrix.yx;
 		xx += thiz->matrix.xx;
 		zz += thiz->matrix.zx;
-		*dst++ = p0;
+		dst++;
 	}
 }
 /*----------------------------------------------------------------------------*
@@ -257,7 +332,15 @@ static const char * _grid_name(Enesim_Renderer *r EINA_UNUSED)
 
 static void _grid_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
 {
+	Enesim_Renderer_Grid *thiz;
 
+	thiz = ENESIM_RENDERER_GRID(r);
+	if (thiz->mask)
+	{
+		enesim_renderer_unref(thiz->mask);
+		thiz->mask = NULL;
+	}
+	thiz->do_mask = EINA_FALSE;
 }
 
 static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
@@ -268,6 +351,7 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 	Enesim_Matrix m;
 	Enesim_Matrix inv;
 	Enesim_Matrix_Type type;
+	Enesim_Color color;
 
 	thiz = ENESIM_RENDERER_GRID(r);
 	if (!thiz->inside.w || !thiz->inside.h || !thiz->outside.w || !thiz->outside.h)
@@ -282,6 +366,18 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &m);
 	enesim_matrix_inverse(&m, &inv);
 	type = enesim_renderer_transformation_type_get(r);
+	thiz->mask = enesim_renderer_mask_get(r);
+	if (thiz->mask)
+	{
+		Enesim_Channel mchannel;
+
+		mchannel = enesim_renderer_mask_channel_get(r);
+		if (mchannel == ENESIM_CHANNEL_ALPHA)
+			thiz->do_mask = EINA_TRUE;
+	}
+	color = enesim_renderer_color_get(r);
+	thiz->icolor = argb8888_mul4_sym(thiz->inside.color, color);
+	thiz->ocolor = argb8888_mul4_sym(thiz->outside.color, color);
 	switch (type)
 	{
 		case ENESIM_MATRIX_TYPE_IDENTITY:
@@ -313,6 +409,18 @@ static void _grid_features_get(Enesim_Renderer *r EINA_UNUSED,
 			ENESIM_RENDERER_FEATURE_PROJECTIVE |
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
+
+static void _grid_sw_hints_get(Enesim_Renderer *r,
+		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
+{
+	Enesim_Channel  mchannel;
+
+	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
+	mchannel = enesim_renderer_mask_channel_get(r);
+	if (mchannel == ENESIM_CHANNEL_ALPHA)
+		*hints |= ENESIM_RENDERER_SW_HINT_MASK;
+}
+
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -327,6 +435,7 @@ static void _enesim_renderer_grid_class_init(void *k)
 	klass = ENESIM_RENDERER_CLASS(k);
 	klass->base_name_get = _grid_name;
 	klass->features_get = _grid_features_get;
+	klass->sw_hints_get = _grid_sw_hints_get;
 	klass->sw_setup = _grid_sw_setup;
 	klass->sw_cleanup = _grid_sw_cleanup;
 }
