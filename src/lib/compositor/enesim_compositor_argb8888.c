@@ -143,7 +143,7 @@ static void _argb8888_sp_none_color_none_blend(uint32_t *d,
 		uint32_t color, uint32_t *m EINA_UNUSED)
 {
 #if BUILD_ORC
-	argb8888_sp_none_color_none_blend_orc(d, color, len);
+	enesim_color_blend_orc_sp_none_color_none(d, color, len);
 #else
 	enesim_color_blend_sp_none_color_none(d, len, color);
 #endif
@@ -154,7 +154,7 @@ static void _argb8888_sp_argb8888_none_none_blend(uint32_t *d,
 		uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
 {
 #if BUILD_ORC
-	argb8888_sp_argb8888_none_none_blend_orc(d, s, len);
+	enesim_color_blend_orc_sp_argb8888_none_none(d, s, len);
 #else
 	enesim_color_blend_sp_argb8888_none_none(d, len, s);
 #endif
@@ -165,7 +165,7 @@ static void _argb8888_sp_argb8888_color_none_blend(uint32_t *d,
 		uint32_t color, uint32_t *m EINA_UNUSED)
 {
 #if BUILD_ORC
-	argb8888_sp_argb8888_color_none_blend_orc(d, s, color, len);
+	enesim_color_blend_orc_sp_argb8888_color_none(d, s, color, len);
 #else
 	enesim_color_blend_sp_argb8888_color_none(d, len, s, color);
 #endif
@@ -176,7 +176,7 @@ static void _argb8888_sp_none_color_argb8888_alpha_blend(uint32_t *d,
 		uint32_t *m)
 {
 #if BUILD_ORC
-	argb8888_sp_none_color_argb8888_alpha_blend_orc(d, m, color, len);
+	enesim_color_blend_orc_sp_none_color_argb8888_alpha(d, m, color, len);
 #else
 	enesim_color_blend_sp_none_color_argb8888_alpha(d, len, color, m);
 #endif

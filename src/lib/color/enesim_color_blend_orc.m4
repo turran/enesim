@@ -1,6 +1,6 @@
 include(src/lib/color/enesim_color_orc.m4)dnl
 
-.function argb8888_sp_none_color_none_blend_orc
+.function enesim_color_blend_orc_sp_none_color_none
 .flags 1d
 .dest 4 d uint32_t
 .param 4 color uint32_t
@@ -22,7 +22,7 @@ argb8888_blend(w_d, w_a, w_color)
 argb8888_unpack(t_d, w_d)
 storel d, t_d
 
-.function argb8888_sp_argb8888_none_none_blend_orc
+.function enesim_color_blend_orc_sp_argb8888_none_none
 .flags 1d
 .dest 4 d uint32_t
 .source 4 s uint32_t
@@ -44,7 +44,7 @@ argb8888_blend(w_d, w_a, w_s)
 argb8888_unpack(t_d, w_d)
 storel d, t_d
 
-.function argb8888_sp_argb8888_color_none_blend_orc
+.function enesim_color_blend_orc_sp_argb8888_color_none
 .flags 1d
 .dest 4 d uint32_t
 .source 4 s uint32_t
@@ -74,7 +74,7 @@ argb8888_blend(w_d, w_a, w_mul)
 argb8888_unpack(t_d, w_d)
 storel d, t_d
 
-.function argb8888_sp_none_color_argb8888_alpha_blend_orc
+.function enesim_color_blend_orc_sp_none_color_argb8888_alpha
 .flags 1d
 .dest 4 d uint32_t
 .source 4 m uint32_t
