@@ -19,29 +19,6 @@
 #ifndef _ENESIM_TEXT_PRIVATE_H
 #define _ENESIM_TEXT_PRIVATE_H
 
-/* SIMD intrinsics */
-#ifdef ENS_HAVE_MMX
-#define LIBARGB_MMX 1
-#else
-#define LIBARGB_MMX 0
-#endif
-
-#ifdef  ENS_HAVE_SSE
-#define LIBARGB_SSE 1
-#else
-#define LIBARGB_SSE 0
-#endif
-
-#ifdef ENS_HAVE_SSE2
-#define LIBARGB_SSE2 1
-#else
-#define LIBARGB_SSE2 0
-#endif
-
-#define LIBARGB_DEBUG 0
-
-#include "libargb.h"
-
 /* freetype engine */
 void enesim_text_engine_freetype_init(void);
 void enesim_text_engine_freetype_shutdown(void);

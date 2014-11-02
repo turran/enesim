@@ -38,6 +38,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_coord_private.h"
 #include "enesim_renderer_gradient_private.h"

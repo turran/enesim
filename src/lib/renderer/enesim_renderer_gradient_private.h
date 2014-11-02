@@ -15,10 +15,8 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GRADIENT_H_
-#define GRADIENT_H_
-
-#include "libargb.h"
+#ifndef _ENESIM_RENDERER_GRADIENT_PRIVATE_H_
+#define _ENESIM_RENDERER_GRADIENT_PRIVATE_H
 
 #define ENESIM_RENDERER_GRADIENT_DESCRIPTOR enesim_renderer_gradient_descriptor_get()
 #define ENESIM_RENDERER_GRADIENT_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k,		\
@@ -49,7 +47,7 @@ static inline uint32_t enesim_renderer_gradient_pad_color_get(Enesim_Color *src,
 		uint16_t a;
 
 		a = eina_f16p16_fracc_get(p) >> 8;
-		v = argb8888_interp_256(1 + a, src[fp + 1], src[fp]);
+		v = enesim_color_interp_256(1 + a, src[fp + 1], src[fp]);
 	}
 
 	return v;
@@ -69,7 +67,7 @@ static inline uint32_t enesim_renderer_gradient_restrict_color_get(Enesim_Color 
 			uint16_t a;
 
 			a = eina_f16p16_fracc_get(p) >> 8;
-			v = argb8888_interp_256(1 + a, src[0], 0);
+			v = enesim_color_interp_256(1 + a, src[0], 0);
 		}
 	}
 	else if (fp >= len - 1)
@@ -82,7 +80,7 @@ static inline uint32_t enesim_renderer_gradient_restrict_color_get(Enesim_Color 
 			uint16_t a;
 
 			a = eina_f16p16_fracc_get(p - slen) >> 8;
-			v = argb8888_interp_256(1 + a, 0, src[len - 1]);
+			v = enesim_color_interp_256(1 + a, 0, src[len - 1]);
 		}
 	}
 	else
@@ -90,7 +88,7 @@ static inline uint32_t enesim_renderer_gradient_restrict_color_get(Enesim_Color 
 		uint16_t a;
 
 		a = eina_f16p16_fracc_get(p) >> 8;
-		v = argb8888_interp_256(1 + a, src[fp + 1], src[fp]);
+		v = enesim_color_interp_256(1 + a, src[fp + 1], src[fp]);
 	}
 
 	return v;
@@ -110,7 +108,7 @@ static inline uint32_t enesim_renderer_gradient_reflect_color_get(Enesim_Color *
 	fp_next = (fp < (len - 1) ? (fp + 1) : len - 1);
 
 	a = eina_f16p16_fracc_get(p) >> 8;
-	v = argb8888_interp_256(1 + a, src[fp_next], src[fp]);
+	v = enesim_color_interp_256(1 + a, src[fp_next], src[fp]);
 
 	return v;
 }
@@ -132,7 +130,7 @@ static inline uint32_t enesim_renderer_gradient_repeat_color_get(Enesim_Color *s
 	fp_next = (fp < (len - 1) ? fp + 1 : 0);
 
 	a = eina_f16p16_fracc_get(p) >> 8;
-	v = argb8888_interp_256(1 + a, src[fp_next], src[fp]);
+	v = enesim_color_interp_256(1 + a, src[fp_next], src[fp]);
 
 	return v;
 }
@@ -178,7 +176,7 @@ static void _gradient_fill_argb8888_##mode##_projective(		\
 		p0 = enesim_renderer_gradient_##mode##_color_get(	\
 				g->sw.src, g->sw.len, d);		\
 		if (ma < 255)						\
-			p0 = argb8888_mul_sym(ma, p0);			\
+			p0 = enesim_color_mul_sym(ma, p0);		\
 		*dst = p0;						\
 next:									\
 		dst++;							\
@@ -223,7 +221,7 @@ static void _gradient_fill_argb8888_##mode##_identity(			\
 		p0 = enesim_renderer_gradient_##mode##_color_get(	\
 				g->sw.src, g->sw.len, d);		\
 		if (ma < 255)						\
-			p0 = argb8888_mul_sym(ma, p0);			\
+			p0 = enesim_color_mul_sym(ma, p0);		\
 		*dst = p0;						\
 next:									\
 		dst++;							\
@@ -268,7 +266,7 @@ static void _gradient_fill_argb8888_##mode##_affine(			\
 		p0 = enesim_renderer_gradient_##mode##_color_get(	\
 				g->sw.src, g->sw.len, d);		\
 		if (ma < 255)						\
-			p0 = argb8888_mul_sym(ma, p0);			\
+			p0 = enesim_color_mul_sym(ma, p0);		\
 		*dst = p0;						\
 next:									\
 		dst++;							\
