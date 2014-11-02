@@ -442,6 +442,7 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *area, int x, int y)
 {
 	Enesim_Renderer *mask;
+	Enesim_Color color;
 	Enesim_Format dfmt;
 	Eina_Rectangle final;
 	Eina_Bool visible;
@@ -459,6 +460,16 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 
 	/* get the destination pointer */
 	_sw_surface_setup(s, &dfmt, (void **)&ddata, &stride, &bpp);
+
+	color = enesim_renderer_color_get(r);
+	if (!color)
+	{
+		if (r->current_rop == ENESIM_ROP_FILL)
+		{
+			_sw_clear(ddata, stride, bpp, area);
+		}
+		return;
+	}
 
 	/* be sure to clip the area to the renderer bounds */
 	final = r->current_destination_bounds;
@@ -681,6 +692,7 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 		int len, uint32_t *data)
 {
 	Enesim_Renderer_Sw_Data *sw_data;
+	Enesim_Color color;
 	Eina_Rectangle span;
 	Eina_Rectangle rbounds, mbounds;
 	Eina_Bool visible;
@@ -689,6 +701,17 @@ void enesim_renderer_sw_draw(Enesim_Renderer *r,  int x, int y,
 	if (!len) return;
 	visible = enesim_renderer_visibility_get(r);
 	if (!visible) return;
+
+	color = enesim_renderer_color_get(r);
+	if (!color)
+	{
+		if (r->current_rop == ENESIM_ROP_FILL)
+		{
+			memset(data, 0, len * sizeof(uint32_t));
+		}
+		return;
+	}
+
 	sw_data = r->backend_data[ENESIM_BACKEND_SOFTWARE];
 
 	eina_rectangle_coords_from(&span, x, y, len, 1);
@@ -737,11 +760,9 @@ mask_done:
 
 	if (sw_data->span)
 	{
-		Enesim_Color color;
 		uint32_t *tmp;
 		size_t bytes;
 
-		color = enesim_renderer_color_get(r);
 		bytes = rbounds.w * sizeof(uint32_t);
 		tmp = alloca(bytes);
 
