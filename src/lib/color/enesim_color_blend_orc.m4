@@ -1,4 +1,4 @@
-include(src/lib/argb/libargb_argb8888_core_orc.m4)dnl
+include(src/lib/color/enesim_color_orc.m4)dnl
 
 .function argb8888_sp_none_color_none_blend_orc
 .flags 1d

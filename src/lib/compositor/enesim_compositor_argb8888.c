@@ -17,7 +17,6 @@
  */
 
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_color.h"
@@ -27,6 +26,10 @@
 #include "enesim_color_private.h"
 #include "enesim_color_fill_private.h"
 #include "enesim_color_blend_private.h"
+
+#if BUILD_ORC
+#include "enesim_color_blend_orc_private.h"
+#endif
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
