@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -42,6 +41,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -95,7 +95,7 @@ static void _transition_span_general(Enesim_Renderer *r,
 	{
 		uint32_t p0 = *d, p1 = *buf;
 
-		*d++ = argb8888_interp_256(interp, p1, p0);
+		*d++ = enesim_color_interp_256(interp, p1, p0);
 		buf++;
 	}
 }

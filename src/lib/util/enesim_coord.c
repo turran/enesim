@@ -16,10 +16,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_rectangle.h"
+#include "enesim_color.h"
 #include "enesim_matrix.h"
+
+#include "enesim_color_private.h"
 #include "enesim_coord_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -126,7 +128,7 @@ uint32_t enesim_coord_sample_good_restrict(uint32_t *data, size_t stride, int sw
 		y = eina_f16p16_int_to(yy);
 
 		/* pick the coord */
-		data = argb8888_at(data, stride, x, y);
+		data = enesim_color_at(data, stride, x, y);
 
 		if ((x > -1) && (y > - 1) && (x < sw) && (y < sh))
 			p0 = *data;
@@ -153,9 +155,9 @@ uint32_t enesim_coord_sample_good_restrict(uint32_t *data, size_t stride, int sw
 			ax = 1 + (eina_f16p16_fracc_get(xx) >> 8);
 			ay = 1 + (eina_f16p16_fracc_get(yy) >> 8);
 
-			p0 = argb8888_interp_256(ax, p1, p0);
-			p2 = argb8888_interp_256(ax, p3, p2);
-			p0 = argb8888_interp_256(ay, p2, p0);
+			p0 = enesim_color_interp_256(ax, p1, p0);
+			p2 = enesim_color_interp_256(ax, p3, p2);
+			p0 = enesim_color_interp_256(ay, p2, p0);
 		}
 		return p0;
 	}
@@ -186,18 +188,18 @@ uint32_t enesim_coord_sample_good_repeat(uint32_t *data, size_t stride, int sw,
 	y = eina_f16p16_int_to(enesim_coord_repeat(tyy, shh));
 	x1 = eina_f16p16_int_to(enesim_coord_repeat(txx + EINA_F16P16_ONE, sww));
 	y1 = eina_f16p16_int_to(enesim_coord_repeat(tyy + EINA_F16P16_ONE, shh));
-	p0 = *(argb8888_at(data, stride, x, y));
-	p1 = *(argb8888_at(data, stride, x1, y));
-	p2 = *(argb8888_at(data, stride, x, y1));
-	p3 = *(argb8888_at(data, stride, x1, y1));
+	p0 = *(enesim_color_at(data, stride, x, y));
+	p1 = *(enesim_color_at(data, stride, x1, y));
+	p2 = *(enesim_color_at(data, stride, x, y1));
+	p3 = *(enesim_color_at(data, stride, x1, y1));
 
 	/* sample */
 	ax = 1 + (eina_f16p16_fracc_get(xx) >> 8);
 	ay = 1 + (eina_f16p16_fracc_get(yy) >> 8);
 
-	p0 = argb8888_interp_256(ax, p1, p0);
-	p2 = argb8888_interp_256(ax, p3, p2);
-	p0 = argb8888_interp_256(ay, p2, p0);
+	p0 = enesim_color_interp_256(ax, p1, p0);
+	p2 = enesim_color_interp_256(ax, p3, p2);
+	p0 = enesim_color_interp_256(ay, p2, p0);
 	return p0;
 }
 
@@ -224,18 +226,18 @@ uint32_t enesim_coord_sample_good_reflect(uint32_t *data, size_t stride, int sw,
 	y = eina_f16p16_int_to(enesim_coord_reflect(tyy, shh));
 	x1 = eina_f16p16_int_to(enesim_coord_reflect(txx + EINA_F16P16_ONE, sww));
 	y1 = eina_f16p16_int_to(enesim_coord_reflect(tyy + EINA_F16P16_ONE, shh));
-	p0 = *(argb8888_at(data, stride, x, y));
-	p1 = *(argb8888_at(data, stride, x1, y));
-	p2 = *(argb8888_at(data, stride, x, y1));
-	p3 = *(argb8888_at(data, stride, x1, y1));
+	p0 = *(enesim_color_at(data, stride, x, y));
+	p1 = *(enesim_color_at(data, stride, x1, y));
+	p2 = *(enesim_color_at(data, stride, x, y1));
+	p3 = *(enesim_color_at(data, stride, x1, y1));
 
 	/* sample */
 	ax = 1 + (eina_f16p16_fracc_get(xx) >> 8);
 	ay = 1 + (eina_f16p16_fracc_get(yy) >> 8);
 
-	p0 = argb8888_interp_256(ax, p1, p0);
-	p2 = argb8888_interp_256(ax, p3, p2);
-	p0 = argb8888_interp_256(ay, p2, p0);
+	p0 = enesim_color_interp_256(ax, p1, p0);
+	p2 = enesim_color_interp_256(ax, p3, p2);
+	p0 = enesim_color_interp_256(ay, p2, p0);
 	return p0;
 }
 
@@ -253,7 +255,7 @@ uint32_t enesim_coord_sample_fast(uint32_t *data, size_t stride, int sw,
 	{
 		uint32_t *ret;
 
-		ret = argb8888_at(data, stride, x, y);
+		ret = enesim_color_at(data, stride, x, y);
 		return *ret;
 	}
 	else

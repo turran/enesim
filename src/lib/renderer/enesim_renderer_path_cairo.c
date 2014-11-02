@@ -17,7 +17,6 @@
  */
 
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -187,7 +186,7 @@ static void _path_cairo_draw(Enesim_Renderer *r, int x, int y, int len,
 	y -= thiz->destination_bounds.y;
 	//printf("drawing at %d,%d -> %d\n", x, y, len);
 	/* just copy the pixels from the cairo rendered surface to the destination */
-	src = (unsigned char *)argb8888_at((uint32_t *)thiz->data, thiz->stride, x, y);
+	src = (unsigned char *)enesim_color_at((uint32_t *)thiz->data, thiz->stride, x, y);
 	memcpy(ddata, src, len * 4);
 }
 /*----------------------------------------------------------------------------*

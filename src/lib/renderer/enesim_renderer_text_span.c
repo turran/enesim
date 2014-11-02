@@ -419,7 +419,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 				goto after;
 			}
 
-			mask = argb8888_at(mask, stride, rx, ry);
+			mask = enesim_color_at(mask, stride, rx, ry);
 			if (fpaint)
 			{
 				if (fcolor != 0xffffffff)

@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -37,6 +36,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_draw_cache_private.h"
 /*============================================================================*
@@ -287,7 +287,7 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 
 		if (!eina_rectangle_intersection(&redraw, &s_area))
 			continue;
-		dst = (uint8_t *)argb8888_at(mapped->argb8888.plane0,
+		dst = (uint8_t *)enesim_color_at(mapped->argb8888.plane0,
 				mapped->argb8888.plane0_stride,
 				redraw.x, redraw.y);
 		//printf("redrawing into %d %d %d %d from %d %d\n", redraw.x, redraw.y, redraw.w, redraw.h,
