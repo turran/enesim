@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include <math.h>
 #include <float.h>
@@ -36,6 +35,8 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
+#include "enesim_color_mul4_sym_private.h"
 #include "enesim_list_private.h"
 #include "enesim_vector_private.h"
 #include "enesim_renderer_private.h"
@@ -433,8 +434,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 		if (fpaint)
 			enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
@@ -471,7 +472,7 @@ get_out:
 					{
 						uint32_t tmp;
 
-						tmp = argb8888_mul4_sym(fcolor, *dst);
+						tmp = enesim_color_mul4_sym(fcolor, *dst);
 						*dst++ = tmp;
 					}
 				}
@@ -610,8 +611,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
@@ -634,7 +635,7 @@ get_out:
 				{
 					uint32_t tmp;
 
-					tmp = argb8888_mul4_sym(scolor, *dst);
+					tmp = enesim_color_mul4_sym(scolor, *dst);
 					*dst++ = tmp;
 				}
 			}
@@ -763,8 +764,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sbuf = alloca((rx - lx) * sizeof(unsigned int));
@@ -791,7 +792,7 @@ get_out:
 				uint32_t tmp = *sb;
 
 				if (scolor != 0xffffffff)
-					tmp = argb8888_mul4_sym(scolor, tmp);
+					tmp = enesim_color_mul4_sym(scolor, tmp);
 				*dst++ = tmp;
 				sb++;
 			}
@@ -808,7 +809,7 @@ get_out:
 					{
 						uint32_t tmp;
 
-						tmp = argb8888_mul4_sym(fcolor, *dst);
+						tmp = enesim_color_mul4_sym(fcolor, *dst);
 						*dst++ = tmp;
 					}
 				}
@@ -1055,8 +1056,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 		if (fpaint)
 			enesim_renderer_sw_draw(fpaint, x + lx, y, rx - lx, dst + lx);
@@ -1093,7 +1094,7 @@ get_out:
 					{
 						uint32_t tmp;
 
-						tmp = argb8888_mul4_sym(fcolor, *dst);
+						tmp = enesim_color_mul4_sym(fcolor, *dst);
 						*dst++ = tmp;
 					}
 				}
@@ -1232,8 +1233,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		enesim_renderer_sw_draw(spaint, x + lx, y, rx - lx, dst + lx);
@@ -1256,7 +1257,7 @@ get_out:
 				{
 					uint32_t tmp;
 
-					tmp = argb8888_mul4_sym(scolor, *dst);
+					tmp = enesim_color_mul4_sym(scolor, *dst);
 					*dst++ = tmp;
 				}
 			}
@@ -1385,8 +1386,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sbuf = alloca((rx - lx) * sizeof(unsigned int));
@@ -1413,7 +1414,7 @@ get_out:
 				uint32_t tmp = *sb;
 
 				if (scolor != 0xffffffff)
-					tmp = argb8888_mul4_sym(scolor, tmp);
+					tmp = enesim_color_mul4_sym(scolor, tmp);
 				*dst++ = tmp;
 				sb++;
 			}
@@ -1430,7 +1431,7 @@ get_out:
 					{
 						uint32_t tmp;
 
-						tmp = argb8888_mul4_sym(fcolor, *dst);
+						tmp = enesim_color_mul4_sym(fcolor, *dst);
 						*dst++ = tmp;
 					}
 				}

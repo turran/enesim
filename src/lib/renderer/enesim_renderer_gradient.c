@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -38,6 +37,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_gradient_private.h"
 
@@ -126,10 +126,10 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 			xx = 0;
 		}
 		off = 1 + (eina_f16p16_fracc_get(xx) >> 8);
-		p0 = argb8888_interp_256(off, next->argb, curr->argb);
+		p0 = enesim_color_interp_256(off, next->argb, curr->argb);
 		p0 = enesim_color_argb_from(p0);
 		if (color)
-			p0 = argb8888_mul4_sym(p0, color);
+			p0 = enesim_color_mul4_sym(p0, color);
 		*dst++ = p0;
 		xx += inc;
 	}
@@ -140,7 +140,7 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 
 		p0 = enesim_color_argb_from(next->argb);
 		if (color)
-			p0 = argb8888_mul4_sym(p0, color);
+			p0 = enesim_color_mul4_sym(p0, color);
 		*dst++ = p0;
 	}
 	return EINA_TRUE;

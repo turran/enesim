@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -42,6 +41,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 /**
  * @todo
@@ -302,7 +302,7 @@ static void _image_blend_argb8888(Enesim_Renderer *r,
 	}
 	if (len > thiz->sw - x)
 		len = thiz->sw - x;
-	src = argb8888_at(src, thiz->sstride, x, y);
+	src = enesim_color_at(src, thiz->sstride, x, y);
 	thiz->span(dst, len, src, thiz->color, NULL);
 }
 
@@ -344,7 +344,7 @@ static void _image_fill_argb8888_no_scale_affine_fast(Enesim_Renderer *r,
 		{
 			p0 = *(src + (y * sw) + x);
 			if (color && p0)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
 		}
 		*dst++ = p0;  xx += thiz->matrix.xx;  yy += thiz->matrix.yx;
 	}
@@ -396,7 +396,7 @@ static void _image_fill_argb8888_scale_identity_fast(Enesim_Renderer *r,
 
 			p0 = *(src + ix);
 			if (p0 && color)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
         	}
 		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
@@ -447,7 +447,7 @@ static void _image_fill_argb8888_scale_affine_fast(Enesim_Renderer *r,
 			p0 = *(src + (iy * sw) + ix);
 
 			if (p0 && color)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
         	}
 		*dst++ = p0;  xx += thiz->matrix.xx;  yy += thiz->matrix.yx;
 	}
@@ -481,7 +481,7 @@ static void _image_fill_argb8888_no_scale_identity(Enesim_Renderer *r,
 		memset(dst + (thiz->sw - x), 0, sizeof(unsigned int) * (len - (thiz->sw - x)));
 		len = thiz->sw - x;
 	}
-	src = argb8888_at(src, thiz->sstride, x, y);
+	src = enesim_color_at(src, thiz->sstride, x, y);
 	thiz->span(dst, len, src, thiz->color, NULL);
 }
 
@@ -538,11 +538,11 @@ static void _image_fill_argb8888_no_scale_affine(Enesim_Renderer *r,
 				uint16_t ax = 1 + ((xx & 0xffff) >> 8);
 				uint16_t ay = 1 + ((yy & 0xffff) >> 8);
 
-				p0 = argb8888_interp_256(ax, p1, p0);
-				p2 = argb8888_interp_256(ax, p3, p2);
-				p0 = argb8888_interp_256(ay, p2, p0);
+				p0 = enesim_color_interp_256(ax, p1, p0);
+				p2 = enesim_color_interp_256(ax, p3, p2);
+				p0 = enesim_color_interp_256(ay, p2, p0);
 				if (color && p0)
-					p0 = argb8888_mul4_sym(p0, color);
+					p0 = enesim_color_mul4_sym(p0, color);
 			}
 		}
 		*dst++ = p0;  xx += thiz->matrix.xx;  yy += thiz->matrix.yx;
@@ -620,11 +620,11 @@ static void _image_fill_argb8888_scale_identity(Enesim_Renderer *r,
 					ax = 1 + ((xx & 0xffff) >> 8);
 				if ((iww - xx) < EINA_F16P16_ONE)
 					ax = 256 - ((iww - xx) >> 8);
-				p0 = argb8888_interp_256(ax, p1, p0);
-				p2 = argb8888_interp_256(ax, p3, p2);
-				p0 = argb8888_interp_256(ay, p2, p0);
+				p0 = enesim_color_interp_256(ax, p1, p0);
+				p2 = enesim_color_interp_256(ax, p3, p2);
+				p0 = enesim_color_interp_256(ay, p2, p0);
 				if (color && p0)
-					p0 = argb8888_mul4_sym(p0, color);
+					p0 = enesim_color_mul4_sym(p0, color);
 			}
         	}
 		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
@@ -702,11 +702,11 @@ static void _image_fill_argb8888_scale_affine(Enesim_Renderer *r,
 				if ((ihh - yy) < EINA_F16P16_ONE)
 					ay = 256 - ((ihh - yy) >> 8);
 
-				p0 = argb8888_interp_256(ax, p1, p0);
-				p2 = argb8888_interp_256(ax, p3, p2);
-				p0 = argb8888_interp_256(ay, p2, p0);
+				p0 = enesim_color_interp_256(ax, p1, p0);
+				p2 = enesim_color_interp_256(ax, p3, p2);
+				p0 = enesim_color_interp_256(ay, p2, p0);
 				if (color && p0)
-					p0 = argb8888_mul4_sym(p0, color);
+					p0 = enesim_color_mul4_sym(p0, color);
 			}
         	}
 		*dst++ = p0;  xx += thiz->matrix.xx;  yy += thiz->matrix.yx;
@@ -783,7 +783,7 @@ static void _image_fill_argb8888_scale_d_u_identity(Enesim_Renderer *r,
 						p2 = *(p + sw);
 				}
 				if (p1 | p2)
-				    p1 = argb8888_interp_256(ay, p2, p1);
+				    p1 = enesim_color_interp_256(ay, p2, p1);
 				if (ntx != tx)
 				{
 					int ax;
@@ -816,7 +816,7 @@ static void _image_fill_argb8888_scale_d_u_identity(Enesim_Renderer *r,
 			}
 			p0 = ((ag0 + 0xff00ff) & 0xff00ff00) + (((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 			if (color && p0)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
 		}
 		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
@@ -893,7 +893,7 @@ static void _image_fill_argb8888_scale_u_d_identity(Enesim_Renderer *r,
 						p3 = *(p + 1);
 				}
 				if (p2 | p3)
-					p2 = argb8888_interp_256(ax, p3, p2);
+					p2 = enesim_color_interp_256(ax, p3, p2);
 
 				if (nty != ty)
 				{
@@ -928,7 +928,7 @@ static void _image_fill_argb8888_scale_u_d_identity(Enesim_Renderer *r,
 			}
 			p0 = ((ag0 + 0xff00ff) & 0xff00ff00) + (((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 			if (color && p0)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
 		}
 	*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
@@ -1067,7 +1067,7 @@ static void _image_fill_argb8888_scale_d_d_identity(Enesim_Renderer *r,
 			}
 			p0 = ((ag0 + 0xff00ff) & 0xff00ff00) + (((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 			if (color && p0)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
 		}
 		*dst++ = p0;  xx += EINA_F16P16_ONE;  ixx += mxx;
 	}
@@ -1138,7 +1138,7 @@ static void _image_fill_argb8888_scale_d_u_affine(Enesim_Renderer *r,
 						p2 = *(p + sw);
 				}
 				if (p1 | p2)
-				    p1 = argb8888_interp_256(ay, p2, p1);
+				    p1 = enesim_color_interp_256(ay, p2, p1);
 				if (ntx != tx)
 				{
 					int ax;
@@ -1171,7 +1171,7 @@ static void _image_fill_argb8888_scale_d_u_affine(Enesim_Renderer *r,
 			}
 			p0 = ((ag0 + 0xff00ff) & 0xff00ff00) + (((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 			if (color && p0)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
 		}
 		*dst++ = p0;  xx += thiz->matrix.xx;  yy += thiz->matrix.yx;
 	}
@@ -1241,7 +1241,7 @@ static void _image_fill_argb8888_scale_u_d_affine(Enesim_Renderer *r,
 						p3 = *(p + 1);
 				}
 				if (p2 | p3)
-					p2 = argb8888_interp_256(ax, p3, p2);
+					p2 = enesim_color_interp_256(ax, p3, p2);
 
 				if (nty != ty)
 				{
@@ -1276,7 +1276,7 @@ static void _image_fill_argb8888_scale_u_d_affine(Enesim_Renderer *r,
 			}
 			p0 = ((ag0 + 0xff00ff) & 0xff00ff00) + (((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 			if (color && p0)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
 		}
 	*dst++ = p0;  xx += thiz->matrix.xx;  yy += thiz->matrix.yx;
 	}
@@ -1412,7 +1412,7 @@ static void _image_fill_argb8888_scale_d_d_affine(Enesim_Renderer *r,
 			}
 			p0 = ((ag0 + 0xff00ff) & 0xff00ff00) + (((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 			if (color && p0)
-				p0 = argb8888_mul4_sym(p0, color);
+				p0 = enesim_color_mul4_sym(p0, color);
 		}
 		*dst++ = p0;  xx += thiz->matrix.xx;  yy += thiz->matrix.yx;
 	}

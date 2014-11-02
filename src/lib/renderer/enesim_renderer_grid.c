@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -33,6 +32,7 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
 #include "enesim_coord_private.h"
 #include "enesim_renderer_private.h"
 /*============================================================================*
@@ -112,14 +112,14 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, thiz->ocolor);
+				p0 = enesim_color_interp_256(a, p0, thiz->ocolor);
 			}
 			else if (sx == (thiz->inside.w - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, thiz->ocolor, p0);
+				p0 = enesim_color_interp_256(a, thiz->ocolor, p0);
 
 			}
 			if (sy == 0)
@@ -127,14 +127,14 @@ static inline uint32_t _grid(Enesim_Renderer_Grid *thiz, Eina_F16p16 yy, Eina_F1
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, thiz->ocolor);
+				p0 = enesim_color_interp_256(a, p0, thiz->ocolor);
 			}
 			else if (sy == (thiz->inside.h - 1))
 			{
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, thiz->ocolor, p0);
+				p0 = enesim_color_interp_256(a, thiz->ocolor, p0);
 			}
 		}
 	}
@@ -187,7 +187,7 @@ static void _grid_fill_argb8888_identity(Enesim_Renderer *r,
 				{
 					color = thiz->ocolor;
 					if (ma < 255)
-						color = argb8888_mul_sym(ma, color);
+						color = enesim_color_mul_sym(ma, color);
 					*dst = color;
 				}
 				dst++;
@@ -221,7 +221,7 @@ static void _grid_fill_argb8888_identity(Enesim_Renderer *r,
 					else
 						color = thiz->icolor;
 					if (ma < 255)
-						color = argb8888_mul_sym(ma, color);
+						color = enesim_color_mul_sym(ma, color);
 					*dst = color;
 				}
 				dst++;
@@ -275,7 +275,7 @@ static void _grid_fill_argb8888_affine(Enesim_Renderer *r,
 		{
 			p0 = _grid(thiz, yy, xx);
 			if (ma < 255)
-				p0 = argb8888_mul_sym(ma, p0);
+				p0 = enesim_color_mul_sym(ma, p0);
 			*dst = p0;
 		}
 		yy += thiz->matrix.yx;
@@ -313,7 +313,7 @@ static void _grid_fill_argb8888_projective(Enesim_Renderer *r,
 
 			p0 = _grid(thiz, syy, sxx);
 			if (ma < 255)
-				p0 = argb8888_mul_sym(ma, p0);
+				p0 = enesim_color_mul_sym(ma, p0);
 			*dst = p0;
 		}
 		yy += thiz->matrix.yx;
@@ -376,8 +376,8 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 			thiz->do_mask = EINA_TRUE;
 	}
 	color = enesim_renderer_color_get(r);
-	thiz->icolor = argb8888_mul4_sym(thiz->inside.color, color);
-	thiz->ocolor = argb8888_mul4_sym(thiz->outside.color, color);
+	thiz->icolor = enesim_color_mul4_sym(thiz->inside.color, color);
+	thiz->ocolor = enesim_color_mul4_sym(thiz->outside.color, color);
 	switch (type)
 	{
 		case ENESIM_MATRIX_TYPE_IDENTITY:

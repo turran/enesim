@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -199,8 +198,8 @@ static Eina_Bool _checker_state_setup(Enesim_Renderer *r, Enesim_Renderer_Checke
 	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
 	{
-		final_color1 = argb8888_mul4_sym(rend_color, final_color1);
-		final_color2 = argb8888_mul4_sym(rend_color, final_color2);
+		final_color1 = enesim_color_mul4_sym(rend_color, final_color1);
+		final_color2 = enesim_color_mul4_sym(rend_color, final_color2);
 	}
 	enesim_renderer_origin_get(r, &thiz->ox, &thiz->oy);
 	thiz->final_color1 = final_color1;
@@ -282,7 +281,7 @@ static void _span_identity(Enesim_Renderer *r,
 			p0 = color[1];
 		}
 		if (ma < 255)
-			p0 = argb8888_mul_sym(ma, p0);
+			p0 = enesim_color_mul_sym(ma, p0);
 		*dst++ = p0;
 done:
 		xx += EINA_F16P16_ONE;
@@ -353,14 +352,14 @@ static void _span_affine(Enesim_Renderer *r,
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[1]);
+				p0 = enesim_color_interp_256(a, p0, color[1]);
 			}
 			if (sx == 0 || sx == thiz->current.sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[1]);
+				p0 = enesim_color_interp_256(a, p0, color[1]);
 			}
 		}
 		else
@@ -373,18 +372,18 @@ static void _span_affine(Enesim_Renderer *r,
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[0]);
+				p0 = enesim_color_interp_256(a, p0, color[0]);
 			}
 			if (sx == 0 || sx == thiz->current.sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[0]);
+				p0 = enesim_color_interp_256(a, p0, color[0]);
 			}
 		}
 		if (ma < 255)
-			p0 = argb8888_mul_sym(ma, p0);
+			p0 = enesim_color_mul_sym(ma, p0);
 		*dst++ = p0;
 done:
 		yy += thiz->matrix.yx;
@@ -460,14 +459,14 @@ static void _span_projective(Enesim_Renderer *r,
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[1]);
+				p0 = enesim_color_interp_256(a, p0, color[1]);
 			}
 			if (sx == 0 || sx == thiz->current.sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[1]);
+				p0 = enesim_color_interp_256(a, p0, color[1]);
 			}
 		}
 		else
@@ -479,18 +478,18 @@ static void _span_projective(Enesim_Renderer *r,
 				uint16_t a;
 
 				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[0]);
+				p0 = enesim_color_interp_256(a, p0, color[0]);
 			}
 			if (sx == 0 || sx == thiz->current.sw)
 			{
 				uint16_t a;
 
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = argb8888_interp_256(a, p0, color[0]);
+				p0 = enesim_color_interp_256(a, p0, color[0]);
 			}
 		}
 		if (ma < 255)
-			p0 = argb8888_mul_sym(ma, p0);
+			p0 = enesim_color_mul_sym(ma, p0);
 		*dst++ = p0;
 done:
 		yy += thiz->matrix.yx;

@@ -35,6 +35,8 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
+#include "enesim_color_fill_private.h"
 #include "enesim_text_private.h"
 #include "enesim_list_private.h"
 #include "enesim_coord_private.h"
@@ -364,7 +366,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	fcolor = enesim_renderer_shape_fill_color_get(r);
 	color = enesim_renderer_color_get(r);
 	if (color != ENESIM_COLOR_FULL)
-		fcolor = argb8888_mul4_sym(color, fcolor);
+		fcolor = enesim_color_mul4_sym(color, fcolor);
 
 	font = thiz->state.current.font;
 	if (!font)
@@ -421,12 +423,12 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 			if (fpaint)
 			{
 				if (fcolor != 0xffffffff)
-					argb8888_sp_argb8888_color_argb8888_alpha_fill(dst, rlen, fbuf, fcolor, mask);
+					enesim_color_fill_sp_argb8888_color_argb8888_alpha(dst, rlen, fbuf, fcolor, mask);
 				else
-					argb8888_sp_argb8888_none_argb8888_alpha_fill(dst, rlen, fbuf, 0, mask);
+					enesim_color_fill_sp_argb8888_none_argb8888_alpha(dst, rlen, fbuf, mask);
 			}
 			else
-				argb8888_sp_none_color_argb8888_alpha_fill(dst, rlen, NULL, fcolor, mask);
+				enesim_color_fill_sp_none_color_argb8888_alpha(dst, rlen, fcolor, mask);
 			/* clear the area that we have not drawn on the horizontal bounds */
 after:
 			if (w < g->x_advance)

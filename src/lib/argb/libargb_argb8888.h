@@ -31,10 +31,6 @@
 
 #include "libargb_argb8888_core.h"
 #include "libargb_argb8888_misc.h"
-#include "libargb_argb8888_mul4_sym.h"
-#include "libargb_argb8888_fill.h"
-#include "libargb_argb8888_copy.h"
-#include "libargb_argb8888_blend.h"
 
 #if BUILD_ORC
 #include "libargb_argb8888_blend_orc_private.h"

@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -33,6 +32,7 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_draw_cache_private.h"
 #include "enesim_coord_private.h"
@@ -199,7 +199,7 @@ static void _blur_fill_argb8888_identity(Enesim_Renderer *r,
 		sstride = thiz->sstride;
 	}
 
-	src = argb8888_at(src, sstride, ix, iy);
+	src = enesim_color_at(src, sstride, ix, iy);
 
 	tyy0 = yy & 0xffff0000;  ty0 = (tyy0 >> 16);
 	ntyy0 = tyy0 + ibyy;  nty0 = (ntyy0 >> 16);
@@ -310,12 +310,12 @@ static void _blur_fill_argb8888_identity(Enesim_Renderer *r,
 					(((rb0 + 0xff00ff) >> 8) & 0xff00ff);
 				// apply an alpha modifier to dampen alphas more smoothly
 				if ((a = (p0 >> 24)) && (a < 234))
-				{ a = _atable[a];  p0 = argb8888_mul_256(a, p0); }
+				{ a = _atable[a];  p0 = enesim_color_mul_256(a, p0); }
 
 				if (color)
-					p0 = argb8888_mul4_sym(p0, color);
+					p0 = enesim_color_mul4_sym(p0, color);
 				if (ma < 255)
-					p0 = argb8888_mul_sym(ma, p0);
+					p0 = enesim_color_mul_sym(ma, p0);
 			}
 		}
 		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);  ix++;
@@ -383,7 +383,7 @@ static void _blur_fill_a8_identity(Enesim_Renderer *r,
 		sstride = thiz->sstride;
 	}
 
-	src = argb8888_at(src, sstride, ix, iy);
+	src = enesim_color_at(src, sstride, ix, iy);
 
 	tyy0 = yy & 0xffff0000;  ty0 = (tyy0 >> 16);
 	ntyy0 = tyy0 + ibyy;  nty0 = (ntyy0 >> 16);
@@ -474,13 +474,13 @@ static void _blur_fill_a8_identity(Enesim_Renderer *r,
 				p0 = ((a0 + 0xff0000) & 0xff000000);
 				// apply an alpha modifier to dampen alphas more smoothly
 				if ((da = (p0 >> 24)) && (da < 234))
-				{ da = _atable[da];  p0 = argb8888_mul_256(da, p0); }
+				{ da = _atable[da];  p0 = enesim_color_mul_256(da, p0); }
 
 				if (color)
-					p0 = argb8888_mul_256(1 + (p0 >> 24), color);
+					p0 = enesim_color_mul_256(1 + (p0 >> 24), color);
 
 				if (ma < 255)
-					p0 = argb8888_mul_sym(ma, p0);
+					p0 = enesim_color_mul_sym(ma, p0);
 			}
 		}
 		*dst++ = p0;  xx += ibxx;  x = (xx >> 16);  ix++;

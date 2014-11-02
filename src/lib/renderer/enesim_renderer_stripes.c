@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -206,7 +205,7 @@ static void _span_projective(Enesim_Renderer *r,
 		{
 			int a = 1 + ((syy & 0xffff) >> 8);
 
-			p0 = argb8888_interp_256(a, c0, c1);
+			p0 = enesim_color_interp_256(a, c0, c1);
 		}
 		if (syy >= hh0)
 		{
@@ -215,7 +214,7 @@ static void _span_projective(Enesim_Renderer *r,
 			{
 				int a = 1 + ((syy & 0xffff) >> 8);
 
-				p0 = argb8888_interp_256(a, c1, c0);
+				p0 = enesim_color_interp_256(a, c1, c0);
 			}
 		}
 		*d++ = p0;
@@ -268,7 +267,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 		{
 			p0 = *d;
 			if (c0 != 0xffffffff)
-				p0 = argb8888_mul4_sym(p0, c0);
+				p0 = enesim_color_mul4_sym(p0, c0);
 		}
 		if (sy == 0)
 		{
@@ -278,9 +277,9 @@ static void _span_projective_paints(Enesim_Renderer *r,
 			{
 				p1 = *s;
 				if (c1 != 0xffffffff)
-					p1 = argb8888_mul4_sym(p1, c1);
+					p1 = enesim_color_mul4_sym(p1, c1);
 			}
-			p0 = argb8888_interp_256(a, p0, p1);
+			p0 = enesim_color_interp_256(a, p0, p1);
 		}
 		if (syy >= hh0)
 		{
@@ -288,13 +287,13 @@ static void _span_projective_paints(Enesim_Renderer *r,
 			{
 				p1 = *s;
 				if (c1 != 0xffffffff)
-					p1 = argb8888_mul4_sym(p1, c1);
+					p1 = enesim_color_mul4_sym(p1, c1);
 			}
 			if (sy == h0)
 			{
 				int a = 1 + ((syy & 0xffff) >> 8);
 
-				p1 = argb8888_interp_256(a, p1, p0);
+				p1 = enesim_color_interp_256(a, p1, p0);
 			}
 			p0 = p1;
 
@@ -332,7 +331,7 @@ static void _span_affine(Enesim_Renderer *r,
 		{
 			int a = 1 + ((syy & 0xffff) >> 8);
 
-			p0 = argb8888_interp_256(a, c0, c1);
+			p0 = enesim_color_interp_256(a, c0, c1);
 		}
 		if (syy >= hh0)
 		{
@@ -341,7 +340,7 @@ static void _span_affine(Enesim_Renderer *r,
 			{
 				int a = 1 + ((syy & 0xffff) >> 8);
 
-				p0 = argb8888_interp_256(a, c1, c0);
+				p0 = enesim_color_interp_256(a, c1, c0);
 			}
 		}
 		*d++ = p0;
@@ -389,7 +388,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 		{
 			p0 = *d;
 			if (c0 != 0xffffffff)
-				p0 = argb8888_mul4_sym(p0, c0);
+				p0 = enesim_color_mul4_sym(p0, c0);
 		}
 		if (sy == 0)
 		{
@@ -399,9 +398,9 @@ static void _span_affine_paints(Enesim_Renderer *r,
 			{
 				p1 = *s;
 				if (c1 != 0xffffffff)
-					p1 = argb8888_mul4_sym(p1, c1);
+					p1 = enesim_color_mul4_sym(p1, c1);
 			}
-			p0 = argb8888_interp_256(a, p0, p1);
+			p0 = enesim_color_interp_256(a, p0, p1);
 		}
 		if (syy >= hh0)
 		{
@@ -409,13 +408,13 @@ static void _span_affine_paints(Enesim_Renderer *r,
 			{
 				p1 = *s;
 				if (c1 != 0xffffffff)
-					p1 = argb8888_mul4_sym(p1, c1);
+					p1 = enesim_color_mul4_sym(p1, c1);
 			}
 			if (sy == h0)
 			{
 				int a = 1 + ((syy & 0xffff) >> 8);
 
-				p1 = argb8888_interp_256(a, p1, p0);
+				p1 = enesim_color_interp_256(a, p1, p0);
 			}
 			p0 = p1;
 		}
@@ -437,8 +436,8 @@ static Eina_Bool _stripes_state_setup(Enesim_Renderer_Stripes *thiz, Enesim_Rend
 	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
 	{
-		final_color1 = argb8888_mul4_sym(rend_color, final_color1);
-		final_color2 = argb8888_mul4_sym(rend_color, final_color2);
+		final_color1 = enesim_color_mul4_sym(rend_color, final_color1);
+		final_color2 = enesim_color_mul4_sym(rend_color, final_color2);
 	}
 	thiz->final_color1 = final_color1;
 	thiz->final_color2 = final_color2;

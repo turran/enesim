@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include <math.h>
 
@@ -35,6 +34,8 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
+#include "enesim_color_mul4_sym_private.h"
 #include "enesim_list_private.h"
 #include "enesim_vector_private.h"
 #include "enesim_renderer_private.h"
@@ -338,8 +339,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sw = state->stroke.weight;
@@ -400,7 +401,7 @@ get_out:
 			}
 			else if (fcolor != 0xffffffff)
 			{
-				argb8888_none_color_none_mul4_sym(dst, ne - dst, NULL, fcolor, NULL);
+				enesim_color_mul4_sym_sp_none_color_none(dst, ne - dst, fcolor);
 				dst = ne;
 			}
 		}
@@ -421,7 +422,7 @@ get_out:
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = argb8888_mul4_sym(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 			}
 
 			if (stroke)
@@ -440,7 +441,7 @@ get_out:
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = argb8888_mul4_sym(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 			}
 			if (a < 65536)
 				p0 = MUL_A_65536(a, p0);
@@ -503,8 +504,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sw = state->stroke.weight;
@@ -544,7 +545,7 @@ get_out:
 		EVAL_EDGES_NZ
 
 		if (scolor != 0xffffffff)
-			p0 = argb8888_mul4_sym(scolor, p0);
+			p0 = enesim_color_mul4_sym(scolor, p0);
 		if (a < 65536)
 		{
 			if (count)
@@ -613,8 +614,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sw = state->stroke.weight;
@@ -639,7 +640,7 @@ get_out:
 			memset(dst, 0, sizeof(unsigned int) * dx);
 		else
 		{
-			argb8888_none_color_none_mul4_sym(dst, dx, NULL, fcolor, NULL);
+			enesim_color_mul4_sym_sp_none_color_none(dst, dx, fcolor);
 			dst += dx;
 		}
 	}
@@ -654,7 +655,7 @@ get_out:
 		EVAL_EDGES_NZ
 
 		if (scolor != 0xffffffff)
-			p0 = argb8888_mul4_sym(scolor, p0);
+			p0 = enesim_color_mul4_sym(scolor, p0);
 		if (a < 65536)
 		{
 			if (count)
@@ -662,7 +663,7 @@ get_out:
 				unsigned int q0 = *d;
 
 				if (fcolor != 0xffffffff)
-					q0 = argb8888_mul4_sym(fcolor, q0);
+					q0 = enesim_color_mul4_sym(fcolor, q0);
 				p0 = INTERP_65536(a, p0, q0);
 			}
 			else
@@ -785,8 +786,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sw = state->stroke.weight;
@@ -845,7 +846,7 @@ get_out:
 			}
 			else if (fcolor != 0xffffffff)
 			{
-				argb8888_none_color_none_mul4_sym(dst, ne - dst, NULL, fcolor, NULL);
+				enesim_color_mul4_sym_sp_none_color_none(dst, ne - dst, fcolor);
 				dst = ne;
 			}
 		}
@@ -868,7 +869,7 @@ get_out:
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = argb8888_mul4_sym(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 			}
 
 			if (stroke && a)
@@ -887,7 +888,7 @@ get_out:
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = argb8888_mul4_sym(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 			}
 			if (a < 65536)
 				p0 = MUL_A_65536(a, p0);
@@ -950,8 +951,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sw = state->stroke.weight;
@@ -992,7 +993,7 @@ get_out:
 		EVAL_EDGES_EO
 
 		if (scolor != 0xffffffff)
-			p0 = argb8888_mul4_sym(scolor, p0);
+			p0 = enesim_color_mul4_sym(scolor, p0);
 		if (a < 65536)
 		{
 			if (in)
@@ -1061,8 +1062,8 @@ get_out:
 		color = state->color;
 		if (color != 0xffffffff)
 		{
-			scolor = argb8888_mul4_sym(color, scolor);
-			fcolor = argb8888_mul4_sym(color, fcolor);
+			scolor = enesim_color_mul4_sym(color, scolor);
+			fcolor = enesim_color_mul4_sym(color, fcolor);
 		}
 
 		sw = state->stroke.weight;
@@ -1087,7 +1088,7 @@ get_out:
 			memset(dst, 0, sizeof(unsigned int) * dx);
 		else
 		{
-			argb8888_none_color_none_mul4_sym(dst, dx, NULL, fcolor, NULL);
+			enesim_color_mul4_sym_sp_none_color_none(dst, dx, fcolor);
 			dst += dx;
 		}
 	}
@@ -1103,7 +1104,7 @@ get_out:
 		EVAL_EDGES_EO
 
 		if (scolor != 0xffffffff)
-			p0 = argb8888_mul4_sym(scolor, p0);
+			p0 = enesim_color_mul4_sym(scolor, p0);
 		if (a < 65536)
 		{
 			if (in)
@@ -1111,7 +1112,7 @@ get_out:
 				unsigned int q0 = *d;
 
 				if (fcolor != 0xffffffff)
-					q0 = argb8888_mul4_sym(fcolor, q0);
+					q0 = enesim_color_mul4_sym(fcolor, q0);
 				p0 = INTERP_65536(a, p0, q0);
 			}
 			else

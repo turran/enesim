@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -34,6 +33,7 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -122,7 +122,7 @@ static void _perlin_fill_argb8888_identity(Enesim_Renderer *r,
 		
 		color = 0xff << 24 | i << 16 | i << 8 | i;
 		if (rcolor != ENESIM_COLOR_FULL)
-			color = argb8888_mul4_sym(color, rcolor);
+			color = enesim_color_mul4_sym(color, rcolor);
 		*dst++ = color;
 		xx += 65536;
 	}

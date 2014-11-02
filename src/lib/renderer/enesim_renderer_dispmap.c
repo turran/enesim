@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -109,7 +108,7 @@ static void _dispmap_fill_argb8888_##xch##_##ych##_identity(Enesim_Renderer *r,	
 	enesim_coord_identity_setup(&xx, &yy, x, y, thiz->ox, thiz->oy);	\
 	x = eina_f16p16_int_to(xx);						\
 	y = eina_f16p16_int_to(yy);						\
-	map = argb8888_at(thiz->msrc, thiz->mstride, x, y);			\
+	map = enesim_color_at(thiz->msrc, thiz->mstride, x, y);			\
 										\
 	/* do mask */								\
 	if (thiz->do_mask) 							\
@@ -144,7 +143,7 @@ static void _dispmap_fill_argb8888_##xch##_##ych##_identity(Enesim_Renderer *r,	
 				thiz->sstride, sw, sh, sxx, syy);		\
 										\
 		if (ma < 255)							\
-			p0 = argb8888_mul_sym(ma, p0);				\
+			p0 = enesim_color_mul_sym(ma, p0);			\
 set:										\
 		*dst = p0;							\
 next:										\
@@ -205,7 +204,7 @@ static void _dispmap_fill_argb8888_##xch##_##ych##_affine(Enesim_Renderer *r,	\
 				goto next;					\
 		}								\
 										\
-		m = argb8888_at(thiz->msrc, thiz->mstride, x, y);		\
+		m = enesim_color_at(thiz->msrc, thiz->mstride, x, y);		\
 		m1 = yfunction(*m);						\
 		m0 = xfunction(*m);						\
 										\
@@ -216,9 +215,9 @@ static void _dispmap_fill_argb8888_##xch##_##ych##_affine(Enesim_Renderer *r,	\
 				thiz->sstride, sw, sh, sxx, syy);		\
 										\
 		if (color)							\
-			p0 = argb8888_mul4_sym(p0, color);			\
+			p0 = enesim_color_mul4_sym(p0, color);			\
 		if (ma < 255)							\
-			p0 = argb8888_mul_sym(ma, p0);				\
+			p0 = enesim_color_mul_sym(ma, p0);			\
 set:										\
 		*dst = p0;							\
 next:										\

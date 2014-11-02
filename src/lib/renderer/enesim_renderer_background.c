@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_main.h"
 #include "enesim_log.h"
@@ -42,6 +41,7 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -147,7 +147,7 @@ static Eina_Bool _background_state_setup(Enesim_Renderer *r)
 	final_color = thiz->color;
 	rend_color = enesim_renderer_color_get(r);
 	if (rend_color != ENESIM_COLOR_FULL)
-		final_color = argb8888_mul4_sym(rend_color, final_color);
+		final_color = enesim_color_mul4_sym(rend_color, final_color);
 	thiz->final_color = final_color;
 
 	thiz->mask = enesim_renderer_mask_get(r);
