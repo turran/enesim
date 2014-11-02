@@ -99,6 +99,7 @@ argb8888_c16_pack(w_a, t2, a16)
 argb8888_mul_256(w_m, w_a, w_color)
 argb8888_packed_alpha_inv_get(a16, t2, t1, w_m)
 argb8888_c16_pack(w_a, t2, a16)
+argb8888_pack(w_d, t_d)
 argb8888_blend(w_d, w_a, w_m)
 argb8888_unpack(t_d, w_d)
 storel d, t_d
