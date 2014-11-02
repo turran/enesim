@@ -16,7 +16,6 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
-#include "libargb.h"
 
 #include "enesim_color.h"
 #include "enesim_color_private.h"
@@ -42,10 +41,24 @@
  */
 EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c)
 {
-	Enesim_Argb argb;
+	Enesim_Argb ret;
 
-	argb8888_unpre_argb_from(&argb, c);
-	return argb;
+	uint8_t a = enesim_color_alpha_get(c);
+
+	if ((a > 0) && (a < 255))
+	{
+		uint8_t r, g, b;
+
+		r = enesim_color_red_get(c);
+		g = enesim_color_green_get(c);
+		b = enesim_color_blue_get(c);
+
+		enesim_color_from_components(&ret, a, (r * 255) / a,  (g * 255) / a, (b * 255) / a);
+	}
+	else
+		ret = c;
+
+	return ret;
 }
 
 /**
@@ -58,10 +71,17 @@ EAPI Enesim_Argb enesim_color_argb_to(Enesim_Color c)
  */
 EAPI Enesim_Color enesim_color_argb_from(Enesim_Argb argb)
 {
-	Enesim_Color c;
+	Enesim_Color ret;
+	uint16_t a = enesim_color_alpha_get(argb) + 1;
 
-	argb8888_unpre_argb_to(argb, &c);
-	return c;
+	if (a != 256)
+	{
+		ret = (argb & 0xff000000) + (((((argb) >> 8) & 0xff) * a) & 0xff00) +
+		(((((argb) & 0x00ff00ff) * a) >> 8) & 0x00ff00ff);
+	}
+	else
+		ret = argb;
+	return ret;
 }
 
 /**
