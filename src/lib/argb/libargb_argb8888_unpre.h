@@ -116,31 +116,5 @@ static inline void argb8888_unpre_argb_to(uint32_t plane0, uint32_t *argb)
 	else
 		*argb = plane0;
 }
-#if 0
-static inline void argb8888_unpre_blend(unsigned int *dplane0, unsigned int splane0)
-{
-	/* TODO this is really wrong! */
-	*dplane0 = BLEND_ARGB_256(1 + (splane0 >> 24), 1 + (*dplane0 >> 24), splane0, *dplane0);
-}
-
-static inline void argb8888_unpre_fill(unsigned int *dplane0, unsigned int splane0)
-{
-	//printf("filling unpre %08x %08x\n", *dplane0, splane0);
-	*dplane0 = splane0;
-}
-
-/*============================================================================*
- *                                Surface                                     *
- *============================================================================*/
-static inline void argb8888_unpre_pixel_blend(Enesim_Surface_Data *d, Enesim_Surface_Pixel *p)
-{
-	argb8888_unpre_blend(d->data.argb8888_unpre.plane0, p->pixel.argb8888_unpre.plane0);
-}
-
-static inline void argb8888_unpre_pixel_fill(Enesim_Surface_Data *d, Enesim_Surface_Pixel *p)
-{
-	argb8888_unpre_fill(d->data.argb8888_unpre.plane0, p->pixel.argb8888_unpre.plane0);
-}
-#endif
 
 #endif
