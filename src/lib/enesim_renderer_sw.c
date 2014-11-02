@@ -441,6 +441,7 @@ void enesim_renderer_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop, Enesim_Ren
 void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *area, int x, int y)
 {
+	Enesim_Renderer *mask;
 	Enesim_Format dfmt;
 	Eina_Rectangle final;
 	Eina_Bool visible;
@@ -461,6 +462,14 @@ void enesim_renderer_sw_draw_area(Enesim_Renderer *r, Enesim_Surface *s,
 
 	/* be sure to clip the area to the renderer bounds */
 	final = r->current_destination_bounds;
+	/* in case of a mask, clip it against the mask bounds */
+	mask = enesim_renderer_mask_get(r);
+	if (mask)
+	{
+		if (!eina_rectangle_intersection(&final, &mask->current_destination_bounds))
+			eina_rectangle_coords_from(&final, 0, 0, 0, 0);
+		enesim_renderer_unref(mask);
+	}
 	/* final translation */
 	final.x += x;
 	final.y += y;
