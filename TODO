@@ -13,11 +13,6 @@ Enesim
 + Make the threads work on windows
 + Remove the renderers on the stripes
 + Remove the warnings
-+ We can make the API be more user friendly and avoid being so ender-alike, that is,
-  every _get function of a reffed object or basic type (int, char *, etc) return directly
-  instead of an out pointer. For other types (structs, unions) keep as it is right now
-  Missing ones:
-  + pattern
 + Add the luminance format
 + We have a performance problem when some renderer has changed. Basically on the practice
   we end having a full tree of renderers, several levels, proxies, whatever. When we need
