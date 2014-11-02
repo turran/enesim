@@ -24,8 +24,8 @@
 /** "copy" functions - do a copy shaped by a mask **/
 /** dst = src*color*ma + dst*(1 - ma) **/
 /** case of no mask agrees with the copy versions, so omitted **/
-static inline void enesim_color_copy_sp_none_color_argb8888(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
+static inline void enesim_color_copy_sp_none_color_argb8888(uint32_t *d,
+		uint32_t len, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -51,8 +51,8 @@ static inline void enesim_color_copy_sp_none_color_argb8888(uint32_t *d, uint32_
 	}
 }
 
-static inline void enesim_color_copy_sp_none_none_argb8888_alpha(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color EINA_UNUSED, uint32_t *m)
+static inline void enesim_color_copy_sp_none_none_argb8888_alpha(uint32_t *d,
+		uint32_t len, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -79,7 +79,7 @@ static inline void enesim_color_copy_sp_none_none_argb8888_alpha(uint32_t *d, ui
 }
 
 static inline void enesim_color_copy_sp_argb8888_none_argb8888_alpha(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+		uint32_t len, uint32_t *s, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -138,8 +138,8 @@ static inline void enesim_color_copy_sp_argb8888_color_argb8888_alpha(uint32_t *
 
 }
 
-static inline void enesim_color_copy_sp_none_color_a8_alpha(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
+static inline void enesim_color_copy_sp_none_color_a8_alpha(uint32_t *d,
+		uint32_t len, uint32_t color, uint8_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -164,7 +164,7 @@ static inline void enesim_color_copy_sp_none_color_a8_alpha(uint32_t *d, uint32_
 }
 
 static inline void enesim_color_copy_sp_argb8888_none_argb8888_luminance(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+		uint32_t len, uint32_t *s, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)

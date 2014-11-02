@@ -22,8 +22,7 @@
  *                              Span operations                               *
  *============================================================================*/
 static inline void enesim_color_mul4_sym_sp_none_color_none(uint32_t *d,
-		unsigned int len, uint32_t *s EINA_UNUSED,
-		uint32_t color, uint32_t *m EINA_UNUSED)
+		unsigned int len, uint32_t color)
 {
 	uint32_t *end = d + len;
 	while (d < end)

@@ -22,14 +22,14 @@
  *                             Point operations                               *
  *============================================================================*/
 static inline void enesim_color_blend_pt_none_color_none(uint32_t *d,
-		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m EINA_UNUSED)
+		uint32_t color)
 {
 	uint16_t a16 = 256 - enesim_color_alpha_get(color);
 	enesim_color_blend(d, a16, color);
 }
 
-static inline void enesim_color_blend_pt_none_color_enesim_color_blend(uint32_t *d,
-		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m)
+static inline void enesim_color_blend_pt_none_color_argb8888_alpha(uint32_t *d,
+		uint32_t color, uint32_t m)
 {
 	uint16_t ca = 256 - enesim_color_alpha_get(color);
 	uint16_t ma = enesim_color_alpha_get(m);
@@ -56,7 +56,7 @@ static inline void enesim_color_blend_pt_none_color_enesim_color_blend(uint32_t 
 }
 
 static inline void enesim_color_blend_pt_argb8888_none_none(uint32_t *d,
-		uint32_t s, uint32_t color EINA_UNUSED, uint32_t m EINA_UNUSED)
+		uint32_t s)
 {
 	uint16_t a;
 
@@ -69,8 +69,7 @@ static inline void enesim_color_blend_pt_argb8888_none_none(uint32_t *d,
 
 /* no mask */
 static inline void enesim_color_blend_sp_none_color_none(uint32_t *d,
-		unsigned int len, uint32_t *s EINA_UNUSED,
-		uint32_t color, uint32_t *m EINA_UNUSED)
+		unsigned int len, uint32_t color)
 {
 	uint32_t *end = d + len;
 	uint16_t a16 = 256 - enesim_color_alpha_get(color);
@@ -83,8 +82,7 @@ static inline void enesim_color_blend_sp_none_color_none(uint32_t *d,
 }
 
 static inline void enesim_color_blend_sp_argb8888_none_none(uint32_t *d,
-		unsigned int len, uint32_t *s,
-		uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
+		unsigned int len, uint32_t *s)
 {
 	uint32_t *end = d + len;
 
@@ -111,8 +109,7 @@ static inline void enesim_color_blend_sp_argb8888_none_none(uint32_t *d,
 }
 
 static inline void enesim_color_blend_sp_argb8888_color_none(uint32_t *d,
-		unsigned int len, uint32_t *s,
-		uint32_t color, uint32_t *m EINA_UNUSED)
+		unsigned int len, uint32_t *s, 	uint32_t color)
 {
 	uint32_t *end = d + len;
 
@@ -128,9 +125,8 @@ static inline void enesim_color_blend_sp_argb8888_color_none(uint32_t *d,
 }
 
 /* a8 mask */
-
-static inline void enesim_color_blend_sp_none_color_a8_alpha(uint32_t *d, unsigned int len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
+static inline void enesim_color_blend_sp_none_color_a8_alpha(uint32_t *d,
+		unsigned int len,  uint32_t color, uint8_t *m)
 {
 	uint16_t ca = 256 - enesim_color_alpha_get(color);
 	uint32_t *end = d + len;
@@ -163,8 +159,8 @@ static inline void enesim_color_blend_sp_none_color_a8_alpha(uint32_t *d, unsign
 }
 
 /* argb luminance-channel masking */
-static inline void enesim_color_blend_sp_argb8888_none_argb8888_luminance(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+static inline void enesim_color_blend_sp_argb8888_none_argb8888_luminance(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t *m)
 {
 	uint32_t *end = d + len;
 
@@ -205,8 +201,8 @@ static inline void enesim_color_blend_sp_argb8888_none_argb8888_luminance(uint32
 	}
 }
 
-static inline void enesim_color_blend_sp_argb8888_color_argb8888_luminance(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color, uint32_t *m)
+static inline void enesim_color_blend_sp_argb8888_color_argb8888_luminance(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	uint16_t ca = 1 + enesim_color_alpha_get(color);
@@ -260,8 +256,8 @@ static inline void enesim_color_blend_sp_argb8888_color_argb8888_luminance(uint3
 }
 
 /* argb alpha-channel masking */
-static inline void enesim_color_blend_sp_none_color_argb8888_alpha(uint32_t *d, unsigned int len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
+static inline void enesim_color_blend_sp_none_color_argb8888_alpha(uint32_t *d,
+		unsigned int len, uint32_t color, uint32_t *m)
 {
 	uint16_t ca = 256 - enesim_color_alpha_get(color);
 	uint32_t *end = d + len;
@@ -293,8 +289,8 @@ static inline void enesim_color_blend_sp_none_color_argb8888_alpha(uint32_t *d, 
 	}
 }
 
-static inline void enesim_color_blend_sp_argb8888_none_argb8888_alpha(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+static inline void enesim_color_blend_sp_argb8888_none_argb8888_alpha(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t *m)
 {
 	uint32_t *end = d + len;
 
@@ -335,8 +331,8 @@ static inline void enesim_color_blend_sp_argb8888_none_argb8888_alpha(uint32_t *
 }
 
 
-static inline void enesim_color_blend_sp_argb8888_color_argb8888_alpha(uint32_t *d, unsigned int len,
-		uint32_t *s, uint32_t color, uint32_t *m)
+static inline void enesim_color_blend_sp_argb8888_color_argb8888_alpha(uint32_t *d,
+		unsigned int len, uint32_t *s, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	uint16_t ca = 1 + enesim_color_alpha_get(color);

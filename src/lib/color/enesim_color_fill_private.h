@@ -21,14 +21,14 @@
 /*============================================================================*
  *                             Point operations                               *
  *============================================================================*/
-static inline void enesim_color_fill_pt_none_color_none(uint32_t *d, uint32_t s EINA_UNUSED,
-		uint32_t color, uint32_t m EINA_UNUSED)
+static inline void enesim_color_fill_pt_none_color_none(uint32_t *d,
+		uint32_t color)
 {
 	*d = color;
 }
 
 static inline void enesim_color_fill_pt_none_color_argb8888(uint32_t *d,
-		uint32_t s EINA_UNUSED, uint32_t color, uint32_t m)
+		uint32_t color, uint32_t m)
 {
 	uint16_t a;
 
@@ -49,7 +49,7 @@ static inline void enesim_color_fill_pt_none_color_argb8888(uint32_t *d,
 }
 
 static inline void enesim_color_fill_pt_argb8888_none_argb8888(uint32_t *d,
-		uint32_t s, uint32_t color EINA_UNUSED, uint32_t m)
+		uint32_t s, uint32_t m)
 {
 	uint16_t a;
 
@@ -70,13 +70,13 @@ static inline void enesim_color_fill_pt_argb8888_none_argb8888(uint32_t *d,
 }
 
 static inline void enesim_color_fill_pt_argb8888_none_none(uint32_t *d,
-		uint32_t s, uint32_t color EINA_UNUSED, uint32_t m EINA_UNUSED)
+		uint32_t s)
 {
 	*d = s;
 }
 
 static inline void enesim_color_fill_pt_argb8888_color_none(uint32_t *d,
-		uint32_t s, uint32_t color, uint32_t m EINA_UNUSED)
+		uint32_t s, uint32_t color)
 {
 	*d = enesim_color_mul4_sym(color, s);
 }
@@ -89,7 +89,7 @@ static inline void enesim_color_fill_pt_argb8888_color_none(uint32_t *d,
 /** dst = src*color*ma **/
 /** no mask or src is equivalent to them being 1 everywhere **/
 static inline void enesim_color_fill_sp_none_color_none(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m EINA_UNUSED)
+		uint32_t color)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -99,7 +99,7 @@ static inline void enesim_color_fill_sp_none_color_none(uint32_t *d, uint32_t le
 	}
 }
 static inline void enesim_color_fill_sp_argb8888_none_none(uint32_t *d, uint32_t len,
-		uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m EINA_UNUSED)
+		uint32_t *s)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -111,7 +111,7 @@ static inline void enesim_color_fill_sp_argb8888_none_none(uint32_t *d, uint32_t
 }
 
 static inline void enesim_color_fill_sp_argb8888_color_none(uint32_t *d, uint32_t len,
-		uint32_t *s, uint32_t color, uint32_t *m EINA_UNUSED)
+		uint32_t *s, uint32_t color)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -171,7 +171,7 @@ static inline void enesim_color_fill_sp_argb8888_color_argb8888_alpha(uint32_t *
 }
 
 static inline void enesim_color_fill_sp_argb8888_none_argb8888_alpha(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+		uint32_t len, uint32_t *s, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -200,8 +200,8 @@ static inline void enesim_color_fill_sp_argb8888_none_argb8888_alpha(uint32_t *d
 
 }
 
-static inline void enesim_color_fill_sp_none_color_argb8888_alpha(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint32_t *m)
+static inline void enesim_color_fill_sp_none_color_argb8888_alpha(uint32_t *d,
+		uint32_t len, uint32_t color, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -228,8 +228,8 @@ static inline void enesim_color_fill_sp_none_color_argb8888_alpha(uint32_t *d, u
 	}
 }
 
-static inline void enesim_color_fill_sp_none_none_argb8888_alpha(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color EINA_UNUSED, uint32_t *m)
+static inline void enesim_color_fill_sp_none_none_argb8888_alpha(uint32_t *d,
+		uint32_t len, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -242,8 +242,8 @@ static inline void enesim_color_fill_sp_none_none_argb8888_alpha(uint32_t *d, ui
 	}
 }
 
-static inline void enesim_color_fill_sp_none_color_a8_alpha(uint32_t *d, uint32_t len,
-		uint32_t *s EINA_UNUSED, uint32_t color, uint8_t *m)
+static inline void enesim_color_fill_sp_none_color_a8_alpha(uint32_t *d,
+		uint32_t len, uint32_t color, uint8_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
@@ -304,7 +304,7 @@ static inline void enesim_color_fill_sp_argb8888_color_argb8888_luminance(uint32
 }
 
 static inline void enesim_color_fill_sp_argb8888_none_argb8888_luminance(uint32_t *d,
-		uint32_t len, uint32_t *s, uint32_t color EINA_UNUSED, uint32_t *m)
+		uint32_t len, uint32_t *s, uint32_t *m)
 {
 	uint32_t *end = d + len;
 	while (d < end)
