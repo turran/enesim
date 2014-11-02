@@ -1,6 +1,5 @@
 Enesim
 ======
-+ Rename every argb8888_ based function into enesim_color in its own dir
 + Rename every argb8888_unpre function enesim_argb in its own dir
 + Remove the enesim_backend_invalid
 + To implement a nine-patch renderer we need to implement the sub surface
