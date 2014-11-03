@@ -130,6 +130,8 @@ extern "C" {
 #include "enesim_renderer_rectangle.h"
 #include "enesim_renderer_text_span.h"
 
+#include "enesim_renderer_map_quad.h"
+
 #ifdef __cplusplus
 }
 #endif

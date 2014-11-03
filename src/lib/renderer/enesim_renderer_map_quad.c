@@ -28,7 +28,6 @@
 #include "enesim_format.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
-#include "enesim_renderer_map_quad.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
@@ -49,13 +48,12 @@
 		Enesim_Renderer_Map_Quad,					\
 		enesim_renderer_map_quad_descriptor_get())
 
-
 typedef struct _Enesim_Renderer_Map_Quad
 {
 	Enesim_Renderer parent;
 	/* properties */
 	Enesim_Surface *src;
-	Enesim_Argb vcolors[4];
+	Enesim_Color vcolors[4];
 	double vx[4], vy[4];
 
 	/* The state variables */
@@ -80,9 +78,7 @@ typedef struct _Enesim_Renderer_Map_Quad_Class {
 	Enesim_Renderer_Class parent;
 } Enesim_Renderer_Map_Quad_Class;
 
-static Eina_Bool _map_quad_state_setup(Enesim_Renderer_Map_Quad *thiz,
-		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop,
-		Enesim_Log **l)
+static Eina_Bool _map_quad_state_setup(Enesim_Renderer_Map_Quad *thiz)
 {
 	if (thiz->src)
 	{
@@ -92,8 +88,7 @@ static Eina_Bool _map_quad_state_setup(Enesim_Renderer_Map_Quad *thiz,
 	return EINA_TRUE;
 }
 
-static void _map_quad_state_cleanup(Enesim_Renderer_Map_Quad *thiz,
-		Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s)
+static void _map_quad_state_cleanup(Enesim_Renderer_Map_Quad *thiz)
 {
 	if (thiz->src)
 	{
@@ -102,9 +97,6 @@ static void _map_quad_state_cleanup(Enesim_Renderer_Map_Quad *thiz,
 	thiz->changed = EINA_FALSE;
 }
 
-static Enesim_Renderer_Sw_Fill _span_color;
-static Enesim_Renderer_Sw_Fill _span_src;
-static Enesim_Renderer_Sw_Fill _span_src_color;
 /*----------------------------------------------------------------------------*
  *                        The Software fill variants                          *
  *----------------------------------------------------------------------------*/
@@ -252,7 +244,7 @@ get_out:
 			{
 				int a = 1 + (p0>>24);
 
-				p0 = MUL_A_256(a, p0 | 0xff000000);
+				p0 = enesim_color_mul_256(a, p0 | 0xff000000);
 			}
 			if (color && p0)
 				p0 = enesim_color_mul4_sym(p0, color);
@@ -422,7 +414,7 @@ _span_src_color(Enesim_Renderer *r,
 	int sxx, syy, dxx, dyy;
 	int sxx_c, syy_c, dxx_c, dyy_c;
 	double sxf = 0, syf = 0;
-	Enesim_Color = thiz->rcolor;
+	Enesim_Color color = thiz->rcolor;
 
 	if ( (y < thiz->ty) || (y >= thiz->by) || 
 		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src || !src_c || !color)
@@ -595,7 +587,7 @@ get_out:
 			{
 				int a = 1 + (q0>>24);
 
-				q0 = MUL_A_256(a, q0 | 0xff000000);
+				q0 = enesim_color_mul_256(a, q0 | 0xff000000);
 			}
 		}
 		if (p0 | q0)
@@ -721,15 +713,15 @@ static Eina_Bool _map_quad_sw_vertices_setup(Enesim_Renderer *r)
 }
 
 static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Rop rop, 
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
+		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Map_Quad *thiz;
 	Enesim_Quad sq, dq;
 	Eina_Bool do_cols = 0;
 
 	thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	if (!_map_quad_state_setup(thiz, r, s, rop, l))
+	if (!_map_quad_state_setup(thiz))
 		return EINA_FALSE;
 	if (thiz->src)
 	{
@@ -737,7 +729,7 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 
 		if (!enesim_surface_map(thiz->src, (void **)&thiz->ssrc, &stride))
 		{
-			_map_quad_state_cleanup(thiz, r, s);
+			_map_quad_state_cleanup(thiz);
 			return EINA_FALSE;
 		}
 		enesim_surface_size_get(thiz->src, &(thiz->sw), &(thiz->sh));
@@ -834,12 +826,12 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 }
 
 
-static void _map_quad_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _map_quad_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Renderer_Map_Quad *thiz;
 
 	thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	_map_quad_state_cleanup(thiz, r, s);
+	_map_quad_state_cleanup(thiz);
 }
 
 static void _map_quad_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -1033,7 +1025,7 @@ EAPI Enesim_Surface * enesim_renderer_map_quad_source_surface_get(Enesim_Rendere
  * @param[in] color The argb color
  * @param[in] index The vertex index
  */
-EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_Argb color, int index)
+EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_Color color, int index)
 {
 	Enesim_Renderer_Map_Quad *thiz;
 
@@ -1054,7 +1046,7 @@ EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_A
  * @param[in] index The vertex index
  * @return the color of the vertex
  */
-EAPI Enesim_Argb enesim_renderer_map_quad_vertex_color_get(Enesim_Renderer *r, int index)
+EAPI Enesim_Color enesim_renderer_map_quad_vertex_color_get(Enesim_Renderer *r, int index)
 {
 	Enesim_Renderer_Map_Quad *thiz;
 
