@@ -51,30 +51,6 @@
 # endif
 #endif
 
-/* FIXME: now that libargb is in the enesim tree, why not using ENS_** in it directly ? */
-
-/* the libargb needed macros */
-/* SIMD intrinsics */
-#ifdef ENS_HAVE_MMX
-#define LIBARGB_MMX 1
-#else
-#define LIBARGB_MMX 0
-#endif
-
-#ifdef  ENS_HAVE_SSE
-#define LIBARGB_SSE 1
-#else
-#define LIBARGB_SSE 0
-#endif
-
-#ifdef ENS_HAVE_SSE2
-#define LIBARGB_SSE2 1
-#else
-#define LIBARGB_SSE2 0
-#endif
-
-#define LIBARGB_DEBUG 0
-
 /* dependencies */
 #include <Eina.h>
 
