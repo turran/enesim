@@ -58,6 +58,14 @@
 #include "GL/glew.h"
 #endif
 
+#ifndef MIN
+#define MIN(a,b) ((a) < (b)) ? (a) : (b)
+#endif
+
+#ifndef MAX
+#define MAX(a,b) ((a) > (b)) ? (a) : (b)
+#endif
+
 #include <math.h>
 
 /* the log domains */

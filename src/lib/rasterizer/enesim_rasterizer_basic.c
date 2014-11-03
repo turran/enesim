@@ -48,10 +48,6 @@
 		Enesim_Rasterizer_Basic,					\
 		enesim_rasterizer_basic_descriptor_get())
 
-#ifndef MIN
-# define MIN(a,b) ((a) < (b)) ? (a) : (b)
-#endif
-
 #define INTERP_65536(a, c0, c1) \
 	( ((((((c0 >> 16) & 0xff00) - ((c1 >> 16) & 0xff00)) * a) + \
 	  (c1 & 0xff000000)) & 0xff000000) + \
