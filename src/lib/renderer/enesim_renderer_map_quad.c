@@ -62,8 +62,11 @@ typedef struct _Enesim_Renderer_Map_Quad
 	int sgn[4];
 
 	uint32_t *ssrc;
+	size_t sstride;
 	int sw, sh;
+
 	uint32_t *src_c;
+	size_t stride_c;
 	int sw_c, sh_c;
 
 	Enesim_Matrix it, ct;
@@ -103,8 +106,8 @@ static inline int _map_quad_get_endpoints(Enesim_Renderer_Map_Quad *thiz,
 	int active = 0;
 	int i = 0;
 
-	*rx = thiz->rx;
-	*lx = thiz->lx;
+	*rx = thiz->lx;
+	*lx = thiz->rx;
 
 	while (i < 4)
 	{
@@ -123,6 +126,7 @@ static inline int _map_quad_get_endpoints(Enesim_Renderer_Map_Quad *thiz,
 			{
 				double d2 = (thiz->qx[j] - thiz->qx[i]) / (thiz->qy[j] - thiz->qy[i]);
 
+				/* get the intersection to the edges */
 				if (thiz->sgn[i] > 0)
 				{
 					lxt = (d2 * (y - thiz->qy[i])) + thiz->qx[i];
@@ -133,6 +137,7 @@ static inline int _map_quad_get_endpoints(Enesim_Renderer_Map_Quad *thiz,
 					lxt = (d2 * (y + 1 - thiz->qy[i])) + thiz->qx[i];
 					rxt = (d2 * (y - thiz->qy[i])) + thiz->qx[i];
 				}
+				/* make sure it is not out of x-bounds */
 				if (lxt < MIN(thiz->qx[i], thiz->qx[j]))
 					lxt = MIN(thiz->qx[i], thiz->qx[j]);
 				if (rxt > MAX(thiz->qx[i], thiz->qx[j]))
@@ -143,6 +148,7 @@ static inline int _map_quad_get_endpoints(Enesim_Renderer_Map_Quad *thiz,
 				lxt = MIN(thiz->qx[i], thiz->qx[j]);
 				rxt = MAX(thiz->qx[i], thiz->qx[j]);
 			}
+			/* get the min/max */
 			if (*lx > lxt)
 				*lx = lxt;
 			if (*rx < rxt)
@@ -150,6 +156,7 @@ static inline int _map_quad_get_endpoints(Enesim_Renderer_Map_Quad *thiz,
 		}
 		i++;
 	}
+
 	return active;
 }
 /*----------------------------------------------------------------------------*
@@ -218,21 +225,15 @@ get_out:
 	{
 		uint32_t p0 = 0;
 
-		x = sxx >> 16;
-		y = syy >> 16;
-
-		if ( (((unsigned)x) < sw) & (((unsigned)y) < sh) )
+		p0 = enesim_coord_sample_fast(src, thiz->stride_c, sw, sh, sxx, syy);
+		if (p0 && ((p0>>24) < 255))
 		{
-			p0 = *(src + (y * sw) + x);
-			if (p0 && ((p0>>24) < 255))
-			{
-				int a = 1 + (p0>>24);
+			int a = 1 + (p0>>24);
 
-				p0 = enesim_color_mul_256(a, p0 | 0xff000000);
-			}
-			if (color && p0)
-				p0 = enesim_color_mul4_sym(p0, color);
+			p0 = enesim_color_mul_256(a, p0 | 0xff000000);
 		}
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
 		*d++ = p0;
 		sxx += dxx; syy += dyy;
 	}
@@ -509,21 +510,15 @@ get_out:
 	{
 		uint32_t p0 = 0;
 
-		x = sxx >> 16;
-		y = syy >> 16;
-
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		p0 = enesim_coord_sample_good_restrict(src, thiz->stride_c, sw, sh, sxx, syy);
+		if (p0 && ((p0>>24) < 255))
 		{
-			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
-			if (p0 && ((p0>>24) < 255))
-			{
-				int a = 1 + (p0>>24);
+			int a = 1 + (p0>>24);
 
-				p0 = enesim_color_mul_256(a, p0 | 0xff000000);
-			}
-			if (color && p0)
-				p0 = enesim_color_mul4_sym(p0, color);
+			p0 = enesim_color_mul_256(a, p0 | 0xff000000);
 		}
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
 		*d++ = p0;
 		sxx += dxx; syy += dyy;
 	}
@@ -590,15 +585,9 @@ get_out:
 	{
 		uint32_t p0 = 0;
 
-		x = sxx >> 16;
-		y = syy >> 16;
-
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
-		{
-			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
-			if (color && p0)
-				p0 = enesim_color_mul4_sym(p0, color);
-		}
+		p0 = enesim_coord_sample_good_restrict(src, thiz->sstride, sw, sh, sxx, syy);
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
 		*d++ = p0;
 		sxx += dxx; syy += dyy;
 	}
@@ -676,26 +665,13 @@ get_out:
 	{
 		uint32_t p0 = 0, q0 = 0;
 
-		x = sxx >> 16;
-		y = syy >> 16;
-
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		p0 = enesim_coord_sample_good_restrict(src, thiz->sstride, sw, sh, sxx, syy);
+		q0 = enesim_coord_sample_good_restrict(src_c, thiz->stride_c, sw_c, sh_c, sxx_c, syy_c);
+		if (q0 && ((q0>>24) < 255))
 		{
-			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
-		}
+			int a = 1 + (q0>>24);
 
-		x = sxx_c >> 16; 
-		y = syy_c >> 16;
-
-		if ( (((unsigned) (x + 1)) < (sw_c + 1)) & (((unsigned) (y + 1)) < (sh_c + 1)) )
-		{
-			SAMPLE_SRC(q0, src_c, sxx_c, syy_c, sw_c, sh_c)
-			if (q0 && ((q0>>24) < 255))
-			{
-				int a = 1 + (q0>>24);
-
-				q0 = enesim_color_mul_256(a, q0 | 0xff000000);
-			}
+			q0 = enesim_color_mul_256(a, q0 | 0xff000000);
 		}
 		if (p0 | q0)
 			p0 = enesim_color_mul4_sym(p0, q0);
@@ -776,21 +752,16 @@ get_out:
 
 		sxx = xx / zf;
 		syy = yy / zf;
-		x = sxx >> 16;
-		y = syy >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		p0 = enesim_coord_sample_good_restrict(src, thiz->stride_c, sw, sh, sxx, syy);
+		if (p0 && ((p0>>24) < 255))
 		{
-			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
-			if (p0 && ((p0>>24) < 255))
-			{
-				int a = 1 + (p0>>24);
+			int a = 1 + (p0>>24);
 
-				p0 = enesim_color_mul_256(a, p0 | 0xff000000);
-			}
-			if (color && p0)
-				p0 = enesim_color_mul4_sym(p0, color);
+			p0 = enesim_color_mul_256(a, p0 | 0xff000000);
 		}
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
 		*d++ = p0;
 		xx += axx; yy += ayx; zf += azx;
 	}
@@ -861,15 +832,10 @@ get_out:
 
 		sxx = xx / zf;
 		syy = yy / zf;
-		x = sxx >> 16;
-		y = syy >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
-		{
-			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
-			if (color && p0)
-				p0 = enesim_color_mul4_sym(p0, color);
-		}
+		p0 = enesim_coord_sample_good_restrict(src, thiz->sstride, sw, sh, sxx, syy);
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
 		*d++ = p0;
 		xx += axx; yy += ayx; zf += azx;
 	}
@@ -956,28 +922,20 @@ get_out:
 
 		sxx = xx / zf;
 		syy = yy / zf;
-		x = sxx >> 16;
-		y = syy >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
-		{
-			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
-		}
+		p0 = enesim_coord_sample_good_restrict(src, thiz->sstride, sw, sh, sxx, syy);
 
 		sxx = xx_c / zf_c;
 		syy = yy_c / zf_c;
 		x = sxx >> 16; 
 		y = syy >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw_c + 1)) & (((unsigned) (y + 1)) < (sh_c + 1)) )
+		q0 = enesim_coord_sample_good_restrict(src_c, thiz->stride_c, sw_c, sh_c, sxx, syy);
+		if (q0 && ((q0>>24) < 255))
 		{
-			SAMPLE_SRC(q0, src_c, sxx, syy, sw_c, sh_c)
-			if (q0 && ((q0>>24) < 255))
-			{
-				int a = 1 + (q0>>24);
+			int a = 1 + (q0>>24);
 
-				q0 = enesim_color_mul_256(a, q0 | 0xff000000);
-			}
+			q0 = enesim_color_mul_256(a, q0 | 0xff000000);
 		}
 		if (p0 | q0)
 			p0 = enesim_color_mul4_sym(p0, q0);
@@ -1115,9 +1073,7 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	if (thiz->src)
 	{
-		size_t stride;
-
-		if (!enesim_surface_map(thiz->src, (void **)&thiz->ssrc, &stride))
+		if (!enesim_surface_map(thiz->src, (void **)&thiz->ssrc, &thiz->sstride))
 		{
 			_map_quad_state_cleanup(thiz);
 			return EINA_FALSE;
@@ -1152,7 +1108,10 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 		{
 			thiz->sw_c = thiz->sh_c = 3;
 			if (!thiz->src_c)
-				thiz->src_c = malloc(thiz->sw_c * thiz->sh_c * sizeof(uint32_t));
+			{
+				thiz->stride_c = thiz->sw_c * sizeof(uint32_t);
+				thiz->src_c = malloc(thiz->sh_c * thiz->stride_c);
+			}
 			if (thiz->src_c)
 			{
 				sq.x0 = sq.y0 = 0;
@@ -1173,15 +1132,21 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 		}
 		else
 		{
-			free(thiz->src_c);
-			thiz->src_c = NULL;
+			if (thiz->src_c)
+			{
+				free(thiz->src_c);
+				thiz->src_c = NULL;
+			}
 		}
 	}
 	else
 	{
 		thiz->sw_c = thiz->sh_c = 3;
 		if (!thiz->src_c)
-			thiz->src_c = malloc(thiz->sw_c * thiz->sh_c * sizeof(uint32_t));
+		{
+			thiz->stride_c = thiz->sw_c * sizeof(uint32_t);
+			thiz->src_c = malloc(thiz->sh_c * thiz->stride_c);
+		}
 		if (thiz->src_c)
 		{
 			sq.x0 = sq.y0 = 0;
