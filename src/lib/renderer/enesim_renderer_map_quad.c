@@ -53,7 +53,7 @@ typedef struct _Enesim_Renderer_Map_Quad
 	Enesim_Renderer parent;
 	/* properties */
 	Enesim_Surface *src;
-	Enesim_Color vcolors[4];
+	Enesim_Argb vcolors[4];
 	double vx[4], vy[4];
 
 	/* The state variables */
@@ -97,26 +97,80 @@ static void _map_quad_state_cleanup(Enesim_Renderer_Map_Quad *thiz)
 	thiz->changed = EINA_FALSE;
 }
 
+static inline int _map_quad_get_endpoints(Enesim_Renderer_Map_Quad *thiz,
+		int y, int *lx, int *rx)
+{
+	int active = 0;
+	int i = 0;
+
+	*rx = thiz->rx;
+	*lx = thiz->lx;
+
+	while (i < 4)
+	{
+		int j = i+1;
+
+		if (i == 3)  j = 0;
+
+		if (((thiz->qy[i] < (y + 1)) && (thiz->qy[j] >= y)) ||
+			((thiz->qy[j] < (y + 1)) && (thiz->qy[i] >= y)))
+		{
+			double lxt, rxt;
+
+			active++;
+
+			if (thiz->sgn[i])
+			{
+				double d2 = (thiz->qx[j] - thiz->qx[i]) / (thiz->qy[j] - thiz->qy[i]);
+
+				if (thiz->sgn[i] > 0)
+				{
+					lxt = (d2 * (y - thiz->qy[i])) + thiz->qx[i];
+					rxt = (d2 * (y + 1 - thiz->qy[i])) + thiz->qx[i];
+				}
+				else
+				{
+					lxt = (d2 * (y + 1 - thiz->qy[i])) + thiz->qx[i];
+					rxt = (d2 * (y - thiz->qy[i])) + thiz->qx[i];
+				}
+				if (lxt < MIN(thiz->qx[i], thiz->qx[j]))
+					lxt = MIN(thiz->qx[i], thiz->qx[j]);
+				if (rxt > MAX(thiz->qx[i], thiz->qx[j]))
+					rxt = MAX(thiz->qx[i], thiz->qx[j]);
+			}
+			else
+			{
+				lxt = MIN(thiz->qx[i], thiz->qx[j]);
+				rxt = MAX(thiz->qx[i], thiz->qx[j]);
+			}
+			if (*lx > lxt)
+				*lx = lxt;
+			if (*rx < rxt)
+				*rx = rxt;
+		}
+		i++;
+	}
+	return active;
+}
 /*----------------------------------------------------------------------------*
  *                        The Software fill variants                          *
  *----------------------------------------------------------------------------*/
-
+/* fast */
 static void
-_span_color(Enesim_Renderer *r,
-		int x, int y, int len, void *ddata)
+_span_color_fast(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	unsigned int *d = ddata, *e = d + len;
+	uint32_t *d = ddata, *e = d + len;
 	int lx = thiz->rx, rx = thiz->lx;
-	int i = 0, active = 0;
-	unsigned int *src = thiz->src_c;
+	int active = 0;
+	uint32_t *src = thiz->src_c;
 	int sw = thiz->sw_c, sh = thiz->sh_c;
 	int sxx, syy, dxx, dyy;
 	double sxf = 0, syf = 0;
 	Enesim_Color color = thiz->rcolor;
 
 	if ( (y < thiz->ty) || (y >= thiz->by) || 
-		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src || !color)
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src)
 	{
 get_out:
 		while (d < e)
@@ -128,51 +182,9 @@ get_out:
 		color = 0;
 
 	/* get left and right points on the quad on this scanline */
-	while (i < 4)
-	{
-		int j = i+1;
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
 
-		if (i == 3)  j = 0;
-
-		if ( ((thiz->qy[i] < (y + 1)) && (thiz->qy[j] >= y)) ||
-			((thiz->qy[j] < (y + 1)) && (thiz->qy[i] >= y)) )
-		{
-			double lxt, rxt;
-
-			active++;
-
-			if (thiz->sgn[i])
-			{
-				double d = (thiz->qx[j] - thiz->qx[i]) / (thiz->qy[j] - thiz->qy[i]);
-
-				if (thiz->sgn[i] > 0)
-				{
-					lxt = (d * (y - thiz->qy[i])) + thiz->qx[i];
-					rxt = (d * (y + 1 - thiz->qy[i])) + thiz->qx[i];
-				}
-				else
-				{
-					lxt = (d * (y + 1 - thiz->qy[i])) + thiz->qx[i];
-					rxt = (d * (y - thiz->qy[i])) + thiz->qx[i];
-				}
-				if (lxt < MIN(thiz->qx[i], thiz->qx[j]))  
-					lxt = MIN(thiz->qx[i], thiz->qx[j]);
-				if (rxt > MAX(thiz->qx[i], thiz->qx[j]))  
-					rxt = MAX(thiz->qx[i], thiz->qx[j]);
-			}
-			else
-			{
-				lxt = MIN(thiz->qx[i], thiz->qx[j]);
-				rxt = MAX(thiz->qx[i], thiz->qx[j]);
-			}
-			if (lx > lxt)  lx = lxt;
-			if (rx < rxt)  rx = rxt;
-
-		}
-		i++;
-	}
-
-	if (!active || ((rx - lx) < 1) || (rx <= x) || (lx >= (x + len)))
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
 		goto get_out;
 
 	/* get corresponding points and increments on src space */
@@ -185,15 +197,15 @@ get_out:
 	rx -= x;
 	if (len > rx)
 	{
-		len -= rx;
-		memset(d + rx, 0, sizeof(unsigned int) * len);
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
 		e -= len;
 	}
 
 	lx -= x;
 	if (lx > 0)
 	{
-		memset(d, 0, sizeof(unsigned int) * lx);
+		memset(d, 0, sizeof(uint32_t) * lx);
 		d += lx;
 	}
 	else
@@ -204,42 +216,14 @@ get_out:
 
 	while (d < e)
 	{
-		unsigned int p0 = 0;
+		uint32_t p0 = 0;
 
 		x = sxx >> 16;
 		y = syy >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		if ( (((unsigned)x) < sw) & (((unsigned)y) < sh) )
 		{
-			unsigned int *p, p1 = 0, p2 = 0, p3 = 0;
-
-			p = src + (y * sw) + x;
-
-			if ((x > -1) & (y > - 1))
-				p0 = *p;
-
-			if ((y > -1) & ((x + 1) < sw))
-				p1 = *(p + 1);
-
-			if ((y + 1) < sh)
-			{
-				if (x > -1)
-					p2 = *(p + sw);
-				if ((x + 1) < sw)
-					p3 = *(p + sw + 1);
-			}
-
-			if (p0 | p1 | p2 | p3)
-			{
-				int ax, ay;
-
-				ax = 1 + ((sxx & 0xffff) >> 8);
-				ay = 1 + ((syy & 0xffff) >> 8);
-
-				p0 = enesim_color_interp_256(ax, p1, p0);
-				p2 = enesim_color_interp_256(ax, p3, p2);
-				p0 = enesim_color_interp_256(ay, p2, p0);
-			}
+			p0 = *(src + (y * sw) + x);
 			if (p0 && ((p0>>24) < 255))
 			{
 				int a = 1 + (p0>>24);
@@ -254,22 +238,20 @@ get_out:
 	}
 }
 
-
 static void
-_span_src(Enesim_Renderer *r,
-		int x, int y, int len, void *ddata)
+_span_src_fast(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	unsigned int *d = ddata, *e = d + len, *src = thiz->ssrc;
+	uint32_t *d = ddata, *e = d + len, *src = thiz->ssrc;
 	int lx = thiz->rx, rx = thiz->lx;
-	int i = 0, active = 0;
+	int active = 0;
 	int sw = thiz->sw, sh = thiz->sh;
 	int sxx, syy, dxx, dyy;
 	double sxf = 0, syf = 0;
 	Enesim_Color color = thiz->rcolor;
 
 	if ( (y < thiz->ty) || (y >= thiz->by) || 
-		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src || !color)
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src)
 	{
 get_out:
 		while (d < e)
@@ -280,50 +262,9 @@ get_out:
 		color = 0;
 
 	/* get left and right points on the quad on this scanline */
-	while (i < 4)
-	{
-		int j = i+1;
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
 
-		if (i == 3)  j = 0;
-
-		if ( ((thiz->qy[i] < (y + 1)) && (thiz->qy[j] >= y)) ||
-			((thiz->qy[j] < (y + 1)) && (thiz->qy[i] >= y)) )
-		{
-			double lxt, rxt;
-
-			active++;
-
-			if (thiz->sgn[i])
-			{
-				double d = (thiz->qx[j] - thiz->qx[i]) / (thiz->qy[j] - thiz->qy[i]);
-
-				if (thiz->sgn[i] > 0)
-				{
-					lxt = (d * (y - thiz->qy[i])) + thiz->qx[i];
-					rxt = (d * (y + 1 - thiz->qy[i])) + thiz->qx[i];
-				}
-				else
-				{
-					lxt = (d * (y + 1 - thiz->qy[i])) + thiz->qx[i];
-					rxt = (d * (y - thiz->qy[i])) + thiz->qx[i];
-				}
-				if (lxt < MIN(thiz->qx[i], thiz->qx[j]))
-					lxt = MIN(thiz->qx[i], thiz->qx[j]);
-				if (rxt > MAX(thiz->qx[i], thiz->qx[j]))
-					rxt = MAX(thiz->qx[i], thiz->qx[j]);
-			}
-			else
-			{
-				lxt = MIN(thiz->qx[i], thiz->qx[j]);
-				rxt = MAX(thiz->qx[i], thiz->qx[j]);
-			}
-			if (lx > lxt)  lx = lxt;
-			if (rx < rxt)  rx = rxt;
-		}
-		i++;
-	}
-
-	if (!active || ((rx - lx) < 1) || (rx <= x) || (lx >= (x + len)))
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
 		goto get_out;
 
 	/* get corresponding points and increments on src space */
@@ -336,15 +277,15 @@ get_out:
 	rx -= x;
 	if (len > rx)
 	{
-		len -= rx;
-		memset(d + rx, 0, sizeof(unsigned int) * len);
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
 		e -= len;
 	}
 
 	lx -= x;
 	if (lx > 0)
 	{
-		memset(d, 0, sizeof(unsigned int) * lx);
+		memset(d, 0, sizeof(uint32_t) * lx);
 		d += lx;
 	}
 	else
@@ -355,42 +296,14 @@ get_out:
 
 	while (d < e)
 	{
-		unsigned int p0 = 0;
+		uint32_t p0 = 0;
 
 		x = sxx >> 16;
 		y = syy >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		if ( (((unsigned)x) < sw) & (((unsigned)y) < sh) )
 		{
-			unsigned int *p, p1 = 0, p2 = 0, p3 = 0;
-
-			p = src + (y * sw) + x;
-
-			if ((x > -1) & (y > - 1))
-				p0 = *p;
-
-			if ((y > -1) & ((x + 1) < sw))
-				p1 = *(p + 1);
-
-			if ((y + 1) < sh)
-			{
-				if (x > -1)
-					p2 = *(p + sw);
-				if ((x + 1) < sw)
-					p3 = *(p + sw + 1);
-			}
-
-			if (p0 | p1 | p2 | p3)
-			{
-				int ax, ay;
-
-				ax = 1 + ((sxx & 0xffff) >> 8);
-				ay = 1 + ((syy & 0xffff) >> 8);
-
-				p0 = enesim_color_interp_256(ax, p1, p0);
-				p2 = enesim_color_interp_256(ax, p3, p2);
-				p0 = enesim_color_interp_256(ay, p2, p0);
-			}
+			p0 = *(src + (y * sw) + x);
 			if (color && p0)
 				p0 = enesim_color_mul4_sym(p0, color);
 		}
@@ -399,16 +312,14 @@ get_out:
 	}
 }
 
-
 static void
-_span_src_color(Enesim_Renderer *r,
-		int x, int y, int len, void *ddata)
+_span_src_color_fast(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	unsigned int *d = ddata, *e = d + len, *src = thiz->src;
-	unsigned int *src_c = thiz->src_c;
+	uint32_t *d = ddata, *e = d + len, *src = thiz->src;
+	uint32_t *src_c = thiz->src_c;
 	int lx = thiz->rx, rx = thiz->lx;
-	int i = 0, active = 0;
+	int active = 0;
 	int sw = thiz->sw, sh = thiz->sh;
 	int sw_c = thiz->sw_c, sh_c = thiz->sh_c;
 	int sxx, syy, dxx, dyy;
@@ -417,7 +328,7 @@ _span_src_color(Enesim_Renderer *r,
 	Enesim_Color color = thiz->rcolor;
 
 	if ( (y < thiz->ty) || (y >= thiz->by) || 
-		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src || !src_c || !color)
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src || !src_c)
 	{
 get_out:
 		while (d < e)
@@ -428,50 +339,9 @@ get_out:
 	if (color == 0xffffffff)
 		color = 0;
 	/* get left and right points on the quad on this scanline */
-	while (i < 4)
-	{
-		int j = i+1;
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
 
-		if (i == 3)  j = 0;
-
-		if ( ((thiz->qy[i] < (y + 1)) && (thiz->qy[j] >= y)) ||
-			((thiz->qy[j] < (y + 1)) && (thiz->qy[i] >= y)) )
-		{
-			double lxt, rxt;
-
-			active++;
-
-			if (thiz->sgn[i])
-			{
-				double d = (thiz->qx[j] - thiz->qx[i]) / (thiz->qy[j] - thiz->qy[i]);
-
-				if (thiz->sgn[i] > 0)
-				{
-					lxt = (d * (y - thiz->qy[i])) + thiz->qx[i];
-					rxt = (d * (y + 1 - thiz->qy[i])) + thiz->qx[i];
-				}
-				else
-				{
-					lxt = (d * (y + 1 - thiz->qy[i])) + thiz->qx[i];
-					rxt = (d * (y - thiz->qy[i])) + thiz->qx[i];
-				}
-				if (lxt < MIN(thiz->qx[i], thiz->qx[j]))  
-					lxt = MIN(thiz->qx[i], thiz->qx[j]);
-				if (rxt > MAX(thiz->qx[i], thiz->qx[j]))  
-					rxt = MAX(thiz->qx[i], thiz->qx[j]);
-			}
-			else
-			{
-				lxt = MIN(thiz->qx[i], thiz->qx[j]);
-				rxt = MAX(thiz->qx[i], thiz->qx[j]);
-			}
-			if (lx > lxt)  lx = lxt;
-			if (rx < rxt)  rx = rxt;
-		}
-		i++;
-	}
-
-	if (!active || ((rx - lx) < 1) || (rx <= x) || (lx >= (x + len)))
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
 		goto get_out;
 
 	/* get corresponding points and increments on src space */
@@ -490,15 +360,15 @@ get_out:
 	rx -= x;
 	if (len > rx)
 	{
-		len -= rx;
-		memset(d + rx, 0, sizeof(unsigned int) * len);
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
 		e -= len;
 	}
 
 	lx -= x;
 	if (lx > 0)
 	{
-		memset(d, 0, sizeof(unsigned int) * lx);
+		memset(d, 0, sizeof(uint32_t) * lx);
 		d += lx;
 	}
 	else
@@ -511,78 +381,22 @@ get_out:
 
 	while (d < e)
 	{
-		unsigned int p0 = 0, q0 = 0;
+		uint32_t p0 = 0, q0 = 0;
 
 		x = sxx >> 16;
 		y = syy >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		if ( (((unsigned)x) < sw) & (((unsigned)y) < sh) )
 		{
-			unsigned int *p, p1 = 0, p2 = 0, p3 = 0;
-
-			p = src + (y * sw) + x;
-
-			if ((x > -1) & (y > - 1))
-				p0 = *p;
-
-			if ((y > -1) & ((x + 1) < sw))
-				p1 = *(p + 1);
-
-			if ((y + 1) < sh)
-			{
-				if (x > -1)
-					p2 = *(p + sw);
-				if ((x + 1) < sw)
-					p3 = *(p + sw + 1);
-			}
-
-			if (p0 | p1 | p2 | p3)
-			{
-				int ax, ay;
-
-				ax = 1 + ((sxx & 0xffff) >> 8);
-				ay = 1 + ((syy & 0xffff) >> 8);
-
-				p0 = enesim_color_interp_256(ax, p1, p0);
-				p2 = enesim_color_interp_256(ax, p3, p2);
-				p0 = enesim_color_interp_256(ay, p2, p0);
-			}
+			p0 = *(src + (y * sw) + x);
 		}
 
 		x = sxx_c >> 16; 
 		y = syy_c >> 16;
 
-		if ( (((unsigned) (x + 1)) < (sw_c + 1)) & (((unsigned) (y + 1)) < (sh_c + 1)) )
+		if ( (((unsigned)x) < sw_c) & (((unsigned)y) < sh_c) )
 		{
-			unsigned int *p, p1 = 0, p2 = 0, p3 = 0;
-
-			p = src_c + (y * sw_c) + x;
-
-			if ((x > -1) & (y > - 1))
-				q0 = *p;
-
-			if ((y > -1) & ((x + 1) < sw_c))
-				p1 = *(p + 1);
-
-			if ((y + 1) < sh_c)
-			{
-				if (x > -1)
-					p2 = *(p + sw_c);
-				if ((x + 1) < sw_c)
-					p3 = *(p + sw_c + 1);
-			}
-
-			if (q0 | p1 | p2 | p3)
-			{
-				int ax, ay;
-
-				ax = 1 + ((sxx_c & 0xffff) >> 8);
-				ay = 1 + ((syy_c & 0xffff) >> 8);
-
-				q0 = enesim_color_interp_256(ax, p1, q0);
-				p2 = enesim_color_interp_256(ax, p3, p2);
-				q0 = enesim_color_interp_256(ay, p2, q0);
-			}
+			q0 = *(src_c + (y * sw_c) + x);
 			if (q0 && ((q0>>24) < 255))
 			{
 				int a = 1 + (q0>>24);
@@ -597,6 +411,581 @@ get_out:
 		*d++ = p0;
 		sxx += dxx; syy += dyy;
 		sxx_c += dxx_c; syy_c += dyy_c;
+	}
+}
+
+/* good */
+#define SAMPLE_SRC(p0, src, sxx, syy, sw, sh) \
+		uint32_t *p, p1 = 0, p2 = 0, p3 = 0; \
+ \
+		p = src + (y * sw) + x; \
+ \
+		if ((x > -1) & (y > - 1)) \
+			p0 = *p; \
+ \
+		if ((y > -1) & ((x + 1) < sw)) \
+			p1 = *(p + 1); \
+ \
+		if ((y + 1) < sh) \
+		{ \
+			if (x > -1) \
+				p2 = *(p + sw); \
+			if ((x + 1) < sw) \
+				p3 = *(p + sw + 1); \
+		} \
+ \
+		if (p0 | p1 | p2 | p3) \
+		{ \
+			int ax, ay; \
+ \
+			ax = 1 + ((sxx & 0xffff) >> 8); \
+			ay = 1 + ((syy & 0xffff) >> 8); \
+ \
+			p0 = enesim_color_interp_256(ax, p1, p0); \
+			p2 = enesim_color_interp_256(ax, p3, p2); \
+			p0 = enesim_color_interp_256(ay, p2, p0); \
+		}
+
+
+static void
+_span_color_good(Enesim_Renderer *r, int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
+	uint32_t *d = ddata, *e = d + len;
+	int lx = thiz->rx, rx = thiz->lx;
+	int active = 0;
+	uint32_t *src = thiz->src_c;
+	int sw = thiz->sw_c, sh = thiz->sh_c;
+	int sxx, syy, dxx, dyy;
+	double sxf = 0, syf = 0;
+	Enesim_Color color = thiz->rcolor;
+
+	if ( (y < thiz->ty) || (y >= thiz->by) || 
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src)
+	{
+get_out:
+		while (d < e)
+			*d++ = 0;
+		return;
+	}
+
+	if (color == 0xffffffff)
+		color = 0;
+
+	/* get left and right points on the quad on this scanline */
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
+
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
+		goto get_out;
+
+	/* get corresponding points and increments on src space */
+	enesim_matrix_point_transform(&(thiz->ct), lx, y, &sxf, &syf);
+	sxx = sxf * 65536;  syy = syf * 65536;
+	enesim_matrix_point_transform(&(thiz->ct), rx, y, &sxf, &syf);
+	dxx = ((sxf * 65536) - sxx) / (double)(rx - lx);
+	dyy = ((syf * 65536) - syy) / (double)(rx - lx);
+
+	rx -= x;
+	if (len > rx)
+	{
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
+		e -= len;
+	}
+
+	lx -= x;
+	if (lx > 0)
+	{
+		memset(d, 0, sizeof(uint32_t) * lx);
+		d += lx;
+	}
+	else
+	{
+		sxx -= lx * dxx;
+		syy -= lx * dyy;
+	}
+
+	while (d < e)
+	{
+		uint32_t p0 = 0;
+
+		x = sxx >> 16;
+		y = syy >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		{
+			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
+			if (p0 && ((p0>>24) < 255))
+			{
+				int a = 1 + (p0>>24);
+
+				p0 = enesim_color_mul_256(a, p0 | 0xff000000);
+			}
+			if (color && p0)
+				p0 = enesim_color_mul4_sym(p0, color);
+		}
+		*d++ = p0;
+		sxx += dxx; syy += dyy;
+	}
+}
+
+
+static void
+_span_src_good(Enesim_Renderer *r, int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
+	uint32_t *d = ddata, *e = d + len, *src = thiz->ssrc;
+	int lx = thiz->rx, rx = thiz->lx;
+	int active = 0;
+	int sw = thiz->sw, sh = thiz->sh;
+	int sxx, syy, dxx, dyy;
+	double sxf = 0, syf = 0;
+	Enesim_Color color = thiz->rcolor;
+
+	if ( (y < thiz->ty) || (y >= thiz->by) || 
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src)
+	{
+get_out:
+		while (d < e)
+		   *d++ = 0;
+		return;
+	}
+	if (color == 0xffffffff)
+		color = 0;
+
+	/* get left and right points on the quad on this scanline */
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
+
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
+		goto get_out;
+
+	/* get corresponding points and increments on src space */
+	enesim_matrix_point_transform(&(thiz->it), lx, y, &sxf, &syf);
+	sxx = sxf * 65536;  syy = syf * 65536;
+	enesim_matrix_point_transform(&(thiz->it), rx, y, &sxf, &syf);
+	dxx = ((sxf * 65536) - sxx) / (double)(rx - lx);
+	dyy = ((syf * 65536) - syy) / (double)(rx - lx);
+
+	rx -= x;
+	if (len > rx)
+	{
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
+		e -= len;
+	}
+
+	lx -= x;
+	if (lx > 0)
+	{
+		memset(d, 0, sizeof(uint32_t) * lx);
+		d += lx;
+	}
+	else
+	{
+		sxx -= lx * dxx;
+		syy -= lx * dyy;
+	}
+
+	while (d < e)
+	{
+		uint32_t p0 = 0;
+
+		x = sxx >> 16;
+		y = syy >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		{
+			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
+			if (color && p0)
+				p0 = enesim_color_mul4_sym(p0, color);
+		}
+		*d++ = p0;
+		sxx += dxx; syy += dyy;
+	}
+}
+
+
+static void
+_span_src_color_good(Enesim_Renderer *r, int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
+	uint32_t *d = ddata, *e = d + len, *src = thiz->src;
+	uint32_t *src_c = thiz->src_c;
+	int lx = thiz->rx, rx = thiz->lx;
+	int active = 0;
+	int sw = thiz->sw, sh = thiz->sh;
+	int sw_c = thiz->sw_c, sh_c = thiz->sh_c;
+	int sxx, syy, dxx, dyy;
+	int sxx_c, syy_c, dxx_c, dyy_c;
+	double sxf = 0, syf = 0;
+	Enesim_Color color = thiz->rcolor;
+
+	if ( (y < thiz->ty) || (y >= thiz->by) || 
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src || !src_c)
+	{
+get_out:
+		while (d < e)
+		   *d++ = 0;
+		return;
+	}
+
+	if (color == 0xffffffff)
+		color = 0;
+	/* get left and right points on the quad on this scanline */
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
+
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
+		goto get_out;
+
+	/* get corresponding points and increments on src space */
+	enesim_matrix_point_transform(&(thiz->it), lx, y, &sxf, &syf);
+	sxx = sxf * 65536;  syy = syf * 65536;
+	enesim_matrix_point_transform(&(thiz->it), rx, y, &sxf, &syf);
+	dxx = ((sxf * 65536) - sxx) / (double)(rx - lx);
+	dyy = ((syf * 65536) - syy) / (double)(rx - lx);
+
+	enesim_matrix_point_transform(&(thiz->ct), lx, y, &sxf, &syf);
+	sxx_c = sxf * 65536;  syy_c = syf * 65536;
+	enesim_matrix_point_transform(&(thiz->ct), rx, y, &sxf, &syf);
+	dxx_c = ((sxf * 65536) - sxx_c) / (double)(rx - lx);
+	dyy_c = ((syf * 65536) - syy_c) / (double)(rx - lx);
+
+	rx -= x;
+	if (len > rx)
+	{
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
+		e -= len;
+	}
+
+	lx -= x;
+	if (lx > 0)
+	{
+		memset(d, 0, sizeof(uint32_t) * lx);
+		d += lx;
+	}
+	else
+	{
+		sxx -= lx * dxx;
+		syy -= lx * dyy;
+		sxx_c -= lx * dxx_c;
+		syy_c -= lx * dyy_c;
+	}
+
+	while (d < e)
+	{
+		uint32_t p0 = 0, q0 = 0;
+
+		x = sxx >> 16;
+		y = syy >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		{
+			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
+		}
+
+		x = sxx_c >> 16; 
+		y = syy_c >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw_c + 1)) & (((unsigned) (y + 1)) < (sh_c + 1)) )
+		{
+			SAMPLE_SRC(q0, src_c, sxx_c, syy_c, sw_c, sh_c)
+			if (q0 && ((q0>>24) < 255))
+			{
+				int a = 1 + (q0>>24);
+
+				q0 = enesim_color_mul_256(a, q0 | 0xff000000);
+			}
+		}
+		if (p0 | q0)
+			p0 = enesim_color_mul4_sym(p0, q0);
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
+		*d++ = p0;
+		sxx += dxx; syy += dyy;
+		sxx_c += dxx_c; syy_c += dyy_c;
+	}
+}
+
+
+/* best */
+static void
+_span_color_best(Enesim_Renderer *r, int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
+	uint32_t *d = ddata, *e = d + len;
+	int lx = thiz->rx, rx = thiz->lx;
+	int active = 0;
+	uint32_t *src = thiz->src_c;
+	int sw = thiz->sw_c, sh = thiz->sh_c;
+	int xx, yy, sxx, syy;
+	int axx, ayx;
+	float azx;
+	float zf;
+	Enesim_Color color = thiz->rcolor;
+
+	if ( (y < thiz->ty) || (y >= thiz->by) || 
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src)
+	{
+get_out:
+		while (d < e)
+			*d++ = 0;
+		return;
+	}
+
+	if (color == 0xffffffff)
+		color = 0;
+
+	/* get left and right points on the quad on this scanline */
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
+
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
+		goto get_out;
+
+	axx = (thiz->ct.xx) * 65536;
+	ayx = (thiz->ct.yx) * 65536;
+	azx = thiz->ct.zx;
+	xx = (axx * lx) + ((thiz->ct.xy * 65536) * y) + (thiz->ct.xz * 65536);
+	yy = (ayx * lx) + ((thiz->ct.yy * 65536) * y) + (thiz->ct.yz * 65536);
+	zf = (azx * lx) + (thiz->ct.zy * y) + thiz->ct.zz;
+
+	rx -= x;
+	if (len > rx)
+	{
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
+		e -= len;
+	}
+
+	lx -= x;
+	if (lx > 0)
+	{
+		memset(d, 0, sizeof(uint32_t) * lx);
+		d += lx;
+	}
+	else
+	{
+		xx -= lx * axx;
+		yy -= lx * ayx;
+		zf -= lx * azx;
+	}
+
+	while (d < e)
+	{
+		uint32_t p0 = 0;
+
+		sxx = xx / zf;
+		syy = yy / zf;
+		x = sxx >> 16;
+		y = syy >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		{
+			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
+			if (p0 && ((p0>>24) < 255))
+			{
+				int a = 1 + (p0>>24);
+
+				p0 = enesim_color_mul_256(a, p0 | 0xff000000);
+			}
+			if (color && p0)
+				p0 = enesim_color_mul4_sym(p0, color);
+		}
+		*d++ = p0;
+		xx += axx; yy += ayx; zf += azx;
+	}
+}
+
+static void
+_span_src_best(Enesim_Renderer *r, int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
+	uint32_t *d = ddata, *e = d + len, *src = thiz->ssrc;
+	int lx = thiz->rx, rx = thiz->lx;
+	int active = 0;
+	int sw = thiz->sw, sh = thiz->sh;
+	int xx, yy, sxx, syy;
+	int axx, ayx;
+	float azx;
+	float zf;
+	Enesim_Color color = thiz->rcolor;
+
+	if ( (y < thiz->ty) || (y >= thiz->by) || 
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src)
+	{
+get_out:
+		while (d < e)
+		   *d++ = 0;
+		return;
+	}
+	if (color == 0xffffffff)
+		color = 0;
+
+	/* get left and right points on the quad on this scanline */
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
+
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
+		goto get_out;
+
+	axx = (thiz->it.xx) * 65536;
+	ayx = (thiz->it.yx) * 65536;
+	azx = thiz->it.zx;
+	xx = (axx * lx) + ((thiz->it.xy * 65536) * y) + (thiz->it.xz * 65536);
+	yy = (ayx * lx) + ((thiz->it.yy * 65536) * y) + (thiz->it.yz * 65536);
+	zf = (azx * lx) + (thiz->it.zy * y) + thiz->it.zz;
+
+	rx -= x;
+	if (len > rx)
+	{
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
+		e -= len;
+	}
+
+	lx -= x;
+	if (lx > 0)
+	{
+		memset(d, 0, sizeof(uint32_t) * lx);
+		d += lx;
+	}
+	else
+	{
+		xx -= lx * axx;
+		yy -= lx * ayx;
+		zf -= lx * azx;
+	}
+
+	while (d < e)
+	{
+		uint32_t p0 = 0;
+
+		sxx = xx / zf;
+		syy = yy / zf;
+		x = sxx >> 16;
+		y = syy >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		{
+			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
+			if (color && p0)
+				p0 = enesim_color_mul4_sym(p0, color);
+		}
+		*d++ = p0;
+		xx += axx; yy += ayx; zf += azx;
+	}
+}
+
+static void
+_span_src_color_best(Enesim_Renderer *r, int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
+	uint32_t *d = ddata, *e = d + len, *src = thiz->src;
+	uint32_t *src_c = thiz->src_c;
+	int lx = thiz->rx, rx = thiz->lx;
+	int active = 0;
+	int sw = thiz->sw, sh = thiz->sh;
+	int sw_c = thiz->sw_c, sh_c = thiz->sh_c;
+	int xx, yy, sxx, syy;
+	int axx, ayx;
+	float azx;
+	float zf;
+	int xx_c, yy_c;
+	int axx_c, ayx_c;
+	float azx_c;
+	float zf_c;
+	Enesim_Color color = thiz->rcolor;
+
+	if ( (y < thiz->ty) || (y >= thiz->by) || 
+		(x >= thiz->rx) || ((x + len) <= thiz->lx) || !src || !src_c)
+	{
+get_out:
+		while (d < e)
+		   *d++ = 0;
+		return;
+	}
+
+	if (color == 0xffffffff)
+		color = 0;
+	/* get left and right points on the quad on this scanline */
+	active = _map_quad_get_endpoints(thiz, y, &lx, &rx);
+
+	if (!active || ((rx - lx) < 1) || (rx < x) || (lx >= (x + len)))
+		goto get_out;
+
+	axx = (thiz->it.xx) * 65536;
+	ayx = (thiz->it.yx) * 65536;
+	azx = thiz->it.zx;
+	xx = (axx * lx) + ((thiz->it.xy * 65536) * y) + (thiz->it.xz * 65536);
+	yy = (ayx * lx) + ((thiz->it.yy * 65536) * y) + (thiz->it.yz * 65536);
+	zf = (azx * lx) + (thiz->it.zy * y) + thiz->it.zz;
+
+	axx_c = (thiz->ct.xx) * 65536;
+	ayx_c = (thiz->ct.yx) * 65536;
+	azx_c = thiz->ct.zx;
+	xx_c = (axx_c * lx) + ((thiz->ct.xy * 65536) * y) + (thiz->ct.xz * 65536);
+	yy_c = (ayx_c * lx) + ((thiz->ct.yy * 65536) * y) + (thiz->ct.yz * 65536);
+	zf_c = (azx_c * lx) + (thiz->ct.zy * y) + thiz->ct.zz;
+
+	rx -= x;
+	if (len > rx)
+	{
+		len -= rx + 1;
+		memset(d + rx + 1, 0, sizeof(uint32_t) * len);
+		e -= len;
+	}
+
+	lx -= x;
+	if (lx > 0)
+	{
+		memset(d, 0, sizeof(uint32_t) * lx);
+		d += lx;
+	}
+	else
+	{
+		xx -= lx * axx;
+		yy -= lx * ayx;
+		zf -= lx * azx;
+		xx_c -= lx * axx_c;
+		yy_c -= lx * ayx_c;
+		zf_c -= lx * azx_c;
+	}
+
+	while (d < e)
+	{
+		uint32_t p0 = 0, q0 = 0;
+
+		sxx = xx / zf;
+		syy = yy / zf;
+		x = sxx >> 16;
+		y = syy >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw + 1)) & (((unsigned) (y + 1)) < (sh + 1)) )
+		{
+			SAMPLE_SRC(p0, src, sxx, syy, sw, sh)
+		}
+
+		sxx = xx_c / zf_c;
+		syy = yy_c / zf_c;
+		x = sxx >> 16; 
+		y = syy >> 16;
+
+		if ( (((unsigned) (x + 1)) < (sw_c + 1)) & (((unsigned) (y + 1)) < (sh_c + 1)) )
+		{
+			SAMPLE_SRC(q0, src_c, sxx, syy, sw_c, sh_c)
+			if (q0 && ((q0>>24) < 255))
+			{
+				int a = 1 + (q0>>24);
+
+				q0 = enesim_color_mul_256(a, q0 | 0xff000000);
+			}
+		}
+		if (p0 | q0)
+			p0 = enesim_color_mul4_sym(p0, q0);
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
+		*d++ = p0;
+		xx += axx; yy += ayx; zf += azx;
+		xx_c += axx_c; yy_c += ayx_c; zf_c += azx_c;
 	}
 }
 
@@ -717,6 +1106,7 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
 {
 	Enesim_Renderer_Map_Quad *thiz;
+	Enesim_Quality quality;
 	Enesim_Quad sq, dq;
 	Eina_Bool do_cols = 0;
 
@@ -762,7 +1152,7 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 		{
 			thiz->sw_c = thiz->sh_c = 3;
 			if (!thiz->src_c)
-				thiz->src_c = malloc(thiz->sw_c * thiz->sh_c * sizeof(unsigned int));
+				thiz->src_c = malloc(thiz->sw_c * thiz->sh_c * sizeof(uint32_t));
 			if (thiz->src_c)
 			{
 				sq.x0 = sq.y0 = 0;
@@ -791,7 +1181,7 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 	{
 		thiz->sw_c = thiz->sh_c = 3;
 		if (!thiz->src_c)
-			thiz->src_c = malloc(thiz->sw_c * thiz->sh_c * sizeof(unsigned int));
+			thiz->src_c = malloc(thiz->sw_c * thiz->sh_c * sizeof(uint32_t));
 		if (thiz->src_c)
 		{
 			sq.x0 = sq.y0 = 0;
@@ -812,15 +1202,55 @@ static Eina_Bool _map_quad_sw_setup(Enesim_Renderer *r,
 
 	thiz->rcolor = enesim_renderer_color_get(r);
 	/* assign span funcs */
+	/* assign span funcs */
+	quality = enesim_renderer_quality_get(r);
+
 	if (!thiz->src)
-		*fill = _span_color;
+	{
+		if (enesim_matrix_type_get(&(thiz->ct)) == ENESIM_MATRIX_TYPE_AFFINE)
+			quality = ENESIM_QUALITY_GOOD;
+
+		if (quality == ENESIM_QUALITY_BEST)
+			*fill = _span_color_best;
+		else if (quality == ENESIM_QUALITY_GOOD)
+			*fill = _span_color_good;
+		else
+			*fill = _span_color_fast;
+	}
 	else
 	{
-		*fill = _span_src;
-		if (do_cols)
-			*fill = _span_src_color;
+		if (enesim_matrix_type_get(&(thiz->it)) == ENESIM_MATRIX_TYPE_AFFINE)
+		{
+			if (quality == ENESIM_QUALITY_BEST)
+			{
+				if (!do_cols)
+					quality = ENESIM_QUALITY_GOOD;
+				else if (enesim_matrix_type_get(&(thiz->ct)) == ENESIM_MATRIX_TYPE_AFFINE)
+					quality = ENESIM_QUALITY_GOOD;
+			}
+		}
+
+		if (quality == ENESIM_QUALITY_BEST)
+		{
+			*fill = _span_src_best;
+			if (do_cols)
+				*fill = _span_src_color_best;
+		}
+		else if (quality == ENESIM_QUALITY_GOOD)
+		{
+			*fill = _span_src_good;
+			if (do_cols)
+				*fill = _span_src_color_good;
+		}
+		else
+		{
+			*fill = _span_src_fast;
+			if (do_cols)
+				*fill = _span_src_color_fast;
+		}
 	}
-	if (!*fill) return EINA_FALSE;
+	if (!*fill)
+		return EINA_FALSE;
 
 	return EINA_TRUE;
 }
@@ -1025,7 +1455,7 @@ EAPI Enesim_Surface * enesim_renderer_map_quad_source_surface_get(Enesim_Rendere
  * @param[in] color The argb color
  * @param[in] index The vertex index
  */
-EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_Color color, int index)
+EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_Argb color, int index)
 {
 	Enesim_Renderer_Map_Quad *thiz;
 
@@ -1046,7 +1476,7 @@ EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_C
  * @param[in] index The vertex index
  * @return the color of the vertex
  */
-EAPI Enesim_Color enesim_renderer_map_quad_vertex_color_get(Enesim_Renderer *r, int index)
+EAPI Enesim_Argb enesim_renderer_map_quad_vertex_color_get(Enesim_Renderer *r, int index)
 {
 	Enesim_Renderer_Map_Quad *thiz;
 

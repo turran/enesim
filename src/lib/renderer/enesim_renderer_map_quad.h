@@ -37,8 +37,8 @@ EAPI void enesim_renderer_map_quad_vertex_get(Enesim_Renderer *r,
 	double *x, double *y, int index);
 EAPI void enesim_renderer_map_quad_source_surface_set(Enesim_Renderer *r, Enesim_Surface *src);
 EAPI Enesim_Surface * enesim_renderer_map_quad_source_surface_get(Enesim_Renderer *r);
-EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_Color color, int index);
-EAPI Enesim_Color enesim_renderer_map_quad_vertex_color_get(Enesim_Renderer *r, int index);
+EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r, Enesim_Argb color, int index);
+EAPI Enesim_Argb enesim_renderer_map_quad_vertex_color_get(Enesim_Renderer *r, int index);
 
 /**
  * @}
