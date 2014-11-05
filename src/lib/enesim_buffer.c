@@ -494,9 +494,8 @@ EAPI Eina_Bool enesim_buffer_sw_data_get(const Enesim_Buffer *b, Enesim_Buffer_S
 
 /**
  * Maps the buffer into user space memory
- * @param[in] s The buffer to map
+ * @param[in] b The buffer to map
  * @param[out] data The pointer to store the buffer data
- * @param[out] stride The stride of the buffer
  * @return EINA_TRUE if sucessfull, EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_buffer_map(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data)
@@ -547,9 +546,10 @@ EAPI Eina_Bool enesim_buffer_map(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *
  * @brief Unmaps the buffer
  * Call this function when the mapped data of a buffer is no longer
  * needed.
- * @param[in] s The buffer to unmap
+ * @param[in] b The buffer to unmap
  * @param[in] data The pointer where the buffer data is mapped
  * @param[in] written EINA_TRUE in case the mapped data has been written, EINA_FALSE otherwise
+ * @return EINA_TRUE if sucessfull, EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_buffer_unmap(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data, Eina_Bool written)
 {

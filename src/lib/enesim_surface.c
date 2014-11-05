@@ -488,6 +488,7 @@ EAPI Eina_Bool enesim_surface_map(const Enesim_Surface *s, void **data, size_t *
  * @param[in] s The surface to unmap
  * @param[in] data The pointer where the surface data is mapped
  * @param[in] written EINA_TRUE in case the mapped data has been written, EINA_FALSE otherwise
+ * @return EINA_TRUE if sucessfull, EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_surface_unmap(const Enesim_Surface *s, void *data, Eina_Bool written)
 {

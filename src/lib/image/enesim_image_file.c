@@ -108,6 +108,7 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, con
  * @param w The image width
  * @param h The image height
  * @param sfmt The image original format
+ * @param options Any option the provider might require
  * @param[out] err The error in case the file info load fails
  */
 EAPI Eina_Bool enesim_image_file_info_get(const char *file, int *w, int *h,
