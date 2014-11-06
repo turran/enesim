@@ -299,15 +299,9 @@ get_out:
 	{
 		uint32_t p0 = 0;
 
-		x = sxx >> 16;
-		y = syy >> 16;
-
-		if ( (((unsigned)x) < sw) & (((unsigned)y) < sh) )
-		{
-			p0 = *(src + (y * sw) + x);
-			if (color && p0)
-				p0 = enesim_color_mul4_sym(p0, color);
-		}
+		p0 = enesim_coord_sample_fast(src, thiz->sstride, sw, sh, sxx, syy);
+		if (color && p0)
+			p0 = enesim_color_mul4_sym(p0, color);
 		*d++ = p0;
 		sxx += dxx; syy += dyy;
 	}
@@ -384,26 +378,13 @@ get_out:
 	{
 		uint32_t p0 = 0, q0 = 0;
 
-		x = sxx >> 16;
-		y = syy >> 16;
-
-		if ( (((unsigned)x) < sw) & (((unsigned)y) < sh) )
+		p0 = enesim_coord_sample_fast(src, thiz->sstride, sw, sh, sxx, syy);
+		q0 = enesim_coord_sample_fast(src_c, thiz->stride_c, sw_c, sh_c, sxx_c, syy_c);
+		if (q0 && ((q0>>24) < 255))
 		{
-			p0 = *(src + (y * sw) + x);
-		}
+			int a = 1 + (q0>>24);
 
-		x = sxx_c >> 16; 
-		y = syy_c >> 16;
-
-		if ( (((unsigned)x) < sw_c) & (((unsigned)y) < sh_c) )
-		{
-			q0 = *(src_c + (y * sw_c) + x);
-			if (q0 && ((q0>>24) < 255))
-			{
-				int a = 1 + (q0>>24);
-
-				q0 = enesim_color_mul_256(a, q0 | 0xff000000);
-			}
+			q0 = enesim_color_mul_256(a, q0 | 0xff000000);
 		}
 		if (p0 | q0)
 			p0 = enesim_color_mul4_sym(p0, q0);
@@ -416,38 +397,6 @@ get_out:
 }
 
 /* good */
-#define SAMPLE_SRC(p0, src, sxx, syy, sw, sh) \
-		uint32_t *p, p1 = 0, p2 = 0, p3 = 0; \
- \
-		p = src + (y * sw) + x; \
- \
-		if ((x > -1) & (y > - 1)) \
-			p0 = *p; \
- \
-		if ((y > -1) & ((x + 1) < sw)) \
-			p1 = *(p + 1); \
- \
-		if ((y + 1) < sh) \
-		{ \
-			if (x > -1) \
-				p2 = *(p + sw); \
-			if ((x + 1) < sw) \
-				p3 = *(p + sw + 1); \
-		} \
- \
-		if (p0 | p1 | p2 | p3) \
-		{ \
-			int ax, ay; \
- \
-			ax = 1 + ((sxx & 0xffff) >> 8); \
-			ay = 1 + ((syy & 0xffff) >> 8); \
- \
-			p0 = enesim_color_interp_256(ax, p1, p0); \
-			p2 = enesim_color_interp_256(ax, p3, p2); \
-			p0 = enesim_color_interp_256(ay, p2, p0); \
-		}
-
-
 static void
 _span_color_good(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
