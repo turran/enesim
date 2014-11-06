@@ -47,7 +47,7 @@ static Eina_Bool _provider_info_get(Enesim_Image_Provider *p, Enesim_Stream *dat
 	/* sanitize the values */
 	if (w) *w = 0;
 	if (h) *h = 0;
-	if (sfmt) *sfmt = ENESIM_BUFFER_FORMATS;
+	if (sfmt) *sfmt = ENESIM_BUFFER_FORMAT_LAST;
 
 	/* get the info from the image */
 	if (!p->d->info_get)

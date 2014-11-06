@@ -60,8 +60,10 @@ typedef enum _Enesim_Buffer_Format
 	ENESIM_BUFFER_FORMAT_GRAY, /**< 8bpp Grayscale */
 	ENESIM_BUFFER_FORMAT_CMYK, /**< CMYK */
 	ENESIM_BUFFER_FORMAT_CMYK_ADOBE, /**< Adobe CMYK */
-	ENESIM_BUFFER_FORMATS /**< Total number of buffer formats */
 } Enesim_Buffer_Format;
+
+/**< Total number of buffer formats */
+#define ENESIM_BUFFER_FORMAT_LAST (ENESIM_BUFFER_FORMAT_CMYK_ADOBE + 1)
 
 /**
  * Definition of a 24 bits per pixel format
