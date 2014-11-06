@@ -39,7 +39,7 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-typedef Enesim_Converter_2D Enesim_Converter_2D_Lut[ENESIM_BUFFER_FORMATS][ENESIM_ANGLE_LAST][ENESIM_BUFFER_FORMATS];
+typedef Enesim_Converter_2D Enesim_Converter_2D_Lut[ENESIM_BUFFER_FORMAT_LAST][ENESIM_ANGLE_LAST][ENESIM_BUFFER_FORMAT_LAST];
 
 Enesim_Converter_2D_Lut _converters_2d;
 /*============================================================================*
