@@ -38,8 +38,10 @@ typedef enum _Enesim_Matrix_Type
 	ENESIM_MATRIX_TYPE_IDENTITY, /**< Identity matrix type */
 	ENESIM_MATRIX_TYPE_AFFINE, /**< Affine matrix type */
 	ENESIM_MATRIX_TYPE_PROJECTIVE, /**< Projective matrix type */
-	ENESIM_MATRIX_TYPE_LAST /**< The total number of matrix types */
 } Enesim_Matrix_Type;
+
+/**< The total number of matrix types */
+#define ENESIM_MATRIX_TYPE_LAST (ENESIM_MATRIX_TYPE_PROJECTIVE + 1)
 
 /**
  * @}
