@@ -311,7 +311,7 @@ static void
 _span_src_color_fast(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	uint32_t *d = ddata, *e = d + len, *src = thiz->src;
+	uint32_t *d = ddata, *e = d + len, *src = thiz->ssrc;
 	uint32_t *src_c = thiz->src_c;
 	int lx = thiz->rx, rx = thiz->lx;
 	int active = 0;
@@ -547,7 +547,7 @@ static void
 _span_src_color_good(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	uint32_t *d = ddata, *e = d + len, *src = thiz->src;
+	uint32_t *d = ddata, *e = d + len, *src = thiz->ssrc;
 	uint32_t *src_c = thiz->src_c;
 	int lx = thiz->rx, rx = thiz->lx;
 	int active = 0;
@@ -794,7 +794,7 @@ static void
 _span_src_color_best(Enesim_Renderer *r, int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Map_Quad *thiz = ENESIM_RENDERER_MAP_QUAD(r);
-	uint32_t *d = ddata, *e = d + len, *src = thiz->src;
+	uint32_t *d = ddata, *e = d + len, *src = thiz->ssrc;
 	uint32_t *src_c = thiz->src_c;
 	int lx = thiz->rx, rx = thiz->lx;
 	int active = 0;
