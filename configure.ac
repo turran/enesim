@@ -93,7 +93,7 @@ ENS_SURFACE_FORMAT([rgb888], [yes])
 
 AC_PROG_CC
 AC_CHECK_PROG(M4, m4, m4, no)
-if "x${M4}" = "xno" ; then
+if test "x${M4}" = "xno" ; then
   AC_MSG_ERROR([m4 is required. Be sure to have it installed.])
 fi
 
