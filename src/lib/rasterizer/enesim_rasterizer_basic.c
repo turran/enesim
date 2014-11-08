@@ -122,6 +122,88 @@ typedef struct _Enesim_Rasterizer_Basic_Class {
 	Enesim_Rasterizer_Class parent;
 } Enesim_Rasterizer_Basic_Class;
 
+#if 0
+static inline int _basic_setup_edges(Enesim_Rasterizer_Basic *thiz,
+		Eina_F16p16 xx, Eina_F16p16 yy, Eina_F16p16 *lx,
+		Eina_F16p16 *rx)
+{
+	Enesim_F16p16_Edge *edge = thiz->edges;
+	Enesim_F16p16_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors;
+	int nedges = 0;
+	int n = 0;
+
+	*lx = INT_MAX / 2;
+	*rx = -(*lx);
+	while (n < nvectors)
+	{
+		if (yy + 0xffff < v->yy0)
+			break;
+		if (((yy + 0xffff) >= v->yy0) & (yy <= (v->yy1 + 0xffff)))
+		{
+			edge->xx0 = v->xx0;
+			edge->xx1 = v->xx1;
+			edge->yy0 = v->yy0;
+			edge->yy1 = v->yy1;
+			edge->de = (v->a * (long long int) thiz->matrix.xx) >> 16;
+			edge->e = ((v->a * (long long int) xx) >> 16) +
+					((v->b * (long long int) yy) >> 16) +
+					v->c;
+			edge->counted = ((yy >= edge->yy0) & (yy < edge->yy1));
+			if (v->sgn)
+			{
+				int dxx = (v->xx1 - v->xx0);
+				double dd = dxx / (double)(v->yy1 - v->yy0);
+				int lxxc, lyyc = yy - 0xffff;
+				int rxxc, ryyc = yy + 0xffff;
+
+				if (v->sgn < 0)
+				{
+					lyyc = yy + 0xffff;
+					ryyc = yy - 0xffff;
+				}
+
+				lxxc = (lyyc - v->yy0) * dd;
+				rxxc = (ryyc - v->yy0) * dd;
+
+				if (v->sgn < 0)
+				{
+					lxxc = dxx - lxxc;
+					rxxc = dxx - rxxc;
+				}
+
+				lxxc += v->xx0;
+				rxxc += v->xx0;
+
+				if (lxxc < v->xx0)
+					lxxc = v->xx0;
+				if (rxxc > v->xx1)
+					rxxc = v->xx1;
+
+				if (*lx > lxxc)
+					*lx = lxxc;
+				if (*rx < rxxc)
+					*rx = rxxc;
+				edge->lx = (lxxc >> 16);
+			}
+			else
+			{
+				if (*lx > v->xx0)
+					*lx = v->xx0;
+				if (*rx < v->xx1)
+					*rx = v->xx1;
+				edge->lx = (v->xx0 >> 16);
+			}
+			edge++;
+			nedges++;
+		}
+		n++;
+		v++;
+	}
+	return nedges;
+}
+#endif
+
 #define SETUP_EDGES \
 	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
 	edge = edges; \
