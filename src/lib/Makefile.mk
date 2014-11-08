@@ -29,6 +29,8 @@ if BUILD_OPENGL
 dist_installed_headers_DATA += src/lib/Enesim_OpenGL.h
 endif
 
+nodist_src_lib_libenesim_la_SOURCES =
+
 src_lib_libenesim_la_SOURCES = \
 src/lib/enesim_buffer.c \
 src/lib/enesim_buffer_private.h \

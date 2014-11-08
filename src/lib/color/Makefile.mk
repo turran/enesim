@@ -10,6 +10,6 @@ src/lib/color/enesim_color_blend_orc.c \
 src/lib/color/enesim_color_blend_orc_private.h
 
 BUILT_SOURCES += $(ORC_SOURCES)
-src_lib_libenesim_la_SOURCES += $(ORC_SOURCES)
+nodist_src_lib_libenesim_la_SOURCES += $(ORC_SOURCES)
 
 endif
