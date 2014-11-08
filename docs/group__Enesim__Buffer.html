@@ -50,6 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -720,9 +721,8 @@ Functions</h2></td></tr>
 <p>Maps the buffer into user space memory </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The buffer to map </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The buffer to map </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>The pointer to store the buffer data </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">stride</td><td>The stride of the buffer </td></tr>
   </table>
   </dd>
 </dl>
@@ -764,12 +764,13 @@ Functions</h2></td></tr>
 <p>Unmaps the buffer Call this function when the mapped data of a buffer is no longer needed. </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The buffer to unmap </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The buffer to unmap </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The pointer where the buffer data is mapped </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">written</td><td>EINA_TRUE in case the mapped data has been written, EINA_FALSE otherwise </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if sucessfull, EINA_FALSE otherwise </dd></dl>
 
 </div>
 </div>
@@ -1114,7 +1115,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 27 2014 00:25:11 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Nov 8 2014 13:54:40 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

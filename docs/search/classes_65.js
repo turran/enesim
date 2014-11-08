@@ -6,6 +6,8 @@ var searchData=
   ['enesim_5fbuffer_5fopengl_5fdata',['Enesim_Buffer_OpenGL_Data',['../structEnesim__Buffer__OpenGL__Data.html',1,'']]],
   ['enesim_5fbuffer_5frgb565',['Enesim_Buffer_Rgb565',['../structEnesim__Buffer__Rgb565.html',1,'']]],
   ['enesim_5fbuffer_5fsw_5fdata',['Enesim_Buffer_Sw_Data',['../unionEnesim__Buffer__Sw__Data.html',1,'']]],
+  ['enesim_5fexample_5frenderer_5fbackend_5finterface',['Enesim_Example_Renderer_Backend_Interface',['../structEnesim__Example__Renderer__Backend__Interface.html',1,'']]],
+  ['enesim_5fexample_5frenderer_5foptions',['Enesim_Example_Renderer_Options',['../structEnesim__Example__Renderer__Options.html',1,'']]],
   ['enesim_5fimage_5ffinder_5fdescriptor',['Enesim_Image_Finder_Descriptor',['../structEnesim__Image__Finder__Descriptor.html',1,'']]],
   ['enesim_5fimage_5fprovider_5fdescriptor',['Enesim_Image_Provider_Descriptor',['../structEnesim__Image__Provider__Descriptor.html',1,'']]],
   ['enesim_5fmatrix',['Enesim_Matrix',['../structEnesim__Matrix.html',1,'']]],

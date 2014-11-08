@@ -50,6 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -101,6 +102,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>Another way to optmize this is to make the setup() function of every layer thread safe, that way given that each layer does not depend on the other the setup can be done on parallel  </li>
 </ul>
 </dd>
+<dt><a class="anchor" id="_todo000008"></a>Global <a class="el" href="group__Enesim__Renderer__Image.html#gae09982ac2675a40fabd7236aa14a4248">enesim_renderer_image_new</a>  (void)</dt>
+<dd><ul>
+<li>add support for sw and sh</li>
+<li>add support for qualities (good scaler, interpolate between the four neighbours)</li>
+<li>all the span functions have a memset ... that has to be fixed to: + whenever the color = 0, use a image renderer and call it directly + on sw hints check the same condition and use the image renderer hints  </li>
+</ul>
+</dd>
 <dt><a class="anchor" id="_todo000002"></a>Global <a class="el" href="group__Enesim__Renderer.html#gaa295fa95bee27bbf7a0105f69a5098ae">enesim_renderer_ref</a>  (Enesim_Renderer *r)</dt>
 <dd><ul>
 <li>Add a way to get/set such description</li>
@@ -144,7 +152,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Oct 27 2014 00:25:11 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Nov 8 2014 13:54:39 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
