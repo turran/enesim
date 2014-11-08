@@ -227,6 +227,7 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the quality of a renderer.  <a href="#gae4a522eeccc8976dd33b98bf3f9e5001"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Basic.html#ga7253c799b06f355899b57b6eb51051af">Enesim_Quality</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga9f4f2ea6c425dc576d85620930940f67">enesim_renderer_quality_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the quality of a renderer.  <a href="#ga9f4f2ea6c425dc576d85620930940f67"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gae70e0fe570bec97bc7ac9b0113c4e4ad">enesim_renderer_alpha_hints_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga1a12b9a982ba23f84bbb9c4e2a1a22b8">enesim_renderer_is_supported</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a renderer supports the current state of properties.  <a href="#ga1a12b9a982ba23f84bbb9c4e2a1a22b8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga2a3e8b3f470b76228fcc64f5494a37d5">enesim_renderer_bounds_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rect)</td></tr>
@@ -1250,6 +1251,31 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
+<a class="anchor" id="gae70e0fe570bec97bc7ac9b0113c4e4ad"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_alpha_hints_get" ref="gae70e0fe570bec97bc7ac9b0113c4e4ad" args="(Enesim_Renderer *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a> <a class="el" href="group__Enesim__Renderer.html#gae70e0fe570bec97bc7ac9b0113c4e4ad">enesim_renderer_alpha_hints_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Gets the alpha hints of a renderer </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The renderer to get the alpha hints from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The alpha hints </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ga1a12b9a982ba23f84bbb9c4e2a1a22b8"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_is_supported" ref="ga1a12b9a982ba23f84bbb9c4e2a1a22b8" args="(Enesim_Renderer *r, Enesim_Surface *s)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1758,7 +1784,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 8 2014 13:54:40 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Nov 8 2014 19:58:16 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

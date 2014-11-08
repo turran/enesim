@@ -129,6 +129,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Locks a buffer.  <a href="#gae6e3e13a5728bc30d8243f75b4f4b86e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga5c1afd0ebe6b835a760edf6a0a4ccd72">enesim_buffer_unlock</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlocks a buffer.  <a href="#ga5c1afd0ebe6b835a760edf6a0a4ccd72"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gaf00e423735d56383a93308c2f600bce2">enesim_buffer_alpha_hint_set</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *thiz, <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a> hint)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga62f670c16d859013191b6c42be836f19">enesim_buffer_alpha_hint_get</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *thiz)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Target device pixel data holder. </p>
@@ -1097,6 +1099,66 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="gaf00e423735d56383a93308c2f600bce2"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_alpha_hint_set" ref="gaf00e423735d56383a93308c2f600bce2" args="(Enesim_Buffer *thiz, Enesim_Alpha_Hint hint)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Buffer.html#gaf00e423735d56383a93308c2f600bce2">enesim_buffer_alpha_hint_set</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>&#160;</td>
+          <td class="paramname"><em>hint</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Set the alpha hint on a buffer </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The buffer to set the alpha hint </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hint</td><td>The alpha hint to set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga62f670c16d859013191b6c42be836f19"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_alpha_hint_get" ref="ga62f670c16d859013191b6c42be836f19" args="(Enesim_Buffer *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a> <a class="el" href="group__Enesim__Buffer.html#ga62f670c16d859013191b6c42be836f19">enesim_buffer_alpha_hint_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the alpha hint on a buffer </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The buffer to get the alpha hint from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The buffer alpha hint </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -1115,7 +1177,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 8 2014 13:54:40 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Nov 8 2014 19:58:16 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

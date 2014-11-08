@@ -121,6 +121,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Locks a surface.  <a href="#gadc84790a46bd4ed15d9a4db83da6b920"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#gacb7bdd94a0c4dd925eafb0fa6c0891ec">enesim_surface_unlock</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlocks a surface.  <a href="#gacb7bdd94a0c4dd925eafb0fa6c0891ec"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga51bf0e6449e045d360dfb6483a52c4f6">enesim_surface_alpha_hint_set</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a> hint)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Surface.html#ga981a28e97295c61522e867c493871b2c">enesim_surface_alpha_hint_get</a> (<a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Native pixel data holder. </p>
@@ -867,6 +869,66 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga51bf0e6449e045d360dfb6483a52c4f6"></a><!-- doxytag: member="enesim_surface.h::enesim_surface_alpha_hint_set" ref="ga51bf0e6449e045d360dfb6483a52c4f6" args="(Enesim_Surface *s, Enesim_Alpha_Hint hint)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Surface.html#ga51bf0e6449e045d360dfb6483a52c4f6">enesim_surface_alpha_hint_set</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>&#160;</td>
+          <td class="paramname"><em>hint</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Set the alpha hint on a surface </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The surface to set the alpha hint </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hint</td><td>The alpha hint to set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga981a28e97295c61522e867c493871b2c"></a><!-- doxytag: member="enesim_surface.h::enesim_surface_alpha_hint_get" ref="ga981a28e97295c61522e867c493871b2c" args="(Enesim_Surface *s)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a> <a class="el" href="group__Enesim__Surface.html#ga981a28e97295c61522e867c493871b2c">enesim_surface_alpha_hint_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the alpha hint on a surface </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The surface to get the alpha hint from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The surface alpha hint </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -885,7 +947,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 8 2014 13:54:40 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Nov 8 2014 19:58:16 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
