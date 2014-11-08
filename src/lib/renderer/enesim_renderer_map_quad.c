@@ -876,8 +876,6 @@ get_out:
 
 		sxx = xx_c / zf_c;
 		syy = yy_c / zf_c;
-		x = sxx >> 16; 
-		y = syy >> 16;
 
 		q0 = enesim_coord_sample_good_restrict(src_c, thiz->stride_c, sw_c, sh_c, sxx, syy);
 		if (q0 && ((q0>>24) < 255))
