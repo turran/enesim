@@ -99,6 +99,7 @@ common/m4/ens_format.m4 \
 common/m4/ens_modules.m4 \
 common/m4/ens_tests.m4
 
+if BUILD_ORC
 # Rule to generate from m4 to orc files
 # The filename must end with 'orc'
 %orc.orc: %orc.m4
@@ -110,6 +111,7 @@ common/m4/ens_tests.m4
 	${ORCC} $< -o $@
 %orc_private.h: %orc.orc
 	${ORCC} $< --header -o $@
+endif
 
 sed_process = \
 $(SED) \
