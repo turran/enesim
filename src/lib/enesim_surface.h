@@ -75,6 +75,9 @@ EAPI Eina_Bool enesim_surface_unmap(const Enesim_Surface *s, void *data, Eina_Bo
 EAPI void enesim_surface_lock(Enesim_Surface *s, Eina_Bool write);
 EAPI void enesim_surface_unlock(Enesim_Surface *s);
 
+EAPI void enesim_surface_alpha_hint_set(Enesim_Surface *s, Enesim_Alpha_Hint hint);
+EAPI Enesim_Alpha_Hint enesim_surface_alpha_hint_get(Enesim_Surface *s);
+
 /** @} */ //End of Enesim_Surface
 
 #endif /*ENESIM_SURFACE_H_*/

@@ -565,3 +565,23 @@ EAPI void enesim_surface_unlock(Enesim_Surface *s)
 {
 	enesim_buffer_unlock(s->buffer);
 }
+
+/**
+ * Set the alpha hint on a surface
+ * @param[in] s The surface to set the alpha hint
+ * @param[in] hint The alpha hint to set
+ */
+EAPI void enesim_surface_alpha_hint_set(Enesim_Surface *s, Enesim_Alpha_Hint hint)
+{
+	enesim_buffer_alpha_hint_set(s->buffer, hint);
+}
+
+/**
+ * Get the alpha hint on a surface
+ * @param[in] s The surface to get the alpha hint from
+ * @return The surface alpha hint
+ */
+EAPI Enesim_Alpha_Hint enesim_surface_alpha_hint_get(Enesim_Surface *s)
+{
+	return enesim_buffer_alpha_hint_get(s->buffer);
+}

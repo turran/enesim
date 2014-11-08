@@ -970,6 +970,23 @@ EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r)
 }
 
 /**
+ * Gets the alpha hints of a renderer
+ * @param[in] thiz The renderer to get the alpha hints from
+ * @return The alpha hints
+ */
+EAPI Enesim_Alpha_Hint enesim_renderer_alpha_hints_get(Enesim_Renderer *thiz)
+{
+	Enesim_Renderer_Class *klass;
+
+	ENESIM_MAGIC_CHECK_RENDERER(thiz);
+	klass = ENESIM_RENDERER_CLASS_GET(thiz);
+	if (klass->alpha_hints_get)
+		return klass->alpha_hints_get(thiz);
+	else
+		return ENESIM_ALPHA_HINT_NORMAL;
+}
+
+/**
  * @brief Gets the transformation type of the transformation attribute
  * of a renderer.
  * @param[in] r The renderer to get the transformation type from
@@ -1410,3 +1427,4 @@ EAPI void enesim_renderer_default_quality_set(Enesim_Quality quality)
 {
 	_default_quality = quality;
 }
+

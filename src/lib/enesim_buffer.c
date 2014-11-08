@@ -54,6 +54,29 @@ static void _buffer_data_free(void *data, void *user_data EINA_UNUSED)
 	free(data);
 }
 
+static Eina_Bool _buffer_format_has_alpha(Enesim_Buffer_Format fmt)
+{
+	switch (fmt)
+	{
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		case ENESIM_BUFFER_FORMAT_XRGB8888:
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		case ENESIM_BUFFER_FORMAT_GRAY:
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		return EINA_FALSE;
+
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_A8:
+		return EINA_TRUE;
+
+		default:
+		return EINA_FALSE;
+	}
+}
+
 static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backend,
 		void *backend_data, Enesim_Buffer_Format f, Enesim_Pool *p,
 		Eina_Bool external, Enesim_Buffer_Free free_func, void *free_func_data)
@@ -77,6 +100,11 @@ static Enesim_Buffer * _buffer_new(uint32_t w, uint32_t h, Enesim_Backend backen
 	thiz = enesim_buffer_ref(thiz);
 	/* now create the needed locks */
 	eina_rwlock_new(&thiz->lock);
+	/* set the default alpha hints */
+	if (_buffer_format_has_alpha(f))
+		thiz->alpha_hint = ENESIM_ALPHA_HINT_NORMAL;
+	else
+		thiz->alpha_hint = ENESIM_ALPHA_HINT_OPAQUE;
 
 	return thiz;
 }
@@ -97,6 +125,7 @@ static void _buffer_free(Enesim_Buffer *b)
 	eina_rwlock_free(&b->lock);
 	free(b);
 }
+
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -858,3 +887,25 @@ EAPI void enesim_buffer_unlock(Enesim_Buffer *b)
 	eina_rwlock_release(&b->lock);
 }
 
+/**
+ * Set the alpha hint on a buffer
+ * @param[in] thiz The buffer to set the alpha hint
+ * @param[in] hint The alpha hint to set
+ */
+EAPI void enesim_buffer_alpha_hint_set(Enesim_Buffer *thiz, Enesim_Alpha_Hint hint)
+{
+	if (!_buffer_format_has_alpha(thiz->format))
+		return;
+	thiz->alpha_hint = hint;
+}
+
+/**
+ * Get the alpha hint on a buffer
+ * @param[in] thiz The buffer to get the alpha hint from
+ * @return The buffer alpha hint
+ */
+EAPI Enesim_Alpha_Hint enesim_buffer_alpha_hint_get(Enesim_Buffer *thiz)
+{
+	return thiz->alpha_hint;
+
+}

@@ -31,6 +31,7 @@ struct _Enesim_Buffer
 	int ref;
 	uint32_t w;
 	uint32_t h;
+	Enesim_Alpha_Hint alpha_hint;
 	Enesim_Buffer_Format format;
 	Enesim_Backend backend;
 	void *backend_data;

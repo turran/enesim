@@ -88,6 +88,7 @@ EAPI void enesim_renderer_mask_channel_set(Enesim_Renderer *r, Enesim_Channel ch
 EAPI Enesim_Channel enesim_renderer_mask_channel_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality);
 EAPI Enesim_Quality enesim_renderer_quality_get(Enesim_Renderer *r);
+EAPI Enesim_Alpha_Hint enesim_renderer_alpha_hints_get(Enesim_Renderer *thiz);
 
 EAPI Eina_Bool enesim_renderer_is_supported(Enesim_Renderer *r, Enesim_Surface *s);
 
