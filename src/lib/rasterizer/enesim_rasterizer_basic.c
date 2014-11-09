@@ -122,12 +122,21 @@ typedef struct _Enesim_Rasterizer_Basic_Class {
 	Enesim_Rasterizer_Class parent;
 } Enesim_Rasterizer_Basic_Class;
 
-#if 0
+typedef struct _Enesim_Rasterizer_Basic_Span {
+	Enesim_F16p16_Edge *edges;
+	int nedges;
+	Eina_F16p16 lx;
+	Eina_F16p16 rx;
+} Enesim_Rasterizer_Basic_Span;
+
+#define ENESIM_RASTERIZER_BASIC_SPAN_INIT(thiz, s)                            \
+	s.edges = alloca(thiz->nvectors * sizeof(Enesim_F16p16_Edge));
+
 static inline int _basic_setup_edges(Enesim_Rasterizer_Basic *thiz,
-		Eina_F16p16 xx, Eina_F16p16 yy, Eina_F16p16 *lx,
-		Eina_F16p16 *rx)
+		Enesim_F16p16_Edge *edges, Eina_F16p16 xx, Eina_F16p16 yy,
+		Eina_F16p16 *lx, Eina_F16p16 *rx)
 {
-	Enesim_F16p16_Edge *edge = thiz->edges;
+	Enesim_F16p16_Edge *edge = edges;
 	Enesim_F16p16_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors;
 	int nedges = 0;
@@ -202,73 +211,10 @@ static inline int _basic_setup_edges(Enesim_Rasterizer_Basic *thiz,
 	}
 	return nedges;
 }
-#endif
 
 #define SETUP_EDGES \
 	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
-	edge = edges; \
-	n = 0; \
-	while (n < nvectors) \
-	{ \
-		if (yy + 0xffff < v->yy0) \
-			break; \
-		if (((yy + 0xffff) >= v->yy0) & (yy <= (v->yy1 + 0xffff))) \
-		{ \
-			edge->xx0 = v->xx0; \
-			edge->xx1 = v->xx1; \
-			edge->yy0 = v->yy0; \
-			edge->yy1 = v->yy1; \
-			edge->de = (v->a * (long long int) axx) >> 16; \
-			edge->e = ((v->a * (long long int) xx) >> 16) + \
-					((v->b * (long long int) yy) >> 16) + \
-					v->c; \
-			edge->counted = ((yy >= edge->yy0) & (yy < edge->yy1)); \
-			if (v->sgn) \
-			{ \
-				int dxx = (v->xx1 - v->xx0); \
-				double dd = dxx / (double)(v->yy1 - v->yy0); \
-				int lxxc, lyyc = yy - 0xffff; \
-				int rxxc, ryyc = yy + 0xffff; \
- \
-				if (v->sgn < 0) \
-				{ \
-					lyyc = yy + 0xffff; \
-					ryyc = yy - 0xffff; \
-				} \
- \
-				lxxc = (lyyc - v->yy0) * dd; \
-				rxxc = (ryyc - v->yy0) * dd; \
- \
-				if (v->sgn < 0) \
-				{ \
-					lxxc = dxx - lxxc; \
-					rxxc = dxx - rxxc; \
-				} \
- \
-				lxxc += v->xx0; \
-				rxxc += v->xx0; \
- \
-				if (lxxc < v->xx0) \
-					lxxc = v->xx0; \
-				if (rxxc > v->xx1) \
-					rxxc = v->xx1; \
- \
-				if (lx > lxxc)  lx = lxxc; \
-				if (rx < rxxc)  rx = rxxc; \
-				edge->lx = (lxxc >> 16); \
-			} \
-			else \
-			{ \
-				if (lx > v->xx0)  lx = v->xx0; \
-				if (rx < v->xx1)  rx = v->xx1; \
-				edge->lx = (v->xx0 >> 16); \
-			} \
-			edge++; \
-			nedges++; \
-		} \
-		n++; \
-		v++; \
-	} \
+	nedges = _basic_setup_edges(thiz, edges, xx, yy, &lx, &rx); \
  \
 	if (!nedges) \
 		goto get_out; \
@@ -316,33 +262,47 @@ repeat: \
 	else lx = 0;
 
 
+static inline void _basic_eval_edges_nz(Enesim_F16p16_Edge *edges,
+		int nedges, Eina_F16p16 xx, int sww, int *a, int *count)
+{
+	Enesim_F16p16_Edge *edge = edges;
+	int n = 0;
+
+	/* initialize the output parameters */
+	*a = 0;
+	*count = 0;
+
+	/* start evaluating the edges */
+	edge = edges;
+	n = 0;
+	while (n < nedges)
+	{
+		int ee = edge->e;
+
+		/* alternative */
+		/* count += (ee >> 31) | ((~ee >> 31) & 1); */
+		if (edge->counted)
+			*count += (ee >= 0) - (ee < 0);
+		if (ee < 0)
+			ee = -ee;
+
+		if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) &
+				(xx <= (0xffff + edge->xx1)))
+		{
+			if (*a < sww/4)
+				*a = sww - ee;
+			else
+				*a = (*a + (sww - ee)) / 2;
+		}
+
+		edge->e += edge->de;
+		edge++;
+		n++;
+	}
+}
+
 #define EVAL_EDGES_NZ \
-	edge = edges; \
-	n = 0; \
-	while (n < nedges) \
-	{  \
-		int ee = edge->e; \
- \
-		/* alternative */ \
-		/* count += (ee >> 31) | ((~ee >> 31) & 1); */ \
-		if (edge->counted) \
-			count += (ee >= 0) - (ee < 0); \
-		if (ee < 0) \
-			ee = -ee; \
- \
-		if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) &  \
-				(xx <= (0xffff + edge->xx1)))  \
-		{ \
-			if (a < sww/4) \
-				a = sww - ee; \
-			else \
-				a = (a + (sww - ee)) / 2; \
-		} \
- \
-		edge->e += edge->de; \
-		edge++; \
-		n++; \
-	} \
+	_basic_eval_edges_nz(edges, nedges, xx, sww, &a, &count); \
  \
 	if (!a) \
 	{ \
