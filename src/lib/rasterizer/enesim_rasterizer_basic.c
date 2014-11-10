@@ -542,6 +542,12 @@ static inline void _fill_renderer_setup(Enesim_Rasterizer_Basic *thiz, int x, in
 	enesim_renderer_sw_draw(thiz->fpaint, x, y, len, dst);
 }
 
+static inline void _fill_color_renderer_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
+{
+	if (thiz->fpaint)
+		_fill_renderer_setup(thiz, x, y, len, dst);
+}
+
 static inline void _stroke_renderer_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
 {
 	enesim_renderer_sw_draw(thiz->spaint, x, y, len, dst);
@@ -565,6 +571,54 @@ static inline void _fill_renderer_advance(Enesim_Rasterizer_Basic *thiz, uint32_
 static inline void _fill_color_advance(Enesim_Rasterizer_Basic *thiz, uint32_t *dst, int len)
 {
 	enesim_color_fill_sp_none_color_none(dst, len, thiz->fcolor);
+}
+
+static inline void _fill_color_renderer_advance(Enesim_Rasterizer_Basic *thiz, uint32_t *dst, int len)
+{
+	if (!thiz->fpaint)
+	{
+		_fill_color_advance(thiz, dst, len);
+	}
+	else if (thiz->fcolor != 0xffffffff)
+		_fill_renderer_advance(thiz, dst, len);
+}
+
+static inline uint32_t _fill_color_renderer_stroke_color_draw(Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
+{
+	uint32_t p0;
+
+	if (count)
+	{
+		p0 = thiz->fcolor;
+		if (thiz->fpaint)
+		{
+			p0 = *d;
+			if (thiz->fcolor != 0xffffffff)
+				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+		}
+
+		if (thiz->stroke)
+		{
+			unsigned int q0 = p0;
+
+			p0 = thiz->scolor;
+			if (a < 65536)
+				p0 = INTERP_65536(a, p0, q0);
+		}
+	}
+	else
+	{
+		p0 = thiz->scolor;
+		if (thiz->fpaint && !thiz->stroke)
+		{
+			p0 = *d;
+			if (thiz->fcolor != 0xffffffff)
+				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+		}
+		if (a < 65536)
+			p0 = MUL_A_65536(a, p0);
+	}
+	return p0;
 }
 
 static inline uint32_t _fill_color_stroke_color_draw(Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
@@ -690,7 +744,7 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 		e -= nlen;
 	}
 
-	_fill_renderer_setup(thiz, lx, y, rx - lx, dst + (lx - x));
+	_fill_color_renderer_setup(thiz, lx, y, rx - lx, dst + (lx - x));
 	/* lx will be an offset from now on */
 	lx -= x;
 repeat:
@@ -702,7 +756,7 @@ repeat:
 		}
 		else
 		{
-			_fill_renderer_advance(thiz, d, lx);
+			_fill_color_renderer_advance(thiz, d, lx);
 		}
 
 		/* advance the edges by lx */
@@ -749,7 +803,7 @@ repeat:
 			goto repeat;
 		}
 
-		p0 = _fill_renderer_stroke_color_draw(thiz, d, count, a);
+		p0 = _fill_color_renderer_stroke_color_draw(thiz, d, count, a);
 		*d++ = p0;
 		xx += EINA_F16P16_ONE;
 		x++;
