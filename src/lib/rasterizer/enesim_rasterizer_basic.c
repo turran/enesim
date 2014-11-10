@@ -606,21 +606,13 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 {
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
 	Enesim_Rasterizer_Basic_State *state = &thiz->state;
-	Enesim_Color color;
-	Enesim_Color fcolor;
-	Enesim_Color scolor;
-	Enesim_Renderer *fpaint;
-	int stroke = 0;
-	double sw;
-	int sww;
 	uint32_t *dst = ddata;
 	uint32_t *d = dst, *e = d + len;
 	Enesim_F16p16_Edge *edges, *edge;
-	Enesim_F16p16_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors, n = 0, nedges = 0;
 	double ox, oy;
 	int lx = INT_MAX / 2, rx = -lx;
-	int first = 1, outside = 0;
+	Eina_Bool outside = EINA_TRUE;
 
 	int xx = eina_f16p16_int_from(x);
 	int yy = eina_f16p16_int_from(y);
@@ -649,7 +641,6 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 	}
 
 	_fill_painters_setup(thiz, lx, y, rx - lx, dst + (lx - x));
-	outside = 1;
 	/* lx will be an offset from now on */
 	lx -= x;
 repeat:
