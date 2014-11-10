@@ -35,6 +35,7 @@
 #include "enesim_object_instance.h"
 
 #include "enesim_color_private.h"
+#include "enesim_color_fill_private.h"
 #include "enesim_color_mul4_sym_private.h"
 #include "enesim_list_private.h"
 #include "enesim_vector_private.h"
@@ -116,6 +117,13 @@ typedef struct _Enesim_Rasterizer_Basic
 	 */
 	int lxx, rxx, tyy, byy;
 	Enesim_Matrix_F16p16 matrix;
+	/* TODO the above must be cleaned up */
+	Enesim_Renderer *spaint;
+	Enesim_Renderer *fpaint;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Eina_F16p16 sww;
+	Eina_Bool stroke;
 } Enesim_Rasterizer_Basic;
 
 typedef struct _Enesim_Rasterizer_Basic_Class {
@@ -212,6 +220,36 @@ static inline int _basic_setup_edges(Enesim_Rasterizer_Basic *thiz,
 	return nedges;
 }
 
+static inline Eina_Bool _basic_clip(int l1, int r1, int l2, int r2, int *rl, int *rr)
+{
+	if (r2 < l1)
+	{
+		return EINA_FALSE;
+	}
+	else
+	{
+		if (r2 > r1)
+		{
+			r2 = r1;
+		}
+	}
+
+	if (l2 > r1)
+	{
+		return EINA_FALSE;
+	}
+	else
+	{
+		if (l2 < l1)
+		{
+			l2 = l1;
+		}
+	}
+	*rl = l2;
+	*rr = r2;
+	return EINA_TRUE;
+}
+
 #define SETUP_EDGES \
 	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge)); \
 	nedges = _basic_setup_edges(thiz, edges, xx, yy, &lx, &rx); \
@@ -259,7 +297,8 @@ repeat: \
 			n++; \
 		} \
 	} \
-	else lx = 0;
+	else lx = 0; \
+	printf("first x: %d -> %d %d\n", x, lx, rx);
 
 
 static inline void _basic_eval_edges_nz(Enesim_F16p16_Edge *edges,
@@ -290,9 +329,13 @@ static inline void _basic_eval_edges_nz(Enesim_F16p16_Edge *edges,
 				(xx <= (0xffff + edge->xx1)))
 		{
 			if (*a < sww/4)
+			{
 				*a = sww - ee;
+			}
 			else
+			{
 				*a = (*a + (sww - ee)) / 2;
+			}
 		}
 
 		edge->e += edge->de;
@@ -325,6 +368,7 @@ static inline void _basic_eval_edges_nz(Enesim_F16p16_Edge *edges,
 		goto repeat; \
 	}
 
+#if 0
 /* identity */
 /* stroke and/or fill with possibly a fill renderer non-zero rule */
 static void _stroke_fill_paint_nz(Enesim_Renderer *r,
@@ -368,6 +412,7 @@ get_out:
 
 	SETUP_EDGES
 
+	printf("first\n");
 	if (first)
 	{
 		first = 0;
@@ -490,6 +535,188 @@ get_out:
 		x++;
 	}
 }
+#else
+
+static inline void _fill_only_painters_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
+{
+	enesim_renderer_sw_draw(thiz->fpaint, x, y, len, dst);
+}
+
+static inline void _fill_painters_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
+{
+	if (thiz->fpaint)
+		_fill_only_painters_setup(thiz, x, y, len, dst);
+}
+
+static inline void _fill_painters_advance(Enesim_Rasterizer_Basic *thiz, uint32_t *dst, int len)
+{
+	if (!thiz->fpaint)
+	{
+		enesim_color_fill_sp_none_color_none(dst, len, thiz->fcolor);
+	}
+	else if (thiz->fcolor != 0xffffffff)
+	{
+		enesim_color_mul4_sym_sp_none_color_none(dst, len, thiz->fcolor);
+	}
+}
+
+static inline uint32_t _fill_painters_draw(Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
+{
+	uint32_t p0;
+
+	if (count)
+	{
+		p0 = thiz->fcolor;
+		if (thiz->fpaint)
+		{
+			p0 = *d;
+			if (thiz->fcolor != 0xffffffff)
+				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+		}
+
+		if (thiz->stroke)
+		{
+			uint32_t q0 = p0;
+
+			p0 = thiz->scolor;
+			if (a < 65536)
+				p0 = INTERP_65536(a, p0, q0);
+		}
+	}
+	else
+	{
+		p0 = thiz->scolor;
+		if (thiz->fpaint && !thiz->stroke)
+		{
+			p0 = *d;
+			if (thiz->fcolor != 0xffffffff)
+				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+		}
+		if (a < 65536)
+		{
+			p0 = MUL_A_65536(a, p0);
+		}
+	}
+
+	return p0;
+}
+
+static void _stroke_fill_paint_nz(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata)
+{
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;
+	Enesim_Color color;
+	Enesim_Color fcolor;
+	Enesim_Color scolor;
+	Enesim_Renderer *fpaint;
+	int stroke = 0;
+	double sw;
+	int sww;
+	uint32_t *dst = ddata;
+	uint32_t *d = dst, *e = d + len;
+	Enesim_F16p16_Edge *edges, *edge;
+	Enesim_F16p16_Vector *v = thiz->vectors;
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;
+	double ox, oy;
+	int lx = INT_MAX / 2, rx = -lx;
+	int first = 1, outside = 0;
+
+	int xx = eina_f16p16_int_from(x);
+	int yy = eina_f16p16_int_from(y);
+
+	ox = state->ox;
+	oy = state->oy;
+	xx -= eina_f16p16_double_from(ox);
+	yy -= eina_f16p16_double_from(oy);
+
+	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge));
+	nedges = _basic_setup_edges(thiz, edges, xx, yy, &lx, &rx);
+	if (!_basic_clip(x, x + len, (lx >> 16) - 1, (rx >> 16) + 2, &lx, &rx))
+	{
+		memset(d, 0, sizeof(uint32_t) * len);
+		return;
+	}
+	/* the most right coordinate found is smaller than the requested length to draw */
+	if (rx < x + len)
+	{
+		int roff = rx - x;
+		int nlen = (x + len) - rx;
+
+		memset(d + roff, 0, sizeof(uint32_t) * nlen);
+		len -= nlen;
+		e -= nlen;
+	}
+
+	_fill_painters_setup(thiz, lx, y, rx - lx, dst + (lx - x));
+	outside = 1;
+	/* lx will be an offset from now on */
+	lx -= x;
+repeat:
+	if (lx > 0)
+	{
+		if (outside)
+		{
+			memset(d, 0, sizeof(uint32_t) * lx);
+		}
+		else
+		{
+			_fill_painters_advance(thiz, d, lx);
+		}
+
+		/* advance the edges by lx */
+		n = 0;
+		edge = edges;
+		while (n < nedges)
+		{
+			edge->e += lx * edge->de;
+			edge++;
+			n++;
+		}
+
+		/* advance our position by lx */
+		xx += lx * EINA_F16P16_ONE;
+		x += lx;
+		d += lx;
+	}
+
+	while (d < e)
+	{
+		unsigned int p0;
+		int count = 0;
+		int a = 0;
+
+		_basic_eval_edges_nz(edges, nedges, xx, thiz->sww, &a, &count);
+		if (!a)
+		{
+			int nx = rx;
+
+			edge = edges;
+			n = 0;
+			while (n < nedges)
+			{
+				if ((x <= edge->lx) & (nx > edge->lx))
+					nx = edge->lx;
+				edge->e -= edge->de;
+				edge++;
+				n++;
+			}
+			lx = nx - x;
+			if (lx < 1)
+				lx = 1;
+			outside = !count;
+			goto repeat;
+		}
+
+		p0 = _fill_painters_draw(thiz, d, count, a);
+		*d++ = p0;
+		xx += EINA_F16P16_ONE;
+		x++;
+	}
+}
+
+
+#endif
 
 /* stroke with a renderer and possibly fill with color non-zero rule */
 static void _stroke_paint_fill_nz(Enesim_Renderer *r,
@@ -1448,6 +1675,47 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	fill_rule = enesim_renderer_shape_fill_rule_get(r);
 	state->draw_mode = draw_mode;
 
+	/* setup the colors */
+	thiz->scolor = state->stroke.color;
+	thiz->fcolor = state->fill.color;
+	if (state->color != 0xffffffff)
+	{
+		thiz->scolor = enesim_color_mul4_sym(state->color, thiz->scolor);
+		thiz->fcolor = enesim_color_mul4_sym(state->color, thiz->fcolor);
+	}
+	/* setup the renderers to use */
+	thiz->fpaint = enesim_renderer_ref(state->fill.r);
+	thiz->spaint = enesim_renderer_ref(state->stroke.r);
+
+	if (state->draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	{
+		thiz->scolor = thiz->fcolor;
+		thiz->stroke = EINA_FALSE;
+		thiz->sww = 65536;
+	}
+	else if (state->draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
+	{
+		thiz->stroke = EINA_TRUE;
+		if (state->stroke.weight <= 0)
+		{
+			thiz->sww = 65536;
+			thiz->stroke = EINA_FALSE;
+		}
+		else
+		{
+			thiz->sww = sqrt(state->stroke.weight) * 65536;
+		}
+	}
+	/* stroke + fill */
+	else
+	{
+		thiz->sww = sqrt(state->stroke.weight) * 65536;
+		thiz->fcolor = 0;
+		enesim_renderer_unref(thiz->fpaint);
+		thiz->fpaint = NULL;
+		thiz->stroke = EINA_TRUE;
+	}
+
 	if (fill_rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)
 	{
 		*draw = _stroke_fill_paint_nz;
@@ -1478,6 +1746,17 @@ static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s 
 	Enesim_Rasterizer_Basic_State *state;
 
 	thiz = ENESIM_RASTERIZER_BASIC(r);
+	if (thiz->fpaint)
+	{
+		enesim_renderer_unref(thiz->fpaint);
+		thiz->fpaint = NULL;
+	}
+	if (thiz->spaint)
+	{
+		enesim_renderer_unref(thiz->spaint);
+		thiz->spaint = NULL;
+	}
+
 	state = &thiz->state;
 	if (state->fill.r)
 		enesim_renderer_unref(state->fill.r);
