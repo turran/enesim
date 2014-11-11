@@ -130,16 +130,6 @@ typedef struct _Enesim_Rasterizer_Basic_Class {
 	Enesim_Rasterizer_Class parent;
 } Enesim_Rasterizer_Basic_Class;
 
-typedef struct _Enesim_Rasterizer_Basic_Span {
-	Enesim_F16p16_Edge *edges;
-	int nedges;
-	Eina_F16p16 lx;
-	Eina_F16p16 rx;
-} Enesim_Rasterizer_Basic_Span;
-
-#define ENESIM_RASTERIZER_BASIC_SPAN_INIT(thiz, s)                            \
-	s.edges = alloca(thiz->nvectors * sizeof(Enesim_F16p16_Edge));
-
 static inline int _basic_setup_edges(Enesim_Rasterizer_Basic *thiz,
 		Enesim_F16p16_Edge *edges, Eina_F16p16 xx, Eina_F16p16 yy,
 		Eina_F16p16 *lx, Eina_F16p16 *rx)
