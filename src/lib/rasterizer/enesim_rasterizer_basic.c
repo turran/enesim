@@ -300,8 +300,10 @@ repeat: \
 	else lx = 0; \
 	printf("first x: %d -> %d %d\n", x, lx, rx);
 
-
-static inline void _basic_eval_edges_nz(Enesim_F16p16_Edge *edges,
+/*----------------------------------------------------------------------------*
+ *                            Evaluate functions                              *
+ *----------------------------------------------------------------------------*/
+static inline void _basic_edges_nz_evaluate(Enesim_F16p16_Edge *edges,
 		int nedges, Eina_F16p16 xx, int sww, int *a, int *count)
 {
 	Enesim_F16p16_Edge *edge = edges;
@@ -344,8 +346,55 @@ static inline void _basic_eval_edges_nz(Enesim_F16p16_Edge *edges,
 	}
 }
 
+static inline void _basic_edges_eo_evaluate(Enesim_F16p16_Edge *edges,
+		int nedges, Eina_F16p16 xx, int sww, int *a, int *in)
+{
+	Enesim_F16p16_Edge *edge = edges;
+	int n = 0;
+	int np = 0;
+	int nn = 0;
+
+	/* initialize the output parameters */
+	*a = 0;
+	*in = 0;
+
+	/* start evaluating the edges */
+	edge = edges;
+	while (n < nedges)
+	{
+		int ee = edge->e;
+
+		if (edge->counted)
+		{
+			np += (ee >= 0);
+			nn += (ee < 0);
+		}
+		if (ee < 0)
+			ee = -ee;
+
+		if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) &
+				(xx <= (0xffff + edge->xx1)))
+		{
+			if (*a < sww/4)
+				*a = sww - ee;
+			else
+				*a = (*a + (sww - ee)) / 2;
+		}
+
+		edge->e += edge->de;
+		edge++;
+		n++;
+	}
+
+	if ((np + nn) % 4)
+		*in = !(np % 2);
+	else
+		*in = (np % 2);
+}
+
+
 #define EVAL_EDGES_NZ \
-	_basic_eval_edges_nz(edges, nedges, xx, sww, &a, &count); \
+	_basic_edges_nz_evaluate(edges, nedges, xx, sww, &a, &count); \
  \
 	if (!a) \
 	{ \
@@ -537,6 +586,9 @@ get_out:
 }
 #else
 
+/*----------------------------------------------------------------------------*
+ *                           Fill/Stroke variants                             *
+ *----------------------------------------------------------------------------*/
 static inline void _fill_renderer_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
 {
 	enesim_renderer_sw_draw(thiz->fpaint, x, y, len, dst);
@@ -781,7 +833,7 @@ repeat:
 		int count = 0;
 		int a = 0;
 
-		_basic_eval_edges_nz(edges, nedges, xx, thiz->sww, &a, &count);
+		_basic_edges_nz_evaluate(edges, nedges, xx, thiz->sww, &a, &count);
 		if (!a)
 		{
 			int nx = rx;
@@ -809,7 +861,114 @@ repeat:
 		x++;
 	}
 }
-
+#define BASIC_SIMPLE(ftype, stype, evaluate)					\
+static void _basic_span_fill_##ftype##_stroke_##stype##_##evalute##(		\
+		Enesim_Renderer *r, int x, int y, int len, void *ddata)		\
+{										\
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);		\
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;			\
+	uint32_t *dst = ddata;							\
+	uint32_t *d = dst, *e = d + len;					\
+	Enesim_F16p16_Edge *edges, *edge;					\
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;			\
+	double ox, oy;								\
+	int lx = INT_MAX / 2, rx = -lx;						\
+	Eina_Bool outside = EINA_TRUE;						\
+										\
+	int xx = eina_f16p16_int_from(x);					\
+	int yy = eina_f16p16_int_from(y);					\
+										\
+	ox = state->ox;								\
+	oy = state->oy;								\
+	xx -= eina_f16p16_double_from(ox);					\
+	yy -= eina_f16p16_double_from(oy);					\
+										\
+	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge));			\
+	nedges = _basic_setup_edges(thiz, edges, xx, yy, &lx, &rx);		\
+	if (!_basic_clip(x, x + len, (lx >> 16) - 1, (rx >> 16) + 2, &lx, &rx))	\
+	{									\
+		memset(d, 0, sizeof(uint32_t) * len);				\
+		return;								\
+	}									\
+	/* the most right coordinate is smaller than the requested length */ 	\
+	if (rx < x + len)							\
+	{									\
+		int roff = rx - x;						\
+		int nlen = (x + len) - rx;					\
+										\
+		memset(d + roff, 0, sizeof(uint32_t) * nlen);			\
+		len -= nlen;							\
+		e -= nlen;							\
+	}									\
+										\
+	_basic_fill_##ftype##_stroke_##stype##_setup(thiz, lx, y, rx - lx,	\
+			 dst + (lx - x));					\
+	/* lx will be an offset from now on */					\
+	lx -= x;								\
+repeat:										\
+	if (lx > 0)								\
+	{									\
+		if (outside)							\
+		{								\
+			memset(d, 0, sizeof(uint32_t) * lx);			\
+		}								\
+		else								\
+		{								\
+			_basic_fill_##ftype##_advance(thiz, d, lx);		\
+		}								\
+										\
+		/* advance the edges by lx */					\
+		n = 0;								\
+		edge = edges;							\
+		while (n < nedges)						\
+		{								\
+			edge->e += lx * edge->de;				\
+			edge++;							\
+			n++;							\
+		}								\
+										\
+		/* advance our position by lx */				\
+		xx += lx * EINA_F16P16_ONE;					\
+		x += lx;							\
+		d += lx;							\
+	}									\
+										\
+	while (d < e)								\
+	{									\
+		uint32_t p0;							\
+		int count = 0;							\
+		int a = 0;							\
+										\
+		_basic_edges_##evaluate##_evalute(edges, nedges, xx, thiz->sww, \
+				&a, &count);					\
+		if (!a)								\
+		{								\
+			int nx = rx;						\
+										\
+			edge = edges;						\
+			n = 0;							\
+			while (n < nedges)					\
+			{							\
+				if ((x <= edge->lx) & (nx > edge->lx))		\
+					nx = edge->lx;				\
+				edge->e -= edge->de;				\
+				edge++;						\
+				n++;						\
+			}							\
+			lx = nx - x;						\
+			if (lx < 1)						\
+				lx = 1;						\
+			outside = !count;					\
+			goto repeat;						\
+		}								\
+										\
+		p0 = _basic_fill_##ftype##_stroke_##stype##_draw(thiz, d, 	\
+				count, a);					\
+		*d++ = p0;							\
+		xx += EINA_F16P16_ONE;						\
+		x++;								\
+	}									\
+}
 
 #endif
 
@@ -1035,53 +1194,6 @@ get_out:
 		xx += axx;
 		x++;
 	}
-}
-
-static inline void _basic_eval_edges_eo(Enesim_F16p16_Edge *edges,
-		int nedges, Eina_F16p16 xx, int sww, int *a, int *in)
-{
-	Enesim_F16p16_Edge *edge = edges;
-	int n = 0;
-	int np = 0;
-	int nn = 0;
-
-	/* initialize the output parameters */
-	*a = 0;
-	*in = 0;
-
-	/* start evaluating the edges */
-	edge = edges;
-	while (n < nedges)
-	{
-		int ee = edge->e;
-
-		if (edge->counted)
-		{
-			np += (ee >= 0);
-			nn += (ee < 0);
-		}
-		if (ee < 0)
-			ee = -ee;
-
-		if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) &
-				(xx <= (0xffff + edge->xx1)))
-		{
-			if (*a < sww/4)
-				*a = sww - ee;
-			else
-				*a = (*a + (sww - ee)) / 2;
-		}
-
-		edge->e += edge->de;
-		edge++;
-		n++;
-	}
-
-	if ((np + nn) % 4)
-		*in = !(np % 2);
-	else
-		*in = (np % 2);
-	
 }
 
 #define EVAL_EDGES_EO \
@@ -1532,6 +1644,8 @@ get_out:
 	}
 }
 
+/* [fill_rule][fill color|renderer][stroke color|renderer] */
+static Enesim_Renderer_Sw_Fill _fill[ENESIM_RENDERER_SHAPE_FILL_RULES][2][2];
 /*----------------------------------------------------------------------------*
  *                           Rasterizer interface                             *
  *----------------------------------------------------------------------------*/
