@@ -1037,6 +1037,52 @@ get_out:
 	}
 }
 
+static inline void _basic_eval_edges_eo(Enesim_F16p16_Edge *edges,
+		int nedges, Eina_F16p16 xx, int sww, int *a, int *in)
+{
+	Enesim_F16p16_Edge *edge = edges;
+	int n = 0;
+	int np = 0;
+	int nn = 0;
+
+	/* initialize the output parameters */
+	*a = 0;
+	*in = 0;
+
+	/* start evaluating the edges */
+	edge = edges;
+	while (n < nedges)
+	{
+		int ee = edge->e;
+
+		if (edge->counted)
+		{
+			np += (ee >= 0);
+			nn += (ee < 0);
+		}
+		if (ee < 0)
+			ee = -ee;
+
+		if ((ee < sww) && ((xx + 0xffff) >= edge->xx0) &
+				(xx <= (0xffff + edge->xx1)))
+		{
+			if (*a < sww/4)
+				*a = sww - ee;
+			else
+				*a = (*a + (sww - ee)) / 2;
+		}
+
+		edge->e += edge->de;
+		edge++;
+		n++;
+	}
+
+	if ((np + nn) % 4)
+		*in = !(np % 2);
+	else
+		*in = (np % 2);
+	
+}
 
 #define EVAL_EDGES_EO \
 		edge = edges; \
