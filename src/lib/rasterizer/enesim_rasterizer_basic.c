@@ -392,6 +392,227 @@ static inline void _basic_edges_eo_evaluate(Enesim_F16p16_Edge *edges,
 		*in = (np % 2);
 }
 
+/*----------------------------------------------------------------------------*
+ *                           Fill/Stroke variants                             *
+ *----------------------------------------------------------------------------*/
+static inline void _basic_fill_color_stroke_color_setup(
+			Enesim_Rasterizer_Basic *thiz EINA_UNUSED,
+			int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
+			uint32_t *dst EINA_UNUSED)
+{
+
+}
+
+static inline void _basic_fill_color_stroke_renderer_setup(
+			Enesim_Rasterizer_Basic *thiz, int x, int y, int len,
+			uint32_t *dst)
+{
+	enesim_renderer_sw_draw(thiz->spaint, x, y, len, dst);
+}
+
+static inline void _basic_fill_renderer_stroke_color_setup(
+			Enesim_Rasterizer_Basic *thiz, int x, int y, int len,
+			uint32_t *dst)
+{
+	enesim_renderer_sw_draw(thiz->fpaint, x, y, len, dst);
+}
+
+
+static inline void _basic_fill_renderer_stroke_renderer_setup(
+			Enesim_Rasterizer_Basic *thiz, int x, int y, int len,
+			uint32_t *dst, uint32_t *sdst)
+{
+	enesim_renderer_sw_draw(thiz->fpaint, x, y, len, dst);
+	enesim_renderer_sw_draw(thiz->spaint, x, y, len, sdst);
+}
+
+static inline void _basic_fill_color_renderer_setup(
+		Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
+{
+	if (thiz->fpaint)
+		_basic_fill_renderer_stroke_color_setup(thiz, x, y, len, dst);
+}
+
+static inline void _stroke_renderer_setup(Enesim_Rasterizer_Basic *thiz,
+		int x, int y, int len, uint32_t *dst)
+{
+	enesim_renderer_sw_draw(thiz->spaint, x, y, len, dst);
+}
+
+static inline void _basic_fill_renderer_advance(Enesim_Rasterizer_Basic *thiz,
+		uint32_t *dst, int len)
+{
+	enesim_color_mul4_sym_sp_none_color_none(dst, len, thiz->fcolor);
+}
+
+static inline void _basic_fill_color_advance(Enesim_Rasterizer_Basic *thiz,
+		uint32_t *dst, int len)
+{
+	enesim_color_fill_sp_none_color_none(dst, len, thiz->fcolor);
+}
+
+static inline void _basic_fill_color_renderer_advance(
+		Enesim_Rasterizer_Basic *thiz, uint32_t *dst, int len)
+{
+	if (!thiz->fpaint)
+	{
+		_basic_fill_color_advance(thiz, dst, len);
+	}
+	else if (thiz->fcolor != 0xffffffff)
+		_basic_fill_renderer_advance(thiz, dst, len);
+}
+
+static inline uint32_t _basic_fill_color_renderer_stroke_color_draw(
+		Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
+{
+	uint32_t p0;
+
+	if (count)
+	{
+		p0 = thiz->fcolor;
+		if (thiz->fpaint)
+		{
+			p0 = *d;
+			if (thiz->fcolor != 0xffffffff)
+				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+		}
+
+		if (thiz->stroke)
+		{
+			unsigned int q0 = p0;
+
+			p0 = thiz->scolor;
+			if (a < 65536)
+				p0 = INTERP_65536(a, p0, q0);
+		}
+	}
+	else
+	{
+		p0 = thiz->scolor;
+		if (thiz->fpaint && !thiz->stroke)
+		{
+			p0 = *d;
+			if (thiz->fcolor != 0xffffffff)
+				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+		}
+		if (a < 65536)
+			p0 = MUL_A_65536(a, p0);
+	}
+	return p0;
+}
+
+static inline uint32_t _basic_fill_color_stroke_color_draw(
+		Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
+{
+	uint32_t p0;
+
+	if (count)
+	{
+		p0 = thiz->fcolor;
+		if (thiz->stroke)
+		{
+			uint32_t q0 = p0;
+
+			p0 = thiz->scolor;
+			if (a < 65536)
+				p0 = INTERP_65536(a, p0, q0);
+		}
+	}
+	else
+	{
+		p0 = thiz->scolor;
+		if (a < 65536)
+		{
+			p0 = MUL_A_65536(a, p0);
+		}
+	}
+
+	return p0;
+
+}
+
+static inline uint32_t _basic_fill_renderer_stroke_color_draw(
+		Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
+{
+	uint32_t p0;
+
+	if (count)
+	{
+		p0 = *d;
+		if (thiz->fcolor != 0xffffffff)
+			p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+
+		if (thiz->stroke)
+		{
+			uint32_t q0 = p0;
+
+			p0 = thiz->scolor;
+			if (a < 65536)
+				p0 = INTERP_65536(a, p0, q0);
+		}
+	}
+	else
+	{
+		p0 = thiz->scolor;
+		if (!thiz->stroke)
+		{
+			p0 = *d;
+			if (thiz->fcolor != 0xffffffff)
+				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
+		}
+		if (a < 65536)
+		{
+			p0 = MUL_A_65536(a, p0);
+		}
+	}
+
+	return p0;
+}
+
+
+static inline uint32_t _basic_fill_color_stroke_renderer_draw(
+		Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
+{
+	uint32_t p0;
+
+	p0 = *d;
+	if (thiz->scolor != 0xffffffff)
+		p0 = enesim_color_mul4_sym(thiz->scolor, p0);
+	if (a < 65536)
+	{
+		if (count)
+			p0 = INTERP_65536(a, p0, thiz->fcolor);
+		else
+			p0 = MUL_A_65536(a, p0);
+	}
+	return p0;
+}
+
+static inline uint32_t _basic_fill_renderer_stroke_renderer_draw(
+		Enesim_Rasterizer_Basic *thiz, uint32_t *d, uint32_t *s,
+		int count, int a)
+{
+	uint32_t p0;
+
+	p0 = *s;
+	if (thiz->scolor != 0xffffffff)
+		p0 = enesim_color_mul4_sym(thiz->scolor, p0);
+	if (a < 65536)
+	{
+		if (count)
+		{
+			uint32_t q0 = *d;
+
+			if (thiz->fcolor != 0xffffffff)
+				q0 = enesim_color_mul4_sym(thiz->fcolor, q0);
+			p0 = INTERP_65536(a, p0, q0);
+		}
+		else
+			p0 = MUL_A_65536(a, p0);
+	}
+	return p0;
+}
+
 
 #define EVAL_EDGES_NZ \
 	_basic_edges_nz_evaluate(edges, nedges, xx, sww, &a, &count); \
@@ -586,176 +807,6 @@ get_out:
 }
 #else
 
-/*----------------------------------------------------------------------------*
- *                           Fill/Stroke variants                             *
- *----------------------------------------------------------------------------*/
-static inline void _fill_renderer_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
-{
-	enesim_renderer_sw_draw(thiz->fpaint, x, y, len, dst);
-}
-
-static inline void _fill_color_renderer_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
-{
-	if (thiz->fpaint)
-		_fill_renderer_setup(thiz, x, y, len, dst);
-}
-
-static inline void _stroke_renderer_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
-{
-	enesim_renderer_sw_draw(thiz->spaint, x, y, len, dst);
-}
-
-static inline void _fill_color_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
-{
-
-}
-
-static inline void _stroke_color_setup(Enesim_Rasterizer_Basic *thiz, int x, int y, int len, uint32_t *dst)
-{
-
-}
-
-static inline void _fill_renderer_advance(Enesim_Rasterizer_Basic *thiz, uint32_t *dst, int len)
-{
-	enesim_color_mul4_sym_sp_none_color_none(dst, len, thiz->fcolor);
-}
-
-static inline void _fill_color_advance(Enesim_Rasterizer_Basic *thiz, uint32_t *dst, int len)
-{
-	enesim_color_fill_sp_none_color_none(dst, len, thiz->fcolor);
-}
-
-static inline void _fill_color_renderer_advance(Enesim_Rasterizer_Basic *thiz, uint32_t *dst, int len)
-{
-	if (!thiz->fpaint)
-	{
-		_fill_color_advance(thiz, dst, len);
-	}
-	else if (thiz->fcolor != 0xffffffff)
-		_fill_renderer_advance(thiz, dst, len);
-}
-
-static inline uint32_t _fill_color_renderer_stroke_color_draw(Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
-{
-	uint32_t p0;
-
-	if (count)
-	{
-		p0 = thiz->fcolor;
-		if (thiz->fpaint)
-		{
-			p0 = *d;
-			if (thiz->fcolor != 0xffffffff)
-				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
-		}
-
-		if (thiz->stroke)
-		{
-			unsigned int q0 = p0;
-
-			p0 = thiz->scolor;
-			if (a < 65536)
-				p0 = INTERP_65536(a, p0, q0);
-		}
-	}
-	else
-	{
-		p0 = thiz->scolor;
-		if (thiz->fpaint && !thiz->stroke)
-		{
-			p0 = *d;
-			if (thiz->fcolor != 0xffffffff)
-				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
-		}
-		if (a < 65536)
-			p0 = MUL_A_65536(a, p0);
-	}
-	return p0;
-}
-
-static inline uint32_t _fill_color_stroke_color_draw(Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
-{
-	uint32_t p0;
-
-	if (count)
-	{
-		p0 = thiz->fcolor;
-		if (thiz->stroke)
-		{
-			uint32_t q0 = p0;
-
-			p0 = thiz->scolor;
-			if (a < 65536)
-				p0 = INTERP_65536(a, p0, q0);
-		}
-	}
-	else
-	{
-		p0 = thiz->scolor;
-		if (a < 65536)
-		{
-			p0 = MUL_A_65536(a, p0);
-		}
-	}
-
-	return p0;
-
-}
-
-static inline uint32_t _fill_renderer_stroke_color_draw(Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
-{
-	uint32_t p0;
-
-	if (count)
-	{
-		p0 = *d;
-		if (thiz->fcolor != 0xffffffff)
-			p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
-
-		if (thiz->stroke)
-		{
-			uint32_t q0 = p0;
-
-			p0 = thiz->scolor;
-			if (a < 65536)
-				p0 = INTERP_65536(a, p0, q0);
-		}
-	}
-	else
-	{
-		p0 = thiz->scolor;
-		if (!thiz->stroke)
-		{
-			p0 = *d;
-			if (thiz->fcolor != 0xffffffff)
-				p0 = enesim_color_mul4_sym(thiz->fcolor, p0);
-		}
-		if (a < 65536)
-		{
-			p0 = MUL_A_65536(a, p0);
-		}
-	}
-
-	return p0;
-}
-
-
-static inline uint32_t _fill_color_stroke_renderer_draw(Enesim_Rasterizer_Basic *thiz, uint32_t *d, int count, int a)
-{
-	uint32_t p0;
-
-	p0 = *d;
-	if (thiz->scolor != 0xffffffff)
-		p0 = enesim_color_mul4_sym(thiz->scolor, p0);
-	if (a < 65536)
-	{
-		if (count)
-			p0 = INTERP_65536(a, p0, thiz->fcolor);
-		else
-			p0 = MUL_A_65536(a, p0);
-	}
-	return p0;
-}
 
 static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
@@ -796,7 +847,7 @@ static void _stroke_fill_paint_nz(Enesim_Renderer *r,
 		e -= nlen;
 	}
 
-	_fill_color_renderer_setup(thiz, lx, y, rx - lx, dst + (lx - x));
+	_basic_fill_color_renderer_setup(thiz, lx, y, rx - lx, dst + (lx - x));
 	/* lx will be an offset from now on */
 	lx -= x;
 repeat:
@@ -808,7 +859,7 @@ repeat:
 		}
 		else
 		{
-			_fill_color_renderer_advance(thiz, d, lx);
+			_basic_fill_color_renderer_advance(thiz, d, lx);
 		}
 
 		/* advance the edges by lx */
@@ -855,14 +906,14 @@ repeat:
 			goto repeat;
 		}
 
-		p0 = _fill_color_renderer_stroke_color_draw(thiz, d, count, a);
+		p0 = _basic_fill_color_renderer_stroke_color_draw(thiz, d, count, a);
 		*d++ = p0;
 		xx += EINA_F16P16_ONE;
 		x++;
 	}
 }
 #define BASIC_SIMPLE(ftype, stype, evaluate)					\
-static void _basic_span_fill_##ftype##_stroke_##stype##_##evalute##(		\
+static void _basic_span_fill_##ftype##_stroke_##stype##_##evaluate(		\
 		Enesim_Renderer *r, int x, int y, int len, void *ddata)		\
 {										\
 	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);		\
@@ -969,6 +1020,127 @@ repeat:										\
 		x++;								\
 	}									\
 }
+
+#define BASIC_FULL(evaluate)							\
+static void _basic_span_fill_renderer_stroke_renderer_##evaluate(		\
+		Enesim_Renderer *r, int x, int y, int len, void *ddata)		\
+{										\
+	Enesim_Rasterizer_Basic *thiz = ENESIM_RASTERIZER_BASIC(r);		\
+	Enesim_Rasterizer_Basic_State *state = &thiz->state;			\
+	uint32_t *dst = ddata;							\
+	uint32_t *d = dst, *e = d + len;					\
+	uint32_t *s;								\
+	Enesim_F16p16_Edge *edges, *edge;					\
+	int nvectors = thiz->nvectors, n = 0, nedges = 0;			\
+	double ox, oy;								\
+	int lx = INT_MAX / 2, rx = -lx;						\
+	Eina_Bool outside = EINA_TRUE;						\
+										\
+	int xx = eina_f16p16_int_from(x);					\
+	int yy = eina_f16p16_int_from(y);					\
+										\
+	ox = state->ox;								\
+	oy = state->oy;								\
+	xx -= eina_f16p16_double_from(ox);					\
+	yy -= eina_f16p16_double_from(oy);					\
+										\
+	edges = alloca(nvectors * sizeof(Enesim_F16p16_Edge));			\
+	nedges = _basic_setup_edges(thiz, edges, xx, yy, &lx, &rx);		\
+	if (!_basic_clip(x, x + len, (lx >> 16) - 1, (rx >> 16) + 2, &lx, &rx))	\
+	{									\
+		memset(d, 0, sizeof(uint32_t) * len);				\
+		return;								\
+	}									\
+	/* the most right coordinate is smaller than the requested length */ 	\
+	if (rx < x + len)							\
+	{									\
+		int roff = rx - x;						\
+		int nlen = (x + len) - rx;					\
+										\
+		memset(d + roff, 0, sizeof(uint32_t) * nlen);			\
+		len -= nlen;							\
+		e -= nlen;							\
+	}									\
+										\
+	s = alloca((rx - lx) * sizeof(uint32_t));				\
+	_basic_fill_renderer_stroke_renderer_setup(thiz, lx, y, rx - lx,	\
+			 dst + (lx - x), s);					\
+	/* lx will be an offset from now on */					\
+	lx -= x;								\
+repeat:										\
+	if (lx > 0)								\
+	{									\
+		if (outside)							\
+		{								\
+			memset(d, 0, sizeof(uint32_t) * lx);			\
+		}								\
+		else								\
+		{								\
+			_basic_fill_renderer_advance(thiz, d, lx);		\
+		}								\
+										\
+		/* advance the edges by lx */					\
+		n = 0;								\
+		edge = edges;							\
+		while (n < nedges)						\
+		{								\
+			edge->e += lx * edge->de;				\
+			edge++;							\
+			n++;							\
+		}								\
+										\
+		/* advance our position by lx */				\
+		xx += lx * EINA_F16P16_ONE;					\
+		x += lx;							\
+		d += lx;							\
+	}									\
+										\
+	while (d < e)								\
+	{									\
+		uint32_t p0;							\
+		int count = 0;							\
+		int a = 0;							\
+										\
+		_basic_edges_##evaluate##_evaluate(edges, nedges, xx, 		\
+				thiz->sww, &a, &count);				\
+		if (!a)								\
+		{								\
+			int nx = rx;						\
+										\
+			edge = edges;						\
+			n = 0;							\
+			while (n < nedges)					\
+			{							\
+				if ((x <= edge->lx) & (nx > edge->lx))		\
+					nx = edge->lx;				\
+				edge->e -= edge->de;				\
+				edge++;						\
+				n++;						\
+			}							\
+			lx = nx - x;						\
+			if (lx < 1)						\
+				lx = 1;						\
+			outside = !count;					\
+			goto repeat;						\
+		}								\
+										\
+		p0 = _basic_fill_renderer_stroke_renderer_draw(thiz, d, s, 	\
+				count, a);					\
+		*d++ = p0;							\
+		xx += EINA_F16P16_ONE;						\
+		x++;								\
+		s++;								\
+	}									\
+}
+
+BASIC_SIMPLE(color, color, nz);
+BASIC_SIMPLE(color, renderer, nz);
+BASIC_SIMPLE(renderer, color, nz);
+BASIC_FULL(nz);
+BASIC_SIMPLE(color, color, eo);
+BASIC_SIMPLE(color, renderer, eo);
+BASIC_SIMPLE(renderer, color, eo);
+BASIC_FULL(eo);
 
 #endif
 
@@ -1645,7 +1817,7 @@ get_out:
 }
 
 /* [fill_rule][fill color|renderer][stroke color|renderer] */
-static Enesim_Renderer_Sw_Fill _fill[ENESIM_RENDERER_SHAPE_FILL_RULES][2][2];
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_RENDERER_SHAPE_FILL_RULES][2][2];
 /*----------------------------------------------------------------------------*
  *                           Rasterizer interface                             *
  *----------------------------------------------------------------------------*/
@@ -2044,6 +2216,15 @@ static void _enesim_rasterizer_basic_class_init(void *k)
 
 	klass = ENESIM_RASTERIZER_CLASS(k);
 	klass->figure_set = _basic_figure_set;
+
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][0] = _basic_span_fill_color_stroke_color_nz;
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1][0] = _basic_span_fill_renderer_stroke_color_nz;
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][1] = _basic_span_fill_color_stroke_renderer_nz;
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1][1] = _basic_span_fill_renderer_stroke_renderer_nz;
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0][0] = _basic_span_fill_color_stroke_color_eo;
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1][0] = _basic_span_fill_renderer_stroke_color_eo;
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0][1] = _basic_span_fill_color_stroke_renderer_eo;
+	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1][1] = _basic_span_fill_renderer_stroke_renderer_eo;
 }
 
 static void _enesim_rasterizer_basic_instance_init(void *o EINA_UNUSED)
