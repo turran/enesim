@@ -939,8 +939,8 @@ repeat:										\
 		int count = 0;							\
 		int a = 0;							\
 										\
-		_basic_edges_##evaluate##_evalute(edges, nedges, xx, thiz->sww, \
-				&a, &count);					\
+		_basic_edges_##evaluate##_evaluate(edges, nedges, xx, 		\
+				thiz->sww, &a, &count);				\
 		if (!a)								\
 		{								\
 			int nx = rx;						\
