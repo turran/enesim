@@ -647,9 +647,9 @@ static void _basic_span_fill_renderer_stroke_renderer_##evaluate(		\
 		e -= nlen;							\
 	}									\
 										\
-	s = alloca((rx - lx) * sizeof(uint32_t));				\
+	s = alloca(len * sizeof(uint32_t));					\
 	_basic_fill_renderer_stroke_renderer_setup(thiz, lx, y, rx - lx,	\
-			 dst + (lx - x), s);					\
+			 dst + (lx - x), s + (lx - x));				\
 	/* lx will be an offset from now on */					\
 	lx -= x;								\
 repeat:										\
@@ -678,6 +678,7 @@ repeat:										\
 		xx += lx * EINA_F16P16_ONE;					\
 		x += lx;							\
 		d += lx;							\
+		s += lx;							\
 	}									\
 										\
 	while (d < e)								\
