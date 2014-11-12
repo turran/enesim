@@ -85,7 +85,7 @@ EAPI Enesim_Matrix_Type enesim_matrix_f16p16_type_get(const Enesim_Matrix_F16p16
  */
 
 /** Helper macro for printf formatting */
-#define ENESIM_MATRIX_FORMAT "g %g %g | %g %g %g | %g %g %g"
+#define ENESIM_MATRIX_FORMAT "f %f %f | %f %f %f | %f %f %f"
 /** Helper macro for printf formatting arg */
 #define ENESIM_MATRIX_ARGS(m) (m)->xx, (m)->xy, (m)->xz, 	\
 		(m)->yx, (m)->yy, (m)->yz,			\
