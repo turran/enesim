@@ -130,6 +130,218 @@ typedef struct _Enesim_Rasterizer_Basic_Class {
 	Enesim_Rasterizer_Class parent;
 } Enesim_Rasterizer_Basic_Class;
 
+static int _tysort(const void *l, const void *r)
+{
+	Enesim_F16p16_Vector *lv = (Enesim_F16p16_Vector *)l;
+	Enesim_F16p16_Vector *rv = (Enesim_F16p16_Vector *)r;
+
+	if (lv->yy0 <= rv->yy0)
+		return -1;
+	return 1;
+}
+
+static Eina_Bool _basic_setup_vectors(Enesim_Renderer *r)
+{
+	Enesim_Rasterizer_Basic *thiz;
+	Enesim_Renderer_Shape_Draw_Mode draw_mode;
+	Enesim_Polygon *p;
+	Enesim_F16p16_Vector *vec;
+	Eina_List *l1;
+	int nvectors = 0;
+
+	thiz = ENESIM_RASTERIZER_BASIC(r);
+	if (thiz->vectors)
+	{
+		free(thiz->vectors);
+		thiz->vectors = NULL;
+	}
+
+	draw_mode = enesim_renderer_shape_draw_mode_get(r);
+	EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
+	{
+		Enesim_Point *first_point;
+		Enesim_Point *last_point;
+		int pclosed = 0;
+		int npts;
+
+		npts = enesim_polygon_point_count(p);
+		if ((npts < 2) ||
+				((npts < 3) && (draw_mode != ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)))
+		{
+			return EINA_FALSE;
+		}
+		nvectors += npts;
+		first_point = eina_list_data_get(p->points);
+		last_point = eina_list_data_get(eina_list_last(p->points));
+		{
+			double x0, x1, y0, y1;
+			double x01, y01;
+			double len;
+
+			x0 = ((int) (first_point->x * 256)) / 256.0;
+			x1 = ((int) (last_point->x * 256)) / 256.0;
+			y0 = ((int) (first_point->y * 256)) / 256.0;
+			y1 = ((int) (last_point->y * 256)) / 256.0;
+			//printf("%g %g -> %g %g\n", x0, y0, x1, y1);
+			x01 = x1 - x0;
+			y01 = y1 - y0;
+			len = hypot(x01, y01);
+			//printf("len = %g\n", len);
+			if (len < (1 / 256.0))
+			{
+				//printf("last == first\n");
+				nvectors--;
+				pclosed = 1;
+			}
+		}
+
+		if (!p->closed && (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) && !pclosed)
+			nvectors--;
+	}
+
+	thiz->vectors = calloc(nvectors, sizeof(Enesim_F16p16_Vector));
+	if (!thiz->vectors)
+	{
+		return EINA_FALSE;
+	}
+	thiz->nvectors = nvectors;
+
+	vec = thiz->vectors;
+
+	/* FIXME why this loop can't be done on the upper one? */
+	EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
+	{
+		Enesim_Point *first_point;
+		Enesim_Point *last_point;
+		Enesim_Point *pt;
+		Eina_List *l2;
+		int n = 0;
+		int nverts = enesim_polygon_point_count(p);
+		int sopen = !p->closed;
+		int pclosed = 0;
+
+		if (sopen && (draw_mode != ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
+			sopen = 0;
+
+		first_point = eina_list_data_get(p->points);
+		last_point = eina_list_data_get(eina_list_last(p->points));
+
+		{
+			double x0, x1, y0, y1;
+			double x01, y01;
+			double len;
+
+			x0 = ((int) (first_point->x * 256)) / 256.0;
+			x1 = ((int) (last_point->x * 256)) / 256.0;
+			y0 = ((int) (first_point->y * 256)) / 256.0;
+			y1 = ((int) (last_point->y * 256)) / 256.0;
+			//printf("%g %g -> %g %g\n", x0, y0, x1, y1);
+			x01 = x1 - x0;
+			y01 = y1 - y0;
+			len = hypot(x01, y01);
+			//printf("len = %g\n", len);
+			if (len < (1 / 256.0))
+			{
+				//printf("last == first\n");
+				nverts--;
+				pclosed = 1;
+			}
+		}
+
+		if (sopen && !pclosed)
+			nverts--;
+
+		pt = first_point;
+		l2 = eina_list_next(p->points);
+		while (n < nverts)
+		{
+			Enesim_Point *npt;
+			double x0, y0, x1, y1;
+			double x01, y01;
+			double len;
+
+			npt = eina_list_data_get(l2);
+			if ((n == (enesim_polygon_point_count(p) - 1)) && !sopen)
+				npt = first_point;
+#if 0
+			x0 = sx * (pt->x - lx) + lx;
+			y0 = sy * (pt->y - ty) + ty;
+			x1 = sx * (npt->x - lx) + lx;
+			y1 = sy * (npt->y - ty) + ty;
+			x0 = ((int) (x0 * 256)) / 256.0;
+			x1 = ((int) (x1 * 256)) / 256.0;
+			y0 = ((int) (y0 * 256)) / 256.0;
+			y1 = ((int) (y1 * 256)) / 256.0;
+#endif
+			x0 = pt->x;
+			y0 = pt->y;
+			x1 = npt->x;
+			y1 = npt->y;
+			x01 = x1 - x0;
+			y01 = y1 - y0;
+			len = hypot(x01, y01);
+#if 0
+			if (len < (1 / 512.0))
+			{
+				/* FIXME what to do here?
+				 * skip this point, pick the next? */
+				ENESIM_RENDERER_LOG(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/512.0, x0, y0, x1, y1);
+				return EINA_FALSE;
+			}
+#endif
+			//len *= 1 + (1 / 32.0);
+			vec->a = -(y01 * 65536) / len;
+			vec->b = (x01 * 65536) / len;
+			vec->c = (65536 * ((y1 * x0) - (x1 * y0)))
+					/ len;
+			vec->xx0 = x0 * 65536;
+			vec->yy0 = y0 * 65536;
+			vec->xx1 = x1 * 65536;
+			vec->yy1 = y1 * 65536;
+
+			if ((vec->yy0 == vec->yy1) || (vec->xx0 == vec->xx1))
+				vec->sgn = 0;
+			else
+			{
+				vec->sgn = 1;
+				if (vec->yy1 > vec->yy0)
+				{
+					if (vec->xx1 < vec->xx0)
+						vec->sgn = -1;
+				}
+				else
+				{
+					 if (vec->xx1 > vec->xx0)
+						vec->sgn = -1;
+				}
+			}
+
+			if (vec->xx0 > vec->xx1)
+			{
+				int xx0 = vec->xx0;
+				vec->xx0 = vec->xx1;
+				vec->xx1 = xx0;
+			}
+
+			if (vec->yy0 > vec->yy1)
+			{
+				int yy0 = vec->yy0;
+				vec->yy0 = vec->yy1;
+				vec->yy1 = yy0;
+			}
+
+			pt = npt;
+			vec++;
+			n++;
+			l2 = eina_list_next(l2);
+
+		}
+	}
+	qsort(thiz->vectors, thiz->nvectors, sizeof(Enesim_F16p16_Vector), _tysort);
+	thiz->changed = EINA_FALSE;
+	return EINA_TRUE;
+}
+
 static inline int _basic_setup_edges(Enesim_Rasterizer_Basic *thiz,
 		Enesim_F16p16_Edge *edges, Eina_F16p16 xx, Eina_F16p16 yy,
 		Eina_F16p16 *lx, Eina_F16p16 *rx)
@@ -749,17 +961,6 @@ static const char * _basic_name(Enesim_Renderer *r EINA_UNUSED)
 	return "basic";
 }
 
-static int _tysort(const void *l, const void *r)
-{
-	Enesim_F16p16_Vector *lv = (Enesim_F16p16_Vector *)l;
-	Enesim_F16p16_Vector *rv = (Enesim_F16p16_Vector *)r;
-
-	if (lv->yy0 <= rv->yy0)
-		return -1;
-	return 1;
-}
-
-
 static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
@@ -778,6 +979,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
+	/* in case the draw mode has changed */
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
 	if ((state->draw_mode != draw_mode) &&
 			((state->draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) ||
@@ -788,74 +990,16 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 
 	if (thiz->changed)
 	{
-		Enesim_Polygon *p;
-		Enesim_F16p16_Vector *vec;
-		Eina_List *l1;
-		int nvectors = 0;
 		double sx = 1, sy = 1;
 		double lx, rx, ty, by;
 
-		if (thiz->vectors)
-		{
-			free(thiz->vectors);
-			thiz->vectors = NULL;
-		}
-
-		EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
-		{
-			Enesim_Point *first_point;
-			Enesim_Point *last_point;
-			int pclosed = 0;
-			int npts;
-
-			npts = enesim_polygon_point_count(p);
-			if ((npts < 2) ||
-					((npts < 3) && (draw_mode != ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)))
-			{
-				ENESIM_RENDERER_LOG(r, error, "Not enough points %d", npts);
-				return EINA_FALSE;
-			}
-			nvectors += npts;
-			first_point = eina_list_data_get(p->points);
-			last_point = eina_list_data_get(eina_list_last(p->points));
-			{
-				double x0, x1, y0, y1;
-				double x01, y01;
-				double len;
-
-				x0 = ((int) (first_point->x * 256)) / 256.0;
-				x1 = ((int) (last_point->x * 256)) / 256.0;
-				y0 = ((int) (first_point->y * 256)) / 256.0;
-				y1 = ((int) (last_point->y * 256)) / 256.0;
-				//printf("%g %g -> %g %g\n", x0, y0, x1, y1);
-				x01 = x1 - x0;
-				y01 = y1 - y0;
-				len = hypot(x01, y01);
-				//printf("len = %g\n", len);
-				if (len < (1 / 256.0))
-				{
-					//printf("last == first\n");
-					nvectors--;
-					pclosed = 1;
-				}
-			}
-
-			if (!p->closed && (draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) && !pclosed)
-				nvectors--;
-		}
-
-		thiz->vectors = calloc(nvectors, sizeof(Enesim_F16p16_Vector));
-		if (!thiz->vectors)
-		{
+		if (!_basic_setup_vectors(r))
 			return EINA_FALSE;
-		}
-		thiz->nvectors = nvectors;
-
-		vec = thiz->vectors;
 
 		/* generate the bounds to clip the span functions */
 		if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
 			return EINA_FALSE;
+#if 0
 		if ((draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) &&
 			 (lx != rx) && (ty != by))
 		{
@@ -866,6 +1010,7 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 			if (sy < (1 / 16.0))
 				sy = 1 / 16.0;
 		}
+#endif
 		/* in theory we should add 1 here, like the path renderer
 		 * but the span functions handle that for us
 		 */
@@ -874,131 +1019,6 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->lxx = eina_f16p16_double_from(lx);
 		thiz->rxx = eina_f16p16_double_from(rx);
 
-		/* FIXME why this loop can't be done on the upper one? */
-		EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
-		{
-			Enesim_Point *first_point;
-			Enesim_Point *last_point;
-			Enesim_Point *pt;
-			Eina_List *l2;
-			int n = 0;
-			int nverts = enesim_polygon_point_count(p);
-			int sopen = !p->closed;
-			int pclosed = 0;
-
-			if (sopen && (draw_mode != ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
-				sopen = 0;
-
-			first_point = eina_list_data_get(p->points);
-			last_point = eina_list_data_get(eina_list_last(p->points));
-
-			{
-				double x0, x1, y0, y1;
-				double x01, y01;
-				double len;
-
-				x0 = ((int) (first_point->x * 256)) / 256.0;
-				x1 = ((int) (last_point->x * 256)) / 256.0;
-				y0 = ((int) (first_point->y * 256)) / 256.0;
-				y1 = ((int) (last_point->y * 256)) / 256.0;
-				//printf("%g %g -> %g %g\n", x0, y0, x1, y1);
-				x01 = x1 - x0;
-				y01 = y1 - y0;
-				len = hypot(x01, y01);
-				//printf("len = %g\n", len);
-				if (len < (1 / 256.0))
-				{
-					//printf("last == first\n");
-					nverts--;
-					pclosed = 1;
-				}
-			}
-
-			if (sopen && !pclosed)
-				nverts--;
-
-			pt = first_point;
-			l2 = eina_list_next(p->points);
-			while (n < nverts)
-			{
-				Enesim_Point *npt;
-				double x0, y0, x1, y1;
-				double x01, y01;
-				double len;
-
-				npt = eina_list_data_get(l2);
-				if ((n == (enesim_polygon_point_count(p) - 1)) && !sopen)
-					npt = first_point;
-				x0 = sx * (pt->x - lx) + lx;
-				y0 = sy * (pt->y - ty) + ty;
-				x1 = sx * (npt->x - lx) + lx;
-				y1 = sy * (npt->y - ty) + ty;
-				x0 = ((int) (x0 * 256)) / 256.0;
-				x1 = ((int) (x1 * 256)) / 256.0;
-				y0 = ((int) (y0 * 256)) / 256.0;
-				y1 = ((int) (y1 * 256)) / 256.0;
-				x01 = x1 - x0;
-				y01 = y1 - y0;
-				len = hypot(x01, y01);
-#if 0
-				if (len < (1 / 512.0))
-				{
-					/* FIXME what to do here?
-					 * skip this point, pick the next? */
-					ENESIM_RENDERER_LOG(r, error, "Length %g < %g for points %gx%g %gx%g", len, 1/512.0, x0, y0, x1, y1);
-					return EINA_FALSE;
-				}
-#endif
-				len *= 1 + (1 / 32.0);
-				vec->a = -(y01 * 65536) / len;
-				vec->b = (x01 * 65536) / len;
-				vec->c = (65536 * ((y1 * x0) - (x1 * y0)))
-						/ len;
-				vec->xx0 = x0 * 65536;
-				vec->yy0 = y0 * 65536;
-				vec->xx1 = x1 * 65536;
-				vec->yy1 = y1 * 65536;
-
-				if ((vec->yy0 == vec->yy1) || (vec->xx0 == vec->xx1))
-					vec->sgn = 0;
-				else
-				{
-					vec->sgn = 1;
-					if (vec->yy1 > vec->yy0)
-					{
-						if (vec->xx1 < vec->xx0)
-							vec->sgn = -1;
-					}
-					else
-					{
-						 if (vec->xx1 > vec->xx0)
-							vec->sgn = -1;
-					}
-				}
-
-				if (vec->xx0 > vec->xx1)
-				{
-					int xx0 = vec->xx0;
-					vec->xx0 = vec->xx1;
-					vec->xx1 = xx0;
-				}
-
-				if (vec->yy0 > vec->yy1)
-				{
-					int yy0 = vec->yy0;
-					vec->yy0 = vec->yy1;
-					vec->yy1 = yy0;
-				}
-
-				pt = npt;
-				vec++;
-				n++;
-				l2 = eina_list_next(l2);
-
-			}
-		}
-		qsort(thiz->vectors, thiz->nvectors, sizeof(Enesim_F16p16_Vector), _tysort);
-		thiz->changed = EINA_FALSE;
 	}
 
 	enesim_renderer_transformation_get(r, &matrix);
