@@ -49,22 +49,6 @@
 		Enesim_Rasterizer_Basic,					\
 		enesim_rasterizer_basic_descriptor_get())
 
-#define INTERP_65536(a, c0, c1) \
-	( ((((((c0 >> 16) & 0xff00) - ((c1 >> 16) & 0xff00)) * a) + \
-	  (c1 & 0xff000000)) & 0xff000000) + \
-	  ((((((c0 >> 16) & 0xff) - ((c1 >> 16) & 0xff)) * a) + \
-	  (c1 & 0xff0000)) & 0xff0000) + \
-	  ((((((c0 & 0xff00) - (c1 & 0xff00)) * a) >> 16) + \
-	  (c1 & 0xff00)) & 0xff00) + \
-	  ((((((c0 & 0xff) - (c1 & 0xff)) * a) >> 16) + \
-	  (c1 & 0xff)) & 0xff) )
-
-#define MUL_A_65536(a, c) \
-	( ((((c >> 16) & 0xff00) * a) & 0xff000000) + \
-	  ((((c >> 16) & 0xff) * a) & 0xff0000) + \
-	  ((((c & 0xff00) * a) >> 16) & 0xff00) + \
-	  ((((c & 0xff) * a) >> 16) & 0xff) )
-
 /* State generated at the state_setup process
  * the colors are already multiplied by the renderer color
  */
@@ -611,7 +595,7 @@ static inline uint32_t _basic_fill_color_stroke_color_draw(
 
 			p0 = thiz->scolor;
 			if (a < 65536)
-				p0 = INTERP_65536(a, p0, q0);
+				p0 = enesim_color_interp_65536(a, p0, q0);
 		}
 	}
 	else
@@ -619,7 +603,7 @@ static inline uint32_t _basic_fill_color_stroke_color_draw(
 		p0 = thiz->scolor;
 		if (a < 65536)
 		{
-			p0 = MUL_A_65536(a, p0);
+			p0 = enesim_color_mul_65536(a, p0);
 		}
 	}
 
@@ -644,7 +628,7 @@ static inline uint32_t _basic_fill_renderer_stroke_color_draw(
 
 			p0 = thiz->scolor;
 			if (a < 65536)
-				p0 = INTERP_65536(a, p0, q0);
+				p0 = enesim_color_interp_65536(a, p0, q0);
 		}
 	}
 	else
@@ -658,7 +642,7 @@ static inline uint32_t _basic_fill_renderer_stroke_color_draw(
 		}
 		if (a < 65536)
 		{
-			p0 = MUL_A_65536(a, p0);
+			p0 = enesim_color_mul_65536(a, p0);
 		}
 	}
 
@@ -677,9 +661,9 @@ static inline uint32_t _basic_fill_color_stroke_renderer_draw(
 	if (a < 65536)
 	{
 		if (count)
-			p0 = INTERP_65536(a, p0, thiz->fcolor);
+			p0 = enesim_color_interp_65536(a, p0, thiz->fcolor);
 		else
-			p0 = MUL_A_65536(a, p0);
+			p0 = enesim_color_mul_65536(a, p0);
 	}
 	return p0;
 }
@@ -701,10 +685,10 @@ static inline uint32_t _basic_fill_renderer_stroke_renderer_draw(
 
 			if (thiz->fcolor != 0xffffffff)
 				q0 = enesim_color_mul4_sym(thiz->fcolor, q0);
-			p0 = INTERP_65536(a, p0, q0);
+			p0 = enesim_color_interp_65536(a, p0, q0);
 		}
 		else
-			p0 = MUL_A_65536(a, p0);
+			p0 = enesim_color_mul_65536(a, p0);
 	}
 	return p0;
 }

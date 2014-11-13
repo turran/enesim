@@ -49,30 +49,6 @@
 		Enesim_Rasterizer_BiFigure,					\
 		enesim_rasterizer_bifigure_descriptor_get())
 
-/* TODO merge this with the bifigure */
-#define MUL4_SYM(x, y) \
- ( ((((((x) >> 16) & 0xff00) * (((y) >> 16) & 0xff00)) + 0xff0000) & 0xff000000) + \
-   ((((((x) >> 8) & 0xff00) * (((y) >> 16) & 0xff)) + 0xff00) & 0xff0000) + \
-   ((((((x) & 0xff00) * ((y) & 0xff00)) + 0xff00) >> 16) & 0xff00) + \
-   (((((x) & 0xff) * ((y) & 0xff)) + 0xff) >> 8) )
-
-#define INTERP_65536(a, c0, c1) \
-	( ((((((c0 >> 16) & 0xff00) - ((c1 >> 16) & 0xff00)) * a) + \
-	  (c1 & 0xff000000)) & 0xff000000) + \
-	  ((((((c0 >> 16) & 0xff) - ((c1 >> 16) & 0xff)) * a) + \
-	  (c1 & 0xff0000)) & 0xff0000) + \
-	  ((((((c0 & 0xff00) - (c1 & 0xff00)) * a) >> 16) + \
-	  (c1 & 0xff00)) & 0xff00) + \
-	  ((((((c0 & 0xff) - (c1 & 0xff)) * a) >> 16) + \
-	  (c1 & 0xff)) & 0xff) )
-
-#define MUL_A_65536(a, c) \
-	( ((((c >> 16) & 0xff00) * a) & 0xff000000) + \
-	  ((((c >> 16) & 0xff) * a) & 0xff0000) + \
-	  ((((c & 0xff00) * a) >> 16) & 0xff00) + \
-	  ((((c & 0xff) * a) >> 16) & 0xff) )
-
-
 typedef struct _Enesim_Rasterizer_BiFigure_State
 {
 	double ox;
@@ -505,7 +481,7 @@ get_out:
 				{
 					q0 = *d;
 					if (fcolor != 0xffffffff)
-						q0 = MUL4_SYM(fcolor, q0);
+						q0 = enesim_color_mul4_sym(fcolor, q0);
 				}
 			}
 			else if (ua) // on the outside boundary of the under figure
@@ -515,14 +491,14 @@ get_out:
 				{
 					q0 = *d;
 					if (fcolor != 0xffffffff)
-						q0 = MUL4_SYM(fcolor, q0);
+						q0 = enesim_color_mul4_sym(fcolor, q0);
 				}
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);
+					q0 = enesim_color_mul_65536(ua, q0);
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, p0, q0);
+				p0 = enesim_color_interp_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -533,7 +509,7 @@ get_out:
 				{
 					p0 = *d;
 					if (fcolor != 0xffffffff)
-						p0 = MUL4_SYM(fcolor, p0);
+						p0 = enesim_color_mul4_sym(fcolor, p0);
 				}
 			}
 			else if (ua) // on the outside boundary of the under figure
@@ -543,10 +519,10 @@ get_out:
 				{
 					p0 = *d;
 					if (fcolor != 0xffffffff)
-						p0 = MUL4_SYM(fcolor, p0);
+						p0 = enesim_color_mul4_sym(fcolor, p0);
 				}
 				if (ua < 65536)
-					p0 = MUL_A_65536(ua, p0);
+					p0 = enesim_color_mul_65536(ua, p0);
 			}
 		}
 		*d++ = p0;
@@ -667,7 +643,7 @@ get_out:
 		{
 			p0 = *d;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 		}
 		else if (oa)  // on the outside boundary of the over figure
 		{
@@ -675,7 +651,7 @@ get_out:
 
 			p0 = *d;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 
 			if (ucount) // inside under figure
 				q0 = fcolor;
@@ -683,11 +659,11 @@ get_out:
 			{
 				q0 = fcolor;
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);
+					q0 = enesim_color_mul_65536(ua, q0);
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, p0, q0);
+				p0 = enesim_color_interp_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -697,7 +673,7 @@ get_out:
 			{
 				p0 = fcolor;
 				if (ua < 65536)
-					p0 = MUL_A_65536(ua, p0);
+					p0 = enesim_color_mul_65536(ua, p0);
 			}
 		}
 		*d++ = p0;
@@ -833,7 +809,7 @@ get_out:
 		{
 			p0 = *s;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 		}
 		else if (oa)  // on the outside boundary of the over figure
 		{
@@ -841,25 +817,25 @@ get_out:
 
 			p0 = *s;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 
 			if (ucount) // inside under figure
 			{
 				q0 = *d;
 				if (fcolor != 0xffffffff)
-					q0 = MUL4_SYM(fcolor, q0);
+					q0 = enesim_color_mul4_sym(fcolor, q0);
 			}
 			else if (ua) // on the outside boundary of the under figure
 			{
 				q0 = *d;
 				if (fcolor != 0xffffffff)
-					q0 = MUL4_SYM(fcolor, q0);
+					q0 = enesim_color_mul4_sym(fcolor, q0);
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);
+					q0 = enesim_color_mul_65536(ua, q0);
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, p0, q0);
+				p0 = enesim_color_interp_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -867,15 +843,15 @@ get_out:
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = MUL4_SYM(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 			}
 			else if (ua) // on the outside boundary of the under figure
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = MUL4_SYM(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 				if (ua < 65536)
-					p0 = MUL_A_65536(ua, p0);
+					p0 = enesim_color_mul_65536(ua, p0);
 			}
 		}
 		*d++ = p0;
@@ -1128,7 +1104,7 @@ get_out:
 				{
 					q0 = *d;
 					if (fcolor != 0xffffffff)
-						q0 = MUL4_SYM(fcolor, q0);
+						q0 = enesim_color_mul4_sym(fcolor, q0);
 				}
 			}
 			else if (ua) // on the outside boundary of the under figure
@@ -1138,14 +1114,14 @@ get_out:
 				{
 					q0 = *d;
 					if (fcolor != 0xffffffff)
-						q0 = MUL4_SYM(fcolor, q0);
+						q0 = enesim_color_mul4_sym(fcolor, q0);
 				}
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);
+					q0 = enesim_color_mul_65536(ua, q0);
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, p0, q0);
+				p0 = enesim_color_interp_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -1156,7 +1132,7 @@ get_out:
 				{
 					p0 = *d;
 					if (fcolor != 0xffffffff)
-						p0 = MUL4_SYM(fcolor, p0);
+						p0 = enesim_color_mul4_sym(fcolor, p0);
 				}
 			}
 			else if (ua) // on the outside boundary of the under figure
@@ -1166,10 +1142,10 @@ get_out:
 				{
 					p0 = *d;
 					if (fcolor != 0xffffffff)
-						p0 = MUL4_SYM(fcolor, p0);
+						p0 = enesim_color_mul4_sym(fcolor, p0);
 				}
 				if (ua < 65536)
-					p0 = MUL_A_65536(ua, p0);
+					p0 = enesim_color_mul_65536(ua, p0);
 			}
 		}
 		*d++ = p0;
@@ -1290,7 +1266,7 @@ get_out:
 		{
 			p0 = *d;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 		}
 		else if (oa)  // on the outside boundary of the over figure
 		{
@@ -1298,7 +1274,7 @@ get_out:
 
 			p0 = *d;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 
 			if (uin) // inside under figure
 				q0 = fcolor;
@@ -1306,11 +1282,11 @@ get_out:
 			{
 				q0 = fcolor;
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);
+					q0 = enesim_color_mul_65536(ua, q0);
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, p0, q0);
+				p0 = enesim_color_interp_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -1320,7 +1296,7 @@ get_out:
 			{
 				p0 = fcolor;
 				if (ua < 65536)
-					p0 = MUL_A_65536(ua, p0);
+					p0 = enesim_color_mul_65536(ua, p0);
 			}
 		}
 		*d++ = p0;
@@ -1456,7 +1432,7 @@ get_out:
 		{
 			p0 = *s;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 		}
 		else if (oa)  // on the outside boundary of the over figure
 		{
@@ -1464,25 +1440,25 @@ get_out:
 
 			p0 = *s;
 			if (scolor != 0xffffffff)
-				p0 = MUL4_SYM(scolor, p0);
+				p0 = enesim_color_mul4_sym(scolor, p0);
 
 			if (uin) // inside under figure
 			{
 				q0 = *d;
 				if (fcolor != 0xffffffff)
-					q0 = MUL4_SYM(fcolor, q0);
+					q0 = enesim_color_mul4_sym(fcolor, q0);
 			}
 			else if (ua) // on the outside boundary of the under figure
 			{
 				q0 = *d;
 				if (fcolor != 0xffffffff)
-					q0 = MUL4_SYM(fcolor, q0);
+					q0 = enesim_color_mul4_sym(fcolor, q0);
 				if (ua < 65536)
-					q0 = MUL_A_65536(ua, q0);
+					q0 = enesim_color_mul_65536(ua, q0);
 			}
 
 			if (oa < 65536)
-				p0 = INTERP_65536(oa, p0, q0);
+				p0 = enesim_color_interp_65536(oa, p0, q0);
 		}
 		else // outside over figure and not on its boundary
 		{
@@ -1490,15 +1466,15 @@ get_out:
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = MUL4_SYM(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 			}
 			else if (ua) // on the outside boundary of the under figure
 			{
 				p0 = *d;
 				if (fcolor != 0xffffffff)
-					p0 = MUL4_SYM(fcolor, p0);
+					p0 = enesim_color_mul4_sym(fcolor, p0);
 				if (ua < 65536)
-					p0 = MUL_A_65536(ua, p0);
+					p0 = enesim_color_mul_65536(ua, p0);
 			}
 		}
 		*d++ = p0;
