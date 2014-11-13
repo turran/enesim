@@ -109,6 +109,11 @@ static inline Eina_F16p16 enesim_f16p16_line_affine_setup(Enesim_F16p16_Line *l,
 }
 
 /*----------------------------------------------------------------------------*
+ *                              F16p16 Vector                                 *
+ *----------------------------------------------------------------------------*/
+Eina_Bool enesim_f16p16_vector_setup(Enesim_F16p16_Vector *thiz,
+		Enesim_Point *p0, Enesim_Point *p1, double tolerance);
+/*----------------------------------------------------------------------------*
  *                                 Points                                     *
  *----------------------------------------------------------------------------*/
 Enesim_Point * enesim_point_new(void);
@@ -143,6 +148,12 @@ static inline double enesim_point_3d_distance(Enesim_Point *p0, Enesim_Point *p1
 static inline double enesim_point_2d_length(Enesim_Point *p0)
 {
 	return hypot(p0->x, p0->y);
+}
+
+static inline void enesim_point_2d_round(Enesim_Point *p0, double rounding)
+{
+	p0->x = ((int) (p0->x * rounding)) / rounding;
+	p0->y = ((int) (p0->y * rounding)) / rounding;
 }
 
 static inline double enesim_point_3d_length(Enesim_Point *p0)
