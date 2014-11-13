@@ -599,7 +599,7 @@ Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r,
 	if (!sw_data)
 	{
 		sw_data = calloc(1, sizeof(Enesim_Renderer_Sw_Data));
-		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);	
+		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_SOFTWARE, sw_data);
 	}
 
 	color = enesim_renderer_color_get(r);
@@ -801,6 +801,15 @@ mask_done:
 		if (right > 0)
 			memset(data + len - right, 0, right * sizeof(uint32_t));
 	}
+}
+
+unsigned int enesim_renderer_sw_cpu_count(void)
+{
+#ifdef BUILD_MULTI_CORE
+	return _num_cpus;
+#else
+	return 0;
+#endif
 }
 /** @endcond */
 /*============================================================================*

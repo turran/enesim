@@ -88,5 +88,6 @@ void enesim_renderer_sw_free(Enesim_Renderer *r);
 
 Eina_Bool enesim_renderer_sw_setup(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **error);
 void enesim_renderer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
+unsigned int enesim_renderer_sw_cpu_count(void);
 
 #endif
