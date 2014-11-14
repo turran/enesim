@@ -89,10 +89,8 @@ typedef struct _Enesim_Rasterizer_Basic
 {
 	Enesim_Rasterizer parent;
 	/* private */
-	Enesim_F16p16_Vector *vectors;
+	const Enesim_F16p16_Vector *vectors;
 	int nvectors;
-	const Enesim_Figure *figure;
-	Eina_Bool changed : 1;
 
 	Enesim_Rasterizer_Basic_State state;
 	/* FIXME this are the bounds calculated at the setup
@@ -114,111 +112,12 @@ typedef struct _Enesim_Rasterizer_Basic_Class {
 	Enesim_Rasterizer_Class parent;
 } Enesim_Rasterizer_Basic_Class;
 
-static int _tysort(const void *l, const void *r)
-{
-	Enesim_F16p16_Vector *lv = (Enesim_F16p16_Vector *)l;
-	Enesim_F16p16_Vector *rv = (Enesim_F16p16_Vector *)r;
-
-	if (lv->yy0 <= rv->yy0)
-		return -1;
-	return 1;
-}
-
-static Eina_Bool _basic_setup_vectors(Enesim_Renderer *r)
-{
-	Enesim_Rasterizer_Basic *thiz;
-	Enesim_Renderer_Shape_Draw_Mode draw_mode;
-	Enesim_Polygon *p;
-	Enesim_F16p16_Vector *vec;
-	Eina_List *l1;
-	int nvectors = 0;
-	int n = 0;
-
-	thiz = ENESIM_RASTERIZER_BASIC(r);
-	if (thiz->vectors)
-	{
-		free(thiz->vectors);
-		thiz->vectors = NULL;
-	}
-
-	draw_mode = enesim_renderer_shape_draw_mode_get(r);
-	/* allocate the maximum number of vectors possible */
-	EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
-		n += enesim_polygon_point_count(p);
-	vec = malloc(n * sizeof(Enesim_F16p16_Vector));
-	/* generate the vectors */
-	n = 0;
-	EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
-	{
-		Enesim_Point *fp, *lp, *pt, pp;
-		Eina_List *points, *l2;
-		double len;
-		int sopen = !p->closed;
-		int pclosed = p->closed;
-		int npts;
-
-		if (sopen && (draw_mode != ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE))
-			sopen = EINA_FALSE;
-
-		npts = enesim_polygon_point_count(p);
-		/* check polygons integrity */
-		if ((npts < 2) || ((npts < 3) && (draw_mode !=
-				ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)))
-		{
-			continue;
-		}
-		nvectors += npts;
-		fp = eina_list_data_get(p->points);
-		lp = eina_list_data_get(eina_list_last(p->points));
-		len = enesim_point_2d_distance(fp, lp);
-		if (len < (1 / 256.0))
-			pclosed = EINA_TRUE;
-
-		/* start with the second point */
-		pp = *fp;
-		enesim_point_2d_round(&pp, 256.0);
-		points = eina_list_next(p->points);
-		EINA_LIST_FOREACH(points, l2, pt)
-		{
-			Enesim_Point pc;
-			Enesim_F16p16_Vector *v = &vec[n];
-
-			pc = *pt;
-			enesim_point_2d_round(&pc, 256.0);
-			if (enesim_f16p16_vector_setup(v, &pp, &pc, 1 / 256.0))
-			{
-				pp = pc;
-				n++;
-			}
-		}
-		/* add the last vertex */
-		if (!sopen || pclosed)
-		{
-			Enesim_Point pc;
-			Enesim_F16p16_Vector *v = &vec[n];
-
-			pc = *fp;
-			enesim_point_2d_round(&pc, 256.0);
-			pp = *lp;
-			enesim_point_2d_round(&pp, 256.0);
-			enesim_f16p16_vector_setup(v, &pp, &pc, 1 / 256.0);
-			n++;
-		}
-	}
-	thiz->vectors = vec;
-	thiz->nvectors = n;
-
-	qsort(thiz->vectors, thiz->nvectors, sizeof(Enesim_F16p16_Vector), _tysort);
-	thiz->changed = EINA_FALSE;
-	return EINA_TRUE;
-}
-
 static inline int _basic_setup_edges(Enesim_Rasterizer_Basic *thiz,
 		Enesim_F16p16_Edge *edges, Eina_F16p16 xx, Eina_F16p16 yy,
 		Eina_F16p16 *lx, Eina_F16p16 *rx)
 {
 	Enesim_F16p16_Edge *edge = edges;
-	Enesim_F16p16_Vector *v = thiz->vectors;
+	const Enesim_F16p16_Vector *v = thiz->vectors;
 	int nvectors = thiz->nvectors;
 	int nedges = 0;
 	int n = 0;
@@ -816,14 +715,30 @@ static Enesim_Renderer_Sw_Fill _spans[ENESIM_RENDERER_SHAPE_FILL_RULES][2][2];
 /*----------------------------------------------------------------------------*
  *                           Rasterizer interface                             *
  *----------------------------------------------------------------------------*/
-static void _basic_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure)
+static void _basic_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
 	Enesim_Rasterizer_Basic *thiz;
+	Enesim_Rasterizer_Basic_State *state;
 
 	thiz = ENESIM_RASTERIZER_BASIC(r);
-	thiz->figure = figure;
-	thiz->changed = EINA_TRUE;
+	if (thiz->fpaint)
+	{
+		enesim_renderer_unref(thiz->fpaint);
+		thiz->fpaint = NULL;
+	}
+	if (thiz->spaint)
+	{
+		enesim_renderer_unref(thiz->spaint);
+		thiz->spaint = NULL;
+	}
+
+	state = &thiz->state;
+	if (state->fill.r)
+		enesim_renderer_unref(state->fill.r);
+	if (state->stroke.r)
+		enesim_renderer_unref(state->stroke.r);
 }
+
 /*----------------------------------------------------------------------------*
  *                    The Enesim's rasterizer interface                       *
  *----------------------------------------------------------------------------*/
@@ -836,39 +751,44 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
 {
+	Enesim_Rasterizer *rr;
 	Enesim_Rasterizer_Basic *thiz;
 	Enesim_Rasterizer_Basic_State *state;
 	Enesim_Renderer_Shape_Draw_Mode draw_mode;
 	Enesim_Renderer_Shape_Fill_Rule fill_rule;
 	Enesim_Matrix matrix;
+	Eina_Bool changed;
 
-	thiz = ENESIM_RASTERIZER_BASIC(r);
-	state = &thiz->state;
-	if (!thiz->figure)
+	rr = ENESIM_RASTERIZER(r);
+	if (!rr->figure)
 	{
 		ENESIM_RENDERER_LOG(r, error, "No figure to rasterize");
 		return EINA_FALSE;
 	}
 
+	thiz = ENESIM_RASTERIZER_BASIC(r);
+	state = &thiz->state;
 	/* in case the draw mode has changed */
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
 	if ((state->draw_mode != draw_mode) &&
 			((state->draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) ||
 			(draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)))
 	{
-		thiz->changed = EINA_TRUE;
+		changed = EINA_TRUE;
 	}
 
-	if (thiz->changed)
+	if (changed || enesim_rasterizer_has_changed(r))
 	{
+#if 0
 		double sx = 1, sy = 1;
+#endif
 		double lx, rx, ty, by;
 
-		if (!_basic_setup_vectors(r))
+		thiz->vectors = enesim_rasterizer_figure_vectors_get(r, &thiz->nvectors);
+		if (!thiz->vectors)
 			return EINA_FALSE;
-
 		/* generate the bounds to clip the span functions */
-		if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
+		if (!enesim_figure_bounds(rr->figure, &lx, &ty, &rx, &by))
 			return EINA_FALSE;
 #if 0
 		if ((draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) &&
@@ -889,7 +809,6 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		thiz->byy = eina_f16p16_double_from(by);
 		thiz->lxx = eina_f16p16_double_from(lx);
 		thiz->rxx = eina_f16p16_double_from(rx);
-
 	}
 
 	enesim_renderer_transformation_get(r, &matrix);
@@ -950,30 +869,6 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _basic_sw_cleanup(Enesim_Renderer *r EINA_UNUSED, Enesim_Surface *s EINA_UNUSED)
-{
-	Enesim_Rasterizer_Basic *thiz;
-	Enesim_Rasterizer_Basic_State *state;
-
-	thiz = ENESIM_RASTERIZER_BASIC(r);
-	if (thiz->fpaint)
-	{
-		enesim_renderer_unref(thiz->fpaint);
-		thiz->fpaint = NULL;
-	}
-	if (thiz->spaint)
-	{
-		enesim_renderer_unref(thiz->spaint);
-		thiz->spaint = NULL;
-	}
-
-	state = &thiz->state;
-	if (state->fill.r)
-		enesim_renderer_unref(state->fill.r);
-	if (state->stroke.r)
-		enesim_renderer_unref(state->stroke.r);
-}
-
 static void _basic_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
@@ -994,11 +889,10 @@ static void _enesim_rasterizer_basic_class_init(void *k)
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _basic_name;
 	r_klass->sw_setup = _basic_sw_setup;
-	r_klass->sw_cleanup = _basic_sw_cleanup;
 	r_klass->sw_hints_get = _basic_sw_hints;
 
 	klass = ENESIM_RASTERIZER_CLASS(k);
-	klass->figure_set = _basic_figure_set;
+	klass->sw_cleanup = _basic_sw_cleanup;
 
 	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][0] = _basic_span_fill_color_stroke_color_nz;
 	_spans[ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1][0] = _basic_span_fill_renderer_stroke_color_nz;
@@ -1014,13 +908,8 @@ static void _enesim_rasterizer_basic_instance_init(void *o EINA_UNUSED)
 {
 }
 
-static void _enesim_rasterizer_basic_instance_deinit(void *o)
+static void _enesim_rasterizer_basic_instance_deinit(void *o EINA_UNUSED)
 {
-	Enesim_Rasterizer_Basic *thiz;
-
-	thiz = ENESIM_RASTERIZER_BASIC(o);
-	if (thiz->vectors)
-		free(thiz->vectors);
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -1031,16 +920,6 @@ Enesim_Renderer * enesim_rasterizer_basic_new(void)
 
 	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_rasterizer_basic);
 	return r;
-}
-
-void enesim_rasterizer_basic_vectors_get(Enesim_Renderer *r, int *nvectors,
-		Enesim_F16p16_Vector **vectors)
-{
-	Enesim_Rasterizer_Basic *thiz;
-
-	thiz = ENESIM_RASTERIZER_BASIC(r);
-	*nvectors = thiz->nvectors;
-	*vectors = thiz->vectors;
 }
 /** @endcond */
 /*============================================================================*
