@@ -78,7 +78,8 @@ typedef struct _Enesim_Rasterizer_Kiia
 	Enesim_Rasterizer parent;
 	/* private */
 	Enesim_Color fcolor;
-	/* The let most coordinate */
+	/* The left most coordinate */
+	int len;
 	Eina_F16p16 lx;
 	/* The number of samples (8, 16, 32) */
 	int nsamples;
@@ -140,8 +141,8 @@ static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 	slope = x01 / y01;
 
 	/* get the sampled Y inside the line */
-	start = (ceil(y0 * 32.0) / 32.0);
-	y1 = (floor(y1 * 32.0) / 32.0);
+	start = (((int)(y0 * 32.0) )/ 32.0);
+	y1 = (((int)(y1 * 32.0)) / 32.0);
 	mx = x0 + (slope * (start - y0));
 
 	thiz->yy0 = eina_f16p16_double_from(start);
@@ -339,7 +340,6 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	Enesim_Rasterizer *rr;
 	Enesim_Color color;
 	double lx, rx, ty, by;
-	int len;
 	int i;
 	int y;
 
@@ -359,19 +359,20 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	color = enesim_renderer_color_get(r);
 	if (color != ENESIM_COLOR_FULL)
 		thiz->fcolor = enesim_color_mul4_sym(thiz->fcolor, color);
-	/* 32 samples for now */
+	/* TODO use the quality, 32 samples for now */
 	thiz->inc = eina_f16p16_double_from(1/32.0);
 	thiz->pattern = _kiia_pattern32;
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
-	len = ceil(rx - lx);
+	thiz->len = ceil(rx - lx) + 1;
 	thiz->lx = eina_f16p16_int_from(floor(lx));
 	/* setup the workers */
 	for (i = 0; i < thiz->nworkers; i++)
 	{
 		thiz->workers[i].y = y;
-		thiz->workers[i].mask = calloc(len + 1, sizeof(uint32_t));
+		/* +1 because of the pattern offset */
+		thiz->workers[i].mask = calloc(thiz->len + 1, sizeof(uint32_t));
 	}
 	*draw = _kiia_span;
 	return EINA_TRUE;
