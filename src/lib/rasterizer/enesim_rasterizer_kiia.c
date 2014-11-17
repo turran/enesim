@@ -77,6 +77,7 @@ typedef struct _Enesim_Rasterizer_Kiia
 {
 	Enesim_Rasterizer parent;
 	/* private */
+	Enesim_Color fcolor;
 	/* The let most coordinate */
 	Eina_F16p16 lx;
 	/* The number of samples (8, 16, 32) */
@@ -175,7 +176,7 @@ static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
 	n = 0;
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
-		Enesim_Point *fp, *lp, *pt, *pp;
+		Enesim_Point *fp, *pt, *pp;
 		Eina_List *points, *l2;
 
 		fp = eina_list_data_get(p->points);
@@ -250,20 +251,19 @@ static void _kiia_span(Enesim_Renderer *r,
 			m = 1;
 		}
 
-		/* keep track of the start, end of edges */
-		if (edge->xx0 < ll)
-			ll = edge->xx0;
-		if (edge->xx1 > rr)
-			rr = edge->xx1;
-
+		/* get the pattern to use */
 		pattern = thiz->pattern;
-
 		/* finally sample */
 		for (; yyy0 < yyy1; yyy0 += sinc)
 		{
 			int mx;
 
 			mx = eina_f16p16_int_to(cx - thiz->lx + *pattern);
+			/* keep track of the start, end of intersections */
+			if (mx < ll)
+				ll = mx;
+			if (mx > rr)
+				rr = mx;
 			w->mask[mx] ^= m;
 			cx += edge->slope;
 			pattern++;
@@ -284,7 +284,7 @@ static void _kiia_span(Enesim_Renderer *r,
 	while (dst < end)
 	{
 		if (cm == 0xffffff)
-			*dst++ = 0xffff0000;
+			*dst++ = thiz->fcolor;
 		else if (cm == 0)
 			*dst++ = 0;
 		else
@@ -297,7 +297,7 @@ static void _kiia_span(Enesim_Renderer *r,
 			count = (count & 0x33333333) + ((count >> 2) & 0x33333333);
 			/* we use 21 instead of 24, because we need to rescale 32 -> 256 */
 			coverage = (((count + (count >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 21;
-			*dst++ = enesim_color_mul_256(coverage, 0xffff0000);
+			*dst++ = enesim_color_mul_256(coverage, thiz->fcolor);
 		}
 		cm ^= w->mask[i];
 		w->mask[i] = 0;
@@ -337,6 +337,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Rasterizer_Kiia *thiz;
 	Enesim_Rasterizer *rr;
+	Enesim_Color color;
 	double lx, rx, ty, by;
 	int len;
 	int i;
@@ -354,6 +355,10 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
+	thiz->fcolor = enesim_renderer_shape_fill_color_get(r);
+	color = enesim_renderer_color_get(r);
+	if (color != ENESIM_COLOR_FULL)
+		thiz->fcolor = enesim_color_mul4_sym(thiz->fcolor, color);
 	/* 32 samples for now */
 	thiz->inc = eina_f16p16_double_from(1/32.0);
 	thiz->pattern = _kiia_pattern32;
