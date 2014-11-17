@@ -808,7 +808,7 @@ unsigned int enesim_renderer_sw_cpu_count(void)
 #ifdef BUILD_MULTI_CORE
 	return _num_cpus;
 #else
-	return 0;
+	return 1;
 #endif
 }
 /** @endcond */
