@@ -83,6 +83,8 @@ typedef struct _Enesim_Rasterizer_Kiia
 	int nsamples;
 	/* the increment on the y direction (i.e 1/num samples) */
 	Eina_F16p16 inc;
+	/* the pattern to use */
+	Eina_F16p16 *pattern;
 	/* One worker per cpu */
 	Enesim_Rasterizer_Kiia_Worker *workers;
 	int nworkers;
@@ -93,6 +95,10 @@ typedef struct _Enesim_Rasterizer_Kiia
 typedef struct _Enesim_Rasterizer_Kiia_Class {
 	Enesim_Rasterizer_Class parent;
 } Enesim_Rasterizer_Kiia_Class;
+
+static Eina_F16p16 _kiia_pattern8[8];
+static Eina_F16p16 _kiia_pattern16[16];
+static Eina_F16p16 _kiia_pattern32[32];
 
 static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 		Enesim_Point *p0, Enesim_Point *p1)
@@ -197,30 +203,52 @@ static void _kiia_span(Enesim_Renderer *r,
 	Enesim_Rasterizer_Kiia_Worker *w;
 	Eina_F16p16 yy0, yy1;
 	Eina_F16p16 ll = INT_MAX, rr = -INT_MAX;
+	Eina_F16p16 sinc;
 	uint32_t *dst = ddata;
+	uint32_t *end = dst + len;
+	uint32_t cm = 0;
 	int i;
+	int offset;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
 	w = &thiz->workers[y % thiz->nworkers];
 
 	yy0 = eina_f16p16_int_from(y);
 	yy1 = eina_f16p16_int_from(y + 1);
+	sinc = thiz->inc;
 	/* intersect with each edge */
 	for (i = 0; i < thiz->nedges; i++)
 	{
 		Enesim_Rasterizer_Kiia_Edge *edge = &thiz->edges[i];
+		Eina_F16p16 *pattern;
 		Eina_F16p16 yyy0, yyy1;
-		Eina_F16p16 inc;
 		Eina_F16p16 cx;
-		int j;
+		int m;
 
 		/* outside the edge */
-		if (yy0 < edge->yy0 || yy0 > edge->yy1)
+		if (yy1 < edge->yy0 || yy0 >= edge->yy1)
 			continue;
+
 		/* make sure not overflow */
 		yyy1 = yy1;
 		if (yyy1 > edge->yy1)
 			yyy1 = edge->yy1;
+
+		yyy0 = yy0;
+		if (yy0 <= edge->yy0)
+		{
+			yyy0 = edge->yy0;
+			cx = edge->mx;
+			m = 1 << (eina_f16p16_fracc_get(yyy0) >> 11); /* 16.16 << nsamples */
+		}
+		else
+		{
+			Eina_F16p16 inc;
+
+			inc = eina_f16p16_mul(yyy0 - edge->yy0, eina_f16p16_int_from(32));
+			cx = edge->mx + eina_f16p16_mul(inc, edge->slope);
+			m = 1;
+		}
 
 		/* keep track of the start, end of edges */
 		if (edge->xx0 < ll)
@@ -228,25 +256,54 @@ static void _kiia_span(Enesim_Renderer *r,
 		if (edge->xx1 > rr)
 			rr = edge->xx1;
 
-		inc = eina_f16p16_mul(yy0 - edge->yy0, eina_f16p16_int_from(32.0));
-		cx = edge->mx + eina_f16p16_mul(inc, edge->slope);
+		pattern = thiz->pattern;
+
 		/* finally sample */
-		for (yyy0 = yy0; yyy0 < yyy1; yyy0 += eina_f16p16_double_from(1/32.0))
+		for (; yyy0 < yyy1; yyy0 += sinc)
 		{
 			int mx;
 
-			mx = eina_f16p16_int_to(cx - thiz->lx);
-			//w->mask[mx] ^= 0xffffffff;
-			w->mask[mx] = 0xffff0000;
+			mx = eina_f16p16_int_to(cx - thiz->lx + *pattern);
+			w->mask[mx] ^= m;
 			cx += edge->slope;
+			pattern++;
+			m <<= 1;
 		}
 	}
-	//printf("y = %d ll %d rr %d\n", y, eina_f16p16_int_to(ll), eina_f16p16_int_to(rr));
-	/* memset [x ... left] [right ... x + len] */
-	memcpy(dst, w->mask + (x - eina_f16p16_int_to(thiz->lx)), sizeof(uint32_t) * len);
-	memset(w->mask + (x - eina_f16p16_int_to(thiz->lx)), 0, sizeof(uint32_t) * len);
-	/* iterate over the mask and fill */ 
+
+	/* TODO memset [x ... left] [right ... x + len] */
+	offset = x - eina_f16p16_int_to(thiz->lx);
+	/* advance the mask until we reach the requested x */
 	/* also clear the mask in the process */
+	for (i = 0; i < offset; i++)
+	{
+		cm ^= w->mask[i];
+		w->mask[i] = 0;
+	}
+	/* iterate over the mask and fill */ 
+	while (dst < end)
+	{
+		if (cm == 0xffffff)
+			*dst++ = 0xffff0000;
+		else if (cm == 0)
+			*dst++ = 0;
+		else
+		{
+			uint32_t count;
+			uint16_t coverage;
+
+			/* use the hamming weight to know the number of bits set to 1 */
+			count = cm - ((cm >> 1) & 0x55555555);
+			count = (count & 0x33333333) + ((count >> 2) & 0x33333333);
+			/* we use 21 instead of 24, because we need to rescale 32 -> 256 */
+			coverage = (((count + (count >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 21;
+			*dst++ = enesim_color_mul_256(coverage, 0xffff0000);
+		}
+		cm ^= w->mask[i];
+		w->mask[i] = 0;
+		i++;
+	}
+	/* TODO set to zero the rest of the bits of the mask */
 	/* update the latest y coordinate of the worker */
 	w->y = y;
 }
@@ -297,7 +354,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
-
+	/* 32 samples for now */
+	thiz->inc = eina_f16p16_double_from(1/32.0);
+	thiz->pattern = _kiia_pattern32;
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
@@ -337,6 +396,128 @@ static void _enesim_rasterizer_kiia_class_init(void *k)
 
 	klass = ENESIM_RASTERIZER_CLASS(k);
 	klass->sw_cleanup = _kiia_sw_cleanup;
+
+	/* create the sampling patterns */
+	/* 8x8 sparse supersampling mask:
+	 * [][][][][]##[][] 5
+	 * ##[][][][][][][] 0
+	 * [][][]##[][][][] 3
+	 * [][][][][][]##[] 6
+	 * []##[][][][][][] 1
+	 * [][][][]##[][][] 4
+	 * [][][][][][][]## 7
+	 * [][]##[][][][][] 2
+	 */
+	_kiia_pattern8[0] = eina_f16p16_double_from(5.0/8.0);
+	_kiia_pattern8[1] = eina_f16p16_double_from(0.0/8.0);
+	_kiia_pattern8[2] = eina_f16p16_double_from(3.0/8.0);
+	_kiia_pattern8[3] = eina_f16p16_double_from(6.0/8.0);
+	_kiia_pattern8[4] = eina_f16p16_double_from(1.0/8.0);
+	_kiia_pattern8[5] = eina_f16p16_double_from(4.0/8.0);
+	_kiia_pattern8[6] = eina_f16p16_double_from(7.0/8.0);
+	_kiia_pattern8[7] = eina_f16p16_double_from(2.0/8.0);
+
+	/* 16x16 sparse supersampling mask:
+	 * []##[][][][][][][][][][][][][][] 1
+	 * [][][][][][][][]##[][][][][][][] 8
+	 * [][][][]##[][][][][][][][][][][] 4
+	 * [][][][][][][][][][][][][][][]## 15
+	 * [][][][][][][][][][][]##[][][][] 11
+	 * [][]##[][][][][][][][][][][][][] 2
+	 * [][][][][][]##[][][][][][][][][] 6
+	 * [][][][][][][][][][][][][][]##[] 14
+	 * [][][][][][][][][][]##[][][][][] 10
+	 * [][][]##[][][][][][][][][][][][] 3
+	 * [][][][][][][]##[][][][][][][][] 7 
+	 * [][][][][][][][][][][][]##[][][] 12
+	 * ##[][][][][][][][][][][][][][][] 0
+	 * [][][][][][][][][]##[][][][][][] 9
+	 * [][][][][]##[][][][][][][][][][] 5
+	 * [][][][][][][][][][][][][]##[][] 13
+	 */
+	_kiia_pattern16[0] = eina_f16p16_double_from(1.0/16.0);
+	_kiia_pattern16[1] = eina_f16p16_double_from(8.0/16.0);
+	_kiia_pattern16[2] = eina_f16p16_double_from(4.0/16.0);
+	_kiia_pattern16[3] = eina_f16p16_double_from(15.0/16.0);
+	_kiia_pattern16[4] = eina_f16p16_double_from(11.0/16.0);
+	_kiia_pattern16[5] = eina_f16p16_double_from(2.0/16.0);
+	_kiia_pattern16[6] = eina_f16p16_double_from(6.0/16.0);
+	_kiia_pattern16[7] = eina_f16p16_double_from(14.0/16.0);
+	_kiia_pattern16[8] = eina_f16p16_double_from(10.0/16.0);
+	_kiia_pattern16[9] = eina_f16p16_double_from(3.0/16.0);
+	_kiia_pattern16[10] = eina_f16p16_double_from(7.0/16.0);
+	_kiia_pattern16[11] = eina_f16p16_double_from(12.0/16.0);
+	_kiia_pattern16[12] = eina_f16p16_double_from(0.0/16.0);
+	_kiia_pattern16[13] = eina_f16p16_double_from(9.0/16.0);
+	_kiia_pattern16[14] = eina_f16p16_double_from(5.0/16.0);
+	_kiia_pattern16[15] = eina_f16p16_double_from(13.0/16.0);
+
+	/* 32x32 sparse supersampling mask
+	 * [][][][][][][][][][][][][][][][][][][][][][][][][][][][]##[][][] 28
+	 * [][][][][][][][][][][][][]##[][][][][][][][][][][][][][][][][][] 13
+	 * [][][][][][]##[][][][][][][][][][][][][][][][][][][][][][][][][] 6
+	 * [][][][][][][][][][][][][][][][][][][][][][][]##[][][][][][][][] 23
+	 * ##[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 0
+	 * [][][][][][][][][][][][][][][][][]##[][][][][][][][][][][][][][] 17
+	 * [][][][][][][][][][]##[][][][][][][][][][][][][][][][][][][][][] 10
+	 * [][][][][][][][][][][][][][][][][][][][][][][][][][][]##[][][][] 27
+	 * [][][][]##[][][][][][][][][][][][][][][][][][][][][][][][][][][] 4
+	 * [][][][][][][][][][][][][][][][][][][][][]##[][][][][][][][][][] 21
+	 * [][][][][][][][][][][][][][]##[][][][][][][][][][][][][][][][][] 14
+	 * [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]## 31
+	 * [][][][][][][][]##[][][][][][][][][][][][][][][][][][][][][][][] 8
+	 * [][][][][][][][][][][][][][][][][][][][][][][][][]##[][][][][][] 25
+	 * [][][][][][][][][][][][][][][][][][]##[][][][][][][][][][][][][] 18
+	 * [][][]##[][][][][][][][][][][][][][][][][][][][][][][][][][][][] 3
+	 * [][][][][][][][][][][][]##[][][][][][][][][][][][][][][][][][][] 12
+	 * [][][][][][][][][][][][][][][][][][][][][][][][][][][][][]##[][] 29
+	 * [][][][][][][][][][][][][][][][][][][][][][]##[][][][][][][][][] 22
+	 * [][][][][][][]##[][][][][][][][][][][][][][][][][][][][][][][][] 7
+	 * [][][][][][][][][][][][][][][][]##[][][][][][][][][][][][][][][] 16
+	 * []##[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 1
+	 * [][][][][][][][][][][][][][][][][][][][][][][][][][]##[][][][][] 26
+	 * [][][][][][][][][][][]##[][][][][][][][][][][][][][][][][][][][] 11
+	 * [][][][][][][][][][][][][][][][][][][][]##[][][][][][][][][][][] 20
+	 * [][][][][]##[][][][][][][][][][][][][][][][][][][][][][][][][][] 5
+	 * [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]##[] 30
+	 * [][][][][][][][][][][][][][][]##[][][][][][][][][][][][][][][][] 15
+	 * [][][][][][][][][][][][][][][][][][][][][][][][]##[][][][][][][] 24
+	 * [][][][][][][][][]##[][][][][][][][][][][][][][][][][][][][][][] 9
+	 * [][]##[][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 2
+	 * [][][][][][][][][][][][][][][][][][][]##[][][][][][][][][][][][] 19
+	 */
+	_kiia_pattern32[0] = eina_f16p16_double_from(28.0/32.0);
+	_kiia_pattern32[1] = eina_f16p16_double_from(13.0/32.0);
+	_kiia_pattern32[2] = eina_f16p16_double_from(6.0/32.0);
+	_kiia_pattern32[3] = eina_f16p16_double_from(23.0/32.0);
+	_kiia_pattern32[4] = eina_f16p16_double_from(0.0/32.0);
+	_kiia_pattern32[5] = eina_f16p16_double_from(17.0/32.0);
+	_kiia_pattern32[6] = eina_f16p16_double_from(10.0/32.0);
+	_kiia_pattern32[7] = eina_f16p16_double_from(27.0/32.0);
+	_kiia_pattern32[8] = eina_f16p16_double_from(4.0/32.0);
+	_kiia_pattern32[9] = eina_f16p16_double_from(21.0/32.0);
+	_kiia_pattern32[10] = eina_f16p16_double_from(14.0/32.0);
+	_kiia_pattern32[11] = eina_f16p16_double_from(31.0/32.0);
+	_kiia_pattern32[12] = eina_f16p16_double_from(8.0/32.0);
+	_kiia_pattern32[13] = eina_f16p16_double_from(25.0/32.0);
+	_kiia_pattern32[14] = eina_f16p16_double_from(18.0/32.0);
+	_kiia_pattern32[15] = eina_f16p16_double_from(3.0/32.0);
+	_kiia_pattern32[16] = eina_f16p16_double_from(12.0/32.0);
+	_kiia_pattern32[17] = eina_f16p16_double_from(29.0/32.0);
+	_kiia_pattern32[18] = eina_f16p16_double_from(22.0/32.0);
+	_kiia_pattern32[19] = eina_f16p16_double_from(7.0/32.0);
+	_kiia_pattern32[20] = eina_f16p16_double_from(16.0/32.0);
+	_kiia_pattern32[21] = eina_f16p16_double_from(1.0/32.0);
+	_kiia_pattern32[22] = eina_f16p16_double_from(26.0/32.0);
+	_kiia_pattern32[23] = eina_f16p16_double_from(11.0/32.0);
+	_kiia_pattern32[24] = eina_f16p16_double_from(20.0/32.0);
+	_kiia_pattern32[25] = eina_f16p16_double_from(5.0/32.0);
+	_kiia_pattern32[26] = eina_f16p16_double_from(30.0/32.0);
+	_kiia_pattern32[27] = eina_f16p16_double_from(15.0/32.0);
+	_kiia_pattern32[28] = eina_f16p16_double_from(24.0/32.0);
+	_kiia_pattern32[29] = eina_f16p16_double_from(9.0/32.0);
+	_kiia_pattern32[30] = eina_f16p16_double_from(2.0/32.0);
+	_kiia_pattern32[31] = eina_f16p16_double_from(19.0/32.0);
 }
 
 static void _enesim_rasterizer_kiia_instance_init(void *o)
