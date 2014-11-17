@@ -284,7 +284,7 @@ static void _kiia_span(Enesim_Renderer *r,
 	/* iterate over the mask and fill */ 
 	while (dst < end)
 	{
-		if (cm == 0xffffff)
+		if (cm == 0xffffffff)
 			*dst++ = thiz->fcolor;
 		else if (cm == 0)
 			*dst++ = 0;
