@@ -230,59 +230,22 @@ static inline void _kiia_non_zero_sample(Enesim_Rasterizer_Kiia_Worker *w,
 		int x, int m, int nsamples, int sample, int winding)
 {
 	w->mask[x] |= m;
-	w->winding[(x * nsamples) + sample] += winding;
+	w->winding[x] += winding;
 }
 
-static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w, int cm, int m, uint32_t *winding)
+static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w, int i, int cm)
 {
-#if 0
-	uint32_t ret = cm;
-	uint32_t bit = 1;
-	uint32_t values[32] = { 0 };
-	int n;
-
-	for (n = 0; n < 32; n++)
-	{
-		if (m & bit)
-		{
-			uint32_t t = values[n];
-
-			values[n] += *winding;
-			if ((t == 0) ^ (values[n] == 0))
-				ret ^= bit;
-		}
-		*winding = 0;
-		winding++;
-		bit <<= 1;
-	}
-	//printf("had %08x has %08x values[1] %d\n", m, ret, values[1]);
-	return ret;
-#else
 	uint32_t ret;
-	uint32_t bit = 1;
-	int ww = 0;
-	int n;
+	int m;
 
-	for (n = 0; n < 32; n++)
-	{
-		if (m & bit)
-			ww += *winding;
-		*winding = 0;
-		winding++;
-		bit <<= 1;
-	}
-
-	w->cwinding += ww;
+	m = w->mask[i];
+	w->cwinding += w->winding[i];
+	w->winding[i] = 0;
 	if (!w->cwinding)
-	{
 		ret = m;
-	}
 	else
-	{
 		ret = cm | m;
-	}
 	return ret;
-#endif
 }
 
 static void _kiia_span(Enesim_Renderer *r,
@@ -303,6 +266,7 @@ static void _kiia_span(Enesim_Renderer *r,
 	thiz = ENESIM_RASTERIZER_KIIA(r);
 	w = &thiz->workers[y % thiz->nworkers];
 
+	//memset(w->winding, 0, thiz->rx * sizeof(uint32_t));
 	yy0 = eina_f16p16_int_from(y);
 	yy1 = eina_f16p16_int_from(y + 1);
 	sinc = thiz->inc;
@@ -359,7 +323,7 @@ static void _kiia_span(Enesim_Renderer *r,
 				ll = mx;
 			if (mx > rr)
 				rr = mx;
-#if 0
+#if 1
 			_kiia_even_odd_sample(w, mx, m, thiz->nsamples, sample, edge->sgn);
 #else
 			_kiia_non_zero_sample(w, mx, m, thiz->nsamples, sample, edge->sgn);
@@ -390,10 +354,10 @@ static void _kiia_span(Enesim_Renderer *r,
 	{
 		uint32_t p0;
 
-#if 0
+#if 1
 		cm ^= w->mask[i];
 #else
-		cm = _kiia_non_zero_get_mask(w, cm, w->mask[i], &w->winding[i * 32]);
+		cm = _kiia_non_zero_get_mask(w, i, cm);
 #endif
 		w->mask[i] = 0;
 		if (cm == 0xffffffff)
@@ -527,7 +491,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		thiz->workers[i].y = y;
 		/* +1 because of the pattern offset */
 		thiz->workers[i].mask = calloc(len + 1, sizeof(uint32_t));
-		thiz->workers[i].winding = calloc((len + 1) * thiz->nsamples, sizeof(uint32_t));
+		thiz->workers[i].winding = calloc((len + 1), sizeof(uint32_t));
 	}
 	*draw = _kiia_span;
 	return EINA_TRUE;
