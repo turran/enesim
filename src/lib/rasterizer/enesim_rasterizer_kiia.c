@@ -51,8 +51,13 @@
 /* A worker is in charge of rasterize one span */
 typedef struct _Enesim_Rasterizer_Kiia_Worker
 {
-	/* a span of length equal to the width of the bounds */
+	/* a span of length equal to the width of the bounds to store the sample mask */
 	uint32_t *mask;
+	/* a span of length equal to the width of the bounds * nsamples to
+	 * store the sample winding
+	 */
+	uint32_t *winding;
+	int cwinding;
 	/* keep track of the current Y this worker is doing, to ease
 	 * the x increment on the edges
 	 */
@@ -104,6 +109,16 @@ static Eina_F16p16 _kiia_pattern8[8];
 static Eina_F16p16 _kiia_pattern16[16];
 static Eina_F16p16 _kiia_pattern32[32];
 
+static int _kiia_edge_sort(const void *l, const void *r)
+{
+	Enesim_Rasterizer_Kiia_Edge *lv = (Enesim_Rasterizer_Kiia_Edge *)l;
+	Enesim_Rasterizer_Kiia_Edge *rv = (Enesim_Rasterizer_Kiia_Edge *)r;
+
+	if (lv->yy0 <= rv->yy0)
+		return -1;
+	return 1;
+}
+
 static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 		Enesim_Point *p0, Enesim_Point *p1)
 {
@@ -112,27 +127,24 @@ static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 	double start;
 	double slope;
 	double mx;
+	int sgn;
 
-	x0 = p0->x;
-	y0 = p0->y;
-	x1 = p1->x;
-	y1 = p1->y;
-
-	/* TODO get the sign */
-
-	/* clamp to subpixel */
 	/* going down, swap the y */
-	if (y0 > y1)
+	if (p0->y > p1->y)
 	{
-		double tmp;
-
-		tmp = y0;
-		y0 = y1;
-		y1 = tmp;
-
-		tmp = x0;
-		x0 = x1;
-		x1 = tmp;
+		x0 = p1->x;
+		y0 = p1->y;
+		x1 = p0->x;
+		y1 = p0->y;
+		sgn = -1;
+	}
+	else
+	{
+		x0 = p0->x;
+		y0 = p0->y;
+		x1 = p1->x;
+		y1 = p1->y;
+		sgn = 1;
 	}
 	/* get the slope */
 	x01 = x1 - x0;
@@ -153,6 +165,7 @@ static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 	thiz->xx1 = eina_f16p16_double_from(x1);
 	thiz->slope = eina_f16p16_double_from(slope/32.0);
 	thiz->mx = eina_f16p16_double_from(mx);
+	thiz->sgn = sgn;
 
 	return EINA_TRUE;
 }
@@ -189,15 +202,87 @@ static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
 		{
 			Enesim_Rasterizer_Kiia_Edge *e = &thiz->edges[n];
 
-			if (!_kiia_edge_setup(e, pp, pt))
-				goto next;
-			n++;
-next:
+			if (_kiia_edge_setup(e, pp, pt))
+				n++;
 			pp = pt;
+		}
+		/* add the last point in case the polygon is closed */
+		if (p->closed)
+		{
+			Enesim_Rasterizer_Kiia_Edge *e = &thiz->edges[n];
+			if (_kiia_edge_setup(e, pp, fp))
+				n++;
 		}
 	}
 	thiz->nedges = n;
+	qsort(thiz->edges, thiz->nedges, sizeof(Enesim_Rasterizer_Kiia_Edge), _kiia_edge_sort);
 	return EINA_TRUE;
+}
+
+static inline void _kiia_even_odd_sample(Enesim_Rasterizer_Kiia_Worker *w,
+		int x, int m, int nsamples EINA_UNUSED, int sample EINA_UNUSED,
+		int winding EINA_UNUSED)
+{
+	w->mask[x] ^= m;
+}
+
+static inline void _kiia_non_zero_sample(Enesim_Rasterizer_Kiia_Worker *w,
+		int x, int m, int nsamples, int sample, int winding)
+{
+	w->mask[x] |= m;
+	w->winding[(x * nsamples) + sample] += winding;
+}
+
+static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w, int cm, int m, uint32_t *winding)
+{
+#if 0
+	uint32_t ret = cm;
+	uint32_t bit = 1;
+	uint32_t values[32] = { 0 };
+	int n;
+
+	for (n = 0; n < 32; n++)
+	{
+		if (m & bit)
+		{
+			uint32_t t = values[n];
+
+			values[n] += *winding;
+			if ((t == 0) ^ (values[n] == 0))
+				ret ^= bit;
+		}
+		*winding = 0;
+		winding++;
+		bit <<= 1;
+	}
+	//printf("had %08x has %08x values[1] %d\n", m, ret, values[1]);
+	return ret;
+#else
+	uint32_t ret;
+	uint32_t bit = 1;
+	int ww = 0;
+	int n;
+
+	for (n = 0; n < 32; n++)
+	{
+		if (m & bit)
+			ww += *winding;
+		*winding = 0;
+		winding++;
+		bit <<= 1;
+	}
+
+	w->cwinding += ww;
+	if (!w->cwinding)
+	{
+		ret = m;
+	}
+	else
+	{
+		ret = cm | m;
+	}
+	return ret;
+#endif
 }
 
 static void _kiia_span(Enesim_Renderer *r,
@@ -228,11 +313,15 @@ static void _kiia_span(Enesim_Renderer *r,
 		Eina_F16p16 *pattern;
 		Eina_F16p16 yyy0, yyy1;
 		Eina_F16p16 cx;
+		int sample;
 		int m;
 
-		/* outside the edge */
-		if (yy1 < edge->yy0 || yy0 >= edge->yy1)
+		/* up the span */
+		if (yy0 >= edge->yy1)
 			continue;
+		/* down the span, just skip processing, the edges are ordered in y */
+		if (yy1 < edge->yy0)
+			break;
 
 		/* make sure not overflow */
 		yyy1 = yy1;
@@ -244,7 +333,8 @@ static void _kiia_span(Enesim_Renderer *r,
 		{
 			yyy0 = edge->yy0;
 			cx = edge->mx;
-			m = 1 << (eina_f16p16_fracc_get(yyy0) >> 11); /* 16.16 << nsamples */
+			sample = (eina_f16p16_fracc_get(yyy0) >> 11); /* 16.16 << nsamples */
+			m = 1 << sample;
 		}
 		else
 		{
@@ -252,6 +342,7 @@ static void _kiia_span(Enesim_Renderer *r,
 
 			inc = eina_f16p16_mul(yyy0 - edge->yy0, eina_f16p16_int_from(32));
 			cx = edge->mx + eina_f16p16_mul(inc, edge->slope);
+			sample = 0;
 			m = 1;
 		}
 
@@ -268,9 +359,14 @@ static void _kiia_span(Enesim_Renderer *r,
 				ll = mx;
 			if (mx > rr)
 				rr = mx;
-			w->mask[mx] ^= m;
+#if 0
+			_kiia_even_odd_sample(w, mx, m, thiz->nsamples, sample, edge->sgn);
+#else
+			_kiia_non_zero_sample(w, mx, m, thiz->nsamples, sample, edge->sgn);
+#endif
 			cx += edge->slope;
 			pattern++;
+			sample++;
 			m <<= 1;
 		}
 	}
@@ -294,14 +390,24 @@ static void _kiia_span(Enesim_Renderer *r,
 	{
 		uint32_t p0;
 
+#if 0
+		cm ^= w->mask[i];
+#else
+		cm = _kiia_non_zero_get_mask(w, cm, w->mask[i], &w->winding[i * 32]);
+#endif
+		w->mask[i] = 0;
 		if (cm == 0xffffffff)
 		{
 			if (thiz->fren)
 			{
-				p0 = *dst;
 				if (thiz->fcolor != 0xffffffff)
 				{
+					p0 = *dst;
 					p0 = enesim_color_mul4_sym(p0, thiz->fcolor);
+				}
+				else
+				{
+					goto next;
 				}
 			}
 			else
@@ -336,10 +442,10 @@ static void _kiia_span(Enesim_Renderer *r,
 				p0 = enesim_color_mul_256(coverage, thiz->fcolor);
 			}
 		}
-		cm ^= w->mask[i];
-		w->mask[i] = 0;
+		*dst = p0;
+next:
+		dst++;
 		i++;
-		*dst++ = p0;
 	}
 	/* set to zero the rest of the bits of the mask */
 	for (i = rx; i <= thiz->rx; i++)
@@ -348,6 +454,7 @@ static void _kiia_span(Enesim_Renderer *r,
 	}
 	/* update the latest y coordinate of the worker */
 	w->y = y;
+	w->cwinding = 0;
 }
 /*----------------------------------------------------------------------------*
  *                           Rasterizer interface                             *
@@ -363,6 +470,7 @@ static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 	for (i = 0; i < thiz->nworkers; i++)
 	{
 		free(thiz->workers[i].mask);
+		free(thiz->workers[i].winding);
 	}
 }
 
@@ -403,6 +511,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	if (color != ENESIM_COLOR_FULL)
 		thiz->fcolor = enesim_color_mul4_sym(thiz->fcolor, color);
 	/* TODO use the quality, 32 samples for now */
+	thiz->nsamples = 32;
 	thiz->inc = eina_f16p16_double_from(1/32.0);
 	thiz->pattern = _kiia_pattern32;
 	/* set the y coordinate with the topmost value */
@@ -418,6 +527,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		thiz->workers[i].y = y;
 		/* +1 because of the pattern offset */
 		thiz->workers[i].mask = calloc(len + 1, sizeof(uint32_t));
+		thiz->workers[i].winding = calloc((len + 1) * thiz->nsamples, sizeof(uint32_t));
 	}
 	*draw = _kiia_span;
 	return EINA_TRUE;
