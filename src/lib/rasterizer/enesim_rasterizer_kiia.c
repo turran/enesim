@@ -78,9 +78,11 @@ typedef struct _Enesim_Rasterizer_Kiia
 	Enesim_Rasterizer parent;
 	/* private */
 	Enesim_Color fcolor;
-	/* The left most coordinate */
-	int len;
-	Eina_F16p16 lx;
+	Enesim_Renderer *fren;
+	/* The coordinates of the figure */
+	int lx;
+	int rx;
+	Eina_F16p16 llx;
 	/* The number of samples (8, 16, 32) */
 	int nsamples;
 	/* the increment on the y direction (i.e 1/num samples) */
@@ -209,8 +211,9 @@ static void _kiia_span(Enesim_Renderer *r,
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	uint32_t cm = 0;
+	int lx;
+	int rx;
 	int i;
-	int offset;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
 	w = &thiz->workers[y % thiz->nworkers];
@@ -259,7 +262,7 @@ static void _kiia_span(Enesim_Renderer *r,
 		{
 			int mx;
 
-			mx = eina_f16p16_int_to(cx - thiz->lx + *pattern);
+			mx = eina_f16p16_int_to(cx - thiz->llx + *pattern);
 			/* keep track of the start, end of intersections */
 			if (mx < ll)
 				ll = mx;
@@ -273,10 +276,15 @@ static void _kiia_span(Enesim_Renderer *r,
 	}
 
 	/* TODO memset [x ... left] [right ... x + len] */
-	offset = x - eina_f16p16_int_to(thiz->lx);
+	lx = x - thiz->lx;
+	rx = lx + len;
+	if (thiz->fren)
+	{
+		enesim_renderer_sw_draw(thiz->fren, x, y, len, dst);
+	}
 	/* advance the mask until we reach the requested x */
 	/* also clear the mask in the process */
-	for (i = 0; i < offset; i++)
+	for (i = 0; i < lx; i++)
 	{
 		cm ^= w->mask[i];
 		w->mask[i] = 0;
@@ -284,10 +292,27 @@ static void _kiia_span(Enesim_Renderer *r,
 	/* iterate over the mask and fill */ 
 	while (dst < end)
 	{
+		uint32_t p0;
+
 		if (cm == 0xffffffff)
-			*dst++ = thiz->fcolor;
+		{
+			if (thiz->fren)
+			{
+				p0 = *dst;
+				if (thiz->fcolor != 0xffffffff)
+				{
+					p0 = enesim_color_mul4_sym(p0, thiz->fcolor);
+				}
+			}
+			else
+			{
+				p0 = thiz->fcolor;
+			}
+		}
 		else if (cm == 0)
-			*dst++ = 0;
+		{
+			p0 = 0;
+		}
 		else
 		{
 			uint32_t count;
@@ -298,13 +323,29 @@ static void _kiia_span(Enesim_Renderer *r,
 			count = (count & 0x33333333) + ((count >> 2) & 0x33333333);
 			/* we use 21 instead of 24, because we need to rescale 32 -> 256 */
 			coverage = (((count + (count >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 21;
-			*dst++ = enesim_color_mul_256(coverage, thiz->fcolor);
+			if (thiz->fren)
+			{
+				uint32_t q0 = *dst;
+
+				if (thiz->fcolor != 0xffffffff)
+					q0 = enesim_color_mul4_sym(thiz->fcolor, q0);
+				p0 = enesim_color_mul_256(coverage, q0);
+			}
+			else
+			{
+				p0 = enesim_color_mul_256(coverage, thiz->fcolor);
+			}
 		}
 		cm ^= w->mask[i];
 		w->mask[i] = 0;
 		i++;
+		*dst++ = p0;
 	}
-	/* TODO set to zero the rest of the bits of the mask */
+	/* set to zero the rest of the bits of the mask */
+	for (i = rx; i <= thiz->rx; i++)
+	{
+		w->mask[i] = 0;
+	}
 	/* update the latest y coordinate of the worker */
 	w->y = y;
 }
@@ -317,6 +358,7 @@ static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 	int i;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
+	enesim_renderer_unref(thiz->fren);
 	/* cleanup the workers */
 	for (i = 0; i < thiz->nworkers; i++)
 	{
@@ -340,9 +382,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	Enesim_Rasterizer *rr;
 	Enesim_Color color;
 	double lx, rx, ty, by;
+	int len;
 	int i;
 	int y;
-
 
 	if (enesim_rasterizer_has_changed(r))
 	{
@@ -355,6 +397,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
+	thiz->fren = enesim_renderer_shape_fill_renderer_get(r);
 	thiz->fcolor = enesim_renderer_shape_fill_color_get(r);
 	color = enesim_renderer_color_get(r);
 	if (color != ENESIM_COLOR_FULL)
@@ -365,14 +408,16 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
-	thiz->len = ceil(rx - lx) + 1;
-	thiz->lx = eina_f16p16_int_from(floor(lx));
+	len = ceil(rx - lx) + 1;
+	thiz->rx = len;
+	thiz->lx = floor(lx);
+	thiz->llx = eina_f16p16_int_from(thiz->lx);
 	/* setup the workers */
 	for (i = 0; i < thiz->nworkers; i++)
 	{
 		thiz->workers[i].y = y;
 		/* +1 because of the pattern offset */
-		thiz->workers[i].mask = calloc(thiz->len + 1, sizeof(uint32_t));
+		thiz->workers[i].mask = calloc(len + 1, sizeof(uint32_t));
 	}
 	*draw = _kiia_span;
 	return EINA_TRUE;
