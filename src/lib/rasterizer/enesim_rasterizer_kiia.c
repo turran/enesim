@@ -82,6 +82,8 @@ typedef struct _Enesim_Rasterizer_Kiia
 {
 	Enesim_Rasterizer parent;
 	/* private */
+	const Enesim_Figure *figure;
+	Eina_Bool changed;
 	Enesim_Color fcolor;
 	Enesim_Renderer *fren;
 	/* The coordinates of the figure */
@@ -173,15 +175,13 @@ static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
 {
 	Enesim_Rasterizer_Kiia *thiz;
-	Enesim_Rasterizer *rr;
 	Enesim_Polygon *p;
 	const Enesim_Figure *f;
 	Eina_List *l1;
 	int n = 0;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
-	rr = ENESIM_RASTERIZER(r);
-	f = rr->figure;
+	f = thiz->figure;
 
 	/* allocate the maximum number of vectors possible */
 	EINA_LIST_FOREACH(f->polygons, l1, p)
@@ -456,6 +456,15 @@ static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 	}
 }
 
+static void _kiia_figure_set(Enesim_Renderer *r, const Enesim_Figure *f)
+{
+	Enesim_Rasterizer_Kiia *thiz;
+
+	thiz = ENESIM_RASTERIZER_KIIA(r);
+	thiz->figure = f;
+	thiz->changed = EINA_TRUE;
+}
+
 /*----------------------------------------------------------------------------*
  *                    The Enesim's rasterizer interface                       *
  *----------------------------------------------------------------------------*/
@@ -469,24 +478,29 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Rasterizer_Kiia *thiz;
-	Enesim_Rasterizer *rr;
 	Enesim_Color color;
 	double lx, rx, ty, by;
 	int len;
 	int i;
 	int y;
 
-	if (enesim_rasterizer_has_changed(r))
+	thiz = ENESIM_RASTERIZER_KIIA(r);
+	if (thiz->changed)
 	{
+		thiz->changed = EINA_FALSE;
+		if (thiz->edges)
+		{
+			free(thiz->edges);
+			thiz->edges = NULL;
+			thiz->nedges = 0;
+		}
 		/* create the edges */
 		if (!_kiia_edges_setup(r))
 			return EINA_FALSE;
 	}
-	rr = ENESIM_RASTERIZER(r);
-	if (!enesim_figure_bounds(rr->figure, &lx, &ty, &rx, &by))
+	if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
 		return EINA_FALSE;
 
-	thiz = ENESIM_RASTERIZER_KIIA(r);
 	thiz->fren = enesim_renderer_shape_fill_renderer_get(r);
 	thiz->fcolor = enesim_renderer_shape_fill_color_get(r);
 	color = enesim_renderer_color_get(r);
@@ -539,6 +553,7 @@ static void _enesim_rasterizer_kiia_class_init(void *k)
 
 	klass = ENESIM_RASTERIZER_CLASS(k);
 	klass->sw_cleanup = _kiia_sw_cleanup;
+	klass->figure_set = _kiia_figure_set;
 
 	/* create the sampling patterns */
 	/* 8x8 sparse supersampling mask:
@@ -677,6 +692,11 @@ static void _enesim_rasterizer_kiia_instance_deinit(void *o)
 	Enesim_Rasterizer_Kiia *thiz;
 
 	thiz = ENESIM_RASTERIZER_KIIA(o);
+	if (thiz->edges)
+	{
+		free(thiz->edges);
+		thiz->edges = NULL;
+	}
 	free(thiz->workers);
 }
 /*============================================================================*

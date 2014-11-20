@@ -35,32 +35,32 @@
 typedef struct _Enesim_Rasterizer
 {
 	Enesim_Renderer_Shape parent;
-	const Enesim_Figure *figure;
 	/* private */
-	Eina_Bool changed;
-	Eina_Bool vectors_generated;
-	Enesim_F16p16_Vector *vectors;
-	int nvectors;
 } Enesim_Rasterizer;
 
 /* FIXME we should not inherit from the shape, but use a new interface that only has
  * a subset of the properties. For example we dont need the dash list, or the stroke
  * width. A rasterizer should only rasterize a figure
  */
+
+typedef void (*Enesim_Rasterizer_Figure_Set)(Enesim_Renderer *r, const Enesim_Figure *f);
+
 typedef struct _Enesim_Rasterizer_Class
 {
 	Enesim_Renderer_Shape_Class parent;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	Enesim_Rasterizer_Figure_Set figure_set;
 } Enesim_Rasterizer_Class;
 
 Enesim_Object_Descriptor * enesim_rasterizer_descriptor_get(void);
 
 Eina_Bool enesim_rasterizer_has_changed(Enesim_Renderer *r);
 void enesim_rasterizer_figure_set(Enesim_Renderer *r, const Enesim_Figure *f);
-const Enesim_F16p16_Vector * enesim_rasterizer_figure_vectors_get(
-		Enesim_Renderer *r, int *nvectors);
 
 Enesim_Renderer * enesim_rasterizer_basic_new(void);
+const Enesim_F16p16_Vector * enesim_rasterizer_basic_figure_vectors_get(
+		Enesim_Renderer *r, int *nvectors);
+
 Enesim_Renderer * enesim_rasterizer_bifigure_new(void);
 void enesim_rasterizer_bifigure_over_figure_set(Enesim_Renderer *r, const Enesim_Figure *figure);
 
