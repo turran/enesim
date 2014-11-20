@@ -220,16 +220,22 @@ static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
 }
 
 static inline void _kiia_even_odd_sample(Enesim_Rasterizer_Kiia_Worker *w,
-		int x, int m, int nsamples EINA_UNUSED, int sample EINA_UNUSED,
-		int winding EINA_UNUSED)
+		int x, int m, int winding EINA_UNUSED)
 {
 	w->mask[x] ^= m;
 }
 
-static inline void _kiia_non_zero_sample(Enesim_Rasterizer_Kiia_Worker *w,
-		int x, int m, int nsamples, int sample, int winding)
+static inline uint32_t _kiia_even_odd_get_mask(Enesim_Rasterizer_Kiia_Worker *w, int i, int cm)
 {
-	w->mask[x] |= m;
+	cm ^= w->mask[i];
+	w->mask[i] = 0;
+	return cm;
+}
+
+static inline void _kiia_non_zero_sample(Enesim_Rasterizer_Kiia_Worker *w,
+		int x, int m, int winding)
+{
+	w->mask[x] ^= m;
 	w->winding[x] += winding;
 }
 
@@ -237,14 +243,24 @@ static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w,
 {
 	uint32_t ret;
 	int m;
+	int winding;
 
 	m = w->mask[i];
-	w->cwinding += w->winding[i];
-	w->winding[i] = 0;
-	if (!w->cwinding)
-		ret = m;
+	winding = w->winding[i];
+	w->cwinding += winding;
+	if (abs(w->cwinding) < 32)
+	{
+		if (w->cwinding == 0)
+			ret = 0;
+		else
+			ret = cm ^ m;
+	}
 	else
-		ret = cm | m;
+	{
+		ret = 0xffffffff;
+	}
+	/* reset the winding */
+	w->winding[i] = 0;
 	return ret;
 }
 
@@ -323,17 +339,17 @@ static void _kiia_span(Enesim_Renderer *r,
 				ll = mx;
 			if (mx > rr)
 				rr = mx;
-#if 1
-			_kiia_even_odd_sample(w, mx, m, thiz->nsamples, sample, edge->sgn);
+#if 0
+			_kiia_even_odd_sample(w, mx, m, edge->sgn);
 #else
-			_kiia_non_zero_sample(w, mx, m, thiz->nsamples, sample, edge->sgn);
+			_kiia_non_zero_sample(w, mx, m, edge->sgn);
 #endif
 			cx += edge->slope;
 			pattern++;
-			sample++;
 			m <<= 1;
 		}
 	}
+	w->count = 0;
 
 	/* TODO memset [x ... left] [right ... x + len] */
 	lx = x - thiz->lx;
@@ -346,15 +362,18 @@ static void _kiia_span(Enesim_Renderer *r,
 	/* also clear the mask in the process */
 	for (i = 0; i < lx; i++)
 	{
+#if 0
 		cm ^= w->mask[i];
-		w->mask[i] = 0;
+#else
+		cm = _kiia_non_zero_get_mask(w, i, cm);
+#endif
 	}
 	/* iterate over the mask and fill */ 
 	while (dst < end)
 	{
 		uint32_t p0;
 
-#if 1
+#if 0
 		cm ^= w->mask[i];
 #else
 		cm = _kiia_non_zero_get_mask(w, i, cm);
@@ -448,7 +467,7 @@ static const char * _kiia_name(Enesim_Renderer *r EINA_UNUSED)
 
 static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error)
+		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Rasterizer_Kiia *thiz;
 	Enesim_Rasterizer *rr;
