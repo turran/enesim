@@ -349,7 +349,6 @@ static void _kiia_span(Enesim_Renderer *r,
 			m <<= 1;
 		}
 	}
-	w->count = 0;
 
 	/* TODO memset [x ... left] [right ... x + len] */
 	lx = x - thiz->lx;
