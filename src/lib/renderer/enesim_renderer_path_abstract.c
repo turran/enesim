@@ -39,6 +39,27 @@
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_path_abstract_private.h"
 
+/**
+ * TODO
+ * Ok this file needs a refactoring, basically it was the base class for every
+ * path renderer on enesim.
+ * For the generation of paths -> figures we have
+ * rasterizer : used
+ *   basic    : special case, stroke < 1
+ *   kiia     : normal
+ * cairo      : not-used
+ * tesselator : used
+ * nv         : not-used
+ * loop-blinn : WIP but wont be used either
+ *
+ * - Make the generate function a class function pointer, this way we avoid
+ *   the need to have changed/generated/has_changed on the implementations
+ *   and whenever the renderer needs to do a setup, it just calls the implementation
+ *   generate based on its own state
+ * - The setup function must be split on two too, one for the real setup of
+ *   fill/stroke renderers, etc, then do the generation and finally call the
+ *   implementation setup
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
