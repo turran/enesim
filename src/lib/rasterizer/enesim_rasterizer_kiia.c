@@ -381,6 +381,13 @@ static void _kiia_span(Enesim_Renderer *r,
 		}
 	}
 
+	/* does not intersect with anything */
+	if (mlx == INT_MAX)
+	{
+		memset(dst, 0, len * sizeof(uint32_t));
+		return;
+	}
+
 	/* clip on the left side [x.. left] */
 	lx = x - thiz->lx;
 	if (lx < mlx)
@@ -487,9 +494,9 @@ next:
 	/* finally memset on dst at the end to keep the correct order on the
 	 * dst access
 	 */
-	if (end < rend)
+	if (dst < rend)
 	{
-		memset(dst, 0, (rend - end) * sizeof(uint32_t));
+		memset(dst, 0, (rend - dst) * sizeof(uint32_t));
 	}
 	/* set to zero the rest of the bits of the mask */
 	else
