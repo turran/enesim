@@ -300,13 +300,12 @@ static void _kiia_span(Enesim_Renderer *r,
 	Enesim_Rasterizer_Kiia *thiz;
 	Enesim_Rasterizer_Kiia_Worker *w;
 	Eina_F16p16 yy0, yy1;
-	Eina_F16p16 ll = INT_MAX, rr = -INT_MAX;
 	Eina_F16p16 sinc;
 	uint32_t *dst = ddata;
-	uint32_t *end = dst + len;
+	uint32_t *end, *rend = dst + len;
 	uint32_t cm = 0;
-	int lx;
-	int rx;
+	int lx, mlx = INT_MAX;
+	int rx, mrx = -INT_MAX;
 	int i;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
@@ -367,10 +366,10 @@ static void _kiia_span(Enesim_Renderer *r,
 
 			mx = eina_f16p16_int_to(cx - thiz->llx + *pattern);
 			/* keep track of the start, end of intersections */
-			if (mx < ll)
-				ll = mx;
-			if (mx > rr)
-				rr = mx;
+			if (mx < mlx)
+				mlx = mx;
+			if (mx > mrx)
+				mrx = mx;
 #if 0
 			_kiia_even_odd_sample(w, mx, m, edge->sgn);
 #else
@@ -382,22 +381,51 @@ static void _kiia_span(Enesim_Renderer *r,
 		}
 	}
 
-	/* TODO memset [x ... left] [right ... x + len] */
+	/* clip on the left side [x.. left] */
 	lx = x - thiz->lx;
-	rx = lx + len;
-	if (thiz->fren)
+	if (lx < mlx)
 	{
-		enesim_renderer_sw_draw(thiz->fren, x, y, len, dst);
+		int adv;
+
+		adv = mlx - lx;
+		memset(dst, 0, adv * sizeof(uint32_t));
+		len -= adv;
+		dst += adv;
+		lx = mlx;
+		i = mlx;
 	}
 	/* advance the mask until we reach the requested x */
 	/* also clear the mask in the process */
-	for (i = 0; i < lx; i++)
+	else
 	{
+		for (i = mlx; i < lx; i++)
+		{
 #if 0
-		cm ^= w->mask[i];
+			cm ^= w->mask[i];
 #else
-		cm = _kiia_non_zero_get_mask(w, i, cm);
+			cm = _kiia_non_zero_get_mask(w, i, cm);
 #endif
+		}
+	}
+	/* clip on the right side [right ... x + len] */
+	rx = lx + len;
+	/* given that we always jump to the next pixel because of the offset
+	 * pattern, start counting on the next pixel */
+	mrx += 1;
+	if (rx > mrx)
+	{
+		int adv;
+
+		adv = rx - mrx;
+		len -= adv;
+		rx = mrx;
+	}
+
+	/* time to draw */
+ 	end = dst + len;
+	if (thiz->fren)
+	{
+		enesim_renderer_sw_draw(thiz->fren, x, y, len, dst);
 	}
 	/* iterate over the mask and fill */ 
 	while (dst < end)
@@ -456,10 +484,20 @@ next:
 		dst++;
 		i++;
 	}
-	/* set to zero the rest of the bits of the mask */
-	for (i = rx; i <= thiz->rx; i++)
+	/* finally memset on dst at the end to keep the correct order on the
+	 * dst access
+	 */
+	if (end < rend)
 	{
-		w->mask[i] = 0;
+		memset(dst, 0, (rend - end) * sizeof(uint32_t));
+	}
+	/* set to zero the rest of the bits of the mask */
+	else
+	{
+		for (i = rx; i < mrx; i++)
+		{
+			w->mask[i] = 0;
+		}
 	}
 	/* update the latest y coordinate of the worker */
 	w->y = y;
