@@ -40,6 +40,9 @@
 #include "enesim_vector_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_rasterizer_private.h"
+/* Add support for the different fill rules
+ * Add support for the different qualities
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -122,7 +125,7 @@ static int _kiia_edge_sort(const void *l, const void *r)
 }
 
 static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
-		Enesim_Point *p0, Enesim_Point *p1)
+		Enesim_Point *p0, Enesim_Point *p1, double nsamples)
 {
 	double x0, y0, x1, y1;
 	double x01, y01;
@@ -157,15 +160,15 @@ static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 	slope = x01 / y01;
 
 	/* get the sampled Y inside the line */
-	start = (((int)(y0 * 32.0) )/ 32.0);
-	y1 = (((int)(y1 * 32.0)) / 32.0);
+	start = (((int)(y0 * nsamples) )/ nsamples);
+	y1 = (((int)(y1 * nsamples)) / nsamples);
 	mx = x0 + (slope * (start - y0));
 
 	thiz->yy0 = eina_f16p16_double_from(start);
 	thiz->yy1 = eina_f16p16_double_from(y1);
 	thiz->xx0 = eina_f16p16_double_from(x0);
 	thiz->xx1 = eina_f16p16_double_from(x1);
-	thiz->slope = eina_f16p16_double_from(slope/32.0);
+	thiz->slope = eina_f16p16_double_from(slope/nsamples);
 	thiz->mx = eina_f16p16_double_from(mx);
 	thiz->sgn = sgn;
 
@@ -202,7 +205,7 @@ static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
 		{
 			Enesim_Rasterizer_Kiia_Edge *e = &thiz->edges[n];
 
-			if (_kiia_edge_setup(e, pp, pt))
+			if (_kiia_edge_setup(e, pp, pt, thiz->nsamples))
 				n++;
 			pp = pt;
 		}
@@ -210,7 +213,7 @@ static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
 		if (p->closed)
 		{
 			Enesim_Rasterizer_Kiia_Edge *e = &thiz->edges[n];
-			if (_kiia_edge_setup(e, pp, fp))
+			if (_kiia_edge_setup(e, pp, fp, thiz->nsamples))
 				n++;
 		}
 	}
@@ -239,6 +242,32 @@ static inline void _kiia_non_zero_sample(Enesim_Rasterizer_Kiia_Worker *w,
 	w->winding[x] += winding;
 }
 
+static inline uint16_t _kiia_32_get_alpha(int cm)
+{
+	uint16_t coverage;
+
+	/* use the hamming weight to know the number of bits set to 1 */
+	cm = cm - ((cm >> 1) & 0x55555555);
+	cm = (cm & 0x33333333) + ((cm >> 2) & 0x33333333);
+	/* we use 21 instead of 24, because we need to rescale 32 -> 256 */
+	coverage = (((cm + (cm >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 21;
+
+	return coverage;
+}
+
+static inline uint16_t _kiia_16_get_alpha(int cm)
+{
+	uint16_t coverage;
+
+	/* use the hamming weight to know the number of bits set to 1 */
+	cm = cm - ((cm >> 1) & 0x55555555);
+	cm = (cm & 0x33333333) + ((cm >> 2) & 0x33333333);
+	/* we use 20 instead of 24, because we need to rescale 16 -> 256 */
+	coverage = (((cm + (cm >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 20;
+
+	return coverage;
+}
+
 static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w, int i, int cm)
 {
 	uint32_t ret;
@@ -248,6 +277,7 @@ static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w,
 	m = w->mask[i];
 	winding = w->winding[i];
 	w->cwinding += winding;
+	/* TODO Use the number of samples */
 	if (abs(w->cwinding) < 32)
 	{
 		if (w->cwinding == 0)
@@ -282,7 +312,6 @@ static void _kiia_span(Enesim_Renderer *r,
 	thiz = ENESIM_RASTERIZER_KIIA(r);
 	w = &thiz->workers[y % thiz->nworkers];
 
-	//memset(w->winding, 0, thiz->rx * sizeof(uint32_t));
 	yy0 = eina_f16p16_int_from(y);
 	yy1 = eina_f16p16_int_from(y + 1);
 	sinc = thiz->inc;
@@ -314,13 +343,16 @@ static void _kiia_span(Enesim_Renderer *r,
 			yyy0 = edge->yy0;
 			cx = edge->mx;
 			sample = (eina_f16p16_fracc_get(yyy0) >> 11); /* 16.16 << nsamples */
+			//sample = (eina_f16p16_fracc_get(yyy0) >> 12); /* 16.16 << nsamples */
 			m = 1 << sample;
 		}
 		else
 		{
 			Eina_F16p16 inc;
 
+			/* TODO use the correct sample */
 			inc = eina_f16p16_mul(yyy0 - edge->yy0, eina_f16p16_int_from(32));
+			//inc = eina_f16p16_mul(yyy0 - edge->yy0, eina_f16p16_int_from(16));
 			cx = edge->mx + eina_f16p16_mul(inc, edge->slope);
 			sample = 0;
 			m = 1;
@@ -403,14 +435,9 @@ static void _kiia_span(Enesim_Renderer *r,
 		}
 		else
 		{
-			uint32_t count;
 			uint16_t coverage;
 
-			/* use the hamming weight to know the number of bits set to 1 */
-			count = cm - ((cm >> 1) & 0x55555555);
-			count = (count & 0x33333333) + ((count >> 2) & 0x33333333);
-			/* we use 21 instead of 24, because we need to rescale 32 -> 256 */
-			coverage = (((count + (count >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 21;
+			coverage = _kiia_32_get_alpha(cm);
 			if (thiz->fren)
 			{
 				uint32_t q0 = *dst;
@@ -485,6 +512,24 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	int y;
 
 	thiz = ENESIM_RASTERIZER_KIIA(r);
+	/* TODO use the quality, 32 samples for now */
+	thiz->nsamples = 32;
+	switch (thiz->nsamples)
+	{
+		case 8:
+		thiz->pattern = _kiia_pattern8;
+		break;
+
+		case 16:
+		thiz->pattern = _kiia_pattern16;
+		break;
+
+		case 32:
+		thiz->pattern = _kiia_pattern32;
+		break;
+	}
+	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
+
 	if (thiz->changed)
 	{
 		thiz->changed = EINA_FALSE;
@@ -506,10 +551,6 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	color = enesim_renderer_color_get(r);
 	if (color != ENESIM_COLOR_FULL)
 		thiz->fcolor = enesim_color_mul4_sym(thiz->fcolor, color);
-	/* TODO use the quality, 32 samples for now */
-	thiz->nsamples = 32;
-	thiz->inc = eina_f16p16_double_from(1/32.0);
-	thiz->pattern = _kiia_pattern32;
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
