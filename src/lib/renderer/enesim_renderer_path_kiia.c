@@ -85,6 +85,15 @@ typedef struct _Enesim_Renderer_Path_Kiia_Edge
 	int sgn;
 } Enesim_Renderer_Path_Kiia_Edge;
 
+typedef struct _Enesim_Renderer_Path_Kiia_Figure
+{
+	Enesim_Figure *figure;
+	Enesim_Renderer_Path_Kiia_Edge *edges;
+	int nedges;
+	Enesim_Renderer *ren;
+	Enesim_Color color;
+} Enesim_Renderer_Path_Kiia_Figure;
+
 typedef struct _Enesim_Renderer_Path_Kiia
 {
 	Enesim_Renderer_Path_Abstract parent;
@@ -95,13 +104,10 @@ typedef struct _Enesim_Renderer_Path_Kiia
 	Enesim_Path_Generator *dashed_path;
 
 	/* The figures themselves */
-	Enesim_Figure *fill_figure;
-	Enesim_Figure *stroke_figure;
-	const Enesim_Figure *figure;
+	Enesim_Renderer_Path_Kiia_Figure fill;
+	Enesim_Renderer_Path_Kiia_Figure stroke;
 
 	Eina_Bool changed;
-	Enesim_Color fcolor;
-	Enesim_Renderer *fren;
 	/* The coordinates of the figure */
 	int lx;
 	int rx;
@@ -115,6 +121,11 @@ typedef struct _Enesim_Renderer_Path_Kiia
 	/* One worker per cpu */
 	Enesim_Renderer_Path_Kiia_Worker *workers;
 	int nworkers;
+
+	/* TODO remove this */
+	Enesim_Color fcolor;
+	Enesim_Renderer *fren;
+	const Enesim_Figure *figure;
 	Enesim_Renderer_Path_Kiia_Edge *edges;
 	int nedges;
 } Enesim_Renderer_Path_Kiia;
@@ -230,6 +241,116 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
 	*nedges = n;
 	return edges;
+}
+
+static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Path_Abstract *pa;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Matrix transformation;
+	Enesim_Renderer_Shape_Stroke_Join join;
+	Enesim_Renderer_Shape_Stroke_Cap cap;
+	Enesim_Path_Generator *generator;
+	Enesim_List *dashes;
+	Eina_List *dashes_l;
+	Eina_Bool stroke_scalable;
+	double stroke_weight;
+	double swx;
+	double swy;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+
+	/* TODO check that we actually need to generate */
+	if (thiz->fill.figure)
+		enesim_figure_clear(thiz->fill.figure);
+	else
+		thiz->fill.figure = enesim_figure_new();
+
+	if (thiz->stroke.figure)
+		enesim_figure_clear(thiz->stroke.figure);
+	else
+		thiz->stroke.figure = enesim_figure_new();
+
+
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	dashes = enesim_renderer_shape_dashes_get(r);
+	dashes_l = dashes->l;
+	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
+
+	/* decide what generator to use */
+	/* for a stroke smaller than 1px we will use the basic
+	 * rasterizer directly, so we dont need to generate the
+	 * stroke path
+	 */
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) 
+	{
+		if (!dashes_l)
+			generator = thiz->stroke_path;
+		else
+			generator = thiz->dashed_path;
+	}
+	else
+	{
+		generator = thiz->strokeless_path;
+	}
+	enesim_list_unref(dashes);
+
+	join = enesim_renderer_shape_stroke_join_get(r);
+	cap = enesim_renderer_shape_stroke_cap_get(r);
+	stroke_weight = enesim_renderer_shape_stroke_weight_get(r);
+	stroke_scalable = enesim_renderer_shape_stroke_scalable_get(r);
+	enesim_renderer_transformation_get(r, &transformation);
+
+	enesim_path_generator_figure_set(generator, thiz->fill.figure);
+	enesim_path_generator_stroke_figure_set(generator, thiz->stroke.figure);
+	enesim_path_generator_stroke_cap_set(generator, cap);
+	enesim_path_generator_stroke_join_set(generator, join);
+	enesim_path_generator_stroke_weight_set(generator, stroke_weight);
+	enesim_path_generator_stroke_scalable_set(generator, stroke_scalable);
+	enesim_path_generator_stroke_dash_set(generator, dashes_l);
+	enesim_path_generator_scale_set(generator, 1, 1);
+	enesim_path_generator_transformation_set(generator, &transformation);
+
+	/* Finall generate the figures */
+	pa = ENESIM_RENDERER_PATH_ABSTRACT(r);
+	enesim_path_generator_generate(generator, pa->path->commands);
+	return EINA_TRUE;
+}
+
+static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	{
+		if (thiz->fill.edges)
+		{
+			free(thiz->fill.edges);
+			thiz->fill.edges = NULL;
+		}
+		thiz->fill.edges = _kiia_edges_setup(thiz->fill.figure,
+				thiz->nsamples, &thiz->fill.nedges);
+		if (!thiz->fill.edges)
+			return EINA_FALSE;
+	}
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	{
+		if (thiz->stroke.edges)
+		{
+			free(thiz->stroke.edges);
+			thiz->stroke.edges = NULL;
+		}
+		thiz->stroke.edges = _kiia_edges_setup(thiz->stroke.figure,
+				thiz->nsamples, &thiz->stroke.nedges);
+		if (!thiz->stroke.edges)
+			return EINA_FALSE;
+	}
+	return EINA_TRUE;
 }
 
 static inline void _kiia_even_odd_sample(Enesim_Renderer_Path_Kiia_Worker *w,
@@ -523,11 +644,6 @@ next:
 /*----------------------------------------------------------------------------*
  *                               Path abstract                                *
  *----------------------------------------------------------------------------*/
-static void _kiia_path_generate(Enesim_Renderer *r, Enesim_Path *path)
-{
-
-}
-
 static void _kiia_path_set(Enesim_Renderer *r, Enesim_Path *path)
 {
 
@@ -583,8 +699,14 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	int i;
 	int y;
 
+	/* Convert the path to a figure */
+	/* TODO later all of this will be on the generate interface */
+	if (!_kiia_figures_generate(r))
+		return EINA_FALSE;
+	if (!_kiia_edges_generate(r))
+		return EINA_FALSE;
+
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	/* TODO generate the figures in case we need to */
 	/* TODO use the quality, 32 samples for now */
 	thiz->nsamples = 32;
 	switch (thiz->nsamples)
@@ -804,6 +926,11 @@ static void _enesim_renderer_path_kiia_instance_init(void *o)
 	thiz = ENESIM_RENDERER_PATH_KIIA(o);
 	thiz->nworkers = enesim_renderer_sw_cpu_count();
 	thiz->workers = calloc(thiz->nworkers, sizeof(Enesim_Renderer_Path_Kiia_Worker));
+
+	/* create the different path implementations */
+	thiz->stroke_path = enesim_path_generator_stroke_dashless_new();
+	thiz->strokeless_path = enesim_path_generator_strokeless_new();
+	thiz->dashed_path = enesim_path_generator_dashed_new();
 }
 
 static void _enesim_renderer_path_kiia_instance_deinit(void *o)
