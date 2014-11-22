@@ -249,8 +249,6 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	Eina_List *dashes_l;
 	Eina_Bool stroke_scalable;
 	double stroke_weight;
-	double swx;
-	double swy;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 
@@ -269,7 +267,6 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	dashes = enesim_renderer_shape_dashes_get(r);
 	dashes_l = dashes->l;
-	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
 
 	/* decide what generator to use */
 	/* for a stroke smaller than 1px we will use the basic
@@ -649,11 +646,6 @@ static void _kiia_span(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                               Path abstract                                *
  *----------------------------------------------------------------------------*/
-static void _kiia_path_set(Enesim_Renderer *r, Enesim_Path *path)
-{
-
-}
-
 static Eina_Bool _kiia_is_available(Enesim_Renderer *r)
 {
 	/* TODO check the current properties */
@@ -684,6 +676,15 @@ static const char * _kiia_name(Enesim_Renderer *r EINA_UNUSED)
 	return "kiia";
 }
 
+static void _kiia_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Feature *features)
+{
+	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
+			ENESIM_RENDERER_FEATURE_AFFINE |
+			ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE |
+			ENESIM_RENDERER_FEATURE_ARGB8888;
+}
+
 static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error EINA_UNUSED)
@@ -696,6 +697,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	int i;
 	int y;
 
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	/* TODO use the quality, 32 samples for now */
+	thiz->nsamples = 32;
 	/* Convert the path to a figure */
 	/* TODO later all of this will be on the generate interface */
 	if (!_kiia_figures_generate(r))
@@ -703,7 +707,6 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	if (!_kiia_edges_generate(r))
 		return EINA_FALSE;
 
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	/* setup the fill properties */
 	thiz->fill.ren = enesim_renderer_shape_fill_renderer_get(r);
 	thiz->fill.color = enesim_renderer_shape_fill_color_get(r);
@@ -732,8 +735,6 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 	}
 
-	/* TODO use the quality, 32 samples for now */
-	thiz->nsamples = 32;
 	switch (thiz->nsamples)
 	{
 		case 8:
@@ -749,10 +750,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		break;
 	}
 	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
-
+	/* TODO snap the coordinates */
 	if (!enesim_figure_bounds(thiz->current->figure, &lx, &ty, &rx, &by))
 		return EINA_FALSE;
-
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
@@ -791,15 +791,14 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _kiia_name;
+	r_klass->features_get = _kiia_features_get;
 	r_klass->sw_setup = _kiia_sw_setup;
 	r_klass->sw_hints_get = _kiia_sw_hints;
 
 	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
-	klass->path_set = _kiia_path_set;
 	klass->is_available = _kiia_is_available;
 #if 0
 	klass->sw_cleanup = _kiia_sw_cleanup;
-	klass->figure_set = _kiia_figure_set;
 #endif
 
 	/* create the sampling patterns */
