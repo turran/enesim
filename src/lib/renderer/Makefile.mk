@@ -49,6 +49,7 @@ src/lib/renderer/enesim_renderer_map_quad.c \
 src/lib/renderer/enesim_renderer_path.c \
 src/lib/renderer/enesim_renderer_path_abstract.c \
 src/lib/renderer/enesim_renderer_path_abstract_private.h \
+src/lib/renderer/enesim_renderer_path_kiia.c \
 src/lib/renderer/enesim_renderer_path_rasterizer.c \
 src/lib/renderer/enesim_renderer_pattern.c \
 src/lib/renderer/enesim_renderer_perlin.c \

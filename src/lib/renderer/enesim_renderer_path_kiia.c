@@ -23,6 +23,7 @@
 #include "enesim_color.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
+#include "enesim_path.h"
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_format.h"
@@ -39,20 +40,23 @@
 #include "enesim_list_private.h"
 #include "enesim_vector_private.h"
 #include "enesim_renderer_private.h"
-#include "enesim_rasterizer_private.h"
+#include "enesim_renderer_shape_private.h"
+#include "enesim_renderer_path_abstract_private.h"
 /* Add support for the different fill rules
  * Add support for the different qualities
+ * Modify it to handle the current_figure
+ * Make it generate both figures
  */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-#define ENESIM_RASTERIZER_KIIA(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
-		Enesim_Rasterizer_Kiia,						\
-		enesim_rasterizer_kiia_descriptor_get())
+#define ENESIM_RENDERER_PATH_KIIA(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
+		Enesim_Renderer_Path_Kiia,						\
+		enesim_renderer_path_kiia_descriptor_get())
 
 /* A worker is in charge of rasterize one span */
-typedef struct _Enesim_Rasterizer_Kiia_Worker
+typedef struct _Enesim_Renderer_Path_Kiia_Worker
 {
 	/* a span of length equal to the width of the bounds to store the sample mask */
 	uint32_t *mask;
@@ -65,10 +69,10 @@ typedef struct _Enesim_Rasterizer_Kiia_Worker
 	 * the x increment on the edges
 	 */
 	int y;
-} Enesim_Rasterizer_Kiia_Worker;
+} Enesim_Renderer_Path_Kiia_Worker;
 
 /* Its own definition of an edge */
-typedef struct _Enesim_Rasterizer_Kiia_Edge
+typedef struct _Enesim_Renderer_Path_Kiia_Edge
 {
 	/* The top/bottom coordinates rounded to increment of 1/num samples */
 	Eina_F16p16 yy0, yy1;
@@ -79,13 +83,22 @@ typedef struct _Enesim_Rasterizer_Kiia_Edge
 	/* The increment on x when y increments 1/num samples */
 	Eina_F16p16 slope;
 	int sgn;
-} Enesim_Rasterizer_Kiia_Edge;
+} Enesim_Renderer_Path_Kiia_Edge;
 
-typedef struct _Enesim_Rasterizer_Kiia
+typedef struct _Enesim_Renderer_Path_Kiia
 {
-	Enesim_Rasterizer parent;
+	Enesim_Renderer_Path_Abstract parent;
 	/* private */
+	/* To generate the figures */
+	Enesim_Path_Generator *stroke_path;
+	Enesim_Path_Generator *strokeless_path;
+	Enesim_Path_Generator *dashed_path;
+
+	/* The figures themselves */
+	Enesim_Figure *fill_figure;
+	Enesim_Figure *stroke_figure;
 	const Enesim_Figure *figure;
+
 	Eina_Bool changed;
 	Enesim_Color fcolor;
 	Enesim_Renderer *fren;
@@ -100,15 +113,15 @@ typedef struct _Enesim_Rasterizer_Kiia
 	/* the pattern to use */
 	Eina_F16p16 *pattern;
 	/* One worker per cpu */
-	Enesim_Rasterizer_Kiia_Worker *workers;
+	Enesim_Renderer_Path_Kiia_Worker *workers;
 	int nworkers;
-	Enesim_Rasterizer_Kiia_Edge *edges;
+	Enesim_Renderer_Path_Kiia_Edge *edges;
 	int nedges;
-} Enesim_Rasterizer_Kiia;
+} Enesim_Renderer_Path_Kiia;
 
-typedef struct _Enesim_Rasterizer_Kiia_Class {
-	Enesim_Rasterizer_Class parent;
-} Enesim_Rasterizer_Kiia_Class;
+typedef struct _Enesim_Renderer_Path_Kiia_Class {
+	Enesim_Renderer_Path_Abstract_Class parent;
+} Enesim_Renderer_Path_Kiia_Class;
 
 static Eina_F16p16 _kiia_pattern8[8];
 static Eina_F16p16 _kiia_pattern16[16];
@@ -116,15 +129,15 @@ static Eina_F16p16 _kiia_pattern32[32];
 
 static int _kiia_edge_sort(const void *l, const void *r)
 {
-	Enesim_Rasterizer_Kiia_Edge *lv = (Enesim_Rasterizer_Kiia_Edge *)l;
-	Enesim_Rasterizer_Kiia_Edge *rv = (Enesim_Rasterizer_Kiia_Edge *)r;
+	Enesim_Renderer_Path_Kiia_Edge *lv = (Enesim_Renderer_Path_Kiia_Edge *)l;
+	Enesim_Renderer_Path_Kiia_Edge *rv = (Enesim_Renderer_Path_Kiia_Edge *)r;
 
 	if (lv->yy0 <= rv->yy0)
 		return -1;
 	return 1;
 }
 
-static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
+static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 		Enesim_Point *p0, Enesim_Point *p1, double nsamples)
 {
 	double x0, y0, x1, y1;
@@ -175,21 +188,18 @@ static Eina_Bool _kiia_edge_setup(Enesim_Rasterizer_Kiia_Edge *thiz,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
+static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
+		int nsamples, int *nedges)
 {
-	Enesim_Rasterizer_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia_Edge *edges;
 	Enesim_Polygon *p;
-	const Enesim_Figure *f;
 	Eina_List *l1;
 	int n = 0;
-
-	thiz = ENESIM_RASTERIZER_KIIA(r);
-	f = thiz->figure;
 
 	/* allocate the maximum number of vectors possible */
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 		n += enesim_polygon_point_count(p);
-	thiz->edges = malloc(n * sizeof(Enesim_Rasterizer_Kiia_Edge));
+	edges = malloc(n * sizeof(Enesim_Renderer_Path_Kiia_Edge));
 
 	/* create the edges */
 	n = 0;
@@ -203,39 +213,39 @@ static Eina_Bool _kiia_edges_setup(Enesim_Renderer *r)
 		points = eina_list_next(p->points);
 		EINA_LIST_FOREACH(points, l2, pt)
 		{
-			Enesim_Rasterizer_Kiia_Edge *e = &thiz->edges[n];
+			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
 
-			if (_kiia_edge_setup(e, pp, pt, thiz->nsamples))
+			if (_kiia_edge_setup(e, pp, pt, nsamples))
 				n++;
 			pp = pt;
 		}
 		/* add the last point in case the polygon is closed */
 		if (p->closed)
 		{
-			Enesim_Rasterizer_Kiia_Edge *e = &thiz->edges[n];
-			if (_kiia_edge_setup(e, pp, fp, thiz->nsamples))
+			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
+			if (_kiia_edge_setup(e, pp, fp, nsamples))
 				n++;
 		}
 	}
-	thiz->nedges = n;
-	qsort(thiz->edges, thiz->nedges, sizeof(Enesim_Rasterizer_Kiia_Edge), _kiia_edge_sort);
-	return EINA_TRUE;
+	qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
+	*nedges = n;
+	return edges;
 }
 
-static inline void _kiia_even_odd_sample(Enesim_Rasterizer_Kiia_Worker *w,
+static inline void _kiia_even_odd_sample(Enesim_Renderer_Path_Kiia_Worker *w,
 		int x, int m, int winding EINA_UNUSED)
 {
 	w->mask[x] ^= m;
 }
 
-static inline uint32_t _kiia_even_odd_get_mask(Enesim_Rasterizer_Kiia_Worker *w, int i, int cm)
+static inline uint32_t _kiia_even_odd_get_mask(Enesim_Renderer_Path_Kiia_Worker *w, int i, int cm)
 {
 	cm ^= w->mask[i];
 	w->mask[i] = 0;
 	return cm;
 }
 
-static inline void _kiia_non_zero_sample(Enesim_Rasterizer_Kiia_Worker *w,
+static inline void _kiia_non_zero_sample(Enesim_Renderer_Path_Kiia_Worker *w,
 		int x, int m, int winding)
 {
 	w->mask[x] ^= m;
@@ -268,7 +278,7 @@ static inline uint16_t _kiia_16_get_alpha(int cm)
 	return coverage;
 }
 
-static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w, int i, int cm)
+static inline uint32_t _kiia_non_zero_get_mask(Enesim_Renderer_Path_Kiia_Worker *w, int i, int cm)
 {
 	uint32_t ret;
 	int m;
@@ -297,8 +307,8 @@ static inline uint32_t _kiia_non_zero_get_mask(Enesim_Rasterizer_Kiia_Worker *w,
 static void _kiia_span(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
-	Enesim_Rasterizer_Kiia *thiz;
-	Enesim_Rasterizer_Kiia_Worker *w;
+	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia_Worker *w;
 	Eina_F16p16 yy0, yy1;
 	Eina_F16p16 sinc;
 	uint32_t *dst = ddata;
@@ -308,7 +318,7 @@ static void _kiia_span(Enesim_Renderer *r,
 	int rx, mrx = -INT_MAX;
 	int i;
 
-	thiz = ENESIM_RASTERIZER_KIIA(r);
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	w = &thiz->workers[y % thiz->nworkers];
 
 	yy0 = eina_f16p16_int_from(y);
@@ -317,7 +327,7 @@ static void _kiia_span(Enesim_Renderer *r,
 	/* intersect with each edge */
 	for (i = 0; i < thiz->nedges; i++)
 	{
-		Enesim_Rasterizer_Kiia_Edge *edge = &thiz->edges[i];
+		Enesim_Renderer_Path_Kiia_Edge *edge = &thiz->edges[i];
 		Eina_F16p16 *pattern;
 		Eina_F16p16 yyy0, yyy1;
 		Eina_F16p16 cx;
@@ -511,14 +521,31 @@ next:
 	w->cwinding = 0;
 }
 /*----------------------------------------------------------------------------*
- *                           Rasterizer interface                             *
+ *                               Path abstract                                *
  *----------------------------------------------------------------------------*/
+static void _kiia_path_generate(Enesim_Renderer *r, Enesim_Path *path)
+{
+
+}
+
+static void _kiia_path_set(Enesim_Renderer *r, Enesim_Path *path)
+{
+
+}
+
+static Eina_Bool _kiia_is_available(Enesim_Renderer *r)
+{
+	/* TODO check the current properties */
+	return EINA_TRUE;
+}
+
+#if 0
 static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
-	Enesim_Rasterizer_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia *thiz;
 	int i;
 
-	thiz = ENESIM_RASTERIZER_KIIA(r);
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	enesim_renderer_unref(thiz->fren);
 	/* cleanup the workers */
 	for (i = 0; i < thiz->nworkers; i++)
@@ -530,15 +557,15 @@ static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 
 static void _kiia_figure_set(Enesim_Renderer *r, const Enesim_Figure *f)
 {
-	Enesim_Rasterizer_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia *thiz;
 
-	thiz = ENESIM_RASTERIZER_KIIA(r);
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	thiz->figure = f;
 	thiz->changed = EINA_TRUE;
 }
-
+#endif
 /*----------------------------------------------------------------------------*
- *                    The Enesim's rasterizer interface                       *
+ *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
 static const char * _kiia_name(Enesim_Renderer *r EINA_UNUSED)
 {
@@ -549,14 +576,15 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error EINA_UNUSED)
 {
-	Enesim_Rasterizer_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Color color;
 	double lx, rx, ty, by;
 	int len;
 	int i;
 	int y;
 
-	thiz = ENESIM_RASTERIZER_KIIA(r);
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	/* TODO generate the figures in case we need to */
 	/* TODO use the quality, 32 samples for now */
 	thiz->nsamples = 32;
 	switch (thiz->nsamples)
@@ -585,7 +613,8 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 			thiz->nedges = 0;
 		}
 		/* create the edges */
-		if (!_kiia_edges_setup(r))
+		thiz->edges = _kiia_edges_setup(thiz->figure, thiz->nsamples, &thiz->nedges);
+		if (!thiz->edges)
 			return EINA_FALSE;
 	}
 	if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
@@ -623,23 +652,27 @@ static void _kiia_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
-ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RASTERIZER_DESCRIPTOR,
-		Enesim_Rasterizer_Kiia, Enesim_Rasterizer_Kiia_Class,
-		enesim_rasterizer_kiia);
+ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR,
+		Enesim_Renderer_Path_Kiia, Enesim_Renderer_Path_Kiia_Class,
+		enesim_renderer_path_kiia);
 
-static void _enesim_rasterizer_kiia_class_init(void *k)
+static void _enesim_renderer_path_kiia_class_init(void *k)
 {
 	Enesim_Renderer_Class *r_klass;
-	Enesim_Rasterizer_Class *klass;
+	Enesim_Renderer_Path_Abstract_Class *klass;
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _kiia_name;
 	r_klass->sw_setup = _kiia_sw_setup;
 	r_klass->sw_hints_get = _kiia_sw_hints;
 
-	klass = ENESIM_RASTERIZER_CLASS(k);
+	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
+	klass->path_set = _kiia_path_set;
+	klass->is_available = _kiia_is_available;
+#if 0
 	klass->sw_cleanup = _kiia_sw_cleanup;
 	klass->figure_set = _kiia_figure_set;
+#endif
 
 	/* create the sampling patterns */
 	/* 8x8 sparse supersampling mask:
@@ -764,20 +797,20 @@ static void _enesim_rasterizer_kiia_class_init(void *k)
 	_kiia_pattern32[31] = eina_f16p16_double_from(19.0/32.0);
 }
 
-static void _enesim_rasterizer_kiia_instance_init(void *o)
+static void _enesim_renderer_path_kiia_instance_init(void *o)
 {
-	Enesim_Rasterizer_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia *thiz;
 
-	thiz = ENESIM_RASTERIZER_KIIA(o);
+	thiz = ENESIM_RENDERER_PATH_KIIA(o);
 	thiz->nworkers = enesim_renderer_sw_cpu_count();
-	thiz->workers = calloc(thiz->nworkers, sizeof(Enesim_Rasterizer_Kiia_Worker));
+	thiz->workers = calloc(thiz->nworkers, sizeof(Enesim_Renderer_Path_Kiia_Worker));
 }
 
-static void _enesim_rasterizer_kiia_instance_deinit(void *o)
+static void _enesim_renderer_path_kiia_instance_deinit(void *o)
 {
-	Enesim_Rasterizer_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia *thiz;
 
-	thiz = ENESIM_RASTERIZER_KIIA(o);
+	thiz = ENESIM_RENDERER_PATH_KIIA(o);
 	if (thiz->edges)
 	{
 		free(thiz->edges);
@@ -788,11 +821,11 @@ static void _enesim_rasterizer_kiia_instance_deinit(void *o)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Renderer * enesim_rasterizer_kiia_new(void)
+Enesim_Renderer * enesim_renderer_path_kiia_new(void)
 {
 	Enesim_Renderer *r;
 
-	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_rasterizer_kiia);
+	r = ENESIM_OBJECT_INSTANCE_NEW(enesim_renderer_path_kiia);
 	return r;
 }
 /** @endcond */

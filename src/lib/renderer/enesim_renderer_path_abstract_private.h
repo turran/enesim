@@ -75,6 +75,7 @@ Eina_Bool enesim_renderer_path_abstract_needs_generate(Enesim_Renderer *r);
 void enesim_renderer_path_abstract_cleanup(Enesim_Renderer *r);
 
 /* abstract implementations */
+Enesim_Renderer * enesim_renderer_path_kiia_new(void);
 Enesim_Renderer * enesim_renderer_path_enesim_new(void);
 #if BUILD_OPENGL
 Enesim_Renderer * enesim_renderer_path_nv_new(void);

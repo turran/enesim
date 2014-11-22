@@ -55,7 +55,6 @@
 /* In case this is set, if the path has a stroke, only the stroke will be
  * rendered
  */
-#define KIIA 1
 #define WIREFRAME 0
 
 #define ENESIM_RENDERER_PATH_ENESIM(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
@@ -68,7 +67,6 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	/* properties */
 	/* private */
 	Enesim_Renderer *bifigure;
-	Enesim_Renderer *kiia;
 } Enesim_Renderer_Path_Enesim;
 
 typedef struct _Enesim_Renderer_Path_Enesim_Class
@@ -82,11 +80,7 @@ static void _enesim_renderer_path_rasterizer_span(Enesim_Renderer *r,
 	Enesim_Renderer_Path_Enesim *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-#if KIIA
-	enesim_renderer_sw_draw(thiz->kiia, x, y, len, ddata);
-#else
 	enesim_renderer_sw_draw(thiz->bifigure, x, y, len, ddata);
-#endif
 }
 
 static void _enesim_renderer_path_rasterizer_generate_figures(Enesim_Renderer *r)
@@ -98,9 +92,6 @@ static void _enesim_renderer_path_rasterizer_generate_figures(Enesim_Renderer *r
  	parent = ENESIM_RENDERER_PATH_ABSTRACT(r);
 
 	enesim_renderer_path_abstract_generate(r);
-#if KIIA
-	enesim_rasterizer_figure_set(thiz->kiia, parent->fill_figure);
-#else
 #if WIREFRAME
 	if (parent->stroke_figure_used)
 		enesim_rasterizer_figure_set(thiz->bifigure, parent->stroke_figure);
@@ -111,7 +102,6 @@ static void _enesim_renderer_path_rasterizer_generate_figures(Enesim_Renderer *r
 	enesim_rasterizer_figure_set(thiz->bifigure, parent->fill_figure);
 	/* set the stroke figure on the bifigure as its over polys */
 	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, parent->stroke_figure_used ? parent->stroke_figure : NULL);
-#endif
 #endif
 }
 
@@ -143,7 +133,6 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 		Enesim_Rop rop, Enesim_Renderer_Sw_Fill *draw, Enesim_Log **l)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Renderer *implementation;
 	Enesim_Renderer_Shape *bifigure_shape;
 	Enesim_Renderer *m;
 	const Enesim_Renderer_State *cs;
@@ -159,15 +148,10 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 	{
 		_enesim_renderer_path_rasterizer_generate_figures(r);
 	}
-#if KIIA
-	implementation = thiz->kiia;
-#else
 #if WIREFRAME
 	enesim_renderer_shape_draw_mode_set(thiz->bifigure, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 #else
 	enesim_renderer_shape_draw_mode_set(thiz->bifigure, css->current.draw_mode);
-	implementation = thiz->bifigure;
-#endif
 #endif
 	/* FIXME the logic on the bifigure depends on the stroke weight and the transformation
 	 * matrix. We always pass an identity transformation matrix so the calculation of the
@@ -175,23 +159,23 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 	 * weight to avoid such case
 	 */
 	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
-	enesim_renderer_shape_stroke_weight_set(implementation, swx > swy ? swx * 2: swy * 2);
-	enesim_renderer_shape_stroke_color_set(implementation, css->current.stroke.color);
-	enesim_renderer_shape_stroke_renderer_set(implementation, enesim_renderer_ref(css->current.stroke.r));
-	enesim_renderer_shape_fill_color_set(implementation, css->current.fill.color);
-	enesim_renderer_shape_fill_renderer_set(implementation, enesim_renderer_ref(css->current.fill.r));
-	enesim_renderer_shape_fill_rule_set(implementation, css->current.fill.rule);
+	enesim_renderer_shape_stroke_weight_set(thiz->bifigure, swx > swy ? swx * 2: swy * 2);
+	enesim_renderer_shape_stroke_color_set(thiz->bifigure, css->current.stroke.color);
+	enesim_renderer_shape_stroke_renderer_set(thiz->bifigure, enesim_renderer_ref(css->current.stroke.r));
+	enesim_renderer_shape_fill_color_set(thiz->bifigure, css->current.fill.color);
+	enesim_renderer_shape_fill_renderer_set(thiz->bifigure, enesim_renderer_ref(css->current.fill.r));
+	enesim_renderer_shape_fill_rule_set(thiz->bifigure, css->current.fill.rule);
 
 	/* propagate the common renderer properties manually, because calling
 	 * enesim_renderer_propagate() will also set the transformation which
 	 * is something we dont want
 	 */
 	m = enesim_renderer_mask_get(r);
-	enesim_renderer_color_set(implementation, cs->current.color);
-	enesim_renderer_origin_set(implementation, cs->current.ox, cs->current.oy);
-	enesim_renderer_mask_set(implementation, m);
+	enesim_renderer_color_set(thiz->bifigure, cs->current.color);
+	enesim_renderer_origin_set(thiz->bifigure, cs->current.ox, cs->current.oy);
+	enesim_renderer_mask_set(thiz->bifigure, m);
 	/* pass the dashes */
-	bifigure_shape = ENESIM_RENDERER_SHAPE(implementation);
+	bifigure_shape = ENESIM_RENDERER_SHAPE(thiz->bifigure);
 	if (bifigure_shape->state.dashes)
 	{
 		enesim_list_unref(bifigure_shape->state.dashes);
@@ -199,7 +183,7 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 	bifigure_shape->state.dashes = enesim_list_ref(css->dashes);
 
 	/* finally do the setup */
-	if (!enesim_renderer_setup(implementation, s, rop, l))
+	if (!enesim_renderer_setup(thiz->bifigure, s, rop, l))
 	{
 		return EINA_FALSE;
 	}
@@ -214,11 +198,6 @@ static void _enesim_renderer_path_rasterizer_sw_cleanup(Enesim_Renderer *r, Enes
 	Enesim_Renderer_Path_Enesim *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
-#if KIIA
-	enesim_renderer_cleanup(thiz->kiia, s);
-#else
-	enesim_renderer_cleanup(thiz->bifigure, s);
-#endif
 	enesim_renderer_path_abstract_cleanup(r);
 }
 /*----------------------------------------------------------------------------*
@@ -355,7 +334,6 @@ static void _enesim_renderer_path_enesim_instance_init(void *o)
 
 	r = enesim_rasterizer_bifigure_new();
 	thiz->bifigure = r;
-	thiz->kiia = enesim_rasterizer_kiia_new();
 
 	/* FIXME for now */
 	enesim_renderer_shape_stroke_join_set(ENESIM_RENDERER(o), ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND);
