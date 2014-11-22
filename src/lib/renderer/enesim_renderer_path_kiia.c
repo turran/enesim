@@ -106,8 +106,8 @@ typedef struct _Enesim_Renderer_Path_Kiia
 	/* The figures themselves */
 	Enesim_Renderer_Path_Kiia_Figure fill;
 	Enesim_Renderer_Path_Kiia_Figure stroke;
+	Enesim_Renderer_Path_Kiia_Figure *current;
 
-	Eina_Bool changed;
 	/* The coordinates of the figure */
 	int lx;
 	int rx;
@@ -121,13 +121,6 @@ typedef struct _Enesim_Renderer_Path_Kiia
 	/* One worker per cpu */
 	Enesim_Renderer_Path_Kiia_Worker *workers;
 	int nworkers;
-
-	/* TODO remove this */
-	Enesim_Color fcolor;
-	Enesim_Renderer *fren;
-	const Enesim_Figure *figure;
-	Enesim_Renderer_Path_Kiia_Edge *edges;
-	int nedges;
 } Enesim_Renderer_Path_Kiia;
 
 typedef struct _Enesim_Renderer_Path_Kiia_Class {
@@ -324,15 +317,21 @@ static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r)
 	Enesim_Renderer_Shape_Draw_Mode dm;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	
+	if (thiz->fill.edges)
+	{
+		free(thiz->fill.edges);
+		thiz->fill.edges = NULL;
+	}
+
+	if (thiz->stroke.edges)
+	{
+		free(thiz->stroke.edges);
+		thiz->stroke.edges = NULL;
+	}
+
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
-		if (thiz->fill.edges)
-		{
-			free(thiz->fill.edges);
-			thiz->fill.edges = NULL;
-		}
 		thiz->fill.edges = _kiia_edges_setup(thiz->fill.figure,
 				thiz->nsamples, &thiz->fill.nedges);
 		if (!thiz->fill.edges)
@@ -340,11 +339,6 @@ static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r)
 	}
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
-		if (thiz->stroke.edges)
-		{
-			free(thiz->stroke.edges);
-			thiz->stroke.edges = NULL;
-		}
 		thiz->stroke.edges = _kiia_edges_setup(thiz->stroke.figure,
 				thiz->nsamples, &thiz->stroke.nedges);
 		if (!thiz->stroke.edges)
@@ -425,8 +419,9 @@ static inline uint32_t _kiia_non_zero_get_mask(Enesim_Renderer_Path_Kiia_Worker 
 	return ret;
 }
 
-static void _kiia_span(Enesim_Renderer *r,
-		int x, int y, int len, void *ddata)
+static inline void _kiia_figure_draw(Enesim_Renderer *r,
+		Enesim_Renderer_Path_Kiia_Figure *f, int x, int y, int len,
+		void *ddata)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Renderer_Path_Kiia_Worker *w;
@@ -446,9 +441,9 @@ static void _kiia_span(Enesim_Renderer *r,
 	yy1 = eina_f16p16_int_from(y + 1);
 	sinc = thiz->inc;
 	/* intersect with each edge */
-	for (i = 0; i < thiz->nedges; i++)
+	for (i = 0; i < f->nedges; i++)
 	{
-		Enesim_Renderer_Path_Kiia_Edge *edge = &thiz->edges[i];
+		Enesim_Renderer_Path_Kiia_Edge *edge = &f->edges[i];
 		Eina_F16p16 *pattern;
 		Eina_F16p16 yyy0, yyy1;
 		Eina_F16p16 cx;
@@ -561,9 +556,9 @@ static void _kiia_span(Enesim_Renderer *r,
 
 	/* time to draw */
  	end = dst + len;
-	if (thiz->fren)
+	if (f->ren)
 	{
-		enesim_renderer_sw_draw(thiz->fren, x, y, len, dst);
+		enesim_renderer_sw_draw(f->ren, x, y, len, dst);
 	}
 	/* iterate over the mask and fill */ 
 	while (dst < end)
@@ -578,12 +573,12 @@ static void _kiia_span(Enesim_Renderer *r,
 		w->mask[i] = 0;
 		if (cm == 0xffffffff)
 		{
-			if (thiz->fren)
+			if (f->ren)
 			{
-				if (thiz->fcolor != 0xffffffff)
+				if (f->color != 0xffffffff)
 				{
 					p0 = *dst;
-					p0 = enesim_color_mul4_sym(p0, thiz->fcolor);
+					p0 = enesim_color_mul4_sym(p0, f->color);
 				}
 				else
 				{
@@ -592,7 +587,7 @@ static void _kiia_span(Enesim_Renderer *r,
 			}
 			else
 			{
-				p0 = thiz->fcolor;
+				p0 = f->color;
 			}
 		}
 		else if (cm == 0)
@@ -604,17 +599,17 @@ static void _kiia_span(Enesim_Renderer *r,
 			uint16_t coverage;
 
 			coverage = _kiia_32_get_alpha(cm);
-			if (thiz->fren)
+			if (f->ren)
 			{
 				uint32_t q0 = *dst;
 
-				if (thiz->fcolor != 0xffffffff)
-					q0 = enesim_color_mul4_sym(thiz->fcolor, q0);
+				if (f->color != 0xffffffff)
+					q0 = enesim_color_mul4_sym(f->color, q0);
 				p0 = enesim_color_mul_256(coverage, q0);
 			}
 			else
 			{
-				p0 = enesim_color_mul_256(coverage, thiz->fcolor);
+				p0 = enesim_color_mul_256(coverage, f->color);
 			}
 		}
 		*dst = p0;
@@ -640,6 +635,16 @@ next:
 	/* update the latest y coordinate of the worker */
 	w->y = y;
 	w->cwinding = 0;
+
+}
+
+static void _kiia_span(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	_kiia_figure_draw(r, thiz->current, x, y, len, ddata);
 }
 /*----------------------------------------------------------------------------*
  *                               Path abstract                                *
@@ -670,15 +675,6 @@ static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 		free(thiz->workers[i].winding);
 	}
 }
-
-static void _kiia_figure_set(Enesim_Renderer *r, const Enesim_Figure *f)
-{
-	Enesim_Renderer_Path_Kiia *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	thiz->figure = f;
-	thiz->changed = EINA_TRUE;
-}
 #endif
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
@@ -693,6 +689,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *draw, Enesim_Log **error EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Shape_Draw_Mode dm;
 	Enesim_Color color;
 	double lx, rx, ty, by;
 	int len;
@@ -707,6 +704,34 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		return EINA_FALSE;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	/* setup the fill properties */
+	thiz->fill.ren = enesim_renderer_shape_fill_renderer_get(r);
+	thiz->fill.color = enesim_renderer_shape_fill_color_get(r);
+	/* setup the stroke properties */
+	thiz->stroke.ren = enesim_renderer_shape_stroke_renderer_get(r);
+	thiz->stroke.color = enesim_renderer_shape_stroke_color_get(r);
+	/* simplify the calcs */
+	color = enesim_renderer_color_get(r);
+	if (color != ENESIM_COLOR_FULL)
+	{
+		thiz->stroke.color = enesim_color_mul4_sym(thiz->stroke.color, color);
+		thiz->fill.color = enesim_color_mul4_sym(thiz->fill.color, color);
+	}
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	{
+		thiz->current = &thiz->fill;
+	}
+	else if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	{
+		thiz->current = &thiz->stroke;
+	}
+	else
+	{
+		/* TODO handle both at once */
+		return EINA_FALSE;
+	}
+
 	/* TODO use the quality, 32 samples for now */
 	thiz->nsamples = 32;
 	switch (thiz->nsamples)
@@ -725,28 +750,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	}
 	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
 
-	if (thiz->changed)
-	{
-		thiz->changed = EINA_FALSE;
-		if (thiz->edges)
-		{
-			free(thiz->edges);
-			thiz->edges = NULL;
-			thiz->nedges = 0;
-		}
-		/* create the edges */
-		thiz->edges = _kiia_edges_setup(thiz->figure, thiz->nsamples, &thiz->nedges);
-		if (!thiz->edges)
-			return EINA_FALSE;
-	}
-	if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
+	if (!enesim_figure_bounds(thiz->current->figure, &lx, &ty, &rx, &by))
 		return EINA_FALSE;
 
-	thiz->fren = enesim_renderer_shape_fill_renderer_get(r);
-	thiz->fcolor = enesim_renderer_shape_fill_color_get(r);
-	color = enesim_renderer_color_get(r);
-	if (color != ENESIM_COLOR_FULL)
-		thiz->fcolor = enesim_color_mul4_sym(thiz->fcolor, color);
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
@@ -938,11 +944,19 @@ static void _enesim_renderer_path_kiia_instance_deinit(void *o)
 	Enesim_Renderer_Path_Kiia *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(o);
-	if (thiz->edges)
-	{
-		free(thiz->edges);
-		thiz->edges = NULL;
-	}
+	/* Remove the figures */
+	if (thiz->stroke.figure)
+		enesim_figure_delete(thiz->stroke.figure);
+	if (thiz->fill.figure)
+		enesim_figure_delete(thiz->fill.figure);
+	/* Remove the figure generators */
+	if (thiz->dashed_path)
+		enesim_path_generator_free(thiz->dashed_path);
+	if (thiz->strokeless_path)
+		enesim_path_generator_free(thiz->strokeless_path);
+	if (thiz->stroke_path)
+		enesim_path_generator_free(thiz->stroke_path);
+	/* Remove the workers */
 	free(thiz->workers);
 }
 /*============================================================================*
