@@ -98,11 +98,6 @@ typedef struct _Enesim_Renderer_Path_Kiia
 {
 	Enesim_Renderer_Path_Abstract parent;
 	/* private */
-	/* To generate the figures */
-	Enesim_Path_Generator *stroke_path;
-	Enesim_Path_Generator *strokeless_path;
-	Enesim_Path_Generator *dashed_path;
-
 	/* The figures themselves */
 	Enesim_Renderer_Path_Kiia_Figure fill;
 	Enesim_Renderer_Path_Kiia_Figure stroke;
@@ -276,13 +271,13 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) 
 	{
 		if (!dashes_l)
-			generator = thiz->stroke_path;
+			generator = enesim_path_generator_stroke_dashless_new();
 		else
-			generator = thiz->dashed_path;
+			generator = enesim_path_generator_dashed_new();
 	}
 	else
 	{
-		generator = thiz->strokeless_path;
+		generator = enesim_path_generator_strokeless_new();
 	}
 	enesim_list_unref(dashes);
 
@@ -305,6 +300,8 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	/* Finall generate the figures */
 	pa = ENESIM_RENDERER_PATH_ABSTRACT(r);
 	enesim_path_generator_generate(generator, pa->path->commands);
+	/* Remove the figure generators */
+	enesim_path_generator_free(generator);
 	return EINA_TRUE;
 }
 
@@ -925,11 +922,6 @@ static void _enesim_renderer_path_kiia_instance_init(void *o)
 	thiz = ENESIM_RENDERER_PATH_KIIA(o);
 	thiz->nworkers = enesim_renderer_sw_cpu_count();
 	thiz->workers = calloc(thiz->nworkers, sizeof(Enesim_Renderer_Path_Kiia_Worker));
-
-	/* create the different path implementations */
-	thiz->stroke_path = enesim_path_generator_stroke_dashless_new();
-	thiz->strokeless_path = enesim_path_generator_strokeless_new();
-	thiz->dashed_path = enesim_path_generator_dashed_new();
 }
 
 static void _enesim_renderer_path_kiia_instance_deinit(void *o)
@@ -942,13 +934,6 @@ static void _enesim_renderer_path_kiia_instance_deinit(void *o)
 		enesim_figure_delete(thiz->stroke.figure);
 	if (thiz->fill.figure)
 		enesim_figure_delete(thiz->fill.figure);
-	/* Remove the figure generators */
-	if (thiz->dashed_path)
-		enesim_path_generator_free(thiz->dashed_path);
-	if (thiz->strokeless_path)
-		enesim_path_generator_free(thiz->strokeless_path);
-	if (thiz->stroke_path)
-		enesim_path_generator_free(thiz->stroke_path);
 	/* Remove the workers */
 	free(thiz->workers);
 }
