@@ -52,7 +52,7 @@
  *============================================================================*/
 /** @cond internal */
 #define ENESIM_RENDERER_PATH_KIIA(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
-		Enesim_Renderer_Path_Kiia,						\
+		Enesim_Renderer_Path_Kiia,					\
 		enesim_renderer_path_kiia_descriptor_get())
 
 /* A worker is in charge of rasterize one span */
@@ -200,7 +200,7 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	Eina_List *l1;
 	int n = 0;
 
-	/* allocate the maximum number of vectors possible */
+	/* allocate the maximum number of possible edges */
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 		n += enesim_polygon_point_count(p);
 	edges = malloc(n * sizeof(Enesim_Renderer_Path_Kiia_Edge));
@@ -646,28 +646,6 @@ static void _kiia_span(Enesim_Renderer *r,
 /*----------------------------------------------------------------------------*
  *                               Path abstract                                *
  *----------------------------------------------------------------------------*/
-static Eina_Bool _kiia_is_available(Enesim_Renderer *r)
-{
-	/* TODO check the current properties */
-	return EINA_TRUE;
-}
-
-#if 0
-static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
-{
-	Enesim_Renderer_Path_Kiia *thiz;
-	int i;
-
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	enesim_renderer_unref(thiz->fren);
-	/* cleanup the workers */
-	for (i = 0; i < thiz->nworkers; i++)
-	{
-		free(thiz->workers[i].mask);
-		free(thiz->workers[i].winding);
-	}
-}
-#endif
 /*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
@@ -772,6 +750,22 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
+static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+	int i;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	enesim_renderer_unref(thiz->fill.ren);
+	enesim_renderer_unref(thiz->stroke.ren);
+	/* cleanup the workers */
+	for (i = 0; i < thiz->nworkers; i++)
+	{
+		free(thiz->workers[i].mask);
+		free(thiz->workers[i].winding);
+	}
+}
+
 static void _kiia_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Rop rop EINA_UNUSED, Enesim_Renderer_Sw_Hint *hints)
 {
@@ -787,19 +781,19 @@ ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR,
 static void _enesim_renderer_path_kiia_class_init(void *k)
 {
 	Enesim_Renderer_Class *r_klass;
+	Enesim_Renderer_Shape_Class *s_klass;
 	Enesim_Renderer_Path_Abstract_Class *klass;
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _kiia_name;
 	r_klass->features_get = _kiia_features_get;
-	r_klass->sw_setup = _kiia_sw_setup;
 	r_klass->sw_hints_get = _kiia_sw_hints;
 
+	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	s_klass->sw_setup = _kiia_sw_setup;
+	s_klass->sw_cleanup = _kiia_sw_cleanup;
+
 	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
-	klass->is_available = _kiia_is_available;
-#if 0
-	klass->sw_cleanup = _kiia_sw_cleanup;
-#endif
 
 	/* create the sampling patterns */
 	/* 8x8 sparse supersampling mask:
