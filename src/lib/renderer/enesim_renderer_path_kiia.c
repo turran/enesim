@@ -413,24 +413,19 @@ static inline uint32_t _kiia_non_zero_get_mask(Enesim_Renderer_Path_Kiia_Worker 
 	return ret;
 }
 
-static inline void _kiia_figure_draw(Enesim_Renderer *r,
-		Enesim_Renderer_Path_Kiia_Figure *f, int x, int y, int len,
-		void *ddata)
+static inline void _kiia_figure_evalute_non_zero(Enesim_Renderer *r,
+		Enesim_Renderer_Path_Kiia_Figure *f, int *lx, int *rx, int y)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Renderer_Path_Kiia_Worker *w;
 	Eina_F16p16 yy0, yy1;
 	Eina_F16p16 sinc;
-	uint32_t *dst = ddata;
-	uint32_t *end, *rend = dst + len;
-	uint32_t cm = 0;
-	int lx, mlx = INT_MAX;
-	int rx, mrx = -INT_MAX;
+	int mlx = INT_MAX;
+	int mrx = -INT_MAX;
 	int i;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	w = &thiz->workers[y % thiz->nworkers];
-
 	yy0 = eina_f16p16_int_from(y);
 	yy1 = eina_f16p16_int_from(y + 1);
 	sinc = thiz->inc;
@@ -500,7 +495,28 @@ static inline void _kiia_figure_draw(Enesim_Renderer *r,
 			m <<= 1;
 		}
 	}
+	*lx = mlx;
+	*rx = mrx;
+}
 
+static inline void _kiia_figure_draw(Enesim_Renderer *r,
+		Enesim_Renderer_Path_Kiia_Figure *f, int x, int y, int len,
+		void *ddata)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia_Worker *w;
+	uint32_t *dst = ddata;
+	uint32_t *end, *rend = dst + len;
+	uint32_t cm = 0;
+	int lx, mlx;
+	int rx, mrx;
+	int i;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	w = &thiz->workers[y % thiz->nworkers];
+
+	/* evaluate the edges at y */
+	_kiia_figure_evalute_non_zero(r, f, &mlx, &mrx, y);
 	/* does not intersect with anything */
 	if (mlx == INT_MAX)
 	{
