@@ -315,7 +315,8 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(		\
 	{									\
 		uint32_t p0;							\
 										\
-		cm = _kiia_even_odd_get_mask(mask, i, cm, winding, &cwinding);	\
+		cm = _kiia_##fill_mode##_get_mask(mask, i, cm, winding,		\
+				 &cwinding);					\
 		if (!_kiia_figure_##fill##_fill(f, cm, dst, &p0))		\
 			goto next;						\
 		*dst = p0;							\
