@@ -343,6 +343,8 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 			thiz->current = &thiz->stroke;
 		if (thiz->current->ren)
 			has_renderer = EINA_TRUE;
+		if (!enesim_figure_bounds(thiz->current->figure, &lx, &ty, &rx, &by))
+			return EINA_FALSE;
 		*draw = _fill_simple[ENESIM_QUALITY_BEST][fr][has_renderer];
 	}
 
@@ -361,9 +363,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		break;
 	}
 	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
-	/* TODO snap the coordinates */
-	if (!enesim_figure_bounds(thiz->current->figure, &lx, &ty, &rx, &by))
-		return EINA_FALSE;
+	/* TODO snap the coordinates lx, rx, ty and by */
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
