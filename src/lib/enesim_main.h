@@ -65,7 +65,7 @@ typedef enum _Enesim_Quality
 	ENESIM_QUALITY_FAST, /**< Lower quality, fastest */
 } Enesim_Quality;
 
-#define ENESIM_QUALITY_FAST (ENESIM_QUALITY_FAST + 1)
+#define ENESIM_QUALITY_LAST (ENESIM_QUALITY_FAST + 1)
 
 /**
  * Priorities

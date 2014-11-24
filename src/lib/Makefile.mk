@@ -85,6 +85,7 @@ endif
 src_lib_libenesim_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib \
 -I$(top_srcdir)/src/lib/renderer \
+-I$(top_srcdir)/src/lib/renderer/kiia \
 -I$(top_srcdir)/src/lib/object \
 -I$(top_srcdir)/src/lib/curve \
 -I$(top_srcdir)/src/lib/path \

@@ -17,31 +17,9 @@
 */
 #include "enesim_private.h"
 #include <math.h>
+#include <float.h>
+#include "enesim_renderer_path_kiia_private.h"
 
-#include "enesim_main.h"
-#include "enesim_log.h"
-#include "enesim_color.h"
-#include "enesim_rectangle.h"
-#include "enesim_matrix.h"
-#include "enesim_path.h"
-#include "enesim_pool.h"
-#include "enesim_buffer.h"
-#include "enesim_format.h"
-#include "enesim_surface.h"
-#include "enesim_renderer.h"
-#include "enesim_renderer_shape.h"
-#include "enesim_object_descriptor.h"
-#include "enesim_object_class.h"
-#include "enesim_object_instance.h"
-
-#include "enesim_color_private.h"
-#include "enesim_color_fill_private.h"
-#include "enesim_color_mul4_sym_private.h"
-#include "enesim_list_private.h"
-#include "enesim_vector_private.h"
-#include "enesim_renderer_private.h"
-#include "enesim_renderer_shape_private.h"
-#include "enesim_renderer_path_abstract_private.h"
 /* Add support for the different fill rules
  * Add support for the different qualities
  * Modify it to handle the current_figure
@@ -51,77 +29,6 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-#define ENESIM_RENDERER_PATH_KIIA(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
-		Enesim_Renderer_Path_Kiia,					\
-		enesim_renderer_path_kiia_descriptor_get())
-
-/* A worker is in charge of rasterize one span */
-typedef struct _Enesim_Renderer_Path_Kiia_Worker
-{
-	/* a span of length equal to the width of the bounds to store the sample mask */
-	uint32_t *mask;
-	/* a span of length equal to the width of the bounds * nsamples to
-	 * store the sample winding
-	 */
-	uint32_t *winding;
-	int cwinding;
-	/* keep track of the current Y this worker is doing, to ease
-	 * the x increment on the edges
-	 */
-	int y;
-} Enesim_Renderer_Path_Kiia_Worker;
-
-/* Its own definition of an edge */
-typedef struct _Enesim_Renderer_Path_Kiia_Edge
-{
-	/* The top/bottom coordinates rounded to increment of 1/num samples */
-	Eina_F16p16 yy0, yy1;
-	/* The left/right coordinates in fixed point */
-	Eina_F16p16 xx0, xx1;
-	/* The x coordinate at yy0 */
-	Eina_F16p16 mx;
-	/* The increment on x when y increments 1/num samples */
-	Eina_F16p16 slope;
-	int sgn;
-} Enesim_Renderer_Path_Kiia_Edge;
-
-typedef struct _Enesim_Renderer_Path_Kiia_Figure
-{
-	Enesim_Figure *figure;
-	Enesim_Renderer_Path_Kiia_Edge *edges;
-	int nedges;
-	Enesim_Renderer *ren;
-	Enesim_Color color;
-} Enesim_Renderer_Path_Kiia_Figure;
-
-typedef struct _Enesim_Renderer_Path_Kiia
-{
-	Enesim_Renderer_Path_Abstract parent;
-	/* private */
-	/* The figures themselves */
-	Enesim_Renderer_Path_Kiia_Figure fill;
-	Enesim_Renderer_Path_Kiia_Figure stroke;
-	Enesim_Renderer_Path_Kiia_Figure *current;
-
-	/* The coordinates of the figure */
-	int lx;
-	int rx;
-	Eina_F16p16 llx;
-	/* The number of samples (8, 16, 32) */
-	int nsamples;
-	/* the increment on the y direction (i.e 1/num samples) */
-	Eina_F16p16 inc;
-	/* the pattern to use */
-	Eina_F16p16 *pattern;
-	/* One worker per cpu */
-	Enesim_Renderer_Path_Kiia_Worker *workers;
-	int nworkers;
-} Enesim_Renderer_Path_Kiia;
-
-typedef struct _Enesim_Renderer_Path_Kiia_Class {
-	Enesim_Renderer_Path_Abstract_Class parent;
-} Enesim_Renderer_Path_Kiia_Class;
-
 static Eina_F16p16 _kiia_pattern8[8];
 static Eina_F16p16 _kiia_pattern16[16];
 static Eina_F16p16 _kiia_pattern32[32];
@@ -341,320 +248,32 @@ static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r)
 	return EINA_TRUE;
 }
 
-static inline void _kiia_even_odd_sample(Enesim_Renderer_Path_Kiia_Worker *w,
-		int x, int m, int winding EINA_UNUSED)
-{
-	w->mask[x] ^= m;
-}
-
-static inline uint32_t _kiia_even_odd_get_mask(Enesim_Renderer_Path_Kiia_Worker *w, int i, int cm)
-{
-	cm ^= w->mask[i];
-	w->mask[i] = 0;
-	return cm;
-}
-
-static inline void _kiia_non_zero_sample(Enesim_Renderer_Path_Kiia_Worker *w,
-		int x, int m, int winding)
-{
-	w->mask[x] ^= m;
-	w->winding[x] += winding;
-}
-
-static inline uint16_t _kiia_32_get_alpha(int cm)
-{
-	uint16_t coverage;
-
-	/* use the hamming weight to know the number of bits set to 1 */
-	cm = cm - ((cm >> 1) & 0x55555555);
-	cm = (cm & 0x33333333) + ((cm >> 2) & 0x33333333);
-	/* we use 21 instead of 24, because we need to rescale 32 -> 256 */
-	coverage = (((cm + (cm >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 21;
-
-	return coverage;
-}
-
-static inline uint16_t _kiia_16_get_alpha(int cm)
-{
-	uint16_t coverage;
-
-	/* use the hamming weight to know the number of bits set to 1 */
-	cm = cm - ((cm >> 1) & 0x55555555);
-	cm = (cm & 0x33333333) + ((cm >> 2) & 0x33333333);
-	/* we use 20 instead of 24, because we need to rescale 16 -> 256 */
-	coverage = (((cm + (cm >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 20;
-
-	return coverage;
-}
-
-static inline uint32_t _kiia_non_zero_get_mask(Enesim_Renderer_Path_Kiia_Worker *w, int i, int cm)
-{
-	uint32_t ret;
-	int m;
-	int winding;
-
-	m = w->mask[i];
-	winding = w->winding[i];
-	w->cwinding += winding;
-	/* TODO Use the number of samples */
-	if (abs(w->cwinding) < 32)
-	{
-		if (w->cwinding == 0)
-			ret = 0;
-		else
-			ret = cm ^ m;
-	}
-	else
-	{
-		ret = 0xffffffff;
-	}
-	/* reset the winding */
-	w->winding[i] = 0;
-	return ret;
-}
-
-static inline void _kiia_figure_evalute_non_zero(Enesim_Renderer *r,
-		Enesim_Renderer_Path_Kiia_Figure *f, int *lx, int *rx, int y)
+static Eina_Bool _kiia_generate(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
-	Enesim_Renderer_Path_Kiia_Worker *w;
-	Eina_F16p16 yy0, yy1;
-	Eina_F16p16 sinc;
-	int mlx = INT_MAX;
-	int mrx = -INT_MAX;
-	int i;
+	Enesim_Quality q;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	w = &thiz->workers[y % thiz->nworkers];
-	yy0 = eina_f16p16_int_from(y);
-	yy1 = eina_f16p16_int_from(y + 1);
-	sinc = thiz->inc;
-	/* intersect with each edge */
-	for (i = 0; i < f->nedges; i++)
+	q = enesim_renderer_quality_get(r);
+	switch (q)
 	{
-		Enesim_Renderer_Path_Kiia_Edge *edge = &f->edges[i];
-		Eina_F16p16 *pattern;
-		Eina_F16p16 yyy0, yyy1;
-		Eina_F16p16 cx;
-		int sample;
-		int m;
+		case ENESIM_QUALITY_FAST:
+		thiz->nsamples = 8;
+		break;
 
-		/* up the span */
-		if (yy0 >= edge->yy1)
-			continue;
-		/* down the span, just skip processing, the edges are ordered in y */
-		if (yy1 < edge->yy0)
-			break;
+		case ENESIM_QUALITY_GOOD:
+		thiz->nsamples = 16;
+		break;
 
-		/* make sure not overflow */
-		yyy1 = yy1;
-		if (yyy1 > edge->yy1)
-			yyy1 = edge->yy1;
-
-		yyy0 = yy0;
-		if (yy0 <= edge->yy0)
-		{
-			yyy0 = edge->yy0;
-			cx = edge->mx;
-			sample = (eina_f16p16_fracc_get(yyy0) >> 11); /* 16.16 << nsamples */
-			//sample = (eina_f16p16_fracc_get(yyy0) >> 12); /* 16.16 << nsamples */
-			m = 1 << sample;
-		}
-		else
-		{
-			Eina_F16p16 inc;
-
-			/* TODO use the correct sample */
-			inc = eina_f16p16_mul(yyy0 - edge->yy0, eina_f16p16_int_from(32));
-			//inc = eina_f16p16_mul(yyy0 - edge->yy0, eina_f16p16_int_from(16));
-			cx = edge->mx + eina_f16p16_mul(inc, edge->slope);
-			sample = 0;
-			m = 1;
-		}
-
-		/* get the pattern to use */
-		pattern = thiz->pattern;
-		/* finally sample */
-		for (; yyy0 < yyy1; yyy0 += sinc)
-		{
-			int mx;
-
-			mx = eina_f16p16_int_to(cx - thiz->llx + *pattern);
-			/* keep track of the start, end of intersections */
-			if (mx < mlx)
-				mlx = mx;
-			if (mx > mrx)
-				mrx = mx;
-#if 0
-			_kiia_even_odd_sample(w, mx, m, edge->sgn);
-#else
-			_kiia_non_zero_sample(w, mx, m, edge->sgn);
-#endif
-			cx += edge->slope;
-			pattern++;
-			m <<= 1;
-		}
+		case ENESIM_QUALITY_BEST:
+		thiz->nsamples = 32;
+		break;
 	}
-	*lx = mlx;
-	*rx = mrx;
-}
-
-static inline void _kiia_figure_draw(Enesim_Renderer *r,
-		Enesim_Renderer_Path_Kiia_Figure *f, int x, int y, int len,
-		void *ddata)
-{
-	Enesim_Renderer_Path_Kiia *thiz;
-	Enesim_Renderer_Path_Kiia_Worker *w;
-	uint32_t *dst = ddata;
-	uint32_t *end, *rend = dst + len;
-	uint32_t cm = 0;
-	int lx, mlx;
-	int rx, mrx;
-	int i;
-
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	w = &thiz->workers[y % thiz->nworkers];
-
-	/* evaluate the edges at y */
-	_kiia_figure_evalute_non_zero(r, f, &mlx, &mrx, y);
-	/* does not intersect with anything */
-	if (mlx == INT_MAX)
-	{
-		memset(dst, 0, len * sizeof(uint32_t));
-		return;
-	}
-
-	/* clip on the left side [x.. left] */
-	lx = x - thiz->lx;
-	if (lx < mlx)
-	{
-		int adv;
-
-		adv = mlx - lx;
-		memset(dst, 0, adv * sizeof(uint32_t));
-		len -= adv;
-		dst += adv;
-		lx = mlx;
-		i = mlx;
-	}
-	/* advance the mask until we reach the requested x */
-	/* also clear the mask in the process */
-	else
-	{
-		for (i = mlx; i < lx; i++)
-		{
-#if 0
-			cm ^= w->mask[i];
-#else
-			cm = _kiia_non_zero_get_mask(w, i, cm);
-#endif
-		}
-	}
-	/* clip on the right side [right ... x + len] */
-	rx = lx + len;
-	/* given that we always jump to the next pixel because of the offset
-	 * pattern, start counting on the next pixel */
-	mrx += 1;
-	if (rx > mrx)
-	{
-		int adv;
-
-		adv = rx - mrx;
-		len -= adv;
-		rx = mrx;
-	}
-
-	/* time to draw */
- 	end = dst + len;
-	if (f->ren)
-	{
-		enesim_renderer_sw_draw(f->ren, x, y, len, dst);
-	}
-	/* iterate over the mask and fill */ 
-	while (dst < end)
-	{
-		uint32_t p0;
-
-#if 0
-		cm ^= w->mask[i];
-#else
-		cm = _kiia_non_zero_get_mask(w, i, cm);
-#endif
-		w->mask[i] = 0;
-		if (cm == 0xffffffff)
-		{
-			if (f->ren)
-			{
-				if (f->color != 0xffffffff)
-				{
-					p0 = *dst;
-					p0 = enesim_color_mul4_sym(p0, f->color);
-				}
-				else
-				{
-					goto next;
-				}
-			}
-			else
-			{
-				p0 = f->color;
-			}
-		}
-		else if (cm == 0)
-		{
-			p0 = 0;
-		}
-		else
-		{
-			uint16_t coverage;
-
-			coverage = _kiia_32_get_alpha(cm);
-			if (f->ren)
-			{
-				uint32_t q0 = *dst;
-
-				if (f->color != 0xffffffff)
-					q0 = enesim_color_mul4_sym(f->color, q0);
-				p0 = enesim_color_mul_256(coverage, q0);
-			}
-			else
-			{
-				p0 = enesim_color_mul_256(coverage, f->color);
-			}
-		}
-		*dst = p0;
-next:
-		dst++;
-		i++;
-	}
-	/* finally memset on dst at the end to keep the correct order on the
-	 * dst access
-	 */
-	if (dst < rend)
-	{
-		memset(dst, 0, (rend - dst) * sizeof(uint32_t));
-	}
-	/* set to zero the rest of the bits of the mask */
-	else
-	{
-		for (i = rx; i < mrx; i++)
-		{
-			w->mask[i] = 0;
-		}
-	}
-	/* update the latest y coordinate of the worker */
-	w->y = y;
-	w->cwinding = 0;
-
-}
-
-static void _kiia_span(Enesim_Renderer *r,
-		int x, int y, int len, void *ddata)
-{
-	Enesim_Renderer_Path_Kiia *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	_kiia_figure_draw(r, thiz->current, x, y, len, ddata);
+	if (!_kiia_figures_generate(r))
+		return EINA_FALSE;
+	if (!_kiia_edges_generate(r))
+		return EINA_FALSE;
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                               Path abstract                                *
@@ -670,8 +289,7 @@ static const char * _kiia_name(Enesim_Renderer *r EINA_UNUSED)
 static void _kiia_features_get(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Renderer_Feature *features)
 {
-	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
-			ENESIM_RENDERER_FEATURE_AFFINE |
+	*features =  ENESIM_RENDERER_FEATURE_QUALITY |
 			ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE |
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
@@ -689,15 +307,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	int y;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	/* TODO use the quality, 32 samples for now */
-	thiz->nsamples = 32;
 	/* Convert the path to a figure */
-	/* TODO later all of this will be on the generate interface */
-	if (!_kiia_figures_generate(r))
+	if (!_kiia_generate(r))
 		return EINA_FALSE;
-	if (!_kiia_edges_generate(r))
-		return EINA_FALSE;
-
 	/* setup the fill properties */
 	thiz->fill.ren = enesim_renderer_shape_fill_renderer_get(r);
 	thiz->fill.color = enesim_renderer_shape_fill_color_get(r);
@@ -757,9 +369,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		thiz->workers[i].y = y;
 		/* +1 because of the pattern offset */
 		thiz->workers[i].mask = calloc(len + 1, sizeof(uint32_t));
-		thiz->workers[i].winding = calloc((len + 1), sizeof(uint32_t));
+		thiz->workers[i].winding = calloc((len + 1), sizeof(int));
 	}
-	*draw = _kiia_span;
+	*draw = enesim_renderer_path_kiia_best_even_odd_simple_span;
 	return EINA_TRUE;
 }
 
@@ -784,6 +396,67 @@ static void _kiia_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 {
 	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
+
+static void _kiia_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds)
+{
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	double xmin = DBL_MAX;
+	double ymin = DBL_MAX;
+	double xmax = -DBL_MAX;
+	double ymax = -DBL_MAX;
+
+	/* TODO generate only when needed */
+	if (!_kiia_generate(r))
+		goto failed;
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	/* check the type of draw mode */
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	{
+		Enesim_Renderer_Path_Kiia *thiz;
+		double lx, rx, ty, by;
+
+		thiz = ENESIM_RENDERER_PATH_KIIA(r);
+		if (!enesim_figure_bounds(thiz->fill.figure, &lx, &ty, &rx, &by))
+			goto failed;
+		if (lx < xmin)
+			xmin = lx;
+		if (rx > xmax)
+			xmax = rx;
+		if (ty < ymin)
+			ymin = ty;
+		if (by > ymax)
+			ymax = by;
+	}
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	{
+		Enesim_Renderer_Path_Kiia *thiz;
+		double lx, rx, ty, by;
+
+		thiz = ENESIM_RENDERER_PATH_KIIA(r);
+		if (!enesim_figure_bounds(thiz->stroke.figure, &lx, &ty, &rx, &by))
+			goto failed;
+		if (lx < xmin)
+			xmin = lx;
+		if (rx > xmax)
+			xmax = rx;
+		if (ty < ymin)
+			ymin = ty;
+		if (by > ymax)
+			ymax = by;
+	}
+	/* snap the bounds */
+	bounds->x = xmin;
+	bounds->y = ymin;
+	bounds->w = (xmax - xmin) + 1;
+	bounds->h = (ymax - ymin) + 1;
+	return;
+failed:
+	bounds->x = 0;
+	bounds->y = 0;
+	bounds->w = 0;
+	bounds->h = 0;
+}
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -801,6 +474,7 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	r_klass->base_name_get = _kiia_name;
 	r_klass->features_get = _kiia_features_get;
 	r_klass->sw_hints_get = _kiia_sw_hints;
+	r_klass->bounds_get = _kiia_bounds_get;
 
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	s_klass->sw_setup = _kiia_sw_setup;
@@ -965,5 +639,5 @@ Enesim_Renderer * enesim_renderer_path_kiia_new(void)
 }
 /** @endcond */
 /*============================================================================*
- *                                  Local                                     *
+ *                                   API                                      *
  *============================================================================*/
