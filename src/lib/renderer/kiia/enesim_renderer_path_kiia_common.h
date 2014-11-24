@@ -28,7 +28,8 @@ static inline void _kiia_even_odd_sample(
 
 static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_even_odd_get_mask(
 		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int i,
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm)
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
+		int *winding EINA_UNUSED, int *cwinding EINA_UNUSED)
 {
 	cm ^= mask[i];
 	/* reset the mask */
@@ -157,274 +158,189 @@ static inline void _kiia_figure_evalute(Enesim_Renderer *r,
 	*rx = mrx;
 }
 
-static inline void _kiia_figure_non_zero_draw(Enesim_Renderer *r,
-		Enesim_Renderer_Path_Kiia_Figure *f,
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int *winding,
-		int x, int y, int len, void *ddata)
+static inline void _kiia_figure_renderer_setup(Enesim_Renderer_Path_Kiia_Figure *f,
+		int x, int y, int len, uint32_t *dst)
 {
-	Enesim_Renderer_Path_Kiia *thiz;
-	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm = 0;
-	uint32_t *dst = ddata;
-	uint32_t *end, *rend = dst + len;
-	int cwinding = 0;
-	int lx, mlx;
-	int rx, mrx;
-	int i;
-
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-
-	/* evaluate the edges at y */
-	_kiia_figure_evalute(r, f, mask, winding, &mlx, &mrx, y);
-	/* does not intersect with anything */
-	if (mlx == INT_MAX)
-	{
-		memset(dst, 0, len * sizeof(uint32_t));
-		return;
-	}
-
-	/* clip on the left side [x.. left] */
-	lx = x - thiz->lx;
-	if (lx < mlx)
-	{
-		int adv;
-
-		adv = mlx - lx;
-		memset(dst, 0, adv * sizeof(uint32_t));
-		len -= adv;
-		dst += adv;
-		lx = mlx;
-		i = mlx;
-	}
-	/* advance the mask until we reach the requested x */
-	/* also clear the mask in the process */
-	else
-	{
-		for (i = mlx; i < lx; i++)
-		{
-			cm = _kiia_non_zero_get_mask(mask, i, cm, winding, &cwinding);
-		}
-	}
-	/* clip on the right side [right ... x + len] */
-	rx = lx + len;
-	/* given that we always jump to the next pixel because of the offset
-	 * pattern, start counting on the next pixel */
-	mrx += 1;
-	if (rx > mrx)
-	{
-		int adv;
-
-		adv = rx - mrx;
-		len -= adv;
-		rx = mrx;
-	}
-
-	/* time to draw */
- 	end = dst + len;
-	if (f->ren)
-	{
-		enesim_renderer_sw_draw(f->ren, x, y, len, dst);
-	}
-	/* iterate over the mask and fill */ 
-	while (dst < end)
-	{
-		uint32_t p0;
-
-		cm = _kiia_non_zero_get_mask(mask, i, cm, winding, &cwinding);
-		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
-		{
-			if (f->ren)
-			{
-				if (f->color != 0xffffffff)
-				{
-					p0 = *dst;
-					p0 = enesim_color_mul4_sym(p0, f->color);
-				}
-				else
-				{
-					goto next;
-				}
-			}
-			else
-			{
-				p0 = f->color;
-			}
-		}
-		else if (cm == 0)
-		{
-			p0 = 0;
-		}
-		else
-		{
-			uint16_t coverage;
-
-			coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(cm);
-			if (f->ren)
-			{
-				uint32_t q0 = *dst;
-
-				if (f->color != 0xffffffff)
-					q0 = enesim_color_mul4_sym(f->color, q0);
-				p0 = enesim_color_mul_256(coverage, q0);
-			}
-			else
-			{
-				p0 = enesim_color_mul_256(coverage, f->color);
-			}
-		}
-		*dst = p0;
-next:
-		dst++;
-		i++;
-	}
-	/* finally memset on dst at the end to keep the correct order on the
-	 * dst access
-	 */
-	if (dst < rend)
-	{
-		memset(dst, 0, (rend - dst) * sizeof(uint32_t));
-	}
-	/* set to zero the rest of the bits of the mask */
-	else
-	{
-		for (i = rx; i < mrx; i++)
-		{
-			mask[i] = 0;
-			winding = 0;
-		}
-	}
+	enesim_renderer_sw_draw(f->ren, x, y, len, dst);
 }
 
-static inline void _kiia_figure_even_odd_draw(Enesim_Renderer *r,
+static inline Eina_Bool _kiia_figure_renderer_fill(
 		Enesim_Renderer_Path_Kiia_Figure *f,
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int *winding,
-		int x, int y, int len, void *ddata)
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
+		uint32_t *src, uint32_t *p0)
 {
-	Enesim_Renderer_Path_Kiia *thiz;
-	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm = 0;
-	uint32_t *dst = ddata;
-	uint32_t *end, *rend = dst + len;
-	int lx, mlx;
-	int rx, mrx;
-	int i;
-
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-
-	/* evaluate the edges at y */
-	_kiia_figure_evalute(r, f, mask, winding, &mlx, &mrx, y);
-	/* does not intersect with anything */
-	if (mlx == INT_MAX)
+	if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
 	{
-		memset(dst, 0, len * sizeof(uint32_t));
-		return;
-	}
-
-	/* clip on the left side [x.. left] */
-	lx = x - thiz->lx;
-	if (lx < mlx)
-	{
-		int adv;
-
-		adv = mlx - lx;
-		memset(dst, 0, adv * sizeof(uint32_t));
-		len -= adv;
-		dst += adv;
-		lx = mlx;
-		i = mlx;
-	}
-	/* advance the mask until we reach the requested x */
-	/* also clear the mask in the process */
-	else
-	{
-		for (i = mlx; i < lx; i++)
+		if (f->color != 0xffffffff)
 		{
-			cm = _kiia_even_odd_get_mask(mask, i, cm);
-		}
-	}
-	/* clip on the right side [right ... x + len] */
-	rx = lx + len;
-	/* given that we always jump to the next pixel because of the offset
-	 * pattern, start counting on the next pixel */
-	mrx += 1;
-	if (rx > mrx)
-	{
-		int adv;
-
-		adv = rx - mrx;
-		len -= adv;
-		rx = mrx;
-	}
-
-	/* time to draw */
- 	end = dst + len;
-	if (f->ren)
-	{
-		enesim_renderer_sw_draw(f->ren, x, y, len, dst);
-	}
-	/* iterate over the mask and fill */ 
-	while (dst < end)
-	{
-		uint32_t p0;
-
-		cm = _kiia_even_odd_get_mask(mask, i, cm);
-		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
-		{
-			if (f->ren)
-			{
-				if (f->color != 0xffffffff)
-				{
-					p0 = *dst;
-					p0 = enesim_color_mul4_sym(p0, f->color);
-				}
-				else
-				{
-					goto next;
-				}
-			}
-			else
-			{
-				p0 = f->color;
-			}
-		}
-		else if (cm == 0)
-		{
-			p0 = 0;
+			*p0 = enesim_color_mul4_sym(*src, f->color);
 		}
 		else
 		{
-			uint16_t coverage;
-
-			coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(cm);
-			if (f->ren)
-			{
-				uint32_t q0 = *dst;
-
-				if (f->color != 0xffffffff)
-					q0 = enesim_color_mul4_sym(f->color, q0);
-				p0 = enesim_color_mul_256(coverage, q0);
-			}
-			else
-			{
-				p0 = enesim_color_mul_256(coverage, f->color);
-			}
+			/* don't draw */
+			return EINA_FALSE;
 		}
-		*dst = p0;
-next:
-		dst++;
-		i++;
 	}
-	/* finally memset on dst at the end to keep the correct order on the
-	 * dst access
-	 */
-	if (dst < rend)
+	else if (cm == 0)
 	{
-		memset(dst, 0, (rend - dst) * sizeof(uint32_t));
+		*p0 = 0;
 	}
-	/* set to zero the rest of the bits of the mask */
 	else
 	{
-		for (i = rx; i < mrx; i++)
-		{
-			mask[i] = 0;
-		}
+		uint16_t coverage;
+		uint32_t q0 = *src;
+
+		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(cm);
+
+		if (f->color != 0xffffffff)
+			q0 = enesim_color_mul4_sym(f->color, q0);
+		*p0 = enesim_color_mul_256(coverage, q0);
 	}
+	return EINA_TRUE;
+}
+
+static inline Eina_Bool _kiia_figure_color_fill(
+		Enesim_Renderer_Path_Kiia_Figure *f,
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
+		uint32_t *src EINA_UNUSED, uint32_t *p0)
+{
+	if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	{
+		*p0 = f->color;
+	}
+	else if (cm == 0)
+	{
+		*p0 = 0;
+	}
+	else
+	{
+		uint16_t coverage;
+
+		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(cm);
+		*p0 = enesim_color_mul_256(coverage, f->color);
+	}
+	return EINA_TRUE;
+}
+
+
+static inline void _kiia_figure_color_setup(
+		Enesim_Renderer_Path_Kiia_Figure *f EINA_UNUSED,
+		int x EINA_UNUSED, int y EINA_UNUSED, int len EINA_UNUSED,
+		uint32_t *dst EINA_UNUSED)
+{
+}
+
+/* nsamples = 8, 16, 32
+ * fill_mode = non_zero, even_odd
+ * fill = color, renderer
+ */
+#define ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(nsamples, fill_mode, fill)	\
+void										\
+enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(		\
+		Enesim_Renderer *r, int x, int y, int len, void *ddata)		\
+{										\
+	Enesim_Renderer_Path_Kiia *thiz;					\
+	Enesim_Renderer_Path_Kiia_Worker *w;					\
+	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm = 0;				\
+	Enesim_Renderer_Path_Kiia_Figure *f;					\
+	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask;				\
+	int *winding;								\
+	int cwinding = 0;							\
+	uint32_t *dst = ddata;							\
+	uint32_t *end, *rend = dst + len;					\
+	int lx, mlx;								\
+	int rx, mrx;								\
+	int i;									\
+										\
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);					\
+	/* pick the worker at y coordinate */					\
+	w = &thiz->workers[y % thiz->nworkers];					\
+	/* set our own local vars */						\
+	f = thiz->current;							\
+	mask = w->mask;								\
+	winding = w->winding;							\
+										\
+	/* evaluate the edges at y */						\
+	_kiia_figure_evalute(r, f, mask, winding, &mlx, &mrx, y);		\
+	/* does not intersect with anything */					\
+	if (mlx == INT_MAX)							\
+	{									\
+		memset(dst, 0, len * sizeof(uint32_t));				\
+		return;								\
+	}									\
+										\
+	/* clip on the left side [x.. left] */					\
+	lx = x - thiz->lx;							\
+	if (lx < mlx)								\
+	{									\
+		int adv;							\
+										\
+		adv = mlx - lx;							\
+		memset(dst, 0, adv * sizeof(uint32_t));				\
+		len -= adv;							\
+		dst += adv;							\
+		lx = mlx;							\
+		i = mlx;							\
+	}									\
+	/* advance the mask until we reach the requested x */			\
+	/* also clear the mask in the process */				\
+	else									\
+	{									\
+		for (i = mlx; i < lx; i++)					\
+		{								\
+			cm = _kiia_##fill_mode##_get_mask(mask, i, cm, winding, \
+					&cwinding);				\
+		}								\
+	}									\
+	/* clip on the right side [right ... x + len] */			\
+	rx = lx + len;								\
+	/* given that we always jump to the next pixel because of the offset	
+	 * pattern, start counting on the next pixel */				\
+	mrx += 1;								\
+	if (rx > mrx)								\
+	{									\
+		int adv;							\
+										\
+		adv = rx - mrx;							\
+		len -= adv;							\
+		rx = mrx;							\
+	}									\
+										\
+	/* time to draw */							\
+ 	end = dst + len;							\
+	/* do the setup, i.e draw the fill renderer */				\
+	_kiia_figure_##fill##_setup(f, x, y, len, dst);				\
+	/* iterate over the mask and fill */					\
+	while (dst < end)							\
+	{									\
+		uint32_t p0;							\
+										\
+		cm = _kiia_even_odd_get_mask(mask, i, cm, winding, &cwinding);	\
+		if (!_kiia_figure_##fill##_fill(f, cm, dst, &p0))		\
+			goto next;						\
+		*dst = p0;							\
+next:										\
+		dst++;								\
+		i++;								\
+	}									\
+	/* finally memset on dst at the end to keep the correct order on the
+	 * dst access
+	 */									\
+	if (dst < rend)								\
+	{									\
+		memset(dst, 0, (rend - dst) * sizeof(uint32_t));		\
+	}									\
+	/* set to zero the rest of the bits of the mask */			\
+	else									\
+	{									\
+		for (i = rx; i < mrx; i++)					\
+		{								\
+			/* FIXME For now we always clear both arrays, even if
+			 * one might not be used */				\
+			mask[i] = 0;						\
+			winding[i] = 0;						\
+		}								\
+	}									\
+	/* update the latest y coordinate of the worker */			\
+	w->y = y;								\
 }

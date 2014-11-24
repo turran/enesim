@@ -33,6 +33,8 @@ static Eina_F16p16 _kiia_pattern8[8];
 static Eina_F16p16 _kiia_pattern16[16];
 static Eina_F16p16 _kiia_pattern32[32];
 
+static Enesim_Renderer_Sw_Fill _fill_simple[3][ENESIM_RENDERER_SHAPE_FILL_RULES][2];
+
 static int _kiia_edge_sort(const void *l, const void *r)
 {
 	Enesim_Renderer_Path_Kiia_Edge *lv = (Enesim_Renderer_Path_Kiia_Edge *)l;
@@ -300,6 +302,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Renderer_Shape_Fill_Rule fr;
 	Enesim_Color color;
 	double lx, rx, ty, by;
 	int len;
@@ -323,19 +326,24 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		thiz->stroke.color = enesim_color_mul4_sym(thiz->stroke.color, color);
 		thiz->fill.color = enesim_color_mul4_sym(thiz->fill.color, color);
 	}
+	fr = enesim_renderer_shape_fill_rule_get(r);
 	dm = enesim_renderer_shape_draw_mode_get(r);
-	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
-	{
-		thiz->current = &thiz->fill;
-	}
-	else if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
-	{
-		thiz->current = &thiz->stroke;
-	}
-	else
+	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
 		/* TODO handle both at once */
 		return EINA_FALSE;
+	}
+	else
+	{
+		Eina_Bool has_renderer = EINA_FALSE;
+
+		if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+			thiz->current = &thiz->fill;
+		else
+			thiz->current = &thiz->stroke;
+		if (thiz->current->ren)
+			has_renderer = EINA_TRUE;
+		*draw = _fill_simple[ENESIM_QUALITY_BEST][fr][has_renderer];
 	}
 
 	switch (thiz->nsamples)
@@ -371,7 +379,6 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		thiz->workers[i].mask = calloc(len + 1, sizeof(uint32_t));
 		thiz->workers[i].winding = calloc((len + 1), sizeof(int));
 	}
-	*draw = enesim_renderer_path_kiia_best_even_odd_simple_span;
 	return EINA_TRUE;
 }
 
@@ -603,6 +610,16 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	_kiia_pattern32[29] = eina_f16p16_double_from(9.0/32.0);
 	_kiia_pattern32[30] = eina_f16p16_double_from(2.0/32.0);
 	_kiia_pattern32[31] = eina_f16p16_double_from(19.0/32.0);
+
+	/* setup our function pointers */
+	_fill_simple[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0] = 
+			enesim_renderer_path_kiia_32_even_odd_color_simple;
+	_fill_simple[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1] = 
+			enesim_renderer_path_kiia_32_even_odd_renderer_simple;
+	_fill_simple[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0] = 
+			enesim_renderer_path_kiia_32_non_zero_color_simple;
+	_fill_simple[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1] = 
+			enesim_renderer_path_kiia_32_non_zero_renderer_simple;
 }
 
 static void _enesim_renderer_path_kiia_instance_init(void *o)

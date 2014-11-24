@@ -46,22 +46,11 @@ static inline uint16_t _kiia_32_get_alpha(int cm)
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-
-void enesim_renderer_path_kiia_best_even_odd_simple_span(Enesim_Renderer *r,
-		int x, int y, int len, void *ddata)
-{
-	Enesim_Renderer_Path_Kiia *thiz;
-	Enesim_Renderer_Path_Kiia_Worker *w;
-
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	/* pick the worker at y coordinate */
-	w = &thiz->workers[y % thiz->nworkers];
-	_kiia_figure_even_odd_draw(r, thiz->current, w->mask, w->winding, x, y, len, ddata);
-	/* update the latest y coordinate of the worker */
-	w->y = y;
-}
+ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, even_odd, color)
+ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, even_odd, renderer)
+ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, non_zero, color)
+ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, non_zero, renderer)
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-

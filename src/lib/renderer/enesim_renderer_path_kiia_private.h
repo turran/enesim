@@ -115,7 +115,13 @@ typedef struct _Enesim_Renderer_Path_Kiia_Class {
 } Enesim_Renderer_Path_Kiia_Class;
 
 /* different fill implementations */
-void enesim_renderer_path_kiia_best_even_odd_simple_span(Enesim_Renderer *r,
+void enesim_renderer_path_kiia_32_even_odd_color_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_even_odd_renderer_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_non_zero_color_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_non_zero_renderer_simple(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata);
 
 #endif
