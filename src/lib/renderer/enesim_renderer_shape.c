@@ -676,6 +676,7 @@ void enesim_renderer_shape_propagate(Enesim_Renderer *r, Enesim_Renderer *s)
 	enesim_renderer_shape_stroke_join_set(s, sstate->current.stroke.join);
 	enesim_renderer_shape_stroke_cap_set(s, sstate->current.stroke.cap);
 	enesim_renderer_shape_stroke_scalable_set(s, sstate->current.stroke.scalable);
+	enesim_renderer_shape_stroke_location_set(s, sstate->current.stroke.location);
 	stroke = enesim_renderer_shape_stroke_renderer_get(r);
 	enesim_renderer_shape_stroke_renderer_set(s, stroke);
 
