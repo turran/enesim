@@ -53,10 +53,12 @@ typedef struct _Enesim_Renderer_Path_Kiia_Worker
 {
 	/* a span of length equal to the width of the bounds to store the sample mask */
 	uint32_t *mask;
+	uint32_t *omask;
 	/* a span of length equal to the width of the bounds * nsamples to
 	 * store the sample winding
 	 */
 	int *winding;
+	int *owinding;
 	/* keep track of the current Y this worker is doing, to ease
 	 * the x increment on the edges
 	 */
@@ -122,6 +124,8 @@ void enesim_renderer_path_kiia_32_even_odd_renderer_simple(Enesim_Renderer *r,
 void enesim_renderer_path_kiia_32_non_zero_color_simple(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata);
 void enesim_renderer_path_kiia_32_non_zero_renderer_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_even_odd_color_color_full(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata);
 
 #endif

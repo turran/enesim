@@ -50,6 +50,7 @@ ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, even_odd, color)
 ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, even_odd, renderer)
 ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, non_zero, color)
 ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(32, non_zero, renderer)
+ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(32, even_odd, color, color)
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *
