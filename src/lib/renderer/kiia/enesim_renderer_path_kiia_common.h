@@ -273,6 +273,142 @@ static inline Eina_Bool _kiia_figure_color_color_fill(
 	return EINA_TRUE;
 }
 
+static inline Eina_Bool _kiia_figure_renderer_color_fill(
+		Enesim_Renderer_Path_Kiia_Figure *f,
+		Enesim_Renderer_Path_Kiia_Figure *s,
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE scm,
+		uint32_t *src, uint32_t *ssrc EINA_UNUSED,
+		uint32_t *p0)
+{
+	if (scm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	{
+		*p0 = s->color;
+	}
+	else if (scm == 0)
+	{
+		if (!_kiia_figure_renderer_fill(f, cm, src, p0))
+			return EINA_FALSE;
+	}
+	else
+	{
+		uint16_t coverage;
+
+		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(scm);
+		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+		{
+			uint32_t q0;
+
+			if (f->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*src, f->color);
+			}
+			else
+			{
+				q0 = *src;
+			}
+			*p0 = enesim_color_interp_256(coverage, s->color, q0);
+		}
+		else if (cm == 0)
+		{
+			*p0 = enesim_color_mul_256(coverage, s->color);
+		}
+		else
+		{
+			uint32_t q0;
+			uint16_t fcoverage;
+
+			fcoverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(cm);
+			q0 = *src;
+			if (f->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*src, f->color);
+			}
+			q0 = enesim_color_mul_256(fcoverage, q0);
+			*p0 = enesim_color_interp_256(coverage, s->color, q0);
+		}
+	}
+	return EINA_TRUE;
+}
+
+static inline Eina_Bool _kiia_figure_color_renderer_fill(
+		Enesim_Renderer_Path_Kiia_Figure *f,
+		Enesim_Renderer_Path_Kiia_Figure *s,
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE scm,
+		uint32_t *src, uint32_t *ssrc,
+		uint32_t *p0)
+{
+	if (scm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	{
+		uint32_t q0;
+
+		q0 = *ssrc;
+		if (s->color != 0xffffffff)
+			q0 = enesim_color_mul4_sym(q0, s->color);
+		*p0 = q0;
+	}
+	else if (scm == 0)
+	{
+		if (!_kiia_figure_color_fill(f, cm, src, p0))
+			return EINA_FALSE;
+	}
+	else
+	{
+		uint16_t coverage;
+
+		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(scm);
+		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+		{
+			uint32_t q0;
+
+			if (s->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*ssrc, s->color);
+			}
+			else
+			{
+				q0 = *ssrc;
+			}
+			*p0 = enesim_color_interp_256(coverage, q0, f->color);
+		}
+		else if (cm == 0)
+		{
+			uint32_t q0;
+
+			if (s->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*ssrc, s->color);
+			}
+			else
+			{
+				q0 = *ssrc;
+			}
+			*p0 = enesim_color_mul_256(coverage, q0);
+		}
+		else
+		{
+			uint32_t q0;
+			uint32_t q1;
+			uint16_t fcoverage;
+
+			fcoverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(cm);
+			if (s->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*ssrc, s->color);
+			}
+			else
+			{
+				q0 = *ssrc;
+			}
+
+			q1 = enesim_color_mul_256(fcoverage, f->color);
+			*p0 = enesim_color_interp_256(coverage, q0, q1);
+		}
+	}
+	return EINA_TRUE;
+}
+
 /* nsamples = 8, 16, 32
  * fill_mode = non_zero, even_odd
  * fill = color, renderer
@@ -318,11 +454,14 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 		int adv;							\
 										\
 		adv = mlx - lx;							\
+		if (adv > len)							\
+			adv = len;						\
 		memset(dst, 0, adv * sizeof(uint32_t));				\
 		len -= adv;							\
 		dst += adv;							\
 		lx = mlx;							\
 		i = mlx;							\
+		x += adv; 							\
 	}									\
 	/* advance the mask until we reach the requested x */			\
 	/* also clear the mask in the process */				\
@@ -390,7 +529,8 @@ next:										\
 
 /* nsamples = 8, 16, 32
  * fill_mode = non_zero, even_odd
- * fill = color, renderer
+ * ft = color, renderer
+ * st = color, renderer
  */
 #define ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(nsamples, fill_mode, ft, st)	\
 void 										\
@@ -403,7 +543,7 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 	int cwinding = 0, ocwinding = 0;					\
 	uint32_t *dst = ddata;							\
 	uint32_t *end, *rend = dst + len;					\
-	uint32_t *odst;								\
+	uint32_t *odst = NULL;							\
 	int lx, mlx, omlx;							\
 	int rx, mrx, omrx;							\
 	int i;									\
@@ -422,15 +562,15 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 		mlx = omlx;							\
 	if (omrx > mrx)								\
 		mrx = omrx;							\
-	/* allocate the tmp buffer */ 						\
-	odst = alloca(sizeof(uint32_t) * len);					\
-										\
 	/* does not intersect with anything */					\
 	if (mlx == INT_MAX)							\
 	{									\
 		memset(dst, 0, len * sizeof(uint32_t));				\
 		return;								\
 	}									\
+	/* allocate the tmp buffer */ 						\
+	if (thiz->stroke.ren)							\
+		odst = alloca(sizeof(uint32_t) * len);				\
 										\
 	/* clip on the left side [x.. left] */					\
 	lx = x - thiz->lx;							\
@@ -439,11 +579,15 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 		int adv;							\
 										\
 		adv = mlx - lx;							\
+		if (adv > len)							\
+			adv = len;						\
 		memset(dst, 0, adv * sizeof(uint32_t));				\
 		len -= adv;							\
 		dst += adv;							\
+		odst += adv;							\
 		lx = mlx;							\
 		i = mlx;							\
+		x += adv; 							\
 	}									\
 	/* advance the mask until we reach the requested x */			\
 	/* also clear the mask in the process */				\
@@ -453,7 +597,7 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 		{								\
 			cm = _kiia_##fill_mode##_get_mask(w->mask, i, cm, 	\
 					w->winding, &cwinding);			\
-			ocm = _kiia_##fill_mode##_get_mask(w->omask, i, ocm,	\
+			ocm = _kiia_non_zero_get_mask(w->omask, i, ocm,		\
 					w->owinding, &ocwinding);		\
 		}								\
 	}									\
@@ -491,6 +635,7 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 			goto next;						\
 		*dst = p0;							\
 next:										\
+		odst++;								\
 		dst++;								\
 		i++;								\
 	}									\

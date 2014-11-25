@@ -130,5 +130,13 @@ void enesim_renderer_path_kiia_32_even_odd_color_color_full(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata);
 void enesim_renderer_path_kiia_32_non_zero_color_color_full(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_even_odd_renderer_color_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_even_odd_color_renderer_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_non_zero_renderer_color_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_32_non_zero_color_renderer_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
 
 #endif

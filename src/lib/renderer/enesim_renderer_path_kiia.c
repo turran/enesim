@@ -77,8 +77,8 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	x01 = x1 - x0;
 	y01 = y1 - y0;
 	/* for horizontal edges we just skip */
-	if (!y01) return EINA_FALSE;
-
+	if (fabs(y01) < DBL_EPSILON)
+		return EINA_FALSE;
 	slope = x01 / y01;
 
 	/* get the sampled Y inside the line */
@@ -93,6 +93,8 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	thiz->slope = eina_f16p16_double_from(slope/nsamples);
 	thiz->mx = eina_f16p16_double_from(mx);
 	thiz->sgn = sgn;
+
+	//printf("edges %f %f %f %f %f (%f)\n", x0, start, x1, y1, slope, y01);
 
 	return EINA_TRUE;
 }
@@ -282,6 +284,16 @@ static Eina_Bool _kiia_generate(Enesim_Renderer *r)
  *                               Path abstract                                *
  *----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static void _kiia_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Renderer_Shape_Feature *features)
+{
+	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
+			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
+}
+
+/*----------------------------------------------------------------------------*
  *                      The Enesim's renderer interface                       *
  *----------------------------------------------------------------------------*/
 static const char * _kiia_name(Enesim_Renderer *r EINA_UNUSED)
@@ -331,7 +343,10 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
+		Eina_Bool has_fill_renderer = EINA_FALSE;
+		Eina_Bool has_stroke_renderer = EINA_FALSE;
 		double olx, oty, orx, oby;
+
 		if (!enesim_figure_bounds(thiz->fill.figure, &lx, &ty, &rx, &by))
 			return EINA_FALSE;
 		if (!enesim_figure_bounds(thiz->stroke.figure, &olx, &oty, &orx, &oby))
@@ -344,8 +359,11 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 			ty = oty;
 		if (oby > by)
 			by = oby;
-		/* TODO for now */
-		*draw = _fill_full[ENESIM_QUALITY_BEST][fr][0][0];
+		if (thiz->fill.ren)
+			has_fill_renderer = EINA_TRUE;
+		if (thiz->stroke.ren)
+			has_stroke_renderer = EINA_TRUE;
+		*draw = _fill_full[ENESIM_QUALITY_BEST][fr][has_fill_renderer][has_stroke_renderer];
 	}
 	else
 	{
@@ -381,9 +399,9 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		break;
 	}
 	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
+	/* snap the coordinates lx, rx, ty and by */
 #if 0
-	/* TODO snap the coordinates lx, rx, ty and by */
-	lx = (((int)(lx * thiz->nsamples)) / thiz->nsamples);
+	lx = (((int)(lx * thiz->nsamples) + 1) / thiz->nsamples) - 1;
 	ty = (((int)(ty * thiz->nsamples)) / thiz->nsamples);
 	rx = (((int)(rx * thiz->nsamples)) / thiz->nsamples);
 	by = (((int)(by * thiz->nsamples)) / thiz->nsamples);
@@ -400,10 +418,10 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	{
 		thiz->workers[i].y = y;
 		/* +1 because of the pattern offset */
-		thiz->workers[i].mask = calloc(len + 1, sizeof(uint32_t));
-		thiz->workers[i].winding = calloc((len + 1), sizeof(int));
-		thiz->workers[i].omask = calloc(len + 1, sizeof(uint32_t));
-		thiz->workers[i].owinding = calloc((len + 1), sizeof(int));
+		thiz->workers[i].mask = calloc(len + 10, sizeof(uint32_t));
+		thiz->workers[i].winding = calloc((len + 10), sizeof(int));
+		thiz->workers[i].omask = calloc(len + 10, sizeof(uint32_t));
+		thiz->workers[i].owinding = calloc((len + 10), sizeof(int));
 	}
 	return EINA_TRUE;
 }
@@ -514,6 +532,7 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	s_klass->sw_setup = _kiia_sw_setup;
 	s_klass->sw_cleanup = _kiia_sw_cleanup;
+	s_klass->features_get = _kiia_shape_features_get;
 
 	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
 
@@ -654,6 +673,14 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 			enesim_renderer_path_kiia_32_even_odd_color_color_full;
 	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][0] = 
 			enesim_renderer_path_kiia_32_non_zero_color_color_full;
+	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1][0] = 
+			enesim_renderer_path_kiia_32_even_odd_renderer_color_full;
+	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1][0] = 
+			enesim_renderer_path_kiia_32_non_zero_renderer_color_full;
+	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0][1] = 
+			enesim_renderer_path_kiia_32_even_odd_color_renderer_full;
+	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][1] = 
+			enesim_renderer_path_kiia_32_non_zero_color_renderer_full;
 }
 
 static void _enesim_renderer_path_kiia_instance_init(void *o)
