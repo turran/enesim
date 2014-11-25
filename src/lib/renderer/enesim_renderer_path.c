@@ -131,7 +131,6 @@ static Eina_Bool _path_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		if (!enesim_renderer_setup(abstract, s, rop, log))
 		{
 			INF("Abstract '%s' failed on the setup", enesim_renderer_name_get(abstract));
-			enesim_renderer_cleanup(abstract, s);
 			continue;
 		}
 		thiz->current = abstract;
