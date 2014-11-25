@@ -381,7 +381,13 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		break;
 	}
 	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
+#if 0
 	/* TODO snap the coordinates lx, rx, ty and by */
+	lx = (((int)(lx * thiz->nsamples)) / thiz->nsamples);
+	ty = (((int)(ty * thiz->nsamples)) / thiz->nsamples);
+	rx = (((int)(rx * thiz->nsamples)) / thiz->nsamples);
+	by = (((int)(by * thiz->nsamples)) / thiz->nsamples);
+#endif
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
@@ -414,7 +420,9 @@ static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 	for (i = 0; i < thiz->nworkers; i++)
 	{
 		free(thiz->workers[i].mask);
+		free(thiz->workers[i].omask);
 		free(thiz->workers[i].winding);
+		free(thiz->workers[i].owinding);
 	}
 }
 
@@ -644,6 +652,8 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	/* the full variants */
 	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0][0] = 
 			enesim_renderer_path_kiia_32_even_odd_color_color_full;
+	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][0] = 
+			enesim_renderer_path_kiia_32_non_zero_color_color_full;
 }
 
 static void _enesim_renderer_path_kiia_instance_init(void *o)
