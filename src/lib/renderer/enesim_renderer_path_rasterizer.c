@@ -56,6 +56,7 @@
  * rendered
  */
 #define WIREFRAME 0
+#define DUMP 0
 
 #define ENESIM_RENDERER_PATH_ENESIM(o) ENESIM_OBJECT_INSTANCE_CHECK(o,		\
 		Enesim_Renderer_Path_Enesim,					\
@@ -66,6 +67,8 @@ typedef struct _Enesim_Renderer_Path_Enesim
 	Enesim_Renderer_Path_Abstract parent;
 	/* properties */
 	/* private */
+	Enesim_Figure *fill_figure;
+	Enesim_Figure *stroke_figure;
 	Enesim_Renderer *bifigure;
 } Enesim_Renderer_Path_Enesim;
 
@@ -86,23 +89,101 @@ static void _enesim_renderer_path_rasterizer_span(Enesim_Renderer *r,
 static void _enesim_renderer_path_rasterizer_generate_figures(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
-	Enesim_Renderer_Path_Abstract *parent;
+	Enesim_Renderer_Path_Abstract *pa;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Path_Generator *generator;
+	Enesim_List *dashes;
+	Enesim_Matrix transformation;
+	Enesim_Renderer_Shape_Stroke_Join join;
+	Enesim_Renderer_Shape_Stroke_Cap cap;
+	Eina_List *dashes_l;
+	Eina_Bool stroke_figure_used = EINA_FALSE;
+	Eina_Bool stroke_scalable;
+	double stroke_weight;
+	double swx;
+	double swy;
 
 	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
- 	parent = ENESIM_RENDERER_PATH_ABSTRACT(r);
 
-	enesim_renderer_path_abstract_generate(r);
-#if WIREFRAME
-	if (parent->stroke_figure_used)
-		enesim_rasterizer_figure_set(thiz->bifigure, parent->stroke_figure);
+	if (thiz->fill_figure)
+		enesim_figure_clear(thiz->fill_figure);
 	else
-		enesim_rasterizer_figure_set(thiz->bifigure, parent->fill_figure);
+		thiz->fill_figure = enesim_figure_new();
+
+	if (thiz->stroke_figure)
+		enesim_figure_clear(thiz->stroke_figure);
+	else
+		thiz->stroke_figure = enesim_figure_new();
+
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	dashes = enesim_renderer_shape_dashes_get(r);
+	dashes_l = dashes->l;
+
+	join = enesim_renderer_shape_stroke_join_get(r);
+	cap = enesim_renderer_shape_stroke_cap_get(r);
+	stroke_weight = enesim_renderer_shape_stroke_weight_get(r);
+	stroke_scalable = enesim_renderer_shape_stroke_scalable_get(r);
+	enesim_renderer_transformation_get(r, &transformation);
+	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
+
+	/* decide what generator to use */
+	/* for a stroke smaller than 1px we will use the basic
+	 * rasterizer directly, so we dont need to generate the
+	 * stroke path
+	 */
+	if ((dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) &&
+			(dashes_l || swx > 1.0 || swy > 1.0))
+	{
+		if (!dashes_l)
+			generator = enesim_path_generator_stroke_dashless_new();
+		else
+			generator = enesim_path_generator_dashed_new();
+		stroke_figure_used = EINA_TRUE;
+	}
+	else
+	{
+		generator = enesim_path_generator_strokeless_new();
+	}
+
+	enesim_path_generator_figure_set(generator, thiz->fill_figure);
+	enesim_path_generator_stroke_figure_set(generator, thiz->stroke_figure);
+	enesim_path_generator_stroke_cap_set(generator, cap);
+	enesim_path_generator_stroke_join_set(generator, join);
+	enesim_path_generator_stroke_weight_set(generator, stroke_weight);
+	enesim_path_generator_stroke_scalable_set(generator, stroke_scalable);
+	enesim_path_generator_stroke_dash_set(generator, dashes_l);
+	enesim_path_generator_scale_set(generator, 1, 1);
+	enesim_path_generator_transformation_set(generator, &transformation);
+	/* Now generate */
+	pa = ENESIM_RENDERER_PATH_ABSTRACT(r);
+	enesim_path_generator_generate(generator, pa->path->commands);
+	enesim_list_unref(dashes);
+	/* Remove the figure generators */
+	enesim_path_generator_free(generator);
+
+#if DUMP
+	if (stroke_figure_used)
+	{
+		printf("stroke figure\n");
+		enesim_figure_dump(thiz->stroke_figure);
+	}
+	printf("fill figure\n");
+	enesim_figure_dump(thiz->fill_figure);
+#endif
+
+#if WIREFRAME
+	if (stroke_figure_used)
+		enesim_rasterizer_figure_set(thiz->bifigure, thiz->stroke_figure);
+	else
+		enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 #else
 	/* set the fill figure on the bifigure as its under polys */
-	enesim_rasterizer_figure_set(thiz->bifigure, parent->fill_figure);
+	enesim_rasterizer_figure_set(thiz->bifigure, thiz->fill_figure);
 	/* set the stroke figure on the bifigure as its over polys */
-	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, parent->stroke_figure_used ? parent->stroke_figure : NULL);
+	enesim_rasterizer_bifigure_over_figure_set(thiz->bifigure, stroke_figure_used ? thiz->stroke_figure : NULL);
 #endif
+	/* Finally mark as we have already generated the figure */
+	enesim_renderer_path_abstract_generate(r);
 }
 
 /*----------------------------------------------------------------------------*
@@ -193,11 +274,8 @@ static Eina_Bool _enesim_renderer_path_rasterizer_sw_setup(Enesim_Renderer *r, E
 	return EINA_TRUE;
 }
 
-static void _enesim_renderer_path_rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _enesim_renderer_path_rasterizer_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
-	Enesim_Renderer_Path_Enesim *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
 	enesim_renderer_path_abstract_cleanup(r);
 }
 /*----------------------------------------------------------------------------*
@@ -229,7 +307,7 @@ static void _enesim_renderer_path_rasterizer_sw_hints(Enesim_Renderer *r EINA_UN
 static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
-	Enesim_Renderer_Path_Abstract *parent;
+	Enesim_Renderer_Path_Enesim *thiz;
 	const Enesim_Renderer_State *cs;
 	const Enesim_Renderer_Shape_State *css;
 	double xmin;
@@ -238,7 +316,6 @@ static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
 	double ymax;
 	double swx, swy;
 
-	parent = ENESIM_RENDERER_PATH_ABSTRACT(r);
 	cs = enesim_renderer_state_get(r);
 	css = enesim_renderer_shape_state_get(r);
 
@@ -247,7 +324,8 @@ static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
 		_enesim_renderer_path_rasterizer_generate_figures(r);
 	}
 
-	if (!parent->fill_figure)
+	thiz = ENESIM_RENDERER_PATH_ENESIM(r);
+	if (!thiz->fill_figure)
 	{
 		bounds->x = 0;
 		bounds->y = 0;
@@ -261,12 +339,12 @@ static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
 	{
 		if (swx > 1.0 || swy > 1.0)
 		{
-			if (!enesim_figure_bounds(parent->stroke_figure, &xmin, &ymin, &xmax, &ymax))
+			if (!enesim_figure_bounds(thiz->stroke_figure, &xmin, &ymin, &xmax, &ymax))
 				goto failed;
 		}
 		else
 		{
-			if (!enesim_figure_bounds(parent->fill_figure, &xmin, &ymin, &xmax, &ymax))
+			if (!enesim_figure_bounds(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax))
 				goto failed;
 			/* add the stroke offset, even if the basic figure has its own bounds
 			 * we need to define the correct one here
@@ -279,7 +357,7 @@ static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
 	}
 	else
 	{
-		if (!enesim_figure_bounds(parent->fill_figure, &xmin, &ymin, &xmax, &ymax))
+		if (!enesim_figure_bounds(thiz->fill_figure, &xmin, &ymin, &xmax, &ymax))
 			goto failed;
 	}
 
@@ -347,6 +425,10 @@ static void _enesim_renderer_path_enesim_instance_deinit(void *o)
 	thiz = ENESIM_RENDERER_PATH_ENESIM(o);
 	if (thiz->bifigure)
 		enesim_renderer_unref(thiz->bifigure);
+	if (thiz->stroke_figure)
+		enesim_figure_delete(thiz->stroke_figure);
+	if (thiz->fill_figure)
+		enesim_figure_delete(thiz->fill_figure);
 }
 /*============================================================================*
  *                                 Global                                     *

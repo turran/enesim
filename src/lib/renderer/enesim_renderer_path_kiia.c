@@ -159,7 +159,6 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 
-	/* TODO check that we actually need to generate */
 	if (thiz->fill.figure)
 		enesim_figure_clear(thiz->fill.figure);
 	else
@@ -191,7 +190,6 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	{
 		generator = enesim_path_generator_strokeless_new();
 	}
-	enesim_list_unref(dashes);
 
 	join = enesim_renderer_shape_stroke_join_get(r);
 	cap = enesim_renderer_shape_stroke_cap_get(r);
@@ -209,11 +207,13 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	enesim_path_generator_scale_set(generator, 1, 1);
 	enesim_path_generator_transformation_set(generator, &transformation);
 
-	/* Finall generate the figures */
+	/* Now generate */
 	pa = ENESIM_RENDERER_PATH_ABSTRACT(r);
 	enesim_path_generator_generate(generator, pa->path->commands);
+	enesim_list_unref(dashes);
 	/* Remove the figure generators */
 	enesim_path_generator_free(generator);
+
 	return EINA_TRUE;
 }
 
@@ -259,6 +259,9 @@ static Eina_Bool _kiia_generate(Enesim_Renderer *r)
 	Enesim_Quality q;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	if (!enesim_renderer_path_abstract_needs_generate(r))
+		return EINA_TRUE;
+
 	q = enesim_renderer_quality_get(r);
 	switch (q)
 	{
@@ -278,6 +281,9 @@ static Eina_Bool _kiia_generate(Enesim_Renderer *r)
 		return EINA_FALSE;
 	if (!_kiia_edges_generate(r))
 		return EINA_FALSE;
+	/* Finally mark as we have already generated the figure */
+	enesim_renderer_path_abstract_generate(r);
+
 	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
@@ -459,7 +465,6 @@ static void _kiia_bounds_get(Enesim_Renderer *r,
 	double xmax = -DBL_MAX;
 	double ymax = -DBL_MAX;
 
-	/* TODO generate only when needed */
 	if (!_kiia_generate(r))
 		goto failed;
 	dm = enesim_renderer_shape_draw_mode_get(r);

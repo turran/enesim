@@ -17,6 +17,8 @@
  */
 #include "enesim_private.h"
 
+#include <float.h>
+
 #include "enesim_main.h"
 #include "enesim_log.h"
 #include "enesim_color.h"
@@ -72,6 +74,7 @@ typedef struct _Enesim_Renderer_Path_Tesselator_Polygon
 
 typedef struct _Enesim_Renderer_Path_Tesselator_Figure
 {
+	Enesim_Figure *figure;
 	Eina_List *polygons;
 	Enesim_Surface *src;
 	Eina_Bool needs_tesselate : 1;
@@ -84,31 +87,121 @@ typedef struct _Enesim_Renderer_Path_Tesselator
 	Enesim_Renderer_Path_Tesselator_Figure fill;
 } Enesim_Renderer_Path_Tesselator;
 
-static void _path_opengl_figure_clear(
-		Enesim_Renderer_Path_Tesselator_Figure *f)
+static void _path_opengl_figure_polygons_clear(Eina_List *polygons)
 {
-	if (f->polygons)
+	if (polygons)
 	{
 		Enesim_Renderer_Path_Tesselator_Polygon *p;
 
-		EINA_LIST_FREE(f->polygons, p)
+		EINA_LIST_FREE(polygons, p)
 		{
 			enesim_polygon_delete(p->polygon);
 			free(p);
 		}
-		f->polygons = NULL;
 	}
 }
 
-static void _enesim_renderer_path_tesselator_generate_figures(Enesim_Renderer *r)
+static void _path_opengl_figure_clear(Enesim_Renderer_Path_Tesselator_Figure *f)
+{
+	_path_opengl_figure_polygons_clear(f->polygons);
+	f->polygons = NULL;
+	if (f->src)
+	{
+		enesim_surface_unref(f->src);
+		f->src = NULL;
+	}
+}
+
+static Eina_Bool _enesim_renderer_path_tesselator_generate_figures(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Path_Tesselator *thiz;
+	Enesim_Renderer_Path_Abstract *pa;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Matrix transformation;
+	Enesim_Renderer_Shape_Stroke_Join join;
+	Enesim_Renderer_Shape_Stroke_Cap cap;
+	Enesim_Path_Generator *generator;
+	Enesim_List *dashes;
+	Eina_List *dashes_l;
+	Eina_Bool stroke_scalable;
+	double stroke_weight;
+
+	thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
+
+	if (thiz->fill.figure)
+		enesim_figure_clear(thiz->fill.figure);
+	else
+		thiz->fill.figure = enesim_figure_new();
+
+	if (thiz->stroke.figure)
+		enesim_figure_clear(thiz->stroke.figure);
+	else
+		thiz->stroke.figure = enesim_figure_new();
+
+
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	dashes = enesim_renderer_shape_dashes_get(r);
+	dashes_l = dashes->l;
+
+	/* decide what generator to use */
+	/* for a stroke smaller than 1px we will use the basic
+	 * rasterizer directly, so we dont need to generate the
+	 * stroke path
+	 */
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) 
+	{
+		if (!dashes_l)
+			generator = enesim_path_generator_stroke_dashless_new();
+		else
+			generator = enesim_path_generator_dashed_new();
+	}
+	else
+	{
+		generator = enesim_path_generator_strokeless_new();
+	}
+
+	join = enesim_renderer_shape_stroke_join_get(r);
+	cap = enesim_renderer_shape_stroke_cap_get(r);
+	stroke_weight = enesim_renderer_shape_stroke_weight_get(r);
+	stroke_scalable = enesim_renderer_shape_stroke_scalable_get(r);
+	enesim_renderer_transformation_get(r, &transformation);
+
+	enesim_path_generator_figure_set(generator, thiz->fill.figure);
+	enesim_path_generator_stroke_figure_set(generator, thiz->stroke.figure);
+	enesim_path_generator_stroke_cap_set(generator, cap);
+	enesim_path_generator_stroke_join_set(generator, join);
+	enesim_path_generator_stroke_weight_set(generator, stroke_weight);
+	enesim_path_generator_stroke_scalable_set(generator, stroke_scalable);
+	enesim_path_generator_stroke_dash_set(generator, dashes_l);
+	enesim_path_generator_scale_set(generator, 1, 1);
+	enesim_path_generator_transformation_set(generator, &transformation);
+
+	/* Now generate */
+	pa = ENESIM_RENDERER_PATH_ABSTRACT(r);
+	enesim_path_generator_generate(generator, pa->path->commands);
+	enesim_list_unref(dashes);
+	/* Remove the figure generators */
+	enesim_path_generator_free(generator);
+
+	return EINA_TRUE;
+}
+
+static Eina_Bool _enesim_renderer_path_tesselator_generate(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Tesselator *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
+	if (!enesim_renderer_path_abstract_needs_generate(r))
+		return EINA_TRUE;
 
-	enesim_renderer_path_abstract_generate(r);
+	_enesim_renderer_path_tesselator_generate_figures(r);
 	thiz->fill.needs_tesselate = EINA_TRUE;
 	thiz->stroke.needs_tesselate = EINA_TRUE;
+
+	/* Finally mark as we have already generated the figure */
+	enesim_renderer_path_abstract_generate(r);
+
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                                Shaders                                     *
@@ -320,14 +413,16 @@ static void _path_opengl_error_cb(GLenum err_no EINA_UNUSED, void *data EINA_UNU
 }
 
 static void _path_opengl_tesselate(
-		Enesim_Renderer_Path_Tesselator_Figure *glf,
-		Enesim_Figure *f)
+		Enesim_Renderer_Path_Tesselator_Figure *glf)
 {
 	Enesim_Polygon *p;
+	Enesim_Figure *f;
 	Eina_List *l1;
 	GLUtesselator *t;
 
-	_path_opengl_figure_clear(glf);
+	_path_opengl_figure_polygons_clear(glf->polygons);
+	glf->polygons = NULL;
+	f = glf->figure;
 
 	/* generate the figures */
 	/* TODO we could use the tesselator directly on our own vertex generator? */
@@ -465,7 +560,6 @@ static void _path_opengl_blit(GLenum fbo, GLenum dst,
 static void _path_opengl_figure_draw(GLenum fbo,
 		GLuint texture,
 		Enesim_Renderer_Path_Tesselator_Figure *gf,
-		Enesim_Figure *f,
 		Enesim_Color color,
 		Enesim_Pool *pool,
 		Enesim_Renderer *rel,
@@ -475,8 +569,8 @@ static void _path_opengl_figure_draw(GLenum fbo,
 		int x, int y)
 {
 	Enesim_OpenGL_Compiled_Program *cp;
-	GLfloat fm[16];
 	Enesim_Matrix tx;
+	GLfloat fm[16];
 
 	/* draw the relative renderer */
 	if (rel)
@@ -536,7 +630,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 			_path_opengl_silhoutte_ambient_shader_setup(cp->id, color);
 		}
 		glUseProgramObjectARB(cp->id);
-		_path_opengl_silhoutte_draw(f, area);
+		_path_opengl_silhoutte_draw(gf->figure, area);
 	}
 
 	/* now fill the aliased figure on top */
@@ -558,7 +652,7 @@ static void _path_opengl_figure_draw(GLenum fbo,
 	/* check if we need to tesselate again */
 	if (gf->needs_tesselate)
 	{
-		_path_opengl_tesselate(gf, f);
+		_path_opengl_tesselate(gf);
 	}
 	/* if not, just use the cached vertices */
 	else
@@ -576,13 +670,11 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 		int x, int y)
 {
 	Enesim_Renderer_Path_Tesselator *thiz;
-	Enesim_Renderer_Path_Abstract *parent;
 	Enesim_Renderer_Path_Tesselator_Figure *gf;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Renderer *rel;
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	Enesim_Buffer_OpenGL_Data *sdata;
-	Enesim_Figure *f;
 	Enesim_Pool *pool;
 	Enesim_Color final_color;
 	GLint viewport[4];
@@ -590,7 +682,6 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
-	parent = ENESIM_RENDERER_PATH_ABSTRACT(r);
 
 	enesim_surface_size_get(s, &w, &h);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -600,13 +691,11 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		gf = &thiz->stroke;
-		f = parent->stroke_figure;
 		enesim_renderer_shape_stroke_setup(r, &final_color, &rel);
 	}
 	else
 	{
 		gf = &thiz->fill;
-		f = parent->fill_figure;
 		enesim_renderer_shape_fill_setup(r, &final_color, &rel);
 	}
 
@@ -614,7 +703,7 @@ static void _path_opengl_fill_or_stroke_draw(Enesim_Renderer *r,
 	texture = enesim_opengl_texture_new(area->w, area->h, NULL);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	/* render there */
-	_path_opengl_figure_draw(sdata->fbo, texture, gf, f, final_color,
+	_path_opengl_figure_draw(sdata->fbo, texture, gf, final_color,
 			pool, rel, rdata, EINA_TRUE, area, x, y);
 	/* we no longer need the pool */
 	enesim_pool_unref(pool);
@@ -661,7 +750,6 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 		int x, int y)
 {
 	Enesim_Renderer_Path_Tesselator *thiz;
-	Enesim_Renderer_Path_Abstract *parent;
 	Enesim_Renderer_OpenGL_Data *rdata;
 	Enesim_Buffer_OpenGL_Data *sdata;
 	Enesim_OpenGL_Compiled_Program *cp;
@@ -673,7 +761,6 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	int w, h;
 
 	thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
-	parent = ENESIM_RENDERER_PATH_ABSTRACT(r);
 
 	enesim_surface_size_get(s, &w, &h);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
@@ -691,16 +778,14 @@ static void _path_opengl_fill_and_stroke_draw(Enesim_Renderer *r,
 	/* draw the fill into the newly created buffer */
 	enesim_renderer_shape_fill_setup(r, &final_color, &rel);
 	_path_opengl_figure_draw(sdata->fbo, textures[0], &thiz->fill,
-			parent->fill_figure, final_color, pool, rel, rdata,
-			EINA_FALSE, area, x, y);
+			final_color, pool, rel, rdata, EINA_FALSE, area, x, y);
 	if (rel) enesim_renderer_unref(rel);
 
 	/* draw the stroke into the newly created buffer */
 	enesim_renderer_shape_stroke_setup(r, &final_color, &rel);
 	/* FIXME this one is slow but only after the other */
 	_path_opengl_figure_draw(sdata->fbo, textures[1], &thiz->stroke,
-			parent->stroke_figure, final_color, pool, rel, rdata,
-			EINA_TRUE, area, x, y);
+			final_color, pool, rel, rdata, EINA_TRUE, area, x, y);
 	if (rel) enesim_renderer_unref(rel);
 
 	/* we no longer need the pool */
@@ -783,10 +868,8 @@ static Eina_Bool _enesim_renderer_path_tesselator_opengl_setup(Enesim_Renderer *
 	css = enesim_renderer_shape_state_get(r);
 
 	/* generate the figures */
-	if (enesim_renderer_path_abstract_needs_generate(r))
-	{
-		_enesim_renderer_path_tesselator_generate_figures(r);
-	}
+	if (!_enesim_renderer_path_tesselator_generate(r))
+		return EINA_FALSE;
 
 	/* check what to draw, stroke, fill or stroke + fill */
 	dm = css->current.draw_mode;
@@ -831,70 +914,56 @@ static void _enesim_renderer_path_tesselator_features_get(
 static void _enesim_renderer_path_tesselator_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds)
 {
-	Enesim_Renderer_Path_Abstract *parent;
-	const Enesim_Renderer_State *cs;
-	const Enesim_Renderer_Shape_State *css;
-	double xmin;
-	double ymin;
-	double xmax;
-	double ymax;
-	double swx, swy;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	double xmin = DBL_MAX;
+	double ymin = DBL_MAX;
+	double xmax = -DBL_MAX;
+	double ymax = -DBL_MAX;
 
-	parent = ENESIM_RENDERER_PATH_ABSTRACT(r);
-	cs = enesim_renderer_state_get(r);
-	css = enesim_renderer_shape_state_get(r);
+	if (!_enesim_renderer_path_tesselator_generate(r))
+		goto failed;
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	/* check the type of draw mode */
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	{
+		Enesim_Renderer_Path_Tesselator *thiz;
+		double lx, rx, ty, by;
 
-	if (enesim_renderer_path_abstract_needs_generate(r))
-	{
-		_enesim_renderer_path_tesselator_generate_figures(r);
-	}
-
-	if (!parent->fill_figure)
-	{
-		bounds->x = 0;
-		bounds->y = 0;
-		bounds->w = 0;
-		bounds->h = 0;
-		return;
-	}
-
-	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
-	if (css->current.draw_mode & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
-	{
-		if (swx > 1.0 || swy > 1.0)
-		{
-			if (!enesim_figure_bounds(parent->stroke_figure, &xmin, &ymin, &xmax, &ymax))
-				goto failed;
-		}
-		else
-		{
-			if (!enesim_figure_bounds(parent->fill_figure, &xmin, &ymin, &xmax, &ymax))
-				goto failed;
-			/* add the stroke offset, even if the basic figure has its own bounds
-			 * we need to define the correct one here
-			 */
-			xmin -= 0.5;
-			ymin -= 0.5;
-			xmax += 0.5;
-			ymax += 0.5;
-		}
-	}
-	else
-	{
-		if (!enesim_figure_bounds(parent->fill_figure, &xmin, &ymin, &xmax, &ymax))
+		thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
+		if (!enesim_figure_bounds(thiz->fill.figure, &lx, &ty, &rx, &by))
 			goto failed;
+		if (lx < xmin)
+			xmin = lx;
+		if (rx > xmax)
+			xmax = rx;
+		if (ty < ymin)
+			ymin = ty;
+		if (by > ymax)
+			ymax = by;
 	}
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	{
+		Enesim_Renderer_Path_Tesselator *thiz;
+		double lx, rx, ty, by;
 
+		thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
+		if (!enesim_figure_bounds(thiz->stroke.figure, &lx, &ty, &rx, &by))
+			goto failed;
+		if (lx < xmin)
+			xmin = lx;
+		if (rx > xmax)
+			xmax = rx;
+		if (ty < ymin)
+			ymin = ty;
+		if (by > ymax)
+			ymax = by;
+	}
+	/* snap the bounds */
 	bounds->x = xmin;
-	bounds->w = xmax - xmin;
 	bounds->y = ymin;
-	bounds->h = ymax - ymin;
-
-	/* translate by the origin */
-	bounds->x += cs->current.ox;
-	bounds->y += cs->current.oy;
+	bounds->w = (xmax - xmin) + 1;
+	bounds->h = (ymax - ymin) + 1;
 	return;
-
 failed:
 	bounds->x = 0;
 	bounds->y = 0;
@@ -948,10 +1017,8 @@ static void _enesim_renderer_path_tesselator_instance_deinit(void *o)
 	Enesim_Renderer_Path_Tesselator *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_TESSELATOR(o);
-	if (thiz->fill.src)
-		enesim_surface_unref(thiz->fill.src);
-	if (thiz->stroke.src)
-		enesim_surface_unref(thiz->stroke.src);
+	_path_opengl_figure_clear(&thiz->fill);
+	_path_opengl_figure_clear(&thiz->stroke);
 }
 #endif
 /*============================================================================*

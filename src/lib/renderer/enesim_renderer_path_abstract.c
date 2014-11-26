@@ -64,7 +64,6 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-#define DUMP 0
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -83,9 +82,6 @@ static void _enesim_renderer_path_abstract_instance_init(void *o EINA_UNUSED)
 
 	thiz = ENESIM_RENDERER_PATH_ABSTRACT(o);
 	/* create the different path implementations */
-	thiz->stroke_path = enesim_path_generator_stroke_dashless_new();
-	thiz->strokeless_path = enesim_path_generator_strokeless_new();
-	thiz->dashed_path = enesim_path_generator_dashed_new();
 }
 
 static void _enesim_renderer_path_abstract_instance_deinit(void *o)
@@ -93,16 +89,6 @@ static void _enesim_renderer_path_abstract_instance_deinit(void *o)
 	Enesim_Renderer_Path_Abstract *thiz;
 
 	thiz = ENESIM_RENDERER_PATH_ABSTRACT(o);
-	if (thiz->stroke_figure)
-		enesim_figure_delete(thiz->stroke_figure);
-	if (thiz->fill_figure)
-		enesim_figure_delete(thiz->fill_figure);
-	if (thiz->dashed_path)
-		enesim_path_generator_free(thiz->dashed_path);
-	if (thiz->strokeless_path)
-		enesim_path_generator_free(thiz->strokeless_path);
-	if (thiz->stroke_path)
-		enesim_path_generator_free(thiz->stroke_path);
 	if (thiz->path)
 		enesim_path_unref(thiz->path);
 }
@@ -166,86 +152,19 @@ Eina_Bool enesim_renderer_path_abstract_needs_generate(Enesim_Renderer *r)
 void enesim_renderer_path_abstract_generate(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path_Abstract *thiz;
-	Enesim_Renderer_Shape_Draw_Mode dm;
 	Enesim_Matrix transformation;
 	Enesim_Renderer_Shape_Stroke_Join join;
 	Enesim_Renderer_Shape_Stroke_Cap cap;
-	Enesim_Path_Generator *generator;
-	Enesim_List *dashes;
-	Eina_List *dashes_l;
 	Eina_Bool stroke_scalable;
 	double stroke_weight;
-	double swx;
-	double swy;
 
 	thiz = ENESIM_RENDERER_PATH_ABSTRACT(r);
-	if (thiz->fill_figure)
-		enesim_figure_clear(thiz->fill_figure);
-	else
-		thiz->fill_figure = enesim_figure_new();
-
-	if (thiz->stroke_figure)
-		enesim_figure_clear(thiz->stroke_figure);
-	else
-		thiz->stroke_figure = enesim_figure_new();
-
-
-	dm = enesim_renderer_shape_draw_mode_get(r);
-	dashes = enesim_renderer_shape_dashes_get(r);
-	dashes_l = dashes->l;
-	enesim_list_unref(dashes);
-	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
-
-	/* decide what generator to use */
-	/* for a stroke smaller than 1px we will use the basic
-	 * rasterizer directly, so we dont need to generate the
-	 * stroke path
-	 */
-	if ((dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) &&
-			(dashes_l || swx > 1.0 || swy > 1.0))
-	{
-		if (!dashes_l)
-			generator = thiz->stroke_path;
-		else
-			generator = thiz->dashed_path;
-		thiz->stroke_figure_used = EINA_TRUE;
-	}
-	else
-	{
-		generator = thiz->strokeless_path;
-		thiz->stroke_figure_used = EINA_FALSE;
-
-	}
 
 	join = enesim_renderer_shape_stroke_join_get(r);
 	cap = enesim_renderer_shape_stroke_cap_get(r);
 	stroke_weight = enesim_renderer_shape_stroke_weight_get(r);
 	stroke_scalable = enesim_renderer_shape_stroke_scalable_get(r);
 	enesim_renderer_transformation_get(r, &transformation);
-
-	enesim_path_generator_figure_set(generator, thiz->fill_figure);
-	enesim_path_generator_stroke_figure_set(generator, thiz->stroke_figure);
-	enesim_path_generator_stroke_cap_set(generator, cap);
-	enesim_path_generator_stroke_join_set(generator, join);
-	enesim_path_generator_stroke_weight_set(generator, stroke_weight);
-	enesim_path_generator_stroke_scalable_set(generator, stroke_scalable);
-	enesim_path_generator_stroke_dash_set(generator, dashes_l);
-	enesim_path_generator_scale_set(generator, 1, 1);
-	enesim_path_generator_transformation_set(generator, &transformation);
-	if (thiz->path)
-	{
-		enesim_path_generator_generate(generator, thiz->path->commands);
-	}
-
-#if DUMP
-	if (thiz->stroke_figure_used)
-	{
-		printf("stroke figure\n");
-		enesim_figure_dump(thiz->stroke_figure);
-	}
-	printf("fill figure\n");
-	enesim_figure_dump(thiz->fill_figure);
-#endif
 
 	thiz->generated = EINA_TRUE;
 	thiz->last_path_change = thiz->path->changed;

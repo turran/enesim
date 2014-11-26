@@ -41,11 +41,6 @@ typedef struct _Enesim_Renderer_Path_Abstract
 	Enesim_Renderer_Shape parent;
 	/* some common helpers */
 	Enesim_Path *path;
-	Enesim_Path_Generator *stroke_path;
-	Enesim_Path_Generator *strokeless_path;
-	Enesim_Path_Generator *dashed_path;
-	Enesim_Figure *fill_figure;
-	Enesim_Figure *stroke_figure;
 	/* external properties that require a path generation */
 	Enesim_Matrix last_matrix;
 	Enesim_Renderer_Shape_Stroke_Join last_join;
