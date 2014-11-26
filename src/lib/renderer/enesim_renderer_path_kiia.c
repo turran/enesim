@@ -686,6 +686,11 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 			enesim_renderer_path_kiia_32_even_odd_color_renderer_full;
 	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][1] = 
 			enesim_renderer_path_kiia_32_non_zero_color_renderer_full;
+
+	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1][1] = 
+			enesim_renderer_path_kiia_32_non_zero_renderer_renderer_full;
+	_fill_full[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1][1] = 
+			enesim_renderer_path_kiia_32_even_odd_renderer_renderer_full;
 }
 
 static void _enesim_renderer_path_kiia_instance_init(void *o)

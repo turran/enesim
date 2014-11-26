@@ -409,6 +409,98 @@ static inline Eina_Bool _kiia_figure_color_renderer_fill(
 	return EINA_TRUE;
 }
 
+static inline Eina_Bool _kiia_figure_renderer_renderer_fill(
+		Enesim_Renderer_Path_Kiia_Figure *f,
+		Enesim_Renderer_Path_Kiia_Figure *s,
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE scm,
+		uint32_t *src, uint32_t *ssrc,
+		uint32_t *p0)
+{
+	if (scm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	{
+		uint32_t q0;
+
+		q0 = *ssrc;
+		if (s->color != 0xffffffff)
+			q0 = enesim_color_mul4_sym(q0, s->color);
+		*p0 = q0;
+	}
+	else if (scm == 0)
+	{
+		if (!_kiia_figure_renderer_fill(f, cm, src, p0))
+			return EINA_FALSE;
+	}
+	else
+	{
+		uint16_t coverage;
+
+		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(scm);
+		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+		{
+			uint32_t q0, q1;
+
+			if (s->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*ssrc, s->color);
+			}
+			else
+			{
+				q0 = *ssrc;
+			}
+			if (f->color != 0xffffffff)
+			{
+				q1 = enesim_color_mul4_sym(*src, f->color);
+			}
+			else
+			{
+				q1 = *src;
+			}
+			*p0 = enesim_color_interp_256(coverage, q0, q1);
+		}
+		else if (cm == 0)
+		{
+			uint32_t q0;
+
+			if (s->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*ssrc, s->color);
+			}
+			else
+			{
+				q0 = *ssrc;
+			}
+			*p0 = enesim_color_mul_256(coverage, q0);
+		}
+		else
+		{
+			uint32_t q0;
+			uint32_t q1;
+			uint16_t fcoverage;
+
+			fcoverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(cm);
+			if (s->color != 0xffffffff)
+			{
+				q0 = enesim_color_mul4_sym(*ssrc, s->color);
+			}
+			else
+			{
+				q0 = *ssrc;
+			}
+
+			q1 = *src;
+			if (f->color != 0xffffffff)
+			{
+				q1 = enesim_color_mul4_sym(*src, f->color);
+			}
+
+			q1 = enesim_color_mul_256(fcoverage, q1);
+			*p0 = enesim_color_interp_256(coverage, q0, q1);
+		}
+	}
+	return EINA_TRUE;
+}
+
 /* nsamples = 8, 16, 32
  * fill_mode = non_zero, even_odd
  * fill = color, renderer
