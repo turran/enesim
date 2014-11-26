@@ -730,7 +730,7 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 	{
 		ERR("glPathTexGenNV failed 0x%08x", err);
 	}
-propagate:
+//propagate:
 	_enesim_renderer_path_nv_setup_stroke(thiz);
 	_enesim_renderer_path_nv_setup_fill(thiz);
 

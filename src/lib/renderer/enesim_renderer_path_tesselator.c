@@ -841,17 +841,16 @@ static void _enesim_renderer_path_tesselator_shape_features_get(
 			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
 
-static Eina_Bool _enesim_renderer_path_tesselator_has_changed(Enesim_Renderer *r)
+static Eina_Bool _enesim_renderer_path_tesselator_has_changed(
+		Enesim_Renderer *r EINA_UNUSED)
 {
-	Enesim_Renderer_Path_Tesselator *thiz;
-
 #if 0
 	thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
 	if (thiz->new_path || thiz->path_changed || (thiz->path && thiz->path->changed) || (thiz->dashes_changed))
 		return EINA_TRUE;
 	else
 #endif
-		return EINA_FALSE;
+	return EINA_FALSE;
 }
 
 static Eina_Bool _enesim_renderer_path_tesselator_opengl_setup(Enesim_Renderer *r,
@@ -859,11 +858,8 @@ static Eina_Bool _enesim_renderer_path_tesselator_opengl_setup(Enesim_Renderer *
 		Enesim_Renderer_OpenGL_Draw *draw,
 		Enesim_Log **l EINA_UNUSED)
 {
-	Enesim_Renderer_Path_Tesselator *thiz;
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	const Enesim_Renderer_Shape_State *css;
-
-	thiz = ENESIM_RENDERER_PATH_TESSELATOR(r);
 
 	css = enesim_renderer_shape_state_get(r);
 
@@ -989,7 +985,6 @@ ENESIM_OBJECT_INSTANCE_BOILERPLATE(ENESIM_RENDERER_PATH_ABSTRACT_DESCRIPTOR,
 
 static void _enesim_renderer_path_tesselator_class_init(void *k)
 {
-	Enesim_Renderer_Path_Abstract_Class *klass;
 	Enesim_Renderer_Shape_Class *s_klass;
 	Enesim_Renderer_Class *r_klass;
 
@@ -1004,8 +999,6 @@ static void _enesim_renderer_path_tesselator_class_init(void *k)
 	s_klass->has_changed = _enesim_renderer_path_tesselator_has_changed;
 	s_klass->opengl_setup = _enesim_renderer_path_tesselator_opengl_setup;
 	s_klass->opengl_cleanup = _enesim_renderer_path_tesselator_opengl_cleanup;
-
-	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
 }
 
 static void _enesim_renderer_path_tesselator_instance_init(void *o EINA_UNUSED)
