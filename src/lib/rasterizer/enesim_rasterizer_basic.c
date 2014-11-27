@@ -196,8 +196,8 @@ static Eina_Bool _basic_vectors_generate(Enesim_Renderer *r)
 			enesim_point_2d_round(&pc, 256.0);
 			pp = *lp;
 			enesim_point_2d_round(&pp, 256.0);
-			enesim_f16p16_vector_setup(v, &pp, &pc, 1 / 256.0);
-			n++;
+			if (enesim_f16p16_vector_setup(v, &pp, &pc, 1 / 256.0))
+				n++;
 		}
 	}
 	thiz->vectors = vec;
