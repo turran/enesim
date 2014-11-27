@@ -131,12 +131,28 @@ static Eina_Bool _basic_vectors_generate(Enesim_Renderer *r)
 	Enesim_Polygon *p;
 	Enesim_F16p16_Vector *vec;
 	Eina_List *l1;
+	double lx, rx, ty, by;
+	double sx = 1, sy = 1;
 	int nvectors = 0;
 	int n = 0;
 
 	thiz = ENESIM_RASTERIZER_BASIC(r);
+	/* get the bounds of the figure */
+	if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
+		return EINA_FALSE;
 
 	draw_mode = enesim_renderer_shape_draw_mode_get(r);
+	/* reduce by one pixel given how the algorithm works */
+	if ((draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) &&
+		 (lx != rx) && (ty != by))
+	{
+		sx = (rx - lx - 1) / (rx - lx);
+		if (sx < (1 / 16.0))
+			sx = 1 / 16.0;
+		sy = (by - ty - 1) / (by - ty);
+		if (sy < (1 / 16.0))
+			sy = 1 / 16.0;
+	}
 	/* allocate the maximum number of vectors possible */
 	EINA_LIST_FOREACH(thiz->figure->polygons, l1, p)
 		n += enesim_polygon_point_count(p);
@@ -171,6 +187,9 @@ static Eina_Bool _basic_vectors_generate(Enesim_Renderer *r)
 
 		/* start with the second point */
 		pp = *fp;
+		/* rescale the point */
+		pp.x = sx * (pp.x - lx) + lx;
+		pp.y = sy * (pp.y - ty) + ty;
 		enesim_point_2d_round(&pp, 256.0);
 		points = eina_list_next(p->points);
 		EINA_LIST_FOREACH(points, l2, pt)
@@ -179,6 +198,9 @@ static Eina_Bool _basic_vectors_generate(Enesim_Renderer *r)
 			Enesim_F16p16_Vector *v = &vec[n];
 
 			pc = *pt;
+			/* rescale the point */
+			pc.x = sx * (pc.x - lx) + lx;
+			pc.y = sy * (pc.y - ty) + ty;
 			enesim_point_2d_round(&pc, 256.0);
 			if (enesim_f16p16_vector_setup(v, &pp, &pc, 1 / 256.0))
 			{
@@ -193,8 +215,14 @@ static Eina_Bool _basic_vectors_generate(Enesim_Renderer *r)
 			Enesim_F16p16_Vector *v = &vec[n];
 
 			pc = *fp;
+			/* rescale the point */
+			pc.x = sx * (pc.x - lx) + lx;
+			pc.y = sy * (pc.y - ty) + ty;
 			enesim_point_2d_round(&pc, 256.0);
 			pp = *lp;
+			/* rescale the point */
+			pp.x = sx * (pp.x - lx) + lx;
+			pp.y = sy * (pp.y - ty) + ty;
 			enesim_point_2d_round(&pp, 256.0);
 			if (enesim_f16p16_vector_setup(v, &pp, &pc, 1 / 256.0))
 				n++;
@@ -204,6 +232,13 @@ static Eina_Bool _basic_vectors_generate(Enesim_Renderer *r)
 	thiz->nvectors = n;
 
 	qsort(thiz->vectors, thiz->nvectors, sizeof(Enesim_F16p16_Vector), _basic_vectors_ty_sort);
+	/* in theory we should add 1 here, like the path renderer
+	 * but the span functions handle that for us
+	 */
+	thiz->tyy = eina_f16p16_double_from(ty);
+	thiz->byy = eina_f16p16_double_from(by);
+	thiz->lxx = eina_f16p16_double_from(lx);
+	thiz->rxx = eina_f16p16_double_from(rx);
 	return EINA_TRUE;
 }
 
@@ -881,11 +916,6 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 
 	if (changed || thiz->changed)
 	{
-#if 0
-		double sx = 1, sy = 1;
-#endif
-		double lx, rx, ty, by;
-
 		thiz->changed = EINA_FALSE;
 		if (thiz->vectors)
 		{
@@ -897,28 +927,6 @@ static Eina_Bool _basic_sw_setup(Enesim_Renderer *r,
 		_basic_vectors_generate(r);
 		if (!thiz->vectors)
 			return EINA_FALSE;
-		/* generate the bounds to clip the span functions */
-		if (!enesim_figure_bounds(thiz->figure, &lx, &ty, &rx, &by))
-			return EINA_FALSE;
-#if 0
-		if ((draw_mode == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) &&
-			 (lx != rx) && (ty != by))
-		{
-			sx = (rx - lx - 1) / (rx - lx);
-			if (sx < (1 / 16.0))
-				sx = 1 / 16.0;
-			sy = (by - ty - 1) / (by - ty);
-			if (sy < (1 / 16.0))
-				sy = 1 / 16.0;
-		}
-#endif
-		/* in theory we should add 1 here, like the path renderer
-		 * but the span functions handle that for us
-		 */
-		thiz->tyy = eina_f16p16_double_from(ty);
-		thiz->byy = eina_f16p16_double_from(by);
-		thiz->lxx = eina_f16p16_double_from(lx);
-		thiz->rxx = eina_f16p16_double_from(rx);
 	}
 
 	enesim_renderer_transformation_get(r, &matrix);
