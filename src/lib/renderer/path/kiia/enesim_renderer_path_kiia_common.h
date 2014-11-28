@@ -743,10 +743,13 @@ next:										\
 	{									\
 		for (i = rx; i < mrx; i++)					\
 		{								\
+			ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *tmp;		\
 			/* FIXME For now we always clear both arrays, even if
 			 * one might not be used */				\
-			w->mask[i] = 0;						\
-			w->omask[i] = 0;					\
+			tmp = w->mask;						\
+			tmp[i] = 0;						\
+			tmp = w->omask;						\
+			tmp[i] = 0;						\
 			w->winding[i] = 0;					\
 			w->owinding[i] = 0;					\
 		}								\
@@ -755,3 +758,23 @@ next:										\
 	w->y = y;								\
 }
 
+#define ENESIM_RENDERER_PATH_KIIA_WORKER_SETUP(nsamples)			\
+void enesim_renderer_path_kiia_##nsamples##_worker_setup(Enesim_Renderer *r, 	\
+		int y, int len)							\
+{										\
+	Enesim_Renderer_Path_Kiia *thiz;					\
+	int i;									\
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);					\
+	/* setup the workers */							\
+	for (i = 0; i < thiz->nworkers; i++)					\
+	{									\
+		thiz->workers[i].y = y;						\
+		/* +1 because of the pattern offset */				\
+		thiz->workers[i].mask = calloc(len + 1, 			\
+				sizeof(ENESIM_RENDERER_PATH_KIIA_MASK_TYPE));	\
+		thiz->workers[i].winding = calloc((len + 1), sizeof(int));	\
+		thiz->workers[i].omask = calloc(len + 1,			\
+				sizeof(ENESIM_RENDERER_PATH_KIIA_MASK_TYPE));	\
+		thiz->workers[i].owinding = calloc((len + 1), sizeof(int));	\
+	}									\
+}
