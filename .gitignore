@@ -42,3 +42,7 @@ coverage
 /m4/ltsugar.m4
 /m4/ltversion.m4
 /m4/lt~obsolete.m4
+src/lib/color/enesim_color_blend_orc.c
+src/lib/color/enesim_color_blend_orc_private.h
+enesim-*.tar.gz
+enesim-*.tar.bz2
