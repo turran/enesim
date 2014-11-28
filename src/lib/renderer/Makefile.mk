@@ -47,10 +47,6 @@ src/lib/renderer/enesim_renderer_importer.c \
 src/lib/renderer/enesim_renderer_line.c \
 src/lib/renderer/enesim_renderer_map_quad.c \
 src/lib/renderer/enesim_renderer_path.c \
-src/lib/renderer/enesim_renderer_path_abstract.c \
-src/lib/renderer/enesim_renderer_path_abstract_private.h \
-src/lib/renderer/enesim_renderer_path_kiia.c \
-src/lib/renderer/enesim_renderer_path_rasterizer.c \
 src/lib/renderer/enesim_renderer_pattern.c \
 src/lib/renderer/enesim_renderer_perlin.c \
 src/lib/renderer/enesim_renderer_proxy.c \
@@ -65,17 +61,6 @@ src/lib/renderer/enesim_renderer_stripes.c \
 src/lib/renderer/enesim_renderer_text_span.c \
 src/lib/renderer/enesim_renderer_transition.c
 
-if BUILD_CAIRO
-src_lib_libenesim_la_SOURCES += \
-src/lib/renderer/enesim_renderer_path_cairo.c
-endif
-
-if BUILD_OPENGL
-src_lib_libenesim_la_SOURCES += \
-src/lib/renderer/enesim_renderer_path_nv.c \
-src/lib/renderer/enesim_renderer_path_tesselator.c
-endif
-
 EXTRA_DIST += \
 src/lib/renderer/enesim_renderer_checker.glsl \
 src/lib/renderer/enesim_renderer_gradient_linear.glsl \
@@ -85,9 +70,6 @@ src/lib/renderer/enesim_renderer_opengl_common_blit.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_merge.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_texture.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_vertex.glsl \
-src/lib/renderer/enesim_renderer_path_silhoutte_ambient.glsl \
-src/lib/renderer/enesim_renderer_path_silhoutte_vertex.glsl \
-src/lib/renderer/enesim_renderer_path_silhoutte_texture.glsl \
 src/lib/renderer/enesim_renderer_rectangle.glsl \
 src/lib/renderer/enesim_renderer_stripes.glsl
 
