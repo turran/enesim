@@ -48,12 +48,14 @@ static int _kiia_edge_sort(const void *l, const void *r)
 	return 1;
 }
 
-static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
+/* On the first edge we will modify the first and the second point
+ * with the snapped y's coordinates
+ */
+static Eina_Bool _kiia_edge_first_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 		Enesim_Point *p0, Enesim_Point *p1, double nsamples)
 {
 	double x0, y0, x1, y1;
 	double x01, y01;
-	double start;
 	double slope;
 	double mx;
 	int sgn;
@@ -75,20 +77,20 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 		y1 = p1->y;
 		sgn = 1;
 	}
+	/* get the sampled Y inside the line */
+	y0 = (ceil(y0 * nsamples) / nsamples);
+	y1 = (floor(y1 * nsamples) / nsamples);
+	if (y0 == y1)
+		return EINA_FALSE;
+
 	/* get the slope */
 	x01 = x1 - x0;
 	y01 = y1 - y0;
-	/* for horizontal edges we just skip */
-	if (fabs(y01) < 1/256.0)
-		return EINA_FALSE;
+
 	slope = x01 / y01;
+	mx = x0;
 
-	/* get the sampled Y inside the line */
-	start = (((int)(y0 * nsamples) )/ nsamples);
-	y1 = (((int)(y1 * nsamples)) / nsamples);
-	mx = x0 + (slope * (start - y0));
-
-	thiz->yy0 = eina_f16p16_double_from(start);
+	thiz->yy0 = eina_f16p16_double_from(y0);
 	thiz->yy1 = eina_f16p16_double_from(y1);
 	thiz->xx0 = eina_f16p16_double_from(x0);
 	thiz->xx1 = eina_f16p16_double_from(x1);
@@ -96,7 +98,77 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	thiz->mx = eina_f16p16_double_from(mx);
 	thiz->sgn = sgn;
 
-	//printf("edges %g %g %g %g %g (%g)\n", x0, start, x1, y1, slope, y01);
+	if (sgn < 0)
+	{
+		p0->y = y1;
+		p1->y = y0;
+	}
+	else
+	{
+		p0->y = y0;
+		p1->y = y1;
+	}
+
+	//printf("edges %g %g %g %g %g (%g)\n", x0, y0, x1, y1, slope, y01);
+
+	return EINA_TRUE;
+}
+
+/* Only modify the second point, the first is already snapped
+ */
+static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
+		Enesim_Point *p0, Enesim_Point *p1, double nsamples)
+{
+	double x0, y0, x1, y1;
+	double x01, y01;
+	double slope;
+	double mx;
+	int sgn;
+
+	/* going down, swap the y */
+	if (p0->y > p1->y)
+	{
+		x0 = p1->x;
+		y0 = p1->y;
+		x1 = p0->x;
+		y1 = p0->y;
+		/* get the sampled Y inside the line */
+		y0 = (ceil(y0 * nsamples) / nsamples);
+		/* set the p1 y */
+		p1->y = y0;
+		sgn = -1;
+	}
+	else
+	{
+		x0 = p0->x;
+		y0 = p0->y;
+		x1 = p1->x;
+		y1 = p1->y;
+		/* get the sampled Y inside the line */
+		y1 = (floor(y1 * nsamples) / nsamples);
+		/* set the p1 y */
+		p1->y = y1;
+		sgn = 1;
+	}
+	if (y0 == y1)
+		return EINA_FALSE;
+
+	/* get the slope */
+	x01 = x1 - x0;
+	y01 = y1 - y0;
+
+	slope = x01 / y01;
+	mx = x0;
+
+	thiz->yy0 = eina_f16p16_double_from(y0);
+	thiz->yy1 = eina_f16p16_double_from(y1);
+	thiz->xx0 = eina_f16p16_double_from(x0);
+	thiz->xx1 = eina_f16p16_double_from(x1);
+	thiz->slope = eina_f16p16_double_from(slope/nsamples);
+	thiz->mx = eina_f16p16_double_from(mx);
+	thiz->sgn = sgn;
+
+	//printf("edges %g %g %g %g %g (%g)\n", x0, y0, x1, y1, slope, y01);
 
 	return EINA_TRUE;
 }
@@ -118,25 +190,47 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	n = 0;
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
-		Enesim_Point *fp, *pt, *pp;
+		Enesim_Point *pt;
+		Enesim_Point fp;
+		Enesim_Point pp;
 		Eina_List *points, *l2;
 
-		fp = eina_list_data_get(p->points);
-		pp = fp;
+		pt = eina_list_data_get(p->points);
+		fp = pp = *pt;
 		points = eina_list_next(p->points);
+		/* find the first edge */
 		EINA_LIST_FOREACH(points, l2, pt)
 		{
 			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
+			Enesim_Point cp;
 
-			if (_kiia_edge_setup(e, pp, pt, nsamples))
+			/* make a copy so we can modify the point */
+			cp = *pt;
+			if (_kiia_edge_first_setup(e, &fp, &cp, nsamples))
+			{
+				/* ok, we found the first edge */
+				pp = cp;
 				n++;
-			pp = pt;
+				break;
+			}
+		}
+		/* iterate over the other edges */
+		EINA_LIST_FOREACH(points, l2, pt)
+		{
+			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
+			Enesim_Point cp;
+
+			/* make a copy so we can modify the point */
+			cp = *pt;
+			if (_kiia_edge_setup(e, &pp, &cp, nsamples))
+				n++;
+			pp = cp;
 		}
 		/* add the last point in case the polygon is closed */
 		if (p->closed)
 		{
 			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
-			if (_kiia_edge_setup(e, pp, fp, nsamples))
+			if (_kiia_edge_setup(e, &pp, &fp, nsamples))
 				n++;
 		}
 	}
