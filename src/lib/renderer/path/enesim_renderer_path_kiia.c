@@ -60,6 +60,7 @@ static Eina_Bool _kiia_edge_first_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	double mx;
 	int sgn;
 
+	//printf("first edge 0: %g %g %g %g\n", p0->x, p0->y, p1->x, p1->y);
 	/* going down, swap the y */
 	if (p0->y > p1->y)
 	{
@@ -109,7 +110,7 @@ static Eina_Bool _kiia_edge_first_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 		p1->y = y1;
 	}
 
-	//printf("edges %g %g %g %g %g (%g)\n", x0, y0, x1, y1, slope, y01);
+	//printf("first edge 1: %g %g %g %g (%g)\n", p0->x, p0->y, p1->x, p1->y, slope);
 
 	return EINA_TRUE;
 }
@@ -125,6 +126,7 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	double mx;
 	int sgn;
 
+	//printf("edges 0: %g %g %g %g\n", p0->x, p0->y, p1->x, p1->y);
 	/* going down, swap the y */
 	if (p0->y > p1->y)
 	{
@@ -168,7 +170,7 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	thiz->mx = eina_f16p16_double_from(mx);
 	thiz->sgn = sgn;
 
-	//printf("edges %g %g %g %g %g (%g)\n", x0, y0, x1, y1, slope, y01);
+	//printf("edges 1: %g %g %g %g (%g)\n", p0->x, p0->y, p1->x, p1->y, slope);
 
 	return EINA_TRUE;
 }
@@ -183,7 +185,11 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 
 	/* allocate the maximum number of possible edges */
 	EINA_LIST_FOREACH(f->polygons, l1, p)
+	{
 		n += enesim_polygon_point_count(p);
+		if (p->closed)
+			n++;
+	}
 	edges = malloc(n * sizeof(Enesim_Renderer_Path_Kiia_Edge));
 
 	/* create the edges */
@@ -203,18 +209,32 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		{
 			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
 			Enesim_Point cp;
+			Eina_Bool ok;
 
 			/* make a copy so we can modify the point */
 			cp = *pt;
-			if (_kiia_edge_first_setup(e, &fp, &cp, nsamples))
+			ok = _kiia_edge_first_setup(e, &pp, &cp, nsamples);
+			/* swap */
+			pp = cp;
+			if (ok)
 			{
 				/* ok, we found the first edge */
-				pp = cp;
 				n++;
 				break;
 			}
 		}
+		/* no points left */
+		if (!l2)
+		{
+			goto error;
+		}
+
 		/* iterate over the other edges */
+		points = eina_list_next(l2);
+		if (!points)
+		{
+			goto error;
+		}
 		EINA_LIST_FOREACH(points, l2, pt)
 		{
 			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
@@ -237,6 +257,9 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
 	*nedges = n;
 	return edges;
+error:
+	free(edges);
+	return 0;
 }
 
 static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
@@ -489,9 +512,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 
 	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
 	/* snap the coordinates lx, rx, ty and by */
-	lx = (((int)(lx * thiz->nsamples)) / thiz->nsamples);
 	ty = (((int)(ty * thiz->nsamples)) / thiz->nsamples);
-	rx = (((int)(rx * thiz->nsamples)) / thiz->nsamples);
 	by = (((int)(by * thiz->nsamples)) / thiz->nsamples);
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
