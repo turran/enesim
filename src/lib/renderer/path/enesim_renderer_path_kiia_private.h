@@ -169,9 +169,36 @@ void enesim_renderer_path_kiia_16_non_zero_color_renderer_full(Enesim_Renderer *
 void enesim_renderer_path_kiia_16_non_zero_renderer_renderer_full(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata);
 
+void enesim_renderer_path_kiia_8_even_odd_color_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_even_odd_renderer_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_non_zero_color_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_non_zero_renderer_simple(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+
+void enesim_renderer_path_kiia_8_even_odd_color_color_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_non_zero_color_color_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_even_odd_renderer_color_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_even_odd_color_renderer_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_even_odd_renderer_renderer_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_non_zero_renderer_color_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_non_zero_color_renderer_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+void enesim_renderer_path_kiia_8_non_zero_renderer_renderer_full(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata);
+
 typedef void (*Enesim_Renderer_Path_Kiia_Worker_Setup)(Enesim_Renderer *r, int y, int len);
 
 void enesim_renderer_path_kiia_32_worker_setup(Enesim_Renderer *r, int y, int len);
 void enesim_renderer_path_kiia_16_worker_setup(Enesim_Renderer *r, int y, int len);
+void enesim_renderer_path_kiia_8_worker_setup(Enesim_Renderer *r, int y, int len);
 
 #endif

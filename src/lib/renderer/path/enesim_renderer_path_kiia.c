@@ -766,7 +766,7 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	_patterns[ENESIM_QUALITY_BEST] = _kiia_pattern32;
 
 	/* set the workers setup */
-	_worker_setup[ENESIM_QUALITY_FAST] = NULL;
+	_worker_setup[ENESIM_QUALITY_FAST] = enesim_renderer_path_kiia_8_worker_setup;
 	_worker_setup[ENESIM_QUALITY_GOOD] = enesim_renderer_path_kiia_16_worker_setup;
 	_worker_setup[ENESIM_QUALITY_BEST] = enesim_renderer_path_kiia_32_worker_setup;
 
@@ -825,6 +825,24 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 			enesim_renderer_path_kiia_16_non_zero_renderer_renderer_full;
 	_fill_full[ENESIM_QUALITY_GOOD][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1][1] = 
 			enesim_renderer_path_kiia_16_even_odd_renderer_renderer_full;
+
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0][0] = 
+			enesim_renderer_path_kiia_8_even_odd_color_color_full;
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][0] = 
+			enesim_renderer_path_kiia_8_non_zero_color_color_full;
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1][0] = 
+			enesim_renderer_path_kiia_8_even_odd_renderer_color_full;
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1][0] = 
+			enesim_renderer_path_kiia_8_non_zero_renderer_color_full;
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0][1] = 
+			enesim_renderer_path_kiia_8_even_odd_color_renderer_full;
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][0][1] = 
+			enesim_renderer_path_kiia_8_non_zero_color_renderer_full;
+
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO][1][1] = 
+			enesim_renderer_path_kiia_8_non_zero_renderer_renderer_full;
+	_fill_full[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][1][1] = 
+			enesim_renderer_path_kiia_8_even_odd_renderer_renderer_full;
 }
 
 static void _enesim_renderer_path_kiia_instance_init(void *o)
