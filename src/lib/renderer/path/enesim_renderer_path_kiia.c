@@ -542,8 +542,6 @@ static void _kiia_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 	{
 		free(thiz->workers[i].mask);
 		free(thiz->workers[i].omask);
-		free(thiz->workers[i].winding);
-		free(thiz->workers[i].owinding);
 	}
 }
 

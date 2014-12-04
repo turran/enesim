@@ -44,7 +44,7 @@ static inline void _kiia_non_zero_sample(int *mask, int x, int m)
 	mask[x] += m;
 }
 
-static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_non_zero_get_mask(
+static inline int _kiia_non_zero_get_mask(
 		int *mask, int i, int cm, int *cacc)
 {
 	int abs_cacc;
@@ -65,8 +65,9 @@ static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_non_zero_get_mask(
 	}
 	else
 	{
-		cm = ENESIM_RENDERER_PATH_KIIA_MASK_MAX;
+		cm = ENESIM_RENDERER_PATH_KIIA_SAMPLES;
 	}
+
 	return cm;
 }
 
@@ -236,6 +237,10 @@ static inline void _kiia_figure_renderer_setup(Enesim_Renderer_Path_Kiia_Figure 
 	enesim_renderer_sw_draw(f->ren, x, y, len, dst);
 }
 
+/*----------------------------------------------------------------------------*
+ *                             Simple rendering                               *
+ *----------------------------------------------------------------------------*/
+
 static inline Eina_Bool _kiia_figure_renderer_fill(
 		Enesim_Renderer_Path_Kiia_Figure *f,
 		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
@@ -302,15 +307,17 @@ static inline void _kiia_figure_color_setup(
 {
 }
 
+/*----------------------------------------------------------------------------*
+ *                              Full rendering                                *
+ *----------------------------------------------------------------------------*/
 static inline Eina_Bool _kiia_figure_color_color_fill(
 		Enesim_Renderer_Path_Kiia_Figure *f,
 		Enesim_Renderer_Path_Kiia_Figure *s,
 		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE scm,
-		uint32_t *src, uint32_t *ssrc EINA_UNUSED,
+		int scm, uint32_t *src, uint32_t *ssrc EINA_UNUSED,
 		uint32_t *p0)
 {
-	if (scm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	if (scm == ENESIM_RENDERER_PATH_KIIA_SAMPLES)
 	{
 		*p0 = s->color;
 	}
@@ -323,7 +330,7 @@ static inline Eina_Bool _kiia_figure_color_color_fill(
 	{
 		uint16_t coverage;
 
-		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(scm);
+		coverage = ENESIM_RENDERER_PATH_KIIA_NON_ZERO_GET_ALPHA(scm);
 		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
 		{
 			*p0 = enesim_color_interp_256(coverage, s->color, f->color);
@@ -353,7 +360,7 @@ static inline Eina_Bool _kiia_figure_renderer_color_fill(
 		uint32_t *src, uint32_t *ssrc EINA_UNUSED,
 		uint32_t *p0)
 {
-	if (scm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	if (scm == ENESIM_RENDERER_PATH_KIIA_SAMPLES)
 	{
 		*p0 = s->color;
 	}
@@ -366,7 +373,7 @@ static inline Eina_Bool _kiia_figure_renderer_color_fill(
 	{
 		uint16_t coverage;
 
-		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(scm);
+		coverage = ENESIM_RENDERER_PATH_KIIA_NON_ZERO_GET_ALPHA(scm);
 		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
 		{
 			uint32_t q0;
@@ -411,7 +418,7 @@ static inline Eina_Bool _kiia_figure_color_renderer_fill(
 		uint32_t *src, uint32_t *ssrc,
 		uint32_t *p0)
 {
-	if (scm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	if (scm == ENESIM_RENDERER_PATH_KIIA_SAMPLES)
 	{
 		uint32_t q0;
 
@@ -429,7 +436,7 @@ static inline Eina_Bool _kiia_figure_color_renderer_fill(
 	{
 		uint16_t coverage;
 
-		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(scm);
+		coverage = ENESIM_RENDERER_PATH_KIIA_NON_ZERO_GET_ALPHA(scm);
 		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
 		{
 			uint32_t q0;
@@ -489,7 +496,7 @@ static inline Eina_Bool _kiia_figure_renderer_renderer_fill(
 		uint32_t *src, uint32_t *ssrc,
 		uint32_t *p0)
 {
-	if (scm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
+	if (scm == ENESIM_RENDERER_PATH_KIIA_SAMPLES)
 	{
 		uint32_t q0;
 
@@ -507,7 +514,7 @@ static inline Eina_Bool _kiia_figure_renderer_renderer_fill(
 	{
 		uint16_t coverage;
 
-		coverage = ENESIM_RENDERER_PATH_KIIA_GET_ALPHA(scm);
+		coverage = ENESIM_RENDERER_PATH_KIIA_NON_ZERO_GET_ALPHA(scm);
 		if (cm == ENESIM_RENDERER_PATH_KIIA_MASK_MAX)
 		{
 			uint32_t q0, q1;

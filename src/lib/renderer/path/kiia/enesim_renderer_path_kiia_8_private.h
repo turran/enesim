@@ -25,10 +25,6 @@
 #define ENESIM_RENDERER_PATH_KIIA_SAMPLES 8
 #define ENESIM_RENDERER_PATH_KIIA_INC 8192 /* in 16.16 1/8.0 */
 #define ENESIM_RENDERER_PATH_KIIA_SHIFT 3
-
-static inline uint16_t enesim_renderer_path_kiia_8_non_zero_get_alpha(int cm)
-{
-	return cm << 5;
-}
+#define ENESIM_RENDERER_PATH_KIIA_NON_ZERO_GET_ALPHA(cm) ((cm) << 5)
 
 #endif

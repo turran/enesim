@@ -25,6 +25,7 @@
 #define ENESIM_RENDERER_PATH_KIIA_SAMPLES 32
 #define ENESIM_RENDERER_PATH_KIIA_INC 2048 /* in 16.16 1/32.0 */
 #define ENESIM_RENDERER_PATH_KIIA_SHIFT 5
+#define ENESIM_RENDERER_PATH_KIIA_NON_ZERO_GET_ALPHA(cm) ((cm) << 3)
 
 static inline uint16_t enesim_renderer_path_kiia_32_even_odd_get_alpha(int cm)
 {
@@ -37,11 +38,6 @@ static inline uint16_t enesim_renderer_path_kiia_32_even_odd_get_alpha(int cm)
 	coverage = (((cm + (cm >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 21;
 
 	return coverage;
-}
-
-static inline uint16_t enesim_renderer_path_kiia_32_non_zero_get_alpha(int cm)
-{
-	return cm << 3;
 }
 
 #endif

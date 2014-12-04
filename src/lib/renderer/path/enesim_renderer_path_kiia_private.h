@@ -54,11 +54,6 @@ typedef struct _Enesim_Renderer_Path_Kiia_Worker
 	/* a span of length equal to the width of the bounds to store the sample mask */
 	void *mask;
 	void *omask;
-	/* a span of length equal to the width of the bounds * nsamples to
-	 * store the sample winding
-	 */
-	int *winding;
-	int *owinding;
 	/* keep track of the current Y this worker is doing, to ease
 	 * the x increment on the edges
 	 */

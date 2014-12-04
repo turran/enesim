@@ -22,7 +22,7 @@
 /** @cond internal */
 #define ENESIM_RENDERER_PATH_KIIA_MASK_TYPE int
 #define ENESIM_RENDERER_PATH_KIIA_MASK_MAX ENESIM_RENDERER_PATH_KIIA_SAMPLES
-#define ENESIM_RENDERER_PATH_KIIA_GET_ALPHA enesim_renderer_path_kiia_16_non_zero_get_alpha
+#define ENESIM_RENDERER_PATH_KIIA_GET_ALPHA ENESIM_RENDERER_PATH_KIIA_NON_ZERO_GET_ALPHA
 
 #include "enesim_renderer_path_kiia_common.h"
 /*============================================================================*
