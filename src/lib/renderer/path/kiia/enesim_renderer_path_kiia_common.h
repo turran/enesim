@@ -31,8 +31,7 @@ static inline void _kiia_even_odd_sample(
 
 static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_even_odd_get_mask(
 		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int i,
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
-		int *winding EINA_UNUSED, int *cwinding EINA_UNUSED)
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm, int *cacc EINA_UNUSED)
 {
 	cm ^= mask[i];
 	/* reset the mask */
@@ -46,26 +45,20 @@ static inline void _kiia_non_zero_sample(int *mask, int x, int m)
 }
 
 static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_non_zero_get_mask(
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int i,
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm,
-		int *winding, int *cwinding)
+		int *mask, int i, int cm, int *cacc)
 {
 	int m;
-	int w;
 
 	m = mask[i];
 	/* reset the mask */
 	mask[i] = 0;
-	w = winding[i];
-	/* reset the winding */
-	winding[i] = 0;
-	*cwinding += w;
-	if (abs(*cwinding) < ENESIM_RENDERER_PATH_KIIA_SAMPLES)
+	*cacc += m;
+	if (abs(*cacc) < ENESIM_RENDERER_PATH_KIIA_SAMPLES)
 	{
-		if (*cwinding == 0)
+		if (*cacc == 0)
 			cm = 0;
 		else
-			cm = cm ^ m;
+			cm = m;
 	}
 	else
 	{
@@ -79,8 +72,8 @@ static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_non_zero_get_mask(
  *----------------------------------------------------------------------------*/
 static inline void _kiia_even_odd_figure_evalute(Enesim_Renderer *r,
 		Enesim_Renderer_Path_Kiia_Figure *f,
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int *winding,
-		int *lx, int *rx, int y)
+		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int *lx, int *rx,
+		int y)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Eina_F16p16 yy0, yy1;
@@ -162,7 +155,7 @@ static inline void _kiia_even_odd_figure_evalute(Enesim_Renderer *r,
 
 static inline void _kiia_non_zero_figure_evalute(Enesim_Renderer *r,
 		Enesim_Renderer_Path_Kiia_Figure *f,
-		int *mask, int *winding, int *lx, int *rx, int y)
+		int *mask, int *lx, int *rx, int y)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Eina_F16p16 yy0, yy1;
@@ -590,7 +583,6 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm = 0;				\
 	Enesim_Renderer_Path_Kiia_Figure *f;					\
 	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask;				\
-	int *winding;								\
 	int cwinding = 0;							\
 	uint32_t *dst = ddata;							\
 	uint32_t *end, *rend = dst + len;					\
@@ -604,10 +596,9 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 	/* set our own local vars */						\
 	f = thiz->current;							\
 	mask = w->mask;								\
-	winding = w->winding;							\
 										\
 	/* evaluate the edges at y */						\
-	_kiia_##fill_mode##_figure_evalute(r, f, mask, winding, &mlx, &mrx, y);	\
+	_kiia_##fill_mode##_figure_evalute(r, f, mask, &mlx, &mrx, y);		\
 	/* does not intersect with anything */					\
 	if (mlx == INT_MAX)							\
 	{									\
@@ -637,7 +628,7 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 	{									\
 		for (i = mlx; i < lx; i++)					\
 		{								\
-			cm = _kiia_##fill_mode##_get_mask(mask, i, cm, winding, \
+			cm = _kiia_##fill_mode##_get_mask(mask, i, cm, 		\
 					&cwinding);				\
 		}								\
 	}									\
@@ -664,8 +655,7 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 	{									\
 		uint32_t p0;							\
 										\
-		cm = _kiia_##fill_mode##_get_mask(mask, i, cm, winding,		\
-				 &cwinding);					\
+		cm = _kiia_##fill_mode##_get_mask(mask, i, cm, &cwinding);	\
 		if (!_kiia_figure_##fill##_fill(f, cm, dst, &p0))		\
 			goto next;						\
 		*dst = p0;							\
@@ -685,10 +675,7 @@ next:										\
 	{									\
 		for (i = rx; i < mrx; i++)					\
 		{								\
-			/* FIXME For now we always clear both arrays, even if
-			 * one might not be used */				\
 			mask[i] = 0;						\
-			winding[i] = 0;						\
 		}								\
 	}									\
 	/* update the latest y coordinate of the worker */			\
@@ -707,7 +694,8 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 {										\
 	Enesim_Renderer_Path_Kiia *thiz;					\
 	Enesim_Renderer_Path_Kiia_Worker *w;					\
-	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm = 0, ocm = 0;			\
+	ENESIM_RENDERER_PATH_KIIA_MASK_TYPE cm = 0;				\
+	int ocm = 0;								\
 	int cwinding = 0, ocwinding = 0;					\
 	uint32_t *dst = ddata;							\
 	uint32_t *end, *rend = dst + len;					\
@@ -721,10 +709,10 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 	w = &thiz->workers[y % thiz->nworkers];					\
 										\
 	/* evaluate the edges at y */						\
-	_kiia_##fill_mode##_figure_evalute(r, &thiz->fill, w->mask, w->winding, \
-			&mlx, &mrx, y);						\
-	_kiia_non_zero_figure_evalute(r, &thiz->stroke, w->omask, w->owinding, 	\
-			&omlx, &omrx, y);					\
+	_kiia_##fill_mode##_figure_evalute(r, &thiz->fill, w->mask, &mlx, &mrx, \
+			y);							\
+	_kiia_non_zero_figure_evalute(r, &thiz->stroke, w->omask, &omlx, &omrx, \
+			y);							\
 	/* pick the larger */							\
 	if (omlx < mlx)								\
 		mlx = omlx;							\
@@ -764,9 +752,9 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 		for (i = mlx; i < lx; i++)					\
 		{								\
 			cm = _kiia_##fill_mode##_get_mask(w->mask, i, cm, 	\
-					w->winding, &cwinding);			\
+					&cwinding);				\
 			ocm = _kiia_non_zero_get_mask(w->omask, i, ocm,		\
-					w->owinding, &ocwinding);		\
+					&ocwinding);				\
 		}								\
 	}									\
 	/* clip on the right side [right ... x + len] */			\
@@ -794,10 +782,8 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 	{									\
 		uint32_t p0;							\
 										\
-		cm = _kiia_##fill_mode##_get_mask(w->mask, i, cm, w->winding,	\
-				&cwinding);					\
-		ocm = _kiia_non_zero_get_mask(w->omask, i, ocm, w->owinding, 	\
-				&ocwinding);					\
+		cm = _kiia_##fill_mode##_get_mask(w->mask, i, cm, &cwinding);	\
+		ocm = _kiia_non_zero_get_mask(w->omask, i, ocm, &ocwinding);	\
 		if (!_kiia_figure_##ft##_##st##_fill(&thiz->fill, &thiz->stroke,\
 				cm, ocm, dst, odst, &p0))			\
 			goto next;						\
@@ -820,14 +806,10 @@ next:										\
 		for (i = rx; i < mrx; i++)					\
 		{								\
 			ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *tmp;		\
-			/* FIXME For now we always clear both arrays, even if
-			 * one might not be used */				\
 			tmp = w->mask;						\
 			tmp[i] = 0;						\
 			tmp = w->omask;						\
 			tmp[i] = 0;						\
-			w->winding[i] = 0;					\
-			w->owinding[i] = 0;					\
 		}								\
 	}									\
 	/* update the latest y coordinate of the worker */			\
