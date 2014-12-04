@@ -816,9 +816,9 @@ next:										\
 	w->y = y;								\
 }
 
-#define ENESIM_RENDERER_PATH_KIIA_WORKER_SETUP(nsamples)			\
-void enesim_renderer_path_kiia_##nsamples##_worker_setup(Enesim_Renderer *r, 	\
-		int y, int len)							\
+#define ENESIM_RENDERER_PATH_KIIA_WORKER_SETUP(nsamples, fill_mode)		\
+void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_worker_setup(		\
+		Enesim_Renderer *r, int y, int len)				\
 {										\
 	Enesim_Renderer_Path_Kiia *thiz;					\
 	int i;									\
@@ -830,9 +830,7 @@ void enesim_renderer_path_kiia_##nsamples##_worker_setup(Enesim_Renderer *r, 	\
 		/* +1 because of the pattern offset */				\
 		thiz->workers[i].mask = calloc(len + 1, 			\
 				sizeof(ENESIM_RENDERER_PATH_KIIA_MASK_TYPE));	\
-		thiz->workers[i].winding = calloc((len + 1), sizeof(int));	\
 		thiz->workers[i].omask = calloc(len + 1,			\
-				sizeof(ENESIM_RENDERER_PATH_KIIA_MASK_TYPE));	\
-		thiz->workers[i].owinding = calloc((len + 1), sizeof(int));	\
+				sizeof(int));					\
 	}									\
 }
