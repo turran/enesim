@@ -47,18 +47,21 @@ static inline void _kiia_non_zero_sample(int *mask, int x, int m)
 static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_non_zero_get_mask(
 		int *mask, int i, int cm, int *cacc)
 {
+	int abs_cacc;
 	int m;
 
 	m = mask[i];
 	/* reset the mask */
 	mask[i] = 0;
+	/* accumulate the winding */
 	*cacc += m;
-	if (abs(*cacc) < ENESIM_RENDERER_PATH_KIIA_SAMPLES)
+	abs_cacc = abs(*cacc);
+	if (abs_cacc < ENESIM_RENDERER_PATH_KIIA_SAMPLES)
 	{
-		if (*cacc == 0)
+		if (abs_cacc == 0)
 			cm = 0;
 		else
-			cm = m;
+			cm = abs_cacc;
 	}
 	else
 	{
