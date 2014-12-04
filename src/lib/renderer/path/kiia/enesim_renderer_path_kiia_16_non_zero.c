@@ -15,51 +15,27 @@
 * License along with this library.
 * If not, see <http://www.gnu.org/licenses/>.
 */
-#include "enesim_private.h"
-#include "enesim_renderer_path_kiia_private.h"
+#include "enesim_renderer_path_kiia_16_private.h"
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-/* define our own 16 bit sampling */
-#define ENESIM_RENDERER_PATH_KIIA_SAMPLES 16
-#define ENESIM_RENDERER_PATH_KIIA_INC 4096 /* in 16.16 1/16.0 */
-#define ENESIM_RENDERER_PATH_KIIA_SHIFT 4
-#define ENESIM_RENDERER_PATH_KIIA_MASK_TYPE uint16_t
-#define ENESIM_RENDERER_PATH_KIIA_MASK_MAX 0xffff
-#define ENESIM_RENDERER_PATH_KIIA_GET_ALPHA _kiia_16_get_alpha
-
-static inline uint16_t _kiia_16_get_alpha(int cm)
-{
-	uint16_t coverage;
-
-	/* use the hamming weight to know the number of bits set to 1 */
-	cm = cm - ((cm >> 1) & 0x55555555);
-	cm = (cm & 0x33333333) + ((cm >> 2) & 0x33333333);
-	/* we use 21 instead of 24, because we need to rescale 32 -> 256 */
-	coverage = (((cm + (cm >> 4)) & 0x0f0f0f0f) * 0x01010101) >> 20;
-
-	return coverage;
-}
+#define ENESIM_RENDERER_PATH_KIIA_MASK_TYPE int
+#define ENESIM_RENDERER_PATH_KIIA_MASK_MAX ENESIM_RENDERER_PATH_KIIA_SAMPLES
+#define ENESIM_RENDERER_PATH_KIIA_GET_ALPHA enesim_renderer_path_kiia_16_non_zero_get_alpha
 
 #include "enesim_renderer_path_kiia_common.h"
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(16, even_odd, color)
-ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(16, even_odd, renderer)
 ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(16, non_zero, color)
 ENESIM_RENDERER_PATH_KIIA_SPAN_SIMPLE(16, non_zero, renderer)
-ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, even_odd, color, color)
-ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, even_odd, renderer, color)
-ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, even_odd, color, renderer)
-ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, even_odd, renderer, renderer)
 ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, non_zero, color, color)
 ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, non_zero, renderer, color)
 ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, non_zero, color, renderer)
 ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, non_zero, renderer, renderer)
 
-ENESIM_RENDERER_PATH_KIIA_WORKER_SETUP(16)
+ENESIM_RENDERER_PATH_KIIA_WORKER_SETUP(16, even_odd)
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *
