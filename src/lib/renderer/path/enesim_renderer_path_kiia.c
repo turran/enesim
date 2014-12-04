@@ -35,7 +35,7 @@ static Eina_F16p16 _kiia_pattern32[32];
 
 static Enesim_Renderer_Sw_Fill _fill_simple[3][ENESIM_RENDERER_SHAPE_FILL_RULES][2];
 static Enesim_Renderer_Sw_Fill _fill_full[3][ENESIM_RENDERER_SHAPE_FILL_RULES][2][2];
-static Enesim_Renderer_Path_Kiia_Worker_Setup _worker_setup[3];
+static Enesim_Renderer_Path_Kiia_Worker_Setup _worker_setup[3][ENESIM_RENDERER_SHAPE_FILL_RULES];
 static Eina_F16p16 *_patterns[3];
 
 static int _kiia_edge_sort(const void *l, const void *r)
@@ -524,7 +524,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	/* set the patterns */
 	thiz->pattern = _patterns[quality];
 	/* setup the worker */
-	_worker_setup[quality](r, y, len);
+	_worker_setup[quality][fr](r, y, len);
 
 	return EINA_TRUE;
 }
@@ -766,9 +766,19 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	_patterns[ENESIM_QUALITY_BEST] = _kiia_pattern32;
 
 	/* set the workers setup */
-	_worker_setup[ENESIM_QUALITY_FAST] = enesim_renderer_path_kiia_8_worker_setup;
-	_worker_setup[ENESIM_QUALITY_GOOD] = enesim_renderer_path_kiia_16_worker_setup;
-	_worker_setup[ENESIM_QUALITY_BEST] = enesim_renderer_path_kiia_32_worker_setup;
+	_worker_setup[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO] =
+			enesim_renderer_path_kiia_8_non_zero_worker_setup;
+	_worker_setup[ENESIM_QUALITY_GOOD][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO] =
+			enesim_renderer_path_kiia_16_non_zero_worker_setup;
+	_worker_setup[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO] =
+			enesim_renderer_path_kiia_32_non_zero_worker_setup;
+
+	_worker_setup[ENESIM_QUALITY_FAST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD] =
+			enesim_renderer_path_kiia_8_even_odd_worker_setup;
+	_worker_setup[ENESIM_QUALITY_GOOD][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD] =
+			enesim_renderer_path_kiia_16_even_odd_worker_setup;
+	_worker_setup[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD] =
+			enesim_renderer_path_kiia_32_even_odd_worker_setup;
 
 	/* setup our function pointers */
 	_fill_simple[ENESIM_QUALITY_BEST][ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD][0] = 

@@ -197,8 +197,12 @@ void enesim_renderer_path_kiia_8_non_zero_renderer_renderer_full(Enesim_Renderer
 
 typedef void (*Enesim_Renderer_Path_Kiia_Worker_Setup)(Enesim_Renderer *r, int y, int len);
 
-void enesim_renderer_path_kiia_32_worker_setup(Enesim_Renderer *r, int y, int len);
-void enesim_renderer_path_kiia_16_worker_setup(Enesim_Renderer *r, int y, int len);
-void enesim_renderer_path_kiia_8_worker_setup(Enesim_Renderer *r, int y, int len);
+void enesim_renderer_path_kiia_32_even_odd_worker_setup(Enesim_Renderer *r, int y, int len);
+void enesim_renderer_path_kiia_16_even_odd_worker_setup(Enesim_Renderer *r, int y, int len);
+void enesim_renderer_path_kiia_8_even_odd_worker_setup(Enesim_Renderer *r, int y, int len);
+
+void enesim_renderer_path_kiia_32_non_zero_worker_setup(Enesim_Renderer *r, int y, int len);
+void enesim_renderer_path_kiia_16_non_zero_worker_setup(Enesim_Renderer *r, int y, int len);
+void enesim_renderer_path_kiia_8_non_zero_worker_setup(Enesim_Renderer *r, int y, int len);
 
 #endif
