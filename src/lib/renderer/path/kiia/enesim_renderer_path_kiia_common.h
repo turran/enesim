@@ -20,6 +20,9 @@
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
+/*----------------------------------------------------------------------------*
+ *                                 Sampling                                   *
+ *----------------------------------------------------------------------------*/
 static inline void _kiia_even_odd_sample(
 		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int x, int m)
 {
@@ -37,12 +40,9 @@ static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_even_odd_get_mask(
 	return cm;
 }
 
-static inline void _kiia_non_zero_sample(
-		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int x, int m,
-		int *windings, int winding)
+static inline void _kiia_non_zero_sample(int *mask, int x, int m)
 {
-	mask[x] ^= m;
-	windings[x] += winding;
+	mask[x] += m;
 }
 
 static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_non_zero_get_mask(
@@ -74,7 +74,10 @@ static inline ENESIM_RENDERER_PATH_KIIA_MASK_TYPE _kiia_non_zero_get_mask(
 	return cm;
 }
 
-static inline void _kiia_figure_evalute(Enesim_Renderer *r,
+/*----------------------------------------------------------------------------*
+ *                                 Evaluation                                 *
+ *----------------------------------------------------------------------------*/
+static inline void _kiia_even_odd_figure_evalute(Enesim_Renderer *r,
 		Enesim_Renderer_Path_Kiia_Figure *f,
 		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int *winding,
 		int *lx, int *rx, int y)
@@ -146,12 +149,85 @@ static inline void _kiia_figure_evalute(Enesim_Renderer *r,
 				mlx = mx;
 			if (mx > mrx)
 				mrx = mx;
-			/* FIXME For now we evaluate always on non-zero (i.e with winding) */
-			_kiia_non_zero_sample(mask, mx, m, winding, edge->sgn);
+			_kiia_even_odd_sample(mask, mx, m);
 
 			cx += edge->slope;
 			pattern++;
 			m <<= 1;
+		}
+	}
+	*lx = mlx;
+	*rx = mrx;
+}
+
+static inline void _kiia_non_zero_figure_evalute(Enesim_Renderer *r,
+		Enesim_Renderer_Path_Kiia_Figure *f,
+		int *mask, int *winding, int *lx, int *rx, int y)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+	Eina_F16p16 yy0, yy1;
+	Eina_F16p16 sinc;
+	int mlx = INT_MAX;
+	int mrx = -INT_MAX;
+	int i;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	yy0 = eina_f16p16_int_from(y);
+	yy1 = eina_f16p16_int_from(y + 1);
+	sinc = thiz->inc;
+	/* intersect with each edge */
+	for (i = 0; i < f->nedges; i++)
+	{
+		Enesim_Renderer_Path_Kiia_Edge *edge = &f->edges[i];
+		Eina_F16p16 *pattern;
+		Eina_F16p16 yyy0, yyy1;
+		Eina_F16p16 cx;
+
+		/* up the span */
+		if (yy0 >= edge->yy1)
+			continue;
+		/* down the span, just skip processing, the edges are ordered in y */
+		if (yy1 < edge->yy0)
+			break;
+
+		/* make sure not overflow */
+		yyy1 = yy1;
+		if (yyy1 > edge->yy1)
+			yyy1 = edge->yy1;
+
+		yyy0 = yy0;
+		if (yy0 <= edge->yy0)
+		{
+			yyy0 = edge->yy0;
+			cx = edge->mx;
+		}
+		else
+		{
+			Eina_F16p16 inc;
+
+			inc = eina_f16p16_mul(yyy0 - edge->yy0,
+					eina_f16p16_int_from(
+					ENESIM_RENDERER_PATH_KIIA_SAMPLES));
+			cx = edge->mx + eina_f16p16_mul(inc, edge->slope);
+		}
+
+		/* get the pattern to use */
+		pattern = thiz->pattern;
+		/* finally sample */
+		for (; yyy0 < yyy1; yyy0 += ENESIM_RENDERER_PATH_KIIA_INC)
+		{
+			int mx;
+
+			mx = eina_f16p16_int_to(cx - thiz->llx + *pattern);
+			/* keep track of the start, end of intersections */
+			if (mx < mlx)
+				mlx = mx;
+			if (mx > mrx)
+				mrx = mx;
+			_kiia_non_zero_sample(mask, mx, edge->sgn);
+
+			cx += edge->slope;
+			pattern++;
 		}
 	}
 	*lx = mlx;
@@ -531,7 +607,7 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 	winding = w->winding;							\
 										\
 	/* evaluate the edges at y */						\
-	_kiia_figure_evalute(r, f, mask, winding, &mlx, &mrx, y);		\
+	_kiia_##fill_mode##_figure_evalute(r, f, mask, winding, &mlx, &mrx, y);	\
 	/* does not intersect with anything */					\
 	if (mlx == INT_MAX)							\
 	{									\
@@ -645,10 +721,10 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 	w = &thiz->workers[y % thiz->nworkers];					\
 										\
 	/* evaluate the edges at y */						\
-	_kiia_figure_evalute(r, &thiz->fill, w->mask, w->winding, &mlx, &mrx,	\
-			y);							\
-	_kiia_figure_evalute(r, &thiz->stroke, w->omask, w->owinding, &omlx, 	\
-			&omrx, y);						\
+	_kiia_##fill_mode##_figure_evalute(r, &thiz->fill, w->mask, w->winding, \
+			&mlx, &mrx, y);						\
+	_kiia_non_zero_figure_evalute(r, &thiz->stroke, w->omask, w->owinding, 	\
+			&omlx, &omrx, y);					\
 	/* pick the larger */							\
 	if (omlx < mlx)								\
 		mlx = omlx;							\
