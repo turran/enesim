@@ -35,7 +35,7 @@ ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, non_zero, renderer, color)
 ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, non_zero, color, renderer)
 ENESIM_RENDERER_PATH_KIIA_SPAN_FULL(16, non_zero, renderer, renderer)
 
-ENESIM_RENDERER_PATH_KIIA_WORKER_SETUP(16, even_odd)
+ENESIM_RENDERER_PATH_KIIA_WORKER_SETUP(16, non_zero)
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *
