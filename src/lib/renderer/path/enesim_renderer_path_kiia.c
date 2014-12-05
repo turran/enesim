@@ -187,7 +187,7 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
 		n += enesim_polygon_point_count(p);
-		if (p->closed)
+		if (p->closed && n)
 			n++;
 	}
 	edges = malloc(n * sizeof(Enesim_Renderer_Path_Kiia_Edge));
@@ -202,6 +202,9 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		Eina_List *points, *l2;
 
 		pt = eina_list_data_get(p->points);
+		if (!pt)
+			continue;
+
 		fp = pp = *pt;
 		points = eina_list_next(p->points);
 		/* find the first edge */
