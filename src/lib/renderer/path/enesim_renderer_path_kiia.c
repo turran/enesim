@@ -136,9 +136,9 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 		y1 = p0->y;
 		/* get the sampled Y inside the line */
 		y0 = (ceil(y0 * nsamples) / nsamples);
+		sgn = -1;
 		/* set the p1 y */
 		p1->y = y0;
-		sgn = -1;
 	}
 	else
 	{
@@ -148,9 +148,9 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 		y1 = p1->y;
 		/* get the sampled Y inside the line */
 		y1 = (floor(y1 * nsamples) / nsamples);
+		sgn = 1;
 		/* set the p1 y */
 		p1->y = y1;
-		sgn = 1;
 	}
 	if (y0 == y1)
 		return EINA_FALSE;
@@ -189,6 +189,10 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		n += enesim_polygon_point_count(p);
 		if (p->closed && n)
 			n++;
+		/* one more for the sanity edge, the one that will make
+		 * the figure closed
+		 */
+		n++;
 	}
 	edges = malloc(n * sizeof(Enesim_Renderer_Path_Kiia_Edge));
 
@@ -197,6 +201,7 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	EINA_LIST_FOREACH(f->polygons, l1, p)
 	{
 		Enesim_Point *pt;
+		Enesim_Point lp;
 		Enesim_Point fp;
 		Enesim_Point pp;
 		Eina_List *points, *l2;
@@ -205,25 +210,31 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		if (!pt)
 			continue;
 
-		fp = pp = *pt;
+		fp = lp = pp = *pt;
 		points = eina_list_next(p->points);
 		/* find the first edge */
 		EINA_LIST_FOREACH(points, l2, pt)
 		{
 			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
 			Enesim_Point cp;
-			Eina_Bool ok;
 
 			/* make a copy so we can modify the point */
 			cp = *pt;
-			ok = _kiia_edge_first_setup(e, &pp, &cp, nsamples);
-			/* swap */
-			pp = cp;
-			if (ok)
+			if (_kiia_edge_first_setup(e, &pp, &cp, nsamples))
 			{
-				/* ok, we found the first edge */
+				/* ok, we found the first edge, update the real
+				 * first/last point y */
+				fp.y = pp.y;
+				lp.y = pp.y;
+				/* swap */
+				pp = cp;
 				n++;
 				break;
+			}
+			else
+			{
+				/* just swap */
+				pp = cp;
 			}
 		}
 		/* no points left */
@@ -253,7 +264,13 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		if (p->closed)
 		{
 			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
-			if (_kiia_edge_setup(e, &pp, &fp, nsamples))
+			if (_kiia_edge_setup(e, &pp, &lp, nsamples))
+				n++;
+		}
+		/* sanity edge */
+		{
+			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
+			if (_kiia_edge_setup(e, &lp, &fp, nsamples))
 				n++;
 		}
 	}
