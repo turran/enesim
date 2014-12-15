@@ -599,10 +599,14 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 	int lx, mlx;								\
 	int rx, mrx;								\
 	int i;									\
+	int nworker;								\
 										\
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);					\
 	/* pick the worker at y coordinate */					\
-	w = &thiz->workers[y % thiz->nworkers];					\
+	nworker = y % thiz->nworkers;						\
+	if (nworker < 0)							\
+		nworker = nworker + thiz->nworkers;				\
+	w = &thiz->workers[nworker];						\
 	/* set our own local vars */						\
 	f = thiz->current;							\
 	mask = w->mask;								\
@@ -713,10 +717,14 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 	int lx, mlx, omlx;							\
 	int rx, mrx, omrx;							\
 	int i;									\
+	int nworker;								\
 										\
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);					\
 	/* pick the worker at y coordinate */					\
-	w = &thiz->workers[y % thiz->nworkers];					\
+	nworker = y % thiz->nworkers;						\
+	if (nworker < 0)							\
+		nworker = nworker + thiz->nworkers;				\
+	w = &thiz->workers[nworker];						\
 										\
 	/* evaluate the edges at y */						\
 	_kiia_##fill_mode##_figure_evalute(r, &thiz->fill, w->mask, &mlx, &mrx, \
