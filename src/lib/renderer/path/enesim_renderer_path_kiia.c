@@ -266,12 +266,28 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
 			if (_kiia_edge_setup(e, &pp, &lp, nsamples))
 				n++;
+			/* sanity edge */
+			{
+				e = &edges[n];
+				if (_kiia_edge_setup(e, &lp, &fp, nsamples))
+				{
+					n++;
+				}
+			}
 		}
-		/* sanity edge */
+		else
 		{
-			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
-			if (_kiia_edge_setup(e, &lp, &fp, nsamples))
-				n++;
+			/* sanity edge */
+			/* TODO for a multi polygon figure, the generator is generating
+			 * a figure with the all open but the last that is closed
+			 */
+			{
+				Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
+				if (_kiia_edge_setup(e, &pp, &fp, nsamples))
+				{
+					n++;
+				}
+			}
 		}
 	}
 	qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
