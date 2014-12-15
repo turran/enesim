@@ -659,6 +659,8 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 		len -= adv;							\
 		rx = mrx;							\
 	}									\
+	if (len < 0)								\
+		goto done;							\
 										\
 	/* time to draw */							\
  	end = dst + len;							\
@@ -677,6 +679,7 @@ next:										\
 		dst++;								\
 		i++;								\
 	}									\
+done:										\
 	/* finally memset on dst at the end to keep the correct order on the
 	 * dst access
 	 */									\
@@ -788,6 +791,8 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 		len -= adv;							\
 		rx = mrx;							\
 	}									\
+	if (len < 0)								\
+		goto done;							\
 										\
 	/* time to draw */							\
  	end = dst + len;							\
@@ -811,6 +816,7 @@ next:										\
 		dst++;								\
 		i++;								\
 	}									\
+done:										\
 	/* finally memset on dst at the end to keep the correct order on the
 	 * dst access
 	 */									\
