@@ -87,18 +87,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <a class="code" href="group__Enesim__Path.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *p;
 
     p = <a name="a1"></a><a class="code" href="group__Enesim__Path.html#gada15a36dd2f634ed79ebf2c20626ee32" title="Creates a new path.">enesim_path_new</a>();
-    <a name="a2"></a><a class="code" href="group__Enesim__Path.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, 50, 50);
-    <a name="a3"></a><a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 150, 150);
-    <a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 50, 150);
-    <a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 150, 50);
-    <a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 50, 50);
+    <a name="a2"></a><a class="code" href="group__Enesim__Path.html#ga1fa58a4062f929eae8f21c99597b3af0">enesim_path_move_to</a>(p, 123.2, 10.5);
+    <a name="a3"></a><a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 102.5, 243.8);
+    <a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 240.6, 80.3);
+    <a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 10.4, 90.6);
+    <a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 230.3, 230.1);
+    <a class="code" href="group__Enesim__Path.html#ga59881f269e253c0b34f75a60a875b5b1">enesim_path_line_to</a>(p, 123.2, 10.5);
 
     r = <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Path.html#gad777913fb8fafe712e2a29238b1fac96">enesim_renderer_path_new</a>();
     <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Path.html#ga1692d3640652960ccb9a3f1e21005573">enesim_renderer_path_path_set</a>(r, p);
     <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r, 18);
-    <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r, 0xffffff00);
-    <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Shape.html#gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c">enesim_renderer_shape_fill_color_set</a>(r, 0xffff0000);
+    <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r, 0xffff0000);
+    <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Shape.html#gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c">enesim_renderer_shape_fill_color_set</a>(r, 0xff000000);
     <a name="a9"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga77889a5678923f86862c1ea78f1796cb">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Shape__Definitions.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
+    <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Shape.html#gab6b82aae059dbdd55f31ed0b31495b12">enesim_renderer_shape_fill_rule_set</a>(r, <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Shape__Definitions.html#ggaeb4fc569aea393c34eaef499cb8965fca11c37d0599fd571c873e97e59d618051">ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD</a>);
     <span class="keywordflow">return</span> r;
 }
 </pre></div> </div><!-- contents -->
@@ -120,7 +122,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Nov 8 2014 20:03:26 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Dec 15 2014 10:42:39 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
