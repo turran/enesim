@@ -106,6 +106,7 @@ extern "C" {
 #include "enesim_renderer_checker.h"
 #include "enesim_renderer_clipper.h"
 #include "enesim_renderer_compound.h"
+#include "enesim_renderer_convolve.h"
 #include "enesim_renderer_dispmap.h"
 #include "enesim_renderer_grid.h"
 #include "enesim_renderer_image.h"

@@ -6,6 +6,7 @@ src/lib/renderer/enesim_renderer_checker.h \
 src/lib/renderer/enesim_renderer_circle.h \
 src/lib/renderer/enesim_renderer_clipper.h \
 src/lib/renderer/enesim_renderer_compound.h \
+src/lib/renderer/enesim_renderer_convolve.h \
 src/lib/renderer/enesim_renderer_dispmap.h \
 src/lib/renderer/enesim_renderer_ellipse.h \
 src/lib/renderer/enesim_renderer_figure.h \
@@ -35,6 +36,7 @@ src/lib/renderer/enesim_renderer_checker.c \
 src/lib/renderer/enesim_renderer_clipper.c \
 src/lib/renderer/enesim_renderer_circle.c \
 src/lib/renderer/enesim_renderer_compound.c \
+src/lib/renderer/enesim_renderer_convolve.c \
 src/lib/renderer/enesim_renderer_dispmap.c \
 src/lib/renderer/enesim_renderer_ellipse.c \
 src/lib/renderer/enesim_renderer_figure.c \
