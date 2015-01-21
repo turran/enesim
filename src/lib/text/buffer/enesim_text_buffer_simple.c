@@ -93,9 +93,39 @@ static int _simple_string_insert(void *data, const char *string, int length, ssi
 	return length;
 }
 
-static int _simple_string_delete(void *data EINA_UNUSED, int length EINA_UNUSED, ssize_t offset EINA_UNUSED)
+static int _simple_string_delete(void *data, int length, ssize_t offset)
 {
-	return 0;
+	Enesim_Text_Buffer_Simple *thiz = data;
+
+	if (length <= 0)
+		return 0;
+
+	if ((unsigned int)offset >= thiz->length)
+		return 0;
+
+	/* simple case */
+	if ((unsigned int)(offset + length) >= thiz->length)
+	{
+		int del;
+
+		del = thiz->length;
+		thiz->string = '\0';
+		thiz->length = 0;
+
+		return del;
+	}
+	else
+	{
+		int i;
+		int j = offset;
+
+		/* shift the chars */
+		for (i = offset + length; (unsigned int)i < thiz->length; i++, j++)
+			thiz->string[j] = thiz->string[i];
+		thiz->length -= length;
+		thiz->string[thiz->length] = '\0';
+		return length;
+	}
 }
 
 static const char * _simple_string_get(void *data)
