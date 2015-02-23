@@ -175,7 +175,7 @@ static void _path_shape_features_get(Enesim_Renderer *r,
 	EINA_LIST_FOREACH (thiz->abstracts, l, abstract)
 	{
 		if (!abstract) continue;
-		*features |= enesim_renderer_shape_features_get(abstract);
+		*features |= enesim_renderer_shape_shape_features_get(abstract);
 	}
 }
 /*----------------------------------------------------------------------------*

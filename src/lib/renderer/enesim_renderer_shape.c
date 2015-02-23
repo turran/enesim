@@ -322,7 +322,7 @@ static Eina_Bool _shape_setup(Enesim_Renderer *r, Enesim_Surface *s,
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	state = &thiz->state;
-	features = enesim_renderer_shape_features_get(r);
+	features = enesim_renderer_shape_shape_features_get(r);
 	/* TODO check the sw hints so we can optimize the case
 	 * where the fill and/or the stroke renderers support
 	 * the rop operation and thus we can set the hints
@@ -368,7 +368,7 @@ static Eina_Bool _enesim_renderer_shape_is_supported(Enesim_Renderer *r, Enesim_
 	Enesim_Renderer_Shape_Feature features;
 	Enesim_Renderer_Shape_Class *klass;
 
-	features = enesim_renderer_shape_features_get(r);
+	features = enesim_renderer_shape_shape_features_get(r);
 	thiz = ENESIM_RENDERER_SHAPE(r);
 	if (thiz->state.current.fill.r &&
 			!(features & ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER))
@@ -412,7 +412,7 @@ static void _enesim_renderer_shape_sw_cleanup(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Feature features;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
-	features = enesim_renderer_shape_features_get(r);
+	features = enesim_renderer_shape_shape_features_get(r);
 	_shape_cleanup(r, features, s);
 	if (klass->sw_cleanup)
 		klass->sw_cleanup(r, s);
@@ -439,7 +439,7 @@ static void _enesim_renderer_shape_opengl_cleanup(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Feature features;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
-	features = enesim_renderer_shape_features_get(r);
+	features = enesim_renderer_shape_shape_features_get(r);
 	_shape_cleanup(r, features, s);
 	if (klass->opengl_cleanup)
 		klass->opengl_cleanup(r, s);
@@ -468,7 +468,7 @@ static void _enesim_renderer_shape_opencl_cleanup(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Feature features;
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS_GET(r);
-	features = enesim_renderer_shape_features_get(r);
+	features = enesim_renderer_shape_shape_features_get(r);
 	_shape_cleanup(r, features, s);
 	if (klass->opencl_cleanup)
 		klass->opencl_cleanup(r, s);
@@ -506,7 +506,7 @@ static Eina_Bool _enesim_renderer_shape_damage(Enesim_Renderer *r,
 	state = &thiz->state;
 
 	/* get the features */
-	features = enesim_renderer_shape_features_get(r);
+	features = enesim_renderer_shape_shape_features_get(r);
 
 	/* first check if the common properties have changed */
 	do_send_old = enesim_renderer_state_has_changed(r);
@@ -643,7 +643,7 @@ Eina_Bool enesim_renderer_shape_state_has_changed(Enesim_Renderer *r)
 	Eina_Bool ret;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
-	features = enesim_renderer_shape_features_get(r);
+	features = enesim_renderer_shape_shape_features_get(r);
 	ret = _state_changed(&thiz->state, features);
 	return ret;
 }
@@ -1087,7 +1087,7 @@ EAPI Enesim_Renderer_Shape_Draw_Mode enesim_renderer_shape_draw_mode_get(Enesim_
  * @param[in] r The renderer to get the features from
  * @return The renderer features
  */
-EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_features_get(Enesim_Renderer *r)
+EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_shape_features_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Shape_Class *klass;
 	Enesim_Renderer_Shape_Feature features = 0;
