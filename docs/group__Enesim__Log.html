@@ -91,12 +91,14 @@ Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef struct _Enesim_Log&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Log.html#gac103f47cddd672a71c7d2a586a3b8377">enesim_log_ref</a> (<a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *log)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the reference counter of a log.  <a href="#gac103f47cddd672a71c7d2a586a3b8377"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Log.html#gac0149ace98f1a7a39ec1461074fa94fe">enesim_log_unref</a> (<a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *log)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease the reference counter of a log.  <a href="#gac0149ace98f1a7a39ec1461074fa94fe"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Log.html#gac179d51639a06e02786907ffbcd5c779">enesim_log_add</a> (<a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *log, const char *string)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an log string to the list of defined logs.  <a href="#gac179d51639a06e02786907ffbcd5c779"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Log.html#ga65aa3915e04312e76e09b1a22cd53274">enesim_log_add_parametric</a> (<a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *log, const char *file, const char *function, int line, char *fmt, va_list args)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a log to the list of defined logs with a formatted description.  <a href="#ga65aa3915e04312e76e09b1a22cd53274"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Log.html#ga557c35540eaa0c33ff53518e7c24d4b3">enesim_log_delete</a> (<a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *log)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the given list of logs.  <a href="#ga557c35540eaa0c33ff53518e7c24d4b3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Log.html#ga7f5f14016a269ef7eabf6df7508e054b">enesim_log_dump</a> (const <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *log)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Display in the standard output the given logs.  <a href="#ga7f5f14016a269ef7eabf6df7508e054b"></a><br/></td></tr>
 </table>
@@ -154,6 +156,59 @@ Functions</h2></td></tr>
 </div>
 </div>
 <hr/><h2>Function Documentation</h2>
+<a class="anchor" id="gac103f47cddd672a71c7d2a586a3b8377"></a><!-- doxytag: member="enesim_log.h::enesim_log_ref" ref="gac103f47cddd672a71c7d2a586a3b8377" args="(Enesim_Log *log)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a>* <a class="el" href="group__Enesim__Log.html#gac103f47cddd672a71c7d2a586a3b8377">enesim_log_ref</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *&#160;</td>
+          <td class="paramname"><em>log</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Increase the reference counter of a log. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">log</td><td>The renderer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The input parameter <em>log</em> for programming convenience </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Log.html#gac0149ace98f1a7a39ec1461074fa94fe" title="Decrease the reference counter of a log.">enesim_log_unref()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac0149ace98f1a7a39ec1461074fa94fe"></a><!-- doxytag: member="enesim_log.h::enesim_log_unref" ref="gac0149ace98f1a7a39ec1461074fa94fe" args="(Enesim_Log *log)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Log.html#gac0149ace98f1a7a39ec1461074fa94fe">enesim_log_unref</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *&#160;</td>
+          <td class="paramname"><em>log</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Decrease the reference counter of a log. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">log</td><td>The renderer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Log.html#gac103f47cddd672a71c7d2a586a3b8377" title="Increase the reference counter of a log.">enesim_log_ref()</a> </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="gac179d51639a06e02786907ffbcd5c779"></a><!-- doxytag: member="enesim_log.h::enesim_log_add" ref="gac179d51639a06e02786907ffbcd5c779" args="(Enesim_Log *log, const char *string)" -->
 <div class="memitem">
 <div class="memproto">
@@ -189,9 +244,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The new list of logs.</dd></dl>
 <p>This function add the description <code>string</code> to the list or logs <code>log</code>. If <code>string</code> is <code>NULL</code>, <code>NULL</code> is returned. if <code>log</code> is <code>NULL</code>, an <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> is allocated. <code>string</code> is added to <code>log</code>. On memory allocation log, <code>NULL</code> is returned, otherwise <code>log</code> is returned.</p>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Log.html#ga65aa3915e04312e76e09b1a22cd53274" title="Add a log to the list of defined logs with a formatted description.">enesim_log_add_parametric()</a> </dd>
-<dd>
-<a class="el" href="group__Enesim__Log.html#ga557c35540eaa0c33ff53518e7c24d4b3" title="Free the given list of logs.">enesim_log_delete()</a> </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Log.html#ga65aa3915e04312e76e09b1a22cd53274" title="Add a log to the list of defined logs with a formatted description.">enesim_log_add_parametric()</a> </dd></dl>
 
 </div>
 </div>
@@ -258,38 +311,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The new list of logs.</dd></dl>
 <p>This function formats the description of the log with <code>file</code>, <code>function</code> and <code>line</code> and calls <a class="el" href="group__Enesim__Log.html#gac179d51639a06e02786907ffbcd5c779" title="Add an log string to the list of defined logs.">enesim_log_add()</a> with the built string. User defined description can be appended with <code>fmt</code>.</p>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Log.html#gac179d51639a06e02786907ffbcd5c779" title="Add an log string to the list of defined logs.">enesim_log_add()</a> </dd>
-<dd>
-<a class="el" href="group__Enesim__Log.html#ga557c35540eaa0c33ff53518e7c24d4b3" title="Free the given list of logs.">enesim_log_delete()</a> </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga557c35540eaa0c33ff53518e7c24d4b3"></a><!-- doxytag: member="enesim_log.h::enesim_log_delete" ref="ga557c35540eaa0c33ff53518e7c24d4b3" args="(Enesim_Log *log)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Log.html#ga557c35540eaa0c33ff53518e7c24d4b3">enesim_log_delete</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> *&#160;</td>
-          <td class="paramname"><em>log</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Free the given list of logs. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">log</td><td>The list of logs to free.</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>This function frees the list of logs <code>log</code>. If <code>log</code> is <code>NULL</code>, this function returns immediatly.</p>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Log.html#gac179d51639a06e02786907ffbcd5c779" title="Add an log string to the list of defined logs.">enesim_log_add()</a> </dd>
-<dd>
-<a class="el" href="group__Enesim__Log.html#ga65aa3915e04312e76e09b1a22cd53274" title="Add a log to the list of defined logs with a formatted description.">enesim_log_add_parametric()</a> </dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Log.html#gac179d51639a06e02786907ffbcd5c779" title="Add an log string to the list of defined logs.">enesim_log_add()</a> </dd></dl>
 
 </div>
 </div>
@@ -337,7 +359,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Feb 23 2015 19:25:24 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Feb 25 2015 19:56:41 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
