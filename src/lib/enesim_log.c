@@ -25,6 +25,7 @@
 /** @cond internal */
 struct _Enesim_Log
 {
+	int ref;
 	Eina_List *trace;
 };
 /*============================================================================*
@@ -48,7 +49,6 @@ struct _Enesim_Log
  * otherwise @p log is returned.
  *
  * @see enesim_log_add_parametric()
- * @see enesim_log_delete()
  */
 EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string)
 {
@@ -82,7 +82,6 @@ EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string)
  * built string. User defined description can be appended with @p fmt.
  *
  * @see enesim_log_add()
- * @see enesim_log_delete()
  */
 EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *log, const char *file, const char *function, int line, char *fmt, va_list args)
 {
@@ -97,27 +96,37 @@ EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *log, const char *file, c
 }
 
 /**
- * @brief Free the given list of logs.
- *
- * @param log The list of logs to free.
- *
- * This function frees the list of logs @p log. If @p log is @c
- * NULL, this function returns immediatly.
- *
- * @see enesim_log_add()
- * @see enesim_log_add_parametric()
+ * @brief Increase the reference counter of a log
+ * @param[in] log The renderer
+ * @return The input parameter @a log for programming convenience
+ * @see enesim_log_unref()
  */
-EAPI void enesim_log_delete(Enesim_Log *log)
+EAPI Enesim_Log * enesim_log_ref(Enesim_Log *log)
+{
+	if (!log) return log;
+	log->ref++;
+	return log;
+}
+
+/**
+ * @brief Decrease the reference counter of a log
+ * @param[in] log The renderer
+ * @see enesim_log_ref()
+ */
+EAPI void enesim_log_unref(Enesim_Log *log)
 {
 	char *str;
 
 	if (!log) return;
-
-	EINA_LIST_FREE(log->trace, str)
+	log->ref--;
+	if (!log->ref)
 	{
-		free(str);
+		EINA_LIST_FREE(log->trace, str)
+		{
+			free(str);
+		}
+		free(log);
 	}
-	free(log);
 }
 
 /**
