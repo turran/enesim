@@ -52,6 +52,7 @@ typedef enum _Enesim_Matrix_Type
  */
 
 /**
+ * @ender_name{enesim.matrix_f16p16}
  * Fixed point matrix handler
  */
 typedef struct _Enesim_Matrix_F16p16

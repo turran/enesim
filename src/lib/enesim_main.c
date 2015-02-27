@@ -275,6 +275,7 @@ done:
 }
 
 /**
+ * @ender_name{enesim.version_get}
  * @brief Retrieve the Enesim version.
  *
  * @param[out] major The major version number.
