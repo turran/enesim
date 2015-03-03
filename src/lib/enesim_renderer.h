@@ -21,15 +21,14 @@
 /**
  * @file
  * @ender_group{Enesim_Renderer}
+ * @ender_group{Enesim_Renderer_Feature}
  */
 
 /**
- * @defgroup Enesim_Renderer Renderer
- * @brief Vector and raster drawing primitives
+ * @defgroup Enesim_Renderer_Feature Renderer features
+ * @ingroup Enesim_Renderer
  * @{
  */
-
-typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handle */
 
 /** Flags that specify what a renderer supports */
 typedef enum _Enesim_Renderer_Feature
@@ -46,6 +45,15 @@ typedef enum _Enesim_Renderer_Feature
 
 /** Helper macro to define an affine and proective transformation support */
 #define ENESIM_RENDERER_FEATURE_TRANSFORMATION (ENESIM_RENDERER_FEATURE_AFFINE | ENESIM_RENDERER_FEATURE_PROJECTIVE)
+
+/**
+ * @}
+ * @defgroup Enesim_Renderer Renderer
+ * @brief Vector and raster drawing primitives
+ * @{
+ */
+
+typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handle */
 
 /**
  * Callback function of the Enesim_Renderer_Damages_Get_Cb descriptor function
