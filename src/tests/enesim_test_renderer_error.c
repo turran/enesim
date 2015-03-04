@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 	if (!enesim_renderer_draw(r, s, ENESIM_ROP_FILL, NULL, 0, 0, &error))
 	{
 		enesim_log_dump(error);
-		enesim_log_delete(error);
+		enesim_log_unref(error);
 	}
 
 	enesim_shutdown();
