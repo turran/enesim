@@ -96,6 +96,7 @@ typedef enum _Enesim_Channel
 
 /**
  * Alpha hints
+ * @ender_name{enesim.aplha_hint}
  */
 typedef enum _Enesim_Alpha_Hint
 {
@@ -109,6 +110,7 @@ typedef enum _Enesim_Alpha_Hint
 
 /**
  * Repeat modes
+ * @ender_name{enesim.repeat_mode}
  */
 typedef enum _Enesim_Repeat_Mode
 {

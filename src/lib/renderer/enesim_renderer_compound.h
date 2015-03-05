@@ -38,6 +38,9 @@
  * @{
  */
 
+/**
+ * Compound Layer handle
+ */
 typedef struct _Enesim_Renderer_Compound_Layer Enesim_Renderer_Compound_Layer;
 
 EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_new(void);
