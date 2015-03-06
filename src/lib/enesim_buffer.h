@@ -67,55 +67,89 @@ typedef enum _Enesim_Buffer_Format
 
 /**
  * Definition of a 24 bits per pixel format
+ * @ender_name{enesim.buffer.sw_data_24bpp}
  */
-typedef struct _Enesim_Buffer_24bpp
+typedef struct _Enesim_Buffer_Sw_Data_24bpp
 {
 	uint8_t *plane0; /**< The buffer data */
 	int plane0_stride; /**< The stride of the buffer */
-} Enesim_Buffer_24bpp;
+} Enesim_Buffer_Sw_Data_24bpp;
 
 /**
  * Definition of a 32 bits per pixel format
+ * @ender_name{enesim.buffer.sw_data_32bpp}
  */
-typedef struct _Enesim_Buffer_32bpp
+typedef struct _Enesim_Buffer_Sw_Data_32bpp
 {
 	uint32_t *plane0; /**< The buffer data */
 	int plane0_stride; /**< The stride of the buffer */
-} Enesim_Buffer_32bpp;
+} Enesim_Buffer_Sw_Data_32bpp;
 
-typedef struct _Enesim_Buffer_Rgb565
+/**
+ * The definition associated with @ref ENESIM_BUFFER_FORMAT_RGB565
+ * @ender_name{enesim.buffer.sw_data_rgb565}
+ */
+typedef struct _Enesim_Buffer_Sw_Data_Rgb565
 {
 	uint16_t *plane0; /**< The buffer data */
 	int plane0_stride; /**< The stride of the buffer */
-} Enesim_Buffer_Rgb565;
+} Enesim_Buffer_Sw_Data_Rgb565;
 
 /**
  * Definition of a 8 bits alpha only format
+ * @ender_name{enesim.buffer.sw_data_a8}
  */
-typedef struct _Enesim_Buffer_A8
+typedef struct _Enesim_Buffer_Sw_Data_A8
 {
 	uint8_t *plane0; /**< The buffer data */
 	int plane0_stride; /**< The stride of the buffer */
-} Enesim_Buffer_A8;
+} Enesim_Buffer_Sw_Data_A8;
 
-typedef Enesim_Buffer_32bpp Enesim_Buffer_Argb8888; /**< The definition associated with @ref ENESIM_BUFFER_FORMAT_ARGB8888 */
-typedef Enesim_Buffer_32bpp Enesim_Buffer_Argb8888_Pre; /**< The definition associated with @ref ENESIM_BUFFER_FORMAT_ARGB8888_PRE */
-typedef Enesim_Buffer_32bpp Enesim_Buffer_Xrgb8888; /**< The definition associated with @ref ENESIM_BUFFER_FORMAT_XRGB8888 */
-typedef Enesim_Buffer_24bpp Enesim_Buffer_Rgb888; /**< The definition associated with @ref ENESIM_BUFFER_FORMAT_RGB888 */
-typedef Enesim_Buffer_24bpp Enesim_Buffer_Bgr888; /**< The definition associated with @ref ENESIM_BUFFER_FORMAT_BGR888 */
-typedef Enesim_Buffer_24bpp Enesim_Buffer_Cmyk; /**< The definition associated with @ref ENESIM_BUFFER_FORMAT_CMYK */
+/**
+ * The definition associated with @ref ENESIM_BUFFER_FORMAT_ARGB8888
+ * @ender_name{enesim.buffer.sw_data_argb8888}
+ */
+typedef Enesim_Buffer_Sw_Data_32bpp Enesim_Buffer_Sw_Data_Argb8888;
+/**
+ * The definition associated with @ref ENESIM_BUFFER_FORMAT_ARGB8888_PRE
+ * @ender_name{enesim.buffer.sw_data_argb8888_pre}
+ */
+typedef Enesim_Buffer_Sw_Data_32bpp Enesim_Buffer_Sw_Data_Argb8888_Pre;
+/**
+ * The definition associated with @ref ENESIM_BUFFER_FORMAT_XRGB8888
+ * @ender_name{enesim.buffer.sw_data_xrgb8888}
+ */
+typedef Enesim_Buffer_Sw_Data_32bpp Enesim_Buffer_Sw_Data_Xrgb8888;
+/**
+ * The definition associated with @ref ENESIM_BUFFER_FORMAT_RGB888
+ * @ender_name{enesim.buffer.sw_data_rgb888}
+ */
+typedef Enesim_Buffer_Sw_Data_24bpp Enesim_Buffer_Sw_Data_Rgb888; 
+/**
+ * The definition associated with @ref ENESIM_BUFFER_FORMAT_BGR888
+ * @ender_name{enesim.buffer.sw_data_bgr888}
+ */
+typedef Enesim_Buffer_Sw_Data_24bpp Enesim_Buffer_Sw_Data_Bgr888;
+/**
+ * The definition associated with @ref ENESIM_BUFFER_FORMAT_CMYK
+ * @ender_name{enesim.buffer.sw_data_cmyk}
+ */
+typedef Enesim_Buffer_Sw_Data_24bpp Enesim_Buffer_Sw_Data_Cmyk;
 
-/**< The software data definition */
+/**
+ * The software data definition
+ * @ender_name{enesim.buffer.sw_data}
+ */
 typedef union _Enesim_Buffer_Sw_Data
 {
-	Enesim_Buffer_Argb8888 argb8888; /**< The @ref ENESIM_BUFFER_FORMAT_ARGB8888 value */
-	Enesim_Buffer_Argb8888_Pre argb8888_pre; /**< The @ref ENESIM_BUFFER_FORMAT_ARGB8888_PRE value */
-	Enesim_Buffer_Xrgb8888 xrgb8888; /**< The @ref ENESIM_BUFFER_FORMAT_XRGB8888 value */
-	Enesim_Buffer_Rgb565 rgb565; /**< The @ref ENESIM_BUFFER_FORMAT_RGB565 value */
-	Enesim_Buffer_A8 a8; /**< The @ref ENESIM_BUFFER_FORMAT_A8 value */
-	Enesim_Buffer_Rgb888 rgb888; /**< The @ref ENESIM_BUFFER_FORMAT_RGB888 value */
-	Enesim_Buffer_Bgr888 bgr888; /**< The @ref ENESIM_BUFFER_FORMAT_BGR888 value */
-	Enesim_Buffer_Cmyk cmyk; /**< The @ref ENESIM_BUFFER_FORMAT_CMYK values */
+	Enesim_Buffer_Sw_Data_Argb8888 argb8888; /**< The @ref ENESIM_BUFFER_FORMAT_ARGB8888 value */
+	Enesim_Buffer_Sw_Data_Argb8888_Pre argb8888_pre; /**< The @ref ENESIM_BUFFER_FORMAT_ARGB8888_PRE value */
+	Enesim_Buffer_Sw_Data_Xrgb8888 xrgb8888; /**< The @ref ENESIM_BUFFER_FORMAT_XRGB8888 value */
+	Enesim_Buffer_Sw_Data_Rgb565 rgb565; /**< The @ref ENESIM_BUFFER_FORMAT_RGB565 value */
+	Enesim_Buffer_Sw_Data_A8 a8; /**< The @ref ENESIM_BUFFER_FORMAT_A8 value */
+	Enesim_Buffer_Sw_Data_Rgb888 rgb888; /**< The @ref ENESIM_BUFFER_FORMAT_RGB888 value */
+	Enesim_Buffer_Sw_Data_Bgr888 bgr888; /**< The @ref ENESIM_BUFFER_FORMAT_BGR888 value */
+	Enesim_Buffer_Sw_Data_Cmyk cmyk; /**< The @ref ENESIM_BUFFER_FORMAT_CMYK values */
 } Enesim_Buffer_Sw_Data;
 
 
