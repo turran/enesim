@@ -56,6 +56,10 @@ include src/modules/Makefile.mk
 
 include src/tests/Makefile.mk
 
+### Data
+
+include data/Makefile.mk
+
 ### Examples
 
 include src/examples/Makefile.mk

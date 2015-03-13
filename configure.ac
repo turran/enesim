@@ -452,11 +452,7 @@ ENS_CHECK_COVERAGE(yes, [enable_coverage="yes"], [enable_coverage="no"])
 ENS_CHECK_BENCHMARK([enable_benchmark="yes"], [enable_benchmark="no"])
 
 # Check where the ender data should be installed
-PKG_CHECK_EXISTS([ender], [have_ender="yes"], [have_ender="no"])
-if test "x${have_ender}" = "xyes"; then
-   ENDER_DATADIR=$($PKG_CONFIG --variable=descriptionsdir ender)
-   AC_SUBST([ENDER_DATADIR])
-fi
+ENS_CHECK_ENDER([enable_ender="yes"], [enable_ender="no"])
 
 ### Substitutions
 
@@ -497,6 +493,7 @@ echo "Configuration Options Summary:"
 echo
 echo "  Build example.............................: ${enable_benchmark}"
 echo "  Coverage..................................: ${enable_coverage}"
+echo "  Ender description.........................: ${enable_ender}"
 echo
 echo "Converter:"
 echo "  Build ARGB8888_UNPRE format support.......: ${format_argb8888_unpre}"

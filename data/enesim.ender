@@ -1,0 +1,2351 @@
+<?xml version="1.0" standalone="yes"?>
+<lib xmlns:dyn="http://exslt.org/dynamic" name="enesim" version="0" case="underscore">
+  <includes name="eina"/>
+  <object name="enesim.log">
+    <ref name="ref">
+      <return type="enesim.log" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="add">
+      <return type="enesim.log" transfer="full"/>
+      <arg name="string" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="add_parametric">
+      <return type="enesim.log" transfer="full"/>
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="function" type="string" direction="in" transfer="none"/>
+      <arg name="line" type="int32" direction="in" transfer="full"/>
+      <arg name="fmt" type="string" direction="in" transfer="full"/>
+      <arg name="args" type="va.list" direction="in" transfer="full"/>
+    </method>
+    <method name="dump"/>
+  </object>
+  <enum name="enesim.angle">
+    <value name="0"/>
+    <value name="90"/>
+    <value name="180"/>
+    <value name="270"/>
+  </enum>
+  <enum name="enesim.rop">
+    <value name="blend"/>
+    <value name="fill"/>
+  </enum>
+  <enum name="enesim.quality">
+    <value name="best"/>
+    <value name="good"/>
+    <value name="fast"/>
+  </enum>
+  <enum name="enesim.priority">
+    <value name="none" initializer="0"/>
+    <value name="marginal" initializer="64"/>
+    <value name="secondary" initializer="128"/>
+    <value name="primary" initializer="256"/>
+  </enum>
+  <enum name="enesim.channel">
+    <value name="red"/>
+    <value name="green"/>
+    <value name="blue"/>
+    <value name="alpha"/>
+    <value name="luminance"/>
+  </enum>
+  <enum name="enesim.aplha_hint">
+    <value name="normal"/>
+    <value name="sparse"/>
+    <value name="opaque"/>
+  </enum>
+  <enum name="enesim.repeat_mode">
+    <value name="restrict"/>
+    <value name="pad"/>
+    <value name="reflect"/>
+    <value name="repeat"/>
+  </enum>
+  <enum name="enesim.backend">
+    <value name="invalid"/>
+    <value name="software"/>
+    <value name="opencl"/>
+    <value name="opengl"/>
+  </enum>
+  <function name="enesim.init">
+    <return type="int32" transfer="full"/>
+  </function>
+  <function name="enesim.shutdown">
+    <return type="int32" transfer="full"/>
+  </function>
+  <function name="enesim.version_get">
+    <arg name="major" type="uint32" direction="out" transfer="full"/>
+    <arg name="minor" type="uint32" direction="out" transfer="full"/>
+    <arg name="micro" type="uint32" direction="out" transfer="full"/>
+  </function>
+  <enum name="enesim.format">
+    <value name="none"/>
+    <value name="argb8888"/>
+    <value name="a8"/>
+  </enum>
+  <def name="enesim.argb" type="uint32">
+    <function name="components_from">
+      <return type="enesim.argb" transfer="full"/>
+      <arg name="a" type="uint8" direction="in" transfer="full"/>
+      <arg name="r" type="uint8" direction="in" transfer="full"/>
+      <arg name="g" type="uint8" direction="in" transfer="full"/>
+      <arg name="b" type="uint8" direction="in" transfer="full"/>
+    </function>
+    <function name="components_to">
+      <arg name="argb" type="enesim.argb" direction="in" transfer="full"/>
+      <arg name="a" type="uint8" direction="out" transfer="full"/>
+      <arg name="r" type="uint8" direction="out" transfer="full"/>
+      <arg name="g" type="uint8" direction="out" transfer="full"/>
+      <arg name="b" type="uint8" direction="out" transfer="full"/>
+    </function>
+  </def>
+  <def name="enesim.color" type="uint32">
+    <function name="argb_to">
+      <return type="enesim.argb" transfer="full"/>
+      <arg name="c" type="enesim.color" direction="in" transfer="full"/>
+    </function>
+    <function name="argb_from">
+      <return type="enesim.color" transfer="full"/>
+      <arg name="argb" type="enesim.argb" direction="in" transfer="full"/>
+    </function>
+    <function name="components_from">
+      <return type="enesim.color" transfer="full"/>
+      <arg name="a" type="uint8" direction="in" transfer="full"/>
+      <arg name="r" type="uint8" direction="in" transfer="full"/>
+      <arg name="g" type="uint8" direction="in" transfer="full"/>
+      <arg name="b" type="uint8" direction="in" transfer="full"/>
+    </function>
+    <function name="components_to">
+      <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      <arg name="a" type="uint8" direction="out" transfer="full"/>
+      <arg name="r" type="uint8" direction="out" transfer="full"/>
+      <arg name="g" type="uint8" direction="out" transfer="full"/>
+      <arg name="b" type="uint8" direction="out" transfer="full"/>
+    </function>
+  </def>
+  <def name="enesim.alpha" type="uint8"/>
+  <struct name="enesim.rectangle">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="w" type="double"/>
+    <field name="h" type="double"/>
+    <method name="normalize">
+      <arg name="dst" type="eina.rectangle" direction="in" transfer="full"/>
+    </method>
+    <method name="is_inside">
+      <return type="bool" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="coords_from">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+      <arg name="w" type="double" direction="in" transfer="full"/>
+      <arg name="h" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="union">
+      <arg name="rr2" type="enesim.rectangle" direction="in" transfer="full"/>
+      <arg name="dst" type="enesim.rectangle" direction="in" transfer="full"/>
+    </method>
+  </struct>
+  <object name="enesim.pool">
+    <function name="default_get">
+      <return type="enesim.pool" transfer="none"/>
+    </function>
+    <method name="default_set"/>
+    <ref name="ref">
+      <return type="enesim.pool" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <ctor name="eina_new">
+      <arg name="mp" type="eina.mempool" direction="in" transfer="full"/>
+    </ctor>
+  </object>
+  <struct name="enesim.quad">
+    <field name="x0" type="double"/>
+    <field name="y0" type="double"/>
+    <field name="x1" type="double"/>
+    <field name="y1" type="double"/>
+    <field name="x2" type="double"/>
+    <field name="y2" type="double"/>
+    <field name="x3" type="double"/>
+    <field name="y3" type="double"/>
+    <method name="rectangle_to">
+      <arg name="r" type="enesim.rectangle" direction="in" transfer="full"/>
+    </method>
+    <method name="eina_rectangle_to">
+      <arg name="r" type="eina.rectangle" direction="in" transfer="full"/>
+    </method>
+    <method name="rectangle_from">
+      <arg name="r" type="eina.rectangle" direction="in" transfer="none"/>
+    </method>
+    <method name="coords_set">
+      <arg name="x1" type="double" direction="in" transfer="full"/>
+      <arg name="y1" type="double" direction="in" transfer="full"/>
+      <arg name="x2" type="double" direction="in" transfer="full"/>
+      <arg name="y2" type="double" direction="in" transfer="full"/>
+      <arg name="x3" type="double" direction="in" transfer="full"/>
+      <arg name="y3" type="double" direction="in" transfer="full"/>
+      <arg name="x4" type="double" direction="in" transfer="full"/>
+      <arg name="y4" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="coords_get">
+      <arg name="x1" type="double" direction="in" transfer="full"/>
+      <arg name="y1" type="double" direction="in" transfer="full"/>
+      <arg name="x2" type="double" direction="in" transfer="full"/>
+      <arg name="y2" type="double" direction="in" transfer="full"/>
+      <arg name="x3" type="double" direction="in" transfer="full"/>
+      <arg name="y3" type="double" direction="in" transfer="full"/>
+      <arg name="x4" type="double" direction="in" transfer="full"/>
+      <arg name="y4" type="double" direction="in" transfer="full"/>
+    </method>
+  </struct>
+  <enum name="enesim.matrix.type">
+    <value name="identity"/>
+    <value name="affine"/>
+    <value name="projective"/>
+  </enum>
+  <struct name="enesim.matrix_f16p16">
+    <field name="xx" type="eina.f16p16"/>
+    <field name="xy" type="eina.f16p16"/>
+    <field name="xz" type="eina.f16p16"/>
+    <field name="yx" type="eina.f16p16"/>
+    <field name="yy" type="eina.f16p16"/>
+    <field name="yz" type="eina.f16p16"/>
+    <field name="zx" type="eina.f16p16"/>
+    <field name="zy" type="eina.f16p16"/>
+    <field name="zz" type="eina.f16p16"/>
+    <method name="identity"/>
+    <method name="compose">
+      <arg name="m2" type="enesim.matrix_f16p16" direction="in" transfer="none"/>
+      <arg name="dst" type="enesim.matrix_f16p16" direction="in" transfer="full"/>
+    </method>
+    <method name="type_get">
+      <return type="enesim.matrix.type" transfer="full"/>
+    </method>
+  </struct>
+  <struct name="enesim.matrix">
+    <field name="xx" type="double"/>
+    <field name="xy" type="double"/>
+    <field name="xz" type="double"/>
+    <field name="yx" type="double"/>
+    <field name="yy" type="double"/>
+    <field name="yz" type="double"/>
+    <field name="zx" type="double"/>
+    <field name="zy" type="double"/>
+    <field name="zz" type="double"/>
+    <method name="type_get">
+      <return type="enesim.matrix.type" transfer="full"/>
+    </method>
+    <method name="values_set">
+      <arg name="a" type="double" direction="in" transfer="full"/>
+      <arg name="b" type="double" direction="in" transfer="full"/>
+      <arg name="c" type="double" direction="in" transfer="full"/>
+      <arg name="d" type="double" direction="in" transfer="full"/>
+      <arg name="e" type="double" direction="in" transfer="full"/>
+      <arg name="f" type="double" direction="in" transfer="full"/>
+      <arg name="g" type="double" direction="in" transfer="full"/>
+      <arg name="h" type="double" direction="in" transfer="full"/>
+      <arg name="i" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="values_get">
+      <arg name="a" type="double" direction="in" transfer="full"/>
+      <arg name="b" type="double" direction="in" transfer="full"/>
+      <arg name="c" type="double" direction="in" transfer="full"/>
+      <arg name="d" type="double" direction="in" transfer="full"/>
+      <arg name="e" type="double" direction="in" transfer="full"/>
+      <arg name="f" type="double" direction="in" transfer="full"/>
+      <arg name="g" type="double" direction="in" transfer="full"/>
+      <arg name="h" type="double" direction="in" transfer="full"/>
+      <arg name="i" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="fixed_values_get">
+      <arg name="a" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="b" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="c" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="d" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="e" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="f" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="g" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="h" type="eina.f16p16" direction="in" transfer="full"/>
+      <arg name="i" type="eina.f16p16" direction="in" transfer="full"/>
+    </method>
+    <method name="matrix_f16p16_to">
+      <arg name="fm" type="enesim.matrix_f16p16" direction="in" transfer="full"/>
+    </method>
+    <method name="is_equal">
+      <return type="bool" transfer="full"/>
+      <arg name="m2" type="enesim.matrix" direction="in" transfer="none"/>
+    </method>
+    <method name="compose">
+      <arg name="m2" type="enesim.matrix" direction="in" transfer="none"/>
+      <arg name="dst" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="translate">
+      <arg name="tx" type="double" direction="in" transfer="full"/>
+      <arg name="ty" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="scale">
+      <arg name="sx" type="double" direction="in" transfer="full"/>
+      <arg name="sy" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="rotate">
+      <arg name="rad" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="identity"/>
+    <method name="determinant">
+      <return type="double" transfer="full"/>
+    </method>
+    <method name="divide">
+      <arg name="scalar" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="inverse">
+      <arg name="m2" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="transpose">
+      <arg name="a" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="cofactor">
+      <arg name="a" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="adjoint">
+      <arg name="a" type="enesim.matrix" direction="in" transfer="full"/>
+    </method>
+    <method name="point_transform">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+      <arg name="xr" type="double" direction="in" transfer="full"/>
+      <arg name="yr" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="eina_rectangle_transform">
+      <arg name="r" type="eina.rectangle" direction="in" transfer="none"/>
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="rectangle_transform">
+      <arg name="r" type="enesim.rectangle" direction="in" transfer="none"/>
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="quad_quad_map">
+      <return type="bool" transfer="full"/>
+      <arg name="src" type="enesim.quad" direction="in" transfer="none"/>
+      <arg name="dst" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="square_quad_map">
+      <return type="bool" transfer="full"/>
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+    <method name="quad_square_map">
+      <return type="bool" transfer="full"/>
+      <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
+    </method>
+  </struct>
+  <struct name="enesim.path.command.move.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.line.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.squadratic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.quadratic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="ctrl_x" type="double"/>
+    <field name="ctrl_y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.cubic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="ctrl_x0" type="double"/>
+    <field name="ctrl_y0" type="double"/>
+    <field name="ctrl_x1" type="double"/>
+    <field name="ctrl_y1" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.scubic.to">
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="ctrl_x" type="double"/>
+    <field name="ctrl_y" type="double"/>
+  </struct>
+  <struct name="enesim.path.command.arc.to">
+    <field name="rx" type="double"/>
+    <field name="ry" type="double"/>
+    <field name="angle" type="double"/>
+    <field name="x" type="double"/>
+    <field name="y" type="double"/>
+    <field name="large" type="bool"/>
+    <field name="sweep" type="bool"/>
+  </struct>
+  <struct name="enesim.path.command.close">
+    <field name="close" type="bool"/>
+  </struct>
+  <struct name="enesim.path.command.definition"/>
+  <struct name="enesim.path.command">
+    <field name="type" type="enesim.path.command.type"/>
+    <field name="definition" type="enesim.path.command.definition"/>
+  </struct>
+  <enum name="enesim.path.command.type">
+    <value name="move_to"/>
+    <value name="line_to"/>
+    <value name="quadratic_to"/>
+    <value name="squadratic_to"/>
+    <value name="cubic_to"/>
+    <value name="scubic_to"/>
+    <value name="arc_to"/>
+    <value name="close"/>
+    <value name="types"/>
+  </enum>
+  <object name="enesim.path">
+    <ctor name="new"/>
+    <ref name="ref">
+      <return type="enesim.path" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="command_clear"/>
+    <method name="command_add">
+      <arg name="cmd" type="enesim.path.command" direction="in" transfer="full"/>
+    </method>
+    <method name="move_to">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="line_to">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="squadratic_to">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="quadratic_to">
+      <arg name="ctrl_x" type="double" direction="in" transfer="full"/>
+      <arg name="ctrl_y" type="double" direction="in" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="cubic_to">
+      <arg name="ctrl_x0" type="double" direction="in" transfer="full"/>
+      <arg name="ctrl_y0" type="double" direction="in" transfer="full"/>
+      <arg name="ctrl_x" type="double" direction="in" transfer="full"/>
+      <arg name="ctrl_y" type="double" direction="in" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="scubic_to">
+      <arg name="ctrl_x" type="double" direction="in" transfer="full"/>
+      <arg name="ctrl_y" type="double" direction="in" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="arc_to">
+      <arg name="rx" type="double" direction="in" transfer="full"/>
+      <arg name="ry" type="double" direction="in" transfer="full"/>
+      <arg name="angle" type="double" direction="in" transfer="full"/>
+      <arg name="large" type="uint8" direction="in" transfer="full"/>
+      <arg name="sweep" type="uint8" direction="in" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="close"/>
+  </object>
+  <struct name="enesim.buffer.sw_data_24bpp">
+    <field name="plane0" type="uint8.t"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.buffer.sw_data_32bpp">
+    <field name="plane0" type="uint32.t"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.buffer.sw_data_rgb565">
+    <field name="plane0" type="uint16.t"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.buffer.sw_data_a8">
+    <field name="plane0" type="uint8.t"/>
+    <field name="plane0_stride" type="int32"/>
+  </struct>
+  <struct name="enesim.buffer.sw_data"/>
+  <enum name="enesim.buffer.format">
+    <value name="rgb565"/>
+    <value name="argb8888"/>
+    <value name="argb8888_pre"/>
+    <value name="xrgb8888"/>
+    <value name="rgb888"/>
+    <value name="bgr888"/>
+    <value name="a8"/>
+    <value name="gray"/>
+    <value name="cmyk"/>
+    <value name="cmyk_adobe"/>
+  </enum>
+  <def name="enesim.buffer.sw.data.argb8888" type=""/>
+  <def name="enesim.buffer.sw.data.argb8888.pre" type=""/>
+  <def name="enesim.buffer.sw.data.xrgb8888" type=""/>
+  <def name="enesim.buffer.sw.data.rgb888" type=""/>
+  <def name="enesim.buffer.sw.data.bgr888" type=""/>
+  <def name="enesim.buffer.sw.data.cmyk" type=""/>
+  <object name="enesim.buffer">
+    <ctor name="new">
+      <arg name="f" type="enesim.buffer.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_data_from">
+      <arg name="f" type="enesim.buffer.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+      <arg name="copy" type="bool" direction="in" transfer="full"/>
+      <arg name="data" type="enesim.buffer.sw_data" direction="in" transfer="full"/>
+      <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full"/>
+      <arg name="free_func_data" type="pointer" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_pool_from">
+      <arg name="f" type="enesim.buffer.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+      <arg name="p" type="enesim.pool" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_pool_and_data_from">
+      <arg name="f" type="enesim.buffer.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+      <arg name="p" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="copy" type="bool" direction="in" transfer="full"/>
+      <arg name="data" type="enesim.buffer.sw_data" direction="in" transfer="full"/>
+      <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full"/>
+      <arg name="free_func_data" type="pointer" direction="in" transfer="full"/>
+    </ctor>
+    <ref name="ref">
+      <return type="enesim.buffer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="size_get">
+      <arg name="w" type="int32" direction="out" transfer="full"/>
+      <arg name="h" type="int32" direction="out" transfer="full"/>
+    </method>
+    <method name="format_get">
+      <return type="enesim.buffer.format" transfer="full"/>
+    </method>
+    <method name="backend_get">
+      <return type="enesim.backend" transfer="full"/>
+    </method>
+    <method name="pool_get">
+      <return type="enesim.pool" transfer="full"/>
+    </method>
+    <method name="private_set">
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+    </method>
+    <method name="private_get">
+      <return type="pointer" transfer="full"/>
+    </method>
+    <method name="sw_data_get">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.buffer.sw_data" direction="out" transfer="full"/>
+    </method>
+    <method name="map">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.buffer.sw_data" direction="out" transfer="full"/>
+    </method>
+    <method name="unmap">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.buffer.sw_data" direction="in" transfer="full"/>
+      <arg name="written" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="format_size_get">
+      <return type="size" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+    </method>
+    <method name="format_rgb_components_from">
+      <return type="bool" transfer="full"/>
+      <arg name="depth" type="int32" direction="in" transfer="full"/>
+      <arg name="aoffset" type="uint8" direction="in" transfer="full"/>
+      <arg name="alen" type="uint8" direction="in" transfer="full"/>
+      <arg name="roffset" type="uint8" direction="in" transfer="full"/>
+      <arg name="rlen" type="uint8" direction="in" transfer="full"/>
+      <arg name="goffset" type="uint8" direction="in" transfer="full"/>
+      <arg name="glen" type="uint8" direction="in" transfer="full"/>
+      <arg name="boffset" type="uint8" direction="in" transfer="full"/>
+      <arg name="blen" type="uint8" direction="in" transfer="full"/>
+      <arg name="premul" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="format_rgb_components_to">
+      <return type="bool" transfer="full"/>
+      <arg name="aoffset" type="uint8" direction="out" transfer="full"/>
+      <arg name="alen" type="uint8" direction="out" transfer="full"/>
+      <arg name="roffset" type="uint8" direction="out" transfer="full"/>
+      <arg name="rlen" type="uint8" direction="out" transfer="full"/>
+      <arg name="goffset" type="uint8" direction="out" transfer="full"/>
+      <arg name="glen" type="uint8" direction="out" transfer="full"/>
+      <arg name="boffset" type="uint8" direction="out" transfer="full"/>
+      <arg name="blen" type="uint8" direction="out" transfer="full"/>
+      <arg name="premul" type="bool" direction="out" transfer="full"/>
+    </method>
+    <method name="format_rgb_depth_get">
+      <return type="uint8" transfer="full"/>
+    </method>
+    <method name="lock">
+      <arg name="write" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="unlock"/>
+    <method name="alpha_hint_set">
+      <arg name="hint" type="enesim.aplha_hint" direction="in" transfer="full"/>
+    </method>
+    <method name="alpha_hint_get">
+      <return type="enesim.aplha_hint" transfer="full"/>
+    </method>
+  </object>
+  <callback name="enesim.buffer.free"/>
+  <object name="enesim.surface">
+    <ctor name="new">
+      <arg name="f" type="enesim.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_data_from">
+      <arg name="f" type="enesim.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+      <arg name="copy" type="bool" direction="in" transfer="full"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+      <arg name="stride" type="size" direction="in" transfer="full"/>
+      <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full"/>
+      <arg name="free_func_data" type="pointer" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_pool_from">
+      <arg name="f" type="enesim.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+      <arg name="p" type="enesim.pool" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_pool_and_data_from">
+      <arg name="fmt" type="enesim.format" direction="in" transfer="full"/>
+      <arg name="w" type="uint32" direction="in" transfer="full"/>
+      <arg name="h" type="uint32" direction="in" transfer="full"/>
+      <arg name="p" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="copy" type="bool" direction="in" transfer="full"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+      <arg name="stride" type="size" direction="in" transfer="full"/>
+      <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full"/>
+      <arg name="free_func_data" type="pointer" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_buffer_from">
+      <arg name="buffer" type="enesim.buffer" direction="in" transfer="full"/>
+    </ctor>
+    <ref name="ref">
+      <return type="enesim.surface" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="buffer_get">
+      <return type="enesim.buffer" transfer="full"/>
+    </method>
+    <method name="size_get">
+      <arg name="w" type="int32" direction="out" transfer="full"/>
+      <arg name="h" type="int32" direction="out" transfer="full"/>
+    </method>
+    <method name="format_get">
+      <return type="enesim.format" transfer="full"/>
+    </method>
+    <method name="backend_get">
+      <return type="enesim.backend" transfer="full"/>
+    </method>
+    <method name="pool_get">
+      <return type="enesim.pool" transfer="full"/>
+    </method>
+    <method name="private_set">
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+    </method>
+    <method name="private_get">
+      <return type="pointer" transfer="full"/>
+    </method>
+    <method name="sw_data_get">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="pointer" direction="out" transfer="full"/>
+      <arg name="stride" type="size" direction="out" transfer="full"/>
+    </method>
+    <method name="map">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="pointer" direction="out" transfer="full"/>
+      <arg name="stride" type="size" direction="out" transfer="full"/>
+    </method>
+    <method name="unmap">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+      <arg name="written" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="lock">
+      <arg name="write" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="unlock"/>
+    <method name="alpha_hint_set">
+      <arg name="hint" type="enesim.aplha_hint" direction="in" transfer="full"/>
+    </method>
+    <method name="alpha_hint_get">
+      <return type="enesim.aplha_hint" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.converter">
+    <function name="buffer">
+      <return type="bool" transfer="full"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
+    </function>
+    <function name="surface">
+      <return type="bool" transfer="full"/>
+      <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
+      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
+    </function>
+  </object>
+  <object name="enesim.renderer">
+    <method name="private_set">
+      <arg name="name" type="string" direction="in" transfer="none"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+    </method>
+    <method name="private_get">
+      <return type="pointer" transfer="full"/>
+      <arg name="name" type="string" direction="in" transfer="none"/>
+    </method>
+    <ref name="ref">
+      <return type="enesim.renderer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="ref_count">
+      <return type="int32" transfer="full"/>
+    </method>
+    <method name="lock"/>
+    <method name="unlock"/>
+    <method name="name_set">
+      <arg name="name" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="name_get">
+      <return type="string" transfer="none"/>
+    </method>
+    <method name="transformation_set">
+      <arg name="m" type="enesim.matrix" direction="in" transfer="none"/>
+    </method>
+    <method name="transformation_get">
+      <arg name="m" type="enesim.matrix" direction="out" transfer="full"/>
+    </method>
+    <method name="transformation_type_get">
+      <return type="enesim.matrix.type" transfer="full"/>
+    </method>
+    <method name="origin_set">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="origin_get">
+      <arg name="x" type="double" direction="out" transfer="full"/>
+      <arg name="y" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="x_origin_set">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="x_origin_get">
+      <return type="double" transfer="full"/>
+    </method>
+    <method name="y_origin_set">
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="y_origin_get">
+      <return type="double" transfer="full"/>
+    </method>
+    <method name="visibility_set">
+      <arg name="visibility" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="visibility_get">
+      <return type="bool" transfer="full"/>
+    </method>
+    <method name="color_set">
+      <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+    </method>
+    <method name="color_get">
+      <return type="enesim.color" transfer="full"/>
+    </method>
+    <method name="mask_set">
+      <arg name="mask" type="enesim.renderer" direction="in" transfer="full"/>
+    </method>
+    <method name="mask_get">
+      <return type="enesim.renderer" transfer="none"/>
+    </method>
+    <method name="mask_channel_set">
+      <arg name="channel" type="enesim.channel" direction="in" transfer="full"/>
+    </method>
+    <method name="mask_channel_get">
+      <return type="enesim.channel" transfer="full"/>
+    </method>
+    <method name="quality_set">
+      <arg name="quality" type="enesim.quality" direction="in" transfer="full"/>
+    </method>
+    <method name="quality_get">
+      <return type="enesim.quality" transfer="full"/>
+    </method>
+    <method name="alpha_hints_get">
+      <return type="enesim.aplha_hint" transfer="full"/>
+    </method>
+    <method name="is_supported">
+      <return type="bool" transfer="full"/>
+      <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
+    </method>
+    <method name="bounds_get">
+      <return type="bool" transfer="full"/>
+      <arg name="rect" type="enesim.rectangle" direction="out" transfer="full"/>
+    </method>
+    <method name="bounds_get_extended">
+      <return type="bool" transfer="full"/>
+      <arg name="prev" type="enesim.rectangle" direction="out" transfer="full"/>
+      <arg name="curr" type="enesim.rectangle" direction="out" transfer="full"/>
+    </method>
+    <method name="destination_bounds_get">
+      <return type="bool" transfer="full"/>
+      <arg name="rect" type="eina.rectangle" direction="out" transfer="full"/>
+      <arg name="x" type="int32" direction="in" transfer="full"/>
+      <arg name="y" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="destination_bounds_get_extended">
+      <return type="bool" transfer="full"/>
+      <arg name="prev" type="eina.rectangle" direction="out" transfer="full"/>
+      <arg name="curr" type="eina.rectangle" direction="out" transfer="full"/>
+      <arg name="x" type="int32" direction="in" transfer="full"/>
+      <arg name="y" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="features_get">
+      <return type="enesim.renderer.feature" transfer="full"/>
+    </method>
+    <method name="is_inside">
+      <return type="bool" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="has_changed">
+      <return type="bool" transfer="full"/>
+    </method>
+    <method name="damages_get">
+      <return type="bool" transfer="full"/>
+      <arg name="cb" type="enesim.renderer.damage.cb" direction="in" transfer="full"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+    </method>
+    <method name="draw">
+      <return type="bool" transfer="full"/>
+      <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
+      <arg name="rop" type="enesim.rop" direction="in" transfer="full"/>
+      <arg name="clip" type="eina.rectangle" direction="in" transfer="full"/>
+      <arg name="x" type="int32" direction="in" transfer="full"/>
+      <arg name="y" type="int32" direction="in" transfer="full"/>
+      <arg name="log" type="enesim.log" direction="in" transfer="full"/>
+    </method>
+    <method name="draw_list">
+      <return type="bool" transfer="full"/>
+      <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
+      <arg name="rop" type="enesim.rop" direction="in" transfer="full"/>
+      <arg name="clips" type="eina.list" direction="in" transfer="full"/>
+      <arg name="x" type="int32" direction="in" transfer="full"/>
+      <arg name="y" type="int32" direction="in" transfer="full"/>
+      <arg name="log" type="enesim.log" direction="in" transfer="full"/>
+    </method>
+    <function name="default_quality_set">
+      <arg name="quality" type="enesim.quality" direction="in" transfer="full"/>
+    </function>
+  </object>
+  <callback name="enesim.renderer.damage.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <enum name="enesim.renderer.feature">
+    <value name="translate" initializer=""/>
+    <value name="affine" initializer=""/>
+    <value name="projective" initializer=""/>
+    <value name="a8" initializer=""/>
+    <value name="argb8888" initializer=""/>
+    <value name="quality" initializer=""/>
+    <value name="backend_software" initializer=""/>
+    <value name="backend_opengl" initializer=""/>
+  </enum>
+  <object name="enesim.stream">
+    <ref name="ref">
+      <return type="enesim.stream" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="read">
+      <return type="ssize.t" transfer="full"/>
+      <arg name="buffer" type="pointer" direction="in" transfer="full"/>
+      <arg name="len" type="size" direction="in" transfer="full"/>
+    </method>
+    <method name="write">
+      <return type="ssize.t" transfer="full"/>
+      <arg name="buffer" type="pointer" direction="in" transfer="full"/>
+      <arg name="len" type="size" direction="in" transfer="full"/>
+    </method>
+    <method name="length">
+      <return type="size" transfer="full"/>
+    </method>
+    <method name="mmap">
+      <return type="pointer" transfer="full"/>
+      <arg name="size" type="size" direction="out" transfer="full"/>
+    </method>
+    <method name="munmap">
+      <arg name="ptr" type="pointer" direction="in" transfer="full"/>
+    </method>
+    <method name="reset"/>
+    <method name="uri_get">
+      <return type="string" transfer="none"/>
+    </method>
+    <ctor name="file_new">
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="mode" type="string" direction="in" transfer="none"/>
+    </ctor>
+    <ctor name="buffer_new">
+      <arg name="buffer" type="pointer" direction="in" transfer="full"/>
+      <arg name="len" type="size" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="base64_new">
+      <arg name="d" type="enesim.stream" direction="in" transfer="full"/>
+    </ctor>
+  </object>
+  <callback name="enesim.image.callback"/>
+  <object name="enesim.image">
+    <function name="dispatch"/>
+    <function name="info_get">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+      <arg name="w" type="int" direction="in" transfer="full"/>
+      <arg name="h" type="int" direction="in" transfer="full"/>
+      <arg name="sfmt" type="enesim.buffer.format" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
+    </function>
+    <function name="load">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="out" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="in" transfer="full"/>
+    </function>
+    <function name="load_async">
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="cb" type="enesim.image.callback" direction="in" transfer="full"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+    </function>
+    <function name="save">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
+    </function>
+    <function name="save_async">
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="cb" type="enesim.image.callback" direction="in" transfer="full"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+    </function>
+  </object>
+  <object name="enesim.image.context">
+    <ctor name="new"/>
+    <method name="free"/>
+    <method name="load_async">
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="cb" type="enesim.image.callback" direction="in" transfer="full"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="save_async">
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="cb" type="enesim.image.callback" direction="in" transfer="full"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="dispatch"/>
+  </object>
+  <object name="enesim.image.file">
+    <function name="info_get">
+      <return type="bool" transfer="full"/>
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="w" type="int" direction="in" transfer="full"/>
+      <arg name="h" type="int" direction="in" transfer="full"/>
+      <arg name="sfmt" type="enesim.buffer.format" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
+    </function>
+    <function name="load">
+      <return type="bool" transfer="full"/>
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
+    </function>
+    <function name="load_async">
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="cb" type="enesim.image.callback" direction="in" transfer="full"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+    </function>
+    <function name="save">
+      <return type="bool" transfer="full"/>
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
+    </function>
+    <function name="save_async">
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="cb" type="enesim.image.callback" direction="in" transfer="full"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+    </function>
+  </object>
+  <struct name="enesim.image.provider.descriptor">
+    <field name="version" type="int32"/>
+    <field name="name" type="const char"/>
+    <field name="options_parse" type="enesim.image.provider.options.parse.cb"/>
+    <field name="options_free" type="enesim.image.provider.options.free.cb"/>
+    <field name="loadable" type="enesim.image.provider.loadable.cb"/>
+    <field name="saveable" type="enesim.image.provider.saveable.cb"/>
+    <field name="info_get" type="enesim.image.provider.info.get.cb"/>
+    <field name="formats_get" type="enesim.image.provider.formats.get.cb"/>
+    <field name="load" type="enesim.image.provider.load.cb"/>
+    <field name="save" type="enesim.image.provider.save.cb"/>
+    <method name="enesim_image_provider_register">
+      <return type="bool" transfer="full"/>
+      <arg name="priority" type="enesim.priority" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="enesim_image_provider_unregister">
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+    </method>
+    <function name="enesim_image_provider_priority_set">
+      <arg name="p" type="enesim.image.provider" direction="in" transfer="full"/>
+      <arg name="priority" type="enesim.priority" direction="in" transfer="full"/>
+    </function>
+    <function name="enesim_image_provider_info_get">
+      <return type="bool" transfer="full"/>
+      <arg name="thiz" type="enesim.image.provider" direction="in" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="w" type="int32" direction="out" transfer="full"/>
+      <arg name="h" type="int32" direction="out" transfer="full"/>
+      <arg name="sfmt" type="enesim.buffer.format" direction="out" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
+    </function>
+    <function name="enesim_image_provider_load">
+      <return type="bool" transfer="full"/>
+      <arg name="thiz" type="enesim.image.provider" direction="in" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="in" transfer="full"/>
+    </function>
+    <function name="enesim_image_provider_save">
+      <return type="bool" transfer="full"/>
+      <arg name="thiz" type="enesim.image.provider" direction="in" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="in" transfer="full"/>
+    </function>
+  </struct>
+  <object name="enesim.image.provider">
+    <method name="register">
+      <return type="bool" transfer="full"/>
+      <arg name="priority" type="enesim.priority" direction="in" transfer="full"/>
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="unregister">
+      <arg name="mime" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="priority_set">
+      <arg name="priority" type="enesim.priority" direction="in" transfer="full"/>
+    </method>
+    <method name="info_get">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="w" type="int32" direction="out" transfer="full"/>
+      <arg name="h" type="int32" direction="out" transfer="full"/>
+      <arg name="sfmt" type="enesim.buffer.format" direction="out" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
+    </method>
+    <method name="load">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="in" transfer="full"/>
+    </method>
+    <method name="save">
+      <return type="bool" transfer="full"/>
+      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="options" type="string" direction="in" transfer="none"/>
+      <arg name="err" type="eina.error" direction="in" transfer="full"/>
+    </method>
+  </object>
+  <callback name="enesim.image.provider.options.parse.cb">
+    <return type="pointer" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.options.free.cb"/>
+  <callback name="enesim.image.provider.loadable.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.saveable.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.info.get.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.formats.get.cb">
+    <return type="int32" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.load.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <callback name="enesim.image.provider.save.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <struct name="enesim.image.finder.descriptor">
+    <field name="version" type="int32"/>
+    <field name="data_from" type="enesim.image.finder.data.from.cb"/>
+    <field name="extension_from" type="enesim.image.finder.extension.from.cb"/>
+    <method name="enesim_image_finder_register">
+      <return type="bool" transfer="full"/>
+    </method>
+    <method name="enesim_image_finder_unregister"/>
+  </struct>
+  <callback name="enesim.image.finder.data.from.cb">
+    <return type="string" transfer="none"/>
+  </callback>
+  <callback name="enesim.image.finder.extension.from.cb">
+    <return type="string" transfer="none"/>
+  </callback>
+  <enum name="enesim.text.direction">
+    <value name="ltr"/>
+    <value name="rtl"/>
+  </enum>
+  <object name="enesim.text.engine">
+    <function name="default_get">
+      <return type="enesim.text.engine" transfer="full"/>
+    </function>
+    <function name="freetype_get">
+      <return type="enesim.text.engine" transfer="full"/>
+    </function>
+    <ref name="ref">
+      <return type="enesim.text.engine" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+  </object>
+  <object name="enesim.text.font">
+    <ctor name="new_description_from">
+      <arg name="e" type="enesim.text.engine" direction="in" transfer="full"/>
+      <arg name="description" type="string" direction="in" transfer="none"/>
+      <arg name="size" type="int32" direction="in" transfer="full"/>
+    </ctor>
+    <ctor name="new_file_from">
+      <arg name="e" type="enesim.text.engine" direction="in" transfer="full"/>
+      <arg name="file" type="string" direction="in" transfer="none"/>
+      <arg name="index" type="int32" direction="in" transfer="full"/>
+      <arg name="size" type="int32" direction="in" transfer="full"/>
+    </ctor>
+    <ref name="ref">
+      <return type="enesim.text.font" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="max_ascent_get">
+      <return type="int32" transfer="full"/>
+    </method>
+    <method name="max_descent_get">
+      <return type="int32" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.text.buffer">
+    <ref name="ref">
+      <return type="enesim.text.buffer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="string_set">
+      <arg name="string" type="string" direction="in" transfer="none"/>
+      <arg name="length" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="string_get">
+      <return type="string" transfer="none"/>
+    </method>
+    <method name="string_insert">
+      <return type="int32" transfer="full"/>
+      <arg name="string" type="string" direction="in" transfer="none"/>
+      <arg name="length" type="int32" direction="in" transfer="full"/>
+      <arg name="offset" type="ssize.t" direction="in" transfer="full"/>
+    </method>
+    <method name="string_delete">
+      <return type="int32" transfer="full"/>
+      <arg name="length" type="int32" direction="in" transfer="full"/>
+      <arg name="offset" type="ssize.t" direction="in" transfer="full"/>
+    </method>
+    <method name="string_length">
+      <return type="int32" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.text.buffer.simple" inherits="enesim.text.buffer">
+    <ctor name="new">
+      <arg name="initial_length" type="int32" direction="in" transfer="full"/>
+    </ctor>
+  </object>
+  <object name="enesim.text.buffer.smart" inherits="enesim.text.buffer">
+    <ctor name="new">
+      <arg name="thiz" type="enesim.text.buffer" direction="in" transfer="full"/>
+    </ctor>
+    <method name="real_get">
+      <return type="enesim.text.buffer" transfer="full"/>
+    </method>
+    <method name="real_set">
+      <arg name="real" type="enesim.text.buffer" direction="in" transfer="full"/>
+    </method>
+    <method name="dirty"/>
+    <method name="clear"/>
+    <method name="is_dirty">
+      <return type="bool" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.background" inherits="enesim.renderer">
+    <prop name="color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <enum name="enesim.blur.channel">
+    <value name="color"/>
+    <value name="alpha"/>
+    <value name="enesim_blur_channels"/>
+  </enum>
+  <object name="enesim.renderer.blur" inherits="enesim.renderer">
+    <prop name="source_surface">
+      <setter>
+        <arg name="src" type="enesim.surface" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.surface" transfer="none"/>
+      </getter>
+    </prop>
+    <prop name="source_renderer">
+      <setter>
+        <arg name="sr" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="none"/>
+      </getter>
+    </prop>
+    <prop name="channel">
+      <setter>
+        <arg name="channel" type="enesim.blur.channel" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.blur.channel" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="radius_x">
+      <setter>
+        <arg name="rx" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="radius_y">
+      <setter>
+        <arg name="ry" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.checker" inherits="enesim.renderer">
+    <prop name="even_color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="odd_color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="width">
+      <setter>
+        <arg name="width" type="int32" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="int32" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="height">
+      <setter>
+        <arg name="height" type="int32" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="int32" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.clipper" inherits="enesim.renderer">
+    <ctor name="new"/>
+    <method name="clipped_set">
+      <arg name="clipped" type="enesim.renderer" direction="in" transfer="full"/>
+    </method>
+    <method name="clipped_get">
+      <return type="enesim.renderer" transfer="none"/>
+    </method>
+    <method name="x_set">
+      <arg name="x" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="x_get">
+      <return type="int32" transfer="full"/>
+    </method>
+    <method name="y_set">
+      <arg name="y" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="y_get">
+      <return type="int32" transfer="full"/>
+    </method>
+    <method name="position_set">
+      <arg name="x" type="int32" direction="in" transfer="full"/>
+      <arg name="y" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="position_get">
+      <arg name="x" type="int32" direction="out" transfer="full"/>
+      <arg name="y" type="int32" direction="out" transfer="full"/>
+    </method>
+    <method name="width_set">
+      <arg name="width" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="width_get">
+      <return type="int32" transfer="full"/>
+    </method>
+    <method name="height_set">
+      <arg name="height" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="height_get">
+      <return type="int32" transfer="full"/>
+    </method>
+    <method name="size_set">
+      <arg name="w" type="int32" direction="in" transfer="full"/>
+      <arg name="h" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="size_get">
+      <arg name="w" type="int32" direction="out" transfer="full"/>
+      <arg name="h" type="int32" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.compound.layer">
+    <ctor name="new"/>
+    <ref name="ref">
+      <return type="enesim.renderer.compound.layer" transfer="full"/>
+    </ref>
+    <unref name="unref"/>
+    <prop name="renderer">
+      <setter>
+        <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="rop">
+      <setter>
+        <arg name="rop" type="enesim.rop" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+  </object>
+  <callback name="enesim.renderer.compound.cb">
+    <return type="bool" transfer="full"/>
+  </callback>
+  <object name="enesim.renderer.compound">
+    <prop name="background_enable">
+      <setter>
+        <arg name="enable" type="bool" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="bool" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="background_color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="layer_add">
+      <arg name="layer" type="enesim.renderer.compound.layer" direction="in" transfer="full"/>
+    </method>
+    <method name="layer_remove">
+      <arg name="layer" type="enesim.renderer.compound.layer" direction="in" transfer="full"/>
+    </method>
+    <method name="layer_clear"/>
+    <method name="layer_foreach">
+      <arg name="cb" type="enesim.renderer.compound.cb" direction="in" transfer="full"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+    </method>
+    <method name="layer_reverse_foreach">
+      <arg name="cb" type="enesim.renderer.compound.cb" direction="in" transfer="full"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.dispmap" inherits="enesim.renderer">
+    <prop name="map_surface">
+      <setter>
+        <arg name="map" type="enesim.surface" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.surface" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="source_surface">
+      <setter>
+        <arg name="src" type="enesim.surface" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.surface" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="factor">
+      <setter>
+        <arg name="factor" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="x_channel">
+      <setter>
+        <arg name="channel" type="enesim.channel" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="y_channel">
+      <setter>
+        <arg name="channel" type="enesim.channel" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.grid" inherits="enesim.renderer">
+    <prop name="inside_width">
+      <setter>
+        <arg name="width" type="uint32" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="uint32" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="inside_height">
+      <setter>
+        <arg name="height" type="uint32" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="uint32" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="inside_color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="border_hthickness">
+      <setter>
+        <arg name="hthickness" type="uint32" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="uint32" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="border_vthickness">
+      <setter>
+        <arg name="vthickness" type="uint32" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="uint32" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="border_color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.image" inherits="enesim.renderer">
+    <prop name="x">
+      <setter>
+        <arg name="x" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y">
+      <setter>
+        <arg name="y" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="width">
+      <setter>
+        <arg name="w" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="height">
+      <setter>
+        <arg name="h" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="source_surface">
+      <setter>
+        <arg name="src" type="enesim.surface" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.surface" transfer="none"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="position_set">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="position_get">
+      <arg name="x" type="double" direction="out" transfer="full"/>
+      <arg name="y" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="size_set">
+      <arg name="w" type="double" direction="in" transfer="full"/>
+      <arg name="h" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="size_get">
+      <arg name="w" type="double" direction="out" transfer="full"/>
+      <arg name="h" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="damage_add">
+      <arg name="area" type="eina.rectangle" direction="in" transfer="none"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.importer" inherits="enesim.renderer">
+    <prop name="buffer">
+      <setter>
+        <arg name="buffer" type="enesim.buffer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.buffer" transfer="none"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.perlin" inherits="enesim.renderer">
+    <prop name="octaves">
+      <setter>
+        <arg name="octaves" type="uint32" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="persistence">
+      <setter>
+        <arg name="persistence" type="double" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="amplitude">
+      <setter>
+        <arg name="ampl" type="double" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="xfrequency">
+      <setter>
+        <arg name="freq" type="double" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="yfrequency">
+      <setter>
+        <arg name="freq" type="double" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.pattern" inherits="enesim.renderer">
+    <prop name="source_renderer">
+      <setter>
+        <arg name="source" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="none"/>
+      </getter>
+    </prop>
+    <prop name="source_surface">
+      <getter>
+        <return type="enesim.surface" transfer="none"/>
+      </getter>
+    </prop>
+    <prop name="repeat_mode">
+      <setter>
+        <arg name="mode" type="enesim.repeat_mode" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.repeat_mode" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="enesim_surface_pattern_source_surface_set">
+      <arg name="source" type="enesim.surface" direction="in" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.proxy" inherits="enesim.renderer">
+    <prop name="proxied">
+      <setter>
+        <arg name="proxied" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="none"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.raddist" inherits="enesim.renderer">
+    <prop name="radius">
+      <setter>
+        <arg name="radius" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="factor">
+      <setter>
+        <arg name="factor" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="source_surface">
+      <setter>
+        <arg name="src" type="enesim.surface" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.surface" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="x">
+      <setter>
+        <arg name="ox" type="double" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <prop name="y">
+      <setter>
+        <arg name="oy" type="double" direction="in" transfer="full"/>
+      </setter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.stripes" inherits="enesim.renderer">
+    <prop name="even_color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="even_renderer">
+      <setter>
+        <arg name="paint" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="none"/>
+      </getter>
+    </prop>
+    <prop name="even_thickness">
+      <setter>
+        <arg name="thickness" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="odd_color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="odd_renderer">
+      <setter>
+        <arg name="paint" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="none"/>
+      </getter>
+    </prop>
+    <prop name="odd_thickness">
+      <setter>
+        <arg name="thickness" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.transition" inherits="enesim.renderer">
+    <prop name="level">
+      <setter>
+        <arg name="level" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="source">
+      <setter>
+        <arg name="r0" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="target">
+      <setter>
+        <arg name="r1" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <struct name="enesim.renderer.gradient.stop">
+    <field name="argb" type="enesim.argb"/>
+    <field name="pos" type="double"/>
+  </struct>
+  <object name="enesim.renderer.gradient" inherits="enesim.renderer">
+    <prop name="repeat_mode">
+      <setter>
+        <arg name="mode" type="enesim.repeat_mode" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.repeat_mode" transfer="full"/>
+      </getter>
+    </prop>
+    <method name="stop_add">
+      <arg name="stop" type="enesim.renderer.gradient.stop" direction="in" transfer="full"/>
+    </method>
+    <method name="stop_clear"/>
+  </object>
+  <object name="enesim.renderer.gradient.linear" inherits="enesim.renderer.gradient">
+    <prop name="x0">
+      <setter>
+        <arg name="x0" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y0">
+      <setter>
+        <arg name="y0" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="x1">
+      <setter>
+        <arg name="x1" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y1">
+      <setter>
+        <arg name="y1" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="position_set">
+      <arg name="x0" type="double" direction="in" transfer="full"/>
+      <arg name="y0" type="double" direction="in" transfer="full"/>
+      <arg name="x1" type="double" direction="in" transfer="full"/>
+      <arg name="y1" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="position_get">
+      <arg name="x0" type="double" direction="out" transfer="full"/>
+      <arg name="y0" type="double" direction="out" transfer="full"/>
+      <arg name="x1" type="double" direction="out" transfer="full"/>
+      <arg name="y1" type="double" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.gradient.radial" inherits="enesim.renderer.gradient">
+    <prop name="center_x">
+      <setter>
+        <arg name="center_x" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="center_y">
+      <setter>
+        <arg name="center_y" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="focus_x">
+      <setter>
+        <arg name="focus_x" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="focus_y">
+      <setter>
+        <arg name="focus_y" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="radius">
+      <setter>
+        <arg name="radius" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="center_set">
+      <arg name="center_x" type="double" direction="in" transfer="full"/>
+      <arg name="center_y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="center_get">
+      <arg name="center_x" type="double" direction="out" transfer="full"/>
+      <arg name="center_y" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="focus_set">
+      <arg name="focus_x" type="double" direction="in" transfer="full"/>
+      <arg name="focus_y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="focus_get">
+      <arg name="focus_x" type="double" direction="out" transfer="full"/>
+      <arg name="focus_y" type="double" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <struct name="enesim.renderer.shape.stroke_dash">
+    <field name="length" type="double"/>
+    <field name="gap" type="double"/>
+  </struct>
+  <enum name="enesim.renderer.shape.feature">
+    <value name="fill_renderer" initializer=""/>
+    <value name="stroke_renderer" initializer=""/>
+    <value name="stroke_location" initializer=""/>
+    <value name="stroke_dash" initializer=""/>
+  </enum>
+  <enum name="enesim.renderer.shape.draw_mode">
+    <value name="fill" initializer=""/>
+    <value name="stroke" initializer=""/>
+  </enum>
+  <enum name="enesim.renderer.shape.stroke_location">
+    <value name="inside"/>
+    <value name="outside"/>
+    <value name="center"/>
+  </enum>
+  <enum name="enesim.renderer.shape.stroke_cap">
+    <value name="butt"/>
+    <value name="round"/>
+    <value name="square"/>
+    <value name="enesim_renderer_shape_stroke_caps"/>
+  </enum>
+  <enum name="enesim.renderer.shape.stroke_join">
+    <value name="miter"/>
+    <value name="round"/>
+    <value name="bevel"/>
+    <value name="enesim_renderer_shape_stroke_joins"/>
+  </enum>
+  <enum name="enesim.renderer.shape.fill_rule">
+    <value name="non_zero"/>
+    <value name="even_odd"/>
+    <value name="enesim_renderer_shape_fill_rules"/>
+  </enum>
+  <object name="enesim.renderer.shape" inherits="enesim.renderer">
+    <prop name="stroke_color">
+      <setter>
+        <arg name="stroke_color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="stroke_renderer">
+      <setter>
+        <arg name="stroke" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="stroke_weight">
+      <setter>
+        <arg name="weight" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="stroke_location">
+      <setter>
+        <arg name="location" type="enesim.renderer.shape.stroke_location" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer.shape.stroke_location" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="stroke_cap">
+      <setter>
+        <arg name="cap" type="enesim.renderer.shape.stroke_cap" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer.shape.stroke_cap" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="stroke_join">
+      <setter>
+        <arg name="join" type="enesim.renderer.shape.stroke_join" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer.shape.stroke_join" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="stroke_scalable">
+      <setter>
+        <arg name="scalable" type="bool" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="bool" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="fill_color">
+      <setter>
+        <arg name="fill_color" type="enesim.color" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="fill_renderer">
+      <setter>
+        <arg name="fill" type="enesim.renderer" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="fill_rule">
+      <setter>
+        <arg name="rule" type="enesim.renderer.shape.fill_rule" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer.shape.fill_rule" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="draw_mode">
+      <setter>
+        <arg name="draw_mode" type="enesim.renderer.shape.draw_mode" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer.shape.draw_mode" transfer="full"/>
+      </getter>
+    </prop>
+    <method name="shape_features_get">
+      <return type="enesim.renderer.shape.feature" transfer="full"/>
+    </method>
+    <method name="stroke_dash_add_simple">
+      <arg name="length" type="double" direction="in" transfer="full"/>
+      <arg name="gap" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="stroke_dash_add">
+      <arg name="dash" type="enesim.renderer.shape.stroke_dash" direction="in" transfer="none"/>
+    </method>
+    <method name="stroke_dash_clear"/>
+    <method name="geometry_get">
+      <return type="bool" transfer="full"/>
+      <arg name="geometry" type="enesim.rectangle" direction="out" transfer="full"/>
+    </method>
+    <method name="destination_geometry_get">
+      <return type="bool" transfer="full"/>
+      <arg name="geometry" type="enesim.rectangle" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.circle" inherits="enesim.renderer.shape">
+    <prop name="x">
+      <setter>
+        <arg name="x" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y">
+      <setter>
+        <arg name="y" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="radius">
+      <setter>
+        <arg name="radius" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="center_set">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="center_get">
+      <arg name="x" type="double" direction="out" transfer="full"/>
+      <arg name="y" type="double" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.ellipse" inherits="enesim.renderer.shape">
+    <prop name="x">
+      <setter>
+        <arg name="x" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y">
+      <setter>
+        <arg name="y" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="radius_x">
+      <setter>
+        <arg name="rad" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="radius_y">
+      <setter>
+        <arg name="rad" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="center_set">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="center_get">
+      <arg name="x" type="double" direction="out" transfer="full"/>
+      <arg name="y" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="radii_set">
+      <arg name="radius_x" type="double" direction="in" transfer="full"/>
+      <arg name="radius_y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="radii_get">
+      <arg name="radius_x" type="double" direction="out" transfer="full"/>
+      <arg name="radius_y" type="double" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.figure" inherits="enesim.renderer.shape">
+    <ctor name="new"/>
+    <method name="polygon_add"/>
+    <method name="polygon_vertex_add">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="polygon_close"/>
+    <method name="clear"/>
+  </object>
+  <object name="enesim.renderer.line" inherits="enesim.renderer.shape">
+    <prop name="x0">
+      <setter>
+        <arg name="x0" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y0">
+      <setter>
+        <arg name="y0" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="x1">
+      <setter>
+        <arg name="x1" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y1">
+      <setter>
+        <arg name="y1" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="coords_set">
+      <arg name="x0" type="double" direction="in" transfer="full"/>
+      <arg name="y0" type="double" direction="in" transfer="full"/>
+      <arg name="x1" type="double" direction="in" transfer="full"/>
+      <arg name="y1" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="coords_get">
+      <arg name="x0" type="double" direction="out" transfer="full"/>
+      <arg name="y0" type="double" direction="out" transfer="full"/>
+      <arg name="x1" type="double" direction="out" transfer="full"/>
+      <arg name="y1" type="double" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.path" inherits="enesim.renderer.shape">
+    <prop name="path">
+      <setter>
+        <arg name="path" type="enesim.path" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.path" transfer="none"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.renderer.rectangle" inherits="enesim.renderer.shape">
+    <prop name="x">
+      <setter>
+        <arg name="x" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="y">
+      <setter>
+        <arg name="y" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="width">
+      <setter>
+        <arg name="w" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="height">
+      <setter>
+        <arg name="h" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full"/>
+      </getter>
+    </prop>
+    <ctor name="new"/>
+    <method name="position_set">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="position_get">
+      <arg name="x" type="double" direction="out" transfer="full"/>
+      <arg name="y" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="size_set">
+      <arg name="w" type="double" direction="in" transfer="full"/>
+      <arg name="h" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="size_get">
+      <arg name="w" type="double" direction="out" transfer="full"/>
+      <arg name="h" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="corner_radius_x_set">
+      <arg name="rx" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="corner_radius_x_get">
+      <return type="double" transfer="full"/>
+    </method>
+    <method name="corner_radius_y_set">
+      <arg name="ry" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="corner_radius_y_get">
+      <return type="double" transfer="full"/>
+    </method>
+    <method name="corner_radii_set">
+      <arg name="rx" type="double" direction="in" transfer="full"/>
+      <arg name="ry" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="corner_radii_get">
+      <arg name="rx" type="double" direction="in" transfer="full"/>
+      <arg name="ry" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="corners_set">
+      <arg name="tl" type="bool" direction="in" transfer="full"/>
+      <arg name="tr" type="bool" direction="in" transfer="full"/>
+      <arg name="bl" type="bool" direction="in" transfer="full"/>
+      <arg name="br" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="corners_get">
+      <arg name="tl" type="bool" direction="out" transfer="full"/>
+      <arg name="tr" type="bool" direction="out" transfer="full"/>
+      <arg name="bl" type="bool" direction="out" transfer="full"/>
+      <arg name="br" type="bool" direction="out" transfer="full"/>
+    </method>
+    <method name="top_left_corner_set">
+      <arg name="rounded" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="top_left_corner_get">
+      <return type="bool" transfer="full"/>
+    </method>
+    <method name="top_right_corner_set">
+      <arg name="rounded" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="top_right_corner_get">
+      <return type="bool" transfer="full"/>
+    </method>
+    <method name="bottom_left_corner_set">
+      <arg name="rounded" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="bottom_left_corner_get">
+      <return type="bool" transfer="full"/>
+    </method>
+    <method name="bottom_right_corner_set">
+      <arg name="rounded" type="bool" direction="in" transfer="full"/>
+    </method>
+    <method name="bottom_right_corner_get">
+      <return type="bool" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.text.span" inherits="enesim.renderer.shape">
+    <ctor name="new"/>
+    <method name="text_set">
+      <arg name="str" type="string" direction="in" transfer="none"/>
+    </method>
+    <method name="text_get">
+      <return type="string" transfer="none"/>
+    </method>
+    <method name="direction_set">
+      <arg name="direction" type="enesim.text.direction" direction="in" transfer="full"/>
+    </method>
+    <method name="direction_get">
+      <return type="enesim.text.direction" transfer="full"/>
+    </method>
+    <method name="buffer_get">
+      <return type="enesim.text.buffer" transfer="full"/>
+    </method>
+    <method name="real_buffer_get">
+      <return type="enesim.text.buffer" transfer="full"/>
+    </method>
+    <method name="real_buffer_set">
+      <arg name="b" type="enesim.text.buffer" direction="in" transfer="full"/>
+    </method>
+    <method name="font_set">
+      <arg name="font" type="enesim.text.font" direction="in" transfer="full"/>
+    </method>
+    <method name="font_get">
+      <return type="enesim.text.font" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.renderer.map.quad" inherits="enesim.renderer">
+    <prop name="source_surface">
+      <setter>
+        <arg name="src" type="enesim.surface" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.surface" transfer="none"/>
+      </getter>
+    </prop>
+    <prop name="vertex_color">
+      <setter>
+        <arg name="index" type="int32" direction="in" transfer="full"/>
+        <arg name="color" type="enesim.argb" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.argb" transfer="full"/>
+        <arg name="index" type="int32" direction="in" transfer="full"/>
+      </getter>
+    </prop>
+    <prop name="vertex">
+      <accessor name="position_set" oname="enesim_renderer_map_quad" otype="enesim.renderer"/>
+      <accessor name="position_get" oname="enesim_renderer_map_quad" otype="enesim.renderer"/>
+    </prop>
+    <ctor name="new"/>
+  </object>
+</lib>
