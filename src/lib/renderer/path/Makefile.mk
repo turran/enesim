@@ -2,6 +2,7 @@ src_lib_libenesim_la_SOURCES += \
 src/lib/renderer/path/enesim_renderer_path_abstract.c \
 src/lib/renderer/path/enesim_renderer_path_abstract_private.h \
 src/lib/renderer/path/enesim_renderer_path_kiia.c \
+src/lib/renderer/path/enesim_renderer_path_kiia_private.h \
 src/lib/renderer/path/enesim_renderer_path_rasterizer.c
 
 if BUILD_CAIRO
