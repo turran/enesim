@@ -48,17 +48,17 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Example_Renderer_Options *options);
 
 /* the different interfaces */
-Enesim_Example_Renderer_Backend_Interface
+extern Enesim_Example_Renderer_Backend_Interface
 enesim_example_renderer_backend_image;
 
 #if BUILD_OPENGL
 #if BUILD_GLX
-Enesim_Example_Renderer_Backend_Interface
+extern Enesim_Example_Renderer_Backend_Interface
 enesim_example_renderer_backend_glx;
 #endif
 
 #if BUILD_WGL
-Enesim_Example_Renderer_Backend_Interface
+extern Enesim_Example_Renderer_Backend_Interface
 enesim_example_renderer_backend_wgl;
 #endif
 #endif
