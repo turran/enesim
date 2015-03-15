@@ -189,7 +189,7 @@ EAPI Enesim_Surface * enesim_surface_new_pool_and_data_from(Enesim_Format fmt,
 		break;
 
 		default:
-		WRN("Unsupported format %d", s->format);
+		WRN("Unsupported format %d", fmt);
 		return EINA_FALSE;
 	}
 
