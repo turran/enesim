@@ -29,6 +29,8 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
+#define ENESIM_LOG_DEFAULT enesim_log_image
+
 typedef struct _Enesim_Image_File_Data
 {
 	Enesim_Image_Callback cb;
@@ -60,14 +62,23 @@ static Eina_Bool _file_save_data_get(const char *file, Enesim_Stream **data, con
 	const char *ext;
 
 	ext = _enesim_image_file_get_extension(file);
-	if (!ext) return EINA_FALSE;
+	if (!ext)
+	{
+		WRN("No extension found for file '%s'", file);
+		return EINA_FALSE;
+	}
 
 	d = enesim_stream_file_new(file, "wb");
-	if (!d) return EINA_FALSE;
+	if (!d)
+	{
+		WRN("Can not create a stream for file '%s'", file);
+		return EINA_FALSE;
+	}
 
 	m = enesim_image_mime_extension_from(ext);
 	if (!m)
 	{
+		WRN("Can not find mime for file '%s'", file);
 		enesim_stream_unref(d);
 		return EINA_FALSE;
 	}
