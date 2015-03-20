@@ -20,8 +20,8 @@
 
 /**
  * @file
- * @ender_group{Enesim_Renderer}
  * @ender_group{Enesim_Renderer_Feature}
+ * @ender_group{Enesim_Renderer}
  */
 
 /**

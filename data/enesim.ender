@@ -697,6 +697,16 @@
       <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
     </function>
   </object>
+  <enum name="enesim.renderer.feature">
+    <value name="translate" initializer=""/>
+    <value name="affine" initializer=""/>
+    <value name="projective" initializer=""/>
+    <value name="a8" initializer=""/>
+    <value name="argb8888" initializer=""/>
+    <value name="quality" initializer=""/>
+    <value name="backend_software" initializer=""/>
+    <value name="backend_opengl" initializer=""/>
+  </enum>
   <object name="enesim.renderer">
     <method name="private_set">
       <arg name="name" type="string" direction="in" transfer="none"/>
@@ -850,16 +860,6 @@
   <callback name="enesim.renderer.damage.cb">
     <return type="bool" transfer="full"/>
   </callback>
-  <enum name="enesim.renderer.feature">
-    <value name="translate" initializer=""/>
-    <value name="affine" initializer=""/>
-    <value name="projective" initializer=""/>
-    <value name="a8" initializer=""/>
-    <value name="argb8888" initializer=""/>
-    <value name="quality" initializer=""/>
-    <value name="backend_software" initializer=""/>
-    <value name="backend_opengl" initializer=""/>
-  </enum>
   <object name="enesim.stream">
     <ref name="ref">
       <return type="enesim.stream" transfer="full"/>
