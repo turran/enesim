@@ -451,19 +451,19 @@
     <method name="close"/>
   </object>
   <struct name="enesim.buffer.sw_data_24bpp">
-    <field name="plane0" type="uint8.t"/>
+    <field name="plane0" type="pointer"/>
     <field name="plane0_stride" type="int32"/>
   </struct>
   <struct name="enesim.buffer.sw_data_32bpp">
-    <field name="plane0" type="uint32.t"/>
+    <field name="plane0" type="pointer"/>
     <field name="plane0_stride" type="int32"/>
   </struct>
   <struct name="enesim.buffer.sw_data_rgb565">
-    <field name="plane0" type="uint16.t"/>
+    <field name="plane0" type="pointer"/>
     <field name="plane0_stride" type="int32"/>
   </struct>
   <struct name="enesim.buffer.sw_data_a8">
-    <field name="plane0" type="uint8.t"/>
+    <field name="plane0" type="pointer"/>
     <field name="plane0_stride" type="int32"/>
   </struct>
   <struct name="enesim.buffer.sw_data"/>
@@ -866,12 +866,12 @@
     </ref>
     <unref name="unref"/>
     <method name="read">
-      <return type="ssize.t" transfer="full"/>
+      <return type="size" transfer="full"/>
       <arg name="buffer" type="pointer" direction="in" transfer="full"/>
       <arg name="len" type="size" direction="in" transfer="full"/>
     </method>
     <method name="write">
-      <return type="ssize.t" transfer="full"/>
+      <return type="size" transfer="full"/>
       <arg name="buffer" type="pointer" direction="in" transfer="full"/>
       <arg name="len" type="size" direction="in" transfer="full"/>
     </method>
@@ -1014,7 +1014,7 @@
   </object>
   <struct name="enesim.image.provider.descriptor">
     <field name="version" type="int32"/>
-    <field name="name" type="const char"/>
+    <field name="name" type="string"/>
     <field name="options_parse" type="enesim.image.provider.options.parse.cb"/>
     <field name="options_free" type="enesim.image.provider.options.free.cb"/>
     <field name="loadable" type="enesim.image.provider.loadable.cb"/>
@@ -1192,12 +1192,12 @@
       <return type="int32" transfer="full"/>
       <arg name="string" type="string" direction="in" transfer="none"/>
       <arg name="length" type="int32" direction="in" transfer="full"/>
-      <arg name="offset" type="ssize.t" direction="in" transfer="full"/>
+      <arg name="offset" type="size" direction="in" transfer="full"/>
     </method>
     <method name="string_delete">
       <return type="int32" transfer="full"/>
       <arg name="length" type="int32" direction="in" transfer="full"/>
-      <arg name="offset" type="ssize.t" direction="in" transfer="full"/>
+      <arg name="offset" type="size" direction="in" transfer="full"/>
     </method>
     <method name="string_length">
       <return type="int32" transfer="full"/>
