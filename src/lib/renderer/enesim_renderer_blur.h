@@ -31,12 +31,14 @@
  */
 
 /** The blur channel enumeration */
-typedef enum _Enesim_Blur_Channel
+typedef enum _Enesim_Renderer_Blur_Channel
 {
-	ENESIM_BLUR_CHANNEL_COLOR, /**< Use the color */
-	ENESIM_BLUR_CHANNEL_ALPHA, /**< Use the alpha channel */
-	ENESIM_BLUR_CHANNELS, /**< Total number of channels */
-} Enesim_Blur_Channel;
+	ENESIM_RENDERER_BLUR_CHANNEL_COLOR, /**< Use the color */
+	ENESIM_RENDERER_BLUR_CHANNEL_ALPHA, /**< Use the alpha channel */
+} Enesim_Renderer_Blur_Channel;
+
+/**< Total number of channels */
+#define ENESIM_RENDERER_BLUR_CHANNELS (ENESIM_RENDERER_BLUR_CHANNEL_ALPHA + 1)
 
 /**
  * @}
@@ -53,8 +55,8 @@ EAPI Enesim_Surface * enesim_renderer_blur_source_surface_get(Enesim_Renderer *r
 EAPI void enesim_renderer_blur_source_renderer_set(Enesim_Renderer *r, Enesim_Renderer *sr);
 EAPI Enesim_Renderer * enesim_renderer_blur_source_renderer_get(Enesim_Renderer *r);
 
-EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r, Enesim_Blur_Channel channel);
-EAPI Enesim_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r, Enesim_Renderer_Blur_Channel channel);
+EAPI Enesim_Renderer_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_blur_radius_x_set(Enesim_Renderer *r, double rx);
 EAPI double enesim_renderer_blur_radius_x_get(Enesim_Renderer *r);

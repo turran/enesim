@@ -70,7 +70,7 @@ typedef struct _Enesim_Renderer_Blur
 	/* properties */
 	Enesim_Surface *src;
 	Enesim_Renderer *src_r;
-	Enesim_Blur_Channel channel;
+	Enesim_Renderer_Blur_Channel channel;
 	double rx, ry;
 
 	/* The state variables */
@@ -135,7 +135,7 @@ static void _blur_state_cleanup(Enesim_Renderer_Blur *thiz,
 	thiz->changed = EINA_FALSE;
 }
 
-static Enesim_Renderer_Sw_Fill _spans[ENESIM_BLUR_CHANNELS];
+static Enesim_Renderer_Sw_Fill _spans[ENESIM_RENDERER_BLUR_CHANNELS];
 /*----------------------------------------------------------------------------*
  *                        The Software fill variants                          *
  *----------------------------------------------------------------------------*/
@@ -648,9 +648,9 @@ static void _enesim_renderer_blur_class_init(void *k)
 	klass->sw_cleanup = _blur_sw_cleanup;
 	/* initialize the static information */
 	_init_atable();
-	_spans[ENESIM_BLUR_CHANNEL_COLOR]
+	_spans[ENESIM_RENDERER_BLUR_CHANNEL_COLOR]
 		= _blur_fill_argb8888_identity;
-	_spans[ENESIM_BLUR_CHANNEL_ALPHA]
+	_spans[ENESIM_RENDERER_BLUR_CHANNEL_ALPHA]
 		= _blur_fill_a8_identity;
 }
 
@@ -660,7 +660,7 @@ static void _enesim_renderer_blur_instance_init(void *o)
 
 	thiz->cache = enesim_draw_cache_new();
 	/* initial properties */
-	thiz->channel = ENESIM_BLUR_CHANNEL_COLOR;
+	thiz->channel = ENESIM_RENDERER_BLUR_CHANNEL_COLOR;
 	thiz->rx = thiz->ry = 0.5;
 }
 
@@ -709,7 +709,7 @@ EAPI Enesim_Renderer * enesim_renderer_blur_new(void)
  * @param[in] channel The channel to use
  */
 EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r,
-	Enesim_Blur_Channel channel)
+	Enesim_Renderer_Blur_Channel channel)
 {
 	Enesim_Renderer_Blur *thiz;
 
@@ -725,7 +725,7 @@ EAPI void enesim_renderer_blur_channel_set(Enesim_Renderer *r,
  * @param[in] r The blur filter renderer
  * @return the channel used
  */
-EAPI Enesim_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r)
+EAPI Enesim_Renderer_Blur_Channel enesim_renderer_blur_channel_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Blur *thiz;
 

@@ -1235,10 +1235,9 @@
     </prop>
     <ctor name="new"/>
   </object>
-  <enum name="enesim.blur.channel">
+  <enum name="enesim.renderer.blur.channel">
     <value name="color"/>
     <value name="alpha"/>
-    <value name="enesim_blur_channels"/>
   </enum>
   <object name="enesim.renderer.blur" inherits="enesim.renderer">
     <prop name="source_surface">
@@ -1259,10 +1258,10 @@
     </prop>
     <prop name="channel">
       <setter>
-        <arg name="channel" type="enesim.blur.channel" direction="in" transfer="full"/>
+        <arg name="channel" type="enesim.renderer.blur.channel" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.blur.channel" transfer="full"/>
+        <return type="enesim.renderer.blur.channel" transfer="full"/>
       </getter>
     </prop>
     <prop name="radius_x">
