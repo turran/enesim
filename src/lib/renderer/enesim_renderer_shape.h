@@ -91,8 +91,10 @@ typedef enum _Enesim_Renderer_Shape_Stroke_Cap
 	ENESIM_RENDERER_SHAPE_STROKE_CAP_BUTT, /**< The butt cap */
 	ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND, /**< The round cap */
 	ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE, /**< The square cap */
-	ENESIM_RENDERER_SHAPE_STROKE_CAPS, /**< The number of caps */
 } Enesim_Renderer_Shape_Stroke_Cap;
+
+/** The number of caps */
+#define ENESIM_RENDERER_SHAPE_STROKE_CAPS (ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE + 1)
 
 /**
  * Stroke join type
@@ -103,8 +105,10 @@ typedef enum _Enesim_Renderer_Shape_Stroke_Join
 	ENESIM_RENDERER_SHAPE_STROKE_JOIN_MITER, /**< The miter join */
 	ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND, /**< The round join */
 	ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL, /**< The bevel join */
-	ENESIM_RENDERER_SHAPE_STROKE_JOINS, /**< The number of joins */
 } Enesim_Renderer_Shape_Stroke_Join;
+
+/** The number of joins */
+#define ENESIM_RENDERER_SHAPE_STROKE_JOINS (ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL + 1)
 
 /**
  * Fill rule mode
@@ -114,8 +118,10 @@ typedef enum _Enesim_Renderer_Shape_Fill_Rule
 {
 	ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO, /**< The non zero fill rule */
 	ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD, /**< The even odd fill rule */
-	ENESIM_RENDERER_SHAPE_FILL_RULES, /**< The number of fill rules */
 } Enesim_Renderer_Shape_Fill_Rule;
+
+/** The number of fill rules */
+#define ENESIM_RENDERER_SHAPE_FILL_RULES (ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD + 1)
 
 /**
  * @}
