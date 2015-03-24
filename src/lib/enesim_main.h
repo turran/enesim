@@ -42,7 +42,7 @@ typedef enum _Enesim_Angle
 	ENESIM_ANGLE_CW_270, /**< 270 degrees angle CW */
 } Enesim_Angle;
 
-#define ENESIM_ANGLE_LAST (ENESIM_ANGLE_270 + 1)
+#define ENESIM_ANGLE_LAST (ENESIM_ANGLE_CW_270 + 1)
 
 /**
  * Raster operations at pixel level
