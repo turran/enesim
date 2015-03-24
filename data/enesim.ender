@@ -842,7 +842,7 @@
       <arg name="clip" type="eina.rectangle" direction="in" transfer="full"/>
       <arg name="x" type="int32" direction="in" transfer="full"/>
       <arg name="y" type="int32" direction="in" transfer="full"/>
-      <arg name="log" type="enesim.log" direction="in" transfer="full"/>
+      <arg name="log" type="enesim.log" direction="out" transfer="full"/>
     </method>
     <method name="draw_list">
       <return type="bool" transfer="full"/>
@@ -851,7 +851,7 @@
       <arg name="clips" type="eina.list" direction="in" transfer="full"/>
       <arg name="x" type="int32" direction="in" transfer="full"/>
       <arg name="y" type="int32" direction="in" transfer="full"/>
-      <arg name="log" type="enesim.log" direction="in" transfer="full"/>
+      <arg name="log" type="enesim.log" direction="out" transfer="full"/>
     </method>
     <function name="default_quality_set">
       <arg name="quality" type="enesim.quality" direction="in" transfer="full"/>
@@ -1909,18 +1909,15 @@
     <value name="butt"/>
     <value name="round"/>
     <value name="square"/>
-    <value name="enesim_renderer_shape_stroke_caps"/>
   </enum>
   <enum name="enesim.renderer.shape.stroke_join">
     <value name="miter"/>
     <value name="round"/>
     <value name="bevel"/>
-    <value name="enesim_renderer_shape_stroke_joins"/>
   </enum>
   <enum name="enesim.renderer.shape.fill_rule">
     <value name="non_zero"/>
     <value name="even_odd"/>
-    <value name="enesim_renderer_shape_fill_rules"/>
   </enum>
   <object name="enesim.renderer.shape" inherits="enesim.renderer">
     <prop name="stroke_color">
