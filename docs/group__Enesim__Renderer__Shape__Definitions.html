@@ -86,6 +86,9 @@ Data Structures</h2></td></tr>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggac3b181bec3c0638941c7612efb0665d4a020d229e686de235f864e21ff8f71f1d">ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL</a> | <a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggac3b181bec3c0638941c7612efb0665d4a45b6c61ebec44c94f311f9265a63bb4d">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE</a>)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ga10b258e090fb227fb44c8e183e677ba1">ENESIM_RENDERER_SHAPE_STROKE_CAPS</a>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gga03f3612c897c9353b4bd9881c408156caa4e18a98748090dd9f38f360653bbbd7">ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE</a> + 1)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ga03c4add9a199397bf88f1585df8c48d5">ENESIM_RENDERER_SHAPE_STROKE_JOINS</a>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggabe70a7a4727579260c1b5a097a5ad6cfae605d5a58e4ed7dffb7aa1ba799fbdaa">ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL</a> + 1)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gab7e2ae4958a16068ccb3452453e02ae6">ENESIM_RENDERER_SHAPE_FILL_RULES</a>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggaeb4fc569aea393c34eaef499cb8965fca11c37d0599fd571c873e97e59d618051">ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD</a> + 1)</td></tr>
 <tr><td colspan="2"><h2><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ga98513c18ea5d706aefd3fab40ba610fe">Enesim_Renderer_Shape_Feature</a> { <br/>
@@ -117,9 +120,7 @@ Enumerations</h2></td></tr>
 <br/>
 &#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gga03f3612c897c9353b4bd9881c408156ca9c40b9bd57d2fe89334a9269054cfafd">ENESIM_RENDERER_SHAPE_STROKE_CAP_ROUND</a>, 
 <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gga03f3612c897c9353b4bd9881c408156caa4e18a98748090dd9f38f360653bbbd7">ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE</a>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gga03f3612c897c9353b4bd9881c408156cac1f76d6a26573d0658055e9c6209052e">ENESIM_RENDERER_SHAPE_STROKE_CAPS</a>
+&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gga03f3612c897c9353b4bd9881c408156caa4e18a98748090dd9f38f360653bbbd7">ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE</a>
 <br/>
  }</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gabe70a7a4727579260c1b5a097a5ad6cf">Enesim_Renderer_Shape_Stroke_Join</a> { <br/>
@@ -127,17 +128,13 @@ Enumerations</h2></td></tr>
 <br/>
 &#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggabe70a7a4727579260c1b5a097a5ad6cfa06702908bd829a6d5935953cf661b173">ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND</a>, 
 <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggabe70a7a4727579260c1b5a097a5ad6cfae605d5a58e4ed7dffb7aa1ba799fbdaa">ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL</a>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggabe70a7a4727579260c1b5a097a5ad6cfa8e260bc74d4e1962f0672b243ec12c45">ENESIM_RENDERER_SHAPE_STROKE_JOINS</a>
+&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggabe70a7a4727579260c1b5a097a5ad6cfae605d5a58e4ed7dffb7aa1ba799fbdaa">ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL</a>
 <br/>
  }</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gaeb4fc569aea393c34eaef499cb8965fc">Enesim_Renderer_Shape_Fill_Rule</a> { <br/>
 &#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggaeb4fc569aea393c34eaef499cb8965fcac87c318c1c28749aab57d48cba044bd0">ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO</a>, 
 <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggaeb4fc569aea393c34eaef499cb8965fca11c37d0599fd571c873e97e59d618051">ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD</a>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggaeb4fc569aea393c34eaef499cb8965fca95f9dcdb80ee79105f89626f9305bb0e">ENESIM_RENDERER_SHAPE_FILL_RULES</a>
+&#160;&#160;<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggaeb4fc569aea393c34eaef499cb8965fca11c37d0599fd571c873e97e59d618051">ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD</a>
 <br/>
  }</td></tr>
 </table>
@@ -155,6 +152,48 @@ Enumerations</h2></td></tr>
 <p>Helper macro to define fill and stroke drawing mode </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="enesim_renderer_blur01_8c-example.html#a8">enesim_renderer_blur01.c</a>, <a class="el" href="enesim_renderer_circle01_8c-example.html#a8">enesim_renderer_circle01.c</a>, <a class="el" href="enesim_renderer_circle02_8c-example.html#a22">enesim_renderer_circle02.c</a>, <a class="el" href="enesim_renderer_mask01_8c-example.html#a13">enesim_renderer_mask01.c</a>, <a class="el" href="enesim_renderer_mask02_8c-example.html#a13">enesim_renderer_mask02.c</a>, <a class="el" href="enesim_renderer_path01_8c-example.html#a17">enesim_renderer_path01.c</a>, <a class="el" href="enesim_renderer_path02_8c-example.html#a12">enesim_renderer_path02.c</a>, <a class="el" href="enesim_renderer_path03_8c-example.html#a10">enesim_renderer_path03.c</a>, <a class="el" href="enesim_renderer_pattern01_8c-example.html#a9">enesim_renderer_pattern01.c</a>, and <a class="el" href="enesim_renderer_rectangle01_8c-example.html#a10">enesim_renderer_rectangle01.c</a>.</dd>
 </dl>
+</div>
+</div>
+<a class="anchor" id="ga10b258e090fb227fb44c8e183e677ba1"></a><!-- doxytag: member="enesim_renderer_shape.h::ENESIM_RENDERER_SHAPE_STROKE_CAPS" ref="ga10b258e090fb227fb44c8e183e677ba1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define <a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ga10b258e090fb227fb44c8e183e677ba1">ENESIM_RENDERER_SHAPE_STROKE_CAPS</a>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gga03f3612c897c9353b4bd9881c408156caa4e18a98748090dd9f38f360653bbbd7">ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE</a> + 1)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>The number of caps </p>
+
+</div>
+</div>
+<a class="anchor" id="ga03c4add9a199397bf88f1585df8c48d5"></a><!-- doxytag: member="enesim_renderer_shape.h::ENESIM_RENDERER_SHAPE_STROKE_JOINS" ref="ga03c4add9a199397bf88f1585df8c48d5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define <a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ga03c4add9a199397bf88f1585df8c48d5">ENESIM_RENDERER_SHAPE_STROKE_JOINS</a>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggabe70a7a4727579260c1b5a097a5ad6cfae605d5a58e4ed7dffb7aa1ba799fbdaa">ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL</a> + 1)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>The number of joins </p>
+
+</div>
+</div>
+<a class="anchor" id="gab7e2ae4958a16068ccb3452453e02ae6"></a><!-- doxytag: member="enesim_renderer_shape.h::ENESIM_RENDERER_SHAPE_FILL_RULES" ref="gab7e2ae4958a16068ccb3452453e02ae6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define <a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#gab7e2ae4958a16068ccb3452453e02ae6">ENESIM_RENDERER_SHAPE_FILL_RULES</a>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Renderer__Shape__Definitions.html#ggaeb4fc569aea393c34eaef499cb8965fca11c37d0599fd571c873e97e59d618051">ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD</a> + 1)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>The number of fill rules </p>
+
 </div>
 </div>
 <hr/><h2>Enumeration Type Documentation</h2>
@@ -257,9 +296,6 @@ Enumerations</h2></td></tr>
 <tr><td valign="top"><em><a class="anchor" id="gga03f3612c897c9353b4bd9881c408156caa4e18a98748090dd9f38f360653bbbd7"></a><!-- doxytag: member="ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE" ref="gga03f3612c897c9353b4bd9881c408156caa4e18a98748090dd9f38f360653bbbd7" args="" -->ENESIM_RENDERER_SHAPE_STROKE_CAP_SQUARE</em>&nbsp;</td><td>
 <p>The square cap </p>
 </td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga03f3612c897c9353b4bd9881c408156cac1f76d6a26573d0658055e9c6209052e"></a><!-- doxytag: member="ENESIM_RENDERER_SHAPE_STROKE_CAPS" ref="gga03f3612c897c9353b4bd9881c408156cac1f76d6a26573d0658055e9c6209052e" args="" -->ENESIM_RENDERER_SHAPE_STROKE_CAPS</em>&nbsp;</td><td>
-<p>The number of caps </p>
-</td></tr>
 </table>
 </dd>
 </dl>
@@ -286,9 +322,6 @@ Enumerations</h2></td></tr>
 <tr><td valign="top"><em><a class="anchor" id="ggabe70a7a4727579260c1b5a097a5ad6cfae605d5a58e4ed7dffb7aa1ba799fbdaa"></a><!-- doxytag: member="ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL" ref="ggabe70a7a4727579260c1b5a097a5ad6cfae605d5a58e4ed7dffb7aa1ba799fbdaa" args="" -->ENESIM_RENDERER_SHAPE_STROKE_JOIN_BEVEL</em>&nbsp;</td><td>
 <p>The bevel join </p>
 </td></tr>
-<tr><td valign="top"><em><a class="anchor" id="ggabe70a7a4727579260c1b5a097a5ad6cfa8e260bc74d4e1962f0672b243ec12c45"></a><!-- doxytag: member="ENESIM_RENDERER_SHAPE_STROKE_JOINS" ref="ggabe70a7a4727579260c1b5a097a5ad6cfa8e260bc74d4e1962f0672b243ec12c45" args="" -->ENESIM_RENDERER_SHAPE_STROKE_JOINS</em>&nbsp;</td><td>
-<p>The number of joins </p>
-</td></tr>
 </table>
 </dd>
 </dl>
@@ -311,9 +344,6 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="ggaeb4fc569aea393c34eaef499cb8965fca11c37d0599fd571c873e97e59d618051"></a><!-- doxytag: member="ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD" ref="ggaeb4fc569aea393c34eaef499cb8965fca11c37d0599fd571c873e97e59d618051" args="" -->ENESIM_RENDERER_SHAPE_FILL_RULE_EVEN_ODD</em>&nbsp;</td><td>
 <p>The even odd fill rule </p>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="ggaeb4fc569aea393c34eaef499cb8965fca95f9dcdb80ee79105f89626f9305bb0e"></a><!-- doxytag: member="ENESIM_RENDERER_SHAPE_FILL_RULES" ref="ggaeb4fc569aea393c34eaef499cb8965fca95f9dcdb80ee79105f89626f9305bb0e" args="" -->ENESIM_RENDERER_SHAPE_FILL_RULES</em>&nbsp;</td><td>
-<p>The number of fill rules </p>
 </td></tr>
 </table>
 </dd>
@@ -339,7 +369,7 @@ Enumerations</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 23 2015 21:26:15 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 24 2015 20:07:30 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

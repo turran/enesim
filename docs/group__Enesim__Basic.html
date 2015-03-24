@@ -115,7 +115,7 @@ Modules</h2></td></tr>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga9fe47ab917a1c99b35d24bf1481d57b1"></a><!-- doxytag: member="Enesim_Basic::ENESIM_ANGLE_LAST" ref="ga9fe47ab917a1c99b35d24bf1481d57b1" args="" -->
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_ANGLE_LAST</b>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033ba956224a54bb0aaabc9d1fc84eb427d5d">ENESIM_ANGLE_270</a> + 1)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_ANGLE_LAST</b>&#160;&#160;&#160;(ENESIM_ANGLE_270 + 1)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga84882b9b440d23087e30fba21f351ea1"></a><!-- doxytag: member="Enesim_Basic::ENESIM_ROP_LAST" ref="ga84882b9b440d23087e30fba21f351ea1" args="" -->
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_ROP_LAST</b>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Basic.html#gga3824db2d3d2f4239a0ffd5eaf18de331a4d6aafb91b2e13d06d6550087e57213a">ENESIM_ROP_FILL</a> + 1)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga619530a5cbe769609de725458e17459e"></a><!-- doxytag: member="Enesim_Basic::ENESIM_QUALITY_LAST" ref="ga619530a5cbe769609de725458e17459e" args="" -->
@@ -131,13 +131,13 @@ Defines</h2></td></tr>
 <tr><td colspan="2"><h2><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Basic.html#ga563af58e19097005ab5991d57ebd033b">Enesim_Angle</a> { <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033bafd31abb270a2e8c55f23a01a94581449">ENESIM_ANGLE_0</a>, 
+&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033bacccfc33c01d287c33f9083d3583b649a">ENESIM_ANGLE_NONE</a>, 
 <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033ba5cdee194342660597137df25941108ff">ENESIM_ANGLE_90</a>, 
+&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033ba8f8b8f191c5d2ba85b2523894075fcc0">ENESIM_ANGLE_CW_90</a>, 
 <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033ba61ddc046f15a4bca143b1db44f00927e">ENESIM_ANGLE_180</a>, 
+&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033ba7a6230ee91f386861040bd5513677e9e">ENESIM_ANGLE_CW_180</a>, 
 <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033ba956224a54bb0aaabc9d1fc84eb427d5d">ENESIM_ANGLE_270</a>
+&#160;&#160;<a class="el" href="group__Enesim__Basic.html#gga563af58e19097005ab5991d57ebd033baeb4dbf8afa91744f674176afc81e75b9">ENESIM_ANGLE_CW_270</a>
 <br/>
  }</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Basic.html#ga3824db2d3d2f4239a0ffd5eaf18de331">Enesim_Rop</a> { <br/>
@@ -220,16 +220,16 @@ Enumerations</h2></td></tr>
 <div class="memdoc">
 <p>Angle enumeration </p>
 <dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033bafd31abb270a2e8c55f23a01a94581449"></a><!-- doxytag: member="ENESIM_ANGLE_0" ref="gga563af58e19097005ab5991d57ebd033bafd31abb270a2e8c55f23a01a94581449" args="" -->ENESIM_ANGLE_0</em>&nbsp;</td><td>
+<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033bacccfc33c01d287c33f9083d3583b649a"></a><!-- doxytag: member="ENESIM_ANGLE_NONE" ref="gga563af58e19097005ab5991d57ebd033bacccfc33c01d287c33f9083d3583b649a" args="" -->ENESIM_ANGLE_NONE</em>&nbsp;</td><td>
 <p>0 degrees angle </p>
 </td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033ba5cdee194342660597137df25941108ff"></a><!-- doxytag: member="ENESIM_ANGLE_90" ref="gga563af58e19097005ab5991d57ebd033ba5cdee194342660597137df25941108ff" args="" -->ENESIM_ANGLE_90</em>&nbsp;</td><td>
+<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033ba8f8b8f191c5d2ba85b2523894075fcc0"></a><!-- doxytag: member="ENESIM_ANGLE_CW_90" ref="gga563af58e19097005ab5991d57ebd033ba8f8b8f191c5d2ba85b2523894075fcc0" args="" -->ENESIM_ANGLE_CW_90</em>&nbsp;</td><td>
 <p>90 degrees angle CW </p>
 </td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033ba61ddc046f15a4bca143b1db44f00927e"></a><!-- doxytag: member="ENESIM_ANGLE_180" ref="gga563af58e19097005ab5991d57ebd033ba61ddc046f15a4bca143b1db44f00927e" args="" -->ENESIM_ANGLE_180</em>&nbsp;</td><td>
+<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033ba7a6230ee91f386861040bd5513677e9e"></a><!-- doxytag: member="ENESIM_ANGLE_CW_180" ref="gga563af58e19097005ab5991d57ebd033ba7a6230ee91f386861040bd5513677e9e" args="" -->ENESIM_ANGLE_CW_180</em>&nbsp;</td><td>
 <p>180 degrees angle CW </p>
 </td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033ba956224a54bb0aaabc9d1fc84eb427d5d"></a><!-- doxytag: member="ENESIM_ANGLE_270" ref="gga563af58e19097005ab5991d57ebd033ba956224a54bb0aaabc9d1fc84eb427d5d" args="" -->ENESIM_ANGLE_270</em>&nbsp;</td><td>
+<tr><td valign="top"><em><a class="anchor" id="gga563af58e19097005ab5991d57ebd033baeb4dbf8afa91744f674176afc81e75b9"></a><!-- doxytag: member="ENESIM_ANGLE_CW_270" ref="gga563af58e19097005ab5991d57ebd033baeb4dbf8afa91744f674176afc81e75b9" args="" -->ENESIM_ANGLE_CW_270</em>&nbsp;</td><td>
 <p>270 degrees angle CW </p>
 </td></tr>
 </table>
@@ -423,7 +423,7 @@ Enumerations</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 23 2015 21:26:15 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Mar 24 2015 20:07:30 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
