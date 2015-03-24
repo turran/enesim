@@ -117,7 +117,7 @@ EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst)
 
 	if (dstw != w || dsth != h) return EINA_FALSE;
 
-	converter = enesim_converter_surface_get(dfmt, ENESIM_ANGLE_0, sfmt);
+	converter = enesim_converter_surface_get(dfmt, ENESIM_ANGLE_NONE, sfmt);
 	if (!converter) return EINA_FALSE;
 
 	enesim_buffer_sw_data_get(dst, &ddata);

@@ -59,7 +59,7 @@ void enesim_converter_bgr888_init(void)
 	enesim_converter_surface_register(
 			ENESIM_CONVERTER_2D(_2d_bgr888_none_argb8888_pre),
 			ENESIM_BUFFER_FORMAT_BGR888,
-			ENESIM_ANGLE_0,
+			ENESIM_ANGLE_NONE,
 			ENESIM_BUFFER_FORMAT_ARGB8888_PRE);
 }
 /** @endcond */

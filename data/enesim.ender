@@ -21,10 +21,10 @@
     <method name="dump"/>
   </object>
   <enum name="enesim.angle">
-    <value name="0"/>
-    <value name="90"/>
-    <value name="180"/>
-    <value name="270"/>
+    <value name="none"/>
+    <value name="cw_90"/>
+    <value name="cw_180"/>
+    <value name="cw_270"/>
   </enum>
   <enum name="enesim.rop">
     <value name="blend"/>

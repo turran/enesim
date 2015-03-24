@@ -60,7 +60,7 @@ void enesim_converter_rgb565_init(void)
 	enesim_converter_surface_register(
 			ENESIM_CONVERTER_2D(_2d_rgb565_none_argb8888_pre),
 			ENESIM_BUFFER_FORMAT_RGB565,
-			ENESIM_ANGLE_0,
+			ENESIM_ANGLE_NONE,
 			ENESIM_BUFFER_FORMAT_ARGB8888_PRE);
 }
 /** @endcond */

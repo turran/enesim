@@ -36,10 +36,10 @@
  */
 typedef enum _Enesim_Angle
 {
-	ENESIM_ANGLE_0, /**< 0 degrees angle */
-	ENESIM_ANGLE_90, /**< 90 degrees angle CW */
-	ENESIM_ANGLE_180, /**< 180 degrees angle CW */
-	ENESIM_ANGLE_270, /**< 270 degrees angle CW */
+	ENESIM_ANGLE_NONE, /**< 0 degrees angle */
+	ENESIM_ANGLE_CW_90, /**< 90 degrees angle CW */
+	ENESIM_ANGLE_CW_180, /**< 180 degrees angle CW */
+	ENESIM_ANGLE_CW_270, /**< 270 degrees angle CW */
 } Enesim_Angle;
 
 #define ENESIM_ANGLE_LAST (ENESIM_ANGLE_270 + 1)
