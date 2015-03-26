@@ -1208,10 +1208,10 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  * @param[in] r The renderer to draw
  * @param[in] s The surface to draw the renderer into
  * @param[in] rop The raster operation to use for drawing
- * @param[in] clip The area on the destination surface to limit the drawing
+ * @param[in] clip The area on the destination surface to limit the drawing. @ender_nullable
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
- * @param[out] log In case the drawing fails, the log to put messages on
+ * @param[out] log In case the drawing fails, the log to put messages on. @ender_nullable
  * @return Eina_True if the the drawing was successfull, Eina_False otherwise.
  * In case the drawing fails the @p log is filled with the failed message
  */
@@ -1261,10 +1261,10 @@ end:
  * @param[in] r The renderer to draw
  * @param[in] s The surface to draw the renderer into
  * @param[in] rop The raster operation to use for drawing
- * @param[in] clips A list of clipping areas on the destination surface to limit the drawing
+ * @param[in] clips A list of clipping areas on the destination surface to limit the drawing. @ender_nullable
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
- * @param[out] log In case the drawing fails, the log to put messages on
+ * @param[out] log In case the drawing fails, the log to put messages on. @ender_nullable
  * @return Eina_True if the the drawing was successfull, Eina_False otherwise.
  * In case the drawing fails the @p log is filled with the failed message
  */
