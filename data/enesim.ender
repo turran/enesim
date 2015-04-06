@@ -897,6 +897,10 @@
       <arg name="buffer" type="pointer" direction="in" transfer="full" nullable="false"/>
       <arg name="len" type="size" direction="in" transfer="full" nullable="false"/>
     </ctor>
+    <ctor name="buffer_static_new">
+      <arg name="buffer" type="pointer" direction="in" transfer="full" nullable="false"/>
+      <arg name="len" type="size" direction="in" transfer="full" nullable="false"/>
+    </ctor>
     <ctor name="base64_new">
       <arg name="d" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
     </ctor>

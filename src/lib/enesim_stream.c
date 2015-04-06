@@ -48,6 +48,11 @@ Enesim_Stream * enesim_stream_new(
 
 	return thiz;
 }
+
+void * enesim_stream_data_get(Enesim_Stream *thiz)
+{
+	return thiz->data;
+}
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *

@@ -32,6 +32,7 @@ typedef struct _Enesim_Stream_Buffer
 	/* current position */
 	void *curr;
 	ssize_t off;
+	Eina_Bool to_free;
 } Enesim_Stream_Buffer;
 /*----------------------------------------------------------------------------*
  *                      The Enesim Image Data interface                       *
@@ -87,8 +88,11 @@ static void _enesim_stream_buffer_reset(void *data)
 static void _enesim_stream_buffer_free(void *data)
 {
 	Enesim_Stream_Buffer *thiz = data;
-	if (thiz->buffer)
-		free(thiz->buffer);
+	if (thiz->to_free)
+	{
+		if (thiz->buffer)
+			free(thiz->buffer);
+	}
 	free(thiz);
 }
 
@@ -108,15 +112,18 @@ static Enesim_Stream_Descriptor _enesim_stream_buffer_descriptor = {
  *============================================================================*/
 /**
  * @brief Create a new memory based stream
- * @param[in] buffer The buffer that holds the data
+ * @param[in] buffer The buffer that holds the data.
  * @param[in] len The length of the buffer
  * @return A new memory based enesim stream
+ * @note The buffer will be freed once the stream is completely unreffed. If
+ * that's not what you want, use @ref enesim_stream_buffer_static_new
  */
 EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len)
 {
 	Enesim_Stream_Buffer *thiz;
 
 	thiz = calloc(1, sizeof(Enesim_Stream_Buffer));
+	thiz->to_free = EINA_TRUE;
 	thiz->buffer = thiz->curr = buffer;
 	thiz->len = len;
 	thiz->off = 0;
@@ -124,3 +131,20 @@ EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len)
 	return enesim_stream_new(&_enesim_stream_buffer_descriptor, thiz);
 }
 
+/**
+ * @brief Create a new memory based stream
+ * @param[in] buffer The buffer that holds the data.
+ * @param[in] len The length of the buffer
+ * @return A new memory based enesim stream
+ */
+EAPI Enesim_Stream * enesim_stream_buffer_static_new(void *buffer, size_t len)
+{
+	Enesim_Stream_Buffer *thiz;
+	Enesim_Stream *s;
+
+	s = enesim_stream_buffer_new(buffer, len);
+	thiz = enesim_stream_data_get(s);
+	thiz->to_free = EINA_FALSE;
+
+	return s;
+}

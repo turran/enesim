@@ -43,6 +43,7 @@ EAPI const char * enesim_stream_uri_get(Enesim_Stream *thiz);
 
 EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode);
 EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len);
+EAPI Enesim_Stream * enesim_stream_buffer_static_new(void *buffer, size_t len);
 EAPI Enesim_Stream * enesim_stream_base64_new(Enesim_Stream *d);
 
 /**

@@ -41,5 +41,6 @@ typedef struct _Enesim_Stream_Descriptor
 } Enesim_Stream_Descriptor;
 
 Enesim_Stream * enesim_stream_new(Enesim_Stream_Descriptor *d, void *data);
+void * enesim_stream_data_get(Enesim_Stream *thiz);
 
 #endif
