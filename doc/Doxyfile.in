@@ -4,9 +4,10 @@
 
 PROJECT_BRIEF          = Drawing library
 FILE_PATTERNS          = enesim_*.c enesim_*.h Enesim.h Enesim_OpenGL.h
-INPUT                  = src
+INPUT                  = @abs_srcdir@/../src
 EXCLUDE_PATTERNS       = *_private.h *_orc.c
 EXCLUDE_PATTERNS       += enesim_renderer_text_grid.*
 EXCLUDE_PATTERNS       += Enesim_OpenCL.h
 EXCLUDE_PATTERNS       += enesim_test*
-EXAMPLE_PATH           = src/examples
+EXAMPLE_PATH           = @abs_srcdir@/../src/examples
+

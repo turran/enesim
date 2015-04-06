@@ -474,6 +474,7 @@ Makefile
 enesim_opencl.pc
 enesim_opengl.pc
 common/doc/Doxyfile_common
+doc/Doxyfile
 ])
 
 AC_OUTPUT
