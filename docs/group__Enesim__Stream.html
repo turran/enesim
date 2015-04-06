@@ -108,6 +108,8 @@ EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_s
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new file based stream.  <a href="#ga6a5bf6f96601a7a91df64c9fdd859761"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream.html#ga1e89a17dcbd4b337277f4a1dc9ee3730">enesim_stream_buffer_new</a> (void *buffer, size_t len)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new memory based stream.  <a href="#ga1e89a17dcbd4b337277f4a1dc9ee3730"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream.html#ga89828fd8a5a16723c72ee480664cef77">enesim_stream_buffer_static_new</a> (void *buffer, size_t len)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new memory based stream.  <a href="#ga89828fd8a5a16723c72ee480664cef77"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream.html#ga417eba7c682cb2729b66f36431316111">enesim_stream_base64_new</a> (<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *d)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new base64 based stream.  <a href="#ga417eba7c682cb2729b66f36431316111"></a><br/></td></tr>
 </table>
@@ -281,7 +283,45 @@ EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_s
 <p>Create a new memory based stream. </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>The buffer that holds the data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>The buffer that holds the data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">len</td><td>The length of the buffer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A new memory based enesim stream </dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>The buffer will be freed once the stream is completely unreffed. If that's not what you want, use <a class="el" href="group__Enesim__Stream.html#ga89828fd8a5a16723c72ee480664cef77">enesim_stream_buffer_static_new</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga89828fd8a5a16723c72ee480664cef77"></a><!-- doxytag: member="enesim_stream.h::enesim_stream_buffer_static_new" ref="ga89828fd8a5a16723c72ee480664cef77" args="(void *buffer, size_t len)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream.html#ga89828fd8a5a16723c72ee480664cef77">enesim_stream_buffer_static_new</a> </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>len</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create a new memory based stream. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>The buffer that holds the data. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">len</td><td>The length of the buffer </td></tr>
   </table>
   </dd>
@@ -334,7 +374,7 @@ EAPI const char *&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_s
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 26 2015 01:04:16 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 6 2015 19:30:05 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
