@@ -1,5 +1,7 @@
 Enesim
 ======
++ Add a log parameter on the bounds_get variants, change the internal api
+  and make use of the log
 + To implement a nine-patch renderer we need to implement the sub surface
   concept. For that we need to modify the pool interface given that a sub
   surface is backend dependent
