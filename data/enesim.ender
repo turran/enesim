@@ -1390,7 +1390,7 @@
   <callback name="enesim.renderer.compound.cb">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <object name="enesim.renderer.compound">
+  <object name="enesim.renderer.compound" inherits="enesim.renderer">
     <prop name="background_enable">
       <setter>
         <arg name="enable" type="bool" direction="in" transfer="full" nullable="false"/>

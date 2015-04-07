@@ -26,7 +26,7 @@
 
 /**
  * @defgroup Enesim_Renderer_Compound Compound
- * @brief Renderer that contains other renderers
+ * @brief Renderer that contains other renderers @ender_inherits{Enesim_Renderer}
  * @ingroup Enesim_Renderer
  * @{
  */
