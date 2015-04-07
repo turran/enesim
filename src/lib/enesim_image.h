@@ -47,6 +47,7 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
  * @param b The buffer where the data loadad is or where the data to write is
  * @param data The user provided data
  * @param error The error in case something went wrong
+ * @todo for exception handling better receive a bool for error and an eina error
  */
 typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, int error);
 
@@ -125,13 +126,44 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b,
 
 typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
 
+/**
+ * @ender_name{enesim.image.provider.options_parse_cb}
+ */
 typedef void * (*Enesim_Image_Provider_Options_Parse_Cb)(const char *options);
+
+/**
+ * @ender_name{enesim.image.provider.options_free_cb}
+ */
 typedef void (*Enesim_Image_Provider_Options_Free_Cb)(void *options);
+
+/**
+ * @ender_name{enesim.image.provider.loadable_cb}
+ */
 typedef Eina_Bool (*Enesim_Image_Provider_Loadable_Cb)(Enesim_Stream *data);
+
+/**
+ * @ender_name{enesim.image.provider.saveable_cb}
+ */
 typedef Eina_Bool (*Enesim_Image_Provider_Saveable_Cb)(Enesim_Buffer *b);
+
+/**
+ * @ender_name{enesim.image.provider.info_get_cb}
+ */
 typedef Eina_Bool (*Enesim_Image_Provider_Info_Get_Cb)(Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt, void *options, Eina_Error *err);
+
+/**
+ * @ender_name{enesim.image.provider.formats_get_cb}
+ */
 typedef int (*Enesim_Image_Provider_Formats_Get_Cb)(Enesim_Buffer_Format *formats, void *options, Eina_Error *err);
+
+/**
+ * @ender_name{enesim.image.provider.load_cb}
+ */
 typedef Eina_Bool (*Enesim_Image_Provider_Load_Cb)(Enesim_Stream *data, Enesim_Buffer *b, void *options, Eina_Error *err);
+
+/**
+ * @ender_name{enesim.image.provider.save_cb}
+ */
 typedef Eina_Bool (*Enesim_Image_Provider_Save_Cb)(Enesim_Stream *data, Enesim_Buffer *b, void *options, Eina_Error *err);
 
 #define ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION 0
@@ -176,7 +208,13 @@ EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 
 #define ENESIM_IMAGE_FINDER_DESCRIPTOR_VERSION 0
 
+/**
+ * @ender_name{enesim.image.finder.data_from_cb}
+ */
 typedef const char *(*Enesim_Image_Finder_Data_From_Cb)(Enesim_Stream *data);
+/**
+ * @ender_name{enesim.image.finder.extension_from_cb}
+ */
 typedef const char *(*Enesim_Image_Finder_Extension_From_Cb)(const char *ext);
 
 typedef struct _Enesim_Image_Finder_Descriptor

@@ -52,6 +52,10 @@ EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_ref(
 		Enesim_Renderer_Compound_Layer *l);
 EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l);
 
+/**
+ * @ender_name{enesim.renderer.compound.cb}
+ * @todo Change the name, something like foreach
+ */
 typedef Eina_Bool (*Enesim_Renderer_Compound_Cb)(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer, void *data);
 
