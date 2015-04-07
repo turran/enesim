@@ -240,14 +240,16 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		/* no points left */
 		if (!l2)
 		{
-			goto error;
+			n--;
+			continue;
 		}
 
 		/* iterate over the other edges */
 		points = eina_list_next(l2);
 		if (!points)
 		{
-			goto error;
+			n--;
+			continue;
 		}
 		EINA_LIST_FOREACH(points, l2, pt)
 		{
@@ -293,9 +295,6 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
 	*nedges = n;
 	return edges;
-error:
-	free(edges);
-	return 0;
 }
 
 static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
@@ -657,7 +656,6 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 {
 	Enesim_Renderer_Class *r_klass;
 	Enesim_Renderer_Shape_Class *s_klass;
-	Enesim_Renderer_Path_Abstract_Class *klass;
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _kiia_name;
@@ -669,8 +667,6 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	s_klass->sw_setup = _kiia_sw_setup;
 	s_klass->sw_cleanup = _kiia_sw_cleanup;
 	s_klass->features_get = _kiia_shape_features_get;
-
-	klass = ENESIM_RENDERER_PATH_ABSTRACT_CLASS(k);
 
 	/* create the sampling patterns */
 	/* 8x8 sparse supersampling mask:
