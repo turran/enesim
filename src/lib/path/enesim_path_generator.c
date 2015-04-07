@@ -231,7 +231,7 @@ static Eina_Bool _edge_intersect(Enesim_Path_Edge *e1, Enesim_Path_Edge *e2,
 
 	determinant = (a1*b2) - (a2*b1);
 	/* lines are parallel */
-	if (determinant < threshold)
+	if (fabs(determinant) < threshold)
 		return EINA_FALSE;
 
 	*x = ((b2 * c1) - (b1 * c2))/determinant;
