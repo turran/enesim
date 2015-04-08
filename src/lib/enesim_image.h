@@ -188,9 +188,6 @@ typedef struct _Enesim_Image_Provider_Descriptor
 	Enesim_Image_Provider_Save_Cb save;
 } Enesim_Image_Provider_Descriptor;
 
-EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd, Enesim_Priority priority, const char *mime);
-EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd, const char *mime);
-
 
 /**
  * @}
@@ -214,6 +211,10 @@ EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
 EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 		Enesim_Stream *data, Enesim_Buffer *b,
 		const char *options, Eina_Error *err);
+
+EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd, Enesim_Priority priority, const char *mime);
+EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd, const char *mime);
+
 
 /**
  * @}
