@@ -123,7 +123,7 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		return;
 	}
 
-	enesim_renderer_destination_bounds_get(r, &bounds, 0, 0);
+	enesim_renderer_destination_bounds_get(r, &bounds, 0, 0, NULL);
 	printf("bounds %" EINA_RECTANGLE_FORMAT "\n", 	
 			EINA_RECTANGLE_ARGS(&bounds));
 	c = enesim_renderer_checker_new();

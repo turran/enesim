@@ -163,8 +163,8 @@ static void _raddist_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSE
 	thiz->past = thiz->current;
 }
 
-static void _raddist_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _raddist_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Raddist *thiz;
 
@@ -175,6 +175,7 @@ static void _raddist_bounds_get(Enesim_Renderer *r,
 		rect->y = 0;
 		rect->w = 0;
 		rect->h = 0;
+		return EINA_FALSE;
 	}
 	else
 	{
@@ -185,6 +186,7 @@ static void _raddist_bounds_get(Enesim_Renderer *r,
 		enesim_renderer_origin_get(r, &rect->x, &rect->y);
 		rect->w = sw;
 		rect->h = sh;
+		return EINA_TRUE;
 	}
 }
 

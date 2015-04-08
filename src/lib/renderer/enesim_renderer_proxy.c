@@ -191,8 +191,8 @@ static void _proxy_sw_hints_get(Enesim_Renderer *r, Enesim_Rop rop,
 	*hints |= ENESIM_RENDERER_SW_HINT_ROP;
 }
 
-static void _proxy_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _proxy_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log)
 {
 	Enesim_Renderer_Proxy *thiz;
 
@@ -203,9 +203,9 @@ static void _proxy_bounds_get(Enesim_Renderer *r,
 		rect->y = 0;
 		rect->w = 0;
 		rect->h = 0;
-		return;
+		return EINA_FALSE;
 	}
-	enesim_renderer_bounds_get(thiz->proxied, rect);
+	return enesim_renderer_bounds_get(thiz->proxied, rect, log);
 }
 
 static Eina_Bool _proxy_has_changed(Enesim_Renderer *r)
@@ -233,7 +233,7 @@ static Eina_Bool _proxy_damage(Enesim_Renderer *r,
 	{
 		Eina_Rectangle current_bounds;
 
-		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0, NULL);
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
 		return EINA_TRUE;

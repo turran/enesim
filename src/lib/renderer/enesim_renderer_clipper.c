@@ -223,8 +223,8 @@ static void _clipper_sw_hints_get(Enesim_Renderer *r,
 	}
 }
 
-static void _clipper_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _clipper_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Clipper *thiz;
 
@@ -233,6 +233,7 @@ static void _clipper_bounds_get(Enesim_Renderer *r,
 	rect->y = thiz->current.y;
 	rect->w = thiz->current.w;
 	rect->h = thiz->current.h;
+	return EINA_TRUE;
 }
 
 static Eina_Bool _clipper_has_changed(Enesim_Renderer *r)
@@ -262,7 +263,7 @@ static Eina_Bool _clipper_damage(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_CLIPPER(r);
 
 	/* get the current bounds */
-	enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
+	enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0, NULL);
 	/* if we have changed then send the old and the current */
 	if (_clipper_changed_basic(thiz))
 	{
@@ -275,7 +276,8 @@ static Eina_Bool _clipper_damage(Enesim_Renderer *r,
 	{
 		Enesim_Renderer_Clipper_Damage_Data ddata;
 
-		if (!thiz->current.clipped) return EINA_FALSE;
+		if (!thiz->current.clipped)
+			return EINA_FALSE;
 		ddata.real_cb = cb;
 		ddata.real_data = data;
 		ddata.bounds = &current_bounds;

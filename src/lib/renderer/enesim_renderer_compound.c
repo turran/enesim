@@ -141,8 +141,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop EINA_UNUSED,
 		Enesim_Log **l)
 {
-	Eina_List *ll;
 	Enesim_Renderer_Compound_Layer *layer;
+	Eina_List *ll;
 
 	/* setup the background */
 	if (thiz->background_enabled)
@@ -152,7 +152,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 			ENESIM_RENDERER_LOG(r, l, "Background renderer can not setup");
 			return EINA_FALSE;
 		}
-		enesim_renderer_destination_bounds_get(thiz->background.r, &thiz->background.destination_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(thiz->background.r,
+				&thiz->background.destination_bounds, 0, 0, NULL);
 	}
 
 	if (thiz->visible_layers)
@@ -170,7 +171,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 	{
 		Eina_Bool visible;
 
-		if (!enesim_renderer_setup(layer->r, s, layer->rop, l))
+		if (!enesim_renderer_setup(layer->r, s, layer->rop, NULL))
 		{
 			ENESIM_RENDERER_LOG(r, l, "Layer '%s' can not setup",
 					enesim_renderer_name_get(layer->r));
@@ -181,7 +182,8 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		/* set the span given the color */
 		/* FIXME fix the resulting format */
 		/* FIXME what about the surface formats here? */
-		enesim_renderer_destination_bounds_get(layer->r, &layer->destination_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(layer->r,
+				&layer->destination_bounds, 0, 0, NULL);
 		visible = enesim_renderer_visibility_get(layer->r);
 		if (!visible)
 		{
@@ -195,6 +197,7 @@ static Eina_Bool _compound_state_setup(Enesim_Renderer_Compound *thiz,
 		thiz->visible_layers = eina_list_append(thiz->visible_layers, layer);
 	}
 
+	/* TODO in case every layer failed and no background enabled, is an error */
 	return EINA_TRUE;
 }
 
@@ -496,8 +499,8 @@ static void _compound_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_compound_state_cleanup(thiz, s);
 }
 
-static void _compound_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _compound_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Compound_Layer *l;
@@ -510,7 +513,9 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 	int y2 = -INT_MAX;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
-	if (!thiz->added) goto no_added;
+	if (!thiz->added)
+		goto no_added;
+
 	added = EINA_TRUE;
 
 	/* first the just added layers */
@@ -520,7 +525,7 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
-		enesim_renderer_destination_bounds_get(lr, &tmp, 0, 0);
+		enesim_renderer_destination_bounds_get(lr, &tmp, 0, 0, NULL);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w;
@@ -533,7 +538,9 @@ static void _compound_bounds_get(Enesim_Renderer *r,
 		if (ny2 > y2) y2 = ny2;
 	}
 no_added:
-	if (!thiz->layers) goto no_layers;
+	if (!thiz->layers)
+		goto no_layers;
+
 	layers = EINA_TRUE;
 
 	/* now the already there layers */
@@ -543,7 +550,7 @@ no_added:
 		int nx1, ny1, nx2, ny2;
 		Eina_Rectangle tmp;
 
-		enesim_renderer_destination_bounds_get(lr, &tmp, 0, 0);
+		enesim_renderer_destination_bounds_get(lr, &tmp, 0, 0, NULL);
 		nx1 = tmp.x;
 		ny1 = tmp.y;
 		nx2 = tmp.x + tmp.w;
@@ -560,10 +567,12 @@ no_layers:
 	if (!layers && !added)
 	{
 		enesim_rectangle_coords_from(rect, 0, 0, 0, 0);
+		return EINA_FALSE;
 	}
 	else
 	{
 		enesim_rectangle_coords_from(rect, x1, y1, x2 - x1, y2 - y1);
+		return EINA_TRUE;
 	}
 }
 
@@ -660,7 +669,7 @@ static Eina_Bool _compound_damage(Enesim_Renderer *r,
 
 			DBG("Sending added layer '%s' bounds",
 					l->r->name);
-			enesim_renderer_destination_bounds_get(l->r, &db, 0, 0);
+			enesim_renderer_destination_bounds_get(l->r, &db, 0, 0, NULL);
 			cb(l->r, &db, EINA_FALSE, data);
 		}
 		ret = EINA_TRUE;
@@ -676,7 +685,7 @@ full_bounds:
 	{
 		Eina_Rectangle current_bounds;
 
-		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0, NULL);
 		cb(r, old_bounds, EINA_TRUE, data);
 		cb(r, &current_bounds, EINA_FALSE, data);
 		return EINA_TRUE;

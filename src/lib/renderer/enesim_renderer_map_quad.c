@@ -1197,21 +1197,22 @@ static Eina_Bool _map_quad_has_changed(Enesim_Renderer *r)
 	return thiz->changed;
 }
 
-static void _map_quad_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _map_quad_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Map_Quad *thiz;
 
 	if (!_map_quad_sw_vertices_setup(r))
 	{
 		rect->x = rect->y = rect->w = rect->h = 0;
-		return;
+		return EINA_FALSE;
 	}
 	thiz = ENESIM_RENDERER_MAP_QUAD(r);
 	rect->x = thiz->lx;
 	rect->y = thiz->ty;
 	rect->w = thiz->rx - rect->x;
 	rect->h = thiz->by - rect->y;
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *

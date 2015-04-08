@@ -46,6 +46,7 @@ src/lib/enesim_draw_cache.c \
 src/lib/enesim_draw_cache_private.h \
 src/lib/enesim_format.c \
 src/lib/enesim_log.c \
+src/lib/enesim_log_private.h \
 src/lib/enesim_image.c \
 src/lib/enesim_image_private.h \
 src/lib/enesim_main.c \

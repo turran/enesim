@@ -592,8 +592,8 @@ static void _kiia_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
 
-static void _kiia_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+static Eina_Bool _kiia_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	double xmin = DBL_MAX;
@@ -644,12 +644,14 @@ static void _kiia_bounds_get(Enesim_Renderer *r,
 	bounds->y = ymin;
 	bounds->w = (xmax - xmin) + 1;
 	bounds->h = (ymax - ymin) + 1;
-	return;
+	return EINA_TRUE;
+
 failed:
 	bounds->x = 0;
 	bounds->y = 0;
 	bounds->w = 0;
 	bounds->h = 0;
+	return EINA_FALSE;
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *

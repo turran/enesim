@@ -907,8 +907,8 @@ static void _enesim_renderer_path_tesselator_features_get(
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
-static void _enesim_renderer_path_tesselator_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+static Eina_Bool _enesim_renderer_path_tesselator_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	double xmin = DBL_MAX;
@@ -959,12 +959,14 @@ static void _enesim_renderer_path_tesselator_bounds_get(Enesim_Renderer *r,
 	bounds->y = ymin;
 	bounds->w = (xmax - xmin) + 1;
 	bounds->h = (ymax - ymin) + 1;
-	return;
+	return EINA_TRUE;
+
 failed:
 	bounds->x = 0;
 	bounds->y = 0;
 	bounds->w = 0;
 	bounds->h = 0;
+	return EINA_FALSE;
 }
 
 static Eina_Bool _enesim_renderer_path_tesselator_opengl_initialize(

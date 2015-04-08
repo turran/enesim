@@ -479,12 +479,12 @@
     <value name="cmyk"/>
     <value name="cmyk_adobe"/>
   </enum>
-  <def name="enesim.buffer.sw.data.argb8888" type=""/>
-  <def name="enesim.buffer.sw.data.argb8888.pre" type=""/>
-  <def name="enesim.buffer.sw.data.xrgb8888" type=""/>
-  <def name="enesim.buffer.sw.data.rgb888" type=""/>
-  <def name="enesim.buffer.sw.data.bgr888" type=""/>
-  <def name="enesim.buffer.sw.data.cmyk" type=""/>
+  <def name="enesim.buffer.sw_data_argb8888" type=""/>
+  <def name="enesim.buffer.sw_data_argb8888_pre" type=""/>
+  <def name="enesim.buffer.sw_data_xrgb8888" type=""/>
+  <def name="enesim.buffer.sw_data_rgb888" type=""/>
+  <def name="enesim.buffer.sw_data_bgr888" type=""/>
+  <def name="enesim.buffer.sw_data_cmyk" type=""/>
   <object name="enesim.buffer">
     <ctor name="new">
       <arg name="f" type="enesim.buffer.format" direction="in" transfer="full" nullable="false"/>
@@ -800,24 +800,28 @@
     <method name="bounds_get">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="rect" type="enesim.rectangle" direction="out" transfer="full" nullable="false"/>
+      <arg name="log" type="enesim.log" direction="out" transfer="full" nullable="true"/>
     </method>
     <method name="bounds_get_extended">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="prev" type="enesim.rectangle" direction="out" transfer="full" nullable="false"/>
       <arg name="curr" type="enesim.rectangle" direction="out" transfer="full" nullable="false"/>
+      <arg name="log" type="enesim.log" direction="out" transfer="full" nullable="true"/>
     </method>
     <method name="destination_bounds_get">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="rect" type="eina.rectangle" direction="out" transfer="full" nullable="false"/>
       <arg name="x" type="int32" direction="in" transfer="full" nullable="false"/>
       <arg name="y" type="int32" direction="in" transfer="full" nullable="false"/>
+      <arg name="log" type="enesim.log" direction="out" transfer="full" nullable="true"/>
     </method>
     <method name="destination_bounds_get_extended">
       <return type="bool" transfer="full" nullable="false"/>
-      <arg name="prev" type="eina.rectangle" direction="out" transfer="full" nullable="false"/>
-      <arg name="curr" type="eina.rectangle" direction="out" transfer="full" nullable="false"/>
+      <arg name="prev" type="eina.rectangle" direction="out" transfer="full" nullable="true"/>
+      <arg name="curr" type="eina.rectangle" direction="out" transfer="full" nullable="true"/>
       <arg name="x" type="int32" direction="in" transfer="full" nullable="false"/>
       <arg name="y" type="int32" direction="in" transfer="full" nullable="false"/>
+      <arg name="log" type="enesim.log" direction="out" transfer="full" nullable="true"/>
     </method>
     <method name="features_get">
       <return type="enesim.renderer.feature" transfer="full" nullable="false"/>
@@ -1019,14 +1023,14 @@
   <struct name="enesim.image.provider.descriptor">
     <field name="version" type="int32"/>
     <field name="name" type="string"/>
-    <field name="options_parse" type="enesim.image.provider.options.parse.cb"/>
-    <field name="options_free" type="enesim.image.provider.options.free.cb"/>
-    <field name="loadable" type="enesim.image.provider.loadable.cb"/>
-    <field name="saveable" type="enesim.image.provider.saveable.cb"/>
-    <field name="info_get" type="enesim.image.provider.info.get.cb"/>
-    <field name="formats_get" type="enesim.image.provider.formats.get.cb"/>
-    <field name="load" type="enesim.image.provider.load.cb"/>
-    <field name="save" type="enesim.image.provider.save.cb"/>
+    <field name="options_parse" type="enesim.image.provider.options_parse_cb"/>
+    <field name="options_free" type="enesim.image.provider.options_free_cb"/>
+    <field name="loadable" type="enesim.image.provider.loadable_cb"/>
+    <field name="saveable" type="enesim.image.provider.saveable_cb"/>
+    <field name="info_get" type="enesim.image.provider.info_get_cb"/>
+    <field name="formats_get" type="enesim.image.provider.formats_get_cb"/>
+    <field name="load" type="enesim.image.provider.load_cb"/>
+    <field name="save" type="enesim.image.provider.save_cb"/>
     <method name="enesim_image_provider_register">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="priority" type="enesim.priority" direction="in" transfer="full" nullable="false"/>
@@ -1104,41 +1108,41 @@
       <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
     </method>
   </object>
-  <callback name="enesim.image.provider.options.parse.cb">
+  <callback name="enesim.image.provider.options_parse_cb">
     <return type="pointer" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.options.free.cb"/>
-  <callback name="enesim.image.provider.loadable.cb">
+  <callback name="enesim.image.provider.options_free_cb"/>
+  <callback name="enesim.image.provider.loadable_cb">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.saveable.cb">
+  <callback name="enesim.image.provider.saveable_cb">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.info.get.cb">
+  <callback name="enesim.image.provider.info_get_cb">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.formats.get.cb">
+  <callback name="enesim.image.provider.formats_get_cb">
     <return type="int32" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.load.cb">
+  <callback name="enesim.image.provider.load_cb">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.save.cb">
+  <callback name="enesim.image.provider.save_cb">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
   <struct name="enesim.image.finder.descriptor">
     <field name="version" type="int32"/>
-    <field name="data_from" type="enesim.image.finder.data.from.cb"/>
-    <field name="extension_from" type="enesim.image.finder.extension.from.cb"/>
+    <field name="data_from" type="enesim.image.finder.data_from_cb"/>
+    <field name="extension_from" type="enesim.image.finder.extension_from_cb"/>
     <method name="enesim_image_finder_register">
       <return type="bool" transfer="full" nullable="false"/>
     </method>
     <method name="enesim_image_finder_unregister"/>
   </struct>
-  <callback name="enesim.image.finder.data.from.cb">
+  <callback name="enesim.image.finder.data_from_cb">
     <return type="string" transfer="none" nullable="false"/>
   </callback>
-  <callback name="enesim.image.finder.extension.from.cb">
+  <callback name="enesim.image.finder.extension_from_cb">
     <return type="string" transfer="none" nullable="false"/>
   </callback>
   <enum name="enesim.text.direction">

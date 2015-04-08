@@ -1,13 +1,10 @@
 Enesim
 ======
-+ Add a log parameter on the bounds_get variants, change the internal api
-  and make use of the log
 + To implement a nine-patch renderer we need to implement the sub surface
   concept. For that we need to modify the pool interface given that a sub
   surface is backend dependent
 + Pass the surface when checking for bounds, this allows to know what renderer to use
   on the destination surface
-+ Add a BOOL return on the bounds get
 + Use the decasteljau algo on the path normalizer
 + Split the path generator into their own functions/files
 + Make the threads work on windows

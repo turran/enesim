@@ -296,8 +296,8 @@ static Eina_Bool _dispmap_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _dispmap_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _dispmap_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Dispmap *thiz;
 
@@ -308,6 +308,7 @@ static void _dispmap_bounds_get(Enesim_Renderer *r,
 		rect->y = 0;
 		rect->w = 0;
 		rect->h = 0;
+		return EINA_FALSE;
 	}
 	else
 	{
@@ -320,6 +321,7 @@ static void _dispmap_bounds_get(Enesim_Renderer *r,
 		rect->y = 0;
 		rect->w = mw < sw ? mw : sw;
 		rect->h = mh < sh ? mh : sh;
+		return EINA_TRUE;
 	}
 }
 

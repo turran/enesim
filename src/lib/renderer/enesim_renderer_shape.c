@@ -536,7 +536,7 @@ send_old:
 	if (do_send_old)
 	{
 		/* get the current bounds */
-		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0, NULL);
 		DBG("Sending old bounds %" EINA_RECTANGLE_FORMAT, EINA_RECTANGLE_ARGS(old_bounds));
 		cb(r, old_bounds, EINA_TRUE, data);
 		DBG("And new bounds %" EINA_RECTANGLE_FORMAT, EINA_RECTANGLE_ARGS(&current_bounds));
@@ -566,7 +566,7 @@ send_old:
 			Enesim_Renderer_Shape_Damage_Data ddata;
 
 			DBG("Fill renderer changed, damaging fill area");
-			enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
+			enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0, NULL);
 			ddata.real_cb = cb;
 			ddata.real_data = data;
 			ddata.bounds = &current_bounds;
@@ -579,7 +579,7 @@ send_old:
 			if (stroke_changed)
 			{
 				DBG("Stroke changed, sending current bounds");
-				enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0);
+				enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0, NULL);
 				cb(r, &current_bounds, EINA_FALSE, data);
 				return EINA_TRUE;
 			}

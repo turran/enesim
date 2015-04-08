@@ -107,7 +107,7 @@ static Eina_Bool _pattern_state_setup(Enesim_Renderer *r,
 	{
 		thiz->force_redraw = enesim_renderer_has_changed(thiz->src_r);
 
-		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0, NULL);
 		if (thiz->cache)
 		{
 			int old_sw, old_sh;
@@ -299,11 +299,12 @@ static void _pattern_features_get(Enesim_Renderer *r EINA_UNUSED,
 	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
-static void _pattern_bounds_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Rectangle *rect)
+static Eina_Bool _pattern_bounds_get(Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	/* TODO in case of restrict, do not do this */
 	enesim_rectangle_coords_from(rect, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
+	return EINA_TRUE;
 }
 
 static Eina_Bool _pattern_has_changed(Enesim_Renderer *r)

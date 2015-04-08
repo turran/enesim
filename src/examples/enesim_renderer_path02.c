@@ -35,7 +35,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	enesim_matrix_identity(&m);
 	enesim_matrix_scale(&m, 0.5, 0.5);
 	enesim_renderer_transformation_set(r1, &m);
-	enesim_renderer_destination_bounds_get(r1, &bounds, 0, 0);
+	enesim_renderer_destination_bounds_get(r1, &bounds, 0, 0, NULL);
 
 	r2 = enesim_renderer_rectangle_new();
 	enesim_renderer_shape_fill_color_set(r2, 0xff000000);

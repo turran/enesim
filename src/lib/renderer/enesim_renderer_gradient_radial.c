@@ -338,8 +338,8 @@ static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _radial_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+static Eina_Bool _radial_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Gradient_Radial *thiz;
 
@@ -349,6 +349,7 @@ static void _radial_bounds_get(Enesim_Renderer *r,
 	bounds->y = thiz->center.y - fabs(thiz->radius);
 	bounds->w = fabs(thiz->radius) * 2;
 	bounds->h = fabs(thiz->radius) * 2;
+	return EINA_TRUE;
 }
 
 static Eina_Bool _radial_has_changed(Enesim_Renderer *r)

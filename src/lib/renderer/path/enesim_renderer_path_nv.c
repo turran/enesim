@@ -821,8 +821,8 @@ static void _enesim_renderer_path_nv_features_get(
 			ENESIM_RENDERER_FEATURE_ARGB8888;
 }
 
-static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+static Eina_Bool _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Nv *thiz;
 	Enesim_Matrix m;
@@ -873,13 +873,14 @@ static void _enesim_renderer_path_nv_bounds_get(Enesim_Renderer *r,
 	bounds->w += 2;
 	bounds->h += 2;
 
-	return;
+	return EINA_TRUE;
 
 failed:
 	bounds->x = 0;
 	bounds->y = 0;
 	bounds->w = 0;
 	bounds->h = 0;
+	return EINA_FALSE;
 }
 
 static Eina_Bool _enesim_renderer_path_nv_opengl_initialize(

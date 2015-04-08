@@ -276,8 +276,8 @@ static Eina_Bool _importer_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _importer_bounds(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _importer_bounds(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Importer *thiz;
 
@@ -291,6 +291,7 @@ static void _importer_bounds(Enesim_Renderer *r,
 		rect->y = 0;
 		rect->w = w;
 		rect->h = h;
+		return EINA_TRUE;
 	}
 	else
 	{
@@ -298,6 +299,7 @@ static void _importer_bounds(Enesim_Renderer *r,
 		rect->y = 0;
 		rect->w = 0;
 		rect->h = 0;
+		return EINA_FALSE;
 	}
 }
 

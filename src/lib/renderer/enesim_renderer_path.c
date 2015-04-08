@@ -186,17 +186,18 @@ static const char * _path_name_get(Enesim_Renderer *r EINA_UNUSED)
 	return "path";
 }
 
-static void _path_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+static Eina_Bool _path_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer *abstract;
 	Eina_List *l;
+	Eina_Bool ret = EINA_FALSE;
 
 	thiz = ENESIM_RENDERER_PATH(r);
 	if (thiz->current)
 	{
-		enesim_renderer_bounds_get(thiz->current, bounds);
+		ret = enesim_renderer_bounds_get(thiz->current, bounds, log);
 	}
 	else
 	{
@@ -206,10 +207,11 @@ static void _path_bounds_get(Enesim_Renderer *r,
 			if (!_enesim_renderer_path_is_valid(abstract, NULL))
 				continue;
 			_enesim_renderer_path_propagate(r, abstract);
-			enesim_renderer_bounds_get(abstract, bounds);
+			ret = enesim_renderer_bounds_get(abstract, bounds, log);
 			break;
 		}
 	}
+	return ret;
 }
 
 static void _path_features_get(Enesim_Renderer *r,

@@ -100,11 +100,15 @@ EAPI Enesim_Alpha_Hint enesim_renderer_alpha_hints_get(Enesim_Renderer *thiz);
 
 EAPI Eina_Bool enesim_renderer_is_supported(Enesim_Renderer *r, Enesim_Surface *s);
 
-EAPI Eina_Bool enesim_renderer_bounds_get(Enesim_Renderer *r, Enesim_Rectangle *rect);
-EAPI Eina_Bool enesim_renderer_bounds_get_extended(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr);
+EAPI Eina_Bool enesim_renderer_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log);
+EAPI Eina_Bool enesim_renderer_bounds_get_extended(Enesim_Renderer *r,
+		Enesim_Rectangle *prev, Enesim_Rectangle *curr, Enesim_Log **log);
 
-EAPI Eina_Bool enesim_renderer_destination_bounds_get(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y);
-EAPI Eina_Bool enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y);
+EAPI Eina_Bool enesim_renderer_destination_bounds_get(Enesim_Renderer *r,
+		Eina_Rectangle *rect, int x, int y, Enesim_Log **log);
+EAPI Eina_Bool enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *r,
+		Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y, Enesim_Log **log);
 
 EAPI Enesim_Renderer_Feature enesim_renderer_features_get(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);

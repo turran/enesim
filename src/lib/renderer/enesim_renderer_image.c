@@ -1432,8 +1432,8 @@ static const char * _image_name(Enesim_Renderer *r EINA_UNUSED)
 	return "image";
 }
 
-static void _image_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _image_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Image *thiz;
 	Enesim_Rectangle obounds;
@@ -1447,6 +1447,7 @@ static void _image_bounds_get(Enesim_Renderer *r,
 		obounds.y = 0;
 		obounds.w = 0;
 		obounds.h = 0;
+		return EINA_FALSE;
 	}
 	else
 	{
@@ -1465,6 +1466,7 @@ static void _image_bounds_get(Enesim_Renderer *r,
 	enesim_renderer_transformation_get(r, &m);
 	type = enesim_renderer_transformation_type_get(r);
 	_image_transform_bounds(r, &m, type, &obounds, rect);
+	return EINA_TRUE;
 }
 
 static void _image_sw_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
@@ -1671,7 +1673,7 @@ static Eina_Bool _image_damages(Enesim_Renderer *r,
 		Enesim_Rectangle curr_bounds;
 
 		cb(r, old_bounds, EINA_TRUE, data);
-		_image_bounds_get(r, &curr_bounds);
+		_image_bounds_get(r, &curr_bounds, NULL);
 		enesim_rectangle_normalize(&curr_bounds, &bounds);
 		cb(r, &bounds, EINA_FALSE, data);
 		return EINA_TRUE;

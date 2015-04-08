@@ -147,8 +147,8 @@ static void _transition_state_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_cleanup(thiz->tgt, s);
 }
 
-static void _transition_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _transition_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Transition *trans;
 	Enesim_Rectangle r0_rect;
@@ -160,16 +160,19 @@ static void _transition_bounds_get(Enesim_Renderer *r,
 	rect->w = 0;
 	rect->h = 0;
 
-	if (!trans->src) return;
-	if (!trans->tgt) return;
+	if (!trans->src)
+		return EINA_FALSE;
+	if (!trans->tgt)
+		return EINA_FALSE;
 
-	enesim_renderer_bounds_get(trans->src, &r0_rect);
-	enesim_renderer_bounds_get(trans->tgt, &r1_rect);
+	enesim_renderer_bounds_get(trans->src, &r0_rect, NULL);
+	enesim_renderer_bounds_get(trans->tgt, &r1_rect, NULL);
 
 	rect->x = r0_rect.x < r1_rect.x ? r0_rect.x : r1_rect.x;
 	rect->y = r0_rect.y < r1_rect.y ? r0_rect.y : r1_rect.y;
 	rect->w = r0_rect.w > r1_rect.w ? r0_rect.w : r1_rect.w;
 	rect->h = r0_rect.h > r1_rect.h ? r0_rect.h : r1_rect.h;
+	return EINA_TRUE;
 }
 
 static void _transition_features_get(Enesim_Renderer *r EINA_UNUSED,

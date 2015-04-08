@@ -132,7 +132,9 @@ Eina_Bool enesim_draw_cache_geometry_get(Enesim_Draw_Cache *thiz,
 {
 	if (!thiz->r) return EINA_FALSE;
 
-	enesim_renderer_destination_bounds_get(thiz->r, &thiz->bounds, 0, 0);
+	if (!enesim_renderer_destination_bounds_get(thiz->r, &thiz->bounds, 0,
+			0, NULL))
+		return EINA_FALSE;
 	*g = thiz->bounds;
 
 	return EINA_TRUE;
@@ -162,7 +164,9 @@ Eina_Bool enesim_draw_cache_setup_sw(Enesim_Draw_Cache *thiz,
 		/* in case the size of the renderer has changed be sure
 		 * to destroy the tiler
 		 */
-		enesim_renderer_destination_bounds_get(thiz->r, &thiz->bounds, 0, 0);
+		if (!enesim_renderer_destination_bounds_get(thiz->r, &thiz->bounds, 0, 0, NULL))
+			return EINA_FALSE;
+
 		if (thiz->tw != thiz->bounds.w || thiz->th != thiz->bounds.h)
 		{
 			if (thiz->tiler)

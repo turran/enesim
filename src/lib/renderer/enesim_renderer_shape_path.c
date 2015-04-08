@@ -250,14 +250,14 @@ void enesim_renderer_shape_path_shape_features_get_default(Enesim_Renderer *r,
 	*features = enesim_renderer_shape_shape_features_get(thiz->r_path);
 }
 
-void enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+Eina_Bool enesim_renderer_shape_path_bounds_get_default(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 
 	thiz = ENESIM_RENDERER_SHAPE_PATH(r);
 	_shape_path_propagate(r);
-	enesim_renderer_bounds_get(thiz->r_path, bounds);
+	return enesim_renderer_bounds_get(thiz->r_path, bounds, log);
 }
 /** @endcond */
 /*============================================================================*

@@ -272,17 +272,18 @@ static Eina_Bool _gradient_sw_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _gradient_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+static Eina_Bool _gradient_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log)
 {
 	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Class *klass;
+	Eina_Bool ret = EINA_TRUE;
 
 	thiz = ENESIM_RENDERER_GRADIENT(r);
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
 	if (thiz->state.mode == ENESIM_REPEAT_MODE_RESTRICT && klass->bounds_get)
 	{
-		klass->bounds_get(r, bounds);
+		ret = klass->bounds_get(r, bounds, log);
 	}
 	else
 	{
@@ -291,6 +292,7 @@ static void _gradient_bounds_get(Enesim_Renderer *r,
 		bounds->w = INT_MAX;
 		bounds->h = INT_MAX;
 	}
+	return ret;
 }
 
 static void _gradient_features_get(Enesim_Renderer *r EINA_UNUSED,

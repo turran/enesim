@@ -561,8 +561,8 @@ static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r EINA_UNUS
 	return "text_span";
 }
 
-static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Matrix_Type type;
 
@@ -578,6 +578,7 @@ static void _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 		enesim_matrix_rectangle_transform(&m, rect, &q);
 		enesim_quad_rectangle_to(&q, rect);
 	}
+	return EINA_TRUE;
 }
 
 static void _enesim_renderer_text_span_features_get(Enesim_Renderer *r EINA_UNUSED,

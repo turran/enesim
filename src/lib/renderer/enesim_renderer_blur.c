@@ -184,7 +184,7 @@ static void _blur_fill_argb8888_identity(Enesim_Renderer *r,
 		int rx = ceil(thiz->rx);
 		int ry = ceil(thiz->ry);
 
-		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0, NULL);
 		sw = bounds.w;
 		sh = bounds.h;
 		eina_rectangle_coords_from(&area, ix - rx, iy - ry, len + (rx * 2), 1 + (ry * 2));
@@ -368,7 +368,7 @@ static void _blur_fill_a8_identity(Enesim_Renderer *r,
 		int rx = ceil(thiz->rx);
 		int ry = ceil(thiz->ry);
 
-		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0);
+		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0, NULL);
 		sw = bounds.w;
 		sh = bounds.h;
 		eina_rectangle_coords_from(&area, ix - rx, iy - ry, len + (rx * 2), 1 + (ry * 2));
@@ -590,8 +590,8 @@ static Eina_Bool _blur_has_changed(Enesim_Renderer *r)
 	return EINA_TRUE;
 }
 
-static void _blur_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *rect)
+static Eina_Bool _blur_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *rect, Enesim_Log **log)
 {
 	Enesim_Renderer_Blur *thiz;
 	double ox, oy;
@@ -601,7 +601,8 @@ static void _blur_bounds_get(Enesim_Renderer *r,
 	if (thiz->src_r)
 	{
 		Eina_Rectangle bounds;
-		enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0);
+		if (!enesim_renderer_destination_bounds_get(thiz->src_r, &bounds, 0, 0, log))
+			return EINA_FALSE;
 		enesim_rectangle_coords_from(rect, 0, 0, bounds.w, bounds.h);
 	}
 	/* otherwise use the surface */
@@ -615,7 +616,7 @@ static void _blur_bounds_get(Enesim_Renderer *r,
 	else
 	{
 		enesim_rectangle_coords_from(rect, 0, 0, 0, 0);
-		return;
+		return EINA_FALSE;
 	}
 	/* increment by the radius */
 	rect->x -= thiz->rx;
@@ -626,6 +627,7 @@ static void _blur_bounds_get(Enesim_Renderer *r,
 	enesim_renderer_origin_get(r, &ox, &oy);
 	rect->x += ox;
 	rect->y += oy;
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
