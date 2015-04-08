@@ -1072,6 +1072,28 @@
       <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
     </function>
   </struct>
+  <callback name="enesim.image.provider.options_parse_cb">
+    <return type="pointer" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.options_free_cb"/>
+  <callback name="enesim.image.provider.loadable_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.saveable_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.info_get_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.formats_get_cb">
+    <return type="int32" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.load_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.save_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
   <object name="enesim.image.provider">
     <method name="register">
       <return type="bool" transfer="full" nullable="false"/>
@@ -1109,28 +1131,6 @@
       <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
     </method>
   </object>
-  <callback name="enesim.image.provider.options_parse_cb">
-    <return type="pointer" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.options_free_cb"/>
-  <callback name="enesim.image.provider.loadable_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.saveable_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.info_get_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.formats_get_cb">
-    <return type="int32" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.load_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.save_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
   <struct name="enesim.image.finder.descriptor">
     <field name="version" type="int32"/>
     <field name="data_from" type="enesim.image.finder.data_from_cb"/>

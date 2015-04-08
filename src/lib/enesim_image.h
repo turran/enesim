@@ -124,8 +124,6 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b,
  * @{
  */
 
-typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
-
 /**
  * @ender_name{enesim.image.provider.options_parse_cb}
  */
@@ -165,6 +163,8 @@ typedef Eina_Bool (*Enesim_Image_Provider_Load_Cb)(Enesim_Stream *data, Enesim_B
  * @ender_name{enesim.image.provider.save_cb}
  */
 typedef Eina_Bool (*Enesim_Image_Provider_Save_Cb)(Enesim_Stream *data, Enesim_Buffer *b, void *options, Eina_Error *err);
+
+typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
 
 #define ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION 0
 
