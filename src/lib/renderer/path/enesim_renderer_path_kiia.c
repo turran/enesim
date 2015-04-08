@@ -205,6 +205,7 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		Enesim_Point fp;
 		Enesim_Point pp;
 		Eina_List *points, *l2;
+		Eina_Bool found = EINA_FALSE;
 
 		pt = eina_list_data_get(p->points);
 		if (!pt)
@@ -229,6 +230,7 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 				/* swap */
 				pp = cp;
 				n++;
+				found = EINA_TRUE;
 				break;
 			}
 			else
@@ -240,7 +242,8 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		/* no points left */
 		if (!l2)
 		{
-			n--;
+			if (found)
+				n--;
 			continue;
 		}
 
@@ -248,7 +251,8 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		points = eina_list_next(l2);
 		if (!points)
 		{
-			n--;
+			if (found)
+				n--;
 			continue;
 		}
 		EINA_LIST_FOREACH(points, l2, pt)
@@ -292,7 +296,9 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 			}
 		}
 	}
-	qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
+
+	if (n)
+		qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
 	*nedges = n;
 	return edges;
 }
