@@ -596,10 +596,7 @@
       <return type="enesim.aplha_hint" transfer="full" nullable="false"/>
     </method>
   </object>
-  <callback name="enesim.buffer.free">
-    <arg name="data" type="pointer" direction="in" transfer="none" nullable="false"/>
-    <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
-  </callback>
+  <callback name="enesim.buffer.free"/>
   <object name="enesim.surface">
     <ctor name="new">
       <arg name="f" type="enesim.format" direction="in" transfer="full" nullable="false"/>
@@ -865,10 +862,6 @@
     </function>
   </object>
   <callback name="enesim.renderer.damage.cb">
-    <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
-    <arg name="area" type="eina.rectangle" direction="in" transfer="none" nullable="false"/>
-    <arg name="past" type="bool" direction="in" transfer="none" nullable="false"/>
-    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
   <object name="enesim.stream">
@@ -916,11 +909,7 @@
       <arg name="d" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
     </ctor>
   </object>
-  <callback name="enesim.image.callback">
-    <arg name="r" type="enesim.buffer" direction="in" transfer="none" nullable="false"/>
-    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
-    <arg name="error" type="int32" direction="in" transfer="none" nullable="false"/>
-  </callback>
+  <callback name="enesim.image.callback"/>
   <object name="enesim.image">
     <function name="dispatch"/>
     <function name="info_get">
