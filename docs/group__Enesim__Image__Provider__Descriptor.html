@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: Enesim_Renderer_Gradient_Stop Struct Reference</title>
+<title>enesim: Provider Descriptor</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -49,7 +49,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,63 +69,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
-      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
-      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
-    </ul>
-  </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
+<a href="#nested-classes">Data Structures</a> &#124;
+<a href="#groups">Modules</a> &#124;
+<a href="#define-members">Defines</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Enesim_Renderer_Gradient_Stop Struct Reference<div class="ingroups"><a class="el" href="group__Enesim__Renderer__Gradient__Stop.html">Gradient Stop</a></div></div>  </div>
-</div><!--header-->
+<div class="title">Provider Descriptor</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Image__File.html">File based loading and saving</a> &#124; <a class="el" href="group__Enesim__Image.html">Image</a></div></div><!--header-->
 <div class="contents">
-<!-- doxytag: class="Enesim_Renderer_Gradient_Stop" -->
-<p><code>#include &lt;enesim_renderer_gradient.h&gt;</code></p>
+
+<p>Allows the creation of new providers.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__Enesim__Argb.html#ga04dd6274e36780ecb3c64e33289e437f">Enesim_Argb</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Renderer__Gradient__Stop.html#aaf7636b84457d11c5180a9e53ea032c6">argb</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Renderer__Gradient__Stop.html#a9ee0188608751f7a390fa209b1c824f8">pos</a></td></tr>
+<tr><td colspan="2"><h2><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Image__Provider__Descriptor.html">Enesim_Image_Provider_Descriptor</a></td></tr>
+<tr><td colspan="2"><h2><a name="groups"></a>
+Modules</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html">Definitions</a></td></tr>
+<tr><td colspan="2"><h2><a name="define-members"></a>
+Defines</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga0d6ee031e82b1b9b526a235852a8d0a9"></a><!-- doxytag: member="Enesim_Image_Provider_Descriptor::ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION" ref="ga0d6ee031e82b1b9b526a235852a8d0a9" args="" -->
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION</b>&#160;&#160;&#160;0</td></tr>
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1b4ed5289c072bf85ebe8b816591746b"></a><!-- doxytag: member="Enesim_Image_Provider_Descriptor::enesim_image_provider_register" ref="ga1b4ed5289c072bf85ebe8b816591746b" args="(Enesim_Image_Provider_Descriptor *pd, Enesim_Priority priority, const char *mime)" -->
+EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_provider_register</b> (<a class="el" href="structEnesim__Image__Provider__Descriptor.html">Enesim_Image_Provider_Descriptor</a> *pd, <a class="el" href="group__Enesim__Basic.html#ga7939eaa12b89af073a73dcb9d7f4404a">Enesim_Priority</a> priority, const char *mime)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga8564a6c1ba58bf9e599a4745511b5f26"></a><!-- doxytag: member="Enesim_Image_Provider_Descriptor::enesim_image_provider_unregister" ref="ga8564a6c1ba58bf9e599a4745511b5f26" args="(Enesim_Image_Provider_Descriptor *pd, const char *mime)" -->
+EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_provider_unregister</b> (<a class="el" href="structEnesim__Image__Provider__Descriptor.html">Enesim_Image_Provider_Descriptor</a> *pd, const char *mime)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>A gradient stop definition </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="enesim_renderer_gradient_linear01_8c-example.html#_a2">enesim_renderer_gradient_linear01.c</a>, and <a class="el" href="enesim_renderer_path01_8c-example.html#_a1">enesim_renderer_path01.c</a>.</dd>
-</dl></div><hr/><h2>Field Documentation</h2>
-<a class="anchor" id="aaf7636b84457d11c5180a9e53ea032c6"></a><!-- doxytag: member="Enesim_Renderer_Gradient_Stop::argb" ref="aaf7636b84457d11c5180a9e53ea032c6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__Enesim__Argb.html#ga04dd6274e36780ecb3c64e33289e437f">Enesim_Argb</a> <a class="el" href="structEnesim__Renderer__Gradient__Stop.html#aaf7636b84457d11c5180a9e53ea032c6">Enesim_Renderer_Gradient_Stop::argb</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>The argb color of the stop </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="enesim_renderer_gradient_linear01_8c-example.html#a7">enesim_renderer_gradient_linear01.c</a>, and <a class="el" href="enesim_renderer_path01_8c-example.html#a8">enesim_renderer_path01.c</a>.</dd>
-</dl>
-</div>
-</div>
-<a class="anchor" id="a9ee0188608751f7a390fa209b1c824f8"></a><!-- doxytag: member="Enesim_Renderer_Gradient_Stop::pos" ref="a9ee0188608751f7a390fa209b1c824f8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double <a class="el" href="structEnesim__Renderer__Gradient__Stop.html#a9ee0188608751f7a390fa209b1c824f8">Enesim_Renderer_Gradient_Stop::pos</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>The position of the stop in the 0..1 range </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="enesim_renderer_gradient_linear01_8c-example.html#a8">enesim_renderer_gradient_linear01.c</a>, and <a class="el" href="enesim_renderer_path01_8c-example.html#a9">enesim_renderer_path01.c</a>.</dd>
-</dl>
-</div>
-</div>
+<p>Allows the creation of new providers. </p>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -144,7 +121,7 @@ Data Fields</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 8 2015 22:20:49 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 8 2015 22:20:48 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

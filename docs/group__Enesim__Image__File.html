@@ -72,7 +72,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#groups">Modules</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">File based loading and saving</div>  </div>
 <div class="ingroups"><a class="el" href="group__Enesim__Image.html">Image</a></div></div><!--header-->
@@ -81,6 +83,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Generic file loading and saving using the main context.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="groups"></a>
+Modules</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html">Definitions</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Provider__Descriptor.html">Provider Descriptor</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Allows the creation of new providers. </p>
+<br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Provider.html">Providers</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Image format loader and saver provider. </p>
+<br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Finder.html">Finder</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Image identification. </p>
+<br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Misc.html">Misc</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Helper functions related to images. </p>
+<br/></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File.html#ga9fbf8cb302918fe717424ee7fdcdebb3">enesim_image_file_info_get</a> (const char *file, int *w, int *h, <a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *sfmt, const char *options, Eina_Error *err)</td></tr>
@@ -88,6 +105,34 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File.html#ga642403c0c25de7104172f9d21ec7e4cc">enesim_image_file_load_async</a> (const char *file, <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *mpool, <a class="el" href="group__Enesim__Image__Definitions.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a> cb, void *user_data, const char *options)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File.html#ga3f9f0f0045fcccbf213ac249f9b3734e">enesim_image_file_save</a> (const char *file, <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, const char *options, Eina_Error *err)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__File.html#ga80fc5b06ae51901b00a7c1ced6a9b397">enesim_image_file_save_async</a> (const char *file, <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, <a class="el" href="group__Enesim__Image__Definitions.html#gaca5db6f13c2ff5d450afcc6d47c79e94">Enesim_Image_Callback</a> cb, void *user_data, const char *options)</td></tr>
+<tr><td colspan="2"><h2><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gae9fa488535b2c51f4bd79d32da093e0a"></a><!-- doxytag: member="Enesim_Image_File::version" ref="gae9fa488535b2c51f4bd79d32da093e0a" args="" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::version</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaa47bff032aaec57bfeee85f8aa88f757"></a><!-- doxytag: member="Enesim_Image_File::name" ref="gaa47bff032aaec57bfeee85f8aa88f757" args="" -->
+const char *&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::name</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1e1d134b09fe0c035405125333cc8a03"></a><!-- doxytag: member="Enesim_Image_File::options_parse" ref="ga1e1d134b09fe0c035405125333cc8a03" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#ga23cc3a25bcd2f289ba1df674acf70103">Enesim_Image_Provider_Options_Parse_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::options_parse</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaeeff9a3726fec3d2620b3e31c5bfe1de"></a><!-- doxytag: member="Enesim_Image_File::options_free" ref="gaeeff9a3726fec3d2620b3e31c5bfe1de" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#ga64ec554a3a763aa968bc47172e363b07">Enesim_Image_Provider_Options_Free_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::options_free</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gafc16a96f38e540fa3c53885b85898d39"></a><!-- doxytag: member="Enesim_Image_File::loadable" ref="gafc16a96f38e540fa3c53885b85898d39" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#ga14e3206573ef372bd77ca5f04e131692">Enesim_Image_Provider_Loadable_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::loadable</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga6018fe85187be29397824098fec0e3c0"></a><!-- doxytag: member="Enesim_Image_File::saveable" ref="ga6018fe85187be29397824098fec0e3c0" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#ga239eee735e6c67e1add9345d0648c253">Enesim_Image_Provider_Saveable_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::saveable</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga055061e1c37bd2e53879e5a3704bbe28"></a><!-- doxytag: member="Enesim_Image_File::info_get" ref="ga055061e1c37bd2e53879e5a3704bbe28" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#gac1d85f3f9f6a0bcd06d4bba9b4ec54e8">Enesim_Image_Provider_Info_Get_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::info_get</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga3cac2ccf842ebd723e1b62e8ea781a13"></a><!-- doxytag: member="Enesim_Image_File::formats_get" ref="ga3cac2ccf842ebd723e1b62e8ea781a13" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#ga6c51c00ff491aa10874dc1b77ebb293d">Enesim_Image_Provider_Formats_Get_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::formats_get</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaaf7120c381ab6051421a21ec90ee0d30"></a><!-- doxytag: member="Enesim_Image_File::load" ref="gaaf7120c381ab6051421a21ec90ee0d30" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#ga85fa369e99099a98dbef7e29410087f5">Enesim_Image_Provider_Load_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::load</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gab6592d853c09861a028db045c11e5faf"></a><!-- doxytag: member="Enesim_Image_File::save" ref="gab6592d853c09861a028db045c11e5faf" args="" -->
+<a class="el" href="group__Enesim__Image__Provider__Descriptor__Definitions.html#ga66ccf52ad419b65867eac9658661fe61">Enesim_Image_Provider_Save_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider_Descriptor::save</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga21a1d4da1813b97a6a6a17f6aa4a2a08"></a><!-- doxytag: member="Enesim_Image_File::version" ref="ga21a1d4da1813b97a6a6a17f6aa4a2a08" args="" -->
+int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_Descriptor::version</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gad4c77dd91248b7766b04a294a8ccc993"></a><!-- doxytag: member="Enesim_Image_File::data_from" ref="gad4c77dd91248b7766b04a294a8ccc993" args="" -->
+<a class="el" href="group__Enesim__Image__Finder.html#gab3a929e9eaaeed015fe7076d2dc7f9ba">Enesim_Image_Finder_Data_From_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_Descriptor::data_from</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf60cdc0918b5bf03e471021576e3e852"></a><!-- doxytag: member="Enesim_Image_File::extension_from" ref="gaf60cdc0918b5bf03e471021576e3e852" args="" -->
+<a class="el" href="group__Enesim__Image__Finder.html#ga4739c5bcec7144691abb883f4f5a5dd5">Enesim_Image_Finder_Extension_From_Cb</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_Descriptor::extension_from</b></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Generic file loading and saving using the main context. </p>
@@ -399,7 +444,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 8 2015 22:11:53 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 8 2015 22:20:48 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
