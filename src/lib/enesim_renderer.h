@@ -20,12 +20,20 @@
 
 /**
  * @file
- * @ender_group{Enesim_Renderer_Feature}
+ * @ender_group_proto{Enesim_Renderer}
+ * @ender_group{Enesim_Renderer_Definitions}
  * @ender_group{Enesim_Renderer}
  */
 
 /**
- * @defgroup Enesim_Renderer_Feature Renderer features
+ * Renderer Handle
+ * @ingroup Enesim_Renderer
+ */
+typedef struct _Enesim_Renderer Enesim_Renderer;
+
+
+/**
+ * @defgroup Enesim_Renderer_Definitions Renderer definitions
  * @ingroup Enesim_Renderer
  * @{
  */
@@ -47,15 +55,6 @@ typedef enum _Enesim_Renderer_Feature
 #define ENESIM_RENDERER_FEATURE_TRANSFORMATION (ENESIM_RENDERER_FEATURE_AFFINE | ENESIM_RENDERER_FEATURE_PROJECTIVE)
 
 /**
- * @}
- * @defgroup Enesim_Renderer Renderer
- * @brief Vector and raster drawing primitives
- * @{
- */
-
-typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handle */
-
-/**
  * Callback function of the Enesim_Renderer_Damages_Get_Cb descriptor function
  * @param r
  * @param area
@@ -64,6 +63,12 @@ typedef struct _Enesim_Renderer Enesim_Renderer; /**< Renderer Handle */
  */
 typedef Eina_Bool (*Enesim_Renderer_Damage_Cb)(Enesim_Renderer *r, const Eina_Rectangle *area, Eina_Bool past, void *data);
 
+/**
+ * @}
+ * @defgroup Enesim_Renderer Renderer
+ * @brief Vector and raster drawing primitives
+ * @{
+ */
 
 EAPI void enesim_renderer_private_set(Enesim_Renderer *r, const char *name, void *data);
 EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name);

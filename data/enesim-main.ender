@@ -485,6 +485,7 @@
   <def name="enesim.buffer.sw_data_rgb888" type=""/>
   <def name="enesim.buffer.sw_data_bgr888" type=""/>
   <def name="enesim.buffer.sw_data_cmyk" type=""/>
+  <callback name="enesim.buffer.free"/>
   <object name="enesim.buffer">
     <ctor name="new">
       <arg name="f" type="enesim.buffer.format" direction="in" transfer="full" nullable="false"/>
@@ -596,7 +597,6 @@
       <return type="enesim.aplha_hint" transfer="full" nullable="false"/>
     </method>
   </object>
-  <callback name="enesim.buffer.free"/>
   <object name="enesim.surface">
     <ctor name="new">
       <arg name="f" type="enesim.format" direction="in" transfer="full" nullable="false"/>
@@ -697,6 +697,7 @@
       <arg name="dst" type="enesim.buffer" direction="in" transfer="full" nullable="false"/>
     </function>
   </object>
+  <object name="enesim.renderer"/>
   <enum name="enesim.renderer.feature">
     <value name="translate" initializer=""/>
     <value name="affine" initializer=""/>
@@ -707,6 +708,9 @@
     <value name="backend_software" initializer=""/>
     <value name="backend_opengl" initializer=""/>
   </enum>
+  <callback name="enesim.renderer.damage.cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
   <object name="enesim.renderer">
     <method name="private_set">
       <arg name="name" type="string" direction="in" transfer="none" nullable="false"/>
@@ -861,9 +865,6 @@
       <arg name="quality" type="enesim.quality" direction="in" transfer="full" nullable="false"/>
     </function>
   </object>
-  <callback name="enesim.renderer.damage.cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
   <object name="enesim.stream">
     <ref name="ref">
       <return type="enesim.stream" transfer="full" nullable="false"/>

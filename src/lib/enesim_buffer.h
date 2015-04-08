@@ -160,8 +160,6 @@ typedef union _Enesim_Buffer_Sw_Data
  * @{
  */
 
-typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
-
 /**
  * @brief Free function callback
  * @param data The buffer data provided by the user
@@ -172,6 +170,9 @@ typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
  * @see enesim_surface_new_data_from()
  */
 typedef void (*Enesim_Buffer_Free)(void *data, void *user_data);
+
+
+typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
 
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f, uint32_t w, uint32_t h);
 EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
