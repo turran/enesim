@@ -1032,88 +1032,7 @@
       <arg name="options" type="string" direction="in" transfer="none" nullable="false"/>
     </function>
   </object>
-  <struct name="enesim.image.provider.descriptor">
-    <field name="version" type="int32"/>
-    <field name="name" type="string"/>
-    <field name="options_parse" type="enesim.image.provider.options_parse_cb"/>
-    <field name="options_free" type="enesim.image.provider.options_free_cb"/>
-    <field name="loadable" type="enesim.image.provider.loadable_cb"/>
-    <field name="saveable" type="enesim.image.provider.saveable_cb"/>
-    <field name="info_get" type="enesim.image.provider.info_get_cb"/>
-    <field name="formats_get" type="enesim.image.provider.formats_get_cb"/>
-    <field name="load" type="enesim.image.provider.load_cb"/>
-    <field name="save" type="enesim.image.provider.save_cb"/>
-    <method name="enesim_image_provider_register">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="priority" type="enesim.priority" direction="in" transfer="full" nullable="false"/>
-      <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
-    </method>
-    <method name="enesim_image_provider_unregister">
-      <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
-    </method>
-    <function name="enesim_image_provider_priority_set">
-      <arg name="p" type="enesim.image.provider" direction="in" transfer="full" nullable="false"/>
-      <arg name="priority" type="enesim.priority" direction="in" transfer="full" nullable="false"/>
-    </function>
-    <function name="enesim_image_provider_info_get">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="thiz" type="enesim.image.provider" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
-      <arg name="w" type="int32" direction="out" transfer="full" nullable="false"/>
-      <arg name="h" type="int32" direction="out" transfer="full" nullable="false"/>
-      <arg name="sfmt" type="enesim.buffer.format" direction="out" transfer="full" nullable="false"/>
-      <arg name="options" type="string" direction="in" transfer="none" nullable="false"/>
-      <arg name="err" type="eina.error" direction="out" transfer="full" nullable="false"/>
-    </function>
-    <function name="enesim_image_provider_load">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="thiz" type="enesim.image.provider" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
-      <arg name="b" type="enesim.buffer" direction="in" transfer="full" nullable="false"/>
-      <arg name="mpool" type="enesim.pool" direction="in" transfer="full" nullable="false"/>
-      <arg name="options" type="string" direction="in" transfer="none" nullable="false"/>
-      <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
-    </function>
-    <function name="enesim_image_provider_save">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="thiz" type="enesim.image.provider" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
-      <arg name="b" type="enesim.buffer" direction="in" transfer="full" nullable="false"/>
-      <arg name="options" type="string" direction="in" transfer="none" nullable="false"/>
-      <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
-    </function>
-  </struct>
-  <callback name="enesim.image.provider.options_parse_cb">
-    <return type="pointer" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.options_free_cb"/>
-  <callback name="enesim.image.provider.loadable_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.saveable_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.info_get_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.formats_get_cb">
-    <return type="int32" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.load_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
-  <callback name="enesim.image.provider.save_cb">
-    <return type="bool" transfer="full" nullable="false"/>
-  </callback>
   <object name="enesim.image.provider">
-    <method name="register">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="priority" type="enesim.priority" direction="in" transfer="full" nullable="false"/>
-      <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
-    </method>
-    <method name="unregister">
-      <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
-    </method>
     <method name="priority_set">
       <arg name="priority" type="enesim.priority" direction="in" transfer="full" nullable="false"/>
     </method>
@@ -1142,6 +1061,48 @@
       <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
     </method>
   </object>
+  <callback name="enesim.image.provider.options_parse_cb">
+    <return type="pointer" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.options_free_cb"/>
+  <callback name="enesim.image.provider.loadable_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.saveable_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.info_get_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.formats_get_cb">
+    <return type="int32" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.load_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.save_cb">
+    <return type="bool" transfer="full" nullable="false"/>
+  </callback>
+  <struct name="enesim.image.provider.descriptor">
+    <field name="version" type="int32"/>
+    <field name="name" type="string"/>
+    <field name="options_parse" type="enesim.image.provider.options_parse_cb"/>
+    <field name="options_free" type="enesim.image.provider.options_free_cb"/>
+    <field name="loadable" type="enesim.image.provider.loadable_cb"/>
+    <field name="saveable" type="enesim.image.provider.saveable_cb"/>
+    <field name="info_get" type="enesim.image.provider.info_get_cb"/>
+    <field name="formats_get" type="enesim.image.provider.formats_get_cb"/>
+    <field name="load" type="enesim.image.provider.load_cb"/>
+    <field name="save" type="enesim.image.provider.save_cb"/>
+    <method name="enesim_image_provider_register">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="priority" type="enesim.priority" direction="in" transfer="full" nullable="false"/>
+      <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
+    </method>
+    <method name="enesim_image_provider_unregister">
+      <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
+    </method>
+  </struct>
   <struct name="enesim.image.finder.descriptor">
     <field name="version" type="int32"/>
     <field name="data_from" type="enesim.image.finder.data_from_cb"/>

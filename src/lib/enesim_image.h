@@ -25,6 +25,8 @@
  * @ender_group{Enesim_Image_Context}
  * @ender_group{Enesim_Image_File}
  * @ender_group{Enesim_Image_Provider}
+ * @ender_group{Enesim_Image_Provider_Descriptor_Definitions}
+ * @ender_group{Enesim_Image_Provider_Descriptor}
  * @ender_group{Enesim_Image_Finder}
  */
 
@@ -117,10 +119,8 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b,
 		const char *options);
 
 /**
- * @}
- * @defgroup Enesim_Image_Provider Providers
- * @brief Image format loader and saver provider
- * @ingroup Enesim_Image
+ * @defgroup Enesim_Image_Provider_Descriptor_Definitions Definitions
+ * @ingroup Enesim_Image_Provider_Descriptor
  * @{
  */
 
@@ -164,7 +164,13 @@ typedef Eina_Bool (*Enesim_Image_Provider_Load_Cb)(Enesim_Stream *data, Enesim_B
  */
 typedef Eina_Bool (*Enesim_Image_Provider_Save_Cb)(Enesim_Stream *data, Enesim_Buffer *b, void *options, Eina_Error *err);
 
-typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
+/**
+ * @}
+ * @defgroup Enesim_Image_Provider_Descriptor Provider Descriptor
+ * @brief Allows the creation of new providers
+ * @ingroup Enesim_Image
+ * @{
+ */
 
 #define ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION 0
 
@@ -184,6 +190,17 @@ typedef struct _Enesim_Image_Provider_Descriptor
 
 EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd, Enesim_Priority priority, const char *mime);
 EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd, const char *mime);
+
+
+/**
+ * @}
+ * @defgroup Enesim_Image_Provider Providers
+ * @brief Image format loader and saver provider
+ * @ingroup Enesim_Image
+ * @{
+ */
+
+typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
 
 EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
 		Enesim_Priority priority);
