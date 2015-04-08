@@ -206,12 +206,12 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gae70e0fe570bec97bc7ac9b0113c4e4ad">enesim_renderer_alpha_hints_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga1a12b9a982ba23f84bbb9c4e2a1a22b8">enesim_renderer_is_supported</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if a renderer supports the current state of properties.  <a href="#ga1a12b9a982ba23f84bbb9c4e2a1a22b8"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga2a3e8b3f470b76228fcc64f5494a37d5">enesim_renderer_bounds_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rect)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga367c5a44bf866cc1c505bf156a825f91">enesim_renderer_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *prev, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *curr)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounding box of the renderer on its own coordinate space.  <a href="#ga367c5a44bf866cc1c505bf156a825f91"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga81475f5eb66d4b442e9e93a4e3095201">enesim_renderer_destination_bounds_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *rect, int x, int y)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga5be0202b4003c367fb6a62e214bdcb7c">enesim_renderer_destination_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounding box of the renderer on the destination coordinate space.  <a href="#ga5be0202b4003c367fb6a62e214bdcb7c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga4f259c157587b990b7d7eae064d1443b">enesim_renderer_bounds_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *rect, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga46f9a19d2189f94b5180b9a978a01481">enesim_renderer_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *prev, <a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *curr, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounding box of the renderer on its own coordinate space.  <a href="#ga46f9a19d2189f94b5180b9a978a01481"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gae85f5398bec16b7769a68dec452b4050">enesim_renderer_destination_bounds_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *rect, int x, int y, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga5bd4e54f8f3f19d44ee946c90a83239f">enesim_renderer_destination_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounding box of the renderer on the destination coordinate space.  <a href="#ga5bd4e54f8f3f19d44ee946c90a83239f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Renderer__Feature.html#ga49b2ba2375156c5695917da497d8eed3">Enesim_Renderer_Feature</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga388cda5da2d123c83dcb5956ab7abcce">enesim_renderer_features_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the features a renderer support.  <a href="#ga388cda5da2d123c83dcb5956ab7abcce"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga5d370d589455dd8f4990c8a4dcebe819"></a><!-- doxytag: member="Enesim_Renderer::enesim_renderer_is_inside" ref="ga5d370d589455dd8f4990c8a4dcebe819" args="(Enesim_Renderer *r, double x, double y)" -->
@@ -1231,12 +1231,12 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
-<a class="anchor" id="ga2a3e8b3f470b76228fcc64f5494a37d5"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get" ref="ga2a3e8b3f470b76228fcc64f5494a37d5" args="(Enesim_Renderer *r, Enesim_Rectangle *rect)" -->
+<a class="anchor" id="ga4f259c157587b990b7d7eae064d1443b"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get" ref="ga4f259c157587b990b7d7eae064d1443b" args="(Enesim_Renderer *r, Enesim_Rectangle *rect, Enesim_Log **log)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#ga2a3e8b3f470b76228fcc64f5494a37d5">enesim_renderer_bounds_get</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#ga4f259c157587b990b7d7eae064d1443b">enesim_renderer_bounds_get</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -1245,7 +1245,13 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *&#160;</td>
-          <td class="paramname"><em>rect</em>&#160;</td>
+          <td class="paramname"><em>rect</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **&#160;</td>
+          <td class="paramname"><em>log</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1260,6 +1266,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the bounds from </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">rect</td><td>The rectangle to store the bounds </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">log</td><td>In case the functions fails, the log to put messages on.  [Nullable] </td></tr>
   </table>
   </dd>
 </dl>
@@ -1267,12 +1274,12 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
-<a class="anchor" id="ga367c5a44bf866cc1c505bf156a825f91"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get_extended" ref="ga367c5a44bf866cc1c505bf156a825f91" args="(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr)" -->
+<a class="anchor" id="ga46f9a19d2189f94b5180b9a978a01481"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_bounds_get_extended" ref="ga46f9a19d2189f94b5180b9a978a01481" args="(Enesim_Renderer *r, Enesim_Rectangle *prev, Enesim_Rectangle *curr, Enesim_Log **log)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#ga367c5a44bf866cc1c505bf156a825f91">enesim_renderer_bounds_get_extended</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#ga46f9a19d2189f94b5180b9a978a01481">enesim_renderer_bounds_get_extended</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -1287,7 +1294,13 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> *&#160;</td>
-          <td class="paramname"><em>curr</em>&#160;</td>
+          <td class="paramname"><em>curr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **&#160;</td>
+          <td class="paramname"><em>log</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1304,6 +1317,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the bounds from </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">prev</td><td>The rectangle to store the previous bounds </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">curr</td><td>The rectangle to store the current bounds </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">log</td><td>In case the functions fails, the log to put messages on.  [Nullable] </td></tr>
   </table>
   </dd>
 </dl>
@@ -1312,12 +1326,12 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
-<a class="anchor" id="ga81475f5eb66d4b442e9e93a4e3095201"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_destination_bounds_get" ref="ga81475f5eb66d4b442e9e93a4e3095201" args="(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y)" -->
+<a class="anchor" id="gae85f5398bec16b7769a68dec452b4050"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_destination_bounds_get" ref="gae85f5398bec16b7769a68dec452b4050" args="(Enesim_Renderer *r, Eina_Rectangle *rect, int x, int y, Enesim_Log **log)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#ga81475f5eb66d4b442e9e93a4e3095201">enesim_renderer_destination_bounds_get</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#gae85f5398bec16b7769a68dec452b4050">enesim_renderer_destination_bounds_get</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -1338,7 +1352,13 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **&#160;</td>
+          <td class="paramname"><em>log</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1355,6 +1375,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
     <tr><td class="paramdir">[out]</td><td class="paramname">rect</td><td>The rectangle to store the bounds </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The x destination origin </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The y destination origin </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">log</td><td>In case the functions fails, the log to put messages on.  [Nullable] </td></tr>
   </table>
   </dd>
 </dl>
@@ -1362,12 +1383,12 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
-<a class="anchor" id="ga5be0202b4003c367fb6a62e214bdcb7c"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_destination_bounds_get_extended" ref="ga5be0202b4003c367fb6a62e214bdcb7c" args="(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y)" -->
+<a class="anchor" id="ga5bd4e54f8f3f19d44ee946c90a83239f"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_destination_bounds_get_extended" ref="ga5bd4e54f8f3f19d44ee946c90a83239f" args="(Enesim_Renderer *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y, Enesim_Log **log)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#ga5be0202b4003c367fb6a62e214bdcb7c">enesim_renderer_destination_bounds_get_extended</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#ga5bd4e54f8f3f19d44ee946c90a83239f">enesim_renderer_destination_bounds_get_extended</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -1394,7 +1415,13 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **&#160;</td>
+          <td class="paramname"><em>log</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1409,10 +1436,11 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the bounds from </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">prev</td><td>The rectangle to store the previous bounds </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">curr</td><td>The rectangle to store the current bounds </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">prev</td><td>The rectangle to store the previous bounds.  [Nullable] </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">curr</td><td>The rectangle to store the current bounds.  [Nullable] </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The x destination origin </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The y destination origin </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">log</td><td>In case the functions fails, the log to put messages on.  [Nullable] </td></tr>
   </table>
   </dd>
 </dl>
@@ -1702,7 +1730,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 7 2015 22:50:34 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 8 2015 21:28:39 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
