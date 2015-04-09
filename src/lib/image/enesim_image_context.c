@@ -71,6 +71,7 @@ typedef struct _Enesim_Image_Job
 	Enesim_Image_Callback cb;
 	void *user_data;
 	Eina_Error err;
+	Eina_Bool success;
 	Enesim_Image_Job_Type type;
 	char *options;
 
@@ -197,7 +198,7 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Str
 	prov = enesim_image_load_provider_get(data, mime);
 	if (!prov)
 	{
-		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 
@@ -210,6 +211,7 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Str
 	if (options)
 		j->options = strdup(options);
 	j->err = 0;
+	j->success = EINA_TRUE;
 	j->type = ENESIM_IMAGE_LOAD;
 	j->op.load.b = b;
 	j->op.load.pool = mpool;
@@ -241,7 +243,7 @@ EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Str
 	prov = enesim_image_save_provider_get(b, mime);
 	if (!prov)
 	{
-		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 
@@ -254,6 +256,7 @@ EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Str
 	if (options)
 		j->options = strdup(options);
 	j->err = 0;
+	j->success = EINA_TRUE;
 	j->type = ENESIM_IMAGE_SAVE;
 	j->op.save.b = b;
 	/* FIXME we need to block the thread */
@@ -288,9 +291,9 @@ EAPI void enesim_image_context_dispatch(Enesim_Image_Context *thiz)
 	while (pipe_read(thiz->fifo[0], &j, sizeof(j)) > 0)
 	{
 		if (j->type == ENESIM_IMAGE_LOAD)
-			j->cb(j->op.load.b, j->user_data, j->err);
+			j->cb(j->op.load.b, j->user_data, j->success, j->err);
 		else
-			j->cb(j->op.save.b, j->user_data, j->err);
+			j->cb(j->op.save.b, j->user_data, j->success, j->err);
 		if (j->options)
 			free(j->options);
 		free(j);

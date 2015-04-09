@@ -38,11 +38,12 @@ typedef struct _Enesim_Image_File_Data
 	Enesim_Stream *data;
 } Enesim_Image_File_Data;
 
-static void _enesim_image_file_cb(Enesim_Buffer *b, void *user_data, int error)
+static void _enesim_image_file_cb(Enesim_Buffer *b, void *user_data,
+		Eina_Bool success, Eina_Error error)
 {
 	Enesim_Image_File_Data *fdata = user_data;
 
-	fdata->cb(b, fdata->user_data, error);
+	fdata->cb(b, fdata->user_data, success, error);
 	enesim_stream_unref(fdata->data);
 }
 
@@ -181,7 +182,7 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
 
 	if (!_file_load_data_get(file, &data, &mime))
 	{
-		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 	fdata.cb = cb;
@@ -233,7 +234,7 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesi
 
 	if (!_file_save_data_get(file, &data, &mime))
 	{
-		cb(NULL, user_data, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 	fdata.cb = cb;

@@ -18,7 +18,8 @@
   <callback name="enesim.image.callback">
     <arg name="r" type="enesim.buffer" direction="in" transfer="none" nullable="false"/>
     <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
-    <arg name="error" type="int32" direction="in" transfer="none" nullable="false"/>
+    <arg name="success" type="bool" direction="in" transfer="none" nullable="false"/>
+    <arg name="error" type="eina.error" direction="in" transfer="none" nullable="false"/>
   </callback>
   <callback name="enesim.image.provider.options_parse_cb">
     <return type="pointer" transfer="full" nullable="false"/>

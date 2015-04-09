@@ -13,22 +13,24 @@ static void help(void)
 	printf("enesim_image_example [load | save] [async | sync ] FILE\n");
 }
 
-static void async_load_cb(Enesim_Buffer *b EINA_UNUSED, void *data, int error)
+static void async_load_cb(Enesim_Buffer *b EINA_UNUSED, void *data,
+		Eina_Bool success, Eina_Error error)
 {
 	char *file = data;
 
-	if (!error)
+	if (success)
 		printf("Image %s loaded async successfully\n", file);
 	else
 		printf("Image %s loaded async with error: %s\n", file, eina_error_msg_get(error));
 	end = 1;
 }
 
-static void async_save_cb(Enesim_Buffer *b, void *data, int error)
+static void async_save_cb(Enesim_Buffer *b, void *data,
+		Eina_Bool success, Eina_Error error)
 {
 	char *file = data;
 
-	if (!error)
+	if (success)
 		printf("Image %s saved async successfully\n", file);
 	else
 		printf("Image %s saved async with error: %s\n", file, eina_error_msg_get(error));

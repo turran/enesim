@@ -49,9 +49,9 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
  * @param b The buffer where the data loadad is or where the data to write is
  * @param data The user provided data
  * @param error The error in case something went wrong
- * @todo for exception handling better receive a bool for error and an eina error
  */
-typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, int error);
+typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, Eina_Bool success,
+		Eina_Error error);
 
 /**
  * @}
