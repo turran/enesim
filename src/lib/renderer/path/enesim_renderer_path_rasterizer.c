@@ -304,8 +304,8 @@ static void _enesim_renderer_path_rasterizer_sw_hints(Enesim_Renderer *r EINA_UN
 	*hints = ENESIM_RENDERER_SW_HINT_ROP | ENESIM_RENDERER_SW_HINT_MASK | ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
 
-static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
-		Enesim_Rectangle *bounds)
+static Eina_Bool _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
+		Enesim_Rectangle *bounds, Enesim_Log **log EINA_UNUSED)
 {
 	Enesim_Renderer_Path_Enesim *thiz;
 	const Enesim_Renderer_State *cs;
@@ -331,7 +331,7 @@ static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
 		bounds->y = 0;
 		bounds->w = 0;
 		bounds->h = 0;
-		return;
+		return EINA_FALSE;
 	}
 
 	enesim_renderer_shape_stroke_weight_setup(r, &swx, &swy);
@@ -369,13 +369,14 @@ static void _enesim_renderer_path_rasterizer_bounds_get(Enesim_Renderer *r,
 	/* translate by the origin */
 	bounds->x += cs->current.ox;
 	bounds->y += cs->current.oy;
-	return;
+	return EINA_TRUE;
 
 failed:
 	bounds->x = 0;
 	bounds->y = 0;
 	bounds->w = 0;
 	bounds->h = 0;
+	return EINA_FALSE;
 }
 
 /*----------------------------------------------------------------------------*
