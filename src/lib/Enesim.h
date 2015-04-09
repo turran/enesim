@@ -40,6 +40,31 @@
  * - [1.1.0]
  *   - Implement OpenGL on every renderer with rop support
  *   - Export the pool API
+ *   - To implement a nine-patch renderer we need to implement the sub surface
+ *     concept. For that we need to modify the pool interface given that a sub
+ *     surface is backend dependent
+ * - [1.2.0]
+ *   - Add a path-follow-span, i.e a text span that can receive
+ *     a shape and use that as the path to follow. We need more
+ *     code on enesim to know whenever a renderer is of a specific
+ *     type, similar to what we are doing on eon
+ *   - Add rich text element
+ * - [1.3.0]
+ *   - Add a PDF/PS surfce format
+ *   - We have a performance problem when some renderer has changed. Basically on the practice
+ *     we end having a full tree of renderers, several levels, proxies, whatever. When we need
+ *     to know what area to draw we basically iterate over all the tree. That means that we start
+ *     from the topmost renderer and then going down, even if no children has actually changed
+ *     we still need to call a function on each child to see if it has changed or not. In case
+ *     of damages it is the same.
+ *     So we need a way to inform somehow whenever a renderer has changed "upstream" to avoid
+ *     iterating over all the children Here upstream refers that if a renderer is for example
+ *     added on a compound renderer, when the children have a _set() function it should call a
+ *     function in the form of:
+ *     enesim_renderer_notify_change().
+ *     This function should call a list of "listeners" of such
+ *     "event" so for example the compund renderer can listen to that and again inform "upstream"
+ *      of a change.
  * @brief Enesim API
  */
 
