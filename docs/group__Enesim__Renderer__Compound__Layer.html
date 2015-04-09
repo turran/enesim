@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef struct <br class="typebreak"/>
 _Enesim_Renderer_Compound_Layer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef Eina_Bool(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound__Layer.html#gaa1dfbb11a0ced1c7219c0310257fac1b">Enesim_Renderer_Compound_Cb</a> )(<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *layer, void *data)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef Eina_Bool(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga95f59ecd8827c36c9756a1703d662ce2">Enesim_Renderer_Compund_Foreach_Layer</a> )(<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *layer, void *data)</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <br class="typebreak"/>
@@ -119,18 +119,17 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gaa1dfbb11a0ced1c7219c0310257fac1b"></a><!-- doxytag: member="enesim_renderer_compound.h::Enesim_Renderer_Compound_Cb" ref="gaa1dfbb11a0ced1c7219c0310257fac1b" args=")(Enesim_Renderer *r, Enesim_Renderer_Compound_Layer *layer, void *data)" -->
+<a class="anchor" id="ga95f59ecd8827c36c9756a1703d662ce2"></a><!-- doxytag: member="enesim_renderer_compound.h::Enesim_Renderer_Compund_Foreach_Layer" ref="ga95f59ecd8827c36c9756a1703d662ce2" args=")(Enesim_Renderer *r, Enesim_Renderer_Compound_Layer *layer, void *data)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef Eina_Bool(* <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#gaa1dfbb11a0ced1c7219c0310257fac1b">Enesim_Renderer_Compound_Cb</a>)(<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *layer, void *data)</td>
+          <td class="memname">typedef Eina_Bool(* <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga95f59ecd8827c36c9756a1703d662ce2">Enesim_Renderer_Compund_Foreach_Layer</a>)(<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *layer, void *data)</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
- <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000009">Todo:</a></b></dt><dd>Change the name, something like foreach </dd></dl>
-
+ 
 </div>
 </div>
 <hr/><h2>Function Documentation</h2>
@@ -150,7 +149,7 @@ Functions</h2></td></tr>
 <div class="memdoc">
 
 <p>Creates a compound renderer layer. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000008">Todo:</a></b></dt><dd><ul>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000007">Todo:</a></b></dt><dd><ul>
 <li>Handle the case whenever the renderer supports the ROP itself</li>
 <li>Another way to optmize this is to make the setup() function of every layer thread safe, that way given that each layer does not depend on the other the setup can be done on parallel </li>
 </ul>
@@ -300,7 +299,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 9 2015 18:44:11 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 9 2015 19:22:06 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
