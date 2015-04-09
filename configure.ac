@@ -1,7 +1,7 @@
 # get rid of that stupid cache mechanism
 rm -f config.cache
 
-ENS_VERSION([0], [0], [21], [1])
+ENS_VERSION([0], [0], [22], [1])
 
 AC_INIT([enesim], [v_ver], [enesim-devel@googlegroups.com])
 AC_PREREQ([2.60])
