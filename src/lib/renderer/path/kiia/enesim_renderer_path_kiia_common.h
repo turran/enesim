@@ -81,7 +81,6 @@ static inline void _kiia_even_odd_figure_evalute(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Eina_F16p16 yy0, yy1;
-	Eina_F16p16 sinc;
 	int mlx = INT_MAX;
 	int mrx = -INT_MAX;
 	int i;
@@ -89,7 +88,6 @@ static inline void _kiia_even_odd_figure_evalute(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	yy0 = eina_f16p16_int_from(y);
 	yy1 = eina_f16p16_int_from(y + 1);
-	sinc = thiz->inc;
 	/* intersect with each edge */
 	for (i = 0; i < f->nedges; i++)
 	{
@@ -163,7 +161,6 @@ static inline void _kiia_non_zero_figure_evalute(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Eina_F16p16 yy0, yy1;
-	Eina_F16p16 sinc;
 	int mlx = INT_MAX;
 	int mrx = -INT_MAX;
 	int i;
@@ -171,7 +168,6 @@ static inline void _kiia_non_zero_figure_evalute(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	yy0 = eina_f16p16_int_from(y);
 	yy1 = eina_f16p16_int_from(y + 1);
-	sinc = thiz->inc;
 	/* intersect with each edge */
 	for (i = 0; i < f->nedges; i++)
 	{
