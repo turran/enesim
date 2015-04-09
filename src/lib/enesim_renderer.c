@@ -36,15 +36,9 @@
 /**
  * @todo
  * - Add a way to get/set such description
- * - Change every internal struct on Enesim to have the correct prefix
- *   looks like we are having issues with mingw
  * - We have some overlfow on the coordinates whenever we want to trasnlate or
  *   transform bounds, we need to fix the maximum and minimum for a
  *   coordinate and length
- *
- * - Maybe checking the features for every origin/value set is too much
- * another option is to make every renderer responsable of changing the origin/scale/etc
- * if the owned renderer handles that
  */
 /*============================================================================*
  *                                  Local                                     *
