@@ -21,11 +21,13 @@
 /**
  * @file
  * @ender_group{Enesim_Buffer_Format}
+ * @ender_group{Enesim_Buffer_Definitions}
  * @ender_group{Enesim_Buffer}
  */
 
 /**
  * @defgroup Enesim_Buffer_Format Buffer format
+ * @ingroup Enesim_Buffer
  * @{
  */
 
@@ -64,6 +66,27 @@ typedef enum _Enesim_Buffer_Format
 
 /**< Total number of buffer formats */
 #define ENESIM_BUFFER_FORMAT_LAST (ENESIM_BUFFER_FORMAT_CMYK_ADOBE + 1)
+
+EAPI Eina_Bool enesim_buffer_format_rgb_components_from(
+		Enesim_Buffer_Format *fmt, int depth,
+		uint8_t aoffset, uint8_t alen,
+		uint8_t roffset, uint8_t rlen,
+		uint8_t goffset, uint8_t glen,
+		uint8_t boffset, uint8_t blen, Eina_Bool premul);
+EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
+		uint8_t *aoffset, uint8_t *alen,
+		uint8_t *roffset, uint8_t *rlen,
+		uint8_t *goffset, uint8_t *glen,
+		uint8_t *boffset, uint8_t *blen, Eina_Bool *premul);
+EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt);
+EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
+
+/**
+ * @}
+ * @defgroup Enesim_Buffer_Definitions Buffer definitions
+ * @ingroup Enesim_Buffer
+ * @{
+ */
 
 /**
  * Definition of a 24 bits per pixel format
@@ -198,21 +221,6 @@ EAPI void * enesim_buffer_private_get(Enesim_Buffer *b);
 EAPI Eina_Bool enesim_buffer_sw_data_get(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data);
 EAPI Eina_Bool enesim_buffer_map(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data);
 EAPI Eina_Bool enesim_buffer_unmap(const Enesim_Buffer *b, Enesim_Buffer_Sw_Data *data, Eina_Bool written);
-
-EAPI size_t enesim_buffer_format_size_get(Enesim_Buffer_Format fmt, uint32_t w, uint32_t h);
-
-EAPI Eina_Bool enesim_buffer_format_rgb_components_from(
-		Enesim_Buffer_Format *fmt, int depth,
-		uint8_t aoffset, uint8_t alen,
-		uint8_t roffset, uint8_t rlen,
-		uint8_t goffset, uint8_t glen,
-		uint8_t boffset, uint8_t blen, Eina_Bool premul);
-EAPI Eina_Bool enesim_buffer_format_rgb_components_to(Enesim_Buffer_Format fmt,
-		uint8_t *aoffset, uint8_t *alen,
-		uint8_t *roffset, uint8_t *rlen,
-		uint8_t *goffset, uint8_t *glen,
-		uint8_t *boffset, uint8_t *blen, Eina_Bool *premul);
-EAPI uint8_t enesim_buffer_format_rgb_depth_get(Enesim_Buffer_Format fmt);
 
 EAPI void enesim_buffer_lock(Enesim_Buffer *b, Eina_Bool write);
 EAPI void enesim_buffer_unlock(Enesim_Buffer *b);

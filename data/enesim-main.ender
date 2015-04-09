@@ -80,6 +80,18 @@
     <value name="none"/>
     <value name="argb8888"/>
     <value name="a8"/>
+    <method name="name_get">
+      <return type="string" transfer="none" nullable="false"/>
+    </method>
+    <method name="size_get">
+      <return type="size" transfer="full" nullable="false"/>
+      <arg name="w" type="uint32" direction="in" transfer="full" nullable="false"/>
+      <arg name="h" type="uint32" direction="in" transfer="full" nullable="false"/>
+    </method>
+    <method name="stride_get">
+      <return type="size" transfer="full" nullable="false"/>
+      <arg name="w" type="uint32" direction="in" transfer="full" nullable="false"/>
+    </method>
   </enum>
   <def name="enesim.argb" type="uint32">
     <function name="components_from">
@@ -450,6 +462,51 @@
     </method>
     <method name="close"/>
   </object>
+  <enum name="enesim.buffer.format">
+    <value name="rgb565"/>
+    <value name="argb8888"/>
+    <value name="argb8888_pre"/>
+    <value name="xrgb8888"/>
+    <value name="rgb888"/>
+    <value name="bgr888"/>
+    <value name="a8"/>
+    <value name="gray"/>
+    <value name="cmyk"/>
+    <value name="cmyk_adobe"/>
+    <method name="rgb_components_from">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="depth" type="int32" direction="in" transfer="full" nullable="false"/>
+      <arg name="aoffset" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="alen" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="roffset" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="rlen" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="goffset" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="glen" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="boffset" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="blen" type="uint8" direction="in" transfer="full" nullable="false"/>
+      <arg name="premul" type="bool" direction="in" transfer="full" nullable="false"/>
+    </method>
+    <method name="rgb_components_to">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="aoffset" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="alen" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="roffset" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="rlen" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="goffset" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="glen" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="boffset" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="blen" type="uint8" direction="out" transfer="full" nullable="false"/>
+      <arg name="premul" type="bool" direction="out" transfer="full" nullable="false"/>
+    </method>
+    <method name="rgb_depth_get">
+      <return type="uint8" transfer="full" nullable="false"/>
+    </method>
+    <method name="size_get">
+      <return type="size" transfer="full" nullable="false"/>
+      <arg name="w" type="uint32" direction="in" transfer="full" nullable="false"/>
+      <arg name="h" type="uint32" direction="in" transfer="full" nullable="false"/>
+    </method>
+  </enum>
   <struct name="enesim.buffer.sw_data_24bpp">
     <field name="plane0" type="pointer"/>
     <field name="plane0_stride" type="int32"/>
@@ -467,18 +524,6 @@
     <field name="plane0_stride" type="int32"/>
   </struct>
   <struct name="enesim.buffer.sw_data"/>
-  <enum name="enesim.buffer.format">
-    <value name="rgb565"/>
-    <value name="argb8888"/>
-    <value name="argb8888_pre"/>
-    <value name="xrgb8888"/>
-    <value name="rgb888"/>
-    <value name="bgr888"/>
-    <value name="a8"/>
-    <value name="gray"/>
-    <value name="cmyk"/>
-    <value name="cmyk_adobe"/>
-  </enum>
   <def name="enesim.buffer.sw_data_argb8888" type=""/>
   <def name="enesim.buffer.sw_data_argb8888_pre" type=""/>
   <def name="enesim.buffer.sw_data_xrgb8888" type=""/>
@@ -552,39 +597,6 @@
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="data" type="enesim.buffer.sw_data" direction="in" transfer="full" nullable="false"/>
       <arg name="written" type="bool" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="format_size_get">
-      <return type="size" transfer="full" nullable="false"/>
-      <arg name="w" type="uint32" direction="in" transfer="full" nullable="false"/>
-      <arg name="h" type="uint32" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="format_rgb_components_from">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="depth" type="int32" direction="in" transfer="full" nullable="false"/>
-      <arg name="aoffset" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="alen" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="roffset" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="rlen" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="goffset" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="glen" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="boffset" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="blen" type="uint8" direction="in" transfer="full" nullable="false"/>
-      <arg name="premul" type="bool" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="format_rgb_components_to">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="aoffset" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="alen" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="roffset" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="rlen" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="goffset" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="glen" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="boffset" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="blen" type="uint8" direction="out" transfer="full" nullable="false"/>
-      <arg name="premul" type="bool" direction="out" transfer="full" nullable="false"/>
-    </method>
-    <method name="format_rgb_depth_get">
-      <return type="uint8" transfer="full" nullable="false"/>
     </method>
     <method name="lock">
       <arg name="write" type="bool" direction="in" transfer="full" nullable="false"/>
@@ -1049,14 +1061,16 @@
       <arg name="options" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
     </method>
-    <method name="register">
+    <function name="register">
       <return type="bool" transfer="full" nullable="false"/>
+      <arg name="pd" type="enesim.image.provider.descriptor" direction="in" transfer="full" nullable="false"/>
       <arg name="priority" type="enesim.priority" direction="in" transfer="full" nullable="false"/>
       <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
-    </method>
-    <method name="unregister">
+    </function>
+    <function name="unregister">
+      <arg name="pd" type="enesim.image.provider.descriptor" direction="in" transfer="full" nullable="false"/>
       <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
-    </method>
+    </function>
   </object>
   <callback name="enesim.image.provider.options_parse_cb">
     <return type="pointer" transfer="full" nullable="false"/>
