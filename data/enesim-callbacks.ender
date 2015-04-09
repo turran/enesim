@@ -8,7 +8,7 @@
     <arg name="data" type="pointer" direction="in" transfer="none" nullable="false"/>
     <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
   </callback>
-  <callback name="enesim.renderer.damage.cb">
+  <callback name="enesim.renderer.damage">
     <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
     <arg name="area" type="eina.rectangle" direction="in" transfer="none" nullable="false"/>
     <arg name="past" type="bool" direction="in" transfer="none" nullable="false"/>
@@ -21,35 +21,35 @@
     <arg name="success" type="bool" direction="in" transfer="none" nullable="false"/>
     <arg name="error" type="eina.error" direction="in" transfer="none" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.options_parse_cb">
+  <callback name="enesim.image.provider.options_parse">
     <return type="pointer" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.options_free_cb"/>
-  <callback name="enesim.image.provider.loadable.cb">
+  <callback name="enesim.image.provider.options_free"/>
+  <callback name="enesim.image.provider.loadable">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.saveable_cb">
+  <callback name="enesim.image.provider.saveable">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.info_get_cb">
+  <callback name="enesim.image.provider.info_get">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.formats_get_cb">
+  <callback name="enesim.image.provider.formats_get">
     <return type="int32" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.load_cb">
+  <callback name="enesim.image.provider.load">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.provider.save_cb">
+  <callback name="enesim.image.provider.save">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
-  <callback name="enesim.image.finder.data_from_cb">
+  <callback name="enesim.image.finder.data_from">
     <return type="string" transfer="none" nullable="false"/>
   </callback>
-  <callback name="enesim.image.finder.extension_from_cb">
+  <callback name="enesim.image.finder.extension_from">
     <return type="string" transfer="none" nullable="false"/>
   </callback>
-  <callback name="enesim.renderer.compound_cb">
+  <callback name="enesim.renderer.compound">
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
 </lib>
