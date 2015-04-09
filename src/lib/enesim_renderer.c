@@ -1323,7 +1323,7 @@ EAPI void enesim_renderer_change_notify(Enesim_Renderer *r)
 }
 
 EAPI Enesim_Renderer_Listener * enesim_renderer_change_listen(Enesim_Renderer *r,
-		Enesim_Renderer_Change_Cb cb, void *data)
+		Enesim_Renderer_Change cb, void *data)
 {
 	/* register on the list of listener */
 }
@@ -1336,7 +1336,7 @@ EAPI void enesim_renderer_change_mute(Enesim_Renderer *r,
 }
 
 EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
-		Enesim_Renderer_Change_Cb cb, void *data)
+		Enesim_Renderer_Change cb, void *data)
 {
 	/* unregister from the list of listener */
 	/* call the other function */
@@ -1399,7 +1399,7 @@ done:
  * areas to redraw are called damaged areas.
  * The damaged areas are cleared whenever a renderer is drawn again.
  */
-EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage_Cb cb, void *data)
+EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage cb, void *data)
 {
 	Enesim_Renderer_Class *klass;
 

@@ -1657,7 +1657,7 @@ static Eina_Bool _image_has_changed(Enesim_Renderer *r)
 
 static Eina_Bool _image_damages(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
-		Enesim_Renderer_Damage_Cb cb, void *data)
+		Enesim_Renderer_Damage cb, void *data)
 {
 	Enesim_Renderer_Image *thiz;
 	Eina_Rectangle *sd;

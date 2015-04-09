@@ -53,10 +53,9 @@ EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_ref(
 EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l);
 
 /**
- * @ender_name{enesim.renderer.compound.cb}
- * @todo Change the name, something like foreach
+ * @ender_name{enesim.renderer.compound.foreach_layer}
  */
-typedef Eina_Bool (*Enesim_Renderer_Compound_Cb)(Enesim_Renderer *r,
+typedef Eina_Bool (*Enesim_Renderer_Compund_Foreach_Layer)(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer, void *data);
 
 /**
@@ -71,9 +70,9 @@ EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r);
 
 EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Cb cb, void *data);
+		Enesim_Renderer_Compund_Foreach_Layer cb, void *data);
 EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Cb cb, void *data);
+		Enesim_Renderer_Compund_Foreach_Layer cb, void *data);
 
 EAPI void enesim_renderer_compound_background_enable_set(Enesim_Renderer *r, Eina_Bool enable);
 EAPI Eina_Bool enesim_renderer_compound_background_enable_get(Enesim_Renderer *r);

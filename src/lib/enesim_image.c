@@ -486,7 +486,7 @@ EAPI void enesim_image_finder_unregister(Enesim_Image_Finder_Descriptor *f)
  * The options format is:
  * option1=value1;option2=value2
  */
-EAPI void enesim_image_options_parse(const char *options, Enesim_Image_Option_Cb cb, void *data)
+EAPI void enesim_image_options_parse(const char *options, Enesim_Image_Option cb, void *data)
 {
 	char *orig;
 	char *v;

@@ -53,7 +53,7 @@
 typedef struct _Enesim_Renderer_Clipper_Damage_Data
 {
 	Eina_Rectangle *bounds;
-	Enesim_Renderer_Damage_Cb real_cb;
+	Enesim_Renderer_Damage real_cb;
 	void *real_data;
 } Enesim_Renderer_Clipper_Damage_Data;
 
@@ -255,7 +255,7 @@ end:
 
 static Eina_Bool _clipper_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
-		Enesim_Renderer_Damage_Cb cb, void *data)
+		Enesim_Renderer_Damage cb, void *data)
 {
 	Enesim_Renderer_Clipper *thiz;
 	Eina_Rectangle current_bounds;

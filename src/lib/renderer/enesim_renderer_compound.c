@@ -629,7 +629,7 @@ static Eina_Bool _compound_has_changed(Enesim_Renderer *r)
 
 static Eina_Bool _compound_damage(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
-		Enesim_Renderer_Damage_Cb cb, void *data)
+		Enesim_Renderer_Damage cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Compound_Layer *l;
@@ -1019,7 +1019,7 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
  * @param[in] data User provided data
  */
 EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Cb cb, void *data)
+		Enesim_Renderer_Compund_Foreach_Layer cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Compound_Layer *layer;
@@ -1040,7 +1040,7 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
  * @param[in] data User provided data
  */
 EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Cb cb, void *data)
+		Enesim_Renderer_Compund_Foreach_Layer cb, void *data)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Compound_Layer *layer;

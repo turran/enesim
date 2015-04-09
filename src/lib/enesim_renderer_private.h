@@ -74,7 +74,7 @@ typedef void (*Enesim_Renderer_Features_Get)(Enesim_Renderer *r,
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed_Cb)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
-		Enesim_Renderer_Damage_Cb cb, void *data);
+		Enesim_Renderer_Damage cb, void *data);
 
 /* software backend descriptor functions */
 typedef void (*Enesim_Renderer_Sw_Hints_Get_Cb)(Enesim_Renderer *r,
