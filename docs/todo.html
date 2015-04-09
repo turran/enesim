@@ -80,7 +80,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <dd><ul>
 <li>[1.1.0]<ul>
 <li>Implement OpenGL on every renderer with rop support</li>
-<li>Export the pool API  </li>
+<li>Export the pool API</li>
+<li>To implement a nine-patch renderer we need to implement the sub surface concept. For that we need to modify the pool interface given that a sub surface is backend dependent</li>
+</ul>
+</li>
+<li>[1.2.0]<ul>
+<li>Add a path-follow-span, i.e a text span that can receive a shape and use that as the path to follow. We need more code on enesim to know whenever a renderer is of a specific type, similar to what we are doing on eon</li>
+<li>Add rich text element</li>
+</ul>
+</li>
+<li>[1.3.0]<ul>
+<li>Add a PDF/PS surfce format</li>
+<li>We have a performance problem when some renderer has changed. Basically on the practice we end having a full tree of renderers, several levels, proxies, whatever. When we need to know what area to draw we basically iterate over all the tree. That means that we start from the topmost renderer and then going down, even if no children has actually changed we still need to call a function on each child to see if it has changed or not. In case of damages it is the same. So we need a way to inform somehow whenever a renderer has changed "upstream" to avoid iterating over all the children Here upstream refers that if a renderer is for example added on a compound renderer, when the children have a _set() function it should call a function in the form of: enesim_renderer_notify_change(). This function should call a list of "listeners" of such "event" so for example the compund renderer can listen to that and again inform "upstream" of a change.  </li>
 </ul>
 </li>
 </ul>
@@ -151,7 +162,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 9 2015 19:26:34 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 9 2015 19:34:17 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
