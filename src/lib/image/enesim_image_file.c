@@ -45,6 +45,7 @@ static void _enesim_image_file_cb(Enesim_Buffer *b, void *user_data,
 
 	fdata->cb(b, fdata->user_data, success, error);
 	enesim_stream_unref(fdata->data);
+	free(fdata);
 }
 
 static const char * _enesim_image_file_get_extension(const char *file)
@@ -177,7 +178,7 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
 		void *user_data, const char *options)
 {
 	Enesim_Stream *data;
-	Enesim_Image_File_Data fdata;
+	Enesim_Image_File_Data *fdata;
 	const char *mime;
 
 	if (!_file_load_data_get(file, &data, &mime))
@@ -185,11 +186,13 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
 		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
-	fdata.cb = cb;
-	fdata.user_data = user_data;
-	fdata.data = data;
 
-	enesim_image_load_async(data, mime, b, mpool, _enesim_image_file_cb, &fdata, options);
+	fdata = malloc(sizeof(Enesim_Image_File_Data));
+	fdata->cb = cb;
+	fdata->user_data = user_data;
+	fdata->data = data;
+
+	enesim_image_load_async(data, mime, b, mpool, _enesim_image_file_cb, fdata, options);
 }
 /**
  * Save an image file synchronously
@@ -229,7 +232,7 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesi
 		void *user_data, const char *options)
 {
 	Enesim_Stream *data;
-	Enesim_Image_File_Data fdata;
+	Enesim_Image_File_Data *fdata;
 	const char *mime;
 
 	if (!_file_save_data_get(file, &data, &mime))
@@ -237,9 +240,11 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesi
 		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
-	fdata.cb = cb;
-	fdata.user_data = user_data;
-	fdata.data = data;
 
-	enesim_image_save_async(data, mime, b, _enesim_image_file_cb, &fdata, options);
+	fdata = malloc(sizeof(Enesim_Image_File_Data));
+	fdata->cb = cb;
+	fdata->user_data = user_data;
+	fdata->data = data;
+
+	enesim_image_save_async(data, mime, b, _enesim_image_file_cb, fdata, options);
 }
