@@ -49,7 +49,10 @@
   <callback name="enesim.image.finder.extension_from">
     <return type="string" transfer="none" nullable="false"/>
   </callback>
-  <callback name="enesim.renderer.compound">
+  <callback name="enesim.renderer.compound.foreach_layer">
+    <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
+    <arg name="r" type="enesim.renderer.compound.layer" direction="in" transfer="none" nullable="false"/>
+    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
 </lib>
