@@ -19,7 +19,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	enesim_path_line_to(p, 123.2, 10.5);
 
 	r = enesim_renderer_path_new();
-	enesim_renderer_path_path_set(r, p);
+	enesim_renderer_path_inner_path_set(r, p);
 	enesim_renderer_shape_stroke_weight_set(r, 18);
 	enesim_renderer_shape_stroke_color_set(r, 0xffff0000);
 	enesim_renderer_shape_fill_color_set(r, 0xff000000);

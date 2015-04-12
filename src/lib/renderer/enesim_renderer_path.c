@@ -372,11 +372,11 @@ EAPI Enesim_Renderer * enesim_renderer_path_new(void)
 
 /**
  * Set the path of a path renderer
- * @ender_prop{path}
+ * @ender_prop{inner_path}
  * @param[in] r The path renderer
  * @param[in] path The path to set @ender_transfer{full}
  */
-EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path)
+EAPI void enesim_renderer_path_inner_path_set(Enesim_Renderer *r, Enesim_Path *path)
 {
 	Enesim_Renderer_Path *thiz;
 
@@ -394,15 +394,15 @@ EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path)
 
 /**
  * Get the path of a path renderer
- * @ender_prop{path}
+ * @ender_prop{inner_path}
  * @param[in] r The path renderer
  * @return The path of the path renderer @ender_transfer{none}
  *
  * @note It is always faster to get the path of a path renderer and
  * add commands there than create a new path using @ref enesim_path_new,
- * set the commands and finally call @ref enesim_renderer_path_path_set
+ * set the commands and finally call @ref enesim_renderer_path_inner_path_set
  */
-EAPI Enesim_Path * enesim_renderer_path_path_get(Enesim_Renderer *r)
+EAPI Enesim_Path * enesim_renderer_path_inner_path_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Path *thiz;
 

@@ -57,7 +57,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	enesim_path_arc_to(p, w, h, 0, EINA_FALSE, EINA_FALSE, x + w, y);
 
 	r2 = enesim_renderer_path_new();
-	enesim_renderer_path_path_set(r2, p);
+	enesim_renderer_path_inner_path_set(r2, p);
 	enesim_renderer_shape_stroke_weight_set(r2, 2);
 	enesim_renderer_shape_stroke_color_set(r2, 0xffff0000);
 	enesim_renderer_shape_draw_mode_set(r2, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);

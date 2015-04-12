@@ -35,7 +35,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	enesim_renderer_gradient_stop_add(r2, &stop);
 
 	r = enesim_renderer_path_new();
-	enesim_renderer_path_path_set(r, p);
+	enesim_renderer_path_inner_path_set(r, p);
 	enesim_renderer_shape_stroke_weight_set(r, 18);
 	enesim_renderer_shape_stroke_color_set(r, 0xffffff00);
 	enesim_renderer_shape_fill_renderer_set(r, r2);

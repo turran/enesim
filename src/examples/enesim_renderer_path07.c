@@ -17,7 +17,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(
 	enesim_renderer_shape_stroke_weight_set(r, 0.1);
 	enesim_renderer_shape_draw_mode_set(r, ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE);
 
-	p = enesim_renderer_path_path_get(r);
+	p = enesim_renderer_path_inner_path_get(r);
 	enesim_path_move_to(p, 0.3, 0.3);
 	enesim_path_cubic_to(p, 0.6, 1.1, 1.0, 0.9, 1.4, 0.3);
 	enesim_path_unref(p);

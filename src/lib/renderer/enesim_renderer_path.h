@@ -32,8 +32,8 @@
 
 EAPI Enesim_Renderer * enesim_renderer_path_new(void);
 
-EAPI void enesim_renderer_path_path_set(Enesim_Renderer *r, Enesim_Path *path);
-EAPI Enesim_Path * enesim_renderer_path_path_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_path_inner_path_set(Enesim_Renderer *r, Enesim_Path *path);
+EAPI Enesim_Path * enesim_renderer_path_inner_path_get(Enesim_Renderer *r);
 
 /**
  * @}

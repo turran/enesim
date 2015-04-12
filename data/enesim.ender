@@ -2171,7 +2171,7 @@
     </method>
   </object>
   <object name="enesim.renderer.path" inherits="enesim.renderer.shape">
-    <prop name="path">
+    <prop name="inner_path">
       <setter>
         <arg name="path" type="enesim.path" direction="in" transfer="full" nullable="false"/>
       </setter>
