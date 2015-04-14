@@ -17,7 +17,7 @@
   </callback>
   <callback name="enesim.image.callback">
     <arg name="r" type="enesim.buffer" direction="in" transfer="none" nullable="false"/>
-    <arg name="ser_data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <arg name="success" type="bool" direction="in" transfer="none" nullable="false"/>
     <arg name="error" type="eina.error" direction="in" transfer="none" nullable="false"/>
   </callback>
