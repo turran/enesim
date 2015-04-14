@@ -170,27 +170,27 @@ EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
  * @param mpool The mempool that will create the surface in case the surface
  * reference is NULL
  * @param cb The function that will get called once the load is done
- * @param user_data User provided data
+ * @param data User provided data
  * @param options Any option the emage provider might require
  */
 EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
 		Enesim_Pool *mpool, Enesim_Image_Callback cb,
-		void *user_data, const char *options)
+		void *data, const char *options)
 {
-	Enesim_Stream *data;
+	Enesim_Stream *s;
 	Enesim_Image_File_Data *fdata;
 	const char *mime;
 
-	if (!_file_load_data_get(file, &data, &mime))
+	if (!_file_load_data_get(file, &s, &mime))
 	{
-		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 
 	fdata = malloc(sizeof(Enesim_Image_File_Data));
 	fdata->cb = cb;
-	fdata->user_data = user_data;
-	fdata->data = data;
+	fdata->user_data = data;
+	fdata->data = s;
 
 	enesim_image_load_async(data, mime, b, mpool, _enesim_image_file_cb, fdata, options);
 }
@@ -224,27 +224,27 @@ EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const 
  * @param file The image file to save
  * @param b The surface to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
- * @param user_data User provided data
+ * @param data User provided data
  * @param options Any option the emage provider might require
  *
  */
-EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b, Enesim_Image_Callback cb,
-		void *user_data, const char *options)
+EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b,
+		Enesim_Image_Callback cb, void *data, const char *options)
 {
-	Enesim_Stream *data;
+	Enesim_Stream *s;
 	Enesim_Image_File_Data *fdata;
 	const char *mime;
 
-	if (!_file_save_data_get(file, &data, &mime))
+	if (!_file_save_data_get(file, &s, &mime))
 	{
-		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 
 	fdata = malloc(sizeof(Enesim_Image_File_Data));
 	fdata->cb = cb;
-	fdata->user_data = user_data;
-	fdata->data = data;
+	fdata->user_data = data;
+	fdata->data = s;
 
 	enesim_image_save_async(data, mime, b, _enesim_image_file_cb, fdata, options);
 }

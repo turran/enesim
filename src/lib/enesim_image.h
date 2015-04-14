@@ -50,8 +50,8 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
  * @param data The user provided data
  * @param error The error in case something went wrong
  */
-typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data, Eina_Bool success,
-		Eina_Error error);
+typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *user_data,
+		Eina_Bool success, Eina_Error error);
 
 /**
  * @}

@@ -531,7 +531,7 @@
   <def name="enesim.buffer.sw_data_bgr888" type=""/>
   <def name="enesim.buffer.sw_data_cmyk" type=""/>
   <callback name="enesim.buffer.free">
-    <arg name="data" type="pointer" direction="in" transfer="none" nullable="false"/>
+    <arg name="buffer_data" type="pointer" direction="in" transfer="none" nullable="false"/>
     <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
   </callback>
   <object name="enesim.buffer">
@@ -727,7 +727,7 @@
     <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
     <arg name="area" type="eina.rectangle" direction="in" transfer="none" nullable="false"/>
     <arg name="past" type="bool" direction="in" transfer="none" nullable="false"/>
-    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
   <object name="enesim.renderer">
@@ -931,7 +931,7 @@
   </object>
   <callback name="enesim.image.callback">
     <arg name="r" type="enesim.buffer" direction="in" transfer="none" nullable="false"/>
-    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="ser_data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <arg name="success" type="bool" direction="in" transfer="none" nullable="false"/>
     <arg name="error" type="eina.error" direction="in" transfer="none" nullable="false"/>
   </callback>
@@ -1382,7 +1382,7 @@
   <callback name="enesim.renderer.compound.foreach_layer">
     <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
     <arg name="layer" type="enesim.renderer.compound.layer" direction="in" transfer="none" nullable="false"/>
-    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
   <object name="enesim.renderer.compound" inherits="enesim.renderer">

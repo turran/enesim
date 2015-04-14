@@ -178,18 +178,18 @@ EAPI void enesim_image_context_free(Enesim_Image_Context *thiz)
  * Load an image asynchronously
  *
  * @param thiz The context to use for loading
- * @param data The image data to load
+ * @param s The image data to load
  * @param mime The image mime
  * @param b The buffer to write the image pixels to. It must not be NULL.
  * @param mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
  * @param cb The function that will get called once the load is done
- * @param user_data User provided data
+ * @param data User provided data
  * @param options Any option the provider might require
  */
-EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Stream *data,
+EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Stream *s,
 		const char *mime, Enesim_Buffer *b, Enesim_Pool *mpool,
-		Enesim_Image_Callback cb, void *user_data,
+		Enesim_Image_Callback cb, void *data,
 		const char *options)
 {
 	Enesim_Image_Job *j;
@@ -198,16 +198,16 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Str
 	prov = enesim_image_load_provider_get(data, mime);
 	if (!prov)
 	{
-		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 
 	j = calloc(1, sizeof(Enesim_Image_Job));
 	j->thiz = thiz;
 	j->prov = prov;
-	j->data = data;
+	j->data = s;
 	j->cb = cb;
-	j->user_data = user_data;
+	j->user_data = data;
 	if (options)
 		j->options = strdup(options);
 	j->err = 0;
@@ -225,17 +225,17 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Str
  * Save an image asynchronously
  *
  * @param thiz The context to use for loading
- * @param data The image data to load
+ * @param s The image data to load
  * @param mime The image mime
  * @param b The buffer to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
- * @param user_data User provided data
+ * @param data User provided data
  * @param options Any option the provider might require
  *
  */
-EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Stream *data,
+EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Stream *s,
 		const char *mime, Enesim_Buffer *b, Enesim_Image_Callback cb,
-		void *user_data, const char *options)
+		void *data, const char *options)
 {
 	Enesim_Image_Job *j;
 	Enesim_Image_Provider *prov;
@@ -243,16 +243,16 @@ EAPI void enesim_image_context_save_async(Enesim_Image_Context *thiz, Enesim_Str
 	prov = enesim_image_save_provider_get(b, mime);
 	if (!prov)
 	{
-		cb(NULL, user_data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
+		cb(NULL, data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
 		return;
 	}
 
 	j = malloc(sizeof(Enesim_Image_Job));
 	j->thiz = thiz;
 	j->prov = prov;
-	j->data = data;
+	j->data = s;
 	j->cb = cb;
-	j->user_data = user_data;
+	j->user_data = data;
 	if (options)
 		j->options = strdup(options);
 	j->err = 0;

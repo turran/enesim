@@ -54,9 +54,12 @@ EAPI void enesim_renderer_compound_layer_unref(Enesim_Renderer_Compound_Layer *l
 
 /**
  * @ender_name{enesim.renderer.compound.foreach_layer}
+ * @param r The compound renderer to get the layers from
+ * @param layer The layer found on this iteration
+ * @param user_data The user provided data
  */
 typedef Eina_Bool (*Enesim_Renderer_Compund_Foreach_Layer)(Enesim_Renderer *r,
-		Enesim_Renderer_Compound_Layer *layer, void *data);
+		Enesim_Renderer_Compound_Layer *layer, void *user_data);
 
 /**
  * @}

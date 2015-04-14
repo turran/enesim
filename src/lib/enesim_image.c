@@ -249,22 +249,22 @@ EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
 /**
  * Load an image asynchronously
  *
- * @param data The image data to load from
+ * @param s The image data to load from
  * @param mime The image mime. It can be NULL, if so, it will be autodetected
  * from the data itself.
  * @param b The buffer to write the image pixels to. It must not be NULL.
  * @param mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
  * @param cb The function that will get called once the load is done
- * @param user_data User provided data
+ * @param data User provided data
  * @param options Any option the provider might require
  */
-EAPI void enesim_image_load_async(Enesim_Stream *data, const char *mime,
+EAPI void enesim_image_load_async(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, Enesim_Pool *mpool, Enesim_Image_Callback cb,
-		void *user_data, const char *options)
+		void *data, const char *options)
 {
-	enesim_image_context_load_async(_main_context, data, mime, b, mpool, cb,
-			user_data, options);
+	enesim_image_context_load_async(_main_context, s, mime, b, mpool, cb,
+			data, options);
 }
 /**
  * Save an image synchronously
@@ -288,18 +288,18 @@ EAPI Eina_Bool enesim_image_save(Enesim_Stream *data, const char *mime,
 /**
  * Save an image asynchronously
  *
- * @param data The image data to save to
+ * @param s The image data to save to
  * @param mime The image mime
  * @param b The buffer to read the image pixels from. It must not be NULL.
  * @param cb The function that will get called once the save is done
- * @param user_data User provided data
+ * @param data User provided data
  * @param options Any option the provider might require
  */
-EAPI void enesim_image_save_async(Enesim_Stream *data, const char *mime,
+EAPI void enesim_image_save_async(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, Enesim_Image_Callback cb,
-		void *user_data, const char *options)
+		void *data, const char *options)
 {
-	enesim_image_context_save_async(_main_context, data, mime, b, cb, user_data,
+	enesim_image_context_save_async(_main_context, s, mime, b, cb, data,
 			options);
 }
 

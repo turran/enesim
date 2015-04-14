@@ -185,14 +185,14 @@ typedef union _Enesim_Buffer_Sw_Data
 
 /**
  * @brief Free function callback
- * @param data The buffer data provided by the user
+ * @param buffer_data The buffer data provided by the user
  * @param user_data The user private data
  * This function is used to free the data provided for the creation 
  * @see enesim_buffer_new_pool_and_data_from()
  * @see enesim_buffer_new_data_from()
  * @see enesim_surface_new_data_from()
  */
-typedef void (*Enesim_Buffer_Free)(void *data, void *user_data);
+typedef void (*Enesim_Buffer_Free)(void *buffer_data, void *user_data);
 
 
 typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */

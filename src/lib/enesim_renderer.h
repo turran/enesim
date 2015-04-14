@@ -59,9 +59,9 @@ typedef enum _Enesim_Renderer_Feature
  * @param r
  * @param area
  * @param past
- * @param data
+ * @param user_data
  */
-typedef Eina_Bool (*Enesim_Renderer_Damage)(Enesim_Renderer *r, const Eina_Rectangle *area, Eina_Bool past, void *data);
+typedef Eina_Bool (*Enesim_Renderer_Damage)(Enesim_Renderer *r, const Eina_Rectangle *area, Eina_Bool past, void *user_data);
 
 /**
  * @}
