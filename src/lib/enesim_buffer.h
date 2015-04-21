@@ -186,13 +186,13 @@ typedef union _Enesim_Buffer_Sw_Data
 /**
  * @brief Free function callback
  * @param buffer_data The buffer data provided by the user
- * @param user_data The user private data
+ * @param data The user private data
  * This function is used to free the data provided for the creation 
  * @see enesim_buffer_new_pool_and_data_from()
  * @see enesim_buffer_new_data_from()
  * @see enesim_surface_new_data_from()
  */
-typedef void (*Enesim_Buffer_Free)(void *buffer_data, void *user_data);
+typedef void (*Enesim_Buffer_Free)(void *buffer_data, void *data);
 
 
 typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
@@ -200,12 +200,12 @@ typedef struct _Enesim_Buffer Enesim_Buffer; /**< Buffer Handle */
 EAPI Enesim_Buffer * enesim_buffer_new(Enesim_Buffer_Format f, uint32_t w, uint32_t h);
 EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Eina_Bool copy,
-		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		Enesim_Buffer_Sw_Data *sw_data, Enesim_Buffer_Free free_func,
 		void *free_func_data);
 EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Pool *p);
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
-		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		Enesim_Buffer_Sw_Data *sw_data, Enesim_Buffer_Free free_func,
 		void *free_func_data);
 EAPI Enesim_Buffer * enesim_buffer_ref(Enesim_Buffer *b);
 EAPI void enesim_buffer_unref(Enesim_Buffer *b);

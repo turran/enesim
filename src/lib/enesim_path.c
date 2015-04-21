@@ -250,8 +250,8 @@ EAPI void enesim_path_command_add(Enesim_Path *thiz, Enesim_Path_Command *cmd)
 		last_command = eina_list_data_get(last);
 		if (last_command && last_command->type == ENESIM_PATH_COMMAND_TYPE_MOVE_TO)
 		{
-			last_command->definition.move_to.x = cmd->definition.move_to.x;
-			last_command->definition.move_to.y = cmd->definition.move_to.y;
+			last_command->data.move_to.x = cmd->data.move_to.x;
+			last_command->data.move_to.y = cmd->data.move_to.y;
 			return;
 		}
 	}
@@ -273,8 +273,8 @@ EAPI void enesim_path_move_to(Enesim_Path *thiz, double x, double y)
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_MOVE_TO;
-	cmd.definition.move_to.x = x;
-	cmd.definition.move_to.y = y;
+	cmd.data.move_to.x = x;
+	cmd.data.move_to.y = y;
 	enesim_path_command_add(thiz, &cmd);
 }
 
@@ -289,8 +289,8 @@ EAPI void enesim_path_line_to(Enesim_Path *thiz, double x, double y)
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_LINE_TO;
-	cmd.definition.line_to.x = x;
-	cmd.definition.line_to.y = y;
+	cmd.data.line_to.x = x;
+	cmd.data.line_to.y = y;
 	enesim_path_command_add(thiz, &cmd);
 }
 
@@ -306,8 +306,8 @@ EAPI void enesim_path_squadratic_to(Enesim_Path *thiz, double x,
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO;
-	cmd.definition.squadratic_to.x = x;
-	cmd.definition.squadratic_to.y = y;
+	cmd.data.squadratic_to.x = x;
+	cmd.data.squadratic_to.y = y;
 	enesim_path_command_add(thiz, &cmd);
 }
 
@@ -325,10 +325,10 @@ EAPI void enesim_path_quadratic_to(Enesim_Path *thiz, double ctrl_x,
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO;
-	cmd.definition.quadratic_to.x = x;
-	cmd.definition.quadratic_to.y = y;
-	cmd.definition.quadratic_to.ctrl_x = ctrl_x;
-	cmd.definition.quadratic_to.ctrl_y = ctrl_y;
+	cmd.data.quadratic_to.x = x;
+	cmd.data.quadratic_to.y = y;
+	cmd.data.quadratic_to.ctrl_x = ctrl_x;
+	cmd.data.quadratic_to.ctrl_y = ctrl_y;
 	enesim_path_command_add(thiz, &cmd);
 }
 
@@ -348,12 +348,12 @@ EAPI void enesim_path_cubic_to(Enesim_Path *thiz, double ctrl_x0,
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_CUBIC_TO;
-	cmd.definition.cubic_to.x = x;
-	cmd.definition.cubic_to.y = y;
-	cmd.definition.cubic_to.ctrl_x0 = ctrl_x0;
-	cmd.definition.cubic_to.ctrl_y0 = ctrl_y0;
-	cmd.definition.cubic_to.ctrl_x1 = ctrl_x;
-	cmd.definition.cubic_to.ctrl_y1 = ctrl_y;
+	cmd.data.cubic_to.x = x;
+	cmd.data.cubic_to.y = y;
+	cmd.data.cubic_to.ctrl_x0 = ctrl_x0;
+	cmd.data.cubic_to.ctrl_y0 = ctrl_y0;
+	cmd.data.cubic_to.ctrl_x1 = ctrl_x;
+	cmd.data.cubic_to.ctrl_y1 = ctrl_y;
 	enesim_path_command_add(thiz, &cmd);
 }
 
@@ -371,10 +371,10 @@ EAPI void enesim_path_scubic_to(Enesim_Path *thiz, double ctrl_x,
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO;
-	cmd.definition.scubic_to.x = x;
-	cmd.definition.scubic_to.y = y;
-	cmd.definition.scubic_to.ctrl_x = ctrl_x;
-	cmd.definition.scubic_to.ctrl_y = ctrl_y;
+	cmd.data.scubic_to.x = x;
+	cmd.data.scubic_to.y = y;
+	cmd.data.scubic_to.ctrl_x = ctrl_x;
+	cmd.data.scubic_to.ctrl_y = ctrl_y;
 	enesim_path_command_add(thiz, &cmd);
 }
 
@@ -396,13 +396,13 @@ EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double ang
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_ARC_TO;
-	cmd.definition.arc_to.x = x;
-	cmd.definition.arc_to.y = y;
-	cmd.definition.arc_to.rx = rx;
-	cmd.definition.arc_to.ry = ry;
-	cmd.definition.arc_to.angle = angle;
-	cmd.definition.arc_to.large = large;
-	cmd.definition.arc_to.sweep = sweep;
+	cmd.data.arc_to.x = x;
+	cmd.data.arc_to.y = y;
+	cmd.data.arc_to.rx = rx;
+	cmd.data.arc_to.ry = ry;
+	cmd.data.arc_to.angle = angle;
+	cmd.data.arc_to.large = large;
+	cmd.data.arc_to.sweep = sweep;
 	enesim_path_command_add(thiz, &cmd);
 }
 
@@ -415,6 +415,6 @@ EAPI void enesim_path_close(Enesim_Path *thiz)
 	Enesim_Path_Command cmd;
 
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_CLOSE;
-	cmd.definition.close.close = EINA_TRUE;
+	cmd.data.close.closed = EINA_TRUE;
 	enesim_path_command_add(thiz, &cmd);
 }

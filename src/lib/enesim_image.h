@@ -50,7 +50,7 @@ EAPI extern Eina_Error ENESIM_IMAGE_ERROR_SAVING;
  * @param data The user provided data
  * @param error The error in case something went wrong
  */
-typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *user_data,
+typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *data,
 		Eina_Bool success, Eina_Error error);
 
 /**
@@ -62,18 +62,18 @@ typedef void (*Enesim_Image_Callback)(Enesim_Buffer *b, void *user_data,
 
 EAPI void enesim_image_dispatch(void);
 
-EAPI Eina_Bool enesim_image_info_get(Enesim_Stream *data, const char *mime,
+EAPI Eina_Bool enesim_image_info_get(Enesim_Stream *s, const char *mime,
 		int *w, int *h, Enesim_Buffer_Format *sfmt,
 		const char *options, Eina_Error *err);
-EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
+EAPI Eina_Bool enesim_image_load(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options,
 		Eina_Error *err);
-EAPI void enesim_image_load_async(Enesim_Stream *data, const char *mime,
+EAPI void enesim_image_load_async(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, Enesim_Pool *mpool,
 		Enesim_Image_Callback cb, void *user_data, const char *options);
-EAPI Eina_Bool enesim_image_save(Enesim_Stream *data, const char *mime,
+EAPI Eina_Bool enesim_image_save(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, const char *options, Eina_Error *err);
-EAPI void enesim_image_save_async(Enesim_Stream *data, const char *mime,
+EAPI void enesim_image_save_async(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, Enesim_Image_Callback cb, void *user_data,
 		const char *options);
 

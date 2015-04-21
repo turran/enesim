@@ -156,7 +156,7 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
  * @param[in] copy In case the data needs to be copied to create the surface
  * or used directly
  * @param[in] stride The stride of the surface
- * @param[in] data The data of the surface pixels
+ * @param[in] pixels The data of the surface pixels
  * @param[in] free_func The function to be called whenever the data of the surface
  * needs to be freed
  * @param[in] free_func_data The private data for the @a free_func callback
@@ -164,7 +164,7 @@ EAPI Enesim_Surface * enesim_surface_new_buffer_from(Enesim_Buffer *buffer)
  */
 EAPI Enesim_Surface * enesim_surface_new_pool_and_data_from(Enesim_Format fmt,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
-		void *data, size_t stride, Enesim_Buffer_Free free_func,
+		void *pixels, size_t stride, Enesim_Buffer_Free free_func,
 		void *free_func_data)
 {
 	Enesim_Surface *s;
@@ -179,12 +179,12 @@ EAPI Enesim_Surface * enesim_surface_new_pool_and_data_from(Enesim_Format fmt,
 	switch (fmt)
 	{
 		case ENESIM_FORMAT_ARGB8888:
-		sw_data.argb8888_pre.plane0 = data;
+		sw_data.argb8888_pre.plane0 = pixels;
 		sw_data.argb8888_pre.plane0_stride = stride ? stride : w * 4;
 		break;
 
 		case ENESIM_FORMAT_A8:
-		sw_data.a8.plane0 = data;
+		sw_data.a8.plane0 = pixels;
 		sw_data.a8.plane0_stride = stride ? stride : w;
 		break;
 
@@ -220,19 +220,19 @@ EAPI Enesim_Surface * enesim_surface_new_pool_and_data_from(Enesim_Format fmt,
  * @param[in] copy In case the data needs to be copied to create the surface
  * or used directly
  * @param[in] stride The stride of the surface
- * @param[in] data The data of the surface pixels
+ * @param[in] pixels The data of the surface pixels
  * @param[in] free_func The function to be called whenever the data of the surface
  * needs to be freed
  * @param[in] free_func_data The private data for the @a free_func callback
  * @return The newly created surface
  */
 EAPI Enesim_Surface * enesim_surface_new_data_from(Enesim_Format fmt,
-		uint32_t w, uint32_t h, Eina_Bool copy, void *data,
+		uint32_t w, uint32_t h, Eina_Bool copy, void *pixels,
 		size_t stride, Enesim_Buffer_Free free_func,
 		void *free_func_data)
 {
 	return enesim_surface_new_pool_and_data_from(fmt, w, h, NULL, copy,
-			data, stride, free_func, free_func_data);
+			pixels, stride, free_func, free_func_data);
 }
 
 /**

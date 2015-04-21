@@ -134,7 +134,7 @@ typedef struct _Enesim_Path_Command_Arc_To
  */
 typedef struct _Enesim_Path_Command_Close
 {
-	Eina_Bool close; /**< Set to Eina_True for an actual close */
+	Eina_Bool closed; /**< Set to Eina_True for an actual close */
 } Enesim_Path_Command_Close;
 
 /**
@@ -158,7 +158,7 @@ typedef union _Enesim_Path_Command_Definition
 typedef struct _Enesim_Path_Command
 {
 	Enesim_Path_Command_Type type; /**< The type of the command */
-	Enesim_Path_Command_Definition definition; /**< The values of the definition */
+	Enesim_Path_Command_Definition data; /**< The data of the definition */
 } Enesim_Path_Command;
 
 /** @}

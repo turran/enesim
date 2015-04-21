@@ -59,9 +59,9 @@ typedef enum _Enesim_Renderer_Feature
  * @param r
  * @param area
  * @param past
- * @param user_data
+ * @param data
  */
-typedef Eina_Bool (*Enesim_Renderer_Damage)(Enesim_Renderer *r, const Eina_Rectangle *area, Eina_Bool past, void *user_data);
+typedef Eina_Bool (*Enesim_Renderer_Damage)(Enesim_Renderer *r, const Eina_Rectangle *area, Eina_Bool past, void *data);
 
 /**
  * @}
@@ -118,7 +118,7 @@ EAPI Eina_Bool enesim_renderer_destination_bounds_get_extended(Enesim_Renderer *
 EAPI Enesim_Renderer_Feature enesim_renderer_features_get(Enesim_Renderer *r);
 EAPI Eina_Bool enesim_renderer_is_inside(Enesim_Renderer *r, double x, double y);
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r);
-EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage cb, void *data);
+EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage cb, void *user_data);
 
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_Rectangle *clip, int x, int y, Enesim_Log **log);

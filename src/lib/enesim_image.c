@@ -269,20 +269,20 @@ EAPI void enesim_image_load_async(Enesim_Stream *s, const char *mime,
 /**
  * Save an image synchronously
  *
- * @param data The image data to save to
+ * @param s The image data to save to
  * @param mime The image mime
  * @param b The buffer to read the image pixels from. It must not be NULL.
  * @param options Any option the provider might require
  * @param[out] err The error in case the save fails
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
-EAPI Eina_Bool enesim_image_save(Enesim_Stream *data, const char *mime,
+EAPI Eina_Bool enesim_image_save(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, const char *options, Eina_Error *err)
 {
 	Enesim_Image_Provider *prov;
 
 	prov = enesim_image_save_provider_get(b, mime);
-	return enesim_image_provider_save(prov, data, b, options, err);
+	return enesim_image_provider_save(prov, s, b, options, err);
 }
 
 /**

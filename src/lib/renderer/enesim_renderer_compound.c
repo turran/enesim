@@ -1016,10 +1016,10 @@ EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r)
  * @brief Iterates over all the layers of a compound renderer
  * @param[in] r The compound renderer
  * @param[in] cb The function to call on every layer
- * @param[in] data User provided data
+ * @param[in] user_data User provided data
  */
 EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
-		Enesim_Renderer_Compund_Foreach_Layer cb, void *data)
+		Enesim_Renderer_Compund_Foreach_Layer cb, void *user_data)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Compound_Layer *layer;
@@ -1028,7 +1028,7 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	EINA_LIST_FOREACH(thiz->layers, l, layer)
 	{
-		if (!cb(r, layer, data))
+		if (!cb(r, layer, user_data))
 			break;
 	}
 }
@@ -1037,10 +1037,10 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
  * @brief Iterates over all the layers of a compound renderer in reverse order
  * @param[in] r The compound renderer
  * @param[in] cb The function to call on every layer
- * @param[in] data User provided data
+ * @param[in] user_data User provided data
  */
 EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
-		Enesim_Renderer_Compund_Foreach_Layer cb, void *data)
+		Enesim_Renderer_Compund_Foreach_Layer cb, void *user_data)
 {
 	Enesim_Renderer_Compound *thiz;
 	Enesim_Renderer_Compound_Layer *layer;
@@ -1049,7 +1049,7 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_COMPOUND(r);
 	EINA_LIST_REVERSE_FOREACH(thiz->layers, l, layer)
 	{
-		if (!cb(r, layer, data))
+		if (!cb(r, layer, user_data))
 			break;
 	}
 }

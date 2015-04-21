@@ -690,6 +690,7 @@ EAPI Enesim_Renderer_Feature enesim_renderer_features_get(Enesim_Renderer *r)
 }
 /**
  * @brief Sets the transformation matrix of a renderer
+ * @ender_prop{transformation}
  * @param[in] r The renderer to set the transformation matrix on
  * @param[in] m The transformation matrix to set
  *
@@ -713,6 +714,7 @@ EAPI void enesim_renderer_transformation_set(Enesim_Renderer *r, const Enesim_Ma
 
 /**
  * @brief Gets the transformation matrix of a renderer
+ * @ender_prop{transformation}
  * @param[in] r The renderer to get the transformation matrix from
  * @param[out] m The transformation matrix
  */
@@ -725,6 +727,7 @@ EAPI void enesim_renderer_transformation_get(Enesim_Renderer *r, Enesim_Matrix *
 
 /**
  * @brief Sets the name of a renderer
+ * @ender_prop{name}
  * @param[in] r The renderer to set the name to
  * @param[in] name The name to set
  */
@@ -744,6 +747,7 @@ EAPI void enesim_renderer_name_set(Enesim_Renderer *r, const char *name)
 
 /**
  * @brief Gets the name of a renderer
+ * @ender_prop{name}
  * @param[in] r The renderer to get the name from
  * @return The renderer name
  */
@@ -784,6 +788,7 @@ EAPI void enesim_renderer_origin_get(Enesim_Renderer *r, double *x, double *y)
 
 /**
  * @brief Sets the origin X coordinate of a renderer
+ * @ender_prop{x_origin}
  * @param[in] r The renderer to set the origin X coordinate to
  * @param[in] x The origin X coordinate
  * @note The origin will only take effect if the renderer supports
@@ -798,6 +803,7 @@ EAPI void enesim_renderer_x_origin_set(Enesim_Renderer *r, double x)
 
 /**
  * @brief Gets the origin X coordinate of a renderer
+ * @ender_prop{x_origin}
  * @param[in] r The renderer to get the origin X coordinate from
  * @return The origin X coordinate
  */
@@ -809,6 +815,7 @@ EAPI double enesim_renderer_x_origin_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the origin Y coordinate of a renderer
+ * @ender_prop{y_origin}
  * @param[in] r The renderer to set the origin Y coordinate to
  * @param[in] y The origin Y coordinate
  * @note The origin will only take effect if the renderer supports
@@ -823,6 +830,7 @@ EAPI void enesim_renderer_y_origin_set(Enesim_Renderer *r, double y)
 
 /**
  * @brief Gets the origin Y coordinate of a renderer
+ * @ender_prop{y_origin}
  * @param[in] r The renderer to get the origin Y coordinate from
  * @return The origin Y coordinate
  */
@@ -834,6 +842,7 @@ EAPI double enesim_renderer_y_origin_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the color of a renderer
+ * @ender_prop{color}
  * @param[in] r The renderer to set the color to
  * @param[in] color The color
  *
@@ -850,6 +859,7 @@ EAPI void enesim_renderer_color_set(Enesim_Renderer *r, Enesim_Color color)
 
 /**
  * @brief Gets the color of a renderer
+ * @ender_prop{color}
  * @param[in] r The renderer to get the color from
  * @return The color
  */
@@ -861,6 +871,7 @@ EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the visibility of a renderer
+ * @ender_prop{visibility}
  * @param[in] r The renderer to set the visibility to
  * @param[in] visible Set Eina_True to make it visible or Eina_False to make
  * it invisible
@@ -874,6 +885,7 @@ EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
 
 /**
  * @brief Gets the visibility of a renderer
+ * @ender_prop{visibility}
  * @param[in] r The renderer to get the visibility from
  * @return Eina_True if it is visible, Eina_False otherwise
  */
@@ -885,6 +897,7 @@ EAPI Eina_Bool enesim_renderer_visibility_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the mask renderer for a renderer
+ * @ender_prop{mask}
  * @param[in] r The renderer to set the mask renderer to
  * @param[in] mask The mask renderer to use @ender_transfer{full}
  *
@@ -905,6 +918,7 @@ EAPI void enesim_renderer_mask_set(Enesim_Renderer *r, Enesim_Renderer *mask)
 
 /**
  * @brief Gets the mask renderer from a renderer
+ * @ender_prop{mask}
  * @param[in] r The renderer to get the mask renderer from
  * @return The mask renderer @ender_transfer{none}
  */
@@ -916,6 +930,7 @@ EAPI Enesim_Renderer * enesim_renderer_mask_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the channel to use for masking
+ * @ender_prop{mask_channel}
  * @param[in] r The renderer to set the mask channel to
  * @param[in] channel The channel to use
  *
@@ -932,6 +947,7 @@ EAPI void enesim_renderer_mask_channel_set(Enesim_Renderer *r, Enesim_Channel ch
 
 /**
  * @brief Gets the mask channel from a renderer
+ * @ender_prop{mask_channel}
  * @param[in] r The renderer to get the mask channel from
  * @return The mask channel
  */
@@ -943,6 +959,7 @@ EAPI Enesim_Channel enesim_renderer_mask_channel_get(Enesim_Renderer *r)
 
 /**
  * @brief Sets the quality of a renderer
+ * @ender_prop{quality}
  * @param[in] r The renderer to set the quality to
  * @param[in] quality The quality to set
  * @note The quality will only take effect if the renderer supports
@@ -957,6 +974,7 @@ EAPI void enesim_renderer_quality_set(Enesim_Renderer *r, Enesim_Quality quality
 
 /**
  * @brief Gets the quality of a renderer
+ * @ender_prop{quality}
  * @param[in] r The renderer to get the quality from
  * @return The quality
  */
@@ -1385,7 +1403,7 @@ done:
  * @brief Get the damaged areas of a renderer
  * @param[in] r The renderer to get the damages from
  * @param[in] cb The function to call on every damaged area
- * @param[in] data The user provided data that is passed in on the @p cb function
+ * @param[in] user_data The user provided data that is passed in on the @p cb function
  * @return Eina_True if there is at least one damaged area, Eina_False otherwise
  *
  * This function gets the damaged area of a renderer. Whenever a renderer changes
@@ -1393,7 +1411,7 @@ done:
  * areas to redraw are called damaged areas.
  * The damaged areas are cleared whenever a renderer is drawn again.
  */
-EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage cb, void *data)
+EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_Damage cb, void *user_data)
 {
 	Enesim_Renderer_Class *klass;
 
@@ -1404,7 +1422,7 @@ EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_D
 	if (klass->damages_get)
 	{
 		klass->damages_get(r, &r->past_destination_bounds, cb,
-				data);
+				user_data);
 		return EINA_TRUE;
 	}
 	else
@@ -1417,8 +1435,8 @@ EAPI Eina_Bool enesim_renderer_damages_get(Enesim_Renderer *r, Enesim_Renderer_D
 		/* send the old bounds and the new one */
 		if (!enesim_renderer_destination_bounds_get(r, &current_bounds, 0, 0, NULL))
 			return EINA_FALSE;
-		cb(r, &current_bounds, EINA_FALSE, data);
-		cb(r, &r->past_destination_bounds, EINA_TRUE, data);
+		cb(r, &current_bounds, EINA_FALSE, user_data);
+		cb(r, &r->past_destination_bounds, EINA_TRUE, user_data);
 		return EINA_TRUE;
 	}
 }

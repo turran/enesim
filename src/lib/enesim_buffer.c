@@ -292,7 +292,7 @@ Eina_Bool enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
  * @param[in] p The pool to use
  * @param[in] copy In case the data needs to be copied to create the buffer
  * or used directly
- * @param[in] data The data of the buffer pixels
+ * @param[in] sw_data The data of the buffer pixels
  * @param[in] free_func The function to be called whenever the data of the buffer
  * needs to be freed
  * @param[in] free_func_data The private data for the @a free_func callback
@@ -300,7 +300,7 @@ Eina_Bool enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
  */
 EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy,
-		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		Enesim_Buffer_Sw_Data *sw_data, Enesim_Buffer_Free free_func,
 		void *free_func_data)
 {
 	Enesim_Buffer *buf;
@@ -314,7 +314,7 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
 	}
 
 	if (!enesim_pool_data_from(p, &backend, &backend_data, f, w, h, copy,
-			data))
+			sw_data))
 	{
 		enesim_pool_unref(p);
 		return NULL;
@@ -333,7 +333,7 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
  * @param[in] h The height of the buffer
  * @param[in] copy In case the data needs to be copied to create the buffer
  * or used directly
- * @param[in] data The data of the buffer pixels
+ * @param[in] sw_data The data of the buffer pixels
  * @param[in] free_func The function to be called whenever the data of the buffer
  * needs to be freed
  * @param[in] user_data The private data for the @a free_func callback
@@ -341,12 +341,12 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_and_data_from(Enesim_Buffer_Format f
  */
 EAPI Enesim_Buffer * enesim_buffer_new_data_from(Enesim_Buffer_Format f,
 		uint32_t w, uint32_t h, Eina_Bool copy,
-		Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func,
+		Enesim_Buffer_Sw_Data *sw_data, Enesim_Buffer_Free free_func,
 		void *user_data)
 {
 	Enesim_Buffer *buf;
 
-	buf = enesim_buffer_new_pool_and_data_from(f, w, h, NULL, copy, data,
+	buf = enesim_buffer_new_pool_and_data_from(f, w, h, NULL, copy, sw_data,
 			free_func, user_data);
 
 	return buf;

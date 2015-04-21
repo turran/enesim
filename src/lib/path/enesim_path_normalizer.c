@@ -119,7 +119,7 @@ static void _figure_close(Enesim_Path_Command_Close *close,
 		Enesim_Path_Normalizer_State *state EINA_UNUSED, void *data)
 {
 	Enesim_Path_Normalizer_Figure *thiz = data;
-	thiz->descriptor->polygon_close(close->close, thiz->data);
+	thiz->descriptor->polygon_close(close->closed, thiz->data);
 }
 
 static void _figure_free(void *data)
@@ -502,35 +502,35 @@ void enesim_path_normalizer_normalize(Enesim_Path_Normalizer *thiz,
 	switch (cmd->type)
 	{
 		case ENESIM_PATH_COMMAND_TYPE_MOVE_TO:
-		enesim_path_normalizer_move_to(thiz, &cmd->definition.move_to);
+		enesim_path_normalizer_move_to(thiz, &cmd->data.move_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_TYPE_LINE_TO:
-		enesim_path_normalizer_line_to(thiz, &cmd->definition.line_to);
+		enesim_path_normalizer_line_to(thiz, &cmd->data.line_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO:
-		enesim_path_normalizer_quadratic_to(thiz, &cmd->definition.quadratic_to);
+		enesim_path_normalizer_quadratic_to(thiz, &cmd->data.quadratic_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO:
-		enesim_path_normalizer_squadratic_to(thiz, &cmd->definition.squadratic_to);
+		enesim_path_normalizer_squadratic_to(thiz, &cmd->data.squadratic_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_TYPE_CUBIC_TO:
-		enesim_path_normalizer_cubic_to(thiz, &cmd->definition.cubic_to);
+		enesim_path_normalizer_cubic_to(thiz, &cmd->data.cubic_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO:
-		enesim_path_normalizer_scubic_to(thiz, &cmd->definition.scubic_to);
+		enesim_path_normalizer_scubic_to(thiz, &cmd->data.scubic_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_TYPE_ARC_TO:
-		enesim_path_normalizer_arc_to(thiz, &cmd->definition.arc_to);
+		enesim_path_normalizer_arc_to(thiz, &cmd->data.arc_to);
 		break;
 
 		case ENESIM_PATH_COMMAND_TYPE_CLOSE:
-		enesim_path_normalizer_close(thiz, &cmd->definition.close);
+		enesim_path_normalizer_close(thiz, &cmd->data.close);
 		break;
 
 		default:

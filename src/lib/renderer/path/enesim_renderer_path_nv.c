@@ -632,28 +632,28 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 		{
 			case ENESIM_PATH_COMMAND_TYPE_MOVE_TO:
 			*cmd++ = 'M';
-			*coord++ = pcmd->definition.move_to.x;
-			*coord++ = pcmd->definition.move_to.y;
+			*coord++ = pcmd->data.move_to.x;
+			*coord++ = pcmd->data.move_to.y;
 			num_coords += 2;
 			break;
 			
 			case ENESIM_PATH_COMMAND_TYPE_LINE_TO:
 			*cmd++ = 'L';
-			*coord++ = pcmd->definition.line_to.x;
-			*coord++ = pcmd->definition.line_to.y;
+			*coord++ = pcmd->data.line_to.x;
+			*coord++ = pcmd->data.line_to.y;
 			num_coords += 2;
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_ARC_TO:
 			*cmd++ = 'A';
 			num_coords += 7;
-			*coord++ = pcmd->definition.arc_to.rx;
-			*coord++ = pcmd->definition.arc_to.ry;
-			*coord++ = pcmd->definition.arc_to.angle;
-			*coord++ = pcmd->definition.arc_to.large;
-			*coord++ = pcmd->definition.arc_to.sweep;
-			*coord++ = pcmd->definition.arc_to.x;
-			*coord++ = pcmd->definition.arc_to.y;
+			*coord++ = pcmd->data.arc_to.rx;
+			*coord++ = pcmd->data.arc_to.ry;
+			*coord++ = pcmd->data.arc_to.angle;
+			*coord++ = pcmd->data.arc_to.large;
+			*coord++ = pcmd->data.arc_to.sweep;
+			*coord++ = pcmd->data.arc_to.x;
+			*coord++ = pcmd->data.arc_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_CLOSE:
@@ -663,37 +663,37 @@ static Eina_Bool _enesim_renderer_path_nv_upload_path(
 			case ENESIM_PATH_COMMAND_TYPE_CUBIC_TO:
 			num_coords += 6;
 			*cmd++ = 'C';
-			*coord++ = pcmd->definition.cubic_to.ctrl_x0;
-			*coord++ = pcmd->definition.cubic_to.ctrl_y0;
-			*coord++ = pcmd->definition.cubic_to.ctrl_x1;
-			*coord++ = pcmd->definition.cubic_to.ctrl_y1;
-			*coord++ = pcmd->definition.cubic_to.x;
-			*coord++ = pcmd->definition.cubic_to.y;
+			*coord++ = pcmd->data.cubic_to.ctrl_x0;
+			*coord++ = pcmd->data.cubic_to.ctrl_y0;
+			*coord++ = pcmd->data.cubic_to.ctrl_x1;
+			*coord++ = pcmd->data.cubic_to.ctrl_y1;
+			*coord++ = pcmd->data.cubic_to.x;
+			*coord++ = pcmd->data.cubic_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO:
 			num_coords += 4;
 			*cmd++ = 'S';
-			*coord++ = pcmd->definition.scubic_to.ctrl_x;
-			*coord++ = pcmd->definition.scubic_to.ctrl_y;
-			*coord++ = pcmd->definition.scubic_to.x;
-			*coord++ = pcmd->definition.scubic_to.y;
+			*coord++ = pcmd->data.scubic_to.ctrl_x;
+			*coord++ = pcmd->data.scubic_to.ctrl_y;
+			*coord++ = pcmd->data.scubic_to.x;
+			*coord++ = pcmd->data.scubic_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO:
 			num_coords += 4;
 			*cmd++ = 'Q';
-			*coord++ = pcmd->definition.quadratic_to.ctrl_x;
-			*coord++ = pcmd->definition.quadratic_to.ctrl_y;
-			*coord++ = pcmd->definition.quadratic_to.x;
-			*coord++ = pcmd->definition.quadratic_to.y;
+			*coord++ = pcmd->data.quadratic_to.ctrl_x;
+			*coord++ = pcmd->data.quadratic_to.ctrl_y;
+			*coord++ = pcmd->data.quadratic_to.x;
+			*coord++ = pcmd->data.quadratic_to.y;
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO:
 			num_coords += 2;
 			*cmd++ = 'T';
-			*coord++ = pcmd->definition.squadratic_to.x;
-			*coord++ = pcmd->definition.squadratic_to.y;
+			*coord++ = pcmd->data.squadratic_to.x;
+			*coord++ = pcmd->data.squadratic_to.y;
 			break;
 
 			default:

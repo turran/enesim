@@ -391,12 +391,12 @@
     <field name="sweep" type="bool"/>
   </struct>
   <struct name="enesim.path.command.close">
-    <field name="close" type="bool"/>
+    <field name="closed" type="bool"/>
   </struct>
   <struct name="enesim.path.command.definition"/>
   <struct name="enesim.path.command">
     <field name="type" type="enesim.path.command.type"/>
-    <field name="definition" type="enesim.path.command.definition"/>
+    <field name="data" type="enesim.path.command.definition"/>
   </struct>
   <enum name="enesim.path.command.type">
     <value name="move_to"/>
@@ -532,7 +532,7 @@
   <def name="enesim.buffer.sw_data_cmyk" type=""/>
   <callback name="enesim.buffer.free">
     <arg name="buffer_data" type="pointer" direction="in" transfer="none" nullable="false"/>
-    <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
   </callback>
   <object name="enesim.buffer">
     <ctor name="new">
@@ -545,7 +545,7 @@
       <arg name="w" type="uint32" direction="in" transfer="full" nullable="false"/>
       <arg name="h" type="uint32" direction="in" transfer="full" nullable="false"/>
       <arg name="copy" type="bool" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.buffer.sw_data" direction="in" transfer="full" nullable="false"/>
+      <arg name="sw_data" type="enesim.buffer.sw_data" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func_data" type="pointer" direction="in" transfer="full" nullable="false"/>
     </ctor>
@@ -561,7 +561,7 @@
       <arg name="h" type="uint32" direction="in" transfer="full" nullable="false"/>
       <arg name="p" type="enesim.pool" direction="in" transfer="full" nullable="false"/>
       <arg name="copy" type="bool" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.buffer.sw_data" direction="in" transfer="full" nullable="false"/>
+      <arg name="sw_data" type="enesim.buffer.sw_data" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func_data" type="pointer" direction="in" transfer="full" nullable="false"/>
     </ctor>
@@ -623,7 +623,7 @@
       <arg name="w" type="uint32" direction="in" transfer="full" nullable="false"/>
       <arg name="h" type="uint32" direction="in" transfer="full" nullable="false"/>
       <arg name="copy" type="bool" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="pointer" direction="in" transfer="full" nullable="false"/>
+      <arg name="sw_data" type="pointer" direction="in" transfer="full" nullable="false"/>
       <arg name="stride" type="size" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func_data" type="pointer" direction="in" transfer="full" nullable="false"/>
@@ -640,7 +640,7 @@
       <arg name="h" type="uint32" direction="in" transfer="full" nullable="false"/>
       <arg name="p" type="enesim.pool" direction="in" transfer="full" nullable="false"/>
       <arg name="copy" type="bool" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="pointer" direction="in" transfer="full" nullable="false"/>
+      <arg name="sw_data" type="pointer" direction="in" transfer="full" nullable="false"/>
       <arg name="stride" type="size" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func" type="enesim.buffer.free" direction="in" transfer="full" nullable="false"/>
       <arg name="free_func_data" type="pointer" direction="in" transfer="full" nullable="false"/>
@@ -727,7 +727,7 @@
     <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
     <arg name="area" type="eina.rectangle" direction="in" transfer="none" nullable="false"/>
     <arg name="past" type="bool" direction="in" transfer="none" nullable="false"/>
-    <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
   <object name="enesim.renderer">
@@ -748,18 +748,6 @@
     </method>
     <method name="lock"/>
     <method name="unlock"/>
-    <method name="name_set">
-      <arg name="name" type="string" direction="in" transfer="none" nullable="false"/>
-    </method>
-    <method name="name_get">
-      <return type="string" transfer="none" nullable="false"/>
-    </method>
-    <method name="transformation_set">
-      <arg name="m" type="enesim.matrix" direction="in" transfer="none" nullable="false"/>
-    </method>
-    <method name="transformation_get">
-      <arg name="m" type="enesim.matrix" direction="out" transfer="full" nullable="false"/>
-    </method>
     <method name="transformation_type_get">
       <return type="enesim.matrix.type" transfer="full" nullable="false"/>
     </method>
@@ -770,48 +758,6 @@
     <method name="origin_get">
       <arg name="x" type="double" direction="out" transfer="full" nullable="false"/>
       <arg name="y" type="double" direction="out" transfer="full" nullable="false"/>
-    </method>
-    <method name="x_origin_set">
-      <arg name="x" type="double" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="x_origin_get">
-      <return type="double" transfer="full" nullable="false"/>
-    </method>
-    <method name="y_origin_set">
-      <arg name="y" type="double" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="y_origin_get">
-      <return type="double" transfer="full" nullable="false"/>
-    </method>
-    <method name="visibility_set">
-      <arg name="visibility" type="bool" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="visibility_get">
-      <return type="bool" transfer="full" nullable="false"/>
-    </method>
-    <method name="color_set">
-      <arg name="color" type="enesim.color" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="color_get">
-      <return type="enesim.color" transfer="full" nullable="false"/>
-    </method>
-    <method name="mask_set">
-      <arg name="mask" type="enesim.renderer" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="mask_get">
-      <return type="enesim.renderer" transfer="none" nullable="false"/>
-    </method>
-    <method name="mask_channel_set">
-      <arg name="channel" type="enesim.channel" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="mask_channel_get">
-      <return type="enesim.channel" transfer="full" nullable="false"/>
-    </method>
-    <method name="quality_set">
-      <arg name="quality" type="enesim.quality" direction="in" transfer="full" nullable="false"/>
-    </method>
-    <method name="quality_get">
-      <return type="enesim.quality" transfer="full" nullable="false"/>
     </method>
     <method name="alpha_hints_get">
       <return type="enesim.aplha_hint" transfer="full" nullable="false"/>
@@ -860,7 +806,7 @@
     <method name="damages_get">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="cb" type="enesim.renderer.damage" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="pointer" direction="in" transfer="full" nullable="false"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full" nullable="false"/>
     </method>
     <method name="draw">
       <return type="bool" transfer="full" nullable="false"/>
@@ -883,6 +829,78 @@
     <function name="default_quality_set">
       <arg name="quality" type="enesim.quality" direction="in" transfer="full" nullable="false"/>
     </function>
+    <prop name="name">
+      <setter>
+        <arg name="name" type="string" direction="in" transfer="none" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="string" transfer="none" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="transformation">
+      <setter>
+        <arg name="m" type="enesim.matrix" direction="in" transfer="none" nullable="false"/>
+      </setter>
+      <getter>
+        <arg name="m" type="enesim.matrix" direction="out" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="x_origin">
+      <setter>
+        <arg name="x" type="double" direction="in" transfer="full" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="y_origin">
+      <setter>
+        <arg name="y" type="double" direction="in" transfer="full" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="visibility">
+      <setter>
+        <arg name="visibility" type="bool" direction="in" transfer="full" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="bool" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="color">
+      <setter>
+        <arg name="color" type="enesim.color" direction="in" transfer="full" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="enesim.color" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="mask">
+      <setter>
+        <arg name="mask" type="enesim.renderer" direction="in" transfer="full" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="none" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="mask_channel">
+      <setter>
+        <arg name="channel" type="enesim.channel" direction="in" transfer="full" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="enesim.channel" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="quality">
+      <setter>
+        <arg name="quality" type="enesim.quality" direction="in" transfer="full" nullable="false"/>
+      </setter>
+      <getter>
+        <return type="enesim.quality" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
   </object>
   <object name="enesim.stream">
     <ref name="ref">
@@ -931,7 +949,7 @@
   </object>
   <callback name="enesim.image.callback">
     <arg name="r" type="enesim.buffer" direction="in" transfer="none" nullable="false"/>
-    <arg name="ser_data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <arg name="success" type="bool" direction="in" transfer="none" nullable="false"/>
     <arg name="error" type="eina.error" direction="in" transfer="none" nullable="false"/>
   </callback>
@@ -939,7 +957,7 @@
     <function name="dispatch"/>
     <function name="info_get">
       <return type="bool" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
+      <arg name="s" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
       <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="w" type="int" direction="in" transfer="full" nullable="false"/>
       <arg name="h" type="int" direction="in" transfer="full" nullable="false"/>
@@ -949,7 +967,7 @@
     </function>
     <function name="load">
       <return type="bool" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="out" transfer="full" nullable="false"/>
+      <arg name="s" type="enesim.stream" direction="out" transfer="full" nullable="false"/>
       <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="b" type="enesim.buffer" direction="in" transfer="full" nullable="false"/>
       <arg name="mpool" type="enesim.pool" direction="in" transfer="full" nullable="false"/>
@@ -957,7 +975,7 @@
       <arg name="err" type="eina.error" direction="in" transfer="full" nullable="false"/>
     </function>
     <function name="load_async">
-      <arg name="data" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
+      <arg name="s" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
       <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="b" type="enesim.buffer" direction="in" transfer="full" nullable="false"/>
       <arg name="mpool" type="enesim.pool" direction="in" transfer="full" nullable="false"/>
@@ -967,14 +985,14 @@
     </function>
     <function name="save">
       <return type="bool" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
+      <arg name="s" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
       <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="b" type="enesim.buffer" direction="in" transfer="full" nullable="false"/>
       <arg name="options" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="err" type="eina.error" direction="out" transfer="full" nullable="false"/>
     </function>
     <function name="save_async">
-      <arg name="data" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
+      <arg name="s" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
       <arg name="mime" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="b" type="enesim.buffer" direction="in" transfer="full" nullable="false"/>
       <arg name="cb" type="enesim.image.callback" direction="in" transfer="full" nullable="false"/>
@@ -1382,7 +1400,7 @@
   <callback name="enesim.renderer.compound.foreach_layer">
     <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
     <arg name="layer" type="enesim.renderer.compound.layer" direction="in" transfer="none" nullable="false"/>
-    <arg name="user_data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
   <object name="enesim.renderer.compound" inherits="enesim.renderer">
@@ -1412,11 +1430,11 @@
     <method name="layer_clear"/>
     <method name="layer_foreach">
       <arg name="cb" type="enesim.renderer.compound.foreach_layer" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="pointer" direction="in" transfer="full" nullable="false"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full" nullable="false"/>
     </method>
     <method name="layer_reverse_foreach">
       <arg name="cb" type="enesim.renderer.compound.foreach_layer" direction="in" transfer="full" nullable="false"/>
-      <arg name="data" type="pointer" direction="in" transfer="full" nullable="false"/>
+      <arg name="user_data" type="pointer" direction="in" transfer="full" nullable="false"/>
     </method>
   </object>
   <object name="enesim.renderer.dispmap" inherits="enesim.renderer">

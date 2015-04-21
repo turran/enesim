@@ -1143,8 +1143,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 		switch (cmd->type)
 		{
 			case ENESIM_PATH_COMMAND_TYPE_MOVE_TO:
-			x = scale_x * cmd->definition.move_to.x;
-			y = scale_y * cmd->definition.move_to.y;
+			x = scale_x * cmd->data.move_to.x;
+			y = scale_y * cmd->data.move_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 #if PIXEL_ALIGN
@@ -1156,8 +1156,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_LINE_TO:
-			x = scale_x * cmd->definition.line_to.x;
-			y = scale_y * cmd->definition.line_to.y;
+			x = scale_x * cmd->data.line_to.x;
+			y = scale_y * cmd->data.line_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 #if PIXEL_ALIGN
@@ -1169,10 +1169,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO:
-			x = scale_x * cmd->definition.quadratic_to.x;
-			y = scale_y * cmd->definition.quadratic_to.y;
-			ctrl_x0 = scale_x * cmd->definition.quadratic_to.ctrl_x;
-			ctrl_y0 = scale_y * cmd->definition.quadratic_to.ctrl_y;
+			x = scale_x * cmd->data.quadratic_to.x;
+			y = scale_y * cmd->data.quadratic_to.y;
+			ctrl_x0 = scale_x * cmd->data.quadratic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->data.quadratic_to.ctrl_y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
@@ -1185,8 +1185,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO:
-			x = scale_x * cmd->definition.squadratic_to.x;
-			y = scale_y * cmd->definition.squadratic_to.y;
+			x = scale_x * cmd->data.squadratic_to.x;
+			y = scale_y * cmd->data.squadratic_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			//x = ((int) (2*x + 0.5)) / 2.0;
@@ -1196,12 +1196,12 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_CUBIC_TO:
-			x = scale_x * cmd->definition.cubic_to.x;
-			y = scale_y * cmd->definition.cubic_to.y;
-			ctrl_x0 = scale_x * cmd->definition.cubic_to.ctrl_x0;
-			ctrl_y0 = scale_y * cmd->definition.cubic_to.ctrl_y0;
-			ctrl_x1 = scale_x * cmd->definition.cubic_to.ctrl_x1;
-			ctrl_y1 = scale_y * cmd->definition.cubic_to.ctrl_y1;
+			x = scale_x * cmd->data.cubic_to.x;
+			y = scale_y * cmd->data.cubic_to.y;
+			ctrl_x0 = scale_x * cmd->data.cubic_to.ctrl_x0;
+			ctrl_y0 = scale_y * cmd->data.cubic_to.ctrl_y0;
+			ctrl_x1 = scale_x * cmd->data.cubic_to.ctrl_x1;
+			ctrl_y1 = scale_y * cmd->data.cubic_to.ctrl_y1;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
@@ -1215,10 +1215,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO:
-			x = scale_x * cmd->definition.scubic_to.x;
-			y = scale_y * cmd->definition.scubic_to.y;
-			ctrl_x0 = scale_x * cmd->definition.scubic_to.ctrl_x;
-			ctrl_y0 = scale_y * cmd->definition.scubic_to.ctrl_y;
+			x = scale_x * cmd->data.scubic_to.x;
+			y = scale_y * cmd->data.scubic_to.y;
+			ctrl_x0 = scale_x * cmd->data.scubic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->data.scubic_to.ctrl_y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
@@ -1231,12 +1231,12 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_ARC_TO:
-			x = scale_x * cmd->definition.arc_to.x;
-			y = scale_y * cmd->definition.arc_to.y;
-			rx = scale_x * cmd->definition.arc_to.rx;
-			ry = scale_y * cmd->definition.arc_to.ry;
-			ca = cos(cmd->definition.arc_to.angle * M_PI / 180.0);
-			sa = sin(cmd->definition.arc_to.angle * M_PI / 180.0);
+			x = scale_x * cmd->data.arc_to.x;
+			y = scale_y * cmd->data.arc_to.y;
+			rx = scale_x * cmd->data.arc_to.rx;
+			ry = scale_y * cmd->data.arc_to.ry;
+			ca = cos(cmd->data.arc_to.angle * M_PI / 180.0);
+			sa = sin(cmd->data.arc_to.angle * M_PI / 180.0);
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			rx = rx * hypot((ca * gm->xx) + (sa * gm->xy), (ca * gm->yx) + (sa * gm->yy));
@@ -1247,13 +1247,13 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			y = ((int) (2*y + 0.5)) / 2.0;
 #endif
 			enesim_path_command_arc_to_values_from(&arc_to, rx, ry, ca * 180.0 / M_PI,
-					x, y, cmd->definition.arc_to.large,
-					cmd->definition.arc_to.sweep);
+					x, y, cmd->data.arc_to.large,
+					cmd->data.arc_to.sweep);
 			enesim_path_normalizer_arc_to(normalizer, &arc_to);
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_CLOSE:
-			close.close = cmd->definition.close.close;
+			close.closed = cmd->data.close.closed;
 			enesim_path_normalizer_close(normalizer, &close);
 			break;
 
@@ -1303,8 +1303,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 		switch (cmd->type)
 		{
 			case ENESIM_PATH_COMMAND_TYPE_MOVE_TO:
-			x = scale_x * cmd->definition.move_to.x;
-			y = scale_y * cmd->definition.move_to.y;
+			x = scale_x * cmd->data.move_to.x;
+			y = scale_y * cmd->data.move_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
@@ -1313,8 +1313,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_LINE_TO:
-			x = scale_x * cmd->definition.line_to.x;
-			y = scale_y * cmd->definition.line_to.y;
+			x = scale_x * cmd->data.line_to.x;
+			y = scale_y * cmd->data.line_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
@@ -1323,10 +1323,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_QUADRATIC_TO:
-			x = scale_x * cmd->definition.quadratic_to.x;
-			y = scale_y * cmd->definition.quadratic_to.y;
-			ctrl_x0 = scale_x * cmd->definition.quadratic_to.ctrl_x;
-			ctrl_y0 = scale_y * cmd->definition.quadratic_to.ctrl_y;
+			x = scale_x * cmd->data.quadratic_to.x;
+			y = scale_y * cmd->data.quadratic_to.y;
+			ctrl_x0 = scale_x * cmd->data.quadratic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->data.quadratic_to.ctrl_y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
@@ -1336,8 +1336,8 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_SQUADRATIC_TO:
-			x = scale_x * cmd->definition.squadratic_to.x;
-			y = scale_y * cmd->definition.squadratic_to.y;
+			x = scale_x * cmd->data.squadratic_to.x;
+			y = scale_y * cmd->data.squadratic_to.y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			x = ((int) (2*x + 0.5)) / 2.0;
@@ -1346,12 +1346,12 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_CUBIC_TO:
-			x = scale_x * cmd->definition.cubic_to.x;
-			y = scale_y * cmd->definition.cubic_to.y;
-			ctrl_x0 = scale_x * cmd->definition.cubic_to.ctrl_x0;
-			ctrl_y0 = scale_y * cmd->definition.cubic_to.ctrl_y0;
-			ctrl_x1 = scale_x * cmd->definition.cubic_to.ctrl_x1;
-			ctrl_y1 = scale_y * cmd->definition.cubic_to.ctrl_y1;
+			x = scale_x * cmd->data.cubic_to.x;
+			y = scale_y * cmd->data.cubic_to.y;
+			ctrl_x0 = scale_x * cmd->data.cubic_to.ctrl_x0;
+			ctrl_y0 = scale_y * cmd->data.cubic_to.ctrl_y0;
+			ctrl_x1 = scale_x * cmd->data.cubic_to.ctrl_x1;
+			ctrl_y1 = scale_y * cmd->data.cubic_to.ctrl_y1;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
@@ -1364,10 +1364,10 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_SCUBIC_TO:
-			x = scale_x * cmd->definition.scubic_to.x;
-			y = scale_y * cmd->definition.scubic_to.y;
-			ctrl_x0 = scale_x * cmd->definition.scubic_to.ctrl_x;
-			ctrl_y0 = scale_y * cmd->definition.scubic_to.ctrl_y;
+			x = scale_x * cmd->data.scubic_to.x;
+			y = scale_y * cmd->data.scubic_to.y;
+			ctrl_x0 = scale_x * cmd->data.scubic_to.ctrl_x;
+			ctrl_y0 = scale_y * cmd->data.scubic_to.ctrl_y;
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			enesim_matrix_point_transform(gm, ctrl_x0, ctrl_y0, &ctrl_x0, &ctrl_y0);
@@ -1378,12 +1378,12 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_ARC_TO:
-			x = scale_x * cmd->definition.arc_to.x;
-			y = scale_y * cmd->definition.arc_to.y;
-			rx = scale_x * cmd->definition.arc_to.rx;
-			ry = scale_y * cmd->definition.arc_to.ry;
-			ca = cos(cmd->definition.arc_to.angle * M_PI / 180.0);
-			sa = sin(cmd->definition.arc_to.angle * M_PI / 180.0);
+			x = scale_x * cmd->data.arc_to.x;
+			y = scale_y * cmd->data.arc_to.y;
+			rx = scale_x * cmd->data.arc_to.rx;
+			ry = scale_y * cmd->data.arc_to.ry;
+			ca = cos(cmd->data.arc_to.angle * M_PI / 180.0);
+			sa = sin(cmd->data.arc_to.angle * M_PI / 180.0);
 
 			enesim_matrix_point_transform(gm, x, y, &x, &y);
 			rx = rx * hypot((ca * gm->xx) + (sa * gm->xy), (ca * gm->yx) + (sa * gm->yy));
@@ -1395,13 +1395,13 @@ void enesim_path_generator_generate(Enesim_Path_Generator *thiz, Eina_List *comm
 			enesim_curve_arc_to(&thiz->st,
 					rx, ry,
 					ca * 180.0 / M_PI,
-					cmd->definition.arc_to.large,
-					cmd->definition.arc_to.sweep,
+					cmd->data.arc_to.large,
+					cmd->data.arc_to.sweep,
 					x, y);
 			break;
 
 			case ENESIM_PATH_COMMAND_TYPE_CLOSE:
-			_path_polygon_close(thiz, cmd->definition.close.close);
+			_path_polygon_close(thiz, cmd->data.close.close);
 			break;
 
 			default:
