@@ -89,19 +89,19 @@ Modules</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer__Definitions.html">Buffer definitions</a></td></tr>
 <tr><td colspan="2"><h2><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga3e5375e04ae8cca3af0142ea0335e268">Enesim_Buffer_Free</a> )(void *buffer_data, void *user_data)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Free function callback.  <a href="#ga3e5375e04ae8cca3af0142ea0335e268"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gaa4e1fa94026fa9b91dfa416d109fc300">Enesim_Buffer_Free</a> )(void *buffer_data, void *data)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Free function callback.  <a href="#gaa4e1fa94026fa9b91dfa416d109fc300"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef struct _Enesim_Buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga67c63dae57726fb1e9ac8b5606620de8">enesim_buffer_new</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new buffer using the default memory pool.  <a href="#ga67c63dae57726fb1e9ac8b5606620de8"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga2ece4e20625915711c3b7a0c0288fe50">enesim_buffer_new_data_from</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, Eina_Bool copy, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data, <a class="el" href="group__Enesim__Buffer.html#ga3e5375e04ae8cca3af0142ea0335e268">Enesim_Buffer_Free</a> free_func, void *free_func_data)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new buffer using an user provided data.  <a href="#ga2ece4e20625915711c3b7a0c0288fe50"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gaa4d89ef75aa7c9469a681fa87efd3159">enesim_buffer_new_data_from</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, Eina_Bool copy, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *sw_data, <a class="el" href="group__Enesim__Buffer.html#gaa4e1fa94026fa9b91dfa416d109fc300">Enesim_Buffer_Free</a> free_func, void *free_func_data)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new buffer using an user provided data.  <a href="#gaa4d89ef75aa7c9469a681fa87efd3159"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gad26dd424add56cc61fcfec5fbc8b2a7d">enesim_buffer_new_pool_from</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new buffer using a pool.  <a href="#gad26dd424add56cc61fcfec5fbc8b2a7d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gab76747e867ec0426e346c91b8a72955a">enesim_buffer_new_pool_and_data_from</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p, Eina_Bool copy, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *data, <a class="el" href="group__Enesim__Buffer.html#ga3e5375e04ae8cca3af0142ea0335e268">Enesim_Buffer_Free</a> free_func, void *free_func_data)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new buffer using a pool and an user provided data.  <a href="#gab76747e867ec0426e346c91b8a72955a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga57014980ec58ab18fd263cb1780684fa">enesim_buffer_new_pool_and_data_from</a> (<a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> f, uint32_t w, uint32_t h, <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *p, Eina_Bool copy, <a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *sw_data, <a class="el" href="group__Enesim__Buffer.html#gaa4e1fa94026fa9b91dfa416d109fc300">Enesim_Buffer_Free</a> free_func, void *free_func_data)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new buffer using a pool and an user provided data.  <a href="#ga57014980ec58ab18fd263cb1780684fa"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga5b80698028c36d4a23c2f372b93ad20a">enesim_buffer_ref</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the reference counter of a buffer.  <a href="#ga5b80698028c36d4a23c2f372b93ad20a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga022fa9463035f6018d1477066cd2a5ac">enesim_buffer_unref</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b)</td></tr>
@@ -133,12 +133,12 @@ Functions</h2></td></tr>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Target device pixel data holder. </p>
 <hr/><h2>Typedef Documentation</h2>
-<a class="anchor" id="ga3e5375e04ae8cca3af0142ea0335e268"></a><!-- doxytag: member="enesim_buffer.h::Enesim_Buffer_Free" ref="ga3e5375e04ae8cca3af0142ea0335e268" args=")(void *buffer_data, void *user_data)" -->
+<a class="anchor" id="gaa4e1fa94026fa9b91dfa416d109fc300"></a><!-- doxytag: member="enesim_buffer.h::Enesim_Buffer_Free" ref="gaa4e1fa94026fa9b91dfa416d109fc300" args=")(void *buffer_data, void *data)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void(* <a class="el" href="group__Enesim__Buffer.html#ga3e5375e04ae8cca3af0142ea0335e268">Enesim_Buffer_Free</a>)(void *buffer_data, void *user_data)</td>
+          <td class="memname">typedef void(* <a class="el" href="group__Enesim__Buffer.html#gaa4e1fa94026fa9b91dfa416d109fc300">Enesim_Buffer_Free</a>)(void *buffer_data, void *data)</td>
         </tr>
       </table>
 </div>
@@ -148,15 +148,15 @@ Functions</h2></td></tr>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramname">buffer_data</td><td>The buffer data provided by the user </td></tr>
-    <tr><td class="paramname">user_data</td><td>The user private data This function is used to free the data provided for the creation </td></tr>
+    <tr><td class="paramname">data</td><td>The user private data This function is used to free the data provided for the creation </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Buffer.html#gab76747e867ec0426e346c91b8a72955a" title="Create a new buffer using a pool and an user provided data.">enesim_buffer_new_pool_and_data_from()</a> </dd>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group__Enesim__Buffer.html#ga57014980ec58ab18fd263cb1780684fa" title="Create a new buffer using a pool and an user provided data.">enesim_buffer_new_pool_and_data_from()</a> </dd>
 <dd>
-<a class="el" href="group__Enesim__Buffer.html#ga2ece4e20625915711c3b7a0c0288fe50" title="Create a new buffer using an user provided data.">enesim_buffer_new_data_from()</a> </dd>
+<a class="el" href="group__Enesim__Buffer.html#gaa4d89ef75aa7c9469a681fa87efd3159" title="Create a new buffer using an user provided data.">enesim_buffer_new_data_from()</a> </dd>
 <dd>
-<a class="el" href="group__Enesim__Surface.html#ga2def1320c6fcc1ec50e9a5d0792df883" title="Create a new surface using an user provided data.">enesim_surface_new_data_from()</a> </dd></dl>
+<a class="el" href="group__Enesim__Surface.html#ga286260dd4a7e8ecc49a49a758e5483a2" title="Create a new surface using an user provided data.">enesim_surface_new_data_from()</a> </dd></dl>
 
 </div>
 </div>
@@ -222,12 +222,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga2ece4e20625915711c3b7a0c0288fe50"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_new_data_from" ref="ga2ece4e20625915711c3b7a0c0288fe50" args="(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Eina_Bool copy, Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func, void *free_func_data)" -->
+<a class="anchor" id="gaa4d89ef75aa7c9469a681fa87efd3159"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_new_data_from" ref="gaa4d89ef75aa7c9469a681fa87efd3159" args="(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Eina_Bool copy, Enesim_Buffer_Sw_Data *sw_data, Enesim_Buffer_Free free_func, void *free_func_data)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a>* <a class="el" href="group__Enesim__Buffer.html#ga2ece4e20625915711c3b7a0c0288fe50">enesim_buffer_new_data_from</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a>* <a class="el" href="group__Enesim__Buffer.html#gaa4d89ef75aa7c9469a681fa87efd3159">enesim_buffer_new_data_from</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a>&#160;</td>
           <td class="paramname"><em>f</em>, </td>
@@ -254,12 +254,12 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
+          <td class="paramname"><em>sw_data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga3e5375e04ae8cca3af0142ea0335e268">Enesim_Buffer_Free</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#gaa4e1fa94026fa9b91dfa416d109fc300">Enesim_Buffer_Free</a>&#160;</td>
           <td class="paramname"><em>free_func</em>, </td>
         </tr>
         <tr>
@@ -284,7 +284,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">w</td><td>The width of the buffer </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>The height of the buffer </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">copy</td><td>In case the data needs to be copied to create the buffer or used directly </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data of the buffer pixels </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sw_data</td><td>The data of the buffer pixels </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">free_func</td><td>The function to be called whenever the data of the buffer needs to be freed </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">user_data</td><td>The private data for the <em>free_func</em> callback </td></tr>
   </table>
@@ -345,12 +345,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gab76747e867ec0426e346c91b8a72955a"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_new_pool_and_data_from" ref="gab76747e867ec0426e346c91b8a72955a" args="(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy, Enesim_Buffer_Sw_Data *data, Enesim_Buffer_Free free_func, void *free_func_data)" -->
+<a class="anchor" id="ga57014980ec58ab18fd263cb1780684fa"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_new_pool_and_data_from" ref="ga57014980ec58ab18fd263cb1780684fa" args="(Enesim_Buffer_Format f, uint32_t w, uint32_t h, Enesim_Pool *p, Eina_Bool copy, Enesim_Buffer_Sw_Data *sw_data, Enesim_Buffer_Free free_func, void *free_func_data)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a>* <a class="el" href="group__Enesim__Buffer.html#gab76747e867ec0426e346c91b8a72955a">enesim_buffer_new_pool_and_data_from</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a>* <a class="el" href="group__Enesim__Buffer.html#ga57014980ec58ab18fd263cb1780684fa">enesim_buffer_new_pool_and_data_from</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a>&#160;</td>
           <td class="paramname"><em>f</em>, </td>
@@ -383,12 +383,12 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="unionEnesim__Buffer__Sw__Data.html">Enesim_Buffer_Sw_Data</a> *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
+          <td class="paramname"><em>sw_data</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga3e5375e04ae8cca3af0142ea0335e268">Enesim_Buffer_Free</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#gaa4e1fa94026fa9b91dfa416d109fc300">Enesim_Buffer_Free</a>&#160;</td>
           <td class="paramname"><em>free_func</em>, </td>
         </tr>
         <tr>
@@ -414,7 +414,7 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>The height of the buffer </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">p</td><td>The pool to use </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">copy</td><td>In case the data needs to be copied to create the buffer or used directly </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The data of the buffer pixels </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sw_data</td><td>The data of the buffer pixels </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">free_func</td><td>The function to be called whenever the data of the buffer needs to be freed </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">free_func_data</td><td>The private data for the <em>free_func</em> callback </td></tr>
   </table>
@@ -913,7 +913,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 14 2015 23:34:16 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 21 2015 22:00:14 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
