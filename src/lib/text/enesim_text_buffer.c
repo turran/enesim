@@ -82,21 +82,21 @@ EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz)
 	}
 }
 
-EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *string, int length)
+EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *str, int length)
 {
 	if (!length) return;
 	if (!thiz) return;
 
 	if (thiz->descriptor->string_set)
-		thiz->descriptor->string_set(thiz->data, string, length);
+		thiz->descriptor->string_set(thiz->data, str, length);
 }
 
-EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *string, int length, ssize_t offset)
+EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *str, int length, ssize_t offset)
 {
 	if (!length) return length;
 
 	if (thiz->descriptor->string_insert)
-		return thiz->descriptor->string_insert(thiz->data, string, length, offset);
+		return thiz->descriptor->string_insert(thiz->data, str, length, offset);
 	return 0;
 }
 

@@ -43,7 +43,7 @@ typedef struct _Enesim_Log Enesim_Log; /**< Log Handle */
 EAPI Enesim_Log * enesim_log_ref(Enesim_Log *log);
 EAPI void enesim_log_unref(Enesim_Log *log);
 
-EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string);
+EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *str);
 EAPI Enesim_Log * enesim_log_add_parametric(Enesim_Log *log, const char *file, const char *function, int line, char *fmt, va_list args);
 EAPI void enesim_log_dump(const Enesim_Log *log);
 

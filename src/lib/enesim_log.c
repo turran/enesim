@@ -35,7 +35,7 @@
  * @brief Add an log string to the list of defined logs.
  *
  * @param log The list of logs.
- * @param string The log description.
+ * @param str The log description.
  * @return The new list of logs.
  *
  * This function add the description @p string to the list or logs
@@ -46,9 +46,9 @@
  *
  * @see enesim_log_add_parametric()
  */
-EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string)
+EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *str)
 {
-	if (!string)
+	if (!str)
 		return NULL;
 	if (!log)
 	{
@@ -57,7 +57,7 @@ EAPI Enesim_Log * enesim_log_add(Enesim_Log *log, const char *string)
 			return NULL;
 		log->trace = NULL;
 	}
-	log->trace = eina_list_append(log->trace, strdup(string));
+	log->trace = eina_list_append(log->trace, strdup(str));
 	return log;
 }
 

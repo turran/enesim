@@ -8,7 +8,7 @@
     <unref name="unref"/>
     <method name="add">
       <return type="enesim.log" transfer="full" nullable="false"/>
-      <arg name="string" type="string" direction="in" transfer="none" nullable="false"/>
+      <arg name="str" type="string" direction="in" transfer="none" nullable="false"/>
     </method>
     <method name="add_parametric">
       <return type="enesim.log" transfer="full" nullable="false"/>
@@ -1196,7 +1196,7 @@
     </ref>
     <unref name="unref"/>
     <method name="string_set">
-      <arg name="string" type="string" direction="in" transfer="none" nullable="false"/>
+      <arg name="str" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="length" type="int32" direction="in" transfer="full" nullable="false"/>
     </method>
     <method name="string_get">
@@ -1204,7 +1204,7 @@
     </method>
     <method name="string_insert">
       <return type="int32" transfer="full" nullable="false"/>
-      <arg name="string" type="string" direction="in" transfer="none" nullable="false"/>
+      <arg name="str" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="length" type="int32" direction="in" transfer="full" nullable="false"/>
       <arg name="offset" type="size" direction="in" transfer="full" nullable="false"/>
     </method>
