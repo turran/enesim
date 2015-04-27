@@ -21,6 +21,9 @@
 /**
  * @file
  * @ender_group{Enesim_Stream}
+ * @ender_group{Enesim_Stream_File}
+ * @ender_group{Enesim_Stream_Buffer}
+ * @ender_group{Enesim_Stream_Base64}
  */
 
 /**
@@ -41,9 +44,36 @@ EAPI void enesim_stream_munmap(Enesim_Stream *thiz, void *ptr);
 EAPI void enesim_stream_reset(Enesim_Stream *thiz);
 EAPI const char * enesim_stream_uri_get(Enesim_Stream *thiz);
 
+/**
+ * @}
+ * @defgroup Enesim_Stream_File File
+ * @ingroup Enesim_Stream
+ * @brief File based stream
+ * @{
+ */
 EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode);
-EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len);
-EAPI Enesim_Stream * enesim_stream_buffer_static_new(void *buffer, size_t len);
+
+/**
+ * @}
+ * @defgroup Enesim_Stream_Buffer Buffer
+ * @ingroup Enesim_Stream
+ * @brief Buffer based stream
+ * @{
+ */
+
+/**
+ * @param b The user provided buffer
+ */
+typedef void (*Enesim_Stream_Buffer_Free)(void *b);
+
+EAPI Enesim_Stream * enesim_stream_buffer_new(void *buffer, size_t len, Enesim_Stream_Buffer_Free free_cb);
+/**
+ * @}
+ * @defgroup Enesim_Stream_Base64 Base64
+ * @ingroup Enesim_Stream
+ * @brief Base64 stream
+ * @{
+ */
 EAPI Enesim_Stream * enesim_stream_base64_new(Enesim_Stream *d);
 
 /**

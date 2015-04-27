@@ -924,19 +924,16 @@
     <method name="uri_get">
       <return type="string" transfer="none" nullable="false"/>
     </method>
-    <ctor name="file_new">
+  </object>
+  <object name="enesim.stream.file">
+    <ctor name="new">
       <arg name="file" type="string" direction="in" transfer="none" nullable="false"/>
       <arg name="mode" type="string" direction="in" transfer="none" nullable="false"/>
     </ctor>
-    <ctor name="buffer_new">
-      <arg name="buffer" type="pointer" direction="in" transfer="full" nullable="false"/>
-      <arg name="len" type="size" direction="in" transfer="full" nullable="false"/>
-    </ctor>
-    <ctor name="buffer_static_new">
-      <arg name="buffer" type="pointer" direction="in" transfer="full" nullable="false"/>
-      <arg name="len" type="size" direction="in" transfer="full" nullable="false"/>
-    </ctor>
-    <ctor name="base64_new">
+  </object>
+  <callback name="enesim.stream.buffer.free"/>
+  <object name="enesim.stream.base64">
+    <ctor name="new">
       <arg name="d" type="enesim.stream" direction="in" transfer="full" nullable="false"/>
     </ctor>
   </object>
