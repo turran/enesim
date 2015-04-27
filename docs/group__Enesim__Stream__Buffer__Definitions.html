@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: Buffer</title>
+<title>enesim: Definitions</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -72,68 +72,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#groups">Modules</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
-<div class="title">Buffer</div>  </div>
-<div class="ingroups"><a class="el" href="group__Enesim__Stream.html">Stream</a></div></div><!--header-->
+<div class="title">Definitions</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Stream__Buffer.html">Buffer</a></div></div><!--header-->
 <div class="contents">
-
-<p>Buffer based stream.  
-<a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="groups"></a>
-Modules</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Buffer__Definitions.html">Definitions</a></td></tr>
-<tr><td colspan="2"><h2><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Buffer.html#ga7f75729227c5522a593c3cc3e892ff02">enesim_stream_buffer_new</a> (void *buffer, size_t len, <a class="el" href="group__Enesim__Stream__Buffer__Definitions.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a> free_cb)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new memory based stream.  <a href="#ga7f75729227c5522a593c3cc3e892ff02"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Buffer__Definitions.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a> )(void *b)</td></tr>
 </table>
-<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<p>Buffer based stream. </p>
-<hr/><h2>Function Documentation</h2>
-<a class="anchor" id="ga7f75729227c5522a593c3cc3e892ff02"></a><!-- doxytag: member="enesim_stream.h::enesim_stream_buffer_new" ref="ga7f75729227c5522a593c3cc3e892ff02" args="(void *buffer, size_t len, Enesim_Stream_Buffer_Free free_cb)" -->
+<hr/><h2>Typedef Documentation</h2>
+<a class="anchor" id="ga2444a05798039ba0aafad0c63a78edbd"></a><!-- doxytag: member="enesim_stream.h::Enesim_Stream_Buffer_Free" ref="ga2444a05798039ba0aafad0c63a78edbd" args=")(void *b)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__Buffer.html#ga7f75729227c5522a593c3cc3e892ff02">enesim_stream_buffer_new</a> </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>buffer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>len</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Stream__Buffer__Definitions.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a>&#160;</td>
-          <td class="paramname"><em>free_cb</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="memname">typedef void(* <a class="el" href="group__Enesim__Stream__Buffer__Definitions.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a>)(void *b)</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-
-<p>Create a new memory based stream. </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>The buffer that holds the data. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">len</td><td>The length of the buffer </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">free_cb</td><td>Function to call to free the provided buffer  [Delayed callback] </td></tr>
+    <tr><td class="paramname">b</td><td>The user provided buffer </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>A new memory based enesim stream </dd></dl>
 
 </div>
 </div>
