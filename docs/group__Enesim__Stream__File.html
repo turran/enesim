@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: Enesim_Image_Finder_Descriptor Struct Reference</title>
+<title>enesim: File</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -49,7 +49,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,31 +69,63 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
-      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
-      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
-    </ul>
-  </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Enesim_Image_Finder_Descriptor Struct Reference<div class="ingroups"><a class="el" href="group__Enesim__Image__Finder.html">Finder</a></div></div>  </div>
-</div><!--header-->
+<div class="title">File</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Stream.html">Stream</a></div></div><!--header-->
 <div class="contents">
-<!-- doxytag: class="Enesim_Image_Finder_Descriptor" --><table class="memberdecls">
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga21a1d4da1813b97a6a6a17f6aa4a2a08"></a><!-- doxytag: member="Enesim_Image_Finder_Descriptor::version" ref="ga21a1d4da1813b97a6a6a17f6aa4a2a08" args="" -->
-int&#160;</td><td class="memItemRight" valign="bottom"><b>version</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga8482e0d90a421477fd6c6ac973993b7d"></a><!-- doxytag: member="Enesim_Image_Finder_Descriptor::data_from" ref="ga8482e0d90a421477fd6c6ac973993b7d" args="" -->
-<a class="el" href="group__Enesim__Image__Finder.html#ga79cea014b07deb901a8b1d516179b4e4">Enesim_Image_Finder_Data_From</a>&#160;</td><td class="memItemRight" valign="bottom"><b>data_from</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga4f27e84ae507bfa55305734445068a50"></a><!-- doxytag: member="Enesim_Image_Finder_Descriptor::extension_from" ref="ga4f27e84ae507bfa55305734445068a50" args="" -->
-<a class="el" href="group__Enesim__Image__Finder.html#ga9f4e1b1c857c8dce4e9118a44297f004">Enesim_Image_Finder_Extension_From</a>&#160;</td><td class="memItemRight" valign="bottom"><b>extension_from</b></td></tr>
+
+<p>File based stream.  
+<a href="#details">More...</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__File.html#ga6a5bf6f96601a7a91df64c9fdd859761">enesim_stream_file_new</a> (const char *file, const char *mode)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new file based stream.  <a href="#ga6a5bf6f96601a7a91df64c9fdd859761"></a><br/></td></tr>
 </table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<p>File based stream. </p>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="ga6a5bf6f96601a7a91df64c9fdd859761"></a><!-- doxytag: member="enesim_stream.h::enesim_stream_file_new" ref="ga6a5bf6f96601a7a91df64c9fdd859761" args="(const char *file, const char *mode)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__File.html#ga6a5bf6f96601a7a91df64c9fdd859761">enesim_stream_file_new</a> </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>file</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create a new file based stream. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">file</td><td>The file path to open </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mode</td><td>The read/write mode </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A new file based enesim stream </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -112,7 +144,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>version</b></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Apr 27 2015 19:27:58 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 27 2015 19:27:57 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

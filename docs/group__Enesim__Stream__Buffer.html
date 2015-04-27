@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: Definitions</title>
+<title>enesim: Buffer</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -73,52 +73,87 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Definitions</div>  </div>
-<div class="ingroups"><a class="el" href="group__Enesim__Image.html">Image</a></div></div><!--header-->
+<div class="title">Buffer</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Stream.html">Stream</a></div></div><!--header-->
 <div class="contents">
+
+<p>Buffer based stream.  
+<a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Definitions.html#gab37ade6f32e1de17260ed04a9843c445">Enesim_Image_Callback</a> )(<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, void *data, Eina_Bool success, Eina_Error error)</td></tr>
-<tr><td colspan="2"><h2><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga461d7816b800bb96d3040e1eb2a5c94d"></a><!-- doxytag: member="Enesim_Image_Definitions::ENESIM_IMAGE_ERROR_EXIST" ref="ga461d7816b800bb96d3040e1eb2a5c94d" args="" -->
-EAPI Eina_Error&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_ERROR_EXIST</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga87645c0129011da31b29563c3c5d9cf9"></a><!-- doxytag: member="Enesim_Image_Definitions::ENESIM_IMAGE_ERROR_PROVIDER" ref="ga87645c0129011da31b29563c3c5d9cf9" args="" -->
-EAPI Eina_Error&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_ERROR_PROVIDER</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gac8f75167726dc7a23b8fc374ad18e4d8"></a><!-- doxytag: member="Enesim_Image_Definitions::ENESIM_IMAGE_ERROR_FORMAT" ref="gac8f75167726dc7a23b8fc374ad18e4d8" args="" -->
-EAPI Eina_Error&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_ERROR_FORMAT</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1eb3a57d726235c6aca1d12f9872efb9"></a><!-- doxytag: member="Enesim_Image_Definitions::ENESIM_IMAGE_ERROR_SIZE" ref="ga1eb3a57d726235c6aca1d12f9872efb9" args="" -->
-EAPI Eina_Error&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_ERROR_SIZE</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga30c98ce2806081f320e2dbe0bc3e06cb"></a><!-- doxytag: member="Enesim_Image_Definitions::ENESIM_IMAGE_ERROR_ALLOCATOR" ref="ga30c98ce2806081f320e2dbe0bc3e06cb" args="" -->
-EAPI Eina_Error&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_ERROR_ALLOCATOR</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1060a7f2a1cb079328dbdda0d72df1f9"></a><!-- doxytag: member="Enesim_Image_Definitions::ENESIM_IMAGE_ERROR_LOADING" ref="ga1060a7f2a1cb079328dbdda0d72df1f9" args="" -->
-EAPI Eina_Error&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_ERROR_LOADING</b></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga8bc80bcfbdd437ee4566e2989edceae8"></a><!-- doxytag: member="Enesim_Image_Definitions::ENESIM_IMAGE_ERROR_SAVING" ref="ga8bc80bcfbdd437ee4566e2989edceae8" args="" -->
-EAPI Eina_Error&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_ERROR_SAVING</b></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Buffer.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a> )(void *b)</td></tr>
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Buffer.html#ga7f75729227c5522a593c3cc3e892ff02">enesim_stream_buffer_new</a> (void *buffer, size_t len, <a class="el" href="group__Enesim__Stream__Buffer.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a> free_cb)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new memory based stream.  <a href="#ga7f75729227c5522a593c3cc3e892ff02"></a><br/></td></tr>
 </table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<p>Buffer based stream. </p>
 <hr/><h2>Typedef Documentation</h2>
-<a class="anchor" id="gab37ade6f32e1de17260ed04a9843c445"></a><!-- doxytag: member="enesim_image.h::Enesim_Image_Callback" ref="gab37ade6f32e1de17260ed04a9843c445" args=")(Enesim_Buffer *b, void *data, Eina_Bool success, Eina_Error error)" -->
+<a class="anchor" id="ga2444a05798039ba0aafad0c63a78edbd"></a><!-- doxytag: member="enesim_stream.h::Enesim_Stream_Buffer_Free" ref="ga2444a05798039ba0aafad0c63a78edbd" args=")(void *b)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void(* <a class="el" href="group__Enesim__Image__Definitions.html#gab37ade6f32e1de17260ed04a9843c445">Enesim_Image_Callback</a>)(<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, void *data, Eina_Bool success, Eina_Error error)</td>
+          <td class="memname">typedef void(* <a class="el" href="group__Enesim__Stream__Buffer.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a>)(void *b)</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<p>Function prototype called whenever an image is loaded or saved </p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">b</td><td>The buffer where the data loadad is or where the data to write is </td></tr>
-    <tr><td class="paramname">data</td><td>The user provided data </td></tr>
-    <tr><td class="paramname">error</td><td>The error in case something went wrong </td></tr>
+    <tr><td class="paramname">b</td><td>The user provided buffer </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="ga7f75729227c5522a593c3cc3e892ff02"></a><!-- doxytag: member="enesim_stream.h::enesim_stream_buffer_new" ref="ga7f75729227c5522a593c3cc3e892ff02" args="(void *buffer, size_t len, Enesim_Stream_Buffer_Free free_cb)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__Buffer.html#ga7f75729227c5522a593c3cc3e892ff02">enesim_stream_buffer_new</a> </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>len</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Stream__Buffer.html#ga2444a05798039ba0aafad0c63a78edbd">Enesim_Stream_Buffer_Free</a>&#160;</td>
+          <td class="paramname"><em>free_cb</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Create a new memory based stream. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>The buffer that holds the data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">len</td><td>The length of the buffer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">free_cb</td><td>Function to call to free the provided buffer  [Delayed callback] </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A new memory based enesim stream </dd></dl>
 
 </div>
 </div>
