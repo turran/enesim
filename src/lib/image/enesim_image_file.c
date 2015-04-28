@@ -117,11 +117,11 @@ static Eina_Bool _file_load_data_get(const char *file, Enesim_Stream **data, con
 /**
  * Gets the information about an image file
  *
- * @param file The image file to load
- * @param w The image width
- * @param h The image height
- * @param sfmt The image original format
- * @param options Any option the provider might require
+ * @param[in] file The image file to load
+ * @param[out] w The image width
+ * @param[out] h The image height
+ * @param[out] sfmt The image original format
+ * @param[in] options Any option the provider might require
  * @param[out] err The error in case the file info load fails
  */
 EAPI Eina_Bool enesim_image_file_info_get(const char *file, int *w, int *h,
@@ -141,11 +141,11 @@ EAPI Eina_Bool enesim_image_file_info_get(const char *file, int *w, int *h,
 /**
  * Load an image synchronously
  *
- * @param file The image file to load
- * @param b The buffer to write the image pixels to. It must not be NULL.
+ * @param[in] file The image file to load
+ * @param[out] b The buffer to write the image pixels to. It must not be NULL.
  * @param mpool The mempool that will create the surface in case the surface
  * reference is NULL
- * @param options Any option the emage provider might require
+ * @param[in] options Any option the emage provider might require
  * @param[out] err The error in case the file load fails
  * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
  */
@@ -165,13 +165,13 @@ EAPI Eina_Bool enesim_image_file_load(const char *file, Enesim_Buffer **b,
 /**
  * Load an image file asynchronously
  *
- * @param file The image file to load
- * @param b The buffer to write the image pixels to. It must not be NULL.
- * @param mpool The mempool that will create the surface in case the surface
+ * @param[in] file The image file to load
+ * @param[in] b The buffer to write the image pixels to. It must not be NULL.
+ * @param[in] mpool The mempool that will create the surface in case the surface
  * reference is NULL
- * @param cb The function that will get called once the load is done
- * @param data User provided data
- * @param options Any option the emage provider might require
+ * @param[in] cb The function that will get called once the load is done
+ * @param[in] data User provided data
+ * @param[in] options Any option the emage provider might require
  */
 EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
 		Enesim_Pool *mpool, Enesim_Image_Callback cb,
@@ -197,9 +197,9 @@ EAPI void enesim_image_file_load_async(const char *file, Enesim_Buffer *b,
 /**
  * Save an image file synchronously
  *
- * @param file The image file to save
- * @param b The surface to read the image pixels from. It must not be NULL.
- * @param options Any option the emage provider might require
+ * @param[in] file The image file to save
+ * @param[in] b The surface to read the image pixels from. It must not be NULL.
+ * @param[in] options Any option the emage provider might require
  * @param[out] err The error in case the file save fails
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
@@ -221,12 +221,11 @@ EAPI Eina_Bool enesim_image_file_save(const char *file, Enesim_Buffer *b, const 
 /**
  * Save an image file asynchronously
  *
- * @param file The image file to save
- * @param b The surface to read the image pixels from. It must not be NULL.
- * @param cb The function that will get called once the save is done
- * @param data User provided data
- * @param options Any option the emage provider might require
- *
+ * @param[in] file The image file to save
+ * @param[in] b The surface to read the image pixels from. It must not be NULL.
+ * @param[in] cb The function that will get called once the save is done
+ * @param[in] data User provided data
+ * @param[in] options Any option the emage provider might require
  */
 EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b,
 		Enesim_Image_Callback cb, void *data, const char *options)
