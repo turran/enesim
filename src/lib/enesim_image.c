@@ -208,12 +208,12 @@ Eina_Error ENESIM_IMAGE_ERROR_SAVING;
 /**
  * Gets information about an image
  *
- * @param data The image data
- * @param mime The image mime
- * @param w The image width
- * @param h The image height
- * @param sfmt The image original format
- * @param options Any option the provider might require
+ * @param[in] data The image data
+ * @param[in] mime The image mime
+ * @param[out] w The image width
+ * @param[out] h The image height
+ * @param[out] sfmt The image original format
+ * @param[in] options Any option the provider might require
  * @param[out] err The error in case the info loading fails
  */
 EAPI Eina_Bool enesim_image_info_get(Enesim_Stream *data, const char *mime,
@@ -228,15 +228,15 @@ EAPI Eina_Bool enesim_image_info_get(Enesim_Stream *data, const char *mime,
 /**
  * Load an image synchronously
  *
- * @param data The image data to load from
- * @param mime The image mime. It can be NULL, if so, it will be autodetected
+ * @param[in] data The image data to load from
+ * @param[in] mime The image mime. It can be NULL, if so, it will be autodetected
  * from the data itself.
- * @param b The buffer to write the image pixels to. It must not be NULL.
- * @param mpool The mempool that will create the buffer in case the buffer
+ * @param[out] b The buffer to write the image pixels to. It must not be NULL.
+ * @param[in] mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
- * @param options Any option the provider might require
- * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
+ * @param[in] options Any option the provider might require
  * @param[out] err The error in case the info loading fails
+ * @return EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not
  */
 EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
 		Enesim_Buffer **b, Enesim_Pool *mpool, const char *options, Eina_Error *err)
@@ -249,15 +249,15 @@ EAPI Eina_Bool enesim_image_load(Enesim_Stream *data, const char *mime,
 /**
  * Load an image asynchronously
  *
- * @param s The image data to load from
- * @param mime The image mime. It can be NULL, if so, it will be autodetected
+ * @param[in] s The image data to load from
+ * @param[in] mime The image mime. It can be NULL, if so, it will be autodetected
  * from the data itself.
- * @param b The buffer to write the image pixels to. It must not be NULL.
- * @param mpool The mempool that will create the buffer in case the buffer
+ * @param[in] b The buffer to write the image pixels to. It must not be NULL.
+ * @param[in] mpool The mempool that will create the buffer in case the buffer
  * reference is NULL
- * @param cb The function that will get called once the load is done
- * @param data User provided data
- * @param options Any option the provider might require
+ * @param[in] cb The function that will get called once the load is done
+ * @param[in] data User provided data
+ * @param[in] options Any option the provider might require
  */
 EAPI void enesim_image_load_async(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, Enesim_Pool *mpool, Enesim_Image_Callback cb,
@@ -269,10 +269,10 @@ EAPI void enesim_image_load_async(Enesim_Stream *s, const char *mime,
 /**
  * Save an image synchronously
  *
- * @param s The image data to save to
- * @param mime The image mime
- * @param b The buffer to read the image pixels from. It must not be NULL.
- * @param options Any option the provider might require
+ * @param[in] s The image data to save to
+ * @param[in] mime The image mime
+ * @param[in] b The buffer to read the image pixels from. It must not be NULL.
+ * @param[in] options Any option the provider might require
  * @param[out] err The error in case the save fails
  * @return EINA_TRUE in case the image was saved correctly. EINA_FALSE if not
  */
@@ -288,12 +288,12 @@ EAPI Eina_Bool enesim_image_save(Enesim_Stream *s, const char *mime,
 /**
  * Save an image asynchronously
  *
- * @param s The image data to save to
- * @param mime The image mime
- * @param b The buffer to read the image pixels from. It must not be NULL.
- * @param cb The function that will get called once the save is done
- * @param data User provided data
- * @param options Any option the provider might require
+ * @param[in] s The image data to save to
+ * @param[in] mime The image mime
+ * @param[in] b The buffer to read the image pixels from. It must not be NULL.
+ * @param[in] cb The function that will get called once the save is done
+ * @param[in] data User provided data
+ * @param[in] options Any option the provider might require
  */
 EAPI void enesim_image_save_async(Enesim_Stream *s, const char *mime,
 		Enesim_Buffer *b, Enesim_Image_Callback cb,

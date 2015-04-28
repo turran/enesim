@@ -965,20 +965,20 @@
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="s" type="enesim.stream" direction="in" transfer="full"/>
       <arg name="mime" type="string" direction="in" transfer="none"/>
-      <arg name="w" type="int" direction="in" transfer="full"/>
-      <arg name="h" type="int" direction="in" transfer="full"/>
-      <arg name="sfmt" type="enesim.buffer.format" direction="in" transfer="full"/>
+      <arg name="w" type="int32" direction="out" transfer="full"/>
+      <arg name="h" type="int32" direction="out" transfer="full"/>
+      <arg name="sfmt" type="enesim.buffer.format" direction="out" transfer="full"/>
       <arg name="options" type="string" direction="in" transfer="none"/>
       <arg name="err" type="eina.error" direction="out" transfer="full"/>
     </function>
     <function name="load">
       <return type="bool" transfer="full" nullable="false"/>
-      <arg name="s" type="enesim.stream" direction="out" transfer="full"/>
+      <arg name="s" type="enesim.stream" direction="in" transfer="full"/>
       <arg name="mime" type="string" direction="in" transfer="none"/>
-      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="b" type="enesim.buffer" direction="out" transfer="full"/>
       <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
       <arg name="options" type="string" direction="in" transfer="none"/>
-      <arg name="err" type="eina.error" direction="in" transfer="full"/>
+      <arg name="err" type="eina.error" direction="out" transfer="full"/>
     </function>
     <function name="load_async">
       <arg name="s" type="enesim.stream" direction="in" transfer="full"/>
