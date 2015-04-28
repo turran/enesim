@@ -188,11 +188,11 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_De
 <p>Gets the information about an image file</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">file</td><td>The image file to load </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">w</td><td>The image width </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">h</td><td>The image height </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">sfmt</td><td>The image original format </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">file</td><td>The image file to load </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>The image width </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">h</td><td>The image height </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">sfmt</td><td>The image original format </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">err</td><td>The error in case the file info load fails </td></tr>
   </table>
   </dd>
@@ -245,10 +245,10 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_De
 <p>Load an image synchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">file</td><td>The image file to load </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">file</td><td>The image file to load </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
     <tr><td class="paramdir"></td><td class="paramname">mpool</td><td>The mempool that will create the surface in case the surface reference is NULL </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">err</td><td>The error in case the file load fails </td></tr>
   </table>
   </dd>
@@ -308,12 +308,12 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_De
 <p>Load an image file asynchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">file</td><td>The image file to load </td></tr>
-    <tr><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
-    <tr><td class="paramname">mpool</td><td>The mempool that will create the surface in case the surface reference is NULL </td></tr>
-    <tr><td class="paramname">cb</td><td>The function that will get called once the load is done </td></tr>
-    <tr><td class="paramname">data</td><td>User provided data </td></tr>
-    <tr><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">file</td><td>The image file to load </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mpool</td><td>The mempool that will create the surface in case the surface reference is NULL </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cb</td><td>The function that will get called once the load is done </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>User provided data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
   </table>
   </dd>
 </dl>
@@ -359,9 +359,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_De
 <p>Save an image file synchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">file</td><td>The image file to save </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">b</td><td>The surface to read the image pixels from. It must not be NULL. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">file</td><td>The image file to save </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The surface to read the image pixels from. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">err</td><td>The error in case the file save fails </td></tr>
   </table>
   </dd>
@@ -415,11 +415,11 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_De
 <p>Save an image file asynchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">file</td><td>The image file to save </td></tr>
-    <tr><td class="paramname">b</td><td>The surface to read the image pixels from. It must not be NULL. </td></tr>
-    <tr><td class="paramname">cb</td><td>The function that will get called once the save is done </td></tr>
-    <tr><td class="paramname">data</td><td>User provided data </td></tr>
-    <tr><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">file</td><td>The image file to save </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The surface to read the image pixels from. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cb</td><td>The function that will get called once the save is done </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>User provided data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the emage provider might require </td></tr>
   </table>
   </dd>
 </dl>
@@ -444,7 +444,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Finder_De
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2015 18:47:13 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2015 18:51:54 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
