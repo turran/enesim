@@ -193,12 +193,12 @@ Functions</h2></td></tr>
 <p>Gets information about an image</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">data</td><td>The image data </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">mime</td><td>The image mime </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">w</td><td>The image width </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">h</td><td>The image height </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">sfmt</td><td>The image original format </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The image data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mime</td><td>The image mime </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>The image width </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">h</td><td>The image height </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">sfmt</td><td>The image original format </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">err</td><td>The error in case the info loading fails </td></tr>
   </table>
   </dd>
@@ -257,21 +257,16 @@ Functions</h2></td></tr>
 <p>Load an image synchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">data</td><td>The image data to load from </td></tr>
-    <tr><td class="paramname">mime</td><td>The image mime. It can be NULL, if so, it will be autodetected from the data itself. </td></tr>
-    <tr><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
-    <tr><td class="paramname">mpool</td><td>The mempool that will create the buffer in case the buffer reference is NULL </td></tr>
-    <tr><td class="paramname">options</td><td>Any option the provider might require </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not </dd></dl>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The image data to load from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mime</td><td>The image mime. It can be NULL, if so, it will be autodetected from the data itself. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mpool</td><td>The mempool that will create the buffer in case the buffer reference is NULL </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">err</td><td>The error in case the info loading fails </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE in case the image was loaded correctly. EINA_FALSE if not </dd></dl>
 
 </div>
 </div>
@@ -332,13 +327,13 @@ Functions</h2></td></tr>
 <p>Load an image asynchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">s</td><td>The image data to load from </td></tr>
-    <tr><td class="paramname">mime</td><td>The image mime. It can be NULL, if so, it will be autodetected from the data itself. </td></tr>
-    <tr><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
-    <tr><td class="paramname">mpool</td><td>The mempool that will create the buffer in case the buffer reference is NULL </td></tr>
-    <tr><td class="paramname">cb</td><td>The function that will get called once the load is done </td></tr>
-    <tr><td class="paramname">data</td><td>User provided data </td></tr>
-    <tr><td class="paramname">options</td><td>Any option the provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The image data to load from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mime</td><td>The image mime. It can be NULL, if so, it will be autodetected from the data itself. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The buffer to write the image pixels to. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mpool</td><td>The mempool that will create the buffer in case the buffer reference is NULL </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cb</td><td>The function that will get called once the load is done </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>User provided data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
   </table>
   </dd>
 </dl>
@@ -390,10 +385,10 @@ Functions</h2></td></tr>
 <p>Save an image synchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir"></td><td class="paramname">s</td><td>The image data to save to </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">mime</td><td>The image mime </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">b</td><td>The buffer to read the image pixels from. It must not be NULL. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The image data to save to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mime</td><td>The image mime </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The buffer to read the image pixels from. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">err</td><td>The error in case the save fails </td></tr>
   </table>
   </dd>
@@ -453,12 +448,12 @@ Functions</h2></td></tr>
 <p>Save an image asynchronously</p>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">s</td><td>The image data to save to </td></tr>
-    <tr><td class="paramname">mime</td><td>The image mime </td></tr>
-    <tr><td class="paramname">b</td><td>The buffer to read the image pixels from. It must not be NULL. </td></tr>
-    <tr><td class="paramname">cb</td><td>The function that will get called once the save is done </td></tr>
-    <tr><td class="paramname">data</td><td>User provided data </td></tr>
-    <tr><td class="paramname">options</td><td>Any option the provider might require </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The image data to save to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mime</td><td>The image mime </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The buffer to read the image pixels from. It must not be NULL. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cb</td><td>The function that will get called once the save is done </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>User provided data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
   </table>
   </dd>
 </dl>
@@ -483,7 +478,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2015 18:36:55 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2015 18:47:13 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
