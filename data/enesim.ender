@@ -932,7 +932,7 @@
       <return type="string" transfer="none" nullable="false"/>
     </method>
   </object>
-  <object name="enesim.stream.file">
+  <object name="enesim.stream.file" inherits="enesim.stream">
     <ctor name="new">
       <arg name="file" type="string" direction="in" transfer="none"/>
       <arg name="mode" type="string" direction="in" transfer="none"/>
@@ -941,7 +941,7 @@
   <callback name="enesim.stream.buffer.free">
     <arg name="b" type="pointer" direction="in" transfer="full" nullable="false"/>
   </callback>
-  <object name="enesim.stream.buffer">
+  <object name="enesim.stream.buffer" inherits="enesim.stream">
     <ctor name="new">
       <arg name="buffer" type="pointer" direction="in" transfer="full"/>
       <arg name="len" type="size" direction="in" transfer="full"/>

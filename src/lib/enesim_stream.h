@@ -49,7 +49,7 @@ EAPI const char * enesim_stream_uri_get(Enesim_Stream *thiz);
  * @}
  * @defgroup Enesim_Stream_File File
  * @ingroup Enesim_Stream
- * @brief File based stream
+ * @brief File based stream @ender_inherits{Enesim_Stream}
  * @{
  */
 EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode);
@@ -57,7 +57,7 @@ EAPI Enesim_Stream * enesim_stream_file_new(const char *file, const char *mode);
 /**
  * @}
  * @defgroup Enesim_Stream_Buffer_Definitions Definitions
- * @ingroup Enesim_Stream_Buffer
+ * @ingroup Enesim_Stream_Buffer 
  * @{
  */
 
@@ -70,7 +70,7 @@ typedef void (*Enesim_Stream_Buffer_Free)(void *b);
  * @}
  * @defgroup Enesim_Stream_Buffer Buffer
  * @ingroup Enesim_Stream
- * @brief Buffer based stream
+ * @brief Buffer based stream @ender_inherits{Enesim_Stream}
  * @{
  */
 
