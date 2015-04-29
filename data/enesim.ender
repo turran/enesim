@@ -2351,20 +2351,24 @@
         <return type="enesim.surface" transfer="none" nullable="false"/>
       </getter>
     </prop>
-    <prop name="vertex_color">
-      <setter>
-        <arg name="index" type="int32" direction="in" transfer="full"/>
-        <arg name="color" type="enesim.argb" direction="in" transfer="full"/>
-      </setter>
-      <getter>
-        <return type="enesim.argb" transfer="full" nullable="false"/>
-        <arg name="index" type="int32" direction="in" transfer="full"/>
-      </getter>
-    </prop>
-    <prop name="vertex">
-      <accessor name="position_set" oname="enesim_renderer_map_quad" otype="enesim.renderer"/>
-      <accessor name="position_get" oname="enesim_renderer_map_quad" otype="enesim.renderer"/>
-    </prop>
     <ctor name="new"/>
+    <method name="vertex_color_set">
+      <arg name="index" type="int32" direction="in" transfer="full"/>
+      <arg name="color" type="enesim.argb" direction="in" transfer="full"/>
+    </method>
+    <method name="vertex_color_get">
+      <return type="enesim.argb" transfer="full" nullable="false"/>
+      <arg name="index" type="int32" direction="in" transfer="full"/>
+    </method>
+    <method name="vertex_position_set">
+      <arg name="index" type="int32" direction="in" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="vertex_position_get">
+      <arg name="index" type="int32" direction="in" transfer="full"/>
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
   </object>
 </lib>

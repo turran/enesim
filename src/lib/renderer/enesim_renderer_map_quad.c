@@ -1281,7 +1281,6 @@ EAPI Enesim_Renderer * enesim_renderer_map_quad_new(void)
 
 /**
  * @brief Sets a vertex's coordinates
- * @ender_prop{vertex}
  * @param[in] r The map quad renderer
  * @param[in] index The vertex index
  * @param[in] x The x coord of the vertex
@@ -1305,7 +1304,6 @@ EAPI void enesim_renderer_map_quad_vertex_position_set(Enesim_Renderer *r,
 
 /**
  * @brief Gets a vertex's coordinates
- * @ender_prop{vertex}
  * @param[in] r The map quad renderer
  * @param[in] index The vertex index
  * @param[in] x The x coord of the vertex to get
@@ -1363,7 +1361,6 @@ EAPI Enesim_Surface * enesim_renderer_map_quad_source_surface_get(Enesim_Rendere
 
 /**
  * @brief Sets the non-premul color for a vertex
- * @ender_prop{vertex_color}
  * @param[in] r The map quad renderer
  * @param[in] index The vertex index
  * @param[in] color The argb color
@@ -1385,7 +1382,6 @@ EAPI void enesim_renderer_map_quad_vertex_color_set(Enesim_Renderer *r,
 
 /**
  * @brief Gets the color of a vertex
- * @ender_prop{vertex_color}
  * @param[in] r The map quad renderer
  * @param[in] index The vertex index
  * @return the color of the vertex
