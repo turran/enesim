@@ -37,6 +37,11 @@ typedef struct _Enesim_Stream_Buffer
 /*----------------------------------------------------------------------------*
  *                      The Enesim Image Data interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _enesim_stream_buffer_type_get(void)
+{
+	return "enesim.stream.buffer";
+}
+
 static ssize_t _enesim_stream_buffer_read(void *data, void *buffer, size_t len)
 {
 	Enesim_Stream_Buffer *thiz = data;
@@ -96,6 +101,7 @@ static void _enesim_stream_buffer_free(void *data)
 }
 
 static Enesim_Stream_Descriptor _enesim_stream_buffer_descriptor = {
+	/* .type_get	= */ _enesim_stream_buffer_type_get,
 	/* .read	= */ _enesim_stream_buffer_read,
 	/* .write	= */ _enesim_stream_buffer_write,
 	/* .mmap	= */ _enesim_stream_buffer_mmap,

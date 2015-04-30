@@ -44,6 +44,8 @@ EAPI void * enesim_stream_mmap(Enesim_Stream *thiz, size_t *size);
 EAPI void enesim_stream_munmap(Enesim_Stream *thiz, void *ptr);
 EAPI void enesim_stream_reset(Enesim_Stream *thiz);
 EAPI const char * enesim_stream_uri_get(Enesim_Stream *thiz);
+EAPI Eina_Bool enesim_stream_type_get(Enesim_Stream *thiz, const char **lib,
+		const char **name);
 
 /**
  * @}

@@ -108,6 +108,11 @@ next:
 /*----------------------------------------------------------------------------*
  *                      The Enesim Image Data interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _enesim_stream_base64_type_get(void)
+{
+	return "enesim.stream.base64";
+}
+
 /* when the user requests 3 bytes of base64 decoded data we need to read 4 bytes
  * so we always read more from the real source
  */
@@ -205,6 +210,7 @@ static void _enesim_stream_base64_free(void *data)
 }
 
 static Enesim_Stream_Descriptor _enesim_stream_base64_descriptor = {
+	/* .type_get	= */ _enesim_stream_base64_type_get,
 	/* .read	= */ _enesim_stream_base64_read,
 	/* .write	= */ NULL, /* not implemented yet */
 	/* .mmap	= */ NULL, /* impossible to do */

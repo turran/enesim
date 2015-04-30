@@ -19,6 +19,7 @@
 #ifndef ENESIM_STREAM_PRIVATE_H_
 #define ENESIM_STREAM_PRIVATE_H_
 
+typedef const char * (*Enesim_Stream_Type_Get)(void);
 typedef ssize_t (*Enesim_Stream_Read)(void *data, void *buffer, size_t len);
 typedef ssize_t (*Enesim_Stream_Write)(void *data, void *buffer, size_t len);
 typedef void * (*Enesim_Stream_Mmap)(void *data, size_t *size);
@@ -30,6 +31,7 @@ typedef void (*Enesim_Stream_Free)(void *data);
 
 typedef struct _Enesim_Stream_Descriptor
 {
+	Enesim_Stream_Type_Get type_get;
 	Enesim_Stream_Read read;
 	Enesim_Stream_Write write;
 	Enesim_Stream_Mmap mmap;

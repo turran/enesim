@@ -68,6 +68,11 @@ static  Enesim_Stream_File_Flag _mode_to_flag(const char *mode)
 /*----------------------------------------------------------------------------*
  *                      The Enesim Image Data interface                       *
  *----------------------------------------------------------------------------*/
+static const char * _enesim_stream_file_type_get(void)
+{
+	return "enesim.stream.file";
+}
+
 static ssize_t _enesim_stream_file_read(void *data, void *buffer, size_t len)
 {
 	Enesim_Stream_File *thiz = data;
@@ -145,6 +150,7 @@ static void _enesim_stream_file_free(void *data)
 }
 
 static Enesim_Stream_Descriptor _enesim_stream_file_descriptor = {
+	/* .type_get	= */ _enesim_stream_file_type_get,
 	/* .read	= */ _enesim_stream_file_read,
 	/* .write	= */ _enesim_stream_file_write,
 	/* .mmap	= */ _enesim_stream_file_mmap,
