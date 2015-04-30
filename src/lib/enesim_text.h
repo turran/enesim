@@ -23,6 +23,7 @@
  * @file
  * @ender_group{Enesim_Text}
  * @ender_group{Enesim_Text_Engine}
+ * @ender_group{Enesim_Text_Engine_Freetype}
  * @ender_group{Enesim_Text_Font}
  * @ender_group{Enesim_Text_Buffer}
  * @ender_group{Enesim_Text_Buffer_Simple}
@@ -59,9 +60,18 @@ typedef enum _Enesim_Text_Direction
 
 typedef struct _Enesim_Text_Engine Enesim_Text_Engine;
 EAPI Enesim_Text_Engine * enesim_text_engine_default_get(void);
-EAPI Enesim_Text_Engine * enesim_text_engine_freetype_get(void);
 EAPI Enesim_Text_Engine * enesim_text_engine_ref(Enesim_Text_Engine *thiz);
 EAPI void enesim_text_engine_unref(Enesim_Text_Engine *thiz);
+EAPI Eina_Bool enesim_text_engine_type_get(Enesim_Text_Engine *thiz,
+		const char **lib, const char **name);
+/**
+ * @}
+ * @defgroup Enesim_Text_Engine_Freetype FreeType Text Engine
+ * @ingroup Enesim_Text_Engine
+ * @{
+ */
+
+EAPI Enesim_Text_Engine * enesim_text_engine_freetype_new(void);
 
 /**
  * @}
@@ -92,6 +102,8 @@ typedef struct _Enesim_Text_Buffer Enesim_Text_Buffer;
 
 EAPI Enesim_Text_Buffer * enesim_text_buffer_ref(Enesim_Text_Buffer *thiz);
 EAPI void enesim_text_buffer_unref(Enesim_Text_Buffer *thiz);
+EAPI Eina_Bool enesim_text_buffer_type_get(Enesim_Text_Buffer *thiz,
+		const char **lib, const char **name);
 
 EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *str, int length);
 EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz);

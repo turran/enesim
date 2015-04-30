@@ -95,6 +95,10 @@ static void _raster_callback(const int y,
 /*----------------------------------------------------------------------------*
  *                        The Enesim's text interface                         *
  *----------------------------------------------------------------------------*/
+static const char * _enesim_text_engine_freetype_type_get(void)
+{
+	return "enesim.text.engine.freetype";
+}
 
 static void * _enesim_text_engine_freetype_init(void)
 {
@@ -227,6 +231,7 @@ no_surface:
 static Enesim_Text_Engine_Descriptor _enesim_text_engine_freetype_descriptor  = {
 	/* .init 			= */ _enesim_text_engine_freetype_init,
 	/* .shutdown 			= */ _enesim_text_engine_freetype_shutdown,
+	/* .type_get 			= */ _enesim_text_engine_freetype_type_get,
 	/* .font_load 			= */ _enesim_text_engine_freetype_font_load,
 	/* .font_delete 		= */ _enesim_text_engine_freetype_font_delete,
 	/* .font_max_ascent_get 	= */ _enesim_text_engine_freetype_font_max_ascent_get,
@@ -254,15 +259,10 @@ void enesim_text_engine_freetype_shutdown(void)
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Enesim_Text_Engine * enesim_text_engine_freetype_get(void)
-{
-	return enesim_text_engine_ref(_engine);
-}
-
 EAPI Enesim_Text_Engine * enesim_text_engine_freetype_new(void)
 {
 #if HAVE_FREETYPE
-	return enesim_text_engine_new(&_enesim_text_engine_freetype_descriptor);
+	return enesim_text_engine_ref(_engine);
 #else
 	return NULL;
 #endif

@@ -24,6 +24,7 @@ void enesim_text_engine_freetype_init(void);
 void enesim_text_engine_freetype_shutdown(void);
 
 /* text buffer interface */
+typedef const char * (*Enesim_Text_Buffer_Type_Get)(void);
 typedef void (*Enesim_Text_Buffer_String_Set)(void *data, const char *string, int length);
 typedef const char * (*Enesim_Text_Buffer_String_Get)(void *data);
 typedef int (*Enesim_Text_Buffer_String_Insert)(void *data, const char *string, int length, ssize_t offset);
@@ -33,6 +34,7 @@ typedef void (*Enesim_Text_Buffer_Free)(void *data);
 
 typedef struct _Enesim_Text_Buffer_Descriptor
 {
+	Enesim_Text_Buffer_Type_Get type_get;
 	Enesim_Text_Buffer_String_Get string_get;
 	Enesim_Text_Buffer_String_Set string_set;
 	Enesim_Text_Buffer_String_Insert string_insert;
@@ -86,6 +88,7 @@ typedef struct _Enesim_Text_Engine_Descriptor
 	/* main interface */
 	void *(*init)(void);
 	void (*shutdown)(void *data);
+	const char * (*type_get)(void);
 	/* font interface */
 	void *(*font_load)(void *data, const char *name, int index, int size);
 	void (*font_delete)(void *data, void *fdata);

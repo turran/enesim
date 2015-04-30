@@ -38,6 +38,10 @@ typedef struct _Enesim_Text_Buffer_Simple
 /*----------------------------------------------------------------------------*
  *                           Text buffer interface                            *
  *----------------------------------------------------------------------------*/
+static const char * _simple_type_get(void)
+{
+	return "enesim.text.buffer.simple";
+}
 
 static void _simple_string_set(void *data, const char *string, int length)
 {
@@ -150,6 +154,7 @@ static void _simple_free(void *data)
 
 /* the simple buffer */
 static Enesim_Text_Buffer_Descriptor _enesim_text_buffer_simple = {
+	/* .type_get 		= */ _simple_type_get,
 	/* .string_get 		= */ _simple_string_get,
 	/* .string_set 		= */ _simple_string_set,
 	/* .string_insert 	= */ _simple_string_insert,

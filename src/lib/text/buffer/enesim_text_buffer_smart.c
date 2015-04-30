@@ -37,6 +37,10 @@ typedef struct _Enesim_Text_Buffer_Smart
 /*----------------------------------------------------------------------------*
  *                           Text buffer interface                            *
  *----------------------------------------------------------------------------*/
+static const char *_smart_type_get(void)
+{
+	return "enesim.text.buffer.smart";
+}
 
 static void _smart_string_set(void *data, const char *string, int length)
 {
@@ -96,6 +100,7 @@ static void _smart_free(void *data)
 
 /* the smart buffer */
 static Enesim_Text_Buffer_Descriptor _enesim_text_buffer_smart = {
+	/* .type_get 		= */ _smart_type_get,
 	/* .string_get 		= */ _smart_string_get,
 	/* .string_set 		= */ _smart_string_set,
 	/* .string_insert 	= */ _smart_string_insert,

@@ -123,3 +123,24 @@ EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz)
 		return thiz->descriptor->string_length(thiz->data);
 	return 0;
 }
+
+/**
+ * @brief Get the type of a text buffer 
+ * @ender_downcast
+ * @param[in] thiz The text buffer to get the type from
+ * @param[out] lib The ender library associated with this text buffer
+ * @param[out] name The ender item name of the text buffer
+ *
+ * This function is needed for ender in order to downcast a text buffer
+ */
+EAPI Eina_Bool enesim_text_buffer_type_get(Enesim_Text_Buffer *thiz,
+		const char **lib, const char **name)
+{
+	if (!thiz)
+		return EINA_FALSE;
+	if (lib)
+		*lib = "enesim";
+	if (name)
+		*name = thiz->descriptor->type_get();
+	return EINA_TRUE;
+}
