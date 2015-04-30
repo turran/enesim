@@ -72,6 +72,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#groups">Modules</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -82,6 +83,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Buffer and surface pixel data allocator.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="groups"></a>
+Modules</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Pool__Sw.html">Sw Pool</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Generic Sw based pool. </p>
+<br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Pool__Eina.html">Eina Pool</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Enesim pool based on an Eina Mempool. </p>
+<br/></td></tr>
 <tr><td colspan="2"><h2><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef struct _Enesim_Pool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a></td></tr>
@@ -95,7 +104,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the reference counter of a pool.  <a href="#ga16a5308a7d290489ef96b45a1052b36c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Pool.html#gad057ed7717e5e6a4942675cf51ecda9f">enesim_pool_unref</a> (<a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease the reference counter of a pool.  <a href="#gad057ed7717e5e6a4942675cf51ecda9f"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Pool.html#ga235676f2ae4fd10d6d237f8ed0797e22">enesim_pool_eina_new</a> (Eina_Mempool *mp)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Pool.html#gab7a048c7df4227f17d37ace76e50f0bb">enesim_pool_type_get</a> (<a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *thiz, const char **lib, const char **name)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type of a pool .  <a href="#gab7a048c7df4227f17d37ace76e50f0bb"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Buffer and surface pixel data allocator. </p>
@@ -211,20 +221,47 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga235676f2ae4fd10d6d237f8ed0797e22"></a><!-- doxytag: member="enesim_pool.h::enesim_pool_eina_new" ref="ga235676f2ae4fd10d6d237f8ed0797e22" args="(Eina_Mempool *mp)" -->
+<a class="anchor" id="gab7a048c7df4227f17d37ace76e50f0bb"></a><!-- doxytag: member="enesim_pool.h::enesim_pool_type_get" ref="gab7a048c7df4227f17d37ace76e50f0bb" args="(Enesim_Pool *thiz, const char **lib, const char **name)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a>* <a class="el" href="group__Enesim__Pool.html#ga235676f2ae4fd10d6d237f8ed0797e22">enesim_pool_eina_new</a> </td>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Pool.html#gab7a048c7df4227f17d37ace76e50f0bb">enesim_pool_type_get</a> </td>
           <td>(</td>
-          <td class="paramtype">Eina_Mempool *&#160;</td>
-          <td class="paramname"><em>mp</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>lib</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Get the type of a pool . </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The pool to get the type from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">lib</td><td>The ender library associated with this pool </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">name</td><td>The ender item name of the renderer</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This function is needed for ender in order to downcast a pool </p>
 
 </div>
 </div>
@@ -246,7 +283,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 23:54:18 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 30 2015 20:03:59 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

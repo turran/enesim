@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: Enesim_Example_Renderer_Backend_Interface Struct Reference</title>
+<title>enesim: Eina Pool</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -49,7 +49,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,31 +69,42 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
-      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
-      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
-    </ul>
-  </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Enesim_Example_Renderer_Backend_Interface Struct Reference</div>  </div>
-</div><!--header-->
+<div class="title">Eina Pool</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Pool.html">Pool</a></div></div><!--header-->
 <div class="contents">
-<!-- doxytag: class="Enesim_Example_Renderer_Backend_Interface" --><table class="memberdecls">
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53ab4e0cbed771a3321ae4f15a02e70e"></a><!-- doxytag: member="Enesim_Example_Renderer_Backend_Interface::setup" ref="a53ab4e0cbed771a3321ae4f15a02e70e" args=")(Enesim_Example_Renderer_Options *options)" -->
-Eina_Bool(*&#160;</td><td class="memItemRight" valign="bottom"><b>setup</b> )(<a class="el" href="structEnesim__Example__Renderer__Options.html">Enesim_Example_Renderer_Options</a> *options)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a381981b0464046d003d3fedc11e3c3c3"></a><!-- doxytag: member="Enesim_Example_Renderer_Backend_Interface::cleanup" ref="a381981b0464046d003d3fedc11e3c3c3" args=")(void)" -->
-void(*&#160;</td><td class="memItemRight" valign="bottom"><b>cleanup</b> )(void)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba06b3823ecc01e7635e945e55afd29b"></a><!-- doxytag: member="Enesim_Example_Renderer_Backend_Interface::run" ref="aba06b3823ecc01e7635e945e55afd29b" args=")(Enesim_Renderer *r, Enesim_Example_Renderer_Options *options)" -->
-void(*&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> )(<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="structEnesim__Example__Renderer__Options.html">Enesim_Example_Renderer_Options</a> *options)</td></tr>
+
+<p>Enesim pool based on an Eina Mempool.  
+<a href="#details">More...</a></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Pool__Eina.html#ga235676f2ae4fd10d6d237f8ed0797e22">enesim_pool_eina_new</a> (Eina_Mempool *mp)</td></tr>
 </table>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<p>Enesim pool based on an Eina Mempool. </p>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="ga235676f2ae4fd10d6d237f8ed0797e22"></a><!-- doxytag: member="enesim_pool.h::enesim_pool_eina_new" ref="ga235676f2ae4fd10d6d237f8ed0797e22" args="(Eina_Mempool *mp)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a>* <a class="el" href="group__Enesim__Pool__Eina.html#ga235676f2ae4fd10d6d237f8ed0797e22">enesim_pool_eina_new</a> </td>
+          <td>(</td>
+          <td class="paramtype">Eina_Mempool *&#160;</td>
+          <td class="paramname"><em>mp</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -112,7 +123,7 @@ void(*&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> )(<a class=
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 30 2015 20:04:00 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 30 2015 20:03:59 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

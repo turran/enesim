@@ -222,6 +222,8 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gabdb1abb879459a56970feec5b93d0e6d">enesim_renderer_draw</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, <a class="el" href="group__Enesim__Basic.html#ga3824db2d3d2f4239a0ffd5eaf18de331">Enesim_Rop</a> rop, Eina_Rectangle *clip, int x, int y, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gae39608c420cc0c4ad2fb5ae3290bfb42">enesim_renderer_draw_list</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Surface.html#ga18b28efbe71dc1fe12634354e1a6e616">Enesim_Surface</a> *s, <a class="el" href="group__Enesim__Basic.html#ga3824db2d3d2f4239a0ffd5eaf18de331">Enesim_Rop</a> rop, Eina_List *clips, int x, int y, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gaba83455a3c77a836de1f2ada5613ce4e">enesim_renderer_default_quality_set</a> (<a class="el" href="group__Enesim__Basic.html#ga7253c799b06f355899b57b6eb51051af">Enesim_Quality</a> quality)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gab3a67e3eb1797f0f7c9841c869dd332b">enesim_renderer_type_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, const char **lib, char **name)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type of a renderer .  <a href="#gab3a67e3eb1797f0f7c9841c869dd332b"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Vector and raster drawing primitives. </p>
@@ -856,7 +858,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to set the visibility to </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">visible</td><td>Set Eina_True to make it visible or Eina_False to make it invisible </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">visible</td><td>Set EINA_TRUE to make it visible or EINA_FALSE to make it invisible </td></tr>
   </table>
   </dd>
 </dl>
@@ -885,7 +887,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>Eina_True if it is visible, Eina_False otherwise </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if it is visible, EINA_FALSE otherwise </dd></dl>
 
 </div>
 </div>
@@ -1469,7 +1471,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>Eina_True in case the renderer has changed after the last draw, Eina_False otherwise. </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE in case the renderer has changed after the last draw, EINA_FALSE otherwise. </dd></dl>
 
 </div>
 </div>
@@ -1513,7 +1515,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>Eina_True if there is at least one damaged area, Eina_False otherwise</dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if there is at least one damaged area, EINA_FALSE otherwise</dd></dl>
 <p>This function gets the damaged area of a renderer. Whenever a renderer changes by setting some attributes on it, it might need to redraw on some areas. Those areas to redraw are called damaged areas. The damaged areas are cleared whenever a renderer is drawn again. </p>
 
 </div>
@@ -1585,7 +1587,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>Eina_True if the the drawing was successfull, Eina_False otherwise. In case the drawing fails the <code>log</code> is filled with the failed message </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the the drawing was successfull, EINA_FALSE otherwise. In case the drawing fails the <code>log</code> is filled with the failed message </dd></dl>
 
 </div>
 </div>
@@ -1656,7 +1658,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>Eina_True if the the drawing was successfull, Eina_False otherwise. In case the drawing fails the <code>log</code> is filled with the failed message </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the the drawing was successfull, EINA_FALSE otherwise. In case the drawing fails the <code>log</code> is filled with the failed message </dd></dl>
 
 </div>
 </div>
@@ -1684,6 +1686,51 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
+<a class="anchor" id="gab3a67e3eb1797f0f7c9841c869dd332b"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_type_get" ref="gab3a67e3eb1797f0f7c9841c869dd332b" args="(Enesim_Renderer *r, const char **lib, char **name)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Renderer.html#gab3a67e3eb1797f0f7c9841c869dd332b">enesim_renderer_type_get</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>lib</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the type of a renderer . </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The renderer to get the type from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">lib</td><td>The ender library associated with this renderer </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">name</td><td>The ender item name of the renderer  [Transfer full] </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the function succeeds, EINA_FALSE otherwise</dd></dl>
+<p>This function is needed for ender in order to downcast a renderer </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -1702,7 +1749,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 23:54:18 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 30 2015 20:03:59 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

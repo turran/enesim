@@ -93,6 +93,8 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Text_Buffer *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Text__Buffer.html#gae91c847439d891e7161598c52c6485ff">enesim_text_buffer_ref</a> (Enesim_Text_Buffer *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga66f317029b69939ab337fd8849d18fa2"></a><!-- doxytag: member="Enesim_Text_Buffer::enesim_text_buffer_unref" ref="ga66f317029b69939ab337fd8849d18fa2" args="(Enesim_Text_Buffer *thiz)" -->
 EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_text_buffer_unref</b> (Enesim_Text_Buffer *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Text__Buffer.html#ga6293b9df5203be3ea0b59531c0e68e40">enesim_text_buffer_type_get</a> (Enesim_Text_Buffer *thiz, const char **lib, const char **name)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type of a text buffer .  <a href="#ga6293b9df5203be3ea0b59531c0e68e40"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga01cd0b8162b40ce66a2484d5dbd88b13"></a><!-- doxytag: member="Enesim_Text_Buffer::enesim_text_buffer_string_set" ref="ga01cd0b8162b40ce66a2484d5dbd88b13" args="(Enesim_Text_Buffer *thiz, const char *str, int length)" -->
 EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_text_buffer_string_set</b> (Enesim_Text_Buffer *thiz, const char *str, int length)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga38e3e6e7a2b2b607ea0590fe03cabdf7"></a><!-- doxytag: member="Enesim_Text_Buffer::enesim_text_buffer_string_get" ref="ga38e3e6e7a2b2b607ea0590fe03cabdf7" args="(Enesim_Text_Buffer *thiz)" -->
@@ -122,6 +124,50 @@ EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_text_buffe
 
 </div>
 </div>
+<a class="anchor" id="ga6293b9df5203be3ea0b59531c0e68e40"></a><!-- doxytag: member="enesim_text.h::enesim_text_buffer_type_get" ref="ga6293b9df5203be3ea0b59531c0e68e40" args="(Enesim_Text_Buffer *thiz, const char **lib, const char **name)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Text__Buffer.html#ga6293b9df5203be3ea0b59531c0e68e40">enesim_text_buffer_type_get</a> </td>
+          <td>(</td>
+          <td class="paramtype">Enesim_Text_Buffer *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>lib</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Get the type of a text buffer . </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The text buffer to get the type from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">lib</td><td>The ender library associated with this text buffer </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">name</td><td>The ender item name of the text buffer</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This function is needed for ender in order to downcast a text buffer </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -140,7 +186,7 @@ EAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_text_buffe
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2015 23:54:18 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Apr 30 2015 20:04:00 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
