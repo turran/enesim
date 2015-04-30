@@ -167,7 +167,17 @@
       <return type="enesim.pool" transfer="full" nullable="false"/>
     </ref>
     <unref name="unref"/>
-    <ctor name="eina_new">
+    <method name="type_get" downcast="true">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="lib" type="string" direction="out" transfer="none"/>
+      <arg name="name" type="string" direction="out" transfer="none"/>
+    </method>
+  </object>
+  <object name="enesim.pool.sw">
+    <ctor name="new"/>
+  </object>
+  <object name="enesim.pool.eina">
+    <ctor name="new">
       <arg name="mp" type="eina.mempool" direction="in" transfer="full"/>
     </ctor>
   </object>
@@ -822,6 +832,11 @@
     <function name="default_quality_set">
       <arg name="quality" type="enesim.quality" direction="in" transfer="full"/>
     </function>
+    <method name="type_get" downcast="true">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="lib" type="string" direction="out" transfer="none"/>
+      <arg name="name" type="string" direction="out" transfer="full"/>
+    </method>
     <prop name="name">
       <setter>
         <arg name="name" type="string" direction="in" transfer="none"/>
@@ -923,6 +938,11 @@
     <method name="reset"/>
     <method name="uri_get">
       <return type="string" transfer="none" nullable="false"/>
+    </method>
+    <method name="type_get" downcast="true">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="lib" type="string" direction="out" transfer="none"/>
+      <arg name="name" type="string" direction="out" transfer="none"/>
     </method>
   </object>
   <object name="enesim.stream.file" inherits="enesim.stream">
@@ -1151,13 +1171,18 @@
     <function name="default_get">
       <return type="enesim.text.engine" transfer="full" nullable="false"/>
     </function>
-    <function name="freetype_get">
-      <return type="enesim.text.engine" transfer="full" nullable="false"/>
-    </function>
     <ref name="ref">
       <return type="enesim.text.engine" transfer="full" nullable="false"/>
     </ref>
     <unref name="unref"/>
+    <method name="type_get" downcast="true">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="lib" type="string" direction="out" transfer="none"/>
+      <arg name="name" type="string" direction="out" transfer="full"/>
+    </method>
+  </object>
+  <object name="enesim.text.engine.freetype">
+    <ctor name="new"/>
   </object>
   <object name="enesim.text.font">
     <ctor name="new_description_from">
@@ -1187,6 +1212,11 @@
       <return type="enesim.text.buffer" transfer="full" nullable="false"/>
     </ref>
     <unref name="unref"/>
+    <method name="type_get" downcast="true">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="lib" type="string" direction="out" transfer="none"/>
+      <arg name="name" type="string" direction="out" transfer="none"/>
+    </method>
     <method name="string_set">
       <arg name="str" type="string" direction="in" transfer="none"/>
       <arg name="length" type="int32" direction="in" transfer="full"/>
