@@ -36,6 +36,11 @@ typedef struct _Enesim_OpenCL_Pool
 	cl_command_queue queue;
 } Enesim_OpenCL_Pool;
 
+static const char * _type_get(void)
+{
+	return "enesim.pool.opencl";
+}
+
 static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
@@ -117,6 +122,7 @@ static void _free(void *prv)
 }
 
 static Enesim_Pool_Descriptor _descriptor = {
+	/* .type_get =   */ _type_get,
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ NULL,

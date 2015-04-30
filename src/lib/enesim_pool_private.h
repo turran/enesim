@@ -18,6 +18,8 @@
 #ifndef POOL_H_
 #define POOL_H_
 
+typedef const char * (*Enesim_Pool_Type_Get)(void);
+
 typedef Eina_Bool (*Enesim_Pool_Data_Alloc)(void *prv,
 		Enesim_Backend *backend,
 		void **backend_data,
@@ -52,6 +54,7 @@ typedef void (*Enesim_Pool_Free)(void *prv);
 
 typedef struct _Enesim_Pool_Descriptor
 {
+	Enesim_Pool_Type_Get type_get;
 	Enesim_Pool_Data_Alloc data_alloc;
 	Enesim_Pool_Data_Free data_free;
 	Enesim_Pool_Data_From data_from;
@@ -70,6 +73,9 @@ struct _Enesim_Pool
 
 void enesim_pool_init(void);
 void enesim_pool_shutdown(void);
+
+void enesim_pool_sw_init(void);
+void enesim_pool_sw_shutdown(void);
 
 Enesim_Pool * enesim_pool_new(Enesim_Pool_Descriptor *descriptor, void *data);
 Eina_Bool enesim_pool_data_alloc(Enesim_Pool *p, Enesim_Backend *backend, void **data,

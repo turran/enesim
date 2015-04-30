@@ -77,6 +77,11 @@ static void _zero_buffer(Enesim_OpenGL_Pool *thiz, Enesim_Buffer_OpenGL_Data *da
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
+static const char * _type_get(void)
+{
+	return "enesim.pool.opengl";
+}
+
 static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 		void **backend_data,
 		Enesim_Buffer_Format fmt, uint32_t w, uint32_t h)
@@ -165,6 +170,7 @@ static void _free(void *prv)
 }
 
 static Enesim_Pool_Descriptor _descriptor = {
+	/* .type_get =   */ _type_get,
 	/* .data_alloc = */ _data_alloc,
 	/* .data_free =  */ _data_free,
 	/* .data_from =  */ _data_from,

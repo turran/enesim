@@ -1,5 +1,6 @@
 
 src_lib_libenesim_la_SOURCES += \
+src/lib/pool/enesim_pool_sw.c \
 src/lib/pool/enesim_pool_eina.c
 
 if HAVE_OPENCL

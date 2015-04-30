@@ -21,6 +21,8 @@
 /**
  * @file
  * @ender_group{Enesim_Pool}
+ * @ender_group{Enesim_Pool_Sw}
+ * @ender_group{Enesim_Pool_Eina}
  */
 
 /**
@@ -35,6 +37,26 @@ EAPI void enesim_pool_default_set(Enesim_Pool *thiz);
 
 EAPI Enesim_Pool * enesim_pool_ref(Enesim_Pool *thiz);
 EAPI void enesim_pool_unref(Enesim_Pool *thiz);
+EAPI Eina_Bool enesim_pool_type_get(Enesim_Pool *thiz, const char **lib,
+		const char **name);
+
+/**
+ * @}
+ * @defgroup Enesim_Pool_Sw Sw Pool
+ * @ingroup Enesim_Pool
+ * @brief Generic Sw based pool
+ * @{
+ */
+
+EAPI Enesim_Pool * enesim_pool_sw_new(void);
+
+/**
+ * @}
+ * @defgroup Enesim_Pool_Eina Eina Pool
+ * @ingroup Enesim_Pool
+ * @brief Enesim pool based on an Eina Mempool
+ * @{
+ */
 
 EAPI Enesim_Pool * enesim_pool_eina_new(Eina_Mempool *mp);
 
