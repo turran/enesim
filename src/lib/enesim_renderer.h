@@ -126,6 +126,7 @@ EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Eina_List *clips, int x, int y, Enesim_Log **log);
 
 EAPI void enesim_renderer_default_quality_set(Enesim_Quality quality);
+EAPI Eina_Bool enesim_renderer_type_get(Enesim_Renderer *r, const char **lib, char **name);
 
 /**
  * @}

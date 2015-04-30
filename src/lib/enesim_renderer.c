@@ -873,7 +873,7 @@ EAPI Enesim_Color enesim_renderer_color_get(Enesim_Renderer *r)
  * @brief Sets the visibility of a renderer
  * @ender_prop{visibility}
  * @param[in] r The renderer to set the visibility to
- * @param[in] visible Set Eina_True to make it visible or Eina_False to make
+ * @param[in] visible Set EINA_TRUE to make it visible or EINA_FALSE to make
  * it invisible
  */
 EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
@@ -887,7 +887,7 @@ EAPI void enesim_renderer_visibility_set(Enesim_Renderer *r, Eina_Bool visible)
  * @brief Gets the visibility of a renderer
  * @ender_prop{visibility}
  * @param[in] r The renderer to get the visibility from
- * @return Eina_True if it is visible, Eina_False otherwise
+ * @return EINA_TRUE if it is visible, EINA_FALSE otherwise
  */
 EAPI Eina_Bool enesim_renderer_visibility_get(Enesim_Renderer *r)
 {
@@ -1233,7 +1233,7 @@ EAPI void * enesim_renderer_private_get(Enesim_Renderer *r, const char *name)
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  * @param[out] log In case the drawing fails, the log to put messages on. @ender_nullable
- * @return Eina_True if the the drawing was successfull, Eina_False otherwise.
+ * @return EINA_TRUE if the the drawing was successfull, EINA_FALSE otherwise.
  * In case the drawing fails the @p log is filled with the failed message
  */
 EAPI Eina_Bool enesim_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
@@ -1286,7 +1286,7 @@ end:
  * @param[in] x The x origin of the destination surface
  * @param[in] y The y origin of the destination surface
  * @param[out] log In case the drawing fails, the log to put messages on. @ender_nullable
- * @return Eina_True if the the drawing was successfull, Eina_False otherwise.
+ * @return EINA_TRUE if the the drawing was successfull, EINA_FALSE otherwise.
  * In case the drawing fails the @p log is filled with the failed message
  */
 EAPI Eina_Bool enesim_renderer_draw_list(Enesim_Renderer *r, Enesim_Surface *s,
@@ -1360,8 +1360,8 @@ EAPI void enesim_renderer_change_mute_full(Enesim_Renderer *r,
 /**
  * @brief Check if a renderer has changed
  * @param[in] r The renderer to check for changes
- * @return Eina_True in case the renderer has changed after the last draw,
- * Eina_False otherwise.
+ * @return EINA_TRUE in case the renderer has changed after the last draw,
+ * EINA_FALSE otherwise.
  */
 EAPI Eina_Bool enesim_renderer_has_changed(Enesim_Renderer *r)
 {
@@ -1404,7 +1404,7 @@ done:
  * @param[in] r The renderer to get the damages from
  * @param[in] cb The function to call on every damaged area
  * @param[in] user_data The user provided data that is passed in on the @p cb function
- * @return Eina_True if there is at least one damaged area, Eina_False otherwise
+ * @return EINA_TRUE if there is at least one damaged area, EINA_FALSE otherwise
  *
  * This function gets the damaged area of a renderer. Whenever a renderer changes
  * by setting some attributes on it, it might need to redraw on some areas. Those
@@ -1450,3 +1450,29 @@ EAPI void enesim_renderer_default_quality_set(Enesim_Quality quality)
 	_default_quality = quality;
 }
 
+/**
+ * @brief Get the type of a renderer 
+ * @ender_downcast
+ * @param[in] r The renderer to get the type from
+ * @param[out] lib The ender library associated with this renderer
+ * @param[out] name The ender item name of the renderer @ender_transfer{full}
+ * @return EINA_TRUE if the function succeeds, EINA_FALSE otherwise
+ *
+ * This function is needed for ender in order to downcast a renderer
+ */
+EAPI Eina_Bool enesim_renderer_type_get(Enesim_Renderer *r, const char **lib, char **name)
+{
+	if (!r)
+		return EINA_FALSE;
+
+	if (lib)
+		*lib = "enesim";
+	if (name)
+	{
+		const char *descriptor_name;
+		descriptor_name = _base_name_get(r);
+		if (asprintf(name, "enesim.renderer.%s", descriptor_name) < 0)
+			*name = NULL;
+	}
+	return EINA_TRUE;
+}
