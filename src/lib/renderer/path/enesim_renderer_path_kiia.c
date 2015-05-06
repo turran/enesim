@@ -642,8 +642,8 @@ static Eina_Bool _kiia_bounds_get(Enesim_Renderer *r,
 	/* snap the bounds */
 	bounds->x = xmin;
 	bounds->y = ymin;
-	bounds->w = (xmax - xmin) + 1;
-	bounds->h = (ymax - ymin) + 1;
+	bounds->w = (xmax - xmin);
+	bounds->h = (ymax - ymin);
 	return EINA_TRUE;
 
 failed:
