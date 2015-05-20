@@ -140,7 +140,7 @@ Enesim_Text_Engine * enesim_text_engine_default_get(void)
  * @ender_downcast
  * @param[in] thiz The text engine to get the type from
  * @param[out] lib The ender library associated with this text engine
- * @param[out] name The ender item name of the text engine @ender_transfer{full}
+ * @param[out] name The ender item name of the text engine
  * @return EINA_TRUE if the function succeeds, EINA_FALSE otherwise
  *
  * This function is needed for ender in order to downcast a text engine

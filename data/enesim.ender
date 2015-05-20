@@ -1192,7 +1192,7 @@
     <method name="type_get" downcast="true">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="lib" type="string" direction="out" transfer="none"/>
-      <arg name="name" type="string" direction="out" transfer="full"/>
+      <arg name="name" type="string" direction="out" transfer="none"/>
     </method>
   </object>
   <object name="enesim.text.engine.freetype">
