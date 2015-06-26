@@ -198,8 +198,11 @@ if test "x${have_orc}" = "xyes" -a "x${want_orc}" = "xyes"; then
   build_orc="yes"
   requirements_pc="${requirements_pc} orc-0.4"
   # Get the compiler
-  ORCC=`${PKG_CONFIG} --variable=orcc orc-0.4`
-  AC_SUBST(ORCC)
+  ENS_BIN([orcc], [])
+  if test "x${orcc}" = "x"; then
+    orcc=`${PKG_CONFIG} --variable=orcc orc-0.4`
+  fi
+  AC_SUBST(orcc)
 fi
 
 if test "x${build_orc}" = "xyes"; then
@@ -510,6 +513,7 @@ echo "  SSE.......................................: ${have_sse}"
 echo "  SSE2......................................: ${have_sse2}"
 echo "  ALTIVEC...................................: ${have_altivec}"
 echo "  ORC.......................................: ${build_orc}"
+echo "    orcc:...................................: ${orcc}"
 echo
 echo "Backends:"
 echo "  Software..................................: yes"

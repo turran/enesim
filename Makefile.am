@@ -114,9 +114,9 @@ if BUILD_ORC
 # Rule to generate c/h files from orc files
 # The filename must end with 'orc'
 %orc.c: %orc.orc
-	${ORCC} $< -o $@
+	${orcc} $< -o $@
 %orc_private.h: %orc.orc
-	${ORCC} $< --header -o $@
+	${orcc} $< --header -o $@
 endif
 
 sed_process = \
