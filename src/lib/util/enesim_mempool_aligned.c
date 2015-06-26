@@ -138,8 +138,9 @@ static void _enesim_mempool_aligned_free(void *data EINA_UNUSED, void *element)
 static void * _enesim_mempool_aligned_alloc(void *data, unsigned int size)
 {
 	Enesim_Mempool_Aligned *thiz = (Enesim_Mempool_Aligned *)data;
-#ifdef HAVE_POSIX_MEMALIGN
 	int ret;
+
+#ifdef HAVE_POSIX_MEMALIGN
 #endif
 	void *element = NULL;
 
