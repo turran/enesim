@@ -26,6 +26,8 @@
 /**
  * @defgroup Enesim_Renderer_Map_Quad Map_Quad
  * @brief Map_Quad based renderer @ender_inherits{Enesim_Renderer}
+ *
+ * @ender_name{enesim.renderer.map_quad}
  * @ingroup Enesim_Renderer
  * @{
  */

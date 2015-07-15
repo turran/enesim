@@ -26,6 +26,8 @@
 /**
  * @defgroup Enesim_Renderer_Text_Span Text Span
  * @brief Text span renderer @ender_inherits{Enesim_Renderer_Shape}
+ *
+ * @ender_name{enesim.renderer.text_span}
  * @ingroup Enesim_Renderer
  * @{
  */

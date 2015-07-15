@@ -2325,7 +2325,7 @@
       <return type="bool" transfer="full" nullable="false"/>
     </method>
   </object>
-  <object name="enesim.renderer.text.span" inherits="enesim.renderer.shape">
+  <object name="enesim.renderer.text_span" inherits="enesim.renderer.shape">
     <ctor name="new"/>
     <method name="text_set">
       <arg name="str" type="string" direction="in" transfer="none"/>
@@ -2355,7 +2355,7 @@
       <return type="enesim.text.font" transfer="full" nullable="false"/>
     </method>
   </object>
-  <object name="enesim.renderer.map.quad" inherits="enesim.renderer">
+  <object name="enesim.renderer.map_quad" inherits="enesim.renderer">
     <prop name="source_surface">
       <setter>
         <arg name="src" type="enesim.surface" direction="in" transfer="full"/>
