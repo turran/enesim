@@ -100,6 +100,16 @@ static void _png_flush(png_structp png_ptr EINA_UNUSED)
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
+static int _png_version_get(void)
+{
+	return ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION;
+}
+
+static const char * _png_name_get(void)
+{
+	return "png";
+}
+
 static Eina_Bool _png_info_get(Enesim_Stream *data, int *w, int *h,
 		Enesim_Buffer_Format *sfmt, void *options EINA_UNUSED,
 		Eina_Error *err)
@@ -348,8 +358,8 @@ error_write_struct:
 }
 
 static Enesim_Image_Provider_Descriptor _provider = {
-	/* .version 		= */ ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION,
-	/* .name = 		*/ "png",
+	/* .version_get = 	*/ _png_version_get,
+	/* .name_get = 		*/ _png_name_get,
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,

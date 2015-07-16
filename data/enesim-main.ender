@@ -1075,6 +1075,12 @@
       <arg name="options" type="string" direction="in" transfer="none"/>
     </function>
   </object>
+  <callback name="enesim.image.provider.name_get">
+    <return type="string" transfer="none" nullable="false"/>
+  </callback>
+  <callback name="enesim.image.provider.version_get">
+    <return type="int32" transfer="full" nullable="false"/>
+  </callback>
   <callback name="enesim.image.provider.options_parse">
     <return type="pointer" transfer="full" nullable="false"/>
   </callback>
@@ -1098,8 +1104,8 @@
     <return type="bool" transfer="full" nullable="false"/>
   </callback>
   <struct name="enesim.image.provider.descriptor">
-    <field name="version" type="int32"/>
-    <field name="name" type="string"/>
+    <field name="version_get" type="enesim.image.provider.version_get"/>
+    <field name="name_get" type="enesim.image.provider.name_get"/>
     <field name="options_parse" type="enesim.image.provider.options_parse"/>
     <field name="options_free" type="enesim.image.provider.options_free"/>
     <field name="loadable" type="enesim.image.provider.loadable"/>
@@ -1149,7 +1155,7 @@
     </function>
   </object>
   <struct name="enesim.image.finder.descriptor">
-    <field name="version" type="int32"/>
+    <field name="version_get" type="enesim.image.finder.version_get"/>
     <field name="data_from" type="enesim.image.finder.data_from"/>
     <field name="extension_from" type="enesim.image.finder.extension_from"/>
     <method name="enesim_image_finder_register">
@@ -1157,6 +1163,9 @@
     </method>
     <method name="enesim_image_finder_unregister"/>
   </struct>
+  <callback name="enesim.image.finder.version_get">
+    <return type="int32" transfer="full" nullable="false"/>
+  </callback>
   <callback name="enesim.image.finder.data_from">
     <return type="string" transfer="none" nullable="false"/>
   </callback>

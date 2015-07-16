@@ -329,11 +329,11 @@ EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *
 	/* check for mandatory functions */
 	if (!pd->info_get)
 	{
-		WRN("Provider %s doesn't provide the info_get() function", pd->name);
+		WRN("Provider %s doesn't provide the info_get() function", pd->name_get());
 	}
 	if (!pd->load)
 	{
-		WRN("Provider %s doesn't provide the load() function", pd->name);
+		WRN("Provider %s doesn't provide the load() function", pd->name_get());
 	}
 
 	DBG("Adding provider for mime '%s'", mime);

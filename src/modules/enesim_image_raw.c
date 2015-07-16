@@ -32,6 +32,16 @@ static int enesim_image_log_dom_raw = -1;
 /*----------------------------------------------------------------------------*
  *                         Enesim Image Provider API                          *
  *----------------------------------------------------------------------------*/
+static int _raw_version_get(void)
+{
+	return ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION;
+}
+
+static const char * _raw_name_get(void)
+{
+	return "raw";
+}
+
 static Eina_Bool _raw_saveable(Enesim_Buffer *b)
 {
 	Enesim_Buffer_Format fmt;
@@ -99,8 +109,8 @@ static Eina_Bool _raw_save(Enesim_Stream *data, Enesim_Buffer *buffer,
 }
 
 static Enesim_Image_Provider_Descriptor _provider = {
-	/* .version 		= */ ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION,
-	/* .name = 		*/ "raw",
+	/* .version_get = 	*/ _raw_version_get,
+	/* .name_get = 		*/ _raw_name_get,
 	/* .options_parse = 	*/ NULL,
 	/* .options_free = 	*/ NULL,
 	/* .loadable = 		*/ NULL,

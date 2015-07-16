@@ -66,6 +66,16 @@ static void _jpg_error_exit_cb(j_common_ptr cinfo)
 /*----------------------------------------------------------------------------*
  *                         The jpeg source interface                          *
  *----------------------------------------------------------------------------*/
+static int _jpg_version_get(void)
+{
+	return ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION;
+}
+
+static const char * _jpg_name_get(void)
+{
+	return "jpg";
+}
+
 static void _jpg_enesim_image_src_init(j_decompress_ptr cinfo)
 {
 	/* TODO check if we can mmap the buffer, if so map it and use
@@ -299,8 +309,8 @@ static Eina_Bool _jpg_load(Enesim_Stream *data, Enesim_Buffer *buffer,
 }
 
 static Enesim_Image_Provider_Descriptor _provider = {
-	/* .version 		= */ ENESIM_IMAGE_PROVIDER_DESCRIPTOR_VERSION,
-	/* .name =		*/ "jpg",
+	/* .version_get = 	*/ _jpg_version_get,
+	/* .name_get =		*/ _jpg_name_get,
 	/* .options_parse =	*/ NULL,
 	/* .options_free =	*/ NULL,
 	/* .loadable =		*/ NULL,
