@@ -72,30 +72,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a> &#124;
-<a href="#define-members">Defines</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Finder</div>  </div>
-<div class="ingroups"><a class="el" href="group__Enesim__Image__File.html">File based loading and saving</a> &#124; <a class="el" href="group__Enesim__Image.html">Image</a></div></div><!--header-->
+<div class="ingroups"><a class="el" href="group__Enesim__Image.html">Image</a></div></div><!--header-->
 <div class="contents">
 
 <p>Image identification.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="nested-classes"></a>
-Data Structures</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structEnesim__Image__Finder__Descriptor.html">Enesim_Image_Finder_Descriptor</a></td></tr>
-<tr><td colspan="2"><h2><a name="define-members"></a>
-Defines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga5c20b03e39aeccf18e82f82f084428de"></a><!-- doxytag: member="Enesim_Image_Finder::ENESIM_IMAGE_FINDER_DESCRIPTOR_VERSION" ref="ga5c20b03e39aeccf18e82f82f084428de" args="" -->
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_FINDER_DESCRIPTOR_VERSION</b>&#160;&#160;&#160;0</td></tr>
-<tr><td colspan="2"><h2><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Finder.html#gaf32a49df03a3d56bb5bc9a00c108c9f3">Enesim_Image_Finder_Version_Get</a> )(void)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef const char *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Finder.html#ga79cea014b07deb901a8b1d516179b4e4">Enesim_Image_Finder_Data_From</a> )(<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *data)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">typedef const char *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Finder.html#ga9f4e1b1c857c8dce4e9118a44297f004">Enesim_Image_Finder_Extension_From</a> )(const char *ext)</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga72845bd563bc4c5aa3d8a4c7810b5949"></a><!-- doxytag: member="Enesim_Image_Finder::enesim_image_finder_register" ref="ga72845bd563bc4c5aa3d8a4c7810b5949" args="(Enesim_Image_Finder_Descriptor *f)" -->
@@ -105,46 +90,6 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_fin
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Image identification. </p>
-<hr/><h2>Typedef Documentation</h2>
-<a class="anchor" id="gaf32a49df03a3d56bb5bc9a00c108c9f3"></a><!-- doxytag: member="enesim_image.h::Enesim_Image_Finder_Version_Get" ref="gaf32a49df03a3d56bb5bc9a00c108c9f3" args=")(void)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef int(* <a class="el" href="group__Enesim__Image__Finder.html#gaf32a49df03a3d56bb5bc9a00c108c9f3">Enesim_Image_Finder_Version_Get</a>)(void)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
- 
-</div>
-</div>
-<a class="anchor" id="ga79cea014b07deb901a8b1d516179b4e4"></a><!-- doxytag: member="enesim_image.h::Enesim_Image_Finder_Data_From" ref="ga79cea014b07deb901a8b1d516179b4e4" args=")(Enesim_Stream *data)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef const char*(* <a class="el" href="group__Enesim__Image__Finder.html#ga79cea014b07deb901a8b1d516179b4e4">Enesim_Image_Finder_Data_From</a>)(<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *data)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
- 
-</div>
-</div>
-<a class="anchor" id="ga9f4e1b1c857c8dce4e9118a44297f004"></a><!-- doxytag: member="enesim_image.h::Enesim_Image_Finder_Extension_From" ref="ga9f4e1b1c857c8dce4e9118a44297f004" args=")(const char *ext)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef const char*(* <a class="el" href="group__Enesim__Image__Finder.html#ga9f4e1b1c857c8dce4e9118a44297f004">Enesim_Image_Finder_Extension_From</a>)(const char *ext)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
- 
-</div>
-</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -163,7 +108,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_fin
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 16 2015 22:22:56 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 19:31:37 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

@@ -72,31 +72,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Providers</div>  </div>
-<div class="ingroups"><a class="el" href="group__Enesim__Image__File.html">File based loading and saving</a> &#124; <a class="el" href="group__Enesim__Image.html">Image</a></div></div><!--header-->
+<div class="ingroups"><a class="el" href="group__Enesim__Image.html">Image</a></div></div><!--header-->
 <div class="contents">
 
 <p>Image format loader and saver provider.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga7915e565c855bed03aa6f3d164e6d1c9"></a><!-- doxytag: member="Enesim_Image_Provider::Enesim_Image_Provider" ref="ga7915e565c855bed03aa6f3d164e6d1c9" args="" -->
-typedef struct <br class="typebreak"/>
-_Enesim_Image_Provider&#160;</td><td class="memItemRight" valign="bottom"><b>Enesim_Image_Provider</b></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="gaf674ba0e0b87d312ba1516647afb69e8"></a><!-- doxytag: member="Enesim_Image_Provider::enesim_image_provider_priority_set" ref="gaf674ba0e0b87d312ba1516647afb69e8" args="(Enesim_Image_Provider *p, Enesim_Priority priority)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_provider_priority_set</b> (Enesim_Image_Provider *p, <a class="el" href="group__Enesim__Basic.html#ga7939eaa12b89af073a73dcb9d7f4404a">Enesim_Priority</a> priority)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Provider.html#gac29da3b62c77e413b2d4ce539692af04">enesim_image_provider_info_get</a> (Enesim_Image_Provider *thiz, <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *data, int *w, int *h, <a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *sfmt, const char *options, Eina_Error *err)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the information of an image.  <a href="#gac29da3b62c77e413b2d4ce539692af04"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Provider.html#ga2c8f9baff323ebdd00f2d10037ed384d">enesim_image_provider_load</a> (Enesim_Image_Provider *thiz, <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *data, <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> **b, <a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *mpool, const char *options, Eina_Error *err)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads an image.  <a href="#ga2c8f9baff323ebdd00f2d10037ed384d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga579203bdbac3720d3aa306b00ecc06b1"></a><!-- doxytag: member="Enesim_Image_Provider::enesim_image_provider_save" ref="ga579203bdbac3720d3aa306b00ecc06b1" args="(Enesim_Image_Provider *thiz, Enesim_Stream *data, Enesim_Buffer *b, const char *options, Eina_Error *err)" -->
-EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_provider_save</b> (Enesim_Image_Provider *thiz, <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *data, <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *b, const char *options, Eina_Error *err)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga1b4ed5289c072bf85ebe8b816591746b"></a><!-- doxytag: member="Enesim_Image_Provider::enesim_image_provider_register" ref="ga1b4ed5289c072bf85ebe8b816591746b" args="(Enesim_Image_Provider_Descriptor *pd, Enesim_Priority priority, const char *mime)" -->
 EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_provider_register</b> (<a class="el" href="structEnesim__Image__Provider__Descriptor.html">Enesim_Image_Provider_Descriptor</a> *pd, <a class="el" href="group__Enesim__Basic.html#ga7939eaa12b89af073a73dcb9d7f4404a">Enesim_Priority</a> priority, const char *mime)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga8564a6c1ba58bf9e599a4745511b5f26"></a><!-- doxytag: member="Enesim_Image_Provider::enesim_image_provider_unregister" ref="ga8564a6c1ba58bf9e599a4745511b5f26" args="(Enesim_Image_Provider_Descriptor *pd, const char *mime)" -->
@@ -104,132 +90,6 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_pro
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Image format loader and saver provider. </p>
-<hr/><h2>Function Documentation</h2>
-<a class="anchor" id="gac29da3b62c77e413b2d4ce539692af04"></a><!-- doxytag: member="enesim_image.h::enesim_image_provider_info_get" ref="gac29da3b62c77e413b2d4ce539692af04" args="(Enesim_Image_Provider *thiz, Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt, const char *options, Eina_Error *err)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Image__Provider.html#gac29da3b62c77e413b2d4ce539692af04">enesim_image_provider_info_get</a> </td>
-          <td>(</td>
-          <td class="paramtype">Enesim_Image_Provider *&#160;</td>
-          <td class="paramname"><em>thiz</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>w</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>h</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Buffer__Format.html#gad8659518df07487cca288d68e52216cf">Enesim_Buffer_Format</a> *&#160;</td>
-          <td class="paramname"><em>sfmt</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>options</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Eina_Error *&#160;</td>
-          <td class="paramname"><em>err</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Gets the information of an image. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The image provider to use </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The image data to load the info from </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">w</td><td>The width of the image </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">h</td><td>The height of the image </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">sfmt</td><td>The format of the image </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">options</td><td>Any option the provider might require </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">err</td><td>The error in case the info loading fails </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if succeeded, EINA_FALSE otherwise. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga2c8f9baff323ebdd00f2d10037ed384d"></a><!-- doxytag: member="enesim_image.h::enesim_image_provider_load" ref="ga2c8f9baff323ebdd00f2d10037ed384d" args="(Enesim_Image_Provider *thiz, Enesim_Stream *data, Enesim_Buffer **b, Enesim_Pool *mpool, const char *options, Eina_Error *err)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Image__Provider.html#ga2c8f9baff323ebdd00f2d10037ed384d">enesim_image_provider_load</a> </td>
-          <td>(</td>
-          <td class="paramtype">Enesim_Image_Provider *&#160;</td>
-          <td class="paramname"><em>thiz</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> **&#160;</td>
-          <td class="paramname"><em>b</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Pool.html#ga2b51abf1cfbe606766c505e8c9f26771">Enesim_Pool</a> *&#160;</td>
-          <td class="paramname"><em>mpool</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>options</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Eina_Error *&#160;</td>
-          <td class="paramname"><em>err</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Loads an image. </p>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -248,7 +108,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_image_pro
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 16 2015 22:22:56 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 23 2015 19:31:37 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

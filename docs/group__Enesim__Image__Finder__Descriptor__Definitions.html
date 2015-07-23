@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: Base64</title>
+<title>enesim: Definitions</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -72,47 +72,61 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Defines</a> &#124;
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
-<div class="title">Base64</div>  </div>
-<div class="ingroups"><a class="el" href="group__Enesim__Stream.html">Stream</a></div></div><!--header-->
+<div class="title">Definitions</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Image__Finder__Descriptor.html">Finder Descriptor</a></div></div><!--header-->
 <div class="contents">
-
-<p>Base64 stream.  
-<a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Stream__Base64.html#ga417eba7c682cb2729b66f36431316111">enesim_stream_base64_new</a> (<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *d)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new base64 based stream.  <a href="#ga417eba7c682cb2729b66f36431316111"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="define-members"></a>
+Defines</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga5c20b03e39aeccf18e82f82f084428de"></a><!-- doxytag: member="Enesim_Image_Finder_Descriptor_Definitions::ENESIM_IMAGE_FINDER_DESCRIPTOR_VERSION" ref="ga5c20b03e39aeccf18e82f82f084428de" args="" -->
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_IMAGE_FINDER_DESCRIPTOR_VERSION</b>&#160;&#160;&#160;0</td></tr>
+<tr><td colspan="2"><h2><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Finder__Descriptor__Definitions.html#gaf32a49df03a3d56bb5bc9a00c108c9f3">Enesim_Image_Finder_Version_Get</a> )(void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef const char *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Finder__Descriptor__Definitions.html#ga79cea014b07deb901a8b1d516179b4e4">Enesim_Image_Finder_Data_From</a> )(<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *data)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef const char *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Image__Finder__Descriptor__Definitions.html#ga9f4e1b1c857c8dce4e9118a44297f004">Enesim_Image_Finder_Extension_From</a> )(const char *ext)</td></tr>
 </table>
-<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<p>Base64 stream. </p>
-<hr/><h2>Function Documentation</h2>
-<a class="anchor" id="ga417eba7c682cb2729b66f36431316111"></a><!-- doxytag: member="enesim_stream.h::enesim_stream_base64_new" ref="ga417eba7c682cb2729b66f36431316111" args="(Enesim_Stream *d)" -->
+<hr/><h2>Typedef Documentation</h2>
+<a class="anchor" id="gaf32a49df03a3d56bb5bc9a00c108c9f3"></a><!-- doxytag: member="enesim_image.h::Enesim_Image_Finder_Version_Get" ref="gaf32a49df03a3d56bb5bc9a00c108c9f3" args=")(void)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI <a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a>* <a class="el" href="group__Enesim__Stream__Base64.html#ga417eba7c682cb2729b66f36431316111">enesim_stream_base64_new</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *&#160;</td>
-          <td class="paramname"><em>d</em></td><td>)</td>
-          <td></td>
+          <td class="memname">typedef int(* <a class="el" href="group__Enesim__Image__Finder__Descriptor__Definitions.html#gaf32a49df03a3d56bb5bc9a00c108c9f3">Enesim_Image_Finder_Version_Get</a>)(void)</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-
-<p>Create a new base64 based stream. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">d</td><td>The stream that holds the base64 data  [Transfer full] </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>A new base64 enesim stream </dd></dl>
-
+ 
+</div>
+</div>
+<a class="anchor" id="ga79cea014b07deb901a8b1d516179b4e4"></a><!-- doxytag: member="enesim_image.h::Enesim_Image_Finder_Data_From" ref="ga79cea014b07deb901a8b1d516179b4e4" args=")(Enesim_Stream *data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef const char*(* <a class="el" href="group__Enesim__Image__Finder__Descriptor__Definitions.html#ga79cea014b07deb901a8b1d516179b4e4">Enesim_Image_Finder_Data_From</a>)(<a class="el" href="group__Enesim__Stream.html#ga5d073a3d33bd29d0a05b9e09867e7308">Enesim_Stream</a> *data)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+ 
+</div>
+</div>
+<a class="anchor" id="ga9f4e1b1c857c8dce4e9118a44297f004"></a><!-- doxytag: member="enesim_image.h::Enesim_Image_Finder_Extension_From" ref="ga9f4e1b1c857c8dce4e9118a44297f004" args=")(const char *ext)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef const char*(* <a class="el" href="group__Enesim__Image__Finder__Descriptor__Definitions.html#ga9f4e1b1c857c8dce4e9118a44297f004">Enesim_Image_Finder_Extension_From</a>)(const char *ext)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+ 
 </div>
 </div>
 </div><!-- contents -->
