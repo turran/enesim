@@ -55,6 +55,7 @@ typedef enum _Enesim_Path_Command_Type
 
 /**
  * Definition of a move command
+ * @ender_name{enesim.path.command.move_to}
  */
 typedef struct _Enesim_Path_Command_Move_To
 {
@@ -64,6 +65,7 @@ typedef struct _Enesim_Path_Command_Move_To
 
 /**
  * Definition of a line command
+ * @ender_name{enesim.path.command.line_to}
  */
 typedef struct _Enesim_Path_Command_Line_To
 {
@@ -73,6 +75,7 @@ typedef struct _Enesim_Path_Command_Line_To
 
 /**
  * Definition of a smooth quadratic command
+ * @ender_name{enesim.path.command.squadratic_to}
  */
 typedef struct _Enesim_Path_Command_Squadratic_To
 {
@@ -82,6 +85,7 @@ typedef struct _Enesim_Path_Command_Squadratic_To
 
 /**
  * Definition of a quadratic command
+ * @ender_name{enesim.path.command.quadratic_to}
  */
 typedef struct _Enesim_Path_Command_Quadratic_To
 {
@@ -93,6 +97,7 @@ typedef struct _Enesim_Path_Command_Quadratic_To
 
 /**
  * Definition of a cubic command
+ * @ender_name{enesim.path.command.cubic_to}
  */
 typedef struct _Enesim_Path_Command_Cubic_To
 {
@@ -106,6 +111,7 @@ typedef struct _Enesim_Path_Command_Cubic_To
 
 /**
  * Definition of a smooth cubic command
+ * @ender_name{enesim.path.command.scubic_to}
  */
 typedef struct _Enesim_Path_Command_Scubic_To
 {
@@ -117,6 +123,7 @@ typedef struct _Enesim_Path_Command_Scubic_To
 
 /**
  * Definition of an arc command
+ * @ender_name{enesim.path.command.arc_to}
  */
 typedef struct _Enesim_Path_Command_Arc_To
 {
@@ -131,6 +138,7 @@ typedef struct _Enesim_Path_Command_Arc_To
 
 /**
  * Definition of close command
+ * @ender_name{enesim.path.command.close}
  */
 typedef struct _Enesim_Path_Command_Close
 {
