@@ -359,25 +359,25 @@
       <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
     </method>
   </struct>
-  <struct name="enesim.path.command.move.to">
+  <struct name="enesim.path.command.move_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
   </struct>
-  <struct name="enesim.path.command.line.to">
+  <struct name="enesim.path.command.line_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
   </struct>
-  <struct name="enesim.path.command.squadratic.to">
+  <struct name="enesim.path.command.squadratic_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
   </struct>
-  <struct name="enesim.path.command.quadratic.to">
+  <struct name="enesim.path.command.quadratic_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
     <field name="ctrl_x" type="double"/>
     <field name="ctrl_y" type="double"/>
   </struct>
-  <struct name="enesim.path.command.cubic.to">
+  <struct name="enesim.path.command.cubic_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
     <field name="ctrl_x0" type="double"/>
@@ -385,13 +385,13 @@
     <field name="ctrl_x1" type="double"/>
     <field name="ctrl_y1" type="double"/>
   </struct>
-  <struct name="enesim.path.command.scubic.to">
+  <struct name="enesim.path.command.scubic_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
     <field name="ctrl_x" type="double"/>
     <field name="ctrl_y" type="double"/>
   </struct>
-  <struct name="enesim.path.command.arc.to">
+  <struct name="enesim.path.command.arc_to">
     <field name="rx" type="double"/>
     <field name="ry" type="double"/>
     <field name="angle" type="double"/>
@@ -1116,33 +1116,6 @@
     <field name="save" type="enesim.image.provider.save"/>
   </struct>
   <object name="enesim.image.provider">
-    <method name="priority_set">
-      <arg name="priority" type="enesim.priority" direction="in" transfer="full"/>
-    </method>
-    <method name="info_get">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
-      <arg name="w" type="int32" direction="out" transfer="full"/>
-      <arg name="h" type="int32" direction="out" transfer="full"/>
-      <arg name="sfmt" type="enesim.buffer.format" direction="out" transfer="full"/>
-      <arg name="options" type="string" direction="in" transfer="none"/>
-      <arg name="err" type="eina.error" direction="out" transfer="full"/>
-    </method>
-    <method name="load">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
-      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
-      <arg name="mpool" type="enesim.pool" direction="in" transfer="full"/>
-      <arg name="options" type="string" direction="in" transfer="none"/>
-      <arg name="err" type="eina.error" direction="in" transfer="full"/>
-    </method>
-    <method name="save">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="data" type="enesim.stream" direction="in" transfer="full"/>
-      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
-      <arg name="options" type="string" direction="in" transfer="none"/>
-      <arg name="err" type="eina.error" direction="in" transfer="full"/>
-    </method>
     <function name="register">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="pd" type="enesim.image.provider.descriptor" direction="in" transfer="full"/>
@@ -1154,15 +1127,6 @@
       <arg name="mime" type="string" direction="in" transfer="none"/>
     </function>
   </object>
-  <struct name="enesim.image.finder.descriptor">
-    <field name="version_get" type="enesim.image.finder.version_get"/>
-    <field name="data_from" type="enesim.image.finder.data_from"/>
-    <field name="extension_from" type="enesim.image.finder.extension_from"/>
-    <method name="enesim_image_finder_register">
-      <return type="bool" transfer="full" nullable="false"/>
-    </method>
-    <method name="enesim_image_finder_unregister"/>
-  </struct>
   <callback name="enesim.image.finder.version_get">
     <return type="int32" transfer="full" nullable="false"/>
   </callback>
@@ -1172,6 +1136,20 @@
   <callback name="enesim.image.finder.extension_from">
     <return type="string" transfer="none" nullable="false"/>
   </callback>
+  <struct name="enesim.image.finder.descriptor">
+    <field name="version_get" type="enesim.image.finder.version_get"/>
+    <field name="data_from" type="enesim.image.finder.data_from"/>
+    <field name="extension_from" type="enesim.image.finder.extension_from"/>
+  </struct>
+  <object name="enesim.image.finder">
+    <function name="register">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="f" type="enesim.image.finder.descriptor" direction="in" transfer="full"/>
+    </function>
+    <function name="unregister">
+      <arg name="f" type="enesim.image.finder.descriptor" direction="in" transfer="full"/>
+    </function>
+  </object>
   <enum name="enesim.text.direction">
     <value name="ltr"/>
     <value name="rtl"/>
