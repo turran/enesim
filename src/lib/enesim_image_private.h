@@ -45,6 +45,8 @@
 int enesim_image_init(void);
 int enesim_image_shutdown(void);
 
+typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
+
 struct _Enesim_Image_Provider
 {
 	const char *mime;
@@ -71,5 +73,18 @@ void enesim_image_jpg_provider_shutdown(void);
 Eina_Bool enesim_image_raw_provider_init(void);
 void enesim_image_raw_provider_shutdown(void);
 #endif
+
+void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
+		Enesim_Priority priority);
+
+Eina_Bool enesim_image_provider_info_get(Enesim_Image_Provider *thiz,
+		Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt,
+		const char *options, Eina_Error *err);
+Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
+		Enesim_Stream *data, Enesim_Buffer **b,
+		Enesim_Pool *mpool, const char *options, Eina_Error *err);
+Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
+		Enesim_Stream *data, Enesim_Buffer *b,
+		const char *options, Eina_Error *err);
 
 #endif /*ENESIM_IMAGE_PRIVATE_H_*/

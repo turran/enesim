@@ -169,22 +169,10 @@ static Eina_Bool _provider_data_save(Enesim_Image_Provider *p, Enesim_Stream *da
 
 	return EINA_TRUE;
 }
-/** @endcond */
 /*============================================================================*
- *                                   API                                      *
+ *                                 Global                                     *
  *============================================================================*/
-/**
- * @brief Gets the information of an image
- * @param[in] thiz The image provider to use
- * @param[in] data The image data to load the info from
- * @param[out] w The width of the image
- * @param[out] h The height of the image
- * @param[out] sfmt The format of the image
- * @param[in] options Any option the provider might require
- * @param[out] err The error in case the info loading fails
- * @return EINA_TRUE if succeeded, EINA_FALSE otherwise.
- */
-EAPI Eina_Bool enesim_image_provider_info_get(Enesim_Image_Provider *thiz,
+Eina_Bool enesim_image_provider_info_get(Enesim_Image_Provider *thiz,
 	Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt,
 	const char *options, Eina_Error *err)
 {
@@ -207,10 +195,7 @@ EAPI Eina_Bool enesim_image_provider_info_get(Enesim_Image_Provider *thiz,
 	return ret;
 }
 
-/**
- * @brief Loads an image
- */
-EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
+Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
 		Enesim_Stream *data, Enesim_Buffer **b,
 		Enesim_Pool *mpool, const char *options, Eina_Error *err)
 {
@@ -233,10 +218,7 @@ EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
 	return ret;
 }
 
-/**
- * @brief Saves an image
- */
-EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
+Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 		Enesim_Stream *data, Enesim_Buffer *b,
 		const char *options EINA_UNUSED, Eina_Error *err)
 {
@@ -258,3 +240,8 @@ EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
 	_provider_options_free(thiz, op);
 	return ret;
 }
+/** @endcond */
+/*============================================================================*
+ *                                   API                                      *
+ *============================================================================*/
+

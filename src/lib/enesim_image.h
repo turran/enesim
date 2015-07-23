@@ -27,6 +27,8 @@
  * @ender_group{Enesim_Image_Provider_Descriptor_Definitions}
  * @ender_group{Enesim_Image_Provider_Descriptor}
  * @ender_group{Enesim_Image_Provider}
+ * @ender_group{Enesim_Image_Finder_Descriptor_Definitions}
+ * @ender_group{Enesim_Image_Finder_Descriptor}
  * @ender_group{Enesim_Image_Finder}
  */
 
@@ -119,6 +121,7 @@ EAPI void enesim_image_file_save_async(const char *file, Enesim_Buffer *b,
 		const char *options);
 
 /**
+ * @}
  * @defgroup Enesim_Image_Provider_Descriptor_Definitions Definitions
  * @ingroup Enesim_Image_Provider_Descriptor
  * @{
@@ -207,30 +210,13 @@ typedef struct _Enesim_Image_Provider_Descriptor
  * @{
  */
 
-typedef struct _Enesim_Image_Provider Enesim_Image_Provider;
-
-EAPI void enesim_image_provider_priority_set(Enesim_Image_Provider *p,
-		Enesim_Priority priority);
-
-EAPI Eina_Bool enesim_image_provider_info_get(Enesim_Image_Provider *thiz,
-		Enesim_Stream *data, int *w, int *h, Enesim_Buffer_Format *sfmt,
-		const char *options, Eina_Error *err);
-EAPI Eina_Bool enesim_image_provider_load(Enesim_Image_Provider *thiz,
-		Enesim_Stream *data, Enesim_Buffer **b,
-		Enesim_Pool *mpool, const char *options, Eina_Error *err);
-EAPI Eina_Bool enesim_image_provider_save(Enesim_Image_Provider *thiz,
-		Enesim_Stream *data, Enesim_Buffer *b,
-		const char *options, Eina_Error *err);
-
 EAPI Eina_Bool enesim_image_provider_register(Enesim_Image_Provider_Descriptor *pd, Enesim_Priority priority, const char *mime);
 EAPI void enesim_image_provider_unregister(Enesim_Image_Provider_Descriptor *pd, const char *mime);
 
-
 /**
  * @}
- * @defgroup Enesim_Image_Finder Finder
- * @brief Image identification
- * @ingroup Enesim_Image
+ * @defgroup Enesim_Image_Finder_Descriptor_Definitions Definitions
+ * @ingroup Enesim_Image_Finder_Descriptor
  * @{
  */
 
@@ -251,12 +237,28 @@ typedef const char *(*Enesim_Image_Finder_Data_From)(Enesim_Stream *data);
  */
 typedef const char *(*Enesim_Image_Finder_Extension_From)(const char *ext);
 
+/**
+ * @}
+ * @defgroup Enesim_Image_Finder_Descriptor Finder Descriptor
+ * @brief Allows the creation of new providers
+ * @ingroup Enesim_Image
+ * @{
+ */
+
 typedef struct _Enesim_Image_Finder_Descriptor
 {
 	Enesim_Image_Finder_Version_Get version_get;
 	Enesim_Image_Finder_Data_From data_from;
 	Enesim_Image_Finder_Extension_From extension_from;
 } Enesim_Image_Finder_Descriptor;
+
+/**
+ * @}
+ * @defgroup Enesim_Image_Finder Finder
+ * @brief Image identification
+ * @ingroup Enesim_Image
+ * @{
+ */
 
 EAPI Eina_Bool enesim_image_finder_register(Enesim_Image_Finder_Descriptor *f);
 EAPI void enesim_image_finder_unregister(Enesim_Image_Finder_Descriptor *f);
