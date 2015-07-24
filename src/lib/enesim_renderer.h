@@ -41,14 +41,22 @@ typedef struct _Enesim_Renderer Enesim_Renderer;
 /** Flags that specify what a renderer supports */
 typedef enum _Enesim_Renderer_Feature
 {
-	ENESIM_RENDERER_FEATURE_TRANSLATE		= (1 << 0), /**< The renderer can be translated using the origin property */
-	ENESIM_RENDERER_FEATURE_AFFINE 			= (1 << 1), /**< Affine transformation */
-	ENESIM_RENDERER_FEATURE_PROJECTIVE 		= (1 << 2), /**< Perspective transformations */
-	ENESIM_RENDERER_FEATURE_A8 			= (1 << 3), /**< Supports A8 surfaces */
-	ENESIM_RENDERER_FEATURE_ARGB8888 		= (1 << 4), /**< Supports ARGB8888 surfaces */
-	ENESIM_RENDERER_FEATURE_QUALITY 		= (1 << 5), /**< Supports the quality property */
-	ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE 	= (1 << 6), /**< Supports Sw based surfaces */
-	ENESIM_RENDERER_FEATURE_BACKEND_OPENGL 		= (1 << 7), /**< Supports OpenGL based surfaces */
+	/** The renderer can be translated using the origin property */
+	ENESIM_RENDERER_FEATURE_TRANSLATE		= 1,
+	/** Affine transformation */
+	ENESIM_RENDERER_FEATURE_AFFINE 			= 2,
+	/** Perspective transformations */
+	ENESIM_RENDERER_FEATURE_PROJECTIVE 		= 4,
+	/** Supports A8 surfaces */
+	ENESIM_RENDERER_FEATURE_A8 			= 8,
+	/** Supports ARGB8888 surfaces */
+	ENESIM_RENDERER_FEATURE_ARGB8888 		= 16,
+	/** Supports the quality property */
+	ENESIM_RENDERER_FEATURE_QUALITY 		= 32,
+	/** Supports Sw based surfaces */
+	ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE 	= 64,
+	/** Supports OpenGL based surfaces */
+	ENESIM_RENDERER_FEATURE_BACKEND_OPENGL 		= 128,
 } Enesim_Renderer_Feature;
 
 /** Helper macro to define an affine and proective transformation support */

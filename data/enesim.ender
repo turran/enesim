@@ -724,14 +724,14 @@
   </object>
   <object name="enesim.renderer"/>
   <enum name="enesim.renderer.feature">
-    <value name="translate" initializer=""/>
-    <value name="affine" initializer=""/>
-    <value name="projective" initializer=""/>
-    <value name="a8" initializer=""/>
-    <value name="argb8888" initializer=""/>
-    <value name="quality" initializer=""/>
-    <value name="backend_software" initializer=""/>
-    <value name="backend_opengl" initializer=""/>
+    <value name="translate" initializer="1"/>
+    <value name="affine" initializer="2"/>
+    <value name="projective" initializer="4"/>
+    <value name="a8" initializer="8"/>
+    <value name="argb8888" initializer="16"/>
+    <value name="quality" initializer="32"/>
+    <value name="backend_software" initializer="64"/>
+    <value name="backend_opengl" initializer="128"/>
   </enum>
   <callback name="enesim.renderer.damage">
     <arg name="r" type="enesim.renderer" direction="in" transfer="none" nullable="false"/>
@@ -1931,14 +1931,14 @@
     <field name="gap" type="double"/>
   </struct>
   <enum name="enesim.renderer.shape.feature">
-    <value name="fill_renderer" initializer=""/>
-    <value name="stroke_renderer" initializer=""/>
-    <value name="stroke_location" initializer=""/>
-    <value name="stroke_dash" initializer=""/>
+    <value name="fill_renderer" initializer="1"/>
+    <value name="stroke_renderer" initializer="2"/>
+    <value name="stroke_location" initializer="4"/>
+    <value name="stroke_dash" initializer="8"/>
   </enum>
   <enum name="enesim.renderer.shape.draw_mode">
-    <value name="fill" initializer=""/>
-    <value name="stroke" initializer=""/>
+    <value name="fill" initializer="1"/>
+    <value name="stroke" initializer="2"/>
   </enum>
   <enum name="enesim.renderer.shape.stroke_location">
     <value name="inside"/>

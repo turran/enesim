@@ -34,13 +34,13 @@
 typedef enum _Enesim_Renderer_Shape_Feature
 {
 	/** The shape renderer can use another renderer for filling */
-	ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER 	= (1 << 0),
+	ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER 	= 1,
 	/** The shape renderer can use another renderer for stroking */
-	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER	= (1 << 1),
+	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER	= 2,
 	/** The shape renderer can locate the stroke */
-	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION	= (1 << 2),
+	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_LOCATION	= 4,
 	/** The shape renderer can have a dashed stroke */
-	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH	= (1 << 3),
+	ENESIM_RENDERER_SHAPE_FEATURE_STROKE_DASH	= 8,
 } Enesim_Renderer_Shape_Feature;
 
 /**
@@ -50,9 +50,9 @@ typedef enum _Enesim_Renderer_Shape_Feature
 typedef enum _Enesim_Renderer_Shape_Draw_Mode
 {
 	/** The shape renderer will fill */
-	ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL 	= (1 << 0),
+	ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL 	= 1,
 	/** The shape renderer will stroke */
-	ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE	= (1 << 1),
+	ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE	= 2,
 } Enesim_Renderer_Shape_Draw_Mode;
 
 /**
