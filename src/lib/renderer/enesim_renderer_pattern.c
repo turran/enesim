@@ -294,7 +294,7 @@ static void _pattern_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _pattern_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }

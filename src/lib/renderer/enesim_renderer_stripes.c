@@ -529,7 +529,7 @@ static void _stripes_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _stripes_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

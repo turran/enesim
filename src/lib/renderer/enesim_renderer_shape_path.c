@@ -154,7 +154,7 @@ static void _shape_path_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _shape_path_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_AFFINE |
 		ENESIM_RENDERER_FEATURE_ARGB8888;
@@ -242,7 +242,7 @@ static void _enesim_renderer_shape_path_instance_deinit(void *o)
  *                                 Global                                     *
  *============================================================================*/
 void enesim_renderer_shape_path_shape_features_get_default(Enesim_Renderer *r,
-		Enesim_Renderer_Shape_Feature *features)
+		int *features)
 {
 	Enesim_Renderer_Shape_Path *thiz;
 

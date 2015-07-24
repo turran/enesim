@@ -598,7 +598,7 @@ static Eina_Bool _checker_has_changed(Enesim_Renderer *r)
 }
 
 static void _checker_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

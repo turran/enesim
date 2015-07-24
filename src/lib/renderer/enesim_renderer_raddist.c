@@ -210,7 +210,7 @@ static Eina_Bool _raddist_has_changed(Enesim_Renderer *r)
 }
 
 static void _raddist_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_ARGB8888;

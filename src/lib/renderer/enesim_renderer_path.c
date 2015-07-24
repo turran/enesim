@@ -165,7 +165,7 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static void _path_shape_features_get(Enesim_Renderer *r,
-		Enesim_Renderer_Shape_Feature *features)
+		int *features)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer *abstract;
@@ -215,7 +215,7 @@ static Eina_Bool _path_bounds_get(Enesim_Renderer *r,
 }
 
 static void _path_features_get(Enesim_Renderer *r,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	Enesim_Renderer_Path *thiz;
 	Enesim_Renderer *abstract;

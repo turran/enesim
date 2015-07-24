@@ -129,7 +129,7 @@ static void _line_cleanup(Enesim_Renderer *r)
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static void _line_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Shape_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }

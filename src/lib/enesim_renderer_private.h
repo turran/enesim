@@ -70,7 +70,7 @@ typedef Enesim_Alpha_Hint (*Enesim_Renderer_Alpha_Hints_Get_Cb)(Enesim_Renderer 
 typedef Eina_Bool (*Enesim_Renderer_Bounds_Get_Cb)(Enesim_Renderer *r,
 		Enesim_Rectangle *rect, Enesim_Log **error);
 typedef void (*Enesim_Renderer_Features_Get)(Enesim_Renderer *r,
-		Enesim_Renderer_Feature *features);
+		int *features);
 typedef Eina_Bool (*Enesim_Renderer_Has_Changed_Cb)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Damages_Get_Cb)(Enesim_Renderer *r,
 		const Eina_Rectangle *old_bounds,
@@ -144,7 +144,7 @@ struct _Enesim_Renderer
 	/* the private data */
 	Eina_Lock lock;
 	Eina_Hash *prv_data;
-	Enesim_Renderer_Feature current_features_get;
+	int current_features;
 	Enesim_Rectangle current_bounds;
 	Enesim_Rectangle past_bounds;
 	Eina_Rectangle current_destination_bounds;

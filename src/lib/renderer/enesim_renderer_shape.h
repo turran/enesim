@@ -131,7 +131,7 @@ typedef enum _Enesim_Renderer_Shape_Fill_Rule
  * @{
  */
 
-EAPI Enesim_Renderer_Shape_Feature enesim_renderer_shape_shape_features_get(Enesim_Renderer *r);
+EAPI int enesim_renderer_shape_shape_features_get(Enesim_Renderer *r);
 
 /* stroke properties */
 EAPI void enesim_renderer_shape_stroke_color_set(Enesim_Renderer *r, Enesim_Color stroke_color);
@@ -170,8 +170,8 @@ EAPI void enesim_renderer_shape_fill_rule_set(Enesim_Renderer *r, Enesim_Rendere
 EAPI Enesim_Renderer_Shape_Fill_Rule enesim_renderer_shape_fill_rule_get(Enesim_Renderer *r);
 
 /* stroke and/or fill */
-EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, Enesim_Renderer_Shape_Draw_Mode draw_mode);
-EAPI Enesim_Renderer_Shape_Draw_Mode enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_shape_draw_mode_set(Enesim_Renderer *r, int draw_mode);
+EAPI int enesim_renderer_shape_draw_mode_get(Enesim_Renderer *r);
 
 EAPI Eina_Bool enesim_renderer_shape_geometry_get(Enesim_Renderer *r, Enesim_Rectangle *geometry);
 EAPI Eina_Bool enesim_renderer_shape_destination_geometry_get(

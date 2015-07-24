@@ -276,7 +276,7 @@ static void _background_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EIN
 #endif
 
 static void _background_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_AFFINE |
 			ENESIM_RENDERER_FEATURE_PROJECTIVE |

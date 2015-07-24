@@ -179,7 +179,7 @@ static void _perlin_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED
 }
 
 static void _perlin_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }

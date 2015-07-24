@@ -326,7 +326,7 @@ static Eina_Bool _dispmap_bounds_get(Enesim_Renderer *r,
 }
 
 static void _dispmap_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

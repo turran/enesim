@@ -402,7 +402,7 @@ static Eina_Bool _grid_sw_setup(Enesim_Renderer *r,
 }
 
 static void _grid_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

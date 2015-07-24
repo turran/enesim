@@ -101,7 +101,7 @@ static inline Eina_Bool _enesim_renderer_destination_bounds_get(Enesim_Renderer 
  *                     Internal state related functions                       *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _state_changed(Enesim_Renderer_State *thiz,
-		Enesim_Renderer_Feature features)
+		int features)
 {
 	if (!thiz->changed)
 		return EINA_FALSE;
@@ -373,7 +373,7 @@ static void _enesim_renderer_instance_init(void *o)
 	EINA_MAGIC_SET(thiz, ENESIM_MAGIC_RENDERER);
 	/* private stuff */
 	_state_init(&thiz->state);
-	thiz->current_features_get = 0;
+	thiz->current_features = 0;
 	enesim_rectangle_coords_from(&thiz->past_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	eina_rectangle_coords_from(&thiz->past_destination_bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
 	thiz->prv_data = eina_hash_string_superfast_new(NULL);
@@ -486,8 +486,8 @@ void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char 
 
 Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
 {
-	Enesim_Renderer_Feature features;
 	Eina_Bool ret;
+	int features;
 
 	features = enesim_renderer_features_get(r);
 	ret = _state_changed(&r->state, features);
@@ -551,7 +551,7 @@ Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 	 */
 	_enesim_renderer_bounds_get(r, &r->current_bounds, log);
 	enesim_rectangle_normalize(&r->current_bounds, &r->current_destination_bounds);
-	r->current_features_get = enesim_renderer_features_get(r);
+	r->current_features = enesim_renderer_features_get(r);
 	r->current_rop = rop;
 
 	return ret;
@@ -668,17 +668,17 @@ EAPI void enesim_renderer_unlock(Enesim_Renderer *r)
  * @param[in] r The renderer to get the features from
  * @return The renderer features
  */
-EAPI Enesim_Renderer_Feature enesim_renderer_features_get(Enesim_Renderer *r)
+EAPI int enesim_renderer_features_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Class *klass;
-	Enesim_Renderer_Feature features = 0;
+	int features = 0;
 
 	ENESIM_MAGIC_CHECK_RENDERER(r);
 	klass = ENESIM_RENDERER_CLASS_GET(r);
 
 	if (r->in_setup)
 	{
-		features = r->current_features_get;
+		features = r->current_features;
 		return features;
 	}
 	if (klass->features_get)

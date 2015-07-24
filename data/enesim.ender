@@ -803,7 +803,7 @@
       <arg name="log" type="enesim.log" direction="out" transfer="full" nullable="true"/>
     </method>
     <method name="features_get">
-      <return type="enesim.renderer.feature" transfer="full" nullable="false"/>
+      <return type="int32" transfer="full" nullable="false"/>
     </method>
     <method name="is_inside">
       <return type="bool" transfer="full" nullable="false"/>
@@ -2042,14 +2042,14 @@
     </prop>
     <prop name="draw_mode">
       <setter>
-        <arg name="draw_mode" type="enesim.renderer.shape.draw_mode" direction="in" transfer="full"/>
+        <arg name="draw_mode" type="int32" direction="in" transfer="full"/>
       </setter>
       <getter>
-        <return type="enesim.renderer.shape.draw_mode" transfer="full" nullable="false"/>
+        <return type="int32" transfer="full" nullable="false"/>
       </getter>
     </prop>
     <method name="shape_features_get">
-      <return type="enesim.renderer.shape.feature" transfer="full" nullable="false"/>
+      <return type="int32" transfer="full" nullable="false"/>
     </method>
     <method name="stroke_dash_add_simple">
       <arg name="length" type="double" direction="in" transfer="full"/>

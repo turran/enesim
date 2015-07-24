@@ -1611,7 +1611,7 @@ static Eina_Bool _image_sw_state_setup(Enesim_Renderer *r,
 }
 
 static void _image_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

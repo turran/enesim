@@ -192,7 +192,8 @@ static void _enesim_renderer_path_rasterizer_generate_figures(Enesim_Renderer *r
 /*----------------------------------------------------------------------------*
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
-static void _enesim_renderer_path_rasterizer_shape_features_get(Enesim_Renderer *r EINA_UNUSED, Enesim_Renderer_Shape_Feature *features)
+static void _enesim_renderer_path_rasterizer_shape_features_get(
+		Enesim_Renderer *r EINA_UNUSED, int *features)
 {
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
@@ -287,7 +288,7 @@ static const char * _enesim_renderer_path_rasterizer_name(Enesim_Renderer *r EIN
 }
 
 static void _enesim_renderer_path_rasterizer_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

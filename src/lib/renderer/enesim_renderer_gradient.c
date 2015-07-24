@@ -296,7 +296,7 @@ static Eina_Bool _gradient_bounds_get(Enesim_Renderer *r,
 }
 
 static void _gradient_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

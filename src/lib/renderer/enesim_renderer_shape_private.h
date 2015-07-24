@@ -44,7 +44,7 @@ typedef struct _Enesim_Renderer_Shape_State
 			Enesim_Renderer *r;
 			Enesim_Renderer_Shape_Fill_Rule rule;
 		} fill;
-		Enesim_Renderer_Shape_Draw_Mode draw_mode;
+		int draw_mode;
 	} current, past;
 	Enesim_List *dashes;
 	Eina_Bool changed;
@@ -60,7 +60,7 @@ typedef struct _Enesim_Renderer_Shape
 } Enesim_Renderer_Shape;
 
 
-typedef void (*Enesim_Renderer_Shape_Features_Get_Cb)(Enesim_Renderer *r, Enesim_Renderer_Shape_Feature *features);
+typedef void (*Enesim_Renderer_Shape_Features_Get_Cb)(Enesim_Renderer *r, int *features);
 typedef Eina_Bool (*Enesim_Renderer_Shape_Geometry_Get_Cb)(Enesim_Renderer *r, Enesim_Rectangle *geometry);
 
 typedef struct _Enesim_Renderer_Shape_Class {

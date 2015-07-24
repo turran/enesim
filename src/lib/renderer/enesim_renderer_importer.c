@@ -304,7 +304,7 @@ static Eina_Bool _importer_bounds(Enesim_Renderer *r,
 }
 
 static void _importer_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_ARGB8888;
 }

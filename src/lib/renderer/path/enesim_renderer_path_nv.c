@@ -774,7 +774,7 @@ static Eina_Bool _enesim_renderer_path_is_available(
  *----------------------------------------------------------------------------*/
 static void _enesim_renderer_path_nv_shape_features_get(
 		Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Shape_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
 			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
@@ -812,7 +812,7 @@ static const char * _enesim_renderer_path_nv_name(
 
 static void _enesim_renderer_path_nv_features_get(
 		Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_FEATURE_TRANSLATE |
 			ENESIM_RENDERER_FEATURE_AFFINE |

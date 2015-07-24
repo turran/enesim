@@ -162,7 +162,7 @@ static void _proxy_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 }
 
 static void _proxy_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	/* we dont support anything */
 	*features = 0;

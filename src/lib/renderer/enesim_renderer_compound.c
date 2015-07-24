@@ -577,7 +577,7 @@ no_layers:
 }
 
 static void _compound_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	/* TODO here we should only support the destination formats of the surfaces */
 	*features = 0;

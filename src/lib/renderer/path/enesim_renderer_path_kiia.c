@@ -453,7 +453,7 @@ static Eina_Bool _kiia_generate(Enesim_Renderer *r)
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static void _kiia_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Shape_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER |
 			ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
@@ -468,7 +468,7 @@ static const char * _kiia_name(Enesim_Renderer *r EINA_UNUSED)
 }
 
 static void _kiia_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Feature *features)
+		int *features)
 {
 	*features =  ENESIM_RENDERER_FEATURE_QUALITY |
 			ENESIM_RENDERER_FEATURE_BACKEND_SOFTWARE |

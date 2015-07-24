@@ -107,7 +107,7 @@ static Eina_Bool _figure_has_changed(Enesim_Renderer *r)
 }
 
 static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
-		Enesim_Renderer_Shape_Feature *features)
+		int *features)
 {
 	*features = ENESIM_RENDERER_SHAPE_FEATURE_FILL_RENDERER | ENESIM_RENDERER_SHAPE_FEATURE_STROKE_RENDERER;
 }
