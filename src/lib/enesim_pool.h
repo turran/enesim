@@ -44,7 +44,7 @@ EAPI Eina_Bool enesim_pool_type_get(Enesim_Pool *thiz, const char **lib,
  * @}
  * @defgroup Enesim_Pool_Sw Sw Pool
  * @ingroup Enesim_Pool
- * @brief Generic Sw based pool
+ * @brief Generic Sw based pool @ender_inherits{Enesim_Pool}
  * @{
  */
 
@@ -54,7 +54,7 @@ EAPI Enesim_Pool * enesim_pool_sw_new(void);
  * @}
  * @defgroup Enesim_Pool_Eina Eina Pool
  * @ingroup Enesim_Pool
- * @brief Enesim pool based on an Eina Mempool
+ * @brief Enesim pool based on an Eina Mempool @ender_inherits{Enesim_Pool}
  * @{
  */
 

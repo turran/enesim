@@ -173,10 +173,10 @@
       <arg name="name" type="string" direction="out" transfer="none"/>
     </method>
   </object>
-  <object name="enesim.pool.sw">
+  <object name="enesim.pool.sw" inherits="enesim.pool">
     <ctor name="new"/>
   </object>
-  <object name="enesim.pool.eina">
+  <object name="enesim.pool.eina" inherits="enesim.pool">
     <ctor name="new">
       <arg name="mp" type="eina.mempool" direction="in" transfer="full"/>
     </ctor>
