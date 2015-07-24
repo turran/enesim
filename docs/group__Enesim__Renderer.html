@@ -211,8 +211,8 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gae85f5398bec16b7769a68dec452b4050">enesim_renderer_destination_bounds_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *rect, int x, int y, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga5bd4e54f8f3f19d44ee946c90a83239f">enesim_renderer_destination_bounds_get_extended</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, Eina_Rectangle *prev, Eina_Rectangle *curr, int x, int y, <a class="el" href="group__Enesim__Log.html#gac5da0716c239f6d9b8ef06dfbdccb9f7">Enesim_Log</a> **log)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the bounding box of the renderer on the destination coordinate space.  <a href="#ga5bd4e54f8f3f19d44ee946c90a83239f"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Renderer__Definitions.html#ga49b2ba2375156c5695917da497d8eed3">Enesim_Renderer_Feature</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#ga388cda5da2d123c83dcb5956ab7abcce">enesim_renderer_features_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the features a renderer support.  <a href="#ga388cda5da2d123c83dcb5956ab7abcce"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gad29d50c00be70d912bc5c9585b140dea">enesim_renderer_features_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the features a renderer support.  <a href="#gad29d50c00be70d912bc5c9585b140dea"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga5d370d589455dd8f4990c8a4dcebe819"></a><!-- doxytag: member="Enesim_Renderer::enesim_renderer_is_inside" ref="ga5d370d589455dd8f4990c8a4dcebe819" args="(Enesim_Renderer *r, double x, double y)" -->
 EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_renderer_is_inside</b> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer.html#gad57bf6b01b5d60119e121c2503407092">enesim_renderer_has_changed</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
@@ -1423,12 +1423,12 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 </div>
 </div>
-<a class="anchor" id="ga388cda5da2d123c83dcb5956ab7abcce"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_features_get" ref="ga388cda5da2d123c83dcb5956ab7abcce" args="(Enesim_Renderer *r)" -->
+<a class="anchor" id="gad29d50c00be70d912bc5c9585b140dea"></a><!-- doxytag: member="enesim_renderer.h::enesim_renderer_features_get" ref="gad29d50c00be70d912bc5c9585b140dea" args="(Enesim_Renderer *r)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI <a class="el" href="group__Enesim__Renderer__Definitions.html#ga49b2ba2375156c5695917da497d8eed3">Enesim_Renderer_Feature</a> <a class="el" href="group__Enesim__Renderer.html#ga388cda5da2d123c83dcb5956ab7abcce">enesim_renderer_features_get</a> </td>
+          <td class="memname">EAPI int <a class="el" href="group__Enesim__Renderer.html#gad29d50c00be70d912bc5c9585b140dea">enesim_renderer_features_get</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em></td><td>)</td>
@@ -1749,7 +1749,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_rend
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 23 2015 19:31:37 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 24 2015 16:57:18 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
