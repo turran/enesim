@@ -69,6 +69,19 @@ static Eina_Bool _damage_cb(Enesim_Renderer *r EINA_UNUSED,
 	/* get the real offset based on the geometry of the renderer */
 	tiler_rect.x -= thiz->bounds.x;
 	tiler_rect.y -= thiz->bounds.y;
+	/* invalidate everything? */
+	/* FIXME seems there's a bug on the eina_intersection or the tiler
+	 * rect_add that if you add the whole size of the tiler it wont mark
+	 * it as an area to redraw
+	 */
+	if (tiler_rect.x == 0 && tiler_rect.y == 0 && tiler_rect.w == thiz->tw
+		&& tiler_rect.h == thiz->th)
+	{
+		eina_tiler_clear(thiz->tiler);
+		eina_tiler_rect_add(thiz->tiler, &tiler_rect);
+		return EINA_FALSE;
+	}
+	//printf("adding %" EINA_RECTANGLE_FORMAT "\n", EINA_RECTANGLE_ARGS(&tiler_rect));
 	eina_tiler_rect_add(thiz->tiler, &tiler_rect);
 	return EINA_TRUE;
 }
@@ -212,6 +225,7 @@ Eina_Bool enesim_draw_cache_setup_sw(Enesim_Draw_Cache *thiz,
 		{
 			Eina_Rectangle complete;
 			eina_rectangle_coords_from(&complete, 0, 0, thiz->bounds.w, thiz->bounds.h);
+			eina_tiler_clear(thiz->tiler);
 			eina_tiler_rect_add(thiz->tiler, &complete);
 		}
 		else
@@ -228,17 +242,15 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 {
 	Enesim_Buffer *buffer;
 	Eina_Iterator *it;
-	Eina_Tiler *area_tiler;
 	Eina_Rectangle *rect;
 	Eina_Rectangle real_area;
-	Eina_Rectangle s_area;
 	Eina_Bool ret;
 
 	if (!thiz->r) return EINA_FALSE;
 
 	/* TODO to minimize the impact of the lock, split this function into a setup/cleanup/map */
 	eina_lock_take(&thiz->tlock);
-	//printf("requesting %" EINA_RECTANGLE_FORMAT "\n", EINA_RECTANGLE_ARGS(area));
+	//printf("%p requesting %" EINA_RECTANGLE_FORMAT "\n", thiz->tiler, EINA_RECTANGLE_ARGS(area));
 
 	/* create our own requested area tiler, so we can know what areas
 	 * should be redrawn and what areas should not
@@ -251,33 +263,14 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 	{
 		real_area = *area;
 	}
-	area_tiler = eina_tiler_new(real_area.w, real_area.h);
-	eina_tiler_tile_size_set(area_tiler, 1, 1);
 
 	/* get the mapped pointer */	
 	buffer = enesim_surface_buffer_get(thiz->s);
 	ret = enesim_buffer_sw_data_get(buffer, mapped);
 	enesim_buffer_unref(buffer);
 
-	/* check if the requested area has been already cached or not, ie
-	 * remove rectangles from the area tiler
-	 */
-	it = eina_tiler_iterator_new(thiz->tiler);
-	EINA_ITERATOR_FOREACH(it, rect)
-	{
-		Eina_Rectangle add = *rect;
-
-		/* convert the rect from surface to area coordinates */
-		add.x -= real_area.x;
-		add.y -= real_area.y;
-		eina_tiler_rect_add(area_tiler, &add);
-		//printf("adding %" EINA_RECTANGLE_FORMAT "\n", EINA_RECTANGLE_ARGS(&add));
-	}
-	eina_iterator_free(it);
-
 	/* ok, we now finally can get the damaged rectangles and draw */
-	eina_rectangle_coords_from(&s_area, 0, 0, thiz->tw, thiz->th);
-	it = eina_tiler_iterator_new(area_tiler);
+	it = eina_tiler_iterator_new(thiz->tiler);
 	EINA_ITERATOR_FOREACH(it, rect)
 	{
 		Eina_Rectangle redraw;
@@ -285,17 +278,14 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 		int y, maxy;
 
 		redraw = *rect;
-		/* convert the rect from area to surface coordinates */
-		redraw.x += real_area.x;
-		redraw.y += real_area.y;
+		//printf("damage at %" EINA_RECTANGLE_FORMAT " with translation %d %d\n", EINA_RECTANGLE_ARGS(&redraw), thiz->bounds.x, thiz->bounds.y);
 
-		if (!eina_rectangle_intersection(&redraw, &s_area))
+		if (!eina_rectangle_intersection(&redraw, &real_area))
 			continue;
 		dst = (uint8_t *)enesim_color_at(mapped->argb8888.plane0,
 				mapped->argb8888.plane0_stride,
 				redraw.x, redraw.y);
-		//printf("redrawing into %d %d %d %d from %d %d\n", redraw.x, redraw.y, redraw.w, redraw.h,
-		//	redraw.x + thiz->bounds.x, redraw.y + thiz->bounds.y);
+		//printf("redrawing into %d %d %d %d from %d %d\n", redraw.x, redraw.y, redraw.w, redraw.h, redraw.x + thiz->bounds.x, redraw.y + thiz->bounds.y);
 		y = redraw.y;
 		maxy = y + redraw.h;
 		while (y < maxy)
@@ -305,10 +295,10 @@ Eina_Bool enesim_draw_cache_map_sw(Enesim_Draw_Cache *thiz,
 			dst += mapped->argb8888.plane0_stride;
 			y++;
 		}
+		//printf("deleting %" EINA_RECTANGLE_FORMAT "\n", EINA_RECTANGLE_ARGS(&redraw));
 		eina_tiler_rect_del(thiz->tiler, &redraw);
 	}
 	eina_iterator_free(it);
-	eina_tiler_free(area_tiler);
 	eina_lock_release(&thiz->tlock);
 
 	return ret;
