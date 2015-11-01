@@ -586,8 +586,13 @@ static Eina_Bool _blur_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Blur *thiz;
 
 	thiz = ENESIM_RENDERER_BLUR(r);
-	if (!thiz->changed) return EINA_FALSE;
-	return EINA_TRUE;
+	if (thiz->changed) return EINA_TRUE;
+	if (thiz->src_r)
+	{
+		if (enesim_renderer_has_changed(thiz->src_r))
+			return EINA_TRUE;
+	}
+	return EINA_FALSE;
 }
 
 static Eina_Bool _blur_bounds_get(Enesim_Renderer *r,
