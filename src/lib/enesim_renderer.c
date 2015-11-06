@@ -83,19 +83,19 @@ static inline Eina_Bool _enesim_renderer_bounds_get(Enesim_Renderer *r,
 	else
 	{
 		enesim_rectangle_coords_from(bounds, INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-		return EINA_FALSE;
+		return EINA_TRUE;
 	}
 }
 
 static inline Eina_Bool _enesim_renderer_destination_bounds_get(Enesim_Renderer *r,
 		Eina_Rectangle *bounds, Enesim_Log **log)
 {
-	Eina_Bool ret;
 	Enesim_Rectangle obounds;
 
-	ret = _enesim_renderer_bounds_get(r, &obounds, log);
+	if (!_enesim_renderer_bounds_get(r, &obounds, log))
+		return EINA_FALSE;
 	enesim_rectangle_normalize(&obounds, bounds);
-	return ret;
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                     Internal state related functions                       *
