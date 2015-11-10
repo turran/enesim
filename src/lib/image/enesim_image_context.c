@@ -195,7 +195,7 @@ EAPI void enesim_image_context_load_async(Enesim_Image_Context *thiz, Enesim_Str
 	Enesim_Image_Job *j;
 	Enesim_Image_Provider *prov;
 
-	prov = enesim_image_load_provider_get(data, mime);
+	prov = enesim_image_load_provider_get(s, mime);
 	if (!prov)
 	{
 		cb(NULL, data, EINA_FALSE, ENESIM_IMAGE_ERROR_PROVIDER);
