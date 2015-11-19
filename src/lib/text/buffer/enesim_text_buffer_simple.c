@@ -72,7 +72,7 @@ static int _simple_string_insert(void *data, const char *string, int length, ssi
 	if (length < 0)
 		length = strlen(string);
 	if (offset < 0)
-		offset = 0;
+		offset = thiz->length;
 	else if ((unsigned int)offset > thiz->length)
 		offset = thiz->length;
 
