@@ -749,16 +749,60 @@ EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Fon
 	thiz->state.changed = EINA_TRUE;
 }
 
-#if 0
-/**
- * TODO
- * implement it
- */
-EAPI int enesim_renderer_text_span_index_at(Enesim_Renderer *r, int x, int y)
+EAPI Eina_Bool enesim_renderer_text_span_glyph_at(Enesim_Renderer *r,
+		int x, int y, int *index, int *start, int *end)
 {
-	/* check that x, y is inside the bounding box */
-	/* get the glyph at that position */
-	return 0;
-}
-#endif
+	Enesim_Renderer_Text_Span *thiz;
+	Eina_Rectangle bounds;
+	Eina_Rectangle cursor;
+	Eina_Bool found = EINA_FALSE;
+	int idx = 0;
+	int rcoord = 0;
+	const char *c;
+	const char *text;
+	double ox, oy;
 
+	if (!enesim_renderer_destination_bounds_get(r, &bounds, 0, 0, NULL))
+		return EINA_FALSE;
+
+	/* check that x, y is inside the bounding box */
+	eina_rectangle_coords_from(&cursor, x, y, 1, 1);
+	if (!eina_rectangles_intersect(&bounds, &cursor))
+		return EINA_FALSE;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	/* iterate over every glyph and find the intersection */
+	enesim_renderer_origin_get(r, &ox, &oy);
+	y -= oy;
+	x -= ox;
+
+	text = enesim_text_buffer_string_get(thiz->state.buffer);
+	for (c = text; c && *c; c++)
+	{
+		Enesim_Text_Glyph *g;
+		int w, h;
+
+		g = enesim_text_font_glyph_load(thiz->state.current.font, *c);
+		if (!g)
+		{
+			WRN("No such glyph for %c", *c);
+			continue;
+		}
+		if (!g->surface) goto advance;
+		/* check if the coord is inside the surface */
+		enesim_surface_size_get(g->surface, &w, &h);
+		w = g->x_advance < w ? g->x_advance : w;
+		if (x >= (rcoord - 1) && x < rcoord + w)
+		{
+			if (index) *index = idx;
+			if (start) *start = rcoord -1 + ox;
+			if (end) *end = rcoord - 1 + g->x_advance + ox;
+			found = EINA_TRUE;
+			break;
+		}
+advance:
+		rcoord += g->x_advance;
+		idx++;
+	}
+	return found;
+}

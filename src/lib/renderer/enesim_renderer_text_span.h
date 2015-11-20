@@ -43,6 +43,9 @@ EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_T
 EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Font *font);
 EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r);
 
+EAPI Eina_Bool enesim_renderer_text_span_glyph_at(Enesim_Renderer *r,
+		int x, int y, int *index, int *start, int *end);
+
 /**
  * @}
  */
