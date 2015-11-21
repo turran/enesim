@@ -55,7 +55,7 @@ static Eina_Bool _dump(const Eina_Hash *hash EINA_UNUSED, const void *key, void 
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, char c)
+Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, Eina_Unicode c)
 {
 	Enesim_Text_Glyph *g;
 
@@ -68,37 +68,33 @@ Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, char c)
 	return g;
 }
 
-Enesim_Text_Glyph * enesim_text_font_glyph_load(Enesim_Text_Font *thiz, char c)
+Enesim_Text_Glyph * enesim_text_font_glyph_load(Enesim_Text_Font *thiz, Eina_Unicode c)
 {
 	Enesim_Text_Glyph *g;
-	int key;
 
-	key = c;
-	g = eina_hash_find(thiz->glyphs, &key);
+	g = eina_hash_find(thiz->glyphs, &c);
 	if (!g)
 	{
 		g = enesim_text_font_glyph_get(thiz, c);
 		if (!g) goto end;
-		eina_hash_add(thiz->glyphs, &key, g);
+		eina_hash_add(thiz->glyphs, &c, g);
 	}
 	g->ref++;
 end:
 	return g;
 }
 
-void enesim_text_font_glyph_unload(Enesim_Text_Font *thiz, char c)
+void enesim_text_font_glyph_unload(Enesim_Text_Font *thiz, Eina_Unicode c)
 {
 	Enesim_Text_Glyph *g;
-	int key;
 
-	key = c;
-	g = eina_hash_find(thiz->glyphs, &key);
+	g = eina_hash_find(thiz->glyphs, &c);
 	if (g)
 	{
 		g->ref--;
 		if (!g->ref)
 		{
-			eina_hash_del(thiz->glyphs, &key, g);
+			eina_hash_del(thiz->glyphs, &c, g);
 			free(g);
 		}
 	}

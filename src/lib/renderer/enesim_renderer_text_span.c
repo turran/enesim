@@ -124,40 +124,30 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 	 */
 	if (enesim_text_buffer_smart_is_dirty(thiz->state.buffer) || !thiz->state.glyphs_generated)
 	{
+		Enesim_Text_Glyph *g = NULL;
+		Eina_Unicode unicode;
+		int iidx = 0;
 		const char *text;
-		const char *c;
 		int masc;
 		int mdesc;
-		int len;
-		char last;
 		unsigned int width = 0;
 		
 		text = enesim_text_buffer_string_get(thiz->state.buffer);
-		len = enesim_text_buffer_string_length(thiz->state.buffer);
-
-		for (c = text; c && *c; c++)
+		while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 		{
-			Enesim_Text_Glyph *g;
 
-			g = enesim_text_font_glyph_load(thiz->state.current.font, *c);
+			g = enesim_text_font_glyph_load(thiz->state.current.font, unicode);
 			if (!g) continue;
 			/* calculate the max len */
 			width += g->x_advance;
 		}
 		/* remove the last advance, use only the glyph image size */
-		if (len)
+		if (g && g->surface)
 		{
-			Enesim_Text_Glyph *g;
+			int w, h;
 
-			last = *(text + len - 1);
-			g = enesim_text_font_glyph_load(thiz->state.current.font, last);
-			if (g && g->surface)
-			{
-				int w, h;
-
-				enesim_surface_size_get(g->surface, &w, &h);
-				width -= g->x_advance - w;
-			}
+			enesim_surface_size_get(g->surface, &w, &h);
+			width -= g->x_advance - w;
 		}
 		/* set our own bounds */
 		masc = enesim_text_font_max_ascent_get(thiz->state.current.font);
@@ -188,21 +178,22 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 		int x, int y EINA_UNUSED, Enesim_Text_Glyph_Position *position)
 {
 	Eina_Bool ret = EINA_FALSE;
+	Eina_Unicode unicode;
+	int iidx = 0;
 	int idx = 0;
 	int rcoord = 0;
-	const char *c;
 	const char *text;
 
 	text = enesim_text_buffer_string_get(thiz->state.buffer);
-	for (c = text; c && *c; c++)
+	while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 	{
 		Enesim_Text_Glyph *g;
 		int w, h;
 
-		g = enesim_text_font_glyph_load(font, *c);
+		g = enesim_text_font_glyph_load(font, unicode);
 		if (!g)
 		{
-			WRN("No such glyph for %c", *c);
+			WRN("No such glyph for %c", unicode);
 			continue;
 		}
 		if (!g->surface) goto advance;
@@ -221,7 +212,7 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 		}
 advance:
 		rcoord += g->x_advance;
-		idx++;
+		idx = iidx;
 	}
 	return ret;
 
@@ -338,9 +329,8 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Text_Font *font;
 	Enesim_Text_Glyph_Position position;
-	const char *c;
+	Eina_Unicode unicode;
 	uint32_t *dst = ddata;
-	uint32_t *end = dst + len;
 	double ox, oy;
 	int rx;
 	const char *text;
@@ -383,12 +373,12 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	}
 	rx = x - position.distance;
 	text = enesim_text_buffer_string_get(thiz->state.buffer);
-	for (c = text + position.index; c && *c && dst < end; c++)
+	while ((unicode = eina_unicode_utf8_next_get(text, &position.index)))
 	{
 		Enesim_Text_Glyph *g;
 
 		/* FIXME decide what to use, get() / load()? */
-		g = enesim_text_font_glyph_load(font, *c);
+		g = enesim_text_font_glyph_load(font, unicode);
 		if (!g) continue;
 		if (!g->surface)
 		{
@@ -756,9 +746,10 @@ EAPI Eina_Bool enesim_renderer_text_span_glyph_at(Enesim_Renderer *r,
 	Eina_Rectangle bounds;
 	Eina_Rectangle cursor;
 	Eina_Bool found = EINA_FALSE;
+	Eina_Unicode unicode;
+	int iidx = 0;
 	int idx = 0;
 	int rcoord = 0;
-	const char *c;
 	const char *text;
 	double ox, oy;
 
@@ -777,15 +768,15 @@ EAPI Eina_Bool enesim_renderer_text_span_glyph_at(Enesim_Renderer *r,
 	x -= ox;
 
 	text = enesim_text_buffer_string_get(thiz->state.buffer);
-	for (c = text; c && *c; c++)
+	while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 	{
 		Enesim_Text_Glyph *g;
 		int w, h;
 
-		g = enesim_text_font_glyph_load(thiz->state.current.font, *c);
+		g = enesim_text_font_glyph_load(thiz->state.current.font, unicode);
 		if (!g)
 		{
-			WRN("No such glyph for %c", *c);
+			WRN("No such glyph for %c", unicode);
 			continue;
 		}
 		if (!g->surface) goto advance;

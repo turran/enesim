@@ -180,7 +180,7 @@ static int _enesim_text_engine_freetype_font_max_descent_get(void *data EINA_UNU
 	return desc;
 }
 
-static void _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, char c, Enesim_Text_Glyph *g)
+static void _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, int c, Enesim_Text_Glyph *g)
 {
 	Enesim_Text_Freetype *thiz = edata;
 	FT_UInt gindex;
