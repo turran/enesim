@@ -331,6 +331,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	Enesim_Text_Glyph_Position position;
 	Eina_Unicode unicode;
 	uint32_t *dst = ddata;
+	uint32_t *end = dst + len;
 	double ox, oy;
 	int rx;
 	const char *text;
@@ -373,7 +374,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	}
 	rx = x - position.distance;
 	text = enesim_text_buffer_string_get(thiz->state.buffer);
-	while ((unicode = eina_unicode_utf8_next_get(text, &position.index)))
+	while ((unicode = eina_unicode_utf8_next_get(text, &position.index)) && dst < end)
 	{
 		Enesim_Text_Glyph *g;
 
