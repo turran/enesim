@@ -113,7 +113,7 @@ static int _simple_string_delete(void *data, int length, ssize_t offset)
 		int del;
 
 		del = thiz->length;
-		thiz->string = '\0';
+		thiz->string[0] = '\0';
 		thiz->length = 0;
 
 		return del;
