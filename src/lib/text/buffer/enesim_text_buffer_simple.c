@@ -104,6 +104,13 @@ static int _simple_string_delete(void *data, int length, ssize_t offset)
 	if (length <= 0)
 		return 0;
 
+	if (offset < 0)
+	{
+		if (!thiz->length)
+			return 0;
+		offset = thiz->length - length;
+	}
+
 	if ((unsigned int)offset >= thiz->length)
 		return 0;
 
@@ -113,8 +120,8 @@ static int _simple_string_delete(void *data, int length, ssize_t offset)
 		int del;
 
 		del = thiz->length;
-		thiz->string[0] = '\0';
-		thiz->length = 0;
+		thiz->string[offset] = '\0';
+		thiz->length = offset;
 
 		return del;
 	}
