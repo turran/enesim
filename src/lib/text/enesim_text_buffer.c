@@ -116,7 +116,7 @@ EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, 
 	return 0;
 }
 
-EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz)
+EAPI int enesim_text_buffer_length_get(Enesim_Text_Buffer *thiz)
 {
 	if (!thiz) return 0;
 	if (thiz->descriptor->string_length)

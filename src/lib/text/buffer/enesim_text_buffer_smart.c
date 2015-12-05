@@ -86,7 +86,7 @@ static int _smart_string_length(void *data)
 {
 	Enesim_Text_Buffer_Smart *thiz = data;
 	if (thiz->real)
-		return enesim_text_buffer_string_length(thiz->real);
+		return enesim_text_buffer_length_get(thiz->real);
 	return 0;
 }
 

@@ -109,7 +109,7 @@ EAPI void enesim_text_buffer_string_set(Enesim_Text_Buffer *thiz, const char *st
 EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz);
 EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *str, int length, ssize_t offset);
 EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, ssize_t offset);
-EAPI int enesim_text_buffer_string_length(Enesim_Text_Buffer *thiz);
+EAPI int enesim_text_buffer_length_get(Enesim_Text_Buffer *thiz);
 
 /**
  * @}
