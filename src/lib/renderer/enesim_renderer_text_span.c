@@ -193,7 +193,7 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 		g = enesim_text_font_glyph_load(font, unicode);
 		if (!g)
 		{
-			WRN("No such glyph for %c", unicode);
+			WRN("No such glyph for %08x", unicode);
 			continue;
 		}
 		if (!g->surface) goto advance;
@@ -740,7 +740,7 @@ EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Fon
 	thiz->state.changed = EINA_TRUE;
 }
 
-EAPI Eina_Bool enesim_renderer_text_span_glyph_at(Enesim_Renderer *r,
+EAPI Eina_Bool enesim_renderer_text_span_glyph_coord_at(Enesim_Renderer *r,
 		int x, int y, int *index, int *start, int *end)
 {
 	Enesim_Renderer_Text_Span *thiz;
@@ -777,7 +777,7 @@ EAPI Eina_Bool enesim_renderer_text_span_glyph_at(Enesim_Renderer *r,
 		g = enesim_text_font_glyph_load(thiz->state.current.font, unicode);
 		if (!g)
 		{
-			WRN("No such glyph for %c", unicode);
+			WRN("No such glyph for %08x", unicode);
 			continue;
 		}
 		if (!g->surface) goto advance;
@@ -787,6 +787,55 @@ EAPI Eina_Bool enesim_renderer_text_span_glyph_at(Enesim_Renderer *r,
 		if (x >= (rcoord - 1) && x < rcoord + w)
 		{
 			if (index) *index = idx;
+			if (start) *start = rcoord -1 + ox;
+			if (end) *end = rcoord - 1 + g->x_advance + ox;
+			found = EINA_TRUE;
+			break;
+		}
+advance:
+		rcoord += g->x_advance;
+		idx++;
+	}
+	return found;
+}
+
+EAPI Eina_Bool enesim_renderer_text_span_glyph_index_at(Enesim_Renderer *r,
+		int index, int *start, int *end)
+{
+	Enesim_Renderer_Text_Span *thiz;
+	Eina_Bool found = EINA_FALSE;
+	Eina_Unicode unicode;
+	int iidx = 0;
+	int idx = 0;
+	int rcoord = 0;
+	const char *text;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+
+	/* make sure to load the glyphs first */
+	_enesim_renderer_text_span_generate(thiz);
+	text = enesim_text_buffer_string_get(thiz->state.buffer);
+	/* iterate until we find the correct index, go adding the x advance */
+	while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
+	{
+		Enesim_Text_Glyph *g;
+		int w, h;
+
+		g = enesim_text_font_glyph_load(thiz->state.current.font, unicode);
+		if (!g)
+		{
+			WRN("No such glyph for %08x", unicode);
+			continue;
+		}
+		if (!g->surface) goto advance;
+		/* check if the coord is inside the surface */
+		enesim_surface_size_get(g->surface, &w, &h);
+		w = g->x_advance < w ? g->x_advance : w;
+		if (index == idx)
+		{
+			double ox, oy;
+
+			enesim_renderer_origin_get(r, &ox, &oy);
 			if (start) *start = rcoord -1 + ox;
 			if (end) *end = rcoord - 1 + g->x_advance + ox;
 			found = EINA_TRUE;
