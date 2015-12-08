@@ -61,7 +61,10 @@ typedef struct _Enesim_Text_Glyph_Position Enesim_Text_Glyph_Position;
 
 struct _Enesim_Text_Glyph
 {
+	/* the surface associated with the glyph */
 	Enesim_Surface *surface;
+	/* the unicode char for this glyph */
+	Eina_Unicode code;
 	/* temporary */
 	int origin;
 	int x_advance;

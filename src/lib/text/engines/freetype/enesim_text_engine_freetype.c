@@ -180,7 +180,7 @@ static int _enesim_text_engine_freetype_font_max_descent_get(void *data EINA_UNU
 	return desc;
 }
 
-static void _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, int c, Enesim_Text_Glyph *g)
+static void _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, Eina_Unicode c, Enesim_Text_Glyph *g)
 {
 	Enesim_Text_Freetype *thiz = edata;
 	FT_UInt gindex;
@@ -223,6 +223,7 @@ static void _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, int
 no_surface:
 			g->origin = (face->glyph->metrics.horiBearingY >> 6);
 			g->x_advance = (face->glyph->metrics.horiAdvance >> 6);
+			g->code = c;
 		}
 	}
 	eina_lock_release(&thiz->lock);
