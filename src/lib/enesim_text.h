@@ -113,13 +113,13 @@ EAPI int enesim_text_buffer_length_get(Enesim_Text_Buffer *thiz);
 
 /**
  * @}
- * @defgroup Enesim_Text_Buffer_Simple Simple Buffer
+ * @defgroup Enesim_Text_Buffer_Utf8 Utf8 Buffer
  * @ender_inherits{Enesim_Text_Buffer}
  * @ingroup Enesim_Text_Buffer
  * @{
  */
 
-EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length);
+EAPI Enesim_Text_Buffer * enesim_text_buffer_utf8_new(int initial_length);
 
 /**
  * @}

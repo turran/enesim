@@ -29,13 +29,13 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-typedef struct _Enesim_Text_Buffer_Simple
+typedef struct _Enesim_Text_Buffer_Utf8
 {
 	char *string;
 	size_t length; /* string length */
 	size_t blength; /* string length in bytes */
 	size_t bytes; /* alloced length */
-} Enesim_Text_Buffer_Simple;
+} Enesim_Text_Buffer_Utf8;
 
 static void _utf8_strlen(const char *string, int *length, size_t *bytes)
 {
@@ -59,14 +59,14 @@ static void _utf8_strlen(const char *string, int *length, size_t *bytes)
 /*----------------------------------------------------------------------------*
  *                           Text buffer interface                            *
  *----------------------------------------------------------------------------*/
-static const char * _simple_type_get(void)
+static const char * _utf8_type_get(void)
 {
-	return "enesim.text.buffer.simple";
+	return "enesim.text.buffer.utf8";
 }
 
-static void _simple_string_set(void *data, const char *string, int length)
+static void _utf8_string_set(void *data, const char *string, int length)
 {
-	Enesim_Text_Buffer_Simple *thiz = data;
+	Enesim_Text_Buffer_Utf8 *thiz = data;
 	size_t bytes;
 
 	/* first create the needed space */
@@ -83,9 +83,9 @@ static void _simple_string_set(void *data, const char *string, int length)
 	thiz->blength = bytes;
 }
 
-static int _simple_string_insert(void *data, const char *string, int length, ssize_t offset)
+static int _utf8_string_insert(void *data, const char *string, int length, ssize_t offset)
 {
-	Enesim_Text_Buffer_Simple *thiz = data;
+	Enesim_Text_Buffer_Utf8 *thiz = data;
 	size_t bytes;
 	size_t new_blength;
 	size_t new_length;
@@ -126,9 +126,9 @@ static int _simple_string_insert(void *data, const char *string, int length, ssi
 	return length;
 }
 
-static int _simple_string_delete(void *data, int length, ssize_t offset)
+static int _utf8_string_delete(void *data, int length, ssize_t offset)
 {
-	Enesim_Text_Buffer_Simple *thiz = data;
+	Enesim_Text_Buffer_Utf8 *thiz = data;
 
 	if (length <= 0)
 		return 0;
@@ -143,7 +143,7 @@ static int _simple_string_delete(void *data, int length, ssize_t offset)
 	if ((unsigned int)offset >= thiz->length)
 		return 0;
 
-	/* simple case */
+	/* utf8 case */
 	if ((unsigned int)(offset + length) >= thiz->length)
 	{
 		int del;
@@ -176,35 +176,35 @@ static int _simple_string_delete(void *data, int length, ssize_t offset)
 	}
 }
 
-static const char * _simple_string_get(void *data)
+static const char * _utf8_string_get(void *data)
 {
-	Enesim_Text_Buffer_Simple *thiz = data;
+	Enesim_Text_Buffer_Utf8 *thiz = data;
 	return thiz->string;
 }
 
-static int _simple_string_length(void *data)
+static int _utf8_string_length(void *data)
 {
-	Enesim_Text_Buffer_Simple *thiz = data;
+	Enesim_Text_Buffer_Utf8 *thiz = data;
 	return thiz->length;
 }
 
-static void _simple_free(void *data)
+static void _utf8_free(void *data)
 {
-	Enesim_Text_Buffer_Simple *thiz = data;
+	Enesim_Text_Buffer_Utf8 *thiz = data;
 
 	free(thiz->string);
 	free(thiz);
 }
 
-/* the simple buffer */
-static Enesim_Text_Buffer_Descriptor _enesim_text_buffer_simple = {
-	/* .type_get 		= */ _simple_type_get,
-	/* .string_get 		= */ _simple_string_get,
-	/* .string_set 		= */ _simple_string_set,
-	/* .string_insert 	= */ _simple_string_insert,
-	/* .string_delete 	= */ _simple_string_delete,
-	/* .string_length 	= */ _simple_string_length,
-	/* .free 		= */ _simple_free,
+/* the utf8 buffer */
+static Enesim_Text_Buffer_Descriptor _enesim_text_buffer_utf8 = {
+	/* .type_get 		= */ _utf8_type_get,
+	/* .string_get 		= */ _utf8_string_get,
+	/* .string_set 		= */ _utf8_string_set,
+	/* .string_insert 	= */ _utf8_string_insert,
+	/* .string_delete 	= */ _utf8_string_delete,
+	/* .string_length 	= */ _utf8_string_length,
+	/* .free 		= */ _utf8_free,
 };
 /*============================================================================*
  *                                 Global                                     *
@@ -213,11 +213,11 @@ static Enesim_Text_Buffer_Descriptor _enesim_text_buffer_simple = {
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
-EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length)
+EAPI Enesim_Text_Buffer * enesim_text_buffer_utf8_new(int initial_length)
 {
-	Enesim_Text_Buffer_Simple *thiz;
+	Enesim_Text_Buffer_Utf8 *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Text_Buffer_Simple));
+	thiz = calloc(1, sizeof(Enesim_Text_Buffer_Utf8));
 	if (initial_length <= 0)
 		initial_length = PATH_MAX;
 	/* worst case */
@@ -225,5 +225,5 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length)
 	thiz->bytes = initial_length * sizeof(Eina_Unicode);
 	thiz->length = thiz->blength = 0;
 
-	return enesim_text_buffer_new_from_descriptor(&_enesim_text_buffer_simple, thiz);
+	return enesim_text_buffer_new_from_descriptor(&_enesim_text_buffer_utf8, thiz);
 }
