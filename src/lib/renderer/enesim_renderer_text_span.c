@@ -175,7 +175,7 @@ static Eina_Bool _enesim_renderer_text_span_generate(Enesim_Renderer_Text_Span *
 /* x and y must be inside the bounding box */
 static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 		Enesim_Renderer_Text_Span *thiz, Enesim_Text_Font *font,
-		int x, int y EINA_UNUSED, Enesim_Text_Glyph_Position *position)
+		int x, int *next, Enesim_Text_Glyph_Position *position)
 {
 	Eina_Bool ret = EINA_FALSE;
 	Eina_Unicode unicode;
@@ -188,29 +188,23 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 	while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 	{
 		Enesim_Text_Glyph *g;
-		int w, h;
-
+		//ERR("idx %d", idx);
 		g = enesim_text_font_glyph_load(font, unicode);
 		if (!g)
 		{
 			WRN("No such glyph for %08x", unicode);
 			continue;
 		}
-		if (!g->surface) goto advance;
-		/* check if the coord is inside the surface */
-		enesim_surface_size_get(g->surface, &w, &h);
-		w = g->x_advance < w ? g->x_advance : w;
-		//printf("%c %d %d -> %d %d %d\n", *c, x, y, g->x_advance, w, h);
-		if (x >= (rcoord - 1) && x < rcoord + w)
+		//ERR("x: %d y: %d rcoord: %d w: %d", x, y, rcoord, w);
+		if (x >= rcoord && x < rcoord + g->x_advance)
 		{
 			position->glyph = g;
 			position->index = idx;
 			position->distance = rcoord;
+			if (next) *next = iidx;
 			ret = EINA_TRUE;
-			//printf("returning %c\n", *c);
 			break;
 		}
-advance:
 		rcoord += g->x_advance;
 		idx = iidx;
 	}
@@ -295,15 +289,14 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 		Eina_F16p16 gxx, gyy;
 		int w, h;
 		uint32_t p0 = 0;
-		int sx, sy;
+		int sx;
 		uint32_t *src;
 		size_t stride;
 
 		sx = eina_f16p16_int_to(xx);
-		sy = eina_f16p16_int_to(yy);
 
 		/* FIXME decide what to use, get() / load()? */
-		if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, sx, sy, &position))
+		if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, sx, NULL, &position))
 		{
 			goto next;
 		}
@@ -329,11 +322,14 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Text_Font *font;
 	Enesim_Text_Glyph_Position position;
+	Enesim_Text_Glyph *g;
 	Eina_Unicode unicode;
 	uint32_t *dst = ddata;
 	uint32_t *end = dst + len;
 	double ox, oy;
 	int rx;
+	int rlen;
+	int idx;
 	const char *text;
 	Enesim_Color color;
 	Enesim_Color fcolor;
@@ -367,41 +363,84 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 		return;
 	}
 	/* advance to the first character that is inside the x+len span */
-	if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, x, y, &position))
+	if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, x, &idx, &position))
 	{
-		DBG("Can not get glyph at %d %d", x, y);
+		ERR("Can not get glyph at %d %d %d", x, y, len);
 		return;
 	}
+	g = position.glyph;
 	rx = x - position.distance;
-	text = enesim_text_buffer_string_get(thiz->state.buffer);
-	while ((unicode = eina_unicode_utf8_next_get(text, &position.index)) && dst < end)
-	{
-		Enesim_Text_Glyph *g;
+	rlen = g->x_advance - rx < len ? g->x_advance - rx : len;
 
+	/* draw the first char, for every char after this, we just advance */
+	if (!g->surface)
+	{
+		memset(dst, 0, rlen * sizeof(uint32_t));
+	}
+	else
+	{
+		int w, h;
+		int ry;
+
+		enesim_surface_size_get(g->surface, &w, &h);
+		ry = y - (thiz->top - g->origin);
+		/* clear the in case we are out of the image vertical/horizontal bounds */
+		if (ry < 0 || ry >= h || rx >= w)
+		{
+			memset(dst, 0, rlen * sizeof(uint32_t));
+		}
+		else
+		{
+			uint32_t *mask;
+			size_t stride;
+			int slen;
+
+			slen = w - rx < rlen ? w - rx : rlen;
+			enesim_surface_sw_data_get(g->surface, (void **)&mask, &stride);
+			mask = enesim_color_at(mask, stride, rx, ry);
+			if (fpaint)
+			{
+				if (fcolor != 0xffffffff)
+					enesim_color_fill_sp_argb8888_color_argb8888_alpha(dst, slen, fbuf, fcolor, mask);
+				else
+					enesim_color_fill_sp_argb8888_none_argb8888_alpha(dst, slen, fbuf, mask);
+			}
+			else
+				enesim_color_fill_sp_none_color_argb8888_alpha(dst, slen, fcolor, mask);
+			/* clear the area that we have not drawn on the horizontal bounds */
+			if (slen < rlen)
+			{
+				memset(dst + slen, 0, (rlen - slen) * sizeof(uint32_t));
+			}
+		}
+	}
+	dst += rlen;
+	len -= rlen;
+	fbuf += rlen;
+
+	/* now draw the following chars */
+	text = enesim_text_buffer_string_get(thiz->state.buffer);
+	while (dst < end && (unicode = eina_unicode_utf8_next_get(text, &idx)))
+	{
 		/* FIXME decide what to use, get() / load()? */
 		g = enesim_text_font_glyph_load(font, unicode);
 		if (!g) continue;
 		if (!g->surface)
 		{
-			int rlen;
-
-			rlen = g->x_advance - rx < len ? g->x_advance - rx : len;
+			rlen = g->x_advance < len ? g->x_advance : len;
 			memset(dst, 0, rlen * sizeof(uint32_t));
-			goto advance;
 		}
 		else
 		{
 			int w, h;
 			int ry;
-			int rlen;
 			uint32_t *mask;
 			size_t stride;
 
 			enesim_surface_size_get(g->surface, &w, &h);
-			enesim_surface_sw_data_get(g->surface, (void **)&mask, &stride);
 
 			ry = y - (thiz->top - g->origin);
-			rlen = len < w - rx ? len : w - rx;
+			rlen = len < w ? len : w;
 
 			/* clear the in case we are out of the image vertical bounds */
 			if (ry < 0 || ry >= h)
@@ -410,7 +449,8 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 				goto after;
 			}
 
-			mask = enesim_color_at(mask, stride, rx, ry);
+			enesim_surface_sw_data_get(g->surface, (void **)&mask, &stride);
+			mask = enesim_color_at(mask, stride, 0, ry);
 			if (fpaint)
 			{
 				if (fcolor != 0xffffffff)
@@ -431,12 +471,10 @@ after:
 				memset(dst + rlen, 0, rend * sizeof(uint32_t));
 			}
 		}
-advance:
 		/* finally advance */
-		dst += g->x_advance - rx;
-		len -= g->x_advance - rx;
-		fbuf += g->x_advance - rx;
-		rx = 0;
+		dst += g->x_advance;
+		len -= g->x_advance;
+		fbuf += g->x_advance;
 	}
 }
 
