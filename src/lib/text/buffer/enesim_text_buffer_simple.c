@@ -33,8 +33,29 @@ typedef struct _Enesim_Text_Buffer_Simple
 {
 	char *string;
 	size_t length; /* string length */
+	size_t blength; /* string length in bytes */
 	size_t bytes; /* alloced length */
 } Enesim_Text_Buffer_Simple;
+
+static void _utf8_strlen(const char *string, int *length, size_t *bytes)
+{
+	int count = 0;
+	int idx = 0;
+
+	if (*length < 0)
+	{
+		while (eina_unicode_utf8_next_get(string, &idx))
+			count++;
+		*length = count;
+	}
+	else
+	{
+		while (count < *length && eina_unicode_utf8_next_get(string, &idx))
+			count++;
+	}
+	*bytes = idx;
+}
+
 /*----------------------------------------------------------------------------*
  *                           Text buffer interface                            *
  *----------------------------------------------------------------------------*/
@@ -46,53 +67,61 @@ static const char * _simple_type_get(void)
 static void _simple_string_set(void *data, const char *string, int length)
 {
 	Enesim_Text_Buffer_Simple *thiz = data;
+	size_t bytes;
 
 	/* first create the needed space */
-	if (length < 0)
-		length = strlen(string);
-	if ((unsigned int)length + 1 > thiz->bytes)
+	_utf8_strlen(string, &length, &bytes);
+	if (bytes + 1 > thiz->bytes)
 	{
-		thiz->string = realloc(thiz->string, sizeof(char) * length + 1);
-		thiz->bytes = length + 1;
+		thiz->string = realloc(thiz->string, sizeof(char) * bytes + 1);
+		thiz->bytes = bytes + 1;
 	}
 	/* now set */
-	strncpy(thiz->string, string, length);
-	thiz->string[length] = '\0';
+	strncpy(thiz->string, string, bytes);
+	thiz->string[bytes] = '\0';
 	thiz->length = length;
+	thiz->blength = bytes;
 }
 
 static int _simple_string_insert(void *data, const char *string, int length, ssize_t offset)
 {
 	Enesim_Text_Buffer_Simple *thiz = data;
-	unsigned int new_length;
+	size_t bytes;
+	size_t new_blength;
+	size_t new_length;
 	int to_move;
 	int i;
+	size_t boffset = 0;
 
 	/* first create the needed space */
-	if (length < 0)
-		length = strlen(string);
+	_utf8_strlen(string, &length, &bytes);
+	/* sanitize the offset */
 	if (offset < 0)
 		offset = thiz->length;
 	else if ((unsigned int)offset > thiz->length)
 		offset = thiz->length;
 
+	new_blength = bytes + thiz->blength;
 	new_length = length + thiz->length;
-	to_move = thiz->length - offset;
-	if (new_length + 1 > thiz->bytes)
+	if (new_blength + 1 > thiz->bytes)
 	{
-		thiz->string = realloc(thiz->string, sizeof(char) * new_length + 1);
-		thiz->bytes = new_length + 1;
+		thiz->string = realloc(thiz->string, sizeof(char) * new_blength + 1);
+		thiz->bytes = new_blength + 1;
 	}
 	/* now insert */
 	/* make the needed space */
+	_utf8_strlen(thiz->string, (int *)&offset, &boffset);
+	to_move = thiz->blength - boffset;
+	/* ok we found the byte offset to start moving */
 	for (i = 0; i < to_move; i++)
 	{
-		thiz->string[new_length - i - 1] = thiz->string[offset + to_move - i - 1];
+		thiz->string[new_blength - i - 1] = thiz->string[boffset + to_move - i - 1];
 	}
 	/* insert */
-	strncpy(thiz->string + offset, string, length);
-	thiz->string[new_length] = '\0';
+	strncpy(thiz->string + boffset, string, bytes);
+	thiz->string[new_blength] = '\0';
 	thiz->length = new_length;
+	thiz->blength = new_blength;
 
 	return length;
 }
@@ -118,10 +147,13 @@ static int _simple_string_delete(void *data, int length, ssize_t offset)
 	if ((unsigned int)(offset + length) >= thiz->length)
 	{
 		int del;
+		size_t boffset;
 
-		del = thiz->length;
-		thiz->string[offset] = '\0';
+		del = thiz->length - offset;
+		_utf8_strlen(thiz->string, (int *)&offset, &boffset);
+		thiz->string[boffset] = '\0';
 		thiz->length = offset;
+		thiz->blength = boffset;
 
 		return del;
 	}
@@ -129,12 +161,17 @@ static int _simple_string_delete(void *data, int length, ssize_t offset)
 	{
 		int i;
 		int j = offset;
+		size_t boffset;
+		size_t blength;
 
 		/* shift the chars */
-		for (i = offset + length; (unsigned int)i < thiz->length; i++, j++)
+		_utf8_strlen(thiz->string, (int *)&offset, &boffset);
+		_utf8_strlen(thiz->string + boffset, &length, &blength);
+		for (i = boffset + blength; (unsigned int)i < thiz->blength; i++, j++)
 			thiz->string[j] = thiz->string[i];
+		thiz->blength -= blength;
 		thiz->length -= length;
-		thiz->string[thiz->length] = '\0';
+		thiz->string[thiz->blength] = '\0';
 		return length;
 	}
 }
@@ -183,9 +220,10 @@ EAPI Enesim_Text_Buffer * enesim_text_buffer_simple_new(int initial_length)
 	thiz = calloc(1, sizeof(Enesim_Text_Buffer_Simple));
 	if (initial_length <= 0)
 		initial_length = PATH_MAX;
-	thiz->string = calloc(initial_length, sizeof(char));
-	thiz->bytes = initial_length;
-	thiz->length = 0;
+	/* worst case */
+	thiz->string = calloc(initial_length, sizeof(Eina_Unicode));
+	thiz->bytes = initial_length * sizeof(Eina_Unicode);
+	thiz->length = thiz->blength = 0;
 
 	return enesim_text_buffer_new_from_descriptor(&_enesim_text_buffer_simple, thiz);
 }
