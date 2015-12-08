@@ -1,5 +1,6 @@
 Enesim
 ======
++ In case of a bounds with 0 width or height, the draw is still called
 + Pass the surface when checking for bounds, this allows to know what renderer to use
   on the destination surface
 + Remove the renderers on the stripes
