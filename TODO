@@ -2,7 +2,8 @@ Enesim
 ======
 + Define when to commit the state of a renderer to cleanup the changed flag
   On some renderers it is done on the cleanup, on others in case the setup
-  fails.
+  fails. The change flag is either  a change from the last draw (succesful setup), or a change
+  from the last setup (either sucess or failed).
 + In case of a bounds with 0 width or height, the draw is still called
 + Pass the surface when checking for bounds, this allows to know what renderer to use
   on the destination surface
