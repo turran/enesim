@@ -78,6 +78,10 @@ EAPI void enesim_surface_unlock(Enesim_Surface *s);
 EAPI void enesim_surface_alpha_hint_set(Enesim_Surface *s, Enesim_Alpha_Hint hint);
 EAPI Enesim_Alpha_Hint enesim_surface_alpha_hint_get(Enesim_Surface *s);
 
+EAPI Eina_Bool enesim_surface_convert(Enesim_Surface *thiz, Enesim_Buffer *dst);
+EAPI Eina_Bool enesim_surface_convert_list(Enesim_Surface *thiz, Enesim_Buffer *dst,
+		Eina_List *clips);
+
 /** @} */ //End of Enesim_Surface
 
 #endif /*ENESIM_SURFACE_H_*/

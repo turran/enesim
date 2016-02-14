@@ -585,3 +585,41 @@ EAPI Enesim_Alpha_Hint enesim_surface_alpha_hint_get(Enesim_Surface *s)
 {
 	return enesim_buffer_alpha_hint_get(s->buffer);
 }
+
+/**
+ * Converts a surface into a buffer. Basically it will do a color space
+ * conversion.
+ * @param[in] thiz The surface to convert
+ * @param[in] dst The destination buffer
+ * @return EINA_TRUE if the conversion was correct, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_surface_convert(Enesim_Surface *thiz, Enesim_Buffer *dst)
+{
+	Enesim_Buffer *src;
+	Eina_Bool ret;
+
+	src = enesim_surface_buffer_get(thiz);
+	ret = enesim_buffer_convert(src, dst);
+	enesim_buffer_unref(src);
+	return ret;
+}
+
+/**
+ * Converts a surface into another buffer. Basically it will do a color space
+ * conversion.
+ * @param[in] thiz The surface to convert
+ * @param[in] dst The destination buffer
+ * @param[in] clips A list of clipping areas on the destination surface to limit the conversion. @ender_nullable
+ * @return EINA_TRUE if the conversion was correct, EINA_FALSE otherwise
+ */
+EAPI Eina_Bool enesim_surface_convert_list(Enesim_Surface *thiz, Enesim_Buffer *dst,
+		Eina_List *clips)
+{
+	Enesim_Buffer *src;
+	Eina_Bool ret;
+
+	src = enesim_surface_buffer_get(thiz);
+	ret = enesim_buffer_convert_list(src, dst, clips);
+	enesim_buffer_unref(src);
+	return ret;
+}

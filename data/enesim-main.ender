@@ -618,6 +618,15 @@
     <method name="alpha_hint_get">
       <return type="enesim.aplha_hint" transfer="full" nullable="false"/>
     </method>
+    <method name="convert">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
+    </method>
+    <method name="convert_list">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="clips" type="eina.list" direction="in" transfer="full" nullable="true"/>
+    </method>
   </object>
   <object name="enesim.surface">
     <ctor name="new">
@@ -706,30 +715,15 @@
     <method name="alpha_hint_get">
       <return type="enesim.aplha_hint" transfer="full" nullable="false"/>
     </method>
-  </object>
-  <object name="enesim.converter">
-    <function name="buffer">
+    <method name="convert">
       <return type="bool" transfer="full" nullable="false"/>
-      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
       <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
-    </function>
-    <function name="surface">
+    </method>
+    <method name="convert_list">
       <return type="bool" transfer="full" nullable="false"/>
-      <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
       <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
-    </function>
-    <function name="surface_list">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
-      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
-      <arg name="clips" type="eina.list" direction="in" transfer="full"/>
-    </function>
-    <function name="buffer_list">
-      <return type="bool" transfer="full" nullable="false"/>
-      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
-      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
-      <arg name="clips" type="eina.list" direction="in" transfer="full"/>
-    </function>
+      <arg name="clips" type="eina.list" direction="in" transfer="full" nullable="true"/>
+    </method>
   </object>
   <object name="enesim.renderer"/>
   <enum name="enesim.renderer.feature">

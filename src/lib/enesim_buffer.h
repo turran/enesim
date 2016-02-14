@@ -227,6 +227,9 @@ EAPI void enesim_buffer_unlock(Enesim_Buffer *b);
 EAPI void enesim_buffer_alpha_hint_set(Enesim_Buffer *thiz, Enesim_Alpha_Hint hint);
 EAPI Enesim_Alpha_Hint enesim_buffer_alpha_hint_get(Enesim_Buffer *thiz);
 
+EAPI Eina_Bool enesim_buffer_convert(Enesim_Buffer *thiz, Enesim_Buffer *dst);
+EAPI Eina_Bool enesim_buffer_convert_list(Enesim_Buffer *thiz, Enesim_Buffer *dst, Eina_List *clips);
+
 /** @} */ //End of Enesim_Buffer
 
 

@@ -120,7 +120,6 @@ extern "C" {
 /* main subsystems */
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
-#include "enesim_converter.h"
 #include "enesim_renderer.h"
 #include "enesim_stream.h"
 #include "enesim_image.h"
