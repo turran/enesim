@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: Matrices type</title>
+<title>enesim: ANSI Buffer</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -72,57 +72,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
-<a href="#define-members">Defines</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Matrices type</div>  </div>
-<div class="ingroups"><a class="el" href="group__Enesim__Basic.html">Basic types</a></div></div><!--header-->
+<div class="title">ANSI Buffer</div>  </div>
+<div class="ingroups"><a class="el" href="group__Enesim__Text__Buffer.html">Buffer</a></div></div><!--header-->
 <div class="contents">
-
-<p>Matrix types.  
-<a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="define-members"></a>
-Defines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga2cd1323cce3f1c9e062c75e952f3e125"></a><!-- doxytag: member="Enesim_Matrix_Type::ENESIM_MATRIX_TYPE_LAST" ref="ga2cd1323cce3f1c9e062c75e952f3e125" args="" -->
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>ENESIM_MATRIX_TYPE_LAST</b>&#160;&#160;&#160;(<a class="el" href="group__Enesim__Matrix__Type.html#gga9490982e0f102e9a4d4461b87b87dba8ab9a79b3042c46cfe40d7faddc84403b7">ENESIM_MATRIX_TYPE_PROJECTIVE</a> + 1)</td></tr>
-<tr><td colspan="2"><h2><a name="enum-members"></a>
-Enumerations</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Matrix__Type.html#ga9490982e0f102e9a4d4461b87b87dba8">Enesim_Matrix_Type</a> { <br/>
-&#160;&#160;<a class="el" href="group__Enesim__Matrix__Type.html#gga9490982e0f102e9a4d4461b87b87dba8a199201b0c92932a8f80764756da37f2d">ENESIM_MATRIX_TYPE_IDENTITY</a>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Matrix__Type.html#gga9490982e0f102e9a4d4461b87b87dba8a60db1a6cf6cd5362554ef071b4fa93e5">ENESIM_MATRIX_TYPE_AFFINE</a>, 
-<br/>
-&#160;&#160;<a class="el" href="group__Enesim__Matrix__Type.html#gga9490982e0f102e9a4d4461b87b87dba8ab9a79b3042c46cfe40d7faddc84403b7">ENESIM_MATRIX_TYPE_PROJECTIVE</a>
-<br/>
- }</td></tr>
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Enesim_Text_Buffer *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Text__Buffer__Ansi.html#ga97db8efdafeaa9b552a915af3b696228">enesim_text_buffer_ansi_new</a> (int initial_length)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<p>Matrix types. </p>
-<hr/><h2>Enumeration Type Documentation</h2>
-<a class="anchor" id="ga9490982e0f102e9a4d4461b87b87dba8"></a><!-- doxytag: member="enesim_matrix.h::Enesim_Matrix_Type" ref="ga9490982e0f102e9a4d4461b87b87dba8" args="" -->
+ inherits from \1 </p>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="ga97db8efdafeaa9b552a915af3b696228"></a><!-- doxytag: member="enesim_text.h::enesim_text_buffer_ansi_new" ref="ga97db8efdafeaa9b552a915af3b696228" args="(int initial_length)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="group__Enesim__Matrix__Type.html#ga9490982e0f102e9a4d4461b87b87dba8">Enesim_Matrix_Type</a></td>
+          <td class="memname">EAPI Enesim_Text_Buffer* <a class="el" href="group__Enesim__Text__Buffer__Ansi.html#ga97db8efdafeaa9b552a915af3b696228">enesim_text_buffer_ansi_new</a> </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>initial_length</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
-<tr><td valign="top"><em><a class="anchor" id="gga9490982e0f102e9a4d4461b87b87dba8a199201b0c92932a8f80764756da37f2d"></a><!-- doxytag: member="ENESIM_MATRIX_TYPE_IDENTITY" ref="gga9490982e0f102e9a4d4461b87b87dba8a199201b0c92932a8f80764756da37f2d" args="" -->ENESIM_MATRIX_TYPE_IDENTITY</em>&nbsp;</td><td>
-<p>Identity matrix type </p>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga9490982e0f102e9a4d4461b87b87dba8a60db1a6cf6cd5362554ef071b4fa93e5"></a><!-- doxytag: member="ENESIM_MATRIX_TYPE_AFFINE" ref="gga9490982e0f102e9a4d4461b87b87dba8a60db1a6cf6cd5362554ef071b4fa93e5" args="" -->ENESIM_MATRIX_TYPE_AFFINE</em>&nbsp;</td><td>
-<p>Affine matrix type </p>
-</td></tr>
-<tr><td valign="top"><em><a class="anchor" id="gga9490982e0f102e9a4d4461b87b87dba8ab9a79b3042c46cfe40d7faddc84403b7"></a><!-- doxytag: member="ENESIM_MATRIX_TYPE_PROJECTIVE" ref="gga9490982e0f102e9a4d4461b87b87dba8ab9a79b3042c46cfe40d7faddc84403b7" args="" -->ENESIM_MATRIX_TYPE_PROJECTIVE</em>&nbsp;</td><td>
-<p>Projective matrix type </p>
-</td></tr>
-</table>
-</dd>
-</dl>
 
 </div>
 </div>
@@ -144,7 +120,7 @@ Enumerations</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Feb 14 2016 17:47:17 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 14 2016 17:47:18 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
