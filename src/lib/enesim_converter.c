@@ -24,7 +24,7 @@
 #include "enesim_surface.h"
 #include "enesim_converter.h"
 
-#include "enesim_buffer.h"
+#include "enesim_buffer_private.h"
 #include "enesim_converter_private.h"
 
 /*
@@ -110,15 +110,17 @@ EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst)
 
 	sfmt = enesim_buffer_format_get(b);
 	dfmt = enesim_buffer_format_get(dst);
+	if (sfmt == dfmt)
+		return EINA_FALSE;
 
-	if (sfmt == dfmt) return EINA_FALSE;
 	enesim_buffer_size_get(b, &w, &h);
 	enesim_buffer_size_get(dst, &dstw, &dsth);
-
-	if (dstw != w || dsth != h) return EINA_FALSE;
+	if (dstw != w || dsth != h)
+		return EINA_FALSE;
 
 	converter = enesim_converter_surface_get(dfmt, ENESIM_ANGLE_NONE, sfmt);
-	if (!converter) return EINA_FALSE;
+	if (!converter)
+		return EINA_FALSE;
 
 	enesim_buffer_sw_data_get(dst, &ddata);
 	enesim_buffer_sw_data_get(b, &sdata);
@@ -126,6 +128,62 @@ EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst)
 	/* FIXME check the stride too */
 	/* TODO check the clip and x, y */
 	converter(&ddata, w, h, &sdata, w, h);
+
+	return EINA_TRUE;
+}
+
+EAPI Eina_Bool enesim_converter_surface_list(Enesim_Surface *s, Enesim_Buffer *dst,
+		Eina_List *clips)
+{
+	Enesim_Buffer *src;
+	Eina_Bool ret;
+
+	src = enesim_surface_buffer_get(s);
+	ret = enesim_converter_buffer_list(src, dst, clips);
+	enesim_buffer_unref(src);
+	return ret;
+}
+
+EAPI Eina_Bool enesim_converter_buffer_list(Enesim_Buffer *b, Enesim_Buffer *dst, Eina_List *clips)
+{
+	Enesim_Converter_2D converter;
+	Enesim_Buffer_Format dfmt;
+	Enesim_Buffer_Format sfmt;
+	Enesim_Buffer_Sw_Data ddata;
+	Enesim_Buffer_Sw_Data sdata;
+	Eina_Rectangle *area;
+	Eina_List *l;
+	int w, h, dstw, dsth;
+
+	sfmt = enesim_buffer_format_get(b);
+	dfmt = enesim_buffer_format_get(dst);
+	if (sfmt == dfmt)
+		return EINA_FALSE;
+
+	enesim_buffer_size_get(b, &w, &h);
+	enesim_buffer_size_get(dst, &dstw, &dsth);
+	if (dstw != w || dsth != h)
+		return EINA_FALSE;
+
+	converter = enesim_converter_surface_get(dfmt, ENESIM_ANGLE_NONE, sfmt);
+	if (!converter)
+		return EINA_FALSE;
+
+	enesim_buffer_sw_data_get(dst, &ddata);
+	enesim_buffer_sw_data_get(b, &sdata);
+
+	EINA_LIST_FOREACH(clips, l, area)
+	{
+		Enesim_Buffer_Sw_Data dat;
+		Enesim_Buffer_Sw_Data sat;
+
+		/* FIXME check the stride too */
+		/* TODO check the clip and x, y */
+
+		enesim_buffer_sw_data_at(&ddata, dfmt, area->x, area->y, &dat);
+		enesim_buffer_sw_data_at(&sdata, sfmt, area->x, area->y, &sat);
+		converter(&dat, area->w, area->h, &sat, area->w, area->h);
+	}
 
 	return EINA_TRUE;
 }

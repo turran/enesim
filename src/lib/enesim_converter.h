@@ -31,5 +31,9 @@
 
 EAPI Eina_Bool enesim_converter_buffer(Enesim_Buffer *b, Enesim_Buffer *dst);
 EAPI Eina_Bool enesim_converter_surface(Enesim_Surface *s, Enesim_Buffer *dst);
+EAPI Eina_Bool enesim_converter_surface_list(Enesim_Surface *s, Enesim_Buffer *dst,
+		Eina_List *clips);
+EAPI Eina_Bool enesim_converter_buffer_list(Enesim_Buffer *b, Enesim_Buffer *dst, Eina_List *clips);
+
 /** @} */
 #endif /*ENESIM_CONVERTER_H_*/
