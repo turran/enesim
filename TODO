@@ -1,5 +1,8 @@
 Enesim
 ======
++ Add the log parameter on the shape path renderer callbacks
++ Refactor the logs categories and use only one, enesim_renderer, for every function
++ Add a macro to print eina logs with the renderer name as first parameter
 + Define when to commit the state of a renderer to cleanup the changed flag
   On some renderers it is done on the cleanup, on others in case the setup
   fails. The change flag is either  a change from the last draw (succesful setup), or a change
