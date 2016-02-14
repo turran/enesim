@@ -26,7 +26,8 @@
  * @ender_group{Enesim_Text_Engine_Freetype}
  * @ender_group{Enesim_Text_Font}
  * @ender_group{Enesim_Text_Buffer}
- * @ender_group{Enesim_Text_Buffer_Simple}
+ * @ender_group{Enesim_Text_Buffer_Ansi}
+ * @ender_group{Enesim_Text_Buffer_Utf8}
  * @ender_group{Enesim_Text_Buffer_Smart}
  */
 
@@ -110,6 +111,16 @@ EAPI const char * enesim_text_buffer_string_get(Enesim_Text_Buffer *thiz);
 EAPI int enesim_text_buffer_string_insert(Enesim_Text_Buffer *thiz, const char *str, int length, ssize_t offset);
 EAPI int enesim_text_buffer_string_delete(Enesim_Text_Buffer *thiz, int length, ssize_t offset);
 EAPI int enesim_text_buffer_length_get(Enesim_Text_Buffer *thiz);
+
+/**
+ * @}
+ * @defgroup Enesim_Text_Buffer_Ansi ANSI Buffer
+ * @ender_inherits{Enesim_Text_Buffer}
+ * @ingroup Enesim_Text_Buffer
+ * @{
+ */
+
+EAPI Enesim_Text_Buffer * enesim_text_buffer_ansi_new(int initial_length);
 
 /**
  * @}
