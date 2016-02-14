@@ -718,6 +718,18 @@
       <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
       <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
     </function>
+    <function name="surface_list">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="s" type="enesim.surface" direction="in" transfer="full"/>
+      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="clips" type="eina.list" direction="in" transfer="full"/>
+    </function>
+    <function name="buffer_list">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="b" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="dst" type="enesim.buffer" direction="in" transfer="full"/>
+      <arg name="clips" type="eina.list" direction="in" transfer="full"/>
+    </function>
   </object>
   <object name="enesim.renderer"/>
   <enum name="enesim.renderer.feature">
