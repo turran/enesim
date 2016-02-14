@@ -175,6 +175,9 @@ Eina_Bool enesim_buffer_sw_data_alloc(Enesim_Buffer_Sw_Data *data,
 	return ret;
 }
 
+/* FIXME change this to pass void[] content and int[] strides
+ * TODO add a function to get the number of planes
+ */
 Eina_Bool enesim_buffer_sw_data_set(Enesim_Buffer_Sw_Data *data,
 		Enesim_Buffer_Format fmt, void *content0, int stride0)
 {
@@ -272,6 +275,73 @@ Eina_Bool enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
 		break;
 
 		case ENESIM_BUFFER_FORMAT_GRAY:
+		default:
+		ERR("Unsupported format %d", fmt);
+		ret = EINA_FALSE;
+		break;
+	}
+	return ret;
+}
+
+Eina_Bool enesim_buffer_sw_data_at(Enesim_Buffer_Sw_Data *data,
+		Enesim_Buffer_Format fmt, int x, int y,
+		Enesim_Buffer_Sw_Data *at)
+{
+	Eina_Bool ret = EINA_TRUE;
+	switch (fmt)
+	{
+		/* 32 bpp */
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		at->argb8888.plane0 = (uint32_t *)((uint8_t *)data->argb8888.plane0 +
+				(y * data->argb8888.plane0_stride) + x);
+		at->argb8888.plane0_stride = data->argb8888.plane0_stride;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		at->argb8888_pre.plane0 = (uint32_t *)((uint8_t *)data->argb8888_pre.plane0 +
+				(y * data->argb8888_pre.plane0_stride) + x);
+		at->argb8888_pre.plane0_stride = data->argb8888_pre.plane0_stride;
+		break;
+
+		/* 24 bpp */
+		case ENESIM_BUFFER_FORMAT_BGR888:
+		at->bgr888.plane0 = data->bgr888.plane0 +
+				(y * data->bgr888.plane0_stride) + x;
+		at->bgr888.plane0_stride = data->bgr888.plane0_stride;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_RGB888:
+		at->rgb888.plane0 = data->rgb888.plane0 +
+				(y * data->rgb888.plane0_stride) + x;
+		at->rgb888.plane0_stride = data->rgb888.plane0_stride;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_CMYK:
+		case ENESIM_BUFFER_FORMAT_CMYK_ADOBE:
+		at->cmyk.plane0 = data->cmyk.plane0 +
+				(y * data->cmyk.plane0_stride) + x;
+		at->cmyk.plane0_stride = data->cmyk.plane0_stride;
+		break;
+
+		/* 16 bpp */
+		case ENESIM_BUFFER_FORMAT_RGB565:
+		at->rgb565.plane0 = (uint16_t *)((uint8_t *)data->rgb565.plane0 +
+				(y * data->rgb565.plane0_stride) + x);
+		at->rgb565.plane0_stride = data->rgb565.plane0_stride;
+		break;
+
+		/* 8 bpp */
+		case ENESIM_BUFFER_FORMAT_A8:
+		at->a8.plane0 = data->a8.plane0 +
+				(y * data->a8.plane0_stride) + x;
+		at->a8.plane0_stride = data->a8.plane0_stride;
+		break;
+		case ENESIM_BUFFER_FORMAT_GRAY:
+		at->a8.plane0 = data->a8.plane0 +
+				(y * data->a8.plane0_stride) + x;
+		at->a8.plane0_stride = data->a8.plane0_stride;
+		break;
+
 		default:
 		ERR("Unsupported format %d", fmt);
 		ret = EINA_FALSE;

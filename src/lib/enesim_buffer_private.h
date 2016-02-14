@@ -62,5 +62,8 @@ Eina_Bool enesim_buffer_sw_data_free(Enesim_Buffer_Sw_Data *data,
 		Enesim_Buffer_Format fmt,
 		Enesim_Buffer_Free free_func,
 		void *free_func_data);
+Eina_Bool enesim_buffer_sw_data_at(Enesim_Buffer_Sw_Data *data,
+		Enesim_Buffer_Format fmt, int x, int y,
+		Enesim_Buffer_Sw_Data *at);
 
 #endif
