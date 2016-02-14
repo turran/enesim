@@ -129,6 +129,8 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Unlocks a buffer.  <a href="#ga5c1afd0ebe6b835a760edf6a0a4ccd72"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#gaf00e423735d56383a93308c2f600bce2">enesim_buffer_alpha_hint_set</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *thiz, <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a> hint)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Basic.html#gad2e0cf8a727b54714f6531edc5ec3e95">Enesim_Alpha_Hint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga62f670c16d859013191b6c42be836f19">enesim_buffer_alpha_hint_get</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga8b9eff1cb203ea76b6ed86395bb766bc">enesim_buffer_convert</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *thiz, <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *dst)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Buffer.html#ga656154fc32ddc50fa63d456cbe52fd35">enesim_buffer_convert_list</a> (<a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *thiz, <a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *dst, Eina_List *clips)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Target device pixel data holder. </p>
@@ -895,6 +897,85 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ga8b9eff1cb203ea76b6ed86395bb766bc"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_convert" ref="ga8b9eff1cb203ea76b6ed86395bb766bc" args="(Enesim_Buffer *thiz, Enesim_Buffer *dst)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer.html#ga8b9eff1cb203ea76b6ed86395bb766bc">enesim_buffer_convert</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Converts a buffer into another buffer. Basically it will do a color space conversion. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The buffer to convert </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>The destination buffer </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the conversion was correct, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga656154fc32ddc50fa63d456cbe52fd35"></a><!-- doxytag: member="enesim_buffer.h::enesim_buffer_convert_list" ref="ga656154fc32ddc50fa63d456cbe52fd35" args="(Enesim_Buffer *thiz, Enesim_Buffer *dst, Eina_List *clips)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Buffer.html#ga656154fc32ddc50fa63d456cbe52fd35">enesim_buffer_convert_list</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Buffer.html#ga7b860b380c44bfc60ae36d7787177a5a">Enesim_Buffer</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eina_List *&#160;</td>
+          <td class="paramname"><em>clips</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Converts a buffer into another buffer. Basically it will do a color space conversion. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The buffer to convert </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dst</td><td>The destination buffer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">clips</td><td>A list of clipping areas on the destination surface to limit the conversion.  [Nullable] </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>EINA_TRUE if the conversion was correct, EINA_FALSE otherwise </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -913,7 +994,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Feb 14 2016 17:47:17 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Feb 14 2016 18:40:10 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
