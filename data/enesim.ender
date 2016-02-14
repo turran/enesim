@@ -973,6 +973,13 @@
       <arg name="d" type="enesim.stream" direction="in" transfer="full"/>
     </ctor>
   </object>
+  <constant name="enesim.image.error.exist" type="eina.error"/>
+  <constant name="enesim.image.error.provider" type="eina.error"/>
+  <constant name="enesim.image.error.format" type="eina.error"/>
+  <constant name="enesim.image.error.size" type="eina.error"/>
+  <constant name="enesim.image.error.allocator" type="eina.error"/>
+  <constant name="enesim.image.error.loading" type="eina.error"/>
+  <constant name="enesim.image.error.saving" type="eina.error"/>
   <callback name="enesim.image.callback">
     <arg name="r" type="enesim.buffer" direction="in" transfer="none" nullable="false"/>
     <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
@@ -1236,11 +1243,16 @@
       <arg name="length" type="int32" direction="in" transfer="full"/>
       <arg name="offset" type="size" direction="in" transfer="full"/>
     </method>
-    <method name="string_length">
+    <method name="length_get">
       <return type="int32" transfer="full" nullable="false"/>
     </method>
   </object>
-  <object name="enesim.text.buffer.simple" inherits="enesim.text.buffer">
+  <object name="enesim.text.buffer.ansi" inherits="enesim.text.buffer">
+    <ctor name="new">
+      <arg name="initial_length" type="int32" direction="in" transfer="full"/>
+    </ctor>
+  </object>
+  <object name="enesim.text.buffer.utf8" inherits="enesim.text.buffer">
     <ctor name="new">
       <arg name="initial_length" type="int32" direction="in" transfer="full"/>
     </ctor>
@@ -2357,6 +2369,20 @@
     </method>
     <method name="font_get">
       <return type="enesim.text.font" transfer="full" nullable="false"/>
+    </method>
+    <method name="glyph_coord_at">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="x" type="int32" direction="in" transfer="full"/>
+      <arg name="y" type="int32" direction="in" transfer="full"/>
+      <arg name="index" type="int" direction="in" transfer="full"/>
+      <arg name="start" type="int" direction="in" transfer="full"/>
+      <arg name="end" type="int" direction="in" transfer="full"/>
+    </method>
+    <method name="glyph_index_at">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="index" type="int32" direction="in" transfer="full"/>
+      <arg name="start" type="int" direction="in" transfer="full"/>
+      <arg name="end" type="int" direction="in" transfer="full"/>
     </method>
   </object>
   <object name="enesim.renderer.map_quad" inherits="enesim.renderer">
