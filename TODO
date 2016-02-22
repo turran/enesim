@@ -1,5 +1,8 @@
 Enesim
 ======
++ Fix the callback names
++ Remove enesim_image_dispatch and use the context dispatch directly
++ Add a function to get the default context
 + Add the log parameter on the shape path renderer callbacks
 + Refactor the logs categories and use only one, enesim_renderer, for every function
 + Add a macro to print eina logs with the renderer name as first parameter
