@@ -295,8 +295,9 @@ static void _enesim_renderer_text_span_draw_affine(Enesim_Renderer *r,
 
 		sx = eina_f16p16_int_to(xx);
 
+		/* Our sampling algo goes to the right, so increase by 1 */
 		/* FIXME decide what to use, get() / load()? */
-		if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, sx, NULL, &position))
+		if (!_enesim_renderer_text_span_get_glyph_at_ltr(thiz, font, sx + 1, NULL, &position))
 		{
 			goto next;
 		}
