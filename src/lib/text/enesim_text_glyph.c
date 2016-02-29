@@ -18,55 +18,90 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
-#include "enesim_pool.h"
-#include "enesim_buffer.h"
-#include "enesim_format.h"
-#include "enesim_surface.h"
-#include "enesim_path.h"
-#include "enesim_text.h"
 
+#include "enesim_text.h"
 #include "enesim_text_private.h"
-#ifdef HAVE_FONTCONFIG
-#include <fontconfig/fontconfig.h>
-#endif
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_text
-
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-#if 0
-void enesim_text_cache_glyph_add(Enesim_Text_Glyph)
+Enesim_Text_Glyph * enesim_text_glyph_new(Enesim_Text_Font *f, Eina_Unicode c)
 {
+	Enesim_Text_Glyph *thiz;
 
+	thiz = calloc(1, sizeof(Enesim_Text_Glyph));
+	thiz->font = f;
+	thiz->code = c;
+	thiz->ref = 1;
+
+	return thiz;
 }
 
-void enesim_text_cache_clear()
+void enesim_text_glyph_ref(Enesim_Text_Glyph *thiz)
 {
-
+	thiz->ref++;
 }
 
-#endif
-
-void enesim_text_init(void)
+void enesim_text_glyph_unref(Enesim_Text_Glyph *thiz)
 {
-	enesim_text_engine_freetype_init();
-#ifdef HAVE_FONTCONFIG
-	FcInit();
-#endif
+	thiz->ref--;
+	if (!thiz->ref)
+	{
+		enesim_text_font_unref(thiz->font);
+		if (thiz->surface)
+		{
+			enesim_surface_unref(thiz->surface);
+			thiz->surface = NULL;
+		}
+		if (thiz->path)
+		{
+			enesim_path_unref(thiz->path);
+			thiz->path = NULL;
+		}
+		free(thiz);
+	}
 }
 
-void enesim_text_shutdown(void)
+void enesim_text_glyph_cache(Enesim_Text_Glyph *thiz)
 {
-#ifdef HAVE_FONTCONFIG
-	FcFini();
-#endif
-	enesim_text_engine_freetype_shutdown();
+	if (!thiz->cache)
+		enesim_text_font_glyph_cache(thiz->font, thiz);
+	thiz->cache++;
 }
-/** @endcond */
+
+void enesim_text_glyph_uncache(Enesim_Text_Glyph *thiz)
+{
+	thiz->cache--;
+	if (!thiz->cache)
+		enesim_text_font_glyph_uncache(thiz->font, thiz);
+	enesim_text_glyph_unref(thiz);
+}
+
+Eina_Bool enesim_text_glyph_load(Enesim_Text_Glyph *thiz,
+		int formats)
+{
+	Eina_Bool ret = EINA_TRUE;
+
+	if (formats & ENESIM_TEXT_GLYPH_FORMAT_SURFACE)
+	{
+		if (!thiz->surface)
+			ret &= enesim_text_engine_glyph_load(thiz->font->engine,
+					thiz,
+					ENESIM_TEXT_GLYPH_FORMAT_SURFACE);
+	}
+	if (formats & ENESIM_TEXT_GLYPH_FORMAT_PATH)
+	{
+		if (!thiz->path)
+			ret &= enesim_text_engine_glyph_load(thiz->font->engine,
+					thiz,
+					ENESIM_TEXT_GLYPH_FORMAT_PATH);
+	}
+	return ret;
+}
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
