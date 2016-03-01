@@ -40,6 +40,45 @@
 #define ENESIM_LOG_DEFAULT enesim_log_text
 static Enesim_Text_Engine *_engine = NULL;
 
+#if 0
+typedef struct _Enesim_Text_Freetype_Glyph
+{
+	Enesim_Text_Glyph parent;
+} Enesim_Text_Freetype_Glyph;
+
+typedef struct _Enesim_Text_Freetype_Glyph_Class
+{
+	Enesim_Text_Glyph_Class parent;
+	FT_UInt gindex;
+	/* load glyph */
+} Enesim_Text_Freetype_Glyph_Class;
+
+typedef struct _Enesim_Text_Freetype_Font
+{
+	Enesim_Text_Font parent;
+	FT_Face face;
+} Enesim_Text_Freetype_Font;
+
+typedef struct _Enesim_Text_Freetype_Font_Class
+{
+	Enesim_Text_Font_Class parent;
+	/* get glyph */
+} Enesim_Text_Freetype_Font_Class;
+
+typedef struct _Enesim_Text_Freetype_Engine
+{
+	Enesim_Text_Engine parent;
+	FT_Library library;
+	Eina_Lock lock;
+} Enesim_Text_Freetype_Engine;
+
+typedef struct _Enesim_Text_Freetype_Engine_Class
+{
+	Enesim_Text_Engine_Class parent;
+	/* load_font */
+} Enesim_Text_Freetype_Engine_Class;
+#endif
+
 #if HAVE_FREETYPE
 typedef struct _Enesim_Text_Freetype
 {
