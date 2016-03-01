@@ -97,8 +97,8 @@ struct _Enesim_Text_Glyph_Position
 
 typedef enum _Enesim_Text_Glyph_Format
 {
-	ENESIM_TEXT_GLYPH_FORMAT_SURFACE,
-	ENESIM_TEXT_GLYPH_FORMAT_PATH,
+	ENESIM_TEXT_GLYPH_FORMAT_SURFACE = 1,
+	ENESIM_TEXT_GLYPH_FORMAT_PATH    = 2,
 } Enesim_Text_Glyph_Format;
 
 Enesim_Text_Glyph * enesim_text_glyph_new(Enesim_Text_Font *f, Eina_Unicode c);
@@ -127,6 +127,7 @@ typedef struct _Enesim_Text_Engine_Descriptor
 	int (*font_max_ascent_get)(void *data, void *fdata);
 	int (*font_max_descent_get)(void *data, void *fdata);
 	Enesim_Text_Glyph * (*font_glyph_get)(void *data, void *fdata, Eina_Unicode c);
+	Eina_Bool (*glyph_load)(void *data, void *fdata, Enesim_Text_Glyph *g, int formats);
 } Enesim_Text_Engine_Descriptor;
 
 Enesim_Text_Engine * enesim_text_engine_new(Enesim_Text_Engine_Descriptor *d);
@@ -135,6 +136,14 @@ Enesim_Text_Font * enesim_text_engine_font_new(
 		Enesim_Text_Engine *thiz, const char *file, int index, int size);
 void enesim_text_engine_font_delete(Enesim_Text_Engine *thiz,
 		Enesim_Text_Font *f);
+int enesim_text_engine_font_max_ascent_get(Enesim_Text_Engine *thiz,
+		Enesim_Text_Font *f);
+int enesim_text_engine_font_max_descent_get(Enesim_Text_Engine *thiz,
+		Enesim_Text_Font *f);
+Enesim_Text_Glyph * enesim_text_engine_font_glyph_get(Enesim_Text_Engine *thiz,
+		Enesim_Text_Font *f, Eina_Unicode c);
+Eina_Bool enesim_text_engine_glyph_load(Enesim_Text_Engine *thiz,
+		Enesim_Text_Glyph *g, int formats);
 
 /* main interface */
 struct _Enesim_Text_Engine

@@ -144,7 +144,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 		{
 
-			g = enesim_text_font_glyph_load(thiz->state.current.font, unicode);
+			g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
 			if (!g) continue;
 			/* calculate the max len */
 			width += g->x_advance;
@@ -197,7 +197,7 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 	{
 		Enesim_Text_Glyph *g;
 		//ERR("idx %d", idx);
-		g = enesim_text_font_glyph_load(font, unicode);
+		g = enesim_text_font_glyph_get(font, unicode);
 		if (!g)
 		{
 			WRN("No such glyph for %08x", unicode);
@@ -239,7 +239,7 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_rtl(Enesim_Rende
 		Enesim_Text_Glyph *g;
 		int w, h;
 
-		g = enesim_text_font_glyph_load(font, *c);
+		g = enesim_text_font_glyph_get(font, *c);
 		if (!g)
 		{
 			WRN("No such glyph for %c", *c);
@@ -431,8 +431,7 @@ static void _enesim_renderer_text_span_draw_ltr_identity(Enesim_Renderer *r,
 	text = enesim_text_buffer_string_get(thiz->state.buffer);
 	while (dst < end && (unicode = eina_unicode_utf8_next_get(text, &idx)))
 	{
-		/* FIXME decide what to use, get() / load()? */
-		g = enesim_text_font_glyph_load(font, unicode);
+		g = enesim_text_font_glyph_get(font, unicode);
 		if (!g) continue;
 		if (!g->surface)
 		{
@@ -821,7 +820,7 @@ EAPI Eina_Bool enesim_renderer_text_span_glyph_coord_at(Enesim_Renderer *r,
 		Enesim_Text_Glyph *g;
 		int w, h;
 
-		g = enesim_text_font_glyph_load(thiz->state.current.font, unicode);
+		g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
 		if (!g)
 		{
 			WRN("No such glyph for %08x", unicode);
@@ -868,7 +867,7 @@ EAPI Eina_Bool enesim_renderer_text_span_glyph_index_at(Enesim_Renderer *r,
 		Enesim_Text_Glyph *g;
 		int w, h;
 
-		g = enesim_text_font_glyph_load(thiz->state.current.font, unicode);
+		g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
 		if (!g)
 		{
 			WRN("No such glyph for %08x", unicode);

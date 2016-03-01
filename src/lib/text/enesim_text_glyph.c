@@ -84,23 +84,14 @@ void enesim_text_glyph_uncache(Enesim_Text_Glyph *thiz)
 Eina_Bool enesim_text_glyph_load(Enesim_Text_Glyph *thiz,
 		int formats)
 {
-	Eina_Bool ret = EINA_TRUE;
-
-	if (formats & ENESIM_TEXT_GLYPH_FORMAT_SURFACE)
-	{
-		if (!thiz->surface)
-			ret &= enesim_text_engine_glyph_load(thiz->font->engine,
-					thiz,
-					ENESIM_TEXT_GLYPH_FORMAT_SURFACE);
-	}
-	if (formats & ENESIM_TEXT_GLYPH_FORMAT_PATH)
-	{
-		if (!thiz->path)
-			ret &= enesim_text_engine_glyph_load(thiz->font->engine,
-					thiz,
-					ENESIM_TEXT_GLYPH_FORMAT_PATH);
-	}
-	return ret;
+	if (thiz->path && (formats & ENESIM_TEXT_GLYPH_FORMAT_PATH))
+		formats &= ~ENESIM_TEXT_GLYPH_FORMAT_PATH;
+	if (thiz->surface && (formats & ENESIM_TEXT_GLYPH_FORMAT_SURFACE))
+		formats &= ~ENESIM_TEXT_GLYPH_FORMAT_SURFACE;
+	if (!formats)
+		return EINA_TRUE;
+	return enesim_text_engine_glyph_load(thiz->font->engine, thiz,
+			formats);
 }
 /*============================================================================*
  *                                   API                                      *

@@ -180,15 +180,22 @@ static int _enesim_text_engine_freetype_font_max_descent_get(void *data EINA_UNU
 	return desc;
 }
 
-static void _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, Eina_Unicode c, Enesim_Text_Glyph *g)
+static Enesim_Text_Glyph * _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, Eina_Unicode c)
 {
 	Enesim_Text_Freetype *thiz = edata;
+	Enesim_Text_Glyph *g = NULL;
 	FT_UInt gindex;
 	FT_Face face = fdata;
 
 	eina_lock_take(&thiz->lock);
 	gindex = FT_Get_Char_Index(face, c);
-	if (FT_Load_Glyph(face, gindex, FT_LOAD_NO_BITMAP) == 0)
+	if (!FT_Load_Glyph(face, gindex, FT_LOAD_NO_BITMAP))
+	{
+		g = enesim_text_glyph_new(fdata, c);
+	}
+	eina_lock_release(&thiz->lock);
+	return g;
+#if 0
 	{
 		if (face->glyph->format == FT_GLYPH_FORMAT_OUTLINE)
 		{
@@ -226,7 +233,15 @@ no_surface:
 			g->code = c;
 		}
 	}
+#endif
+}
+
+static Eina_Bool _enesim_text_engine_freetype_glyph_load(void *edata, void *fdata, Enesim_Text_Glyph *g, int formats)
+{
+	Enesim_Text_Freetype *thiz = edata;
+	eina_lock_take(&thiz->lock);
 	eina_lock_release(&thiz->lock);
+	return EINA_FALSE;
 }
 
 static Enesim_Text_Engine_Descriptor _enesim_text_engine_freetype_descriptor  = {
@@ -238,6 +253,7 @@ static Enesim_Text_Engine_Descriptor _enesim_text_engine_freetype_descriptor  = 
 	/* .font_max_ascent_get 	= */ _enesim_text_engine_freetype_font_max_ascent_get,
 	/* .font_max_descent_get 	= */ _enesim_text_engine_freetype_font_max_descent_get,
 	/* .font_glyph_get 		= */ _enesim_text_engine_freetype_glyph_get,
+	/* .glyph_load 			= */ _enesim_text_engine_freetype_glyph_load,
 };
 #endif
 /*============================================================================*

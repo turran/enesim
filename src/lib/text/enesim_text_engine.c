@@ -104,10 +104,41 @@ Enesim_Text_Font * enesim_text_engine_font_new(
 void enesim_text_engine_font_delete(Enesim_Text_Engine *thiz,
 		Enesim_Text_Font *f)
 {
-	thiz->d->font_delete(thiz->data, f->data);
+	if (thiz->d->font_delete)
+		thiz->d->font_delete(thiz->data, f->data);
 	eina_hash_del(thiz->fonts, f->key, f);
-	enesim_text_engine_unref(thiz);
-	free(f);
+}
+
+int enesim_text_engine_font_max_ascent_get(Enesim_Text_Engine *thiz,
+		Enesim_Text_Font *f)
+{
+	if (!thiz->d->font_max_ascent_get)
+		return 0;
+	return thiz->d->font_max_ascent_get(thiz->data, f->data);
+}
+
+int enesim_text_engine_font_max_descent_get(Enesim_Text_Engine *thiz,
+		Enesim_Text_Font *f)
+{
+	if (!thiz->d->font_max_descent_get)
+		return 0;
+	return thiz->d->font_max_descent_get(thiz->data, f->data);
+}
+
+Enesim_Text_Glyph * enesim_text_engine_font_glyph_get(Enesim_Text_Engine *thiz,
+		Enesim_Text_Font *f, Eina_Unicode c)
+{
+	if (!thiz->d->font_glyph_get)
+		return NULL;
+	return thiz->d->font_glyph_get(thiz->data, f->data, c);
+}
+
+Eina_Bool enesim_text_engine_glyph_load(Enesim_Text_Engine *thiz,
+		Enesim_Text_Glyph *g, int formats)
+{
+	if (!thiz->d->glyph_load)
+		return EINA_FALSE;
+	return thiz->d->glyph_load(thiz->data, g->font->data, g, formats);
 }
 /** @endcond */
 /*============================================================================*

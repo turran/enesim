@@ -63,9 +63,7 @@ Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, Eina_Unic
 	g = eina_hash_find(thiz->glyphs, &c);
 	if (g)
 		return g;
-	if (!thiz->engine->d->font_glyph_get)
-		return NULL;
-	g = thiz->engine->d->font_glyph_get(thiz->engine->data, thiz->data, c);
+	g = enesim_text_engine_font_glyph_get(thiz->engine, thiz, c);
 	return g;
 }
 
@@ -142,6 +140,7 @@ EAPI void enesim_text_font_unref(Enesim_Text_Font *thiz)
 	if (!thiz->ref)
 	{
 		enesim_text_engine_font_delete(thiz->engine, thiz);
+		enesim_text_engine_unref(thiz->engine);
 		free(thiz->key);
 		free(thiz);
 	}
@@ -149,14 +148,14 @@ EAPI void enesim_text_font_unref(Enesim_Text_Font *thiz)
 
 EAPI int enesim_text_font_max_ascent_get(Enesim_Text_Font *thiz)
 {
-	if (!thiz || !thiz->engine || !thiz->engine->d) return 0;
-	if (!thiz->engine->d->font_max_ascent_get) return 0;
-	return thiz->engine->d->font_max_ascent_get(thiz->engine->data, thiz->data);
+	if (!thiz || !thiz->engine)
+		return 0;
+	return enesim_text_engine_font_max_ascent_get(thiz->engine, thiz);
 }
 
 EAPI int enesim_text_font_max_descent_get(Enesim_Text_Font *thiz)
 {
-	if (!thiz || !thiz->engine || !thiz->engine->d) return 0;
-	if (!thiz->engine->d->font_max_descent_get) return 0;
-	return thiz->engine->d->font_max_descent_get(thiz->engine->data, thiz->data);
+	if (!thiz || !thiz->engine)
+		return 0;
+	return enesim_text_engine_font_max_descent_get(thiz->engine, thiz);
 }
