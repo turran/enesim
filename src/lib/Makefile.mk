@@ -93,6 +93,7 @@ src_lib_libenesim_la_CPPFLAGS = \
 -I$(top_srcdir)/src/lib/util \
 -I$(top_srcdir)/src/lib/color \
 -I$(top_srcdir)/src/lib/argb \
+-I$(top_srcdir)/src/lib/text \
 -DPACKAGE_LIB_DIR=\"$(libdir)\" \
 -DENESIM_BUILD \
 @ENESIM_CFLAGS@

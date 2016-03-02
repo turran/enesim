@@ -41,9 +41,10 @@ Enesim_Text_Glyph * enesim_text_glyph_new(Enesim_Text_Font *f, Eina_Unicode c)
 	return thiz;
 }
 
-void enesim_text_glyph_ref(Enesim_Text_Glyph *thiz)
+Enesim_Text_Glyph * enesim_text_glyph_ref(Enesim_Text_Glyph *thiz)
 {
 	thiz->ref++;
+	return thiz;
 }
 
 void enesim_text_glyph_unref(Enesim_Text_Glyph *thiz)

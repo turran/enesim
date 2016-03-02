@@ -41,17 +41,6 @@
 static Enesim_Text_Engine *_engine = NULL;
 
 #if 0
-typedef struct _Enesim_Text_Freetype_Glyph
-{
-	Enesim_Text_Glyph parent;
-} Enesim_Text_Freetype_Glyph;
-
-typedef struct _Enesim_Text_Freetype_Glyph_Class
-{
-	Enesim_Text_Glyph_Class parent;
-	FT_UInt gindex;
-	/* load glyph */
-} Enesim_Text_Freetype_Glyph_Class;
 
 typedef struct _Enesim_Text_Freetype_Font
 {
@@ -228,13 +217,22 @@ static Enesim_Text_Glyph * _enesim_text_engine_freetype_glyph_get(void *edata, v
 
 	eina_lock_take(&thiz->lock);
 	gindex = FT_Get_Char_Index(face, c);
-	if (!FT_Load_Glyph(face, gindex, FT_LOAD_NO_BITMAP))
-	{
-		g = enesim_text_glyph_new(fdata, c);
-	}
 	eina_lock_release(&thiz->lock);
+	if (!gindex)
+		return NULL;
+	g = enesim_text_glyph_new(fdata, c);
 	return g;
-#if 0
+}
+
+static Eina_Bool _enesim_text_engine_freetype_glyph_load(void *edata, void *fdata, Enesim_Text_Glyph *g, int formats)
+{
+	Enesim_Text_Freetype *thiz = edata;
+	FT_UInt gindex;
+	FT_Face face = fdata;
+
+	eina_lock_take(&thiz->lock);
+	gindex = FT_Get_Char_Index(face, g->code);
+	if (!FT_Load_Glyph(face, gindex, FT_LOAD_NO_BITMAP))
 	{
 		if (face->glyph->format == FT_GLYPH_FORMAT_OUTLINE)
 		{
@@ -269,18 +267,10 @@ static Enesim_Text_Glyph * _enesim_text_engine_freetype_glyph_get(void *edata, v
 no_surface:
 			g->origin = (face->glyph->metrics.horiBearingY >> 6);
 			g->x_advance = (face->glyph->metrics.horiAdvance >> 6);
-			g->code = c;
 		}
 	}
-#endif
-}
-
-static Eina_Bool _enesim_text_engine_freetype_glyph_load(void *edata, void *fdata, Enesim_Text_Glyph *g, int formats)
-{
-	Enesim_Text_Freetype *thiz = edata;
-	eina_lock_take(&thiz->lock);
 	eina_lock_release(&thiz->lock);
-	return EINA_FALSE;
+	return EINA_TRUE;
 }
 
 static Enesim_Text_Engine_Descriptor _enesim_text_engine_freetype_descriptor  = {

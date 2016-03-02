@@ -59,7 +59,8 @@ Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, Eina_Unic
 {
 	Enesim_Text_Glyph *g;
 
-	if (!thiz) return NULL;
+	if (!thiz)
+		return NULL;
 	g = eina_hash_find(thiz->glyphs, &c);
 	if (g)
 		return g;

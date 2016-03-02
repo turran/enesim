@@ -32,6 +32,8 @@
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_text_span.h"
+#include "enesim_renderer_compound.h"
+#include "enesim_renderer_image.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
@@ -77,6 +79,7 @@ typedef struct _Enesim_Renderer_Text_Span
 	Enesim_Renderer_Shape parent;
 	Enesim_Renderer_Text_Span_State state;
 	Enesim_Text_Direction direction;
+	Enesim_Renderer *compound;
 	/* sw drawing */
 	Enesim_Matrix_F16p16 matrix;
 	/* span geometry */
@@ -118,58 +121,56 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_changed(Enesim_Renderer_Text_
 	return EINA_FALSE;
 }
 
-/* TODO check that the glyph load was ok, if not, just break this step but return TRUE
- * so on the rendering we will load it directly
- */
 static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text_Span *thiz)
 {
+	Eina_Unicode unicode;
+	int iidx = 0;
+	const char *text;
+
+	/* No current font */
 	if (!thiz->state.current.font)
-	{
 		return EINA_FALSE;
-	}
-	/* we dont take into account the buffer_changed, given that we set it
-	 * to true everytime we clear it
-	 */
-	if (enesim_text_buffer_smart_is_dirty(thiz->state.buffer) || !thiz->state.glyphs_generated)
+	/* Text buffer hasnt changed and the glyphs are already generated */
+	if (!enesim_text_buffer_smart_is_dirty(thiz->state.buffer) &&
+			thiz->state.glyphs_generated)
+		return EINA_TRUE;
+
+	text = enesim_text_buffer_string_get(thiz->state.buffer);
+	while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 	{
-		Enesim_Text_Glyph *g = NULL;
-		Eina_Unicode unicode;
-		int iidx = 0;
-		const char *text;
-		int masc;
-		int mdesc;
-		unsigned int width = 0;
-		
-		text = enesim_text_buffer_string_get(thiz->state.buffer);
-		while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
+		Enesim_Text_Glyph *g;
+		double o = 0;
+
+		g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
+		if (g)
 		{
+			Enesim_Renderer *r;
+			Enesim_Renderer_Compound_Layer *l;
 
-			g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
-			if (!g) continue;
-			/* calculate the max len */
-			width += g->x_advance;
+			/* load and cache the glyph */
+			if (!enesim_text_glyph_load(g, ENESIM_TEXT_GLYPH_FORMAT_SURFACE))
+				continue;
+			enesim_text_glyph_cache(enesim_text_glyph_ref(g));
+
+			o += g->x_advance;
+			if (!g->surface)
+				continue;
+			r = enesim_renderer_image_new();
+			enesim_renderer_image_source_surface_set(r,
+					enesim_surface_ref(g->surface));
+			enesim_text_glyph_unref(g);
+
+			/* add the new layer */
+			l = enesim_renderer_compound_layer_new();
+			enesim_renderer_compound_layer_renderer_set(l, r);
+			enesim_renderer_compound_layer_add(thiz->compound, l);
 		}
-		/* remove the last advance, use only the glyph image size */
-		if (g && g->surface)
-		{
-			int w, h;
-
-			enesim_surface_size_get(g->surface, &w, &h);
-			width -= g->x_advance - w;
-		}
-		/* set our own bounds */
-		masc = enesim_text_font_max_ascent_get(thiz->state.current.font);
-		mdesc = enesim_text_font_max_descent_get(thiz->state.current.font);
-		//printf("masc %d mdesc %d\n", masc, mdesc);
-		thiz->width = width;
-		thiz->height = masc + mdesc;
-		thiz->top = masc;
-		thiz->bottom = mdesc;
-
-		thiz->state.glyphs_generated = EINA_TRUE;
-		thiz->state.buffer_changed = EINA_TRUE;
-		enesim_text_buffer_smart_clear(thiz->state.buffer);
 	}
+
+	thiz->state.glyphs_generated = EINA_TRUE;
+	thiz->state.buffer_changed = EINA_TRUE;
+	enesim_text_buffer_smart_clear(thiz->state.buffer);
+
 	return EINA_TRUE;
 }
 
@@ -217,7 +218,6 @@ static inline Eina_Bool _enesim_renderer_text_span_get_glyph_at_ltr(
 		idx = iidx;
 	}
 	return ret;
-
 }
 
 #if 0
@@ -265,6 +265,7 @@ advance:
 /*----------------------------------------------------------------------------*
  *                            The drawing functions                           *
  *----------------------------------------------------------------------------*/
+#if 0
 /* This might the worst case possible, we need to fetch at every pixel what glyph we are at
  * then fetch such pixel value and finally fill the destination surface
  */
@@ -485,13 +486,21 @@ after:
 		fbuf += g->x_advance;
 	}
 }
+#endif
+static void _enesim_renderer_text_span_draw(Enesim_Renderer *r,
+		int x, int y, int len, void *ddata)
+{
+	Enesim_Renderer_Text_Span *thiz;
 
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	enesim_renderer_sw_draw(thiz->compound, x, y, len, ddata);
+}
 /*----------------------------------------------------------------------------*
  *                             Shape interface                                *
  *----------------------------------------------------------------------------*/
 static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s EINA_UNUSED, Enesim_Rop rop EINA_UNUSED,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l EINA_UNUSED)
+		Enesim_Surface *s, Enesim_Rop rop,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Matrix_Type type;
@@ -510,6 +519,11 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 	if (!_enesim_renderer_text_span_generate(thiz))
 		return EINA_FALSE;
 
+	*fill = _enesim_renderer_text_span_draw;
+	if (!enesim_renderer_setup(thiz->compound, s, rop, l))
+		return EINA_FALSE;
+
+#if 0
 	type = enesim_renderer_transformation_type_get(r);
 	switch (type)
 	{
@@ -528,7 +542,7 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 		default:
 		break;
 	}
-
+#endif
 #if 0
 	enesim_text_font_dump(thiz->state.current.font, "/tmp/");
 #endif
@@ -655,6 +669,7 @@ static void _enesim_renderer_text_span_instance_init(void *o)
 	Enesim_Text_Buffer *real;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(o);
+	thiz->compound = enesim_renderer_compound_new();
 	real = enesim_text_buffer_utf8_new(0);
 	thiz->state.buffer = enesim_text_buffer_smart_new(real);
 }
@@ -679,6 +694,7 @@ static void _enesim_renderer_text_span_instance_deinit(void *o)
 		enesim_text_buffer_unref(thiz->state.buffer);
 		thiz->state.buffer = NULL;
 	}
+	enesim_renderer_unref(thiz->compound);
 }
 
 /*============================================================================*
