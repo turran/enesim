@@ -34,9 +34,12 @@
 #include "enesim_text_font_private.h"
 #include "enesim_text_glyph_private.h"
 
-/* freetype engine */
-void enesim_text_engine_freetype_init(void);
-void enesim_text_engine_freetype_shutdown(void);
+#if HAVE_FREETYPE
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_OUTLINE_H
+#endif
 
 /* text buffer interface */
 typedef const char * (*Enesim_Text_Buffer_Type_Get)(void);
@@ -63,5 +66,20 @@ void * enesim_text_buffer_data_get(Enesim_Text_Buffer *thiz);
 
 void enesim_text_init(void);
 void enesim_text_shutdown(void);
+
+
+/* freetype engine */
+void enesim_text_engine_freetype_init(void);
+void enesim_text_engine_freetype_shutdown(void);
+#if HAVE_FREETYPE
+void enesim_text_engine_freetype_lock(Enesim_Text_Engine *e);
+void enesim_text_engine_freetype_unlock(Enesim_Text_Engine *e);
+FT_Library enesim_text_engine_freetype_lib_get(Enesim_Text_Engine *e);
+
+Enesim_Text_Font * enesim_text_font_freetype_new(FT_Face face);
+FT_Face enesim_text_font_freetype_face_get(Enesim_Text_Font *f);
+
+Enesim_Text_Glyph * enesim_text_glyph_freetype_new(FT_UInt index);
+#endif
 
 #endif

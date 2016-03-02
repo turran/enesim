@@ -3,5 +3,6 @@ src/lib/text/enesim_text_buffer.c \
 src/lib/text/enesim_text_engine.c \
 src/lib/text/enesim_text_font.c \
 src/lib/text/enesim_text_glyph.c \
-src/lib/text/engines/freetype/enesim_text_engine_freetype.c
-
+src/lib/text/freetype/enesim_text_freetype_glyph.c \
+src/lib/text/freetype/enesim_text_freetype_font.c \
+src/lib/text/freetype/enesim_text_freetype_engine.c

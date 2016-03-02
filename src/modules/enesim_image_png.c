@@ -331,7 +331,7 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 	/* fill the buffer data */
 	if (convert)
 	{
-		enesim_converter_buffer(b, buffer);
+		enesim_buffer_convert(b, buffer);
 	}
 	enesim_buffer_sw_data_get(buffer, &cdata);
 	row_ptr = (png_bytep) cdata.argb8888.plane0;

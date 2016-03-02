@@ -26,21 +26,29 @@
  *============================================================================*/
 /** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_text
+
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Enesim_Text_Glyph,
+		Enesim_Text_Glyph_Class, enesim_text_glyph);
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+static void _enesim_text_glyph_class_init(void *k EINA_UNUSED)
+{
+}
+
+static void _enesim_text_glyph_instance_init(void *o)
+{
+	Enesim_Text_Glyph *thiz = o;
+
+	thiz->ref = 1;
+}
+
+static void _enesim_text_glyph_instance_deinit(void *o EINA_UNUSED)
+{
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Text_Glyph * enesim_text_glyph_new(Enesim_Text_Font *f, Eina_Unicode c)
-{
-	Enesim_Text_Glyph *thiz;
-
-	thiz = calloc(1, sizeof(Enesim_Text_Glyph));
-	thiz->font = f;
-	thiz->code = c;
-	thiz->ref = 1;
-
-	return thiz;
-}
-
 Enesim_Text_Glyph * enesim_text_glyph_ref(Enesim_Text_Glyph *thiz)
 {
 	thiz->ref++;
@@ -70,7 +78,9 @@ void enesim_text_glyph_unref(Enesim_Text_Glyph *thiz)
 void enesim_text_glyph_cache(Enesim_Text_Glyph *thiz)
 {
 	if (!thiz->cache)
-		enesim_text_font_glyph_cache(thiz->font, thiz);
+		enesim_text_font_glyph_cache(thiz->font,
+				enesim_text_glyph_ref(thiz));
+	enesim_text_glyph_unref(thiz);
 	thiz->cache++;
 }
 
@@ -85,14 +95,18 @@ void enesim_text_glyph_uncache(Enesim_Text_Glyph *thiz)
 Eina_Bool enesim_text_glyph_load(Enesim_Text_Glyph *thiz,
 		int formats)
 {
+	Enesim_Text_Glyph_Class *klass;
+
 	if (thiz->path && (formats & ENESIM_TEXT_GLYPH_FORMAT_PATH))
 		formats &= ~ENESIM_TEXT_GLYPH_FORMAT_PATH;
 	if (thiz->surface && (formats & ENESIM_TEXT_GLYPH_FORMAT_SURFACE))
 		formats &= ~ENESIM_TEXT_GLYPH_FORMAT_SURFACE;
 	if (!formats)
 		return EINA_TRUE;
-	return enesim_text_engine_glyph_load(thiz->font->engine, thiz,
-			formats);
+	klass = ENESIM_TEXT_GLYPH_CLASS_GET(thiz);
+	if (klass->load)
+		return klass->load(thiz, formats);
+	return EINA_FALSE;
 }
 /*============================================================================*
  *                                   API                                      *

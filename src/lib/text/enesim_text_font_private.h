@@ -25,6 +25,14 @@
 
 #include "enesim_text_glyph_private.h"
 
+#define ENESIM_TEXT_FONT_DESCRIPTOR enesim_text_font_descriptor_get()
+#define ENESIM_TEXT_FONT_CLASS(k) ENESIM_OBJECT_CLASS_CHECK(k, 		\
+		Enesim_Text_Font_Class, ENESIM_TEXT_FONT_DESCRIPTOR)
+#define ENESIM_TEXT_FONT_CLASS_GET(o) ENESIM_TEXT_FONT_CLASS(		\
+		(ENESIM_OBJECT_INSTANCE(o))->klass)
+#define ENESIM_TEXT_FONT(o) ENESIM_OBJECT_INSTANCE_CHECK(o, 		\
+		Enesim_Text_Font, ENESIM_TEXT_FONT_DESCRIPTOR)
+
 /* forward declarations */
 typedef struct _Enesim_Text_Glyph Enesim_Text_Glyph;
 
@@ -32,18 +40,24 @@ typedef struct _Enesim_Text_Font
 {
 	Enesim_Object_Instance parent;
 	Enesim_Text_Engine *engine;
-	void *data;
 	Eina_Hash *glyphs;
 	char *key;
 	int ref;
+	int cache;
 } Enesim_Text_Font;
 
 typedef struct _Enesim_Text_Font_Class
 {
 	Enesim_Object_Class parent;
+	int (*max_ascent_get)(Enesim_Text_Font *thiz);
+	int (*max_descent_get)(Enesim_Text_Font *thiz);
+	Enesim_Text_Glyph * (*glyph_get)(Enesim_Text_Font *thiz, Eina_Unicode c);
 } Enesim_Text_Font_Class;
 
+Enesim_Object_Descriptor * enesim_text_font_descriptor_get(void);
 Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *f, Eina_Unicode c);
+void enesim_text_font_glyph_cache(Enesim_Text_Font *thiz, Enesim_Text_Glyph *g);
+void enesim_text_font_glyph_uncache(Enesim_Text_Font *thiz, Enesim_Text_Glyph *g);
 void enesim_text_font_dump(Enesim_Text_Font *f, const char *path);
 
 #endif

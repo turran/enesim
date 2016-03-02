@@ -146,16 +146,19 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		{
 			Enesim_Renderer *r;
 			Enesim_Renderer_Compound_Layer *l;
+			int w, h;
 
 			/* load and cache the glyph */
 			if (!enesim_text_glyph_load(g, ENESIM_TEXT_GLYPH_FORMAT_SURFACE))
 				continue;
 			enesim_text_glyph_cache(enesim_text_glyph_ref(g));
 
-			o += g->x_advance;
 			if (!g->surface)
-				continue;
+				goto next;
 			r = enesim_renderer_image_new();
+			enesim_surface_size_get(g->surface, &w, &h);
+			enesim_renderer_image_size_set(r, w, h);
+			enesim_renderer_origin_set(r, o, 0);
 			enesim_renderer_image_source_surface_set(r,
 					enesim_surface_ref(g->surface));
 			enesim_text_glyph_unref(g);
@@ -163,7 +166,10 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			/* add the new layer */
 			l = enesim_renderer_compound_layer_new();
 			enesim_renderer_compound_layer_renderer_set(l, r);
+			enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_FILL);
 			enesim_renderer_compound_layer_add(thiz->compound, l);
+next:
+			o += g->x_advance;
 		}
 	}
 

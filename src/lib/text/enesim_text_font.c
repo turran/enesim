@@ -52,20 +52,71 @@ static Eina_Bool _dump(const Eina_Hash *hash EINA_UNUSED, const void *key, void 
 
 	return EINA_TRUE;
 }
+
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Enesim_Text_Font,
+		Enesim_Text_Font_Class, enesim_text_font);
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+static void _enesim_text_font_class_init(void *k EINA_UNUSED)
+{
+}
+
+static void _enesim_text_font_instance_init(void *o)
+{
+	Enesim_Text_Font *thiz = o;
+
+	thiz->glyphs = eina_hash_int32_new(NULL);
+	thiz->ref = 1;
+}
+
+static void _enesim_text_font_instance_deinit(void *o)
+{
+	Enesim_Text_Font *thiz = o;
+
+	enesim_text_engine_unref(thiz->engine);
+	eina_hash_free(thiz->glyphs);
+	free(thiz->key);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
 Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, Eina_Unicode c)
 {
 	Enesim_Text_Glyph *g;
+	Enesim_Text_Font_Class *klass;
 
 	if (!thiz)
 		return NULL;
 	g = eina_hash_find(thiz->glyphs, &c);
 	if (g)
 		return g;
-	g = enesim_text_engine_font_glyph_get(thiz->engine, thiz, c);
+	klass = ENESIM_TEXT_FONT_CLASS_GET(thiz);
+	if (klass->glyph_get)
+	{
+		g = klass->glyph_get(thiz, c);
+		g->font = enesim_text_font_ref(thiz);
+		g->code = c;
+	}
+
 	return g;
+}
+
+void enesim_text_font_cache(Enesim_Text_Font *thiz)
+{
+	if (!thiz->cache)
+		enesim_text_engine_font_cache(thiz->engine,
+				enesim_text_font_ref(thiz));
+	enesim_text_font_unref(thiz);
+	thiz->cache++;
+}
+
+void enesim_text_font_uncache(Enesim_Text_Font *thiz)
+{
+	thiz->cache--;
+	if (!thiz->cache)
+		enesim_text_engine_font_uncache(thiz->engine, thiz);
+	enesim_text_font_unref(thiz);
 }
 
 void enesim_text_font_glyph_cache(Enesim_Text_Font *thiz, Enesim_Text_Glyph *g)
@@ -109,7 +160,7 @@ EAPI Enesim_Text_Font * enesim_text_font_new_description_from(
 	if (FcPatternGetInteger(match, FC_INDEX, 0, &index) != FcResultMatch)
 		goto no_prop;
 
-	font = enesim_text_engine_font_new(e, file, index, size);
+	font = enesim_text_engine_font_load(e, file, index, size);
 no_prop:
 	FcPatternDestroy(match);
 no_match:
@@ -124,7 +175,7 @@ no_pattern:
 EAPI Enesim_Text_Font * enesim_text_font_new_file_from(
 		Enesim_Text_Engine *e, const char *file, int index, int size)
 {
-	return enesim_text_engine_font_new(e, file, index, size);
+	return enesim_text_engine_font_load(e, file, index, size);
 }
 
 EAPI Enesim_Text_Font * enesim_text_font_ref(Enesim_Text_Font *thiz)
@@ -140,23 +191,28 @@ EAPI void enesim_text_font_unref(Enesim_Text_Font *thiz)
 	thiz->ref--;
 	if (!thiz->ref)
 	{
-		enesim_text_engine_font_delete(thiz->engine, thiz);
-		enesim_text_engine_unref(thiz->engine);
-		free(thiz->key);
-		free(thiz);
+		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(thiz));
 	}
 }
 
 EAPI int enesim_text_font_max_ascent_get(Enesim_Text_Font *thiz)
 {
-	if (!thiz || !thiz->engine)
+	Enesim_Text_Font_Class *klass;
+
+	klass = ENESIM_TEXT_FONT_CLASS_GET(thiz);
+	if (klass->max_ascent_get)
+		return klass->max_ascent_get(thiz);
+	else
 		return 0;
-	return enesim_text_engine_font_max_ascent_get(thiz->engine, thiz);
 }
 
 EAPI int enesim_text_font_max_descent_get(Enesim_Text_Font *thiz)
 {
-	if (!thiz || !thiz->engine)
+	Enesim_Text_Font_Class *klass;
+
+	klass = ENESIM_TEXT_FONT_CLASS_GET(thiz);
+	if (klass->max_descent_get)
+		return klass->max_descent_get(thiz);
+	else
 		return 0;
-	return enesim_text_engine_font_max_descent_get(thiz->engine, thiz);
 }

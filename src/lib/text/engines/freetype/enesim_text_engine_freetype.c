@@ -40,34 +40,6 @@
 #define ENESIM_LOG_DEFAULT enesim_log_text
 static Enesim_Text_Engine *_engine = NULL;
 
-#if 0
-
-typedef struct _Enesim_Text_Freetype_Font
-{
-	Enesim_Text_Font parent;
-	FT_Face face;
-} Enesim_Text_Freetype_Font;
-
-typedef struct _Enesim_Text_Freetype_Font_Class
-{
-	Enesim_Text_Font_Class parent;
-	/* get glyph */
-} Enesim_Text_Freetype_Font_Class;
-
-typedef struct _Enesim_Text_Freetype_Engine
-{
-	Enesim_Text_Engine parent;
-	FT_Library library;
-	Eina_Lock lock;
-} Enesim_Text_Freetype_Engine;
-
-typedef struct _Enesim_Text_Freetype_Engine_Class
-{
-	Enesim_Text_Engine_Class parent;
-	/* load_font */
-} Enesim_Text_Freetype_Engine_Class;
-#endif
-
 #if HAVE_FREETYPE
 typedef struct _Enesim_Text_Freetype
 {
@@ -178,34 +150,8 @@ static void _enesim_text_engine_freetype_font_delete(void *data, void *fdata)
 	eina_lock_release(&thiz->lock);
 }
 
-static int _enesim_text_engine_freetype_font_max_ascent_get(void *data EINA_UNUSED, void *fdata)
-{
-	FT_Face face = fdata;
-	int asc;
-	int dv;
-
-	asc = face->bbox.yMax;
-	if (face->units_per_EM == 0) return asc;
-
-	dv = 2048;
-	asc = (asc * face->size->metrics.y_scale) / (dv * dv);
-
-	return asc;
-}
-
 static int _enesim_text_engine_freetype_font_max_descent_get(void *data EINA_UNUSED, void *fdata)
 {
-	FT_Face face = fdata;
-	int desc;
-	int dv;
-
-	desc = -face->bbox.yMin;
-	if (face->units_per_EM == 0) return desc;
-
-	dv = 2048;
-	desc = (desc * face->size->metrics.y_scale) / (dv * dv);
-
-	return desc;
 }
 
 static Enesim_Text_Glyph * _enesim_text_engine_freetype_glyph_get(void *edata, void *fdata, Eina_Unicode c)

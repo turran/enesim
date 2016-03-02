@@ -33,41 +33,35 @@
 /** @cond internal */
 #define ENESIM_LOG_DEFAULT enesim_log_text
 
-static void * _enesim_text_engine_font_load(Enesim_Text_Engine *thiz,
-		const char *file, int index, int size)
+ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_OBJECT_DESCRIPTOR, Enesim_Text_Engine,
+		Enesim_Text_Engine_Class, enesim_text_engine);
+/*----------------------------------------------------------------------------*
+ *                            Object definition                               *
+ *----------------------------------------------------------------------------*/
+static void _enesim_text_engine_class_init(void *k EINA_UNUSED)
 {
-	if (!thiz->d->font_load) return NULL;
-	return thiz->d->font_load(thiz->data, file, index, size);
 }
 
+static void _enesim_text_engine_instance_init(void *o)
+{
+	Enesim_Text_Engine *thiz = o;
+	thiz->fonts = eina_hash_string_superfast_new(NULL);
+	thiz->ref = 1;
+}
+
+static void _enesim_text_engine_instance_deinit(void *o)
+{
+	Enesim_Text_Engine *thiz = o;
+	eina_hash_free(thiz->fonts);
+}
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Text_Engine * enesim_text_engine_new(Enesim_Text_Engine_Descriptor *d)
-{
-	Enesim_Text_Engine *thiz;
-
-	thiz = calloc(1, sizeof(Enesim_Text_Engine));
-	thiz->d = d;
-	thiz->data = thiz->d->init();
-	thiz->fonts = eina_hash_string_superfast_new(NULL);
-	thiz->ref = 1;
-
-	return thiz;
-}
-
-void enesim_text_engine_free(Enesim_Text_Engine *thiz)
-{
-	thiz->d->shutdown(thiz->data);
-	eina_hash_free(thiz->fonts);
-	free(thiz);
-}
-
-Enesim_Text_Font * enesim_text_engine_font_new(
+Enesim_Text_Font * enesim_text_engine_font_load(
 		Enesim_Text_Engine *thiz, const char *file, int index, int size)
 {
 	Enesim_Text_Font *f;
-	void *data;
+	Enesim_Text_Engine_Class *klass;
 	char *key;
 	int len;
 
@@ -83,62 +77,36 @@ Enesim_Text_Font * enesim_text_engine_font_new(
 		free(key);
 		return f;
 	}
-	data = _enesim_text_engine_font_load(thiz, file, index, size);
-	if (!data)
+	klass = ENESIM_TEXT_ENGINE_CLASS_GET(thiz);
+	if (klass->font_load)
+	{
+		f = klass->font_load(thiz, file, index, size);
+		if (f)
+		{
+			f->engine = enesim_text_engine_ref(thiz);
+			f->key = key;
+		}
+	}
+
+	if (!f)
 	{
 		free(key);
 		return NULL;
 	}
 
-	f = calloc(1, sizeof(Enesim_Text_Font));
-	f->engine = enesim_text_engine_ref(thiz);
-	f->data = data;
-	f->key = key;
-	f->glyphs = eina_hash_int32_new(NULL);
-	eina_hash_add(thiz->fonts, key, f);
-	enesim_text_font_ref(f);
-
 	return f;
 }
 
-void enesim_text_engine_font_delete(Enesim_Text_Engine *thiz,
+void enesim_text_engine_font_cache(Enesim_Text_Engine *thiz,
 		Enesim_Text_Font *f)
 {
-	if (thiz->d->font_delete)
-		thiz->d->font_delete(thiz->data, f->data);
-	eina_hash_del(thiz->fonts, f->key, f);
+	eina_hash_add(thiz->fonts, &f->key, f);
 }
 
-int enesim_text_engine_font_max_ascent_get(Enesim_Text_Engine *thiz,
+void enesim_text_engine_font_uncache(Enesim_Text_Engine *thiz,
 		Enesim_Text_Font *f)
 {
-	if (!thiz->d->font_max_ascent_get)
-		return 0;
-	return thiz->d->font_max_ascent_get(thiz->data, f->data);
-}
-
-int enesim_text_engine_font_max_descent_get(Enesim_Text_Engine *thiz,
-		Enesim_Text_Font *f)
-{
-	if (!thiz->d->font_max_descent_get)
-		return 0;
-	return thiz->d->font_max_descent_get(thiz->data, f->data);
-}
-
-Enesim_Text_Glyph * enesim_text_engine_font_glyph_get(Enesim_Text_Engine *thiz,
-		Enesim_Text_Font *f, Eina_Unicode c)
-{
-	if (!thiz->d->font_glyph_get)
-		return NULL;
-	return thiz->d->font_glyph_get(thiz->data, f->data, c);
-}
-
-Eina_Bool enesim_text_engine_glyph_load(Enesim_Text_Engine *thiz,
-		Enesim_Text_Glyph *g, int formats)
-{
-	if (!thiz->d->glyph_load)
-		return EINA_FALSE;
-	return thiz->d->glyph_load(thiz->data, g->font->data, g, formats);
+	eina_hash_del(thiz->fonts, &f->key, f);
 }
 /** @endcond */
 /*============================================================================*
@@ -157,7 +125,7 @@ EAPI void enesim_text_engine_unref(Enesim_Text_Engine *thiz)
 	thiz->ref--;
 	if (!thiz->ref)
 	{
-		thiz->d->shutdown(thiz->data);
+		enesim_object_instance_free(ENESIM_OBJECT_INSTANCE(thiz));
 	}
 }
 
@@ -184,6 +152,12 @@ EAPI Eina_Bool enesim_text_engine_type_get(Enesim_Text_Engine *thiz,
 	if (lib)
 		*lib = "enesim";
 	if (name)
-		*name = thiz->d->type_get();
+	{
+		Enesim_Text_Engine_Class *klass;
+
+		klass = ENESIM_TEXT_ENGINE_CLASS_GET(thiz);
+		if (klass->type_get)
+			*name = klass->type_get();
+	}
 	return EINA_TRUE;
 }
