@@ -126,6 +126,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 	Eina_Unicode unicode;
 	int iidx = 0;
 	const char *text;
+	double ox, oy;
 
 	/* No current font */
 	if (!thiz->state.current.font)
@@ -134,12 +135,14 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 	if (!enesim_text_buffer_smart_is_dirty(thiz->state.buffer) &&
 			thiz->state.glyphs_generated)
 		return EINA_TRUE;
-
+	/* TODO check the common renderer and shape renderer attributes to propagate them
+	 * on every inner renderer
+	 */
+	enesim_renderer_origin_get(ENESIM_RENDERER(thiz), &ox, &oy);
 	text = enesim_text_buffer_string_get(thiz->state.buffer);
 	while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 	{
 		Enesim_Text_Glyph *g;
-		double o = 0;
 
 		g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
 		if (g)
@@ -158,7 +161,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			r = enesim_renderer_image_new();
 			enesim_surface_size_get(g->surface, &w, &h);
 			enesim_renderer_image_size_set(r, w, h);
-			enesim_renderer_origin_set(r, o, 0);
+			enesim_renderer_origin_set(r, ox, oy - g->origin + 50);
 			enesim_renderer_image_source_surface_set(r,
 					enesim_surface_ref(g->surface));
 			enesim_text_glyph_unref(g);
@@ -169,7 +172,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_FILL);
 			enesim_renderer_compound_layer_add(thiz->compound, l);
 next:
-			o += g->x_advance;
+			ox += g->x_advance;
 		}
 	}
 
@@ -619,23 +622,13 @@ static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r EINA_UNUS
 }
 
 static Eina_Bool _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
-		Enesim_Rectangle *rect, Enesim_Log **log EINA_UNUSED)
+		Enesim_Rectangle *rect, Enesim_Log **log)
 {
-	Enesim_Matrix_Type type;
+	Enesim_Renderer_Text_Span *thiz;
 
-	_enesim_renderer_text_span_geometry_get(r, rect);
-	type = enesim_renderer_transformation_type_get(r);
-	/* transform the geometry */
-	if (type != ENESIM_MATRIX_TYPE_IDENTITY)
-	{
-		Enesim_Quad q;
-		Enesim_Matrix m;
-
-		enesim_renderer_transformation_get(r, &m);
-		enesim_matrix_rectangle_transform(&m, rect, &q);
-		enesim_quad_rectangle_to(&q, rect);
-	}
-	return EINA_TRUE;
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	_enesim_renderer_text_span_generate(thiz);
+	return enesim_renderer_bounds_get(thiz->compound, rect, log);
 }
 
 static void _enesim_renderer_text_span_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -676,6 +669,8 @@ static void _enesim_renderer_text_span_instance_init(void *o)
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(o);
 	thiz->compound = enesim_renderer_compound_new();
+	enesim_renderer_compound_background_enable_set(thiz->compound, EINA_TRUE);
+	enesim_renderer_compound_background_color_set(thiz->compound, 0x00000000);
 	real = enesim_text_buffer_utf8_new(0);
 	thiz->state.buffer = enesim_text_buffer_smart_new(real);
 }
