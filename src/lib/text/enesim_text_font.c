@@ -90,7 +90,7 @@ Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, Eina_Unic
 		return NULL;
 	g = eina_hash_find(thiz->glyphs, &c);
 	if (g)
-		return g;
+		return enesim_text_glyph_ref(g);
 	klass = ENESIM_TEXT_FONT_CLASS_GET(thiz);
 	if (klass->glyph_get)
 	{
