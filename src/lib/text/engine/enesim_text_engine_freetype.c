@@ -113,7 +113,6 @@ static void _enesim_text_engine_freetype_instance_deinit(void *o)
 	Enesim_Text_Engine_Freetype *thiz = o;
 
 	FT_Done_FreeType(thiz->library);
-	printf("freeing\n");
 	eina_lock_free(&thiz->lock);
 }
 #endif
@@ -130,7 +129,6 @@ void enesim_text_engine_freetype_init(void)
 void enesim_text_engine_freetype_shutdown(void)
 {
 #if HAVE_FREETYPE
-	printf("shutdown %d\n", _engine->ref); 
 	enesim_text_engine_unref(_engine);
 #endif
 }
