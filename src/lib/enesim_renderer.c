@@ -494,6 +494,11 @@ Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r)
 	return ret;
 }
 
+void enesim_renderer_state_commit(Enesim_Renderer *r)
+{
+	_state_commit(&r->state);
+}
+
 Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **log)
 {

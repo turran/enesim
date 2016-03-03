@@ -162,13 +162,16 @@ struct _Enesim_Renderer
 
 void enesim_renderer_init(void);
 void enesim_renderer_shutdown(void);
+
 const Enesim_Renderer_State * enesim_renderer_state_get(Enesim_Renderer *r);
+Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r);
+void enesim_renderer_state_commit(Enesim_Renderer *r);
+
 void enesim_renderer_propagate(Enesim_Renderer *r, Enesim_Renderer *to);
 void * enesim_renderer_backend_data_get(Enesim_Renderer *r, Enesim_Backend b);
 void enesim_renderer_backend_data_set(Enesim_Renderer *r, Enesim_Backend b, void *data);
 void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char *file,
 		const char *function, int line, char *fmt, ...);
-Eina_Bool enesim_renderer_state_has_changed(Enesim_Renderer *r);
 Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **error);
 void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
