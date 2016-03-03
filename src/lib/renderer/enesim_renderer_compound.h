@@ -46,6 +46,8 @@ typedef struct _Enesim_Renderer_Compound_Layer Enesim_Renderer_Compound_Layer;
 EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_new(void);
 EAPI void enesim_renderer_compound_layer_renderer_set(
 		Enesim_Renderer_Compound_Layer *l, Enesim_Renderer *r);
+EAPI Enesim_Renderer * enesim_renderer_compound_layer_renderer_get(
+		Enesim_Renderer_Compound_Layer *l);
 EAPI void enesim_renderer_compound_layer_rop_set(
 		Enesim_Renderer_Compound_Layer *l, Enesim_Rop rop);
 EAPI Enesim_Renderer_Compound_Layer * enesim_renderer_compound_layer_ref(

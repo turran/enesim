@@ -885,6 +885,21 @@ EAPI void enesim_renderer_compound_layer_renderer_set(
 } 
 
 /**
+ * @brief Gets the renderer of a layer
+ * @ender_prop{renderer}
+ * @param[in] l The layer to get the renderer from
+ * @return The renderer of the layer @ender_transfer{none}
+ */
+EAPI Enesim_Renderer * enesim_renderer_compound_layer_renderer_get(
+		Enesim_Renderer_Compound_Layer *l)
+{
+	if (!l) return NULL;
+	if (!l->r) return NULL;
+
+	return enesim_renderer_ref(l->r);
+} 
+
+/**
  * @brief Sets the raster operation of a layer
  * @ender_prop{rop}
  * @param[in] l The layer to set the raster operation on
@@ -1031,6 +1046,11 @@ EAPI void enesim_renderer_compound_layer_foreach(Enesim_Renderer *r,
 		if (!cb(r, layer, user_data))
 			break;
 	}
+	EINA_LIST_FOREACH(thiz->added, l, layer)
+	{
+		if (!cb(r, layer, user_data))
+			break;
+	}
 }
 
 /**
@@ -1047,6 +1067,11 @@ EAPI void enesim_renderer_compound_layer_reverse_foreach(Enesim_Renderer *r,
 	Eina_List *l;
 
 	thiz = ENESIM_RENDERER_COMPOUND(r);
+	EINA_LIST_REVERSE_FOREACH(thiz->added, l, layer)
+	{
+		if (!cb(r, layer, user_data))
+			break;
+	}
 	EINA_LIST_REVERSE_FOREACH(thiz->layers, l, layer)
 	{
 		if (!cb(r, layer, user_data))
