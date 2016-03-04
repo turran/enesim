@@ -33,7 +33,7 @@ Enesim_Renderer * enesim_example_renderer_renderer_get(Enesim_Example_Renderer_O
 	 * given that we dont use any transformation matrix
 	 */
 	enesim_renderer_shape_destination_geometry_get(r, &geom);
-	enesim_renderer_origin_set(r, (256 - geom.w) / 2, (256 - geom.h) / 2);
+	enesim_renderer_origin_set(r, ((256 - geom.w) / 2) - geom.x, ((256 - geom.h) / 2) - geom.y);
 
 	enesim_matrix_rotate(&m, 0.1);
 	enesim_renderer_transformation_set(r, &m);
