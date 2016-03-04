@@ -287,7 +287,6 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		{
 			thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_IMAGE;
 		}
-		thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH;
 		enesim_renderer_unref(fr);
 		/* regenerate the glyphs */
 		enesim_renderer_compound_layer_clear(thiz->compound);
