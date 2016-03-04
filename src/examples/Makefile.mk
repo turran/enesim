@@ -50,6 +50,7 @@ src/examples/enesim_renderer_perlin01 \
 src/examples/enesim_renderer_raddist01 \
 src/examples/enesim_renderer_rectangle01 \
 src/examples/enesim_renderer_text_span01 \
+src/examples/enesim_renderer_text_span02 \
 src/examples/enesim_renderer_pattern01
 
 noinst_LTLIBRARIES = src/examples/libenesim_renderer_examples.la
@@ -174,6 +175,11 @@ src_examples_enesim_renderer_text_span01_SOURCES = \
 src/examples/enesim_renderer_text_span01.c
 src_examples_enesim_renderer_text_span01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_text_span01_LDADD = $(examples_LDADD)
+
+src_examples_enesim_renderer_text_span02_SOURCES = \
+src/examples/enesim_renderer_text_span02.c
+src_examples_enesim_renderer_text_span02_CPPFLAGS = $(examples_CPPFLAGS)
+src_examples_enesim_renderer_text_span02_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_pattern01_SOURCES = \
 src/examples/enesim_renderer_pattern01.c
