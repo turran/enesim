@@ -96,6 +96,7 @@ typedef struct _Enesim_Renderer_Text_Span
 	Enesim_Text_Direction direction;
 	Enesim_Renderer *compound;
 	Enesim_Renderer_Text_Span_Glyph_Mode mode;
+	Enesim_Rectangle geometry;
 } Enesim_Renderer_Text_Span;
 
 typedef struct _Enesim_Renderer_Text_Span_Class {
@@ -339,6 +340,11 @@ next:
 				enesim_text_glyph_unref(g);
 			}
 		}
+		enesim_rectangle_coords_from(&thiz->geometry,
+				thiz->state.current.x, thiz->state.current.y,
+				ox,
+				enesim_text_font_max_ascent_get(thiz->state.current.font) +
+				enesim_text_font_max_descent_get(thiz->state.current.font));
 		thiz->state.buffer_changed = EINA_TRUE;
 		enesim_text_buffer_smart_clear(thiz->state.buffer);
 	}
@@ -760,8 +766,11 @@ static Eina_Bool _enesim_renderer_text_span_geometry_get(Enesim_Renderer *r,
 	Enesim_Renderer_Text_Span *thiz;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	_enesim_renderer_text_span_generate(thiz);
-	return enesim_renderer_bounds_get(thiz->compound, geometry, NULL);
+	if (!_enesim_renderer_text_span_generate(thiz))
+		return EINA_FALSE;
+
+	*geometry = thiz->geometry;
+	return EINA_TRUE;
 }
 /*----------------------------------------------------------------------------*
  *                             Renderer interface                             *
