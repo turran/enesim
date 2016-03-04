@@ -81,11 +81,12 @@ typedef struct _Enesim_Renderer_Text_Span_State
 	} current, past;
 	Eina_Bool changed : 1;
 	Eina_Bool buffer_changed : 1;
-	Eina_Bool glyphs_generated : 1;
 	/* the renderer state has changed */
 	Eina_Bool r_state_changed : 1;
 	/* the shape renderer state has changed */
 	Eina_Bool s_state_changed : 1;
+	/* our own properties have changed */
+	Eina_Bool had_changed : 1;
 } Enesim_Renderer_Text_Span_State;
 
 typedef struct _Enesim_Renderer_Text_Span
@@ -131,10 +132,6 @@ static void _enesim_renderer_text_span_glyph_propagate(Enesim_Renderer *r,
 			fill_color = enesim_color_mul4_sym(rend_color, fill_color);
 		enesim_renderer_color_set(glyph, fill_color);
 	}
-#if 1
-	/* Remove this once the text does not use origin as a pre position */
-	enesim_renderer_origin_set(glyph, 0, 0);
-#endif
 	enesim_renderer_transformation_get(r, &m);
 	enesim_matrix_translate(&tx, ox, oy);
 	enesim_matrix_compose(&m, &tx, &tx);
@@ -150,7 +147,6 @@ static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 	Enesim_Renderer *rl;
 	Enesim_Text_Glyph *g = NULL;
 	const char *text;
-	double ox, oy;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(cb_data->r);
 	rl = enesim_renderer_compound_layer_renderer_get(layer);
@@ -168,9 +164,9 @@ static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 			g = NULL;
 		}
 	}
-	enesim_renderer_origin_get(cb_data->r, &ox, &oy);
 	_enesim_renderer_text_span_glyph_propagate(cb_data->r, rl,
-			ox + cb_data->ox, oy - g->origin);
+			thiz->state.current.x + cb_data->ox,
+			thiz->state.current.y - g->origin);
 	cb_data->ox += g->x_advance;
 	enesim_text_glyph_unref(g);
 	enesim_renderer_unref(rl);
@@ -178,24 +174,20 @@ static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 	return EINA_TRUE;
 }
 
-static Eina_Bool _enesim_renderer_text_span_font_changed(Enesim_Renderer_Text_Span *thiz)
+static Eina_Bool _enesim_renderer_text_span_state_changed(Enesim_Renderer_Text_Span *thiz)
 {
+	if (thiz->state.had_changed)
+		return EINA_TRUE;
 	if (!thiz->state.changed)
 		return EINA_FALSE;
 	/* check that the current state is different from the past state */
 	if (thiz->state.current.font != thiz->state.past.font)
 		return EINA_TRUE;
+	if (thiz->state.current.x != thiz->state.past.x)
+		return EINA_TRUE;
+	if (thiz->state.current.y != thiz->state.past.y)
+		return EINA_TRUE;
 	return EINA_FALSE;
-}
-
-static void _enesim_renderer_text_span_font_generate(Enesim_Renderer_Text_Span *thiz)
-{
-	/* first do the setup of the fonts */
-	if (_enesim_renderer_text_span_font_changed(thiz))
-	{
-		thiz->state.changed = EINA_FALSE;
-		thiz->state.glyphs_generated = EINA_FALSE;
-	}
 }
 
 static Eina_Bool _enesim_renderer_text_span_glyphs_changed(Enesim_Renderer_Text_Span *thiz)
@@ -208,20 +200,47 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_changed(Enesim_Renderer_Text_
 static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text_Span *thiz)
 {
 	Enesim_Renderer *r;
-	Eina_Bool regenerate = EINA_FALSE;
 	Eina_Bool r_changed = EINA_FALSE;
 	Eina_Bool s_changed = EINA_FALSE;
+	Eina_Bool glyphs_generated = EINA_TRUE;
 	Eina_Unicode unicode;
 	int iidx = 0;
 	const char *text;
-	double ox, oy;
+	double ox = 0;
 
+	/* commit the state */
+	if (thiz->state.changed)
+	{
+		if (thiz->state.current.font != thiz->state.past.font)
+		{
+			/* swap the font */
+			enesim_text_font_unref(thiz->state.past.font);
+			thiz->state.past.font = NULL;
+			if (thiz->state.current.font)
+				thiz->state.past.font = enesim_text_font_ref(
+						thiz->state.current.font);
+
+			/* mark to generate the glyphs again */
+			glyphs_generated = EINA_FALSE;
+			thiz->state.had_changed = EINA_TRUE;
+		}
+ 		if (thiz->state.current.x != thiz->state.past.x)
+		{
+			thiz->state.past.x = thiz->state.current.x;
+			thiz->state.had_changed = EINA_TRUE;
+		}
+		if (thiz->state.current.y != thiz->state.past.y)
+		{
+			thiz->state.past.y = thiz->state.current.y;
+			thiz->state.had_changed = EINA_TRUE;
+		}
+		thiz->state.changed = EINA_FALSE;
+	}
 	/* No current font */
 	if (!thiz->state.current.font)
 		return EINA_FALSE;
 
 	r = ENESIM_RENDERER(thiz);
-
 	s_changed = enesim_renderer_shape_state_has_changed(r);
 	if (s_changed)
 	{
@@ -230,11 +249,11 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		sstate = enesim_renderer_shape_state_get(r);
 		if (sstate->current.draw_mode != sstate->past.draw_mode)
 		{
-			regenerate = EINA_TRUE;
+			glyphs_generated = EINA_TRUE;
 		}
 		else if (!sstate->past.fill.r && sstate->current.fill.r)
 		{
-			regenerate = EINA_TRUE;
+			glyphs_generated = EINA_TRUE;
 		}
 		/* commit the state and mark as changed to notify a redraw */
 		enesim_renderer_shape_state_commit(r);
@@ -248,9 +267,9 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		thiz->state.r_state_changed = EINA_TRUE;
 	}
 
-	/* Text buffer hasnt changed and the glyphs are already generated */
+	/* Text buffer has changed or the glyphs need to be generated */
 	if (enesim_text_buffer_smart_is_dirty(thiz->state.buffer) ||
-			!thiz->state.glyphs_generated || regenerate)
+			!glyphs_generated)
 	{
 		Enesim_Renderer *fr;
 
@@ -272,7 +291,6 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		enesim_renderer_unref(fr);
 		/* regenerate the glyphs */
 		enesim_renderer_compound_layer_clear(thiz->compound);
-		enesim_renderer_origin_get(r, &ox, &oy);
 		text = enesim_text_buffer_string_get(thiz->state.buffer);
 		while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
 		{
@@ -308,7 +326,9 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 					enesim_renderer_path_inner_path_set(i, enesim_path_ref(g->path));
 				}
 
-				_enesim_renderer_text_span_glyph_propagate(r, i, ox, oy - g->origin);
+				_enesim_renderer_text_span_glyph_propagate(r, i,
+						thiz->state.current.x + ox,
+						thiz->state.current.y - g->origin);
 
 				/* add the new layer */
 				l = enesim_renderer_compound_layer_new();
@@ -320,14 +340,13 @@ next:
 				enesim_text_glyph_unref(g);
 			}
 		}
-		thiz->state.glyphs_generated = EINA_TRUE;
 		thiz->state.buffer_changed = EINA_TRUE;
 		enesim_text_buffer_smart_clear(thiz->state.buffer);
 	}
 	/* check the common renderer and shape renderer attributes to propagate them
-	 * on every inner renderer
+	 * on every inner renderer. Also attributes that dont require a glyph generate
 	 */
-	else if (r_changed || s_changed)
+	else if (r_changed || s_changed || thiz->state.had_changed)
 	{
 		Enesim_Renderer_Text_Span_Propagate_Cb_Data cb_data;
 
@@ -346,7 +365,6 @@ next:
 /* load the font, load the glyphs and generate the bounds if needed */
 static Eina_Bool _enesim_renderer_text_span_generate(Enesim_Renderer_Text_Span *thiz)
 {
-	_enesim_renderer_text_span_font_generate(thiz);
 	return _enesim_renderer_text_span_glyphs_generate(thiz);
 }
 
@@ -730,7 +748,7 @@ static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r)
 	/* first check that the cached common states have changed */
 	if (thiz->state.r_state_changed || thiz->state.s_state_changed)
 		return EINA_TRUE;
-	if (_enesim_renderer_text_span_font_changed(thiz))
+	if (_enesim_renderer_text_span_state_changed(thiz))
 		return EINA_TRUE;
 	if (_enesim_renderer_text_span_glyphs_changed(thiz))
 		return EINA_TRUE;
