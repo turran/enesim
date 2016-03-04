@@ -70,6 +70,8 @@ typedef Eina_Bool (*Enesim_Renderer_Compund_Foreach_Layer)(Enesim_Renderer *r,
 EAPI Enesim_Renderer * enesim_renderer_compound_new(void);
 EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer);
+EAPI void enesim_renderer_compound_layer_prepend(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Layer *layer);
 EAPI void enesim_renderer_compound_layer_remove(Enesim_Renderer *r,
 		Enesim_Renderer_Compound_Layer *layer);
 EAPI void enesim_renderer_compound_layer_clear(Enesim_Renderer *r);

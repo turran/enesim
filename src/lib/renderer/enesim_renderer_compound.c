@@ -952,6 +952,28 @@ EAPI void enesim_renderer_compound_layer_add(Enesim_Renderer *r,
 }
 
 /**
+ * Prepends a layer
+ * @param[in] r The compound renderer
+ * @param[in] layer The layer to prepend @ender_transfer{full}
+ */
+EAPI void enesim_renderer_compound_layer_prepend(Enesim_Renderer *r,
+		Enesim_Renderer_Compound_Layer *layer)
+{
+	Enesim_Renderer_Compound *thiz;
+
+	if (!layer) return;
+	if (layer->owner)
+	{
+		WRN("Trying to add a layer which belongs to another compound");
+		enesim_renderer_compound_layer_unref(layer);
+		return;
+	}
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	thiz->added = eina_list_prepend(thiz->added, layer);
+	thiz->changed = EINA_TRUE;
+}
+
+/**
  * @brief Removes a layer
  * @param[in] r The compound renderer
  * @param[in] layer The layer to remove @ender_transfer{full}
