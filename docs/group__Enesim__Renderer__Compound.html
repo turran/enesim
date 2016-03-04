@@ -92,6 +92,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound.html#gaae5e98078583b61e932fd9d3980ef174">enesim_renderer_compound_new</a> (void)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a compound renderer.  <a href="#gaae5e98078583b61e932fd9d3980ef174"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound.html#gae89ea1568bc6e618d1abadf0221bdbc8">enesim_renderer_compound_layer_add</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *layer)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound.html#ga0945ff759822441c35177432241a66f6">enesim_renderer_compound_layer_prepend</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *layer)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound.html#gaf0280e44705b96e4e9a0f857d159d82d">enesim_renderer_compound_layer_remove</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *layer)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a layer.  <a href="#gaf0280e44705b96e4e9a0f857d159d82d"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Compound.html#ga90aefc7dd5cb75aeef89f21081c82b83">enesim_renderer_compound_layer_clear</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
@@ -161,6 +162,41 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The compound renderer </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">layer</td><td>The layer to add  [Transfer full] </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ga0945ff759822441c35177432241a66f6"></a><!-- doxytag: member="enesim_renderer_compound.h::enesim_renderer_compound_layer_prepend" ref="ga0945ff759822441c35177432241a66f6" args="(Enesim_Renderer *r, Enesim_Renderer_Compound_Layer *layer)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Compound.html#ga0945ff759822441c35177432241a66f6">enesim_renderer_compound_layer_prepend</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Renderer__Compound__Layer.html#ga72e718546929abb869e58a4b2e10911f">Enesim_Renderer_Compound_Layer</a> *&#160;</td>
+          <td class="paramname"><em>layer</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Prepends a layer </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The compound renderer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">layer</td><td>The layer to prepend  [Transfer full] </td></tr>
   </table>
   </dd>
 </dl>
@@ -456,7 +492,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 26 2016 01:25:00 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 4 2016 19:00:14 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

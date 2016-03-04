@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>enesim: enesim_renderer_checker01.c</title>
+<title>enesim: enesim_renderer_text_span02.c</title>
 
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
@@ -72,27 +72,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="headertitle">
-<div class="title">enesim_renderer_checker01.c</div>  </div>
+<div class="title">enesim_renderer_text_span02.c</div>  </div>
 </div><!--header-->
 <div class="contents">
-<p>Example usage of a checker renderer </p>
+<p>Example usage of a text span renderer </p>
 <div class="image">
-<img src="enesim_renderer_checker01.png" alt="enesim_renderer_checker01.png"/>
+<img src="enesim_renderer_text_span02.png" alt="enesim_renderer_text_span02.png"/>
 </div>
 <div class="fragment"><pre class="fragment"><span class="preprocessor">#include &quot;enesim_example_renderer.h&quot;</span>
 
 <a class="code" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> * enesim_example_renderer_renderer_get(<a name="_a0"></a><a class="code" href="structEnesim__Example__Renderer__Options.html">Enesim_Example_Renderer_Options</a> *options EINA_UNUSED)
 {
     <a class="code" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r;
+    Enesim_Text_Font *f;
+    Enesim_Text_Engine *e;
+    <a name="_a1"></a><a class="code" href="structEnesim__Rectangle.html">Enesim_Rectangle</a> geom;
 
-    r = <a name="a1"></a><a class="code" href="group__Enesim__Renderer__Checker.html#gae65fb4b0031e691d8b0187e1cf7f6749">enesim_renderer_checker_new</a>();
-    <a name="a2"></a><a class="code" href="group__Enesim__Renderer__Checker.html#ga9bd7387f7e086ee0750fbbf8633ba68d" title="Sets the color of the odd squares  &lt;ender-prop name=&quot;odd_color&quot;/&gt;.">enesim_renderer_checker_odd_color_set</a>(r, 0x00000000);
-    <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Checker.html#ga60090ea483068f6cbab93ddff50cac53" title="Sets the color of the even squares  &lt;ender-prop name=&quot;even_color&quot;/&gt;.">enesim_renderer_checker_even_color_set</a>(r, 0xffff0000);
-    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Checker.html#ga45567292038eeeaf9b07dd8f569d0819" title="Sets the width of the checker rectangles  &lt;ender-prop name=&quot;width&quot;/&gt;.">enesim_renderer_checker_width_set</a>(r, 5);
-    <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Checker.html#gaa75fae1829a59dd0679b5830272a890f" title="Sets the height of the checker rectangles  &lt;ender-prop name=&quot;height&quot;/&gt;.">enesim_renderer_checker_height_set</a>(r, 5);
+    <span class="comment">/* Create an arial font */</span>
+    e = enesim_text_engine_default_get();
+    <span class="keywordflow">if</span> (!e) <span class="keywordflow">return</span> NULL;
+
+    f = <a name="a2"></a><a class="code" href="group__Enesim__Text__Font.html#gae19f39a0052059bb195d924bbe026523">enesim_text_font_new_description_from</a>(
+            e, <span class="stringliteral">&quot;arial&quot;</span>, 120);
+    enesim_text_engine_unref(e);
+
+    <span class="keywordflow">if</span> (!f) <span class="keywordflow">return</span> NULL;
+
+    r = <a name="a3"></a><a class="code" href="group__Enesim__Renderer__Text__Span.html#gadc323841568feb08d3860a7db4e7e865">enesim_renderer_text_span_new</a>();
+    <a name="a4"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga5dd625fda6673c78d5bac04d5d0621ae">enesim_renderer_shape_draw_mode_set</a>(r, <a name="a5"></a><a class="code" href="group__Enesim__Renderer__Shape__Definitions.html#ga3c0d44234be39600ee8395d2bd40c073">ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL</a>);
+    <a name="a6"></a><a class="code" href="group__Enesim__Renderer__Shape.html#gafa8d2a1f68f6f36e8ebc88c6d5e7fa5c">enesim_renderer_shape_fill_color_set</a>(r, 0xffff0000);
+    <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga528ec5c51134be4451eaf9554b9edc90">enesim_renderer_shape_stroke_color_set</a>(r, 0xffffcccc);
+    <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga8e56148136e428eb3118c551002ee947">enesim_renderer_shape_stroke_weight_set</a>(r, 3);
+    <a name="a9"></a><a class="code" href="group__Enesim__Renderer__Shape.html#ga29953c2e9aa91fbbf8113819ec2b5d22">enesim_renderer_shape_stroke_join_set</a>(r, <a name="a10"></a><a class="code" href="group__Enesim__Renderer__Shape__Definitions.html#ggabe70a7a4727579260c1b5a097a5ad6cfa06702908bd829a6d5935953cf661b173">ENESIM_RENDERER_SHAPE_STROKE_JOIN_ROUND</a>);
+    <a name="a11"></a><a class="code" href="group__Enesim__Renderer__Text__Span.html#gaedf229432628581c40d0381e351283de" title="Sets the text of the text span.">enesim_renderer_text_span_text_set</a>(r, <span class="stringliteral">&quot;Ají&quot;</span>);
+    enesim_renderer_text_span_font_set(r, f);
+    <span class="comment">/* Center the text. For that we use the destination geometry</span>
+<span class="comment">     * We could use the enesim_renderer_shape_geometry_get instead</span>
+<span class="comment">     * given that we dont use any transformation matrix</span>
+<span class="comment">     */</span>
+    <a name="a12"></a><a class="code" href="group__Enesim__Renderer__Shape.html#gaa18fd1438071079b3b7b7217b15078ee" title="Get the destination geometry of a renderer shape.">enesim_renderer_shape_destination_geometry_get</a>(r, &amp;geom);
+    <a name="a13"></a><a class="code" href="group__Enesim__Renderer__Text__Span.html#ga860d77c568d56dbdd2ee8544a83f0b67" title="Set the top left coordinates of a text span renderer.">enesim_renderer_text_span_position_set</a>(r, ((256 - geom.<a name="a14"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>) / 2) - geom.<a name="a15"></a><a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a>, ((256 - geom.<a name="a16"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>) / 2) - geom.<a name="a17"></a><a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a>);
 
     <span class="keywordflow">return</span> r;
 }
+
 </pre></div> </div><!-- contents -->
 </div><!-- contents -->
 <!-- window showing the filter options -->

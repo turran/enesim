@@ -109,10 +109,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <span class="comment">     * given that we dont use any transformation matrix</span>
 <span class="comment">     */</span>
     <a name="a7"></a><a class="code" href="group__Enesim__Renderer__Shape.html#gaa18fd1438071079b3b7b7217b15078ee" title="Get the destination geometry of a renderer shape.">enesim_renderer_shape_destination_geometry_get</a>(r, &amp;geom);
-    <a name="a8"></a><a class="code" href="group__Enesim__Renderer.html#gaf31b5fce129e3f5e4f3b7f7b8f66b1fe" title="Sets the origin of a renderer.">enesim_renderer_origin_set</a>(r, (256 - geom.<a name="a9"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>) / 2, (256 - geom.<a name="a10"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>) / 2);
+    <a name="a8"></a><a class="code" href="group__Enesim__Renderer__Text__Span.html#ga860d77c568d56dbdd2ee8544a83f0b67" title="Set the top left coordinates of a text span renderer.">enesim_renderer_text_span_position_set</a>(r, ((256 - geom.<a name="a9"></a><a class="code" href="structEnesim__Rectangle.html#aa9010ac80d5253dc66f26c44f6f8c320">w</a>) / 2) - geom.<a name="a10"></a><a class="code" href="structEnesim__Rectangle.html#ae98a0f8df92167af40ed1cc53292c4fa">x</a>, ((256 - geom.<a name="a11"></a><a class="code" href="structEnesim__Rectangle.html#a34a030e8b9d27a2c975d7a1540eeeb18">h</a>) / 2) - geom.<a name="a12"></a><a class="code" href="structEnesim__Rectangle.html#a049adbaf8eeebed0994887ec00609cb3">y</a>);
 
-    <a name="a11"></a><a class="code" href="group__Enesim__Matrix.html#ga353b0534ef72f184ffcdefdf424d3d01">enesim_matrix_rotate</a>(&amp;m, 0.1);
-    <a name="a12"></a><a class="code" href="group__Enesim__Renderer.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer  &lt;ender-prop name=&quot;transformation&quot;/&gt;.">enesim_renderer_transformation_set</a>(r, &amp;m);
+    <a name="a13"></a><a class="code" href="group__Enesim__Matrix.html#ga353b0534ef72f184ffcdefdf424d3d01">enesim_matrix_rotate</a>(&amp;m, 0.1);
+    <a name="a14"></a><a class="code" href="group__Enesim__Renderer.html#gaad02d5c86da52251948f48558b9aa3e9" title="Sets the transformation matrix of a renderer  &lt;ender-prop name=&quot;transformation&quot;/&gt;.">enesim_renderer_transformation_set</a>(r, &amp;m);
 
     <span class="keywordflow">return</span> r;
 }
@@ -135,7 +135,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 26 2016 01:25:00 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Mar 4 2016 19:00:13 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
