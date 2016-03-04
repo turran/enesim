@@ -49,6 +49,7 @@ typedef struct _Enesim_Renderer_Path_Abstract
 	/* to keep track of the changes */
 	int last_path_change;
 	int last_dash_change;
+	Eina_Bool last_stroke_scalable;
 	Eina_Bool generated : 1;
 	Eina_Bool stroke_figure_used : 1;
 } Enesim_Renderer_Path_Abstract;
