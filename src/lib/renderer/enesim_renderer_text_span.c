@@ -33,6 +33,8 @@
 #include "enesim_renderer_shape.h"
 #include "enesim_renderer_text_span.h"
 #include "enesim_renderer_compound.h"
+#include "enesim_renderer_rectangle.h"
+#include "enesim_renderer_path.h"
 #include "enesim_renderer_image.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"
@@ -62,6 +64,12 @@
 		Enesim_Renderer_Text_Span,					\
 		enesim_renderer_text_span_descriptor_get())
 
+typedef enum _Enesim_Renderer_Text_Span_Glyph_Mode
+{
+	ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_IMAGE,
+	ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH,
+} Enesim_Renderer_Text_Span_Glyph_Mode;
+
 typedef struct _Enesim_Renderer_Text_Span_State
 {
 	/* our current smart text buffer */
@@ -84,14 +92,7 @@ typedef struct _Enesim_Renderer_Text_Span
 	Enesim_Renderer_Text_Span_State state;
 	Enesim_Text_Direction direction;
 	Enesim_Renderer *compound;
-	/* sw drawing */
-	Enesim_Matrix_F16p16 matrix;
-	/* span geometry */
-	unsigned int width;
-	unsigned int height;
-	/* max ascent/descent */
-	int top;
-	int bottom;
+	Enesim_Renderer_Text_Span_Glyph_Mode mode;
 } Enesim_Renderer_Text_Span;
 
 typedef struct _Enesim_Renderer_Text_Span_Class {
@@ -105,6 +106,31 @@ typedef struct _Enesim_Renderer_Text_Span_Propagate_Cb_Data
 	double dy;
 	Eina_Bool first;
 } Enesim_Renderer_Text_Span_Propagate_Cb_Data;
+
+static void _enesim_renderer_text_span_glyph_propagate(Enesim_Renderer *r,
+		Enesim_Renderer *glyph, double ox, double oy)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+
+	enesim_renderer_propagate(r, glyph);
+	if (thiz->mode == ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH)
+	{
+		enesim_renderer_shape_propagate(r, glyph);
+	}
+	else
+	{
+		Enesim_Color fill_color, rend_color;
+
+		fill_color = enesim_renderer_shape_fill_color_get(r);
+		rend_color = enesim_renderer_color_get(r);
+		if (rend_color != ENESIM_COLOR_FULL)
+			fill_color = enesim_color_mul4_sym(rend_color, fill_color);
+		enesim_renderer_color_set(glyph, fill_color);
+	}
+	enesim_renderer_origin_set(glyph, ox, oy);
+}
 
 static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 		Enesim_Renderer *c EINA_UNUSED,
@@ -126,7 +152,8 @@ static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 		cb_data->dy = loy - oy;
 		cb_data->first = EINA_FALSE;
 	}
-	enesim_renderer_origin_set(rl, lox - cb_data->dx, loy - cb_data->dy);
+	_enesim_renderer_text_span_glyph_propagate(cb_data->r, rl,
+			lox - cb_data->dx, loy - cb_data->dy);
 	enesim_renderer_unref(rl);
 
 	return EINA_TRUE;
@@ -162,6 +189,9 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_changed(Enesim_Renderer_Text_
 static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text_Span *thiz)
 {
 	Enesim_Renderer *r;
+	Eina_Bool regenerate = EINA_FALSE;
+	Eina_Bool r_changed = EINA_FALSE;
+	Eina_Bool s_changed = EINA_FALSE;
 	Eina_Unicode unicode;
 	int iidx = 0;
 	const char *text;
@@ -172,10 +202,56 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		return EINA_FALSE;
 
 	r = ENESIM_RENDERER(thiz);
+
+	s_changed = enesim_renderer_shape_state_has_changed(r);
+	if (s_changed)
+	{
+		const Enesim_Renderer_Shape_State *sstate;
+
+		sstate = enesim_renderer_shape_state_get(r);
+		if (sstate->current.draw_mode != sstate->past.draw_mode)
+		{
+			regenerate = EINA_TRUE;
+		}
+		else if (!sstate->past.fill.r && sstate->current.fill.r)
+		{
+			regenerate = EINA_TRUE;
+		}
+		/* commit the state and mark as changed to notify a redraw */
+		enesim_renderer_shape_state_commit(r);
+		thiz->state.s_state_changed = EINA_TRUE;
+	}
+	r_changed = enesim_renderer_state_has_changed(r);
+	if (r_changed)
+	{
+		/* commit the state and mark as changed to notify a redraw */
+		enesim_renderer_state_commit(r);
+		thiz->state.r_state_changed = EINA_TRUE;
+	}
+
 	/* Text buffer hasnt changed and the glyphs are already generated */
 	if (enesim_text_buffer_smart_is_dirty(thiz->state.buffer) ||
-			!thiz->state.glyphs_generated)
+			!thiz->state.glyphs_generated || regenerate)
 	{
+		Enesim_Renderer *fr;
+
+		/* define the mode */
+		fr = enesim_renderer_shape_fill_renderer_get(r);
+		if (enesim_renderer_shape_draw_mode_get(r) & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+		{
+			thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH;
+		}
+		else if (fr)
+		{
+			thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH;
+		}
+		else
+		{
+			thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_IMAGE;
+		}
+		//thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH;
+		enesim_renderer_unref(fr);
+		/* regenerate the glyphs */
 		enesim_renderer_compound_layer_clear(thiz->compound);
 		enesim_renderer_origin_get(r, &ox, &oy);
 		text = enesim_text_buffer_string_get(thiz->state.buffer);
@@ -188,26 +264,37 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			{
 				Enesim_Renderer *i;
 				Enesim_Renderer_Compound_Layer *l;
-				int w, h;
 
 				/* load and cache the glyph */
-				if (!enesim_text_glyph_load(g, ENESIM_TEXT_GLYPH_FORMAT_SURFACE))
+				if (!enesim_text_glyph_load(g, ENESIM_TEXT_GLYPH_FORMAT_SURFACE | ENESIM_TEXT_GLYPH_FORMAT_PATH))
 					continue;
 				enesim_text_glyph_cache(enesim_text_glyph_ref(g));
 
-				if (!g->surface)
+				if (!g->surface || !g->path)
 					goto next;
-				i = enesim_renderer_image_new();
-				enesim_surface_size_get(g->surface, &w, &h);
-				enesim_renderer_image_size_set(i, w, h);
-				enesim_renderer_origin_set(i, ox, oy - g->origin);
-				enesim_renderer_image_source_surface_set(i,
-						enesim_surface_ref(g->surface));
+
+				if (thiz->mode == ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_IMAGE)
+				{
+					int w, h;
+
+					i = enesim_renderer_image_new();
+					enesim_surface_size_get(g->surface, &w, &h);
+					enesim_renderer_image_size_set(i, w, h);
+					enesim_renderer_image_source_surface_set(i,
+							enesim_surface_ref(g->surface));
+				}
+				else
+				{
+					i = enesim_renderer_path_new();
+					enesim_renderer_path_inner_path_set(i, enesim_path_ref(g->path));
+				}
+
+				_enesim_renderer_text_span_glyph_propagate(r, i, ox, oy - g->origin);
 
 				/* add the new layer */
 				l = enesim_renderer_compound_layer_new();
 				enesim_renderer_compound_layer_renderer_set(l, i);
-				enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_FILL);
+				enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_BLEND);
 				enesim_renderer_compound_layer_add(thiz->compound, l);
 next:
 				ox += g->x_advance;
@@ -221,7 +308,7 @@ next:
 	/* check the common renderer and shape renderer attributes to propagate them
 	 * on every inner renderer
 	 */
-	else if (enesim_renderer_state_has_changed(r))
+	else if (r_changed || s_changed)
 	{
 		Enesim_Renderer_Text_Span_Propagate_Cb_Data cb_data;
 
@@ -232,10 +319,6 @@ next:
 		/* just propagate the properties */
 		enesim_renderer_compound_layer_foreach(thiz->compound,
 				_enesim_renderer_text_span_propagate_cb, &cb_data);
-		/* commit the states and mark as changed to notify a redraw */
-		enesim_renderer_state_commit(r);
-		thiz->state.r_state_changed = EINA_TRUE;
-		thiz->state.s_state_changed = EINA_TRUE;
 	}
 
 	return EINA_TRUE;
@@ -570,8 +653,6 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
 {
 	Enesim_Renderer_Text_Span *thiz;
-	Enesim_Matrix_Type type;
-	Enesim_Matrix matrix, inv;
 	const char *text;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
@@ -590,26 +671,6 @@ static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
 	if (!enesim_renderer_setup(thiz->compound, s, rop, l))
 		return EINA_FALSE;
 
-#if 0
-	type = enesim_renderer_transformation_type_get(r);
-	switch (type)
-	{
-		case ENESIM_MATRIX_TYPE_IDENTITY:
-		*fill = _enesim_renderer_text_span_draw_ltr_identity;
-		break;
-
-		case ENESIM_MATRIX_TYPE_AFFINE:
-		enesim_renderer_transformation_get(r, &matrix);
-		enesim_matrix_inverse(&matrix, &inv);
-		enesim_matrix_matrix_f16p16_to(&inv,
-			&thiz->matrix);
-		*fill = _enesim_renderer_text_span_draw_affine;
-		break;
-
-		default:
-		break;
-	}
-#endif
 #if 0
 	enesim_text_font_dump(thiz->state.current.font, "/tmp/");
 #endif
@@ -661,22 +722,10 @@ static Eina_Bool _enesim_renderer_text_span_geometry_get(Enesim_Renderer *r,
 		Enesim_Rectangle *geometry)
 {
 	Enesim_Renderer_Text_Span *thiz;
-	double ox, oy;
 
-	/* FIXME fix this */
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	/* we should calculate the current width/height */
 	_enesim_renderer_text_span_generate(thiz);
-	geometry->x = 0;
-	geometry->y = 0;
-	geometry->w = thiz->width;
-	geometry->h = thiz->height;
-	/* first translate */
-	enesim_renderer_origin_get(r, &ox, &oy);
-	geometry->x += ox;
-	geometry->y += oy;
-
-	return EINA_TRUE;
+	return enesim_renderer_bounds_get(thiz->compound, geometry, NULL);
 }
 /*----------------------------------------------------------------------------*
  *                             Renderer interface                             *
@@ -684,6 +733,16 @@ static Eina_Bool _enesim_renderer_text_span_geometry_get(Enesim_Renderer *r,
 static const char * _enesim_renderer_text_span_name(Enesim_Renderer *r EINA_UNUSED)
 {
 	return "text_span";
+}
+
+static void _enesim_renderer_text_span_sw_hints_get(
+		Enesim_Renderer *r EINA_UNUSED,
+		Enesim_Rop rop EINA_UNUSED,
+		Enesim_Renderer_Sw_Hint *hints)
+{
+	*hints |= ENESIM_RENDERER_SW_HINT_COLORIZE |
+			ENESIM_RENDERER_SW_HINT_ROP |
+			ENESIM_RENDERER_SW_HINT_MASK;
 }
 
 static Eina_Bool _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
@@ -717,6 +776,7 @@ static void _enesim_renderer_text_span_class_init(void *k)
 
 	r_klass = ENESIM_RENDERER_CLASS(k);
 	r_klass->base_name_get = _enesim_renderer_text_span_name;
+	r_klass->sw_hints_get = _enesim_renderer_text_span_sw_hints_get;
 	r_klass->bounds_get = _enesim_renderer_text_span_bounds;
 	r_klass->features_get = _enesim_renderer_text_span_features_get;
 
