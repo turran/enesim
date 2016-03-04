@@ -78,10 +78,6 @@ static void _enesim_renderer_path_abstract_class_init(void *k EINA_UNUSED)
 
 static void _enesim_renderer_path_abstract_instance_init(void *o EINA_UNUSED)
 {
-	Enesim_Renderer_Path_Abstract *thiz;
-
-	thiz = ENESIM_RENDERER_PATH_ABSTRACT(o);
-	/* create the different path implementations */
 }
 
 static void _enesim_renderer_path_abstract_instance_deinit(void *o)
@@ -102,6 +98,7 @@ Eina_Bool enesim_renderer_path_abstract_needs_generate(Enesim_Renderer *r)
 	Enesim_Renderer_Shape_Stroke_Cap cap;
 	Enesim_List *dashes;
 	Enesim_Matrix cgm;
+	Eina_Bool stroke_scalable;
 	double stroke_weight;
 
 	thiz = ENESIM_RENDERER_PATH_ABSTRACT(r);
@@ -141,6 +138,10 @@ Eina_Bool enesim_renderer_path_abstract_needs_generate(Enesim_Renderer *r)
 	if (thiz->last_stroke_weight != stroke_weight)
 		return EINA_TRUE;
 
+	stroke_scalable = enesim_renderer_shape_stroke_scalable_get(r);
+	if (thiz->last_stroke_scalable != stroke_scalable)
+		return EINA_TRUE;
+
 	/* the geometry transformation is different */
 	enesim_renderer_transformation_get(r, &cgm);
 	if (!enesim_matrix_is_equal(&cgm, &thiz->last_matrix))
@@ -172,6 +173,7 @@ void enesim_renderer_path_abstract_generate(Enesim_Renderer *r)
 	thiz->last_join = join;
 	thiz->last_cap = cap;
 	thiz->last_matrix = transformation;
+	thiz->last_stroke_scalable = stroke_scalable;
 	thiz->last_stroke_weight = stroke_weight;
 }
 
