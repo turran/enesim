@@ -76,6 +76,8 @@ typedef struct _Enesim_Renderer_Text_Span_State
 	Enesim_Text_Buffer *buffer;
 	struct {
 		Enesim_Text_Font *font;
+		double x;
+		double y;
 	} current, past;
 	Eina_Bool changed : 1;
 	Eina_Bool buffer_changed : 1;
@@ -102,15 +104,15 @@ typedef struct _Enesim_Renderer_Text_Span_Class {
 typedef struct _Enesim_Renderer_Text_Span_Propagate_Cb_Data
 {
 	Enesim_Renderer *r;
-	double dx;
-	double dy;
-	Eina_Bool first;
+	int idx;
+	double ox;
 } Enesim_Renderer_Text_Span_Propagate_Cb_Data;
 
 static void _enesim_renderer_text_span_glyph_propagate(Enesim_Renderer *r,
 		Enesim_Renderer *glyph, double ox, double oy)
 {
 	Enesim_Renderer_Text_Span *thiz;
+	Enesim_Matrix m, tx;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 
@@ -129,31 +131,48 @@ static void _enesim_renderer_text_span_glyph_propagate(Enesim_Renderer *r,
 			fill_color = enesim_color_mul4_sym(rend_color, fill_color);
 		enesim_renderer_color_set(glyph, fill_color);
 	}
-	enesim_renderer_origin_set(glyph, ox, oy);
+#if 1
+	/* Remove this once the text does not use origin as a pre position */
+	enesim_renderer_origin_set(glyph, 0, 0);
+#endif
+	enesim_renderer_transformation_get(r, &m);
+	enesim_matrix_translate(&tx, ox, oy);
+	enesim_matrix_compose(&m, &tx, &tx);
+	enesim_renderer_transformation_set(glyph, &tx);
 }
 
 static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 		Enesim_Renderer *c EINA_UNUSED,
 		Enesim_Renderer_Compound_Layer *layer, void *data)
 {
+	Enesim_Renderer_Text_Span *thiz;
 	Enesim_Renderer_Text_Span_Propagate_Cb_Data *cb_data = data;
 	Enesim_Renderer *rl;
-	double lox, loy;
+	Enesim_Text_Glyph *g = NULL;
+	const char *text;
+	double ox, oy;
 
+	thiz = ENESIM_RENDERER_TEXT_SPAN(cb_data->r);
 	rl = enesim_renderer_compound_layer_renderer_get(layer);
-	enesim_renderer_origin_get(rl, &lox, &loy);
-
-	if (cb_data->first)
+	text = enesim_text_buffer_string_get(thiz->state.buffer);
+	while (!g)
 	{
-		double ox, oy;
+		Eina_Unicode unicode;
 
-		enesim_renderer_origin_get(cb_data->r, &ox, &oy);
-		cb_data->dx = lox - ox;
-		cb_data->dy = loy - oy;
-		cb_data->first = EINA_FALSE;
+		unicode = eina_unicode_utf8_next_get(text, &cb_data->idx);
+		g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
+		if (!g->surface || !g->path)
+		{
+			enesim_text_glyph_unref(g);
+			cb_data->ox += g->x_advance;
+			g = NULL;
+		}
 	}
+	enesim_renderer_origin_get(cb_data->r, &ox, &oy);
 	_enesim_renderer_text_span_glyph_propagate(cb_data->r, rl,
-			lox - cb_data->dx, loy - cb_data->dy);
+			ox + cb_data->ox, oy - g->origin);
+	cb_data->ox += g->x_advance;
+	enesim_text_glyph_unref(g);
 	enesim_renderer_unref(rl);
 
 	return EINA_TRUE;
@@ -249,7 +268,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		{
 			thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_IMAGE;
 		}
-		//thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH;
+		thiz->mode = ENESIM_RENDERER_TEXT_SPAN_GLYPH_MODE_PATH;
 		enesim_renderer_unref(fr);
 		/* regenerate the glyphs */
 		enesim_renderer_compound_layer_clear(thiz->compound);
@@ -313,8 +332,8 @@ next:
 		Enesim_Renderer_Text_Span_Propagate_Cb_Data cb_data;
 
 		cb_data.r = r;
-		cb_data.first = EINA_TRUE;
-		cb_data.dx = cb_data.dy = 0;
+		cb_data.idx = 0;
+		cb_data.ox = 0;
 
 		/* just propagate the properties */
 		enesim_renderer_compound_layer_foreach(thiz->compound,
@@ -1034,4 +1053,113 @@ advance:
 		idx++;
 	}
 	return found;
+}
+
+/**
+ * @brief Set the top left X coordinate of a text span renderer.
+ * @ender_prop{x}
+ * @param[in] r The text span renderer.
+ * @param[in] x The top left X coordinate.
+ *
+ * This function sets the top left X coordinate of the text span
+ * renderer @p r to the value @p x.
+ */
+EAPI void enesim_renderer_text_span_x_set(Enesim_Renderer *r, double x)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	thiz->state.current.x = x;
+	thiz->state.changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the top left X coordinate of a text span renderer.
+ * @ender_prop{x}
+ * @param[in] r The text span renderer.
+ * @return The top left X coordinate.
+ *
+ * This function gets the top left X coordinate of the text span
+ * renderer @p r
+ */
+EAPI double enesim_renderer_text_span_x_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	return thiz->state.current.x;
+}
+
+/**
+ * @brief Set the top left Y coordinate of a text span renderer.
+ * @ender_prop{y}
+ * @param[in] r The text span renderer.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left Y coordinate of the text span
+ * renderer @p r to the value @p y.
+ */
+EAPI void enesim_renderer_text_span_y_set(Enesim_Renderer *r, double y)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	thiz->state.current.y = y;
+	thiz->state.changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the top left Y coordinate of a text span renderer.
+ * @ender_prop{y}
+ * @param[in] r The text span renderer.
+ * @return The top left Y coordinate.
+ *
+ * This function gets the top left Y coordinate of the text span
+ * renderer @p r
+ */
+EAPI double enesim_renderer_text_span_y_get(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	return thiz->state.current.y;
+}
+
+/**
+ * @brief Set the top left coordinates of a text span renderer.
+ *
+ * @param[in] r The text span renderer.
+ * @param[in] x The top left X coordinate.
+ * @param[in] y The top left Y coordinate.
+ *
+ * This function sets the top left coordinates of the text span
+ * renderer @p r to the values @p x and @p y.
+ */
+EAPI void enesim_renderer_text_span_position_set(Enesim_Renderer *r, double x, double y)
+{
+	Enesim_Renderer_Text_Span *thiz;
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	thiz->state.current.x = x;
+	thiz->state.current.y = y;
+	thiz->state.changed = EINA_TRUE;
+}
+
+/**
+ * @brief Retrieve the top left coordinates of a text span renderer.
+ *
+ * @param[in] r The text span renderer.
+ * @param[out] x The top left X coordinate.
+ * @param[out] y The top left Y coordinate.
+ *
+ * This function stores the top left coordinates value of the
+ * text span renderer @p r in the pointers @p x and @p y. These pointers
+ * can be @c NULL.
+ */
+EAPI void enesim_renderer_text_span_position_get(Enesim_Renderer *r, double *x, double *y)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	if (x) *x = thiz->state.current.x;
+	if (y) *y = thiz->state.current.y;
 }

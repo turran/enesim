@@ -40,6 +40,13 @@ EAPI Enesim_Text_Buffer * enesim_renderer_text_span_buffer_get(Enesim_Renderer *
 EAPI Enesim_Text_Buffer * enesim_renderer_text_span_real_buffer_get(Enesim_Renderer *r);
 EAPI void enesim_renderer_text_span_real_buffer_set(Enesim_Renderer *r, Enesim_Text_Buffer *b);
 
+EAPI void enesim_renderer_text_span_x_set(Enesim_Renderer *r, double x);
+EAPI double enesim_renderer_text_span_x_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_text_span_y_set(Enesim_Renderer *r, double y);
+EAPI double enesim_renderer_text_span_y_get(Enesim_Renderer *r);
+EAPI void enesim_renderer_text_span_position_set(Enesim_Renderer *r, double x, double y);
+EAPI void enesim_renderer_text_span_position_get(Enesim_Renderer *r, double *x, double *y);
+
 EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Font *font);
 EAPI Enesim_Text_Font * enesim_renderer_text_span_font_get(Enesim_Renderer *r);
 
