@@ -102,6 +102,16 @@ Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *thiz, Eina_Unic
 	return g;
 }
 
+Eina_Bool enesim_text_font_has_kerning(Enesim_Text_Font *thiz)
+{
+	Enesim_Text_Font_Class *klass;
+
+	klass = ENESIM_TEXT_FONT_CLASS_GET(thiz);
+	if (klass->has_kerning)
+		return klass->has_kerning(thiz);
+	return EINA_FALSE;
+}
+
 void enesim_text_font_cache(Enesim_Text_Font *thiz)
 {
 	if (!thiz->cache)

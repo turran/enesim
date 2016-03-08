@@ -52,10 +52,12 @@ typedef struct _Enesim_Text_Font_Class
 	int (*max_ascent_get)(Enesim_Text_Font *thiz);
 	int (*max_descent_get)(Enesim_Text_Font *thiz);
 	Enesim_Text_Glyph * (*glyph_get)(Enesim_Text_Font *thiz, Eina_Unicode c);
+	Eina_Bool (*has_kerning)(Enesim_Text_Font *thiz);
 } Enesim_Text_Font_Class;
 
 Enesim_Object_Descriptor * enesim_text_font_descriptor_get(void);
 Enesim_Text_Glyph * enesim_text_font_glyph_get(Enesim_Text_Font *f, Eina_Unicode c);
+Eina_Bool enesim_text_font_has_kerning(Enesim_Text_Font *f);
 void enesim_text_font_glyph_cache(Enesim_Text_Font *thiz, Enesim_Text_Glyph *g);
 void enesim_text_font_glyph_uncache(Enesim_Text_Font *thiz, Enesim_Text_Glyph *g);
 void enesim_text_font_dump(Enesim_Text_Font *f, const char *path);

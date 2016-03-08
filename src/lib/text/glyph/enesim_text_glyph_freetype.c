@@ -350,6 +350,26 @@ static Eina_Bool _enesim_text_glyph_freetype_load(Enesim_Text_Glyph *g,
 	return EINA_TRUE;
 }
 
+static double _enesim_text_glyph_freetype_kerning_get(Enesim_Text_Glyph *g,
+		Enesim_Text_Glyph *prev)
+{
+	Enesim_Text_Glyph_Freetype *thiz, *other;
+	FT_Face face;
+	FT_Vector kern;
+	double ret = 0;
+
+	enesim_text_engine_freetype_lock(g->font->engine);
+	face = enesim_text_font_freetype_face_get(g->font);
+	thiz = ENESIM_TEXT_GLYPH_FREETYPE(g);
+	other = ENESIM_TEXT_GLYPH_FREETYPE(prev);
+	if (!FT_Get_Kerning(face, other->index, thiz->index, FT_KERNING_DEFAULT, &kern))
+	{
+		//printf("kerning %d\n", kern.x);
+		ret = kern.x / 64.0;
+	}
+	enesim_text_engine_freetype_unlock(g->font->engine);
+	return ret;
+}
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -361,6 +381,7 @@ static void _enesim_text_glyph_freetype_class_init(void *k)
 {
 	Enesim_Text_Glyph_Class *klass = k;
 	klass->load = _enesim_text_glyph_freetype_load;
+	klass->kerning_get = _enesim_text_glyph_freetype_kerning_get;
 }
 
 static void _enesim_text_glyph_freetype_instance_init(void *o EINA_UNUSED)

@@ -63,6 +63,7 @@ typedef struct _Enesim_Text_Glyph_Class
 	Enesim_Object_Class parent;
 	/* load glyph */
 	Eina_Bool (*load)(Enesim_Text_Glyph *thiz, int formats);
+	double (*kerning_get)(Enesim_Text_Glyph *thiz, Enesim_Text_Glyph *prev);
 } Enesim_Text_Glyph_Class;
 
 typedef struct _Enesim_Text_Glyph_Position
@@ -80,6 +81,7 @@ typedef enum _Enesim_Text_Glyph_Format
 
 Enesim_Object_Descriptor * enesim_text_glyph_descriptor_get(void);
 Enesim_Text_Glyph * enesim_text_glyph_ref(Enesim_Text_Glyph *thiz);
+double enesim_text_glyph_kerning_get(Enesim_Text_Glyph *thiz, Enesim_Text_Glyph *prev);
 void enesim_text_glyph_unref(Enesim_Text_Glyph *thiz);
 Eina_Bool enesim_text_glyph_load(Enesim_Text_Glyph *thiz, int formats);
 void enesim_text_glyph_cache(Enesim_Text_Glyph *thiz);

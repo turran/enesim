@@ -51,12 +51,16 @@ static void _enesim_text_glyph_instance_deinit(void *o EINA_UNUSED)
  *============================================================================*/
 Enesim_Text_Glyph * enesim_text_glyph_ref(Enesim_Text_Glyph *thiz)
 {
+	if (!thiz)
+		return NULL;
 	thiz->ref++;
 	return thiz;
 }
 
 void enesim_text_glyph_unref(Enesim_Text_Glyph *thiz)
 {
+	if (!thiz)
+		return;
 	thiz->ref--;
 	if (!thiz->ref)
 	{
@@ -107,6 +111,18 @@ Eina_Bool enesim_text_glyph_load(Enesim_Text_Glyph *thiz,
 	if (klass->load)
 		return klass->load(thiz, formats);
 	return EINA_FALSE;
+}
+
+double enesim_text_glyph_kerning_get(Enesim_Text_Glyph *thiz, Enesim_Text_Glyph *prev)
+{
+	Enesim_Text_Glyph_Class *klass;
+
+	if (!thiz || !prev)
+		return 0;
+	klass = ENESIM_TEXT_GLYPH_CLASS_GET(thiz);
+	if (klass->kerning_get)
+		return klass->kerning_get(thiz, prev);
+	return 0;
 }
 /*============================================================================*
  *                                   API                                      *

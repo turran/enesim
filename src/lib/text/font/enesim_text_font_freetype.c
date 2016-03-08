@@ -102,6 +102,14 @@ static Enesim_Text_Glyph * _enesim_text_font_freetype_glyph_get(
 	g = enesim_text_glyph_freetype_new(gindex);
 	return g;
 }
+
+static Eina_Bool _enesim_text_font_freetype_has_kerning(Enesim_Text_Font *f)
+{
+	Enesim_Text_Font_Freetype *thiz;
+
+ 	thiz = ENESIM_TEXT_FONT_FREETYPE(f);
+	return FT_HAS_KERNING(thiz->face);
+}
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -115,6 +123,7 @@ static void _enesim_text_font_freetype_class_init(void *k)
 	klass->max_ascent_get = _enesim_text_font_freetype_max_ascent_get;
 	klass->max_descent_get = _enesim_text_font_freetype_max_descent_get;
 	klass->glyph_get = _enesim_text_font_freetype_glyph_get;
+	klass->has_kerning = _enesim_text_font_freetype_has_kerning;
 }
 
 static void _enesim_text_font_freetype_instance_init(void *o EINA_UNUSED)

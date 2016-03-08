@@ -106,8 +106,10 @@ typedef struct _Enesim_Renderer_Text_Span_Class {
 typedef struct _Enesim_Renderer_Text_Span_Propagate_Cb_Data
 {
 	Enesim_Renderer *r;
+	Enesim_Text_Glyph *prev;
 	int idx;
 	double ox;
+	Eina_Bool has_kerning;
 } Enesim_Renderer_Text_Span_Propagate_Cb_Data;
 
 static void _enesim_renderer_text_span_glyph_propagate(Enesim_Renderer *r,
@@ -148,6 +150,7 @@ static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 	Enesim_Renderer *rl;
 	Enesim_Text_Glyph *g = NULL;
 	const char *text;
+	double kern = 0;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(cb_data->r);
 	rl = enesim_renderer_compound_layer_renderer_get(layer);
@@ -158,18 +161,22 @@ static Eina_Bool _enesim_renderer_text_span_propagate_cb(
 
 		unicode = eina_unicode_utf8_next_get(text, &cb_data->idx);
 		g = enesim_text_font_glyph_get(thiz->state.current.font, unicode);
+		if (cb_data->has_kerning)
+			kern = enesim_text_glyph_kerning_get(g, cb_data->prev);
 		if (!g->surface || !g->path)
 		{
-			enesim_text_glyph_unref(g);
-			cb_data->ox += g->x_advance;
+			cb_data->ox += g->x_advance + kern;
+			enesim_text_glyph_unref(cb_data->prev);
+			cb_data->prev = g;
 			g = NULL;
 		}
 	}
 	_enesim_renderer_text_span_glyph_propagate(cb_data->r, rl,
-			thiz->state.current.x + cb_data->ox,
+			thiz->state.current.x + cb_data->ox + kern,
 			thiz->state.current.y - g->origin);
-	cb_data->ox += g->x_advance;
-	enesim_text_glyph_unref(g);
+	cb_data->ox += g->x_advance + kern;
+	enesim_text_glyph_unref(cb_data->prev);
+	cb_data->prev = g;
 	enesim_renderer_unref(rl);
 
 	return EINA_TRUE;
@@ -273,6 +280,8 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			!glyphs_generated)
 	{
 		Enesim_Renderer *fr;
+		Enesim_Text_Glyph *prev = NULL;
+		Eina_Bool has_kerning;
 
 		/* define the mode */
 		fr = enesim_renderer_shape_fill_renderer_get(r);
@@ -290,6 +299,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		}
 		enesim_renderer_unref(fr);
 		/* regenerate the glyphs */
+		has_kerning = enesim_text_font_has_kerning(thiz->state.current.font);
 		enesim_renderer_compound_layer_clear(thiz->compound);
 		text = enesim_text_buffer_string_get(thiz->state.buffer);
 		while ((unicode = eina_unicode_utf8_next_get(text, &iidx)))
@@ -301,11 +311,14 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 			{
 				Enesim_Renderer *i;
 				Enesim_Renderer_Compound_Layer *l;
+				double kern = 0;
 
 				/* load and cache the glyph */
 				if (!enesim_text_glyph_load(g, ENESIM_TEXT_GLYPH_FORMAT_SURFACE | ENESIM_TEXT_GLYPH_FORMAT_PATH))
 					continue;
 				enesim_text_glyph_cache(enesim_text_glyph_ref(g));
+				if (has_kerning)
+					kern = enesim_text_glyph_kerning_get(g, prev);
 
 				if (!g->surface || !g->path)
 					goto next;
@@ -327,7 +340,7 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 				}
 
 				_enesim_renderer_text_span_glyph_propagate(r, i,
-						thiz->state.current.x + ox,
+						thiz->state.current.x + ox + kern,
 						thiz->state.current.y - g->origin);
 
 				/* add the new layer */
@@ -336,10 +349,12 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 				enesim_renderer_compound_layer_rop_set(l, ENESIM_ROP_BLEND);
 				enesim_renderer_compound_layer_add(thiz->compound, l);
 next:
-				ox += g->x_advance;
-				enesim_text_glyph_unref(g);
+				ox += g->x_advance + kern;
+				enesim_text_glyph_unref(prev);
+				prev = g;
 			}
 		}
+		enesim_text_glyph_unref(prev);
 		enesim_rectangle_coords_from(&thiz->geometry,
 				thiz->state.current.x, thiz->state.current.y,
 				ox,
@@ -358,10 +373,13 @@ next:
 		cb_data.r = r;
 		cb_data.idx = 0;
 		cb_data.ox = 0;
+		cb_data.prev = NULL;
+		cb_data.has_kerning = enesim_text_font_has_kerning(thiz->state.current.font);
 
 		/* just propagate the properties */
 		enesim_renderer_compound_layer_foreach(thiz->compound,
 				_enesim_renderer_text_span_propagate_cb, &cb_data);
+		enesim_text_glyph_unref(cb_data.prev);
 	}
 
 	return EINA_TRUE;
