@@ -48,10 +48,13 @@
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 
+#ifdef BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
+#endif
+
 /**
  * TODO
- * - Handle the shape properties, use a path renderer
- * - Use a compound renderer with multiple image renderers
  * - Add a background/foreground color. Use a rectangle renderer for that
  */
 /*============================================================================*
@@ -480,45 +483,37 @@ static void _enesim_renderer_text_span_draw(Enesim_Renderer *r,
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	enesim_renderer_sw_draw(thiz->compound, x, y, len, ddata);
 }
-/*----------------------------------------------------------------------------*
- *                             Shape interface                                *
- *----------------------------------------------------------------------------*/
-static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
-		Enesim_Surface *s, Enesim_Rop rop,
-		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
+
+#if BUILD_OPENGL
+static void _enesim_renderer_text_span_opengl_draw(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop, const Eina_Rectangle *area,
+		int x, int y)
 {
 	Enesim_Renderer_Text_Span *thiz;
-	const char *text;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	if (!thiz) return EINA_FALSE;
+	enesim_renderer_opengl_draw(thiz->compound, s, rop, area, x, y);
+}
+#endif
 
-	text = enesim_text_buffer_string_get(thiz->state.buffer);
-	if (!text)
-	{
-		DBG("No text set");
-		return EINA_FALSE;
-	}
+static Eina_Bool _enesim_renderer_text_span_setup(Enesim_Renderer_Text_Span *thiz,
+		Enesim_Surface *s, Enesim_Rop rop, Enesim_Log **l)
+{
 	if (!_enesim_renderer_text_span_generate(thiz))
 		return EINA_FALSE;
 
-	*fill = _enesim_renderer_text_span_draw;
 	if (!enesim_renderer_setup(thiz->compound, s, rop, l))
 		return EINA_FALSE;
 
 #if 0
 	enesim_text_font_dump(thiz->state.current.font, "/tmp/");
 #endif
-
 	return EINA_TRUE;
 }
 
-static void _enesim_renderer_text_span_sw_cleanup(Enesim_Renderer *r,
+static void _enesim_renderer_text_span_cleanup(Enesim_Renderer_Text_Span *thiz,
 		Enesim_Surface *s)
 {
-	Enesim_Renderer_Text_Span *thiz;
-
-	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
 	enesim_renderer_cleanup(thiz->compound, s);
 	/* swap the states */
 	if (thiz->state.past.font)
@@ -536,6 +531,32 @@ static void _enesim_renderer_text_span_sw_cleanup(Enesim_Renderer *r,
 	thiz->state.buffer_changed = EINA_FALSE;
 	thiz->state.r_state_changed = EINA_FALSE;
 	thiz->state.s_state_changed = EINA_FALSE;
+}
+/*----------------------------------------------------------------------------*
+ *                             Shape interface                                *
+ *----------------------------------------------------------------------------*/
+static Eina_Bool _enesim_renderer_text_span_sw_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		Enesim_Renderer_Sw_Fill *fill, Enesim_Log **l)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	if (!_enesim_renderer_text_span_setup(thiz, s, rop, l))
+		return EINA_FALSE;
+
+	*fill = _enesim_renderer_text_span_draw;
+
+	return EINA_TRUE;
+}
+
+static void _enesim_renderer_text_span_sw_cleanup(Enesim_Renderer *r,
+		Enesim_Surface *s)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	_enesim_renderer_text_span_cleanup(thiz, s);
 }
 
 static Eina_Bool _enesim_renderer_text_span_has_changed(Enesim_Renderer *r)
@@ -565,6 +586,30 @@ static Eina_Bool _enesim_renderer_text_span_geometry_get(Enesim_Renderer *r,
 	*geometry = thiz->geometry;
 	return EINA_TRUE;
 }
+
+#if BUILD_OPENGL
+static Eina_Bool _enesim_renderer_text_span_opengl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		Enesim_Renderer_OpenGL_Draw *draw, Enesim_Log **l)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	if (!_enesim_renderer_text_span_setup(thiz, s, rop, l))
+		return EINA_FALSE;
+
+	*draw = _enesim_renderer_text_span_opengl_draw;
+	return EINA_TRUE;
+}
+
+static void _enesim_renderer_text_span_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+{
+	Enesim_Renderer_Text_Span *thiz;
+
+	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
+	_enesim_renderer_text_span_cleanup(thiz, s);
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                             Renderer interface                             *
  *----------------------------------------------------------------------------*/
@@ -589,7 +634,9 @@ static Eina_Bool _enesim_renderer_text_span_bounds(Enesim_Renderer *r,
 	Enesim_Renderer_Text_Span *thiz;
 
 	thiz = ENESIM_RENDERER_TEXT_SPAN(r);
-	_enesim_renderer_text_span_generate(thiz);
+	if (!_enesim_renderer_text_span_generate(thiz))
+		return EINA_FALSE;
+
 	return enesim_renderer_bounds_get(thiz->compound, rect, log);
 }
 
@@ -600,6 +647,16 @@ static void _enesim_renderer_text_span_features_get(Enesim_Renderer *r EINA_UNUS
 			ENESIM_RENDERER_FEATURE_ARGB8888 |
 			ENESIM_RENDERER_FEATURE_AFFINE;
 }
+
+#if BUILD_OPENGL
+static Eina_Bool _enesim_renderer_text_span_opengl_initialize(Enesim_Renderer *r EINA_UNUSED,
+		int *num_programs EINA_UNUSED,
+		Enesim_Renderer_OpenGL_Program ***programs EINA_UNUSED)
+{
+	return EINA_TRUE;
+}
+
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -617,12 +674,19 @@ static void _enesim_renderer_text_span_class_init(void *k)
 	r_klass->sw_hints_get = _enesim_renderer_text_span_sw_hints_get;
 	r_klass->bounds_get = _enesim_renderer_text_span_bounds;
 	r_klass->features_get = _enesim_renderer_text_span_features_get;
+#if BUILD_OPENGL
+	r_klass->opengl_initialize = _enesim_renderer_text_span_opengl_initialize;
+#endif
 
 	klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	klass->has_changed = _enesim_renderer_text_span_has_changed;
 	klass->sw_setup = _enesim_renderer_text_span_sw_setup;
 	klass->sw_cleanup = _enesim_renderer_text_span_sw_cleanup;
 	klass->geometry_get = _enesim_renderer_text_span_geometry_get;
+#if BUILD_OPENGL
+	klass->opengl_setup = _enesim_renderer_text_span_opengl_setup;
+	klass->opengl_cleanup = _enesim_renderer_text_span_opengl_cleanup;
+#endif
 }
 
 static void _enesim_renderer_text_span_instance_init(void *o)
