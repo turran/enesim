@@ -260,11 +260,11 @@ static Eina_Bool _enesim_renderer_text_span_glyphs_generate(Enesim_Renderer_Text
 		sstate = enesim_renderer_shape_state_get(r);
 		if (sstate->current.draw_mode != sstate->past.draw_mode)
 		{
-			glyphs_generated = EINA_TRUE;
+			glyphs_generated = EINA_FALSE;
 		}
 		else if (!sstate->past.fill.r && sstate->current.fill.r)
 		{
-			glyphs_generated = EINA_TRUE;
+			glyphs_generated = EINA_FALSE;
 		}
 		/* commit the state and mark as changed to notify a redraw */
 		enesim_renderer_shape_state_commit(r);
