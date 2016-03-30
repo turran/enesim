@@ -26,6 +26,18 @@
  * etc, etc. But first we need to modify the enesim path renderer to
  * normalize the path and store it on the enesim path directly
  * also, add the genertad_flag here and a distance variable on the generator
+ * Add API functions to:
+ * + transform a path
+ * + convert a path to a figure
+ * + export the figure concept/polygon etc
+ * + transform a figure
+ * + get the distance from a figure using an iterator of the form:
+ * double enesim_figure_distance_get(const Enesim_Figure *thiz);
+ *
+ * Return the next distance point to find, < 0 to exit
+ * typedef double (*Enesim_Figure_Point_At_Cb)(const Enesim_Figure *thiz,
+   double x, double y, void *data);
+ * enesim_figure_point_at(Enesim_Figure *thiz, double start, Enesim_Figure_Point_At_Cb cb, void *data);
  */
 /*============================================================================*
  *                                  Local                                     *
