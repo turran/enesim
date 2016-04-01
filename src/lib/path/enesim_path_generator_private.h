@@ -22,25 +22,25 @@
 
 /* The generator generates a figure from a path */
 
-typedef void (*Enesim_Path_Delete)(void *data);
-typedef void (*Enesim_Path_Begin)(void *data);
-typedef void (*Enesim_Path_Polygon_Add)(void *data);
-typedef void (*Enesim_Path_Polygon_Close)(Eina_Bool close, void *data);
-typedef void (*Enesim_Path_Done)(void *data);
+typedef void (*Enesim_Path_Generator_Descriptor_Delete)(void *data);
+typedef void (*Enesim_Path_Generator_Descriptor_Begin)(void *data);
+typedef void (*Enesim_Path_Generator_Descriptor_Polygon_Add)(void *data);
+typedef void (*Enesim_Path_Generator_Descriptor_Polygon_Close)(Eina_Bool close, void *data);
+typedef void (*Enesim_Path_Generator_Descriptor_Done)(void *data);
 
-typedef struct _Enesim_Path_Descriptor
+typedef struct _Enesim_Path_Generator_Descriptor
 {
-	Enesim_Path_Delete free;
+	Enesim_Path_Generator_Descriptor_Delete free;
 	Enesim_Curve_Vertex_Add vertex_add;
-	Enesim_Path_Polygon_Add polygon_add;
-	Enesim_Path_Polygon_Close polygon_close;
-	Enesim_Path_Begin path_begin;
-	Enesim_Path_Done path_done;
-} Enesim_Path_Descriptor;
+	Enesim_Path_Generator_Descriptor_Polygon_Add polygon_add;
+	Enesim_Path_Generator_Descriptor_Polygon_Close polygon_close;
+	Enesim_Path_Generator_Descriptor_Begin path_begin;
+	Enesim_Path_Generator_Descriptor_Done path_done;
+} Enesim_Path_Generator_Descriptor;
 
 typedef struct _Enesim_Path_Generator
 {
-	Enesim_Path_Descriptor *descriptor;
+	Enesim_Path_Generator_Descriptor *descriptor;
 	Enesim_Curve_State st;
 	const Enesim_Matrix *gm;
 	double scale_x;
@@ -55,7 +55,7 @@ typedef struct _Enesim_Path_Generator
 	void *data;
 } Enesim_Path_Generator;
 
-Enesim_Path_Generator * enesim_path_generator_new(Enesim_Path_Descriptor *descriptor, void *data);
+Enesim_Path_Generator * enesim_path_generator_new(Enesim_Path_Generator_Descriptor *descriptor, void *data);
 void enesim_path_generator_free(Enesim_Path_Generator *thiz);
 void enesim_path_generator_figure_set(Enesim_Path_Generator *thiz, Enesim_Figure *figure);
 void enesim_path_generator_transformation_set(Enesim_Path_Generator *thiz, const Enesim_Matrix *matrix);

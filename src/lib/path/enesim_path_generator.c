@@ -197,7 +197,7 @@ static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 }
 
 /* the strokeless path generator */
-static Enesim_Path_Descriptor _strokeless_descriptor = {
+static Enesim_Path_Generator_Descriptor _strokeless_descriptor = {
 	/* .free		= */ _strokeless_path_free,
 	/* .vertex_add		= */ _strokeless_path_vertex_add,
 	/* .polygon_add 	= */ _strokeless_path_polygon_add,
@@ -640,7 +640,7 @@ static void _stroke_path_polygon_close(Eina_Bool close, void *data)
 	}
 }
 
-static Enesim_Path_Descriptor _stroke_descriptor = {
+static Enesim_Path_Generator_Descriptor _stroke_descriptor = {
 	/* .free		= */ _stroke_path_free,
 	/* .vertex_add		= */ _stroke_path_vertex_add,
 	/* .polygon_add 	= */ _stroke_path_polygon_add,
@@ -732,7 +732,7 @@ static void _stroke_dashless_path_done(void *data)
 	_path_done(thiz->stroke);
 }
 
-static Enesim_Path_Descriptor _stroke_dashless_descriptor = {
+static Enesim_Path_Generator_Descriptor _stroke_dashless_descriptor = {
 	/* .free		= */ _stroke_dashless_path_free,
 	/* .vertex_add		= */ _stroke_dashless_path_vertex_add,
 	/* .polygon_add 	= */ _stroke_dashless_path_polygon_add,
@@ -948,7 +948,7 @@ static void _dashed_path_done(void *data)
 	}
 }
 
-static Enesim_Path_Descriptor _dashed_descriptor = {
+static Enesim_Path_Generator_Descriptor _dashed_descriptor = {
 	/* .free		= */ _dashed_path_free,
 	/* .vertex_add		= */ _dashed_path_vertex_add,
 	/* .polygon_add 	= */ _dashed_path_polygon_add,
@@ -959,7 +959,7 @@ static Enesim_Path_Descriptor _dashed_descriptor = {
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
-Enesim_Path_Generator * enesim_path_generator_new(Enesim_Path_Descriptor *descriptor,
+Enesim_Path_Generator * enesim_path_generator_new(Enesim_Path_Generator_Descriptor *descriptor,
 		void *data)
 {
 	Enesim_Path_Generator *thiz;
