@@ -29,6 +29,7 @@
  * Add API functions to:
  * + transform a path
  * + convert a path to a figure
+ * + create a path from a figure
  * + export the figure concept/polygon etc
  * + transform a figure
  * + get the distance from a figure using an iterator of the form:
