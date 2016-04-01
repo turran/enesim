@@ -25,6 +25,7 @@
 #include "enesim_path.h"
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
+#include "enesim_figure.h"
 #include "enesim_format.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
@@ -34,6 +35,7 @@
 
 #include "enesim_path_private.h"
 #include "enesim_curve_private.h"
+#include "enesim_figure_private.h"
 #include "enesim_vector_private.h"
 #include "enesim_path_generator_private.h"
 #include "enesim_path_normalizer_private.h"

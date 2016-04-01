@@ -918,9 +918,15 @@ static void _enesim_renderer_path_kiia_instance_deinit(void *o)
 	thiz = ENESIM_RENDERER_PATH_KIIA(o);
 	/* Remove the figures */
 	if (thiz->stroke.figure)
-		enesim_figure_delete(thiz->stroke.figure);
+	{
+		enesim_figure_unref(thiz->stroke.figure);
+		thiz->stroke.figure = NULL;
+	}
 	if (thiz->fill.figure)
-		enesim_figure_delete(thiz->fill.figure);
+	{
+		enesim_figure_unref(thiz->fill.figure);
+		thiz->fill.figure = NULL;
+	}
 	/* Remove the workers */
 	free(thiz->workers);
 }

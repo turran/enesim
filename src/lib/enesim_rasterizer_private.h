@@ -18,6 +18,8 @@
 #ifndef RASTERIZER_H_
 #define RASTERIZER_H_
 
+#include "enesim_figure.h"
+#include "enesim_figure_private.h"
 #include "enesim_renderer_shape_private.h"
 
 #define ENESIM_RASTERIZER_DESCRIPTOR 					\

@@ -428,9 +428,15 @@ static void _enesim_renderer_path_enesim_instance_deinit(void *o)
 	if (thiz->bifigure)
 		enesim_renderer_unref(thiz->bifigure);
 	if (thiz->stroke_figure)
-		enesim_figure_delete(thiz->stroke_figure);
+	{
+		enesim_figure_unref(thiz->stroke_figure);
+		thiz->stroke_figure = NULL;
+	}
 	if (thiz->fill_figure)
-		enesim_figure_delete(thiz->fill_figure);
+	{
+		enesim_figure_unref(thiz->fill_figure);
+		thiz->fill_figure = NULL;
+	}
 }
 /*============================================================================*
  *                                 Global                                     *

@@ -116,6 +116,7 @@ extern "C" {
 /* util headers */
 #include "enesim_quad.h"
 #include "enesim_matrix.h"
+#include "enesim_figure.h"
 #include "enesim_path.h"
 /* main subsystems */
 #include "enesim_buffer.h"

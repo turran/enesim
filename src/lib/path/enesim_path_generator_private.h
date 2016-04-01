@@ -18,6 +18,8 @@
 #ifndef _ENESIM_PATH_GENERATOR_PRIVATE_H
 #define _ENESIM_PATH_GENERATOR_PRIVATE_H
 
+#include "enesim_figure.h"
+
 /* The generator generates a figure from a path */
 
 typedef void (*Enesim_Path_Delete)(void *data);

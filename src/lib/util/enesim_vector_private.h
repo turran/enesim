@@ -15,8 +15,8 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef VECTOR_H_
-#define VECTOR_H_
+#ifndef ENESIM_VECTOR_PRIVATE_H_
+#define ENESIM_VECTOR_PRIVATE_H_
 
 /* The z is required for the gl backend
  * to avoid allocating a new GLdouble[3]
@@ -34,22 +34,6 @@ typedef struct _Enesim_Line
 	double b;
 	double c;
 } Enesim_Line;
-
-typedef struct _Enesim_Polygon
-{
-	Eina_List *points;
-	Eina_Bool closed : 1;
-	double threshold;
-	double xmax;
-	double xmin;
-	double ymax;
-	double ymin;
-} Enesim_Polygon;
-
-typedef struct _Enesim_Figure
-{
-	Eina_List *polygons;
-} Enesim_Figure;
 
 typedef struct _Enesim_F16p16_Point
 {
@@ -258,33 +242,5 @@ static inline void enesim_point_coords_get(Enesim_Point *p, double *x, double *y
 	*y = p->y;
 	*z = p->z;
 }
-
-/*----------------------------------------------------------------------------*
- *                                 Polygon                                    *
- *----------------------------------------------------------------------------*/
-
-Enesim_Polygon * enesim_polygon_new(void);
-void enesim_polygon_delete(Enesim_Polygon *thiz);
-int enesim_polygon_point_count(Enesim_Polygon *thiz);
-void enesim_polygon_point_append_from_coords(Enesim_Polygon *thiz, double x, double y);
-void enesim_polygon_point_prepend_from_coords(Enesim_Polygon *thiz, double x, double y);
-void enesim_polygon_clear(Enesim_Polygon *thiz);
-void enesim_polygon_close(Enesim_Polygon *thiz, Eina_Bool close);
-void enesim_polygon_merge(Enesim_Polygon *thiz, Enesim_Polygon *to_merge);
-Eina_Bool enesim_polygon_bounds(const Enesim_Polygon *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
-void enesim_polygon_threshold_set(Enesim_Polygon *p, double threshold);
-void enesim_polygon_dump(Enesim_Polygon *thiz);
-
-/*----------------------------------------------------------------------------*
- *                                  Figure                                    *
- *----------------------------------------------------------------------------*/
-Enesim_Figure * enesim_figure_new(void);
-void enesim_figure_delete(Enesim_Figure *thiz);
-int enesim_figure_polygon_count(Enesim_Figure *thiz);
-void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p);
-void enesim_figure_polygon_remove(Enesim_Figure *thiz, Enesim_Polygon *p);
-Eina_Bool enesim_figure_bounds(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax);
-void enesim_figure_clear(Enesim_Figure *thiz);
-void enesim_figure_dump(Enesim_Figure *f);
 
 #endif

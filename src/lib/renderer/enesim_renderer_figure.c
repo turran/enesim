@@ -25,6 +25,7 @@
 #include "enesim_path.h"
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
+#include "enesim_figure.h"
 #include "enesim_format.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
@@ -38,6 +39,7 @@
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
 #include "enesim_renderer_shape_path_private.h"
+#include "enesim_figure_private.h"
 #include "enesim_vector_private.h"
 /*============================================================================*
  *                                  Local                                     *
@@ -181,7 +183,7 @@ static void _enesim_renderer_figure_instance_deinit(void *o EINA_UNUSED)
 	thiz = ENESIM_RENDERER_FIGURE(o);
 	if (thiz->figure)
 	{
-		enesim_figure_delete(thiz->figure);
+		enesim_figure_unref(thiz->figure);
 		thiz->figure = NULL;
 	}
 }

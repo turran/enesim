@@ -6,6 +6,7 @@ dist_installed_headers_DATA = \
 src/lib/Enesim.h \
 src/lib/enesim_buffer.h \
 src/lib/enesim_color.h \
+src/lib/enesim_figure.h \
 src/lib/enesim_format.h \
 src/lib/enesim_log.h \
 src/lib/enesim_image.h \
@@ -43,6 +44,8 @@ src/lib/enesim_curve.c \
 src/lib/enesim_curve_private.h \
 src/lib/enesim_draw_cache.c \
 src/lib/enesim_draw_cache_private.h \
+src/lib/enesim_figure.c \
+src/lib/enesim_figure_private.h \
 src/lib/enesim_format.c \
 src/lib/enesim_log.c \
 src/lib/enesim_log_private.h \
