@@ -172,12 +172,8 @@ static void _strokeless_path_vertex_add(double x, double y, void *data)
 {
 	Enesim_Path_Generator_Strokeless *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
-	Enesim_Polygon *p;
-	Eina_List *last;
 
-	last = eina_list_last(path->figure->polygons);
-	p = eina_list_data_get(last);
-	enesim_polygon_point_append_from_coords(p, x, y);
+	enesim_figure_polygon_vertex_add(path->figure, x, y);
 }
 
 static void _strokeless_path_polygon_add(void *data)
@@ -195,12 +191,9 @@ static void _strokeless_path_polygon_close(Eina_Bool close, void *data)
 {
 	Enesim_Path_Generator_Strokeless *thiz = data;
 	Enesim_Path_Generator *path = thiz->p;
-	Enesim_Polygon *p;
-	Eina_List *last;
 
-	last = eina_list_last(path->figure->polygons);
-	p = eina_list_data_get(last);
-	p->closed = close;
+	if (close)
+		enesim_figure_polygon_close(path->figure);
 }
 
 /* the strokeless path generator */
@@ -732,7 +725,7 @@ static void _stroke_dashless_path_done(void *data)
 			eina_list_last(thiz->fill->figure->polygons));
 	if (last && !last->closed)
 	{
-		enesim_polygon_close(last, EINA_TRUE);
+		enesim_figure_polygon_close(thiz->fill->figure);
 		_stroke_path_merge(thiz->stroke->data);
 	}
 	_path_done(thiz->fill);
