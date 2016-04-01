@@ -972,9 +972,6 @@ Enesim_Path_Generator * enesim_path_generator_new(Enesim_Path_Generator_Descript
 
 void enesim_path_generator_free(Enesim_Path_Generator *thiz)
 {
-	/* TODO call the interface to free the path implementation
-	 * data
-	 */
 	if (thiz->descriptor->free)
 		thiz->descriptor->free(thiz->data);
 	free(thiz);
