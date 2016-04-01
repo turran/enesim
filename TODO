@@ -1,5 +1,7 @@
 Enesim
 ======
++ Make the figure renderer work like the path renderer now that the figure is exported
++ Remove the rasterizer code
 + Fix the callback names
 + Remove enesim_image_dispatch and use the context dispatch directly
 + Add a function to get the default context
