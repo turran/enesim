@@ -39,7 +39,6 @@ include src/lib/image/Makefile.mk
 include src/lib/object/Makefile.mk
 include src/lib/path/Makefile.mk
 include src/lib/pool/Makefile.mk
-include src/lib/rasterizer/Makefile.mk
 include src/lib/renderer/Makefile.mk
 include src/lib/renderer/path/Makefile.mk
 include src/lib/renderer/path/kiia/Makefile.mk

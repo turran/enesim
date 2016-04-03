@@ -62,8 +62,6 @@ src/lib/enesim_pool_private.h \
 src/lib/enesim_private.h \
 src/lib/enesim_quad.c \
 src/lib/enesim_quad_private.h \
-src/lib/enesim_rasterizer.c \
-src/lib/enesim_rasterizer_private.h \
 src/lib/enesim_rectangle.c \
 src/lib/enesim_renderer.c \
 src/lib/enesim_renderer_opengl_private.h \

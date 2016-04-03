@@ -46,7 +46,6 @@
  * path renderer on enesim.
  * For the generation of paths -> figures we have
  * rasterizer : used
- *   basic    : special case, stroke < 1
  *   kiia     : normal
  * cairo      : not-used
  * tesselator : used

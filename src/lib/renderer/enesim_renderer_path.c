@@ -332,7 +332,6 @@ static void _enesim_renderer_path_instance_init(void *o)
 	thiz->path = enesim_path_new();
 	/* create the abstracts */
 	thiz->abstracts = eina_list_append(thiz->abstracts, enesim_renderer_path_kiia_new());
-	thiz->abstracts = eina_list_append(thiz->abstracts, enesim_renderer_path_enesim_new());
 #if BUILD_OPENGL
 	thiz->abstracts = eina_list_append(thiz->abstracts, enesim_renderer_path_nv_new());
 	thiz->abstracts = eina_list_append(thiz->abstracts, enesim_renderer_path_tesselator_new());
