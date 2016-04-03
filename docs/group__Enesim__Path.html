@@ -109,6 +109,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path.html#ga89385d2af22fccdc7c7faed8701d8036">enesim_path_scubic_to</a> (<a class="el" href="group__Enesim__Path.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double ctrl_x, double ctrl_y, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path.html#ga08566d891c92289a5f788ca06fe4327e">enesim_path_arc_to</a> (<a class="el" href="group__Enesim__Path.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz, double rx, double ry, double angle, unsigned char large, unsigned char sweep, double x, double y)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path.html#ga0dba3db3192d70798cca767e2375205d">enesim_path_close</a> (<a class="el" href="group__Enesim__Path.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Path.html#gac4cf03a30fecca46f66dd86199867a82">enesim_path_flatten</a> (const <a class="el" href="group__Enesim__Path.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *thiz)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Path definition. </p>
@@ -667,6 +668,31 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="gac4cf03a30fecca46f66dd86199867a82"></a><!-- doxytag: member="enesim_path.h::enesim_path_flatten" ref="gac4cf03a30fecca46f66dd86199867a82" args="(const Enesim_Path *thiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a>* <a class="el" href="group__Enesim__Path.html#gac4cf03a30fecca46f66dd86199867a82">enesim_path_flatten</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Enesim__Path.html#ga47a84f0eb4968c5af3a814d95dc22066">Enesim_Path</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Flatten a path </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>the path to flatten </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The figure that contains the flatten path vertices </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -685,7 +711,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 30 2016 23:03:50 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Apr 3 2016 19:38:48 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
