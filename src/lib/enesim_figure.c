@@ -384,3 +384,39 @@ EAPI void enesim_figure_polygon_close(Enesim_Figure *thiz)
 	enesim_polygon_close(p, EINA_TRUE);
 	_figure_state_changed(thiz);
 }
+
+/* @brief Gets the length of a figure
+ * @param[in] thiz The figure to get the length from
+ * @return The length of the figure
+ */ 
+EAPI double enesim_figure_length_get(Enesim_Figure *thiz)
+{
+	Enesim_Polygon *p;
+	Eina_List *l1;
+	double length = 0;
+
+	/* TODO do the cache system */
+	EINA_LIST_FOREACH(thiz->polygons, l1, p)
+	{
+		Enesim_Point *prev, *curr;
+		Eina_List *l2;
+		Eina_List *l3;
+
+		l2 = p->points;
+
+		if (!l2)
+			continue;
+
+		prev = eina_list_data_get(l2);
+		l2 = eina_list_next(l2);
+
+		EINA_LIST_FOREACH(l2, l3, curr)
+		{
+			/* caluclate the distance */
+			length += enesim_point_2d_distance(prev, curr);
+			/* swap */
+			prev = curr;
+		}
+	}
+	return length;
+}

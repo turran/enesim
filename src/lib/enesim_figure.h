@@ -42,6 +42,7 @@ EAPI void enesim_figure_polygon_add(Enesim_Figure *thiz);
 EAPI void enesim_figure_polygon_vertex_add(Enesim_Figure *thiz,
 		double x, double y);
 EAPI void enesim_figure_polygon_close(Enesim_Figure *thiz);
+EAPI double enesim_figure_length_get(Enesim_Figure *thiz);
 
 /**
  * @}
