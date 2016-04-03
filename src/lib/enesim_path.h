@@ -196,6 +196,8 @@ EAPI void enesim_path_arc_to(Enesim_Path *thiz, double rx, double ry, double ang
                    unsigned char large, unsigned char sweep, double x, double y);
 EAPI void enesim_path_close(Enesim_Path *thiz);
 
+EAPI Enesim_Figure * enesim_path_flatten(const Enesim_Path *thiz);
+
 /**
  * @}
  */

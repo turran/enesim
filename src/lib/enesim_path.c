@@ -18,8 +18,10 @@
 #include "enesim_private.h"
 
 #include "enesim_main.h"
+#include "enesim_figure.h"
 #include "enesim_path.h"
 
+#include "enesim_path_normalizer_private.h"
 #include "enesim_path_private.h"
 
 /* TODO we now can get a point at a distance X, get the length of the path
@@ -28,10 +30,7 @@
  * also, add the genertad_flag here and a distance variable on the generator
  * Add API functions to:
  * + transform a path
- * + convert a path to a figure
  * + create a path from a figure
- * + export the figure concept/polygon etc
- * + transform a figure
  * + get the distance from a figure using an iterator of the form:
  * double enesim_figure_distance_get(const Enesim_Figure *thiz);
  *
@@ -106,6 +105,34 @@ static void _quadratic_flatten(double x0, double y0, double ctrl_x,
 	_quadratic_flatten(x, y, x0, y0, x01, y01, tolerance, vertex_add, data);
 	_quadratic_flatten(x01, y01, x1, y1, x, y, tolerance, vertex_add, data);
 }
+
+/*----------------------------------------------------------------------------*
+ *                              Path to figure                                *
+ *----------------------------------------------------------------------------*/
+static void _enesim_path_flatten_vertex_add(double x, double y, void *data)
+{
+	Enesim_Figure *f = data;
+	enesim_figure_polygon_vertex_add(f, x, y);
+}
+
+static void _enesim_path_flatten_polygon_add(void *data)
+{
+	Enesim_Figure *f = data;
+	enesim_figure_polygon_add(f);
+}
+
+static void _enesim_path_flatten_polygon_close(Eina_Bool close, void *data)
+{
+	Enesim_Figure *f = data;
+	if (close)
+		enesim_figure_polygon_close(f);
+}
+
+static Enesim_Path_Normalizer_Figure_Descriptor _flatten_descriptor = {
+	/* .vertex_add 	 	= */ _enesim_path_flatten_vertex_add,
+	/* .polygon_add 	= */ _enesim_path_flatten_polygon_add,
+	/* .polygon_close 	= */ _enesim_path_flatten_polygon_close,
+}; 
 /*============================================================================*
  *                                 Global                                     *
  *============================================================================*/
@@ -430,4 +457,25 @@ EAPI void enesim_path_close(Enesim_Path *thiz)
 	cmd.type = ENESIM_PATH_COMMAND_TYPE_CLOSE;
 	cmd.data.close.closed = EINA_TRUE;
 	enesim_path_command_add(thiz, &cmd);
+}
+
+/**
+ * Flatten a path
+ * @param[in] thiz the path to flatten
+ * @return The figure that contains the flatten path vertices
+ */
+EAPI Enesim_Figure * enesim_path_flatten(const Enesim_Path *thiz)
+{
+	Enesim_Figure *f;
+	Enesim_Path_Normalizer *n;
+	Enesim_Path_Command *cmd;
+	Eina_List *l;
+
+	f = enesim_figure_new();
+	n = enesim_path_normalizer_figure_new(&_flatten_descriptor, f);
+	EINA_LIST_FOREACH(thiz->commands, l, cmd)
+		enesim_path_normalizer_normalize(n, cmd);
+	enesim_path_normalizer_free(n);
+
+	return f;
 }

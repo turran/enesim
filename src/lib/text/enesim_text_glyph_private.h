@@ -22,6 +22,7 @@
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
 #include "enesim_surface.h"
+#include "enesim_figure.h"
 #include "enesim_path.h"
 #include "enesim_object_descriptor.h"
 #include "enesim_object_class.h"

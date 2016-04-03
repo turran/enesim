@@ -18,6 +18,7 @@
 #include "enesim_private.h"
 #include "enesim_rectangle.h"
 #include "enesim_matrix.h"
+#include "enesim_figure.h"
 #include "enesim_path.h"
 
 #include "enesim_path_private.h"

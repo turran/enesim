@@ -21,6 +21,7 @@
  * Also with some ideas taken from WebCore code
  */
 #include "enesim_private.h"
+#include "enesim_figure.h"
 #include "enesim_path.h"
 
 #include "enesim_path_private.h"
