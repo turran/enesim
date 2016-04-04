@@ -31,13 +31,6 @@
  * Add API functions to:
  * + transform a path
  * + create a path from a figure
- * + get the distance from a figure using an iterator of the form:
- * double enesim_figure_distance_get(const Enesim_Figure *thiz);
- *
- * Return the next distance point to find, < 0 to exit
- * typedef double (*Enesim_Figure_Point_At_Cb)(const Enesim_Figure *thiz,
-   double x, double y, void *data);
- * enesim_figure_point_at(Enesim_Figure *thiz, double start, Enesim_Figure_Point_At_Cb cb, void *data);
  */
 /*============================================================================*
  *                                  Local                                     *
