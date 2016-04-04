@@ -31,7 +31,6 @@ static double _point_at(const Enesim_Figure *thiz EINA_UNUSED, double x, double 
 	enesim_renderer_shape_fill_color_set(r, 0xff000000);
 
 	s = strndup(str + at->i, 1);
-	printf("inside %s %d %g %g\n", s, at->i, x, y);
 	enesim_renderer_text_span_text_set(r, s);
 	free(s);
 
