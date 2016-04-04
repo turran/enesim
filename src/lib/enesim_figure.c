@@ -420,3 +420,63 @@ EAPI double enesim_figure_length_get(Enesim_Figure *thiz)
 	}
 	return length;
 }
+
+EAPI void enesim_figure_point_at(Enesim_Figure *thiz, double at,
+		Enesim_Figure_Point_At_Cb cb, void *data)
+{
+	Enesim_Polygon *p;
+	Eina_List *l1;
+	double length;
+
+start:
+	if (at < 0)
+		return;
+	length = 0;
+	EINA_LIST_FOREACH(thiz->polygons, l1, p)
+	{
+		Enesim_Point *prev, *curr;
+		Eina_List *l2;
+		Eina_List *l3;
+
+		l2 = p->points;
+
+		if (!l2)
+			continue;
+
+		prev = eina_list_data_get(l2);
+		l2 = eina_list_next(l2);
+
+		EINA_LIST_FOREACH(l2, l3, curr)
+		{
+			double d;
+
+			/* caluclate the distance */
+			d = enesim_point_2d_distance(prev, curr);
+			/* we are inside */
+			if ((at >= length) && (at <= length + d))
+			{
+				double dx = curr->x - prev->x;
+				double dy = curr->y - prev->y;
+				double n = atan2(dy, dx) * (180 / M_PI);
+
+				while ((at >= length) && (at <= length + d))
+				{
+					double x;
+					double y;
+					double m = (length - at)/(length - (length + d));
+
+					x = ((1 - m) * prev->x) + (m * curr->x);
+					y = ((1 - m) * prev->y) + (m * curr->y);
+					at = cb(thiz, x, y, n, data);
+				}
+			}
+
+			/* go back */
+			if (at < length)
+				goto start;
+			length += d;
+			/* swap */
+			prev = curr;
+		}
+	}
+}

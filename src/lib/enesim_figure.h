@@ -20,17 +20,32 @@
 
 /**
  * @file
+ * @ender_group_proto{Enesim_Figure}
  * @ender_group{Enesim_Figure}
+ * @ender_group{Enesim_Figure_Definitions}
  */
 
 /**
+ * Figure Handle
+ * @ingroup Enesim_Figure
+ */
+typedef struct _Enesim_Figure Enesim_Figure;
+
+/**
+ * @defgroup Enesim_Figure_Definitions Figure definitions
+ * @ingroup Enesim_Figure
+ * @{
+ */
+
+typedef double (*Enesim_Figure_Point_At_Cb)(const Enesim_Figure *thiz, double x, double y, double n, void *data);
+
+/**
+ * @}
  * @defgroup Enesim_Figure Figures
  * @ingroup Enesim_Basic
  * @brief Figure definition
  * @{
  */
-
-typedef struct _Enesim_Figure Enesim_Figure; /**< A figure handle */
 
 EAPI Enesim_Figure * enesim_figure_new(void);
 EAPI Enesim_Figure * enesim_figure_ref(Enesim_Figure *thiz);
@@ -43,6 +58,9 @@ EAPI void enesim_figure_polygon_vertex_add(Enesim_Figure *thiz,
 		double x, double y);
 EAPI void enesim_figure_polygon_close(Enesim_Figure *thiz);
 EAPI double enesim_figure_length_get(Enesim_Figure *thiz);
+
+EAPI void enesim_figure_point_at(Enesim_Figure *thiz, double at,
+		Enesim_Figure_Point_At_Cb cb, void *data);
 
 /**
  * @}
