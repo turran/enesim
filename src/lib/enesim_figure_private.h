@@ -67,5 +67,7 @@ void enesim_figure_polygon_append(Enesim_Figure *thiz, Enesim_Polygon *p);
 void enesim_figure_polygon_remove(Enesim_Figure *thiz, Enesim_Polygon *p);
 void enesim_figure_dump(Enesim_Figure *thiz);
 void enesim_figure_change(Enesim_Figure *thiz);
+int enesim_figure_changed(Enesim_Figure *thiz);
+void enesim_figure_reset(Enesim_Figure *thiz);
 
 #endif

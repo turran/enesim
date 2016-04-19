@@ -236,6 +236,16 @@ void enesim_figure_change(Enesim_Figure *thiz)
 	_figure_state_changed(thiz);
 }
 
+int enesim_figure_changed(Enesim_Figure *thiz)
+{
+	return thiz->changed;
+}
+
+void enesim_figure_reset(Enesim_Figure *thiz)
+{
+	thiz->changed = 0;
+}
+
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *
