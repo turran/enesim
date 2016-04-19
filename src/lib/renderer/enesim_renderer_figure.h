@@ -31,10 +31,8 @@
  */
 
 EAPI Enesim_Renderer * enesim_renderer_figure_new(void);
-EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *p);
-EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *p, double x, double y);
-EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *p);
-EAPI void enesim_renderer_figure_clear(Enesim_Renderer *p);
+EAPI void enesim_renderer_figure_inner_figure_set(Enesim_Renderer *r, Enesim_Figure *figure);
+EAPI Enesim_Figure * enesim_renderer_figure_inner_figure_get(Enesim_Renderer *r);
 /**
  * @}
  */

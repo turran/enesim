@@ -52,10 +52,9 @@
 typedef struct _Enesim_Renderer_Figure
 {
 	Enesim_Renderer_Shape_Path parent;
+	/* properties */
 	Enesim_Figure *figure;
-	Enesim_Polygon *last_polygon;
-	Eina_Bool changed :1;
-	Eina_Bool generated :1;
+	int last_figure_change;
 } Enesim_Renderer_Figure;
 
 typedef struct _Enesim_Renderer_Figure_Class {
@@ -106,7 +105,10 @@ static Eina_Bool _figure_has_changed(Enesim_Renderer *r)
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = ENESIM_RENDERER_FIGURE(r);
-	return thiz->changed;
+	/* only check if our figure has changed, there is no other property */
+	if (thiz->last_figure_change != enesim_figure_changed(thiz->figure))
+		return EINA_TRUE;
+	return EINA_FALSE;
 }
 
 static void _figure_shape_features_get(Enesim_Renderer *r EINA_UNUSED,
@@ -125,10 +127,9 @@ static Eina_Bool _figure_setup(Enesim_Renderer *r, Enesim_Path *path)
 		return EINA_FALSE;
 	}
 
-	if (thiz->changed && !thiz->generated)
+	if (thiz->last_figure_change != enesim_figure_changed(thiz->figure))
 	{
 		_figure_generate_commands(thiz, path);
-		thiz->generated = EINA_TRUE;
 	}
 
 	return EINA_TRUE;
@@ -139,7 +140,7 @@ static void _figure_cleanup(Enesim_Renderer *r)
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = ENESIM_RENDERER_FIGURE(r);
-	thiz->changed = EINA_FALSE;
+	thiz->last_figure_change = enesim_figure_changed(thiz->figure);
 }
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -208,84 +209,41 @@ EAPI Enesim_Renderer * enesim_renderer_figure_new(void)
 }
 
 /**
- * @brief Add a new polygon for the figure
+ * Set the figure of a figure renderer
+ * @ender_prop{inner_figure}
  * @param[in] r The figure renderer
- *
- * This function adds a new polygon to the current list of polygons. Note
- * that in case there was a previous polygon, it will not be closed. For that
- * call @ref enesim_renderer_figure_polygon_close before
+ * @param[in] figure The figure to set @ender_transfer{full}
  */
-EAPI void enesim_renderer_figure_polygon_add(Enesim_Renderer *r)
+EAPI void enesim_renderer_figure_inner_figure_set(Enesim_Renderer *r, Enesim_Figure *figure)
 {
 	Enesim_Renderer_Figure *thiz;
-	Enesim_Polygon *p;
 
 	thiz = ENESIM_RENDERER_FIGURE(r);
-
-	p = enesim_polygon_new();
-	enesim_figure_polygon_append(thiz->figure, p);
-
-	thiz->last_polygon = p;
-	thiz->changed = EINA_TRUE;
-	thiz->generated = EINA_FALSE;
+	if (!figure)
+	{
+		enesim_figure_clear(thiz->figure);
+	}
+	else
+	{
+		enesim_figure_unref(thiz->figure);
+		thiz->figure = figure;
+	}
 }
 
 /**
- * @brief Add a vertex on the current polygon created on a figure renderer
+ * Get the figure of a figure renderer
+ * @ender_prop{inner_figure}
  * @param[in] r The figure renderer
- * @param[in] x The X coordinate of the vertex
- * @param[in] y The Y coordinate of the vertex
- */
-EAPI void enesim_renderer_figure_polygon_vertex_add(Enesim_Renderer *r,
-		double x, double y)
-{
-	Enesim_Renderer_Figure *thiz;
-	Enesim_Polygon *p;
-
-	thiz = ENESIM_RENDERER_FIGURE(r);
-
-	p = thiz->last_polygon;
-	if (!p) return;
-	enesim_polygon_point_append_from_coords(p, x, y);
-	thiz->changed = EINA_TRUE;
-	thiz->generated = EINA_FALSE;
-}
-
-/**
- * @brief Close the last polygon of a figure renderer
- * @param[in] r The figure renderer
+ * @return The figure of the figure renderer @ender_transfer{none}
  *
- * This function closes the last polygon added with @ref
- * enesim_renderer_figure_polygon_add.
+ * @note It is always faster to get the figure of a figure renderer and
+ * add commands there than create a new figure using @ref enesim_figure_new,
+ * set the commands and finally call @ref enesim_renderer_figure_inner_figure_set
  */
-EAPI void enesim_renderer_figure_polygon_close(Enesim_Renderer *r)
-{
-	Enesim_Renderer_Figure *thiz;
-	Enesim_Polygon *p;
-
-	thiz = ENESIM_RENDERER_FIGURE(r);
-
-	p = thiz->last_polygon;
-	if (!p) return;
-
-	enesim_polygon_close(p, EINA_TRUE);
-	thiz->changed = EINA_TRUE;
-	thiz->generated = EINA_FALSE;
-}
-
-/**
- * @brief Clear the list of polygons on a figure renderer
- * @param[in] r The figure renderer
- *
- * This function removes every polygon added with @ref
- * enesim_renderer_figure_polygon_add
- */
-EAPI void enesim_renderer_figure_clear(Enesim_Renderer *r)
+EAPI Enesim_Figure * enesim_renderer_figure_inner_figure_get(Enesim_Renderer *r)
 {
 	Enesim_Renderer_Figure *thiz;
 
 	thiz = ENESIM_RENDERER_FIGURE(r);
-	enesim_figure_clear(thiz->figure);
-	thiz->changed = EINA_TRUE;
-	thiz->generated = EINA_FALSE;
+	return enesim_figure_ref(thiz->figure);
 }
