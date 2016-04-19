@@ -207,5 +207,7 @@ struct _Enesim_Path {
 
 void enesim_path_command_set(Enesim_Path *thiz, Eina_List *l);
 void enesim_path_command_get(Enesim_Path *thiz, Eina_List **list);
+int enesim_path_changed(Enesim_Path *thiz);
+void enesim_path_reset(Enesim_Path *thiz);
 
 #endif

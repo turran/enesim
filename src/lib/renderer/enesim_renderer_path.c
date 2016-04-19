@@ -160,7 +160,7 @@ static void _path_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	enesim_renderer_cleanup(thiz->current, s);
 	thiz->current = NULL;
 	/* reset the change count */
-	thiz->last_path_change = thiz->path->changed;
+	thiz->last_path_change = enesim_path_changed(thiz->path);
 }
 /*----------------------------------------------------------------------------*
  *                             Shape interface                                *
@@ -238,7 +238,7 @@ static Eina_Bool _path_has_changed(Enesim_Renderer *r)
 	if (enesim_renderer_shape_state_has_changed(r))
 		return EINA_TRUE;
 	/* only check if our path has changed, there is no other property */
-	if (thiz->last_path_change != thiz->path->changed)
+	if (thiz->last_path_change != enesim_path_changed(thiz->path))
 		return EINA_TRUE;
 	return EINA_FALSE;
 }

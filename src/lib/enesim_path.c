@@ -205,6 +205,16 @@ void enesim_path_command_get(Enesim_Path *thiz,
 		*list = eina_list_append(*list, new_cmd);
 	}
 }
+
+int enesim_path_changed(Enesim_Path *thiz)
+{
+	return thiz->changed;
+}
+
+void enesim_path_reset(Enesim_Path *thiz)
+{
+	thiz->changed = 0;
+}
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *
