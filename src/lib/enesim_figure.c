@@ -293,6 +293,14 @@ EAPI void enesim_figure_clear(Enesim_Figure *thiz)
 	_figure_state_changed(thiz);
 }
 
+/**
+ * Calculate the bounds of a figure
+ * @param[in] thiz The figure to calculate the bounds from
+ * @param[out] xmin The minimum x coordinate
+ * @param[out] ymin The minimum y coordinate
+ * @param[out] xmax The maximum x coordinate
+ * @param[out] ymax The maximum y coordinate
+ */
 EAPI Eina_Bool enesim_figure_bounds(const Enesim_Figure *thiz,
 		double *xmin, double *ymin, double *xmax, double *ymax)
 {
@@ -421,6 +429,14 @@ EAPI double enesim_figure_length_get(Enesim_Figure *thiz)
 	return length;
 }
 
+/**
+ * Get the position and angle at a specified length of a figure
+ * @param[in] thiz The figure the get the point attributes from
+ * @param[in] at The length to get the point attributes at. In the
+ * 0 to length range
+ * @param[in] cb The callback to call when the length is found
+ * @param[in] data The user provided data to be passed to the callback
+ */
 EAPI void enesim_figure_point_at(Enesim_Figure *thiz, double at,
 		Enesim_Figure_Point_At_Cb cb, void *data)
 {
