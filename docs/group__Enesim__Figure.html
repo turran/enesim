@@ -97,8 +97,7 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Increase the reference counter of a figure.  <a href="#gaa2dbab35ca74a5bc0057f949c0dc5196"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Figure.html#gad80b81600837159db1f33b5601ed1feb">enesim_figure_unref</a> (<a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrease the reference counter of a figure.  <a href="#gad80b81600837159db1f33b5601ed1feb"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga2740d0c95d78178bea30223b51e26f70"></a><!-- doxytag: member="Enesim_Figure::enesim_figure_bounds" ref="ga2740d0c95d78178bea30223b51e26f70" args="(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)" -->
-EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figure_bounds</b> (const <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz, double *xmin, double *ymin, double *xmax, double *ymax)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Figure.html#ga2740d0c95d78178bea30223b51e26f70">enesim_figure_bounds</a> (const <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz, double *xmin, double *ymin, double *xmax, double *ymax)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Figure.html#gae202d61c8a80cc107cc94122b34656c5">enesim_figure_clear</a> (<a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Figure.html#ga640a59e8a613853895fd9db28e120857">enesim_figure_polygon_add</a> (<a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new polygon for the figure.  <a href="#ga640a59e8a613853895fd9db28e120857"></a><br/></td></tr>
@@ -108,8 +107,7 @@ EAPI Eina_Bool&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figu
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Close the last polygon of a figure renderer.  <a href="#ga03daf8c721704285732c31332fe22caa"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga2f0a3dc49539ea6119d39db5086f35c2"></a><!-- doxytag: member="Enesim_Figure::enesim_figure_length_get" ref="ga2f0a3dc49539ea6119d39db5086f35c2" args="(Enesim_Figure *thiz)" -->
 EAPI double&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figure_length_get</b> (<a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ga8654eaa4449c60cf95c9592f94d30f7b"></a><!-- doxytag: member="Enesim_Figure::enesim_figure_point_at" ref="ga8654eaa4449c60cf95c9592f94d30f7b" args="(Enesim_Figure *thiz, double at, Enesim_Figure_Point_At_Cb cb, void *data)" -->
-EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figure_point_at</b> (<a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz, double at, Enesim_Figure_Point_At_Cb cb, void *data)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Figure.html#ga8654eaa4449c60cf95c9592f94d30f7b">enesim_figure_point_at</a> (<a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *thiz, double at, Enesim_Figure_Point_At_Cb cb, void *data)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>Figure definition. </p>
@@ -200,6 +198,62 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figure_po
 
 </div>
 </div>
+<a class="anchor" id="ga2740d0c95d78178bea30223b51e26f70"></a><!-- doxytag: member="enesim_figure.h::enesim_figure_bounds" ref="ga2740d0c95d78178bea30223b51e26f70" args="(const Enesim_Figure *thiz, double *xmin, double *ymin, double *xmax, double *ymax)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI Eina_Bool <a class="el" href="group__Enesim__Figure.html#ga2740d0c95d78178bea30223b51e26f70">enesim_figure_bounds</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>xmin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>ymin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>xmax</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>ymax</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Calculate the bounds of a figure </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The figure to calculate the bounds from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">xmin</td><td>The minimum x coordinate </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ymin</td><td>The minimum y coordinate </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">xmax</td><td>The maximum x coordinate </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ymax</td><td>The maximum y coordinate </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="gae202d61c8a80cc107cc94122b34656c5"></a><!-- doxytag: member="enesim_figure.h::enesim_figure_clear" ref="gae202d61c8a80cc107cc94122b34656c5" args="(Enesim_Figure *thiz)" -->
 <div class="memitem">
 <div class="memproto">
@@ -246,7 +300,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figure_po
   </table>
   </dd>
 </dl>
-<p>This function adds a new polygon to the current list of polygons. Note that in case there was a previous polygon, it will not be closed. For that call <a class="el" href="group__Enesim__Renderer__Figure.html#ga1908559bf690bb6d63459185e0415b07">enesim_renderer_figure_polygon_close</a> before </p>
+<p>This function adds a new polygon to the current list of polygons. Note that in case there was a previous polygon, it will not be closed. For that call enesim_renderer_figure_polygon_close before </p>
 
 </div>
 </div>
@@ -315,7 +369,56 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figure_po
   </table>
   </dd>
 </dl>
-<p>This function closes the last polygon added with <a class="el" href="group__Enesim__Renderer__Figure.html#ga87c8bc57df726ad033b6df29c6f34014">enesim_renderer_figure_polygon_add</a>. </p>
+<p>This function closes the last polygon added with enesim_renderer_figure_polygon_add. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga8654eaa4449c60cf95c9592f94d30f7b"></a><!-- doxytag: member="enesim_figure.h::enesim_figure_point_at" ref="ga8654eaa4449c60cf95c9592f94d30f7b" args="(Enesim_Figure *thiz, double at, Enesim_Figure_Point_At_Cb cb, void *data)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Figure.html#ga8654eaa4449c60cf95c9592f94d30f7b">enesim_figure_point_at</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *&#160;</td>
+          <td class="paramname"><em>thiz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>at</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Enesim_Figure_Point_At_Cb&#160;</td>
+          <td class="paramname"><em>cb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Get the position and angle at a specified length of a figure </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">thiz</td><td>The figure the get the point attributes from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">at</td><td>The length to get the point attributes at. In the 0 to length range </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cb</td><td>The callback to call when the length is found </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">data</td><td>The user provided data to be passed to the callback </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -337,7 +440,7 @@ EAPI void&#160;</td><td class="memItemRight" valign="bottom"><b>enesim_figure_po
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 6 2016 18:46:51 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Apr 30 2016 17:55:42 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

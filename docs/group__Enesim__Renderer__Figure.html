@@ -84,14 +84,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Figure.html#ga5e503a6fa6aaca5bb96d1ef6f4414f3a">enesim_renderer_figure_new</a> (void)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Figure.html#ga87c8bc57df726ad033b6df29c6f34014">enesim_renderer_figure_polygon_add</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new polygon for the figure.  <a href="#ga87c8bc57df726ad033b6df29c6f34014"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Figure.html#gaab6da4a73f38985c6cc4b146e108e4a6">enesim_renderer_figure_polygon_vertex_add</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p, double x, double y)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a vertex on the current polygon created on a figure renderer.  <a href="#gaab6da4a73f38985c6cc4b146e108e4a6"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Figure.html#ga1908559bf690bb6d63459185e0415b07">enesim_renderer_figure_polygon_close</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Close the last polygon of a figure renderer.  <a href="#ga1908559bf690bb6d63459185e0415b07"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Figure.html#ga74999867f30fef34fd3764bb177a5e8d">enesim_renderer_figure_clear</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *p)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the list of polygons on a figure renderer.  <a href="#ga74999867f30fef34fd3764bb177a5e8d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Figure.html#ga73962b0a3c443452013be7f565abac89">enesim_renderer_figure_inner_figure_set</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r, <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *figure)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">EAPI <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__Enesim__Renderer__Figure.html#ga0d3596242a3047b7577b4c18c8a31ef4">enesim_renderer_figure_inner_figure_get</a> (<a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *r)</td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <p>A figure composed of polygons renderer  inherits from \1. </p>
@@ -115,38 +109,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga87c8bc57df726ad033b6df29c6f34014"></a><!-- doxytag: member="enesim_renderer_figure.h::enesim_renderer_figure_polygon_add" ref="ga87c8bc57df726ad033b6df29c6f34014" args="(Enesim_Renderer *p)" -->
+<a class="anchor" id="ga73962b0a3c443452013be7f565abac89"></a><!-- doxytag: member="enesim_renderer_figure.h::enesim_renderer_figure_inner_figure_set" ref="ga73962b0a3c443452013be7f565abac89" args="(Enesim_Renderer *r, Enesim_Figure *figure)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Figure.html#ga87c8bc57df726ad033b6df29c6f34014">enesim_renderer_figure_polygon_add</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
-          <td class="paramname"><em>r</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Add a new polygon for the figure. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The figure renderer</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>This function adds a new polygon to the current list of polygons. Note that in case there was a previous polygon, it will not be closed. For that call <a class="el" href="group__Enesim__Renderer__Figure.html#ga1908559bf690bb6d63459185e0415b07">enesim_renderer_figure_polygon_close</a> before </p>
-
-</div>
-</div>
-<a class="anchor" id="gaab6da4a73f38985c6cc4b146e108e4a6"></a><!-- doxytag: member="enesim_renderer_figure.h::enesim_renderer_figure_polygon_vertex_add" ref="gaab6da4a73f38985c6cc4b146e108e4a6" args="(Enesim_Renderer *p, double x, double y)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Figure.html#gaab6da4a73f38985c6cc4b146e108e4a6">enesim_renderer_figure_polygon_vertex_add</a> </td>
+          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Figure.html#ga73962b0a3c443452013be7f565abac89">enesim_renderer_figure_inner_figure_set</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em>, </td>
@@ -154,14 +122,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>x</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>y</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a> *&#160;</td>
+          <td class="paramname"><em>figure</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -171,25 +133,22 @@ Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-
-<p>Add a vertex on the current polygon created on a figure renderer. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
+<p>Set the figure of a figure renderer  <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The figure renderer </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The X coordinate of the vertex </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>The Y coordinate of the vertex </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">figure</td><td>The figure to set  [Transfer full] </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="ga1908559bf690bb6d63459185e0415b07"></a><!-- doxytag: member="enesim_renderer_figure.h::enesim_renderer_figure_polygon_close" ref="ga1908559bf690bb6d63459185e0415b07" args="(Enesim_Renderer *p)" -->
+<a class="anchor" id="ga0d3596242a3047b7577b4c18c8a31ef4"></a><!-- doxytag: member="enesim_renderer_figure.h::enesim_renderer_figure_inner_figure_get" ref="ga0d3596242a3047b7577b4c18c8a31ef4" args="(Enesim_Renderer *r)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Figure.html#ga1908559bf690bb6d63459185e0415b07">enesim_renderer_figure_polygon_close</a> </td>
+          <td class="memname">EAPI <a class="el" href="group__Enesim__Figure.html#gadb35a92e88cb1125065ec86b6f0ffb8a">Enesim_Figure</a>* <a class="el" href="group__Enesim__Renderer__Figure.html#ga0d3596242a3047b7577b4c18c8a31ef4">enesim_renderer_figure_inner_figure_get</a> </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
           <td class="paramname"><em>r</em></td><td>)</td>
@@ -198,41 +157,14 @@ Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-
-<p>Close the last polygon of a figure renderer. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
+<p>Get the figure of a figure renderer  <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The figure renderer</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The figure renderer </td></tr>
   </table>
   </dd>
 </dl>
-<p>This function closes the last polygon added with <a class="el" href="group__Enesim__Renderer__Figure.html#ga87c8bc57df726ad033b6df29c6f34014">enesim_renderer_figure_polygon_add</a>. </p>
-
-</div>
-</div>
-<a class="anchor" id="ga74999867f30fef34fd3764bb177a5e8d"></a><!-- doxytag: member="enesim_renderer_figure.h::enesim_renderer_figure_clear" ref="ga74999867f30fef34fd3764bb177a5e8d" args="(Enesim_Renderer *p)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">EAPI void <a class="el" href="group__Enesim__Renderer__Figure.html#ga74999867f30fef34fd3764bb177a5e8d">enesim_renderer_figure_clear</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__Enesim__Renderer.html#ga3ca715b0725d4548d535ba48b5419e29">Enesim_Renderer</a> *&#160;</td>
-          <td class="paramname"><em>r</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Clear the list of polygons on a figure renderer. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">r</td><td>The figure renderer</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>This function removes every polygon added with <a class="el" href="group__Enesim__Renderer__Figure.html#ga87c8bc57df726ad033b6df29c6f34014">enesim_renderer_figure_polygon_add</a> </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The figure of the figure renderer  [Transfer none]</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>It is always faster to get the figure of a figure renderer and add commands there than create a new figure using <a class="el" href="group__Enesim__Figure.html#gaf77d9b3faf232e38b1fc55039d6f69a3">enesim_figure_new</a>, set the commands and finally call <a class="el" href="group__Enesim__Renderer__Figure.html#ga73962b0a3c443452013be7f565abac89">enesim_renderer_figure_inner_figure_set</a> </dd></dl>
 
 </div>
 </div>
@@ -254,7 +186,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 6 2016 18:46:51 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Apr 30 2016 17:55:42 for enesim by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
