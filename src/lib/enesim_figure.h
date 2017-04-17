@@ -21,8 +21,8 @@
 /**
  * @file
  * @ender_group_proto{Enesim_Figure}
- * @ender_group{Enesim_Figure}
  * @ender_group{Enesim_Figure_Definitions}
+ * @ender_group{Enesim_Figure}
  */
 
 /**

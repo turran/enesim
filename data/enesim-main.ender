@@ -360,6 +360,9 @@
     </method>
   </struct>
   <object name="enesim.figure"/>
+  <callback name="enesim.figure.point_at">
+    <return type="double" transfer="full" nullable="false"/>
+  </callback>
   <object name="enesim.figure">
     <ctor name="new"/>
     <ref name="ref">
@@ -389,9 +392,6 @@
       <arg name="data" type="pointer" direction="in" transfer="full"/>
     </method>
   </object>
-  <callback name="enesim.figure.point_at">
-    <return type="double" transfer="full" nullable="false"/>
-  </callback>
   <struct name="enesim.path.command.move_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
