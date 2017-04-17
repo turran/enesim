@@ -58,4 +58,12 @@
   <callback name="enesim.stream.buffer.free">
     <arg name="b" type="pointer" direction="in" transfer="full" nullable="false"/>
   </callback>
+  <callback name="enesim.figure.point_at">
+    <arg name="thiz" type="enesim.figure" direction="in" transfer="none" nullable="false"/>
+    <arg name="x" type="double" direction="in" transfer="none" nullable="false"/>
+    <arg name="y" type="double" direction="in" transfer="none" nullable="false"/>
+    <arg name="n" type="double" direction="in" transfer="none" nullable="false"/>
+    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <return type="double" transfer="full" nullable="false"/>
+  </callback>
 </lib>

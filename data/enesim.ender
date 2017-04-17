@@ -359,6 +359,44 @@
       <arg name="q" type="enesim.quad" direction="in" transfer="none"/>
     </method>
   </struct>
+  <object name="enesim.figure"/>
+  <object name="enesim.figure">
+    <ctor name="new"/>
+    <ref name="ref">
+      <return type="enesim.figure" transfer="full" nullable="false"/>
+    </ref>
+    <unref name="unref"/>
+    <method name="bounds">
+      <return type="bool" transfer="full" nullable="false"/>
+      <arg name="xmin" type="double" direction="out" transfer="full"/>
+      <arg name="ymin" type="double" direction="out" transfer="full"/>
+      <arg name="xmax" type="double" direction="out" transfer="full"/>
+      <arg name="ymax" type="double" direction="out" transfer="full"/>
+    </method>
+    <method name="clear"/>
+    <method name="polygon_add"/>
+    <method name="polygon_vertex_add">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="polygon_close"/>
+    <method name="length_get">
+      <return type="double" transfer="full" nullable="false"/>
+    </method>
+    <method name="point_at">
+      <arg name="at" type="double" direction="in" transfer="full"/>
+      <arg name="cb" type="enesim.figure.point_at" direction="in" transfer="full"/>
+      <arg name="data" type="pointer" direction="in" transfer="full"/>
+    </method>
+  </object>
+  <callback name="enesim.figure.point_at">
+    <arg name="thiz" type="enesim.figure" direction="in" transfer="none" nullable="false"/>
+    <arg name="x" type="double" direction="in" transfer="none" nullable="false"/>
+    <arg name="y" type="double" direction="in" transfer="none" nullable="false"/>
+    <arg name="n" type="double" direction="in" transfer="none" nullable="false"/>
+    <arg name="data" type="pointer" direction="in" transfer="none" nullable="true"/>
+    <return type="double" transfer="full" nullable="false"/>
+  </callback>
   <struct name="enesim.path.command.move_to">
     <field name="x" type="double"/>
     <field name="y" type="double"/>
@@ -471,6 +509,9 @@
       <arg name="y" type="double" direction="in" transfer="full"/>
     </method>
     <method name="close"/>
+    <method name="flatten">
+      <return type="enesim.figure" transfer="full" nullable="false"/>
+    </method>
   </object>
   <enum name="enesim.buffer.format">
     <value name="rgb565"/>
@@ -1431,6 +1472,9 @@
       <setter>
         <arg name="r" type="enesim.renderer" direction="in" transfer="full"/>
       </setter>
+      <getter>
+        <return type="enesim.renderer" transfer="none" nullable="false"/>
+      </getter>
     </prop>
     <prop name="rop">
       <setter>
@@ -1463,6 +1507,9 @@
     </prop>
     <ctor name="new"/>
     <method name="layer_add">
+      <arg name="layer" type="enesim.renderer.compound.layer" direction="in" transfer="full"/>
+    </method>
+    <method name="layer_prepend">
       <arg name="layer" type="enesim.renderer.compound.layer" direction="in" transfer="full"/>
     </method>
     <method name="layer_remove">
@@ -2173,14 +2220,15 @@
     </method>
   </object>
   <object name="enesim.renderer.figure" inherits="enesim.renderer.shape">
+    <prop name="inner_figure">
+      <setter>
+        <arg name="figure" type="enesim.figure" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="enesim.figure" transfer="none" nullable="false"/>
+      </getter>
+    </prop>
     <ctor name="new"/>
-    <method name="polygon_add"/>
-    <method name="polygon_vertex_add">
-      <arg name="x" type="double" direction="in" transfer="full"/>
-      <arg name="y" type="double" direction="in" transfer="full"/>
-    </method>
-    <method name="polygon_close"/>
-    <method name="clear"/>
   </object>
   <object name="enesim.renderer.line" inherits="enesim.renderer.shape">
     <prop name="x0">
@@ -2348,6 +2396,22 @@
     </method>
   </object>
   <object name="enesim.renderer.text_span" inherits="enesim.renderer.shape">
+    <prop name="x">
+      <setter>
+        <arg name="x" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
+    <prop name="y">
+      <setter>
+        <arg name="y" type="double" direction="in" transfer="full"/>
+      </setter>
+      <getter>
+        <return type="double" transfer="full" nullable="false"/>
+      </getter>
+    </prop>
     <ctor name="new"/>
     <method name="text_set">
       <arg name="str" type="string" direction="in" transfer="none"/>
@@ -2370,6 +2434,14 @@
     <method name="real_buffer_set">
       <arg name="b" type="enesim.text.buffer" direction="in" transfer="full"/>
     </method>
+    <method name="position_set">
+      <arg name="x" type="double" direction="in" transfer="full"/>
+      <arg name="y" type="double" direction="in" transfer="full"/>
+    </method>
+    <method name="position_get">
+      <arg name="x" type="double" direction="out" transfer="full"/>
+      <arg name="y" type="double" direction="out" transfer="full"/>
+    </method>
     <method name="font_set">
       <arg name="font" type="enesim.text.font" direction="in" transfer="full"/>
     </method>
@@ -2380,15 +2452,15 @@
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="x" type="int32" direction="in" transfer="full"/>
       <arg name="y" type="int32" direction="in" transfer="full"/>
-      <arg name="index" type="int" direction="in" transfer="full"/>
-      <arg name="start" type="int" direction="in" transfer="full"/>
-      <arg name="end" type="int" direction="in" transfer="full"/>
+      <arg name="index" type="int32" direction="out" transfer="full"/>
+      <arg name="start" type="int32" direction="out" transfer="full"/>
+      <arg name="end" type="int32" direction="out" transfer="full"/>
     </method>
     <method name="glyph_index_at">
       <return type="bool" transfer="full" nullable="false"/>
       <arg name="index" type="int32" direction="in" transfer="full"/>
-      <arg name="start" type="int" direction="in" transfer="full"/>
-      <arg name="end" type="int" direction="in" transfer="full"/>
+      <arg name="start" type="int32" direction="out" transfer="full"/>
+      <arg name="end" type="int32" direction="out" transfer="full"/>
     </method>
   </object>
   <object name="enesim.renderer.map_quad" inherits="enesim.renderer">
