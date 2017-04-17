@@ -124,6 +124,7 @@ double enesim_text_glyph_kerning_get(Enesim_Text_Glyph *thiz, Enesim_Text_Glyph 
 		return klass->kerning_get(thiz, prev);
 	return 0;
 }
+/** @endcond */
 /*============================================================================*
  *                                   API                                      *
  *============================================================================*/
