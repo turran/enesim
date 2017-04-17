@@ -831,6 +831,17 @@ EAPI void enesim_renderer_text_span_font_set(Enesim_Renderer *r, Enesim_Text_Fon
 	thiz->state.changed = EINA_TRUE;
 }
 
+/**
+ * @brief Iterates over the buffer to find the glyph at a specified position
+ * and sets the index of such glyph and the start and end coordinates of it.
+ * @param[in] r The text span renderer to find the glyph on
+ * @param[in] x The X coordinate to find the glyph on
+ * @param[in] y The Y coordinate to find the glyph on
+ * @param[out] index The index of the glyph on the text buffer
+ * @param[out] start The initial coordinate where the glyph starts
+ * @param[out] end The final coordinate where the glyph ends
+ * @return EINA_TRUE if the glyph is found, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool enesim_renderer_text_span_glyph_coord_at(Enesim_Renderer *r,
 		int x, int y, int *index, int *start, int *end)
 {
@@ -890,6 +901,15 @@ advance:
 	return found;
 }
 
+/**
+ * @brief Iterates over the text buffer to find the glyph at a specified index
+ * and sets the start and end coordinates of it.
+ * @param[in] r The text span renderer to find the glyph on
+ * @param[in] index The glyph index
+ * @param[out] start The initial coordinate where the glyph starts
+ * @param[out] end The final coordinate where the glyph ends
+ * @return EINA_TRUE if the glyph is found, EINA_FALSE otherwise
+ */
 EAPI Eina_Bool enesim_renderer_text_span_glyph_index_at(Enesim_Renderer *r,
 		int index, int *start, int *end)
 {
