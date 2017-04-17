@@ -37,7 +37,19 @@ typedef struct _Enesim_Figure Enesim_Figure;
  * @{
  */
 
-typedef double (*Enesim_Figure_Point_At_Cb)(const Enesim_Figure *thiz, double x, double y, double n, void *data);
+
+/**
+ * Callback function for @ref enesim_figure_point_at method
+ * @ender_name{enesim.figure.point_at}
+ * @param thiz
+ * @param x The X coordinate of the point found
+ * @param y The Y coordinate of the point found
+ * @param n The angle of the point found
+ * @param data User provided data
+ * @return Return -1 to stop or a number less than the length
+ * of the figure to find another point
+ */
+typedef double (*Enesim_Figure_Point_At)(const Enesim_Figure *thiz, double x, double y, double n, void *data);
 
 /**
  * @}
@@ -60,7 +72,7 @@ EAPI void enesim_figure_polygon_close(Enesim_Figure *thiz);
 EAPI double enesim_figure_length_get(Enesim_Figure *thiz);
 
 EAPI void enesim_figure_point_at(Enesim_Figure *thiz, double at,
-		Enesim_Figure_Point_At_Cb cb, void *data);
+		Enesim_Figure_Point_At cb, void *data);
 
 /**
  * @}

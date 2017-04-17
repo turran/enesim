@@ -444,11 +444,12 @@ EAPI double enesim_figure_length_get(Enesim_Figure *thiz)
  * @param[in] thiz The figure the get the point attributes from
  * @param[in] at The length to get the point attributes at. In the
  * 0 to length range
- * @param[in] cb The callback to call when the length is found
+ * @param[in] cb The callback to call when a point at the requested length is
+ * found
  * @param[in] data The user provided data to be passed to the callback
  */
 EAPI void enesim_figure_point_at(Enesim_Figure *thiz, double at,
-		Enesim_Figure_Point_At_Cb cb, void *data)
+		Enesim_Figure_Point_At cb, void *data)
 {
 	Enesim_Polygon *p;
 	Eina_List *l1;
