@@ -357,7 +357,7 @@ EAPI Eina_Bool enesim_figure_bounds(const Enesim_Figure *thiz,
  *
  * This function adds a new polygon to the current list of polygons. Note
  * that in case there was a previous polygon, it will not be closed. For that
- * call @ref enesim_renderer_figure_polygon_close before
+ * call @ref enesim_figure_polygon_close before
  */
 EAPI void enesim_figure_polygon_add(Enesim_Figure *thiz)
 {
@@ -390,7 +390,7 @@ EAPI void enesim_figure_polygon_vertex_add(Enesim_Figure *thiz,
  * @param[in] thiz The figure
  *
  * This function closes the last polygon added with @ref
- * enesim_renderer_figure_polygon_add.
+ * enesim_figure_polygon_add.
  */
 EAPI void enesim_figure_polygon_close(Enesim_Figure *thiz)
 {
