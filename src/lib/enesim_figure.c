@@ -353,7 +353,7 @@ EAPI Eina_Bool enesim_figure_bounds(const Enesim_Figure *thiz,
 
 /**
  * @brief Add a new polygon for the figure
- * @param[in] r The figure renderer
+ * @param[in] thiz The figure
  *
  * This function adds a new polygon to the current list of polygons. Note
  * that in case there was a previous polygon, it will not be closed. For that
@@ -369,7 +369,7 @@ EAPI void enesim_figure_polygon_add(Enesim_Figure *thiz)
 
 /**
  * @brief Add a vertex on the current polygon created on a figure renderer
- * @param[in] r The figure renderer
+ * @param[in] thiz The figure
  * @param[in] x The X coordinate of the vertex
  * @param[in] y The Y coordinate of the vertex
  */
@@ -387,7 +387,7 @@ EAPI void enesim_figure_polygon_vertex_add(Enesim_Figure *thiz,
 
 /**
  * @brief Close the last polygon of a figure renderer
- * @param[in] r The figure renderer
+ * @param[in] thiz The figure
  *
  * This function closes the last polygon added with @ref
  * enesim_renderer_figure_polygon_add.
