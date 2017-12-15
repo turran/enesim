@@ -26,15 +26,22 @@
 #include "enesim_matrix.h"
 #include "enesim_pool.h"
 #include "enesim_buffer.h"
+#include "enesim_format.h"
 #include "enesim_surface.h"
 #include "enesim_renderer.h"
+#include "enesim_object_descriptor.h"
+#include "enesim_object_class.h"
+#include "enesim_object_instance.h"
 
 #include "enesim_buffer_private.h"
+#include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
 
 #if BUILD_OPENCL
 #include "Enesim_OpenCL.h"
 #endif
+
+#define ENESIM_LOG_DEFAULT enesim_log_renderer
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -53,10 +60,10 @@ static size_t _roundup(size_t local_size, size_t num)
  *                                 Global                                     *
  *============================================================================*/
 Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		Enesim_Log **error)
 {
+	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *data;
 	Eina_Bool ret;
@@ -66,6 +73,7 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 	const char *source_name = NULL;
 	size_t source_size = 0;
 
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 	data = enesim_surface_backend_data_get(s);
 
 	/* on the sw version we set the fill function, here we need to set
@@ -73,8 +81,8 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 	 * we need a way to get a uniqueid of the program too to not compile
 	 * it every time, something like a token
 	 */
-	if (!r->descriptor.opencl_setup) return EINA_FALSE;
-	ret = r->descriptor.opencl_setup(r, states, s, &source_name, &source, &source_size, error);
+	if (!klass->opencl_setup) return EINA_FALSE;
+	ret = klass->opencl_setup(r, s, rop, &source_name, &source, &source_size, error);
 	printf("loading the opencl description %s\n", source);
 	if (!ret) return EINA_FALSE;
 
@@ -128,9 +136,10 @@ void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	//clReleaseKernel(vector_add_k);
 }
 
-void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rectangle *area,
-		int x, int y)
+void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Eina_Rectangle *area, int x, int y)
 {
+	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *sdata;
 	cl_int error;
@@ -139,14 +148,15 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Eina_Rec
 	size_t max_local;
 
 	printf("inside!!\n");
+	klass = ENESIM_RENDERER_CLASS_GET(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 	sdata = enesim_surface_backend_data_get(s);
 	error = clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
 	assert(error == CL_SUCCESS);
 	/* now setup the kernel on the renderer side */
-	if (r->descriptor.opencl_kernel_setup)
+	if (klass->opencl_kernel_setup)
 	{
-		if (!r->descriptor.opencl_kernel_setup(r, s))
+		if (!klass->opencl_kernel_setup(r, s))
 		{
 			printf("Cannot setup the kernel\n");
 			return;

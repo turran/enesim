@@ -212,8 +212,7 @@ static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UN
 
 #if BUILD_OPENCL
 static Eina_Bool _background_opencl_setup(Enesim_Renderer *r,
-		const Enesim_Renderer_State *states[ENESIM_RENDERER_STATES],
-		Enesim_Surface *s,
+		Enesim_Surface *s, Enesim_Rop rop,
 		const char **program_name, const char **program_source,
 		size_t *program_length, Enesim_Log **l)
 {
