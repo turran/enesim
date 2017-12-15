@@ -25,6 +25,8 @@
 
 #include "enesim_pool_private.h"
 #include "enesim_buffer_private.h"
+
+#define ENESIM_LOG_DEFAULT enesim_log_pool
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
