@@ -19,6 +19,9 @@ static Enesim_Example_Renderer_Backend backends[] = {
 	{ "wgl", &enesim_example_renderer_backend_wgl },
 #endif
 #endif
+#if BUILD_OPENCL
+	{ "opencl_image", &enesim_example_renderer_backend_opencl_image },
+#endif
 };
 
 static Enesim_Example_Renderer_Backend *backend = &backends[0];

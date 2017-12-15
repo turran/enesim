@@ -18,6 +18,10 @@
 #endif
 #endif
 
+#if BUILD_OPENGL
+#include "Enesim_OpenCL.h"
+#endif
+
 #define WIDTH 256
 #define HEIGHT 256
 
@@ -61,6 +65,11 @@ enesim_example_renderer_backend_glx;
 extern Enesim_Example_Renderer_Backend_Interface
 enesim_example_renderer_backend_wgl;
 #endif
+#endif
+
+#if BUILD_OPENCL
+extern Enesim_Example_Renderer_Backend_Interface
+enesim_example_renderer_backend_opencl_image;
 #endif
 
 #endif
