@@ -47,17 +47,17 @@ AC_ARG_ENABLE([multi-core],
    ],
    [want_multi_core="yes"])
 
-## OpenCL (disabled)
-#AC_ARG_ENABLE([opencl],
-#   [AS_HELP_STRING([--enable-opencl], [enable OpenCL backend])],
-#   [
-#    if test "x$enableval" = "xyes" ; then
-#       want_opencl="yes"
-#    else
-#       want_opencl="no"
-#    fi
-#   ],
-#   [want_opencl="no"])
+# OpenCL (disabled)
+AC_ARG_ENABLE([opencl],
+   [AS_HELP_STRING([--enable-opencl], [enable OpenCL backend])],
+   [
+    if test "x$enableval" = "xyes" ; then
+       want_opencl="yes"
+    else
+       want_opencl="no"
+    fi
+   ],
+   [want_opencl="no"])
 
 ## OpenGL
 AC_ARG_ENABLE([opengl],
@@ -330,11 +330,11 @@ AM_CONDITIONAL([BUILD_WGL], [test "x${build_wgl}" = "xyes"])
 # Pthreads
 AC_CHECK_HEADERS([pthread.h pthread_np.h sched.h sys/param.h sys/cpuset.h])
 
-## openCL
-#have_opencl="no"
-#if test "x${want_opencl}" = "xyes" ; then
-#   AC_CHECK_HEADERS([CL/cl.h], [have_opencl="yes"], [have_opencl="no"])
-#fi
+# OpenCL
+have_opencl="no"
+if test "x${want_opencl}" = "xyes" ; then
+   AC_CHECK_HEADERS([CL/cl.h], [have_opencl="yes"], [have_opencl="no"])
+fi
 
 ## libjpeg
 JPG_LIBS=""
@@ -422,15 +422,15 @@ fi
 
 ## OpenCL
 build_opencl="no"
-#if test "x${have_opencl}" = "xyes" ; then
-#   AC_CHECK_LIB([OpenCL], [clGetPlatformIDs],
-#      [
-#       build_opencl="yes"
-#       requirements_libs="-lOpenCL ${requirements_libs}"
-#       AC_DEFINE([BUILD_OPENCL], [1], [Build OpenCL Backend])
-#      ],
-#      [build_opencl="no"])
-#fi
+if test "x${have_opencl}" = "xyes" ; then
+   AC_CHECK_LIB([OpenCL], [clGetPlatformIDs],
+      [
+       build_opencl="yes"
+       requirements_libs="-lOpenCL ${requirements_libs}"
+       AC_DEFINE([BUILD_OPENCL], [1], [Build OpenCL Backend])
+      ],
+      [build_opencl="no"])
+fi
 
 AM_CONDITIONAL([HAVE_OPENCL], [test "x${build_opencl}" = "xyes"])
 
