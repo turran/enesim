@@ -55,8 +55,8 @@ static inline void enesim_color_to_components(uint32_t plane0, uint8_t *a, uint8
 
 /*
  * r = (c0 - c1) * a + c1
- * a = 0 => r = c1
- * a = 1 => r = c0
+ * a = 1 => r = c1
+ * a = 256 => r = c0
  */
 static inline uint32_t enesim_color_interp_256(uint16_t a, uint32_t c0, uint32_t c1)
 {
@@ -68,8 +68,8 @@ static inline uint32_t enesim_color_interp_256(uint16_t a, uint32_t c0, uint32_t
 
 /*
  * ret = (c0 - c1) * a + c1
- * a = 0 => r = c1
- * a = 1 => r = c0
+ * a = 1 => r = c1
+ * a = 65536 => r = c0
  */
 static inline uint32_t enesim_color_interp_65536(uint32_t a, uint32_t c0, uint32_t c1)
 {
