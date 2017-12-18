@@ -651,6 +651,47 @@ static void _checker_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_U
 	_checker_state_cleanup(thiz);
 }
 #endif
+
+#if BUILD_OPENCL
+static Eina_Bool _checker_opencl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		const char **program_name, const char **program_source,
+		size_t *program_length, Enesim_Log **l)
+{
+	Enesim_Renderer_Checker *thiz;
+
+ 	thiz = ENESIM_RENDERER_CHECKER(r);
+	if (!_checker_state_setup(r, thiz)) return EINA_FALSE;
+
+	*program_name = "checker";
+	*program_source =
+	#include "enesim_renderer_checker.cl"
+	*program_length = strlen(*program_source);
+
+	return EINA_TRUE;
+}
+
+static Eina_Bool _checker_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Checker *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
+
+ 	thiz = ENESIM_RENDERER_CHECKER(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	clSetKernelArg(rdata->kernel, 1, sizeof(cl_uchar4), &thiz->final_color1);
+	clSetKernelArg(rdata->kernel, 2, sizeof(cl_uchar4), &thiz->final_color2);
+
+	return EINA_TRUE;
+}
+
+static void _checker_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Checker *thiz;
+
+ 	thiz = ENESIM_RENDERER_CHECKER(r);
+	_checker_state_cleanup(thiz);
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -677,6 +718,11 @@ static void _enesim_renderer_checker_class_init(void *k)
 	klass->opencl_setup = NULL;
 	klass->opencl_kernel_setup = NULL;
 	klass->opencl_cleanup =	NULL;
+#if BUILD_OPENCL
+	klass->opencl_setup = _checker_opencl_setup;
+	klass->opencl_kernel_setup = _checker_opencl_kernel_setup;
+	klass->opencl_cleanup = _checker_opencl_cleanup;
+#endif
 #if BUILD_OPENGL
 	klass->opengl_initialize = _checker_opengl_initialize;
 	klass->opengl_setup = _checker_opengl_setup;
