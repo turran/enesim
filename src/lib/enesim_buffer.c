@@ -1011,12 +1011,20 @@ EAPI Eina_Bool enesim_buffer_convert(Enesim_Buffer *thiz, Enesim_Buffer *dst)
 	if (!converter)
 		return EINA_FALSE;
 
-	enesim_buffer_sw_data_get(dst, &ddata);
-	enesim_buffer_sw_data_get(thiz, &sdata);
+	if (!enesim_buffer_map(thiz, &sdata))
+		return EINA_FALSE;
+
+	if (!enesim_buffer_map(dst, &ddata))
+	{
+		enesim_buffer_unmap(thiz, &sdata, EINA_FALSE);
+		return EINA_FALSE;
+	}
 
 	/* FIXME check the stride too */
 	/* TODO check the clip and x, y */
 	converter(&ddata, w, h, &sdata, w, h);
+	enesim_buffer_unmap(thiz, &sdata, EINA_FALSE);
+	enesim_buffer_unmap(dst, &ddata, EINA_TRUE);
 
 	return EINA_TRUE;
 }
