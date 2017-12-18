@@ -117,29 +117,19 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 		Enesim_Buffer_Sw_Data *dst)
 {
 	Enesim_Buffer_OpenCL_Data *data = backend_data;
-	size_t origin[3];
-	size_t region[3];
+	size_t origin[3] = { 0, 0, 0 };
+	size_t region[3] = { w, h, 1 };
 	size_t size;
 	cl_int ret;
 
-	origin[0] = 0;
-	origin[1] = 0;
-	origin[2] = 0;
-
-	region[0] = w;
-	region[1] = h;
-	region[2] = 1;
-
 	clGetImageInfo(data->mem, CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
 	DBG("row pitch %zd", size);
-	dst->argb8888_pre.plane0 = calloc(size * h, sizeof(uint8_t));
-	ret = clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, 0, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
+	ret = clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, dst->argb8888_pre.plane0_stride, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
 	if (ret != CL_SUCCESS)
 	{
-		DBG("Failed getting the surface");
+		ERR("Failed getting the surface");
 		return EINA_FALSE;
 	}
-	dst->argb8888_pre.plane0_stride = size;
 
 	return EINA_TRUE;
 }
