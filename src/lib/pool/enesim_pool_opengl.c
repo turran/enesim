@@ -77,6 +77,9 @@ static void _zero_buffer(Enesim_OpenGL_Pool *thiz, Enesim_Buffer_OpenGL_Data *da
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
+/*----------------------------------------------------------------------------*
+ *                        The Enesim's pool interface                         *
+ *----------------------------------------------------------------------------*/
 static const char * _type_get(void)
 {
 	return "enesim.pool.opengl";
