@@ -333,7 +333,7 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 	{
 		enesim_buffer_convert(b, buffer);
 	}
-	enesim_buffer_sw_data_get(buffer, &cdata);
+	enesim_buffer_map(buffer, &cdata);
 	row_ptr = (png_bytep) cdata.argb8888.plane0;
 	for (y = 0; y < h; y++)
 	{
@@ -343,6 +343,7 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 	png_write_end(png_ptr, info_ptr);
 	png_destroy_write_struct(&png_ptr, (png_infopp) & info_ptr);
 	png_destroy_info_struct(png_ptr, (png_infopp) & info_ptr);
+	enesim_buffer_unmap(buffer, &cdata, EINA_TRUE);
 	if (convert)
 		enesim_buffer_unref(buffer);
 
