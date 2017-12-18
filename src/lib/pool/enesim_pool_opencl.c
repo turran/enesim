@@ -38,6 +38,32 @@ typedef struct _Enesim_OpenCL_Pool
 	cl_command_queue queue;
 } Enesim_OpenCL_Pool;
 
+static Eina_Bool _format_to_cl(Enesim_Buffer_Format format,
+		cl_channel_order *order, cl_channel_type *type)
+{
+	switch (format)
+	{
+		case ENESIM_BUFFER_FORMAT_A8:
+		*order = CL_A;
+		*type = CL_UNSIGNED_INT8;
+		break;
+
+		case ENESIM_BUFFER_FORMAT_ARGB8888:
+		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
+		*order = CL_ARGB;
+		*type = CL_UNSIGNED_INT8;
+		break;
+
+		default:
+		ERR("Unsupported buffer format %d", format);
+		return EINA_FALSE;
+	}
+	return EINA_TRUE;
+}
+
+/*----------------------------------------------------------------------------*
+ *                        The Enesim's pool interface                         *
+ *----------------------------------------------------------------------------*/
 static const char * _type_get(void)
 {
 	return "enesim.pool.opencl";
@@ -53,8 +79,10 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	cl_int ret;
 	cl_image_format format;
 
-	format.image_channel_order = CL_ARGB;
-	format.image_channel_data_type = CL_UNSIGNED_INT8;
+	if (!_format_to_cl(fmt, &format.image_channel_order,
+			&format.image_channel_data_type))
+		return EINA_FALSE;
+
 	i = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
 			&format, w, h, 0, NULL, &ret);
 	if (ret != CL_SUCCESS)
