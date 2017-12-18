@@ -87,7 +87,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 			&format, w, h, 0, NULL, &ret);
 	if (ret != CL_SUCCESS)
 	{
-		DBG("impossible to create the image %d", ret);
+		ERR("Impossible to create the image %d", ret);
 		return EINA_FALSE;
 	}
 	*backend = ENESIM_BACKEND_OPENCL;
@@ -131,7 +131,7 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 	region[2] = 1;
 
 	clGetImageInfo(data->mem, CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
-	DBG("row pitch %d", size);
+	DBG("row pitch %zd", size);
 	dst->argb8888_pre.plane0 = calloc(size * h, sizeof(uint8_t));
 	ret = clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, 0, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
 	if (ret != CL_SUCCESS)
