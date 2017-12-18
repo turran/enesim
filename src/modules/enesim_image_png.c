@@ -273,7 +273,8 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 {
 	Enesim_Buffer *buffer;
 	Enesim_Buffer_Sw_Data cdata;
-	Eina_Bool convert = EINA_FALSE;;
+	Eina_Bool convert = EINA_FALSE;
+	Eina_Bool ret = EINA_FALSE;
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_bytep row_ptr;
@@ -283,7 +284,8 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 	/* FIXME fix this, it should be part of the options */
 	const int compression = 0;
 
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL,NULL);
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,
+			_png_msg_error_cb, _png_msg_warning_cb);
 	if (!png_ptr)
 		goto error_write_struct;
 
@@ -309,9 +311,10 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 		convert = EINA_FALSE;
 	}
 
-	png_set_write_fn(png_ptr,(png_voidp)data, _png_write, _png_flush);
+	png_set_write_fn(png_ptr, (png_voidp)data, _png_write, _png_flush);
 	png_set_IHDR(png_ptr, info_ptr, w, h, 8,
-                     PNG_COLOR_TYPE_RGB_ALPHA, png_get_interlace_type(png_ptr, info_ptr),
+			PNG_COLOR_TYPE_RGB_ALPHA,
+			png_get_interlace_type(png_ptr, info_ptr),
 			PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 #ifdef WORDS_BIGENDIAN
 	png_set_swap_alpha(png_ptr);
@@ -331,9 +334,11 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 	/* fill the buffer data */
 	if (convert)
 	{
-		enesim_buffer_convert(b, buffer);
+		if (!enesim_buffer_convert(b, buffer))
+			goto error_buffer;
 	}
-	enesim_buffer_map(buffer, &cdata);
+	if (!enesim_buffer_map(buffer, &cdata))
+		goto error_buffer;
 	row_ptr = (png_bytep) cdata.argb8888.plane0;
 	for (y = 0; y < h; y++)
 	{
@@ -341,21 +346,20 @@ static Eina_Bool _png_save(Enesim_Stream *data, Enesim_Buffer *b,
 		row_ptr += w * 4;
 	}
 	png_write_end(png_ptr, info_ptr);
-	png_destroy_write_struct(&png_ptr, (png_infopp) & info_ptr);
-	png_destroy_info_struct(png_ptr, (png_infopp) & info_ptr);
+
 	enesim_buffer_unmap(buffer, &cdata, EINA_TRUE);
+	ret = EINA_TRUE;
+error_buffer:
 	if (convert)
 		enesim_buffer_unref(buffer);
-
-	return EINA_TRUE;
-
 error_jmp:
-	png_destroy_info_struct(png_ptr, (png_infopp)&info_ptr);
+	png_destroy_info_struct(png_ptr, (png_infopp) &info_ptr);
 error_info_struct:
 	png_destroy_write_struct(&png_ptr, NULL);
 error_write_struct:
-	*err = ENESIM_IMAGE_ERROR_SAVING;
-	return EINA_FALSE;
+	if (!ret)
+		*err = ENESIM_IMAGE_ERROR_SAVING;
+	return ret;
 }
 
 static Enesim_Image_Provider_Descriptor _provider = {
