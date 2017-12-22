@@ -50,7 +50,7 @@ static Eina_Bool _format_to_cl(Enesim_Buffer_Format format,
 
 		case ENESIM_BUFFER_FORMAT_ARGB8888:
 		case ENESIM_BUFFER_FORMAT_ARGB8888_PRE:
-		*order = CL_ARGB;
+		*order = CL_RGBA;
 		*type = CL_UNSIGNED_INT8;
 		break;
 
@@ -130,6 +130,7 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 		ERR("Failed getting the surface");
 		return EINA_FALSE;
 	}
+	printf("data = %08x %02x\n", *dst->argb8888_pre.plane0, *(uint8_t*)dst->argb8888_pre.plane0);
 
 	return EINA_TRUE;
 }
