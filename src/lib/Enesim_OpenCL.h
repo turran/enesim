@@ -24,7 +24,10 @@
 
 typedef struct _Enesim_Renderer_OpenCL_Data
 {
+	cl_context context;
+	cl_device_id device;
 	cl_kernel kernel;
+	const char *kernel_name;
 } Enesim_Renderer_OpenCL_Data;
 
 typedef struct _Enesim_Buffer_OpenCL_Data

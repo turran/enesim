@@ -123,14 +123,12 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 	cl_int ret;
 
 	clGetImageInfo(data->mem, CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
-	DBG("row pitch %zd", size);
 	ret = clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, dst->argb8888_pre.plane0_stride, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
 	if (ret != CL_SUCCESS)
 	{
 		ERR("Failed getting the surface");
 		return EINA_FALSE;
 	}
-	printf("data = %08x %02x\n", *dst->argb8888_pre.plane0, *(uint8_t*)dst->argb8888_pre.plane0);
 
 	return EINA_TRUE;
 }
@@ -139,6 +137,9 @@ static void _free(void *prv)
 {
 	Enesim_OpenCL_Pool *thiz = prv;
 
+	clReleaseCommandQueue(thiz->queue);
+	clReleaseContext(thiz->context);
+	clReleaseDevice(thiz->device);
 	free(thiz);
 }
 
@@ -171,7 +172,7 @@ EAPI Enesim_Pool * enesim_pool_opencl_new(void)
 	cl_uint ret_num_platforms;
 
 	clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-	ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_DEFAULT, 1,
+	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1,
             &device_id, &ret_num_devices);
 	if (ret != CL_SUCCESS)
 	{
