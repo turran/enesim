@@ -548,7 +548,6 @@ static Eina_Bool _checker_sw_setup(Enesim_Renderer *r,
 			thiz->do_mask = EINA_TRUE;
 	}
 
-
 	type = enesim_renderer_transformation_type_get(r);
 	enesim_renderer_transformation_get(r, &matrix);
 	switch (type)
@@ -675,11 +674,34 @@ static Eina_Bool _checker_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surface
 {
 	Enesim_Renderer_Checker *thiz;
 	Enesim_Renderer_OpenCL_Data *rdata;
+	Enesim_Buffer_OpenCL_Data *sdata;
+	Enesim_Matrix matrix;
+	Enesim_Matrix inv;
+	cl_float cl_matrix[9];
+	cl_mem cl_mmatrix;
+	cl_float2 oxy;
+	double ox, oy;
 
  	thiz = ENESIM_RENDERER_CHECKER(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	clSetKernelArg(rdata->kernel, 1, sizeof(cl_uchar4), &thiz->final_color1);
-	clSetKernelArg(rdata->kernel, 2, sizeof(cl_uchar4), &thiz->final_color2);
+	sdata = enesim_surface_backend_data_get(s);
+
+	enesim_renderer_transformation_get(r, &matrix);
+	enesim_matrix_inverse(&matrix, &inv);
+	cl_matrix[0] = inv.xx; cl_matrix[1] = inv.xy; cl_matrix[2] = inv.xz;
+	cl_matrix[3] = inv.yx; cl_matrix[4] = inv.yy; cl_matrix[5] = inv.yz;
+	cl_matrix[6] = inv.zx; cl_matrix[7] = inv.zy; cl_matrix[8] = inv.zz;
+	cl_mmatrix = clCreateBuffer(sdata->context,
+			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+			sizeof(cl_matrix), &cl_matrix, NULL);
+	clSetKernelArg(rdata->kernel, 1, sizeof(cl_mem), (void *)&cl_mmatrix);
+	enesim_renderer_origin_get(r, &ox, &oy);
+	oxy.x = ox; oxy.y = oy;
+	clSetKernelArg(rdata->kernel, 2, sizeof(cl_float2), &oxy);
+	clSetKernelArg(rdata->kernel, 3, sizeof(cl_uchar4), &thiz->final_color1);
+	clSetKernelArg(rdata->kernel, 4, sizeof(cl_uchar4), &thiz->final_color2);
+	clSetKernelArg(rdata->kernel, 5, sizeof(cl_uint), &thiz->current.sw);
+	clSetKernelArg(rdata->kernel, 6, sizeof(cl_uint), &thiz->current.sh);
 
 	return EINA_TRUE;
 }
