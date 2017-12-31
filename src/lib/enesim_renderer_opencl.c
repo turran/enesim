@@ -46,7 +46,40 @@
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
-static Eina_Hash *_program_lut = NULL;
+/*----------------------------------------------------------------------------*
+ *                   Cache of kernels/programs per context                    *
+ *----------------------------------------------------------------------------*/
+typedef struct _Enesim_Renderer_OpenCL_Context_Data
+{
+	/* TODO also cache the programs once a renderer can return more
+	 * than one
+	 */
+	cl_program lib;
+	Eina_Hash *kernels;
+} Enesim_Renderer_OpenCL_Context_Data;
+
+static Enesim_Renderer_OpenCL_Context_Data *
+enesim_renderer_opencl_data_new(cl_program lib)
+{
+	Enesim_Renderer_OpenCL_Context_Data *thiz;
+
+	thiz = calloc(1, sizeof(Enesim_Renderer_OpenCL_Context_Data));
+	thiz->kernels = eina_hash_string_superfast_new((Eina_Free_Cb)clReleaseKernel);
+	thiz->lib = lib;
+	return thiz;
+}
+
+static void enesim_renderer_opencl_context_data_free(
+		Enesim_Renderer_OpenCL_Context_Data *thiz)
+{
+	clReleaseProgram(thiz->lib);
+	eina_hash_free(thiz->kernels);
+	free(thiz);
+}
+/*----------------------------------------------------------------------------*
+ *                               Helpers                                      *
+ *----------------------------------------------------------------------------*/
+static Eina_Hash *_context_lut = NULL;
 
 /* smallest multiple of local_size bigger than num */
 static size_t _roundup(size_t local_size, size_t num)
@@ -78,6 +111,52 @@ static void _release(Enesim_Renderer_OpenCL_Data *rdata)
 	{
 		rdata->kernel_name = NULL;
 	}
+}
+
+static Eina_Bool enesim_renderer_opencl_compile_kernel(
+	Enesim_Renderer_OpenCL_Data *thiz, Enesim_Renderer *r,
+	const char *source_name, const char *source, size_t source_size)
+{
+	cl_int cl_err;
+	cl_program program;
+
+	program = clCreateProgramWithSource(thiz->context, 1, &source,
+			&source_size, &cl_err);
+	if (cl_err != CL_SUCCESS)
+	{
+		ERR("Can not create program for renderer %s (err: %d)", r->name, cl_err);
+		return EINA_FALSE;
+	}
+
+	/* build the program */
+	cl_err = clBuildProgram(program, 1, &thiz->device, "-cl-std=CL2.0", NULL,
+			NULL);
+	if (cl_err != CL_SUCCESS)
+	{
+		char *build_log;
+		size_t log_size;
+
+		/* to know the size of the log */
+		clGetProgramBuildInfo(program, thiz->device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+		build_log = malloc(log_size + 1);
+		/* now the log itself */
+		clGetProgramBuildInfo(program, thiz->device, CL_PROGRAM_BUILD_LOG, log_size, build_log, NULL);
+		build_log[log_size] = '\0';
+		ERR("Can not build program for renderer %s (err: %d, log: %s)",
+				r->name, cl_err, build_log);
+		free(build_log);
+		return EINA_FALSE;
+	}
+
+	thiz->kernel = clCreateKernel(program, source_name, &cl_err);
+	if (cl_err != CL_SUCCESS)
+	{
+		ERR("Can not create kernel for renderer %s (err: %d)",
+				r->name, cl_err);
+		return EINA_FALSE;
+	}
+	thiz->kernel_name = source_name;
+	return EINA_TRUE;
 }
 /*============================================================================*
  *                                 Global                                     *
@@ -145,45 +224,9 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 	}
 	if (!rdata->kernel)
 	{
-		cl_int cl_err;
-		cl_program program;
-
-		program = clCreateProgramWithSource(rdata->context, 1, &source,
-				&source_size, &cl_err);
-		if (cl_err != CL_SUCCESS)
-		{
-			ERR("Can not create program for renderer %s (err: %d)", r->name, cl_err);
+		if (!enesim_renderer_opencl_compile_kernel(rdata, r, source_name,
+				source, source_size))
 			return EINA_FALSE;
-		}
-
-		/* build the program */
-		cl_err = clBuildProgram(program, 1, &rdata->device, "-cl-std=CL2.0", NULL,
-				NULL);
-		if (cl_err != CL_SUCCESS)
-		{
-			char *build_log;
-			size_t log_size;
-
-			/* to know the size of the log */
-			clGetProgramBuildInfo(program, rdata->device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
-			build_log = malloc(log_size + 1);
-			/* now the log itself */
-			clGetProgramBuildInfo(program, rdata->device, CL_PROGRAM_BUILD_LOG, log_size, build_log, NULL);
-			build_log[log_size] = '\0';
-			ERR("Can not build program for renderer %s (err: %d, log: %s)",
-					r->name, cl_err, build_log);
-			free(build_log);
-			return EINA_FALSE;
-		}
-
-		rdata->kernel = clCreateKernel(program, source_name, &cl_err);
-		if (cl_err != CL_SUCCESS)
-		{
-			ERR("Can not create kernel for renderer %s (err: %d)",
-					r->name, cl_err);
-			return EINA_FALSE;
-		}
-		rdata->kernel_name = source_name;
 	}
 
 	return EINA_TRUE;
@@ -237,12 +280,14 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 void enesim_renderer_opencl_init(void)
 {
-	/* maybe we should add a hash to match between kernel name and program */
+	/* TODO maybe we should add a hash to match between kernel name and program */
+	/* Create our common library */
+	_context_lut = eina_hash_pointer_new((Eina_Free_Cb)enesim_renderer_opencl_context_data_free);
 }
 
 void enesim_renderer_opencl_shutdown(void)
 {
-
+	eina_hash_free(_context_lut);
 }
 
 void enesim_renderer_opencl_free(Enesim_Renderer *r)
