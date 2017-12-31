@@ -157,7 +157,7 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 		}
 
 		/* build the program */
-		cl_err = clBuildProgram(program, 1, &rdata->device, NULL, NULL,
+		cl_err = clBuildProgram(program, 1, &rdata->device, "-cl-std=CL2.0", NULL,
 				NULL);
 		if (cl_err != CL_SUCCESS)
 		{
