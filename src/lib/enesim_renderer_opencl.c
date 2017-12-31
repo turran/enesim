@@ -201,6 +201,7 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *sdata;
 	cl_int cl_err;
+	cl_int cl_rop = rop;
 	size_t local_ws[2];
 	size_t global_ws[2];
 	size_t max_local;
@@ -210,6 +211,7 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 	sdata = enesim_surface_backend_data_get(s);
 	clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
+	clSetKernelArg(rdata->kernel, 1, sizeof(cl_int), &cl_rop);
 	/* now setup the kernel on the renderer side */
 	if (klass->opencl_kernel_setup)
 	{

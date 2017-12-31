@@ -676,14 +676,14 @@ static Eina_Bool _checker_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surface
 	cl_mmatrix = clCreateBuffer(sdata->context,
 			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 			sizeof(cl_matrix), &cl_matrix, NULL);
-	clSetKernelArg(rdata->kernel, 1, sizeof(cl_mem), (void *)&cl_mmatrix);
+	clSetKernelArg(rdata->kernel, 2, sizeof(cl_mem), (void *)&cl_mmatrix);
 	enesim_renderer_origin_get(r, &ox, &oy);
 	oxy.x = ox; oxy.y = oy;
-	clSetKernelArg(rdata->kernel, 2, sizeof(cl_float2), &oxy);
-	clSetKernelArg(rdata->kernel, 3, sizeof(cl_uchar4), &thiz->final_color1);
-	clSetKernelArg(rdata->kernel, 4, sizeof(cl_uchar4), &thiz->final_color2);
-	clSetKernelArg(rdata->kernel, 5, sizeof(cl_uint), &thiz->current.sw);
-	clSetKernelArg(rdata->kernel, 6, sizeof(cl_uint), &thiz->current.sh);
+	clSetKernelArg(rdata->kernel, 3, sizeof(cl_float2), &oxy);
+	clSetKernelArg(rdata->kernel, 4, sizeof(cl_uchar4), &thiz->final_color1);
+	clSetKernelArg(rdata->kernel, 5, sizeof(cl_uchar4), &thiz->final_color2);
+	clSetKernelArg(rdata->kernel, 6, sizeof(cl_uint), &thiz->current.sw);
+	clSetKernelArg(rdata->kernel, 7, sizeof(cl_uint), &thiz->current.sh);
 
 	return EINA_TRUE;
 }
