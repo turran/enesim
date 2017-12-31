@@ -297,7 +297,6 @@ static void _span_affine(Enesim_Renderer *r,
 	uint32_t *end = dst + len;
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
-	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 	ww = thiz->ww;
 	ww2 = thiz->ww2;
 	hh = thiz->hh;
@@ -307,6 +306,8 @@ static void _span_affine(Enesim_Renderer *r,
 	if (thiz->do_mask)
 		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
 
+	enesim_coord_affine_setup(&xx, &yy, x + 1, y + 1, thiz->ox, thiz->oy,
+			&thiz->matrix);
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx;
@@ -390,8 +391,6 @@ static void _span_projective(Enesim_Renderer *r,
 	uint32_t *end = dst + len;
 
 	thiz = ENESIM_RENDERER_CHECKER(r);
-	/* translate to the origin */
-	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 	ww = thiz->ww;
 	ww2 = thiz->ww2;
 	hh = thiz->hh;
@@ -401,6 +400,9 @@ static void _span_projective(Enesim_Renderer *r,
 	if (thiz->do_mask)
 		enesim_renderer_sw_draw(thiz->mask, x, y, len, dst);
 
+	/* translate to the origin */
+	enesim_coord_projective_setup(&xx, &yy, &zz, x + 1, y + 1, thiz->ox,
+			thiz->oy, &thiz->matrix);
 	while (dst < end)
 	{
 		Eina_F16p16 syy, sxx, syyy, sxxx;
