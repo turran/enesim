@@ -136,7 +136,7 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	enesim_renderer_checker_height_set(c, 10);
 	{
 		Enesim_Matrix m;
-		enesim_matrix_rotate(&m, 20);
+		enesim_matrix_rotate(&m, 1.13);
 		enesim_renderer_transformation_set(c, &m);
 	}
 	for (times = 0; times < options->times; times++)
