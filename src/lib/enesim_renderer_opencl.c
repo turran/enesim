@@ -225,9 +225,8 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	global_ws[0] = _roundup(local_ws[0], area->w);
 	global_ws[1] = _roundup(local_ws[1], area->h);
-	//printf("area %d %d [%d %d] [%d %d] %d\n", area->w, area->h, global_ws[0], global_ws[1], local_ws[0], local_ws[1], max_local);
 	/* launch it!!! */
-	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, 2, NULL, global_ws, local_ws, 0, NULL, NULL);
+	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, 2, NULL, global_ws, NULL, 0, NULL, NULL);
 	if (cl_err != CL_SUCCESS)
 	{
 		CRI("Can not enqueue kenrel for renderer %s", r->name);
