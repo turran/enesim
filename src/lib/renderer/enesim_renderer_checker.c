@@ -345,42 +345,32 @@ static void _span_affine(Enesim_Renderer *r,
 		}
 		if (sxx >= ww)
 		{
-			p0 = color[0];
-			/* antialias the borders */
-			if (sy == 0 || sy == thiz->current.sh)
-			{
-				uint16_t a;
+			uint32_t tmp;
 
-				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[1]);
-			}
+			tmp = color[0];
+			color[0] = color[1];
+			color[1] = tmp;
+		}
+		p0 = color[0];
+		/* antialias the borders */
+		if (sy == 0 || sy == thiz->current.sh)
+		{
+			uint16_t a;
+
+			a = 1 + ((syy & 0xffff) >> 8);
+			p0 = enesim_color_interp_256(a, color[0], color[1]);
 			if (sx == 0 || sx == thiz->current.sw)
 			{
-				uint16_t a;
-
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[1]);
+				p0 = enesim_color_interp_256(a, color[1], color[0]);
 			}
 		}
-		else
+		else if (sx == 0 || sx == thiz->current.sw)
 		{
-			p0 = color[1];
+			uint16_t a;
 
-			/* antialias the borders */
-			if (sy == 0 || sy == thiz->current.sh)
-			{
-				uint16_t a;
-
-				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[0]);
-			}
-			if (sx == 0 || sx == thiz->current.sw)
-			{
-				uint16_t a;
-
-				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[0]);
-			}
+			a = 1 + ((sxx & 0xffff) >> 8);
+			p0 = enesim_color_interp_256(a, color[0], color[1]);
 		}
 		if (ma < 255)
 			p0 = enesim_color_mul_sym(ma, p0);
@@ -451,42 +441,32 @@ static void _span_projective(Enesim_Renderer *r,
 		}
 		if (sxx >= ww)
 		{
-			p0 = color[0];
+			uint32_t tmp;
 
-			/* antialias the borders */
-			if (sy == 0 || sy == thiz->current.sh)
-			{
-				uint16_t a;
+			tmp = color[0];
+			color[0] = color[1];
+			color[1] = tmp;
+		}
+		p0 = color[0];
+		/* antialias the borders */
+		if (sy == 0 || sy == thiz->current.sh)
+		{
+			uint16_t a;
 
-				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[1]);
-			}
+			a = 1 + ((syy & 0xffff) >> 8);
+			p0 = enesim_color_interp_256(a, color[0], color[1]);
 			if (sx == 0 || sx == thiz->current.sw)
 			{
-				uint16_t a;
-
 				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[1]);
+				p0 = enesim_color_interp_256(a, color[1], color[0]);
 			}
 		}
-		else
+		else if (sx == 0 || sx == thiz->current.sw)
 		{
-			p0 = color[1];
-			/* antialias the borders */
-			if (sy == 0 || sy == thiz->current.sh)
-			{
-				uint16_t a;
+			uint16_t a;
 
-				a = 1 + ((syy & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[0]);
-			}
-			if (sx == 0 || sx == thiz->current.sw)
-			{
-				uint16_t a;
-
-				a = 1 + ((sxx & 0xffff) >> 8);
-				p0 = enesim_color_interp_256(a, p0, color[0]);
-			}
+			a = 1 + ((sxx & 0xffff) >> 8);
+			p0 = enesim_color_interp_256(a, color[0], color[1]);
 		}
 		if (ma < 255)
 			p0 = enesim_color_mul_sym(ma, p0);
