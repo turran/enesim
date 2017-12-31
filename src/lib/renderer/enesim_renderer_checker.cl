@@ -81,7 +81,7 @@ __kernel void checker(read_write image2d_t out, int rop,
 	uint w2 = w * 2;
 	uchar4 d0;
 
-	float3 xyz = projective_setup((float2)(x, y), oxy,
+	float3 xyz = projective_setup((float2)(x + 1, y + 1), oxy,
 			(float3)(matrix[0], matrix[1], matrix[2]),
 			(float3)(matrix[3], matrix[4], matrix[5]),
 			(float3)(matrix[6], matrix[7], matrix[8]));
