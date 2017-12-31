@@ -25,6 +25,7 @@
 
 #include "enesim_compositor_private.h"
 #include "enesim_renderer_sw_private.h"
+#include "enesim_renderer_opencl_private.h"
 #include "enesim_renderer_opengl_private.h"
 
 Enesim_Object_Descriptor * enesim_renderer_descriptor_get(void);

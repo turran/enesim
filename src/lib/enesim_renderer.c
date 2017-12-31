@@ -414,6 +414,9 @@ void enesim_renderer_init(void)
 	_factories = eina_hash_string_superfast_new(
 			_enesim_renderer_factory_free);
 	enesim_renderer_sw_init();
+#if BUILD_OPENCL
+	enesim_renderer_opencl_init();
+#endif
 #if BUILD_OPENGL
 	enesim_renderer_opengl_init();
 #endif
@@ -422,6 +425,9 @@ void enesim_renderer_init(void)
 void enesim_renderer_shutdown(void)
 {
 	enesim_renderer_sw_shutdown();
+#if BUILD_OPENCL
+	enesim_renderer_opencl_shutdown();
+#endif
 #if BUILD_OPENGL
 	enesim_renderer_opengl_shutdown();
 #endif

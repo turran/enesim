@@ -54,6 +54,7 @@ src/lib/enesim_image_private.h \
 src/lib/enesim_main.c \
 src/lib/enesim_matrix.c \
 src/lib/enesim_matrix_private.h \
+src/lib/enesim_opencl_private.h \
 src/lib/enesim_opengl_private.h \
 src/lib/enesim_path.c \
 src/lib/enesim_path_private.h \
