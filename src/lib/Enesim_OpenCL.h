@@ -20,7 +20,8 @@
 
 #include "CL/cl.h"
 
-#define ENESIM_OPENCL_KERNEL(k) #k
+
+#define ENESIM_OPENCL_KERNEL(...) #__VA_ARGS__
 
 typedef struct _Enesim_Renderer_OpenCL_Data
 {
