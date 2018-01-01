@@ -74,7 +74,7 @@ static inline int _kiia_non_zero_get_mask(
 /*----------------------------------------------------------------------------*
  *                                 Evaluation                                 *
  *----------------------------------------------------------------------------*/
-static inline void _kiia_even_odd_figure_evalute(Enesim_Renderer *r,
+static inline void _kiia_even_odd_figure_evaluate(Enesim_Renderer *r,
 		Enesim_Renderer_Path_Kiia_Figure *f,
 		ENESIM_RENDERER_PATH_KIIA_MASK_TYPE *mask, int *lx, int *rx,
 		int y)
@@ -155,7 +155,7 @@ static inline void _kiia_even_odd_figure_evalute(Enesim_Renderer *r,
 	*rx = mrx;
 }
 
-static inline void _kiia_non_zero_figure_evalute(Enesim_Renderer *r,
+static inline void _kiia_non_zero_figure_evaluate(Enesim_Renderer *r,
 		Enesim_Renderer_Path_Kiia_Figure *f,
 		int *mask, int *lx, int *rx, int y)
 {
@@ -608,7 +608,7 @@ void enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##fill##_simple(	\
 	mask = w->mask;								\
 										\
 	/* evaluate the edges at y */						\
-	_kiia_##fill_mode##_figure_evalute(r, f, mask, &mlx, &mrx, y);		\
+	_kiia_##fill_mode##_figure_evaluate(r, f, mask, &mlx, &mrx, y);		\
 	/* does not intersect with anything */					\
 	if (mlx == INT_MAX)							\
 	{									\
@@ -726,10 +726,10 @@ enesim_renderer_path_kiia_##nsamples##_##fill_mode##_##ft##_##st##_full(	\
 	w = &thiz->workers[nworker];						\
 										\
 	/* evaluate the edges at y */						\
-	_kiia_##fill_mode##_figure_evalute(r, &thiz->fill, w->mask, &mlx, &mrx, \
-			y);							\
-	_kiia_non_zero_figure_evalute(r, &thiz->stroke, w->omask, &omlx, &omrx, \
-			y);							\
+	_kiia_##fill_mode##_figure_evaluate(r, &thiz->fill, w->mask, &mlx,	\
+			&mrx, y);						\
+	_kiia_non_zero_figure_evaluate(r, &thiz->stroke, w->omask, &omlx,	\
+			&omrx, y);						\
 	/* pick the larger */							\
 	if (omlx < mlx)								\
 		mlx = omlx;							\
