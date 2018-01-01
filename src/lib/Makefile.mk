@@ -106,3 +106,8 @@ src_lib_libenesim_la_LIBADD = \
 -lm
 
 src_lib_libenesim_la_LDFLAGS = -no-undefined -version-info @version_info@
+
+EXTRA_DIST += \
+src/lib/enesim_main_opencl_private.cl \
+src/lib/enesim_color_opencl_private.cl \
+src/lib/enesim_color_opencl.cl

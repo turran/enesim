@@ -18,3 +18,7 @@ src/lib/util/enesim_thread.c \
 src/lib/util/enesim_thread_private.h \
 src/lib/util/enesim_vector.c \
 src/lib/util/enesim_vector_private.h
+
+EXTRA_DIST += \
+src/lib/util/enesim_coord_opencl.cl \
+src/lib/util/enesim_coord_opencl_private.cl
