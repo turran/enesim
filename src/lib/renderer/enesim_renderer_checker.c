@@ -646,6 +646,7 @@ static Eina_Bool _checker_opencl_setup(Enesim_Renderer *r,
 
 	*program_name = "checker";
 	*program_source =
+	"#include \"enesim_opencl.h\"\n" 
 	#include "enesim_renderer_checker.cl"
 	*program_length = strlen(*program_source);
 
