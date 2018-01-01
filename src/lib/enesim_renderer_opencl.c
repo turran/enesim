@@ -364,7 +364,7 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	{
 		if (!klass->opencl_kernel_setup(r, s, 2, &mode))
 		{
-			printf("Cannot setup the kernel\n");
+			ERR("Cannot setup the kernel for renderer %s", r->name);
 			return;
 		}
 	}
@@ -391,7 +391,7 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, ndim, NULL, global_ws, NULL, 0, NULL, NULL);
 	if (cl_err != CL_SUCCESS)
 	{
-		CRI("Can not enqueue kenrel for renderer %s", r->name);
+		ERR("Can not enqueue kernel for renderer %s", r->name);
 	}
 }
 
