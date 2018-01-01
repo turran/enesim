@@ -15,8 +15,8 @@
  * License along with this library.
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _COORD_H
-#define _COORD_H
+#ifndef ENESIM_COORD_PRIVATE_H_
+#define ENESIM_COORD_PRIVATE_H_
 
 /* FIXME in order to reach 1.0 we need to rmeove every occurence
  * of eina_f16p16 and use our own implementation internally
