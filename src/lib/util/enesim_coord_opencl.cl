@@ -1,4 +1,4 @@
-ENESIM_OPENCL_KERNEL(
+ENESIM_OPENCL_CODE(
 float enesim_coord_opencl_transform(float2 xy, float3 mc)
 {
 	return (xy.x * mc.x) + (xy.y * mc.y) + mc.z;

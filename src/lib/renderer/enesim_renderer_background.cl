@@ -1,4 +1,4 @@
-ENESIM_OPENCL_KERNEL(
+ENESIM_OPENCL_CODE(
 __kernel void background(read_write image2d_t out, int rop, uchar4 c)
 {
 	int x = get_global_id(0);

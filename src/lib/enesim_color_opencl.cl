@@ -1,4 +1,4 @@
-ENESIM_OPENCL_KERNEL(
+ENESIM_OPENCL_CODE(
 
 uchar4 enesim_color_opencl_mul_256(ushort a, uchar4 c)
 {

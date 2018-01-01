@@ -1,4 +1,4 @@
-ENESIM_OPENCL_KERNEL(
+ENESIM_OPENCL_CODE(
 /* Shared definitions between enesim's host code and enesim's device code
  * we MUST keep this file and enesim_main.h in sync
  */

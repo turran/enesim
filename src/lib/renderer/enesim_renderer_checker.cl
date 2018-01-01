@@ -1,4 +1,4 @@
-ENESIM_OPENCL_KERNEL(
+ENESIM_OPENCL_CODE(
 
 __kernel void checker(read_write image2d_t out, int rop,
 		__constant float *matrix, float2 oxy, uchar4 even_color,
