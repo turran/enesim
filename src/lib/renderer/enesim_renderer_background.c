@@ -230,14 +230,17 @@ static Eina_Bool _background_opencl_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surface *s)
+static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, int argc,
+		Enesim_Renderer_OpenCL_Kernel_Mode *mode)
 {
 	Enesim_Renderer_Background *thiz;
 	Enesim_Renderer_OpenCL_Data *rdata;
 
  	thiz = ENESIM_RENDERER_BACKGROUND(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	clSetKernelArg(rdata->kernel, 2, sizeof(cl_uchar4), &thiz->final_color);
+	clSetKernelArg(rdata->kernel, argc, sizeof(cl_uchar4), &thiz->final_color);
+	*mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL;
 
 	return EINA_TRUE;
 }

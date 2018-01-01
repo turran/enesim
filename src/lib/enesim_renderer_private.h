@@ -86,7 +86,14 @@ typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 		Enesim_Renderer_Sw_Fill *fill,
 		Enesim_Log **error);
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
-/* opencl backend descriptor functions */
+/* OpenCL backend descriptor functions */
+
+typedef enum _Enesim_Renderer_OpenCL_Kernel_Mode
+{
+	ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL,
+	ENESIM_RENDERER_OPENCL_KERNEL_MODE_HSPAN,
+} Enesim_Renderer_OpenCL_Kernel_Mode;
+
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Rop rop,
@@ -94,7 +101,7 @@ typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r,
 		size_t *program_length,
 		Enesim_Log **error);
 typedef void (*Enesim_Renderer_OpenCL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
-typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s);
+typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s, int argc, Enesim_Renderer_OpenCL_Kernel_Mode *mode);
 
 /* OpenGL descriptor functions */
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Initialize)(Enesim_Renderer *r,

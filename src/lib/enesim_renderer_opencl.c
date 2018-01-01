@@ -345,14 +345,15 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 {
 	Enesim_Renderer_Class *klass;
 	Enesim_Renderer_OpenCL_Data *rdata;
+	Enesim_Renderer_OpenCL_Kernel_Mode mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL;
 	Enesim_Buffer_OpenCL_Data *sdata;
 	cl_int cl_err;
 	cl_int cl_rop = rop;
 	size_t local_ws[2];
 	size_t global_ws[2];
 	size_t max_local;
+	cl_uint ndim;
 
-	//printf("inside!!\n");
 	klass = ENESIM_RENDERER_CLASS_GET(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 	sdata = enesim_surface_backend_data_get(s);
@@ -361,20 +362,33 @@ void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	/* now setup the kernel on the renderer side */
 	if (klass->opencl_kernel_setup)
 	{
-		if (!klass->opencl_kernel_setup(r, s))
+		if (!klass->opencl_kernel_setup(r, s, 2, &mode))
 		{
 			printf("Cannot setup the kernel\n");
 			return;
 		}
 	}
 	clGetDeviceInfo(sdata->device, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t), &max_local, NULL);
- 	local_ws[0] = 16; /* Number of work-items per work-group */
- 	local_ws[1] = 16; /* Number of work-items per work-group */
+	switch (mode)
+	{
+		case ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL:
+		local_ws[0] = 16; /* Number of work-items per work-group */
+		local_ws[1] = 16; /* Number of work-items per work-group */
 
-	global_ws[0] = _roundup(local_ws[0], area->w);
-	global_ws[1] = _roundup(local_ws[1], area->h);
+		global_ws[0] = _roundup(local_ws[0], area->w);
+		global_ws[1] = _roundup(local_ws[1], area->h);
+		ndim = 2;
+		break;
+
+		case ENESIM_RENDERER_OPENCL_KERNEL_MODE_HSPAN:
+		local_ws[0] = 16; /* Number of work-items per work-group */
+		global_ws[0] = _roundup(local_ws[0], area->h);
+		ndim = 1;
+		break;
+	}
+
 	/* launch it!!! */
-	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, 2, NULL, global_ws, NULL, 0, NULL, NULL);
+	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, ndim, NULL, global_ws, NULL, 0, NULL, NULL);
 	if (cl_err != CL_SUCCESS)
 	{
 		CRI("Can not enqueue kenrel for renderer %s", r->name);
