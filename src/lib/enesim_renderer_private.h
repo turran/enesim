@@ -23,6 +23,10 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#if BUILD_OPENCL
+#include "Enesim_OpenCL.h"
+#endif
+
 #include "enesim_compositor_private.h"
 #include "enesim_renderer_sw_private.h"
 #include "enesim_renderer_opencl_private.h"
@@ -64,6 +68,9 @@ typedef struct _Enesim_Renderer_State
  *                        Descriptor related functions                        *
  *----------------------------------------------------------------------------*/
 /* common descriptor functions */
+typedef void (*Enesim_Renderer_Draw)(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y);
+
 typedef const char * (*Enesim_Renderer_Base_Name_Get_Cb)(Enesim_Renderer *r);
 typedef Eina_Bool (*Enesim_Renderer_Is_Supported_Cb)(Enesim_Renderer *r, Enesim_Surface *s);
 typedef Eina_Bool (*Enesim_Renderer_Is_Inside_Cb)(Enesim_Renderer *r, double x, double y);
@@ -88,20 +95,19 @@ typedef Eina_Bool (*Enesim_Renderer_Sw_Setup)(Enesim_Renderer *r,
 typedef void (*Enesim_Renderer_Sw_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 /* OpenCL backend descriptor functions */
 
-typedef enum _Enesim_Renderer_OpenCL_Kernel_Mode
-{
-	ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL,
-	ENESIM_RENDERER_OPENCL_KERNEL_MODE_HSPAN,
-} Enesim_Renderer_OpenCL_Kernel_Mode;
-
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Setup)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Rop rop,
-		const char **program_name, const char **program_source,
-		size_t *program_length,
 		Enesim_Log **error);
 typedef void (*Enesim_Renderer_OpenCL_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
+
+typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Get)(Enesim_Renderer *r,
+		Enesim_Surface *s,
+		Enesim_Rop rop,
+		const char **program_name, const char **program_source,
+		size_t *program_length);
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s, int argc, Enesim_Renderer_OpenCL_Kernel_Mode *mode);
+typedef void (*Enesim_Renderer_OpenCL_Kernel_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 
 /* OpenGL descriptor functions */
 typedef Eina_Bool (*Enesim_Renderer_OpenGL_Initialize)(Enesim_Renderer *r,
@@ -131,8 +137,11 @@ typedef struct _Enesim_Renderer_Class
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
 	/* opencl based functions */
 	Enesim_Renderer_OpenCL_Setup opencl_setup;
-	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
 	Enesim_Renderer_OpenCL_Cleanup opencl_cleanup;
+	Enesim_Renderer_Draw opencl_draw;
+	Enesim_Renderer_OpenCL_Kernel_Get opencl_kernel_get;
+	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
+	Enesim_Renderer_OpenCL_Kernel_Cleanup opencl_kernel_cleanup;
 	/* opengl based functions */
 	Enesim_Renderer_OpenGL_Initialize opengl_initialize;
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
@@ -183,17 +192,5 @@ void enesim_renderer_log_add(Enesim_Renderer *r, Enesim_Log **error, const char 
 Eina_Bool enesim_renderer_setup(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, Enesim_Log **error);
 void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
-
-
-#if BUILD_OPENCL
-Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Enesim_Log **error);
-void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s);
-void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s, Enesim_Rop rop,
-		Eina_Rectangle *area, int x, int y);
-void enesim_renderer_opencl_init(void);
-void enesim_renderer_opencl_shutdown(void);
-void enesim_renderer_opencl_free(Enesim_Renderer *r);
-#endif
 
 #endif

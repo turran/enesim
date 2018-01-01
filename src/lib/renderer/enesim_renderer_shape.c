@@ -36,6 +36,10 @@
 #include "enesim_list_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_shape_private.h"
+
+#if BUILD_OPENCL
+#include "enesim_renderer_opencl_private.h"
+#endif
 /* TODO
  * - whenever we need the damage area of a shape, we need to check if
  *   the renderer has a fill renderer, if so, we should call the damage
@@ -444,10 +448,9 @@ static void _enesim_renderer_shape_opengl_cleanup(Enesim_Renderer *r,
 		klass->opengl_cleanup(r, s);
 }
 
+#if BUILD_OPENCL
 static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
-		const char **program_name, const char **program_source,
-		size_t *program_length,
 		Enesim_Log **l)
 {
 	Enesim_Renderer_Shape_Class *klass;
@@ -456,8 +459,7 @@ static Eina_Bool _enesim_renderer_shape_opencl_setup(Enesim_Renderer *r,
 	if (!_shape_setup(r, s, rop, l)) return EINA_FALSE;
 	if (!klass->opencl_setup) return EINA_FALSE;
 
-	return klass->opencl_setup(r, s, rop, program_name, program_source,
-			program_length, l);
+	return klass->opencl_setup(r, s, rop, l);
 }
 
 static void _enesim_renderer_shape_opencl_cleanup(Enesim_Renderer *r,
@@ -472,6 +474,7 @@ static void _enesim_renderer_shape_opencl_cleanup(Enesim_Renderer *r,
 	if (klass->opencl_cleanup)
 		klass->opencl_cleanup(r, s);
 }
+#endif
 
 static Eina_Bool _enesim_renderer_shape_has_changed(Enesim_Renderer *r)
 {
@@ -596,6 +599,7 @@ ENESIM_OBJECT_ABSTRACT_BOILERPLATE(ENESIM_RENDERER_DESCRIPTOR,
 static void _enesim_renderer_shape_class_init(void *k)
 {
 	Enesim_Renderer_Class *klass;
+	Enesim_Renderer_Shape_Class *sklass;
 
 	klass = ENESIM_RENDERER_CLASS(k);
 	klass->is_supported = _enesim_renderer_shape_is_supported;
@@ -603,10 +607,18 @@ static void _enesim_renderer_shape_class_init(void *k)
 	klass->has_changed = _enesim_renderer_shape_has_changed;
 	klass->sw_setup = _enesim_renderer_shape_sw_setup;
 	klass->sw_cleanup = _enesim_renderer_shape_sw_cleanup;
+#if BUILD_OPENCL
 	klass->opencl_setup = _enesim_renderer_shape_opencl_setup;
 	klass->opencl_cleanup = _enesim_renderer_shape_opencl_cleanup;
+#endif
 	klass->opengl_setup = _enesim_renderer_shape_opengl_setup;
 	klass->opengl_cleanup = _enesim_renderer_shape_opengl_cleanup;
+
+#if BUILD_OPENCL
+	sklass = ENESIM_RENDERER_SHAPE_CLASS(k);
+	sklass->opencl_setup = enesim_renderer_opencl_setup_default;
+	sklass->opencl_cleanup = enesim_renderer_opencl_cleanup_default;
+#endif
 }
 
 static void _enesim_renderer_shape_instance_init(void *o)

@@ -211,16 +211,11 @@ static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UN
 }
 
 #if BUILD_OPENCL
-static Eina_Bool _background_opencl_setup(Enesim_Renderer *r,
+static Eina_Bool _background_opencl_kernel_get(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
 		const char **program_name, const char **program_source,
-		size_t *program_length, Enesim_Log **l)
+		size_t *program_length)
 {
-	Enesim_Renderer_Background *thiz;
-
- 	thiz = ENESIM_RENDERER_BACKGROUND(r);
-	if (!_background_state_setup(r)) return EINA_FALSE;
-
 	*program_name = "background";
 	*program_source =
 	"#include \"enesim_opencl.h\"\n" 
@@ -238,6 +233,8 @@ static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r,
 	Enesim_Renderer_OpenCL_Data *rdata;
 
  	thiz = ENESIM_RENDERER_BACKGROUND(r);
+	if (!_background_state_setup(r)) return EINA_FALSE;
+
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 	clSetKernelArg(rdata->kernel, argc, sizeof(cl_uchar4), &thiz->final_color);
 	*mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL;
@@ -245,7 +242,7 @@ static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r,
 	return EINA_TRUE;
 }
 
-static void _background_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+static void _background_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	_background_state_cleanup(r);
 }
@@ -325,9 +322,9 @@ static void _enesim_renderer_background_class_init(void *k)
 	klass->sw_setup = _background_sw_setup;
 	klass->sw_cleanup = _background_sw_cleanup;
 #if BUILD_OPENCL
-	klass->opencl_setup = _background_opencl_setup;
+	klass->opencl_kernel_get = _background_opencl_kernel_get;
 	klass->opencl_kernel_setup = _background_opencl_kernel_setup;
-	klass->opencl_cleanup = _background_opencl_cleanup;
+	klass->opencl_kernel_cleanup = _background_opencl_kernel_cleanup;
 #endif
 #if BUILD_OPENGL
 	klass->opengl_initialize = _background_opengl_initialize;

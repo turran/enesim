@@ -352,7 +352,13 @@ static void _enesim_renderer_class_init(void *k)
 	dname = enesim_object_descriptor_name_get(object_klass->descriptor);
 
 	klass = ENESIM_RENDERER_CLASS(k);
+#if BUILD_OPENCL
+	klass->opencl_setup = enesim_renderer_opencl_setup_default;
+	klass->opencl_cleanup = enesim_renderer_opencl_cleanup_default;
+	klass->opencl_draw = enesim_renderer_opencl_draw_default;
+#endif
 	/* check the passed in functions */
+	/* TODO remove this, they are always NULL */
 	if (!klass->is_inside)
 		WRN("No is_inside() function available on '%s'", dname);
 	if (!klass->bounds_get)

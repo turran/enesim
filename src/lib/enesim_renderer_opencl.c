@@ -269,9 +269,51 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 		Enesim_Log **error)
 {
 	Enesim_Renderer_Class *klass;
+	Eina_Bool ret = EINA_FALSE;
+
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (klass->opencl_setup)
+	{
+		ret = klass->opencl_setup(r, s, rop, error);
+	}
+	return ret;
+}
+
+void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (klass->opencl_cleanup)
+	{
+		klass->opencl_cleanup(r, s);
+	}
+}
+
+void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (klass->opencl_draw)
+	{
+		klass->opencl_draw(r, s, rop, area, x, y);
+	}
+}
+
+/*----------------------------------------------------------------------------*
+ *                          Default implementation                            *
+ *----------------------------------------------------------------------------*/
+Eina_Bool enesim_renderer_opencl_setup_default(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		Enesim_Log **error)
+{
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *sdata;
+	Enesim_Renderer_Class *klass;
 	Eina_Bool ret;
+	cl_int cl_rop = rop;
 	const char *source = NULL;
 	const char *source_name = NULL;
 	size_t source_size = 0;
@@ -284,10 +326,10 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 	 * we need a way to get a uniqueid of the program too to not compile
 	 * it every time, something like a token
 	 */
-	if (!klass->opencl_setup)
+	if (!klass->opencl_kernel_get)
 		return EINA_FALSE;
 
-	ret = klass->opencl_setup(r, s, rop, &source_name, &source, &source_size, error);
+	ret = klass->opencl_kernel_get(r, s, rop, &source_name, &source, &source_size);
 	if (!ret)
 	{
 		ERR("Can not setup the renderer %s", r->name);
@@ -299,6 +341,7 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 	if (!rdata)
 	{
 		rdata = calloc(1, sizeof(Enesim_Renderer_OpenCL_Data));
+		rdata->mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL;
 		enesim_renderer_backend_data_set(r, ENESIM_BACKEND_OPENCL, rdata);
 	}
 	else
@@ -332,44 +375,47 @@ Eina_Bool enesim_renderer_opencl_setup(Enesim_Renderer *r,
 			return EINA_FALSE;
 	}
 
-	return EINA_TRUE;
-}
-
-void enesim_renderer_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
-{
-	//clReleaseKernel(vector_add_k);
-}
-
-void enesim_renderer_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
-		Enesim_Rop rop, Eina_Rectangle *area, int x, int y)
-{
-	Enesim_Renderer_Class *klass;
-	Enesim_Renderer_OpenCL_Data *rdata;
-	Enesim_Renderer_OpenCL_Kernel_Mode mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL;
-	Enesim_Buffer_OpenCL_Data *sdata;
-	cl_int cl_err;
-	cl_int cl_rop = rop;
-	size_t local_ws[2];
-	size_t global_ws[2];
-	size_t max_local;
-	cl_uint ndim;
-
-	klass = ENESIM_RENDERER_CLASS_GET(r);
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	sdata = enesim_surface_backend_data_get(s);
 	clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
 	clSetKernelArg(rdata->kernel, 1, sizeof(cl_int), &cl_rop);
 	/* now setup the kernel on the renderer side */
 	if (klass->opencl_kernel_setup)
 	{
-		if (!klass->opencl_kernel_setup(r, s, 2, &mode))
+		if (!klass->opencl_kernel_setup(r, s, 2, &rdata->mode))
 		{
 			ERR("Cannot setup the kernel for renderer %s", r->name);
-			return;
+			return EINA_FALSE;
 		}
 	}
+
+	return EINA_TRUE;
+}
+
+void enesim_renderer_opencl_cleanup_default(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Class *klass;
+
+	klass = ENESIM_RENDERER_CLASS_GET(r);
+	if (klass->opencl_kernel_cleanup)
+	{
+		klass->opencl_kernel_cleanup(r, s);
+	}
+}
+
+void enesim_renderer_opencl_draw_default(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+{
+	Enesim_Renderer_OpenCL_Data *rdata;
+	Enesim_Buffer_OpenCL_Data *sdata;
+	cl_int cl_err;
+	size_t local_ws[2];
+	size_t global_ws[2];
+	size_t max_local;
+	cl_uint ndim = 2;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	sdata = enesim_surface_backend_data_get(s);
 	clGetDeviceInfo(sdata->device, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(size_t), &max_local, NULL);
-	switch (mode)
+	switch (rdata->mode)
 	{
 		case ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL:
 		local_ws[0] = 16; /* Number of work-items per work-group */
@@ -410,7 +456,8 @@ void enesim_renderer_opencl_free(Enesim_Renderer *r)
 	Enesim_Renderer_OpenCL_Data *cl_data;
 
 	cl_data = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	if (!cl_data) return;
+	if (!cl_data)
+		return;
 	_release(cl_data);
 	free(cl_data);
 }

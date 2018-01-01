@@ -286,6 +286,21 @@ static void _path_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_path_cleanup(r, s);
 }
 #endif
+
+#if BUILD_OPENCL
+static Eina_Bool _path_opencl_setup(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, Enesim_Log **l)
+{
+	if (!_path_setup(r, s, rop, l))
+		return EINA_FALSE;
+	return EINA_TRUE;
+}
+
+static void _path_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	_path_cleanup(r, s);
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -321,6 +336,10 @@ static void _enesim_renderer_path_class_init(void *k)
 #if BUILD_OPENGL
 	klass->opengl_setup = _path_opengl_setup;
 	klass->opengl_cleanup = _path_opengl_cleanup;
+#endif
+#if BUILD_OPENCL
+	klass->opencl_setup = _path_opencl_setup;
+	klass->opencl_cleanup = _path_opencl_cleanup;
 #endif
 }
 
