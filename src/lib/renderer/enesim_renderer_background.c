@@ -236,7 +236,7 @@ static Eina_Bool _background_opencl_kernel_setup(Enesim_Renderer *r, Enesim_Surf
 
  	thiz = ENESIM_RENDERER_BACKGROUND(r);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	clSetKernelArg(rdata->kernel, 1, sizeof(cl_uchar4), &thiz->final_color);
+	clSetKernelArg(rdata->kernel, 2, sizeof(cl_uchar4), &thiz->final_color);
 
 	return EINA_TRUE;
 }
