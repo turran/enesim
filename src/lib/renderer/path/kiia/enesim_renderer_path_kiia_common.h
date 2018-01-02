@@ -91,7 +91,7 @@ static inline void _kiia_even_odd_figure_evaluate(Enesim_Renderer *r,
 	/* intersect with each edge */
 	for (i = 0; i < f->nedges; i++)
 	{
-		Enesim_Renderer_Path_Kiia_Edge *edge = &f->edges[i];
+		Enesim_Renderer_Path_Kiia_Edge_Sw *edge = &f->edges[i];
 		Eina_F16p16 *pattern;
 		Eina_F16p16 yyy0, yyy1;
 		Eina_F16p16 cx;
@@ -171,7 +171,7 @@ static inline void _kiia_non_zero_figure_evaluate(Enesim_Renderer *r,
 	/* intersect with each edge */
 	for (i = 0; i < f->nedges; i++)
 	{
-		Enesim_Renderer_Path_Kiia_Edge *edge = &f->edges[i];
+		Enesim_Renderer_Path_Kiia_Edge_Sw *edge = &f->edges[i];
 		Eina_F16p16 *pattern;
 		Eina_F16p16 yyy0, yyy1;
 		Eina_F16p16 cx;

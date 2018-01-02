@@ -20,11 +20,10 @@
 #include <float.h>
 #include "enesim_renderer_path_kiia_private.h"
 
-/* Add support for the different fill rules
- * Add support for the different qualities
- * Modify it to handle the current_figure
- * Make it generate both figures
- */
+#ifdef BUILD_OPENCL
+#include "Enesim_OpenCL.h"
+#endif
+
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -38,15 +37,73 @@ static Enesim_Renderer_Sw_Fill _fill_full[3][ENESIM_RENDERER_SHAPE_FILL_RULES][2
 static Enesim_Renderer_Path_Kiia_Worker_Setup _worker_setup[3][ENESIM_RENDERER_SHAPE_FILL_RULES];
 static Eina_F16p16 *_patterns[3];
 
-static int _kiia_edge_sort(const void *l, const void *r)
+
+/*----------------------------------------------------------------------------*
+ *                              Edge helpers                                  *
+ *----------------------------------------------------------------------------*/
+typedef int (Enesim_Renderer_Path_Kiia_Edge_Cmp)(const void *edge1,
+		const void *edge2);
+typedef void (Enesim_Renderer_Path_Kiia_Edge_Store)(
+		Enesim_Renderer_Path_Kiia_Edge *thiz, void *edges, int at);
+
+static void _kiia_edge_to_sw(Enesim_Renderer_Path_Kiia_Edge *thiz,
+		Enesim_Renderer_Path_Kiia_Edge_Sw *sw)
 {
-	Enesim_Renderer_Path_Kiia_Edge *lv = (Enesim_Renderer_Path_Kiia_Edge *)l;
-	Enesim_Renderer_Path_Kiia_Edge *rv = (Enesim_Renderer_Path_Kiia_Edge *)r;
+	sw->yy0 = eina_f16p16_double_from(thiz->y0);
+	sw->yy1 = eina_f16p16_double_from(thiz->y1);
+	sw->xx0 = eina_f16p16_double_from(thiz->x0);
+	sw->xx1 = eina_f16p16_double_from(thiz->x1);
+	sw->slope = eina_f16p16_double_from(thiz->slope);
+	sw->mx = eina_f16p16_double_from(thiz->mx);
+	sw->sgn = thiz->sgn;
+}
+
+static void _kiia_edge_store(Enesim_Renderer_Path_Kiia_Edge *thiz, void *data,
+		int at)
+{
+	Enesim_Renderer_Path_Kiia_Edge_Sw *edges = data;
+	Enesim_Renderer_Path_Kiia_Edge_Sw *sw;
+
+	sw = &edges[at];
+	_kiia_edge_to_sw(thiz, sw);
+}
+
+static int _kiia_edge_cmp(const void *l, const void *r)
+{
+	Enesim_Renderer_Path_Kiia_Edge_Sw *lv = (Enesim_Renderer_Path_Kiia_Edge_Sw *)l;
+	Enesim_Renderer_Path_Kiia_Edge_Sw *rv = (Enesim_Renderer_Path_Kiia_Edge_Sw *)r;
 
 	if (lv->yy0 <= rv->yy0)
 		return -1;
 	return 1;
 }
+
+#if BUILD_OPENCL
+static void _kiia_edge_cl_store(Enesim_Renderer_Path_Kiia_Edge *thiz,
+		void *data, int at)
+{
+	cl_float *edges = data;
+	cl_float *edge = &edges[at * 7]; // 7 members per edge
+	edge[0] = thiz->x0;
+	edge[1] = thiz->y0;
+	edge[2] = thiz->x1;
+	edge[3] = thiz->y1;
+	edge[4] = thiz->slope;
+	edge[5] = thiz->mx;
+	edge[6] = thiz->sgn;
+}
+
+static int _kiia_edge_cl_cmp(const void *l, const void *r)
+{
+	const cl_float *lv = l;
+	const cl_float *rv = r;
+
+	/* compare y0 */
+	if (lv[1] <= rv[1])
+		return -1;
+	return 1;
+}
+#endif
 
 /* On the first edge we will modify the first and the second point
  * with the snapped y's coordinates
@@ -91,12 +148,12 @@ static Eina_Bool _kiia_edge_first_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	slope = x01 / y01;
 	mx = x0;
 
-	thiz->yy0 = eina_f16p16_double_from(y0);
-	thiz->yy1 = eina_f16p16_double_from(y1);
-	thiz->xx0 = eina_f16p16_double_from(x0);
-	thiz->xx1 = eina_f16p16_double_from(x1);
-	thiz->slope = eina_f16p16_double_from(slope/nsamples);
-	thiz->mx = eina_f16p16_double_from(mx);
+	thiz->x0 = x0;
+	thiz->y0 = y0;
+	thiz->x1 = x1;
+	thiz->y1 = y1;
+	thiz->slope = slope/nsamples;
+	thiz->mx = mx;
 	thiz->sgn = sgn;
 
 	if (sgn < 0)
@@ -162,25 +219,26 @@ static Eina_Bool _kiia_edge_setup(Enesim_Renderer_Path_Kiia_Edge *thiz,
 	slope = x01 / y01;
 	mx = x0;
 
-	thiz->yy0 = eina_f16p16_double_from(y0);
-	thiz->yy1 = eina_f16p16_double_from(y1);
-	thiz->xx0 = eina_f16p16_double_from(x0);
-	thiz->xx1 = eina_f16p16_double_from(x1);
-	thiz->slope = eina_f16p16_double_from(slope/nsamples);
-	thiz->mx = eina_f16p16_double_from(mx);
+	thiz->x0 = x0;
+	thiz->y0 = y0;
+	thiz->x1 = x1;
+	thiz->y1 = y1;
+	thiz->slope = slope/nsamples;
+	thiz->mx = mx;
 	thiz->sgn = sgn;
-
 	//printf("edges 1: %g %g %g %g (%g)\n", p0->x, p0->y, p1->x, p1->y, slope);
 
 	return EINA_TRUE;
 }
 
-static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
-		int nsamples, int *nedges)
+static Enesim_Renderer_Path_Kiia_Edge_Sw * _kiia_edges_setup(Enesim_Figure *f,
+		int nsamples, int *nedges, size_t edge_size,
+		Enesim_Renderer_Path_Kiia_Edge_Store store,
+		Enesim_Renderer_Path_Kiia_Edge_Cmp cmp)
 {
-	Enesim_Renderer_Path_Kiia_Edge *edges;
 	Enesim_Polygon *p;
 	Eina_List *l1;
+	void *edges;
 	int n = 0;
 
 	/* allocate the maximum number of possible edges */
@@ -194,7 +252,10 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		 */
 		n++;
 	}
-	edges = malloc(n * sizeof(Enesim_Renderer_Path_Kiia_Edge));
+	/* Generic store of edges, or either the fp for sw backend
+	 * or the cl one
+	 */
+	edges = malloc(n * edge_size);
 
 	/* create the edges */
 	n = 0;
@@ -216,13 +277,14 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		/* find the first edge */
 		EINA_LIST_FOREACH(points, l2, pt)
 		{
-			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
+			Enesim_Renderer_Path_Kiia_Edge e;
 			Enesim_Point cp;
 
 			/* make a copy so we can modify the point */
 			cp = *pt;
-			if (_kiia_edge_first_setup(e, &pp, &cp, nsamples))
+			if (_kiia_edge_first_setup(&e, &pp, &cp, nsamples))
 			{
+				store(&e, edges, n);
 				/* ok, we found the first edge, update the real
 				 * first/last point y */
 				fp.y = pp.y;
@@ -257,40 +319,47 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 		}
 		EINA_LIST_FOREACH(points, l2, pt)
 		{
-			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
+			Enesim_Renderer_Path_Kiia_Edge e;
 			Enesim_Point cp;
 
 			/* make a copy so we can modify the point */
 			cp = *pt;
-			if (_kiia_edge_setup(e, &pp, &cp, nsamples))
+			if (_kiia_edge_setup(&e, &pp, &cp, nsamples))
+			{
+				store(&e, edges, n);
 				n++;
+			}
 			pp = cp;
 		}
 		/* add the last point in case the polygon is closed */
 		if (p->closed)
 		{
-			Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
-			if (_kiia_edge_setup(e, &pp, &lp, nsamples))
+			Enesim_Renderer_Path_Kiia_Edge e;
+			if (_kiia_edge_setup(&e, &pp, &lp, nsamples))
+			{
+				store(&e, edges, n);
 				n++;
+			}
 			/* sanity edge */
 			{
-				e = &edges[n];
-				if (_kiia_edge_setup(e, &lp, &fp, nsamples))
+				if (_kiia_edge_setup(&e, &lp, &fp, nsamples))
 				{
+					store(&e, edges, n);
 					n++;
 				}
 			}
 		}
 		else
 		{
+			Enesim_Renderer_Path_Kiia_Edge e;
 			/* sanity edge */
 			/* TODO for a multi polygon figure, the generator is generating
 			 * a figure with the all open but the last that is closed
 			 */
 			{
-				Enesim_Renderer_Path_Kiia_Edge *e = &edges[n];
-				if (_kiia_edge_setup(e, &pp, &fp, nsamples))
+				if (_kiia_edge_setup(&e, &pp, &fp, nsamples))
 				{
+					store(&e, edges, n);
 					n++;
 				}
 			}
@@ -298,7 +367,7 @@ static Enesim_Renderer_Path_Kiia_Edge * _kiia_edges_setup(Enesim_Figure *f,
 	}
 
 	if (n)
-		qsort(edges, n, sizeof(Enesim_Renderer_Path_Kiia_Edge), _kiia_edge_sort);
+		qsort(edges, n, edge_size, cmp);
 	*nedges = n;
 	return edges;
 }
@@ -377,7 +446,10 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	return EINA_TRUE;
 }
 
-static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r)
+static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r,
+		size_t edge_size,
+		Enesim_Renderer_Path_Kiia_Edge_Store store,
+		Enesim_Renderer_Path_Kiia_Edge_Cmp cmp)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Renderer_Shape_Draw_Mode dm;
@@ -399,21 +471,26 @@ static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r)
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
 		thiz->fill.edges = _kiia_edges_setup(thiz->fill.figure,
-				thiz->nsamples, &thiz->fill.nedges);
+				thiz->nsamples, &thiz->fill.nedges,
+				edge_size, store, cmp);
 		if (!thiz->fill.edges)
 			return EINA_FALSE;
 	}
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		thiz->stroke.edges = _kiia_edges_setup(thiz->stroke.figure,
-				thiz->nsamples, &thiz->stroke.nedges);
+				thiz->nsamples, &thiz->stroke.nedges,
+				edge_size, store, cmp);
 		if (!thiz->stroke.edges)
 			return EINA_FALSE;
 	}
 	return EINA_TRUE;
 }
 
-static Eina_Bool _kiia_generate(Enesim_Renderer *r)
+static Eina_Bool _kiia_generate(Enesim_Renderer *r,
+		size_t edge_size,
+		Enesim_Renderer_Path_Kiia_Edge_Store store,
+		Enesim_Renderer_Path_Kiia_Edge_Cmp cmp)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Quality q;
@@ -439,7 +516,7 @@ static Eina_Bool _kiia_generate(Enesim_Renderer *r)
 	}
 	if (!_kiia_figures_generate(r))
 		return EINA_FALSE;
-	if (!_kiia_edges_generate(r))
+	if (!_kiia_edges_generate(r, edge_size, store, cmp))
 		return EINA_FALSE;
 	/* Finally mark as we have already generated the figure */
 	enesim_renderer_path_abstract_generate(r);
@@ -490,7 +567,8 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	/* Convert the path to a figure */
-	if (!_kiia_generate(r))
+	if (!_kiia_generate(r, 	sizeof(Enesim_Renderer_Path_Kiia_Edge_Sw),
+			_kiia_edge_store, _kiia_edge_cmp))
 		return EINA_FALSE;
 	/* setup the fill properties */
 	thiz->fill.ren = enesim_renderer_shape_fill_renderer_get(r);
@@ -592,6 +670,32 @@ static void _kiia_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 	*hints = ENESIM_RENDERER_SW_HINT_COLORIZE;
 }
 
+#if BUILD_OPENCL
+static Eina_Bool _kiia_opencl_kernel_get(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		const char **program_name, const char **program_source,
+		size_t *program_length)
+{
+	return EINA_FALSE;
+}
+
+static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, int argc,
+		Enesim_Renderer_OpenCL_Kernel_Mode *mode)
+{
+	/* The algorithm requires a Enesim_Renderer_Path_Kiia_Edge_Sw structure to be used
+	 * we can share a struct, but because of the alignment it is not safe to do so
+	 * We better use a buffer of floats for edges, i.e x0, y0, x1, y1, mx, slope
+	 * and sign all sequentially stored as cl_floats
+	 */
+	return EINA_FALSE;
+}
+
+static void _kiia_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+}
+#endif
+
 static Eina_Bool _kiia_bounds_get(Enesim_Renderer *r,
 		Enesim_Rectangle *bounds, Enesim_Log **log EINA_UNUSED)
 {
@@ -601,7 +705,8 @@ static Eina_Bool _kiia_bounds_get(Enesim_Renderer *r,
 	double xmax = -DBL_MAX;
 	double ymax = -DBL_MAX;
 
-	if (!_kiia_generate(r))
+	if (!_kiia_generate(r, 	sizeof(Enesim_Renderer_Path_Kiia_Edge_Sw),
+			_kiia_edge_store, _kiia_edge_cmp))
 		goto failed;
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	/* check the type of draw mode */
@@ -670,6 +775,11 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	r_klass->features_get = _kiia_features_get;
 	r_klass->sw_hints_get = _kiia_sw_hints;
 	r_klass->bounds_get = _kiia_bounds_get;
+#ifdef BUILD_OPENCL
+	r_klass->opencl_kernel_get = _kiia_opencl_kernel_get;
+	r_klass->opencl_kernel_setup = _kiia_opencl_kernel_setup;
+	r_klass->opencl_kernel_cleanup = _kiia_opencl_kernel_cleanup;
+#endif
 
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
 	s_klass->sw_setup = _kiia_sw_setup;

@@ -62,8 +62,20 @@ typedef struct _Enesim_Renderer_Path_Kiia_Worker
 	int y;
 } Enesim_Renderer_Path_Kiia_Worker;
 
-/* Its own definition of an edge */
 typedef struct _Enesim_Renderer_Path_Kiia_Edge
+{
+	/* The top/bottom coordinates rounded to increment of 1/num samples */
+	double y0, y1;
+	double x0, x1;
+	/* The x coordinate at yy0 */
+	double mx;
+	/* The increment on x when y increments 1/num samples */
+	double slope;
+	int sgn;
+} Enesim_Renderer_Path_Kiia_Edge;
+
+/* Its own definition of an edge */
+typedef struct _Enesim_Renderer_Path_Kiia_Edge_Sw
 {
 	/* The top/bottom coordinates rounded to increment of 1/num samples */
 	Eina_F16p16 yy0, yy1;
@@ -74,12 +86,18 @@ typedef struct _Enesim_Renderer_Path_Kiia_Edge
 	/* The increment on x when y increments 1/num samples */
 	Eina_F16p16 slope;
 	int sgn;
-} Enesim_Renderer_Path_Kiia_Edge;
+} Enesim_Renderer_Path_Kiia_Edge_Sw;
 
 typedef struct _Enesim_Renderer_Path_Kiia_Figure
 {
 	Enesim_Figure *figure;
-	Enesim_Renderer_Path_Kiia_Edge *edges;
+#ifdef BUILD_OPENCL
+	/* We store all the edge information continuously
+	 * on the array
+	 */
+	cl_float *cl_edges;
+#endif
+	Enesim_Renderer_Path_Kiia_Edge_Sw *edges;
 	int nedges;
 	Enesim_Renderer *ren;
 	Enesim_Color color;
