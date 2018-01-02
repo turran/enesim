@@ -300,6 +300,15 @@ static void _path_opencl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
 	_path_cleanup(r, s);
 }
+
+static void _path_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+{
+	Enesim_Renderer_Path *thiz;
+
+	thiz = ENESIM_RENDERER_PATH(r);
+	enesim_renderer_opencl_draw(thiz->current, s, rop, area, x, y);
+}
 #endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
@@ -340,6 +349,7 @@ static void _enesim_renderer_path_class_init(void *k)
 #if BUILD_OPENCL
 	klass->opencl_setup = _path_opencl_setup;
 	klass->opencl_cleanup = _path_opencl_cleanup;
+	klass->opencl_draw = _path_opencl_draw;
 #endif
 }
 
