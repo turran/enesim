@@ -608,6 +608,11 @@ void enesim_renderer_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 #endif
 		break;
 
+		case ENESIM_BACKEND_OPENCL:
+#if BUILD_OPENCL
+		enesim_renderer_opencl_cleanup(r, s);
+#endif
+
 		default:
 		break;
 	}
