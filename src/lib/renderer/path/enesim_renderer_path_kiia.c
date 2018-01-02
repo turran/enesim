@@ -676,7 +676,13 @@ static Eina_Bool _kiia_opencl_kernel_get(Enesim_Renderer *r,
 		const char **program_name, const char **program_source,
 		size_t *program_length)
 {
-	return EINA_FALSE;
+	*program_name = "path_kiia";
+	*program_source =
+	"#include \"enesim_opencl.h\"\n" 
+	#include "enesim_renderer_path_kiia.cl"
+	*program_length = strlen(*program_source);
+
+	return EINA_TRUE;
 }
 
 static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
@@ -688,6 +694,7 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	 * We better use a buffer of floats for edges, i.e x0, y0, x1, y1, mx, slope
 	 * and sign all sequentially stored as cl_floats
 	 */
+	/* TODO override the draw method to also draw the fill and/or stroke renderer */
 	return EINA_FALSE;
 }
 
