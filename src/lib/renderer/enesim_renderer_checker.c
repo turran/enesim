@@ -43,6 +43,7 @@
 
 #include "enesim_color_private.h"
 #include "enesim_coord_private.h"
+#include "enesim_surface_private.h"
 #include "enesim_renderer_private.h"
 
 /**
