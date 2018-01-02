@@ -62,6 +62,8 @@ src/lib/renderer/enesim_renderer_text_span.c \
 src/lib/renderer/enesim_renderer_transition.c
 
 EXTRA_DIST += \
+src/lib/renderer/enesim_renderer_background.cl \
+src/lib/renderer/enesim_renderer_checker.cl \
 src/lib/renderer/enesim_renderer_checker.glsl \
 src/lib/renderer/enesim_renderer_gradient_linear.glsl \
 src/lib/renderer/enesim_renderer_gradient_radial.glsl \

@@ -16,6 +16,7 @@ src/lib/renderer/path/enesim_renderer_path_tesselator.c
 endif
 
 EXTRA_DIST += \
+src/lib/renderer/path/enesim_renderer_path_kiia.cl \
 src/lib/renderer/path/enesim_renderer_path_silhoutte_ambient.glsl \
 src/lib/renderer/path/enesim_renderer_path_silhoutte_vertex.glsl \
 src/lib/renderer/path/enesim_renderer_path_silhoutte_texture.glsl
