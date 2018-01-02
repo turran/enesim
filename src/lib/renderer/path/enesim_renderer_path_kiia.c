@@ -523,6 +523,70 @@ static Eina_Bool _kiia_generate(Enesim_Renderer *r,
 
 	return EINA_TRUE;
 }
+
+static Eina_Bool _kiia_setup(Enesim_Renderer *r, double *rty, double *rby,
+		double *rlx, double *rrx)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Color color;
+	double lx, rx, ty, by;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	/* Convert the path to a figure */
+	if (!_kiia_generate(r, 	sizeof(Enesim_Renderer_Path_Kiia_Edge_Sw),
+			_kiia_edge_store, _kiia_edge_cmp))
+		return EINA_FALSE;
+	/* setup the fill properties */
+	thiz->fill.ren = enesim_renderer_shape_fill_renderer_get(r);
+	thiz->fill.color = enesim_renderer_shape_fill_color_get(r);
+	/* setup the stroke properties */
+	thiz->stroke.ren = enesim_renderer_shape_stroke_renderer_get(r);
+	thiz->stroke.color = enesim_renderer_shape_stroke_color_get(r);
+	/* simplify the calcs */
+	color = enesim_renderer_color_get(r);
+	if (color != ENESIM_COLOR_FULL)
+	{
+		thiz->stroke.color = enesim_color_mul4_sym(thiz->stroke.color, color);
+		thiz->fill.color = enesim_color_mul4_sym(thiz->fill.color, color);
+	}
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
+	{
+		double olx, oty, orx, oby;
+
+		if (!enesim_figure_bounds(thiz->fill.figure, &lx, &ty, &rx, &by))
+			return EINA_FALSE;
+		if (!enesim_figure_bounds(thiz->stroke.figure, &olx, &oty, &orx, &oby))
+			return EINA_FALSE;
+		if (olx < lx)
+			lx = olx;
+		if (orx > rx)
+			rx = orx;
+		if (oty < ty)
+			ty = oty;
+		if (oby > by)
+			by = oby;
+	}
+	else
+	{
+		if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+			thiz->current = &thiz->fill;
+		else
+			thiz->current = &thiz->stroke;
+		if (!enesim_figure_bounds(thiz->current->figure, &lx, &ty, &rx, &by))
+			return EINA_FALSE;
+	}
+
+	/* snap the coordinates lx, rx, ty and by */
+	*rty = (((int)(ty * thiz->nsamples)) / thiz->nsamples);
+	*rby = (((int)(by * thiz->nsamples)) / thiz->nsamples);
+	*rrx = rx;
+	*rlx = lx;
+
+	return EINA_TRUE;
+}
+
 /*----------------------------------------------------------------------------*
  *                               Path abstract                                *
  *----------------------------------------------------------------------------*/
@@ -560,29 +624,14 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Shape_Draw_Mode dm;
 	Enesim_Renderer_Shape_Fill_Rule fr;
 	Enesim_Quality quality;
-	Enesim_Color color;
 	double lx, rx, ty, by;
 	int len;
 	int y;
 
-	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	/* Convert the path to a figure */
-	if (!_kiia_generate(r, 	sizeof(Enesim_Renderer_Path_Kiia_Edge_Sw),
-			_kiia_edge_store, _kiia_edge_cmp))
+	if (!_kiia_setup(r, &ty, &by, &lx, &rx))
 		return EINA_FALSE;
-	/* setup the fill properties */
-	thiz->fill.ren = enesim_renderer_shape_fill_renderer_get(r);
-	thiz->fill.color = enesim_renderer_shape_fill_color_get(r);
-	/* setup the stroke properties */
-	thiz->stroke.ren = enesim_renderer_shape_stroke_renderer_get(r);
-	thiz->stroke.color = enesim_renderer_shape_stroke_color_get(r);
-	/* simplify the calcs */
-	color = enesim_renderer_color_get(r);
-	if (color != ENESIM_COLOR_FULL)
-	{
-		thiz->stroke.color = enesim_color_mul4_sym(thiz->stroke.color, color);
-		thiz->fill.color = enesim_color_mul4_sym(thiz->fill.color, color);
-	}
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	fr = enesim_renderer_shape_fill_rule_get(r);
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	quality = enesim_renderer_quality_get(r);
@@ -590,20 +639,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	{
 		Eina_Bool has_fill_renderer = EINA_FALSE;
 		Eina_Bool has_stroke_renderer = EINA_FALSE;
-		double olx, oty, orx, oby;
 
-		if (!enesim_figure_bounds(thiz->fill.figure, &lx, &ty, &rx, &by))
-			return EINA_FALSE;
-		if (!enesim_figure_bounds(thiz->stroke.figure, &olx, &oty, &orx, &oby))
-			return EINA_FALSE;
-		if (olx < lx)
-			lx = olx;
-		if (orx > rx)
-			rx = orx;
-		if (oty < ty)
-			ty = oty;
-		if (oby > by)
-			by = oby;
 		if (thiz->fill.ren)
 			has_fill_renderer = EINA_TRUE;
 		if (thiz->stroke.ren)
@@ -624,15 +660,10 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 		}
 		if (thiz->current->ren)
 			has_renderer = EINA_TRUE;
-		if (!enesim_figure_bounds(thiz->current->figure, &lx, &ty, &rx, &by))
-			return EINA_FALSE;
 		*draw = _fill_simple[quality][fr][has_renderer];
 	}
 
 	thiz->inc = eina_f16p16_double_from(1/(double)thiz->nsamples);
-	/* snap the coordinates lx, rx, ty and by */
-	ty = (((int)(ty * thiz->nsamples)) / thiz->nsamples);
-	by = (((int)(by * thiz->nsamples)) / thiz->nsamples);
 	/* set the y coordinate with the topmost value */
 	y = ceil(ty);
 	/* the length of the mask buffer */
