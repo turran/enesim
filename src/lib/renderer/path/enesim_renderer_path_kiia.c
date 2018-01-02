@@ -18,7 +18,9 @@
 #include "enesim_private.h"
 #include <math.h>
 #include <float.h>
+
 #include "enesim_renderer_path_kiia_private.h"
+#include "enesim_surface_private.h"
 
 #ifdef BUILD_OPENCL
 #include "Enesim_OpenCL.h"
@@ -41,9 +43,9 @@ static Eina_F16p16 *_patterns[3];
 /*----------------------------------------------------------------------------*
  *                              Edge helpers                                  *
  *----------------------------------------------------------------------------*/
-typedef int (Enesim_Renderer_Path_Kiia_Edge_Cmp)(const void *edge1,
+typedef int (*Enesim_Renderer_Path_Kiia_Edge_Cmp)(const void *edge1,
 		const void *edge2);
-typedef void (Enesim_Renderer_Path_Kiia_Edge_Store)(
+typedef void (*Enesim_Renderer_Path_Kiia_Edge_Store)(
 		Enesim_Renderer_Path_Kiia_Edge *thiz, void *edges, int at);
 
 static void _kiia_edge_to_sw(Enesim_Renderer_Path_Kiia_Edge *thiz,
@@ -443,24 +445,63 @@ static Eina_Bool _kiia_figures_generate(Enesim_Renderer *r)
 	/* Remove the figure generators */
 	enesim_path_generator_free(generator);
 
+	/* The figure has been generated, not the edges */
+	thiz->edges_generated = EINA_FALSE;
+
 	return EINA_TRUE;
 }
 
 static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r,
-		size_t edge_size,
-		Enesim_Renderer_Path_Kiia_Edge_Store store,
-		Enesim_Renderer_Path_Kiia_Edge_Cmp cmp)
+		Enesim_Backend backend)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Path_Kiia_Edge_Store store;
+	Enesim_Renderer_Path_Kiia_Edge_Cmp cmp;
 	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Quality q;
+	size_t edge_size;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	q = enesim_renderer_quality_get(r);
+	switch (q)
+	{
+		case ENESIM_QUALITY_FAST:
+		thiz->nsamples = 8;
+		break;
+
+		case ENESIM_QUALITY_GOOD:
+		thiz->nsamples = 16;
+		break;
+
+		case ENESIM_QUALITY_BEST:
+		thiz->nsamples = 32;
+		break;
+	}
+
+	switch (backend)
+	{
+		case ENESIM_BACKEND_SOFTWARE:
+		edge_size = sizeof(Enesim_Renderer_Path_Kiia_Edge_Sw);
+		store = _kiia_edge_store;
+		cmp = _kiia_edge_cmp;
+		break;
+
+#if BUILD_OPENCL
+		case ENESIM_BACKEND_OPENCL:
+		edge_size = sizeof(cl_float) * 7;
+		store = _kiia_edge_cl_store;
+		cmp = _kiia_edge_cl_cmp;
+		break;
+#endif
+		default:
+		return EINA_FALSE;
+	}
+
 	if (thiz->fill.edges)
 	{
 		free(thiz->fill.edges);
 		thiz->fill.edges = NULL;
 	}
-
 	if (thiz->stroke.edges)
 	{
 		free(thiz->stroke.edges);
@@ -484,48 +525,37 @@ static Eina_Bool _kiia_edges_generate(Enesim_Renderer *r,
 		if (!thiz->stroke.edges)
 			return EINA_FALSE;
 	}
+	thiz->edges_generated = EINA_TRUE;
+	thiz->edges_generated_backend = backend;
+
 	return EINA_TRUE;
 }
 
-static Eina_Bool _kiia_generate(Enesim_Renderer *r,
-		size_t edge_size,
-		Enesim_Renderer_Path_Kiia_Edge_Store store,
-		Enesim_Renderer_Path_Kiia_Edge_Cmp cmp)
+static Eina_Bool _kiia_generate(Enesim_Renderer *r, Enesim_Backend backend)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
-	Enesim_Quality q;
+	Eina_Bool needs_generate;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	if (!enesim_renderer_path_abstract_needs_generate(r))
+	needs_generate = enesim_renderer_path_abstract_needs_generate(r);
+	if (!needs_generate && thiz->edges_generated &&
+			thiz->edges_generated_backend == backend)
 		return EINA_TRUE;
 
-	q = enesim_renderer_quality_get(r);
-	switch (q)
-	{
-		case ENESIM_QUALITY_FAST:
-		thiz->nsamples = 8;
-		break;
-
-		case ENESIM_QUALITY_GOOD:
-		thiz->nsamples = 16;
-		break;
-
-		case ENESIM_QUALITY_BEST:
-		thiz->nsamples = 32;
-		break;
-	}
+	printf("inside generate %d %d\n", needs_generate, thiz->edges_generated);
 	if (!_kiia_figures_generate(r))
 		return EINA_FALSE;
-	if (!_kiia_edges_generate(r, edge_size, store, cmp))
+
+	if (!_kiia_edges_generate(r, backend))
 		return EINA_FALSE;
+
 	/* Finally mark as we have already generated the figure */
 	enesim_renderer_path_abstract_generate(r);
-
 	return EINA_TRUE;
 }
 
-static Eina_Bool _kiia_setup(Enesim_Renderer *r, double *rty, double *rby,
-		double *rlx, double *rrx)
+static Eina_Bool _kiia_setup(Enesim_Renderer *r, Enesim_Backend backend,
+		double *rty, double *rby, double *rlx, double *rrx)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Renderer_Shape_Draw_Mode dm;
@@ -533,10 +563,10 @@ static Eina_Bool _kiia_setup(Enesim_Renderer *r, double *rty, double *rby,
 	double lx, rx, ty, by;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
-	/* Convert the path to a figure */
-	if (!_kiia_generate(r, 	sizeof(Enesim_Renderer_Path_Kiia_Edge_Sw),
-			_kiia_edge_store, _kiia_edge_cmp))
+	/* Generate the edges */
+	if (!_kiia_generate(r, backend))
 		return EINA_FALSE;
+
 	/* setup the fill properties */
 	thiz->fill.ren = enesim_renderer_shape_fill_renderer_get(r);
 	thiz->fill.color = enesim_renderer_shape_fill_color_get(r);
@@ -628,7 +658,7 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	int len;
 	int y;
 
-	if (!_kiia_setup(r, &ty, &by, &lx, &rx))
+	if (!_kiia_setup(r, ENESIM_BACKEND_SOFTWARE, &ty, &by, &lx, &rx))
 		return EINA_FALSE;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
@@ -720,13 +750,50 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 		Enesim_Surface *s, int argc,
 		Enesim_Renderer_OpenCL_Kernel_Mode *mode)
 {
+	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
+	Enesim_Buffer_OpenCL_Data *sdata;
+	cl_mem cl_fill_edges = NULL, cl_stroke_edges = NULL;
+	cl_int cl_nedges = 0;
+	double lx, rx, ty, by;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	/* The algorithm requires a Enesim_Renderer_Path_Kiia_Edge_Sw structure to be used
 	 * we can share a struct, but because of the alignment it is not safe to do so
 	 * We better use a buffer of floats for edges, i.e x0, y0, x1, y1, mx, slope
 	 * and sign all sequentially stored as cl_floats
 	 */
 	/* TODO override the draw method to also draw the fill and/or stroke renderer */
-	return EINA_FALSE;
+	if (!_kiia_setup(r, ENESIM_BACKEND_OPENCL, &ty, &by, &lx, &rx))
+		return EINA_FALSE;
+
+	sdata = enesim_surface_backend_data_get(s);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	if (thiz->fill.figure)
+	{
+		cl_fill_edges = clCreateBuffer(sdata->context,
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+				sizeof(cl_float) * 7 * thiz->fill.nedges,
+				thiz->fill.edges, NULL);
+		cl_nedges = thiz->fill.nedges;
+	}
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_fill_edges);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_nedges);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_uchar4), &thiz->fill.color);
+
+	cl_nedges = 0;
+	if (thiz->stroke.figure)
+	{
+		cl_stroke_edges = clCreateBuffer(sdata->context,
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+				sizeof(cl_float) * 7 * thiz->stroke.nedges,
+				thiz->stroke.edges, NULL);
+	}
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_stroke_edges);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_nedges);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_uchar4), &thiz->stroke.color);
+	*mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_HSPAN;
+	return EINA_TRUE;
 }
 
 static void _kiia_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
@@ -743,9 +810,15 @@ static Eina_Bool _kiia_bounds_get(Enesim_Renderer *r,
 	double xmax = -DBL_MAX;
 	double ymax = -DBL_MAX;
 
-	if (!_kiia_generate(r, 	sizeof(Enesim_Renderer_Path_Kiia_Edge_Sw),
-			_kiia_edge_store, _kiia_edge_cmp))
-		goto failed;
+	/* Only generate the figures, not the edges */
+	if (enesim_renderer_path_abstract_needs_generate(r))
+	{
+		printf("needs generate inside bounds\n");
+		if (!_kiia_figures_generate(r))
+			goto failed;
+		enesim_renderer_path_abstract_generate(r);
+	}
+
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	/* check the type of draw mode */
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
