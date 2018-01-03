@@ -542,7 +542,6 @@ static Eina_Bool _kiia_generate(Enesim_Renderer *r, Enesim_Backend backend)
 			thiz->edges_generated_backend == backend)
 		return EINA_TRUE;
 
-	printf("inside generate %d %d\n", needs_generate, thiz->edges_generated);
 	if (!_kiia_figures_generate(r))
 		return EINA_FALSE;
 
@@ -754,7 +753,11 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *sdata;
 	cl_mem cl_fill_edges = NULL, cl_stroke_edges = NULL;
+	cl_mem cl_mask;
 	cl_int cl_nedges = 0;
+	cl_int4 cl_bounds;
+	int width;
+	int height;
 	double lx, rx, ty, by;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
@@ -792,6 +795,20 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_stroke_edges);
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_nedges);
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_uchar4), &thiz->stroke.color);
+
+	cl_bounds.x = floor(lx);
+	cl_bounds.y = floor(ty);
+	cl_bounds.z = ceil(rx);
+	cl_bounds.w = ceil(by);
+
+	/* +1 because of the pattern offset */
+	width = abs(cl_bounds.z - cl_bounds.x) + 2;
+	height = abs(cl_bounds.w - cl_bounds.y) + 1;
+	cl_mask = clCreateBuffer(sdata->context, CL_MEM_READ_WRITE,
+			sizeof(cl_int) * width * height, NULL, NULL);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_mask);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&width);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int4), (void *)&cl_bounds);
 	*mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_HSPAN;
 	return EINA_TRUE;
 }
@@ -813,7 +830,6 @@ static Eina_Bool _kiia_bounds_get(Enesim_Renderer *r,
 	/* Only generate the figures, not the edges */
 	if (enesim_renderer_path_abstract_needs_generate(r))
 	{
-		printf("needs generate inside bounds\n");
 		if (!_kiia_figures_generate(r))
 			goto failed;
 		enesim_renderer_path_abstract_generate(r);
