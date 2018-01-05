@@ -238,8 +238,8 @@ __kernel void path_kiia(read_write image2d_t out, int rop, int fill_rule,
 		/* initialize the mask */
 		if (mask && omask)
 		{
- 			rmask = &mask[y * mask_len];
- 			romask = &omask[y * mask_len];
+ 			rmask = &mask[(y - bounds.s1)* mask_len];
+ 			romask = &omask[(y - bounds.s1) * mask_len];
 			for (x = 0; x < mask_len; x++)
 			{
 				rmask[x] = 0;
