@@ -437,7 +437,8 @@ void enesim_renderer_opencl_draw_default(Enesim_Renderer *r, Enesim_Surface *s,
 	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, ndim, NULL, global_ws, NULL, 0, NULL, NULL);
 	if (cl_err != CL_SUCCESS)
 	{
-		ERR("Can not enqueue kernel for renderer %s", r->name);
+		ERR("Can not enqueue kernel for renderer %s (err: %d)",
+				r->name, cl_err);
 	}
 }
 
