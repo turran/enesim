@@ -149,6 +149,7 @@ static Eina_Bool enesim_renderer_opencl_compile_kernel(
 		/* create the header program, no need to compile it */
 		code = 
 		#include "enesim_main_opencl_private.cl"
+		#include "enesim_renderer_shape_opencl_private.cl"
 		#include "enesim_coord_opencl_private.cl"
 		#include "enesim_color_opencl_private.cl"
 		#include "enesim_color_blend_opencl_private.cl"

@@ -73,5 +73,6 @@ src/lib/renderer/enesim_renderer_opengl_common_merge.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_texture.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_vertex.glsl \
 src/lib/renderer/enesim_renderer_rectangle.glsl \
+src/lib/renderer/enesim_renderer_shape_opencl_private.cl \
 src/lib/renderer/enesim_renderer_stripes.glsl
 
