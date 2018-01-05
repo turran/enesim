@@ -750,12 +750,15 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 		Enesim_Renderer_OpenCL_Kernel_Mode *mode)
 {
 	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Renderer_Shape_Fill_Rule fr;
 	Enesim_Renderer_OpenCL_Data *rdata;
 	Enesim_Buffer_OpenCL_Data *sdata;
 	cl_mem cl_fill_edges = NULL, cl_stroke_edges = NULL;
-	cl_mem cl_mask;
+	cl_mem cl_mask = NULL, cl_omask = NULL;
 	cl_int cl_nedges = 0;
 	cl_int4 cl_bounds;
+	cl_int cl_fr;
 	int width;
 	int height;
 	double lx, rx, ty, by;
@@ -772,7 +775,13 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	if (thiz->fill.figure)
+
+	fr = enesim_renderer_shape_fill_rule_get(r);
+	cl_fr = fr;
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_fr);
+
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
 	{
 		cl_fill_edges = clCreateBuffer(sdata->context,
 				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
@@ -785,12 +794,13 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_uchar4), &thiz->fill.color);
 
 	cl_nedges = 0;
-	if (thiz->stroke.figure)
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 	{
 		cl_stroke_edges = clCreateBuffer(sdata->context,
 				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 				sizeof(cl_float) * 7 * thiz->stroke.nedges,
 				thiz->stroke.edges, NULL);
+		cl_nedges = thiz->stroke.nedges;
 	}
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_stroke_edges);
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_nedges);
@@ -804,9 +814,18 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	/* +1 because of the pattern offset */
 	width = abs(cl_bounds.z - cl_bounds.x) + 2;
 	height = abs(cl_bounds.w - cl_bounds.y) + 1;
-	cl_mask = clCreateBuffer(sdata->context, CL_MEM_READ_WRITE,
-			sizeof(cl_int) * width * height, NULL, NULL);
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+	{
+		cl_mask = clCreateBuffer(sdata->context, CL_MEM_READ_WRITE,
+				sizeof(cl_int) * width * height, NULL, NULL);
+	}
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_mask);
+	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	{
+		cl_omask = clCreateBuffer(sdata->context, CL_MEM_READ_WRITE,
+				sizeof(cl_int) * width * height, NULL, NULL);
+	}
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_omask);
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&width);
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int4), (void *)&cl_bounds);
 	*mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_HSPAN;
