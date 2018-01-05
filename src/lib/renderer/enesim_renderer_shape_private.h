@@ -99,5 +99,11 @@ void enesim_renderer_shape_fill_setup(Enesim_Renderer *r,
 void enesim_renderer_shape_stroke_weight_setup(Enesim_Renderer *r,
 		double *swx, double *swy);
 Enesim_List * enesim_renderer_shape_dashes_get(Enesim_Renderer *r);
-#endif
 
+#if BUILD_OPENCL
+void enesim_renderer_shape_opencl_kernel_draw_mode_add(Enesim_Renderer *r,
+		cl_kernel kernel, int *argc);
+void enesim_renderer_shape_opencl_kernel_fill_rule_add(Enesim_Renderer *r,
+		cl_kernel kernel, int *argc);
+#endif
+#endif

@@ -758,7 +758,6 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	cl_mem cl_mask = NULL, cl_omask = NULL;
 	cl_int cl_nedges = 0;
 	cl_int4 cl_bounds;
-	cl_int cl_fr;
 	int width;
 	int height;
 	double lx, rx, ty, by;
@@ -776,9 +775,7 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	sdata = enesim_surface_backend_data_get(s);
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 
-	fr = enesim_renderer_shape_fill_rule_get(r);
-	cl_fr = fr;
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_fr);
+	enesim_renderer_shape_opencl_kernel_fill_rule_add(r, rdata->kernel, &argc);
 
 	dm = enesim_renderer_shape_draw_mode_get(r);
 	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
