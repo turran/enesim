@@ -10,6 +10,17 @@ uchar4 enesim_color_opencl_mul_256(ushort a, uchar4 c)
 	return ret;
 }
 
+uchar4 enesim_color_opencl_mul4_sym(uchar4 c1, uchar4 c2)
+{
+	uchar4 ret;
+	ushort4 cs1 = upsample((uchar4)(0, 0, 0, 0), c1);
+	ushort4 cs2 = upsample((uchar4)(0, 0, 0, 0), c2);
+
+	ret = convert_uchar4(((cs2 * cs1) + (ushort)0xff) >> 8);
+	//printf("color_mul_sym: c1 = %#v4hhx, c2 = %#v4hhx, ret = %#v4hhx\n", c1, c2, ret);
+	return ret;
+}
+
 uchar4 enesim_color_opencl_interp_256(ushort a, uchar4 c0, uchar4 c1)
 {
 	uchar4 ret;
