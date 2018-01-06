@@ -106,7 +106,8 @@ static inline uint32_t enesim_color_mul_65536(uint32_t a, uint32_t c)
 }
 
 /*
- *
+ * ret = [(c.a * a), (c.r * a), (c.g * a), (c.b * a)]
+ * Where a is on the 1 - 256 range
  */
 static inline uint32_t enesim_color_mul_sym(uint16_t a, uint32_t c)
 {
