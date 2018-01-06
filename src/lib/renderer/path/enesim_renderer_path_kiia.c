@@ -596,6 +596,7 @@ static Eina_Bool _kiia_setup(Enesim_Renderer *r, Enesim_Backend backend,
 			ty = oty;
 		if (oby > by)
 			by = oby;
+		thiz->current = NULL;
 	}
 	else
 	{
