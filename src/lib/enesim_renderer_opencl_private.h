@@ -57,4 +57,7 @@ void enesim_renderer_opencl_cleanup_default(Enesim_Renderer *r, Enesim_Surface *
 void enesim_renderer_opencl_draw_default(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y);
 
+void enesim_renderer_opencl_kernel_transformation_add(Enesim_Renderer *r,
+		int *argc);
+
 #endif

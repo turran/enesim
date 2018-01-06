@@ -463,6 +463,26 @@ void enesim_renderer_opencl_free(Enesim_Renderer *r)
 	_release(cl_data);
 	free(cl_data);
 }
+
+void enesim_renderer_opencl_kernel_transformation_add(Enesim_Renderer *r,
+		int *argc)
+{
+	Enesim_Renderer_OpenCL_Data *rdata;
+	Enesim_Matrix matrix, inv;
+	cl_float cl_matrix[9];
+	cl_mem cl_mmatrix;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	enesim_renderer_transformation_get(r, &matrix);
+	enesim_matrix_inverse(&matrix, &inv);
+	cl_matrix[0] = inv.xx; cl_matrix[1] = inv.xy; cl_matrix[2] = inv.xz;
+	cl_matrix[3] = inv.yx; cl_matrix[4] = inv.yy; cl_matrix[5] = inv.yz;
+	cl_matrix[6] = inv.zx; cl_matrix[7] = inv.zy; cl_matrix[8] = inv.zz;
+	cl_mmatrix = clCreateBuffer(rdata->context,
+			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+			sizeof(cl_matrix), &cl_matrix, NULL);
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem), (void *)&cl_mmatrix);
+}
 /** @endcond */
 /*============================================================================*
  *                                   API                                      *
