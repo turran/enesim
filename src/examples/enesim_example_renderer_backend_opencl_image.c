@@ -24,7 +24,6 @@ static void opencl_image_run(Enesim_Renderer *r,
 	int ret;
 
 	pool = enesim_pool_opencl_new();
-	printf("pool %p\n", pool);
 	s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
 			options->width, options->height, pool);
 	enesim_example_renderer_draw(r, s, options);
@@ -40,6 +39,7 @@ static void opencl_image_run(Enesim_Renderer *r,
 	}
 	enesim_buffer_unref(b);
 	enesim_surface_unref(s);
+	enesim_pool_unref(pool);
 }
 
 Enesim_Example_Renderer_Backend_Interface
