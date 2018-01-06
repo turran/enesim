@@ -105,7 +105,7 @@ typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Get)(Enesim_Renderer *r,
 		Enesim_Surface *s,
 		Enesim_Rop rop,
 		const char **program_name, const char **program_source,
-		size_t *program_length);
+		size_t *program_length, const char **kernel_name);
 typedef Eina_Bool (*Enesim_Renderer_OpenCL_Kernel_Setup)(Enesim_Renderer *r, Enesim_Surface *s, int argc, Enesim_Renderer_OpenCL_Kernel_Mode *mode);
 typedef void (*Enesim_Renderer_OpenCL_Kernel_Cleanup)(Enesim_Renderer *r, Enesim_Surface *s);
 

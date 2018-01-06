@@ -214,13 +214,14 @@ static void _background_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UN
 static Eina_Bool _background_opencl_kernel_get(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
 		const char **program_name, const char **program_source,
-		size_t *program_length)
+		size_t *program_length, const char **kernel_name)
 {
 	*program_name = "background";
 	*program_source =
 	"#include \"enesim_opencl.h\"\n" 
 	#include "enesim_renderer_background.cl"
 	*program_length = strlen(*program_source);
+	*kernel_name = "background";
 
 	return EINA_TRUE;
 }

@@ -47,7 +47,7 @@
  *============================================================================*/
 /** @cond internal */
 /*----------------------------------------------------------------------------*
- *                   Cache of kernels/programs per context                    *
+ *                        Cache of rograms per context                        *
  *----------------------------------------------------------------------------*/
 typedef struct _Enesim_Renderer_OpenCL_Context_Data
 {
@@ -56,7 +56,7 @@ typedef struct _Enesim_Renderer_OpenCL_Context_Data
 	 */
 	cl_program lib;
 	cl_program header;
-	Eina_Hash *kernels;
+	Eina_Hash *programs;
 } Enesim_Renderer_OpenCL_Context_Data;
 
 static Enesim_Renderer_OpenCL_Context_Data *
@@ -65,7 +65,7 @@ enesim_renderer_opencl_context_data_new(void)
 	Enesim_Renderer_OpenCL_Context_Data *thiz;
 
 	thiz = calloc(1, sizeof(Enesim_Renderer_OpenCL_Context_Data));
-	thiz->kernels = eina_hash_string_superfast_new((Eina_Free_Cb)clReleaseKernel);
+	thiz->programs = eina_hash_string_superfast_new((Eina_Free_Cb)clReleaseProgram);
 	return thiz;
 }
 
@@ -76,7 +76,7 @@ static void enesim_renderer_opencl_context_data_free(
 		clReleaseProgram(thiz->lib);
 	if (thiz->header)
 		clReleaseProgram(thiz->header);
-	eina_hash_free(thiz->kernels);
+	eina_hash_free(thiz->programs);
 	free(thiz);
 }
 /*----------------------------------------------------------------------------*
@@ -133,16 +133,18 @@ static void _compile_error(cl_program program, cl_device_id device)
 
 static Eina_Bool enesim_renderer_opencl_compile_kernel(
 	Enesim_Renderer_OpenCL_Data *thiz, Enesim_Renderer *r,
-	const char *source_name, const char *source, size_t source_size)
+	const char *source_name, const char *source, size_t source_size,
+	const char *kernel_name)
 {
 	Enesim_Renderer_OpenCL_Context_Data *cdata;
 	cl_int cl_err;
 	cl_kernel kernel;
+	cl_program program;
 
 	cdata = eina_hash_find(_context_lut, (void *)thiz->context);
 	if (!cdata)
 	{
-		cl_program program, lib_program, hdr_program;
+		cl_program lib_program, hdr_program;
 		size_t code_size;
 		const char *code;
 
@@ -206,12 +208,11 @@ static Eina_Bool enesim_renderer_opencl_compile_kernel(
 		eina_hash_add(_context_lut, (void *)thiz->context, cdata);
 	}
 
-	kernel = eina_hash_find(cdata->kernels, source_name);
-	if (!kernel)
+	program = eina_hash_find(cdata->programs, source_name);
+	if (!program)
 	{
 		const char *header_name = "enesim_opencl.h";
 		cl_program programs[2];
-		cl_program program;
 
 		programs[0] = clCreateProgramWithSource(thiz->context, 1, &source,
 				&source_size, &cl_err);
@@ -246,20 +247,18 @@ static Eina_Bool enesim_renderer_opencl_compile_kernel(
 			return EINA_FALSE;
 		}
 
-		kernel = clCreateKernel(program, source_name, &cl_err);
-		if (cl_err != CL_SUCCESS)
-		{
-			ERR("Can not create kernel for renderer %s (err: %d)",
-					r->name, cl_err);
-			return EINA_FALSE;
-		}
 		clReleaseProgram(programs[0]);
-		clReleaseProgram(program);
-		eina_hash_add(cdata->kernels, source_name, kernel); 
+		eina_hash_add(cdata->programs, source_name, program);
 	}
-	clRetainKernel(kernel);
+	kernel = clCreateKernel(program, kernel_name, &cl_err);
+	if (cl_err != CL_SUCCESS)
+	{
+		ERR("Can not create kernel '%s' for renderer %s (err: %d)",
+				kernel_name, r->name, cl_err);
+		return EINA_FALSE;
+	}
 	thiz->kernel = kernel;
-	thiz->kernel_name = source_name;
+	thiz->kernel_name = kernel_name;
 	return EINA_TRUE;
 }
 /*============================================================================*
@@ -317,6 +316,7 @@ Eina_Bool enesim_renderer_opencl_setup_default(Enesim_Renderer *r,
 	cl_int cl_rop = rop;
 	const char *source = NULL;
 	const char *source_name = NULL;
+	const char *kernel_name = NULL;
 	size_t source_size = 0;
 
 	klass = ENESIM_RENDERER_CLASS_GET(r);
@@ -330,7 +330,8 @@ Eina_Bool enesim_renderer_opencl_setup_default(Enesim_Renderer *r,
 	if (!klass->opencl_kernel_get)
 		return EINA_FALSE;
 
-	ret = klass->opencl_kernel_get(r, s, rop, &source_name, &source, &source_size);
+	ret = klass->opencl_kernel_get(r, s, rop, &source_name, &source,
+			&source_size, &kernel_name);
 	if (!ret)
 	{
 		ERR("Can not setup the renderer %s", r->name);
@@ -353,7 +354,7 @@ Eina_Bool enesim_renderer_opencl_setup_default(Enesim_Renderer *r,
 			release = EINA_TRUE;
 		if (rdata->device != sdata->device)
 			release = EINA_TRUE;
-		if (rdata->kernel_name != source_name)
+		if (rdata->kernel_name != kernel_name)
 			release = EINA_TRUE;
 
 		if (release)
@@ -372,11 +373,10 @@ Eina_Bool enesim_renderer_opencl_setup_default(Enesim_Renderer *r,
 	if (!rdata->kernel)
 	{
 		if (!enesim_renderer_opencl_compile_kernel(rdata, r, source_name,
-				source, source_size))
+				source, source_size, kernel_name))
 			return EINA_FALSE;
 	}
 
-	clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
 	clSetKernelArg(rdata->kernel, 1, sizeof(cl_int), &cl_rop);
 	/* now setup the kernel on the renderer side */
 	if (klass->opencl_kernel_setup)
@@ -434,6 +434,11 @@ void enesim_renderer_opencl_draw_default(Enesim_Renderer *r, Enesim_Surface *s,
 		break;
 	}
 
+	/* only on the final moment add the surface, we should not use the
+	 * surface done at setup, otherwise the renderers can not use a
+	 * temporary surface to draw inner renderers
+	 */
+	clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
 	/* launch it!!! */
 	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, ndim, NULL, global_ws, NULL, 0, NULL, NULL);
 	if (cl_err != CL_SUCCESS)
