@@ -443,6 +443,10 @@ EAPI Enesim_Buffer * enesim_buffer_new_pool_from(Enesim_Buffer_Format f,
 		p = enesim_pool_default_get();
 		if (!p) return NULL;
 	}
+	else
+	{
+		p = enesim_pool_ref(p);
+	}
 
 	if (!enesim_pool_data_alloc(p, &backend, &backend_data, f, w, h))
 	{
