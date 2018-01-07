@@ -776,9 +776,10 @@ static void _kiia_opencl_kernel_figure_setup(
 		Enesim_Renderer_Path_Kiia_Figure *figure, int *argc,
 		int mask_len)
 {
+	cl_int cl_nedges = 0;
 	cl_mem cl_edges = NULL;
 	cl_mem cl_mask = NULL;
-	cl_int cl_nedges = 0;
+	cl_int cl_color = 0;
 
 	if (figure)
 	{
@@ -788,13 +789,16 @@ static void _kiia_opencl_kernel_figure_setup(
 				figure->edges, NULL);
 		cl_nedges = figure->nedges;
 		cl_mask = clCreateBuffer(rdata->context, CL_MEM_READ_WRITE,
-				sizeof(cl_int) * mask_len, NULL, NULL);
+				sizeof(cl_int) * mask_len,
+				NULL, NULL);
+		cl_color = figure->color;
+		figure->cl_edges = cl_edges;
+		figure->cl_mask = cl_mask;
 	}
 	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem), &cl_edges);
 	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_int), &cl_nedges);
-	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_uchar4),
-			&figure->color);
-	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem), (void *)&cl_mask);
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_uchar4), &cl_color);
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem), &cl_mask);
 }
 
 static void _kiia_opencl_kernel_figure_renderer_setup(
@@ -902,10 +906,30 @@ static void _kiia_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 		enesim_surface_unref(thiz->fill.s);
 		thiz->fill.s = NULL;
 	}
+	if (thiz->fill.cl_edges)
+	{
+		clReleaseMemObject(thiz->fill.cl_edges);
+		thiz->fill.cl_edges = NULL;
+	}
+	if (thiz->fill.cl_mask)
+	{
+		clReleaseMemObject(thiz->fill.cl_mask);
+		thiz->fill.cl_mask = NULL;
+	}
 	if (thiz->stroke.s)
 	{
 		enesim_surface_unref(thiz->stroke.s);
 		thiz->stroke.s = NULL;
+	}
+	if (thiz->stroke.cl_edges)
+	{
+		clReleaseMemObject(thiz->stroke.cl_edges);
+		thiz->stroke.cl_edges = NULL;
+	}
+	if (thiz->stroke.cl_mask)
+	{
+		clReleaseMemObject(thiz->stroke.cl_mask);
+		thiz->stroke.cl_mask = NULL;
 	}
 }
 

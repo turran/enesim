@@ -97,6 +97,8 @@ typedef struct _Enesim_Renderer_Path_Kiia_Figure
 	Enesim_Color color;
 #if BUILD_OPENCL
 	Enesim_Surface *s;
+	cl_mem cl_mask;
+	cl_mem cl_edges;
 #endif
 } Enesim_Renderer_Path_Kiia_Figure;
 
