@@ -101,8 +101,8 @@ Enesim_List * enesim_renderer_shape_dashes_get(Enesim_Renderer *r);
 
 #if BUILD_OPENCL
 void enesim_renderer_shape_opencl_kernel_draw_mode_add(Enesim_Renderer *r,
-		cl_kernel kernel, int *argc);
+		int *argc);
 void enesim_renderer_shape_opencl_kernel_fill_rule_add(Enesim_Renderer *r,
-		cl_kernel kernel, int *argc);
+		int *argc);
 #endif
 #endif

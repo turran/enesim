@@ -771,27 +771,29 @@ Enesim_List * enesim_renderer_shape_dashes_get(Enesim_Renderer *r)
 
 #if BUILD_OPENCL
 void enesim_renderer_shape_opencl_kernel_draw_mode_add(Enesim_Renderer *r,
-		cl_kernel kernel, int *argc)
+		int *argc)
 {
 	Enesim_Renderer_Shape *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
 	cl_int dm;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 	dm = thiz->state.current.draw_mode;
-	clSetKernelArg(kernel, *argc, sizeof(cl_mem), (void *)&dm);
-	*argc = *argc + 1;
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem), (void *)&dm);
 }
 
 void enesim_renderer_shape_opencl_kernel_fill_rule_add(Enesim_Renderer *r,
-		cl_kernel kernel, int *argc)
+		int *argc)
 {
 	Enesim_Renderer_Shape *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
 	cl_int fr;
 
 	thiz = ENESIM_RENDERER_SHAPE(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
 	fr = thiz->state.current.fill.rule;
-	clSetKernelArg(kernel, *argc, sizeof(cl_int), (void *)&fr);
-	*argc = *argc + 1;
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_int), (void *)&fr);
 }
 #endif
 /** @endcond */
