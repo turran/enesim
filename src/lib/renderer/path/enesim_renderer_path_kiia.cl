@@ -20,41 +20,37 @@ void kiia_even_odd_sample(__global int *mask, int x, int m)
 	mask[x] ^= m;
 }
 
-int kiia_even_odd_get_mask(__global int *mask, int x, int cm)
+void kiia_even_odd_get_mask(__global int *mask, int x, int *cm)
 {
-	int oldcm = cm;
-	cm ^= mask[x];
-	//printf("mask = %08x, cm = %08x, oldcm = %08x\n", mask[x], cm, oldcm);
+	*cm ^= mask[x];
 	mask[x] = 0;
-	return cm;
 }
 
-void kiia_non_zero_sample(int *mask, int x, int m)
+void kiia_non_zero_sample(__global int *mask, int x, int m)
 {
 	mask[x] += m;
 }
 
-int2 kiia_non_zero_get_mask(int *mask, int x, int cm, int cacc)
+void kiia_non_zero_get_mask(__global int *mask, int x, int *cm, int *cacc)
 {
+	int abs_cacc;
 	int m;
-	int rcacc;
 
 	m = mask[x];
 	mask[x] = 0;
-	rcacc = cacc + m;
-	cacc = abs(cacc);
-	if (cacc < 32)
+	*cacc += m;
+	abs_cacc = abs(*cacc);
+	if (abs_cacc < 32)
 	{
-		if (cacc == 0)
-			cm = 0;
+		if (abs_cacc == 0)
+			*cm = 0;
 		else
-			cm = cacc;
+			*cm = abs_cacc;
 	}
 	else
 	{
-		cm = 32;
+		*cm = 32;
 	}
-	return (int2)(cm, rcacc);
 }
 
 /*----------------------------------------------------------------------------*
@@ -173,6 +169,15 @@ void kiia_non_zero_evaluate(__constant float *edges, int nedges,
 		}
 	}
 }
+
+void kiia_evaluate(__constant float *edges, int nedges, int fill_rule,
+		__global int *mask, int y, int x)
+{
+	if (fill_rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)
+		kiia_non_zero_evaluate(edges, nedges, mask, y, x);
+	else
+		kiia_even_odd_evaluate(edges, nedges, mask, y, x);
+}
 /*----------------------------------------------------------------------------*
  *                              Alpha getters                                 *
  *----------------------------------------------------------------------------*/
@@ -210,16 +215,68 @@ uchar4 kiia_figure_color_color_fill(uchar4 fcolor, ushort falpha,
 	uchar4 p0;
 	uchar4 q0;
 
-	q0 = enesim_color_opencl_mul_256(falpha, fcolor);
+	q0 = kiia_figure_color_fill(fcolor, falpha);
 	p0 = enesim_color_opencl_interp_256(salpha, scolor, q0);
 	return p0;
 }
 
-__kernel void path_kiia(read_write image2d_t out, int rop, int fill_rule,
-		__constant float *fill_edges, int nfedges, uchar4 fcolor,
-		__constant float *stroke_edges, int nsedges, uchar4 scolor,
-		__global int *mask, __global int *omask, int mask_len,
-		int4 bounds)
+
+ushort kiia_get_alpha(int fill_rule, __global int *mask, int x, int *m, int *winding)
+{
+	ushort alpha;
+
+	if (fill_rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)
+	{
+		kiia_non_zero_get_mask(mask, x, m, winding);
+		alpha = kiia_non_zero_get_alpha(*m);
+	}
+	else
+	{
+		kiia_even_odd_get_mask(mask, x, m);
+		alpha = kiia_even_odd_get_alpha(*m);
+	}
+	return alpha;
+}
+
+void kiia_setup_mask(__global int **rmask, __global int **romask, __global int *mask,
+		__global int *omask, int mask_len, int at, int y)
+{
+	int x;
+	if (mask && omask)
+	{
+		*rmask = &mask[(at - y)* mask_len];
+		*romask = &omask[(at - y) * mask_len];
+		for (x = 0; x < mask_len; x++)
+		{
+			(*rmask)[x] = 0;
+			(*romask)[x] = 0;
+		}
+	}
+	else
+	{
+		if (mask)
+		{
+			*rmask = &mask[at * mask_len];
+		}
+		for (x = 0; x < mask_len; x++)
+		{
+			(*rmask)[x] = 0;
+		}
+	}
+}
+
+/*----------------------------------------------------------------------------*
+ *                                  Kernels                                   *
+ *----------------------------------------------------------------------------*/
+/*
+ * fill only
+ * stroke only
+ * fill and stroke
+ */
+__kernel void path_kiia_color_color(read_write image2d_t out, int rop, int fill_rule,
+		__constant float *fill_edges, int nfedges, uchar4 fcolor, __global int *mask,
+		__constant float *stroke_edges, int nsedges, uchar4 scolor, __global int *omask,
+		int mask_len, int4 bounds)
 {
 	int y = get_global_id(0);
 	int x;
@@ -236,44 +293,10 @@ __kernel void path_kiia(read_write image2d_t out, int rop, int fill_rule,
 		__global int *rmask;
 		__global int *romask;
 		/* initialize the mask */
-		if (mask && omask)
-		{
- 			rmask = &mask[(y - bounds.s1)* mask_len];
- 			romask = &omask[(y - bounds.s1) * mask_len];
-			for (x = 0; x < mask_len; x++)
-			{
-				rmask[x] = 0;
-				romask[x] = 0;
-			}
-		}
-		else
-		{
-			if (mask)
-			{
- 				rmask = &mask[y * mask_len];
-			}
-			else
-			{
- 				rmask = &omask[y * mask_len];
-				fill_edges = stroke_edges;
-				nfedges = nsedges;
-				fcolor = scolor;
-				fill_rule = ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO;
-				omask = NULL;
-			}
-			for (x = 0; x < mask_len; x++)
-			{
-				rmask[x] = 0;
-			}
-		}
-
-		if (fill_rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)
-			kiia_non_zero_evaluate(fill_edges, nfedges, rmask, y, bounds.s0);
-		else
-			kiia_even_odd_evaluate(fill_edges, nfedges, rmask, y, bounds.s0);
+		kiia_setup_mask(&rmask, &romask, mask, omask, mask_len, y, bounds.s1);
+		kiia_evaluate(fill_edges, nfedges, fill_rule, rmask, y, bounds.s0);
 		if (omask)
 			kiia_non_zero_evaluate(stroke_edges, nsedges, romask, y, bounds.s0);
-		//printf("x = %d, y = %d, m = %d\n", x, y, mask[0]);
 		for (x = bounds.s0; x < bounds.s2; x++)
 		{
 			uchar4 p0;
@@ -281,27 +304,11 @@ __kernel void path_kiia(read_write image2d_t out, int rop, int fill_rule,
 			ushort salpha;
 
 			int rx = x - bounds.s0;
-			if (fill_rule == ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO)
-			{
-				int2 ret;
-				ret = kiia_non_zero_get_mask(rmask, rx, cm, cwinding);
-				cm = ret.x;
-				cwinding = ret.y;
-				falpha = kiia_non_zero_get_alpha(cm);
-			}
-			else
-			{
-				cm = kiia_even_odd_get_mask(rmask, rx, cm);
-				falpha = kiia_even_odd_get_alpha(cm);
-			}
+			falpha = kiia_get_alpha(fill_rule, rmask, rx, &cm, &cwinding);
 			if (omask)
 			{
-				int2 ret;
-				ret = kiia_non_zero_get_mask(romask, rx, ocm, owinding);
-				ocm = ret.x;
-				owinding = ret.y;
+				kiia_non_zero_get_mask(romask, rx, &ocm, &owinding);
 				salpha = kiia_non_zero_get_alpha(ocm);
-
 				/* compose the stroke + fill */
 				p0 = kiia_figure_color_color_fill(fcolor, falpha, scolor, salpha);
 			}
@@ -309,6 +316,187 @@ __kernel void path_kiia(read_write image2d_t out, int rop, int fill_rule,
 			{
 				p0 = kiia_figure_color_fill(fcolor, falpha);
 			}
+			if (rop == ENESIM_ROP_BLEND)
+			{
+				uchar4 d0;
+
+				d0 = convert_uchar4(read_imageui(out, (int2)(x, y)));
+				p0 = enesim_color_blend_opencl_pt_none_color_none(d0, p0);
+			}
+			write_imageui(out, (int2)(x, y), (uint4)(p0.x, p0.y, p0.z, p0.w));
+		}
+	}
+}
+
+/*
+ * fill only and renderer
+ * fill and stroke, fill renderer
+ */
+__kernel void path_kiia_renderer_color(read_write image2d_t out, int rop, int fill_rule,
+		__constant float *fill_edges, int nfedges, uchar4 fcolor, __global int *mask,
+		__constant float *stroke_edges, int nsedges, uchar4 scolor, __global int *omask,
+		read_only image2d_t fren, int mask_len, int4 bounds)
+{
+	int y = get_global_id(0);
+	int x;
+
+	if (y < bounds.s1 || y > bounds.s3)
+		return;
+	else
+	{
+		int cm = 0;
+		int cwinding = 0;
+		int ocm = 0;
+		int owinding = 0;
+
+		__global int *rmask;
+		__global int *romask;
+		/* initialize the mask */
+		kiia_setup_mask(&rmask, &romask, mask, omask, mask_len, y, bounds.s1);
+		kiia_evaluate(fill_edges, nfedges, fill_rule, rmask, y, bounds.s0);
+		if (omask)
+			kiia_non_zero_evaluate(stroke_edges, nsedges, romask, y, bounds.s0);
+		for (x = bounds.s0; x < bounds.s2; x++)
+		{
+			uchar4 p0;
+			ushort falpha;
+			ushort salpha;
+
+			int rx = x - bounds.s0;
+			falpha = kiia_get_alpha(fill_rule, rmask, rx, &cm, &cwinding);
+			if (omask)
+			{
+				kiia_non_zero_get_mask(romask, rx, &ocm, &owinding);
+				salpha = kiia_non_zero_get_alpha(ocm);
+				/* compose the stroke + fill */
+				p0 = convert_uchar4(read_imageui(fren, (int2)(x, y)));
+				p0 = enesim_color_opencl_mul4_sym(p0, fcolor);
+				p0 = kiia_figure_color_color_fill(p0, falpha, scolor, salpha);
+			}
+			else
+			{
+				p0 = convert_uchar4(read_imageui(fren, (int2)(x, y)));
+				p0 = enesim_color_opencl_mul4_sym(p0, fcolor);
+				p0 = kiia_figure_color_fill(p0, falpha);
+			}
+			if (rop == ENESIM_ROP_BLEND)
+			{
+				uchar4 d0;
+
+				d0 = convert_uchar4(read_imageui(out, (int2)(x, y)));
+				p0 = enesim_color_blend_opencl_pt_none_color_none(d0, p0);
+			}
+			write_imageui(out, (int2)(x, y), (uint4)(p0.x, p0.y, p0.z, p0.w));
+		}
+	}
+}
+
+/*
+ * stroke only and renderer
+ * fill and stroke, stroke renderer
+ */
+__kernel void path_kiia_color_renderer(read_write image2d_t out, int rop, int fill_rule,
+		__constant float *fill_edges, int nfedges, uchar4 fcolor, __global int *mask,
+		__constant float *stroke_edges, int nsedges, uchar4 scolor, __global int *omask,
+		read_only image2d_t fren, int mask_len, int4 bounds)
+{
+	int y = get_global_id(0);
+	int x;
+
+	if (y < bounds.s1 || y > bounds.s3)
+		return;
+	else
+	{
+		int cm = 0;
+		int cwinding = 0;
+		int ocm = 0;
+		int owinding = 0;
+
+		__global int *rmask;
+		__global int *romask;
+		/* initialize the mask */
+		kiia_setup_mask(&rmask, &romask, mask, omask, mask_len, y, bounds.s1);
+		kiia_evaluate(fill_edges, nfedges, fill_rule, rmask, y, bounds.s0);
+		if (omask)
+			kiia_non_zero_evaluate(stroke_edges, nsedges, romask, y, bounds.s0);
+		for (x = bounds.s0; x < bounds.s2; x++)
+		{
+			uchar4 p0;
+			ushort falpha;
+			ushort salpha;
+
+			int rx = x - bounds.s0;
+			falpha = kiia_get_alpha(fill_rule, rmask, rx, &cm, &cwinding);
+			if (omask)
+			{
+				kiia_non_zero_get_mask(romask, rx, &ocm, &owinding);
+				salpha = kiia_non_zero_get_alpha(ocm);
+				/* compose the stroke + fill */
+				p0 = convert_uchar4(read_imageui(fren, (int2)(x, y)));
+				p0 = enesim_color_opencl_mul4_sym(p0, scolor);
+				p0 = kiia_figure_color_color_fill(fcolor, falpha, p0, salpha);
+			}
+			else
+			{
+				p0 = convert_uchar4(read_imageui(fren, (int2)(x, y)));
+				p0 = enesim_color_opencl_mul4_sym(p0, fcolor);
+				p0 = kiia_figure_color_fill(p0, falpha);
+			}
+			if (rop == ENESIM_ROP_BLEND)
+			{
+				uchar4 d0;
+
+				d0 = convert_uchar4(read_imageui(out, (int2)(x, y)));
+				p0 = enesim_color_blend_opencl_pt_none_color_none(d0, p0);
+			}
+			write_imageui(out, (int2)(x, y), (uint4)(p0.x, p0.y, p0.z, p0.w));
+		}
+	}
+}
+
+/* fill and stroke, fill renderer and stroke renderer */
+__kernel void path_kiia_renderer_renderer(read_write image2d_t out, int rop, int fill_rule,
+		__constant float *fill_edges, int nfedges, uchar4 fcolor, __global int *mask,
+		__constant float *stroke_edges, int nsedges, uchar4 scolor, __global int *omask,
+		read_only image2d_t fren, read_only image2d_t sren, int mask_len, int4 bounds)
+{
+	int y = get_global_id(0);
+	int x;
+
+	if (y < bounds.s1 || y > bounds.s3)
+		return;
+	else
+	{
+		int cm = 0;
+		int cwinding = 0;
+		int ocm = 0;
+		int owinding = 0;
+
+		__global int *rmask;
+		__global int *romask;
+		/* initialize the mask */
+		kiia_setup_mask(&rmask, &romask, mask, omask, mask_len, y, bounds.s1);
+		kiia_evaluate(fill_edges, nfedges, fill_rule, rmask, y, bounds.s0);
+		kiia_non_zero_evaluate(stroke_edges, nsedges, romask, y, bounds.s0);
+		for (x = bounds.s0; x < bounds.s2; x++)
+		{
+			uchar4 p0;
+			uchar4 p1;
+			ushort falpha;
+			ushort salpha;
+
+			int rx = x - bounds.s0;
+			falpha = kiia_get_alpha(fill_rule, rmask, rx, &cm, &cwinding);
+			kiia_non_zero_get_mask(romask, rx, &ocm, &owinding);
+			salpha = kiia_non_zero_get_alpha(ocm);
+			/* compose the stroke + fill */
+			p0 = convert_uchar4(read_imageui(fren, (int2)(x, y)));
+			p0 = enesim_color_opencl_mul4_sym(p0, fcolor);
+
+			p1 = convert_uchar4(read_imageui(sren, (int2)(x, y)));
+			p1 = enesim_color_opencl_mul4_sym(p1, scolor);
+
+			p0 = kiia_figure_color_color_fill(p0, falpha, p1, salpha);
 			if (rop == ENESIM_ROP_BLEND)
 			{
 				uchar4 d0;

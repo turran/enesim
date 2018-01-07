@@ -679,12 +679,8 @@ static Eina_Bool _kiia_sw_setup(Enesim_Renderer *r,
 	else
 	{
 		Eina_Bool has_renderer = EINA_FALSE;
-
-		if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
-			thiz->current = &thiz->fill;
-		else
+		if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
 		{
-			thiz->current = &thiz->stroke;
 			/* the stroke must always be non-zero */
 			fr = ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO;
 		}
@@ -735,15 +731,96 @@ static void _kiia_sw_hints(Enesim_Renderer *r EINA_UNUSED,
 static Eina_Bool _kiia_opencl_kernel_get(Enesim_Renderer *r,
 		Enesim_Surface *s, Enesim_Rop rop,
 		const char **program_name, const char **program_source,
-		size_t *program_length)
+		size_t *program_length, const char **kernel_name)
 {
+	Enesim_Renderer_Path_Kiia *thiz;
+	Enesim_Renderer_Shape_Draw_Mode dm;
+	Enesim_Renderer *rf = NULL, *rs = NULL;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
 	*program_name = "path_kiia";
 	*program_source =
 	"#include \"enesim_opencl.h\"\n" 
 	#include "enesim_renderer_path_kiia.cl"
 	*program_length = strlen(*program_source);
 
+	/* choose the kernel */
+	*kernel_name = "path_kiia_color_color";
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	rf = enesim_renderer_shape_fill_renderer_get(r);
+	rs = enesim_renderer_shape_stroke_renderer_get(r);
+	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
+	{
+		if (rf && rs)
+			*kernel_name = "path_kiia_renderer_renderer";
+		else if (rf)
+			*kernel_name = "path_kiia_renderer_color";
+		else if (rs)
+			*kernel_name = "path_kiia_color_renderer";
+	}
+	else
+	{
+		if ((dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE) && rs)
+			*kernel_name = "path_kiia_renderer_color";
+		else if ((dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL) && rf)
+			*kernel_name = "path_kiia_renderer_color";
+	}
+	enesim_renderer_unref(rf);
+	enesim_renderer_unref(rs);
+
 	return EINA_TRUE;
+}
+
+static void _kiia_opencl_kernel_figure_setup(
+		Enesim_Renderer_OpenCL_Data *rdata,
+		Enesim_Renderer_Path_Kiia_Figure *figure, int *argc,
+		int mask_len)
+{
+	cl_mem cl_edges = NULL;
+	cl_mem cl_mask = NULL;
+	cl_int cl_nedges = 0;
+
+	if (figure)
+	{
+		cl_edges = clCreateBuffer(rdata->context,
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+				sizeof(cl_float) * 7 * figure->nedges,
+				figure->edges, NULL);
+		cl_nedges = figure->nedges;
+		cl_mask = clCreateBuffer(rdata->context, CL_MEM_READ_WRITE,
+				sizeof(cl_int) * mask_len, NULL, NULL);
+	}
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem), &cl_edges);
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_int), &cl_nedges);
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_uchar4),
+			&figure->color);
+	clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem), (void *)&cl_mask);
+}
+
+static void _kiia_opencl_kernel_figure_renderer_setup(
+		Enesim_Renderer_OpenCL_Data *rdata,
+		Enesim_Surface *s,
+		Enesim_Renderer_Path_Kiia_Figure *figure,
+		int *argc)
+{
+	if (figure->ren)
+	{
+		Enesim_Pool *pool;
+		Enesim_Buffer_OpenCL_Data *sf_data;
+		int w, h;
+		cl_mem cl_figure_s = NULL;
+
+		pool = enesim_surface_pool_get(s);
+		enesim_surface_size_get(s, &w, &h);
+		figure->s = enesim_surface_new_pool_from(
+				ENESIM_FORMAT_ARGB8888, w, h, pool);
+		sf_data = enesim_surface_backend_data_get(figure->s);
+		cl_figure_s = sf_data->mem;
+		enesim_pool_unref(pool);
+
+		clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem),
+				&cl_figure_s);
+	}
 }
 
 static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
@@ -752,15 +829,12 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 {
 	Enesim_Renderer_Path_Kiia *thiz;
 	Enesim_Renderer_Shape_Draw_Mode dm;
-	Enesim_Renderer_Shape_Fill_Rule fr;
 	Enesim_Renderer_OpenCL_Data *rdata;
-	Enesim_Buffer_OpenCL_Data *sdata;
-	cl_mem cl_fill_edges = NULL, cl_stroke_edges = NULL;
-	cl_mem cl_mask = NULL, cl_omask = NULL;
-	cl_int cl_nedges = 0;
+	cl_int fr;
 	cl_int4 cl_bounds;
 	int width;
 	int height;
+	int mask_size;
 	double lx, rx, ty, by;
 
 	thiz = ENESIM_RENDERER_PATH_KIIA(r);
@@ -773,37 +847,6 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	if (!_kiia_setup(r, ENESIM_BACKEND_OPENCL, &ty, &by, &lx, &rx))
 		return EINA_FALSE;
 
-	sdata = enesim_surface_backend_data_get(s);
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-
-	enesim_renderer_shape_opencl_kernel_fill_rule_add(r, rdata->kernel, &argc);
-
-	dm = enesim_renderer_shape_draw_mode_get(r);
-	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
-	{
-		cl_fill_edges = clCreateBuffer(sdata->context,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				sizeof(cl_float) * 7 * thiz->fill.nedges,
-				thiz->fill.edges, NULL);
-		cl_nedges = thiz->fill.nedges;
-	}
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_fill_edges);
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_nedges);
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_uchar4), &thiz->fill.color);
-
-	cl_nedges = 0;
-	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
-	{
-		cl_stroke_edges = clCreateBuffer(sdata->context,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				sizeof(cl_float) * 7 * thiz->stroke.nedges,
-				thiz->stroke.edges, NULL);
-		cl_nedges = thiz->stroke.nedges;
-	}
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_stroke_edges);
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&cl_nedges);
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_uchar4), &thiz->stroke.color);
-
 	cl_bounds.x = floor(lx);
 	cl_bounds.y = floor(ty);
 	cl_bounds.z = ceil(rx);
@@ -812,18 +855,37 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 	/* +1 because of the pattern offset */
 	width = abs(cl_bounds.z - cl_bounds.x) + 2;
 	height = abs(cl_bounds.w - cl_bounds.y) + 1;
-	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_FILL)
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+
+	dm = enesim_renderer_shape_draw_mode_get(r);
+	fr = enesim_renderer_shape_fill_rule_get(r);
+	mask_size = width * height;
+	if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE_FILL)
 	{
-		cl_mask = clCreateBuffer(sdata->context, CL_MEM_READ_WRITE,
-				sizeof(cl_int) * width * height, NULL, NULL);
+		clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&fr);
+		_kiia_opencl_kernel_figure_setup(rdata, &thiz->fill, &argc,
+				mask_size);
+		_kiia_opencl_kernel_figure_setup(rdata, &thiz->stroke, &argc,
+				mask_size);
+		_kiia_opencl_kernel_figure_renderer_setup(rdata, s, &thiz->fill, &argc);
+		_kiia_opencl_kernel_figure_renderer_setup(rdata, s, &thiz->stroke, &argc);
 	}
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_mask);
-	if (dm & ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+	else
 	{
-		cl_omask = clCreateBuffer(sdata->context, CL_MEM_READ_WRITE,
-				sizeof(cl_int) * width * height, NULL, NULL);
+		if (dm == ENESIM_RENDERER_SHAPE_DRAW_MODE_STROKE)
+		{
+			/* the stroke must always be non-zero */
+			fr = ENESIM_RENDERER_SHAPE_FILL_RULE_NON_ZERO;
+		}
+		clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&fr);
+		_kiia_opencl_kernel_figure_setup(rdata, thiz->current, &argc,
+				mask_size);
+		_kiia_opencl_kernel_figure_setup(rdata, NULL, &argc,
+				mask_size);
+		_kiia_opencl_kernel_figure_renderer_setup(rdata, s, thiz->current, &argc);
 	}
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_omask);
+
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int), (void *)&width);
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_int4), (void *)&cl_bounds);
 	*mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_HSPAN;
@@ -832,6 +894,39 @@ static Eina_Bool _kiia_opencl_kernel_setup(Enesim_Renderer *r,
 
 static void _kiia_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 {
+	Enesim_Renderer_Path_Kiia *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	if (thiz->fill.s)
+	{
+		enesim_surface_unref(thiz->fill.s);
+		thiz->fill.s = NULL;
+	}
+	if (thiz->stroke.s)
+	{
+		enesim_surface_unref(thiz->stroke.s);
+		thiz->stroke.s = NULL;
+	}
+}
+
+static void _kiia_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+{
+	Enesim_Renderer_Path_Kiia *thiz;
+
+	thiz = ENESIM_RENDERER_PATH_KIIA(r);
+	/* if fill/stroke renderer */
+	if (thiz->fill.s)
+	{
+		enesim_renderer_opencl_draw(thiz->fill.ren, thiz->fill.s,
+				ENESIM_ROP_FILL, area, x, y);
+	}
+	if (thiz->stroke.ren)
+	{
+		enesim_renderer_opencl_draw(thiz->stroke.ren, thiz->stroke.s,
+				ENESIM_ROP_FILL, area, x, y);
+	}
+	enesim_renderer_opencl_draw_default(r, s, rop, area, x, y);
 }
 #endif
 
@@ -920,9 +1015,10 @@ static void _enesim_renderer_path_kiia_class_init(void *k)
 	r_klass->sw_hints_get = _kiia_sw_hints;
 	r_klass->bounds_get = _kiia_bounds_get;
 #ifdef BUILD_OPENCL
-	r_klass->opencl_kernel_get = _kiia_opencl_kernel_get;
 	r_klass->opencl_kernel_setup = _kiia_opencl_kernel_setup;
 	r_klass->opencl_kernel_cleanup = _kiia_opencl_kernel_cleanup;
+	r_klass->opencl_kernel_get = _kiia_opencl_kernel_get;
+	r_klass->opencl_draw = _kiia_opencl_draw;
 #endif
 
 	s_klass = ENESIM_RENDERER_SHAPE_CLASS(k);
