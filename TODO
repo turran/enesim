@@ -27,6 +27,7 @@ Enesim
   create some #defines for them and we can easily change from 16.16 to 32.32 or stuff like that
 + Implement a state full matrix transformation like OpenGL matrix handling
 + Implement an API similar to cairo's API, i.e drawing operators like PostScript
++ Add a registry system for the compiled OpenCL code
 
 Image
 =====
