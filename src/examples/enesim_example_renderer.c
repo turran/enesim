@@ -141,6 +141,8 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	}
 	for (times = 0; times < options->times; times++)
 	{
+		struct timeval t0, t1;
+		long elapsed;
 		/* first draw the background */	
 		if (!enesim_renderer_draw(c, s, ENESIM_ROP_FILL, NULL, 0, 0,
 				&error))
@@ -150,12 +152,16 @@ void enesim_example_renderer_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		}
 		eina_rectangle_coords_from(&area, 0, 0, options->width, options->height);
 		/* now the real renderer */
+		gettimeofday(&t0, 0);
 		if (!enesim_renderer_draw(r, s, options->rop, &area, options->x, options->y,
 				&error))
 		{
 			enesim_log_dump(error);
 			break;
 		}
+		gettimeofday(&t1, 0);
+		elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
+		printf("%d: %ldus\n", times, elapsed);
 	}
 
 	enesim_renderer_unref(r);
