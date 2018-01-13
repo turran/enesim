@@ -344,12 +344,7 @@ static void _enesim_renderer_factory_setup(Enesim_Renderer *r)
  *----------------------------------------------------------------------------*/
 static void _enesim_renderer_class_init(void *k)
 {
-	Enesim_Object_Class *object_klass;
 	Enesim_Renderer_Class *klass;
-	const char *dname;
-
-	object_klass = ENESIM_OBJECT_CLASS(k);
-	dname = enesim_object_descriptor_name_get(object_klass->descriptor);
 
 	klass = ENESIM_RENDERER_CLASS(k);
 #if BUILD_OPENCL
@@ -357,18 +352,6 @@ static void _enesim_renderer_class_init(void *k)
 	klass->opencl_cleanup = enesim_renderer_opencl_cleanup_default;
 	klass->opencl_draw = enesim_renderer_opencl_draw_default;
 #endif
-	/* check the passed in functions */
-	/* TODO remove this, they are always NULL */
-	if (!klass->is_inside)
-		WRN("No is_inside() function available on '%s'", dname);
-	if (!klass->bounds_get)
-		WRN("No bounding() function available on '%s'", dname);
-	if (!klass->features_get)
-		WRN("No features() function available on '%s'", dname);
-	if (!klass->sw_setup)
-		WRN("No sw_setup() function available on '%s'", dname);
-	if (!klass->sw_cleanup)
-		WRN("No sw_cleanup() function available on '%s'", dname);
 }
 
 static void _enesim_renderer_instance_init(void *o)
