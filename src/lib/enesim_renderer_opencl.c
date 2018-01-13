@@ -438,7 +438,7 @@ void enesim_renderer_opencl_draw_default(Enesim_Renderer *r, Enesim_Surface *s,
 	 * surface done at setup, otherwise the renderers can not use a
 	 * temporary surface to draw inner renderers
 	 */
-	clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem);
+	clSetKernelArg(rdata->kernel, 0, sizeof(cl_mem), &sdata->mem[0]);
 	/* launch it!!! */
 	cl_err = clEnqueueNDRangeKernel(sdata->queue, rdata->kernel, ndim, NULL, global_ws, NULL, 0, NULL, NULL);
 	if (cl_err != CL_SUCCESS)

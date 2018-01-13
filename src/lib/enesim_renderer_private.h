@@ -175,6 +175,9 @@ struct _Enesim_Renderer
 	 * possible data */
 	void *backend_data[ENESIM_BACKEND_LAST];
 	Eina_Bool in_setup : 1;
+#if BUILD_OPENCL
+	cl_mem cl_matrix;
+#endif
 };
 
 void enesim_renderer_init(void);

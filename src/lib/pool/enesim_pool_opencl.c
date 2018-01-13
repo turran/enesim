@@ -22,11 +22,17 @@
 #include "enesim_buffer.h"
 
 #include "Enesim_OpenCL.h"
+#if BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#endif
 
 #include "enesim_pool_private.h"
 #include "enesim_buffer_private.h"
 
 #define ENESIM_LOG_DEFAULT enesim_log_pool
+/* TODO:
+ * Handle multi buffer formats
+ */
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
@@ -75,7 +81,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 {
 	Enesim_OpenCL_Pool *thiz = prv;
 	Enesim_Buffer_OpenCL_Data *data;
-	cl_mem i;
+	cl_mem mem;
 	cl_int ret;
 	cl_image_format format;
 
@@ -83,7 +89,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 			&format.image_channel_data_type))
 		return EINA_FALSE;
 
-	i = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
+	mem = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
 			&format, w, h, 0, NULL, &ret);
 	if (ret != CL_SUCCESS)
 	{
@@ -93,7 +99,9 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 	*backend = ENESIM_BACKEND_OPENCL;
 	data = malloc(sizeof(Enesim_Buffer_OpenCL_Data));
 	*backend_data = data;
-	data->mem = i;
+	data->mem = calloc(1, sizeof(cl_mem));
+	data->mem[0] = mem;
+	data->num_mems = 1;
 	data->context = thiz->context;
 	data->device = thiz->device;
 	data->queue = thiz->queue;
@@ -107,8 +115,10 @@ static void _data_free(void *prv, void *backend_data,
 		Eina_Bool external_allocated)
 {
 	Enesim_Buffer_OpenCL_Data *data = backend_data;
+	unsigned int i;
 
-	clReleaseMemObject(data->mem);
+	for (i = 0; i < data->num_mems; i++)
+		clReleaseMemObject(data->mem[i]);
 }
 
 static Eina_Bool _data_get(void *prv, void *backend_data,
@@ -122,8 +132,8 @@ static Eina_Bool _data_get(void *prv, void *backend_data,
 	size_t size;
 	cl_int ret;
 
-	clGetImageInfo(data->mem, CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
-	ret = clEnqueueReadImage(data->queue, data->mem, CL_TRUE, origin, region, dst->argb8888_pre.plane0_stride, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
+	clGetImageInfo(data->mem[0], CL_IMAGE_ROW_PITCH, sizeof(size_t), &size, NULL);
+	ret = clEnqueueReadImage(data->queue, data->mem[0], CL_TRUE, origin, region, dst->argb8888_pre.plane0_stride, 0, dst->argb8888_pre.plane0, 0, NULL, NULL);
 	if (ret != CL_SUCCESS)
 	{
 		ERR("Failed getting the surface");
@@ -161,52 +171,89 @@ static Enesim_Pool_Descriptor _descriptor = {
  *============================================================================*/
 EAPI Enesim_Pool * enesim_pool_opencl_new(void)
 {
+	cl_platform_id platform_id;
+	cl_uint ret_num_platforms;
+
+	clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+	return enesim_pool_opencl_new_platform_from(platform_id, CL_DEVICE_TYPE_DEFAULT);
+
+}
+
+EAPI Enesim_Pool * enesim_pool_opencl_new_platform_from(cl_platform_id platform_id, cl_device_type device_type)
+{
+	cl_device_id device_id;
+	cl_uint ret_num_devices;
+	cl_int ret;
+
+	ret = clGetDeviceIDs(platform_id, device_type, 1, &device_id,
+			&ret_num_devices);
+	if (ret != CL_SUCCESS)
+	{
+		ERR("Impossible to get the devices");
+ 		return NULL;
+	}
+	return enesim_pool_opencl_new_device_from(device_id);
+}
+
+EAPI Enesim_Pool * enesim_pool_opencl_new_device_from(cl_device_id device_id)
+{
 	Enesim_OpenCL_Pool *thiz;
 	Enesim_Pool *p;
 	cl_context context;
 	cl_command_queue queue;
-	cl_device_id device_id;
 	cl_int ret;
-	cl_platform_id platform_id;
-	cl_uint ret_num_devices;
-	cl_uint ret_num_platforms;
 
-	clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-	ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1,
-            &device_id, &ret_num_devices);
-	if (ret != CL_SUCCESS)
-	{
-		DBG("impossible to get the devices");
- 		goto end;
-	}
 	context = clCreateContext(0, 1, &device_id, NULL, NULL, &ret);
 	if (ret != CL_SUCCESS)
 	{
-		DBG("impossible to get the context");
+		ERR("Impossible to create the context");
 		goto end;
 	}
 	queue = clCreateCommandQueue(context, device_id, 0, &ret);
 	if (ret != CL_SUCCESS)
 	{
-		DBG("impossible to get the command queue");
+		ERR("Impossible to get the command queue");
 		goto end;
 	}
 
-	DBG("Everything went ok");
 	thiz = calloc(1, sizeof(Enesim_OpenCL_Pool));
 	thiz->context = context;
 	thiz->device = device_id;
 	thiz->queue = queue;
 
 	p = enesim_pool_new(&_descriptor, thiz);
-	if (!p)
-	{
-		free(thiz);
-		return NULL;
-	}
-
 	return p;
 end:
 	return NULL;
 }
 
+#if BUILD_OPENGL
+EAPI Enesim_Buffer * enesim_pool_opencl_new_buffer_opengl_from(
+		Enesim_Pool *p, Enesim_Format f, uint32_t w, uint32_t h,
+		Enesim_Buffer_OpenGL_Data *gl_data)
+{
+	Enesim_OpenCL_Pool *thiz;
+	Enesim_Buffer_OpenCL_Data *data;
+	Enesim_Buffer *b;
+	cl_mem mem;
+	cl_int err;
+
+	thiz = enesim_pool_descriptor_data_get(p);
+	mem = clCreateFromGLTexture(thiz->context, CL_MEM_READ_WRITE,
+			GL_TEXTURE_2D, 0, gl_data->textures[0], &err);
+	if (ret != CL_SUCCESS)
+	{
+		ERR("Can not create from GL texture (err: %d)", cl_err);
+		return NULL;
+	}
+	data = malloc(sizeof(Enesim_Buffer_OpenCL_Data));
+	data->mem = calloc(1, sizeof(cl_mem));
+	data->mem[0] = mem;
+	data->num_mems = 1;
+	data->context = thiz->context;
+	data->device = thiz->device;
+	data->queue = thiz->queue;
+	return enesim_buffer_new_opencl_pool_and_data_from(f, w, h,
+			enesim_pool_ref(p), &data);
+}
+#endif

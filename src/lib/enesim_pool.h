@@ -39,6 +39,7 @@ EAPI Enesim_Pool * enesim_pool_ref(Enesim_Pool *thiz);
 EAPI void enesim_pool_unref(Enesim_Pool *thiz);
 EAPI Eina_Bool enesim_pool_type_get(Enesim_Pool *thiz, const char **lib,
 		const char **name);
+EAPI void * enesim_pool_descriptor_data_get(Enesim_Pool *thiz);
 
 /**
  * @}

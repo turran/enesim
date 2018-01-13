@@ -209,3 +209,12 @@ EAPI Eina_Bool enesim_pool_type_get(Enesim_Pool *thiz, const char **lib,
 	return EINA_TRUE;
 }
 
+/**
+ * Return the descriptor data associated when creating the pool
+ * @pararm[in] thiz The pool to get the data from
+ * @return The descriptor data of the pool
+ */
+EAPI void * enesim_pool_descriptor_data_get(Enesim_Pool *thiz)
+{
+	return thiz->data;
+}

@@ -26,6 +26,10 @@
 #include "enesim_buffer_private.h"
 #include "enesim_converter_private.h"
 
+#if BUILD_OPENCL
+#include "Enesim_OpenCL.h"
+#endif
+
 #if BUILD_OPENGL
 #include "enesim_surface.h"
 #include "enesim_log.h"
@@ -497,6 +501,20 @@ EAPI Enesim_Buffer * enesim_buffer_new_opengl_data_from(Enesim_Buffer_Format f,
 
 	b = _buffer_new(w, h, ENESIM_BACKEND_OPENGL, backend_data, f, NULL,
 			EINA_TRUE, _buffer_opengl_backend_free, NULL);
+	return b;
+}
+#endif
+
+#if BUILD_OPENCL
+EAPI Enesim_Buffer * enesim_buffer_new_opencl_pool_and_data_from(Enesim_Buffer_Format f,
+		uint32_t w, uint32_t h, Enesim_Pool *pool,
+		Enesim_Buffer_OpenCL_Data *backend_data)
+{
+	Enesim_Buffer *b;
+
+	if (!w || !h) return NULL;
+	b = _buffer_new(w, h, ENESIM_BACKEND_OPENCL, backend_data, f, pool,
+			EINA_FALSE, NULL, NULL);
 	return b;
 }
 #endif

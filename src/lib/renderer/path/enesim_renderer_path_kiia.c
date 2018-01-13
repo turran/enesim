@@ -819,7 +819,7 @@ static void _kiia_opencl_kernel_figure_renderer_setup(
 		figure->s = enesim_surface_new_pool_from(
 				ENESIM_FORMAT_ARGB8888, w, h, pool);
 		sf_data = enesim_surface_backend_data_get(figure->s);
-		cl_figure_s = sf_data->mem;
+		cl_figure_s = sf_data->mem[0];
 		enesim_pool_unref(pool);
 
 		clSetKernelArg(rdata->kernel, (*argc)++, sizeof(cl_mem),
