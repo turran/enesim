@@ -783,12 +783,12 @@ static void _kiia_opencl_kernel_figure_setup(
 
 	if (figure)
 	{
-		cl_edges = clCreateBuffer(rdata->context,
+		cl_edges = clCreateBuffer(rdata->context->context,
 				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 				sizeof(cl_float) * 7 * figure->nedges,
 				figure->edges, NULL);
 		cl_nedges = figure->nedges;
-		cl_mask = clCreateBuffer(rdata->context, CL_MEM_READ_WRITE,
+		cl_mask = clCreateBuffer(rdata->context->context, CL_MEM_READ_WRITE,
 				sizeof(cl_int) * mask_len,
 				NULL, NULL);
 		cl_color = figure->color;

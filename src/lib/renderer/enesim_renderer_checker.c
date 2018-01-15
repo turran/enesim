@@ -675,7 +675,7 @@ static Eina_Bool _checker_opencl_kernel_setup(Enesim_Renderer *r,
 	cl_matrix[0] = inv.xx; cl_matrix[1] = inv.xy; cl_matrix[2] = inv.xz;
 	cl_matrix[3] = inv.yx; cl_matrix[4] = inv.yy; cl_matrix[5] = inv.yz;
 	cl_matrix[6] = inv.zx; cl_matrix[7] = inv.zy; cl_matrix[8] = inv.zz;
-	cl_mmatrix = clCreateBuffer(sdata->context,
+	cl_mmatrix = clCreateBuffer(sdata->context->context,
 			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 			sizeof(cl_matrix), &cl_matrix, NULL);
 	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_mmatrix);

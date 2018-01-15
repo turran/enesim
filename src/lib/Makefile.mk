@@ -77,7 +77,7 @@ src/lib/enesim_text.c \
 src/lib/enesim_text_private.h
 
 if HAVE_OPENCL
-src_lib_libenesim_la_SOURCES += src/lib/enesim_renderer_opencl.c
+src_lib_libenesim_la_SOURCES += src/lib/enesim_renderer_opencl.c src/lib/enesim_opencl.c
 endif
 
 if BUILD_OPENGL

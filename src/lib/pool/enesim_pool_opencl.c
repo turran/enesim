@@ -28,6 +28,7 @@
 
 #include "enesim_pool_private.h"
 #include "enesim_buffer_private.h"
+#include "enesim_opencl_private.h"
 
 #define ENESIM_LOG_DEFAULT enesim_log_pool
 /* TODO:
@@ -39,7 +40,7 @@
 /** @cond internal */
 typedef struct _Enesim_OpenCL_Pool
 {
-	cl_context context;
+	const Enesim_Renderer_OpenCL_Context_Data *context;
 	cl_device_id device;
 	cl_command_queue queue;
 } Enesim_OpenCL_Pool;
@@ -89,7 +90,7 @@ static Eina_Bool _data_alloc(void *prv, Enesim_Backend *backend,
 			&format.image_channel_data_type))
 		return EINA_FALSE;
 
-	mem = clCreateImage2D(thiz->context, CL_MEM_READ_WRITE,
+	mem = clCreateImage2D(thiz->context->context, CL_MEM_READ_WRITE,
 			&format, w, h, 0, NULL, &ret);
 	if (ret != CL_SUCCESS)
 	{
@@ -148,7 +149,6 @@ static void _free(void *prv)
 	Enesim_OpenCL_Pool *thiz = prv;
 
 	clReleaseCommandQueue(thiz->queue);
-	clReleaseContext(thiz->context);
 	clReleaseDevice(thiz->device);
 	free(thiz);
 }
@@ -197,19 +197,20 @@ EAPI Enesim_Pool * enesim_pool_opencl_new_platform_from(cl_platform_id platform_
 
 EAPI Enesim_Pool * enesim_pool_opencl_new_device_from(cl_device_id device_id)
 {
+	const Enesim_Renderer_OpenCL_Context_Data *context;
 	Enesim_OpenCL_Pool *thiz;
 	Enesim_Pool *p;
-	cl_context context;
 	cl_command_queue queue;
 	cl_int ret;
 
-	context = clCreateContext(0, 1, &device_id, NULL, NULL, &ret);
-	if (ret != CL_SUCCESS)
+	context = enesim_renderer_opencl_context_data_get(device_id);
+	if (!context)
 	{
-		ERR("Impossible to create the context");
+		ERR("Can not create the context");
 		goto end;
 	}
-	queue = clCreateCommandQueue(context, device_id, 0, &ret);
+
+	queue = clCreateCommandQueue(context->context, device_id, 0, &ret);
 	if (ret != CL_SUCCESS)
 	{
 		ERR("Impossible to get the command queue");

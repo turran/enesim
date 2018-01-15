@@ -22,6 +22,8 @@
 #include "Enesim_OpenCL.h"
 #endif
 
+#include "enesim_opencl_private.h"
+
 typedef enum _Enesim_Renderer_OpenCL_Kernel_Mode
 {
 	ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL,
@@ -31,9 +33,9 @@ typedef enum _Enesim_Renderer_OpenCL_Kernel_Mode
 #if BUILD_OPENCL
 typedef struct _Enesim_Renderer_OpenCL_Data
 {
-	/* to cache the kernel_get */
-	cl_context context;
+	const Enesim_Renderer_OpenCL_Context_Data *context;
 	cl_device_id device;
+	/* to cache the kernel_get */
 	cl_kernel kernel;
 	const char *kernel_name;
 	Enesim_Renderer_OpenCL_Kernel_Mode mode;

@@ -47,6 +47,11 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#if BUILD_OPENGL
+#include "Enesim_OpenCL.h"
+#include "enesim_opencl_private.h"
+#endif
+
 #include "enesim_pool_private.h"
 #include "enesim_image_private.h"
 #include "enesim_text_private.h"
@@ -208,6 +213,9 @@ EAPI int enesim_init(void)
 	enesim_converter_init();
 	enesim_image_init();
 	enesim_text_init();
+#if BUILD_OPENCL
+	enesim_opencl_init();
+#endif
 #ifdef ENS_HAVE_MMX
 	/* EINA_ERROR_PINFO("MMX Drawer available\n"); */
 #endif
@@ -257,6 +265,9 @@ EAPI int enesim_shutdown(void)
 	if (--_enesim_init_count != 0)
 		goto done;
 
+#if BUILD_OPENCL
+	enesim_opencl_shutdown();
+#endif
 	enesim_text_shutdown();
 	enesim_image_shutdown();
 	enesim_converter_shutdown();

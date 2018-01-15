@@ -22,11 +22,12 @@
 
 #define ENESIM_OPENCL_CODE(...) #__VA_ARGS__
 
+typedef struct _Enesim_Renderer_OpenCL_Context_Data Enesim_Renderer_OpenCL_Context_Data;
 
 typedef struct _Enesim_Buffer_OpenCL_Data
 {
+	const Enesim_Renderer_OpenCL_Context_Data *context;
 	cl_mem *mem;
-	cl_context context;
 	cl_device_id device;
 	cl_command_queue queue;
 	unsigned int num_mems;
