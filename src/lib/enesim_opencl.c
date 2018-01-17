@@ -16,6 +16,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 #include "enesim_private.h"
+#include "dlfcn.h"
 
 #include "enesim_main.h"
 #include "enesim_pool.h"
@@ -28,13 +29,65 @@
 #include "enesim_opencl_private.h"
 
 #define ENESIM_LOG_DEFAULT enesim_log_global
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#define ENESIM_LIB "libenesim.so." STR(VERSION_MAJOR)
 /*============================================================================*
  *                                  Local                                     *
  *============================================================================*/
 /** @cond internal */
 static Eina_Hash *_context_lut = NULL;
 
-static char * get_cache_path(void)
+typedef struct _Enesim_OpenCL_Library
+{
+	char *lib_file;
+	struct timespec mt;
+} Enesim_OpenCL_Library;
+
+static Eina_Bool _get_modification_time(struct timespec *ts, char **lib_file)
+{
+	Eina_Bool ret = EINA_FALSE;
+	char path[PATH_MAX];
+	char *file = NULL;
+	void *dl = NULL;
+	struct stat st;
+
+	/* Get the enesim library from the system */
+	dl = dlopen(ENESIM_LIB, RTLD_LAZY | RTLD_NOLOAD);
+	if (!dl)
+	{
+		WRN("Can't load ourselves");
+		goto done;
+	}
+	/* Get the path */
+	if (dlinfo(dl, RTLD_DI_ORIGIN, path) < 0)
+	{
+		WRN("Can't find the path where the lib is");
+		goto done;
+	}
+	if (asprintf(&file, "%s" EINA_PATH_SEP_S ENESIM_LIB, path) < 0)
+	{
+		WRN("Can't allocate file path");
+		goto done;
+	}
+	if (stat(file, &st) < 0)
+	{
+		WRN("Can't stat file '%s'", file);
+		goto done;
+	}
+	*lib_file = file;
+	*ts = st.st_mtim;
+	file = NULL;
+	ret = EINA_TRUE;
+done:
+	if (file)
+		free(file);
+	if (dl)
+		dlclose(dl);
+	return ret;
+}
+
+static char * _get_cache_path(void)
 {
 	char *cache_dir = NULL;
 	char *xdg_cache_dir;
@@ -116,9 +169,10 @@ static void _generate_program_cache(FILE *f, const char *name,
 	}
 	name_len = strlen(name) + 1;
 	fwrite(&name_len, sizeof(size_t), 1, f);
-	fwrite(name, sizeof(char), strlen(name) + 1, f);
+	fwrite(name, sizeof(char), name_len, f);
 	fwrite(&binary_size, sizeof(size_t), 1, f);
 	fwrite(binary, sizeof(unsigned char), binary_size, f);
+	INF("Program '%s' cached", name);
 done:
 	if (binary)
 		free(binary);
@@ -226,6 +280,7 @@ static Eina_Bool _generate_file_cache(const Eina_Hash *hash EINA_UNUSED,
 		const void *key EINA_UNUSED, void *data, void *fdata)
 {
 	Enesim_Renderer_OpenCL_Context_Data *cl_data = data;
+	Eina_Bool write_header = EINA_FALSE;
 	cl_device_id device = NULL;
 	cl_platform_id platform = NULL;
 	FILE *f = NULL;
@@ -234,6 +289,7 @@ static Eina_Bool _generate_file_cache(const Eina_Hash *hash EINA_UNUSED,
 	int cl_err;
 	char *cache_dir = fdata;
 	char *cache_file = NULL;
+	struct stat st;
 
 	/* Let's assume we only have a single device for this cotext */
 	cl_err = clGetContextInfo(cl_data->context, CL_CONTEXT_DEVICES,
@@ -259,13 +315,32 @@ static Eina_Bool _generate_file_cache(const Eina_Hash *hash EINA_UNUSED,
 	if (!device_name)
 		goto done;
 	cache_file = _get_file_name(cache_dir, platform_name, device_name);
+	/* if the files not exist, set the header */
+	if (stat(cache_file, &st) < 0)
+		write_header = EINA_TRUE;
 	f = fopen(cache_file, "a");
 	if (!f)
 	{
 		WRN("Can not open file %s", cache_file);
 		goto done;
 	}
-	/* TODO first the timestamp of the modification time of the library */
+	if (write_header)
+	{
+		Enesim_OpenCL_Library lib = { NULL };
+
+		if (!_get_modification_time(&lib.mt, &lib.lib_file))
+			goto done;
+
+		/* first the timestamp of the modification time of the library */
+		param_size = strlen(lib.lib_file) + 1;
+		fwrite(&param_size, sizeof(size_t), 1, f);
+		fwrite(lib.lib_file, sizeof(char), param_size, f);
+		fwrite(&lib.mt.tv_sec, sizeof(lib.mt.tv_sec), 1, f);
+		fwrite(&lib.mt.tv_nsec, sizeof(lib.mt.tv_nsec), 1, f);
+
+		if (lib.lib_file)
+			free(lib.lib_file);
+	}
 	/* dump the library and the headers */
 	_generate_program_cache(f, "enesim_opencl_header", cl_data->header);
 	_generate_program_cache(f, "enesim_opencl_library", cl_data->lib);
@@ -313,8 +388,9 @@ static Eina_Bool _parse_program_cache(FILE *f,
 			binaries, &binary_status, &cl_err);
 	if (cl_err != CL_SUCCESS)
 	{
-		ERR("Impossible to compile cached binary code (err: %d"
-				" bs: %d)", cl_err, binary_status);
+		ERR("Impossible to compile cached binary code '%s' (err: %d"
+				" bs: %d)", program_name, cl_err,
+				binary_status);
 		goto done;
 	}
 
@@ -345,18 +421,47 @@ done:
 
 
 static Eina_Bool _parse_file_cache(FILE *f, const char *platform_name,
-		const char *device_name)
+		const char *device_name, Enesim_OpenCL_Library *lib,
+		Eina_Bool *remove)
 {
 	Enesim_Renderer_OpenCL_Context_Data *cdata;
 	Eina_Bool ret = EINA_FALSE;
+	Eina_Bool do_remove = EINA_FALSE;
 	cl_platform_id *platforms = NULL, platform = NULL;
 	cl_device_id *devices = NULL, device;
 	cl_uint num_platforms, num_devices;
 	cl_int cl_err;
 	cl_context context;
+	char *lib_file = NULL;
+	size_t len;
 	unsigned int i;
+	struct timespec mt;
 
-	/* TODO if equal */
+	/* compare the path */
+	if (fread(&len, sizeof(len), 1, f) <= 0)
+		goto done;
+	lib_file = malloc(len);
+	if (fread(lib_file, sizeof(char), len, f) <= 0)
+		goto done;
+	if (strcmp(lib_file, lib->lib_file))
+	{
+		INF("Path '%s' does not match, removing cache for '%s'",
+				lib_file, lib->lib_file);
+		do_remove = EINA_TRUE;
+		goto done;
+	}
+	/* compare the timespec */
+	if (fread(&mt.tv_sec, sizeof(mt.tv_sec), 1, f) <= 0)
+		goto done;
+	if (fread(&mt.tv_nsec, sizeof(mt.tv_nsec), 1, f) <= 0)
+		goto done;
+	if (mt.tv_sec != lib->mt.tv_sec || mt.tv_nsec != lib->mt.tv_nsec)
+	{
+		INF("Modification time for '%s' does not match, removing it",
+				lib_file);
+		do_remove = EINA_TRUE;
+		goto done;
+	}
 	/* iterate over the platforms */
 	cl_err = clGetPlatformIDs(0, NULL, &num_platforms);
 	if (cl_err != CL_SUCCESS)
@@ -425,23 +530,25 @@ static Eina_Bool _parse_file_cache(FILE *f, const char *platform_name,
 	cdata->context = context;
 	cdata->name = _get_name(platform_name, device_name);
 	eina_hash_add(_context_lut, cdata->name, cdata);
+	/* populate the hash with the information stored on disk */
 	while (!feof(f))
 		_parse_program_cache(f, cdata, device);
-	/* populate the hash with the information stored on disk */
-	/* load the programs from the binary */
 	ret = EINA_TRUE;
 done:
+	if (lib_file)
+		free(lib_file);
 	if (devices)
 		free(devices);
 	if (platforms)
 		free(platforms);
-	/* TODO othrewise remove the file */
+	*remove = do_remove;
 	return ret;
 }
 
 
 static void _list_file_cache(const char *name, const char *path, void *data)
 {
+	Enesim_OpenCL_Library *lib = data;
 	const char *tmp = name;
 
 	/* split by . and get the platform name and device name */
@@ -449,6 +556,7 @@ static void _list_file_cache(const char *name, const char *path, void *data)
 	{
 		if (*tmp == '.')
 		{
+			Eina_Bool remove = EINA_FALSE;
 			FILE *f;
 			char *platform_name = NULL;
 			char *device_name = NULL;
@@ -464,8 +572,13 @@ static void _list_file_cache(const char *name, const char *path, void *data)
 				goto done;	
 			}
 			f = fopen(cache_file, "r");
-			_parse_file_cache(f, platform_name, device_name);
+			_parse_file_cache(f, platform_name, device_name, lib, &remove);
 			fclose(f);
+			if (remove)
+			{
+				DBG("Removing cached file '%s'", cache_file);
+				unlink(cache_file);
+			}
 done:
 			if (cache_file)
 				free(cache_file);
@@ -586,19 +699,17 @@ void enesim_opencl_init(void)
 
 	_context_lut = eina_hash_string_superfast_new(
 			(Eina_Free_Cb)enesim_renderer_opencl_context_data_free);
-	cache_dir = get_cache_path();
+	cache_dir = _get_cache_path();
 	if (cache_dir)
 	{
-		/* TODO get the enesim library from the system */
-		/* TODO dlopen(enesim.so.VERSION_MAJOR, RTLD_NOLOAD); */
-		/* TODO get the path */
-		/* TODO get the modification time */
-		/* TODO pass the timestamp */
-
+		Enesim_OpenCL_Library lib = { NULL };
+		if (!_get_modification_time(&lib.mt, &lib.lib_file))
+			return;
 		/* read every file on this directory */
-		eina_file_dir_list(cache_dir, EINA_FALSE, _list_file_cache, NULL);
+		eina_file_dir_list(cache_dir, EINA_FALSE, _list_file_cache, &lib);
 		free(cache_dir);
-		/* read the binary cache where we should store, the platform, the device and the program name */
+		if (lib.lib_file)
+			free(lib.lib_file);
 	}
 
 }
@@ -608,7 +719,7 @@ void enesim_opencl_shutdown(void)
 	char *cache_dir;
 
 	/* generate the binary cache */
-	cache_dir = get_cache_path();
+	cache_dir = _get_cache_path();
 	if (cache_dir)
 	{
 		eina_hash_foreach(_context_lut, _generate_file_cache, cache_dir);
