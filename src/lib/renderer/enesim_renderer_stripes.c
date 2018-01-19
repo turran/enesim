@@ -266,7 +266,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 		if (epaint)
 		{
 			p0 = *d;
-			if (c0 != 0xffffffff)
+			if (c0 != ENESIM_COLOR_FULL)
 				p0 = enesim_color_mul4_sym(p0, c0);
 		}
 		if (sy == 0)
@@ -276,7 +276,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 			if (opaint)
 			{
 				p1 = *s;
-				if (c1 != 0xffffffff)
+				if (c1 != ENESIM_COLOR_FULL)
 					p1 = enesim_color_mul4_sym(p1, c1);
 			}
 			p0 = enesim_color_interp_256(a, p0, p1);
@@ -387,7 +387,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 		if (epaint)
 		{
 			p0 = *d;
-			if (c0 != 0xffffffff)
+			if (c0 != ENESIM_COLOR_FULL)
 				p0 = enesim_color_mul4_sym(p0, c0);
 		}
 		if (sy == 0)
@@ -397,7 +397,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 			if (opaint)
 			{
 				p1 = *s;
-				if (c1 != 0xffffffff)
+				if (c1 != ENESIM_COLOR_FULL)
 					p1 = enesim_color_mul4_sym(p1, c1);
 			}
 			p0 = enesim_color_interp_256(a, p0, p1);
@@ -407,7 +407,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 			if (opaint)
 			{
 				p1 = *s;
-				if (c1 != 0xffffffff)
+				if (c1 != ENESIM_COLOR_FULL)
 					p1 = enesim_color_mul4_sym(p1, c1);
 			}
 			if (sy == h0)
