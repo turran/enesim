@@ -65,6 +65,7 @@ EXTRA_DIST += \
 src/lib/renderer/enesim_renderer_background.cl \
 src/lib/renderer/enesim_renderer_checker.cl \
 src/lib/renderer/enesim_renderer_checker.glsl \
+src/lib/renderer/enesim_renderer_compound.cl \
 src/lib/renderer/enesim_renderer_gradient_linear.glsl \
 src/lib/renderer/enesim_renderer_gradient_radial.glsl \
 src/lib/renderer/enesim_renderer_opengl_common_ambient.glsl \
