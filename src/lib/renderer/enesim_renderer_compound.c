@@ -38,6 +38,10 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#ifdef BUILD_OPENCL
+#include "Enesim_OpenCL.h"
+#endif
+
 #include "enesim_renderer_private.h"
 #include "enesim_buffer_private.h"
 #include "enesim_surface_private.h"
@@ -80,7 +84,10 @@ typedef struct _Enesim_Renderer_Compound
 	Eina_List *added;
 	Eina_List *removed;
 #if BUILD_OPENGL
-	Enesim_Surface *s;
+	Enesim_Surface *opengl_s;
+#endif
+#if BUILD_OPENCL
+	Enesim_Surface *opencl_s;
 #endif
 	Enesim_Renderer_Compound_Layer background;
 	Enesim_Renderer *cur_background;
@@ -318,23 +325,23 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENGL);
 
 	/* create our temporary surface */
-	if (thiz->s)
+	if (thiz->opengl_s)
 	{
 		int w, h;
-		enesim_surface_size_get(thiz->s, &w, &h);
+		enesim_surface_size_get(thiz->opengl_s, &w, &h);
 		if (area->w != w || area->h != h)
 		{
-			enesim_surface_unref(thiz->s);
-			thiz->s = NULL;
+			enesim_surface_unref(thiz->opengl_s);
+			thiz->opengl_s = NULL;
 		}
 	}
 
-	if (!thiz->s)
+	if (!thiz->opengl_s)
 	{
 		Enesim_Pool *pool;
 
 		pool = enesim_surface_pool_get(s);
-		thiz->s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
+		thiz->opengl_s = enesim_surface_new_pool_from(ENESIM_FORMAT_ARGB8888,
 				area->w, area->h, pool);
 	}
 	/* draw every layer */
@@ -343,7 +350,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	if (thiz->background_enabled)
 	{
 		Enesim_Renderer_Compound_Layer *l = &thiz->background;
-		_compound_layer_opengl_draw(l, thiz->s, &larea, -(area->x - x), -(area->y - y));
+		_compound_layer_opengl_draw(l, thiz->opengl_s, &larea, -(area->x - x), -(area->y - y));
 	}
 	/* now the layers */
 	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
@@ -351,7 +358,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 		Enesim_Renderer_Compound_Layer *l;
 
 		l = eina_list_data_get(ll);
-		_compound_layer_opengl_draw(l, thiz->s, &larea, -(area->x - x), -(area->y - y));
+		_compound_layer_opengl_draw(l, thiz->opengl_s, &larea, -(area->x - x), -(area->y - y));
 	}
 
 	/* draw the temporary surface */
@@ -360,7 +367,7 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 
 	cp = &rdata->program->compiled[0];
 	enesim_renderer_opengl_shader_texture_setup(cp->id,
-				0, thiz->s, ENESIM_COLOR_FULL, area->x, area->y);
+				0, thiz->opengl_s, ENESIM_COLOR_FULL, area->x, area->y);
 	enesim_opengl_target_surface_set(s);
 	enesim_opengl_rop_set(rop);
 	enesim_opengl_draw_area(area);
@@ -369,6 +376,28 @@ static void _compound_opengl_draw(Enesim_Renderer *r, Enesim_Surface *s,
 	glUseProgramObjectARB(0);
 	enesim_opengl_target_surface_set(NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+#endif
+
+#ifdef BUILD_OPENCL
+static inline void _compound_layer_opencl_draw(
+		Enesim_Renderer_Compound_Layer *l, Enesim_Surface *s,
+		const Eina_Rectangle *area, int x, int y)
+{
+	Eina_Rectangle final;
+
+	/* transform the surface area to renderer coordinates */
+	final = *area;
+	final.x -= x;
+	final.y -= y;
+
+	if (!eina_rectangle_intersection(&final, &l->destination_bounds))
+		return;
+	/* only draw the layer clipped to the renderer bounds */
+	final.x += x;
+	final.y += y;
+
+	enesim_renderer_opencl_draw(l->r, s, l->rop, &final, x, y);
 }
 #endif
 
@@ -725,6 +754,115 @@ static void _compound_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_compound_state_cleanup(thiz, s);
 }
 #endif
+
+#if BUILD_OPENCL
+static Eina_Bool _compound_opencl_kernel_get(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		const char **program_name, const char **program_source,
+		size_t *program_length, const char **kernel_name)
+{
+	*program_name = "compound";
+	*program_source =
+	"#include \"enesim_opencl.h\"\n" 
+	#include "enesim_renderer_compound.cl"
+	*program_length = strlen(*program_source);
+	*kernel_name = "compound";
+	return EINA_TRUE;
+}
+
+static Eina_Bool _compound_opencl_kernel_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, int argc,
+		Enesim_Renderer_OpenCL_Kernel_Mode *mode)
+{
+	Enesim_Renderer_Compound *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
+
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	/* create the surface */
+	return EINA_TRUE;
+}
+
+static void _compound_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Compound *thiz;
+
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	if (thiz->opencl_s)
+	{
+		enesim_surface_unref(thiz->opencl_s);
+		thiz->opencl_s = NULL;
+	}
+}
+
+static Eina_Bool _compound_opencl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		Enesim_Log **l)
+{
+	Enesim_Renderer_Compound *thiz;
+
+ 	thiz = ENESIM_RENDERER_COMPOUND(r);
+	if (!_compound_state_setup(thiz, r, s, rop, l))
+		return EINA_FALSE;
+	return enesim_renderer_opencl_setup_default(r, s, rop, l);
+}
+
+static void _compound_opencl_cleanup(Enesim_Renderer *r,
+		Enesim_Surface *s)
+{
+	Enesim_Renderer_Compound *thiz;
+
+ 	thiz = ENESIM_RENDERER_COMPOUND(r);
+	_compound_state_cleanup(thiz, s);
+	enesim_renderer_opencl_cleanup_default(r, s);
+}
+
+static void _compound_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+{
+	Enesim_Renderer_Compound *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
+	Eina_Rectangle larea;
+	Eina_List *ll;
+
+	thiz = ENESIM_RENDERER_COMPOUND(r);
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	/* create our temporary surface */
+	{
+		Enesim_Pool *pool;
+		Enesim_Buffer_OpenCL_Data *sf_data;
+		int w, h;
+		cl_mem cl_s = NULL;
+
+		pool = enesim_surface_pool_get(s);
+		enesim_surface_size_get(s, &w, &h);
+		thiz->opencl_s = enesim_surface_new_pool_from(
+				ENESIM_FORMAT_ARGB8888, w, h, pool);
+		sf_data = enesim_surface_backend_data_get(thiz->opencl_s);
+		cl_s = sf_data->mem[0];
+		enesim_pool_unref(pool);
+
+		clSetKernelArg(rdata->kernel, 2, sizeof(cl_mem),
+				&cl_s);
+	}
+	/* draw every layer */
+	/* first the background */
+	eina_rectangle_coords_from(&larea, 0, 0, area->w, area->h);
+	if (thiz->background_enabled)
+	{
+		Enesim_Renderer_Compound_Layer *l = &thiz->background;
+		_compound_layer_opencl_draw(l, thiz->opencl_s, &larea, -(area->x - x), -(area->y - y));
+	}
+	/* now the layers */
+	for (ll = thiz->visible_layers; ll; ll = eina_list_next(ll))
+	{
+		Enesim_Renderer_Compound_Layer *l;
+
+		l = eina_list_data_get(ll);
+		_compound_layer_opencl_draw(l, thiz->opencl_s, &larea, -(area->x - x), -(area->y - y));
+	}
+	enesim_renderer_opencl_draw_default(r, s, rop, area, x, y);
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -750,6 +888,14 @@ static void _enesim_renderer_compound_class_init(void *k)
 	klass->opengl_initialize = _compound_opengl_initialize;
 	klass->opengl_setup = _compound_opengl_setup;
 	klass->opengl_cleanup = _compound_opengl_cleanup;
+#endif
+#if BUILD_OPENCL
+	klass->opencl_setup = _compound_opencl_setup;
+	klass->opencl_cleanup = _compound_opencl_cleanup;
+	klass->opencl_kernel_get = _compound_opencl_kernel_get;
+	klass->opencl_kernel_setup = _compound_opencl_kernel_setup;
+	klass->opencl_kernel_cleanup = _compound_opencl_kernel_cleanup;
+	klass->opencl_draw = _compound_opencl_draw;
 #endif
 }
 
@@ -800,9 +946,9 @@ static void _enesim_renderer_compound_instance_deinit(void *o)
 		enesim_renderer_compound_layer_unref(l);
 	}
 #if BUILD_OPENGL
-	if (thiz->s)
+	if (thiz->opengl_s)
 	{
-		enesim_surface_unref(thiz->s);
+		enesim_surface_unref(thiz->opengl_s);
 	}
 #endif
 }

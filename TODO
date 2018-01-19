@@ -28,6 +28,7 @@ Enesim
 + Implement a state full matrix transformation like OpenGL matrix handling
 + Implement an API similar to cairo's API, i.e drawing operators like PostScript
 + Add a registry system for the compiled OpenCL code
++ Only draw the area, not the whole surface
 
 Image
 =====
