@@ -268,6 +268,38 @@ static void _proxy_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
 	_proxy_state_cleanup(thiz, s);
 }
 #endif
+
+#if BUILD_OPENCL
+static Eina_Bool _proxy_opencl_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		Enesim_Log **l)
+{
+	Enesim_Renderer_Proxy *thiz;
+
+ 	thiz = ENESIM_RENDERER_PROXY(r);
+	if (!_proxy_state_setup(thiz, r, s, rop, l))
+		return EINA_FALSE;
+	return EINA_TRUE;
+}
+
+static void _proxy_opencl_cleanup(Enesim_Renderer *r,
+		Enesim_Surface *s)
+{
+	Enesim_Renderer_Proxy *thiz;
+
+ 	thiz = ENESIM_RENDERER_PROXY(r);
+	_proxy_state_cleanup(thiz, s);
+}
+
+static void _proxy_opencl_draw(Enesim_Renderer *r, Enesim_Surface *s,
+		Enesim_Rop rop, const Eina_Rectangle *area, int x, int y)
+{
+	Enesim_Renderer_Proxy *thiz;
+
+ 	thiz = ENESIM_RENDERER_PROXY(r);
+	enesim_renderer_opencl_draw(thiz->proxied, s, rop, area, x, y);
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -291,6 +323,11 @@ static void _enesim_renderer_proxy_class_init(void *k)
 #if BUILD_OPENGL
 	klass->opengl_setup = _proxy_opengl_setup;
 	klass->opengl_cleanup = _proxy_opengl_cleanup;
+#endif
+#if BUILD_OPENCL
+	klass->opencl_setup = _proxy_opencl_setup;
+	klass->opencl_cleanup = _proxy_opencl_cleanup;
+	klass->opencl_draw = _proxy_opencl_draw;
 #endif
 }
 
