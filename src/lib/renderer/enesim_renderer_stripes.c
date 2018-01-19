@@ -65,7 +65,7 @@ typedef struct _Enesim_Renderer_Stripes {
 	Eina_Bool changed : 1;
 	Enesim_Color final_color1;
 	Enesim_Color final_color2;
-	int hh0, hh;
+	Eina_F16p16 hh0, hh;
 	Enesim_Matrix_F16p16 matrix;
 	double ox;
 	double oy;
@@ -179,11 +179,11 @@ static void _span_projective(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
-	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
+	Eina_F16p16 hh = thiz->hh, hh0 = thiz->hh0, h0 = eina_f16p16_int_to(hh0);
 	Enesim_Color c0 = thiz->final_color1;
 	Enesim_Color c1 = thiz->final_color2;
 	uint32_t *dst = ddata;
-	unsigned int *d = dst, *e = d + len;
+	uint32_t *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx, zz;
 
 	enesim_coord_projective_setup(&xx, &yy, &zz, x, y, thiz->ox, thiz->oy, &thiz->matrix);
@@ -191,10 +191,10 @@ static void _span_projective(Enesim_Renderer *r,
 	while (d < e)
 	{
 		Eina_F16p16 syy, syyy;
-		unsigned int p0 = c0;
+		uint32_t p0 = c0;
 		int sy;
 
-		syyy = ((((int64_t)yy) << 16) / zz);
+		syyy = eina_f16p16_div(yy, zz);
 		syy = (syyy % hh);
 
 		if (syy < 0)
@@ -227,14 +227,14 @@ static void _span_projective_paints(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
-	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
+	Eina_F16p16 hh = thiz->hh, hh0 = thiz->hh0, h0 = eina_f16p16_int_to(hh0);
 	Enesim_Color c0 = thiz->final_color1;
 	Enesim_Color c1 = thiz->final_color2;
 	Enesim_Renderer *opaint, *epaint;
 	uint32_t *dst = ddata;
-	unsigned int *d = dst, *e = d + len;
+	uint32_t *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx, zz;
-	unsigned int *sbuf, *s = NULL;
+	uint32_t *sbuf, *s = NULL;
 
 	opaint = thiz->current.odd.paint;
 	epaint = thiz->current.even.paint;
@@ -244,7 +244,7 @@ static void _span_projective_paints(Enesim_Renderer *r,
 	}
 	if (opaint)
 	{
-		sbuf = alloca(len * sizeof(unsigned int));
+		sbuf = alloca(len * sizeof(uint32_t));
 		enesim_renderer_sw_draw(opaint, x, y, len, sbuf);
 		s = sbuf;
 	}
@@ -253,10 +253,10 @@ static void _span_projective_paints(Enesim_Renderer *r,
 	while (d < e)
 	{
 		Eina_F16p16 syy, syyy;
-		unsigned int p0 = c0, p1 = c1;
+		uint32_t p0 = c0, p1 = c1;
 		int sy;
 
-		syyy = ((((int64_t)yy) << 16) / zz);
+		syyy = eina_f16p16_div(yy, zz);
 		syy = (syyy % hh);
 
 		if (syy < 0)
@@ -310,18 +310,18 @@ static void _span_affine(Enesim_Renderer *r,
 		int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
-	int ayx = thiz->matrix.yx;
-	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
+	Eina_F16p16 ayx = thiz->matrix.yx;
+	Eina_F16p16 hh = thiz->hh, hh0 = thiz->hh0, h0 = eina_f16p16_int_to(hh0);
 	Enesim_Color c0 = thiz->final_color1;
 	Enesim_Color c1 = thiz->final_color2;
 	uint32_t *dst = ddata;
-	unsigned int *d = dst, *e = d + len;
+	uint32_t *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx;
 
 	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy,  &thiz->matrix);
 	while (d < e)
 	{
-		unsigned int p0 = c0;
+		uint32_t p0 = c0;
 		int syy = (yy % hh), sy;
 
 		if (syy < 0)
@@ -352,15 +352,15 @@ static void _span_affine_paints(Enesim_Renderer *r,
 		int x, int y, int len, void *ddata)
 {
 	Enesim_Renderer_Stripes *thiz = ENESIM_RENDERER_STRIPES(r);
-	int ayx = thiz->matrix.yx;
-	int hh = thiz->hh, hh0 = thiz->hh0, h0 = hh0 >> 16;
+	Eina_F16p16 ayx = thiz->matrix.yx;
+	Eina_F16p16 hh = thiz->hh, hh0 = thiz->hh0, h0 = eina_f16p16_int_to(hh0);
 	Enesim_Color c0 = thiz->final_color1;
 	Enesim_Color c1 = thiz->final_color2;
 	Enesim_Renderer *opaint, *epaint;
 	uint32_t *dst = ddata;
-	unsigned int *d = dst, *e = d + len;
+	uint32_t *d = dst, *e = d + len;
 	Eina_F16p16 yy, xx;
-	unsigned int *sbuf, *s = NULL;
+	uint32_t *sbuf, *s = NULL;
 
 	opaint = thiz->current.odd.paint;
 	epaint = thiz->current.even.paint;
@@ -370,7 +370,7 @@ static void _span_affine_paints(Enesim_Renderer *r,
 	}
 	if (opaint)
 	{
-		sbuf = alloca(len * sizeof(unsigned int));
+		sbuf = alloca(len * sizeof(uint32_t));
 		enesim_renderer_sw_draw(opaint, x, y, len, sbuf);
 		s = sbuf;
 	}
@@ -378,8 +378,8 @@ static void _span_affine_paints(Enesim_Renderer *r,
 	enesim_coord_affine_setup(&xx, &yy, x, y, thiz->ox, thiz->oy, &thiz->matrix);
 	while (d < e)
 	{
-		unsigned int p0 = c0, p1 = c1;
-		int syy = (yy % hh), sy;
+		Eina_F16p16 syy = (yy % hh), sy;
+		uint32_t p0 = c0, p1 = c1;
 
 		if (syy < 0)
 			syy += hh;
@@ -479,8 +479,8 @@ static Eina_Bool _stripes_sw_setup(Enesim_Renderer *r,
 	if (!thiz)
 		return EINA_FALSE;
 	if (!_stripes_state_setup(thiz, r)) return EINA_FALSE;
-	thiz->hh0 = (int)(thiz->current.even.thickness * 65536);
-	thiz->hh = (int)(thiz->hh0 + (thiz->current.odd.thickness * 65536));
+	thiz->hh0 = eina_f16p16_float_from(thiz->current.even.thickness);
+	thiz->hh = thiz->hh0 + eina_f16p16_float_from(thiz->current.odd.thickness);
 
 	if (thiz->current.even.paint)
 	{
