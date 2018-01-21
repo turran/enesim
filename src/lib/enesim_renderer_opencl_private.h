@@ -33,7 +33,7 @@ typedef enum _Enesim_Renderer_OpenCL_Kernel_Mode
 #if BUILD_OPENCL
 typedef struct _Enesim_Renderer_OpenCL_Data
 {
-	const Enesim_Renderer_OpenCL_Context_Data *context;
+	const Enesim_OpenCL_Context *context;
 	cl_device_id device;
 	/* to cache the kernel_get */
 	cl_kernel kernel;

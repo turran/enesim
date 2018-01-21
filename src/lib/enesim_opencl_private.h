@@ -20,36 +20,36 @@
 
 #include "CL/cl.h"
 
-typedef struct _Enesim_Renderer_OpenCL_Context_Program
+typedef struct _Enesim_OpenCL_Context_Program
 {
 	cl_program program;
 	char *program_name;
 	Eina_Bool cached;
-} Enesim_Renderer_OpenCL_Context_Program;
+} Enesim_OpenCL_Context_Program;
 
-struct _Enesim_Renderer_OpenCL_Context_Data
+struct _Enesim_OpenCL_Context
 {
 	cl_context context;
 	char *name;
-	Enesim_Renderer_OpenCL_Context_Program *lib;
-	Enesim_Renderer_OpenCL_Context_Program *header;
+	Enesim_OpenCL_Context_Program *lib;
+	Enesim_OpenCL_Context_Program *header;
 	Eina_Hash *programs;
 };
 
 void enesim_opencl_init(void);
 void enesim_opencl_shutdown(void);
 
-Enesim_Renderer_OpenCL_Context_Program *
-enesim_renderer_opencl_context_program_new(void);
-void enesim_renderer_opencl_context_program_free(
-		Enesim_Renderer_OpenCL_Context_Program *thiz);
-Enesim_Renderer_OpenCL_Context_Data *
-enesim_renderer_opencl_context_data_new(void);
+Enesim_OpenCL_Context_Program *
+enesim_opencl_context_program_new(void);
+void enesim_opencl_context_program_free(
+		Enesim_OpenCL_Context_Program *thiz);
+Enesim_OpenCL_Context *
+enesim_opencl_context_data_new(void);
 
-void enesim_renderer_opencl_context_data_free(
-		Enesim_Renderer_OpenCL_Context_Data *thiz);
+void enesim_opencl_context_data_free(
+		Enesim_OpenCL_Context *thiz);
 
-Enesim_Renderer_OpenCL_Context_Data * enesim_renderer_opencl_context_data_get(
+Enesim_OpenCL_Context * enesim_opencl_context_data_get(
 		cl_device_id device);
 
 #endif

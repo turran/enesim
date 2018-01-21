@@ -40,7 +40,7 @@
 /** @cond internal */
 typedef struct _Enesim_OpenCL_Pool
 {
-	const Enesim_Renderer_OpenCL_Context_Data *context;
+	const Enesim_OpenCL_Context *context;
 	cl_device_id device;
 	cl_command_queue queue;
 } Enesim_OpenCL_Pool;
@@ -197,13 +197,13 @@ EAPI Enesim_Pool * enesim_pool_opencl_new_platform_from(cl_platform_id platform_
 
 EAPI Enesim_Pool * enesim_pool_opencl_new_device_from(cl_device_id device_id)
 {
-	const Enesim_Renderer_OpenCL_Context_Data *context;
+	const Enesim_OpenCL_Context *context;
 	Enesim_OpenCL_Pool *thiz;
 	Enesim_Pool *p;
 	cl_command_queue queue;
 	cl_int ret;
 
-	context = enesim_renderer_opencl_context_data_get(device_id);
+	context = enesim_opencl_context_data_get(device_id);
 	if (!context)
 	{
 		ERR("Can not create the context");

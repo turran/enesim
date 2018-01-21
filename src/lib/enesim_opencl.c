@@ -131,7 +131,7 @@ static char * _get_cache_path(void)
 }
 
 static void _generate_program_cache(FILE *f, const char *name,
-		Enesim_Renderer_OpenCL_Context_Program *cprogram)
+		Enesim_OpenCL_Context_Program *cprogram)
 {
 	size_t binary_size;
 	size_t name_len;
@@ -181,7 +181,7 @@ done:
 static Eina_Bool _generate_programs_cache(const Eina_Hash *hash EINA_UNUSED,
 		const void *key, void *data, void *fdata)
 {
-	Enesim_Renderer_OpenCL_Context_Program *cprogram = data;
+	Enesim_OpenCL_Context_Program *cprogram = data;
 	FILE *f = fdata;
 	const char *name = key;
 
@@ -279,7 +279,7 @@ done:
 static Eina_Bool _generate_file_cache(const Eina_Hash *hash EINA_UNUSED,
 		const void *key EINA_UNUSED, void *data, void *fdata)
 {
-	Enesim_Renderer_OpenCL_Context_Data *cl_data = data;
+	Enesim_OpenCL_Context *cl_data = data;
 	Eina_Bool write_header = EINA_FALSE;
 	cl_device_id device = NULL;
 	cl_platform_id platform = NULL;
@@ -359,10 +359,10 @@ done:
 }
 
 static Eina_Bool _parse_program_cache(FILE *f,
-		Enesim_Renderer_OpenCL_Context_Data *cdata,
+		Enesim_OpenCL_Context *cdata,
 		cl_device_id device)
 {
-	Enesim_Renderer_OpenCL_Context_Program *cprogram;
+	Enesim_OpenCL_Context_Program *cprogram;
 	cl_program program;
 	cl_int binary_status;
 	cl_int cl_err;
@@ -394,7 +394,7 @@ static Eina_Bool _parse_program_cache(FILE *f,
 		goto done;
 	}
 
-	cprogram = enesim_renderer_opencl_context_program_new();
+	cprogram = enesim_opencl_context_program_new();
 	cprogram->program = program;
 	cprogram->program_name = program_name;
 	cprogram->cached = EINA_TRUE;
@@ -424,7 +424,7 @@ static Eina_Bool _parse_file_cache(FILE *f, const char *platform_name,
 		const char *device_name, Enesim_OpenCL_Library *lib,
 		Eina_Bool *remove)
 {
-	Enesim_Renderer_OpenCL_Context_Data *cdata;
+	Enesim_OpenCL_Context *cdata;
 	Eina_Bool ret = EINA_FALSE;
 	Eina_Bool do_remove = EINA_FALSE;
 	cl_platform_id *platforms = NULL, platform = NULL;
@@ -526,7 +526,7 @@ static Eina_Bool _parse_file_cache(FILE *f, const char *platform_name,
 		ERR("Impossible to create the context");
 		goto done;
 	}
-	cdata = enesim_renderer_opencl_context_data_new();
+	cdata = enesim_opencl_context_data_new();
 	cdata->context = context;
 	cdata->name = _get_name(platform_name, device_name);
 	eina_hash_add(_context_lut, cdata->name, cdata);
@@ -598,17 +598,17 @@ done:
 /*----------------------------------------------------------------------------*
  *                        Cache of programs per context                       *
  *----------------------------------------------------------------------------*/
-Enesim_Renderer_OpenCL_Context_Program *
-enesim_renderer_opencl_context_program_new(void)
+Enesim_OpenCL_Context_Program *
+enesim_opencl_context_program_new(void)
 {
-	Enesim_Renderer_OpenCL_Context_Program *thiz;
+	Enesim_OpenCL_Context_Program *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_OpenCL_Context_Program));
+	thiz = calloc(1, sizeof(Enesim_OpenCL_Context_Program));
 	return thiz;
 }
 
-void enesim_renderer_opencl_context_program_free(
-		Enesim_Renderer_OpenCL_Context_Program *thiz)
+void enesim_opencl_context_program_free(
+		Enesim_OpenCL_Context_Program *thiz)
 {
 	if (thiz->program_name)
 		free(thiz->program_name);
@@ -620,19 +620,19 @@ void enesim_renderer_opencl_context_program_free(
 /*----------------------------------------------------------------------------*
  *                             Cache of contexts                              *
  *----------------------------------------------------------------------------*/
-Enesim_Renderer_OpenCL_Context_Data *
-enesim_renderer_opencl_context_data_new(void)
+Enesim_OpenCL_Context *
+enesim_opencl_context_data_new(void)
 {
-	Enesim_Renderer_OpenCL_Context_Data *thiz;
+	Enesim_OpenCL_Context *thiz;
 
-	thiz = calloc(1, sizeof(Enesim_Renderer_OpenCL_Context_Data));
+	thiz = calloc(1, sizeof(Enesim_OpenCL_Context));
 	thiz->programs = eina_hash_string_superfast_new(
-		(Eina_Free_Cb)enesim_renderer_opencl_context_program_free);
+		(Eina_Free_Cb)enesim_opencl_context_program_free);
 	return thiz;
 }
 
-void enesim_renderer_opencl_context_data_free(
-		Enesim_Renderer_OpenCL_Context_Data *thiz)
+void enesim_opencl_context_data_free(
+		Enesim_OpenCL_Context *thiz)
 {
 	if (thiz->lib)
 		clReleaseProgram(thiz->lib->program);
@@ -645,10 +645,10 @@ void enesim_renderer_opencl_context_data_free(
 	free(thiz);
 }
 
-Enesim_Renderer_OpenCL_Context_Data * enesim_renderer_opencl_context_data_get(
+Enesim_OpenCL_Context * enesim_opencl_context_data_get(
 		cl_device_id device)
 {
-	Enesim_Renderer_OpenCL_Context_Data *cdata = NULL;
+	Enesim_OpenCL_Context *cdata = NULL;
 	cl_context context;
 	cl_platform_id platform;
 	cl_int cl_err;
@@ -677,7 +677,7 @@ Enesim_Renderer_OpenCL_Context_Data * enesim_renderer_opencl_context_data_get(
 			ERR("Impossible to create the context");
 			goto done;
 		}
-		cdata = enesim_renderer_opencl_context_data_new();
+		cdata = enesim_opencl_context_data_new();
 		cdata->context = context;
 		cdata->name = name;
 		eina_hash_add(_context_lut, name, cdata);
@@ -698,7 +698,7 @@ void enesim_opencl_init(void)
 	char *cache_dir;
 
 	_context_lut = eina_hash_string_superfast_new(
-			(Eina_Free_Cb)enesim_renderer_opencl_context_data_free);
+			(Eina_Free_Cb)enesim_opencl_context_data_free);
 	cache_dir = _get_cache_path();
 	if (cache_dir)
 	{

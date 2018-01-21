@@ -103,12 +103,12 @@ static Eina_Bool enesim_renderer_opencl_compile_kernel(
 	const char *source_name, const char *source, size_t source_size,
 	const char *kernel_name)
 {
-	Enesim_Renderer_OpenCL_Context_Data *cdata;
-	Enesim_Renderer_OpenCL_Context_Program *cprogram;
+	Enesim_OpenCL_Context *cdata;
+	Enesim_OpenCL_Context_Program *cprogram;
 	cl_int cl_err;
 	cl_kernel kernel;
 
-	cdata = (Enesim_Renderer_OpenCL_Context_Data *)thiz->context;
+	cdata = (Enesim_OpenCL_Context *)thiz->context;
 	if (!cdata->header)
 	{
 		cl_program hdr_program;
@@ -132,7 +132,7 @@ static Eina_Bool enesim_renderer_opencl_compile_kernel(
 					cl_err);
 			return EINA_FALSE;
 		}
-		cprogram = enesim_renderer_opencl_context_program_new();
+		cprogram = enesim_opencl_context_program_new();
 		cprogram->program = hdr_program;
 		cdata->header = cprogram;
 	}
@@ -178,7 +178,7 @@ static Eina_Bool enesim_renderer_opencl_compile_kernel(
 			_compile_error(program, thiz->device);
 			return EINA_FALSE;
 		}
-		cprogram = enesim_renderer_opencl_context_program_new();
+		cprogram = enesim_opencl_context_program_new();
 		cprogram->program = lib_program;
 		cdata->lib = cprogram;
 		clReleaseProgram(program);
@@ -187,7 +187,7 @@ static Eina_Bool enesim_renderer_opencl_compile_kernel(
 	cprogram = eina_hash_find(cdata->programs, source_name);
 	if (!cprogram)
 	{
-		cprogram = enesim_renderer_opencl_context_program_new();
+		cprogram = enesim_opencl_context_program_new();
 		eina_hash_add(cdata->programs, source_name, cprogram);
 	}
 	if (!cprogram->program)
