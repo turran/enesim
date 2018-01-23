@@ -65,7 +65,7 @@ static Eina_Bool _gradient_generate_1d_span(Enesim_Renderer_Gradient *thiz, Enes
 	slen = thiz->sw.len;
 
 	color = enesim_renderer_color_get(r);
-	if (color == 0xffffffff)
+	if (color == ENESIM_COLOR_FULL)
 		color = 0;
 	curr = eina_list_data_get(thiz->state.stops);
 	tmp = eina_list_next(thiz->state.stops);
