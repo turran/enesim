@@ -37,6 +37,10 @@
 #include "enesim_opengl_private.h"
 #endif
 
+#ifdef BUILD_OPENCL
+#include "Enesim_OpenCL.h"
+#endif
+
 #include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_renderer_gradient_private.h"
@@ -390,6 +394,64 @@ static void _gradient_opengl_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_
 	}
 }
 #endif
+
+#if BUILD_OPENCL
+static Eina_Bool _gradient_opencl_kernel_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, int argc,
+		Enesim_Renderer_OpenCL_Kernel_Mode *mode)
+{
+	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Class *klass;
+	Enesim_Renderer_OpenCL_Data *rdata;
+
+	/* The common kernel setup */
+	if (!_gradient_setup(r, NULL))
+		return EINA_FALSE;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	/* upload the spans to a buffer */
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+	thiz->cl.gen_stops = clCreateBuffer(rdata->context->context,
+			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+			sizeof(cl_int) * thiz->sw.len, thiz->sw.src, NULL);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem),
+			&thiz->cl.gen_stops);
+	/* the implementation kernel setup */
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	if (!klass->opencl_kernel_setup)
+		return EINA_FALSE;
+
+	if (!klass->opencl_kernel_setup(r, s, argc, mode))
+		return EINA_FALSE;
+
+	return EINA_TRUE;
+}
+
+static void _gradient_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s)
+{
+	Enesim_Renderer_Gradient *thiz;
+	Enesim_Renderer_Gradient_Class *klass;
+
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+
+	/* the common clean up */
+	_gradient_cleanup(r);
+
+	/* the specific cleanup */
+	if (thiz->cl.gen_stops)
+	{
+		clReleaseMemObject(thiz->cl.gen_stops);
+		thiz->cl.gen_stops = NULL;
+	}
+
+	/* the implementation clean up */
+	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
+	if (klass->opencl_kernel_cleanup)
+	{
+		klass->opencl_kernel_cleanup(r, s);
+	}
+}
+#endif
 /*----------------------------------------------------------------------------*
  *                            Object definition                               *
  *----------------------------------------------------------------------------*/
@@ -411,6 +473,10 @@ static void _enesim_renderer_gradient_class_init(void *k)
 #if BUILD_OPENGL
 	klass->opengl_setup = _gradient_opengl_setup;
 	klass->opengl_cleanup = _gradient_opengl_cleanup;
+#endif
+#if BUILD_OPENCL
+	klass->opencl_kernel_setup = _gradient_opencl_kernel_setup;
+	klass->opencl_kernel_cleanup = _gradient_opencl_kernel_cleanup;
 #endif
 }
 

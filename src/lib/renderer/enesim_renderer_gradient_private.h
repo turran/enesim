@@ -303,6 +303,11 @@ typedef struct _Enesim_Renderer_Gradient
 		GLuint gen_stops;
 	} gl;
 #endif
+#if BUILD_OPENCL
+	struct {
+		cl_mem gen_stops;
+	} cl;
+#endif
 	/* private */
 	Enesim_Repeat_Mode past_mode;
 	Eina_Bool changed : 1;
@@ -320,6 +325,9 @@ typedef struct _Enesim_Renderer_Gradient_Class
 	/* software based functions */
 	Enesim_Renderer_Sw_Setup sw_setup;
 	Enesim_Renderer_Sw_Cleanup sw_cleanup;
+	/* opencl based functions */
+	Enesim_Renderer_OpenCL_Kernel_Setup opencl_kernel_setup;
+	Enesim_Renderer_OpenCL_Kernel_Cleanup opencl_kernel_cleanup;
 	/* opengl based functions */
 	Enesim_Renderer_OpenGL_Setup opengl_setup;
 	Enesim_Renderer_OpenGL_Cleanup opengl_cleanup;
