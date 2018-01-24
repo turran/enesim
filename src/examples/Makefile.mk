@@ -44,6 +44,7 @@ src/examples/enesim_renderer_checker01 \
 src/examples/enesim_renderer_circle01 \
 src/examples/enesim_renderer_circle02 \
 src/examples/enesim_renderer_gradient_linear01 \
+src/examples/enesim_renderer_gradient_radial01 \
 src/examples/enesim_renderer_hints01 \
 src/examples/enesim_renderer_image01 \
 src/examples/enesim_renderer_map_quad01 \
@@ -138,6 +139,11 @@ src_examples_enesim_renderer_gradient_linear01_SOURCES = \
 src/examples/enesim_renderer_gradient_linear01.c
 src_examples_enesim_renderer_gradient_linear01_CPPFLAGS = $(examples_CPPFLAGS)
 src_examples_enesim_renderer_gradient_linear01_LDADD = $(examples_LDADD)
+
+src_examples_enesim_renderer_gradient_radial01_SOURCES = \
+src/examples/enesim_renderer_gradient_radial01.c
+src_examples_enesim_renderer_gradient_radial01_CPPFLAGS = $(examples_CPPFLAGS)
+src_examples_enesim_renderer_gradient_radial01_LDADD = $(examples_LDADD)
 
 src_examples_enesim_renderer_blur01_SOURCES = \
 src/examples/enesim_renderer_blur01.c
