@@ -403,27 +403,83 @@ static Eina_Bool _gradient_opencl_kernel_setup(Enesim_Renderer *r,
 	Enesim_Renderer_Gradient *thiz;
 	Enesim_Renderer_Gradient_Class *klass;
 	Enesim_Renderer_OpenCL_Data *rdata;
+	cl_image_format format;
+	cl_image_desc desc = { 0 };
+	cl_int cl_err;
+	cl_bool normalized_coords;
+	cl_addressing_mode addressing_mode = CL_ADDRESS_CLAMP;
+	cl_filter_mode filter_mode;
+	int curr_argc = argc;
 
-	/* The common kernel setup */
-	if (!_gradient_setup(r, NULL))
-		return EINA_FALSE;
-
-	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
-	/* upload the spans to a buffer */
-	thiz = ENESIM_RENDERER_GRADIENT(r);
-	thiz->cl.gen_stops = clCreateBuffer(rdata->context->context,
-			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-			sizeof(cl_int) * thiz->sw.len, thiz->sw.src, NULL);
-	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem),
-			&thiz->cl.gen_stops);
-	/* the implementation kernel setup */
+	/* first do the implementation setup */
 	klass = ENESIM_RENDERER_GRADIENT_CLASS_GET(r);
 	if (!klass->opencl_kernel_setup)
 		return EINA_FALSE;
 
-	if (!klass->opencl_kernel_setup(r, s, argc, mode))
+	/* give space for the image and the sampler */
+	if (!klass->opencl_kernel_setup(r, s, argc + 2, mode))
 		return EINA_FALSE;
 
+	/* now the common setup */
+	if (!_gradient_setup(r, NULL))
+		return EINA_FALSE;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	/* upload the spans to a texture */
+	thiz = ENESIM_RENDERER_GRADIENT(r);
+	format.image_channel_order = CL_RGBA;
+	format.image_channel_data_type = CL_UNSIGNED_INT8;
+	desc.image_type = CL_MEM_OBJECT_IMAGE1D;
+	desc.image_width = thiz->sw.len;
+	desc.image_array_size = 1;
+	desc.image_row_pitch = 0;
+	desc.image_slice_pitch = 0;
+	desc.num_mip_levels = 0;
+	desc.buffer = NULL;
+	thiz->cl.gen_stops = clCreateImage(rdata->context->context,
+			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+			&format, &desc, thiz->sw.src, &cl_err);
+	if (cl_err != CL_SUCCESS)
+	{
+		ERR("Impossible to create the gradient span %d", cl_err);
+		return EINA_FALSE;
+	}
+	clSetKernelArg(rdata->kernel, curr_argc++, sizeof(cl_mem),
+			&thiz->cl.gen_stops);
+	/* set the sampler based on the gradient mode */
+	normalized_coords = EINA_FALSE;
+	filter_mode = CL_FILTER_NEAREST;
+	switch (thiz->state.mode)
+	{
+		case ENESIM_REPEAT_MODE_RESTRICT:
+		addressing_mode = CL_ADDRESS_CLAMP;
+		break;
+
+		case ENESIM_REPEAT_MODE_REPEAT:
+		addressing_mode = CL_ADDRESS_REPEAT;
+		break;
+
+		case ENESIM_REPEAT_MODE_REFLECT:
+		addressing_mode = CL_ADDRESS_MIRRORED_REPEAT;
+		break;
+
+		case ENESIM_REPEAT_MODE_PAD:
+		addressing_mode = CL_ADDRESS_CLAMP_TO_EDGE;
+		break;
+
+		default:
+		break;
+	}
+	thiz->cl.repeat_mode = clCreateSampler(rdata->context->context,
+ 			normalized_coords, addressing_mode,
+			filter_mode, &cl_err);
+	if (cl_err != CL_SUCCESS)
+	{
+		ERR("Impossible to create the gradient sampler %d", cl_err);
+		return EINA_FALSE;
+	}
+	clSetKernelArg(rdata->kernel, curr_argc++, sizeof(cl_sampler),
+			&thiz->cl.repeat_mode);
 	return EINA_TRUE;
 }
 
@@ -442,6 +498,11 @@ static void _gradient_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *
 	{
 		clReleaseMemObject(thiz->cl.gen_stops);
 		thiz->cl.gen_stops = NULL;
+	}
+	if (thiz->cl.repeat_mode)
+	{
+		clReleaseSampler(thiz->cl.repeat_mode);
+		thiz->cl.repeat_mode = NULL;
 	}
 
 	/* the implementation clean up */

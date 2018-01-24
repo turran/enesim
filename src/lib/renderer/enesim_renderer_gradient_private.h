@@ -306,6 +306,7 @@ typedef struct _Enesim_Renderer_Gradient
 #if BUILD_OPENCL
 	struct {
 		cl_mem gen_stops;
+		cl_sampler repeat_mode;
 	} cl;
 #endif
 	/* private */

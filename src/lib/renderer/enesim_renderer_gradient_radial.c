@@ -33,9 +33,19 @@
 #include "enesim_object_class.h"
 #include "enesim_object_instance.h"
 
+#ifdef BUILD_OPENGL
+#include "Enesim_OpenGL.h"
+#include "enesim_opengl_private.h"
+#endif
+
+#ifdef BUILD_OPENCL
+#include "Enesim_OpenCL.h"
+#endif
+
 #include "enesim_color_private.h"
 #include "enesim_renderer_private.h"
 #include "enesim_coord_private.h"
+#include "enesim_surface_private.h"
 #include "enesim_renderer_gradient_private.h"
 
 /*============================================================================*
@@ -278,6 +288,13 @@ static Eina_Bool _radial_setup(Enesim_Renderer *r, Enesim_Matrix *m)
 	return EINA_TRUE;
 }
 
+static void _radial_cleanup(Enesim_Renderer *r)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+
+	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
+	thiz->changed = EINA_FALSE;
+}
 
 GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, restrict);
 GRADIENT_IDENTITY(Enesim_Renderer_Gradient_Radial, ENESIM_RENDERER_GRADIENT_RADIAL, _radial_distance, repeat);
@@ -311,9 +328,7 @@ static const char * _radial_name(Enesim_Renderer *r EINA_UNUSED)
 
 static void _radial_sw_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
 {
-	Enesim_Renderer_Gradient_Radial *thiz;
-	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
-	thiz->changed = EINA_FALSE;
+	_radial_cleanup(r);
 }
 
 static Eina_Bool _radial_sw_setup(Enesim_Renderer *r,
@@ -391,6 +406,86 @@ static Eina_Bool _radial_opengl_setup(Enesim_Renderer *r,
 static void _radial_opengl_cleanup(Enesim_Renderer *r EINA_UNUSED,
 		Enesim_Surface *s EINA_UNUSED)
 {
+	_radial_cleanup(r);
+}
+#endif
+
+#if BUILD_OPENCL
+static Eina_Bool _radial_opencl_kernel_get(Enesim_Renderer *r,
+		Enesim_Surface *s, Enesim_Rop rop,
+		const char **program_name, const char **program_source,
+		size_t *program_length, const char **kernel_name)
+{
+	*program_name = "gradient_radial";
+	*program_source =
+	"#include \"enesim_opencl.h\"\n" 
+	#include "enesim_renderer_gradient_radial.cl"
+	*program_length = strlen(*program_source);
+	*kernel_name = "gradient_radial";
+
+	return EINA_TRUE;
+}
+
+static Eina_Bool _radial_opencl_kernel_setup(Enesim_Renderer *r,
+		Enesim_Surface *s, int argc,
+		Enesim_Renderer_OpenCL_Kernel_Mode *mode)
+{
+	Enesim_Renderer_Gradient_Radial *thiz;
+	Enesim_Renderer_OpenCL_Data *rdata;
+	Enesim_Buffer_OpenCL_Data *sdata;
+	Enesim_Matrix inv;
+	cl_float cl_matrix[9];
+	cl_mem cl_mmatrix;
+	cl_float2 oxy;
+	cl_float2 focus;
+	cl_float2 center;
+	cl_float zf;
+	cl_float cl_scale;
+	cl_float rad2;
+	double ox, oy;
+
+ 	thiz = ENESIM_RENDERER_GRADIENT_RADIAL(r);
+	if (!_radial_setup(r, &inv))
+		return EINA_FALSE;
+
+	rdata = enesim_renderer_backend_data_get(r, ENESIM_BACKEND_OPENCL);
+	sdata = enesim_surface_backend_data_get(s);
+
+	/* the matrix */
+	cl_matrix[0] = inv.xx; cl_matrix[1] = inv.xy; cl_matrix[2] = inv.xz;
+	cl_matrix[3] = inv.yx; cl_matrix[4] = inv.yy; cl_matrix[5] = inv.yz;
+	cl_matrix[6] = inv.zx; cl_matrix[7] = inv.zy; cl_matrix[8] = inv.zz;
+	cl_mmatrix = clCreateBuffer(sdata->context->context,
+			CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+			sizeof(cl_matrix), &cl_matrix, NULL);
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_mem), (void *)&cl_mmatrix);
+	/* the origin */
+	enesim_renderer_origin_get(r, &ox, &oy);
+	oxy.x = ox; oxy.y = oy;
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_float2), &oxy);
+	/* the center */
+	center.x = thiz->center.x; center.y = thiz->center.y;
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_float2), &center);
+	/* the focus */
+	focus.x = thiz->fx; focus.y = thiz->fy;
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_float2), &focus);
+	/* the scale */
+	cl_scale = thiz->scale;
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_float), &cl_scale);
+	/* the zf */
+	zf = thiz->zf;
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_float), &zf);
+
+	/* the rad2 */
+	rad2 = thiz->r * thiz->r;
+	clSetKernelArg(rdata->kernel, argc++, sizeof(cl_float), &rad2);
+	*mode = ENESIM_RENDERER_OPENCL_KERNEL_MODE_PIXEL;
+	return EINA_TRUE;
+}
+
+static void _radial_opencl_kernel_cleanup(Enesim_Renderer *r, Enesim_Surface *s EINA_UNUSED)
+{
+	_radial_cleanup(r);
 }
 #endif
 /*----------------------------------------------------------------------------*
@@ -411,6 +506,9 @@ static void _enesim_renderer_gradient_radial_class_init(void *k)
 #if BUILD_OPENGL
 	r_klass->opengl_initialize = _radial_opengl_initialize;
 #endif
+#if BUILD_OPENCL
+	r_klass->opencl_kernel_get = _radial_opencl_kernel_get;
+#endif
 
 	klass = ENESIM_RENDERER_GRADIENT_CLASS(k);
 	klass->length = _radial_length;
@@ -420,6 +518,10 @@ static void _enesim_renderer_gradient_radial_class_init(void *k)
 #if BUILD_OPENGL
 	klass->opengl_setup = _radial_opengl_setup;
 	klass->opengl_cleanup = _radial_opengl_cleanup;
+#endif
+#if BUILD_OPENCL
+	klass->opencl_kernel_setup = _radial_opencl_kernel_setup;
+	klass->opencl_kernel_cleanup = _radial_opencl_kernel_cleanup;
 #endif
 	klass->bounds_get = _radial_bounds_get;
 
